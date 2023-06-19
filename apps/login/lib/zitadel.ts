@@ -21,10 +21,7 @@ import {
   VerifyEmailResponse,
   SetSessionResponse,
   DeleteSessionResponse,
-  VerifyPasskeyRegistrationRequest,
   VerifyPasskeyRegistrationResponse,
-  orgMetadata,
-  SetUserPassword,
   SetHumanPasswordResponse,
 } from "@zitadel/server";
 import { Metadata } from "nice-grpc";
@@ -84,12 +81,12 @@ export async function getPasswordComplexitySettings(
 export async function createSession(
   server: ZitadelServer,
   loginName: string,
-  password?: string
+  password: string | undefined
 ): Promise<CreateSessionResponse | undefined> {
   const sessionService = session.getSession(server);
   return password
     ? sessionService.createSession(
-        { checks: { user: { loginName } }, password: { password } },
+        { checks: { user: { loginName }, password: { password } } },
         {}
       )
     : sessionService.createSession({ checks: { user: { loginName } } }, {});
@@ -165,19 +162,6 @@ export async function addHumanUser(
       {}
     )
     .then((resp: AddHumanUserResponse) => {
-      return resp.userId;
-    });
-}
-
-export async function setHumanPassword(
-  server: ZitadelServer,
-  userId: string,
-  password: string
-): Promise<string> {
-  const mgmt = management.getManagement(server);
-  return mgmt
-    .setHumanPassword({ userId, password }, {})
-    .then((resp: SetHumanPasswordResponse) => {
       return resp.userId;
     });
 }
