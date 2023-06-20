@@ -153,7 +153,13 @@ func (s *Tester) createSystemUser(ctx context.Context) {
 		})
 		if err != nil {
 			logging.OnError(err).Warn("add machine user")
-			user, err = s.Queries.GetUser(ctx, true, true, query)
+			for i := 0; i < 5; i++ {
+				time.Sleep(1 * time.Second)
+				user, err = s.Queries.GetUser(ctx, true, true, query)
+				if user != nil {
+					break
+				}
+			}
 		}
 	}
 	logging.OnError(err).Fatal("get user")
