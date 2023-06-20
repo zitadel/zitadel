@@ -60,6 +60,22 @@ func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse
 	return resp
 }
 
+func (s *Tester) CreateUserIDPlink(ctx context.Context, userID, externalID, idpID, username string) *user.AddIDPLinkResponse {
+	resp, err := s.Client.UserV2.AddIDPLink(
+		ctx,
+		&user.AddIDPLinkRequest{
+			UserId: userID,
+			IdpLink: &user.IDPLink{
+				IdpId:         idpID,
+				IdpExternalId: externalID,
+				DisplayName:   username,
+			},
+		},
+	)
+	logging.OnError(err).Fatal("create human user link")
+	return resp
+}
+
 func (s *Tester) RegisterUserPasskey(ctx context.Context, userID string) {
 	reg, err := s.Client.UserV2.CreatePasskeyRegistrationLink(ctx, &user.CreatePasskeyRegistrationLinkRequest{
 		UserId: userID,

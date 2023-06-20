@@ -105,12 +105,12 @@ func CheckIntent(intentID, token string) SessionCommand {
 				return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser")
 			}
 		} else {
-			linkWriteModel := NewUserIDPLinkWriteModel(cmd.sessionWriteModel.UserID, cmd.intentWriteModel.IDPID, cmd.intentWriteModel.IDPUser, cmd.intentWriteModel.ResourceOwner)
+			linkWriteModel := NewUserIDPLinkWriteModel(cmd.sessionWriteModel.UserID, cmd.intentWriteModel.IDPID, cmd.intentWriteModel.UserID, cmd.intentWriteModel.ResourceOwner)
 			err := cmd.eventstore.FilterToQueryReducer(ctx, linkWriteModel)
 			if err != nil {
 				return err
 			}
-			if linkWriteModel.State != domain.UserIDPLinkStateActive || linkWriteModel.AggregateID != cmd.sessionWriteModel.UserID {
+			if linkWriteModel.State != domain.UserIDPLinkStateActive {
 				return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser")
 			}
 		}

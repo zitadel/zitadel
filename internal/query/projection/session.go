@@ -84,7 +84,7 @@ func (p *sessionProjection) reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  session.IntentCheckedType,
-					Reduce: p.reducePasswordChecked,
+					Reduce: p.reduceIntentChecked,
 				},
 				{
 					Event:  session.PasskeyCheckedType,
@@ -168,7 +168,7 @@ func (p *sessionProjection) reducePasswordChecked(event eventstore.Event) (*hand
 		[]handler.Column{
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
-			handler.NewCol(SessionColumnIntentCheckedAt, e.CheckedAt),
+			handler.NewCol(SessionColumnPasswordCheckedAt, e.CheckedAt),
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnID, e.Aggregate().ID),
@@ -180,7 +180,7 @@ func (p *sessionProjection) reducePasswordChecked(event eventstore.Event) (*hand
 func (p *sessionProjection) reduceIntentChecked(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*session.IntentCheckedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SDgrb", "reduce.wrong.event.type %s", session.IntentCheckedType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SDgr2", "reduce.wrong.event.type %s", session.IntentCheckedType)
 	}
 
 	return crdb.NewUpdateStatement(
@@ -188,7 +188,7 @@ func (p *sessionProjection) reduceIntentChecked(event eventstore.Event) (*handle
 		[]handler.Column{
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
-			handler.NewCol(SessionColumnPasswordCheckedAt, e.CheckedAt),
+			handler.NewCol(SessionColumnIntentCheckedAt, e.CheckedAt),
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnID, e.Aggregate().ID),
