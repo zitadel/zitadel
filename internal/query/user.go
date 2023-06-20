@@ -370,6 +370,7 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwner
 	if shouldTriggerBulk {
 		projection.UserProjection.Trigger(ctx)
 		projection.LoginNameProjection.Trigger(ctx)
+		ctx = call.WithTimestamp(ctx)
 	}
 
 	query, scan := prepareUserQuery(ctx, q.client)
