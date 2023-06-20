@@ -1,0 +1,12 @@
+{
+  "extends": [
+    "//"
+  ],
+  "pipeline": {
+    "generate": {
+      "outputs": [
+        "src/proto/**"
+      ]
+    }
+  }
+}

@@ -12,7 +12,9 @@
     "test": {},
     "test:unit": {},
     "test:integration": {},
-    "test:watch": {},
+    "test:watch": {
+      "persistent": true
+    },
     "lint": {},
     "lint:fix": {},
     "dev": {
@@ -21,49 +23,6 @@
     },
     "clean": {
       "cache": false
-    },
-    "@zitadel/server#generate": {
-      "outputs": [
-        "src/proto/**"
-      ]
-    },
-    "@zitadel/client#generate": {
-      "outputs": [
-        "src/proto/**"
-      ]
-    },
-    "@zitadel/login#build": {
-      "outputs": [
-        "dist/**",
-        ".next/**",
-        "!.next/cache/**"
-      ],
-      "dependsOn": [
-        "^build"
-      ]
-    },
-    "@zitadel/login#test": {
-      "dependsOn": [
-        "@zitadel/server#build",
-        "@zitadel/react#build"
-      ]
-    },
-    "@zitadel/login#test:integration": {
-      "dependsOn": [
-        "@zitadel/server#build",
-        "@zitadel/react#build"
-      ]
-    },
-    "@zitadel/login#test:unit": {
-      "dependsOn": [
-        "@zitadel/server#build"
-      ]
-    },
-    "@zitadel/login#test:watch": {
-      "dependsOn": [
-        "@zitadel/server#build",
-        "@zitadel/react#build"
-      ]
     }
   },
   "globalDependencies": [
