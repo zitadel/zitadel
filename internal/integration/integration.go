@@ -151,11 +151,13 @@ func (s *Tester) createSystemUser(ctx context.Context) {
 			Description:     "who cares?",
 			AccessTokenType: domain.OIDCTokenTypeJWT,
 		})
+		logging.OnError(err).Warn("add machine user")
+		user, err = s.Queries.GetUser(ctx, true, true, query)
 		if err != nil {
-			logging.OnError(err).Warn("add machine user")
 			for i := 0; i < 5; i++ {
 				time.Sleep(1 * time.Second)
 				user, err = s.Queries.GetUser(ctx, true, true, query)
+				logging.OnError(err).Warn("get machine user")
 				if user != nil {
 					break
 				}
