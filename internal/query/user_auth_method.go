@@ -6,6 +6,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
@@ -71,9 +72,9 @@ var (
 	authMethodTypeTypes      = UserAuthMethodColumnMethodType.setTable(authMethodTypeTable)
 	authMethodTypeState      = UserAuthMethodColumnState.setTable(authMethodTypeTable)
 
-	userIDPsCountTable      = userAuthMethodTable.setAlias("user_idps_count")
-	userIDPsCountUserID     = UserAuthMethodColumnUserID.setTable(userIDPsCountTable)
-	userIDPsCountInstanceID = UserAuthMethodColumnInstanceID.setTable(userIDPsCountTable)
+	userIDPsCountTable      = idpUserLinkTable.setAlias("user_idps_count")
+	userIDPsCountUserID     = IDPUserLinkUserIDCol.setTable(userIDPsCountTable)
+	userIDPsCountInstanceID = IDPUserLinkInstanceIDCol.setTable(userIDPsCountTable)
 	userIDPsCountCount      = Column{
 		name:  "count",
 		table: userIDPsCountTable,
@@ -350,7 +351,7 @@ func prepareActiveUserAuthMethodTypesQuery(ctx context.Context, db prepareDataba
 		func(rows *sql.Rows) (*AuthMethodTypes, error) {
 			userAuthMethodTypes := make([]domain.UserAuthMethodType, 0)
 			var passwordSet sql.NullBool
-			var idp uint64
+			var idp sql.NullInt64
 			for rows.Next() {
 				var authMethodType sql.NullInt16
 				err := rows.Scan(
@@ -368,7 +369,8 @@ func prepareActiveUserAuthMethodTypesQuery(ctx context.Context, db prepareDataba
 			if passwordSet.Valid && passwordSet.Bool {
 				userAuthMethodTypes = append(userAuthMethodTypes, domain.UserAuthMethodTypePassword)
 			}
-			if idp > 0 {
+			if idp.Valid && idp.Int64 > 0 {
+				logging.Error("IDP", idp.Int64)
 				userAuthMethodTypes = append(userAuthMethodTypes, domain.UserAuthMethodTypeIDP)
 			}
 

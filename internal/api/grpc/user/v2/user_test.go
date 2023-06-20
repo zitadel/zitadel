@@ -213,7 +213,7 @@ func Test_authMethodTypesToPb(t *testing.T) {
 		{
 			"empty list",
 			nil,
-			nil,
+			[]user.AuthenticationMethodType{},
 		},
 		{
 			"list",
