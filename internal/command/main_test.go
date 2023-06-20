@@ -46,6 +46,12 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	return es
 }
 
+func expectEventstore(expects ...expect) func(*testing.T) *eventstore.Eventstore {
+	return func(t *testing.T) *eventstore.Eventstore {
+		return eventstoreExpect(t, expects...)
+	}
+}
+
 func eventPusherToEvents(eventsPushes ...eventstore.Command) []*repository.Event {
 	events := make([]*repository.Event, len(eventsPushes))
 	for i, event := range eventsPushes {
