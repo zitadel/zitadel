@@ -34,7 +34,7 @@ const (
 type sessionProjection struct{}
 
 func newSessionProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(userProjection))
+	return handler.NewHandler(ctx, &config, new(sessionProjection))
 }
 
 func (*sessionProjection) Name() string {
