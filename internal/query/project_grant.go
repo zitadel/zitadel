@@ -8,6 +8,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
@@ -116,7 +118,8 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, 
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.ProjectGrantProjection.Trigger(ctx, false)
+		err := projection.ProjectGrantProjection.Trigger(ctx, false)
+		logging.OnError(err).Debug("trigger failed")
 	}
 
 	stmt, scan := prepareProjectGrantQuery(ctx, q.client)

@@ -8,6 +8,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -193,7 +195,8 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.IDPProjection.Trigger(ctx, false)
+		err := projection.IDPProjection.Trigger(ctx, false)
+		logging.OnError(err).Debug("trigger failed")
 	}
 
 	eq := sq.Eq{

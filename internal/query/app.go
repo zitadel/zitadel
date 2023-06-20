@@ -253,7 +253,8 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bo
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.AppProjection.Trigger(ctx, false)
+		err := projection.AppProjection.Trigger(ctx, false)
+		logging.OnError(err).Debug("trigger failed")
 	}
 
 	stmt, scan := prepareAppQuery(ctx, q.client)

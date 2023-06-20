@@ -8,6 +8,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -86,7 +88,8 @@ func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, shouldTriggerBulk 
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.PasswordAgeProjection.Trigger(ctx, false)
+		err := projection.PasswordAgeProjection.Trigger(ctx, false)
+		logging.OnError(err).Debug("trigger failed")
 	}
 	eq := sq.Eq{PasswordAgeColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
@@ -116,7 +119,8 @@ func (q *Queries) DefaultPasswordAgePolicy(ctx context.Context, shouldTriggerBul
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.PasswordAgeProjection.Trigger(ctx, false)
+		err := projection.PasswordAgeProjection.Trigger(ctx, false)
+		logging.OnError(err).Debug("trigger failed")
 	}
 
 	stmt, scan := preparePasswordAgePolicyQuery(ctx, q.client)

@@ -338,8 +338,10 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.UserProjection.Trigger(ctx, false)
-		projection.LoginNameProjection.Trigger(ctx, false)
+		err := projection.UserProjection.Trigger(ctx, false)
+		logging.OnError(err).Debug("trigger failed")
+		err = projection.LoginNameProjection.Trigger(ctx, false)
+		logging.OnError(err).Debug("trigger failed")
 		ctx = call.WithTimestamp(ctx)
 	}
 
@@ -368,8 +370,10 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwner
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.UserProjection.Trigger(ctx, false)
-		projection.LoginNameProjection.Trigger(ctx, false)
+		err = projection.UserProjection.Trigger(ctx, false)
+		logging.OnError(err).Debug("trigger failed")
+		err = projection.LoginNameProjection.Trigger(ctx, false)
+		logging.OnError(err).Debug("trigger failed")
 		ctx = call.WithTimestamp(ctx)
 	}
 
@@ -469,8 +473,10 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		projection.UserProjection.Trigger(ctx, false)
-		projection.LoginNameProjection.Trigger(ctx, false)
+		err = projection.UserProjection.Trigger(ctx, false)
+		logging.OnError(err).Debug("trigger failed")
+		err = projection.LoginNameProjection.Trigger(ctx, false)
+		logging.OnError(err).Debug("trigger failed")
 	}
 
 	query, scan := prepareNotifyUserQuery(ctx, q.client)
@@ -498,8 +504,10 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		projection.UserProjection.Trigger(ctx, false)
-		projection.LoginNameProjection.Trigger(ctx, false)
+		err = projection.UserProjection.Trigger(ctx, false)
+		logging.OnError(err).Debug("trigger failed")
+		err = projection.LoginNameProjection.Trigger(ctx, false)
+		logging.OnError(err).Debug("trigger failed")
 	}
 
 	query, scan := prepareNotifyUserQuery(ctx, q.client)

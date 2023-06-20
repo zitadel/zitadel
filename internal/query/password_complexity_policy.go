@@ -8,6 +8,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -38,7 +40,8 @@ func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, shouldTrigg
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.PasswordComplexityProjection.Trigger(ctx, false)
+		err := projection.PasswordComplexityProjection.Trigger(ctx, false)
+		logging.OnError(err).Debug("trigger failed")
 	}
 	eq := sq.Eq{PasswordComplexityColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
@@ -68,7 +71,8 @@ func (q *Queries) DefaultPasswordComplexityPolicy(ctx context.Context, shouldTri
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.PasswordComplexityProjection.Trigger(ctx, false)
+		err := projection.PasswordComplexityProjection.Trigger(ctx, false)
+		logging.OnError(err).Debug("trigger failed")
 	}
 
 	stmt, scan := preparePasswordComplexityPolicyQuery(ctx, q.client)

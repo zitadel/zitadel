@@ -8,6 +8,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -82,7 +84,8 @@ func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk boo
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.OrgMetadataProjection.Trigger(ctx, false)
+		err := projection.OrgMetadataProjection.Trigger(ctx, false)
+		logging.OnError(err).Debug("trigger failed")
 	}
 
 	query, scan := prepareOrgMetadataQuery(ctx, q.client)
@@ -111,7 +114,8 @@ func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool,
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.OrgMetadataProjection.Trigger(ctx, false)
+		err := projection.OrgMetadataProjection.Trigger(ctx, false)
+		logging.OnError(err).Debug("trigger failed")
 	}
 	eq := sq.Eq{
 		OrgMetadataOrgIDCol.identifier():      orgID,
