@@ -730,9 +730,9 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 	})
 	require.NoError(t, err)
 	idpLink, err := Tester.Client.UserV2.AddIDPLink(CTX, &user.AddIDPLinkRequest{UserId: userMultipleAuth, IdpLink: &user.IDPLink{
-		IdpId:         provider.GetId(),
-		IdpExternalId: "external-id",
-		DisplayName:   "displayName",
+		IdpId:    provider.GetId(),
+		UserId:   "external-id",
+		UserName: "displayName",
 	}})
 	require.NoError(t, err)
 
