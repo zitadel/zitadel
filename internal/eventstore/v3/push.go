@@ -96,7 +96,7 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 			return nil, nil, nil, err
 		}
 
-		placeHolders[i] = fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
+		placeHolders[i] = fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, 'zitadel', $%d, $%d, $%d)",
 			i*argsPerCommand+1,
 			i*argsPerCommand+2,
 			i*argsPerCommand+3,
