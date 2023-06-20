@@ -131,6 +131,18 @@ func expectPushFailed(err error, events []*repository.Event, uniqueConstraints .
 	}
 }
 
+func expectRandomPush(events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) expect {
+	return func(m *mock.MockRepository) {
+		m.ExpectRandomPush(events, uniqueConstraints...)
+	}
+}
+
+func expectRandomPushFailed(err error, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) expect {
+	return func(m *mock.MockRepository) {
+		m.ExpectRandomPushFailed(err, events, uniqueConstraints...)
+	}
+}
+
 func expectFilter(events ...*repository.Event) expect {
 	return func(m *mock.MockRepository) {
 		m.ExpectFilterEvents(events...)
