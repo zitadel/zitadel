@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -604,8 +605,13 @@ func pushAggregates(pusher eventstore.Pusher, aggregateCommands [][]eventstore.C
 	errs := make([]error, 0)
 	errsMu := sync.Mutex{}
 	wg.Add(len(aggregateCommands))
+
+	ctx, cancel := context.WithCancel(context.Background())
+
 	for _, commands := range aggregateCommands {
 		go func(events []eventstore.Command) {
+			<-ctx.Done()
+
 			_, err := pusher.Push(context.Background(), events...)
 			if err != nil {
 				errsMu.Lock()
@@ -616,6 +622,9 @@ func pushAggregates(pusher eventstore.Pusher, aggregateCommands [][]eventstore.C
 			wg.Done()
 		}(commands)
 	}
+
+	time.Sleep(100 * time.Millisecond)
+	cancel()
 	wg.Wait()
 
 	return errs
