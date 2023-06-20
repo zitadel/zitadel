@@ -17,7 +17,7 @@ jobs:
       DOCKER_BUILDKIT: 1
     steps:
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
           go-version: '1.20'
       - name: Source checkout
@@ -60,12 +60,12 @@ jobs:
           registry: europe-docker.pkg.dev
           username: _json_key_base64
           password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
-      - uses: goreleaser/goreleaser-action@v3
+      - uses: goreleaser/goreleaser-action@v4
         name: Publish ZITADEL
         if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         with:
           distribution: goreleaser
-          version: v1.11.0
+          version: latest
           args: release --timeout 50m
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
