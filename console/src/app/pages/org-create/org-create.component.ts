@@ -20,6 +20,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { supportedLanguages } from 'src/app/utils/language';
 
 @Component({
   selector: 'cnsl-org-create',
@@ -45,7 +46,7 @@ export class OrgCreateComponent {
   public pwdForm?: UntypedFormGroup;
 
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
-  public languages: string[] = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pl', 'zh'];
+  public languages: string[] = supportedLanguages;
 
   public policy?: PasswordComplexityPolicy.AsObject;
   public usePassword: boolean = false;
