@@ -791,7 +791,6 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 				if err == nil && got.GetDetails().GetProcessedSequence() >= idpLink.GetDetails().GetSequence() {
 					break
 				}
-				require.NoError(t, err)
 				select {
 				case <-CTX.Done():
 					t.Fatal(CTX.Err(), err)
@@ -800,6 +799,7 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 					continue
 				}
 			}
+			require.NoError(t, err)
 			assert.Equal(t, tt.want.GetDetails().GetTotalResult(), got.GetDetails().GetTotalResult())
 			require.Equal(t, tt.want.GetAuthMethodTypes(), got.GetAuthMethodTypes())
 		})
