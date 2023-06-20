@@ -612,7 +612,7 @@ func pushAggregates(pusher eventstore.Pusher, aggregateCommands [][]eventstore.C
 		go func(events []eventstore.Command) {
 			<-ctx.Done()
 
-			_, err := pusher.Push(context.Background(), events...)
+			_, err := pusher.Push(context.Background(), events...) //nolint:all
 			if err != nil {
 				errsMu.Lock()
 				errs = append(errs, err)
