@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Pipe, PipeTransform } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import * as moment from 'moment';
+import { supportedLanguages } from 'src/app/utils/language';
 
 @Pipe({
   name: 'localizedDate',
@@ -22,9 +23,7 @@ export class LocalizedDatePipe implements PipeTransform {
         return moment(value).format(`${format}, HH:mm`);
       }
     } else {
-      const lang = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pl', 'zh'].includes(this.translateService.currentLang)
-        ? this.translateService.currentLang
-        : 'en';
+      const lang = supportedLanguages.includes(this.translateService.currentLang) ? this.translateService.currentLang : 'en';
       const datePipe: DatePipe = new DatePipe(lang);
       return datePipe.transform(value, pattern ?? 'mediumDate');
     }
