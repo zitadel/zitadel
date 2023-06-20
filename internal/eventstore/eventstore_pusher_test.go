@@ -603,8 +603,8 @@ func pushAggregates(pusher eventstore.Pusher, aggregateCommands [][]eventstore.C
 	wg := sync.WaitGroup{}
 	errs := make([]error, 0)
 	errsMu := sync.Mutex{}
+	wg.Add(len(aggregateCommands))
 	for _, commands := range aggregateCommands {
-		wg.Add(1)
 		go func(events []eventstore.Command) {
 			_, err := pusher.Push(context.Background(), events...)
 			if err != nil {
