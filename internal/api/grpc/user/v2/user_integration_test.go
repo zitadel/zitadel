@@ -24,6 +24,7 @@ import (
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/repository/idp"
+	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
@@ -709,6 +710,112 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 			}
 
 			grpc.AllFieldsEqual(t, got.ProtoReflect(), tt.want.ProtoReflect(), grpc.CustomMappers)
+		})
+	}
+}
+
+func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
+	userIDWithoutAuth := Tester.CreateHumanUser(CTX).GetUserId()
+
+	userIDWithPasskey := Tester.CreateHumanUser(CTX).GetUserId()
+	Tester.RegisterUserPasskey(CTX, userIDWithPasskey)
+
+	userMultipleAuth := Tester.CreateHumanUser(CTX).GetUserId()
+	Tester.RegisterUserPasskey(CTX, userMultipleAuth)
+	provider, err := Tester.Client.Mgmt.AddGenericOIDCProvider(CTX, &mgmt.AddGenericOIDCProviderRequest{
+		Name:         "ListAuthenticationMethodTypes",
+		Issuer:       "https://example.com",
+		ClientId:     "client_id",
+		ClientSecret: "client_secret",
+	})
+	require.NoError(t, err)
+	idpLink, err := Tester.Client.UserV2.AddIDPLink(CTX, &user.AddIDPLinkRequest{UserId: userMultipleAuth, IdpLink: &user.IDPLink{
+		IdpId:    provider.GetId(),
+		UserId:   "external-id",
+		UserName: "displayName",
+	}})
+	require.NoError(t, err)
+
+	type args struct {
+		ctx context.Context
+		req *user.ListAuthenticationMethodTypesRequest
+	}
+	tests := []struct {
+		name string
+		args args
+		want *user.ListAuthenticationMethodTypesResponse
+	}{
+		{
+			name: "no auth",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userIDWithoutAuth,
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+				},
+			},
+		},
+		{
+			name: "with auth (passkey)",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userIDWithPasskey,
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
+				},
+			},
+		},
+		{
+			name: "multiple auth",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userMultipleAuth,
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 2,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var got *user.ListAuthenticationMethodTypesResponse
+			var err error
+
+			for {
+				got, err = Client.ListAuthenticationMethodTypes(tt.args.ctx, tt.args.req)
+				if err == nil && got.GetDetails().GetProcessedSequence() >= idpLink.GetDetails().GetSequence() {
+					break
+				}
+				select {
+				case <-CTX.Done():
+					t.Fatal(CTX.Err(), err)
+				case <-time.After(time.Second):
+					t.Log("retrying ListAuthenticationMethodTypes")
+					continue
+				}
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want.GetDetails().GetTotalResult(), got.GetDetails().GetTotalResult())
+			require.Equal(t, tt.want.GetAuthMethodTypes(), got.GetAuthMethodTypes())
 		})
 	}
 }

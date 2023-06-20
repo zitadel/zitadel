@@ -440,6 +440,30 @@ service UserService {
       };
     };
   }
+
+  // List all possible authentication methods of a user
+  rpc ListAuthenticationMethodTypes (ListAuthenticationMethodTypesRequest) returns (ListAuthenticationMethodTypesResponse) {
+    option (google.api.http) = {
+      get: "/v2alpha/users/{user_id}/authentication_methods"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "List all possible authentication methods of a user";
+      description: "List all possible authentication methods of a user like password, passwordless, (T)OTP and more";
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
 }
 
 message AddHumanUserRequest{
@@ -857,6 +881,7 @@ message AddIDPLinkResponse {
   zitadel.object.v2alpha.Details details = 1;
 }
 
+
 message PasswordResetRequest{
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -918,4 +943,30 @@ message SetPasswordRequest{
 
 message SetPasswordResponse{
   zitadel.object.v2alpha.Details details = 1;
+}
+
+message ListAuthenticationMethodTypesRequest{
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message ListAuthenticationMethodTypesResponse{
+  zitadel.object.v2alpha.ListDetails details = 1;
+  repeated AuthenticationMethodType auth_method_types = 2;
+}
+
+enum AuthenticationMethodType {
+  AUTHENTICATION_METHOD_TYPE_UNSPECIFIED = 0;
+  AUTHENTICATION_METHOD_TYPE_PASSWORD = 1;
+  AUTHENTICATION_METHOD_TYPE_PASSKEY = 2;
+  AUTHENTICATION_METHOD_TYPE_IDP = 3;
+  AUTHENTICATION_METHOD_TYPE_TOTP = 4;
+  AUTHENTICATION_METHOD_TYPE_U2F = 5;
 }
