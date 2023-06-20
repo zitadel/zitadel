@@ -8,4 +8,4 @@ FROM
 WHERE
     instance_id = $1
     AND projection_name = $2
-FOR UPDATE NOWAIT;
+FOR UPDATE

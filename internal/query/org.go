@@ -94,7 +94,7 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.OrgProjection.Trigger(ctx)
+		projection.OrgProjection.Trigger(ctx, false)
 	}
 
 	stmt, scan := prepareOrgQuery(ctx, q.client)

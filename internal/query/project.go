@@ -105,7 +105,7 @@ func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id st
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.ProjectProjection.Trigger(ctx)
+		projection.ProjectProjection.Trigger(ctx, false)
 	}
 
 	stmt, scan := prepareProjectQuery(ctx, q.client)

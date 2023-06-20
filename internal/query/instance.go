@@ -182,7 +182,7 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (_ *Inst
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.InstanceProjection.Trigger(ctx)
+		projection.InstanceProjection.Trigger(ctx, false)
 	}
 
 	stmt, scan := prepareInstanceDomainQuery(ctx, q.client, authz.GetInstance(ctx).RequestedDomain())

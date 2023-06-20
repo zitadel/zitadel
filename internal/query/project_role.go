@@ -88,7 +88,7 @@ func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.ProjectRoleProjection.Trigger(ctx)
+		projection.ProjectRoleProjection.Trigger(ctx, false)
 	}
 
 	eq := sq.Eq{ProjectRoleColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}

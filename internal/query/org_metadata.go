@@ -82,7 +82,7 @@ func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk boo
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.OrgMetadataProjection.Trigger(ctx)
+		projection.OrgMetadataProjection.Trigger(ctx, false)
 	}
 
 	query, scan := prepareOrgMetadataQuery(ctx, q.client)
@@ -111,7 +111,7 @@ func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool,
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.OrgMetadataProjection.Trigger(ctx)
+		projection.OrgMetadataProjection.Trigger(ctx, false)
 	}
 	eq := sq.Eq{
 		OrgMetadataOrgIDCol.identifier():      orgID,

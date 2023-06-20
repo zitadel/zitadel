@@ -166,7 +166,7 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.LoginPolicyProjection.Trigger(ctx)
+		projection.LoginPolicyProjection.Trigger(ctx, false)
 	}
 	eq := sq.Eq{LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {

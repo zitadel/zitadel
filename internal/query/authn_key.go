@@ -191,7 +191,7 @@ func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, i
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.AuthNKeyProjection.Trigger(ctx)
+		projection.AuthNKeyProjection.Trigger(ctx, false)
 	}
 
 	query, scan := prepareAuthNKeyQuery(ctx, q.client)
