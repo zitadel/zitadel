@@ -47,6 +47,7 @@ import (
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/authz"
 	authz_repo "github.com/zitadel/zitadel/internal/authz/repository"
+	authz_es "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/eventstore"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
@@ -145,6 +146,11 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		keys.SAML,
 		config.InternalAuthZ.RolePermissionMappings,
 		sessionTokenVerifier,
+		func(q *query.Queries) domain.PermissionCheck {
+			return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+				return internal_authz.CheckPermission(ctx, &authz_es.UserMembershipRepo{Queries: q}, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
+			}
+		},
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
@@ -157,7 +163,6 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	permissionCheck := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
 		return internal_authz.CheckPermission(ctx, authZRepo, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 	}
-	queries.SetPermissionCheck(permissionCheck)
 
 	storage, err := config.AssetStorage.NewStorage(dbClient.DB)
 	if err != nil {

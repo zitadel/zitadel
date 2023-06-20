@@ -56,6 +56,7 @@ func StartQueries(
 	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	zitadelRoles []authz.RoleMapping,
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
+	permissionCheck func(q *Queries) domain.PermissionCheck,
 ) (repo *Queries, err error) {
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	if err != nil {
@@ -96,6 +97,8 @@ func StartQueries(
 		},
 	}
 
+	repo.checkPermission = permissionCheck(repo)
+
 	err = projection.Create(ctx, sqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm)
 	if err != nil {
 		return nil, err
@@ -107,10 +110,6 @@ func StartQueries(
 
 func (q *Queries) Health(ctx context.Context) error {
 	return q.client.Ping()
-}
-
-func (q *Queries) SetPermissionCheck(permissionCheck func(ctx context.Context, permission string, orgID string, resourceID string) (err error)) {
-	q.checkPermission = permissionCheck
 }
 
 type prepareDatabase interface {
