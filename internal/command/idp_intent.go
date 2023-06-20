@@ -123,6 +123,8 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 		ctx,
 		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
 		idpInfo,
+		idpUser.GetID(),
+		idpUser.GetPreferredUsername(),
 		userID,
 		accessToken,
 		idToken,
