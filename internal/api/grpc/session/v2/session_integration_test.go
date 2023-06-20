@@ -234,7 +234,7 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil)
 
-	intentID, token, _, _ := Tester.CreateSuccessfulIntent(t, idpID)
+	intentID, token, _, _ := Tester.CreateSuccessfulIntent(t, idpID, User.GetUserId())
 	updateResp, err := Client.SetSession(CTX, &session.SetSessionRequest{
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),

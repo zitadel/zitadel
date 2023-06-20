@@ -565,7 +565,7 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t)
 	intentID := Tester.CreateIntent(t, idpID)
-	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulIntent(t, idpID)
+	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulIntent(t, idpID, "")
 	type args struct {
 		ctx context.Context
 		req *user.RetrieveIdentityProviderInformationRequest

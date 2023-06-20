@@ -113,7 +113,7 @@ func (s *Tester) CreateIntent(t *testing.T, idpID string) string {
 	return id
 }
 
-func (s *Tester) CreateSuccessfulIntent(t *testing.T, idpID string) (string, string, time.Time, uint64) {
+func (s *Tester) CreateSuccessfulIntent(t *testing.T, idpID, userID string) (string, string, time.Time, uint64) {
 	ctx := authz.WithInstance(context.Background(), s.Instance)
 	intentID := s.CreateIntent(t, idpID)
 	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Organisation.ID)
@@ -131,7 +131,7 @@ func (s *Tester) CreateSuccessfulIntent(t *testing.T, idpID string) (string, str
 			IDToken: "idToken",
 		},
 	}
-	token, err := s.Commands.SucceedIDPIntent(ctx, writeModel, idpUser, idpSession, "")
+	token, err := s.Commands.SucceedIDPIntent(ctx, writeModel, idpUser, idpSession, userID)
 	require.NoError(t, err)
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
 }
