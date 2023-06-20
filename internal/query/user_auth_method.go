@@ -166,7 +166,7 @@ func (q *Queries) ListActiveUserAuthMethodTypes(ctx context.Context, userID stri
 	if err != nil {
 		return nil, err
 	}
-	userAuthMethodTypes.LatestSequence, err = q.latestSequence(ctx, userTable, notifyTable, userAuthMethodTable)
+	userAuthMethodTypes.LatestSequence, err = q.latestSequence(ctx, userTable, notifyTable, userAuthMethodTable, idpUserLinkTable)
 	return userAuthMethodTypes, err
 }
 

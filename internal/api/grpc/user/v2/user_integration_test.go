@@ -22,7 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/repository/idp"
-	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
@@ -708,7 +708,7 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 
 	userMultipleAuth := Tester.CreateHumanUser(CTX).GetUserId()
 	Tester.RegisterUserPasskey(CTX, userMultipleAuth)
-	provider, err := Tester.Client.Admin.AddGenericOIDCProvider(CTX, &admin.AddGenericOIDCProviderRequest{
+	provider, err := Tester.Client.Mgmt.AddGenericOIDCProvider(CTX, &mgmt.AddGenericOIDCProviderRequest{
 		Name:         "ListAuthenticationMethodTypes",
 		Issuer:       "https://example.com",
 		ClientId:     "client_id",
@@ -785,11 +785,11 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var got *user.ListAuthenticationMethodTypesResponse
 			var err error
-		retry:
+
 			for {
 				got, err = Client.ListAuthenticationMethodTypes(tt.args.ctx, tt.args.req)
 				if err == nil && got.GetDetails().GetProcessedSequence() >= idpLink.GetDetails().GetSequence() {
-					break retry
+					break
 				}
 				require.NoError(t, err)
 				select {
