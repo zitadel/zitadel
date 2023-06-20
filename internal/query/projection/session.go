@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/session"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 const (
@@ -104,6 +105,15 @@ func (p *sessionProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(SMSColumnInstanceID),
+				},
+			},
+		},
+		{
+			Aggregate: user.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  user.HumanPasswordChangedType,
+					Reduce: p.reducePasswordChanged,
 				},
 			},
 		},
@@ -242,6 +252,24 @@ func (p *sessionProjection) reduceSessionTerminated(event eventstore.Event) (*ha
 		[]handler.Condition{
 			handler.NewCond(SessionColumnID, e.Aggregate().ID),
 			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reducePasswordChanged(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanPasswordChangedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Deg3d", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnPasswordCheckedAt, nil),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnUserID, e.Aggregate().ID),
+			crdb.NewLessThanCond(SessionColumnPasswordCheckedAt, e.CreationDate()),
 		},
 	), nil
 }

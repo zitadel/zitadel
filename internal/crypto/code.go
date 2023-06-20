@@ -121,10 +121,14 @@ func IsCodeExpired(creationDate time.Time, expiry time.Duration) bool {
 }
 
 func VerifyCode(creationDate time.Time, expiry time.Duration, cryptoCode *CryptoValue, verificationCode string, g Generator) error {
+	return VerifyCodeWithAlgorithm(creationDate, expiry, cryptoCode, verificationCode, g.Alg())
+}
+
+func VerifyCodeWithAlgorithm(creationDate time.Time, expiry time.Duration, cryptoCode *CryptoValue, verificationCode string, algorithm Crypto) error {
 	if IsCodeExpired(creationDate, expiry) {
 		return errors.ThrowPreconditionFailed(nil, "CODE-QvUQ4P", "Errors.User.Code.Expired")
 	}
-	switch alg := g.Alg().(type) {
+	switch alg := algorithm.(type) {
 	case EncryptionAlgorithm:
 		return verifyEncryptedCode(cryptoCode, verificationCode, alg)
 	case HashAlgorithm:
