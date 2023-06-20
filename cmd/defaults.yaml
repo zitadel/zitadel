@@ -402,7 +402,7 @@ Quotas:
 
 Eventstore:
   PushTimeout: 15s
-  AllowOrderByCreationDate: false
+  AllowOrderByCreationDate: true
   UseV2: false
 
 DefaultInstance:
