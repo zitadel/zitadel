@@ -237,7 +237,7 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Start the registration of passkey for a user";
+      summary: "Start the registration of a u2f token for a user";
       description: "Start the registration of a u2f token for a user, as a response the public key credential creation options are returned, which are used to verify the u2f token."
       responses: {
         key: "200"
