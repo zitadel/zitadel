@@ -2,9 +2,6 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "generate": {
-      "outputs": [
-        "src/proto/**"
-      ],
       "cache": true
     },
     "build": {
