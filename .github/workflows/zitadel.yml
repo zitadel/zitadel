@@ -65,7 +65,7 @@ jobs:
         if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         with:
           distribution: goreleaser
-          version: latest
+          version: '1.18.2'
           args: release --timeout 50m
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
