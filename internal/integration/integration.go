@@ -153,7 +153,6 @@ func (s *Tester) createSystemUser(ctx context.Context) {
 		})
 		logging.OnError(err).Fatal("add machine user")
 		user, err = s.Queries.GetUser(ctx, true, true, query)
-
 	}
 	logging.OnError(err).Fatal("get user")
 
