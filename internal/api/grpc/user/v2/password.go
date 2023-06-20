@@ -10,14 +10,14 @@ import (
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
-func (s *Server) RequestPasswordReset(ctx context.Context, req *user.RequestPasswordResetRequest) (_ *user.RequestPasswordResetResponse, err error) {
+func (s *Server) PasswordReset(ctx context.Context, req *user.PasswordResetRequest) (_ *user.PasswordResetResponse, err error) {
 	var details *domain.ObjectDetails
 	var code *string
 
 	switch m := req.GetMedium().(type) {
-	case *user.RequestPasswordResetRequest_SendLink:
+	case *user.PasswordResetRequest_SendLink:
 		details, code, err = s.command.RequestPasswordResetURLTemplate(ctx, req.GetUserId(), m.SendLink.GetUrlTemplate(), notificationTypeToDomain(m.SendLink.GetNotificationType()))
-	case *user.RequestPasswordResetRequest_ReturnCode:
+	case *user.PasswordResetRequest_ReturnCode:
 		details, code, err = s.command.RequestPasswordResetReturnCode(ctx, req.GetUserId())
 	case nil:
 		details, code, err = s.command.RequestPasswordReset(ctx, req.GetUserId())
@@ -28,7 +28,7 @@ func (s *Server) RequestPasswordReset(ctx context.Context, req *user.RequestPass
 		return nil, err
 	}
 
-	return &user.RequestPasswordResetResponse{
+	return &user.PasswordResetResponse{
 		Details:          object.DomainToDetailsPb(details),
 		VerificationCode: code,
 	}, nil

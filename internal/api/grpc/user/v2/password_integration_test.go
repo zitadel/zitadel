@@ -21,16 +21,16 @@ func TestServer_RequestPasswordReset(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		req     *user.RequestPasswordResetRequest
-		want    *user.RequestPasswordResetResponse
+		req     *user.PasswordResetRequest
+		want    *user.PasswordResetResponse
 		wantErr bool
 	}{
 		{
 			name: "default medium",
-			req: &user.RequestPasswordResetRequest{
+			req: &user.PasswordResetRequest{
 				UserId: userID,
 			},
-			want: &user.RequestPasswordResetResponse{
+			want: &user.PasswordResetResponse{
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
@@ -40,16 +40,16 @@ func TestServer_RequestPasswordReset(t *testing.T) {
 		},
 		{
 			name: "custom url template",
-			req: &user.RequestPasswordResetRequest{
+			req: &user.PasswordResetRequest{
 				UserId: userID,
-				Medium: &user.RequestPasswordResetRequest_SendLink{
+				Medium: &user.PasswordResetRequest_SendLink{
 					SendLink: &user.SendPasswordResetLink{
 						NotificationType: user.NotificationType_NOTIFICATION_TYPE_Email,
 						UrlTemplate:      gu.Ptr("https://example.com/password/change?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
 					},
 				},
 			},
-			want: &user.RequestPasswordResetResponse{
+			want: &user.PasswordResetResponse{
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
@@ -59,9 +59,9 @@ func TestServer_RequestPasswordReset(t *testing.T) {
 		},
 		{
 			name: "template error",
-			req: &user.RequestPasswordResetRequest{
+			req: &user.PasswordResetRequest{
 				UserId: userID,
-				Medium: &user.RequestPasswordResetRequest_SendLink{
+				Medium: &user.PasswordResetRequest_SendLink{
 					SendLink: &user.SendPasswordResetLink{
 						UrlTemplate: gu.Ptr("{{"),
 					},
@@ -71,13 +71,13 @@ func TestServer_RequestPasswordReset(t *testing.T) {
 		},
 		{
 			name: "return code",
-			req: &user.RequestPasswordResetRequest{
+			req: &user.PasswordResetRequest{
 				UserId: userID,
-				Medium: &user.RequestPasswordResetRequest_ReturnCode{
+				Medium: &user.PasswordResetRequest_ReturnCode{
 					ReturnCode: &user.ReturnPasswordResetCode{},
 				},
 			},
-			want: &user.RequestPasswordResetResponse{
+			want: &user.PasswordResetResponse{
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
@@ -89,7 +89,7 @@ func TestServer_RequestPasswordReset(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.RequestPasswordReset(CTX, tt.req)
+			got, err := Client.PasswordReset(CTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -185,9 +185,9 @@ func TestServer_SetPassword(t *testing.T) {
 			prepare: func(request *user.SetPasswordRequest) error {
 				userID := Tester.CreateHumanUser(CTX).GetUserId()
 				request.UserId = userID
-				resp, err := Client.RequestPasswordReset(CTX, &user.RequestPasswordResetRequest{
+				resp, err := Client.PasswordReset(CTX, &user.PasswordResetRequest{
 					UserId: userID,
-					Medium: &user.RequestPasswordResetRequest_ReturnCode{
+					Medium: &user.PasswordResetRequest_ReturnCode{
 						ReturnCode: &user.ReturnPasswordResetCode{},
 					},
 				})
