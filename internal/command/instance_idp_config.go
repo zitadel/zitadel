@@ -196,15 +196,6 @@ func (c *Commands) prepareRemoveDefaultIDPConfig(a *instance.Aggregate, idpID st
 				orgEvents := c.removeIDPFromLoginPolicy(ctx, orgAgg, idpID, true)
 				events = append(events, orgEvents...)
 			}
-
-			pushedEvents, err := c.eventstore.Push(ctx, events...)
-			if err != nil {
-				return nil, err
-			}
-
-			if err = AppendAndReduce(existingIDP, pushedEvents...); err != nil {
-				return nil, err
-			}
 			return events, nil
 		}, nil
 	}

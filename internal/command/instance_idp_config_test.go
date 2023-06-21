@@ -332,6 +332,559 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 	}
 }
 
+func TestCommandSide_DeactivateDefaultIDPConfig(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx   context.Context
+		idpID string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "invalid config, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				idpID: "",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "config not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				idpID: "id",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "idp config deactivate, not active",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewIDPConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"config1",
+								"name1",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeGoogle,
+								true,
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"clientid1",
+								"config1",
+								"issuer",
+								"authorization-endpoint",
+								"token-endpoint",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								domain.OIDCMappingFieldEmail,
+								domain.OIDCMappingFieldEmail,
+								"scope",
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewIDPConfigRemovedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"config1",
+								"name1",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:   authz.WithInstanceID(context.Background(), "INSTANCE"),
+				idpID: "config1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "idp config deactivate, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewIDPConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"config1",
+								"name1",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeGoogle,
+								true,
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"clientid1",
+								"config1",
+								"issuer",
+								"authorization-endpoint",
+								"token-endpoint",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								domain.OIDCMappingFieldEmail,
+								domain.OIDCMappingFieldEmail,
+								"scope",
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewIDPConfigDeactivatedEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									"config1",
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:   authz.WithInstanceID(context.Background(), "INSTANCE"),
+				idpID: "config1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{Sequence: 0x0, EventDate: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC), ResourceOwner: "INSTANCE"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := r.DeactivateDefaultIDPConfig(tt.args.ctx, tt.args.idpID)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_ReactivateDefaultIDPConfig(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx   context.Context
+		idpID string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "invalid config, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				idpID: "",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "config not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				idpID: "id",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "idp config reactivate, not deactivated",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewIDPConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"config1",
+								"name1",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeGoogle,
+								true,
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"clientid1",
+								"config1",
+								"issuer",
+								"authorization-endpoint",
+								"token-endpoint",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								domain.OIDCMappingFieldEmail,
+								domain.OIDCMappingFieldEmail,
+								"scope",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:   authz.WithInstanceID(context.Background(), "INSTANCE"),
+				idpID: "config1",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "idp config reactivate, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewIDPConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"config1",
+								"name1",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeGoogle,
+								true,
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"clientid1",
+								"config1",
+								"issuer",
+								"authorization-endpoint",
+								"token-endpoint",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								domain.OIDCMappingFieldEmail,
+								domain.OIDCMappingFieldEmail,
+								"scope",
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewIDPConfigDeactivatedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"config1",
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewIDPConfigReactivatedEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									"config1",
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:   authz.WithInstanceID(context.Background(), "INSTANCE"),
+				idpID: "config1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{Sequence: 0x0, EventDate: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC), ResourceOwner: "INSTANCE"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := r.ReactivateDefaultIDPConfig(tt.args.ctx, tt.args.idpID)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_RemoveDefaultIDPConfig(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx   context.Context
+		idpID string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "invalid config, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				idpID: "",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "config not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				idpID: "id",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "idp config already removed",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewIDPConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"config1",
+								"name1",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeGoogle,
+								true,
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"clientid1",
+								"config1",
+								"issuer",
+								"authorization-endpoint",
+								"token-endpoint",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								domain.OIDCMappingFieldEmail,
+								domain.OIDCMappingFieldEmail,
+								"scope",
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewIDPConfigRemovedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"config1",
+								"name1",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:   authz.WithInstanceID(context.Background(), "INSTANCE"),
+				idpID: "config1",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "idp config remove, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewIDPConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"config1",
+								"name1",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeGoogle,
+								true,
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"clientid1",
+								"config1",
+								"issuer",
+								"authorization-endpoint",
+								"token-endpoint",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								domain.OIDCMappingFieldEmail,
+								domain.OIDCMappingFieldEmail,
+								"scope",
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewIDPConfigRemovedEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									"config1",
+									"name1",
+								),
+							),
+						},
+						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", idpconfig.NewRemoveIDPConfigNameUniqueConstraint("name1", "INSTANCE")),
+					),
+				),
+			},
+			args: args{
+				ctx:   authz.WithInstanceID(context.Background(), "INSTANCE"),
+				idpID: "config1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{Sequence: 0x0, EventDate: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC), ResourceOwner: "INSTANCE"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := r.RemoveDefaultIDPConfig(tt.args.ctx, tt.args.idpID, nil, nil)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
 func newDefaultIDPConfigChangedEvent(ctx context.Context, configID, oldName, newName string, stylingType domain.IDPConfigStylingType, autoRegister bool) *instance.IDPConfigChangedEvent {
 	event, _ := instance.NewIDPConfigChangedEvent(ctx,
 		&instance.NewAggregate("INSTANCE").Aggregate,
