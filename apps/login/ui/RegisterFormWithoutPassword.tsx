@@ -87,9 +87,6 @@ export default function RegisterFormWithoutPassword({ legal }: Props) {
             );
           });
         });
-    //   .then((resp: any) => {
-    //       return router.push(`/verify?userID=${resp.userId}`);
-    //     });
   }
 
   const { errors } = formState;
