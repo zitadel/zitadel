@@ -51,6 +51,7 @@ You can execute the following commands `pnpm test` for a single test run or `pnp
 
 In apps/login, these commands also spin up the application and a ZITADEL gRPC API mock server to run integration tests using [Cypress](https://www.cypress.io/) against them.
 If you want to run the integration tests standalone against an environment of your choice, navigate to ./apps/login, create your .env.local file and run `pnpm test:integration:run` or `pnpm test:integration:open`.
+Then you need to lifecycle the mock process using the command `pnpm mock` or the more fine grained commands `pnpm mock:build`, `pnpm mock:build:nocache`, `pnpm mock:run` and `pnpm mock:destroy`.
 
 ### Developing Against Your Local ZITADEL Instance
 
