@@ -135,7 +135,6 @@ export async function getMostRecentCookieWithLoginname(
 
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
-
     const filtered = sessions.filter((cookie) => {
       return !!loginName ? cookie.loginName === loginName : true;
     });
@@ -153,10 +152,10 @@ export async function getMostRecentCookieWithLoginname(
     if (latest) {
       return latest;
     } else {
-      return Promise.reject();
+      return Promise.reject("Could not get the context or retrieve a session");
     }
   } else {
-    return Promise.reject();
+    return Promise.reject("Could not read session cookie");
   }
 }
 
