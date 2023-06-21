@@ -69,6 +69,8 @@ type SucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	IDPUser        []byte              `json:"idpUser"`
+	IDPUserID      string              `json:"idpUserId,omitempty"`
+	IDPUserName    string              `json:"idpUserName,omitempty"`
 	UserID         string              `json:"userId,omitempty"`
 	IDPAccessToken *crypto.CryptoValue `json:"idpAccessToken,omitempty"`
 	IDPIDToken     string              `json:"idpIdToken,omitempty"`
@@ -78,6 +80,8 @@ func NewSucceededEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	idpUser []byte,
+	idpUserID,
+	idpUserName,
 	userID string,
 	idpAccessToken *crypto.CryptoValue,
 	idpIDToken string,
@@ -89,6 +93,8 @@ func NewSucceededEvent(
 			SucceededEventType,
 		),
 		IDPUser:        idpUser,
+		IDPUserID:      idpUserID,
+		IDPUserName:    idpUserName,
 		UserID:         userID,
 		IDPAccessToken: idpAccessToken,
 		IDPIDToken:     idpIDToken,

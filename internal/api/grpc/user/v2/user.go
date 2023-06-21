@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"golang.org/x/text/language"
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -63,8 +64,8 @@ func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 	for i, link := range req.GetIdpLinks() {
 		links[i] = &command.AddLink{
 			IDPID:         link.GetIdpId(),
-			IDPExternalID: link.GetIdpExternalId(),
-			DisplayName:   link.GetDisplayName(),
+			IDPExternalID: link.GetUserId(),
+			DisplayName:   link.GetUserName(),
 		}
 	}
 	return &command.AddHuman{
@@ -123,8 +124,8 @@ func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_
 	orgID := authz.GetCtxData(ctx).OrgID
 	details, err := s.command.AddUserIDPLink(ctx, req.UserId, orgID, &domain.UserIDPLink{
 		IDPConfigID:    req.GetIdpLink().GetIdpId(),
-		ExternalUserID: req.GetIdpLink().GetIdpExternalId(),
-		DisplayName:    req.GetIdpLink().GetDisplayName(),
+		ExternalUserID: req.GetIdpLink().GetUserId(),
+		DisplayName:    req.GetIdpLink().GetUserName(),
 	})
 	if err != nil {
 		return nil, err
@@ -175,6 +176,12 @@ func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.En
 			return nil, err
 		}
 	}
+	rawInformation := new(structpb.Struct)
+	err = rawInformation.UnmarshalJSON(intent.IDPUser)
+	if err != nil {
+		return nil, err
+	}
+
 	return &user.RetrieveIdentityProviderInformationResponse{
 		Details: &object_pb.Details{
 			Sequence:      intent.ProcessedSequence,
@@ -188,11 +195,52 @@ func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.En
 					IdToken:     idToken,
 				},
 			},
-			IdpInformation: intent.IDPUser,
+			IdpId:          intent.IDPID,
+			UserId:         intent.IDPUserID,
+			UserName:       intent.IDPUserName,
+			RawInformation: rawInformation,
 		},
 	}, nil
 }
 
 func (s *Server) checkIntentToken(token string, intentID string) error {
 	return crypto.CheckToken(s.idpAlg, token, intentID)
+}
+
+func (s *Server) ListAuthenticationMethodTypes(ctx context.Context, req *user.ListAuthenticationMethodTypesRequest) (*user.ListAuthenticationMethodTypesResponse, error) {
+	authMethods, err := s.query.ListActiveUserAuthMethodTypes(ctx, req.GetUserId(), false)
+	if err != nil {
+		return nil, err
+	}
+	return &user.ListAuthenticationMethodTypesResponse{
+		Details:         object.ToListDetails(authMethods.SearchResponse),
+		AuthMethodTypes: authMethodTypesToPb(authMethods.AuthMethodTypes),
+	}, nil
+}
+
+func authMethodTypesToPb(methodTypes []domain.UserAuthMethodType) []user.AuthenticationMethodType {
+	methods := make([]user.AuthenticationMethodType, len(methodTypes))
+	for i, method := range methodTypes {
+		methods[i] = authMethodTypeToPb(method)
+	}
+	return methods
+}
+
+func authMethodTypeToPb(methodType domain.UserAuthMethodType) user.AuthenticationMethodType {
+	switch methodType {
+	case domain.UserAuthMethodTypeOTP:
+		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_TOTP
+	case domain.UserAuthMethodTypeU2F:
+		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_U2F
+	case domain.UserAuthMethodTypePasswordless:
+		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY
+	case domain.UserAuthMethodTypePassword:
+		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSWORD
+	case domain.UserAuthMethodTypeIDP:
+		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP
+	case domain.UserAuthMethodTypeUnspecified:
+		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED
+	default:
+		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED
+	}
 }

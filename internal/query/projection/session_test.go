@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/session"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 func TestSessionProjection_reduces(t *testing.T) {
@@ -269,6 +270,39 @@ func TestSessionProjection_reduces(t *testing.T) {
 							expectedStmt: "DELETE FROM projections.sessions2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reducePasswordChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.HumanPasswordChangedType),
+					user.AggregateType,
+					[]byte(`{"secret": {
+								"cryptoType": 0,
+								"algorithm": "enc",
+								"keyID": "id",
+								"crypted": "cGFzc3dvcmQ="
+							}}`),
+				), user.HumanPasswordChangedEventMapper),
+			},
+			reduce: (&sessionProjection{}).reducePasswordChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("user"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.sessions1 SET password_checked_at = $1 WHERE (user_id = $2) AND (password_checked_at < $3)",
+							expectedArgs: []interface{}{
+								nil,
+								"agg-id",
+								anyArg{},
 							},
 						},
 					},
