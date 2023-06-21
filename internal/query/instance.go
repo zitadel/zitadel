@@ -183,7 +183,7 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (_ *Inst
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.InstanceProjection.Trigger(ctx, false)
+		err := projection.InstanceProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 

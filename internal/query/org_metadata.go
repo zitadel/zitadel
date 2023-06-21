@@ -84,7 +84,7 @@ func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk boo
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.OrgMetadataProjection.Trigger(ctx, false)
+		err := projection.OrgMetadataProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 
@@ -114,7 +114,7 @@ func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool,
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.OrgMetadataProjection.Trigger(ctx, false)
+		err := projection.OrgMetadataProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 	eq := sq.Eq{

@@ -195,7 +195,7 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.IDPProjection.Trigger(ctx, false)
+		err := projection.IDPProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 

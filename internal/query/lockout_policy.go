@@ -88,7 +88,7 @@ func (q *Queries) LockoutPolicyByOrg(ctx context.Context, shouldTriggerBulk bool
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.LockoutPolicyProjection.Trigger(ctx, false)
+		err := projection.LockoutPolicyProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 	eq := sq.Eq{

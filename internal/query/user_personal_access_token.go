@@ -92,7 +92,7 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.PersonalAccessTokenProjection.Trigger(ctx, false)
+		err := projection.PersonalAccessTokenProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 

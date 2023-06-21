@@ -84,7 +84,7 @@ func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bo
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.UserMetadataProjection.Trigger(ctx, false)
+		err := projection.UserMetadataProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 
@@ -114,7 +114,7 @@ func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.UserMetadataProjection.Trigger(ctx, false)
+		err := projection.UserMetadataProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 

@@ -118,7 +118,7 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, 
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.ProjectGrantProjection.Trigger(ctx, false)
+		err := projection.ProjectGrantProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 

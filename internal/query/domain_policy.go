@@ -93,7 +93,7 @@ func (q *Queries) DomainPolicyByOrg(ctx context.Context, shouldTriggerBulk bool,
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.DomainPolicyProjection.Trigger(ctx, false)
+		err := projection.DomainPolicyProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 	eq := sq.And{

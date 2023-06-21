@@ -235,7 +235,7 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwn
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.UserGrantProjection.Trigger(ctx, false)
+		err := projection.UserGrantProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 
@@ -262,7 +262,7 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, sh
 
 	if shouldTriggerBulk {
 		logging.OnError(
-			projection.UserGrantProjection.Trigger(ctx, false),
+			projection.UserGrantProjection.Trigger(ctx),
 		).Debug("unable to trigger")
 	}
 

@@ -168,7 +168,7 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.LoginPolicyProjection.Trigger(ctx, false)
+		err := projection.LoginPolicyProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 	eq := sq.Eq{LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}

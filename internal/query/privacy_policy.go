@@ -98,7 +98,7 @@ func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, shouldTriggerBulk bool
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.PrivacyPolicyProjection.Trigger(ctx, false)
+		err := projection.PrivacyPolicyProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 	eq := sq.Eq{PrivacyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
@@ -128,7 +128,7 @@ func (q *Queries) DefaultPrivacyPolicy(ctx context.Context, shouldTriggerBulk bo
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.PrivacyPolicyProjection.Trigger(ctx, false)
+		err := projection.PrivacyPolicyProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 

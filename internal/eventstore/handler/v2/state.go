@@ -31,7 +31,7 @@ var (
 	updateStateLastRunStmt string
 )
 
-func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, withNoWait bool) (currentState *state, err error) {
+func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *state, err error) {
 	currentState = &state{
 		instanceID: authz.GetInstance(ctx).InstanceID(),
 	}
@@ -40,11 +40,8 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, withNoWait bool)
 	aggregateType := new(sql.NullString)
 	aggregateID := new(sql.NullString)
 	sequence := new(sql.NullInt64)
-	stmt := currentStateStmt
-	if withNoWait {
-		stmt += " NOWAIT"
-	}
-	row := tx.QueryRowContext(ctx, stmt, currentState.instanceID, h.projection.Name())
+
+	row := tx.QueryRowContext(ctx, currentStateStmt, currentState.instanceID, h.projection.Name())
 	err = row.Scan(
 		timestamp,
 		aggregateType,

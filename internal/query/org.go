@@ -96,7 +96,7 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.OrgProjection.Trigger(ctx, false)
+		err := projection.OrgProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 

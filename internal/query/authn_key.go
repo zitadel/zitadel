@@ -193,7 +193,7 @@ func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, i
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.AuthNKeyProjection.Trigger(ctx, false)
+		err := projection.AuthNKeyProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 

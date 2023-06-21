@@ -106,7 +106,7 @@ func (h *Handler) schedule(ctx context.Context) {
 			var instanceFailed bool
 			for _, instance := range instances {
 				instanceCtx := authz.WithInstanceID(ctx, instance)
-				err = h.Trigger(instanceCtx, true)
+				err = h.Trigger(instanceCtx)
 				instanceFailed = instanceFailed || err != nil
 				h.log().WithField("instance", instance).OnError(err).Info("scheduled trigger failed")
 			}
@@ -138,7 +138,7 @@ func (h *Handler) subscribe(ctx context.Context) {
 					continue
 				}
 				ctx := authz.WithInstanceID(ctx, e.Aggregate().InstanceID)
-				err := h.Trigger(ctx, true)
+				err := h.Trigger(ctx)
 				h.log().OnError(err).Debug("trigger of queued event failed")
 				if err == nil {
 					solvedInstances = append(solvedInstances, e.Aggregate().InstanceID)
@@ -183,9 +183,9 @@ func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]str
 	return h.es.InstanceIDs(ctx, query.Builder())
 }
 
-func (h *Handler) Trigger(ctx context.Context, withNoWait bool) (err error) {
+func (h *Handler) Trigger(ctx context.Context) (err error) {
 	for i := 0; ; i++ {
-		additionalIteration, err := h.processEvents(ctx, withNoWait)
+		additionalIteration, err := h.processEvents(ctx)
 		h.log().WithField("iteration", i).Debug("trigger iteration")
 		if !additionalIteration || err != nil {
 			return err
@@ -193,7 +193,7 @@ func (h *Handler) Trigger(ctx context.Context, withNoWait bool) (err error) {
 	}
 }
 
-func (h *Handler) processEvents(ctx context.Context, withNoWait bool) (additionalIteration bool, err error) {
+func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, err error) {
 	defer func() {
 		pgErr := new(pgconn.PgError)
 		if errors.As(err, &pgErr) {
@@ -210,7 +210,7 @@ func (h *Handler) processEvents(ctx context.Context, withNoWait bool) (additiona
 	defer cancel()
 
 	err = crdb.ExecuteTx(ctx, h.client.DB, nil, func(tx *sql.Tx) error {
-		currentState, err := h.currentState(ctx, tx, withNoWait)
+		currentState, err := h.currentState(ctx, tx)
 		if err != nil {
 			return err
 		}

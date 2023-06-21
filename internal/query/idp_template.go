@@ -612,7 +612,7 @@ func (q *Queries) IDPTemplateByID(ctx context.Context, shouldTriggerBulk bool, i
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.IDPTemplateProjection.Trigger(ctx, false)
+		err := projection.IDPTemplateProjection.Trigger(ctx)
 		logging.OnError(err).WithField("projection", idpTemplateTable.identifier()).Warn("could not trigger projection for query")
 	}
 

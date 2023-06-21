@@ -40,7 +40,7 @@ func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, shouldTrigg
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.PasswordComplexityProjection.Trigger(ctx, false)
+		err := projection.PasswordComplexityProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 	eq := sq.Eq{PasswordComplexityColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
@@ -71,7 +71,7 @@ func (q *Queries) DefaultPasswordComplexityPolicy(ctx context.Context, shouldTri
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.PasswordComplexityProjection.Trigger(ctx, false)
+		err := projection.PasswordComplexityProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 

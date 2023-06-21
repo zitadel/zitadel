@@ -90,7 +90,7 @@ func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.ProjectRoleProjection.Trigger(ctx, false)
+		err := projection.ProjectRoleProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 
