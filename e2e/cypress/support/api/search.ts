@@ -25,8 +25,8 @@ export function findFromList(find: (entity: Entity) => boolean, idField: string 
     const entity = b.result?.find(find);
     return {
       entity: entity,
-      sequence: parseInt(<string>b.details.processedSequence),
       id: entity?.[idField],
+      viewTimeStamp: b.details.viewTimeStamp,
     };
   };
 }
