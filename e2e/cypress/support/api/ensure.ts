@@ -107,7 +107,18 @@ export function ensureSomething(
         });
     })
     .then((id) => {
-      return awaitDesired(90, (entity) => ['POST', 'PUT'].indexOf(ensureMethod) > -1 && entity.id === id || ensureMethod == 'DELETE' && !entity, search).then(() => {
+      return awaitDesired(90, (entity) => {
+        switch (ensureMethod) {
+          case 'POST':
+            return entity.id === id
+          case 'DELETE':
+            return !entity
+          case 'PUT':
+            return expectEntity(entity)
+          default:
+            return false
+        }
+      }, search).then(() => {
         return cy.wrap(id);
       });
     });
