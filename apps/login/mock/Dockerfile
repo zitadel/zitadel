@@ -17,4 +17,4 @@ RUN go install github.com/eliobischof/grpc-mock/cmd/grpc-mock@4de05333a51075cb3a
 
 COPY --from=config / .
 
-ENTRYPOINT [ "sh", "-c", "grpc-mock -proto $(tr '\n' ',' < ./mocked-services.cfg) -stub-dir ./initial-stubs" ]
+ENTRYPOINT [ "sh", "-c", "grpc-mock -v 1 -proto $(tr '\n' ',' < ./mocked-services.cfg) -stub-dir ./initial-stubs" ]
