@@ -22,7 +22,6 @@ import {
   SetSessionResponse,
   DeleteSessionResponse,
   VerifyPasskeyRegistrationResponse,
-  SetHumanPasswordResponse,
 } from "@zitadel/server";
 import { Metadata } from "nice-grpc";
 
