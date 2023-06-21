@@ -292,6 +292,13 @@ func (l *Login) handleExternalUserAuthenticated(
 		l.renderError(w, r, authReq, externalErr)
 		return
 	}
+	var err error
+	// read current auth request state (incl. authorized user)
+	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
 	externalUser, externalUserChange, err := l.runPostExternalAuthenticationActions(externalUser, tokens(session), authReq, r, user, nil)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
@@ -301,14 +308,6 @@ func (l *Login) handleExternalUserAuthenticated(
 	if errors.IsNotFound(externalErr) {
 		l.externalUserNotExisting(w, r, authReq, provider, externalUser, externalUserChange)
 		return
-	}
-	if provider.IsAutoUpdate || len(externalUser.Metadatas) > 0 || externalUserChange {
-		// read current auth request state (incl. authorized user)
-		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
-		if err != nil {
-			l.renderError(w, r, authReq, err)
-			return
-		}
 	}
 	if provider.IsAutoUpdate || externalUserChange {
 		err = l.updateExternalUser(r.Context(), authReq, externalUser)
