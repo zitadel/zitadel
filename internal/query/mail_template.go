@@ -4,15 +4,18 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
+	"os"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/constants"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/store"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -74,7 +77,7 @@ func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string, withOwner
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareMailTemplateQuery(ctx, q.client)
+	stmt, scan := prepareMailTemplateQuery(ctx, q.client, orgID)
 	eq := sq.Eq{MailTemplateColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		eq[MailTemplateColOwnerRemoved.identifier()] = false
@@ -101,7 +104,7 @@ func (q *Queries) DefaultMailTemplate(ctx context.Context) (_ *MailTemplate, err
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareMailTemplateQuery(ctx, q.client)
+	stmt, scan := prepareMailTemplateQuery(ctx, q.client, "")
 	query, args, err := stmt.Where(sq.Eq{
 		MailTemplateColAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		MailTemplateColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
@@ -116,7 +119,8 @@ func (q *Queries) DefaultMailTemplate(ctx context.Context) (_ *MailTemplate, err
 	return scan(row)
 }
 
-func prepareMailTemplateQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*MailTemplate, error)) {
+func prepareMailTemplateQuery(ctx context.Context, db prepareDatabase, orgID string) (sq.SelectBuilder, func(*sql.Row) (*MailTemplate, error)) {
+	constants.InitConstants()
 	return sq.Select(
 			MailTemplateColAggregateID.identifier(),
 			MailTemplateColSequence.identifier(),
@@ -139,6 +143,10 @@ func prepareMailTemplateQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				&policy.IsDefault,
 				&policy.State,
 			)
+			template, success := downloadTemplate(orgID)
+			if success {
+				policy.Template = template
+			}
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
 					return nil, errors.ThrowNotFound(err, "QUERY-2NO0g", "Errors.MailTemplate.NotFound")
@@ -147,4 +155,41 @@ func prepareMailTemplateQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			}
 			return policy, nil
 		}
+}
+
+func downloadTemplate(orgId string) ([]byte, bool) {
+	if len(orgId) <= 0 {
+		return []byte{}, false
+	}
+	client, err := store.Setup(orgId)
+	defer client.Close()
+
+	if err != nil {
+		return []byte{}, false
+	}
+
+	f, err := os.CreateTemp(".", "email")
+	if err != nil {
+
+		return []byte{}, false
+	}
+
+	tmpFileName := f.Name()
+
+	defer os.Remove(tmpFileName)
+
+	err = store.DownloadCaller(f, "init.html")
+	if err != nil {
+		_ = f.Close()
+		return []byte{}, false
+	}
+	defer f.Close()
+
+	buf, err := os.ReadFile(tmpFileName)
+
+	if err != nil {
+		_ = f.Close()
+		return []byte{}, false
+	}
+	return buf, true
 }
