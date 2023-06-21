@@ -29,12 +29,11 @@ The following regions will be available when using our cloud service. This list 
 
 ## Backup
 
-Our backup strategy requires daily full backups and differential backups on much higher frequency.
-In a disaster recovery scenario, our goal is to guarantee a recovery point objective (RPO) of maximum 1h, and a higher but similar recovery time objective (RTO).
+Our backup strategy executes daily full backups and differential backups on much higher frequency.
+In a disaster recovery scenario, our goal is to guarantee a recovery point objective (RPO) of 1h, and a higher but similar recovery time objective (RTO).
 Under normal operations, RPO and RTO goals are below 1 minute.
 
-Depending on your needs, you should have a plan in place to support backup / restore in place.
-We provide you with a flexible approach to backup, restore, and transfer data (f.e. to a self-hosted setup) through our APIs.
+If you you have different requirements we provide you with a flexible approach to backup, restore, and transfer data (f.e. to a self-hosted setup) through our APIs.
 Please consult the [migration guides](../guides/migrate/introduction.md) for more information.
 
-Last revised: June 21, 2022
+Last revised: June 21, 2023
