@@ -18,7 +18,6 @@ export interface SystemAPI extends Token {
 
 export type SearchResult = {
   entity: Entity | null;
-  sequence: number;
   id: string;
 };
 

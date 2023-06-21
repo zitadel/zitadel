@@ -63,24 +63,17 @@ function awaitDesired(
   trials: number,
   expectEntity: (entity: Entity) => boolean,
   search: () => Cypress.Chainable<SearchResult>,
-  initialSequence?: number,
 ) {
   return search().then((resp) => {
     const foundExpectedEntity = expectEntity(resp.entity);
-    const foundExpectedSequence = !initialSequence || resp.sequence >= initialSequence;
 
-    const check = !foundExpectedEntity || !foundExpectedSequence;
+    const check = !foundExpectedEntity;
     if (check) {
       expect(trials, `trying ${trials} more times`).to.be.greaterThan(0);
       cy.wait(1000);
-      return awaitDesired(trials - 1, expectEntity, search, initialSequence);
+      return awaitDesired(trials - 1, expectEntity, search);
     }
   });
-}
-
-interface EnsuredResult {
-  id: string;
-  sequence: number;
 }
 
 export function ensureSomething(
@@ -96,7 +89,7 @@ export function ensureSomething(
   return search()
     .then((sRes) => {
       if (expectEntity(sRes.entity)) {
-        return cy.wrap(<EnsuredResult>{ id: sRes.id, sequence: sRes.sequence });
+        return cy.wrap(sRes.id);
       }
 
       return cy
@@ -110,15 +103,12 @@ export function ensureSomething(
         })
         .then((cRes) => {
           expect(cRes.status).to.equal(200);
-          return <EnsuredResult>{
-            id: mapId ? mapId(cRes.body) : undefined,
-            sequence: sRes.sequence,
-          };
+          return mapId ? mapId(cRes.body) : undefined;
         });
     })
-    .then((data) => {
-      return awaitDesired(90, expectEntity, search, data.sequence).then(() => {
-        return cy.wrap(data.id);
+    .then((id) => {
+      return awaitDesired(90, (entity) => ensureMethod == 'POST' && entity.id === id || ensureMethod == 'DELETE' && !entity, search).then(() => {
+        return cy.wrap(id);
       });
     });
 }
