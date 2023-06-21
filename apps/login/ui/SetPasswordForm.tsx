@@ -14,6 +14,7 @@ import {
 } from "#/utils/validators";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
+import Alert from "./Alert";
 
 type Inputs =
   | {
@@ -40,6 +41,7 @@ export default function SetPasswordForm({
   });
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
 
   const router = useRouter();
 
@@ -59,7 +61,8 @@ export default function SetPasswordForm({
     });
     setLoading(false);
     if (!res.ok) {
-      throw new Error("Failed to register user");
+      const error = await res.json();
+      throw new Error(error.details);
     }
     return res.json();
   }
@@ -68,7 +71,6 @@ export default function SetPasswordForm({
     loginName: string,
     password: string
   ) {
-    setLoading(true);
     const res = await fetch("/session", {
       method: "POST",
       headers: {
@@ -80,7 +82,6 @@ export default function SetPasswordForm({
       }),
     });
 
-    setLoading(false);
     if (!res.ok) {
       throw new Error("Failed to set user");
     }
@@ -88,21 +89,27 @@ export default function SetPasswordForm({
   }
 
   function submitAndLink(value: Inputs): Promise<boolean | void> {
-    return submitRegister(value).then((humanResponse: any) => {
-      return createSessionWithLoginNameAndPassword(email, value.password).then(
-        () => {
+    return submitRegister(value)
+      .then((humanResponse: any) => {
+        setError("");
+        return createSessionWithLoginNameAndPassword(
+          email,
+          value.password
+        ).then(() => {
+          setLoading(false);
           return router.push(`/verify?userID=${humanResponse.userId}`);
-        }
-      );
-    });
+        });
+      })
+      .catch((errorDetails: Error) => {
+        setLoading(false);
+        setError(errorDetails.message);
+      });
   }
 
   const { errors } = formState;
 
   const watchPassword = watch("password", "");
   const watchConfirmPassword = watch("confirmPassword", "");
-
-  const [tosAndPolicyAccepted, setTosAndPolicyAccepted] = useState(false);
 
   const hasMinLength =
     passwordComplexitySettings &&
@@ -156,6 +163,8 @@ export default function SetPasswordForm({
           equals={!!watchPassword && watchPassword === watchConfirmPassword}
         />
       )}
+
+      {error && <Alert>{error}</Alert>}
 
       <div className="mt-8 flex w-full flex-row items-center justify-between">
         <Button type="button" variant={ButtonVariants.Secondary}>
