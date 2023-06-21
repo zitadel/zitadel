@@ -23,7 +23,7 @@ export default async function Page({
   }
   const title = !!prompt
     ? "Authenticate with a passkey"
-    : "Use your passkey to confirm it’s really you";
+    : "Use your passkey to confirm it's really you";
   const description = !!prompt
     ? "When set up, you will be able to authenticate without a password."
     : "Your device will ask for your fingerprint, face, or screen lock";
