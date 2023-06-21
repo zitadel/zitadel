@@ -59,23 +59,14 @@ export function ensureSetting(
   );
 }
 
-function awaitDesired(
-  trials: number,
-  eventTimestamp: number,
-  search: () => Cypress.Chainable<SearchResult>,
-) {
+function awaitDesired(trials: number, eventTimestamp: number, search: () => Cypress.Chainable<SearchResult>) {
   return search().then((resp) => {
     if (resp.viewTimeStamp < eventTimestamp) {
       expect(trials, `trying ${trials} more times`).to.be.greaterThan(0);
       cy.wait(1000);
-      return awaitDesired(trials - 1,eventTimestamp, search);
+      return awaitDesired(trials - 1, eventTimestamp, search);
     }
   });
-}
-
-interface EnsuredResult {
-  id: string;
-  creationDate: Date;
 }
 
 export function ensureSomething(
@@ -92,7 +83,6 @@ export function ensureSomething(
     if (expectEntity(sRes.entity)) {
       return cy.wrap(sRes.id);
     }
-
     return cy
       .request({
         method: ensureMethod,
@@ -104,11 +94,7 @@ export function ensureSomething(
       .then((cRes) => {
         expect(cRes.status).to.equal(200);
         const id = mapId ? mapId(cRes.body) : undefined;
-        return awaitDesired(
-          90,
-          cRes.body.details.changeDate || cRes.body.details.creationDate,
-          search,
-        ).then(() => {
+        return awaitDesired(90, cRes.body.details.changeDate || cRes.body.details.creationDate, search).then(() => {
           return cy.wrap(id);
         });
       });
