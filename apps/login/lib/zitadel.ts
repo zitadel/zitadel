@@ -22,7 +22,6 @@ import {
   DeleteSessionResponse,
   VerifyPasskeyRegistrationResponse,
 } from "@zitadel/server";
-import { Metadata } from "nice-grpc";
 
 export const zitadelConfig: ZitadelServerOptions = {
   name: "zitadel login",
