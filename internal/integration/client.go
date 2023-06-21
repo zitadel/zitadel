@@ -106,15 +106,15 @@ func (s *Tester) RegisterUserPasskey(ctx context.Context, userID string) {
 func (s *Tester) AddGenericOAuthProvider(t *testing.T) string {
 	ctx := authz.WithInstance(context.Background(), s.Instance)
 	id, _, err := s.Commands.AddOrgGenericOAuthProvider(ctx, s.Organisation.ID, command.GenericOAuthProvider{
-		"idp",
-		"clientID",
-		"clientSecret",
-		"https://example.com/oauth/v2/authorize",
-		"https://example.com/oauth/v2/token",
-		"https://api.example.com/user",
-		[]string{"openid", "profile", "email"},
-		"id",
-		idp.Options{
+		Name:                  "idp",
+		ClientID:              "clientID",
+		ClientSecret:          "clientSecret",
+		AuthorizationEndpoint: "https://example.com/oauth/v2/authorize",
+		TokenEndpoint:         "https://example.com/oauth/v2/token",
+		UserEndpoint:          "https://api.example.com/user",
+		Scopes:                []string{"openid", "profile", "email"},
+		IDAttribute:           "id",
+		IDPOptions: idp.Options{
 			IsLinkingAllowed:  true,
 			IsCreationAllowed: true,
 			IsAutoCreation:    true,
@@ -132,14 +132,14 @@ func (s *Tester) CreateIntent(t *testing.T, idpID string) string {
 	return id
 }
 
-func (s *Tester) CreateSuccessfulIntent(t *testing.T, idpID, userID string) (string, string, time.Time, uint64) {
+func (s *Tester) CreateSuccessfulIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
 	ctx := authz.WithInstance(context.Background(), s.Instance)
 	intentID := s.CreateIntent(t, idpID)
 	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Organisation.ID)
 	require.NoError(t, err)
 	idpUser := openid.NewUser(
 		&oidc.UserInfo{
-			Subject: "id",
+			Subject: idpUserID,
 			UserInfoProfile: oidc.UserInfoProfile{
 				PreferredUsername: "username",
 			},

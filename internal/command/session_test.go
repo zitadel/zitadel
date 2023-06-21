@@ -534,7 +534,7 @@ func TestCommands_updateSession(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4bw", "Errors.Intent.NotSuccessful"),
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4bw", "Errors.Intent.NotSucceeded"),
 			},
 		},
 		{

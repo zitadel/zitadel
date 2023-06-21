@@ -98,14 +98,14 @@ func CheckIntent(intentID, token string) SessionCommand {
 			return err
 		}
 		if cmd.intentWriteModel.State != domain.IDPIntentStateSucceeded {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4bw", "Errors.Intent.NotSuccessful")
+			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4bw", "Errors.Intent.NotSucceeded")
 		}
 		if cmd.intentWriteModel.UserID != "" {
 			if cmd.intentWriteModel.UserID != cmd.sessionWriteModel.UserID {
 				return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser")
 			}
 		} else {
-			linkWriteModel := NewUserIDPLinkWriteModel(cmd.sessionWriteModel.UserID, cmd.intentWriteModel.IDPID, cmd.intentWriteModel.UserID, cmd.intentWriteModel.ResourceOwner)
+			linkWriteModel := NewUserIDPLinkWriteModel(cmd.sessionWriteModel.UserID, cmd.intentWriteModel.IDPID, cmd.intentWriteModel.IDPUserID, cmd.intentWriteModel.ResourceOwner)
 			err := cmd.eventstore.FilterToQueryReducer(ctx, linkWriteModel)
 			if err != nil {
 				return err
