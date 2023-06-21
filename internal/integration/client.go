@@ -14,7 +14,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
+	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
@@ -69,9 +69,9 @@ func (s *Tester) CreateUserIDPlink(ctx context.Context, userID, externalID, idpI
 		&user.AddIDPLinkRequest{
 			UserId: userID,
 			IdpLink: &user.IDPLink{
-				IdpId:         idpID,
-				IdpExternalId: externalID,
-				DisplayName:   username,
+				IdpId:    idpID,
+				UserId:   externalID,
+				UserName: username,
 			},
 		},
 	)
@@ -137,12 +137,15 @@ func (s *Tester) CreateSuccessfulIntent(t *testing.T, idpID, userID string) (str
 	intentID := s.CreateIntent(t, idpID)
 	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Organisation.ID)
 	require.NoError(t, err)
-	idpUser := &oauth.UserMapper{
-		RawInfo: map[string]interface{}{
-			"id": "id",
+	idpUser := openid.NewUser(
+		&oidc.UserInfo{
+			Subject: "id",
+			UserInfoProfile: oidc.UserInfoProfile{
+				PreferredUsername: "username",
+			},
 		},
-	}
-	idpSession := &oauth.Session{
+	)
+	idpSession := &openid.Session{
 		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 			Token: &oauth2.Token{
 				AccessToken: "accessToken",

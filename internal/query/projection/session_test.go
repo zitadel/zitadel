@@ -298,7 +298,7 @@ func TestSessionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.sessions1 SET password_checked_at = $1 WHERE (user_id = $2) AND (password_checked_at < $3)",
+							expectedStmt: "UPDATE projections.sessions2 SET password_checked_at = $1 WHERE (user_id = $2) AND (password_checked_at < $3)",
 							expectedArgs: []interface{}{
 								nil,
 								"agg-id",

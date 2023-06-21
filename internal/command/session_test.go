@@ -559,6 +559,8 @@ func TestCommands_updateSession(t *testing.T) {
 							eventFromEventPusher(
 								idpintent.NewSucceededEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate,
 									nil,
+									"idpUserID",
+									"idpUserName",
 									"userID2",
 									nil,
 									"",
@@ -651,6 +653,8 @@ func TestCommands_updateSession(t *testing.T) {
 							eventFromEventPusher(
 								idpintent.NewSucceededEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate,
 									nil,
+									"idpUserID",
+									"idpUsername",
 									"userID",
 									nil,
 									"",
