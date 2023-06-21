@@ -200,8 +200,6 @@ export async function setEmail(
   );
 }
 
-const bearerTokenMetadata = (token: string) =>
-  new Metadata({ authorization: `Bearer ${token}` });
 
 /**
  *
