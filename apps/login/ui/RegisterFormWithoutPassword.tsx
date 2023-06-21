@@ -47,13 +47,10 @@ export default function RegisterFormWithoutPassword({ legal }: Props) {
         lastName: values.lastname,
       }),
     });
-
+    setLoading(false);
     if (!res.ok) {
-      setLoading(false);
       throw new Error("Failed to register user");
     }
-
-    setLoading(false);
     return res.json();
   }
 
