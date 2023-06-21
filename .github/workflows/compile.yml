@@ -36,7 +36,7 @@ jobs:
       uses: actions/checkout@v3
     - 
       uses: actions/cache/restore@v3
-      timeout-minutes: 2
+      timeout-minutes: 1
       name: restore console
       with:
         path: ${{ inputs.console_cache_path }}
@@ -44,7 +44,7 @@ jobs:
         fail-on-cache-miss: true
     - 
       uses: actions/cache/restore@v3
-      timeout-minutes: 2
+      timeout-minutes: 1
       name: restore core
       with:
         path: ${{ inputs.core_cache_path }}

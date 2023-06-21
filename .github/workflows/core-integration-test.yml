@@ -41,7 +41,7 @@ jobs:
           go-version: ${{ inputs.go_version }}
       - 
         uses: actions/cache/restore@v3
-        timeout-minutes: 2
+        timeout-minutes: 1
         name: restore core
         id: restore-core
         with:
@@ -54,7 +54,7 @@ jobs:
         run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
       - 
         uses: actions/cache/restore@v3
-        timeout-minutes: 2
+        timeout-minutes: 1
         name: restore previous results
         with:
           key: integration-test-postgres-${{ inputs.core_cache_key }}
@@ -107,7 +107,7 @@ jobs:
   #         go-version: ${{ inputs.go_version }}
   #     - 
   #       uses: actions/cache/restore@v3
-  #       timeout-minutes: 2
+  #       timeout-minutes: 1
   #       name: restore core
   #       with:
   #         path: ${{ inputs.core_cache_path }}
@@ -119,7 +119,7 @@ jobs:
   #       run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
   #     - 
   #       uses: actions/cache/restore@v3
-  #       timeout-minutes: 2
+  #       timeout-minutes: 1
   #       name: restore previous results
   #       with:
   #         key: integration-test-crdb-${{ inputs.core_cache_key }}
