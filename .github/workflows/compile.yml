@@ -25,7 +25,6 @@ on:
 jobs:
   executable:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
     strategy:
       fail-fast: false
       matrix:
@@ -55,6 +54,7 @@ jobs:
         go-version: ${{ inputs.go_version }}
     - 
       name: compile
+      timeout-minutes: 5
       run: |
         GOOS="${{matrix.goos}}" \
         GOARCH="${{matrix.goarch}}" \
