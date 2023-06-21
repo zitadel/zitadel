@@ -52,8 +52,8 @@ func (u *webUser) WebAuthnCredentials() []webauthn.Credential {
 	return u.credentials
 }
 
-func (w *Config) BeginRegistration(ctx context.Context, user *domain.Human, accountName string, authType domain.AuthenticatorAttachment, userVerification domain.UserVerificationRequirement, isLoginUI bool, webAuthNs ...*domain.WebAuthNToken) (*domain.WebAuthNToken, error) {
-	webAuthNServer, err := w.serverFromContext(ctx)
+func (w *Config) BeginRegistration(ctx context.Context, user *domain.Human, accountName string, authType domain.AuthenticatorAttachment, userVerification domain.UserVerificationRequirement, rpID string, webAuthNs ...*domain.WebAuthNToken) (*domain.WebAuthNToken, error) {
+	webAuthNServer, err := w.serverFromContext(ctx, rpID, "")
 	if err != nil {
 		return nil, err
 	}
@@ -90,6 +90,7 @@ func (w *Config) BeginRegistration(ctx context.Context, user *domain.Human, acco
 		CredentialCreationData: cred,
 		AllowedCredentialIDs:   sessionData.AllowedCredentialIDs,
 		UserVerification:       UserVerificationToDomain(sessionData.UserVerification),
+		RPID:                   webAuthNServer.Config.RPID,
 	}, nil
 }
 
@@ -104,7 +105,7 @@ func (w *Config) FinishRegistration(ctx context.Context, user *domain.Human, web
 		return nil, caos_errs.ThrowInternal(err, "WEBAU-sEr8c", "Errors.User.WebAuthN.ErrorOnParseCredential")
 	}
 	sessionData := WebAuthNToSessionData(webAuthN)
-	webAuthNServer, err := w.serverFromContext(ctx)
+	webAuthNServer, err := w.serverFromContext(ctx, webAuthN.RPID, credentialData.Response.CollectedClientData.Origin)
 	if err != nil {
 		return nil, err
 	}
@@ -124,11 +125,12 @@ func (w *Config) FinishRegistration(ctx context.Context, user *domain.Human, web
 	webAuthN.AAGUID = credential.Authenticator.AAGUID
 	webAuthN.SignCount = credential.Authenticator.SignCount
 	webAuthN.WebAuthNTokenName = tokenName
+	webAuthN.RPID = webAuthNServer.Config.RPID
 	return webAuthN, nil
 }
 
-func (w *Config) BeginLogin(ctx context.Context, user *domain.Human, userVerification domain.UserVerificationRequirement, webAuthNs ...*domain.WebAuthNToken) (*domain.WebAuthNLogin, error) {
-	webAuthNServer, err := w.serverFromContext(ctx)
+func (w *Config) BeginLogin(ctx context.Context, user *domain.Human, userVerification domain.UserVerificationRequirement, rpID string, webAuthNs ...*domain.WebAuthNToken) (*domain.WebAuthNLogin, error) {
+	webAuthNServer, err := w.serverFromContext(ctx, rpID, "")
 	if err != nil {
 		return nil, err
 	}
@@ -148,6 +150,7 @@ func (w *Config) BeginLogin(ctx context.Context, user *domain.Human, userVerific
 		CredentialAssertionData: cred,
 		AllowedCredentialIDs:    sessionData.AllowedCredentialIDs,
 		UserVerification:        userVerification,
+		RPID:                    webAuthNServer.Config.RPID,
 	}, nil
 }
 
@@ -160,7 +163,7 @@ func (w *Config) FinishLogin(ctx context.Context, user *domain.Human, webAuthN *
 		Human:       user,
 		credentials: WebAuthNsToCredentials(webAuthNs),
 	}
-	webAuthNServer, err := w.serverFromContext(ctx)
+	webAuthNServer, err := w.serverFromContext(ctx, webAuthN.RPID, assertionData.Response.CollectedClientData.Origin)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -175,15 +178,31 @@ func (w *Config) FinishLogin(ctx context.Context, user *domain.Human, webAuthN *
 	return credential.ID, credential.Authenticator.SignCount, nil
 }
 
-func (w *Config) serverFromContext(ctx context.Context) (*webauthn.WebAuthn, error) {
-	instance := authz.GetInstance(ctx)
-	webAuthn, err := webauthn.New(&webauthn.Config{
-		RPDisplayName: w.DisplayName,
-		RPID:          instance.RequestedDomain(),
-		RPOrigins:     []string{http.BuildOrigin(instance.RequestedHost(), w.ExternalSecure)},
-	})
+func (w *Config) serverFromContext(ctx context.Context, id, origin string) (*webauthn.WebAuthn, error) {
+	config := w.config(id, origin)
+	if id == "" {
+		config = w.configFromContext(ctx)
+	}
+	webAuthn, err := webauthn.New(config)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "WEBAU-UX9ta", "Errors.User.WebAuthN.ServerConfig")
 	}
 	return webAuthn, nil
+}
+
+func (w *Config) configFromContext(ctx context.Context) *webauthn.Config {
+	instance := authz.GetInstance(ctx)
+	return &webauthn.Config{
+		RPDisplayName: w.DisplayName,
+		RPID:          instance.RequestedDomain(),
+		RPOrigins:     []string{http.BuildOrigin(instance.RequestedHost(), w.ExternalSecure)},
+	}
+}
+
+func (w *Config) config(id, origin string) *webauthn.Config {
+	return &webauthn.Config{
+		RPDisplayName: w.DisplayName,
+		RPID:          id,
+		RPOrigins:     []string{origin},
+	}
 }

@@ -12,7 +12,7 @@ import (
 
 func (s *Server) RegisterU2F(ctx context.Context, req *user.RegisterU2FRequest) (*user.RegisterU2FResponse, error) {
 	return u2fRegistrationDetailsToPb(
-		s.command.RegisterUserU2F(ctx, req.GetUserId(), authz.GetCtxData(ctx).ResourceOwner),
+		s.command.RegisterUserU2F(ctx, req.GetUserId(), authz.GetCtxData(ctx).ResourceOwner, req.GetDomain()),
 	)
 }
 
@@ -34,7 +34,7 @@ func (s *Server) VerifyU2FRegistration(ctx context.Context, req *user.VerifyU2FR
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "USERv2-IeTh4", "Errors.Internal")
 	}
-	objectDetails, err := s.command.HumanVerifyU2FSetup(ctx, req.GetUserId(), resourceOwner, req.GetTokenName(), "", pkc)
+	objectDetails, err := s.command.HumanVerifyU2FSetup(ctx, req.GetUserId(), resourceOwner, req.GetTokenName(), "", req.GetU2FId(), pkc)
 	if err != nil {
 		return nil, err
 	}

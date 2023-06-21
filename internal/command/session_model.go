@@ -16,6 +16,7 @@ type PasskeyChallengeModel struct {
 	Challenge          string
 	AllowedCrentialIDs [][]byte
 	UserVerification   domain.UserVerificationRequirement
+	RPID               string
 }
 
 func (p *PasskeyChallengeModel) WebAuthNLogin(human *domain.Human, credentialAssertionData []byte) (*domain.WebAuthNLogin, error) {
@@ -28,6 +29,7 @@ func (p *PasskeyChallengeModel) WebAuthNLogin(human *domain.Human, credentialAss
 		Challenge:               p.Challenge,
 		AllowedCredentialIDs:    p.AllowedCrentialIDs,
 		UserVerification:        p.UserVerification,
+		RPID:                    p.RPID,
 	}, nil
 }
 
@@ -122,6 +124,7 @@ func (wm *SessionWriteModel) reducePasskeyChallenged(e *session.PasskeyChallenge
 		Challenge:          e.Challenge,
 		AllowedCrentialIDs: e.AllowedCrentialIDs,
 		UserVerification:   e.UserVerification,
+		RPID:               e.RPID,
 	}
 }
 
@@ -153,8 +156,8 @@ func (wm *SessionWriteModel) PasswordChecked(ctx context.Context, checkedAt time
 	wm.commands = append(wm.commands, session.NewPasswordCheckedEvent(ctx, wm.aggregate, checkedAt))
 }
 
-func (wm *SessionWriteModel) PasskeyChallenged(ctx context.Context, challenge string, allowedCrentialIDs [][]byte, userVerification domain.UserVerificationRequirement) {
-	wm.commands = append(wm.commands, session.NewPasskeyChallengedEvent(ctx, wm.aggregate, challenge, allowedCrentialIDs, userVerification))
+func (wm *SessionWriteModel) PasskeyChallenged(ctx context.Context, challenge, rpID string, allowedCrentialIDs [][]byte, userVerification domain.UserVerificationRequirement) {
+	wm.commands = append(wm.commands, session.NewPasskeyChallengedEvent(ctx, wm.aggregate, challenge, allowedCrentialIDs, userVerification, rpID))
 }
 
 func (wm *SessionWriteModel) PasskeyChecked(ctx context.Context, checkedAt time.Time, tokenID string, signCount uint32) {

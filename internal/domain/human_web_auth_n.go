@@ -23,6 +23,7 @@ type WebAuthNToken struct {
 	AAGUID                 []byte
 	SignCount              uint32
 	WebAuthNTokenName      string
+	RPID                   string
 }
 
 type WebAuthNLogin struct {
@@ -32,6 +33,7 @@ type WebAuthNLogin struct {
 	Challenge               string
 	AllowedCredentialIDs    [][]byte
 	UserVerification        UserVerificationRequirement
+	RPID                    string
 }
 
 type UserVerificationRequirement int32

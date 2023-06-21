@@ -21,17 +21,19 @@ type HumanWebAuthNWriteModel struct {
 	AAGUID            []byte
 	SignCount         uint32
 	WebAuthNTokenName string
+	RPID              string
 
 	State domain.MFAState
 }
 
-func NewHumanWebAuthNWriteModel(userID, webAuthNTokenID, resourceOwner string) *HumanWebAuthNWriteModel {
+func NewHumanWebAuthNWriteModel(userID, webAuthNTokenID, resourceOwner, rpID string) *HumanWebAuthNWriteModel {
 	return &HumanWebAuthNWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
 		WebauthNTokenID: webAuthNTokenID,
+		RPID:            rpID,
 	}
 }
 
@@ -39,15 +41,15 @@ func (wm *HumanWebAuthNWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.HumanWebAuthNAddedEvent:
-			if wm.WebauthNTokenID == e.WebAuthNTokenID {
+			if wm.WebauthNTokenID == e.WebAuthNTokenID && wm.RPID == e.RPID {
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *user.HumanPasswordlessAddedEvent:
-			if wm.WebauthNTokenID == e.WebAuthNTokenID {
+			if wm.WebauthNTokenID == e.WebAuthNTokenID && wm.RPID == e.RPID {
 				wm.WriteModel.AppendEvents(&e.HumanWebAuthNAddedEvent)
 			}
 		case *user.HumanU2FAddedEvent:
-			if wm.WebauthNTokenID == e.WebAuthNTokenID {
+			if wm.WebauthNTokenID == e.WebAuthNTokenID && wm.RPID == e.RPID {
 				wm.WriteModel.AppendEvents(&e.HumanWebAuthNAddedEvent)
 			}
 		case *user.HumanWebAuthNVerifiedEvent:
@@ -113,6 +115,7 @@ func (wm *HumanWebAuthNWriteModel) Reduce() error {
 func (wm *HumanWebAuthNWriteModel) appendAddedEvent(e *user.HumanWebAuthNAddedEvent) {
 	wm.WebauthNTokenID = e.WebAuthNTokenID
 	wm.Challenge = e.Challenge
+	wm.RPID = e.RPID
 	wm.State = domain.MFAStateNotReady
 }
 
@@ -149,14 +152,16 @@ type HumanU2FTokensReadModel struct {
 
 	WebAuthNTokens []*HumanWebAuthNWriteModel
 	UserState      domain.UserState
+	RPID           string
 }
 
-func NewHumanU2FTokensReadModel(userID, resourceOwner string) *HumanU2FTokensReadModel {
+func NewHumanU2FTokensReadModel(userID, resourceOwner, rpID string) *HumanU2FTokensReadModel {
 	return &HumanU2FTokensReadModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
+		RPID: rpID,
 	}
 }
 
@@ -232,14 +237,16 @@ type HumanPasswordlessTokensReadModel struct {
 
 	WebAuthNTokens []*HumanWebAuthNWriteModel
 	UserState      domain.UserState
+	RPID           string
 }
 
-func NewHumanPasswordlessTokensReadModel(userID, resourceOwner string) *HumanPasswordlessTokensReadModel {
+func NewHumanPasswordlessTokensReadModel(userID, resourceOwner, rpID string) *HumanPasswordlessTokensReadModel {
 	return &HumanPasswordlessTokensReadModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
+		RPID: rpID,
 	}
 }
 

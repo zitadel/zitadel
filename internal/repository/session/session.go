@@ -150,6 +150,7 @@ type PasskeyChallengedEvent struct {
 	Challenge          string                             `json:"challenge,omitempty"`
 	AllowedCrentialIDs [][]byte                           `json:"allowedCrentialIDs,omitempty"`
 	UserVerification   domain.UserVerificationRequirement `json:"userVerification,omitempty"`
+	RPID               string                             `json:"rpID,omitempty"`
 }
 
 func (e *PasskeyChallengedEvent) Data() interface{} {
@@ -170,6 +171,7 @@ func NewPasskeyChallengedEvent(
 	challenge string,
 	allowedCrentialIDs [][]byte,
 	userVerification domain.UserVerificationRequirement,
+	rpID string,
 ) *PasskeyChallengedEvent {
 	return &PasskeyChallengedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -180,6 +182,7 @@ func NewPasskeyChallengedEvent(
 		Challenge:          challenge,
 		AllowedCrentialIDs: allowedCrentialIDs,
 		UserVerification:   userVerification,
+		RPID:               rpID,
 	}
 }
 

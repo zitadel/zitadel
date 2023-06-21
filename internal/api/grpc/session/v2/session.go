@@ -236,17 +236,15 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	return sessionChecks, nil
 }
 
-func (s *Server) challengesToCommand(challenges []session.ChallengeKind, cmds []command.SessionCommand) (*session.Challenges, []command.SessionCommand) {
+func (s *Server) challengesToCommand(challenges []*session.ChallengeKind, cmds []command.SessionCommand) (*session.Challenges, []command.SessionCommand) {
 	if len(challenges) == 0 {
 		return nil, cmds
 	}
 	resp := new(session.Challenges)
 	for _, c := range challenges {
-		switch c {
-		case session.ChallengeKind_CHALLENGE_KIND_UNSPECIFIED:
-			continue
-		case session.ChallengeKind_CHALLENGE_KIND_PASSKEY:
-			passkeyChallenge, cmd := s.createPasskeyChallengeCommand()
+		switch ct := c.GetChallenge().(type) {
+		case *session.ChallengeKind_Passkey:
+			passkeyChallenge, cmd := s.createPasskeyChallengeCommand(ct.Passkey.GetDomain())
 			resp.Passkey = passkeyChallenge
 			cmds = append(cmds, cmd)
 		}
@@ -254,11 +252,11 @@ func (s *Server) challengesToCommand(challenges []session.ChallengeKind, cmds []
 	return resp, cmds
 }
 
-func (s *Server) createPasskeyChallengeCommand() (*session.Challenges_Passkey, command.SessionCommand) {
+func (s *Server) createPasskeyChallengeCommand(rpID string) (*session.Challenges_Passkey, command.SessionCommand) {
 	challenge := &session.Challenges_Passkey{
 		PublicKeyCredentialRequestOptions: new(structpb.Struct),
 	}
-	return challenge, s.command.CreatePasskeyChallenge(domain.UserVerificationRequirementRequired, challenge.PublicKeyCredentialRequestOptions)
+	return challenge, s.command.CreatePasskeyChallenge(domain.UserVerificationRequirementRequired, rpID, challenge.PublicKeyCredentialRequestOptions)
 }
 
 func userCheck(user *session.CheckUser) (userSearch, error) {

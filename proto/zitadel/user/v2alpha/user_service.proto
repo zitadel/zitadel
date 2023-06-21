@@ -587,6 +587,7 @@ message RegisterPasskeyRequest{
       description: "\"Optionally specify the authenticator type of the passkey device (platform or cross-platform). If none is provided, both values are allowed.\"";
     }
   ];
+  string domain = 4;
 }
 
 message RegisterPasskeyResponse{
@@ -658,6 +659,7 @@ message RegisterU2FRequest{
       example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
     }
   ];
+  string domain = 2;
 }
 
 message RegisterU2FResponse{

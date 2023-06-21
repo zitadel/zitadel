@@ -15,8 +15,8 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) getHumanU2FTokens(ctx context.Context, userID, resourceowner string) ([]*domain.WebAuthNToken, error) {
-	tokenReadModel := NewHumanU2FTokensReadModel(userID, resourceowner)
+func (c *Commands) getHumanU2FTokens(ctx context.Context, userID, resourceowner, rpID string) ([]*domain.WebAuthNToken, error) {
+	tokenReadModel := NewHumanU2FTokensReadModel(userID, resourceowner, rpID)
 	err := c.eventstore.FilterToQueryReducer(ctx, tokenReadModel)
 	if err != nil {
 		return nil, err
@@ -27,8 +27,8 @@ func (c *Commands) getHumanU2FTokens(ctx context.Context, userID, resourceowner 
 	return readModelToU2FTokens(tokenReadModel), nil
 }
 
-func (c *Commands) getHumanPasswordlessTokens(ctx context.Context, userID, resourceowner string) ([]*domain.WebAuthNToken, error) {
-	tokenReadModel := NewHumanPasswordlessTokensReadModel(userID, resourceowner)
+func (c *Commands) getHumanPasswordlessTokens(ctx context.Context, userID, resourceOwner, rpID string) ([]*domain.WebAuthNToken, error) {
+	tokenReadModel := NewHumanPasswordlessTokensReadModel(userID, resourceOwner, rpID)
 	err := c.eventstore.FilterToQueryReducer(ctx, tokenReadModel)
 	if err != nil {
 		return nil, err
@@ -78,16 +78,16 @@ func (c *Commands) getHumanPasswordlessLogin(ctx context.Context, userID, authRe
 }
 
 func (c *Commands) HumanAddU2FSetup(ctx context.Context, userID, resourceowner string, isLoginUI bool) (*domain.WebAuthNToken, error) {
-	u2fTokens, err := c.getHumanU2FTokens(ctx, userID, resourceowner)
+	u2fTokens, err := c.getHumanU2FTokens(ctx, userID, resourceowner, "")
 	if err != nil {
 		return nil, err
 	}
-	addWebAuthN, userAgg, webAuthN, err := c.addHumanWebAuthN(ctx, userID, resourceowner, isLoginUI, u2fTokens, domain.AuthenticatorAttachmentUnspecified, domain.UserVerificationRequirementDiscouraged)
+	addWebAuthN, userAgg, webAuthN, err := c.addHumanWebAuthN(ctx, userID, resourceowner, "", u2fTokens, domain.AuthenticatorAttachmentUnspecified, domain.UserVerificationRequirementDiscouraged)
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, usr_repo.NewHumanU2FAddedEvent(ctx, userAgg, addWebAuthN.WebauthNTokenID, webAuthN.Challenge))
+	events, err := c.eventstore.Push(ctx, usr_repo.NewHumanU2FAddedEvent(ctx, userAgg, addWebAuthN.WebauthNTokenID, webAuthN.Challenge, webAuthN.RPID))
 	if err != nil {
 		return nil, err
 	}
@@ -104,16 +104,16 @@ func (c *Commands) HumanAddU2FSetup(ctx context.Context, userID, resourceowner s
 }
 
 func (c *Commands) HumanAddPasswordlessSetup(ctx context.Context, userID, resourceowner string, isLoginUI bool, authenticatorPlatform domain.AuthenticatorAttachment) (*domain.WebAuthNToken, error) {
-	passwordlessTokens, err := c.getHumanPasswordlessTokens(ctx, userID, resourceowner)
+	passwordlessTokens, err := c.getHumanPasswordlessTokens(ctx, userID, resourceowner, "")
 	if err != nil {
 		return nil, err
 	}
-	addWebAuthN, userAgg, webAuthN, err := c.addHumanWebAuthN(ctx, userID, resourceowner, isLoginUI, passwordlessTokens, authenticatorPlatform, domain.UserVerificationRequirementRequired)
+	addWebAuthN, userAgg, webAuthN, err := c.addHumanWebAuthN(ctx, userID, resourceowner, "", passwordlessTokens, authenticatorPlatform, domain.UserVerificationRequirementRequired)
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, usr_repo.NewHumanPasswordlessAddedEvent(ctx, userAgg, addWebAuthN.WebauthNTokenID, webAuthN.Challenge))
+	events, err := c.eventstore.Push(ctx, usr_repo.NewHumanPasswordlessAddedEvent(ctx, userAgg, addWebAuthN.WebauthNTokenID, webAuthN.Challenge, ""))
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +137,7 @@ func (c *Commands) HumanAddPasswordlessSetupInitCode(ctx context.Context, userID
 	return c.HumanAddPasswordlessSetup(ctx, userID, resourceowner, true, preferredPlatformType)
 }
 
-func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner string, isLoginUI bool, tokens []*domain.WebAuthNToken, authenticatorPlatform domain.AuthenticatorAttachment, userVerification domain.UserVerificationRequirement) (*HumanWebAuthNWriteModel, *eventstore.Aggregate, *domain.WebAuthNToken, error) {
+func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner, rpID string, tokens []*domain.WebAuthNToken, authenticatorPlatform domain.AuthenticatorAttachment, userVerification domain.UserVerificationRequirement) (*HumanWebAuthNWriteModel, *eventstore.Aggregate, *domain.WebAuthNToken, error) {
 	if userID == "" {
 		return nil, nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M0od", "Errors.IDMissing")
 	}
@@ -157,7 +157,7 @@ func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner s
 	if accountName == "" {
 		accountName = string(user.EmailAddress)
 	}
-	webAuthN, err := c.webauthnConfig.BeginRegistration(ctx, user, accountName, authenticatorPlatform, userVerification, isLoginUI, tokens...)
+	webAuthN, err := c.webauthnConfig.BeginRegistration(ctx, user, accountName, authenticatorPlatform, userVerification, rpID, tokens...)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -165,7 +165,7 @@ func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner s
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	addWebAuthN, err := c.webauthNWriteModelByID(ctx, userID, tokenID, resourceowner)
+	addWebAuthN, err := c.webauthNWriteModelByID(ctx, userID, tokenID, resourceowner, rpID)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -174,7 +174,7 @@ func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner s
 	return addWebAuthN, userAgg, webAuthN, nil
 }
 
-func (c *Commands) HumanVerifyU2FSetup(ctx context.Context, userID, resourceowner, tokenName, userAgentID string, credentialData []byte) (*domain.ObjectDetails, error) {
+func (c *Commands) HumanVerifyU2FSetup(ctx context.Context, userID, resourceowner, tokenName, userAgentID, u2fID string, credentialData []byte) (*domain.ObjectDetails, error) {
 	u2fTokens, err := c.getHumanU2FTokens(ctx, userID, resourceowner)
 	if err != nil {
 		return nil, err
@@ -226,7 +226,7 @@ func (c *Commands) HumanHumanPasswordlessSetup(ctx context.Context, userID, reso
 func (c *Commands) humanHumanPasswordlessSetup(ctx context.Context, userID, resourceowner, tokenName, userAgentID string, credentialData []byte,
 	codeCheckEvent func(*eventstore.Aggregate) *usr_repo.HumanPasswordlessInitCodeCheckSucceededEvent) (*domain.ObjectDetails, error) {
 
-	u2fTokens, err := c.getHumanPasswordlessTokens(ctx, userID, resourceowner)
+	u2fTokens, err := c.getHumanPasswordlessTokens(ctx, userID, resourceowner, "")
 	if err != nil {
 		return nil, err
 	}
@@ -277,7 +277,7 @@ func (c *Commands) verifyHumanWebAuthN(ctx context.Context, userID, resourceowne
 		return nil, nil, nil, err
 	}
 
-	verifyWebAuthN, err := c.webauthNWriteModelByID(ctx, userID, token.WebAuthNTokenID, resourceowner)
+	verifyWebAuthN, err := c.webauthNWriteModelByID(ctx, userID, token.WebAuthNTokenID, resourceowner, "")
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -287,7 +287,7 @@ func (c *Commands) verifyHumanWebAuthN(ctx context.Context, userID, resourceowne
 }
 
 func (c *Commands) HumanBeginU2FLogin(ctx context.Context, userID, resourceOwner string, authRequest *domain.AuthRequest) (*domain.WebAuthNLogin, error) {
-	u2fTokens, err := c.getHumanU2FTokens(ctx, userID, resourceOwner)
+	u2fTokens, err := c.getHumanU2FTokens(ctx, userID, resourceOwner, "")
 	if err != nil {
 		return nil, err
 	}
@@ -312,7 +312,7 @@ func (c *Commands) HumanBeginU2FLogin(ctx context.Context, userID, resourceOwner
 }
 
 func (c *Commands) HumanBeginPasswordlessLogin(ctx context.Context, userID, resourceOwner string, authRequest *domain.AuthRequest) (*domain.WebAuthNLogin, error) {
-	u2fTokens, err := c.getHumanPasswordlessTokens(ctx, userID, resourceOwner)
+	u2fTokens, err := c.getHumanPasswordlessTokens(ctx, userID, resourceOwner, "")
 	if err != nil {
 		return nil, err
 	}
@@ -343,12 +343,12 @@ func (c *Commands) beginWebAuthNLogin(ctx context.Context, userID, resourceOwner
 	if err != nil {
 		return nil, nil, err
 	}
-	webAuthNLogin, err := c.webauthnConfig.BeginLogin(ctx, human, userVerification, tokens...)
+	webAuthNLogin, err := c.webauthnConfig.BeginLogin(ctx, human, userVerification, "", tokens...)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	writeModel, err := c.webauthNWriteModelByID(ctx, userID, "", resourceOwner)
+	writeModel, err := c.webauthNWriteModelByID(ctx, userID, "", resourceOwner, "")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -362,7 +362,7 @@ func (c *Commands) HumanFinishU2FLogin(ctx context.Context, userID, resourceOwne
 	if err != nil {
 		return err
 	}
-	u2fTokens, err := c.getHumanU2FTokens(ctx, userID, resourceOwner)
+	u2fTokens, err := c.getHumanU2FTokens(ctx, userID, resourceOwner, "")
 	if err != nil {
 		return err
 	}
@@ -407,7 +407,7 @@ func (c *Commands) HumanFinishPasswordlessLogin(ctx context.Context, userID, res
 		return err
 	}
 
-	passwordlessTokens, err := c.getHumanPasswordlessTokens(ctx, userID, resourceOwner)
+	passwordlessTokens, err := c.getHumanPasswordlessTokens(ctx, userID, resourceOwner, "")
 	if err != nil {
 		return err
 	}
@@ -464,7 +464,7 @@ func (c *Commands) finishWebAuthNLogin(ctx context.Context, userID, resourceOwne
 		return nil, nil, 0, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3b7zs", "Errors.User.WebAuthN.NotFound")
 	}
 
-	writeModel, err := c.webauthNWriteModelByID(ctx, userID, "", resourceOwner)
+	writeModel, err := c.webauthNWriteModelByID(ctx, userID, "", resourceOwner, "")
 	if err != nil {
 		return nil, nil, 0, err
 	}
@@ -590,7 +590,7 @@ func (c *Commands) removeHumanWebAuthN(ctx context.Context, userID, webAuthNID, 
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M9de", "Errors.IDMissing")
 	}
 
-	existingWebAuthN, err := c.webauthNWriteModelByID(ctx, userID, webAuthNID, resourceOwner)
+	existingWebAuthN, err := c.webauthNWriteModelByID(ctx, userID, webAuthNID, resourceOwner, "")
 	if err != nil {
 		return nil, err
 	}
@@ -610,11 +610,11 @@ func (c *Commands) removeHumanWebAuthN(ctx context.Context, userID, webAuthNID, 
 	return writeModelToObjectDetails(&existingWebAuthN.WriteModel), nil
 }
 
-func (c *Commands) webauthNWriteModelByID(ctx context.Context, userID, webAuthNID, resourceOwner string) (writeModel *HumanWebAuthNWriteModel, err error) {
+func (c *Commands) webauthNWriteModelByID(ctx context.Context, userID, webAuthNID, resourceOwner, rpID string) (writeModel *HumanWebAuthNWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewHumanWebAuthNWriteModel(userID, webAuthNID, resourceOwner)
+	writeModel = NewHumanWebAuthNWriteModel(userID, webAuthNID, resourceOwner, rpID)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
