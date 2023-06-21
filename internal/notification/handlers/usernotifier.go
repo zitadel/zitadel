@@ -2,12 +2,7 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"time"
-
-	"github.com/zitadel/zitadel/internal/repository/project"
-
-	"github.com/zitadel/zitadel/internal/repository/instance"
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -111,65 +106,9 @@ func (u *userNotifier) reducers() []handler.AggregateReducer {
 					Event:  user.HumanPasswordChangedType,
 					Reduce: u.reducePasswordChanged,
 				},
-				{
-					Event:  user.UserTokenAddedType,
-					Reduce: u.reduceUserTokenAdded,
-				},
-			},
-		},
-		{
-			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  instance.InstanceAddedEventType,
-					Reduce: u.reduceInstanceAdded,
-				},
-				{
-					Event:  instance.InstanceRemovedEventType,
-					Reduce: u.reduceInstanceRemoved,
-				},
-			},
-		},
-		{
-			Aggregate: project.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  project.ProjectAddedType,
-					Reduce: u.reduceProjectAdded,
-				},
-				{
-					Event:  project.ApplicationAddedType,
-					Reduce: u.reduceApplicationAdded,
-				},
 			},
 		},
 	}
-}
-
-func (u *userNotifier) reduceInstanceAdded(event eventstore.Event) (*handler.Statement, error) {
-	fmt.Println("reduceInstanceAdded")
-	return crdb.NewNoOpStatement(event), nil
-}
-
-func (u *userNotifier) reduceProjectAdded(event eventstore.Event) (*handler.Statement, error) {
-	// ignore instance.ProjectSetEventType
-	fmt.Println("reduceProjectAdded")
-	return crdb.NewNoOpStatement(event), nil
-}
-
-func (u *userNotifier) reduceApplicationAdded(event eventstore.Event) (*handler.Statement, error) {
-	fmt.Println("reduceApplicationAdded")
-	return crdb.NewNoOpStatement(event), nil
-}
-
-func (u *userNotifier) reduceUserTokenAdded(event eventstore.Event) (*handler.Statement, error) {
-	fmt.Println("reduceUserTokenAdded")
-	return crdb.NewNoOpStatement(event), nil
-}
-
-func (u *userNotifier) reduceInstanceRemoved(event eventstore.Event) (*handler.Statement, error) {
-	fmt.Println("reduceInstanceRemoved")
-	return crdb.NewNoOpStatement(event), nil
 }
 
 func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Statement, error) {

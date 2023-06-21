@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/repository/milestone"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -124,6 +126,7 @@ func StartCommands(
 	quota.RegisterEventMappers(repo.eventstore)
 	session.RegisterEventMappers(repo.eventstore)
 	idpintent.RegisterEventMappers(repo.eventstore)
+	milestone.RegisterEventMappers(repo.eventstore)
 
 	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)

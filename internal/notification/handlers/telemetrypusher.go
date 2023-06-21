@@ -27,12 +27,12 @@ type TelemetryPusherConfig struct {
 }
 
 type telemetryPusher struct {
-	cfg TelemetryPusherConfig
 	crdb.StatementHandler
 	commands                       *command.Commands
 	queries                        *NotificationQueries
 	metricSuccessfulDeliveriesJSON string
 	metricFailedDeliveriesJSON     string
+	endpoints                      []string
 }
 
 func NewTelemetryPusher(
@@ -46,8 +46,11 @@ func NewTelemetryPusher(
 ) *telemetryPusher {
 	p := new(telemetryPusher)
 	handlerCfg.ProjectionName = TelemetryProjectionTable
-	handlerCfg.Reducers = p.reducers()
-	p.cfg = telemetryCfg
+	handlerCfg.Reducers = []handler.AggregateReducer{{}}
+	if telemetryCfg.Enabled {
+		handlerCfg.Reducers = p.reducers()
+	}
+	p.endpoints = telemetryCfg.Endpoints
 	p.StatementHandler = crdb.NewStatementHandler(ctx, handlerCfg)
 	p.commands = commands
 	p.queries = queries
@@ -58,23 +61,20 @@ func NewTelemetryPusher(
 }
 
 func (t *telemetryPusher) reducers() []handler.AggregateReducer {
-	if !t.cfg.Enabled {
-		return nil
-	}
 	return []handler.AggregateReducer{
 		{
 			Aggregate: milestone.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  milestone.ReachedEventType,
-					Reduce: t.reduceTelemetryPushDue,
+					Reduce: t.reduceMilestoneReached,
 				},
 			},
 		},
 	}
 }
 
-func (t *telemetryPusher) reduceTelemetryPushDue(event eventstore.Event) (*handler.Statement, error) {
+func (t *telemetryPusher) reduceMilestoneReached(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*milestone.ReachedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-UjA3E", "reduce.wrong.event.type %s", milestone.ReachedEventType)
@@ -87,7 +87,7 @@ func (t *telemetryPusher) reduceTelemetryPushDue(event eventstore.Event) (*handl
 	if alreadyHandled {
 		return crdb.NewNoOpStatement(e), nil
 	}
-	for _, endpoint := range t.cfg.Endpoints {
+	for _, endpoint := range t.endpoints {
 		if err = types.SendJSON(
 			ctx,
 			webhook.Config{
@@ -105,7 +105,7 @@ func (t *telemetryPusher) reduceTelemetryPushDue(event eventstore.Event) (*handl
 		}
 	}
 
-	err = t.commands.TelemetryPushed(ctx, e, t.cfg.Endpoints)
+	err = t.commands.ReportMilestonePushed(ctx, t.endpoints, e)
 	if err != nil {
 		return nil, err
 	}

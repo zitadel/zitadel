@@ -1,6 +1,11 @@
 Log:
   Level: info
 
+Telemetry:
+  Enabled: true
+  Endpoints:
+    - https://httpbin.org/post
+
 ExternalDomain: localhost
 ExternalSecure: false
 
@@ -41,6 +46,8 @@ Console:
 Projections:
   Customizations:
     NotificationsQuotas:
+      RequeueEvery: 1s
+    Telemetry:
       RequeueEvery: 1s
 
 DefaultInstance:
