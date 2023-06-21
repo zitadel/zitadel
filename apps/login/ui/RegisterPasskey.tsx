@@ -114,7 +114,6 @@ export default function RegisterPasskey({ sessionId, isPrompt }: Props) {
         navigator.credentials
           .create(resp.publicKeyCredentialCreationOptions)
           .then((resp) => {
-            console.log(resp);
             if (
               resp &&
               (resp as any).response.attestationObject &&
@@ -141,8 +140,6 @@ export default function RegisterPasskey({ sessionId, isPrompt }: Props) {
                   ),
                 },
               };
-              console.log(data);
-
               return submitVerify(passkeyId, "", data, sessionId);
             } else {
               setLoading(false);
