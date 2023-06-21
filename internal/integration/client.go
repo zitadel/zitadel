@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
@@ -17,6 +18,7 @@ import (
 type Client struct {
 	CC        *grpc.ClientConn
 	Admin     admin.AdminServiceClient
+	Mgmt      mgmt.ManagementServiceClient
 	UserV2    user.UserServiceClient
 	SessionV2 session.SessionServiceClient
 }
@@ -25,6 +27,7 @@ func newClient(cc *grpc.ClientConn) Client {
 	return Client{
 		CC:        cc,
 		Admin:     admin.NewAdminServiceClient(cc),
+		Mgmt:      mgmt.NewManagementServiceClient(cc),
 		UserV2:    user.NewUserServiceClient(cc),
 		SessionV2: session.NewSessionServiceClient(cc),
 	}
