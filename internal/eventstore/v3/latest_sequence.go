@@ -107,8 +107,9 @@ func scanToSequence(rows *sql.Rows, sequences []*latestSequence) error {
 	var aggregateType eventstore.AggregateType
 	var aggregateID, instanceID string
 	var currentSequence uint64
+	var resourceOwner string
 
-	if err := rows.Scan(&instanceID, &aggregateType, &aggregateID, &currentSequence); err != nil {
+	if err := rows.Scan(&instanceID, &resourceOwner, &aggregateType, &aggregateID, &currentSequence); err != nil {
 		return errors.ThrowInternal(err, "V3-OIWqj", "Errors.Internal")
 	}
 
@@ -123,6 +124,9 @@ func scanToSequence(rows *sql.Rows, sequences []*latestSequence) error {
 		return nil
 	}
 	sequence.sequence = currentSequence
+	if sequence.aggregate.ResourceOwner == "" {
+		sequence.aggregate.ResourceOwner = resourceOwner
+	}
 
 	return nil
 }

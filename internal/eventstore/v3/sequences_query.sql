@@ -14,6 +14,7 @@ with existing as (
         , aggregate_id
 ) SELECT 
     e.instance_id
+    , e.resource_owner
     , e.aggregate_type
     , e.aggregate_id
     , e.event_sequence
