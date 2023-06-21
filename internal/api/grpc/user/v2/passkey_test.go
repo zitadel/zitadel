@@ -50,7 +50,7 @@ func Test_passkeyAuthenticatorToDomain(t *testing.T) {
 
 func Test_passkeyRegistrationDetailsToPb(t *testing.T) {
 	type args struct {
-		details *domain.PasskeyRegistrationDetails
+		details *domain.WebAuthNRegistrationDetails
 		err     error
 	}
 	tests := []struct {
@@ -70,13 +70,13 @@ func Test_passkeyRegistrationDetailsToPb(t *testing.T) {
 		{
 			name: "unmarshall error",
 			args: args{
-				details: &domain.PasskeyRegistrationDetails{
+				details: &domain.WebAuthNRegistrationDetails{
 					ObjectDetails: &domain.ObjectDetails{
 						Sequence:      22,
 						EventDate:     time.Unix(3000, 22),
 						ResourceOwner: "me",
 					},
-					PasskeyID:                          "123",
+					ID:                                 "123",
 					PublicKeyCredentialCreationOptions: []byte(`\\`),
 				},
 				err: nil,
@@ -86,13 +86,13 @@ func Test_passkeyRegistrationDetailsToPb(t *testing.T) {
 		{
 			name: "ok",
 			args: args{
-				details: &domain.PasskeyRegistrationDetails{
+				details: &domain.WebAuthNRegistrationDetails{
 					ObjectDetails: &domain.ObjectDetails{
 						Sequence:      22,
 						EventDate:     time.Unix(3000, 22),
 						ResourceOwner: "me",
 					},
-					PasskeyID:                          "123",
+					ID:                                 "123",
 					PublicKeyCredentialCreationOptions: []byte(`{"foo": "bar"}`),
 				},
 				err: nil,

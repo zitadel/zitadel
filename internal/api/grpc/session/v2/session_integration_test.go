@@ -10,24 +10,26 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 var (
-	CTX    context.Context
-	Tester *integration.Tester
-	Client session.SessionServiceClient
-	User   *user.AddHumanUserResponse
+	CTX               context.Context
+	Tester            *integration.Tester
+	Client            session.SessionServiceClient
+	User              *user.AddHumanUserResponse
+	GenericOAuthIDPID string
 )
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, errCtx, cancel := integration.Contexts(time.Hour)
+		ctx, errCtx, cancel := integration.Contexts(5 * time.Minute)
 		defer cancel()
 
 		Tester = integration.NewTester(ctx)
@@ -55,7 +57,7 @@ retry:
 			s = resp.GetSession()
 			break retry
 		}
-		if status.Convert(err).Code() == codes.NotFound {
+		if code := status.Convert(err).Code(); code == codes.NotFound || code == codes.PermissionDenied {
 			select {
 			case <-CTX.Done():
 				t.Fatal(CTX.Err(), err)
@@ -82,6 +84,7 @@ const (
 	wantUserFactor wantFactor = iota
 	wantPasswordFactor
 	wantPasskeyFactor
+	wantIntentFactor
 )
 
 func verifyFactors(t testing.TB, factors *session.Factors, window time.Duration, want []wantFactor) {
@@ -98,6 +101,10 @@ func verifyFactors(t testing.TB, factors *session.Factors, window time.Duration,
 			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
 		case wantPasskeyFactor:
 			pf := factors.GetPasskey()
+			assert.NotNil(t, pf)
+			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
+		case wantIntentFactor:
+			pf := factors.GetIntent()
 			assert.NotNil(t, pf)
 			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
 		}
@@ -210,6 +217,108 @@ func TestServer_CreateSession_passkey(t *testing.T) {
 	})
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), updateResp.GetSessionToken(), updateResp.GetDetails().GetSequence(), time.Minute, nil, wantUserFactor, wantPasskeyFactor)
+}
+
+func TestServer_CreateSession_successfulIntent(t *testing.T) {
+	idpID := Tester.AddGenericOAuthProvider(t)
+
+	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{
+					UserId: User.GetUserId(),
+				},
+			},
+		},
+	})
+	require.NoError(t, err)
+	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil)
+
+	intentID, token, _, _ := Tester.CreateSuccessfulIntent(t, idpID, User.GetUserId(), "id")
+	updateResp, err := Client.SetSession(CTX, &session.SetSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: createResp.GetSessionToken(),
+		Checks: &session.Checks{
+			Intent: &session.CheckIntent{
+				IntentId: intentID,
+				Token:    token,
+			},
+		},
+	})
+	require.NoError(t, err)
+	verifyCurrentSession(t, createResp.GetSessionId(), updateResp.GetSessionToken(), updateResp.GetDetails().GetSequence(), time.Minute, nil, wantUserFactor, wantIntentFactor)
+}
+
+func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
+	idpID := Tester.AddGenericOAuthProvider(t)
+
+	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{
+					UserId: User.GetUserId(),
+				},
+			},
+		},
+	})
+	require.NoError(t, err)
+	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil)
+
+	idpUserID := "id"
+	intentID, token, _, _ := Tester.CreateSuccessfulIntent(t, idpID, "", idpUserID)
+	updateResp, err := Client.SetSession(CTX, &session.SetSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: createResp.GetSessionToken(),
+		Checks: &session.Checks{
+			Intent: &session.CheckIntent{
+				IntentId: intentID,
+				Token:    token,
+			},
+		},
+	})
+	require.Error(t, err)
+	Tester.CreateUserIDPlink(CTX, User.GetUserId(), idpUserID, idpID, User.GetUserId())
+	updateResp, err = Client.SetSession(CTX, &session.SetSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: createResp.GetSessionToken(),
+		Checks: &session.Checks{
+			Intent: &session.CheckIntent{
+				IntentId: intentID,
+				Token:    token,
+			},
+		},
+	})
+	require.NoError(t, err)
+	verifyCurrentSession(t, createResp.GetSessionId(), updateResp.GetSessionToken(), updateResp.GetDetails().GetSequence(), time.Minute, nil, wantUserFactor, wantIntentFactor)
+}
+
+func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
+	idpID := Tester.AddGenericOAuthProvider(t)
+
+	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{
+					UserId: User.GetUserId(),
+				},
+			},
+		},
+	})
+	require.NoError(t, err)
+	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil)
+
+	intentID := Tester.CreateIntent(t, idpID)
+	_, err = Client.SetSession(CTX, &session.SetSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: createResp.GetSessionToken(),
+		Checks: &session.Checks{
+			Intent: &session.CheckIntent{
+				IntentId: intentID,
+				Token:    "false",
+			},
+		},
+	})
+	require.Error(t, err)
 }
 
 func TestServer_SetSession_flow(t *testing.T) {
