@@ -34,7 +34,7 @@ export default async function Page({
 
       {sessionFactors && (
         <UserAvatar
-          loginName={loginName ?? sessionFactors.factors?.user?.loginName ?? ""}
+          loginName={loginName ?? sessionFactors.factors?.user?.loginName}
           displayName={sessionFactors.factors?.user?.displayName}
           showDropdown
         ></UserAvatar>

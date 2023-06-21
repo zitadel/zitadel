@@ -2,15 +2,12 @@ import { getSession, server } from "#/lib/zitadel";
 import Alert from "#/ui/Alert";
 import UserAvatar from "#/ui/UserAvatar";
 import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
-import { useRouter } from "next/navigation";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const router = useRouter();
-
   const { loginName } = searchParams;
   const sessionFactors = await loadSession(loginName);
 
@@ -39,7 +36,7 @@ export default async function Page({
 
       {sessionFactors && (
         <UserAvatar
-          loginName={loginName ?? sessionFactors.factors?.user?.loginName ?? ""}
+          loginName={loginName ?? sessionFactors.factors?.user?.loginName}
           displayName={sessionFactors.factors?.user?.displayName}
           showDropdown
         ></UserAvatar>

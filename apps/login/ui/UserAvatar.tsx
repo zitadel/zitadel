@@ -3,7 +3,7 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
 type Props = {
-  loginName: string;
+  loginName?: string;
   displayName?: string;
   showDropdown: boolean;
 };
@@ -18,8 +18,8 @@ export default function UserAvatar({
       <div>
         <Avatar
           size="small"
-          name={displayName ?? loginName}
-          loginName={loginName}
+          name={displayName ?? loginName ?? "A"}
+          loginName={loginName ?? "A"}
         />
       </div>
       <span className="ml-4 text-14px">{loginName}</span>
