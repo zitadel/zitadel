@@ -103,11 +103,10 @@ const (
 
 type CRDB struct {
 	*database.DB
-	AllowOrderByCreationDate bool
 }
 
-func NewCRDB(client *database.DB, allowOrderByCreationDate bool) *CRDB {
-	return &CRDB{client, allowOrderByCreationDate}
+func NewCRDB(client *database.DB) *CRDB {
+	return &CRDB{client}
 }
 
 func (db *CRDB) Health(ctx context.Context) error { return db.Ping() }
@@ -287,19 +286,11 @@ func (db *CRDB) db() *sql.DB {
 }
 
 func (db *CRDB) orderByEventSequence(desc bool) string {
-	if db.AllowOrderByCreationDate {
-		if desc {
-			return " ORDER BY created_at DESC, event_sequence DESC"
-		}
-
-		return " ORDER BY created_at, event_sequence"
-	}
-
 	if desc {
-		return " ORDER BY event_sequence DESC"
+		return " ORDER BY created_at DESC, event_sequence DESC"
 	}
 
-	return " ORDER BY event_sequence"
+	return " ORDER BY created_at, event_sequence"
 }
 
 func (db *CRDB) eventQuery() string {

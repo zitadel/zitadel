@@ -132,8 +132,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				ctx: context.Background(),
 				commands: []eventstore.Command{
 					generateCommand(eventstore.AggregateType(t.Name()), "12",
-						generateRemoveUniqueConstraint("", ""),
-						// generateRemoveInstanceUniqueConstraints("instanceID"),
+						generateRemoveUniqueConstraint("instance", "instanceID"),
 					),
 				},
 				uniqueDataType:       "usernames",

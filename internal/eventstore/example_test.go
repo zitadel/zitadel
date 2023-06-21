@@ -289,7 +289,7 @@ func (rm *UserReadModel) Reduce() error {
 func TestUserReadModel(t *testing.T) {
 	es := eventstore.NewEventstore(
 		&eventstore.Config{
-			Querier: query_repo.NewCRDB(testCRDBClient, true),
+			Querier: query_repo.NewCRDB(testCRDBClient),
 			Pusher:  v3.NewEventstore(testCRDBClient),
 		},
 	)

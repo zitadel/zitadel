@@ -127,12 +127,8 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		return err
 	}
 
-	if config.Eventstore.UseV2 {
-		config.Eventstore.Pusher = old_es.NewCRDB(dbClient, config.Eventstore.AllowOrderByCreationDate)
-	} else {
-		config.Eventstore.Pusher = new_es.NewEventstore(dbClient)
-	}
-	config.Eventstore.Querier = old_es.NewCRDB(dbClient, config.Eventstore.AllowOrderByCreationDate)
+	config.Eventstore.Pusher = new_es.NewEventstore(dbClient)
+	config.Eventstore.Querier = old_es.NewCRDB(dbClient)
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)

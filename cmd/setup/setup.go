@@ -67,12 +67,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	dbClient, err := database.Connect(config.Database, false)
 	logging.OnError(err).Fatal("unable to connect to database")
 
-	config.Eventstore.Querier = old_es.NewCRDB(dbClient, config.Eventstore.AllowOrderByCreationDate)
-	if config.Eventstore.UseV2 {
-		config.Eventstore.Pusher = old_es.NewCRDB(dbClient, config.Eventstore.AllowOrderByCreationDate)
-	} else {
-		config.Eventstore.Pusher = new_es.NewEventstore(dbClient)
-	}
+	config.Eventstore.Querier = old_es.NewCRDB(dbClient)
+	config.Eventstore.Pusher = new_es.NewEventstore(dbClient)
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 	logging.OnError(err).Fatal("unable to start eventstore")
 	migration.RegisterMappers(eventstoreClient)
