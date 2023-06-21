@@ -36,9 +36,10 @@ export {
   CreatePasskeyRegistrationLinkResponse,
   CreatePasskeyRegistrationLinkRequest,
 } from "./proto/server/zitadel/user/v2alpha/user_service";
-export { SetHumanPasswordResponse, SetHumanPasswordRequest} from "./proto/server/zitadel/management";
-export { SetUserPassword } from "./proto/server/zitadel/user/v2alpha/password";
-
+export {
+  SetHumanPasswordResponse,
+  SetHumanPasswordRequest,
+} from "./proto/server/zitadel/management";
 export { type LegalAndSupportSettings } from "./proto/server/zitadel/settings/v2alpha/legal_settings";
 export { type PasswordComplexitySettings } from "./proto/server/zitadel/settings/v2alpha/password_settings";
 export { type ResourceOwnerType } from "./proto/server/zitadel/settings/v2alpha/settings";
