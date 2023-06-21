@@ -28,7 +28,7 @@ jobs:
     timeout-minutes: 5
     strategy:
       matrix:
-        goos: [linux, darwin]
+        goos: [linux, darwin, windows]
         goarch: [amd64, arm64]
     
     steps:
