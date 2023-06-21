@@ -40,7 +40,7 @@ or have limited resources on your local machine.
 
 ### Testing
 
-You can execute the following commands in the following directories:
+You can execute the following commands `pnpm test` for a single test run or `pnpm test:watch` in the following directories:
 
 - apps/login
 - packages/zitadel-client
@@ -49,13 +49,8 @@ You can execute the following commands in the following directories:
 - packages/zitadel-next
 - The projects root directory: all tests in the project are executed
 
-```sh
-# Run all once
-pnpm test
-
-# Rerun tests on file changes
-pnpm test:watch
-```
+In apps/login, these commands also spin up the application and a ZITADEL gRPC API mock server to run integration tests using [Cypress](https://www.cypress.io/) against them.
+If you want to run the integration tests standalone against an environment of your choice, navigate to ./apps/login, create your .env.local file and run `pnpm test:integration:run` or `pnpm test:integration:open`.
 
 ### Developing Against Your Local ZITADEL Instance
 
