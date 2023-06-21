@@ -82,6 +82,7 @@ jobs:
         go-version: ${{ inputs.go_version }}
     - 
       uses: actions/cache/restore@v3
+      timeout-minutes: 2
       name: restore core
       with:
         path: ${{ inputs.core_cache_path }}

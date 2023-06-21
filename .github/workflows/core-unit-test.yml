@@ -25,6 +25,7 @@ jobs:
           go-version: ${{ inputs.go_version }}
       - 
         uses: actions/cache/restore@v3
+        timeout-minutes: 2
         name: restore core
         id: restore-core
         with:
@@ -37,6 +38,7 @@ jobs:
         run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
       - 
         uses: actions/cache/restore@v3
+        timeout-minutes: 2
         name: restore previous results
         with:
           key: unit-test-${{ inputs.core_cache_key }}
