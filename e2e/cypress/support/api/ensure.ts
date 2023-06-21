@@ -107,7 +107,7 @@ export function ensureSomething(
         });
     })
     .then((id) => {
-      return awaitDesired(90, (entity) => ensureMethod == 'POST' && entity.id === id || ensureMethod == 'DELETE' && !entity, search).then(() => {
+      return awaitDesired(90, (entity) => ['POST', 'PUT'].indexOf(ensureMethod) > -1 && entity.id === id || ensureMethod == 'DELETE' && !entity, search).then(() => {
         return cy.wrap(id);
       });
     });
