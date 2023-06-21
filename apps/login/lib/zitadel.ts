@@ -2,7 +2,6 @@ import {
   ZitadelServer,
   ZitadelServerOptions,
   user,
-  management,
   settings,
   getServers,
   initializeServer,
@@ -198,7 +197,6 @@ export async function setEmail(
     {}
   );
 }
-
 
 /**
  *
