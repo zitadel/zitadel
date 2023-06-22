@@ -13,7 +13,7 @@ COPY --from=protos /proto .
 
 FROM golang:1.20.5-alpine3.18 as grpc-mock
 
-RUN go install github.com/eliobischof/grpc-mock/cmd/grpc-mock@08cd37ed491a57162fd950c207105f6fedf720ef
+RUN go install github.com/eliobischof/grpc-mock/cmd/grpc-mock@01b09f60db1b501178af59bed03b2c22661df48c
 
 COPY --from=config / .
 
