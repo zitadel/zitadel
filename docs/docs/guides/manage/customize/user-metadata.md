@@ -29,6 +29,7 @@ Use the [OIDC authentication request playground](/docs/apis/openidoauth/authrequ
 :::info Getting a token
 In case you want to test out different settings configure an application with code flow (PKCE).
 Grab the code from the url parameter after a successful login and exchange the code for tokens by calling the [token endpoint](docs/apis/openidoauth/endpoints#token_endpoint).
+You will find more information in our guides on how to [authenticate users](/docs/guides/integrate/login-users).
 :::
 
 ## Use tokens to get user metadata
@@ -39,17 +40,21 @@ In case you want to manage metadata for other users than the currently logged in
 
 ### Request metadata from userinfo endpoint
 
---> requires metadata scope in auth request! `urn:zitadel:iam:user:metadata`
---> OIDC
---> error?
+With the access token we can make a request to the [userinfo endpoint](/docs/apis/openidoauth/endpoints#introspection_endpoint) to get the user's metadata.
+This method is the preferred method to retrieve a user's information in combination with opaque tokens, to insure that the token is valid.
 
-With the access token we can make a request to the userinfo endpoint to get the user's metadata. This method is the preferred method to retrieve a user's information in combination with opaque tokens, to insure that the token is valid.
+You must pass the [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) `urn:zitadel:iam:user:metadata` in your authentication request.
+If you don't include this scope the response will contain user data, but not the metadata object.
+
+Request the user information by calling the [userinfo endpoint](/docs/apis/openidoauth/endpoints#introspection_endpoint):
 
 ```bash
 curl --request GET \
   --url "https://$ZITADEL_DOMAIN/oidc/v1/userinfo" \
   --header "Authorization: Bearer $ACCESS_TOKEN"
 ```
+
+Replace `$ACCESS_TOKEN` with your user's access token.  
 
 The response will look something like this
 
@@ -72,19 +77,19 @@ The response will look something like this
     }
 ```
 
-```json
-{"email":"mpa+admin.alice@zitadel.com","email_verified":true,"family_name":"Admin","given_name":"Alice","locale":null,"name":"Alice Admin","preferred_username":"admin.alice@demo-customer.b2b-demo-rbxajm.zitadel.cloud","sub":"170848145649959169","updated_at":1658329554,"urn:zitadel:iam:org:project:170086774599581953:roles":{"reader":{"170086363054473473":"demo-customer.b2b-demo-rbxajm.zitadel.cloud","190957560872829185":"demo-customer2.b2b-demo-rbxajm.zitadel.cloud"},"support:read":{"170086363054473473":"demo-customer.b2b-demo-rbxajm.zitadel.cloud"}},"urn:zitadel:iam:org:project:roles":{"reader":{"170086363054473473":"demo-customer.b2b-demo-rbxajm.zitadel.cloud","190957560872829185":"demo-customer2.b2b-demo-rbxajm.zitadel.cloud"},"support:read":{"170086363054473473":"demo-customer.b2b-demo-rbxajm.zitadel.cloud"}},"urn:zitadel:iam:user:metadata":{"P-ID":"MTIzNTE5ODM"}}
-```
-
-You can grab the metadata from the reserved claim `"urn:zitadel:iam:user:metadata"` as key-value pairs. Note that the values are base64 encoded. So the value `MTIzNA` decodes to `1234`.
+You can grab the metadata from the reserved claim `"urn:zitadel:iam:user:metadata"` as key-value pairs.
+Note that the values are base64 encoded.
+So the value `MTIzNA` decodes to `1234`.
 
 ### Send metadata inside the ID token
 
-Check "User Info inside ID Token" in the configuration of your application.
+You might want to include metadata directly into the ID Token.
+For that you need to enable "User Info inside ID Token" in your application's settings.
 
 ![](/img/console_projects_application_token_settings.png)
 
-Now request a new token from ZITADEL.
+Now request a new token from ZITADEL by logging in with the user that has metadata attached.
+Make sure you log into the correct client/application where you enabled the settings.
 
 The result will give you something like:
 
@@ -96,6 +101,8 @@ The result will give you something like:
     "id_token":"ey...Ww"
 }
 ```
+
+When you decode the value of `id_token`, then the response will include the metadata claim:
 
 ```json
 {
@@ -114,54 +121,51 @@ The result will give you something like:
   "auth_time": 1687418556,
   "azp": "170086824411201793@portal",
   "c_hash": "dA3wre4ytCJCn11f7cIm0A",
-  "client_id": "170086824411201793@portal",
-  "email": "mpa+admin.alice@zitadel.com",
+  "client_id": "1700...1793@portal",
+  "email": "road.runner@zitadel.com",
   "email_verified": true,
   "exp": 1687422272,
-  "family_name": "Admin",
-  "given_name": "Alice",
+  "family_name": "Runner",
+  "given_name": "Road",
   "iat": 1687418672,
-  "iss": "https://b2b-demo-rbxajm.zitadel.cloud",
+  "iss": "https://...-abcd.zitadel.cloud",
   "locale": null,
-  "name": "Alice Admin",
-  "preferred_username": "admin.alice@demo-customer.b2b-demo-rbxajm.zitadel.cloud",
+  "name": "Road Runner",
+  "preferred_username": "road.runner@...-abcd.zitadel.cloud",
   "sub": "170848145649959169",
   "updated_at": 1658329554,
-  "urn:zitadel:iam:org:project:170086774599581953:roles": {
-    "reader": {
-      "170086363054473473": "demo-customer.b2b-demo-rbxajm.zitadel.cloud",
-      "190957560872829185": "demo-customer2.b2b-demo-rbxajm.zitadel.cloud"
-    },
-    "support:read": {
-      "170086363054473473": "demo-customer.b2b-demo-rbxajm.zitadel.cloud"
-    }
-  },
-  "urn:zitadel:iam:org:project:roles": {
-    "reader": {
-      "170086363054473473": "demo-customer.b2b-demo-rbxajm.zitadel.cloud",
-      "190957560872829185": "demo-customer2.b2b-demo-rbxajm.zitadel.cloud"
-    },
-    "support:read": {
-      "170086363054473473": "demo-customer.b2b-demo-rbxajm.zitadel.cloud"
-    }
-  },
+  //highlight-start
   "urn:zitadel:iam:user:metadata": {
-    "P-ID": "MTIzNTE5ODM"
+    "ContractNumber": "MTIzNA"
   }
+  //highlight-end
 }
 ```
 
-```bash
-jq -R 'split(".") | .[1] | @base64d | fromjson' <<< $ID_TOKEN
-```
+Note that the values are base64 encoded.
+So the value `MTIzNA` decodes to `1234`.
+
+:::info decoding the jwt token
+Use a website like [jwt.io](https://jwt.io/) to decode the token.  
+With jq installed you can also use `jq -R 'split(".") | .[1] | @base64d | fromjson' <<< $ID_TOKEN`
+:::
 
 ### Request metadata from authentication API
 
---> omit queries to find all
---> `urn:zitadel:iam:org:project:id:zitadel:aud` else invalid audience (APP-Zxfako)
+You can use the authentication service to request and search for the user's metadata.
 
-https://zitadel.com/docs/apis/resources/auth/auth-service-list-my-metadata
+The introspection endpoint and the token endpoint in the examples above do not require a special scope to access.
+Yet when accessing the authentication service, you need to pass the [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) `urn:zitadel:iam:org:project:id:zitadel:aud` along with the authentication request.
+This scope allows the user to access ZITADEL's APIs, specifically the authentication API that we need for this method.
+Use the [OIDC authentication request playground](/docs/apis/openidoauth/authrequest) or the configuration of an [example client](/docs/examples/introduction) to set the required scopes and receive a valid access token.
 
+:::note Invalid audience
+If you get the error "invalid audience (APP-Zxfako)", then you need to add the reserved scope `urn:zitadel:iam:org:project:id:zitadel:aud` to your authentication request.
+:::
+
+You can request the user's metadata with the [List My Metadata](/docs/apis/resources/auth/auth-service-list-my-metadata) method:
+
+```bash
 curl -L -X POST "https://$ZITADEL_DOMAIN/auth/v1/users/me/metadata/_search" \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
@@ -175,12 +179,23 @@ curl -L -X POST "https://$ZITADEL_DOMAIN/auth/v1/users/me/metadata/_search" \
   "queries": [
     {
       "keyQuery": {
-        "key": "P-ID",
+        "key": "$METADATA_KEY",
         "method": "TEXT_QUERY_METHOD_EQUALS"
       }
     }
   ]
 }'
+```
+
+Replace `$ACCESS_TOKEN` with your user's access token.  
+Replace `$ZITADEL_DOMAIN` with your ZITADEL instance's url.  
+Replace `$METADATA_KEY` with they key you want to search for (f.e. "ContractNumber")
+
+:::info Get all metadata
+You can omit the queries array to retrieve all metadata key-value pairs.
+:::
+
+An example response for your search looks like this:
 
 ```json
 {
@@ -197,19 +212,19 @@ curl -L -X POST "https://$ZITADEL_DOMAIN/auth/v1/users/me/metadata/_search" \
                 "changeDate":"2022-08-04T09:09:06.259324Z",
                 "resourceOwner":"170086363054473473"
                 },
-            "key":"P-ID",
-            "value":"MTIzNTE5ODM="
+            "key":"ContractNumber",
+            "value":"MTIzNA"
         }
     ]
 }
 ```
 
-Grab the id_token and inspect the contents of the token at [jwt.io](https://jwt.io/). You should get the same info in the ID token as when requested from the user endpoint.
-
 ## Manage user metadata through the management API
 
-:::warning
-:::
+The previous methods allowed you to retrieve metadata only for the `sub` in the access token.
+In case you want to get the metadata for another user, you need to use the management service.
+The user that calls the management service must have [manager permissions](/docs/guides/manage/console/managers).
+A user can be either a human user or a service user.
 
-http://localhost:3000/docs/apis/resources/mgmt/management-service-list-user-metadata
-http://localhost:3000/docs/apis/resources/mgmt/management-service-get-user-metadata
+You can get [metadata of a user filtered by your query](/docs/apis/resources/mgmt/management-service-list-user-metadata) or [get a metadata object from a user by a specific key](/docs/apis/resources/mgmt/management-service-get-user-metadata).
+The management service allows you to set and delete metadata, see the [API documentation for users](/docs/category/apis/resources/mgmt/users).
