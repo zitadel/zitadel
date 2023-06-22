@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"sync"
 	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
@@ -44,6 +45,8 @@ type Handler struct {
 	requeueEvery          time.Duration
 	handleActiveInstances time.Duration
 	now                   nowFunc
+
+	isTriggered sync.Mutex
 }
 
 // nowFunc makes [time.Now] mockable
@@ -190,6 +193,11 @@ func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]str
 }
 
 func (h *Handler) Trigger(ctx context.Context) (err error) {
+	if !h.isTriggered.TryLock() {
+		return nil
+	}
+	defer h.isTriggered.Unlock()
+
 	for i := 0; ; i++ {
 		additionalIteration, err := h.processEvents(ctx)
 		h.log().WithField("iteration", i).Debug("trigger iteration")
