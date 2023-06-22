@@ -11,8 +11,10 @@
   ],
   "scripts": {
     "build": "tsup src/index.tsx --format esm,cjs --dts --external react",
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "pnpm test:unit",
+    "test:watch": "pnpm test:unit:watch",
+    "test:unit": "jest",
+    "test:unit:watch": "jest --watch",
     "dev": "tsup src/index.tsx --format esm,cjs --watch --dts --external react",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"

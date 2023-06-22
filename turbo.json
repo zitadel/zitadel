@@ -2,36 +2,21 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "generate": {
-      "outputs": [
-        "src/proto/**"
-      ],
       "cache": true
     },
     "build": {
-      "outputs": [
-        "dist/**",
-        ".next/**",
-        "!.next/cache/**"
-      ],
       "dependsOn": [
-        "lint",
-        "generate",
-        "^build"
+        "generate"
       ]
     },
-    "test": {
-      "dependsOn": [
-        "generate",
-        "@zitadel/server#build"
-      ]
-    },
+    "test": {},
+    "test:unit": {},
+    "test:integration": {},
     "test:watch": {
-      "dependsOn": [
-        "generate",
-        "@zitadel/server#build"
-      ]
+      "persistent": true
     },
     "lint": {},
+    "lint:fix": {},
     "dev": {
       "cache": false,
       "persistent": true
