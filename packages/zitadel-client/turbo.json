@@ -6,7 +6,8 @@
     "generate": {
       "outputs": [
         "src/proto/**"
-      ]
+      ],
+      "cache": true
     }
   }
 }
