@@ -56,6 +56,7 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		OrderDesc().
 		InstanceID(authz.GetInstance(ctx).InstanceID()).
+		AllowTimeTravel().
 		Limit(limit).
 		ResourceOwner(req.ResourceOwner).
 		EditorUser(req.EditorUserId).
