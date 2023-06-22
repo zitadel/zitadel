@@ -10,6 +10,7 @@ import (
 	"github.com/jackc/pgconn"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -104,8 +105,9 @@ func (h *Handler) schedule(ctx context.Context) {
 			h.log().OnError(err).Debug("unable to query instances")
 
 			var instanceFailed bool
+			scheduledCtx := call.WithTimestamp(ctx)
 			for _, instance := range instances {
-				instanceCtx := authz.WithInstanceID(ctx, instance)
+				instanceCtx := authz.WithInstanceID(scheduledCtx, instance)
 				err = h.Trigger(instanceCtx)
 				instanceFailed = instanceFailed || err != nil
 				h.log().WithField("instance", instance).OnError(err).Info("scheduled trigger failed")
@@ -133,12 +135,13 @@ func (h *Handler) subscribe(ctx context.Context) {
 		case event := <-queue:
 			events := checkAdditionalEvents(queue, event)
 			solvedInstances := make([]string, 0, len(events))
+			queueCtx := call.WithTimestamp(ctx)
 			for _, e := range events {
 				if instanceSolved(solvedInstances, e.Aggregate().InstanceID) {
 					continue
 				}
-				ctx := authz.WithInstanceID(ctx, e.Aggregate().InstanceID)
-				err := h.Trigger(ctx)
+				queueCtx = authz.WithInstanceID(queueCtx, e.Aggregate().InstanceID)
+				err := h.Trigger(queueCtx)
 				h.log().OnError(err).Debug("trigger of queued event failed")
 				if err == nil {
 					solvedInstances = append(solvedInstances, e.Aggregate().InstanceID)
@@ -215,7 +218,7 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 			return err
 		}
 
-		events, err := h.es.Filter(ctx, h.eventQuery(ctx, tx, currentState))
+		events, err := h.es.Filter(ctx, h.eventQuery(currentState))
 		if err != nil {
 			h.log().WithError(err).Debug("filter eventstore failed")
 			return err
@@ -302,12 +305,11 @@ func (h *Handler) execute(ctx context.Context, tx *sql.Tx, currentState *state, 
 	return nil
 }
 
-func (h *Handler) eventQuery(ctx context.Context, tx *sql.Tx, currentState *state) *eventstore.SearchQueryBuilder {
+func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder {
 	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		Limit(uint64(h.bulkLimit)).
 		AllowTimeTravel().
 		OrderAsc().
-		// SetTx(tx).
 		InstanceID(currentState.instanceID)
 
 	for aggregateType, eventTypes := range h.eventTypes {
