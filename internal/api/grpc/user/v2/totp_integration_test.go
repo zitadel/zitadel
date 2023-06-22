@@ -13,24 +13,24 @@ import (
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
-func TestServer_RegisterOTP(t *testing.T) {
+func TestServer_RegisterTOTP(t *testing.T) {
 	// userID := Tester.CreateHumanUser(CTX).GetUserId()
 
 	type args struct {
 		ctx context.Context
-		req *user.RegisterOTPRequest
+		req *user.RegisterTOTPRequest
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *user.RegisterOTPResponse
+		want    *user.RegisterTOTPResponse
 		wantErr bool
 	}{
 		{
 			name: "missing user id",
 			args: args{
 				ctx: CTX,
-				req: &user.RegisterOTPRequest{},
+				req: &user.RegisterTOTPRequest{},
 			},
 			wantErr: true,
 		},
@@ -38,7 +38,7 @@ func TestServer_RegisterOTP(t *testing.T) {
 			name: "user mismatch",
 			args: args{
 				ctx: CTX,
-				req: &user.RegisterOTPRequest{
+				req: &user.RegisterTOTPRequest{
 					UserId: "wrong",
 				},
 			},
@@ -50,11 +50,11 @@ func TestServer_RegisterOTP(t *testing.T) {
 			name: "human user",
 			args: args{
 				ctx: CTX,
-				req: &user.RegisterOTPRequest{
+				req: &user.RegisterTOTPRequest{
 					UserId: userID,
 				},
 			},
-			want: &user.RegisterOTPResponse{
+			want: &user.RegisterTOTPResponse{
 				Details: &object.Details{
 					ResourceOwner: Tester.Organisation.ID,
 				},
@@ -64,7 +64,7 @@ func TestServer_RegisterOTP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.RegisterOTP(tt.args.ctx, tt.args.req)
+			got, err := Client.RegisterTOTP(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -78,11 +78,11 @@ func TestServer_RegisterOTP(t *testing.T) {
 	}
 }
 
-func TestServer_VerifyOTPRegistration(t *testing.T) {
+func TestServer_VerifyTOTPRegistration(t *testing.T) {
 	userID := Tester.CreateHumanUser(CTX).GetUserId()
 
 	/* TODO: after we are able to obtain a Bearer token for a human user
-	reg, err := Client.RegisterOTP(CTX, &user.RegisterOTPRequest{
+	reg, err := Client.RegisterTOTP(CTX, &user.RegisterTOTPRequest{
 		UserId: userID,
 	})
 	require.NoError(t, err)
@@ -92,19 +92,19 @@ func TestServer_VerifyOTPRegistration(t *testing.T) {
 
 	type args struct {
 		ctx context.Context
-		req *user.VerifyOTPRegistrationRequest
+		req *user.VerifyTOTPRegistrationRequest
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *user.VerifyOTPRegistrationResponse
+		want    *user.VerifyTOTPRegistrationResponse
 		wantErr bool
 	}{
 		{
 			name: "user mismatch",
 			args: args{
 				ctx: CTX,
-				req: &user.VerifyOTPRegistrationRequest{
+				req: &user.VerifyTOTPRegistrationRequest{
 					UserId: "wrong",
 				},
 			},
@@ -114,7 +114,7 @@ func TestServer_VerifyOTPRegistration(t *testing.T) {
 			name: "wrong code",
 			args: args{
 				ctx: CTX,
-				req: &user.VerifyOTPRegistrationRequest{
+				req: &user.VerifyTOTPRegistrationRequest{
 					UserId: userID,
 					Code:   "123",
 				},
@@ -127,12 +127,12 @@ func TestServer_VerifyOTPRegistration(t *testing.T) {
 			name: "success",
 			args: args{
 				ctx: CTX,
-				req: &user.VerifyOTPRegistrationRequest{
+				req: &user.VerifyTOTPRegistrationRequest{
 					UserId: userID,
 					Code:   code,
 				},
 			},
-			want: &user.VerifyOTPRegistrationResponse{
+			want: &user.VerifyTOTPRegistrationResponse{
 				Details: &object.Details{
 					ResourceOwner: Tester.Organisation.ResourceOwner,
 				},
@@ -142,7 +142,7 @@ func TestServer_VerifyOTPRegistration(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.VerifyOTPRegistration(tt.args.ctx, tt.args.req)
+			got, err := Client.VerifyTOTPRegistration(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return

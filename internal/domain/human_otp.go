@@ -17,7 +17,7 @@ type OTP struct {
 	State        MFAState
 }
 
-type OTPv2 struct {
+type TOTP struct {
 	*ObjectDetails
 
 	Secret string
