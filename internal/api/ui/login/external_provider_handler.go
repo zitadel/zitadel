@@ -288,8 +288,15 @@ func (l *Login) handleExternalUserAuthenticated(
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
 	// check and fill in local linked user
 	externalErr := l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r))
-	if !errors.IsNotFound(externalErr) {
+	if externalErr != nil && !errors.IsNotFound(externalErr) {
 		l.renderError(w, r, authReq, externalErr)
+		return
+	}
+	var err error
+	// read current auth request state (incl. authorized user)
+	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
 		return
 	}
 	externalUser, externalUserChange, err := l.runPostExternalAuthenticationActions(externalUser, tokens(session), authReq, r, user, nil)
@@ -301,14 +308,6 @@ func (l *Login) handleExternalUserAuthenticated(
 	if errors.IsNotFound(externalErr) {
 		l.externalUserNotExisting(w, r, authReq, provider, externalUser, externalUserChange)
 		return
-	}
-	if provider.IsAutoUpdate || len(externalUser.Metadatas) > 0 || externalUserChange {
-		// read current auth request state (incl. authorized user)
-		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
-		if err != nil {
-			l.renderError(w, r, authReq, err)
-			return
-		}
 	}
 	if provider.IsAutoUpdate || externalUserChange {
 		err = l.updateExternalUser(r.Context(), authReq, externalUser)
