@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
 type EventStore interface {
@@ -178,6 +179,8 @@ func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]str
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).
 		AllowTimeTravel().
 		AddQuery().
+		AggregateTypes(instance.AggregateType).
+		EventTypes(instance.InstanceAddedEventType).
 		ExcludedInstanceID("")
 	if didInitialize {
 		query = query.
