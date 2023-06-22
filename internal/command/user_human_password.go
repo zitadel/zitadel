@@ -26,6 +26,9 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, passwordStrin
 	if !existingPassword.UserState.Exists() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M0fs", "Errors.User.NotFound")
 	}
+	if err = c.checkPermission(ctx, domain.PermissionUserWrite, existingPassword.ResourceOwner, userID); err != nil {
+		return nil, err
+	}
 	password := &domain.Password{
 		SecretString:   passwordString,
 		ChangeRequired: oneTime,
@@ -46,28 +49,28 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, passwordStrin
 	return writeModelToObjectDetails(&existingPassword.WriteModel), nil
 }
 
-func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID, code, passwordString, userAgentID string, passwordVerificationCode crypto.Generator) (err error) {
+func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID, code, passwordString, userAgentID string) (objectDetails *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if userID == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M9fs", "Errors.IDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M9fs", "Errors.IDMissing")
 	}
 	if passwordString == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Mf0sd", "Errors.User.Password.Empty")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Mf0sd", "Errors.User.Password.Empty")
 	}
 	existingCode, err := c.passwordWriteModel(ctx, userID, orgID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if existingCode.Code == nil || existingCode.UserState == domain.UserStateUnspecified || existingCode.UserState == domain.UserStateDeleted {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.Code.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.Code.NotFound")
 	}
 
-	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, passwordVerificationCode)
+	err = crypto.VerifyCodeWithAlgorithm(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, c.userEncryption)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	password := &domain.Password{
@@ -77,10 +80,13 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID,
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
 	passwordEvent, err := c.changePassword(ctx, userAgentID, password, userAgg, existingCode)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	_, err = c.eventstore.Push(ctx, passwordEvent)
-	return err
+	err = c.pushAppendAndReduce(ctx, existingCode, passwordEvent)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingCode.WriteModel), nil
 }
 
 func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword, userAgentID string) (objectDetails *domain.ObjectDetails, err error) {

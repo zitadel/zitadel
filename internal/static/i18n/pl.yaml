@@ -487,6 +487,7 @@ Errors:
     NotSucceeded: intencja nie powiodła się
     TokenCreationFailed: Tworzenie tokena nie powiodło się
     InvalidToken: Token intencji jest nieprawidłowy
+    OtherUser: Intencja przeznaczona dla innego użytkownika
 
 AggregateTypes:
   action: Działanie
