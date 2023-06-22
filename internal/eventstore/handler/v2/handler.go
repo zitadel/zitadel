@@ -307,7 +307,7 @@ func (h *Handler) eventQuery(ctx context.Context, tx *sql.Tx, currentState *stat
 		Limit(uint64(h.bulkLimit)).
 		AllowTimeTravel().
 		OrderAsc().
-		SetTx(tx).
+		// SetTx(tx).
 		InstanceID(currentState.instanceID)
 
 	for aggregateType, eventTypes := range h.eventTypes {
