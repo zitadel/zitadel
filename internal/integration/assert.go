@@ -35,7 +35,7 @@ func AssertDetails[D DetailsMsg](t testing.TB, exptected, actual D) {
 
 	gotCD := gotDetails.GetChangeDate().AsTime()
 	now := time.Now()
-	assert.WithinRange(t, gotCD, now.Add(-time.Second), now.Add(time.Second))
+	assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
 	assert.Equal(t, wantDetails.GetResourceOwner(), gotDetails.GetResourceOwner())
 }

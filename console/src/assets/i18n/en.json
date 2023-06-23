@@ -167,7 +167,14 @@
     "MORE": "more",
     "STEP": "Step",
     "SETUP": "Setup",
-    "COMINGSOON": "Coming soon",
+    "UNSAVEDCHANGES": "Unsaved changes",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Are you sure you want to discard this new action? Your action will be lost",
+        "CANCEL": "Cancel",
+        "DISCARD": "Discard"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     }
@@ -204,7 +211,10 @@
       "TEXT": "This navigation changes based on your selected organization above or your instance"
     },
     "CONTEXTCHANGED": {
-      "TEXT": "Attention! The organization context has changed."
+      "TEXT": "The organization context has changed."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "The view just changed to instance!"
     }
   },
   "FILTER": {
@@ -1030,7 +1040,8 @@
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български"
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
@@ -1229,7 +1240,8 @@
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -2093,7 +2105,8 @@
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български"
   },
   "MEMBER": {
     "ADD": "Add a Manager",

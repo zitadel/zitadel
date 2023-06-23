@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"io"
 	"testing"
 	"time"
 
@@ -17,9 +18,125 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
+
+func TestSessionCommands_getHumanWriteModel(t *testing.T) {
+	userAggr := &user.NewAggregate("user1", "org1").Aggregate
+
+	type fields struct {
+		eventstore        *eventstore.Eventstore
+		sessionWriteModel *SessionWriteModel
+	}
+	type res struct {
+		want *HumanWriteModel
+		err  error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		res    res
+	}{
+		{
+			name: "missing UID",
+			fields: fields{
+				eventstore:        &eventstore.Eventstore{},
+				sessionWriteModel: &SessionWriteModel{},
+			},
+			res: res{
+				want: nil,
+				err:  caos_errs.ThrowPreconditionFailed(nil, "COMMAND-eeR2e", "Errors.User.UserIDMissing"),
+			},
+		},
+		{
+			name: "filter error",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilterError(io.ErrClosedPipe),
+				),
+				sessionWriteModel: &SessionWriteModel{
+					UserID: "user1",
+				},
+			},
+			res: res{
+				want: nil,
+				err:  io.ErrClosedPipe,
+			},
+		},
+		{
+			name: "removed user",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								userAggr,
+								"", "", "", "", "", language.Georgian,
+								domain.GenderDiverse, "", true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserRemovedEvent(context.Background(),
+								userAggr,
+								"", nil, true,
+							),
+						),
+					),
+				),
+				sessionWriteModel: &SessionWriteModel{
+					UserID: "user1",
+				},
+			},
+			res: res{
+				want: nil,
+				err:  caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.ie4Ai.NotFound"),
+			},
+		},
+		{
+			name: "ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								userAggr,
+								"", "", "", "", "", language.Georgian,
+								domain.GenderDiverse, "", true,
+							),
+						),
+					),
+				),
+				sessionWriteModel: &SessionWriteModel{
+					UserID: "user1",
+				},
+			},
+			res: res{
+				want: &HumanWriteModel{
+					WriteModel: eventstore.WriteModel{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+						Events:        []eventstore.Event{},
+					},
+					PreferredLanguage: language.Georgian,
+					Gender:            domain.GenderDiverse,
+					UserState:         domain.UserStateActive,
+				},
+				err: nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		s := &SessionCommands{
+			eventstore:        tt.fields.eventstore,
+			sessionWriteModel: tt.fields.sessionWriteModel,
+		}
+		got, err := s.gethumanWriteModel(context.Background())
+		require.ErrorIs(t, err, tt.res.err)
+		assert.Equal(t, tt.res.want, got)
+	}
+}
 
 func TestCommands_CreateSession(t *testing.T) {
 	type fields struct {
@@ -29,7 +146,7 @@ func TestCommands_CreateSession(t *testing.T) {
 	}
 	type args struct {
 		ctx      context.Context
-		checks   []SessionCheck
+		checks   []SessionCommand
 		metadata map[string][]byte
 	}
 	type res struct {
@@ -126,7 +243,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 		ctx          context.Context
 		sessionID    string
 		sessionToken string
-		checks       []SessionCheck
+		checks       []SessionCommand
 		metadata     map[string][]byte
 	}
 	type res struct {
@@ -225,13 +342,26 @@ func TestCommands_UpdateSession(t *testing.T) {
 }
 
 func TestCommands_updateSession(t *testing.T) {
+	decryption := func(err error) crypto.EncryptionAlgorithm {
+		mCrypto := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
+		mCrypto.EXPECT().EncryptionKeyID().Return("id")
+		mCrypto.EXPECT().DecryptString(gomock.Any(), gomock.Any()).DoAndReturn(
+			func(code []byte, keyID string) (string, error) {
+				if err != nil {
+					return "", err
+				}
+				return string(code), nil
+			})
+		return mCrypto
+	}
+
 	testNow := time.Now()
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
 		ctx      context.Context
-		checks   *SessionChecks
+		checks   *SessionCommands
 		metadata map[string][]byte
 	}
 	type res struct {
@@ -251,7 +381,7 @@ func TestCommands_updateSession(t *testing.T) {
 			},
 			args{
 				ctx: context.Background(),
-				checks: &SessionChecks{
+				checks: &SessionCommands{
 					sessionWriteModel: &SessionWriteModel{State: domain.SessionStateTerminated},
 				},
 			},
@@ -266,10 +396,10 @@ func TestCommands_updateSession(t *testing.T) {
 			},
 			args{
 				ctx: context.Background(),
-				checks: &SessionChecks{
+				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					checks: []SessionCheck{
-						func(ctx context.Context, cmd *SessionChecks) error {
+					cmds: []SessionCommand{
+						func(ctx context.Context, cmd *SessionCommands) error {
 							return caos_errs.ThrowInternal(nil, "id", "check failed")
 						},
 					},
@@ -286,9 +416,9 @@ func TestCommands_updateSession(t *testing.T) {
 			},
 			args{
 				ctx: context.Background(),
-				checks: &SessionChecks{
+				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					checks:            []SessionCheck{},
+					cmds:              []SessionCommand{},
 				},
 			},
 			res{
@@ -321,9 +451,9 @@ func TestCommands_updateSession(t *testing.T) {
 			},
 			args{
 				ctx: context.Background(),
-				checks: &SessionChecks{
+				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					checks: []SessionCheck{
+					cmds: []SessionCommand{
 						CheckUser("userID"),
 						CheckPassword("password"),
 					},
@@ -350,6 +480,194 @@ func TestCommands_updateSession(t *testing.T) {
 							nil
 					},
 					userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				metadata: map[string][]byte{
+					"key": []byte("value"),
+				},
+			},
+			res{
+				want: &SessionChanged{
+					ObjectDetails: &domain.ObjectDetails{
+						ResourceOwner: "org1",
+					},
+					ID:       "sessionID",
+					NewToken: "token",
+				},
+			},
+		},
+		{
+			"set user, intent not successful",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: context.Background(),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					cmds: []SessionCommand{
+						CheckUser("userID"),
+						CheckIntent("intent", "aW50ZW50"),
+					},
+					eventstore: eventstoreExpect(t,
+						expectFilter(
+							eventFromEventPusher(
+								user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+									"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
+							),
+						),
+					),
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					intentAlg: decryption(nil),
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				metadata: map[string][]byte{
+					"key": []byte("value"),
+				},
+			},
+			res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4bw", "Errors.Intent.NotSucceeded"),
+			},
+		},
+		{
+			"set user, intent not for user",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: context.Background(),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					cmds: []SessionCommand{
+						CheckUser("userID"),
+						CheckIntent("intent", "aW50ZW50"),
+					},
+					eventstore: eventstoreExpect(t,
+						expectFilter(
+							eventFromEventPusher(
+								user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+									"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
+							),
+							eventFromEventPusher(
+								idpintent.NewSucceededEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate,
+									nil,
+									"idpUserID",
+									"idpUserName",
+									"userID2",
+									nil,
+									"",
+								),
+							),
+						),
+					),
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					intentAlg: decryption(nil),
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				metadata: map[string][]byte{
+					"key": []byte("value"),
+				},
+			},
+			res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser"),
+			},
+		},
+		{
+			"set user, intent incorrect token",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: context.Background(),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					cmds: []SessionCommand{
+						CheckUser("userID"),
+						CheckIntent("intent2", "aW50ZW50"),
+					},
+					eventstore: eventstoreExpect(t),
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					intentAlg: decryption(nil),
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				metadata: map[string][]byte{
+					"key": []byte("value"),
+				},
+			},
+			res{
+				err: caos_errs.ThrowPermissionDenied(nil, "CRYPTO-CRYPTO", "Errors.Intent.InvalidToken"),
+			},
+		},
+		{
+			"set user, intent, metadata and token",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectPush(
+						eventPusherToEvents(
+							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+								"userID", testNow),
+							session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+								testNow),
+							session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+								map[string][]byte{"key": []byte("value")}),
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+								"tokenID"),
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					cmds: []SessionCommand{
+						CheckUser("userID"),
+						CheckIntent("intent", "aW50ZW50"),
+					},
+					eventstore: eventstoreExpect(t,
+						expectFilter(
+							eventFromEventPusher(
+								user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+									"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
+							),
+							eventFromEventPusher(
+								idpintent.NewSucceededEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate,
+									nil,
+									"idpUserID",
+									"idpUsername",
+									"userID",
+									nil,
+									"",
+								),
+							),
+						),
+					),
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					intentAlg: decryption(nil),
 					now: func() time.Time {
 						return testNow
 					},
