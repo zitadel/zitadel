@@ -8,6 +8,14 @@
         "src/proto/**"
       ],
       "cache": true
+    },
+    "build": {
+      "outputs": [
+        "dist/**"
+      ],
+      "dependsOn": [
+        "generate"
+      ]
     }
   }
 }
