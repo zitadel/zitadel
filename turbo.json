@@ -4,11 +4,7 @@
     "generate": {
       "cache": true
     },
-    "build": {
-      "dependsOn": [
-        "generate"
-      ]
-    },
+    "build": {},
     "test": {},
     "test:unit": {},
     "test:integration": {},
