@@ -46,6 +46,12 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	return es
 }
 
+func expectEventstore(expects ...expect) func(*testing.T) *eventstore.Eventstore {
+	return func(t *testing.T) *eventstore.Eventstore {
+		return eventstoreExpect(t, expects...)
+	}
+}
+
 func eventPusherToEvents(eventsPushes ...eventstore.Command) []*repository.Event {
 	events := make([]*repository.Event, len(eventsPushes))
 	for i, event := range eventsPushes {
@@ -122,6 +128,18 @@ func expectPush(events []*repository.Event, uniqueConstraints ...*repository.Uni
 func expectPushFailed(err error, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) expect {
 	return func(m *mock.MockRepository) {
 		m.ExpectPushFailed(err, events, uniqueConstraints...)
+	}
+}
+
+func expectRandomPush(events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) expect {
+	return func(m *mock.MockRepository) {
+		m.ExpectRandomPush(events, uniqueConstraints...)
+	}
+}
+
+func expectRandomPushFailed(err error, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) expect {
+	return func(m *mock.MockRepository) {
+		m.ExpectRandomPushFailed(err, events, uniqueConstraints...)
 	}
 }
 

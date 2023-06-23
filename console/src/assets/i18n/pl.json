@@ -166,7 +166,14 @@
     "NEXT": "Następny",
     "MORE": "więcej",
     "STEP": "Krok",
-    "COMINGSOON": "Coming soon",
+    "UNSAVEDCHANGES": "Niezapisane zmiany",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Czy na pewno chcesz odrzucić to nowe działanie? Twoje działanie zostanie utracone",
+        "CANCEL": "Anuluj",
+        "DISCARD": "Wyrzucać"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Pokaż użytkownika {{value}}"
     }
@@ -1032,7 +1039,8 @@
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български"
     },
     "SMTP": {
       "TITLE": "Ustawienia SMTP",
@@ -1231,7 +1239,8 @@
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български"
       },
       "KEYS": {
         "emailVerificationDoneText": "Weryfikacja adresu e-mail zakończona",
@@ -2102,7 +2111,8 @@
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български"
   },
   "MEMBER": {
     "ADD": "Dodaj managera",

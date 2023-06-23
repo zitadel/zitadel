@@ -285,6 +285,16 @@ func NewCopyCol(column, from string) handler.Column {
 	}
 }
 
+func NewLessThanCond(column string, value interface{}) handler.Condition {
+	return handler.Condition{
+		Name:  column,
+		Value: value,
+		ParameterOpt: func(placeholder string) string {
+			return " < " + placeholder
+		},
+	}
+}
+
 // NewCopyStatement creates a new upsert statement which updates a column from an existing row
 // cols represent the columns which are objective to change.
 // if the value of a col is empty the data will be copied from the selected row
@@ -390,6 +400,9 @@ func conditionsToWhere(cols []handler.Condition, paramOffset int) (wheres []stri
 
 	for i, col := range cols {
 		wheres[i] = "(" + col.Name + " = $" + strconv.Itoa(i+1+paramOffset) + ")"
+		if col.ParameterOpt != nil {
+			wheres[i] = "(" + col.Name + col.ParameterOpt("$"+strconv.Itoa(i+1+paramOffset)) + ")"
+		}
 		values[i] = col.Value
 	}
 
