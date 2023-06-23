@@ -487,6 +487,7 @@ Errors:
     NotSucceeded: l'intention n'a pas abouti
     TokenCreationFailed: La création du token a échoué
     InvalidToken: Le jeton d'intention n'est pas valide
+    OtherUser: Intention destinée à un autre utilisateur
 
 AggregateTypes:
   action: Action

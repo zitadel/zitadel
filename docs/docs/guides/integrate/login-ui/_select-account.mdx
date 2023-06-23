@@ -1,0 +1,80 @@
+
+If you want to build your own select account/account picker, you have to cache the session IDs.
+We recommend storing a list of the session Ids with the corresponding session token in a cookie.
+The list of session IDs can be sent in the “search sessions” request to get a detailed list of sessions for the account selection.
+
+[Search Sessions Documentation](https://zitadel.com/docs/apis/resources/session_service/session-service-list-sessions)
+
+### Request
+
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/sessions/_search \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Content-Type: application/json' \
+  --data '{
+  "query": {
+    "offset": "0",
+    "limit": 100,
+    "asc": true
+  },
+  "queries": [
+    {
+      "idsQuery": {
+        "ids": [
+          "218380657934467329", "218480890961985793"
+        ]
+      }
+    }
+  ]
+}'
+```
+
+### Response
+
+```bash
+{
+	"details": {
+		"totalResult": "2",
+		"processedSequence": "582",
+		"timestamp": "2023-06-14T05:42:11.644220Z"
+	},
+	"sessions": [
+		{
+			"id": "218380657934467329",
+			"creationDate": "2023-06-13T12:56:56.683629Z",
+			"changeDate": "2023-06-13T12:56:56.724450Z",
+			"sequence": "574",
+			"factors": {
+				"user": {
+					"verifiedAt": "2023-06-13T12:56:55.440850Z",
+					"id": "218380659823356328",
+					"loginName": "minnie-mouse@fabi.zitadel.app",
+					"displayName": "Minnie Mouse"
+				},
+				"password": {
+					"verifiedAt": "2023-06-13T12:56:56.675359Z"
+				}
+			}
+		},
+		{
+			"id": "218480890961985793",
+			"creationDate": "2023-06-14T05:32:38.977954Z",
+			"changeDate": "2023-06-14T05:42:11.631901Z",
+			"sequence": "582",
+			"factors": {
+				"user": {
+					"verifiedAt": "2023-06-14T05:32:38.972712Z",
+					"id": "218380659823356328",
+					"loginName": "minnie-mouse@fabi.zitadel.app",
+					"displayName": "Minnie Mouse"
+				},
+				"password": {
+					"verifiedAt": "2023-06-14T05:42:11.619484Z"
+				}
+			}
+		}
+	]
+}
+```
