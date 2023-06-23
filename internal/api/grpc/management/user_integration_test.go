@@ -40,6 +40,12 @@ func TestMain(m *testing.M) {
 	}())
 }
 
+// TestImport_and_Get reproduces https://github.com/zitadel/zitadel/issues/5808
+// which led to consistency issues due the call timestamp not being
+// updated after a bulk Trigger.
+// This test Imports a user and directly tries to Get it, 100 times in a loop.
+// When the bug still existed, some (between 1 to 7 out of 100)
+// Get calls would return a Not Found error.
 func TestImport_and_Get(t *testing.T) {
 	const N = 100
 	var misses int
