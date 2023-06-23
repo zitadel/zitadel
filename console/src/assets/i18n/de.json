@@ -1785,7 +1785,7 @@
     "DELETE_TITLE": "IDP löschen",
     "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identitätsanbieter zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
     "REMOVE_WARN_TITLE": "IDP entfernen?",
-    "REMOVE_WARN_DESCRIPTION": "Sie sind dabei, einen Identitätsanbieter zu entfernen. Dadurch wird die Auswahl des verfügbaren IDP für Ihre Benutzer entfernt und bereits registrierte Benutzer können sich nicht erneut anmelden. Sind Sie wirklich fortfahren?",
+    "REMOVE_WARN_DESCRIPTION": "Sie sind dabei, einen Identitätsanbieter zu entfernen. Dadurch wird die Auswahl des verfügbaren IDP für Ihre Benutzer entfernt und bereits registrierte Benutzer können sich nicht erneut anmelden. Wollen Sie wirklich fortfahren?",
     "DELETE_SELECTION_TITLE": "Identitätsanbieter löschen",
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identitätsanbieter zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
     "EMPTY": "Kein IDP vorhanden",
