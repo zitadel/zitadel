@@ -46,7 +46,7 @@ type Handler struct {
 	handleActiveInstances time.Duration
 	now                   nowFunc
 
-	isTriggered sync.Mutex
+	// isTriggered sync.Mutex
 }
 
 // nowFunc makes [time.Now] mockable
