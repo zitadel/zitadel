@@ -487,6 +487,7 @@ Errors:
     NotSucceeded: Intent has not succeeded
     TokenCreationFailed: Token creation failed
     InvalidToken: Intent Token is invalid
+    OtherUser: Intent meant for another user
 
 AggregateTypes:
   action: Action

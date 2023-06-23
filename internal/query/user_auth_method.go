@@ -6,6 +6,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
@@ -64,12 +65,27 @@ var (
 		name:  projection.UserAuthMethodOwnerRemovedCol,
 		table: userAuthMethodTable,
 	}
+
+	authMethodTypeTable      = userAuthMethodTable.setAlias("auth_method_types")
+	authMethodTypeUserID     = UserAuthMethodColumnUserID.setTable(authMethodTypeTable)
+	authMethodTypeInstanceID = UserAuthMethodColumnInstanceID.setTable(authMethodTypeTable)
+	authMethodTypeTypes      = UserAuthMethodColumnMethodType.setTable(authMethodTypeTable)
+	authMethodTypeState      = UserAuthMethodColumnState.setTable(authMethodTypeTable)
+
+	userIDPsCountTable      = idpUserLinkTable.setAlias("user_idps_count")
+	userIDPsCountUserID     = IDPUserLinkUserIDCol.setTable(userIDPsCountTable)
+	userIDPsCountInstanceID = IDPUserLinkInstanceIDCol.setTable(userIDPsCountTable)
+	userIDPsCountCount      = Column{
+		name:  "count",
+		table: userIDPsCountTable,
+	}
 )
 
 type AuthMethods struct {
 	SearchResponse
 	AuthMethods []*AuthMethod
 }
+
 type AuthMethod struct {
 	UserID        string
 	CreationDate  time.Time
@@ -81,6 +97,11 @@ type AuthMethod struct {
 	TokenID string
 	Name    string
 	Type    domain.UserAuthMethodType
+}
+
+type AuthMethodTypes struct {
+	SearchResponse
+	AuthMethodTypes []domain.UserAuthMethodType
 }
 
 type UserAuthMethodSearchQueries struct {
@@ -112,6 +133,41 @@ func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMe
 	}
 	userAuthMethods.LatestSequence, err = q.latestSequence(ctx, userAuthMethodTable)
 	return userAuthMethods, err
+}
+
+func (q *Queries) ListActiveUserAuthMethodTypes(ctx context.Context, userID string, withOwnerRemoved bool) (userAuthMethodTypes *AuthMethodTypes, err error) {
+	ctxData := authz.GetCtxData(ctx)
+	if ctxData.UserID != userID {
+		if err := q.checkPermission(ctx, domain.PermissionUserRead, ctxData.OrgID, userID); err != nil {
+			return nil, err
+		}
+	}
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareActiveUserAuthMethodTypesQuery(ctx, q.client)
+	eq := sq.Eq{
+		UserIDCol.identifier():         userID,
+		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[UserOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := query.Where(eq).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-Sfdrg", "Errors.Query.InvalidRequest")
+	}
+
+	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	if err != nil || rows.Err() != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-SDgr3", "Errors.Internal")
+	}
+	userAuthMethodTypes, err = scan(rows)
+	if err != nil {
+		return nil, err
+	}
+	userAuthMethodTypes.LatestSequence, err = q.latestSequence(ctx, userTable, notifyTable, userAuthMethodTable, idpUserLinkTable)
+	return userAuthMethodTypes, err
 }
 
 func NewUserAuthMethodUserIDSearchQuery(value string) (SearchQuery, error) {
@@ -249,6 +305,83 @@ func prepareUserAuthMethodsQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				AuthMethods: userAuthMethods,
 				SearchResponse: SearchResponse{
 					Count: count,
+				},
+			}, nil
+		}
+}
+
+func prepareActiveUserAuthMethodTypesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+	authMethodsQuery, authMethodsArgs, err := sq.Select(
+		"DISTINCT("+authMethodTypeTypes.identifier()+")",
+		authMethodTypeUserID.identifier(),
+		authMethodTypeInstanceID.identifier()).
+		From(authMethodTypeTable.identifier()).
+		Where(sq.Eq{authMethodTypeState.identifier(): domain.MFAStateReady}).
+		ToSql()
+	if err != nil {
+		return sq.SelectBuilder{}, nil
+	}
+	idpsQuery, _, err := sq.Select(
+		userIDPsCountUserID.identifier(),
+		userIDPsCountInstanceID.identifier(),
+		"COUNT("+userIDPsCountUserID.identifier()+") AS "+userIDPsCountCount.name).
+		From(userIDPsCountTable.identifier()).
+		GroupBy(
+			userIDPsCountUserID.identifier(),
+			userIDPsCountInstanceID.identifier(),
+		).
+		ToSql()
+	if err != nil {
+		return sq.SelectBuilder{}, nil
+	}
+	return sq.Select(
+			NotifyPasswordSetCol.identifier(),
+			authMethodTypeTypes.identifier(),
+			userIDPsCountCount.identifier()).
+			From(userTable.identifier()).
+			LeftJoin(join(NotifyUserIDCol, UserIDCol)).
+			LeftJoin("("+authMethodsQuery+") AS "+authMethodTypeTable.alias+" ON "+
+				authMethodTypeUserID.identifier()+" = "+UserIDCol.identifier()+" AND "+
+				authMethodTypeInstanceID.identifier()+" = "+UserInstanceIDCol.identifier(),
+				authMethodsArgs...).
+			LeftJoin("(" + idpsQuery + ") AS " + userIDPsCountTable.alias + " ON " +
+				userIDPsCountUserID.identifier() + " = " + UserIDCol.identifier() + " AND " +
+				userIDPsCountInstanceID.identifier() + " = " + UserInstanceIDCol.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) (*AuthMethodTypes, error) {
+			userAuthMethodTypes := make([]domain.UserAuthMethodType, 0)
+			var passwordSet sql.NullBool
+			var idp sql.NullInt64
+			for rows.Next() {
+				var authMethodType sql.NullInt16
+				err := rows.Scan(
+					&passwordSet,
+					&authMethodType,
+					&idp,
+				)
+				if err != nil {
+					return nil, err
+				}
+				if authMethodType.Valid {
+					userAuthMethodTypes = append(userAuthMethodTypes, domain.UserAuthMethodType(authMethodType.Int16))
+				}
+			}
+			if passwordSet.Valid && passwordSet.Bool {
+				userAuthMethodTypes = append(userAuthMethodTypes, domain.UserAuthMethodTypePassword)
+			}
+			if idp.Valid && idp.Int64 > 0 {
+				logging.Error("IDP", idp.Int64)
+				userAuthMethodTypes = append(userAuthMethodTypes, domain.UserAuthMethodTypeIDP)
+			}
+
+			if err := rows.Close(); err != nil {
+				return nil, errors.ThrowInternal(err, "QUERY-3n9fl", "Errors.Query.CloseRows")
+			}
+
+			return &AuthMethodTypes{
+				AuthMethodTypes: userAuthMethodTypes,
+				SearchResponse: SearchResponse{
+					Count: uint64(len(userAuthMethodTypes)),
 				},
 			}, nil
 		}

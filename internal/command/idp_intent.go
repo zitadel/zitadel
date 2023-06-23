@@ -119,17 +119,16 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 	if err != nil {
 		return "", err
 	}
-	cmd, err := idpintent.NewSucceededEvent(
+	cmd := idpintent.NewSucceededEvent(
 		ctx,
 		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
 		idpInfo,
+		idpUser.GetID(),
+		idpUser.GetPreferredUsername(),
 		userID,
 		accessToken,
 		idToken,
 	)
-	if err != nil {
-		return "", err
-	}
 	err = c.pushAppendAndReduce(ctx, writeModel, cmd)
 	if err != nil {
 		return "", err
