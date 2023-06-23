@@ -25,6 +25,8 @@ const (
 
 type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	Domain string `json:"domain,omitempty"`
 }
 
 func (e *AddedEvent) Data() interface{} {
@@ -37,6 +39,7 @@ func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 
 func NewAddedEvent(ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	domain string,
 ) *AddedEvent {
 	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -44,6 +47,7 @@ func NewAddedEvent(ctx context.Context,
 			aggregate,
 			AddedType,
 		),
+		Domain: domain,
 	}
 }
 
@@ -150,7 +154,6 @@ type PasskeyChallengedEvent struct {
 	Challenge          string                             `json:"challenge,omitempty"`
 	AllowedCrentialIDs [][]byte                           `json:"allowedCrentialIDs,omitempty"`
 	UserVerification   domain.UserVerificationRequirement `json:"userVerification,omitempty"`
-	RPID               string                             `json:"rpID,omitempty"`
 }
 
 func (e *PasskeyChallengedEvent) Data() interface{} {
@@ -171,7 +174,6 @@ func NewPasskeyChallengedEvent(
 	challenge string,
 	allowedCrentialIDs [][]byte,
 	userVerification domain.UserVerificationRequirement,
-	rpID string,
 ) *PasskeyChallengedEvent {
 	return &PasskeyChallengedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -182,7 +184,6 @@ func NewPasskeyChallengedEvent(
 		Challenge:          challenge,
 		AllowedCrentialIDs: allowedCrentialIDs,
 		UserVerification:   userVerification,
-		RPID:               rpID,
 	}
 }
 

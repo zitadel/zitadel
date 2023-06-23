@@ -34,7 +34,7 @@ func (s *Server) VerifyU2FRegistration(ctx context.Context, req *user.VerifyU2FR
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "USERv2-IeTh4", "Errors.Internal")
 	}
-	objectDetails, err := s.command.HumanVerifyU2FSetup(ctx, req.GetUserId(), resourceOwner, req.GetTokenName(), "", req.GetU2FId(), pkc)
+	objectDetails, err := s.command.HumanVerifyU2FSetup(ctx, req.GetUserId(), resourceOwner, req.GetTokenName(), "", pkc)
 	if err != nil {
 		return nil, err
 	}

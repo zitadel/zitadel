@@ -26,14 +26,13 @@ type HumanWebAuthNWriteModel struct {
 	State domain.MFAState
 }
 
-func NewHumanWebAuthNWriteModel(userID, webAuthNTokenID, resourceOwner, rpID string) *HumanWebAuthNWriteModel {
+func NewHumanWebAuthNWriteModel(userID, webAuthNTokenID, resourceOwner string) *HumanWebAuthNWriteModel {
 	return &HumanWebAuthNWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
 		WebauthNTokenID: webAuthNTokenID,
-		RPID:            rpID,
 	}
 }
 
@@ -41,15 +40,15 @@ func (wm *HumanWebAuthNWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.HumanWebAuthNAddedEvent:
-			if wm.WebauthNTokenID == e.WebAuthNTokenID && wm.RPID == e.RPID {
+			if wm.WebauthNTokenID == e.WebAuthNTokenID {
 				wm.WriteModel.AppendEvents(e)
 			}
 		case *user.HumanPasswordlessAddedEvent:
-			if wm.WebauthNTokenID == e.WebAuthNTokenID && wm.RPID == e.RPID {
+			if wm.WebauthNTokenID == e.WebAuthNTokenID {
 				wm.WriteModel.AppendEvents(&e.HumanWebAuthNAddedEvent)
 			}
 		case *user.HumanU2FAddedEvent:
-			if wm.WebauthNTokenID == e.WebAuthNTokenID && wm.RPID == e.RPID {
+			if wm.WebauthNTokenID == e.WebAuthNTokenID {
 				wm.WriteModel.AppendEvents(&e.HumanWebAuthNAddedEvent)
 			}
 		case *user.HumanWebAuthNVerifiedEvent:
@@ -152,16 +151,14 @@ type HumanU2FTokensReadModel struct {
 
 	WebAuthNTokens []*HumanWebAuthNWriteModel
 	UserState      domain.UserState
-	RPID           string
 }
 
-func NewHumanU2FTokensReadModel(userID, resourceOwner, rpID string) *HumanU2FTokensReadModel {
+func NewHumanU2FTokensReadModel(userID, resourceOwner string) *HumanU2FTokensReadModel {
 	return &HumanU2FTokensReadModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
-		RPID: rpID,
 	}
 }
 
@@ -237,16 +234,14 @@ type HumanPasswordlessTokensReadModel struct {
 
 	WebAuthNTokens []*HumanWebAuthNWriteModel
 	UserState      domain.UserState
-	RPID           string
 }
 
-func NewHumanPasswordlessTokensReadModel(userID, resourceOwner, rpID string) *HumanPasswordlessTokensReadModel {
+func NewHumanPasswordlessTokensReadModel(userID, resourceOwner string) *HumanPasswordlessTokensReadModel {
 	return &HumanPasswordlessTokensReadModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
-		RPID: rpID,
 	}
 }
 

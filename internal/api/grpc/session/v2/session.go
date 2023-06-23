@@ -47,7 +47,7 @@ func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRe
 	}
 	challengeResponse, cmds := s.challengesToCommand(req.GetChallenges(), checks)
 
-	set, err := s.command.CreateSession(ctx, cmds, metadata)
+	set, err := s.command.CreateSession(ctx, cmds, req.GetDomain(), metadata)
 	if err != nil {
 		return nil, err
 	}
@@ -107,6 +107,7 @@ func sessionToPb(s *query.Session) *session.Session {
 		Sequence:     s.Sequence,
 		Factors:      factorsToPb(s),
 		Metadata:     s.Metadata,
+		Domain:       s.Domain,
 	}
 }
 
@@ -236,15 +237,17 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	return sessionChecks, nil
 }
 
-func (s *Server) challengesToCommand(challenges []*session.ChallengeKind, cmds []command.SessionCommand) (*session.Challenges, []command.SessionCommand) {
+func (s *Server) challengesToCommand(challenges []session.ChallengeKind, cmds []command.SessionCommand) (*session.Challenges, []command.SessionCommand) {
 	if len(challenges) == 0 {
 		return nil, cmds
 	}
 	resp := new(session.Challenges)
 	for _, c := range challenges {
-		switch ct := c.GetChallenge().(type) {
-		case *session.ChallengeKind_Passkey:
-			passkeyChallenge, cmd := s.createPasskeyChallengeCommand(ct.Passkey.GetDomain())
+		switch c {
+		case session.ChallengeKind_CHALLENGE_KIND_UNSPECIFIED:
+			continue
+		case session.ChallengeKind_CHALLENGE_KIND_PASSKEY:
+			passkeyChallenge, cmd := s.createPasskeyChallengeCommand()
 			resp.Passkey = passkeyChallenge
 			cmds = append(cmds, cmd)
 		}
@@ -252,11 +255,11 @@ func (s *Server) challengesToCommand(challenges []*session.ChallengeKind, cmds [
 	return resp, cmds
 }
 
-func (s *Server) createPasskeyChallengeCommand(rpID string) (*session.Challenges_Passkey, command.SessionCommand) {
+func (s *Server) createPasskeyChallengeCommand() (*session.Challenges_Passkey, command.SessionCommand) {
 	challenge := &session.Challenges_Passkey{
 		PublicKeyCredentialRequestOptions: new(structpb.Struct),
 	}
-	return challenge, s.command.CreatePasskeyChallenge(domain.UserVerificationRequirementRequired, rpID, challenge.PublicKeyCredentialRequestOptions)
+	return challenge, s.command.CreatePasskeyChallenge(domain.UserVerificationRequirementRequired, challenge.PublicKeyCredentialRequestOptions)
 }
 
 func userCheck(user *session.CheckUser) (userSearch, error) {

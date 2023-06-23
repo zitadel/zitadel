@@ -25,11 +25,11 @@ func (c *Commands) registerUserU2F(ctx context.Context, userID, resourceOwner, r
 }
 
 func (c *Commands) createUserU2F(ctx context.Context, userID, resourceOwner, rpID string) (*HumanWebAuthNWriteModel, *eventstore.Aggregate, *domain.WebAuthNToken, error) {
-	tokens, err := c.getHumanU2FTokens(ctx, userID, resourceOwner, rpID)
+	tokens, err := c.getHumanU2FTokens(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	return c.addHumanWebAuthN(ctx, userID, resourceOwner, "", tokens, domain.AuthenticatorAttachmentUnspecified, domain.UserVerificationRequirementRequired)
+	return c.addHumanWebAuthN(ctx, userID, resourceOwner, rpID, tokens, domain.AuthenticatorAttachmentUnspecified, domain.UserVerificationRequirementRequired)
 }
 
 func (c *Commands) pushUserU2F(ctx context.Context, wm *HumanWebAuthNWriteModel, userAgg *eventstore.Aggregate, webAuthN *domain.WebAuthNToken) (*domain.WebAuthNRegistrationDetails, error) {

@@ -10,12 +10,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 var (
@@ -134,6 +135,7 @@ func TestServer_CreateSession(t *testing.T) {
 					},
 				},
 				Metadata: map[string][]byte{"foo": []byte("bar")},
+				Domain:   "domain",
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
@@ -191,6 +193,7 @@ func TestServer_CreateSession_passkey(t *testing.T) {
 		Challenges: []session.ChallengeKind{
 			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
 		},
+		Domain: Tester.Config.ExternalDomain,
 	})
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil)
@@ -216,7 +219,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 	var wantFactors []wantFactor
 
 	// create new, empty session
-	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{})
+	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{Domain: Tester.Config.ExternalDomain})
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, wantFactors...)
 	sessionToken := createResp.GetSessionToken()

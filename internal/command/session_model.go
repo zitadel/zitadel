@@ -42,6 +42,7 @@ type SessionWriteModel struct {
 	PasswordCheckedAt time.Time
 	PasskeyCheckedAt  time.Time
 	Metadata          map[string][]byte
+	Domain            string
 	State             domain.SessionState
 
 	PasskeyChallenge *PasskeyChallengeModel
@@ -107,6 +108,7 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 func (wm *SessionWriteModel) reduceAdded(e *session.AddedEvent) {
+	wm.Domain = e.Domain
 	wm.State = domain.SessionStateActive
 }
 
@@ -124,7 +126,7 @@ func (wm *SessionWriteModel) reducePasskeyChallenged(e *session.PasskeyChallenge
 		Challenge:          e.Challenge,
 		AllowedCrentialIDs: e.AllowedCrentialIDs,
 		UserVerification:   e.UserVerification,
-		RPID:               e.RPID,
+		RPID:               wm.Domain,
 	}
 }
 
@@ -141,8 +143,10 @@ func (wm *SessionWriteModel) reduceTerminate() {
 	wm.State = domain.SessionStateTerminated
 }
 
-func (wm *SessionWriteModel) Start(ctx context.Context) {
-	wm.commands = append(wm.commands, session.NewAddedEvent(ctx, wm.aggregate))
+func (wm *SessionWriteModel) Start(ctx context.Context, domain string) {
+	wm.commands = append(wm.commands, session.NewAddedEvent(ctx, wm.aggregate, domain))
+	// set the domain so checks can
+	wm.Domain = domain
 }
 
 func (wm *SessionWriteModel) UserChecked(ctx context.Context, userID string, checkedAt time.Time) error {
@@ -156,8 +160,8 @@ func (wm *SessionWriteModel) PasswordChecked(ctx context.Context, checkedAt time
 	wm.commands = append(wm.commands, session.NewPasswordCheckedEvent(ctx, wm.aggregate, checkedAt))
 }
 
-func (wm *SessionWriteModel) PasskeyChallenged(ctx context.Context, challenge, rpID string, allowedCrentialIDs [][]byte, userVerification domain.UserVerificationRequirement) {
-	wm.commands = append(wm.commands, session.NewPasskeyChallengedEvent(ctx, wm.aggregate, challenge, allowedCrentialIDs, userVerification, rpID))
+func (wm *SessionWriteModel) PasskeyChallenged(ctx context.Context, challenge string, allowedCrentialIDs [][]byte, userVerification domain.UserVerificationRequirement) {
+	wm.commands = append(wm.commands, session.NewPasskeyChallengedEvent(ctx, wm.aggregate, challenge, allowedCrentialIDs, userVerification))
 }
 
 func (wm *SessionWriteModel) PasskeyChecked(ctx context.Context, checkedAt time.Time, tokenID string, signCount uint32) {

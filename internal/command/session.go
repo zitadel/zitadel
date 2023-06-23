@@ -118,7 +118,7 @@ func (s *SessionCommands) commands(ctx context.Context) (string, []eventstore.Co
 	return token, s.sessionWriteModel.commands, nil
 }
 
-func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, metadata map[string][]byte) (set *SessionChanged, err error) {
+func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, sessionDomain string, metadata map[string][]byte) (set *SessionChanged, err error) {
 	sessionID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -128,8 +128,8 @@ func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, met
 	if err != nil {
 		return nil, err
 	}
+	sessionWriteModel.Start(ctx, sessionDomain)
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
-	cmd.sessionWriteModel.Start(ctx)
 	return c.updateSession(ctx, cmd, metadata)
 }
 

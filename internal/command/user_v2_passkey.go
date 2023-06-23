@@ -72,7 +72,7 @@ func (c *Commands) registerUserPasskey(ctx context.Context, userID, resourceOwne
 }
 
 func (c *Commands) createUserPasskey(ctx context.Context, userID, resourceOwner, rpID string, authenticator domain.AuthenticatorAttachment) (*HumanWebAuthNWriteModel, *eventstore.Aggregate, *domain.WebAuthNToken, error) {
-	passwordlessTokens, err := c.getHumanPasswordlessTokens(ctx, userID, resourceOwner, rpID)
+	passwordlessTokens, err := c.getHumanPasswordlessTokens(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, nil, nil, err
 	}

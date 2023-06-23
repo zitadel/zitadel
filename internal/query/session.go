@@ -29,6 +29,7 @@ type Session struct {
 	Sequence       uint64
 	State          domain.SessionState
 	ResourceOwner  string
+	Domain         string
 	Creator        string
 	UserFactor     SessionUserFactor
 	PasswordFactor SessionPasswordFactor
@@ -91,6 +92,10 @@ var (
 	}
 	SessionColumnResourceOwner = Column{
 		name:  projection.SessionColumnResourceOwner,
+		table: sessionsTable,
+	}
+	SessionColumnDomain = Column{
+		name:  projection.SessionColumnDomain,
 		table: sessionsTable,
 	}
 	SessionColumnInstanceID = Column{
@@ -202,6 +207,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			SessionColumnState.identifier(),
 			SessionColumnResourceOwner.identifier(),
 			SessionColumnCreator.identifier(),
+			SessionColumnDomain.identifier(),
 			SessionColumnUserID.identifier(),
 			SessionColumnUserCheckedAt.identifier(),
 			LoginNameNameCol.identifier(),
@@ -225,6 +231,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				passkeyCheckedAt  sql.NullTime
 				metadata          database.Map[[]byte]
 				token             sql.NullString
+				sessionDomain     sql.NullString
 			)
 
 			err := row.Scan(
@@ -235,6 +242,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&session.State,
 				&session.ResourceOwner,
 				&session.Creator,
+				&sessionDomain,
 				&userID,
 				&userCheckedAt,
 				&loginName,
@@ -252,6 +260,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				return nil, "", errors.ThrowInternal(err, "QUERY-SAder", "Errors.Internal")
 			}
 
+			session.Domain = sessionDomain.String
 			session.UserFactor.UserID = userID.String
 			session.UserFactor.UserCheckedAt = userCheckedAt.Time
 			session.UserFactor.LoginName = loginName.String
@@ -273,6 +282,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			SessionColumnState.identifier(),
 			SessionColumnResourceOwner.identifier(),
 			SessionColumnCreator.identifier(),
+			SessionColumnDomain.identifier(),
 			SessionColumnUserID.identifier(),
 			SessionColumnUserCheckedAt.identifier(),
 			LoginNameNameCol.identifier(),
@@ -298,6 +308,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					passwordCheckedAt sql.NullTime
 					passkeyCheckedAt  sql.NullTime
 					metadata          database.Map[[]byte]
+					sessionDomain     sql.NullString
 				)
 
 				err := rows.Scan(
@@ -308,6 +319,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&session.State,
 					&session.ResourceOwner,
 					&session.Creator,
+					&sessionDomain,
 					&userID,
 					&userCheckedAt,
 					&loginName,
@@ -321,6 +333,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				if err != nil {
 					return nil, errors.ThrowInternal(err, "QUERY-SAfeg", "Errors.Internal")
 				}
+				session.Domain = sessionDomain.String
 				session.UserFactor.UserID = userID.String
 				session.UserFactor.UserCheckedAt = userCheckedAt.Time
 				session.UserFactor.LoginName = loginName.String

@@ -13,12 +13,12 @@ type humanPasskeys struct {
 	tokens []*domain.WebAuthNToken
 }
 
-func (s *SessionCommands) getHumanPasskeys(ctx context.Context, rpID string) (*humanPasskeys, error) {
+func (s *SessionCommands) getHumanPasskeys(ctx context.Context) (*humanPasskeys, error) {
 	humanWritemodel, err := s.gethumanWriteModel(ctx)
 	if err != nil {
 		return nil, err
 	}
-	tokenReadModel, err := s.getHumanPasswordlessTokenReadModel(ctx, rpID)
+	tokenReadModel, err := s.getHumanPasswordlessTokenReadModel(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -28,8 +28,8 @@ func (s *SessionCommands) getHumanPasskeys(ctx context.Context, rpID string) (*h
 	}, nil
 }
 
-func (s *SessionCommands) getHumanPasswordlessTokenReadModel(ctx context.Context, rpID string) (*HumanPasswordlessTokensReadModel, error) {
-	tokenReadModel := NewHumanPasswordlessTokensReadModel(s.sessionWriteModel.UserID, s.sessionWriteModel.ResourceOwner, rpID)
+func (s *SessionCommands) getHumanPasswordlessTokenReadModel(ctx context.Context) (*HumanPasswordlessTokensReadModel, error) {
+	tokenReadModel := NewHumanPasswordlessTokensReadModel(s.sessionWriteModel.UserID, s.sessionWriteModel.ResourceOwner)
 	err := s.eventstore.FilterToQueryReducer(ctx, tokenReadModel)
 	if err != nil {
 		return nil, err
@@ -37,13 +37,13 @@ func (s *SessionCommands) getHumanPasswordlessTokenReadModel(ctx context.Context
 	return tokenReadModel, nil
 }
 
-func (c *Commands) CreatePasskeyChallenge(userVerification domain.UserVerificationRequirement, rpID string, dst json.Unmarshaler) SessionCommand {
+func (c *Commands) CreatePasskeyChallenge(userVerification domain.UserVerificationRequirement, dst json.Unmarshaler) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) error {
-		humanPasskeys, err := cmd.getHumanPasskeys(ctx, rpID)
+		humanPasskeys, err := cmd.getHumanPasskeys(ctx)
 		if err != nil {
 			return err
 		}
-		webAuthNLogin, err := c.webauthnConfig.BeginLogin(ctx, humanPasskeys.human, userVerification, rpID, humanPasskeys.tokens...)
+		webAuthNLogin, err := c.webauthnConfig.BeginLogin(ctx, humanPasskeys.human, userVerification, cmd.sessionWriteModel.Domain, humanPasskeys.tokens...)
 		if err != nil {
 			return err
 		}
@@ -51,7 +51,7 @@ func (c *Commands) CreatePasskeyChallenge(userVerification domain.UserVerificati
 			return caos_errs.ThrowInternal(err, "COMMAND-Yah6A", "Errors.Internal")
 		}
 
-		cmd.sessionWriteModel.PasskeyChallenged(ctx, webAuthNLogin.Challenge, webAuthNLogin.RPID, webAuthNLogin.AllowedCredentialIDs, webAuthNLogin.UserVerification)
+		cmd.sessionWriteModel.PasskeyChallenged(ctx, webAuthNLogin.Challenge, webAuthNLogin.AllowedCredentialIDs, webAuthNLogin.UserVerification)
 		return nil
 	}
 }
@@ -62,7 +62,7 @@ func (c *Commands) CheckPasskey(credentialAssertionData json.Marshaler) SessionC
 		if err != nil {
 			return caos_errs.ThrowInvalidArgument(err, "COMMAND-ohG2o", "todo")
 		}
-		humanPasskeys, err := cmd.getHumanPasskeys(ctx, cmd.sessionWriteModel.PasskeyChallenge.RPID)
+		humanPasskeys, err := cmd.getHumanPasskeys(ctx)
 		if err != nil {
 			return err
 		}
