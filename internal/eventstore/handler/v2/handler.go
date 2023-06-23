@@ -183,8 +183,8 @@ func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]str
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).
 		AllowTimeTravel().
 		AddQuery().
-		AggregateTypes(instance.AggregateType).
-		EventTypes(instance.InstanceAddedEventType).
+		// AggregateTypes(instance.AggregateType).
+		// EventTypes(instance.InstanceAddedEventType).
 		ExcludedInstanceID("")
 	if didInitialize {
 		query = query.

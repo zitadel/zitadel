@@ -316,7 +316,7 @@ func (db *CRDB) maxSequenceQuery() string {
 }
 
 func (db *CRDB) instanceIDsQuery() string {
-	return "SELECT aggregate_id FROM eventstore.events"
+	return "SELECT DISTINCT instance_id FROM eventstore.events"
 }
 
 func (db *CRDB) columnName(col repository.Field) string {
