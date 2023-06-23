@@ -59,8 +59,12 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 		return nil, err
 	}
 
-	es.notify(events)
-	return es.mapEvents(events)
+	mappedEvents, err := es.mapEvents(events)
+	if err != nil {
+		return mappedEvents, err
+	}
+	es.notify(mappedEvents)
+	return mappedEvents, nil
 }
 
 // TODO(adlerhurst): still needed?

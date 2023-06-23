@@ -197,10 +197,10 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if !h.isTriggered.TryLock() {
-		return nil
-	}
-	defer h.isTriggered.Unlock()
+	// if !h.isTriggered.TryLock() {
+	// 	return nil
+	// }
+	// defer h.isTriggered.Unlock()
 
 	for i := 0; ; i++ {
 		additionalIteration, err := h.processEvents(ctx)

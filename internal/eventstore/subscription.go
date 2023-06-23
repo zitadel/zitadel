@@ -56,15 +56,9 @@ func SubscribeEventTypes(eventQueue chan Event, types map[AggregateType][]EventT
 }
 
 func (es *Eventstore) notify(events []Event) {
-	eventReaders, err := es.mapEvents(events)
-	if err != nil {
-		logging.WithError(err).Debug("unable to map events")
-		return
-	}
-
 	subsMutext.Lock()
 	defer subsMutext.Unlock()
-	for _, event := range eventReaders {
+	for _, event := range events {
 		subs, ok := subscriptions[event.Aggregate().Type]
 		if !ok {
 			continue
@@ -82,6 +76,7 @@ func (es *Eventstore) notify(events []Event) {
 					select {
 					case sub.Events <- event:
 					default:
+						logging.Debug("unable to push event")
 					}
 					break
 				}
