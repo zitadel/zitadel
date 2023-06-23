@@ -1,0 +1,26 @@
+---
+title: OIDC Standard
+---
+
+:::info
+Not yet implemented, but should give you a general impression of how it will work
+Subscribe to the following issue: https://github.com/orgs/zitadel/projects/2/views/1?filterQuery=oidc&pane=issue&itemId=23181369
+:::
+
+To build your own login ui for your own application it is not necessary to have the OIDC standard included or any additional work that has to be done.
+However, it might make sense, if you want to connect your login to different applications especially if they are not in your control and they rely on the standard.
+
+The following flow shows you the different components you need to enable OIDC for your login.
+![OIDC Flow](/img/guides/login-ui/oidc-flow.png)
+
+1. Your application makes an authorization request to your login UI
+2. The login UI takes the requests and sends them to the ZITADEL API. In the request to the ZITADEL API, a header to authenticate your client is needed.
+3. The ZITADEL API parses the request and does what it needs to interpret certain parameters (e.g., organization scope, etc.)
+4. Redirect to a predefined, relative URL of the login UI that includes the authrequest ID
+5. Request to ZITADEL API to get all the information from the auth request
+6. Create and update the session till the login flow is complete and the user is authenticated. Make sure to include the auth Request ID in the session
+7. Read the callback URL from the ZITADEL API
+8. Redirect to your application with the callback URL you got in the previous request
+9. All OIDC-specific endpoints have to be accepted in the Login UI and should be proxied and sent to the ZITADEL API
+
+
