@@ -183,7 +183,8 @@ module.exports = {
             "guides/integrate/login-ui/username-password",
             "guides/integrate/login-ui/external-login",
             "guides/integrate/login-ui/select-account",
-            "guides/integrate/login-ui/logout"
+            "guides/integrate/login-ui/logout",
+            "guides/integrate/login-ui/oidc-standard"
           ],
         },
         {
