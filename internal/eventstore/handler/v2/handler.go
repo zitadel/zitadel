@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"sync"
 	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
