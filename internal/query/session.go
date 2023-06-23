@@ -33,6 +33,7 @@ type Session struct {
 	Creator        string
 	UserFactor     SessionUserFactor
 	PasswordFactor SessionPasswordFactor
+	IntentFactor   SessionIntentFactor
 	PasskeyFactor  SessionPasskeyFactor
 	Metadata       map[string][]byte
 }
@@ -46,6 +47,10 @@ type SessionUserFactor struct {
 
 type SessionPasswordFactor struct {
 	PasswordCheckedAt time.Time
+}
+
+type SessionIntentFactor struct {
+	IntentCheckedAt time.Time
 }
 
 type SessionPasskeyFactor struct {
@@ -116,6 +121,10 @@ var (
 	}
 	SessionColumnPasswordCheckedAt = Column{
 		name:  projection.SessionColumnPasswordCheckedAt,
+		table: sessionsTable,
+	}
+	SessionColumnIntentCheckedAt = Column{
+		name:  projection.SessionColumnIntentCheckedAt,
 		table: sessionsTable,
 	}
 	SessionColumnPasskeyCheckedAt = Column{
@@ -213,6 +222,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			LoginNameNameCol.identifier(),
 			HumanDisplayNameCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
+			SessionColumnIntentCheckedAt.identifier(),
 			SessionColumnPasskeyCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			SessionColumnToken.identifier(),
@@ -228,6 +238,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				loginName         sql.NullString
 				displayName       sql.NullString
 				passwordCheckedAt sql.NullTime
+				intentCheckedAt   sql.NullTime
 				passkeyCheckedAt  sql.NullTime
 				metadata          database.Map[[]byte]
 				token             sql.NullString
@@ -248,6 +259,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&loginName,
 				&displayName,
 				&passwordCheckedAt,
+				&intentCheckedAt,
 				&passkeyCheckedAt,
 				&metadata,
 				&token,
@@ -266,6 +278,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session.UserFactor.LoginName = loginName.String
 			session.UserFactor.DisplayName = displayName.String
 			session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
+			session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
 			session.PasskeyFactor.PasskeyCheckedAt = passkeyCheckedAt.Time
 			session.Metadata = metadata
 
@@ -288,6 +301,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			LoginNameNameCol.identifier(),
 			HumanDisplayNameCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
+			SessionColumnIntentCheckedAt.identifier(),
 			SessionColumnPasskeyCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			countColumn.identifier(),
@@ -306,6 +320,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					loginName         sql.NullString
 					displayName       sql.NullString
 					passwordCheckedAt sql.NullTime
+					intentCheckedAt   sql.NullTime
 					passkeyCheckedAt  sql.NullTime
 					metadata          database.Map[[]byte]
 					sessionDomain     sql.NullString
@@ -325,6 +340,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&loginName,
 					&displayName,
 					&passwordCheckedAt,
+					&intentCheckedAt,
 					&passkeyCheckedAt,
 					&metadata,
 					&sessions.Count,
@@ -339,6 +355,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session.UserFactor.LoginName = loginName.String
 				session.UserFactor.DisplayName = displayName.String
 				session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
+				session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
 				session.PasskeyFactor.PasskeyCheckedAt = passkeyCheckedAt.Time
 				session.Metadata = metadata
 

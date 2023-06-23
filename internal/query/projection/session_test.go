@@ -127,6 +127,38 @@ func TestSessionProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "instance reduceIntentChecked",
+			args: args{
+				event: getEvent(testEvent(
+					session.AddedType,
+					session.AggregateType,
+					[]byte(`{
+						"checkedAt": "2023-05-04T00:00:00Z"
+					}`),
+				), session.IntentCheckedEventMapper),
+			},
+			reduce: (&sessionProjection{}).reduceIntentChecked,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("session"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.sessions2 SET (change_date, sequence, intent_checked_at) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								anyArg{},
+								time.Date(2023, time.May, 4, 0, 0, 0, 0, time.UTC),
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "instance reduceTokenSet",
 			args: args{
 				event: getEvent(testEvent(

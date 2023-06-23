@@ -50,6 +50,7 @@ message Factors {
   UserFactor user = 1;
   PasswordFactor password = 2;
   PasskeyFactor passkey = 3;
+  IntentFactor intent = 4;
 }
 
 message UserFactor {
@@ -79,6 +80,14 @@ message PasswordFactor {
   google.protobuf.Timestamp verified_at = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"time when the password was last checked\"";
+    }
+  ];
+}
+
+message IntentFactor {
+  google.protobuf.Timestamp verified_at = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when an intent was last checked\"";
     }
   ];
 }

@@ -40,6 +40,7 @@ type SessionWriteModel struct {
 	UserID            string
 	UserCheckedAt     time.Time
 	PasswordCheckedAt time.Time
+	IntentCheckedAt   time.Time
 	PasskeyCheckedAt  time.Time
 	Metadata          map[string][]byte
 	Domain            string
@@ -71,6 +72,8 @@ func (wm *SessionWriteModel) Reduce() error {
 			wm.reduceUserChecked(e)
 		case *session.PasswordCheckedEvent:
 			wm.reducePasswordChecked(e)
+		case *session.IntentCheckedEvent:
+			wm.reduceIntentChecked(e)
 		case *session.PasskeyChallengedEvent:
 			wm.reducePasskeyChallenged(e)
 		case *session.PasskeyCheckedEvent:
@@ -93,6 +96,7 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 			session.AddedType,
 			session.UserCheckedType,
 			session.PasswordCheckedType,
+			session.IntentCheckedType,
 			session.PasskeyChallengedType,
 			session.PasskeyCheckedType,
 			session.TokenSetType,
@@ -119,6 +123,10 @@ func (wm *SessionWriteModel) reduceUserChecked(e *session.UserCheckedEvent) {
 
 func (wm *SessionWriteModel) reducePasswordChecked(e *session.PasswordCheckedEvent) {
 	wm.PasswordCheckedAt = e.CheckedAt
+}
+
+func (wm *SessionWriteModel) reduceIntentChecked(e *session.IntentCheckedEvent) {
+	wm.IntentCheckedAt = e.CheckedAt
 }
 
 func (wm *SessionWriteModel) reducePasskeyChallenged(e *session.PasskeyChallengedEvent) {
@@ -158,6 +166,10 @@ func (wm *SessionWriteModel) UserChecked(ctx context.Context, userID string, che
 
 func (wm *SessionWriteModel) PasswordChecked(ctx context.Context, checkedAt time.Time) {
 	wm.commands = append(wm.commands, session.NewPasswordCheckedEvent(ctx, wm.aggregate, checkedAt))
+}
+
+func (wm *SessionWriteModel) IntentChecked(ctx context.Context, checkedAt time.Time) {
+	wm.commands = append(wm.commands, session.NewIntentCheckedEvent(ctx, wm.aggregate, checkedAt))
 }
 
 func (wm *SessionWriteModel) PasskeyChallenged(ctx context.Context, challenge string, allowedCrentialIDs [][]byte, userVerification domain.UserVerificationRequirement) {

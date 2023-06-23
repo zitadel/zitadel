@@ -28,6 +28,7 @@ const (
 	SessionColumnUserID            = "user_id"
 	SessionColumnUserCheckedAt     = "user_checked_at"
 	SessionColumnPasswordCheckedAt = "password_checked_at"
+	SessionColumnIntentCheckedAt   = "intent_checked_at"
 	SessionColumnPasskeyCheckedAt  = "passkey_checked_at"
 	SessionColumnMetadata          = "metadata"
 	SessionColumnTokenID           = "token_id"
@@ -55,6 +56,7 @@ func newSessionProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(SessionColumnUserID, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnUserCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnPasswordCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
+			crdb.NewColumn(SessionColumnIntentCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnPasskeyCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnMetadata, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnTokenID, crdb.ColumnTypeText, crdb.Nullable()),
@@ -82,6 +84,10 @@ func (p *sessionProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  session.PasswordCheckedType,
 					Reduce: p.reducePasswordChecked,
+				},
+				{
+					Event:  session.IntentCheckedType,
+					Reduce: p.reduceIntentChecked,
 				},
 				{
 					Event:  session.PasskeyCheckedType,
@@ -176,6 +182,26 @@ func (p *sessionProjection) reducePasswordChecked(event eventstore.Event) (*hand
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
 			handler.NewCol(SessionColumnPasswordCheckedAt, e.CheckedAt),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceIntentChecked(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*session.IntentCheckedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SDgr2", "reduce.wrong.event.type %s", session.IntentCheckedType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnIntentCheckedAt, e.CheckedAt),
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnID, e.Aggregate().ID),

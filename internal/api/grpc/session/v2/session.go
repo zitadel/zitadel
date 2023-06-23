@@ -120,6 +120,7 @@ func factorsToPb(s *query.Session) *session.Factors {
 		User:     user,
 		Password: passwordFactorToPb(s.PasswordFactor),
 		Passkey:  passkeyFactorToPb(s.PasskeyFactor),
+		Intent:   intentFactorToPb(s.IntentFactor),
 	}
 }
 
@@ -129,6 +130,15 @@ func passwordFactorToPb(factor query.SessionPasswordFactor) *session.PasswordFac
 	}
 	return &session.PasswordFactor{
 		VerifiedAt: timestamppb.New(factor.PasswordCheckedAt),
+	}
+}
+
+func intentFactorToPb(factor query.SessionIntentFactor) *session.IntentFactor {
+	if factor.IntentCheckedAt.IsZero() {
+		return nil
+	}
+	return &session.IntentFactor{
+		VerifiedAt: timestamppb.New(factor.IntentCheckedAt),
 	}
 }
 
@@ -229,6 +239,9 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	}
 	if password := checks.GetPassword(); password != nil {
 		sessionChecks = append(sessionChecks, command.CheckPassword(password.GetPassword()))
+	}
+	if intent := checks.GetIntent(); intent != nil {
+		sessionChecks = append(sessionChecks, command.CheckIntent(intent.GetIntentId(), intent.GetToken()))
 	}
 	if passkey := checks.GetPasskey(); passkey != nil {
 		sessionChecks = append(sessionChecks, s.command.CheckPasskey(passkey.GetCredentialAssertionData()))

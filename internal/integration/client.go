@@ -3,11 +3,19 @@ package integration
 import (
 	"context"
 	"fmt"
+	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/command"
+	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
@@ -55,6 +63,22 @@ func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse
 	return resp
 }
 
+func (s *Tester) CreateUserIDPlink(ctx context.Context, userID, externalID, idpID, username string) *user.AddIDPLinkResponse {
+	resp, err := s.Client.UserV2.AddIDPLink(
+		ctx,
+		&user.AddIDPLinkRequest{
+			UserId: userID,
+			IdpLink: &user.IDPLink{
+				IdpId:    idpID,
+				UserId:   externalID,
+				UserName: username,
+			},
+		},
+	)
+	logging.OnError(err).Fatal("create human user link")
+	return resp
+}
+
 func (s *Tester) RegisterUserPasskey(ctx context.Context, userID string) {
 	reg, err := s.Client.UserV2.CreatePasskeyRegistrationLink(ctx, &user.CreatePasskeyRegistrationLinkRequest{
 		UserId: userID,
@@ -77,4 +101,59 @@ func (s *Tester) RegisterUserPasskey(ctx context.Context, userID string) {
 		PasskeyName:         "nice name",
 	})
 	logging.OnError(err).Fatal("create user passkey")
+}
+
+func (s *Tester) AddGenericOAuthProvider(t *testing.T) string {
+	ctx := authz.WithInstance(context.Background(), s.Instance)
+	id, _, err := s.Commands.AddOrgGenericOAuthProvider(ctx, s.Organisation.ID, command.GenericOAuthProvider{
+		Name:                  "idp",
+		ClientID:              "clientID",
+		ClientSecret:          "clientSecret",
+		AuthorizationEndpoint: "https://example.com/oauth/v2/authorize",
+		TokenEndpoint:         "https://example.com/oauth/v2/token",
+		UserEndpoint:          "https://api.example.com/user",
+		Scopes:                []string{"openid", "profile", "email"},
+		IDAttribute:           "id",
+		IDPOptions: idp.Options{
+			IsLinkingAllowed:  true,
+			IsCreationAllowed: true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+		},
+	})
+	require.NoError(t, err)
+	return id
+}
+
+func (s *Tester) CreateIntent(t *testing.T, idpID string) string {
+	ctx := authz.WithInstance(context.Background(), s.Instance)
+	id, _, err := s.Commands.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", s.Organisation.ID)
+	require.NoError(t, err)
+	return id
+}
+
+func (s *Tester) CreateSuccessfulIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+	ctx := authz.WithInstance(context.Background(), s.Instance)
+	intentID := s.CreateIntent(t, idpID)
+	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Organisation.ID)
+	require.NoError(t, err)
+	idpUser := openid.NewUser(
+		&oidc.UserInfo{
+			Subject: idpUserID,
+			UserInfoProfile: oidc.UserInfoProfile{
+				PreferredUsername: "username",
+			},
+		},
+	)
+	idpSession := &openid.Session{
+		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+			Token: &oauth2.Token{
+				AccessToken: "accessToken",
+			},
+			IDToken: "idToken",
+		},
+	}
+	token, err := s.Commands.SucceedIDPIntent(ctx, writeModel, idpUser, idpSession, userID)
+	require.NoError(t, err)
+	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
 }

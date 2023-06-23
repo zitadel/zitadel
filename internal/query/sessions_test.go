@@ -30,6 +30,7 @@ var (
 		` projections.login_names2.login_name,` +
 		` projections.users8_humans.display_name,` +
 		` projections.sessions2.password_checked_at,` +
+		` projections.sessions2.intent_checked_at,` +
 		` projections.sessions2.passkey_checked_at,` +
 		` projections.sessions2.metadata,` +
 		` projections.sessions2.token_id` +
@@ -50,6 +51,7 @@ var (
 		` projections.login_names2.login_name,` +
 		` projections.users8_humans.display_name,` +
 		` projections.sessions2.password_checked_at,` +
+		` projections.sessions2.intent_checked_at,` +
 		` projections.sessions2.passkey_checked_at,` +
 		` projections.sessions2.metadata,` +
 		` COUNT(*) OVER ()` +
@@ -72,6 +74,7 @@ var (
 		"login_name",
 		"display_name",
 		"password_checked_at",
+		"intent_checked_at",
 		"passkey_checked_at",
 		"metadata",
 		"token",
@@ -91,6 +94,7 @@ var (
 		"login_name",
 		"display_name",
 		"password_checked_at",
+		"intent_checked_at",
 		"passkey_checked_at",
 		"metadata",
 		"count",
@@ -143,6 +147,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							"display-name",
 							testNow,
 							testNow,
+							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
 						},
 					},
@@ -170,6 +175,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						},
 						PasswordFactor: SessionPasswordFactor{
 							PasswordCheckedAt: testNow,
+						},
+						IntentFactor: SessionIntentFactor{
+							IntentCheckedAt: testNow,
 						},
 						PasskeyFactor: SessionPasskeyFactor{
 							PasskeyCheckedAt: testNow,
@@ -204,6 +212,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							"display-name",
 							testNow,
 							testNow,
+							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
 						},
 						{
@@ -219,6 +228,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							"login-name2",
 							"display-name2",
+							testNow,
 							testNow,
 							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
@@ -249,6 +259,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						PasswordFactor: SessionPasswordFactor{
 							PasswordCheckedAt: testNow,
 						},
+						IntentFactor: SessionIntentFactor{
+							IntentCheckedAt: testNow,
+						},
 						PasskeyFactor: SessionPasskeyFactor{
 							PasskeyCheckedAt: testNow,
 						},
@@ -273,6 +286,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						},
 						PasswordFactor: SessionPasswordFactor{
 							PasswordCheckedAt: testNow,
+						},
+						IntentFactor: SessionIntentFactor{
+							IntentCheckedAt: testNow,
 						},
 						PasskeyFactor: SessionPasskeyFactor{
 							PasskeyCheckedAt: testNow,
@@ -360,6 +376,7 @@ func Test_SessionPrepare(t *testing.T) {
 						"display-name",
 						testNow,
 						testNow,
+						testNow,
 						[]byte(`{"key": "dmFsdWU="}`),
 						"tokenID",
 					},
@@ -382,6 +399,9 @@ func Test_SessionPrepare(t *testing.T) {
 				},
 				PasswordFactor: SessionPasswordFactor{
 					PasswordCheckedAt: testNow,
+				},
+				IntentFactor: SessionIntentFactor{
+					IntentCheckedAt: testNow,
 				},
 				PasskeyFactor: SessionPasskeyFactor{
 					PasskeyCheckedAt: testNow,
