@@ -285,27 +285,27 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler2.Statement, err
 				return nil, err
 			}
 		}
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return u.view.PutUserSessions(sessions)
-			}), nil
+		if err = u.view.PutUserSessions(sessions); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case org.OrgDomainPrimarySetEventType:
 		return u.fillLoginNamesOnOrgUsers(event)
 	case user.UserRemovedType:
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return u.view.DeleteUserSessions(event.Aggregate().ID, event.Aggregate().InstanceID)
-			}), nil
+		if err = u.view.DeleteUserSessions(event.Aggregate().ID, event.Aggregate().InstanceID); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case instance.InstanceRemovedEventType:
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return u.view.DeleteInstanceUserSessions(event.Aggregate().InstanceID)
-			}), nil
+		if err = u.view.DeleteInstanceUserSessions(event.Aggregate().InstanceID); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case org.OrgRemovedEventType:
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return u.view.DeleteOrgUserSessions(event)
-			}), nil
+		if err = u.view.DeleteOrgUserSessions(event); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	default:
 		return handler2.NewNoOpStatement(event), nil
 	}
@@ -318,10 +318,10 @@ func (u *UserSession) updateSession(session *view_model.UserSessionView, event e
 	if err := u.fillUserInfo(session); err != nil {
 		return nil, err
 	}
-	return handler2.NewStatement(event,
-		func(ex handler2.Executer, projectionName string) error {
-			return u.view.PutUserSession(session)
-		}), nil
+	if err := u.view.PutUserSession(session); err != nil {
+		return nil, err
+	}
+	return handler2.NewNoOpStatement(event), nil
 }
 
 func (u *UserSession) fillUserInfo(session *view_model.UserSessionView) error {
@@ -354,10 +354,10 @@ func (u *UserSession) fillLoginNamesOnOrgUsers(event eventstore.Event) (*handler
 	for _, session := range sessions {
 		session.LoginName = session.UserName + "@" + primaryDomain
 	}
-	return handler2.NewStatement(event,
-		func(ex handler2.Executer, projectionName string) error {
-			return u.view.PutUserSessions(sessions)
-		}), nil
+	if err := u.view.PutUserSessions(sessions); err != nil {
+		return nil, err
+	}
+	return handler2.NewNoOpStatement(event), nil
 }
 
 func (u *UserSession) loginNameInformation(ctx context.Context, orgID string, instanceID string) (userLoginMustBeDomain bool, primaryDomain string, err error) {
