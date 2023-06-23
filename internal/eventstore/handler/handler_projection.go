@@ -284,7 +284,7 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 				continue
 			}
 			go h.cancelOnErr(lockInstanceCtx, errs, cancelInstanceLock)
-			ctx, err = h.TriggerErr(lockInstanceCtx, instances...)
+			_, err = h.TriggerErr(lockInstanceCtx, instances...)
 			if err != nil {
 				logging.WithFields("projection", h.ProjectionName, "instanceIDs", instances).WithError(err).Error("trigger failed")
 				failed = true
