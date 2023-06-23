@@ -11,7 +11,6 @@ import (
 	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
-	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
@@ -77,11 +76,6 @@ func (t *RefreshToken) Reducers() []handler2.AggregateReducer {
 				},
 			},
 		},
-		// TODO: which events should be processed?
-		{
-			Aggregate:     project.AggregateType,
-			EventRedusers: []handler2.EventReducer{},
-		},
 		{
 			Aggregate: instance.AggregateType,
 			EventRedusers: []handler2.EventReducer{
@@ -111,10 +105,11 @@ func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler2.Statement, er
 		if err != nil {
 			return nil, err
 		}
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return t.view.PutRefreshToken(token)
-			}), nil
+
+		if err := t.view.PutRefreshToken(token); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case user.HumanRefreshTokenRenewedType:
 		e := new(user.HumanRefreshTokenRenewedEvent)
 		if err := event.Unmarshal(e); err != nil {
@@ -129,37 +124,40 @@ func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler2.Statement, er
 		if err != nil {
 			return nil, err
 		}
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return t.view.PutRefreshToken(token)
-			}), nil
+		if err := t.view.PutRefreshToken(token); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case user.HumanRefreshTokenRemovedType:
 		e := new(user.HumanRefreshTokenRemovedEvent)
 		if err := event.Unmarshal(e); err != nil {
 			logging.WithError(err).Error("could not unmarshal event data")
 			return nil, caos_errs.ThrowInternal(nil, "MODEL-Bz653", "could not unmarshal data")
 		}
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return t.view.DeleteRefreshToken(e.TokenID, event.Aggregate().InstanceID)
-			}), nil
+		if err := t.view.DeleteRefreshToken(e.TokenID, event.Aggregate().InstanceID); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case user.UserLockedType,
 		user.UserDeactivatedType,
 		user.UserRemovedType:
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return t.view.DeleteUserRefreshTokens(event.Aggregate().ID, event.Aggregate().InstanceID)
-			}), nil
+
+		if err := t.view.DeleteUserRefreshTokens(event.Aggregate().ID, event.Aggregate().InstanceID); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case instance.InstanceRemovedEventType:
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return t.view.DeleteInstanceRefreshTokens(event.Aggregate().InstanceID)
-			}), nil
+
+		if err := t.view.DeleteInstanceRefreshTokens(event.Aggregate().InstanceID); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case org.OrgRemovedEventType:
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return t.view.DeleteOrgRefreshTokens(event)
-			}), nil
+
+		if err := t.view.DeleteOrgRefreshTokens(event); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	default:
 		return handler2.NewNoOpStatement(event), nil
 	}

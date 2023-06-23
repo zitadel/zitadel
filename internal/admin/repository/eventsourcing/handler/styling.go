@@ -237,25 +237,27 @@ func (m *Styling) processLabelPolicy(event eventstore.Event) (_ *handler2.Statem
 		if err != nil {
 			return nil, err
 		}
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return m.view.DeleteInstanceStyling(event)
-			}), nil
+		if err := m.view.DeleteInstanceStyling(event); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case org.OrgRemovedEventType:
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return m.view.UpdateOrgOwnerRemovedStyling(event)
-			}), nil
+
+		if err := m.view.UpdateOrgOwnerRemovedStyling(event); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	default:
 		return handler2.NewNoOpStatement(event), nil
 	}
 	if err != nil {
 		return nil, err
 	}
-	return handler2.NewStatement(event,
-		func(ex handler2.Executer, projectionName string) error {
-			return m.view.PutStyling(policy, event)
-		}), nil
+
+	if err := m.view.PutStyling(policy, event); err != nil {
+		return nil, err
+	}
+	return handler2.NewNoOpStatement(event), nil
 }
 
 func (m *Styling) generateStylingFile(policy *iam_model.LabelPolicyView) error {

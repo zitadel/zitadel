@@ -146,7 +146,7 @@ func (t *Token) Reducers() []handler2.AggregateReducer {
 	}
 }
 
-func (t *Token) Reduce(event eventstore.Event) (_ *handler2.Statement, err error) {
+func (t *Token) Reduce(event eventstore.Event) (_ *handler2.Statement, err error) { //nolint:gocognit
 	switch event.Type() {
 	case user.UserTokenAddedType,
 		user.PersonalAccessTokenAddedType:
@@ -155,10 +155,10 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler2.Statement, err error
 		if err != nil {
 			return nil, err
 		}
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return t.view.PutToken(token)
-			}), nil
+		if err := t.view.PutToken(token); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case user.UserV1ProfileChangedType,
 		user.HumanProfileChangedType:
 		user := new(view_model.UserView)
@@ -173,57 +173,61 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler2.Statement, err error
 		for _, token := range tokens {
 			token.PreferredLanguage = user.PreferredLanguage
 		}
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return t.view.PutTokens(tokens)
-			}), nil
+		if err := t.view.PutTokens(tokens); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case user.UserV1SignedOutType,
 		user.HumanSignedOutType:
 		id, err := agentIDFromSession(event)
 		if err != nil {
 			return nil, err
 		}
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return t.view.DeleteSessionTokens(id, event)
-			}), nil
+
+		if err := t.view.DeleteSessionTokens(id, event); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case user.UserLockedType,
 		user.UserDeactivatedType,
 		user.UserRemovedType:
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return t.view.DeleteUserTokens(event)
-			}), nil
+
+		if err := t.view.DeleteUserTokens(event); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case user.UserTokenRemovedType,
 		user.PersonalAccessTokenRemovedType:
 		id, err := tokenIDFromRemovedEvent(event)
 		if err != nil {
 			return nil, err
 		}
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return t.view.DeleteToken(id, event.Aggregate().InstanceID)
-			}), nil
 
+		if err := t.view.DeleteToken(id, event.Aggregate().InstanceID); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case user.HumanRefreshTokenRemovedType:
 		id, err := refreshTokenIDFromRemovedEvent(event)
 		if err != nil {
 			return nil, err
 		}
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return t.view.DeleteTokensFromRefreshToken(id, event.Aggregate().InstanceID)
-			}), nil
+
+		if err := t.view.DeleteTokensFromRefreshToken(id, event.Aggregate().InstanceID); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case project.ApplicationDeactivatedType,
 		project.ApplicationRemovedType:
 		application, err := applicationFromSession(event)
 		if err != nil {
 			return nil, err
 		}
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return t.view.DeleteApplicationTokens(event, application.AppID)
-			}), nil
+
+		if err := t.view.DeleteApplicationTokens(event, application.AppID); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case project.ProjectDeactivatedType,
 		project.ProjectRemovedType:
 		project, err := t.getProjectByID(context.Background(), event.Aggregate().ID, event.Aggregate().InstanceID)
@@ -236,23 +240,24 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler2.Statement, err error
 				applicationIDs = append(applicationIDs, app.OIDCConfig.ClientID)
 			}
 		}
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return t.view.DeleteApplicationTokens(event, applicationIDs...)
-			}), nil
+
+		if err := t.view.DeleteApplicationTokens(event, applicationIDs...); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case instance.InstanceRemovedEventType:
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return t.view.DeleteInstanceTokens(event)
-			}), nil
+		if err := t.view.DeleteInstanceTokens(event); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	case org.OrgRemovedEventType:
 		// deletes all tokens including PATs, which is expected for now
 		// if there is an undo of the org deletion in the future,
 		// we will need to have a look on how to handle the deleted PATs
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return t.view.DeleteOrgTokens(event)
-			}), nil
+		if err := t.view.DeleteOrgTokens(event); err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	default:
 		return handler2.NewNoOpStatement(event), nil
 	}
