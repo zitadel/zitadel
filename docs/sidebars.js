@@ -173,7 +173,7 @@ module.exports = {
           link: {
             type: "generated-index",
             title: "Build your own Login-UI",
-            slug: "/guides/integrate/identity-providers",
+            slug: "/guides/integrate/login-ui",
             description:
                 "In the following guides you will learn how to create your own login ui with our APIs. The different scenarios like username/password, external identity provider, etc will be shown.",
 
