@@ -22,7 +22,7 @@ func (c *Commands) AddDebugNotificationProviderFile(ctx context.Context, fileSys
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(writeModel, pushedEvents...)
+	err = appendAndReduce(writeModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *Commands) ChangeDefaultNotificationFile(ctx context.Context, fileSystem
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(writeModel, pushedEvents...)
+	err = appendAndReduce(writeModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (c *Commands) RemoveDefaultNotificationFile(ctx context.Context) (*domain.O
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingProvider, events...)
+	err = appendAndReduce(existingProvider, events...)
 	if err != nil {
 		return nil, err
 	}

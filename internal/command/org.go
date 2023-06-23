@@ -186,7 +186,7 @@ func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, reso
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedOrg, pushedEvents...)
+	err = appendAndReduce(addedOrg, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -223,7 +223,7 @@ func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.O
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(orgWriteModel, pushedEvents...)
+	err = appendAndReduce(orgWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -246,7 +246,7 @@ func (c *Commands) DeactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(orgWriteModel, pushedEvents...)
+	err = appendAndReduce(orgWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -269,7 +269,7 @@ func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(orgWriteModel, pushedEvents...)
+	err = appendAndReduce(orgWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

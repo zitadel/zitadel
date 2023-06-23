@@ -62,7 +62,7 @@ func (c *Commands) AddPrivacyPolicy(ctx context.Context, resourceOwner string, p
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedPolicy, pushedEvents...)
+	err = appendAndReduce(addedPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (c *Commands) ChangePrivacyPolicy(ctx context.Context, resourceOwner string
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (c *Commands) RemovePrivacyPolicy(ctx context.Context, orgID string) (*doma
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

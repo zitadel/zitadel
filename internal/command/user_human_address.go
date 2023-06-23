@@ -28,7 +28,7 @@ func (c *Commands) ChangeHumanAddress(ctx context.Context, address *domain.Addre
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingAddress, pushedEvents...)
+	err = appendAndReduce(existingAddress, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

@@ -24,7 +24,7 @@ func (c *Commands) SetOrgMessageText(ctx context.Context, resourceOwner string, 
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingMessageText, pushedEvents...)
+	err = appendAndReduce(existingMessageText, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (c *Commands) RemoveOrgMessageTexts(ctx context.Context, resourceOwner, mes
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(customText, pushedEvents...)
+	err = appendAndReduce(customText, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

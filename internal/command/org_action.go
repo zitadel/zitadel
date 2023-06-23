@@ -52,7 +52,7 @@ func (c *Commands) addActionWithID(ctx context.Context, addAction *domain.Action
 	if err != nil {
 		return "", nil, err
 	}
-	err = AppendAndReduce(actionModel, pushedEvents...)
+	err = appendAndReduce(actionModel, pushedEvents...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -87,7 +87,7 @@ func (c *Commands) ChangeAction(ctx context.Context, actionChange *domain.Action
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingAction, pushedEvents...)
+	err = appendAndReduce(existingAction, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (c *Commands) DeactivateAction(ctx context.Context, actionID string, resour
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingAction, pushedEvents...)
+	err = appendAndReduce(existingAction, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func (c *Commands) ReactivateAction(ctx context.Context, actionID string, resour
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingAction, pushedEvents...)
+	err = appendAndReduce(existingAction, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -179,7 +179,7 @@ func (c *Commands) DeleteAction(ctx context.Context, actionID, resourceOwner str
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingAction, pushedEvents...)
+	err = appendAndReduce(existingAction, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

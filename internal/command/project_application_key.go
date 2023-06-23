@@ -84,7 +84,7 @@ func (c *Commands) addApplicationKey(ctx context.Context, key *domain.Applicatio
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(keyWriteModel, pushedEvents...)
+	err = appendAndReduce(keyWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (c *Commands) RemoveApplicationKey(ctx context.Context, projectID, applicat
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(keyWriteModel, pushedEvents...)
+	err = appendAndReduce(keyWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

@@ -53,7 +53,7 @@ func (c *Commands) addProjectGrantWithID(ctx context.Context, grant *domain.Proj
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedGrant, pushedEvents...)
+	err = appendAndReduce(addedGrant, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *domain.Project
 		if err != nil {
 			return nil, err
 		}
-		err = AppendAndReduce(existingGrant, pushedEvents...)
+		err = appendAndReduce(existingGrant, pushedEvents...)
 		if err != nil {
 			return nil, err
 		}
@@ -107,7 +107,7 @@ func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *domain.Project
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingGrant, pushedEvents...)
+	err = appendAndReduce(existingGrant, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantI
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingGrant, pushedEvents...)
+	err = appendAndReduce(existingGrant, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +192,7 @@ func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantI
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingGrant, pushedEvents...)
+	err = appendAndReduce(existingGrant, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -227,7 +227,7 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingGrant, pushedEvents...)
+	err = appendAndReduce(existingGrant, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

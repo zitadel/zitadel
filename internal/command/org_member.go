@@ -84,7 +84,7 @@ func (c *Commands) AddOrgMember(ctx context.Context, orgID, userID string, roles
 		return nil, err
 	}
 	addedMember := NewOrgMemberWriteModel(orgID, userID)
-	err = AppendAndReduce(addedMember, events...)
+	err = appendAndReduce(addedMember, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +131,7 @@ func (c *Commands) ChangeOrgMember(ctx context.Context, member *domain.Member) (
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingMember, pushedEvents...)
+	err = appendAndReduce(existingMember, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +155,7 @@ func (c *Commands) RemoveOrgMember(ctx context.Context, orgID, userID string) (*
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(m, pushedEvents...)
+	err = appendAndReduce(m, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

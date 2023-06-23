@@ -22,7 +22,7 @@ func (c *Commands) AddUserGrant(ctx context.Context, usergrant *domain.UserGrant
 		return nil, err
 	}
 
-	err = AppendAndReduce(addedUserGrant, pushedEvents...)
+	err = appendAndReduce(addedUserGrant, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(changedUserGrant, pushedEvents...)
+	err = appendAndReduce(changedUserGrant, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +164,7 @@ func (c *Commands) DeactivateUserGrant(ctx context.Context, grantID, resourceOwn
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingUserGrant, pushedEvents...)
+	err = appendAndReduce(existingUserGrant, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +196,7 @@ func (c *Commands) ReactivateUserGrant(ctx context.Context, grantID, resourceOwn
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingUserGrant, pushedEvents...)
+	err = appendAndReduce(existingUserGrant, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +213,7 @@ func (c *Commands) RemoveUserGrant(ctx context.Context, grantID, resourceOwner s
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingUserGrant, pushedEvents...)
+	err = appendAndReduce(existingUserGrant, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

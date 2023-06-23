@@ -25,7 +25,7 @@ func (c *Commands) SetUserMetadata(ctx context.Context, metadata *domain.Metadat
 		return nil, err
 	}
 
-	err = AppendAndReduce(setMetadata, pushedEvents...)
+	err = appendAndReduce(setMetadata, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwne
 		return nil, err
 	}
 
-	err = AppendAndReduce(setMetadata, pushedEvents...)
+	err = appendAndReduce(setMetadata, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (c *Commands) RemoveUserMetadata(ctx context.Context, metadataKey, userID, 
 		return nil, err
 	}
 
-	err = AppendAndReduce(removeMetadata, pushedEvents...)
+	err = appendAndReduce(removeMetadata, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func (c *Commands) BulkRemoveUserMetadata(ctx context.Context, userID, resourceO
 		return nil, err
 	}
 
-	err = AppendAndReduce(removeMetadata, pushedEvents...)
+	err = appendAndReduce(removeMetadata, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

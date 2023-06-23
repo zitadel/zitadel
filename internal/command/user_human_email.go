@@ -53,7 +53,7 @@ func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email, em
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingEmail, pushedEvents...)
+	err = appendAndReduce(existingEmail, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceo
 		if err != nil {
 			return nil, err
 		}
-		err = AppendAndReduce(existingCode, pushedEvents...)
+		err = appendAndReduce(existingCode, pushedEvents...)
 		if err != nil {
 			return nil, err
 		}
@@ -122,7 +122,7 @@ func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID,
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingEmail, pushedEvents...)
+	err = appendAndReduce(existingEmail, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

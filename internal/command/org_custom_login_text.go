@@ -24,7 +24,7 @@ func (c *Commands) SetOrgLoginText(ctx context.Context, resourceOwner string, lo
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingLoginText, pushedEvents...)
+	err = appendAndReduce(existingLoginText, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (c *Commands) RemoveOrgLoginTexts(ctx context.Context, resourceOwner string
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(customText, pushedEvents...)
+	err = appendAndReduce(customText, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

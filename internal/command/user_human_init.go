@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -42,7 +43,7 @@ func (c *Commands) ResendInitialMail(ctx context.Context, userID string, email d
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingCode, pushedEvents...)
+	err = appendAndReduce(existingCode, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

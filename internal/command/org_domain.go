@@ -206,7 +206,7 @@ func (c *Commands) ValidateOrgDomain(ctx context.Context, orgDomain *domain.OrgD
 		if err != nil {
 			return nil, err
 		}
-		err = AppendAndReduce(domainWriteModel, pushedEvents...)
+		err = appendAndReduce(domainWriteModel, pushedEvents...)
 		if err != nil {
 			return nil, err
 		}
@@ -237,7 +237,7 @@ func (c *Commands) SetPrimaryOrgDomain(ctx context.Context, orgDomain *domain.Or
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(domainWriteModel, pushedEvents...)
+	err = appendAndReduce(domainWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -263,7 +263,7 @@ func (c *Commands) RemoveOrgDomain(ctx context.Context, orgDomain *domain.OrgDom
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(domainWriteModel, pushedEvents...)
+	err = appendAndReduce(domainWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

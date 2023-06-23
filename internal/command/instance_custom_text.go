@@ -24,7 +24,7 @@ func (c *Commands) SetInstanceCustomText(ctx context.Context, customText *domain
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(setText, pushedEvents...)
+	err = appendAndReduce(setText, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

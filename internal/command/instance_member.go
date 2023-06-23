@@ -80,7 +80,7 @@ func (c *Commands) AddInstanceMember(ctx context.Context, userID string, roles .
 		return nil, err
 	}
 	addedMember := NewInstanceMemberWriteModel(ctx, userID)
-	err = AppendAndReduce(addedMember, events...)
+	err = appendAndReduce(addedMember, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (c *Commands) ChangeInstanceMember(ctx context.Context, member *domain.Memb
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingMember, pushedEvents...)
+	err = appendAndReduce(existingMember, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +136,7 @@ func (c *Commands) RemoveInstanceMember(ctx context.Context, userID string) (*do
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(memberWriteModel, pushedEvents...)
+	err = appendAndReduce(memberWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

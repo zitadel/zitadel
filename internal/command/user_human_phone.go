@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -46,7 +47,7 @@ func (c *Commands) ChangeHumanPhone(ctx context.Context, phone *domain.Phone, re
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPhone, pushedEvents...)
+	err = appendAndReduce(existingPhone, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +81,7 @@ func (c *Commands) VerifyHumanPhone(ctx context.Context, userID, code, resourceo
 		if err != nil {
 			return nil, err
 		}
-		err = AppendAndReduce(existingCode, pushedEvents...)
+		err = appendAndReduce(existingCode, pushedEvents...)
 		if err != nil {
 			return nil, err
 		}
@@ -121,7 +122,7 @@ func (c *Commands) CreateHumanPhoneVerificationCode(ctx context.Context, userID,
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPhone, pushedEvents...)
+	err = appendAndReduce(existingPhone, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +171,7 @@ func (c *Commands) RemoveHumanPhone(ctx context.Context, userID, resourceOwner s
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPhone, pushedEvents...)
+	err = appendAndReduce(existingPhone, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

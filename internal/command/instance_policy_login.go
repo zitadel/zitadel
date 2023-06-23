@@ -59,7 +59,7 @@ func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpPr
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(idpModel, pushedEvents...)
+	err = appendAndReduce(idpModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(idpModel, pushedEvents...)
+	err = appendAndReduce(idpModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func (c *Commands) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(secondFactorModel, pushedEvents...)
+	err = appendAndReduce(secondFactorModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +187,7 @@ func (c *Commands) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(multiFactorModel, pushedEvents...)
+	err = appendAndReduce(multiFactorModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

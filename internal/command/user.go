@@ -53,7 +53,7 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingUser, pushedEvents...)
+	err = appendAndReduce(existingUser, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func (c *Commands) DeactivateUser(ctx context.Context, userID, resourceOwner str
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingUser, pushedEvents...)
+	err = appendAndReduce(existingUser, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (c *Commands) ReactivateUser(ctx context.Context, userID, resourceOwner str
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingUser, pushedEvents...)
+	err = appendAndReduce(existingUser, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func (c *Commands) LockUser(ctx context.Context, userID, resourceOwner string) (
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingUser, pushedEvents...)
+	err = appendAndReduce(existingUser, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +168,7 @@ func (c *Commands) UnlockUser(ctx context.Context, userID, resourceOwner string)
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingUser, pushedEvents...)
+	err = appendAndReduce(existingUser, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +217,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingUser, pushedEvents...)
+	err = appendAndReduce(existingUser, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -249,7 +249,7 @@ func (c *Commands) RevokeAccessToken(ctx context.Context, userID, orgID, tokenID
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(accessTokenWriteModel, events...)
+	err = appendAndReduce(accessTokenWriteModel, events...)
 	if err != nil {
 		return nil, err
 	}

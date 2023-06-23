@@ -117,7 +117,7 @@ func (c *Commands) HumanCheckMFAOTPSetup(ctx context.Context, userID, code, user
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingOTP, pushedEvents...)
+	err = appendAndReduce(existingOTP, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ func (c *Commands) HumanRemoveOTP(ctx context.Context, userID, resourceOwner str
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingOTP, pushedEvents...)
+	err = appendAndReduce(existingOTP, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

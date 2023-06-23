@@ -58,7 +58,7 @@ func (c *Commands) AddPasswordComplexityPolicy(ctx context.Context, resourceOwne
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedPolicy, pushedEvents...)
+	err = appendAndReduce(addedPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (c *Commands) ChangePasswordComplexityPolicy(ctx context.Context, resourceO
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (c *Commands) RemovePasswordComplexityPolicy(ctx context.Context, orgID str
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

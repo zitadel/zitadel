@@ -104,7 +104,7 @@ func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, generatorTyp
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(generatorWriteModel, pushedEvents...)
+	err = appendAndReduce(generatorWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func (c *Commands) RemoveSecretGeneratorConfig(ctx context.Context, generatorTyp
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(generatorWriteModel, pushedEvents...)
+	err = appendAndReduce(generatorWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

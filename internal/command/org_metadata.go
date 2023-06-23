@@ -25,7 +25,7 @@ func (c *Commands) SetOrgMetadata(ctx context.Context, orgID string, metadata *d
 		return nil, err
 	}
 
-	err = AppendAndReduce(setMetadata, pushedEvents...)
+	err = appendAndReduce(setMetadata, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *Commands) BulkSetOrgMetadata(ctx context.Context, orgID string, metadat
 		return nil, err
 	}
 
-	err = AppendAndReduce(setMetadata, pushedEvents...)
+	err = appendAndReduce(setMetadata, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (c *Commands) RemoveOrgMetadata(ctx context.Context, orgID, metadataKey str
 		return nil, err
 	}
 
-	err = AppendAndReduce(removeMetadata, pushedEvents...)
+	err = appendAndReduce(removeMetadata, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func (c *Commands) BulkRemoveOrgMetadata(ctx context.Context, orgID string, meta
 		return nil, err
 	}
 
-	err = AppendAndReduce(removeMetadata, pushedEvents...)
+	err = appendAndReduce(removeMetadata, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

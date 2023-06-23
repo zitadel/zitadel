@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -26,7 +27,7 @@ func (c *Commands) AddProjectRole(ctx context.Context, projectRole *domain.Proje
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(roleWriteModel, pushedEvents...)
+	err = appendAndReduce(roleWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +51,7 @@ func (c *Commands) BulkAddProjectRole(ctx context.Context, projectID, resourceOw
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(roleWriteModel, pushedEvents...)
+	err = appendAndReduce(roleWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +108,7 @@ func (c *Commands) ChangeProjectRole(ctx context.Context, projectRole *domain.Pr
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingRole, pushedEvents...)
+	err = appendAndReduce(existingRole, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +153,7 @@ func (c *Commands) RemoveProjectRole(ctx context.Context, projectID, key, resour
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingRole, pushedEvents...)
+	err = appendAndReduce(existingRole, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

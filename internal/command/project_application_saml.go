@@ -32,7 +32,7 @@ func (c *Commands) AddSAMLApplication(ctx context.Context, application *domain.S
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedApplication, pushedEvents...)
+	err = appendAndReduce(addedApplication, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func (c *Commands) ChangeSAMLApplication(ctx context.Context, samlApp *domain.SA
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingSAML, pushedEvents...)
+	err = appendAndReduce(existingSAML, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

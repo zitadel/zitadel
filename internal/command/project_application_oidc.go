@@ -202,7 +202,7 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedApplication, pushedEvents...)
+	err = appendAndReduce(addedApplication, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -259,7 +259,7 @@ func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingOIDC, pushedEvents...)
+	err = appendAndReduce(existingOIDC, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -295,7 +295,7 @@ func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, a
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingOIDC, pushedEvents...)
+	err = appendAndReduce(existingOIDC, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

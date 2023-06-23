@@ -105,7 +105,7 @@ func (c *Commands) RevokeRefreshToken(ctx context.Context, userID, orgID, tokenI
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(refreshTokenWriteModel, events...)
+	err = appendAndReduce(refreshTokenWriteModel, events...)
 	if err != nil {
 		return nil, err
 	}

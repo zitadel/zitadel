@@ -200,7 +200,7 @@ func (c *UserEmailEvents) Push(ctx context.Context) (*domain.Email, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(c.model, pushedEvents...)
+	err = appendAndReduce(c.model, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

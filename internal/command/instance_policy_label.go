@@ -78,7 +78,7 @@ func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context, upload *AssetU
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func (c *Commands) RemoveLogoDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ func (c *Commands) AddIconDefaultLabelPolicy(ctx context.Context, upload *AssetU
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +192,7 @@ func (c *Commands) RemoveIconDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +217,7 @@ func (c *Commands) AddLogoDarkDefaultLabelPolicy(ctx context.Context, upload *As
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -242,7 +242,7 @@ func (c *Commands) RemoveLogoDarkDefaultLabelPolicy(ctx context.Context) (*domai
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -267,7 +267,7 @@ func (c *Commands) AddIconDarkDefaultLabelPolicy(ctx context.Context, upload *As
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -292,7 +292,7 @@ func (c *Commands) RemoveIconDarkDefaultLabelPolicy(ctx context.Context) (*domai
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -317,7 +317,7 @@ func (c *Commands) AddFontDefaultLabelPolicy(ctx context.Context, upload *AssetU
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -342,7 +342,7 @@ func (c *Commands) RemoveFontDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

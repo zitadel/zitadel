@@ -50,7 +50,7 @@ func (c *Commands) ChangeDefaultPrivacyPolicy(ctx context.Context, policy *domai
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

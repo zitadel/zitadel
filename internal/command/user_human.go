@@ -408,12 +408,12 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 		return nil, nil, err
 	}
 
-	err = AppendAndReduce(addedHuman, pushedEvents...)
+	err = appendAndReduce(addedHuman, pushedEvents...)
 	if err != nil {
 		return nil, nil, err
 	}
 	if addedCode != nil {
-		err = AppendAndReduce(addedCode, pushedEvents...)
+		err = appendAndReduce(addedCode, pushedEvents...)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -469,7 +469,7 @@ func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domai
 		return nil, err
 	}
 
-	err = AppendAndReduce(registeredHuman, pushedEvents...)
+	err = appendAndReduce(registeredHuman, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

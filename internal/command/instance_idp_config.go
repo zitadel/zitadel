@@ -11,15 +11,22 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (string, *domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	return c.processWithID(ctx, prepareAddDefaultIDPConfig(instanceAgg, c.idGenerator, c.idpConfigEncryption, config))
+	wm := NewInstanceIDPConfigWriteModel(authz.GetInstance(ctx).InstanceID(), config.IDPConfigID)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultIDPConfig(wm, c.idGenerator, c.idpConfigEncryption, config))
+	if err != nil {
+		return "", nil, err
+	}
+	err = c.pushAppendAndReduce(ctx, wm, cmds...)
+	if err != nil {
+		return "", nil, err
+	}
+	return wm.ConfigID, writeModelToObjectDetails(&wm.WriteModel), nil
 }
 
-func prepareAddDefaultIDPConfig(a *instance.Aggregate, idGenerator id.Generator, encrypt crypto.EncryptionAlgorithm, config *domain.IDPConfig) preparation.Validation {
+func prepareAddDefaultIDPConfig(wm *InstanceIDPConfigWriteModel, idGenerator id.Generator, encrypt crypto.EncryptionAlgorithm, config *domain.IDPConfig) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if config.OIDCConfig == nil && config.JWTConfig == nil {
 			return nil, errors.ThrowInvalidArgument(nil, "IDP-s8nn3", "Errors.IDPConfig.Invalid")
@@ -29,19 +36,17 @@ func prepareAddDefaultIDPConfig(a *instance.Aggregate, idGenerator id.Generator,
 			if err != nil {
 				return nil, err
 			}
-
-			idpWriteModel, err := getInstanceIDPConfigWriteModel(ctx, filter, idpConfigID)
-			if err != nil {
+			if err := queryAndReduce(ctx, filter, wm); err != nil {
 				return nil, err
 			}
-			if idpWriteModel.State == domain.IDPConfigStateActive {
+			if wm.State == domain.IDPConfigStateActive {
 				return nil, errors.ThrowAlreadyExists(nil, "INST-i2nl", "Errors.IDPConfig.AlreadyExists")
 			}
 
 			events := []eventstore.Command{
 				instance.NewIDPConfigAddedEvent(
 					ctx,
-					&a.Aggregate,
+					InstanceAggregateFromWriteModel(&wm.WriteModel),
 					idpConfigID,
 					config.Name,
 					config.Type,
@@ -57,7 +62,7 @@ func prepareAddDefaultIDPConfig(a *instance.Aggregate, idGenerator id.Generator,
 
 				events = append(events, instance.NewIDPOIDCConfigAddedEvent(
 					ctx,
-					&a.Aggregate,
+					InstanceAggregateFromWriteModel(&wm.WriteModel),
 					config.OIDCConfig.ClientID,
 					idpConfigID,
 					config.OIDCConfig.Issuer,
@@ -71,7 +76,7 @@ func prepareAddDefaultIDPConfig(a *instance.Aggregate, idGenerator id.Generator,
 			} else if config.JWTConfig != nil {
 				events = append(events, instance.NewIDPJWTConfigAddedEvent(
 					ctx,
-					&a.Aggregate,
+					InstanceAggregateFromWriteModel(&wm.WriteModel),
 					idpConfigID,
 					config.JWTConfig.JWTEndpoint,
 					config.JWTConfig.Issuer,
@@ -85,24 +90,31 @@ func prepareAddDefaultIDPConfig(a *instance.Aggregate, idGenerator id.Generator,
 }
 
 func (c *Commands) ChangeDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	return c.processWithLast(ctx, c.prepareChangeDefaultIDPConfig(instanceAgg, config))
+	wm := NewInstanceIDPConfigWriteModel(authz.GetInstance(ctx).InstanceID(), config.IDPConfigID)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareChangeDefaultIDPConfig(wm, config))
+	if err != nil {
+		return nil, err
+	}
+	err = c.pushAppendAndReduce(ctx, wm, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
 
-func (c *Commands) prepareChangeDefaultIDPConfig(a *instance.Aggregate, config *domain.IDPConfig) preparation.Validation {
+func prepareChangeDefaultIDPConfig(wm *InstanceIDPConfigWriteModel, config *domain.IDPConfig) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if config.IDPConfigID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INSTANCE-4m9gs", "Errors.IDMissing")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			existingIDP, err := c.instanceIDPConfigWriteModelByID(ctx, config.IDPConfigID)
-			if err != nil {
+			if err := queryAndReduce(ctx, filter, wm); err != nil {
 				return nil, err
 			}
-			if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
+			if wm.State == domain.IDPConfigStateRemoved || wm.State == domain.IDPConfigStateUnspecified {
 				return nil, errors.ThrowNotFound(nil, "INSTANCE-m0e3r", "Errors.IDPConfig.NotExisting")
 			}
-			changedEvent, hasChanged := existingIDP.NewChangedEvent(ctx, &a.Aggregate, config.IDPConfigID, config.Name, config.StylingType, config.AutoRegister)
+			changedEvent, hasChanged := wm.NewChangedEvent(ctx, InstanceAggregateFromWriteModel(&wm.WriteModel), config.IDPConfigID, config.Name, config.StylingType, config.AutoRegister)
 			if !hasChanged {
 				return nil, errors.ThrowPreconditionFailed(nil, "INSTANCE-3k0fs", "Errors.IAM.IDPConfig.NotChanged")
 			}
@@ -115,81 +127,102 @@ func (c *Commands) prepareChangeDefaultIDPConfig(a *instance.Aggregate, config *
 }
 
 func (c *Commands) DeactivateDefaultIDPConfig(ctx context.Context, idpID string) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	return c.processWithLast(ctx, prepareDeactivateDefaultIDPConfig(instanceAgg, idpID))
+	wm := NewInstanceIDPConfigWriteModel(authz.GetInstance(ctx).InstanceID(), idpID)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareDeactivateDefaultIDPConfig(wm, idpID))
+	if err != nil {
+		return nil, err
+	}
+	err = c.pushAppendAndReduce(ctx, wm, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
 
-func prepareDeactivateDefaultIDPConfig(a *instance.Aggregate, idpID string) preparation.Validation {
+func prepareDeactivateDefaultIDPConfig(wm *InstanceIDPConfigWriteModel, idpID string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if idpID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INSTANCE-apso2n", "Errors.IDMissing")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			existingIDP, err := getInstanceIDPConfigWriteModel(ctx, filter, idpID)
-			if err != nil {
+			if err := queryAndReduce(ctx, filter, wm); err != nil {
 				return nil, err
 			}
-			if existingIDP.State != domain.IDPConfigStateActive {
+			if wm.State != domain.IDPConfigStateActive {
 				return nil, errors.ThrowPreconditionFailed(nil, "INSTANCE-2n0fs", "Errors.IAM.IDPConfig.NotActive")
 			}
 			return []eventstore.Command{
-				instance.NewIDPConfigDeactivatedEvent(ctx, &a.Aggregate, idpID),
+				instance.NewIDPConfigDeactivatedEvent(ctx, InstanceAggregateFromWriteModel(&wm.WriteModel), idpID),
 			}, nil
 		}, nil
 	}
 }
 
 func (c *Commands) ReactivateDefaultIDPConfig(ctx context.Context, idpID string) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	return c.processWithLast(ctx, prepareReactivateDefaultIDPConfig(instanceAgg, idpID))
+	wm := NewInstanceIDPConfigWriteModel(authz.GetInstance(ctx).InstanceID(), idpID)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareReactivateDefaultIDPConfig(wm, idpID))
+	if err != nil {
+		return nil, err
+	}
+	err = c.pushAppendAndReduce(ctx, wm, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
 
-func prepareReactivateDefaultIDPConfig(a *instance.Aggregate, idpID string) preparation.Validation {
+func prepareReactivateDefaultIDPConfig(wm *InstanceIDPConfigWriteModel, idpID string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if idpID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INSTANCE-arso2n", "Errors.IDMissing")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			existingIDP, err := getInstanceIDPConfigWriteModel(ctx, filter, idpID)
-			if err != nil {
+			if err := queryAndReduce(ctx, filter, wm); err != nil {
 				return nil, err
 			}
-			if existingIDP.State != domain.IDPConfigStateInactive {
+			if wm.State != domain.IDPConfigStateInactive {
 				return nil, errors.ThrowPreconditionFailed(nil, "INSTANCE-5Mo0d", "Errors.IAM.IDPConfig.NotInactive")
 			}
 			return []eventstore.Command{
-				instance.NewIDPConfigReactivatedEvent(ctx, &a.Aggregate, idpID),
+				instance.NewIDPConfigReactivatedEvent(ctx, InstanceAggregateFromWriteModel(&wm.WriteModel), idpID),
 			}, nil
 		}, nil
 	}
 }
 
 func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idpProviders []*domain.IDPProvider, externalIDPs ...*domain.UserIDPLink) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	return c.processWithLast(ctx, c.prepareRemoveDefaultIDPConfig(instanceAgg, idpID, idpProviders, externalIDPs...))
+	wm := NewInstanceIDPConfigWriteModel(authz.GetInstance(ctx).InstanceID(), idpID)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveDefaultIDPConfig(wm, idpID, idpProviders, externalIDPs...))
+	if err != nil {
+		return nil, err
+	}
+	err = c.pushAppendAndReduce(ctx, wm, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
 
-func (c *Commands) prepareRemoveDefaultIDPConfig(a *instance.Aggregate, idpID string, idpProviders []*domain.IDPProvider, externalIDPs ...*domain.UserIDPLink) preparation.Validation {
+func (c *Commands) prepareRemoveDefaultIDPConfig(wm *InstanceIDPConfigWriteModel, idpID string, idpProviders []*domain.IDPProvider, externalIDPs ...*domain.UserIDPLink) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if idpID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INSTANCE-arso2n", "Errors.IDMissing")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			existingIDP, err := getInstanceIDPConfigWriteModel(ctx, filter, idpID)
-			if err != nil {
+			if err := queryAndReduce(ctx, filter, wm); err != nil {
 				return nil, err
 			}
-			if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
+			if wm.State == domain.IDPConfigStateRemoved || wm.State == domain.IDPConfigStateUnspecified {
 				return nil, errors.ThrowNotFound(nil, "INSTANCE-4M0xy", "Errors.IDPConfig.NotExisting")
 			}
 
 			events := []eventstore.Command{
-				instance.NewIDPConfigRemovedEvent(ctx, &a.Aggregate, idpID, existingIDP.Name),
+				instance.NewIDPConfigRemovedEvent(ctx, InstanceAggregateFromWriteModel(&wm.WriteModel), idpID, wm.Name),
 			}
 
 			for _, idpProvider := range idpProviders {
 				if idpProvider.AggregateID == authz.GetInstance(ctx).InstanceID() {
-					userEvents := c.removeIDPProviderFromDefaultLoginPolicy(ctx, &a.Aggregate, idpProvider, true, externalIDPs...)
+					userEvents := c.removeIDPProviderFromDefaultLoginPolicy(ctx, InstanceAggregateFromWriteModel(&wm.WriteModel), idpProvider, true, externalIDPs...)
 					events = append(events, userEvents...)
 				}
 				orgAgg := OrgAggregateFromWriteModel(&NewOrgIdentityProviderWriteModel(idpProvider.AggregateID, idpID).WriteModel)
@@ -199,41 +232,4 @@ func (c *Commands) prepareRemoveDefaultIDPConfig(a *instance.Aggregate, idpID st
 			return events, nil
 		}, nil
 	}
-}
-
-func (c *Commands) getInstanceIDPConfigByID(ctx context.Context, idpID string) (*domain.IDPConfig, error) {
-	config, err := c.instanceIDPConfigWriteModelByID(ctx, idpID)
-	if err != nil {
-		return nil, err
-	}
-	if !config.State.Exists() {
-		return nil, errors.ThrowNotFound(nil, "INSTANCE-p0pFF", "Errors.IDPConfig.NotExisting")
-	}
-	return writeModelToIDPConfig(&config.IDPConfigWriteModel), nil
-}
-
-func (c *Commands) instanceIDPConfigWriteModelByID(ctx context.Context, idpID string) (policy *InstanceIDPConfigWriteModel, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	writeModel := NewInstanceIDPConfigWriteModel(ctx, idpID)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
-	if err != nil {
-		return nil, err
-	}
-	return writeModel, nil
-}
-
-func getInstanceIDPConfigWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, idpID string) (*InstanceIDPConfigWriteModel, error) {
-	writeModel := NewInstanceIDPConfigWriteModel(ctx, idpID)
-	events, err := filter(ctx, writeModel.Query())
-	if err != nil {
-		return nil, err
-	}
-	if len(events) == 0 {
-		return writeModel, nil
-	}
-	writeModel.AppendEvents(events...)
-	err = writeModel.Reduce()
-	return writeModel, err
 }

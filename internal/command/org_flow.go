@@ -25,7 +25,7 @@ func (c *Commands) ClearFlow(ctx context.Context, flowType domain.FlowType, reso
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingFlow, pushedEvents...)
+	err = appendAndReduce(existingFlow, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (c *Commands) SetTriggerActions(ctx context.Context, flowType domain.FlowTy
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingFlow, pushedEvents...)
+	err = appendAndReduce(existingFlow, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

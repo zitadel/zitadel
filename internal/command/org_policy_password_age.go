@@ -26,7 +26,7 @@ func (c *Commands) AddPasswordAgePolicy(ctx context.Context, resourceOwner strin
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedPolicy, pushedEvents...)
+	err = appendAndReduce(addedPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (c *Commands) ChangePasswordAgePolicy(ctx context.Context, resourceOwner st
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (c *Commands) RemovePasswordAgePolicy(ctx context.Context, orgID string) (*
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

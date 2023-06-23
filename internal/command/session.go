@@ -147,7 +147,7 @@ func (c *Commands) TerminateSession(ctx context.Context, sessionID, sessionToken
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(sessionWriteModel, pushedEvents...)
+	err = appendAndReduce(sessionWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +175,7 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionChecks, met
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(checks.sessionWriteModel, pushedEvents...)
+	err = appendAndReduce(checks.sessionWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

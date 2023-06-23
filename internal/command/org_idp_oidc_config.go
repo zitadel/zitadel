@@ -49,7 +49,7 @@ func (c *Commands) ChangeIDPOIDCConfig(ctx context.Context, config *domain.OIDCI
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingConfig, pushedEvents...)
+	err = appendAndReduce(existingConfig, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

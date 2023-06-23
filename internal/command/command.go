@@ -139,21 +139,21 @@ func StartCommands(
 	return repo, nil
 }
 
-type AppendReducer interface {
+type appendReducer interface {
 	AppendEvents(...eventstore.Event)
 	// TODO: Why is it allowed to return an error here?
 	Reduce() error
 }
 
-func (c *Commands) pushAppendAndReduce(ctx context.Context, object AppendReducer, cmds ...eventstore.Command) error {
+func (c *Commands) pushAppendAndReduce(ctx context.Context, object appendReducer, cmds ...eventstore.Command) error {
 	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return err
 	}
-	return AppendAndReduce(object, events...)
+	return appendAndReduce(object, events...)
 }
 
-func AppendAndReduce(object AppendReducer, events ...eventstore.Event) error {
+func appendAndReduce(object appendReducer, events ...eventstore.Event) error {
 	object.AppendEvents(events...)
 	return object.Reduce()
 }
@@ -181,50 +181,4 @@ func exists(ctx context.Context, filter preparation.FilterToQueryReducer, wm exi
 		return false, err
 	}
 	return wm.Exists(), nil
-}
-
-func (c *Commands) processWithLast(ctx context.Context, validation preparation.Validation) (*domain.ObjectDetails, error) {
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
-	if err != nil {
-		return nil, err
-	}
-	events, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
-		return nil, err
-	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
-	}, nil
-}
-func (c *Commands) processWithFirst(ctx context.Context, validation preparation.Validation) (*domain.ObjectDetails, error) {
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
-	if err != nil {
-		return nil, err
-	}
-	events, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
-		return nil, err
-	}
-	return &domain.ObjectDetails{
-		Sequence:      events[0].Sequence(),
-		EventDate:     events[0].CreationDate(),
-		ResourceOwner: events[0].Aggregate().ResourceOwner,
-	}, nil
-}
-func (c *Commands) processWithID(ctx context.Context, validation preparation.Validation) (string, *domain.ObjectDetails, error) {
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
-	if err != nil {
-		return "", nil, err
-	}
-	events, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
-		return "", nil, err
-	}
-	return events[len(events)-1].Aggregate().ID, &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
-	}, nil
 }

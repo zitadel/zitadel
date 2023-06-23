@@ -138,7 +138,7 @@ func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedApplication, pushedEvents...)
+	err = appendAndReduce(addedApplication, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -179,7 +179,7 @@ func (c *Commands) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIA
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingAPI, pushedEvents...)
+	err = appendAndReduce(existingAPI, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +213,7 @@ func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, ap
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingAPI, pushedEvents...)
+	err = appendAndReduce(existingAPI, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

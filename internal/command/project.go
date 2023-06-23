@@ -57,7 +57,7 @@ func (c *Commands) addProjectWithID(ctx context.Context, projectAdd *domain.Proj
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedProject, pushedEvents...)
+	err = appendAndReduce(addedProject, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (c *Commands) addProjectWithIDWithOwner(ctx context.Context, projectAdd *do
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedProject, pushedEvents...)
+	err = appendAndReduce(addedProject, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +201,7 @@ func (c *Commands) ChangeProject(ctx context.Context, projectChange *domain.Proj
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingProject, pushedEvents...)
+	err = appendAndReduce(existingProject, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -229,7 +229,7 @@ func (c *Commands) DeactivateProject(ctx context.Context, projectID string, reso
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingProject, pushedEvents...)
+	err = appendAndReduce(existingProject, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -257,7 +257,7 @@ func (c *Commands) ReactivateProject(ctx context.Context, projectID string, reso
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingProject, pushedEvents...)
+	err = appendAndReduce(existingProject, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -305,7 +305,7 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingProject, pushedEvents...)
+	err = appendAndReduce(existingProject, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

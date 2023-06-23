@@ -29,7 +29,7 @@ func (c *Commands) AddHumanAvatar(ctx context.Context, orgID, userID string, upl
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingUser, pushedEvents...)
+	err = appendAndReduce(existingUser, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (c *Commands) RemoveHumanAvatar(ctx context.Context, orgID, userID string) 
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingUser, pushedEvents...)
+	err = appendAndReduce(existingUser, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

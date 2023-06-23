@@ -385,15 +385,15 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		SetIAMConsoleID(instanceAgg, &console.ClientID, &setup.zitadel.consoleAppID),
 	)
 
-	addGeneratedDomain, err := c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName)
+	addGeneratedDomain, err := c.addGeneratedInstanceDomain(ctx, instanceID, setup.InstanceName)
 	if err != nil {
 		return "", "", nil, nil, err
 	}
 	validations = append(validations, addGeneratedDomain...)
 	if setup.CustomDomain != "" {
 		validations = append(validations,
-			c.prepareAddInstanceDomain(instanceAgg, setup.CustomDomain, false),
-			prepareSetPrimaryInstanceDomain(instanceAgg, setup.CustomDomain),
+			c.prepareAddInstanceDomain(NewInstanceDomainWriteModel(instanceID, setup.CustomDomain), false),
+			prepareSetPrimaryInstanceDomain(NewInstanceDomainWriteModel(instanceID, setup.CustomDomain)),
 		)
 	}
 

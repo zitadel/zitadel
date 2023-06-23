@@ -42,7 +42,7 @@ func (c *Commands) ChangeApplication(ctx context.Context, projectID string, appC
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingApp, pushedEvents...)
+	err = appendAndReduce(existingApp, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (c *Commands) DeactivateApplication(ctx context.Context, projectID, appID, 
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingApp, pushedEvents...)
+	err = appendAndReduce(existingApp, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func (c *Commands) ReactivateApplication(ctx context.Context, projectID, appID, 
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingApp, pushedEvents...)
+	err = appendAndReduce(existingApp, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func (c *Commands) RemoveApplication(ctx context.Context, projectID, appID, reso
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingApp, pushedEvents...)
+	err = appendAndReduce(existingApp, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

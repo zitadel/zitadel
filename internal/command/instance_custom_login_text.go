@@ -3,8 +3,9 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -22,7 +23,7 @@ func (c *Commands) SetCustomInstanceLoginText(ctx context.Context, loginText *do
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingMailText, pushedEvents...)
+	err = appendAndReduce(existingMailText, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +46,7 @@ func (c *Commands) RemoveCustomInstanceLoginTexts(ctx context.Context, lang lang
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(customText, pushedEvents...)
+	err = appendAndReduce(customText, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

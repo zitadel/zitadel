@@ -41,7 +41,7 @@ func (c *Commands) ChangeDefaultIDPJWTConfig(ctx context.Context, config *domain
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingConfig, pushedEvents...)
+	err = appendAndReduce(existingConfig, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

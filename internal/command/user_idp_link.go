@@ -83,7 +83,7 @@ func (c *Commands) RemoveUserIDPLink(ctx context.Context, link *domain.UserIDPLi
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(linkWriteModel, pushedEvents...)
+	err = appendAndReduce(linkWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

@@ -39,7 +39,7 @@ func (c *Commands) AddSMSConfigTwilio(ctx context.Context, instanceID string, co
 	if err != nil {
 		return "", nil, err
 	}
-	err = AppendAndReduce(smsConfigWriteModel, pushedEvents...)
+	err = appendAndReduce(smsConfigWriteModel, pushedEvents...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -75,7 +75,7 @@ func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, instanceID, id str
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(smsConfigWriteModel, pushedEvents...)
+	err = appendAndReduce(smsConfigWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func (c *Commands) ChangeSMSConfigTwilioToken(ctx context.Context, instanceID, i
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(smsConfigWriteModel, pushedEvents...)
+	err = appendAndReduce(smsConfigWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func (c *Commands) ActivateSMSConfig(ctx context.Context, instanceID, id string)
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(smsConfigWriteModel, pushedEvents...)
+	err = appendAndReduce(smsConfigWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ func (c *Commands) DeactivateSMSConfig(ctx context.Context, instanceID, id strin
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(smsConfigWriteModel, pushedEvents...)
+	err = appendAndReduce(smsConfigWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -190,7 +190,7 @@ func (c *Commands) RemoveSMSConfig(ctx context.Context, instanceID, id string) (
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(smsConfigWriteModel, pushedEvents...)
+	err = appendAndReduce(smsConfigWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

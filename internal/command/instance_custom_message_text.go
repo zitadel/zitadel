@@ -22,7 +22,7 @@ func (c *Commands) SetDefaultMessageText(ctx context.Context, instanceID string,
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingMessageText, pushedEvents...)
+	err = appendAndReduce(existingMessageText, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (c *Commands) RemoveInstanceMessageTexts(ctx context.Context, messageTextTy
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(customText, pushedEvents...)
+	err = appendAndReduce(customText, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

@@ -61,7 +61,7 @@ func (c *Commands) AddQuota(
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(wm, events...)
+	err = appendAndReduce(wm, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (c *Commands) RemoveQuota(ctx context.Context, unit QuotaUnit) (*domain.Obj
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(wm, pushedEvents...)
+	err = appendAndReduce(wm, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

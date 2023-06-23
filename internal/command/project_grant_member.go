@@ -37,7 +37,7 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *domain.Pro
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedMember, pushedEvents...)
+	err = appendAndReduce(addedMember, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (c *Commands) ChangeProjectGrantMember(ctx context.Context, member *domain.
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingMember, pushedEvents...)
+	err = appendAndReduce(existingMember, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, user
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(m, pushedEvents...)
+	err = appendAndReduce(m, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

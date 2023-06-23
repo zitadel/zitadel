@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -15,12 +14,12 @@ type InstanceIDPConfigWriteModel struct {
 	IDPConfigWriteModel
 }
 
-func NewInstanceIDPConfigWriteModel(ctx context.Context, configID string) *InstanceIDPConfigWriteModel {
+func NewInstanceIDPConfigWriteModel(instanceID, configID string) *InstanceIDPConfigWriteModel {
 	return &InstanceIDPConfigWriteModel{
 		IDPConfigWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   authz.GetInstance(ctx).InstanceID(),
-				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
 			},
 			ConfigID: configID,
 		},

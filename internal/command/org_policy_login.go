@@ -124,7 +124,7 @@ func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) (*domain
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +169,7 @@ func (c *Commands) AddIDPToLoginPolicy(ctx context.Context, resourceOwner string
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(idpModel, pushedEvents...)
+	err = appendAndReduce(idpModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -207,7 +207,7 @@ func (c *Commands) RemoveIDPFromLoginPolicy(ctx context.Context, resourceOwner s
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(idpModel, pushedEvents...)
+	err = appendAndReduce(idpModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -251,7 +251,7 @@ func (c *Commands) AddSecondFactorToLoginPolicy(ctx context.Context, secondFacto
 		return domain.SecondFactorTypeUnspecified, nil, err
 	}
 
-	err = AppendAndReduce(secondFactorModel, pushedEvents...)
+	err = appendAndReduce(secondFactorModel, pushedEvents...)
 	if err != nil {
 		return domain.SecondFactorTypeUnspecified, nil, err
 	}
@@ -289,7 +289,7 @@ func (c *Commands) RemoveSecondFactorFromLoginPolicy(ctx context.Context, second
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(secondFactorModel, pushedEvents...)
+	err = appendAndReduce(secondFactorModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -325,7 +325,7 @@ func (c *Commands) AddMultiFactorToLoginPolicy(ctx context.Context, multiFactor 
 	if err != nil {
 		return domain.MultiFactorTypeUnspecified, nil, err
 	}
-	err = AppendAndReduce(multiFactorModel, pushedEvents...)
+	err = appendAndReduce(multiFactorModel, pushedEvents...)
 	if err != nil {
 		return domain.MultiFactorTypeUnspecified, nil, err
 	}
@@ -362,7 +362,7 @@ func (c *Commands) RemoveMultiFactorFromLoginPolicy(ctx context.Context, multiFa
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(multiFactorModel, pushedEvents...)
+	err = appendAndReduce(multiFactorModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -492,7 +492,7 @@ func prepareChangeLoginPolicy(a *org.Aggregate, policy *ChangeLoginPolicy) prepa
 
 func idpExists(ctx context.Context, filter preparation.FilterToQueryReducer, idp *AddLoginPolicyIDP) (bool, error) {
 	if idp.Type == domain.IdentityProviderTypeSystem {
-		return exists(ctx, filter, NewInstanceIDPConfigWriteModel(ctx, idp.ConfigID))
+		return exists(ctx, filter, NewInstanceIDPConfigWriteModel(authz.GetInstance(ctx).InstanceID(), idp.ConfigID))
 	}
 	return exists(ctx, filter, NewOrgIDPConfigWriteModel(idp.ConfigID, authz.GetCtxData(ctx).ResourceOwner))
 }

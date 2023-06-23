@@ -91,7 +91,7 @@ func (c *Commands) HumanAddU2FSetup(ctx context.Context, userID, resourceowner s
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addWebAuthN, events...)
+	err = appendAndReduce(addWebAuthN, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (c *Commands) HumanAddPasswordlessSetup(ctx context.Context, userID, resour
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addWebAuthN, events...)
+	err = appendAndReduce(addWebAuthN, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +201,7 @@ func (c *Commands) HumanVerifyU2FSetup(ctx context.Context, userID, resourceowne
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(verifyWebAuthN, pushedEvents...)
+	err = appendAndReduce(verifyWebAuthN, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -256,7 +256,7 @@ func (c *Commands) humanHumanPasswordlessSetup(ctx context.Context, userID, reso
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(verifyWebAuthN, pushedEvents...)
+	err = appendAndReduce(verifyWebAuthN, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -492,7 +492,7 @@ func (c *Commands) HumanAddPasswordlessInitCode(ctx context.Context, userID, res
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(initCode, pushedEvents...)
+	err = appendAndReduce(initCode, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -508,7 +508,7 @@ func (c *Commands) HumanSendPasswordlessInitCode(ctx context.Context, userID, re
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(initCode, pushedEvents...)
+	err = appendAndReduce(initCode, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -603,7 +603,7 @@ func (c *Commands) removeHumanWebAuthN(ctx context.Context, userID, webAuthNID, 
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingWebAuthN, pushedEvents...)
+	err = appendAndReduce(existingWebAuthN, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

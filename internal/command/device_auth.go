@@ -32,7 +32,7 @@ func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, user
 	if err != nil {
 		return "", nil, err
 	}
-	err = AppendAndReduce(model, pushedEvents...)
+	err = appendAndReduce(model, pushedEvents...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -54,7 +54,7 @@ func (c *Commands) ApproveDeviceAuth(ctx context.Context, id, subject string) (*
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(model, pushedEvents...)
+	err = appendAndReduce(model, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (c *Commands) CancelDeviceAuth(ctx context.Context, id string, reason domai
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(model, pushedEvents...)
+	err = appendAndReduce(model, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (c *Commands) RemoveDeviceAuth(ctx context.Context, id string) (*domain.Obj
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(model, pushedEvents...)
+	err = appendAndReduce(model, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

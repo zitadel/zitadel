@@ -39,7 +39,7 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, passwordStrin
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPassword, pushedEvents...)
+	err = appendAndReduce(existingPassword, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPasswor
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPassword, pushedEvents...)
+	err = appendAndReduce(existingPassword, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -172,7 +172,7 @@ func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingHuman, pushedEvents...)
+	err = appendAndReduce(existingHuman, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

@@ -43,7 +43,7 @@ func (c *Commands) AddLabelPolicy(ctx context.Context, resourceOwner string, pol
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedPolicy, pushedEvents...)
+	err = appendAndReduce(addedPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (c *Commands) ChangeLabelPolicy(ctx context.Context, resourceOwner string, 
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (c *Commands) ActivateLabelPolicy(ctx context.Context, orgID string) (*doma
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +141,7 @@ func (c *Commands) AddLogoLabelPolicy(ctx context.Context, orgID string, upload 
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +169,7 @@ func (c *Commands) RemoveLogoLabelPolicy(ctx context.Context, orgID string) (*do
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +197,7 @@ func (c *Commands) AddIconLabelPolicy(ctx context.Context, orgID string, upload 
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -226,7 +226,7 @@ func (c *Commands) RemoveIconLabelPolicy(ctx context.Context, orgID string) (*do
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -254,7 +254,7 @@ func (c *Commands) AddLogoDarkLabelPolicy(ctx context.Context, orgID string, upl
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -282,7 +282,7 @@ func (c *Commands) RemoveLogoDarkLabelPolicy(ctx context.Context, orgID string) 
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -310,7 +310,7 @@ func (c *Commands) AddIconDarkLabelPolicy(ctx context.Context, orgID string, upl
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -334,7 +334,7 @@ func (c *Commands) RemoveIconDarkLabelPolicy(ctx context.Context, orgID string) 
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -362,7 +362,7 @@ func (c *Commands) AddFontLabelPolicy(ctx context.Context, orgID string, upload 
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -386,7 +386,7 @@ func (c *Commands) RemoveFontLabelPolicy(ctx context.Context, orgID string) (*do
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -406,7 +406,7 @@ func (c *Commands) RemoveLabelPolicy(ctx context.Context, orgID string) (*domain
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

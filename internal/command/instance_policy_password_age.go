@@ -44,7 +44,7 @@ func (c *Commands) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy *d
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

@@ -35,7 +35,7 @@ func (c *Commands) ChangeHumanProfile(ctx context.Context, profile *domain.Profi
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingProfile, events...)
+	err = appendAndReduce(existingProfile, events...)
 	if err != nil {
 		return nil, err
 	}

@@ -23,7 +23,7 @@ func (c *Commands) AddDefaultMailTemplate(ctx context.Context, policy *domain.Ma
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedPolicy, pushedEvents...)
+	err = appendAndReduce(addedPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (c *Commands) ChangeDefaultMailTemplate(ctx context.Context, policy *domain
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	err = appendAndReduce(existingPolicy, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}

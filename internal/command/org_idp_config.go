@@ -85,7 +85,7 @@ func (c *Commands) addIDPConfig(ctx context.Context, config *domain.IDPConfig, i
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedConfig, pushedEvents...)
+	err = appendAndReduce(addedConfig, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (c *Commands) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingIDP, pushedEvents...)
+	err = appendAndReduce(existingIDP, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func (c *Commands) DeactivateIDPConfig(ctx context.Context, idpID, orgID string)
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingIDP, pushedEvents...)
+	err = appendAndReduce(existingIDP, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +160,7 @@ func (c *Commands) ReactivateIDPConfig(ctx context.Context, idpID, orgID string)
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingIDP, pushedEvents...)
+	err = appendAndReduce(existingIDP, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -180,7 +180,7 @@ func (c *Commands) RemoveIDPConfig(ctx context.Context, idpID, orgID string, cas
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingIDP, pushedEvents...)
+	err = appendAndReduce(existingIDP, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
