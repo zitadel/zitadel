@@ -2027,7 +2027,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             summary: "Delete Organization";
-            description: "Sets the state of my organization and all its resource (Users, Projects, Grants to and from the org) to remove. Users of this organization will not be able to log in."
+            description: "Deletes my organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
