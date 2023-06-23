@@ -68,6 +68,10 @@ func (u *User) Reducers() []handler2.AggregateReducer {
 					Reduce: u.ProcessUser,
 				},
 				{
+					Event:  user_repo.UserV1AddedType,
+					Reduce: u.ProcessUser,
+				},
+				{
 					Event:  user_repo.UserV1RegisteredType,
 					Reduce: u.ProcessUser,
 				},
@@ -295,8 +299,13 @@ func (u *User) Reducers() []handler2.AggregateReducer {
 			},
 		},
 		{
-			Aggregate:     instance.AggregateType,
-			EventRedusers: []handler2.EventReducer{},
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler2.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: u.ProcessInstance,
+				},
+			},
 		},
 	}
 }
@@ -386,22 +395,22 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler2.Statement, err e
 		}
 		err = u.fillLoginNames(user)
 	case user_repo.UserRemovedType:
-		return handler2.NewStatement(event,
-			func(ex handler2.Executer, projectionName string) error {
-				return u.view.DeleteUser(event.Aggregate().ID, event.Aggregate().InstanceID, event)
-			},
-		), nil
+		err = u.view.DeleteUser(event.Aggregate().ID, event.Aggregate().InstanceID, event)
+		if err != nil {
+			return nil, err
+		}
+		return handler2.NewNoOpStatement(event), nil
 	default:
 		return handler2.NewNoOpStatement(event), nil
 	}
 	if err != nil {
 		return nil, err
 	}
-	return handler2.NewStatement(event,
-		func(ex handler2.Executer, projectionName string) error {
-			return u.view.PutUser(user, event)
-		},
-	), nil
+	err = u.view.PutUser(user, event)
+	if err != nil {
+		return nil, err
+	}
+	return handler2.NewNoOpStatement(event), nil
 }
 
 func (u *User) fillLoginNames(user *view_model.UserView) (err error) {

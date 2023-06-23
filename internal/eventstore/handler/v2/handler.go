@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type EventStore interface {
@@ -193,6 +194,9 @@ func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]str
 }
 
 func (h *Handler) Trigger(ctx context.Context) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if !h.isTriggered.TryLock() {
 		return nil
 	}
