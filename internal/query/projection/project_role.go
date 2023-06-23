@@ -184,13 +184,8 @@ func (p *projectRoleProjection) reduceOwnerRemoved(event eventstore.Event) (*han
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-3XrHY", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(ProjectRoleColumnChangeDate, e.CreationDate()),
-			handler.NewCol(ProjectRoleColumnSequence, e.Sequence()),
-			handler.NewCol(ProjectRoleColumnOwnerRemoved, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(ProjectRoleColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(ProjectRoleColumnResourceOwner, e.Aggregate().ID),

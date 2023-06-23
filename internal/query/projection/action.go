@@ -220,13 +220,8 @@ func (p *actionProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-mSmWM", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(ActionChangeDateCol, e.CreationDate()),
-			handler.NewCol(ActionSequenceCol, e.Sequence()),
-			handler.NewCol(ActionOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(ActionInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(ActionResourceOwnerCol, e.Aggregate().ID),

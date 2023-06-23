@@ -155,13 +155,8 @@ func (p *personalAccessTokenProjection) reduceOwnerRemoved(event eventstore.Even
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-zQVhl", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(PersonalAccessTokenColumnChangeDate, e.CreationDate()),
-			handler.NewCol(PersonalAccessTokenColumnSequence, e.Sequence()),
-			handler.NewCol(PersonalAccessTokenColumnOwnerRemoved, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(PersonalAccessTokenColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(PersonalAccessTokenColumnResourceOwner, e.Aggregate().ID),

@@ -259,13 +259,8 @@ func (p *idpLoginPolicyLinkProjection) reduceOwnerRemoved(event eventstore.Event
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-YbhOv", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(IDPLoginPolicyLinkChangeDateCol, e.CreationDate()),
-			handler.NewCol(IDPLoginPolicyLinkSequenceCol, e.Sequence()),
-			handler.NewCol(IDPLoginPolicyLinkOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(IDPLoginPolicyLinkInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(IDPLoginPolicyLinkResourceOwnerCol, e.Aggregate().ID),

@@ -135,13 +135,8 @@ func (p *flowProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.St
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Yd7WC", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(FlowChangeDateCol, e.CreationDate()),
-			handler.NewCol(FlowSequenceCol, e.Sequence()),
-			handler.NewCol(FlowOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(FlowInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(FlowResourceOwnerCol, e.Aggregate().ID),
