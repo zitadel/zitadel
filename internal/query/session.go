@@ -136,9 +136,13 @@ var (
 	}
 )
 
-func (q *Queries) SessionByID(ctx context.Context, id, sessionToken string) (_ *Session, err error) {
+func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string) (_ *Session, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	if shouldTriggerBulk {
+		ctx = projection.SessionProjection.Trigger(ctx)
+	}
 
 	query, scan := prepareSessionQuery(ctx, q.client)
 	stmt, args, err := query.Where(

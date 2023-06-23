@@ -16,7 +16,7 @@ import (
 )
 
 func (s *Server) GetSession(ctx context.Context, req *session.GetSessionRequest) (*session.GetSessionResponse, error) {
-	res, err := s.query.SessionByID(ctx, req.GetSessionId(), req.GetSessionToken())
+	res, err := s.query.SessionByID(ctx, true, req.GetSessionId(), req.GetSessionToken())
 	if err != nil {
 		return nil, err
 	}
