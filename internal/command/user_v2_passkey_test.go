@@ -46,7 +46,7 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *domain.PasskeyRegistrationDetails
+		want    *domain.WebAuthNRegistrationDetails
 		wantErr error
 	}{
 		{
@@ -449,7 +449,7 @@ func TestCommands_pushUserPasskey(t *testing.T) {
 			require.ErrorIs(t, err, tt.wantErr)
 			if tt.wantErr == nil {
 				assert.NotEmpty(t, got.PublicKeyCredentialCreationOptions)
-				assert.Equal(t, "123", got.PasskeyID)
+				assert.Equal(t, "123", got.ID)
 				assert.Equal(t, "org1", got.ObjectDetails.ResourceOwner)
 			}
 		})

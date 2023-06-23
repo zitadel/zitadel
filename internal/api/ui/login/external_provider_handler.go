@@ -288,27 +288,26 @@ func (l *Login) handleExternalUserAuthenticated(
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
 	// check and fill in local linked user
 	externalErr := l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r))
-	if !errors.IsNotFound(externalErr) {
+	if externalErr != nil && !errors.IsNotFound(externalErr) {
 		l.renderError(w, r, authReq, externalErr)
 		return
 	}
-	externalUser, externalUserChange, err := l.runPostExternalAuthenticationActions(externalUser, tokens(session), authReq, r, user, externalErr)
+	var err error
+	// read current auth request state (incl. authorized user)
+	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	externalUser, externalUserChange, err := l.runPostExternalAuthenticationActions(externalUser, tokens(session), authReq, r, user, nil)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
 	// if action is done and no user linked then link or register
 	if errors.IsNotFound(externalErr) {
-		l.externalUserNotExisting(w, r, authReq, provider, externalUser)
+		l.externalUserNotExisting(w, r, authReq, provider, externalUser, externalUserChange)
 		return
-	}
-	if provider.IsAutoUpdate || len(externalUser.Metadatas) > 0 || externalUserChange {
-		// read current auth request state (incl. authorized user)
-		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
-		if err != nil {
-			l.renderError(w, r, authReq, err)
-			return
-		}
 	}
 	if provider.IsAutoUpdate || externalUserChange {
 		err = l.updateExternalUser(r.Context(), authReq, externalUser)
@@ -334,7 +333,7 @@ func (l *Login) handleExternalUserAuthenticated(
 // * external not found overview:
 //   - creation by user
 //   - linking to existing user
-func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser) {
+func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser, changed bool) {
 	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
 
 	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
@@ -359,6 +358,12 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, orgIAMPolicy, human, idpLink, err)
 		return
+	}
+	if changed {
+		if err := l.authRepo.SetLinkingUser(r.Context(), authReq, externalUser); err != nil {
+			l.renderError(w, r, authReq, err)
+			return
+		}
 	}
 	l.autoCreateExternalUser(w, r, authReq)
 }
