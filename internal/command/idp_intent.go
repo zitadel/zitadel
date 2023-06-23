@@ -67,7 +67,7 @@ func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureU
 	if err != nil {
 		return "", nil, err
 	}
-	err = AppendAndReduce(writeModel, pushedEvents...)
+	err = appendAndReduce(writeModel, pushedEvents...)
 	if err != nil {
 		return "", nil, err
 	}

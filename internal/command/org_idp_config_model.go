@@ -89,11 +89,6 @@ func (wm *OrgIDPConfigWriteModel) Reduce() error {
 	return wm.IDPConfigWriteModel.Reduce()
 }
 
-func (wm *OrgIDPConfigWriteModel) AppendAndReduce(events ...eventstore.Event) error {
-	wm.AppendEvents(events...)
-	return wm.Reduce()
-}
-
 func (wm *OrgIDPConfigWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
