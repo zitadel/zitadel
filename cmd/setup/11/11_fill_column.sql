@@ -1,1 +1,1 @@
-UPDATE eventstore.events SET created_at = $1 WHERE id = $2
+UPDATE eventstore.events SET created_at = $1 WHERE instance_id = $2 AND event_sequence = $3
