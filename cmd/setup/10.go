@@ -35,7 +35,7 @@ func (mig *CorrectCreationDate) Execute(ctx context.Context) (err error) {
 	defer cancel()
 
 	for {
-		affected := int64(0)
+		var affected int64
 		err = crdb.ExecuteTx(ctx, mig.dbClient.DB, nil, func(tx *sql.Tx) error {
 			if mig.dbClient.Type() == "cockroach" {
 				if _, err := tx.Exec("SET experimental_enable_temp_tables=on"); err != nil {

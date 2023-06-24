@@ -1,5 +1,6 @@
 SELECT 
-    id
+    instance_id
+    , event_sequence
     , creation_date 
 FROM 
     eventstore.events 
