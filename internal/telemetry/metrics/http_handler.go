@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/zitadel/logging"
 	"go.opentelemetry.io/otel/attribute"
 )
 
@@ -99,13 +100,17 @@ func RegisterRequestCounter(r *http.Request) {
 		URI:    attribute.StringValue(strings.Split(r.RequestURI, "?")[0]),
 		Method: attribute.StringValue(r.Method),
 	}
-	RegisterCounter(RequestCounter, RequestCountDescription)
-	AddCount(r.Context(), RequestCounter, 1, labels)
+	err := RegisterCounter(RequestCounter, RequestCountDescription)
+	logging.WithFields("metric", RequestCounter).OnError(err).Panic("unable to register counter")
+	err = AddCount(r.Context(), RequestCounter, 1, labels)
+	logging.WithFields("metric", RequestCounter).OnError(err).Panic("unable to add count")
 }
 
 func RegisterTotalRequestCounter(r *http.Request) {
-	RegisterCounter(TotalRequestCounter, TotalRequestDescription)
-	AddCount(r.Context(), TotalRequestCounter, 1, nil)
+	err := RegisterCounter(TotalRequestCounter, TotalRequestDescription)
+	logging.WithFields("metric", TotalRequestCounter).OnError(err).Panic("unable to register counter")
+	err = AddCount(r.Context(), TotalRequestCounter, 1, nil)
+	logging.WithFields("metric", TotalRequestCounter).OnError(err).Panic("unable to add count")
 }
 
 func RegisterRequestCodeCounter(recorder *StatusRecorder, r *http.Request) {
@@ -114,8 +119,10 @@ func RegisterRequestCodeCounter(recorder *StatusRecorder, r *http.Request) {
 		Method:     attribute.StringValue(r.Method),
 		ReturnCode: attribute.IntValue(recorder.Status),
 	}
-	RegisterCounter(ReturnCodeCounter, ReturnCodeCounterDescription)
-	AddCount(r.Context(), ReturnCodeCounter, 1, labels)
+	err := RegisterCounter(ReturnCodeCounter, ReturnCodeCounterDescription)
+	logging.WithFields("metric", ReturnCodeCounter).OnError(err).Panic("unable to register counter")
+	err = AddCount(r.Context(), ReturnCodeCounter, 1, labels)
+	logging.WithFields("metric", ReturnCodeCounter).OnError(err).Panic("unable to add count")
 }
 
 func shouldNotIgnore(endpoints ...string) func(r *http.Request) bool {
