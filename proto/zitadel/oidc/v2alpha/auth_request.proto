@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package zitadel.oidc.v2alpha;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha;oidc";
+
+// https://github.com/zitadel/zitadel/blob/2c6a2a376c6e66d659e25bca461265e0a125c557/internal/api/oidc/auth_request_converter.go#L113
+message AuthRequest{
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"id of the authorization request\"";
+    }
+  ];
+
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the authorization request was created\"";
+    }
+  ];
+
+  // skipped: browser info. (UI should already know?)
+  string application_id = 3;
+  string callback_uri = 4;
+  // skipped: state
+  string prompt = 5;
+  // skipped: PossibleLOAs
+  // skipped: UiLocales
+  string login_hint = 6;
+  // skipped: SelectedIDPConfigID
+  google.protobuf.Duration max_age = 7;
+  string user_id = 8; // taken from id token hint by OIDC
+  // skipped: Request
+}

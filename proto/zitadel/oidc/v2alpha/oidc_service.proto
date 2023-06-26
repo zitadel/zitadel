@@ -1,0 +1,140 @@
+syntax = "proto3";
+
+package zitadel.oidc.v2alpha;
+
+import "zitadel/object/v2alpha/object.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+import "zitadel/oidc/v2alpha/auth_request.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha;oidc";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "OIDC Service";
+    version: "2.0-alpha";
+    description: "Create OIDC auth requests and retrieve callback URLs. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+
+  produces: "application/json";
+  produces: "application/grpc";
+
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+
+  host: "$ZITADEL_DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "404";
+    value: {
+      description: "Returned when the resource does not exist.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+service OIDCService {
+  rpc GetAuthRequest (GetAuthRequestRequest) returns (GetAuthRequestResponse) {
+    option (google.api.http) = {
+      get: "/v2alpha/oidc/auth_requests/{auth_request_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authrequest.read" // TODO: define.
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Create a new OIDC Auth Request";
+      
+      description: "Create a new OIDC Auth Request. An Auth request ID will be returned, which is required to connect the Auth request to a Session."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc CreateCallback (CreateCallbackRequest) returns (CreateCallbackResponse) {
+    option (google.api.http) = {
+      post: "/v2alpha/oidc/auth_requests/{auth_request_id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authrequest.update"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "";
+      description: ""
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+}
+
+message GetAuthRequestRequest {
+  string auth_request_id = 1;
+}
+
+message GetAuthRequestResponse {
+  AuthRequest auth_request = 1;
+}
+
+message CreateCallbackRequest {
+  string auth_request_id = 1;
+}
+
+message CreateCallbackResponse {
+  zitadel.object.v2alpha.Details details = 1;
+  string callback_url = 2;
+}
