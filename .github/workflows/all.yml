@@ -85,13 +85,12 @@ jobs:
 
   release:
     uses: ./.github/workflows/release.yml
-    # needs: [version, core-unit-test, core-integration-test, lint, container, e2e]
-    needs: [version, core-unit-test, core-integration-test, container, e2e]
+    needs: [version, core-unit-test, core-integration-test, lint, container, e2e]
     if: ${{ needs.version.outputs.published == 'true' }}
     with:
       node_version: '16'
       buf_version: 'latest'
-      # tag_name: ghcr.io/zitadel/test:d2021f68a732839d18f2ff9ca78fc018dbe91320
       tag_name: ${{ needs.container.outputs.tag_name }}
       semantic_version: '19.0.2'
       image_name: 'ghcr.io/zitadel/test'
+      google_image_name: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/test"
