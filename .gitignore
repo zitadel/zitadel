@@ -7,8 +7,8 @@ dist
 dist-ssr
 *.local
 .env
-apps/login/.env.local.?.bak
-apps/login/.env.local.??.bak
+apps/login/.env.local
+apps/login/.env.acceptance
 .cache
 server/dist
 public/dist
