@@ -247,6 +247,8 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 	}
 	err = repo.checkExternalUserLogin(ctx, request, externalUser.IDPConfigID, externalUser.ExternalUserID)
 	if errors.IsNotFound(err) {
+		// clear potential user information (e.g. when username was entered but another external user was returned)
+		request.SetUserInfo("", "", "", "", "", request.UserOrgID)
 		if err := repo.setLinkingUser(ctx, request, externalUser); err != nil {
 			return err
 		}
@@ -276,6 +278,16 @@ func (repo *AuthRequestRepo) SetExternalUserLogin(ctx context.Context, authReqID
 		return err
 	}
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
+func (repo *AuthRequestRepo) SetLinkingUser(ctx context.Context, request *domain.AuthRequest, externalUser *domain.ExternalUser) error {
+	for i, user := range request.LinkingUsers {
+		if user.ExternalUserID == externalUser.ExternalUserID {
+			request.LinkingUsers[i] = externalUser
+			return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+		}
+	}
+	return nil
 }
 
 func (repo *AuthRequestRepo) setLinkingUser(ctx context.Context, request *domain.AuthRequest, externalUser *domain.ExternalUser) error {

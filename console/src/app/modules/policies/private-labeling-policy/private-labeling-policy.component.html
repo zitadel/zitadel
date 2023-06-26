@@ -492,7 +492,9 @@
           </cnsl-info-section>
           <div class="font-preview" *ngIf="previewData.fontUrl; else addFontButton">
             <mat-icon class="icon">text_fields</mat-icon>
-
+            <span class="font-name" [ngStyle]="fontName ? { 'font-family': 'brandingFont' } : { '': '' }">{{
+              fontName
+            }}</span>
             <span class="fill-space"></span>
 
             <button
@@ -634,6 +636,7 @@
           class="preview"
           [ngClass]="{ darkmode: theme === Theme.DARK, lightmode: theme === Theme.LIGHT }"
           [policy]="view === View.PREVIEW ? previewData : data"
+          [ngStyle]="fontName ? { 'font-family': 'brandingFont' } : { '': '' }"
         >
         </cnsl-preview>
       </div>

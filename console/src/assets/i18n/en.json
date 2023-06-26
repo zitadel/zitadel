@@ -167,7 +167,14 @@
     "MORE": "more",
     "STEP": "Step",
     "SETUP": "Setup",
-    "COMINGSOON": "Coming soon",
+    "UNSAVEDCHANGES": "Unsaved changes",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Are you sure you want to discard this new action? Your action will be lost",
+        "CANCEL": "Cancel",
+        "DISCARD": "Discard"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     }
@@ -1033,7 +1040,8 @@
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български"
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
@@ -1232,7 +1240,8 @@
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -2096,7 +2105,8 @@
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български"
   },
   "MEMBER": {
     "ADD": "Add a Manager",
