@@ -512,7 +512,7 @@ func TestCommands_createHumanOTP(t *testing.T) {
 					},
 				},
 			}
-			got, err := c.createHumanOTP(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
+			got, err := c.createHumanTOTP(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			require.ErrorIs(t, err, tt.wantErr)
 			if tt.want {
 				require.NotNil(t, got)

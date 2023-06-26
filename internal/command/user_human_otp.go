@@ -45,7 +45,7 @@ func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
 	}
-	prep, err := c.createHumanOTP(ctx, userID, resourceowner)
+	prep, err := c.createHumanTOTP(ctx, userID, resourceowner)
 	if err != nil {
 		return nil, err
 	}
@@ -62,14 +62,14 @@ func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string
 	}, nil
 }
 
-type preparedOTP struct {
+type preparedTOTP struct {
 	wm      *HumanOTPWriteModel
 	userAgg *eventstore.Aggregate
 	key     *otp.Key
 	cmds    []eventstore.Command
 }
 
-func (c *Commands) createHumanOTP(ctx context.Context, userID, resourceOwner string) (*preparedOTP, error) {
+func (c *Commands) createHumanTOTP(ctx context.Context, userID, resourceOwner string) (*preparedTOTP, error) {
 	human, err := c.getHuman(ctx, userID, resourceOwner)
 	if err != nil {
 		logging.Log("COMMAND-DAqe1").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get human for loginname")
@@ -107,7 +107,7 @@ func (c *Commands) createHumanOTP(ctx context.Context, userID, resourceOwner str
 	if err != nil {
 		return nil, err
 	}
-	return &preparedOTP{
+	return &preparedTOTP{
 		wm:      otpWriteModel,
 		userAgg: userAgg,
 		key:     key,
