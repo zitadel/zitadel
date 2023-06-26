@@ -6,6 +6,7 @@ package zitadel.session.v2alpha;
 import "zitadel/object/v2alpha/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/session/v2alpha/challenge.proto";
+import "zitadel/session/v2alpha/consumers.proto";
 import "zitadel/session/v2alpha/session.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
@@ -261,7 +262,8 @@ message CreateSessionResponse{
     }
   ];
   Challenges challenges = 4;
-}
+  Consumers consumers = 5;
+  }
 
 message SetSessionRequest{
   string session_id = 1 [
