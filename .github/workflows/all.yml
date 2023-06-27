@@ -5,9 +5,8 @@ on:
     branches:
       - '**'
   push:
-    tags-ignore:
-      - "*"
-  workflow_dispatch:
+    branches:
+      - 'ci/improve-make'
 
 permissions:
   contents: write
