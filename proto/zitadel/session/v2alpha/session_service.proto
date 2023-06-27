@@ -263,7 +263,7 @@ message CreateSessionResponse{
   ];
   Challenges challenges = 4;
   Consumers consumers = 5;
-  }
+}
 
 message SetSessionRequest{
   string session_id = 1 [
