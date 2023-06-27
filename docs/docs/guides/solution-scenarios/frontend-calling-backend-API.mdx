@@ -10,7 +10,7 @@ Single-Page Applications (SPAs) are web applications that run entirely in the br
 
 While APIs are vital for communication between applications and services, they don't directly participate in user authentication. Instead, they often authorize client requests based on access tokens issued by an authorization server. APIs in ZITADEL use grant types like JWT Profile or Basic Authentication to access the authorization server's introspection endpoint for token validation.
 
-## A real-world scenario:
+## A real-world scenario
 
 Suppose there is a news portal web app that allows users to browse through various news articles and personalize their news feed based on their preferences. The back-end API handles fetching and delivering news content from the database.
 
@@ -30,7 +30,7 @@ In this example, the application is a web-based quote generator that employs a s
 4. The application presents an option for the user to generate a quote via a button. Upon pressing this button, the front-end application communicates with the back-end API using the user's access token received from ZITADEL.
 5. The back-end API introspects the access token for validity using ZITADEL's introspection endpoint. If the token is valid, the API generates a quote and sends it as a response to the front-end application, which is then displayed to the user in their browser.
 
-## Setting up the applications and ZITADEL:
+## Setting up the applications and ZITADEL
 
 
 All code and instructions to run the sample application can be found at [https://github.com/zitadel/example-quote-generator-app/](https://github.com/zitadel/example-quote-generator-app/). You can also find the steps for the integration between the front-end, back-end API, and ZITADEL in the README.md. 
@@ -57,7 +57,7 @@ You can create the front-end application (User Agent) and the API in the same pr
 - Once the frontend obtains the tokens, it can extract certain information from the ID token itself (e.g., user ID, email, etc.) without making an additional request.
 - If more user information is required, the frontend can use the access token to call the ZITADEL User Info endpoint. This endpoint provides additional user details, such as name, profile picture, etc.
 
-### Back-end API communication:
+### Back-end API communication
 
 - To communicate with the back-end API, the front-end includes the access token in the Authorization header of API requests.
 - The back-end API receives the request and needs to validate and authorize the token before processing the request.
