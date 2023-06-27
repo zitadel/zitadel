@@ -20,13 +20,15 @@ export async function POST(request: NextRequest) {
       sessionCookie.token
     );
 
+    const domain: string = request.nextUrl.hostname;
+
     const userId = session?.session?.factors?.user?.id;
 
     if (userId) {
       return createPasskeyRegistrationLink(userId)
         .then((resp) => {
           const code = resp.code;
-          return registerPasskey(userId, code).then((resp) => {
+          return registerPasskey(userId, code, domain).then((resp) => {
             return NextResponse.json(resp);
           });
         })
