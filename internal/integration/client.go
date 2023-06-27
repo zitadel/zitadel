@@ -89,6 +89,7 @@ func (s *Tester) RegisterUserPasskey(ctx context.Context, userID string) {
 	pkr, err := s.Client.UserV2.RegisterPasskey(ctx, &user.RegisterPasskeyRequest{
 		UserId: userID,
 		Code:   reg.GetCode(),
+		Domain: s.Config.ExternalDomain,
 	})
 	logging.OnError(err).Fatal("create user passkey")
 	attestationResponse, err := s.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())

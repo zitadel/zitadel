@@ -170,6 +170,22 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "passkey without domain (not registered) error",
+			req: &session.CreateSessionRequest{
+				Checks: &session.Checks{
+					User: &session.CheckUser{
+						Search: &session.CheckUser_UserId{
+							UserId: User.GetUserId(),
+						},
+					},
+				},
+				Challenges: []session.ChallengeKind{
+					session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
