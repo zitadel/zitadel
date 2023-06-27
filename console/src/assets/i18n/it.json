@@ -166,7 +166,13 @@
     "NEXT": "Avanti",
     "MORE": "azioni",
     "STEP": "Passo",
-    "COMINGSOON": "Coming soon",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Sei sicuro di voler eliminare questa nuova azione? La tua azione andrà persa",
+        "CANCEL": "Cancella",
+        "DISCARD": "Continua comunque"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Mostra utente {{value}}"
     }
@@ -1033,7 +1039,8 @@
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български"
     },
     "SMTP": {
       "TITLE": "Impostazioni SMTP",
@@ -1232,7 +1239,8 @@
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -2101,7 +2109,8 @@
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

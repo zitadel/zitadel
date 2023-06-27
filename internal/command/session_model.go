@@ -16,6 +16,7 @@ type PasskeyChallengeModel struct {
 	Challenge          string
 	AllowedCrentialIDs [][]byte
 	UserVerification   domain.UserVerificationRequirement
+	RPID               string
 }
 
 func (p *PasskeyChallengeModel) WebAuthNLogin(human *domain.Human, credentialAssertionData []byte) (*domain.WebAuthNLogin, error) {
@@ -28,6 +29,7 @@ func (p *PasskeyChallengeModel) WebAuthNLogin(human *domain.Human, credentialAss
 		Challenge:               p.Challenge,
 		AllowedCredentialIDs:    p.AllowedCrentialIDs,
 		UserVerification:        p.UserVerification,
+		RPID:                    p.RPID,
 	}, nil
 }
 
@@ -38,8 +40,10 @@ type SessionWriteModel struct {
 	UserID            string
 	UserCheckedAt     time.Time
 	PasswordCheckedAt time.Time
+	IntentCheckedAt   time.Time
 	PasskeyCheckedAt  time.Time
 	Metadata          map[string][]byte
+	Domain            string
 	State             domain.SessionState
 
 	PasskeyChallenge *PasskeyChallengeModel
@@ -68,6 +72,8 @@ func (wm *SessionWriteModel) Reduce() error {
 			wm.reduceUserChecked(e)
 		case *session.PasswordCheckedEvent:
 			wm.reducePasswordChecked(e)
+		case *session.IntentCheckedEvent:
+			wm.reduceIntentChecked(e)
 		case *session.PasskeyChallengedEvent:
 			wm.reducePasskeyChallenged(e)
 		case *session.PasskeyCheckedEvent:
@@ -90,6 +96,7 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 			session.AddedType,
 			session.UserCheckedType,
 			session.PasswordCheckedType,
+			session.IntentCheckedType,
 			session.PasskeyChallengedType,
 			session.PasskeyCheckedType,
 			session.TokenSetType,
@@ -105,6 +112,7 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 func (wm *SessionWriteModel) reduceAdded(e *session.AddedEvent) {
+	wm.Domain = e.Domain
 	wm.State = domain.SessionStateActive
 }
 
@@ -117,11 +125,16 @@ func (wm *SessionWriteModel) reducePasswordChecked(e *session.PasswordCheckedEve
 	wm.PasswordCheckedAt = e.CheckedAt
 }
 
+func (wm *SessionWriteModel) reduceIntentChecked(e *session.IntentCheckedEvent) {
+	wm.IntentCheckedAt = e.CheckedAt
+}
+
 func (wm *SessionWriteModel) reducePasskeyChallenged(e *session.PasskeyChallengedEvent) {
 	wm.PasskeyChallenge = &PasskeyChallengeModel{
 		Challenge:          e.Challenge,
 		AllowedCrentialIDs: e.AllowedCrentialIDs,
 		UserVerification:   e.UserVerification,
+		RPID:               wm.Domain,
 	}
 }
 
@@ -138,8 +151,10 @@ func (wm *SessionWriteModel) reduceTerminate() {
 	wm.State = domain.SessionStateTerminated
 }
 
-func (wm *SessionWriteModel) Start(ctx context.Context) {
-	wm.commands = append(wm.commands, session.NewAddedEvent(ctx, wm.aggregate))
+func (wm *SessionWriteModel) Start(ctx context.Context, domain string) {
+	wm.commands = append(wm.commands, session.NewAddedEvent(ctx, wm.aggregate, domain))
+	// set the domain so checks can use it
+	wm.Domain = domain
 }
 
 func (wm *SessionWriteModel) UserChecked(ctx context.Context, userID string, checkedAt time.Time) error {
@@ -151,6 +166,10 @@ func (wm *SessionWriteModel) UserChecked(ctx context.Context, userID string, che
 
 func (wm *SessionWriteModel) PasswordChecked(ctx context.Context, checkedAt time.Time) {
 	wm.commands = append(wm.commands, session.NewPasswordCheckedEvent(ctx, wm.aggregate, checkedAt))
+}
+
+func (wm *SessionWriteModel) IntentChecked(ctx context.Context, checkedAt time.Time) {
+	wm.commands = append(wm.commands, session.NewIntentCheckedEvent(ctx, wm.aggregate, checkedAt))
 }
 
 func (wm *SessionWriteModel) PasskeyChallenged(ctx context.Context, challenge string, allowedCrentialIDs [][]byte, userVerification domain.UserVerificationRequirement) {

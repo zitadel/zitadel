@@ -47,6 +47,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { supportedLanguages } from 'src/app/utils/language';
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
@@ -441,7 +442,7 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
   };
 
   public locale: string = 'en';
-  public LOCALES: string[] = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pl', 'zh'];
+  public LOCALES: string[] = supportedLanguages;
   private sub: Subscription = new Subscription();
   public canWrite$: Observable<boolean> = this.authService.isAllowed([
     this.serviceType === PolicyComponentServiceType.ADMIN

@@ -43,7 +43,7 @@ func (c *Commands) CreatePasskeyChallenge(userVerification domain.UserVerificati
 		if err != nil {
 			return err
 		}
-		webAuthNLogin, err := c.webauthnConfig.BeginLogin(ctx, humanPasskeys.human, userVerification, humanPasskeys.tokens...)
+		webAuthNLogin, err := c.webauthnConfig.BeginLogin(ctx, humanPasskeys.human, userVerification, cmd.sessionWriteModel.Domain, humanPasskeys.tokens...)
 		if err != nil {
 			return err
 		}

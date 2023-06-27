@@ -53,23 +53,21 @@ func (mig *AddEventCreatedAt) Execute(ctx context.Context) error {
 	}
 
 	for i := 0; ; i++ {
-		var count int64
-		err := crdb.ExecuteTx(ctx, mig.dbClient.DB, nil, func(tx *sql.Tx) error {
+		var affected int64
+		err = crdb.ExecuteTx(ctx, mig.dbClient.DB, nil, func(tx *sql.Tx) error {
 			res, err := tx.Exec(setCreatedAt, mig.BulkAmount)
 			if err != nil {
 				return err
 			}
 
-			count, _ = res.RowsAffected()
-			logging.WithFields("affected", count).Info("created_at updated")
-
+			affected, _ = res.RowsAffected()
 			return nil
 		})
 		if err != nil {
 			return err
 		}
-		logging.WithFields("step", "11", "iteration", i, "count", count).Info("set created_at iteration done")
-		if count < int64(mig.BulkAmount) {
+		logging.WithFields("step", "11", "iteration", i, "affected", affected).Info("set created_at iteration done")
+		if affected < int64(mig.BulkAmount) {
 			break
 		}
 	}
