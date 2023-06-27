@@ -78,12 +78,13 @@ export async function getPasswordComplexitySettings(
 export async function createSession(
   server: ZitadelServer,
   loginName: string,
-  password: string | undefined
+  password: string | undefined,
+  domain: string
 ): Promise<CreateSessionResponse | undefined> {
   const sessionService = session.getSession(server);
   return password
     ? sessionService.createSession(
-        { checks: { user: { loginName }, password: { password } } },
+        { checks: { user: { loginName }, password: { password } }, domain },
         {}
       )
     : sessionService.createSession({ checks: { user: { loginName } } }, {});
@@ -236,6 +237,7 @@ export async function verifyPasskeyRegistration(
     {
       passkeyId,
       passkeyName,
+
       publicKeyCredential,
       userId,
     },
@@ -251,12 +253,15 @@ export async function verifyPasskeyRegistration(
  */
 export async function registerPasskey(
   userId: string,
-  code: { id: string; code: string }
+  code: { id: string; code: string },
+  domain: string
 ): Promise<any> {
   const userservice = user.getUser(server);
   return userservice.registerPasskey({
     userId,
     code,
+    domain,
+    // authenticator:
   });
 }
 

@@ -95,7 +95,7 @@ export default function RegisterPasskey({ sessionId, isPrompt }: Props) {
         resp.publicKeyCredentialCreationOptions.publicKey.user.id =
           coerceToArrayBuffer(
             resp.publicKeyCredentialCreationOptions.publicKey.user.id,
-            "challenge"
+            "userid"
           );
         if (
           resp.publicKeyCredentialCreationOptions.publicKey.excludeCredentials
@@ -140,7 +140,9 @@ export default function RegisterPasskey({ sessionId, isPrompt }: Props) {
                   ),
                 },
               };
-              return submitVerify(passkeyId, "", data, sessionId);
+              return submitVerify(passkeyId, "", data, sessionId).then(() => {
+                router.push("/accounts");
+              });
             } else {
               setLoading(false);
               setError("An error on registering passkey");
