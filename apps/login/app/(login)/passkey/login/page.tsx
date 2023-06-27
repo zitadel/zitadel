@@ -1,5 +1,6 @@
 import { getSession, server } from "#/lib/zitadel";
 import Alert, { AlertType } from "#/ui/Alert";
+import LoginPasskey from "#/ui/LoginPasskey";
 import RegisterPasskey from "#/ui/RegisterPasskey";
 import UserAvatar from "#/ui/UserAvatar";
 import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
@@ -50,9 +51,7 @@ export default async function Page({
         </div>
       )}
 
-      {sessionFactors?.id && (
-        <LoginPasskey sessionId={sessionFactors.id} isPrompt={!!prompt} />
-      )}
+      {sessionFactors?.id && <LoginPasskey sessionId={sessionFactors.id} />}
     </div>
   );
 }
