@@ -17,8 +17,6 @@ on:
         value: ${{ jobs.build.outputs.cache_key }}
       cache_path:
         value: ${{ jobs.build.outputs.cache_path }}
-      cache_hit:
-        value: ${{ jobs.build.outputs.cache_hit }}
 
 env:
   cache_path: |
@@ -37,7 +35,6 @@ jobs:
     outputs:
       cache_key: ${{ steps.cache.outputs.cache-primary-key }}
       cache_path: ${{ env.cache_path }}
-      cache_hit: ${{ steps.cache.outputs.cache-hit }}
     steps:
         - 
           uses: actions/checkout@v3
@@ -46,7 +43,7 @@ jobs:
           timeout-minutes: 1
           id: cache
           with:
-            key: core-${{ hashFiles( 'go.*', 'openapi', 'cmd', 'pkg/grpc/**/*.go', 'internal') }}
+            key: core-${{ hashFiles( 'go.*', 'openapi', 'cmd', 'pkg/grpc/**/*.go', 'proto', 'internal') }}
             restore-keys: |
               core-
             path: ${{ env.cache_path }}
@@ -79,6 +76,6 @@ jobs:
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
           uses: actions/cache/save@v3
           with:
-            key: core-${{ hashFiles('go.*', 'openapi', '!openapi/v2', 'cmd', 'pkg/grpc/**/*.go', '!pkg/grpc/**/*.pb.*', 'pkg/grpc/protoc/v2/options.pb.go', 'internal', '!internal/**/statik.go', '!**/zitadel.css*', '**/.sass-cache', '!internal/api/assets/authz.go', '!internal/api/assets/router.go') }}
+            key: ${{ steps.cache.outputs.cache-primary-key }}
             path: ${{ env.cache_path }}
         

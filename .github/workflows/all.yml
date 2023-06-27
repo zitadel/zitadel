@@ -70,8 +70,6 @@ jobs:
       go_lint_version: 'v1.53.2'
       core_cache_key: ${{ needs.core.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
-      core_cache_hit: ${{ needs.core.outputs.cache_hit }}
-      console_cache_hit: ${{ needs.console.outputs.cache_hit }}
 
   container:
     needs: [compile]

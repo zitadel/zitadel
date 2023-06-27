@@ -14,8 +14,6 @@ on:
         value: ${{ jobs.build.outputs.cache_key }}
       cache_path:
           value: ${{ jobs.build.outputs.cache_path }}
-      cache_hit:
-        value: ${{ jobs.build.outputs.cache_hit }}
 
 env:
   cache_path: console/dist/console
@@ -25,7 +23,6 @@ jobs:
     outputs:
       cache_key: ${{ steps.cache.outputs.cache-primary-key }}
       cache_path: ${{ env.cache_path }}
-      cache_hit: ${{ steps.cache.outputs.cache-hit }}
     runs-on: ubuntu-latest
     steps:
         - 
@@ -35,7 +32,7 @@ jobs:
           timeout-minutes: 1
           id: cache
           with:
-            key: console-${{ hashFiles('console') }}
+            key: console-${{ hashFiles('console', 'proto') }}
             restore-keys: |
               console-
             path: ${{ env.cache_path }}
@@ -60,5 +57,5 @@ jobs:
           uses: actions/cache/save@v3
           with:
             path: ${{ env.cache_path }}
-            key: console-${{ hashFiles('console', '!console/dist', '!console/node_modules', '!console/.angular', '!console/src/app/proto') }}
+            key: ${{ steps.cache.outputs.cache-primary-key }}
         
