@@ -14,15 +14,15 @@ import (
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
-func Test_otpDetailsToPb(t *testing.T) {
+func Test_totpDetailsToPb(t *testing.T) {
 	type args struct {
-		otp *domain.OTPv2
+		otp *domain.TOTP
 		err error
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *user.RegisterOTPResponse
+		want    *user.RegisterTOTPResponse
 		wantErr error
 	}{
 		{
@@ -35,7 +35,7 @@ func Test_otpDetailsToPb(t *testing.T) {
 		{
 			name: "success",
 			args: args{
-				otp: &domain.OTPv2{
+				otp: &domain.TOTP{
 					ObjectDetails: &domain.ObjectDetails{
 						Sequence:      123,
 						EventDate:     time.Unix(456, 789),
@@ -45,7 +45,7 @@ func Test_otpDetailsToPb(t *testing.T) {
 					URI:    "URI",
 				},
 			},
-			want: &user.RegisterOTPResponse{
+			want: &user.RegisterTOTPResponse{
 				Details: &object.Details{
 					Sequence: 123,
 					ChangeDate: &timestamppb.Timestamp{
@@ -61,10 +61,10 @@ func Test_otpDetailsToPb(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := otpDetailsToPb(tt.args.otp, tt.args.err)
+			got, err := totpDetailsToPb(tt.args.otp, tt.args.err)
 			require.ErrorIs(t, err, tt.wantErr)
 			if !proto.Equal(tt.want, got) {
-				t.Errorf("RegisterOTPResponse =\n%v\nwant\n%v", got, tt.want)
+				t.Errorf("RegisterTOTPResponse =\n%v\nwant\n%v", got, tt.want)
 			}
 		})
 	}

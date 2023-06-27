@@ -84,7 +84,7 @@ func TestSessionCommands_getHumanPasskeys(t *testing.T) {
 					expectFilter(eventFromEventPusher(
 						user.NewHumanWebAuthNAddedEvent(eventstore.NewBaseEventForPush(
 							context.Background(), &org.NewAggregate("org1").Aggregate, user.HumanPasswordlessTokenAddedType,
-						), "111", "challenge"),
+						), "111", "challenge", "rpID"),
 					)),
 				),
 				sessionWriteModel: &SessionWriteModel{
@@ -112,6 +112,7 @@ func TestSessionCommands_getHumanPasskeys(t *testing.T) {
 						WebAuthNTokenID: "111",
 						State:           domain.MFAStateNotReady,
 						Challenge:       "challenge",
+						RPID:            "rpID",
 					}},
 				},
 				err: nil,
