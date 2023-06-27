@@ -14,6 +14,7 @@ type HumanWebAuthNAddedEvent struct {
 
 	WebAuthNTokenID string `json:"webAuthNTokenId"`
 	Challenge       string `json:"challenge"`
+	RPID            string `json:"rpID,omitempty"`
 }
 
 func (e *HumanWebAuthNAddedEvent) Data() interface{} {
@@ -28,11 +29,13 @@ func NewHumanWebAuthNAddedEvent(
 	base *eventstore.BaseEvent,
 	webAuthNTokenID,
 	challenge string,
+	rpID string,
 ) *HumanWebAuthNAddedEvent {
 	return &HumanWebAuthNAddedEvent{
 		BaseEvent:       *base,
 		WebAuthNTokenID: webAuthNTokenID,
 		Challenge:       challenge,
+		RPID:            rpID,
 	}
 }
 
