@@ -587,6 +587,11 @@ message RegisterPasskeyRequest{
       description: "\"Optionally specify the authenticator type of the passkey device (platform or cross-platform). If none is provided, both values are allowed.\"";
     }
   ];
+  string domain = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Domain on which the user is authenticated.\"";
+    }
+  ];
 }
 
 message RegisterPasskeyResponse{
@@ -656,6 +661,11 @@ message RegisterU2FRequest{
       min_length: 1;
       max_length: 200;
       example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  string domain = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Domain on which the user is authenticated.\"";
     }
   ];
 }

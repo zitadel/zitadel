@@ -26,6 +26,8 @@ const (
 
 type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	Domain string `json:"domain,omitempty"`
 }
 
 func (e *AddedEvent) Data() interface{} {
@@ -38,6 +40,7 @@ func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 
 func NewAddedEvent(ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	domain string,
 ) *AddedEvent {
 	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -45,6 +48,7 @@ func NewAddedEvent(ctx context.Context,
 			aggregate,
 			AddedType,
 		),
+		Domain: domain,
 	}
 }
 
