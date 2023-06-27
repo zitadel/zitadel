@@ -5,8 +5,9 @@ on:
     branches:
       - '**'
   push:
-    branches:
-      - main
+    tags-ignore:
+      - "*"
+  workflow_dispatch:
 
 permissions:
   contents: write
