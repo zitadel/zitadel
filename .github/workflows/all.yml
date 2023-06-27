@@ -3,7 +3,7 @@ name: All in one build
 on:
   pull_request:
     branches:
-      - ci/improve-make
+      - '**'
   push:
     branches:
       - main
