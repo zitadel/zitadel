@@ -84,9 +84,18 @@ jobs:
         fail-on-cache-miss: true
     - 
       uses: golangci/golangci-lint-action@v3
+      if: ${{ github.event_name == 'pull_request' }}
       with:
         version: ${{ inputs.go_lint_version }}
         github-token: ${{ github.token }}
         only-new-issues: true
+        skip-pkg-cache: true
+        skip-build-cache: true
+    - uses: golangci/golangci-lint-action@v3
+      if: ${{ github.event_name != 'pull_request' }}
+      with:
+        version: ${{ inputs.go_lint_version }}
+        github-token: ${{ github.token }}
+        only-new-issues: false
         skip-pkg-cache: true
         skip-build-cache: true
