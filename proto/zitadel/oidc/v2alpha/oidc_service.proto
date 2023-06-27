@@ -4,7 +4,7 @@ package zitadel.oidc.v2alpha;
 
 import "zitadel/object/v2alpha/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
-import "zitadel/oidc/v2alpha/auth_request.proto";
+import "zitadel/oidc/v2alpha/authorization.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/struct.proto";
@@ -17,7 +17,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "OIDC Service";
     version: "2.0-alpha";
-    description: "Create OIDC auth requests and retrieve callback URLs. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+    description: "Get OIDC auth requests details and retrieve callback URLs. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -80,14 +80,13 @@ service OIDCService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "authrequest.read" // TODO: define.
+        permission: "authrequest.read"
       }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Create a new OIDC Auth Request";
-      
-      description: "Create a new OIDC Auth Request. An Auth request ID will be returned, which is required to connect the Auth request to a Session."
+      summary: "Get OIDC Auth Request details";
+      description: "Get OIDC Auth Request details by ID, obtained from the redirect URL. Returns details that are parsed from the application's Auth Request."
       responses: {
         key: "200"
         value: {
@@ -110,8 +109,8 @@ service OIDCService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "";
-      description: ""
+      summary: "Finalize an Auth Request and get the callback URL.";
+      description: "Finalize an Auth Request and get the callback URL for success or failure. The user must be redirected to the URL in order to inform the application about the success or failure. On success, the URL contains details for the application to obtain the tokens. This method can only be called once for an Auth request."
       responses: {
         key: "200"
         value: {
@@ -123,7 +122,15 @@ service OIDCService {
 }
 
 message GetAuthRequestRequest {
-  string auth_request_id = 1;
+  string auth_request_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      description: "ID of the Auth Request, as obtained from the redirect URL.";
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
 }
 
 message GetAuthRequestResponse {
@@ -131,10 +138,30 @@ message GetAuthRequestResponse {
 }
 
 message CreateCallbackRequest {
-  string auth_request_id = 1;
+  string auth_request_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      description: "ID of the Auth Request, as obtained from the redirect URL.";
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+
+  optional AuthorizationError error = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Set this field when the authorization flow failed. It creates a callback URL to the application, with the error details set.";
+      ref: "https://openid.net/specs/openid-connect-core-1_0.html#AuthError";
+    }
+  ];
 }
 
 message CreateCallbackResponse {
   zitadel.object.v2alpha.Details details = 1;
-  string callback_url = 2;
+  string callback_url = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Callback URL where the user should be redirected, using a \"302 FOUND\" status. Contains details for the application to obtain the tokens on success, or error details on failure. Note that this field must be treated as credentials, as the contained code can be used to obtain tokens on behalve of the user.";
+      example: "\"https://client.example.org/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj\""
+    }
+  ];
 }
