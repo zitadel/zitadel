@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/oidc/v2/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
@@ -28,7 +29,11 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(err, "OIDC-Gqrfg", "Errors.Internal")
 	}
-	authRequest := CreateAuthRequestToBusiness(ctx, req, userAgentID, userID)
+	headers, _ := http_utils.HeadersFromCtx(ctx)
+	authRequest := CreateAuthRequestToBusiness(ctx, req, userAgentID, userID, headers.Get("x-zitadel-client"))
+	if authRequest.LoginClient != "" {
+		err = o.command.AddAuthRequest(ctx, authRequest)
+	}
 	resp, err := o.repo.CreateAuthRequest(ctx, authRequest)
 	if err != nil {
 		return nil, err
