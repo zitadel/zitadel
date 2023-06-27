@@ -466,6 +466,20 @@ module.exports = {
         },
         {
           type: "category",
+          label: "OIDC lifecycle (Alpha)",
+          link: {
+            type: "generated-index",
+            title: "OIDC service API (Alpha)",
+            slug: "/apis/resources/oidc_service",
+            description:
+              "Get OIDC Auth Request details and create callback URLs.\n"+
+              "\n"+
+              "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+          },
+          items: require("./docs/apis/resources/oidc_service/sidebar.js"),
+        },
+        {
+          type: "category",
           label: "Settings lifecycle (alpha)",
           link: {
             type: "generated-index",

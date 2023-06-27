@@ -17,7 +17,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "OIDC Service";
     version: "2.0-alpha";
-    description: "Get OIDC auth requests details and retrieve callback URLs. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+    description: "Get OIDC Auth Request details and create callback URLs. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
