@@ -167,7 +167,14 @@
     "MORE": "さらに",
     "STEP": "ステップ",
     "SETUP": "セットアップ",
-    "COMINGSOON": "近日公開",
+    "UNSAVEDCHANGES": "未保存の変更",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "この新しいアクションを破棄してもよろしいですか?あなたのアクションは失われます",
+        "CANCEL": "キャンセル",
+        "DISCARD": "破棄"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "ユーザー {{value}} を表示する"
     }
@@ -205,6 +212,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "注意！ 組織のコンテキストが変更されました。"
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "ビューがインスタンスに変更されました。"
     }
   },
   "FILTER": {
@@ -1030,7 +1040,8 @@
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български"
     },
     "SMTP": {
       "TITLE": "SMTP設定",
@@ -1224,7 +1235,8 @@
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -2088,7 +2100,8 @@
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
 	action_repo "github.com/zitadel/zitadel/internal/repository/action"
+	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
 	key_repo "github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -41,7 +42,14 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	key_repo.RegisterEventMappers(es)
 	action_repo.RegisterEventMappers(es)
 	session.RegisterEventMappers(es)
+	idpintent.RegisterEventMappers(es)
 	return es
+}
+
+func expectEventstore(expects ...expect) func(*testing.T) *eventstore.Eventstore {
+	return func(t *testing.T) *eventstore.Eventstore {
+		return eventstoreExpect(t, expects...)
+	}
 }
 
 func eventPusherToEvents(eventsPushes ...eventstore.Command) []*repository.Event {
@@ -120,6 +128,18 @@ func expectPush(events []*repository.Event, uniqueConstraints ...*repository.Uni
 func expectPushFailed(err error, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) expect {
 	return func(m *mock.MockRepository) {
 		m.ExpectPushFailed(err, events, uniqueConstraints...)
+	}
+}
+
+func expectRandomPush(events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) expect {
+	return func(m *mock.MockRepository) {
+		m.ExpectRandomPush(events, uniqueConstraints...)
+	}
+}
+
+func expectRandomPushFailed(err error, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) expect {
+	return func(m *mock.MockRepository) {
+		m.ExpectRandomPushFailed(err, events, uniqueConstraints...)
 	}
 }
 

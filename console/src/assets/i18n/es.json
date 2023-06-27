@@ -167,7 +167,14 @@
     "MORE": "más",
     "STEP": "Paso",
     "SETUP": "Configurar",
-    "COMINGSOON": "Próximamente",
+    "UNSAVEDCHANGES": "Cambios no guardados",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "¿Estás seguro de que quieres descartar esta nueva acción? Tu acción se perderá",
+        "CANCEL": "Cancelar",
+        "DISCARD": "Descartar"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Mostrar usuario {{value}}"
     }
@@ -205,6 +212,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "¡Atención! El contexto de la organización ha cambiado."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "¡La vista acaba de cambiar a instancia!"
     }
   },
   "FILTER": {
@@ -1030,7 +1040,8 @@
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български"
     },
     "SMTP": {
       "TITLE": "Ajustes SMTP",
@@ -1229,7 +1240,8 @@
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificación de email realizada",
@@ -2093,7 +2105,8 @@
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български"
   },
   "MEMBER": {
     "ADD": "Añadir un Mánager",

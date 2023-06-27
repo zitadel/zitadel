@@ -166,7 +166,14 @@
     "NEXT": "Weiter",
     "MORE": "mehr",
     "STEP": "Schritt",
-    "COMINGSOON": "Coming soon",
+    "UNSAVEDCHANGES": "Nicht gespeicherte Änderungen",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Möchten Sie diese neue Aktion wirklich verwerfen? Ihre Aktion geht verloren",
+        "CANCEL": "Abbrechen",
+        "DISCARD": "Verwerfen"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Zeige Benutzer {{value}}"
     }
@@ -204,6 +211,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "Achtung! Soeben wurde die Organisation gewechselt."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "Soeben wurde die Ansicht auf Instanz gewechselt."
     }
   },
   "FILTER": {
@@ -1029,7 +1039,8 @@
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български"
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -1228,7 +1239,8 @@
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -2096,7 +2108,8 @@
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

@@ -29,6 +29,7 @@ import (
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/webauthn"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -68,8 +69,9 @@ type Tester struct {
 	Organisation *query.Org
 	Users        map[UserType]User
 
-	GRPCClientConn *grpc.ClientConn
-	wg             sync.WaitGroup // used for shutdown
+	Client   Client
+	WebAuthN *webauthn.Client
+	wg       sync.WaitGroup // used for shutdown
 }
 
 const commandLine = `start --masterkeyFromEnv`
@@ -90,7 +92,7 @@ func (s *Tester) createClientConn(ctx context.Context) {
 	logging.OnError(err).Fatal("integration tester client dial")
 	logging.New().WithField("target", target).Info("finished dialing grpc client conn")
 
-	s.GRPCClientConn = cc
+	s.Client = newClient(cc)
 	err = s.pollHealth(ctx)
 	logging.OnError(err).Fatal("integration tester health")
 }
@@ -99,14 +101,12 @@ func (s *Tester) createClientConn(ctx context.Context) {
 // TODO: remove when we make the setup blocking on all
 // projections completed.
 func (s *Tester) pollHealth(ctx context.Context) (err error) {
-	client := admin.NewAdminServiceClient(s.GRPCClientConn)
-
 	for {
 		err = func(ctx context.Context) error {
 			ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 			defer cancel()
 
-			_, err := client.Healthz(ctx, &admin.HealthzRequest{})
+			_, err := s.Client.Admin.Healthz(ctx, &admin.HealthzRequest{})
 			return err
 		}(ctx)
 		if err == nil {
@@ -182,7 +182,7 @@ func (s *Tester) WithSystemAuthorization(ctx context.Context, u UserType) contex
 
 // Done send an interrupt signal to cleanly shutdown the server.
 func (s *Tester) Done() {
-	err := s.GRPCClientConn.Close()
+	err := s.Client.CC.Close()
 	logging.OnError(err).Error("integration tester client close")
 
 	s.Shutdown <- os.Interrupt
@@ -238,6 +238,7 @@ func NewTester(ctx context.Context) *Tester {
 	}
 	tester.createClientConn(ctx)
 	tester.createSystemUser(ctx)
+	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, "https://"+tester.Host())
 
 	return tester
 }

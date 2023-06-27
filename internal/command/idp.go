@@ -6,6 +6,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 )
 
@@ -138,4 +139,38 @@ func ExistsIDP(ctx context.Context, filter preparation.FilterToQueryReducer, id,
 		return false, err
 	}
 	return instanceWriteModel.State.Exists(), nil
+}
+
+func IDPProviderWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, id string) (_ *AllIDPWriteModel, err error) {
+	writeModel := NewIDPTypeWriteModel(id)
+	events, err := filter(ctx, writeModel.Query())
+	if err != nil {
+		return nil, err
+	}
+	if len(events) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-as02jin", "Errors.IDPConfig.NotExisting")
+	}
+	writeModel.AppendEvents(events...)
+	if err := writeModel.Reduce(); err != nil {
+		return nil, err
+	}
+	allWriteModel, err := NewAllIDPWriteModel(
+		writeModel.ResourceOwner,
+		writeModel.ResourceOwner == writeModel.InstanceID,
+		writeModel.ID,
+		writeModel.Type,
+	)
+	if err != nil {
+		return nil, err
+	}
+	events, err = filter(ctx, allWriteModel.Query())
+	if err != nil {
+		return nil, err
+	}
+	allWriteModel.AppendEvents(events...)
+	if err := allWriteModel.Reduce(); err != nil {
+		return nil, err
+	}
+
+	return allWriteModel, err
 }
