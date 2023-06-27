@@ -8,8 +8,8 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha;session";
 
 enum ChallengeKind {
-  CHALLENGE_KIND_UNSPECIFIED = 0;
-  CHALLENGE_KIND_PASSKEY = 1;
+    CHALLENGE_KIND_UNSPECIFIED = 0;
+    CHALLENGE_KIND_PASSKEY = 1;
 }
 
 message Challenges {

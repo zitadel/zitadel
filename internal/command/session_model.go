@@ -153,7 +153,7 @@ func (wm *SessionWriteModel) reduceTerminate() {
 
 func (wm *SessionWriteModel) Start(ctx context.Context, domain string) {
 	wm.commands = append(wm.commands, session.NewAddedEvent(ctx, wm.aggregate, domain))
-	// set the domain so checks can
+	// set the domain so checks can use it
 	wm.Domain = domain
 }
 

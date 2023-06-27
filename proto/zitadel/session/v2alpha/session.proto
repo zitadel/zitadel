@@ -40,9 +40,9 @@ message Session {
     }
   ];
   string domain = 7 [
-  (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-  description: "\"domain on which the session was created\"";
-      }
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"domain on which the session was created\"";
+    }
   ];
 }
 
