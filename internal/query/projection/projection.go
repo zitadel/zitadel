@@ -83,6 +83,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 		RequeueEvery:          config.RequeueEvery,
 		HandleActiveInstances: config.HandleActiveInstances,
 		MaxFailureCount:       config.MaxFailureCount,
+		RetryFailedAfter:      config.RetryFailedAfter,
 	}
 
 	OrgProjection = newOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
@@ -155,18 +156,18 @@ func ApplyCustomConfig(customConfig CustomConfig) handler.Config {
 }
 
 func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler.Config {
-	// if customConfig.BulkLimit != nil {
-	// 	config.BulkLimit = *customConfig.BulkLimit
-	// }
-	// if customConfig.MaxFailureCount != nil {
-	// 	config.MaxFailureCount = *customConfig.MaxFailureCount
-	// }
+	if customConfig.BulkLimit != nil {
+		config.BulkLimit = *customConfig.BulkLimit
+	}
+	if customConfig.MaxFailureCount != nil {
+		config.MaxFailureCount = *customConfig.MaxFailureCount
+	}
 	if customConfig.RequeueEvery != nil {
 		config.RequeueEvery = *customConfig.RequeueEvery
 	}
-	// if customConfig.RetryFailedAfter != nil {
-	// 	config.RetryFailedAfter = *customConfig.RetryFailedAfter
-	// }
+	if customConfig.RetryFailedAfter != nil {
+		config.RetryFailedAfter = *customConfig.RetryFailedAfter
+	}
 	if customConfig.HandleActiveInstances != nil {
 		config.HandleActiveInstances = *customConfig.HandleActiveInstances
 	}

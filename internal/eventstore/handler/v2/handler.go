@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"sync"
 	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
@@ -28,6 +29,7 @@ type Config struct {
 
 	BulkLimit             uint16
 	RequeueEvery          time.Duration
+	RetryFailedAfter      time.Duration
 	HandleActiveInstances time.Duration
 	MaxFailureCount       uint8
 }
@@ -41,11 +43,13 @@ type Handler struct {
 	eventTypes map[eventstore.AggregateType][]eventstore.EventType
 
 	maxFailureCount       uint8
+	retryFailedAfter      time.Duration
 	requeueEvery          time.Duration
 	handleActiveInstances time.Duration
 	now                   nowFunc
 
-	// isTriggered sync.Mutex
+	triggeredInstancesMu sync.Mutex
+	triggeredInstances   map[string]*sync.Mutex
 }
 
 // nowFunc makes [time.Now] mockable
@@ -80,6 +84,9 @@ func NewHandler(
 		handleActiveInstances: config.HandleActiveInstances,
 		now:                   time.Now,
 		maxFailureCount:       config.MaxFailureCount,
+		triggeredInstancesMu:  sync.Mutex{},
+		triggeredInstances:    make(map[string]*sync.Mutex),
+		retryFailedAfter:      config.RetryFailedAfter,
 	}
 
 	return handler
@@ -114,6 +121,16 @@ func (h *Handler) schedule(ctx context.Context) {
 				err = h.Trigger(instanceCtx)
 				instanceFailed = instanceFailed || err != nil
 				h.log().WithField("instance", instance).OnError(err).Info("scheduled trigger failed")
+
+				for ; err != nil; err = h.Trigger(instanceCtx) {
+					instanceFailed = instanceFailed || err != nil
+					h.log().WithField("instance", instance).OnError(err).Info("scheduled trigger failed")
+					if err == nil {
+						break
+					}
+					time.Sleep(h.retryFailedAfter)
+				}
+
 			}
 
 			if !didInitialize && !instanceFailed {
@@ -195,10 +212,11 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	// if !h.isTriggered.TryLock() {
-	// 	return nil
-	// }
-	// defer h.isTriggered.Unlock()
+	cancel := h.lockInstance(ctx)
+	if cancel == nil {
+		return nil
+	}
+	defer cancel()
 
 	for i := 0; ; i++ {
 		additionalIteration, err := h.processEvents(ctx)
@@ -206,6 +224,23 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 		if !additionalIteration || err != nil {
 			return err
 		}
+	}
+}
+
+func (h *Handler) lockInstance(ctx context.Context) func() {
+	h.triggeredInstancesMu.Lock()
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceMu, ok := h.triggeredInstances[instanceID]
+	if !ok {
+		instanceMu = new(sync.Mutex)
+		h.triggeredInstances[instanceID] = instanceMu
+	}
+	h.triggeredInstancesMu.Unlock()
+	if !instanceMu.TryLock() {
+		return nil
+	}
+	return func() {
+		instanceMu.Unlock()
 	}
 }
 
@@ -222,7 +257,7 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 		}
 	}()
 
-	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	err = crdb.ExecuteTx(ctx, h.client.DB, nil, func(tx *sql.Tx) error {

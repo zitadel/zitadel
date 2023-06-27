@@ -17,8 +17,8 @@ type Config struct {
 type CustomConfig struct {
 	RequeueEvery          *time.Duration
 	RetryFailedAfter      *time.Duration
-	MaxFailureCount       *uint
+	MaxFailureCount       *uint8
 	ConcurrentInstances   *uint
-	BulkLimit             *uint64
+	BulkLimit             *uint16
 	HandleActiveInstances *time.Duration
 }
