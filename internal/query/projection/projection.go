@@ -66,6 +66,7 @@ var (
 	NotificationsQuotaProjection        interface{}
 	DeviceAuthProjection                *deviceAuthProjection
 	SessionProjection                   *sessionProjection
+	AuthRequestProjection               *authRequestProjection
 )
 
 type projection interface {
@@ -143,6 +144,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es *eventstore.Eventsto
 	NotificationPolicyProjection = newNotificationPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["notification_policies"]))
 	DeviceAuthProjection = newDeviceAuthProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["device_auth"]))
 	SessionProjection = newSessionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["sessions"]))
+	AuthRequestProjection = newAuthRequestProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["auth_requests"]))
 	newProjectionsList()
 	return nil
 }
@@ -240,5 +242,6 @@ func newProjectionsList() {
 		NotificationPolicyProjection,
 		DeviceAuthProjection,
 		SessionProjection,
+		AuthRequestProjection,
 	}
 }
