@@ -40,7 +40,7 @@ message AuthRequest{
     }
   ];
   
-  string callback_uri = 5 [
+  string redirect_uri = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Base URI that points back to the application";
     }
