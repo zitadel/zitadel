@@ -7,7 +7,6 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/oidc/v2alpha/authorization.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
-import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
@@ -148,7 +147,26 @@ message CreateCallbackRequest {
     }
   ];
 
-  optional AuthorizationError error = 2 [
+  string session_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      description: "ID of the session, used to login the user. Connects the session to the Auth Request.";
+      example: "\"163840776835432705\"";
+    }
+  ];
+
+  string session_token = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      description: "Token to verify the session is valid";
+    }
+  ];
+
+  optional AuthorizationError error = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Set this field when the authorization flow failed. It creates a callback URL to the application, with the error details set.";
       ref: "https://openid.net/specs/openid-connect-core-1_0.html#AuthError";
