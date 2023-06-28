@@ -110,7 +110,7 @@ func AuthRequestFromBusiness(authReq *domain.AuthRequest) (_ op.AuthRequest, err
 	return &AuthRequest{authReq}, nil
 }
 
-func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest, userAgentID, userID string) *domain.AuthRequest {
+func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest, userAgentID, userID, loginClient string) *domain.AuthRequest {
 	return &domain.AuthRequest{
 		CreationDate:        time.Now(),
 		AgentID:             userAgentID,
@@ -132,6 +132,7 @@ func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest,
 			Nonce:         authReq.Nonce,
 			CodeChallenge: CodeChallengeToBusiness(authReq.CodeChallenge, authReq.CodeChallengeMethod),
 		},
+		LoginClient: loginClient,
 	}
 }
 

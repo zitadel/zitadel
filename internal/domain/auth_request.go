@@ -55,6 +55,7 @@ type AuthRequest struct {
 	LockoutPolicy            *LockoutPolicy
 	DefaultTranslations      []*CustomText
 	OrgTranslations          []*CustomText
+	LoginClient              string
 }
 
 type ExternalUser struct {
@@ -114,6 +115,16 @@ const (
 	MFALevelSecondFactor
 	MFALevelMultiFactor
 	MFALevelMultiFactorCertified
+)
+
+type AuthRequestState int
+
+const (
+	AuthRequestStateUnspecified AuthRequestState = iota
+	AuthRequestStateAdded
+	AuthRequestStateCodeAdded
+	AuthRequestStateFailed
+	AuthRequestStateSucceeded
 )
 
 func NewAuthRequestFromType(requestType AuthRequestType) (*AuthRequest, error) {

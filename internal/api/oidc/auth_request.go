@@ -10,11 +10,17 @@ import (
 	"github.com/zitadel/oidc/v2/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/user/model"
+)
+
+const (
+	loginClientHeader = "x-zitadel-login-client"
 )
 
 func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
@@ -28,12 +34,45 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(err, "OIDC-Gqrfg", "Errors.Internal")
 	}
-	authRequest := CreateAuthRequestToBusiness(ctx, req, userAgentID, userID)
+	headers, _ := http_utils.HeadersFromCtx(ctx)
+	authRequest := CreateAuthRequestToBusiness(ctx, req, userAgentID, userID, headers.Get(loginClientHeader))
+	if err = o.setAudience(ctx, authRequest); err != nil {
+		return nil, err
+	}
+	if authRequest.LoginClient != "" {
+		err = o.command.AddAuthRequest(ctx, authRequest)
+		if err != nil {
+			return nil, err
+		}
+		return AuthRequestFromBusiness(authRequest)
+	}
 	resp, err := o.repo.CreateAuthRequest(ctx, authRequest)
 	if err != nil {
 		return nil, err
 	}
 	return AuthRequestFromBusiness(resp)
+}
+
+func (o *OPStorage) setAudience(ctx context.Context, req *domain.AuthRequest) error {
+	project, err := o.query.ProjectByClientID(ctx, req.ApplicationID, false)
+	if err != nil {
+		return err
+	}
+	projectIDQuery, err := query.NewAppProjectIDSearchQuery(project.ID)
+	if err != nil {
+		return err
+	}
+	appIDs, err := o.query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
+	if err != nil {
+		return err
+	}
+	req.Audience = appIDs
+	req.AppendAudIfNotExisting(project.ID)
+
+	// the following fields are only set for the internal login UI
+	req.ApplicationResourceOwner = project.ResourceOwner
+	req.PrivateLabelingSetting = project.PrivateLabelingSetting
+	return nil
 }
 
 func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRequest, err error) {

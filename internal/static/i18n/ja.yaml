@@ -477,6 +477,8 @@ Errors:
     TokenCreationFailed: トークンの作成に失敗しました
     InvalidToken: インテントのトークンが無効である
     OtherUser: 他のユーザーを意図している
+  AuthRequest:
+    AlreadyExists: AuthRequestはすでに存在する
 
 AggregateTypes:
   action: アクション

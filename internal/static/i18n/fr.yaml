@@ -488,6 +488,8 @@ Errors:
     TokenCreationFailed: La création du token a échoué
     InvalidToken: Le jeton d'intention n'est pas valide
     OtherUser: Intention destinée à un autre utilisateur
+  AuthRequest:
+    AlreadyExists: Auth Request existe déjà
 
 AggregateTypes:
   action: Action

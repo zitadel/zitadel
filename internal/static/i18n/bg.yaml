@@ -506,6 +506,8 @@ Errors:
     TokenCreationFailed: Неуспешно създаване на токен
     InvalidToken: Знакът за намерение е невалиден
     OtherUser: Намерение, предназначено за друг потребител
+  AuthRequest:
+    AlreadyExists: Auth Request вече съществува
 
 AggregateTypes:
   action: Действие

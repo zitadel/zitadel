@@ -488,6 +488,8 @@ Errors:
     TokenCreationFailed: Tokenerstellung schlug fehl
     InvalidToken: Intent Token ist ungültig
     OtherUser: Intent ist für anderen Benutzer gedacht
+  AuthRequest:
+    AlreadyExists: Auth Request existiert bereits
 
 AggregateTypes:
   action: Action

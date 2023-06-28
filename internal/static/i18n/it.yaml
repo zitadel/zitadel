@@ -488,6 +488,8 @@ Errors:
     TokenCreationFailed: creazione del token fallita
     InvalidToken: Il token dell'intento non è valido
     OtherUser: Intento destinato a un altro utente
+  AuthRequest:
+    AlreadyExists: Auth Request esiste già
 
 AggregateTypes:
   action: Azione
