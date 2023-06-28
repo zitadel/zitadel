@@ -7,7 +7,6 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/oidc/v2alpha/authorization.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
-import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
