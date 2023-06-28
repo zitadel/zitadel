@@ -34,7 +34,7 @@ message AuthRequest{
     }
   ];
 
-  repeated string scopes = 4 [
+  repeated string scope = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Requested scopes by the application, which the user must consent to.";
     }
