@@ -11,19 +11,19 @@ import (
 type AuthRequestWriteModel struct {
 	eventstore.WriteModel
 
-	ClientID           string
-	RedirectURI        string
-	State              string
-	Nonce              string
-	Scope              []string
-	ResponseType       domain.OIDCResponseType
-	CodeChallenge      *domain.OIDCCodeChallenge
-	Prompts            []domain.Prompt
-	UILocales          []string
-	MaxAge             *time.Duration
-	LoginHint          string
-	IDTokenHintSubject string
-	//State              domain.AuthRequestState
+	ClientID         string
+	RedirectURI      string
+	State            string
+	Nonce            string
+	Scope            []string
+	ResponseType     domain.OIDCResponseType
+	CodeChallenge    *domain.OIDCCodeChallenge
+	Prompts          []domain.Prompt
+	UILocales        []string
+	MaxAge           *time.Duration
+	LoginHint        string
+	HintUserID       string
+	AuthRequestState domain.AuthRequestState
 }
 
 func NewAuthRequestWriteModel(id string) *AuthRequestWriteModel {
@@ -49,7 +49,11 @@ func (m *AuthRequestWriteModel) Reduce() error {
 			m.UILocales = e.UILocales
 			m.MaxAge = e.MaxAge
 			m.LoginHint = e.LoginHint
-			m.IDTokenHintSubject = e.IDTokenHintSubject
+			m.HintUserID = e.HintUserID
+			m.AuthRequestState = domain.AuthRequestStateAdded
+		case *authrequest.CodeAddedEvent:
+			// TODO: left fold fields ASAP
+			m.AuthRequestState = domain.AuthRequestStateCodeAdded
 		}
 	}
 

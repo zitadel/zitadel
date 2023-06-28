@@ -488,6 +488,8 @@ Errors:
     TokenCreationFailed: 令牌创建失败
     InvalidToken: 意图令牌是无效的
     OtherUser: 意图是为另一个用户准备的
+  AuthRequest:
+    AlreadyExists: AuthRequest已经存在
 
 AggregateTypes:
   action: 动作

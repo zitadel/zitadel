@@ -117,6 +117,16 @@ const (
 	MFALevelMultiFactorCertified
 )
 
+type AuthRequestState int
+
+const (
+	AuthRequestStateUnspecified AuthRequestState = iota
+	AuthRequestStateAdded
+	AuthRequestStateCodeAdded
+	AuthRequestStateFailed
+	AuthRequestStateSucceeded
+)
+
 func NewAuthRequestFromType(requestType AuthRequestType) (*AuthRequest, error) {
 	switch requestType {
 	case AuthRequestTypeOIDC:
