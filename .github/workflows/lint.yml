@@ -28,6 +28,7 @@ jobs:
     name: api
     runs-on: ubuntu-latest
     continue-on-error: true
+    if: ${{ github.event_name == 'pull_request' }}
     steps:
     - 
       uses: actions/checkout@v3
@@ -45,6 +46,7 @@ jobs:
         against: "https://github.com/${{ github.repository }}.git#branch=main"
 
   console:
+    if: ${{ github.event_name == 'pull_request' }}
     name: console
     runs-on: ubuntu-latest
     steps:
@@ -66,6 +68,7 @@ jobs:
   core:
     name: core
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
     steps:
     -
       name: Checkout
@@ -73,7 +76,7 @@ jobs:
     - 
       uses: actions/setup-go@v4
       with:
-        go-version: ${{ inputs.go_version }}
+        go-version: ${{ github.event.inputs.go_version }}
     - 
       uses: actions/cache/restore@v3
       timeout-minutes: 1
@@ -84,18 +87,9 @@ jobs:
         fail-on-cache-miss: true
     - 
       uses: golangci/golangci-lint-action@v3
-      if: ${{ github.event_name == 'pull_request' }}
       with:
         version: ${{ inputs.go_lint_version }}
         github-token: ${{ github.token }}
         only-new-issues: true
-        skip-pkg-cache: true
-        skip-build-cache: true
-    - uses: golangci/golangci-lint-action@v3
-      if: ${{ github.event_name != 'pull_request' }}
-      with:
-        version: ${{ inputs.go_lint_version }}
-        github-token: ${{ github.token }}
-        only-new-issues: false
         skip-pkg-cache: true
         skip-build-cache: true

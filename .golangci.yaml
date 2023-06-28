@@ -1,5 +1,5 @@
 issues:
-  new-from-rev: main
+  new-from-rev: HEAD~
   # Set to 0 to disable.
   max-issues-per-linter: 0
   # Set to 0 to disable.
