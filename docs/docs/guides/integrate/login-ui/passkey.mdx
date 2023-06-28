@@ -20,6 +20,9 @@ There are two different possibilities when you like to enable passkey for your u
 When you want to send a link to your user, that enables him to register a new passkey device, you can let ZITADEL send the code or return it in the response so you can send a message by yourself.
 
 Make sure to also include the URL Template to customize the reset link in the email sent to the user, in case of ZITADEL sending the email.a
+
+[Send Registration Link Documentation](/apis/resources/user_service/user-service-add-human-user)
+
 ### Request
 ```bash
 curl --request POST \
@@ -200,11 +203,59 @@ Next step is to authenticate the user with the new registered passkey.
 ## Create Session
 
 First step is to ask the user for his username and create a new session with the ZITADEL API.
-When creating the new session make sure to include the challenge for passkey, ZITADEL will then return
+When creating the new session make sure to include the challenge for passkey.
+The response will include the public key credential request options for the passkey in the challenges.
 
+### Request
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/sessions \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Content-Type: application/json' \
+  --data '{
+  "checks": {
+    "user": {
+      "loginName": "minni-mouse@mouse.com@fabi.zitadel.app"
+    }
+  },
+  "metadata": {},
+  "challenges": [
+    "CHALLENGE_KIND_PASSKEY"
+  ]
+}'
+```
 
-## Verify Passkey
-
+### Response
+```bash
+{
+  "details": {
+    "sequence": "2",
+    "changeDate": "2023-06-27",
+    "resourceOwner": "69629023906488334"
+  },
+  "sessionId": "d654e6ba-70a3-48ef-a95d-37c8d8a7901a",
+  "sessionToken": "string",
+  "challenges": {
+    "passkey": {
+      "publicKeyCredentialRequestOptions": {
+        "publicKey": {
+          "allowCredentials": [
+            {
+              "id": "ATmqBg-99qyOZk2zloPdJQyS2R7IkFT7v9Hoos_B_nM",
+              "type": "public-key"
+            }
+          ],
+          "challenge": "GAOHYz2jE69kJMYo6Laij8yWw9-dKKgbViNhfuy0StA",
+          "rpId": "localhost",
+          "timeout": 300000,
+          "userVerification": "required"
+        }
+      }
+    }
+  }
+}
+```
 
 ### Signing in Browser
 
