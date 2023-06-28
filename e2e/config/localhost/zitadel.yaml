@@ -49,7 +49,7 @@ Projections:
     NotificationsQuotas:
 #      RequeueEvery: 1s
     Telemetry:
-      RequeueEvery: 10s
+#      RequeueEvery: 1s
 
 DefaultInstance:
   LoginPolicy:

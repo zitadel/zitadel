@@ -52,7 +52,7 @@ type StatementHandler struct {
 
 	bulkLimit uint64
 
-	subscribe bool
+	reduceScheduledPseudoEvent bool
 }
 
 func NewStatementHandler(
@@ -61,37 +61,40 @@ func NewStatementHandler(
 ) StatementHandler {
 	aggregateTypes := make([]eventstore.AggregateType, 0, len(config.Reducers))
 	reduces := make(map[eventstore.EventType]handler.Reduce, len(config.Reducers))
-	subscribe := true
+	reduceScheduledPseudoEvent := false
 	for _, aggReducer := range config.Reducers {
 		aggregateTypes = append(aggregateTypes, aggReducer.Aggregate)
 		if aggReducer.Aggregate == pseudo.AggregateType {
-			subscribe = false
+			reduceScheduledPseudoEvent = true
+			if len(config.Reducers) != 1 ||
+				len(aggReducer.EventRedusers) != 1 ||
+				aggReducer.EventRedusers[0].Event != pseudo.ScheduledEventType {
+				panic("if a pseudo.AggregateType is reduced, exactly one event reducer for pseudo.ScheduledEventType is supported and no other aggregate can be reduced")
+			}
 		}
 		for _, eventReducer := range aggReducer.EventRedusers {
-			if eventReducer.Event == pseudo.TimestampEventType {
-				subscribe = false
-			}
 			reduces[eventReducer.Event] = eventReducer.Reduce
 		}
 	}
 
 	h := StatementHandler{
-		client:                  config.Client,
-		sequenceTable:           config.SequenceTable,
-		maxFailureCount:         config.MaxFailureCount,
-		currentSequenceStmt:     fmt.Sprintf(currentSequenceStmtFormat, config.SequenceTable),
-		updateSequencesBaseStmt: fmt.Sprintf(updateCurrentSequencesStmtFormat, config.SequenceTable),
-		failureCountStmt:        fmt.Sprintf(failureCountStmtFormat, config.FailedEventsTable),
-		setFailureCountStmt:     fmt.Sprintf(setFailureCountStmtFormat, config.FailedEventsTable),
-		aggregates:              aggregateTypes,
-		reduces:                 reduces,
-		bulkLimit:               config.BulkLimit,
-		Locker:                  NewLocker(config.Client.DB, config.LockTable, config.ProjectionName),
-		initCheck:               config.InitCheck,
-		initialized:             make(chan bool),
+		client:                     config.Client,
+		sequenceTable:              config.SequenceTable,
+		maxFailureCount:            config.MaxFailureCount,
+		currentSequenceStmt:        fmt.Sprintf(currentSequenceStmtFormat, config.SequenceTable),
+		updateSequencesBaseStmt:    fmt.Sprintf(updateCurrentSequencesStmtFormat, config.SequenceTable),
+		failureCountStmt:           fmt.Sprintf(failureCountStmtFormat, config.FailedEventsTable),
+		setFailureCountStmt:        fmt.Sprintf(setFailureCountStmtFormat, config.FailedEventsTable),
+		aggregates:                 aggregateTypes,
+		reduces:                    reduces,
+		bulkLimit:                  config.BulkLimit,
+		Locker:                     NewLocker(config.Client.DB, config.LockTable, config.ProjectionName),
+		initCheck:                  config.InitCheck,
+		initialized:                make(chan bool),
+		reduceScheduledPseudoEvent: reduceScheduledPseudoEvent,
 	}
 
-	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock, h.initialized, subscribe)
+	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock, h.initialized, reduceScheduledPseudoEvent)
 
 	return h
 }
@@ -99,10 +102,9 @@ func NewStatementHandler(
 func (h *StatementHandler) Start() {
 	h.initialized <- true
 	close(h.initialized)
-	if !h.subscribe {
-		return
+	if h.reduceScheduledPseudoEvent {
+		h.Subscribe(h.aggregates...)
 	}
-	h.Subscribe(h.aggregates...)
 }
 
 func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string) (*eventstore.SearchQueryBuilder, uint64, error) {
@@ -111,7 +113,12 @@ func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string
 		return nil, 0, err
 	}
 
-	queryBuilder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).Limit(h.bulkLimit).AllowTimeTravel()
+	bulkLimit := h.bulkLimit
+	if h.reduceScheduledPseudoEvent {
+		bulkLimit = 1
+	}
+
+	queryBuilder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).Limit(bulkLimit).AllowTimeTravel()
 
 	for _, aggregateType := range h.aggregates {
 		for _, instanceID := range instanceIDs {
@@ -124,13 +131,18 @@ func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string
 			}
 			queryBuilder.
 				AddQuery().
-				AggregateTypes(aggregateType).
 				SequenceGreater(seq).
 				InstanceID(instanceID)
+
+			if !h.reduceScheduledPseudoEvent {
+				queryBuilder.
+					AddQuery().
+					AggregateTypes(aggregateType)
+			}
 		}
 	}
 
-	return queryBuilder, h.bulkLimit, nil
+	return queryBuilder, bulkLimit, nil
 }
 
 // Update implements handler.Update

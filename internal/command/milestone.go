@@ -6,11 +6,11 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/milestone"
 )
 
-// MilestonePushed writes a new event with a new milestone.Aggregate to the eventstore
+// MilestonePushed writes a new milestone.PushedEvent with a new milestone.Aggregate to the eventstore
 func (c *Commands) MilestonePushed(
 	ctx context.Context,
 	instanceID string,
-	eventType milestone.PushedEventType,
+	msType milestone.Type,
 	endpoints []string,
 	primaryDomain string,
 ) error {
@@ -18,10 +18,6 @@ func (c *Commands) MilestonePushed(
 	if err != nil {
 		return err
 	}
-	pushedEvent, err := milestone.NewPushedEventByType(ctx, eventType, milestone.NewAggregate(id, instanceID, instanceID), endpoints, primaryDomain)
-	if err != nil {
-		return err
-	}
-	_, err = c.eventstore.Push(ctx, pushedEvent)
+	_, err = c.eventstore.Push(ctx, milestone.NewPushedEvent(ctx, milestone.NewAggregate(id, instanceID, instanceID), msType, endpoints, primaryDomain))
 	return err
 }

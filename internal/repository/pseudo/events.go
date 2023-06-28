@@ -1,6 +1,7 @@
 package pseudo
 
 import (
+	"context"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -8,57 +9,28 @@ import (
 
 const (
 	eventTypePrefix    = eventstore.EventType("pseudo.")
-	TimestampEventType = eventTypePrefix + "timestamp"
+	ScheduledEventType = eventTypePrefix + "timestamp"
 )
 
-var _ eventstore.Event = (*TimestampEvent)(nil)
+var _ eventstore.Event = (*ScheduledEvent)(nil)
 
-type TimestampEvent struct {
-	Timestamp   time.Time
-	InstanceIDs []string
+type ScheduledEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+	Timestamp             time.Time `json:"-"`
+	InstanceIDs           []string  `json:"-"`
 }
 
-func (t TimestampEvent) Aggregate() eventstore.Aggregate {
-	panic("TimestampEvent is not a real event")
-}
-
-func (t TimestampEvent) EditorService() string {
-	panic("TimestampEvent is not a real event")
-}
-
-func (t TimestampEvent) EditorUser() string {
-	panic("TimestampEvent is not a real event")
-}
-
-func (t TimestampEvent) Type() eventstore.EventType {
-	panic("TimestampEvent is not a real event")
-}
-
-func (t TimestampEvent) Sequence() uint64 {
-	panic("TimestampEvent is not a real event")
-}
-
-func (t TimestampEvent) CreationDate() time.Time {
-	panic("TimestampEvent is not a real event")
-}
-
-func (t TimestampEvent) PreviousAggregateSequence() uint64 {
-	panic("TimestampEvent is not a real event")
-}
-
-func (t TimestampEvent) PreviousAggregateTypeSequence() uint64 {
-	panic("TimestampEvent is not a real event")
-}
-
-func (t TimestampEvent) DataAsBytes() []byte {
-	panic("TimestampEvent is not a real event")
-}
-
-func NewTimestampEvent(
+func NewScheduledEvent(
+	ctx context.Context,
 	timestamp time.Time,
 	instanceIDs ...string,
-) *TimestampEvent {
-	return &TimestampEvent{
+) *ScheduledEvent {
+	return &ScheduledEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			&NewAggregate().Aggregate,
+			ScheduledEventType,
+		),
 		Timestamp:   timestamp,
 		InstanceIDs: instanceIDs,
 	}

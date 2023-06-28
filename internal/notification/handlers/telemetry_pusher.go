@@ -72,7 +72,7 @@ func (t *telemetryPusher) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{{
 		Aggregate: pseudo.AggregateType,
 		EventRedusers: []handler.EventReducer{{
-			Event:  pseudo.TimestampEventType,
+			Event:  pseudo.ScheduledEventType,
 			Reduce: t.pushMilestones,
 		}},
 	}}
@@ -80,7 +80,7 @@ func (t *telemetryPusher) reducers() []handler.AggregateReducer {
 
 func (t *telemetryPusher) pushMilestones(event eventstore.Event) (*handler.Statement, error) {
 	ctx := call.WithTimestamp(context.Background())
-	timestampEvent, ok := event.(pseudo.TimestampEvent)
+	scheduledEvent, ok := event.(*pseudo.ScheduledEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-lDTs5", "reduce.wrong.event.type %s", event.Type())
 	}
@@ -97,9 +97,9 @@ func (t *telemetryPusher) pushMilestones(event eventstore.Event) (*handler.State
 	if err != nil {
 		return nil, err
 	}
-	unpushedMilestones, err := t.queries.Queries.SearchMilestones(ctx, timestampEvent.InstanceIDs, &query.MilestonesSearchQueries{
+	unpushedMilestones, err := t.queries.Queries.SearchMilestones(ctx, scheduledEvent.InstanceIDs, &query.MilestonesSearchQueries{
 		SearchRequest: query.SearchRequest{
-			Offset:        100,
+			Limit:         100,
 			SortingColumn: query.MilestoneReachedDateColID,
 			Asc:           true,
 		},
@@ -110,7 +110,7 @@ func (t *telemetryPusher) pushMilestones(event eventstore.Event) (*handler.State
 	}
 	var errs int
 	for _, ms := range unpushedMilestones.Milestones {
-		if err = t.pushMilestone(ctx, ms); err != nil {
+		if err = t.pushMilestone(ctx, scheduledEvent, ms); err != nil {
 			errs++
 			logging.Warnf("pushing milestone %+v failed: %s", *ms, err.Error())
 		}
@@ -119,10 +119,10 @@ func (t *telemetryPusher) pushMilestones(event eventstore.Event) (*handler.State
 		return nil, fmt.Errorf("pushing %d of %d milestones failed", errs, unpushedMilestones.Count)
 	}
 
-	return crdb.NewNoOpStatement(timestampEvent), nil
+	return crdb.NewNoOpStatement(scheduledEvent), nil
 }
 
-func (t *telemetryPusher) pushMilestone(ctx context.Context, ms *query.Milestone) error {
+func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.ScheduledEvent, ms *query.Milestone) error {
 	for _, endpoint := range t.endpoints {
 		if err := types.SendJSON(
 			ctx,
@@ -133,12 +133,12 @@ func (t *telemetryPusher) pushMilestone(ctx context.Context, ms *query.Milestone
 			t.queries.GetFileSystemProvider,
 			t.queries.GetLogProvider,
 			ms,
-			nil,
+			event,
 			t.metricSuccessfulDeliveriesJSON,
 			t.metricFailedDeliveriesJSON,
 		).WithoutTemplate(); err != nil {
 			return err
 		}
 	}
-	return t.commands.MilestonePushed(ctx, ms.InstanceID, ms.MilestoneType, t.endpoints, ms.PrimaryDomain)
+	return t.commands.MilestonePushed(ctx, ms.InstanceID, ms.Type, t.endpoints, ms.PrimaryDomain)
 }

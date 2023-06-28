@@ -26,7 +26,7 @@ type Milestones struct {
 
 type Milestone struct {
 	InstanceID    string
-	MilestoneType milestone.PushedEventType
+	Type          milestone.Type
 	ReachedDate   time.Time
 	PushedDate    time.Time
 	PrimaryDomain string
@@ -55,7 +55,7 @@ var (
 		table: milestonesTable,
 	}
 	MilestoneTypeColID = Column{
-		name:  projection.MilestoneColumnMilestoneType,
+		name:  projection.MilestoneColumnType,
 		table: milestonesTable,
 	}
 	MilestonePrimaryDomainColID = Column{
@@ -80,10 +80,14 @@ func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, qu
 	if len(instanceIDs) == 0 {
 		instanceIDs = []string{authz.GetInstance(ctx).InstanceID()}
 	}
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			MilestoneInstanceIDColID.identifier(): fmt.Sprintf("IN (%s)", strings.Join(instanceIDs, ",")),
-		}).ToSql()
+	instanceIDParams := make([]string, len(instanceIDs))
+	instanceIDArgs := make([]interface{}, len(instanceIDs))
+	for idx := range instanceIDs {
+		instanceIDParams[idx] = fmt.Sprintf("$%d", idx+1)
+		instanceIDArgs[idx] = instanceIDs[idx]
+	}
+	expr := fmt.Sprintf("%s IN (%s)", MilestoneInstanceIDColID.name, strings.Join(instanceIDParams, ","))
+	stmt, args, err := queries.toQuery(query).Where(sq.Expr(expr, instanceIDArgs...)).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-A9i5k", "Errors.Query.SQLStatement")
 	}
@@ -102,28 +106,37 @@ func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, qu
 
 func prepareMilestonesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Milestones, error)) {
 	return sq.Select(
+			MilestoneInstanceIDColID.identifier(),
 			MilestonePrimaryDomainColID.identifier(),
 			MilestoneReachedDateColID.identifier(),
 			MilestonePushedDateColID.identifier(),
 			MilestoneTypeColID.identifier(),
 			countColumn.identifier(),
 		).
-			From(notificationPolicyTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(milestonesTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Milestones, error) {
 			milestones := make([]*Milestone, 0)
 			var count uint64
 			for rows.Next() {
 				m := new(Milestone)
+				reachedDate := sql.NullTime{}
+				pushedDate := sql.NullTime{}
+				primaryDomain := sql.NullString{}
 				err := rows.Scan(
-					&m.PrimaryDomain,
-					&m.ReachedDate,
-					&m.MilestoneType,
+					&m.InstanceID,
+					&primaryDomain,
+					&reachedDate,
+					&pushedDate,
+					&m.Type,
 					&count,
 				)
 				if err != nil {
 					return nil, err
 				}
+				m.PrimaryDomain = primaryDomain.String
+				m.ReachedDate = reachedDate.Time
+				m.ReachedDate = pushedDate.Time
 				milestones = append(milestones, m)
 			}
 			if err := rows.Close(); err != nil {

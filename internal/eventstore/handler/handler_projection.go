@@ -51,19 +51,20 @@ type NowFunc func() time.Time
 
 type ProjectionHandler struct {
 	Handler
-	ProjectionName        string
-	reduce                Reduce
-	update                Update
-	searchQuery           SearchQuery
-	triggerProjection     *time.Timer
-	lock                  Lock
-	unlock                Unlock
-	requeueAfter          time.Duration
-	retryFailedAfter      time.Duration
-	retries               int
-	concurrentInstances   int
-	handleActiveInstances time.Duration
-	nowFunc               NowFunc
+	ProjectionName             string
+	reduce                     Reduce
+	update                     Update
+	searchQuery                SearchQuery
+	triggerProjection          *time.Timer
+	lock                       Lock
+	unlock                     Unlock
+	requeueAfter               time.Duration
+	retryFailedAfter           time.Duration
+	retries                    int
+	concurrentInstances        int
+	handleActiveInstances      time.Duration
+	nowFunc                    NowFunc
+	reduceScheduledPseudoEvent bool
 }
 
 func NewProjectionHandler(
@@ -75,32 +76,33 @@ func NewProjectionHandler(
 	lock Lock,
 	unlock Unlock,
 	initialized <-chan bool,
-	subscribe bool,
+	reduceScheduledPseudoEvent bool,
 ) *ProjectionHandler {
 	concurrentInstances := int(config.ConcurrentInstances)
 	if concurrentInstances < 1 {
 		concurrentInstances = 1
 	}
 	h := &ProjectionHandler{
-		Handler:               NewHandler(config.HandlerConfig),
-		ProjectionName:        config.ProjectionName,
-		reduce:                reduce,
-		update:                update,
-		searchQuery:           query,
-		lock:                  lock,
-		unlock:                unlock,
-		requeueAfter:          config.RequeueEvery,
-		triggerProjection:     time.NewTimer(0), // first trigger is instant on startup
-		retryFailedAfter:      config.RetryFailedAfter,
-		retries:               int(config.Retries),
-		concurrentInstances:   concurrentInstances,
-		handleActiveInstances: config.HandleActiveInstances,
-		nowFunc:               time.Now,
+		Handler:                    NewHandler(config.HandlerConfig),
+		ProjectionName:             config.ProjectionName,
+		reduce:                     reduce,
+		update:                     update,
+		searchQuery:                query,
+		lock:                       lock,
+		unlock:                     unlock,
+		requeueAfter:               config.RequeueEvery,
+		triggerProjection:          time.NewTimer(0), // first trigger is instant on startup
+		retryFailedAfter:           config.RetryFailedAfter,
+		retries:                    int(config.Retries),
+		concurrentInstances:        concurrentInstances,
+		handleActiveInstances:      config.HandleActiveInstances,
+		nowFunc:                    time.Now,
+		reduceScheduledPseudoEvent: reduceScheduledPseudoEvent,
 	}
 
 	go func() {
 		<-initialized
-		if subscribe {
+		if h.reduceScheduledPseudoEvent {
 			go h.subscribe(ctx)
 		}
 		go h.schedule(ctx)
@@ -115,9 +117,6 @@ func (h *ProjectionHandler) Trigger(ctx context.Context, instances ...string) er
 	ids := []string{authz.GetInstance(ctx).InstanceID()}
 	if len(instances) > 0 {
 		ids = instances
-	}
-	if h.searchQuery == nil {
-		return h.processTimestamp(ctx, ids...)
 	}
 	return h.processEvents(ctx, ids...)
 }
@@ -139,11 +138,6 @@ func (h *ProjectionHandler) processEvents(ctx context.Context, ids ...string) er
 			return nil
 		}
 	}
-}
-
-func (h *ProjectionHandler) processTimestamp(ctx context.Context, instances ...string) error {
-	_, err := h.Process(ctx, pseudo.NewTimestampEvent(h.nowFunc(), instances...))
-	return err
 }
 
 // Process handles multiple events by reducing them to statements and updating the projection
@@ -181,6 +175,9 @@ func (h *ProjectionHandler) FetchEvents(ctx context.Context, instances ...string
 	events, err := h.Eventstore.Filter(ctx, eventQuery)
 	if err != nil {
 		return nil, false, err
+	}
+	if h.reduceScheduledPseudoEvent {
+		events[0] = pseudo.NewScheduledEvent(ctx, time.Now(), instances...)
 	}
 	return events, int(eventsLimit) == len(events), err
 }
