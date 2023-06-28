@@ -61,5 +61,5 @@ You can create the front-end application (User Agent) and the API in the same pr
 
 - To communicate with the back-end API, the front-end includes the access token in the Authorization header of API requests.
 - The back-end API receives the request and needs to validate and authorize the token before processing the request.
-- The API performs token introspection using ZITADEL's introspection endpoint to validate the access token. This API uses Basic Authentication to invoke the introspection endpoint, which means it sends its client ID and client secret along with the access token received. 
+- The API performs token introspection using ZITADEL's introspection endpoint to validate the access token. This API uses Basic Authentication to invoke the [introspection endpoint](/docs/apis/openidoauth/endpoints#introspection_endpoint), which means it sends its client ID and client secret along with the access token received. 
 - If the token is valid and active, the API proceeds to handle the requested action or fetch data from the underlying data sources.
