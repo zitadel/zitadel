@@ -43,11 +43,9 @@ func (s *Server) MethodPrefix() string {
 }
 
 func (s *Server) AuthMethods() authz.MethodMapping {
-	return map[string]authz.Option{}
-	//return oidc_pb.OIDCService_AuthMethods
+	return oidc_pb.OIDCService_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
-	return nil
-	//return oidc_pb.RegisterOIDCServiceHandler
+	return oidc_pb.RegisterOIDCServiceHandler
 }
