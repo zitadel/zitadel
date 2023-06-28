@@ -4,7 +4,8 @@ Log:
 Telemetry:
   Enabled: true
   Endpoints:
-    - https://httpbin.org/post
+#    - https://httpbin.org/post
+    - https://example.com
 
 ExternalDomain: localhost
 ExternalSecure: false
@@ -49,7 +50,7 @@ Projections:
     NotificationsQuotas:
 #      RequeueEvery: 1s
     Telemetry:
-#      RequeueEvery: 1s
+      RequeueEvery: 10s
 
 DefaultInstance:
   LoginPolicy:
