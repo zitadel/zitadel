@@ -12,6 +12,8 @@ export {
   Theme,
 } from "./proto/server/zitadel/settings/v2alpha/branding_settings";
 
+export { ChallengeKind } from "./proto/server/zitadel/session/v2alpha/challenge";
+
 export { Session } from "./proto/server/zitadel/session/v2alpha/session";
 export {
   ListSessionsResponse,
@@ -25,6 +27,8 @@ export {
   GetBrandingSettingsResponse,
   GetLegalAndSupportSettingsResponse,
   GetGeneralSettingsResponse,
+  GetLoginSettingsResponse,
+  GetLoginSettingsRequest,
 } from "./proto/server/zitadel/settings/v2alpha/settings_service";
 export {
   AddHumanUserResponse,

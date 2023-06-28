@@ -31,7 +31,7 @@ export default async function Page() {
 
       <div className="flex flex-col w-full space-y-2">
         <SessionsList sessions={sessions} />
-        <Link href="/username">
+        <Link href="/loginname">
           <div className="flex flex-row items-center py-3 px-4 hover:bg-black/10 dark:hover:bg-white/10 rounded-md transition-all">
             <div className="w-8 h-8 mr-4 flex flex-row justify-center items-center rounded-full bg-black/5 dark:bg-white/5">
               <UserPlusIcon className="h-5 w-5" />

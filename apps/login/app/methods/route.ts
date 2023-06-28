@@ -54,8 +54,9 @@ export async function POST(request: NextRequest) {
     const createdSession = await createSession(
       server,
       loginName,
+      domain,
       undefined,
-      domain
+      undefined
     );
 
     if (createdSession) {
