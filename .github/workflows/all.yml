@@ -87,6 +87,8 @@ jobs:
     uses: ./.github/workflows/release.yml
     needs: [version, core-unit-test, core-integration-test, lint, container, e2e]
     if: ${{ needs.version.outputs.published == 'true' }}
+    secrets:
+      GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
     with:
       node_version: '16'
       buf_version: 'latest'
