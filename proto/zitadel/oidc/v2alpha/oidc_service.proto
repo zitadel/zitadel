@@ -144,7 +144,7 @@ message CreateCallbackRequest {
       min_length: 1;
       max_length: 200;
       description: "ID of the Auth Request, as obtained from the redirect URL.";
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      example: "\"163840776835432705\"";
     }
   ];
 
