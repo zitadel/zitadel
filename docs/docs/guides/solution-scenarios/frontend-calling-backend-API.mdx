@@ -18,7 +18,7 @@ Suppose there is a news portal web app that allows users to browse through vario
 
 ** Back-End API Communication**: When the user browses through the news feed, the front-end app makes an API request to the back-end, including the access token in the Authorization header. The back-end API, upon receiving the request, uses the IdP’s introspection endpoint to validate the access token. Once validated, it fetches personalized news data based on the user's preferences from the news database.
 
-This way, the news portal web app provides a secure and personalized browsing experience for each user, while also protecting its data via secure token-based communication with the back-end API.
+While it is true that the back-end API typically needs to authenticate with the IdP, in this specific use case, the back-end API can work with a client credential / JWT since it's not a public client. This means that instead of relying on user-specific authentication, the back-end API can obtain a client credential (such as a client ID and client secret) from the IdP to authenticate itself and validate the access token received from the front-end app. This approach ensures secure communication between the front-end app, the back-end API, and the IdP, while still allowing the back-end API to access user-specific data and provide personalized news feeds.
 
 ## A simplified example with a React frontend and a Python Flask API
 
