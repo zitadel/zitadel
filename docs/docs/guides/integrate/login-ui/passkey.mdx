@@ -21,7 +21,7 @@ When you want to send a link to your user, that enables him to register a new pa
 
 Make sure to also include the URL Template to customize the reset link in the email sent to the user, in case of ZITADEL sending the email.a
 
-[Send Registration Link Documentation](/apis/resources/user_service/user-service-add-human-user)
+[Send Registration Link Documentation](/apis/resources/user_service/user-service-create-passkey-registration-link)
 
 ### Request
 ```bash
@@ -63,6 +63,8 @@ By specifying the authenticator you can choose if the passkey should be cross pa
 - PASSKEY_AUTHENTICATOR_CROSS_PLATFORM
 
 In the response you will get the public key credential options, that will be obtained by the browser to use the physical key to obtain a signed challenge.
+
+[Start Passkey Registration Documentation](/apis/resources/user_service/user-service-register-passkey)
 
 ### Request
 
@@ -177,6 +179,8 @@ Include the public key credential you got from the browser in your request.
 Also you can give the Passkey a name, which makes it easier for the user to identify the registered authentication methods.
 Example: Google Pixel, iPhone, Mac Book, etc
 
+[Verify Passkey Registration Documentation](/apis/resources/user_service/user-service-verify-passkey-registration)
+
 ```bash
 curl --request POST \
   --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER_ID/passkeys/$PASSKEY_ID \
@@ -205,6 +209,8 @@ Next step is to authenticate the user with the new registered passkey.
 First step is to ask the user for his username and create a new session with the ZITADEL API.
 When creating the new session make sure to include the challenge for passkey.
 The response will include the public key credential request options for the passkey in the challenges.
+
+[Create Session Documentation](/apis/resources/session_service/session-service-create-session)
 
 ### Request
 ```bash
@@ -259,7 +265,43 @@ curl --request POST \
 
 ### Signing in Browser
 
-navigator.credentials.get -> login
+After starting the passkey authentication on the side of ZITADEL you have to verify in the browser.
+To do this you need to call the browser API to get the credentials.
+Make sure to send the public key credential request options you got from ZITADEL.
+
+```bash
+const credential = await navigator.credentials.get({
+    publicKey: publicKeyCredentialRequestOptions
+});
+```
+
+Read the [WebAuthN Guide](https://webauthn.guide/#authentication) for more information about "Authenticating with a WebAuthN Credential".
+
+### Update Session with Passkey
+
+Now that you have successfully authenticated in the browser, you can update the session of the user.
+Fill the passkey checks with the credential assertion data you get from the browser.
+
+[Update Session Documentation](/apis/resources/session_service/session-service-set-session)
+
+### Request
+
+```bash
+curl --request PATCH \
+  --url https://$ZITADEL_DOMAIN/v2alpha/sessions/218480890961985793 \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Content-Type: application/json' \
+  --data '{
+  "sessionToken": "yMDi6uVPJAcphbbz0LaxC07ihWkNTe7m0Xqch8SzfM5Cz3HSIQIDZ65x1f5Qal0jxz0MEyo-_zYcUg",
+  "checks": {
+    "passkey": {
+      "credentialAssertionData": {}
+    }
+  }
+}'
+```
+
 
 
 
