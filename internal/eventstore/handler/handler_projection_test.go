@@ -833,7 +833,7 @@ func TestProjection_schedule(t *testing.T) {
 								[]*repository.Filter{{
 									Field:     repository.FieldInstanceID,
 									Operation: repository.OperationNotIn,
-									Value:     database.StringArray{""},
+									Value:     database.Array[string]{""},
 								}, {
 									Field:     repository.FieldCreationDate,
 									Operation: repository.OperationGreater,
@@ -893,7 +893,7 @@ func TestProjection_schedule(t *testing.T) {
 							ExpectInstanceIDs([]*repository.Filter{{
 								Field:     repository.FieldInstanceID,
 								Operation: repository.OperationNotIn,
-								Value:     database.StringArray{""},
+								Value:     database.Array[string]{""},
 							}, {
 								Field:     repository.FieldCreationDate,
 								Operation: repository.OperationGreater,

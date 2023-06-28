@@ -214,14 +214,14 @@ func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 			handler.NewCol(UserGrantResourceOwnerProject, projectOwner),
 			handler.NewCol(UserGrantGrantID, e.ProjectGrantID),
 			handler.NewCol(UserGrantGrantedOrg, grantOwner),
-			handler.NewCol(UserGrantRoles, database.StringArray(e.RoleKeys)),
+			handler.NewCol(UserGrantRoles, database.Array[string](e.RoleKeys)),
 			handler.NewCol(UserGrantState, domain.UserGrantStateActive),
 		},
 	), nil
 }
 
 func (p *userGrantProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
-	var roles database.StringArray
+	var roles database.Array[string]
 
 	switch e := event.(type) {
 	case *usergrant.UserGrantChangedEvent:
@@ -379,7 +379,7 @@ func (p *userGrantProjection) reduceProjectGrantChanged(event eventstore.Event) 
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{
-			crdb.NewArrayIntersectCol(UserGrantRoles, database.StringArray(keys)),
+			crdb.NewArrayIntersectCol(UserGrantRoles, database.Array[string](keys)),
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantGrantID, grantID),

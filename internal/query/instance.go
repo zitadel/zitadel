@@ -88,7 +88,7 @@ type Instance struct {
 
 type csp struct {
 	enabled        bool
-	allowedOrigins database.StringArray
+	allowedOrigins database.Array[string]
 }
 
 type Instances struct {

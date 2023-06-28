@@ -322,7 +322,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 					Limit:   0,
 					Filters: [][]*repository.Filter{
 						{
-							repository.NewFilter(repository.FieldAggregateType, database.StringArray{"user", "org"}, repository.OperationIn),
+							repository.NewFilter(repository.FieldAggregateType, database.Array[string]{"user", "org"}, repository.OperationIn),
 						},
 					},
 				},
@@ -493,7 +493,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 					Filters: [][]*repository.Filter{
 						{
 							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
-							repository.NewFilter(repository.FieldAggregateID, database.StringArray{"1234", "0815"}, repository.OperationIn),
+							repository.NewFilter(repository.FieldAggregateID, database.Array[string]{"1234", "0815"}, repository.OperationIn),
 						},
 					},
 				},
@@ -571,7 +571,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 					Filters: [][]*repository.Filter{
 						{
 							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
-							repository.NewFilter(repository.FieldEventType, database.StringArray{"user.created", "user.changed"}, repository.OperationIn),
+							repository.NewFilter(repository.FieldEventType, database.Array[string]{"user.created", "user.changed"}, repository.OperationIn),
 						},
 					},
 				},

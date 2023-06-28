@@ -40,23 +40,23 @@ type App struct {
 }
 
 type OIDCApp struct {
-	RedirectURIs             database.StringArray
+	RedirectURIs             database.Array[string]
 	ResponseTypes            database.EnumArray[domain.OIDCResponseType]
 	GrantTypes               database.EnumArray[domain.OIDCGrantType]
 	AppType                  domain.OIDCApplicationType
 	ClientID                 string
 	AuthMethodType           domain.OIDCAuthMethodType
-	PostLogoutRedirectURIs   database.StringArray
+	PostLogoutRedirectURIs   database.Array[string]
 	Version                  domain.OIDCVersion
-	ComplianceProblems       database.StringArray
+	ComplianceProblems       database.Array[string]
 	IsDevMode                bool
 	AccessTokenType          domain.OIDCTokenType
 	AssertAccessTokenRole    bool
 	AssertIDTokenRole        bool
 	AssertIDTokenUserinfo    bool
 	ClockSkew                time.Duration
-	AdditionalOrigins        database.StringArray
-	AllowedOrigins           database.StringArray
+	AdditionalOrigins        database.Array[string]
+	AllowedOrigins           database.Array[string]
 	SkipNativeAppSuccessPage bool
 }
 
@@ -795,7 +795,7 @@ func prepareClientIDsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) ([]string, error) {
-			ids := database.StringArray{}
+			ids := database.Array[string]{}
 
 			for rows.Next() {
 				var apiID sql.NullString
@@ -821,17 +821,17 @@ type sqlOIDCConfig struct {
 	appID                    sql.NullString
 	version                  sql.NullInt32
 	clientID                 sql.NullString
-	redirectUris             database.StringArray
+	redirectUris             database.Array[string]
 	applicationType          sql.NullInt16
 	authMethodType           sql.NullInt16
-	postLogoutRedirectUris   database.StringArray
+	postLogoutRedirectUris   database.Array[string]
 	devMode                  sql.NullBool
 	accessTokenType          sql.NullInt16
 	accessTokenRoleAssertion sql.NullBool
 	iDTokenRoleAssertion     sql.NullBool
 	iDTokenUserinfoAssertion sql.NullBool
 	clockSkew                sql.NullInt64
-	additionalOrigins        database.StringArray
+	additionalOrigins        database.Array[string]
 	responseTypes            database.EnumArray[domain.OIDCResponseType]
 	grantTypes               database.EnumArray[domain.OIDCGrantType]
 	skipNativeAppSuccessPage sql.NullBool

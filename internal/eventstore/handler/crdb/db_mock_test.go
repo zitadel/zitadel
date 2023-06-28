@@ -133,7 +133,7 @@ func expectCurrentSequence(tableName, projection string, seq uint64, aggregateTy
 		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM `+tableName+` WHERE projection_name = \$1 AND instance_id = ANY \(\$2\) FOR UPDATE`).
 			WithArgs(
 				projection,
-				database.StringArray(instanceIDs),
+				database.Array[string](instanceIDs),
 			).
 			WillReturnRows(
 				rows,
@@ -146,7 +146,7 @@ func expectCurrentSequenceErr(tableName, projection string, instanceIDs []string
 		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM `+tableName+` WHERE projection_name = \$1 AND instance_id = ANY \(\$2\) FOR UPDATE`).
 			WithArgs(
 				projection,
-				database.StringArray(instanceIDs),
+				database.Array[string](instanceIDs),
 			).
 			WillReturnError(err)
 	}
@@ -157,7 +157,7 @@ func expectCurrentSequenceNoRows(tableName, projection string, instanceIDs []str
 		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM `+tableName+` WHERE projection_name = \$1 AND instance_id = ANY \(\$2\) FOR UPDATE`).
 			WithArgs(
 				projection,
-				database.StringArray(instanceIDs),
+				database.Array[string](instanceIDs),
 			).
 			WillReturnRows(
 				sqlmock.NewRows([]string{"current_sequence", "aggregate_type", "instance_id"}),
@@ -170,7 +170,7 @@ func expectCurrentSequenceScanErr(tableName, projection string, instanceIDs []st
 		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM `+tableName+` WHERE projection_name = \$1 AND instance_id = ANY \(\$2\) FOR UPDATE`).
 			WithArgs(
 				projection,
-				database.StringArray(instanceIDs),
+				database.Array[string](instanceIDs),
 			).
 			WillReturnRows(
 				sqlmock.NewRows([]string{"current_sequence", "aggregate_type", "instance_id"}).
@@ -300,7 +300,7 @@ func expectLock(lockTable, workerName string, d time.Duration, instanceID string
 				d,
 				projectionName,
 				instanceID,
-				database.StringArray{instanceID},
+				database.Array[string]{instanceID},
 			).
 			WillReturnResult(
 				sqlmock.NewResult(1, 1),
@@ -321,7 +321,7 @@ func expectLockMultipleInstances(lockTable, workerName string, d time.Duration, 
 				projectionName,
 				instanceID1,
 				instanceID2,
-				database.StringArray{instanceID1, instanceID2},
+				database.Array[string]{instanceID1, instanceID2},
 			).
 			WillReturnResult(
 				sqlmock.NewResult(1, 1),
@@ -341,7 +341,7 @@ func expectLockNoRows(lockTable, workerName string, d time.Duration, instanceID 
 				d,
 				projectionName,
 				instanceID,
-				database.StringArray{instanceID},
+				database.Array[string]{instanceID},
 			).
 			WillReturnResult(driver.ResultNoRows)
 	}
@@ -359,7 +359,7 @@ func expectLockErr(lockTable, workerName string, d time.Duration, instanceID str
 				d,
 				projectionName,
 				instanceID,
-				database.StringArray{instanceID},
+				database.Array[string]{instanceID},
 			).
 			WillReturnError(err)
 	}

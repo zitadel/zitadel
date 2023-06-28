@@ -77,7 +77,7 @@ type PersonalAccessToken struct {
 
 	UserID     string
 	Expiration time.Time
-	Scopes     database.StringArray
+	Scopes     database.Array[string]
 }
 
 type PersonalAccessTokenSearchQueries struct {

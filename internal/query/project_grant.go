@@ -102,7 +102,7 @@ type ProjectGrant struct {
 	ProjectName       string
 	GrantedOrgID      string
 	OrgName           string
-	GrantedRoleKeys   database.StringArray
+	GrantedRoleKeys   database.Array[string]
 	ResourceOwnerName string
 }
 

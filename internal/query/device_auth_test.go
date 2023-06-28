@@ -43,7 +43,7 @@ var (
 	expectedDeviceAuthValues               = []driver.Value{
 		"primary-id",
 		"client-id",
-		database.StringArray{"a", "b", "c"},
+		database.Array[string]{"a", "b", "c"},
 		testNow,
 		domain.DeviceAuthStateApproved,
 		"subject",

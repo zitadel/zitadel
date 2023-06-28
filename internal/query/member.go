@@ -54,7 +54,7 @@ type Member struct {
 	ResourceOwner string
 
 	UserID             string
-	Roles              database.StringArray
+	Roles              database.Array[string]
 	PreferredLoginName string
 	Email              string
 	FirstName          string

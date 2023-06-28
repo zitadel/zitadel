@@ -265,7 +265,7 @@ func NewArrayIntersectCol(column string, value interface{}) handler.Column {
 	var arrayType string
 	switch value.(type) {
 
-	case []string, database.StringArray:
+	case []string, database.Array[string]:
 		arrayType = "TEXT"
 		//TODO: handle more types if necessary
 	}

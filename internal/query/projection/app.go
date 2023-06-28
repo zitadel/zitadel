@@ -452,19 +452,19 @@ func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(AppOIDCConfigColumnVersion, e.Version),
 				handler.NewCol(AppOIDCConfigColumnClientID, e.ClientID),
 				handler.NewCol(AppOIDCConfigColumnClientSecret, e.ClientSecret),
-				handler.NewCol(AppOIDCConfigColumnRedirectUris, database.StringArray(e.RedirectUris)),
+				handler.NewCol(AppOIDCConfigColumnRedirectUris, database.Array[string](e.RedirectUris)),
 				handler.NewCol(AppOIDCConfigColumnResponseTypes, database.EnumArray[domain.OIDCResponseType](e.ResponseTypes)),
 				handler.NewCol(AppOIDCConfigColumnGrantTypes, database.EnumArray[domain.OIDCGrantType](e.GrantTypes)),
 				handler.NewCol(AppOIDCConfigColumnApplicationType, e.ApplicationType),
 				handler.NewCol(AppOIDCConfigColumnAuthMethodType, e.AuthMethodType),
-				handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, database.StringArray(e.PostLogoutRedirectUris)),
+				handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, database.Array[string](e.PostLogoutRedirectUris)),
 				handler.NewCol(AppOIDCConfigColumnDevMode, e.DevMode),
 				handler.NewCol(AppOIDCConfigColumnAccessTokenType, e.AccessTokenType),
 				handler.NewCol(AppOIDCConfigColumnAccessTokenRoleAssertion, e.AccessTokenRoleAssertion),
 				handler.NewCol(AppOIDCConfigColumnIDTokenRoleAssertion, e.IDTokenRoleAssertion),
 				handler.NewCol(AppOIDCConfigColumnIDTokenUserinfoAssertion, e.IDTokenUserinfoAssertion),
 				handler.NewCol(AppOIDCConfigColumnClockSkew, e.ClockSkew),
-				handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, database.StringArray(e.AdditionalOrigins)),
+				handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, database.Array[string](e.AdditionalOrigins)),
 				handler.NewCol(AppOIDCConfigColumnSkipNativeAppSuccessPage, e.SkipNativeAppSuccessPage),
 			},
 			crdb.WithTableSuffix(appOIDCTableSuffix),
@@ -493,7 +493,7 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnVersion, *e.Version))
 	}
 	if e.RedirectUris != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnRedirectUris, database.StringArray(*e.RedirectUris)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnRedirectUris, database.Array[string](*e.RedirectUris)))
 	}
 	if e.ResponseTypes != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnResponseTypes, database.EnumArray[domain.OIDCResponseType](*e.ResponseTypes)))
@@ -508,7 +508,7 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAuthMethodType, *e.AuthMethodType))
 	}
 	if e.PostLogoutRedirectUris != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, database.StringArray(*e.PostLogoutRedirectUris)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, database.Array[string](*e.PostLogoutRedirectUris)))
 	}
 	if e.DevMode != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnDevMode, *e.DevMode))
@@ -529,7 +529,7 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnClockSkew, *e.ClockSkew))
 	}
 	if e.AdditionalOrigins != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, database.StringArray(*e.AdditionalOrigins)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, database.Array[string](*e.AdditionalOrigins)))
 	}
 	if e.SkipNativeAppSuccessPage != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnSkipNativeAppSuccessPage, *e.SkipNativeAppSuccessPage))

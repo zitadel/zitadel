@@ -43,7 +43,7 @@ type OIDCIDP struct {
 	ClientID              string
 	ClientSecret          *crypto.CryptoValue
 	Issuer                string
-	Scopes                database.StringArray
+	Scopes                database.Array[string]
 	DisplayNameMapping    domain.OIDCMappingField
 	UsernameMapping       domain.OIDCMappingField
 	AuthorizationEndpoint string
@@ -323,7 +323,7 @@ func prepareIDPByIDQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			oidcClientID := sql.NullString{}
 			oidcClientSecret := new(crypto.CryptoValue)
 			oidcIssuer := sql.NullString{}
-			oidcScopes := database.StringArray{}
+			oidcScopes := database.Array[string]{}
 			oidcDisplayNameMapping := sql.NullInt32{}
 			oidcUsernameMapping := sql.NullInt32{}
 			oidcAuthorizationEndpoint := sql.NullString{}
@@ -435,7 +435,7 @@ func prepareIDPsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 				oidcClientID := sql.NullString{}
 				oidcClientSecret := new(crypto.CryptoValue)
 				oidcIssuer := sql.NullString{}
-				oidcScopes := database.StringArray{}
+				oidcScopes := database.Array[string]{}
 				oidcDisplayNameMapping := sql.NullInt32{}
 				oidcUsernameMapping := sql.NullInt32{}
 				oidcAuthorizationEndpoint := sql.NullString{}

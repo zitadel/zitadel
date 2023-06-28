@@ -8,6 +8,52 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestArray_Scan_string(t *testing.T) {
+	const src = "{foo,bar}"
+	want := Array[string]{"foo", "bar"}
+
+	var got Array[string]
+	err := got.Scan(src)
+	require.NoError(t, err)
+	assert.Equal(t, want, got)
+}
+
+func TestArray_Value_string(t *testing.T) {
+	src := Array[string]{"foo", "bar"}
+	const want = "{foo,bar}"
+
+	got, err := src.Value()
+	require.NoError(t, err)
+	assert.Equal(t, want, got)
+}
+
+type myEnum int32
+
+const (
+	myEnumZero myEnum = iota
+	myEnumOne
+	myEnumTwo
+)
+
+func TestEnumArray_Scan(t *testing.T) {
+	const src = "{0,1,2}"
+	want := EnumArray[myEnum]{myEnumZero, myEnumOne, myEnumTwo}
+
+	var got EnumArray[myEnum]
+	err := got.Scan(src)
+	require.NoError(t, err)
+	assert.Equal(t, want, got)
+}
+
+func TestEnumArray_Value(t *testing.T) {
+	src := EnumArray[myEnum]{myEnumZero, myEnumOne, myEnumTwo}
+	const want = "{0,1,2}"
+
+	got, err := src.Value()
+	require.NoError(t, err)
+	assert.Equal(t, want, got)
+}
+
 func TestMap_Scan(t *testing.T) {
 	type args struct {
 		src any

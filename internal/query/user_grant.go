@@ -25,7 +25,7 @@ type UserGrant struct {
 	CreationDate time.Time
 	ChangeDate   time.Time
 	Sequence     uint64
-	Roles        database.StringArray
+	Roles        database.Array[string]
 	// GrantID represents the project grant id
 	GrantID string
 	State   domain.UserGrantState

@@ -3,59 +3,63 @@ package database
 import (
 	"database/sql/driver"
 	"encoding/json"
+	"fmt"
 
 	"github.com/jackc/pgtype"
+	pgtype_v5 "github.com/jackc/pgx/v5/pgtype"
 )
 
-type StringArray []string
+type Array[T any] []T
 
-// Scan implements the [database/sql.Scanner] interface.
-func (s *StringArray) Scan(src any) error {
-	array := new(pgtype.TextArray)
-	if err := array.Scan(src); err != nil {
+func (a *Array[T]) Scan(src any) error {
+	pgTypeMap := pgtype_v5.NewMap()
+	var dst []T
+	if err := pgTypeMap.SQLScanner(&dst).Scan(src); err != nil {
 		return err
 	}
-	if err := array.AssignTo(s); err != nil {
-		return err
-	}
+	*a = Array[T](dst)
 	return nil
 }
 
-// Value implements the [database/sql/driver.Valuer] interface.
-func (s StringArray) Value() (driver.Value, error) {
-	if len(s) == 0 {
+func (a Array[T]) Value() (driver.Value, error) {
+	if len(a) == 0 {
 		return nil, nil
 	}
+	src := pgtype_v5.FlatArray[T](a)
 
-	array := pgtype.TextArray{}
-	if err := array.Set(s); err != nil {
+	pgTypeMap := pgtype_v5.NewMap()
+	arrayType, ok1 := pgTypeMap.TypeForValue(src)
+	elementType, ok2 := pgTypeMap.TypeForValue(src[0])
+	if !ok1 || !ok2 {
+		return nil, fmt.Errorf("%T not registered as sql driver.Value", src)
+	}
+	codec := pgtype_v5.ArrayCodec{ElementType: elementType}
+
+	buf, err := codec.PlanEncode(pgTypeMap, arrayType.OID, pgtype_v5.TextFormatCode, src).Encode(src, nil)
+	if err != nil {
 		return nil, err
 	}
-
-	return array.Value()
+	return string(buf), err
 }
 
-type enumField interface {
-	~int8 | ~uint8 | ~int16 | ~uint16 | ~int32 | ~uint32
-}
-
-type EnumArray[F enumField] []F
+type EnumArray[F ~int32] []F
 
 // Scan implements the [database/sql.Scanner] interface.
 func (s *EnumArray[F]) Scan(src any) error {
-	array := new(pgtype.Int2Array)
+	array := new(Array[int32])
 	if err := array.Scan(src); err != nil {
 		return err
 	}
-	ints := make([]int32, 0, len(array.Elements))
-	if err := array.AssignTo(&ints); err != nil {
-		return err
-	}
-	*s = make([]F, len(ints))
-	for i, a := range ints {
-		(*s)[i] = F(a)
-	}
+	s.setArray(*array)
 	return nil
+}
+
+func (s *EnumArray[F]) setArray(array Array[int32]) {
+	out := make(EnumArray[F], len(array))
+	for k, v := range array {
+		out[k] = F(v)
+	}
+	*s = out
 }
 
 // Value implements the [database/sql/driver.Valuer] interface.
@@ -63,13 +67,16 @@ func (s EnumArray[F]) Value() (driver.Value, error) {
 	if len(s) == 0 {
 		return nil, nil
 	}
-
-	array := pgtype.Int2Array{}
-	if err := array.Set(s); err != nil {
-		return nil, err
-	}
-
+	array := s.toArray()
 	return array.Value()
+}
+
+func (enums EnumArray[F]) toArray() Array[int32] {
+	out := make(Array[int32], len(enums))
+	for k, v := range enums {
+		out[k] = int32(v)
+	}
+	return out
 }
 
 type Map[V any] map[string]V

@@ -632,7 +632,7 @@ func (p *idpTemplateProjection) reduceOAuthIDPAdded(event eventstore.Event) (*ha
 				handler.NewCol(OAuthAuthorizationEndpointCol, idpEvent.AuthorizationEndpoint),
 				handler.NewCol(OAuthTokenEndpointCol, idpEvent.TokenEndpoint),
 				handler.NewCol(OAuthUserEndpointCol, idpEvent.UserEndpoint),
-				handler.NewCol(OAuthScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(OAuthScopesCol, database.Array[string](idpEvent.Scopes)),
 				handler.NewCol(OAuthIDAttributeCol, idpEvent.IDAttribute),
 			},
 			crdb.WithTableSuffix(IDPTemplateOAuthSuffix),
@@ -722,7 +722,7 @@ func (p *idpTemplateProjection) reduceOIDCIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(OIDCIssuerCol, idpEvent.Issuer),
 				handler.NewCol(OIDCClientIDCol, idpEvent.ClientID),
 				handler.NewCol(OIDCClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(OIDCScopesCol, database.Array[string](idpEvent.Scopes)),
 				handler.NewCol(OIDCIDTokenMappingCol, idpEvent.IsIDTokenMapping),
 			},
 			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
@@ -813,7 +813,7 @@ func (p *idpTemplateProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Ev
 				handler.NewCol(AzureADInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(AzureADClientIDCol, idpEvent.ClientID),
 				handler.NewCol(AzureADClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(AzureADScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(AzureADScopesCol, database.Array[string](idpEvent.Scopes)),
 				handler.NewCol(AzureADTenantCol, idpEvent.Tenant),
 				handler.NewCol(AzureADIsEmailVerified, idpEvent.IsEmailVerified),
 			},
@@ -864,7 +864,7 @@ func (p *idpTemplateProjection) reduceOIDCIDPMigratedGoogle(event eventstore.Eve
 				handler.NewCol(GoogleInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(GoogleClientIDCol, idpEvent.ClientID),
 				handler.NewCol(GoogleClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(GoogleScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(GoogleScopesCol, database.Array[string](idpEvent.Scopes)),
 			},
 			crdb.WithTableSuffix(IDPTemplateGoogleSuffix),
 		),
@@ -1059,7 +1059,7 @@ func (p *idpTemplateProjection) reduceOldOIDCConfigAdded(event eventstore.Event)
 				handler.NewCol(OIDCIssuerCol, idpEvent.Issuer),
 				handler.NewCol(OIDCClientIDCol, idpEvent.ClientID),
 				handler.NewCol(OIDCClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(OIDCScopesCol, database.Array[string](idpEvent.Scopes)),
 				handler.NewCol(OIDCIDTokenMappingCol, true),
 			},
 			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
@@ -1102,7 +1102,7 @@ func (p *idpTemplateProjection) reduceOldOIDCConfigChanged(event eventstore.Even
 		oidcCols = append(oidcCols, handler.NewCol(OIDCIssuerCol, *idpEvent.Issuer))
 	}
 	if idpEvent.Scopes != nil {
-		oidcCols = append(oidcCols, handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)))
+		oidcCols = append(oidcCols, handler.NewCol(OIDCScopesCol, database.Array[string](idpEvent.Scopes)))
 	}
 	if len(oidcCols) > 0 {
 		ops = append(ops,
@@ -1257,7 +1257,7 @@ func (p *idpTemplateProjection) reduceAzureADIDPAdded(event eventstore.Event) (*
 				handler.NewCol(AzureADInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(AzureADClientIDCol, idpEvent.ClientID),
 				handler.NewCol(AzureADClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(AzureADScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(AzureADScopesCol, database.Array[string](idpEvent.Scopes)),
 				handler.NewCol(AzureADTenantCol, idpEvent.Tenant),
 				handler.NewCol(AzureADIsEmailVerified, idpEvent.IsEmailVerified),
 			},
@@ -1347,7 +1347,7 @@ func (p *idpTemplateProjection) reduceGitHubIDPAdded(event eventstore.Event) (*h
 				handler.NewCol(GitHubInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(GitHubClientIDCol, idpEvent.ClientID),
 				handler.NewCol(GitHubClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(GitHubScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(GitHubScopesCol, database.Array[string](idpEvent.Scopes)),
 			},
 			crdb.WithTableSuffix(IDPTemplateGitHubSuffix),
 		),
@@ -1397,7 +1397,7 @@ func (p *idpTemplateProjection) reduceGitHubEnterpriseIDPAdded(event eventstore.
 				handler.NewCol(GitHubEnterpriseAuthorizationEndpointCol, idpEvent.AuthorizationEndpoint),
 				handler.NewCol(GitHubEnterpriseTokenEndpointCol, idpEvent.TokenEndpoint),
 				handler.NewCol(GitHubEnterpriseUserEndpointCol, idpEvent.UserEndpoint),
-				handler.NewCol(GitHubEnterpriseScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(GitHubEnterpriseScopesCol, database.Array[string](idpEvent.Scopes)),
 			},
 			crdb.WithTableSuffix(IDPTemplateGitHubEnterpriseSuffix),
 		),
@@ -1526,7 +1526,7 @@ func (p *idpTemplateProjection) reduceGitLabIDPAdded(event eventstore.Event) (*h
 				handler.NewCol(GitLabInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(GitLabClientIDCol, idpEvent.ClientID),
 				handler.NewCol(GitLabClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(GitLabScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(GitLabScopesCol, database.Array[string](idpEvent.Scopes)),
 			},
 			crdb.WithTableSuffix(IDPTemplateGitLabSuffix),
 		),
@@ -1615,7 +1615,7 @@ func (p *idpTemplateProjection) reduceGitLabSelfHostedIDPAdded(event eventstore.
 				handler.NewCol(GitLabSelfHostedIssuerCol, idpEvent.Issuer),
 				handler.NewCol(GitLabSelfHostedClientIDCol, idpEvent.ClientID),
 				handler.NewCol(GitLabSelfHostedClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(GitLabSelfHostedScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(GitLabSelfHostedScopesCol, database.Array[string](idpEvent.Scopes)),
 			},
 			crdb.WithTableSuffix(IDPTemplateGitLabSelfHostedSuffix),
 		),
@@ -1703,7 +1703,7 @@ func (p *idpTemplateProjection) reduceGoogleIDPAdded(event eventstore.Event) (*h
 				handler.NewCol(GoogleInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(GoogleClientIDCol, idpEvent.ClientID),
 				handler.NewCol(GoogleClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(GoogleScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(GoogleScopesCol, database.Array[string](idpEvent.Scopes)),
 			},
 			crdb.WithTableSuffix(IDPTemplateGoogleSuffix),
 		),
@@ -1789,14 +1789,14 @@ func (p *idpTemplateProjection) reduceLDAPIDPAdded(event eventstore.Event) (*han
 			[]handler.Column{
 				handler.NewCol(LDAPIDCol, idpEvent.ID),
 				handler.NewCol(LDAPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(LDAPServersCol, database.StringArray(idpEvent.Servers)),
+				handler.NewCol(LDAPServersCol, database.Array[string](idpEvent.Servers)),
 				handler.NewCol(LDAPStartTLSCol, idpEvent.StartTLS),
 				handler.NewCol(LDAPBaseDNCol, idpEvent.BaseDN),
 				handler.NewCol(LDAPBindDNCol, idpEvent.BindDN),
 				handler.NewCol(LDAPBindPasswordCol, idpEvent.BindPassword),
 				handler.NewCol(LDAPUserBaseCol, idpEvent.UserBase),
-				handler.NewCol(LDAPUserObjectClassesCol, database.StringArray(idpEvent.UserObjectClasses)),
-				handler.NewCol(LDAPUserFiltersCol, database.StringArray(idpEvent.UserFilters)),
+				handler.NewCol(LDAPUserObjectClassesCol, database.Array[string](idpEvent.UserObjectClasses)),
+				handler.NewCol(LDAPUserFiltersCol, database.Array[string](idpEvent.UserFilters)),
 				handler.NewCol(LDAPTimeoutCol, idpEvent.Timeout),
 				handler.NewCol(LDAPIDAttributeCol, idpEvent.IDAttribute),
 				handler.NewCol(LDAPFirstNameAttributeCol, idpEvent.FirstNameAttribute),
@@ -1959,7 +1959,7 @@ func reduceOAuthIDPChangedColumns(idpEvent idp.OAuthIDPChangedEvent) []handler.C
 		oauthCols = append(oauthCols, handler.NewCol(OAuthUserEndpointCol, *idpEvent.UserEndpoint))
 	}
 	if idpEvent.Scopes != nil {
-		oauthCols = append(oauthCols, handler.NewCol(OAuthScopesCol, database.StringArray(idpEvent.Scopes)))
+		oauthCols = append(oauthCols, handler.NewCol(OAuthScopesCol, database.Array[string](idpEvent.Scopes)))
 	}
 	if idpEvent.IDAttribute != nil {
 		oauthCols = append(oauthCols, handler.NewCol(OAuthIDAttributeCol, *idpEvent.IDAttribute))
@@ -1979,7 +1979,7 @@ func reduceOIDCIDPChangedColumns(idpEvent idp.OIDCIDPChangedEvent) []handler.Col
 		oidcCols = append(oidcCols, handler.NewCol(OIDCIssuerCol, *idpEvent.Issuer))
 	}
 	if idpEvent.Scopes != nil {
-		oidcCols = append(oidcCols, handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)))
+		oidcCols = append(oidcCols, handler.NewCol(OIDCScopesCol, database.Array[string](idpEvent.Scopes)))
 	}
 	if idpEvent.IsIDTokenMapping != nil {
 		oidcCols = append(oidcCols, handler.NewCol(OIDCIDTokenMappingCol, *idpEvent.IsIDTokenMapping))
@@ -2013,7 +2013,7 @@ func reduceAzureADIDPChangedColumns(idpEvent idp.AzureADIDPChangedEvent) []handl
 		azureADCols = append(azureADCols, handler.NewCol(AzureADClientSecretCol, *idpEvent.ClientSecret))
 	}
 	if idpEvent.Scopes != nil {
-		azureADCols = append(azureADCols, handler.NewCol(AzureADScopesCol, database.StringArray(idpEvent.Scopes)))
+		azureADCols = append(azureADCols, handler.NewCol(AzureADScopesCol, database.Array[string](idpEvent.Scopes)))
 	}
 	if idpEvent.Tenant != nil {
 		azureADCols = append(azureADCols, handler.NewCol(AzureADTenantCol, *idpEvent.Tenant))
@@ -2033,7 +2033,7 @@ func reduceGitHubIDPChangedColumns(idpEvent idp.GitHubIDPChangedEvent) []handler
 		oauthCols = append(oauthCols, handler.NewCol(GitHubClientSecretCol, *idpEvent.ClientSecret))
 	}
 	if idpEvent.Scopes != nil {
-		oauthCols = append(oauthCols, handler.NewCol(GitHubScopesCol, database.StringArray(idpEvent.Scopes)))
+		oauthCols = append(oauthCols, handler.NewCol(GitHubScopesCol, database.Array[string](idpEvent.Scopes)))
 	}
 	return oauthCols
 }
@@ -2056,7 +2056,7 @@ func reduceGitHubEnterpriseIDPChangedColumns(idpEvent idp.GitHubEnterpriseIDPCha
 		oauthCols = append(oauthCols, handler.NewCol(GitHubEnterpriseUserEndpointCol, *idpEvent.UserEndpoint))
 	}
 	if idpEvent.Scopes != nil {
-		oauthCols = append(oauthCols, handler.NewCol(GitHubEnterpriseScopesCol, database.StringArray(idpEvent.Scopes)))
+		oauthCols = append(oauthCols, handler.NewCol(GitHubEnterpriseScopesCol, database.Array[string](idpEvent.Scopes)))
 	}
 	return oauthCols
 }
@@ -2070,7 +2070,7 @@ func reduceGitLabIDPChangedColumns(idpEvent idp.GitLabIDPChangedEvent) []handler
 		gitlabCols = append(gitlabCols, handler.NewCol(GitLabClientSecretCol, *idpEvent.ClientSecret))
 	}
 	if idpEvent.Scopes != nil {
-		gitlabCols = append(gitlabCols, handler.NewCol(GitLabScopesCol, database.StringArray(idpEvent.Scopes)))
+		gitlabCols = append(gitlabCols, handler.NewCol(GitLabScopesCol, database.Array[string](idpEvent.Scopes)))
 	}
 	return gitlabCols
 }
@@ -2087,7 +2087,7 @@ func reduceGitLabSelfHostedIDPChangedColumns(idpEvent idp.GitLabSelfHostedIDPCha
 		gitlabCols = append(gitlabCols, handler.NewCol(GitLabSelfHostedClientSecretCol, *idpEvent.ClientSecret))
 	}
 	if idpEvent.Scopes != nil {
-		gitlabCols = append(gitlabCols, handler.NewCol(GitLabSelfHostedScopesCol, database.StringArray(idpEvent.Scopes)))
+		gitlabCols = append(gitlabCols, handler.NewCol(GitLabSelfHostedScopesCol, database.Array[string](idpEvent.Scopes)))
 	}
 	return gitlabCols
 }
@@ -2101,7 +2101,7 @@ func reduceGoogleIDPChangedColumns(idpEvent idp.GoogleIDPChangedEvent) []handler
 		googleCols = append(googleCols, handler.NewCol(GoogleClientSecretCol, *idpEvent.ClientSecret))
 	}
 	if idpEvent.Scopes != nil {
-		googleCols = append(googleCols, handler.NewCol(GoogleScopesCol, database.StringArray(idpEvent.Scopes)))
+		googleCols = append(googleCols, handler.NewCol(GoogleScopesCol, database.Array[string](idpEvent.Scopes)))
 	}
 	return googleCols
 }
@@ -2109,7 +2109,7 @@ func reduceGoogleIDPChangedColumns(idpEvent idp.GoogleIDPChangedEvent) []handler
 func reduceLDAPIDPChangedColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Column {
 	ldapCols := make([]handler.Column, 0, 4)
 	if idpEvent.Servers != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPServersCol, database.StringArray(idpEvent.Servers)))
+		ldapCols = append(ldapCols, handler.NewCol(LDAPServersCol, database.Array[string](idpEvent.Servers)))
 	}
 	if idpEvent.StartTLS != nil {
 		ldapCols = append(ldapCols, handler.NewCol(LDAPStartTLSCol, *idpEvent.StartTLS))
@@ -2127,10 +2127,10 @@ func reduceLDAPIDPChangedColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Col
 		ldapCols = append(ldapCols, handler.NewCol(LDAPUserBaseCol, *idpEvent.UserBase))
 	}
 	if idpEvent.UserObjectClasses != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPUserObjectClassesCol, database.StringArray(idpEvent.UserObjectClasses)))
+		ldapCols = append(ldapCols, handler.NewCol(LDAPUserObjectClassesCol, database.Array[string](idpEvent.UserObjectClasses)))
 	}
 	if idpEvent.UserFilters != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPUserFiltersCol, database.StringArray(idpEvent.UserFilters)))
+		ldapCols = append(ldapCols, handler.NewCol(LDAPUserFiltersCol, database.Array[string](idpEvent.UserFilters)))
 	}
 	if idpEvent.Timeout != nil {
 		ldapCols = append(ldapCols, handler.NewCol(LDAPTimeoutCol, *idpEvent.Timeout))

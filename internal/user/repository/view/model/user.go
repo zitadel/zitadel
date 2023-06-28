@@ -43,18 +43,18 @@ const (
 )
 
 type UserView struct {
-	ID                 string               `json:"-" gorm:"column:id;primary_key"`
-	CreationDate       time.Time            `json:"-" gorm:"column:creation_date"`
-	ChangeDate         time.Time            `json:"-" gorm:"column:change_date"`
-	ResourceOwner      string               `json:"-" gorm:"column:resource_owner"`
-	State              int32                `json:"-" gorm:"column:user_state"`
-	LastLogin          time.Time            `json:"-" gorm:"column:last_login"`
-	LoginNames         database.StringArray `json:"-" gorm:"column:login_names"`
-	PreferredLoginName string               `json:"-" gorm:"column:preferred_login_name"`
-	Sequence           uint64               `json:"-" gorm:"column:sequence"`
-	Type               userType             `json:"-" gorm:"column:user_type"`
-	UserName           string               `json:"userName" gorm:"column:user_name"`
-	InstanceID         string               `json:"instanceID" gorm:"column:instance_id;primary_key"`
+	ID                 string                 `json:"-" gorm:"column:id;primary_key"`
+	CreationDate       time.Time              `json:"-" gorm:"column:creation_date"`
+	ChangeDate         time.Time              `json:"-" gorm:"column:change_date"`
+	ResourceOwner      string                 `json:"-" gorm:"column:resource_owner"`
+	State              int32                  `json:"-" gorm:"column:user_state"`
+	LastLogin          time.Time              `json:"-" gorm:"column:last_login"`
+	LoginNames         database.Array[string] `json:"-" gorm:"column:login_names"`
+	PreferredLoginName string                 `json:"-" gorm:"column:preferred_login_name"`
+	Sequence           uint64                 `json:"-" gorm:"column:sequence"`
+	Type               userType               `json:"-" gorm:"column:user_type"`
+	UserName           string                 `json:"userName" gorm:"column:user_name"`
+	InstanceID         string                 `json:"instanceID" gorm:"column:instance_id;primary_key"`
 	*MachineView
 	*HumanView
 }

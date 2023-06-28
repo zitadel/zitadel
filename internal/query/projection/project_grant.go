@@ -138,7 +138,7 @@ func (p *projectGrantProjection) reduceProjectGrantAdded(event eventstore.Event)
 			handler.NewCol(ProjectGrantColumnState, domain.ProjectGrantStateActive),
 			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectGrantColumnGrantedOrgID, e.GrantedOrgID),
-			handler.NewCol(ProjectGrantColumnRoleKeys, database.StringArray(e.RoleKeys)),
+			handler.NewCol(ProjectGrantColumnRoleKeys, database.Array[string](e.RoleKeys)),
 		},
 	), nil
 }
@@ -153,7 +153,7 @@ func (p *projectGrantProjection) reduceProjectGrantChanged(event eventstore.Even
 		[]handler.Column{
 			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
 			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
-			handler.NewCol(ProjectGrantColumnRoleKeys, database.StringArray(e.RoleKeys)),
+			handler.NewCol(ProjectGrantColumnRoleKeys, database.Array[string](e.RoleKeys)),
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
@@ -173,7 +173,7 @@ func (p *projectGrantProjection) reduceProjectGrantCascadeChanged(event eventsto
 		[]handler.Column{
 			handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
 			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
-			handler.NewCol(ProjectGrantColumnRoleKeys, database.StringArray(e.RoleKeys)),
+			handler.NewCol(ProjectGrantColumnRoleKeys, database.Array[string](e.RoleKeys)),
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),

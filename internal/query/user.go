@@ -33,7 +33,7 @@ type User struct {
 	State              domain.UserState
 	Type               domain.UserType
 	Username           string
-	LoginNames         database.StringArray
+	LoginNames         database.Array[string]
 	PreferredLoginName string
 	Human              *Human
 	Machine            *Machine
@@ -104,7 +104,7 @@ type NotifyUser struct {
 	State              domain.UserState
 	Type               domain.UserType
 	Username           string
-	LoginNames         database.StringArray
+	LoginNames         database.Array[string]
 	PreferredLoginName string
 	FirstName          string
 	LastName           string
@@ -1075,7 +1075,7 @@ func prepareNotifyUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 		func(row *sql.Row) (*NotifyUser, error) {
 			u := new(NotifyUser)
 			var count int
-			loginNames := database.StringArray{}
+			loginNames := database.Array[string]{}
 			preferredLoginName := sql.NullString{}
 
 			humanID := sql.NullString{}
@@ -1248,7 +1248,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 			var count uint64
 			for rows.Next() {
 				u := new(User)
-				loginNames := database.StringArray{}
+				loginNames := database.Array[string]{}
 				preferredLoginName := sql.NullString{}
 
 				humanID := sql.NullString{}

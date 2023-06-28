@@ -288,7 +288,7 @@ func (query *SearchQuery) aggregateIDFilter() *repository.Filter {
 	if len(query.aggregateIDs) == 1 {
 		return repository.NewFilter(repository.FieldAggregateID, query.aggregateIDs[0], repository.OperationEquals)
 	}
-	return repository.NewFilter(repository.FieldAggregateID, database.StringArray(query.aggregateIDs), repository.OperationIn)
+	return repository.NewFilter(repository.FieldAggregateID, database.Array[string](query.aggregateIDs), repository.OperationIn)
 }
 
 func (query *SearchQuery) eventTypeFilter() *repository.Filter {
@@ -298,7 +298,7 @@ func (query *SearchQuery) eventTypeFilter() *repository.Filter {
 	if len(query.eventTypes) == 1 {
 		return repository.NewFilter(repository.FieldEventType, repository.EventType(query.eventTypes[0]), repository.OperationEquals)
 	}
-	eventTypes := make(database.StringArray, len(query.eventTypes))
+	eventTypes := make(database.Array[string], len(query.eventTypes))
 	for i, eventType := range query.eventTypes {
 		eventTypes[i] = string(eventType)
 	}
@@ -312,7 +312,7 @@ func (query *SearchQuery) aggregateTypeFilter() *repository.Filter {
 	if len(query.aggregateTypes) == 1 {
 		return repository.NewFilter(repository.FieldAggregateType, repository.AggregateType(query.aggregateTypes[0]), repository.OperationEquals)
 	}
-	aggregateTypes := make(database.StringArray, len(query.aggregateTypes))
+	aggregateTypes := make(database.Array[string], len(query.aggregateTypes))
 	for i, aggregateType := range query.aggregateTypes {
 		aggregateTypes[i] = string(aggregateType)
 	}
@@ -352,7 +352,7 @@ func (query *SearchQuery) excludedInstanceIDFilter() *repository.Filter {
 	if len(query.excludedInstanceIDs) == 0 {
 		return nil
 	}
-	return repository.NewFilter(repository.FieldInstanceID, database.StringArray(query.excludedInstanceIDs), repository.OperationNotIn)
+	return repository.NewFilter(repository.FieldInstanceID, database.Array[string](query.excludedInstanceIDs), repository.OperationNotIn)
 }
 
 func (builder *SearchQueryBuilder) resourceOwnerFilter() *repository.Filter {

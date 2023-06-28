@@ -51,7 +51,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 								uint64(15),
 								"agg-id",
 								time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-								database.StringArray{"openid"},
+								database.Array[string]{"openid"},
 							},
 						},
 					},

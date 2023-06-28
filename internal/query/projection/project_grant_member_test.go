@@ -72,7 +72,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 								"user-id",
 								"org1",
 								false,
-								database.StringArray{"role"},
+								database.Array[string]{"role"},
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -112,7 +112,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPDATE projections.project_grant_members3 SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (instance_id = $4) AND (user_id = $5) AND (project_id = $6) AND (grant_id = $7)",
 							expectedArgs: []interface{}{
-								database.StringArray{"role", "changed"},
+								database.Array[string]{"role", "changed"},
 								anyArg{},
 								uint64(15),
 								"instance-id",
