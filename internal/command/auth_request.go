@@ -15,7 +15,10 @@ func (c *Commands) AddAuthRequest(ctx context.Context, request *domain.AuthReque
 	if err != nil {
 		return err
 	}
-	oidcRequest := request.Request.(*domain.AuthRequestOIDC)
+	oidcRequest, ok := request.Request.(*domain.AuthRequestOIDC)
+	if !ok {
+		// TODO: error?
+	}
 	writeModel, err := c.getAuthRequestWriteModel(ctx, id)
 	if err != nil {
 		return err
