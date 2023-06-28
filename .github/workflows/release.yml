@@ -21,9 +21,6 @@ on:
       google_image_name:
         required: true
         type: string
-      gcr_json_key_base64:
-        required: true
-        type: string
 
 jobs:
   version:
@@ -55,7 +52,7 @@ jobs:
       with:
         registry: europe-docker.pkg.dev
         username: _json_key_base64
-        password: ${{ inputs.gcr_json_key_base64 }}
+        password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
     -
       name: Publish ${{ needs.version.outputs.version }}
       run: |

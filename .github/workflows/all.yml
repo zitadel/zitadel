@@ -94,4 +94,4 @@ jobs:
       semantic_version: '19.0.2'
       image_name: 'ghcr.io/zitadel/test'
       google_image_name: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/test"
-      gcr_json_key_base64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
+      secrets: inherit
