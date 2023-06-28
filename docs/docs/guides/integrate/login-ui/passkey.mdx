@@ -152,7 +152,7 @@ curl --request POST \
 }
 ```
 
-### Register in Browser
+## Register in Browser
 
 Now that you have started the registration within ZITADEL, you have to register the credentials in the browser.
 This requires a call to the browser api and looks something like the following.
@@ -162,10 +162,52 @@ Make sure to send the public key credential creation options you got in the prev
 const credential = await navigator.credentials.create({
     publicKey: publicKeyCredentialCreationOptions
 });
-``
-We recommend reading the WebAuthN Guide for the [Registering a WebAuthN Credentials](https://webauthn.guide/#registration)
+```
 
-### Login
+For more information about WebAuthN and registering credential flow, read the following guide:
+[Registering a WebAuthN Credentials](https://webauthn.guide/#registration)
+
+### Verify Passkey in ZITADEL
+
+In the next request you have to verify the Passkey within ZITADEL.
+Include the public key credential you got from the browser in your request.
+Also you can give the Passkey a name, which makes it easier for the user to identify the registered authentication methods.
+Example: Google Pixel, iPhone, Mac Book, etc
+
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER_ID/passkeys/$PASSKEY_ID \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Content-Type: application/json' \
+  --data '{
+  "publicKeyCredential": {
+    "type": "public-key",
+    "id": "pawVarF4xPxLFmfCnRkwXWeTrKGzabcAi92LEI1WC00",
+    "rawId": "pawVarF4xPxLFmfCnRkwXWeTrKGzabcAi92LEI1WC00",
+    "response": {
+      "attestationObject": "o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIgRKS3VpeE9tfExXRzkoUKnG4rQWPvtSSt4YtDGgTx32oCIQDPey-2YJ4uIg-QCM4jj6aE2U3tgMFM_RP7Efx6xRu3JGhhdXRoRGF0YVikSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFAAAAADju76085Yhmlt1CEOHkwLQAIKWsFWqxeMT8SxZnwp0ZMF1nk6yhs2m3AIvdixCNVgtNpQECAyYgASFYIMGUDSP2FAQn2MIfPMy7cyB_Y30VqixVgGULTBtFjfRiIlggjUGfQo3_-CrMmH3S-ZQkFKWKnNBQEAMkFtG-9A4zqW0",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQlhXdHh0WGxJeFZZa0pHT1dVaUVmM25zby02aXZKdWw2YmNmWHdMVlFIayIsIm9yaWdpbiI6Imh0dHBzOi8vbG9jYWxob3N0OjgwODAifQ"
+    }
+  },
+  "passkeyName": "fido key"
+}'
+```
+
+You have successfully registered a new passkey to the user.
+Next step is to authenticate the user with the new registered passkey.
+
+## Create Session
+
+First step is to ask the user for his username and create a new session with the ZITADEL API.
+When creating the new session make sure to include the challenge for passkey, ZITADEL will then return
+
+
+## Verify Passkey
+
+
+### Signing in Browser
+
 navigator.credentials.get -> login
 
 
