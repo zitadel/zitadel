@@ -431,7 +431,7 @@ service UserService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Change password";
-      description: "Change the password of a user with either a verification code or an old password.";
+      description: "Change the password of a user with either a verification code or the current password.";
       responses: {
         key: "200"
         value: {
