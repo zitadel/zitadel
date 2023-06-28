@@ -1,0 +1,172 @@
+---
+title: Handle Passkey Registration and Login
+sidebar_label: Passkey
+---
+
+Passkeys are a replacement for passwords that provide faster, easier, and more secure sign-ins to websites and apps across a user’s devices.
+It is based on the [FIDO Standard](https://fidoalliance.org/).
+Unlike passwords, passkeys are always strong and phishing-resistant.
+
+## Flow
+
+![Passkey Registration and Login Flow](/img/guides/login-ui/external-login-flow.png)
+
+There are two different possibilities when you like to enable passkey for your user.
+1. You send the user a notification with a code so the user is able to register passkey on another device
+2. You start the passkey registration directly on the device
+
+## Send Registration Link
+
+When you want to send a link to your user, that enables him to register a new passkey device, you can let ZITADEL send the code or return it in the response so you can send a message by yourself.
+
+Make sure to also include the URL Template to customize the reset link in the email sent to the user, in case of ZITADEL sending the email.a
+### Request
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER_ID/passkeys/registration_link \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Content-Type: application/json' \
+  --data '{
+   "sendLink": {
+      "urlTemplate": "https://example.com/passkey/register?userID={{.UserID}}&orgID={{.OrgID}}&codeID={{.CodeID}}&code={{.Code}}"
+   },
+   "returnCode": {}
+}'
+```
+
+## Response in case of return code
+```bash
+{
+	"details": {
+		"sequence": "632",
+		"changeDate": "2023-06-28T08:09:51.257699Z",
+		"resourceOwner": "163840776835432705"
+	},
+	"code": {
+		"id": "220526087715684609",
+		"code": "2KEpIeQGSBBd"
+	}
+}
+```
+
+## Start Passkey Registration
+
+When starting the passkey registration you can optionally send the code from the step before, if you have sent the code to the user.
+
+By specifying the authenticator you can choose if the passkey should be cross paltform or not. Per default everything is allowed:
+- PASSKEY_AUTHENTICATOR_UNSPECIFIED
+- PASSKEY_AUTHENTICATOR_PLATFORM
+- PASSKEY_AUTHENTICATOR_CROSS_PLATFORM
+
+In the response you will get the public key credential options, that will be obtained by the browser to use the physical key to obtain a signed challenge.
+
+### Request
+
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER_ID/passkeys \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Content-Type: application/json' \
+  --data '{
+	"code": {
+		"id": "220526087715684609",
+		"code": "2KEpIeQGSBBd"
+	},
+  "authenticator": "PASSKEY_AUTHENTICATOR_UNSPECIFIED"
+}'
+```
+
+### Response
+
+```bash
+{
+	"details": {
+		"sequence": "633",
+		"changeDate": "2023-06-28T08:10:26.725981Z",
+		"resourceOwner": "163840776835432705"
+	},
+	"passkeyId": "220526147258024193",
+	"publicKeyCredentialCreationOptions": {
+		"publicKey": {
+			"attestation": "none",
+			"authenticatorSelection": {
+				"userVerification": "required"
+			},
+			"challenge": "JM1uLbVQR2xZJ210DA7E-3j0Cd9rHKUSmc8NyIJBtAY",
+			"pubKeyCredParams": [
+				{
+					"alg": -7,
+					"type": "public-key"
+				},
+				{
+					"alg": -35,
+					"type": "public-key"
+				},
+				{
+					"alg": -36,
+					"type": "public-key"
+				},
+				{
+					"alg": -257,
+					"type": "public-key"
+				},
+				{
+					"alg": -258,
+					"type": "public-key"
+				},
+				{
+					"alg": -259,
+					"type": "public-key"
+				},
+				{
+					"alg": -37,
+					"type": "public-key"
+				},
+				{
+					"alg": -38,
+					"type": "public-key"
+				},
+				{
+					"alg": -39,
+					"type": "public-key"
+				},
+				{
+					"alg": -8,
+					"type": "public-key"
+				}
+			],
+			"rp": {
+				"id": "fabi-t7rlmd.zitadel.app",
+				"name": "ZITADEL"
+			},
+			"timeout": 300000,
+			"user": {
+				"displayName": "Minnie Mouse",
+				"id": "MjE4NjYyNTk2OTE4NjQwODk3",
+				"name": "minni-mouse@mouse.com@fabi.zitadel.app"
+			}
+		}
+	}
+}
+```
+
+### Register in Browser
+
+Now that you have started the registration within ZITADEL, you have to register the credentials in the browser.
+This requires a call to the browser api and looks something like the following.
+Make sure to send the public key credential creation options you got in the previous request from ZITADEL.
+
+```bash
+const credential = await navigator.credentials.create({
+    publicKey: publicKeyCredentialCreationOptions
+});
+``
+We recommend reading the WebAuthN Guide for the [Registering a WebAuthN Credentials](https://webauthn.guide/#registration)
+
+### Login
+navigator.credentials.get -> login
+
+
+
