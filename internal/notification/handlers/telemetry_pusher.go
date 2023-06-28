@@ -2,27 +2,25 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/query"
-
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
-
-	"github.com/zitadel/zitadel/internal/repository/pseudo"
-
-	"github.com/zitadel/zitadel/internal/errors"
-
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/notification/types"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/repository/pseudo"
 )
 
 const (
@@ -78,7 +76,16 @@ func (t *telemetryPusher) reducers() []handler.AggregateReducer {
 	}}
 }
 
+func printEvent(event eventstore.Event) {
+	bytes, err := json.MarshalIndent(event, "", "    ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(event.Type(), string(bytes))
+}
+
 func (t *telemetryPusher) pushMilestones(event eventstore.Event) (*handler.Statement, error) {
+	printEvent(event)
 	ctx := call.WithTimestamp(context.Background())
 	scheduledEvent, ok := event.(*pseudo.ScheduledEvent)
 	if !ok {
@@ -123,6 +130,7 @@ func (t *telemetryPusher) pushMilestones(event eventstore.Event) (*handler.State
 }
 
 func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.ScheduledEvent, ms *query.Milestone) error {
+	ctx = authz.WithInstanceID(ctx, ms.InstanceID)
 	for _, endpoint := range t.endpoints {
 		if err := types.SendJSON(
 			ctx,
@@ -140,5 +148,5 @@ func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.Sched
 			return err
 		}
 	}
-	return t.commands.MilestonePushed(ctx, ms.InstanceID, ms.Type, t.endpoints, ms.PrimaryDomain)
+	return t.commands.MilestonePushed(ctx, ms.Type, t.endpoints, ms.PrimaryDomain)
 }

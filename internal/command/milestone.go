@@ -9,7 +9,6 @@ import (
 // MilestonePushed writes a new milestone.PushedEvent with a new milestone.Aggregate to the eventstore
 func (c *Commands) MilestonePushed(
 	ctx context.Context,
-	instanceID string,
 	msType milestone.Type,
 	endpoints []string,
 	primaryDomain string,
@@ -18,6 +17,6 @@ func (c *Commands) MilestonePushed(
 	if err != nil {
 		return err
 	}
-	_, err = c.eventstore.Push(ctx, milestone.NewPushedEvent(ctx, milestone.NewAggregate(id, instanceID, instanceID), msType, endpoints, primaryDomain))
+	_, err = c.eventstore.Push(ctx, milestone.NewPushedEvent(ctx, milestone.NewAggregate(ctx, id), msType, endpoints, primaryDomain))
 	return err
 }

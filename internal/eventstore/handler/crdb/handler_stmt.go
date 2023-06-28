@@ -5,14 +5,13 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/zitadel/zitadel/internal/repository/pseudo"
-
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/repository/pseudo"
 )
 
 var (
@@ -102,7 +101,7 @@ func NewStatementHandler(
 func (h *StatementHandler) Start() {
 	h.initialized <- true
 	close(h.initialized)
-	if h.reduceScheduledPseudoEvent {
+	if !h.reduceScheduledPseudoEvent {
 		h.Subscribe(h.aggregates...)
 	}
 }

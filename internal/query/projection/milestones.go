@@ -1,7 +1,6 @@
 package projection
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -147,6 +146,7 @@ func (p *milestoneProjection) reduceInstanceDomainPrimarySet(event eventstore.Ev
 
 func (p *milestoneProjection) milestoneReached(msType milestone.Type) func(event eventstore.Event) (*handler.Statement, error) {
 	return func(event eventstore.Event) (*handler.Statement, error) {
+		printEvent(event)
 		if event.EditorUser() == "" || event.EditorService() == "" {
 			return crdb.NewNoOpStatement(event), nil
 		}
@@ -188,9 +188,9 @@ func (p *milestoneProjection) reduceUserTokenAdded(event eventstore.Event) (*han
 }
 
 func printEvent(event eventstore.Event) {
-	var pretty bytes.Buffer
-	if err := json.Indent(&pretty, event.DataAsBytes(), "", "    "); err != nil {
+	bytes, err := json.MarshalIndent(event, "", "    ")
+	if err != nil {
 		panic(err)
 	}
-	fmt.Println(event.Type(), pretty.String())
+	fmt.Println(event.Type(), string(bytes))
 }

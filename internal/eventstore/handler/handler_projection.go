@@ -102,7 +102,7 @@ func NewProjectionHandler(
 
 	go func() {
 		<-initialized
-		if h.reduceScheduledPseudoEvent {
+		if !h.reduceScheduledPseudoEvent {
 			go h.subscribe(ctx)
 		}
 		go h.schedule(ctx)
@@ -177,9 +177,9 @@ func (h *ProjectionHandler) FetchEvents(ctx context.Context, instances ...string
 		return nil, false, err
 	}
 	if h.reduceScheduledPseudoEvent {
-		events[0] = pseudo.NewScheduledEvent(ctx, time.Now(), instances...)
+		events = []eventstore.Event{pseudo.NewScheduledEvent(ctx, time.Now(), events[0], instances...)}
 	}
-	return events, int(eventsLimit) == len(events), err
+	return events, int(eventsLimit) == len(events) && !h.reduceScheduledPseudoEvent, err
 }
 
 func (h *ProjectionHandler) subscribe(ctx context.Context) {

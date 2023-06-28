@@ -40,7 +40,7 @@ LATEST=$(curl -i https://github.com/zitadel/zitadel/releases/latest | grep locat
 ## Run ZITADEL
 
 ```bash
-ZITADEL_EXTERNALSECURE=false ZITADEL_ANALYTICS_PUSH_ALLENABLED=true zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+ZITADEL_EXTERNALSECURE=false ZITADEL_TELEMETRY_ENABLED=true zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
 ```
 
 <DefaultUser components={props.components} />

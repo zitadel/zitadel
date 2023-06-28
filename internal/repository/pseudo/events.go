@@ -16,13 +16,15 @@ var _ eventstore.Event = (*ScheduledEvent)(nil)
 
 type ScheduledEvent struct {
 	*eventstore.BaseEvent `json:"-"`
-	Timestamp             time.Time `json:"-"`
-	InstanceIDs           []string  `json:"-"`
+	Timestamp             time.Time        `json:"timestamp"`
+	InstanceIDs           []string         `json:"instanceIDs"`
+	TriggeringEvent       eventstore.Event `json:"triggeringEvent"`
 }
 
 func NewScheduledEvent(
 	ctx context.Context,
 	timestamp time.Time,
+	triggeringEvent eventstore.Event,
 	instanceIDs ...string,
 ) *ScheduledEvent {
 	return &ScheduledEvent{
@@ -31,7 +33,8 @@ func NewScheduledEvent(
 			&NewAggregate().Aggregate,
 			ScheduledEventType,
 		),
-		Timestamp:   timestamp,
-		InstanceIDs: instanceIDs,
+		Timestamp:       timestamp,
+		InstanceIDs:     instanceIDs,
+		TriggeringEvent: triggeringEvent,
 	}
 }
