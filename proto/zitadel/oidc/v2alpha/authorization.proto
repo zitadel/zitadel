@@ -28,7 +28,7 @@ message AuthRequest{
     }
   ];
 
-  string application_id = 3 [
+  string client_id = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "OIDC client ID of the application that created the auth request";
     }
