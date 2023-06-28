@@ -6,6 +6,8 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/repository/pseudo"
+
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -73,6 +75,7 @@ func NewProjectionHandler(
 	lock Lock,
 	unlock Unlock,
 	initialized <-chan bool,
+	subscribe bool,
 ) *ProjectionHandler {
 	concurrentInstances := int(config.ConcurrentInstances)
 	if concurrentInstances < 1 {
@@ -97,8 +100,9 @@ func NewProjectionHandler(
 
 	go func() {
 		<-initialized
-		go h.subscribe(ctx)
-
+		if subscribe {
+			go h.subscribe(ctx)
+		}
 		go h.schedule(ctx)
 	}()
 
@@ -112,6 +116,13 @@ func (h *ProjectionHandler) Trigger(ctx context.Context, instances ...string) er
 	if len(instances) > 0 {
 		ids = instances
 	}
+	if h.searchQuery == nil {
+		return h.processTimestamp(ctx, ids...)
+	}
+	return h.processEvents(ctx, ids...)
+}
+
+func (h *ProjectionHandler) processEvents(ctx context.Context, ids ...string) error {
 	for {
 		events, hasLimitExceeded, err := h.FetchEvents(ctx, ids...)
 		if err != nil {
@@ -128,6 +139,11 @@ func (h *ProjectionHandler) Trigger(ctx context.Context, instances ...string) er
 			return nil
 		}
 	}
+}
+
+func (h *ProjectionHandler) processTimestamp(ctx context.Context, instances ...string) error {
+	_, err := h.Process(ctx, pseudo.NewTimestampEvent(h.nowFunc(), instances...))
+	return err
 }
 
 // Process handles multiple events by reducing them to statements and updating the projection

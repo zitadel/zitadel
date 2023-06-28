@@ -44,11 +44,12 @@ Console:
   InstanceManagementURL: "https://example.com/instances/{{.InstanceID}}"
 
 Projections:
+  RequeueEvery: 1s
   Customizations:
     NotificationsQuotas:
-      RequeueEvery: 1s
+#      RequeueEvery: 1s
     Telemetry:
-      RequeueEvery: 1s
+      RequeueEvery: 10s
 
 DefaultInstance:
   LoginPolicy:

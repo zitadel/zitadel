@@ -1,6 +1,7 @@
 package crdb
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -285,6 +286,24 @@ func NewCopyCol(column, from string) handler.Column {
 	}
 }
 
+func NewIsNullCond(column string) handler.Condition {
+	return handler.Condition{
+		Name: column,
+		Value: specialWhere(func(colName, param string) (clause string, needsParam bool) {
+			return fmt.Sprintf("%s IS NULL", colName), false
+		}),
+	}
+}
+
+func NewIsNotNullCond(column string) handler.Condition {
+	return handler.Condition{
+		Name: column,
+		Value: specialWhere(func(colName, param string) (clause string, needsParam bool) {
+			return fmt.Sprintf("%s IS NOT NULL", colName), false
+		}),
+	}
+}
+
 // NewCopyStatement creates a new upsert statement which updates a column from an existing row
 // cols represent the columns which are objective to change.
 // if the value of a col is empty the data will be copied from the selected row
@@ -384,13 +403,25 @@ func columnsToQuery(cols []handler.Column) (names []string, parameters []string,
 	return names, parameters, values[:parameterIndex]
 }
 
+type specialWhere func(colName, param string) (clause string, needsParam bool)
+
 func conditionsToWhere(cols []handler.Condition, paramOffset int) (wheres []string, values []interface{}) {
 	wheres = make([]string, len(cols))
-	values = make([]interface{}, len(cols))
+	values = make([]interface{}, 0, len(cols))
 
 	for i, col := range cols {
-		wheres[i] = "(" + col.Name + " = $" + strconv.Itoa(i+1+paramOffset) + ")"
-		values[i] = col.Value
+		param := strconv.Itoa(i + 1 + paramOffset)
+		special, ok := col.Value.(specialWhere)
+		if !ok {
+			wheres[i] = "(" + col.Name + " = $" + param + ")"
+			values = append(values, col.Value)
+			continue
+		}
+		clause, needsValueParam := special(col.Name, param)
+		wheres[i] = clause
+		if needsValueParam {
+			values = append(values, col.Value)
+		}
 	}
 
 	return wheres, values

@@ -2,12 +2,20 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/repository/milestone"
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/query"
+
+	"github.com/zitadel/zitadel/internal/api/call"
+
+	"github.com/zitadel/zitadel/internal/repository/pseudo"
+
+	"github.com/zitadel/zitadel/internal/errors"
 
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
@@ -61,34 +69,62 @@ func NewTelemetryPusher(
 }
 
 func (t *telemetryPusher) reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: milestone.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  milestone.ReachedEventType,
-					Reduce: t.reduceMilestoneReached,
-				},
-			},
-		},
-	}
+	return []handler.AggregateReducer{{
+		Aggregate: pseudo.AggregateType,
+		EventRedusers: []handler.EventReducer{{
+			Event:  pseudo.TimestampEventType,
+			Reduce: t.pushMilestones,
+		}},
+	}}
 }
 
-func (t *telemetryPusher) reduceMilestoneReached(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*milestone.ReachedEvent)
+func (t *telemetryPusher) pushMilestones(event eventstore.Event) (*handler.Statement, error) {
+	ctx := call.WithTimestamp(context.Background())
+	timestampEvent, ok := event.(pseudo.TimestampEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-UjA3E", "reduce.wrong.event.type %s", milestone.ReachedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-lDTs5", "reduce.wrong.event.type %s", event.Type())
 	}
-	ctx := HandlerContext(event.Aggregate())
-	alreadyHandled, err := t.queries.IsAlreadyHandled(ctx, event, nil, milestone.AggregateType, milestone.PushedEventType)
+
+	isReached, err := query.NewNotNullQuery(query.MilestoneReachedDateColID)
 	if err != nil {
 		return nil, err
 	}
-	if alreadyHandled {
-		return crdb.NewNoOpStatement(e), nil
+	isNotPushed, err := query.NewIsNullQuery(query.MilestonePushedDateColID)
+	if err != nil {
+		return nil, err
 	}
+	hasPrimaryDomain, err := query.NewNotNullQuery(query.MilestonePrimaryDomainColID)
+	if err != nil {
+		return nil, err
+	}
+	unpushedMilestones, err := t.queries.Queries.SearchMilestones(ctx, timestampEvent.InstanceIDs, &query.MilestonesSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset:        100,
+			SortingColumn: query.MilestoneReachedDateColID,
+			Asc:           true,
+		},
+		Queries: []query.SearchQuery{isReached, isNotPushed, hasPrimaryDomain},
+	})
+	if err != nil {
+		return nil, err
+	}
+	var errs int
+	for _, ms := range unpushedMilestones.Milestones {
+		if err = t.pushMilestone(ctx, ms); err != nil {
+			errs++
+			logging.Warnf("pushing milestone %+v failed: %s", *ms, err.Error())
+		}
+	}
+	if errs > 0 {
+		return nil, fmt.Errorf("pushing %d of %d milestones failed", errs, unpushedMilestones.Count)
+	}
+
+	return crdb.NewNoOpStatement(timestampEvent), nil
+}
+
+func (t *telemetryPusher) pushMilestone(ctx context.Context, ms *query.Milestone) error {
 	for _, endpoint := range t.endpoints {
-		if err = types.SendJSON(
+		if err := types.SendJSON(
 			ctx,
 			webhook.Config{
 				CallURL: endpoint,
@@ -96,18 +132,13 @@ func (t *telemetryPusher) reduceMilestoneReached(event eventstore.Event) (*handl
 			},
 			t.queries.GetFileSystemProvider,
 			t.queries.GetLogProvider,
-			e,
-			e,
+			ms,
+			nil,
 			t.metricSuccessfulDeliveriesJSON,
 			t.metricFailedDeliveriesJSON,
 		).WithoutTemplate(); err != nil {
-			return nil, err
+			return err
 		}
 	}
-
-	err = t.commands.ReportMilestonePushed(ctx, t.endpoints, e)
-	if err != nil {
-		return nil, err
-	}
-	return crdb.NewNoOpStatement(e), nil
+	return t.commands.MilestonePushed(ctx, ms.InstanceID, ms.MilestoneType, t.endpoints, ms.PrimaryDomain)
 }

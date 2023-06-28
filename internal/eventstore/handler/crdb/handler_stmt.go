@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/zitadel/zitadel/internal/repository/pseudo"
+
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
@@ -49,6 +51,8 @@ type StatementHandler struct {
 	initialized chan bool
 
 	bulkLimit uint64
+
+	subscribe bool
 }
 
 func NewStatementHandler(
@@ -57,9 +61,16 @@ func NewStatementHandler(
 ) StatementHandler {
 	aggregateTypes := make([]eventstore.AggregateType, 0, len(config.Reducers))
 	reduces := make(map[eventstore.EventType]handler.Reduce, len(config.Reducers))
+	subscribe := true
 	for _, aggReducer := range config.Reducers {
 		aggregateTypes = append(aggregateTypes, aggReducer.Aggregate)
+		if aggReducer.Aggregate == pseudo.AggregateType {
+			subscribe = false
+		}
 		for _, eventReducer := range aggReducer.EventRedusers {
+			if eventReducer.Event == pseudo.TimestampEventType {
+				subscribe = false
+			}
 			reduces[eventReducer.Event] = eventReducer.Reduce
 		}
 	}
@@ -80,7 +91,7 @@ func NewStatementHandler(
 		initialized:             make(chan bool),
 	}
 
-	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock, h.initialized)
+	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock, h.initialized, subscribe)
 
 	return h
 }
@@ -88,6 +99,9 @@ func NewStatementHandler(
 func (h *StatementHandler) Start() {
 	h.initialized <- true
 	close(h.initialized)
+	if !h.subscribe {
+		return
+	}
 	h.Subscribe(h.aggregates...)
 }
 

@@ -76,13 +76,15 @@ func Start(
 		metricSuccessfulDeliveriesJSON,
 		metricFailedDeliveriesJSON,
 	).Start()
-	handlers.NewTelemetryPusher(
-		ctx,
-		telemetryCfg,
-		projection.ApplyCustomConfig(telemetryHandlerCustomConfig),
-		commands,
-		q,
-		metricSuccessfulDeliveriesJSON,
-		metricFailedDeliveriesJSON,
-	).Start()
+	if telemetryCfg.Enabled {
+		handlers.NewTelemetryPusher(
+			ctx,
+			telemetryCfg,
+			projection.ApplyCustomConfig(telemetryHandlerCustomConfig),
+			commands,
+			q,
+			metricSuccessfulDeliveriesJSON,
+			metricFailedDeliveriesJSON,
+		).Start()
+	}
 }
