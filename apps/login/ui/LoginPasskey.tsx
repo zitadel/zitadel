@@ -6,19 +6,14 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
-import { RegisterPasskeyResponse } from "@zitadel/server";
+import { Challenges_Passkey } from "@zitadel/server";
 import { coerceToArrayBuffer, coerceToBase64Url } from "#/utils/base64";
-type Inputs = {};
 
 type Props = {
-  sessionId: string;
+  challenge: Challenges_Passkey;
 };
 
-export default function LoginPasskey({ sessionId }: Props) {
-  const { login, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
-  });
-
+export default function LoginPasskey({ challenge }: Props) {
   const [error, setError] = useState<string>("");
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -55,10 +50,10 @@ export default function LoginPasskey({ sessionId }: Props) {
     return response;
   }
 
-  function submitLoginAndContinue(value: Inputs): Promise<boolean | void> {
+  function submitLoginAndContinue(): Promise<boolean | void> {
       navigator.credentials
         .get({
-          publicKey: resp.publicKeyCredentialCreationOptions,
+          publicKey: challenge.publicKeyCredentialRequestOptions,
         })
         .then((assertedCredential: any) => {
           if (assertedCredential) {
@@ -107,8 +102,6 @@ export default function LoginPasskey({ sessionId }: Props) {
     //   return router.push(`/accounts`);
   }
 
-  const { errors } = formState;
-
   return (
     <form className="w-full">
       {error && (
@@ -118,15 +111,7 @@ export default function LoginPasskey({ sessionId }: Props) {
       )}
 
       <div className="mt-8 flex w-full flex-row items-center">
-        {isPrompt ? (
-          <Button
-            type="button"
-            variant={ButtonVariants.Secondary}
-            onClick={() => router.push("/accounts")}
-          >
-            skip
-          </Button>
-        ) : (
+        
           <Button
             type="button"
             variant={ButtonVariants.Secondary}
@@ -134,14 +119,13 @@ export default function LoginPasskey({ sessionId }: Props) {
           >
             back
           </Button>
-        )}
 
         <span className="flex-grow"></span>
         <Button
           type="submit"
           className="self-end"
           variant={ButtonVariants.Primary}
-          disabled={loading || !formState.isValid}
+          disabled={loading}
           onClick={handleSubmit(submitLoginAndContinue)}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}

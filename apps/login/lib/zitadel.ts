@@ -22,6 +22,8 @@ import {
   DeleteSessionResponse,
   VerifyPasskeyRegistrationResponse,
   ChallengeKind,
+  LoginSettings,
+  GetLoginSettingsResponse,
 } from "@zitadel/server";
 
 export const zitadelConfig: ZitadelServerOptions = {
@@ -102,20 +104,31 @@ export async function createSession(
         },
         {}
       )
-    : sessionService.createSession({ checks: { user: { loginName } } }, {});
+    : sessionService.createSession(
+        { checks: { user: { loginName } }, domain },
+        {}
+      );
 }
 
 export async function setSession(
   server: ZitadelServer,
   sessionId: string,
   sessionToken: string,
-  password: string
+  password: string | undefined,
+  challenges: ChallengeKind[] | undefined
 ): Promise<SetSessionResponse | undefined> {
   const sessionService = session.getSession(server);
-  return sessionService.setSession(
-    { sessionId, sessionToken, checks: { password: { password } } },
-    {}
-  );
+  return password
+    ? sessionService.setSession(
+        {
+          sessionId,
+          sessionToken,
+          checks: { password: { password } },
+          challenges,
+        },
+        {}
+      )
+    : sessionService.setSession({ sessionId, sessionToken, challenges }, {});
 }
 
 export async function getSession(

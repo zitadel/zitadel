@@ -65,6 +65,7 @@ export async function POST(request: NextRequest) {
         createdSession.sessionId,
         createdSession.sessionToken
       ).then((response) => {
+        console.log(response);
         if (response?.session && response.session?.factors?.user?.loginName) {
           const userId = response?.session?.factors?.user?.id;
 

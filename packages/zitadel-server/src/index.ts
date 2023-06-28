@@ -12,7 +12,12 @@ export {
   Theme,
 } from "./proto/server/zitadel/settings/v2alpha/branding_settings";
 
-export { ChallengeKind } from "./proto/server/zitadel/session/v2alpha/challenge";
+export { LoginSettings } from "./proto/server/zitadel/settings/v2alpha/login_settings";
+
+export {
+  ChallengeKind,
+  Challenges_Passkey,
+} from "./proto/server/zitadel/session/v2alpha/challenge";
 
 export { Session } from "./proto/server/zitadel/session/v2alpha/session";
 export {

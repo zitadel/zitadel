@@ -1,41 +1,68 @@
-import { getSession, server } from "#/lib/zitadel";
+import {
+  getSession,
+  listAuthenticationMethodTypes,
+  server,
+  setSession,
+} from "#/lib/zitadel";
 import Alert, { AlertType } from "#/ui/Alert";
 import LoginPasskey from "#/ui/LoginPasskey";
 import RegisterPasskey from "#/ui/RegisterPasskey";
 import UserAvatar from "#/ui/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
+import {
+  SessionCookie,
+  getMostRecentCookieWithLoginname,
+  updateSessionCookie,
+} from "#/utils/cookies";
+import { ChallengeKind } from "@zitadel/server";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName, prompt } = searchParams;
+  const { loginName } = searchParams;
 
-  const sessionFactors = await loadSession(loginName);
+  const session = await setSessionForPasskeyChallenge(loginName);
 
-  async function loadSession(loginName?: string) {
+  const challenge = session?.challenges?.passkey;
+
+  //   let methods = [];
+  //   if (sessionFactors?.factors?.user?.id) {
+  //     methods = await listAuthenticationMethodTypes(
+  //       sessionFactors.factors.user.id
+  //     );
+
+  //     console.log(methods);
+  //   }
+
+  async function setSessionForPasskeyChallenge(loginName?: string) {
     const recent = await getMostRecentCookieWithLoginname(loginName);
-    return getSession(server, recent.id, recent.token).then((response) => {
-      if (response?.session) {
-        return response.session;
-      }
-    });
-
     console.log(recent);
+    return setSession(server, recent.id, recent.token, undefined, [
+      ChallengeKind.CHALLENGE_KIND_PASSKEY,
+    ]).then((session) => {
+      const sessionCookie: SessionCookie = {
+        id: recent.id,
+        token: session.sessionToken,
+        changeDate: session.changeDate?.toString() ?? "",
+        loginName: session.factors?.user?.loginName ?? "",
+      };
+
+      return updateSessionCookie(sessionCookie.id, sessionCookie).then(() => {
+        return session;
+      });
+    });
   }
-  const title = !!prompt
-    ? "Authenticate with a passkey"
-    : "Use your passkey to confirm it's really you";
-  const description = !!prompt
-    ? "When set up, you will be able to authenticate without a password."
-    : "Your device will ask for your fingerprint, face, or screen lock";
+
+  const title = "Authenticate with a passkey";
+  const description =
+    "Your device will ask for your fingerprint, face, or screen lock";
 
   return (
     <div className="flex flex-col items-center space-y-4">
       <h1>{title}</h1>
 
-      {sessionFactors && (
+      {/* {sessionFactors && (
         <UserAvatar
           loginName={loginName ?? sessionFactors.factors?.user?.loginName}
           displayName={sessionFactors.factors?.user?.displayName}
@@ -51,9 +78,9 @@ export default async function Page({
             username first or provide a loginName as searchParam.
           </Alert>
         </div>
-      )}
+      )} */}
 
-      {sessionFactors?.id && <LoginPasskey sessionId={sessionFactors.id} />}
+      {challenge && <LoginPasskey challenge={challenge} />}
     </div>
   );
 }
