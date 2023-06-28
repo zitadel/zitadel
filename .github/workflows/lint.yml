@@ -24,6 +24,16 @@ on:
 
 jobs:
 
+  lint-skip:
+    name: lint skip
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' }}
+    steps:
+      - name: Lint skip
+        run: |
+          echo "Linting outside of pull requests is skipped"
+    
+
   api:
     name: api
     runs-on: ubuntu-latest
