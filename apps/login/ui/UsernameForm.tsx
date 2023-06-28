@@ -6,6 +6,10 @@ import { TextInput } from "./Input";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
+import {
+  ListAuthenticationMethodTypesResponse,
+  AuthenticationMethodType,
+} from "@zitadel/server";
 
 type Inputs = {
   loginName: string;
@@ -18,11 +22,11 @@ export default function UsernameForm() {
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const router = useRouter();
-
-  async function submitUsername(values: Inputs) {
+  async function submitUsernameAndGetAuthenticationMethods(
+    values: Inputs
+  ): Promise<ListAuthenticationMethodTypesResponse> {
     setLoading(true);
-    const res = await fetch("/session", {
+    const res = await fetch("/methods", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -34,18 +38,20 @@ export default function UsernameForm() {
 
     setLoading(false);
     if (!res.ok) {
-      throw new Error("Failed to set user");
+      throw new Error("Failed to load authentication methods");
     }
     return res.json();
   }
 
   function submitUsernameAndContinue(value: Inputs): Promise<boolean | void> {
-    return submitUsername(value).then(({ factors }) => {
-      return router.push(
-        `/password?` +
-          new URLSearchParams({ loginName: `${factors.user.loginName}` })
-      );
-    });
+    return submitUsernameAndGetAuthenticationMethods(value).then(
+      ({ factors, sessionId, authMethodTypes }) => {
+        console.log(factors, sessionId, authMethodTypes);
+        if (authMethodTypes.length === 1) {
+        } else {
+        }
+      }
+    );
   }
 
   const { errors } = formState;

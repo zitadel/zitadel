@@ -265,4 +265,19 @@ export async function registerPasskey(
   });
 }
 
+/**
+ *
+ * @param server
+ * @param userId the id of the user where the email should be set
+ * @returns the newly set email
+ */
+export async function listAuthenticationMethodTypes(
+  userId: string
+): Promise<any> {
+  const userservice = user.getUser(server);
+  return userservice.listAuthenticationMethodTypes({
+    userId,
+  });
+}
+
 export { server };

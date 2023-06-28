@@ -21,6 +21,8 @@ export default async function Page({
         return response.session;
       }
     });
+
+    console.log(recent);
   }
   const title = !!prompt
     ? "Authenticate with a passkey"

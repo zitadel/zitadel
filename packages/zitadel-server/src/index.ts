@@ -35,6 +35,9 @@ export {
   RegisterPasskeyResponse,
   CreatePasskeyRegistrationLinkResponse,
   CreatePasskeyRegistrationLinkRequest,
+  ListAuthenticationMethodTypesResponse,
+  ListAuthenticationMethodTypesRequest,
+  AuthenticationMethodType,
 } from "./proto/server/zitadel/user/v2alpha/user_service";
 export {
   SetHumanPasswordResponse,
