@@ -43,7 +43,7 @@ You can create the front-end application (User Agent) and the API in the same pr
 ### Front-end login with ZITADEL
 
 - You must create a User Agent application in your project to add login to your React application using the Authorization Code with PKCE flow. This allows the front-end application to integrate with ZITADEL to enable user authentication and authorization.
-- In the React front-end application, configure the ZITADEL OIDC client settings, including the client ID, ZITADEL URLs,  redirect URIs, and required scopes.
+- In the React front-end application, configure the ZITADEL OIDC client settings, including the client ID, ZITADEL URLs, redirect URIs, and required scopes.
 - Implement the login flow, authentication callbacks, and token handling logic in the front-end application.
 - When a user visits the front-end application, they are presented with a login option.
 - Upon clicking the login button, the frontend initiates the Authorization Code with PKCE authentication flow and redirects the user to the ZITADEL login page. The user enters their credentials and authenticates with ZITADEL. Authorization Code Flow returns an authorization code to the client application, which can then exchange it for an ID token and an access token directly. This provides the benefit of not exposing any tokens to the user agent and possibly other malicious applications with access to the user agent. 
