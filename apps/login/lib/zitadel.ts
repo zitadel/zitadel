@@ -143,20 +143,20 @@ export async function addHumanUser(
   { email, firstName, lastName, password }: AddHumanUserData
 ): Promise<string> {
   const mgmt = user.getUser(server);
+
+  const payload = {
+    email: { email },
+    username: email,
+    profile: { firstName, lastName },
+  };
   return mgmt
     .addHumanUser(
       password
         ? {
-            email: { email },
-            username: email,
-            profile: { firstName, lastName },
+            ...payload,
             password: { password },
           }
-        : {
-            email: { email },
-            username: email,
-            profile: { firstName, lastName },
-          },
+        : payload,
       {}
     )
     .then((resp: AddHumanUserResponse) => {

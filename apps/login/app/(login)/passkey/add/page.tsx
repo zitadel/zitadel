@@ -44,7 +44,7 @@ export default async function Page({
       <Alert type={AlertType.INFO}>
         <span>
           A passkey is an authentication method on a device like your
-          fingerprint, Apple FaceID or similar.{" "}
+          fingerprint, Apple FaceID or similar.
           <a
             className="text-primary-light-500 dark:text-primary-dark-500 hover:text-primary-light-300 hover:dark:text-primary-dark-300"
             target="_blank"
