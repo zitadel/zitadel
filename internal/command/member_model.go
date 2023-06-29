@@ -37,3 +37,16 @@ func (wm *MemberWriteModel) Reduce() error {
 	}
 	return wm.WriteModel.Reduce()
 }
+
+func isMemberExisting(state domain.MemberState) bool {
+	return !hasMemberState(state, domain.MemberStateUnspecified, domain.MemberStateRemoved)
+}
+
+func hasMemberState(check domain.MemberState, states ...domain.MemberState) bool {
+	for _, state := range states {
+		if check == state {
+			return true
+		}
+	}
+	return false
+}

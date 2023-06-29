@@ -34,30 +34,22 @@ func (s *Server) ListIAMMembers(ctx context.Context, req *admin_pb.ListIAMMember
 }
 
 func (s *Server) AddIAMMember(ctx context.Context, req *admin_pb.AddIAMMemberRequest) (*admin_pb.AddIAMMemberResponse, error) {
-	member, err := s.command.AddInstanceMember(ctx, req.UserId, req.Roles...)
+	objectDetails, err := s.command.AddInstanceMember(ctx, req.UserId, req.Roles...)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.AddIAMMemberResponse{
-		Details: object.AddToDetailsPb(
-			member.Sequence,
-			member.ChangeDate,
-			member.ResourceOwner,
-		),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
 func (s *Server) UpdateIAMMember(ctx context.Context, req *admin_pb.UpdateIAMMemberRequest) (*admin_pb.UpdateIAMMemberResponse, error) {
-	member, err := s.command.ChangeInstanceMember(ctx, UpdateIAMMemberToDomain(req))
+	objectDetails, err := s.command.ChangeInstanceMember(ctx, UpdateIAMMemberToDomain(req))
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.UpdateIAMMemberResponse{
-		Details: object.ChangeToDetailsPb(
-			member.Sequence,
-			member.ChangeDate,
-			member.ResourceOwner,
-		),
+		Details: object.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
