@@ -1,5 +1,5 @@
 ---
-title: Handle Passkey Registration and Login
+title: Passkeys
 sidebar_label: Passkey
 ---
 
@@ -7,23 +7,27 @@ Passkeys are a replacement for passwords that provide faster, easier, and more s
 Unlike passwords, passkeys are phishing-resistant and can improve the user experience and security at the same time.
 Passkeys and there underlying protocols are a standard defined by the [FIDO Standard](https://fidoalliance.org/) .
 
-## Flow
+## Register Passkey
 
-![Passkey Registration and Login Flow](/img/guides/login-ui/passkey-flow.png)
+### Flow
+
+![Passkey Registration(/img/guides/login-ui/passkey-registration-flow.png)
 
 There are two options to onboard users with passkeys:
 1. You send the user a link (email, sms, ...) with an embedded code, so the user is able to register passkey on any capable device
 2. You start the passkey registration directly on the current device used by a user
 
-## Send Registration Link
+### Send Registration Link
 
-When you want to send a link to your user, that enables him to register a new passkey device, you can let ZITADEL send the code or return it in the response so you can send a message by yourself.
+When you want to send a link to your user, that enables him to register a new passkey device, you can choose if ZITADEL sends the code or ZITADEL can return the code in the API response. This way you can send a link through any channel of your choice (email, sms, phone, in-person, postal, ...).
 
-Make sure to also include the URL Template to customize the reset link in the email sent to the user, in case of ZITADEL sending the email.a
+If you asked ZITADEL to send the link to the user please make sure to populate the link with the needed values that point towards your registration UI.
 
 [Send Registration Link Documentation](/apis/resources/user_service/user-service-create-passkey-registration-link)
 
-### Request
+Request Example:
+Send either the sendLink or the returnCode (empty message) in the request body, depending on the use case you have.
+
 ```bash
 curl --request POST \
   --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER_ID/passkeys/registration_link \
