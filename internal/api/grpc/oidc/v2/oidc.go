@@ -3,12 +3,13 @@ package oidc
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/domain"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/zitadel/zitadel/internal/domain"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
 )
 
 func (s *Server) GetAuthRequest(ctx context.Context, req *oidc_pb.GetAuthRequestRequest) (*oidc_pb.GetAuthRequestResponse, error) {

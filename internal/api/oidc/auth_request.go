@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	loginClientHeader = "x-zitadel-login-client"
+	LoginClientHeader = "x-zitadel-login-client"
 )
 
 func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
@@ -28,7 +28,7 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	defer func() { span.EndWithError(err) }()
 
 	headers, _ := http_utils.HeadersFromCtx(ctx)
-	if loginClient := headers.Get(loginClientHeader); loginClient != "" {
+	if loginClient := headers.Get(LoginClientHeader); loginClient != "" {
 		return o.createAuthRequestLoginClient(ctx, req, userID, loginClient)
 	}
 
