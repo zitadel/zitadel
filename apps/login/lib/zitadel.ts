@@ -118,17 +118,17 @@ export async function setSession(
   challenges: ChallengeKind[] | undefined
 ): Promise<SetSessionResponse | undefined> {
   const sessionService = session.getSession(server);
+
+  const payload = { sessionId, sessionToken, challenges };
   return password
     ? sessionService.setSession(
         {
-          sessionId,
-          sessionToken,
+          ...payload,
           checks: { password: { password } },
-          challenges,
         },
         {}
       )
-    : sessionService.setSession({ sessionId, sessionToken, challenges }, {});
+    : sessionService.setSession(payload, {});
 }
 
 export async function getSession(

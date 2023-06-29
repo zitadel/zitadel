@@ -1,11 +1,11 @@
 import {
-  createSession,
   getLoginSettings,
   listAuthenticationMethodTypes,
   server,
 } from "#/lib/zitadel";
 import UsernameForm from "#/ui/UsernameForm";
 import { AuthenticationMethodType, Factors } from "@zitadel/server";
+import { redirect } from "next/navigation";
 
 type SessionAuthMethods = {
   authMethodTypes: AuthenticationMethodType[];
@@ -13,7 +13,7 @@ type SessionAuthMethods = {
   factors: Factors;
 };
 
-async function updateCookie(loginName: string) {
+async function createSessionAndCookie(loginName: string) {
   const res = await fetch(
     `${process.env.VERCEL_URL ?? "http://localhost:3000"}/session`,
     {
@@ -24,52 +24,39 @@ async function updateCookie(loginName: string) {
       body: JSON.stringify({
         loginName,
       }),
+      next: { revalidate: 0 },
     }
   );
 
   const response = await res.json();
 
   if (!res.ok) {
-    console.log("damn");
     return Promise.reject(response.details);
   }
   return response;
 }
 
-async function getSessionAndAuthMethods(
-  loginName: string,
-  domain: string
+async function createSessionAndGetAuthMethods(
+  loginName: string
 ): Promise<SessionAuthMethods> {
-  const createdSession = await createSession(
-    server,
-    loginName,
-    domain,
-    undefined,
-    undefined
-  );
-
-  if (createdSession) {
-    return updateCookie(loginName)
-      .then((resp) => {
-        return listAuthenticationMethodTypes(resp.factors.user.id)
-          .then((methods) => {
-            return {
-              authMethodTypes: methods.authMethodTypes,
-              sessionId: createdSession.sessionId,
-              factors: resp?.factors,
-            };
-          })
-          .catch((error) => {
-            throw "Could not get auth methods";
-          });
-      })
-      .catch((error) => {
-        console.log(error);
-        throw "Could not add session to cookie";
-      });
-  } else {
-    throw "Could not create session";
-  }
+  return createSessionAndCookie(loginName)
+    .then((resp) => {
+      return listAuthenticationMethodTypes(resp.factors.user.id)
+        .then((methods) => {
+          return {
+            authMethodTypes: methods.authMethodTypes,
+            sessionId: resp.sessionId,
+            factors: resp?.factors,
+          };
+        })
+        .catch((error) => {
+          throw "Could not get auth methods";
+        });
+    })
+    .catch((error) => {
+      console.log(error);
+      throw "Could not add session to cookie";
+    });
 }
 
 export default async function Page({
@@ -77,17 +64,25 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const domain: string = process.env.VERCEL_URL ?? "localhost";
-
   const loginName = searchParams?.loginName;
   if (loginName) {
     const login = await getLoginSettings(server);
-    console.log(login);
-    const sessionAndAuthMethods = await getSessionAndAuthMethods(
-      loginName,
-      domain
+    const sessionAndAuthMethods = await createSessionAndGetAuthMethods(
+      loginName
     );
-    console.log(sessionAndAuthMethods);
+    if (sessionAndAuthMethods.authMethodTypes.length == 1) {
+      const method = sessionAndAuthMethods.authMethodTypes[0];
+      switch (method) {
+        case AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSWORD:
+          return redirect("/password?" + new URLSearchParams({ loginName }));
+        case AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY:
+          return redirect(
+            "/passkey/login?" + new URLSearchParams({ loginName })
+          );
+        default:
+          return redirect("/password?" + new URLSearchParams({ loginName }));
+      }
+    }
     return (
       <div className="flex flex-col items-center space-y-4">
         <h1>Welcome back!</h1>

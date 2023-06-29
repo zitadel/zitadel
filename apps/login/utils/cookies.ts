@@ -91,11 +91,11 @@ export async function getMostRecentSessionCookie(): Promise<any> {
 
     return latest;
   } else {
-    return Promise.reject();
+    return Promise.reject("no session cookie found");
   }
 }
 
-export async function getSessionCookieById(id: string): Promise<any> {
+export async function getSessionCookieById(id: string): Promise<SessionCookie> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -110,6 +110,28 @@ export async function getSessionCookieById(id: string): Promise<any> {
     }
   } else {
     return Promise.reject();
+  }
+}
+
+export async function getSessionCookieByLoginName(
+  loginName: string
+): Promise<SessionCookie> {
+  const cookiesList = cookies();
+  const stringifiedCookie = cookiesList.get("sessions");
+
+  console.log("str", stringifiedCookie);
+  if (stringifiedCookie?.value) {
+    const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
+
+    console.log("sessions", sessions);
+    const found = sessions.find((s) => s.loginName === loginName);
+    if (found) {
+      return found;
+    } else {
+      return Promise.reject("no cookie found with loginName: " + loginName);
+    }
+  } else {
+    return Promise.reject("no session cookie found");
   }
 }
 

@@ -36,6 +36,7 @@ export default function PasswordForm({ loginName }: Props) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        loginName,
         password: values.password,
       }),
     });
