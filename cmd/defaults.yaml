@@ -235,6 +235,7 @@ OIDC:
       Path: /oauth/v2/keys
     DeviceAuth:
       Path: /oauth/v2/device_authorization
+  DefaultLoginURLV2: "/login?authRequest="
 
 SAML:
   ProviderConfig:

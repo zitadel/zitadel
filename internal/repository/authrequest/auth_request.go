@@ -25,10 +25,11 @@ type AddedEvent struct {
 	RedirectURI   string                    `json:"redirect_uri"`
 	State         string                    `json:"state,omitempty"`
 	Nonce         string                    `json:"nonce,omitempty"`
-	Scope         []string                  `json:"scope"`
+	Scope         []string                  `json:"scope,omitempty"`
+	Audience      []string                  `json:"audience,omitempty"`
 	ResponseType  domain.OIDCResponseType   `json:"response_type,omitempty"`
 	CodeChallenge *domain.OIDCCodeChallenge `json:"code_challenge,omitempty"`
-	Prompts       []domain.Prompt           `json:"prompts,omitempty"`
+	Prompt        []domain.Prompt           `json:"prompt,omitempty"`
 	UILocales     []string                  `json:"ui_locales,omitempty"`
 	MaxAge        *time.Duration            `json:"max_age,omitempty"`
 	LoginHint     string                    `json:"login_hint,omitempty"`
@@ -50,10 +51,11 @@ func NewAddedEvent(ctx context.Context,
 	redirectURI,
 	state,
 	nonce string,
-	scope []string,
+	scope,
+	audience []string,
 	responseType domain.OIDCResponseType,
 	codeChallenge *domain.OIDCCodeChallenge,
-	prompts []domain.Prompt,
+	prompt []domain.Prompt,
 	uiLocales []string,
 	maxAge *time.Duration,
 	loginHint,
@@ -71,9 +73,10 @@ func NewAddedEvent(ctx context.Context,
 		State:         state,
 		Nonce:         nonce,
 		Scope:         scope,
+		Audience:      audience,
 		ResponseType:  responseType,
 		CodeChallenge: codeChallenge,
-		Prompts:       prompts,
+		Prompt:        prompt,
 		UILocales:     uiLocales,
 		MaxAge:        maxAge,
 		LoginHint:     loginHint,

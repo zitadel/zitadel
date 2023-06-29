@@ -24,7 +24,7 @@ const (
 	AuthRequestColumnClientID      = "client_id"
 	AuthRequestColumnRedirectURI   = "redirect_uri"
 	AuthRequestColumnScope         = "scope"
-	AuthRequestColumnPrompts       = "prompts"
+	AuthRequestColumnPrompt        = "prompt"
 	AuthRequestColumnUILocales     = "ui_locales"
 	AuthRequestColumnMaxAge        = "max_age"
 	AuthRequestColumnLoginHint     = "login_hint"
@@ -51,7 +51,7 @@ func newAuthRequestProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(AuthRequestColumnClientID, crdb.ColumnTypeText),
 			crdb.NewColumn(AuthRequestColumnRedirectURI, crdb.ColumnTypeText),
 			crdb.NewColumn(AuthRequestColumnScope, crdb.ColumnTypeTextArray),
-			crdb.NewColumn(AuthRequestColumnPrompts, crdb.ColumnTypeEnumArray, crdb.Nullable()),
+			crdb.NewColumn(AuthRequestColumnPrompt, crdb.ColumnTypeEnumArray, crdb.Nullable()),
 			crdb.NewColumn(AuthRequestColumnUILocales, crdb.ColumnTypeTextArray, crdb.Nullable()),
 			crdb.NewColumn(AuthRequestColumnMaxAge, crdb.ColumnTypeInt64, crdb.Nullable()),
 			crdb.NewColumn(AuthRequestColumnLoginHint, crdb.ColumnTypeText, crdb.Default("")),
@@ -106,7 +106,7 @@ func (p *authRequestProjection) reduceAuthRequestAdded(event eventstore.Event) (
 			handler.NewCol(AuthRequestColumnClientID, e.ClientID),
 			handler.NewCol(AuthRequestColumnRedirectURI, e.RedirectURI),
 			handler.NewCol(AuthRequestColumnScope, e.Scope),
-			handler.NewCol(AuthRequestColumnPrompts, e.Prompts),
+			handler.NewCol(AuthRequestColumnPrompt, e.Prompt),
 			handler.NewCol(AuthRequestColumnUILocales, e.UILocales),
 			handler.NewCol(AuthRequestColumnMaxAge, e.MaxAge),
 			handler.NewCol(AuthRequestColumnLoginHint, e.LoginHint),

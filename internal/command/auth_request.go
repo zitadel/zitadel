@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -10,13 +11,30 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddAuthRequest(ctx context.Context, request *domain.AuthRequest) error {
-	id, err := c.idGenerator.Next()
+type AuthRequest struct {
+	ID            string
+	LoginClient   string
+	ClientID      string
+	RedirectURI   string
+	State         string
+	Nonce         string
+	Scope         []string
+	Audience      []string
+	ResponseType  domain.OIDCResponseType
+	CodeChallenge *domain.OIDCCodeChallenge
+	Prompt        []domain.Prompt
+	UILocales     []string
+	MaxAge        *time.Duration
+	LoginHint     string
+	HintUserID    string
+}
+
+func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest) (err error) {
+	authRequest.ID, err = c.idGenerator.Next()
 	if err != nil {
 		return err
 	}
-	oidcRequest := request.Request.(*domain.AuthRequestOIDC) //TODO: will be changed
-	writeModel, err := c.getAuthRequestWriteModel(ctx, id)
+	writeModel, err := c.getAuthRequestWriteModel(ctx, authRequest.ID)
 	if err != nil {
 		return err
 	}
@@ -25,20 +43,22 @@ func (c *Commands) AddAuthRequest(ctx context.Context, request *domain.AuthReque
 	}
 	return c.pushAppendAndReduce(ctx, writeModel, authrequest.NewAddedEvent(
 		ctx,
-		&authrequest.NewAggregate(id, authz.GetInstance(ctx).InstanceID()).Aggregate,
-		request.LoginClient,
-		request.ApplicationID,
-		request.CallbackURI,
-		request.TransferState,
-		oidcRequest.Nonce,
-		oidcRequest.Scopes,
-		oidcRequest.ResponseType,
-		oidcRequest.CodeChallenge,
-		request.Prompt,
-		request.UiLocales,
-		request.MaxAuthAge,
-		request.LoginHint,
-		request.UserID))
+		&authrequest.NewAggregate(authRequest.ID, authz.GetInstance(ctx).InstanceID()).Aggregate,
+		authRequest.LoginClient,
+		authRequest.ClientID,
+		authRequest.RedirectURI,
+		authRequest.State,
+		authRequest.Nonce,
+		authRequest.Scope,
+		authRequest.Audience,
+		authRequest.ResponseType,
+		authRequest.CodeChallenge,
+		authRequest.Prompt,
+		authRequest.UILocales,
+		authRequest.MaxAge,
+		authRequest.LoginHint,
+		authRequest.HintUserID,
+	))
 }
 
 func (c *Commands) getAuthRequestWriteModel(ctx context.Context, id string) (writeModel *AuthRequestWriteModel, err error) {
