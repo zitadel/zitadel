@@ -152,12 +152,11 @@ export default function RegisterPasskey({ sessionId, isPrompt }: Props) {
           .catch((error) => {
             console.error(error);
             setLoading(false);
-            //   setError(error);
+            setError(error);
 
             return null;
           });
       }
-      //   return router.push(`/accounts`);
     });
   }
 
