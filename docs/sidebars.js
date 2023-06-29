@@ -294,6 +294,7 @@ module.exports = {
         "guides/solution-scenarios/saas",
         "guides/solution-scenarios/domain-discovery",
         "guides/solution-scenarios/configurations",
+        "guides/solution-scenarios/frontend-calling-backend-API",
       ],
     },
     {
