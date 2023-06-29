@@ -100,13 +100,13 @@ func NewProjectionHandler(
 		reduceScheduledPseudoEvent: reduceScheduledPseudoEvent,
 	}
 
-	go func() {
+	go func(subscribe bool) {
 		<-initialized
-		if !h.reduceScheduledPseudoEvent {
+		if subscribe {
 			go h.subscribe(ctx)
 		}
 		go h.schedule(ctx)
-	}()
+	}(!h.reduceScheduledPseudoEvent)
 
 	return h
 }

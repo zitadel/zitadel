@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/zitadel/zitadel/internal/repository/milestone"
 
@@ -127,14 +128,22 @@ func (p *milestoneProjection) reducePushed(event eventstore.Event) (*handler.Sta
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-XJGXK", "reduce.wrong.event.type %s", milestone.PushedEventType)
 	}
-	return crdb.NewUpdateStatement(
+	if e.MilestoneType != milestone.InstanceDeleted {
+		return crdb.NewUpdateStatement(
+			event,
+			[]handler.Column{
+				handler.NewCol(MilestoneColumnPushedDate, event.CreationDate()),
+			},
+			[]handler.Condition{
+				handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(MilestoneColumnType, e.MilestoneType),
+			},
+		), nil
+	}
+	return crdb.NewDeleteStatement(
 		event,
-		[]handler.Column{
-			handler.NewCol(MilestoneColumnPushedDate, event.CreationDate()),
-		},
 		[]handler.Condition{
 			handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
-			handler.NewCond(MilestoneColumnType, e.MilestoneType),
 		},
 	), nil
 }
@@ -194,7 +203,6 @@ func (p *milestoneProjection) reduceProjectAdded(event eventstore.Event) (*handl
 }
 
 func (p *milestoneProjection) reduceUserTokenAdded(event eventstore.Event) (*handler.Statement, error) {
-	printEvent(event)
 	e, ok := event.(*user.UserTokenAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-3xhJ7", "reduce.wrong.event.type %s", user.UserTokenAddedType)
@@ -211,19 +219,17 @@ func (p *milestoneProjection) reduceUserTokenAdded(event eventstore.Event) (*han
 				crdb.NewIsNullCond(MilestoneColumnReachedDate),
 			},
 		),
-		/*		crdb.AddUpdateStatement(
-				[]handler.Column{
-					handler.NewCol(MilestoneColumnReachedDate, event.CreationDate()),
-				},
-				[]handler.Condition{
-					handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
-					handler.NewCond(MilestoneColumnType, milestone.AuthenticationSucceededOnApplication),
-					crdb.NewExpressionCond(func(param string) (clause string, needsParam bool) {
-						return fmt.Sprintf("%s")
-					}),
-					crdb.NewIsNullCond(MilestoneColumnReachedDate),
-				},
-			),*/
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(MilestoneColumnReachedDate, event.CreationDate()),
+			},
+			[]handler.Condition{
+				handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(MilestoneColumnType, milestone.AuthenticationSucceededOnApplication),
+				crdb.NewNotEqualCond(MilestoneColumnIgnoredProject, strings.Split(e.ApplicationID, "@")[0]),
+				crdb.NewIsNullCond(MilestoneColumnReachedDate),
+			},
+		),
 	), nil
 }
 

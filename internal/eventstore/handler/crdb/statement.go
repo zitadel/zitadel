@@ -290,7 +290,17 @@ func NewIsNullCond(column string) handler.Condition {
 	return handler.Condition{
 		Name: column,
 		ParameterOpt: func(string) string {
-			return fmt.Sprintf("%s IS NULL", column)
+			return " IS NULL"
+		},
+	}
+}
+
+func NewNotEqualCond(column, value string) handler.Condition {
+	return handler.Condition{
+		Name:  column,
+		Value: value,
+		ParameterOpt: func(param string) string {
+			return fmt.Sprintf(" != %s", param)
 		},
 	}
 }
