@@ -90,7 +90,7 @@ func createAuthRequest(t testing.TB, clientID string) string {
 
 	req, err := http.NewRequest(http.MethodGet, authURL, nil)
 	require.NoError(t, err)
-	req.Header.Set(oidc_internal.LoginClientHeader, "something")
+	req.Header.Set(oidc_internal.LoginClientHeader, "loginClient")
 
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -115,5 +115,5 @@ func TestOPStorage_CreateAuthRequest(t *testing.T) {
 	clientID := createClient(t)
 
 	id := createAuthRequest(t, clientID)
-	require.NotEmpty(t, id)
+	require.Contains(t, id, oidc_internal.IDPrefix)
 }
