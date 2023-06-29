@@ -18,8 +18,8 @@ export default function UserAvatar({
       <div>
         <Avatar
           size="small"
-          name={displayName ?? loginName ?? "A"}
-          loginName={loginName ?? "A"}
+          name={displayName ?? loginName ?? ""}
+          loginName={loginName ?? ""}
         />
       </div>
       <span className="ml-4 text-14px">{loginName}</span>
