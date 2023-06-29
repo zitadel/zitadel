@@ -114,12 +114,13 @@ export async function setSession(
   server: ZitadelServer,
   sessionId: string,
   sessionToken: string,
+  domain: string | undefined,
   password: string | undefined,
   challenges: ChallengeKind[] | undefined
 ): Promise<SetSessionResponse | undefined> {
   const sessionService = session.getSession(server);
 
-  const payload = { sessionId, sessionToken, challenges };
+  const payload = { sessionId, sessionToken, challenges, domain };
   return password
     ? sessionService.setSession(
         {

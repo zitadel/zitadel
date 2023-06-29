@@ -1,19 +1,15 @@
-import {
-  createSession,
-  getSession,
-  server,
-  setSession,
-  deleteSession,
-} from "#/lib/zitadel";
+import { server, deleteSession } from "#/lib/zitadel";
 import {
   SessionCookie,
-  addSessionToCookie,
   getMostRecentSessionCookie,
   getSessionCookieById,
   getSessionCookieByLoginName,
   removeSessionFromCookie,
-  updateSessionCookie,
 } from "#/utils/cookies";
+import {
+  createSessionAndUpdateCookie,
+  setSessionAndUpdateCookie,
+} from "#/utils/session";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -23,47 +19,7 @@ export async function POST(request: NextRequest) {
 
     const domain: string = request.nextUrl.hostname;
 
-    const createdSession = await createSession(
-      server,
-      loginName,
-      domain,
-      password,
-      undefined
-    );
-
-    if (createdSession) {
-      return getSession(
-        server,
-        createdSession.sessionId,
-        createdSession.sessionToken
-      ).then((response) => {
-        if (response?.session && response.session?.factors?.user?.loginName) {
-          const sessionCookie: SessionCookie = {
-            id: createdSession.sessionId,
-            token: createdSession.sessionToken,
-            changeDate: response.session.changeDate?.toString() ?? "",
-            loginName: response.session?.factors?.user?.loginName ?? "",
-          };
-
-          return addSessionToCookie(sessionCookie).then(() => {
-            return NextResponse.json({
-              sessionId: createdSession.sessionId,
-              factors: response?.session?.factors,
-            });
-          });
-        } else {
-          return NextResponse.json(
-            {
-              details:
-                "could not get session or session does not have loginName",
-            },
-            { status: 500 }
-          );
-        }
-      });
-    } else {
-      return NextResponse.error();
-    }
+    return createSessionAndUpdateCookie(loginName, password, domain, undefined);
   } else {
     return NextResponse.json(
       { details: "Session could not be created" },
@@ -91,65 +47,23 @@ export async function PUT(request: NextRequest) {
           return Promise.reject(error);
         });
 
+    const domain: string = request.nextUrl.hostname;
+
     return recentPromise
       .then((recent) => {
-        return setSession(server, recent.id, recent.token, password, challenges)
-          .then((session) => {
-            if (session) {
-              const sessionCookie: SessionCookie = {
-                id: recent.id,
-                token: session.sessionToken,
-                changeDate: session.details?.changeDate?.toString() ?? "",
-                loginName: recent.loginName,
-              };
-
-              return getSession(
-                server,
-                sessionCookie.id,
-                sessionCookie.token
-              ).then((response) => {
-                if (
-                  response?.session &&
-                  response.session.factors?.user?.loginName
-                ) {
-                  const { session } = response;
-                  const newCookie: SessionCookie = {
-                    id: sessionCookie.id,
-                    token: sessionCookie.token,
-                    changeDate: session.changeDate?.toString() ?? "",
-                    loginName: session.factors?.user?.loginName ?? "",
-                  };
-
-                  return updateSessionCookie(sessionCookie.id, newCookie)
-                    .then(() => {
-                      return NextResponse.json({ factors: session.factors });
-                    })
-                    .catch((error) => {
-                      return NextResponse.json(
-                        { details: "could not set cookie" },
-                        { status: 500 }
-                      );
-                    });
-                } else {
-                  return NextResponse.json(
-                    {
-                      details:
-                        "could not get session or session does not have loginName",
-                    },
-                    { status: 500 }
-                  );
-                }
-              });
-            } else {
-              return NextResponse.json(
-                { details: "Session not be set" },
-                { status: 500 }
-              );
-            }
-          })
-          .catch((error) => {
-            return NextResponse.json({ details: error }, { status: 500 });
+        return setSessionAndUpdateCookie(
+          recent.id,
+          recent.token,
+          recent.loginName,
+          password,
+          domain,
+          challenges
+        ).then((session) => {
+          return NextResponse.json({
+            sessionId: session.id,
+            factors: session.factors,
           });
+        });
       })
       .catch((error) => {
         return NextResponse.json({ details: error }, { status: 500 });
