@@ -6,10 +6,6 @@ import { TextInput } from "./Input";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
-import {
-  ListAuthenticationMethodTypesResponse,
-  AuthenticationMethodType,
-} from "@zitadel/server";
 
 type Inputs = {
   loginName: string;
@@ -20,38 +16,30 @@ export default function UsernameForm() {
     mode: "onBlur",
   });
 
+  const router = useRouter();
+
   const [loading, setLoading] = useState<boolean>(false);
 
-  async function submitUsernameAndGetAuthenticationMethods(
-    values: Inputs
-  ): Promise<ListAuthenticationMethodTypesResponse> {
-    setLoading(true);
-    const res = await fetch("/methods", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        loginName: values.loginName,
-      }),
-    });
-
-    setLoading(false);
-    if (!res.ok) {
-      throw new Error("Failed to load authentication methods");
-    }
-    return res.json();
-  }
-
-  function submitUsernameAndContinue(value: Inputs): Promise<boolean | void> {
-    return submitUsernameAndGetAuthenticationMethods(value).then(
-      ({ factors, sessionId, authMethodTypes }) => {
-        console.log(factors, sessionId, authMethodTypes);
-        if (authMethodTypes.length === 1) {
-        } else {
-        }
-      }
+  function resubmitWithUsername(values: Inputs) {
+    return router.push(
+      `/loginname?` + new URLSearchParams({ loginName: values.loginName })
     );
+    // setLoading(true);
+    // const res = await fetch("/methods", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     loginName: values.loginName,
+    //   }),
+    // });
+
+    // setLoading(false);
+    // if (!res.ok) {
+    //   throw new Error("Failed to load authentication methods");
+    // }
+    // return res.json();
   }
 
   const { errors } = formState;
@@ -78,7 +66,7 @@ export default function UsernameForm() {
           className="self-end"
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid}
-          onClick={handleSubmit(submitUsernameAndContinue)}
+          onClick={handleSubmit(resubmitWithUsername)}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           continue

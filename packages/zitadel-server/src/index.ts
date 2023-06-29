@@ -19,7 +19,10 @@ export {
   Challenges_Passkey,
 } from "./proto/server/zitadel/session/v2alpha/challenge";
 
-export { Session } from "./proto/server/zitadel/session/v2alpha/session";
+export {
+  Session,
+  Factors,
+} from "./proto/server/zitadel/session/v2alpha/session";
 export {
   ListSessionsResponse,
   GetSessionResponse,

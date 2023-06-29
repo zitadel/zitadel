@@ -19,6 +19,7 @@ function setSessionHttpOnlyCookie(sessions: SessionCookie[]) {
     path: "/",
   });
 }
+
 export async function addSessionToCookie(session: SessionCookie): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -37,7 +38,9 @@ export async function addSessionToCookie(session: SessionCookie): Promise<any> {
     currentSessions = [...currentSessions, session];
   }
 
-  setSessionHttpOnlyCookie(currentSessions);
+  console.log(currentSessions);
+
+  return setSessionHttpOnlyCookie(currentSessions);
 }
 
 export async function updateSessionCookie(
