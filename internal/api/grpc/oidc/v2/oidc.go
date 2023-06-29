@@ -9,33 +9,34 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
 )
 
 func (s *Server) GetAuthRequest(ctx context.Context, req *oidc_pb.GetAuthRequestRequest) (*oidc_pb.GetAuthRequestResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAuthRequest not implemented")
+	dar, err := s.query.AuthRequestByID(ctx, true, req.GetAuthRequestId())
+	if err != nil {
+		return nil, err
+	}
+	return &oidc_pb.GetAuthRequestResponse{
+		AuthRequest: authRequestToPb(dar),
+	}, nil
 }
 
-func authRequestToPb(a *domain.AuthRequest) *oidc_pb.AuthRequest {
+func authRequestToPb(a *query.AuthRequest) *oidc_pb.AuthRequest {
 	pba := &oidc_pb.AuthRequest{
 		Id:           a.ID,
 		CreationDate: timestamppb.New(a.CreationDate),
-		ClientId:     a.ApplicationID,
-		RedirectUri:  a.CallbackURI,
+		ClientId:     a.ClientID,
+		Scope:        a.Scope,
+		RedirectUri:  a.RedirectURI,
 		Prompt:       promptsToPb(a.Prompt),
 		UiLocales:    a.UiLocales,
+		LoginHint:    a.LoginHint,
+		HintUserId:   a.HintUserID,
 	}
-	if oidcAuthReq, ok := a.Request.(*domain.AuthRequestOIDC); ok { // should we throw an error here if the type != OIDC?
-		pba.Scope = oidcAuthReq.Scopes
-	}
-	if a.LoginHint != "" {
-		pba.LoginHint = &a.LoginHint
-	}
-	if a.MaxAuthAge != nil {
-		pba.MaxAge = durationpb.New(*a.MaxAuthAge)
-	}
-	if a.UserID != "" {
-		pba.HintUserId = &a.UserID
+	if a.MaxAge != nil {
+		pba.MaxAge = durationpb.New(*a.MaxAge)
 	}
 	return pba
 }
