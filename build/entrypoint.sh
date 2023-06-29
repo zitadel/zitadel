@@ -8,9 +8,9 @@ case $@ in
         ${@:5}
         ;;
     *)
-        if [ ! -z '$@' ]
+        if [ ! -z "$@" ]
         then
-            ZITADEL_ARGS=$@
+            ZITADEL_ARGS="$@"
         fi
         /app/zitadel ${ZITADEL_ARGS}
         ;;
