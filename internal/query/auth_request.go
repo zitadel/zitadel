@@ -5,8 +5,10 @@ import (
 	"database/sql"
 	_ "embed"
 	errs "errors"
+	"fmt"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -30,6 +32,10 @@ type AuthRequest struct {
 //go:embed embed/auth_request_by_id.sql
 var authRequestByIDQuery string
 
+func (q *Queries) authRequestByIDQuery(ctx context.Context) string {
+	return fmt.Sprintf(authRequestByIDQuery, q.client.Timetravel(call.Took(ctx)))
+}
+
 func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, id string) (_ *AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -45,7 +51,7 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 	)
 
 	dst := new(AuthRequest)
-	err = q.client.DB.QueryRowContext(ctx, authRequestByIDQuery, id).Scan(
+	err = q.client.DB.QueryRowContext(ctx, q.authRequestByIDQuery(ctx), id).Scan(
 		&dst.ID, &dst.CreationDate, &dst.ClientID, &scope, &dst.RedirectURI,
 		&prompt, &locales, &dst.LoginHint, &dst.MaxAge, &dst.HintUserID,
 	)

@@ -9,6 +9,6 @@ select
     login_hint,
     max_age,
     hint_user_id
-from projections.auth_requests
+from projections.auth_requests %s
 where id = $1
 limit 1;

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	_ "embed"
+	"fmt"
 	"regexp"
 	"testing"
 	"time"
@@ -19,7 +20,10 @@ import (
 )
 
 func TestQueries_AuthRequestByID(t *testing.T) {
-	expQuery := regexp.QuoteMeta(authRequestByIDQuery)
+	expQuery := regexp.QuoteMeta(fmt.Sprintf(
+		authRequestByIDQuery,
+		asOfSystemTime,
+	))
 
 	cols := []string{
 		projection.AuthRequestColumnID,
@@ -139,7 +143,8 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 			execMock(t, tt.expect, func(db *sql.DB) {
 				q := &Queries{
 					client: &database.DB{
-						DB: db,
+						DB:       db,
+						Database: &prepareDB{},
 					},
 				}
 				got, err := q.AuthRequestByID(context.Background(), tt.args.shouldTriggerBulk, tt.args.id)
