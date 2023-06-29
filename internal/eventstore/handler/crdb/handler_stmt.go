@@ -128,16 +128,18 @@ func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string
 					break
 				}
 			}
+			if h.reduceScheduledPseudoEvent {
+				queryBuilder.
+					AddQuery().
+					SequenceGreater(seq).
+					InstanceID(instanceID)
+				continue
+			}
 			queryBuilder.
 				AddQuery().
 				SequenceGreater(seq).
-				InstanceID(instanceID)
-
-			if !h.reduceScheduledPseudoEvent {
-				queryBuilder.
-					AddQuery().
-					AggregateTypes(aggregateType)
-			}
+				InstanceID(instanceID).
+				AggregateTypes(aggregateType)
 		}
 	}
 

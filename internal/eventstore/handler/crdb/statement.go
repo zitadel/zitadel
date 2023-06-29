@@ -315,6 +315,16 @@ func NewLessThanCond(column string, value interface{}) handler.Condition {
 	}
 }
 
+func NewContainsCond(column string, value interface{}) handler.Condition {
+	return handler.Condition{
+		Name:  column,
+		Value: value,
+		ParameterOpt: func(placeholder string) string {
+			return fmt.Sprintf(" @> ARRAY[%s]", placeholder)
+		},
+	}
+}
+
 // NewCopyStatement creates a new upsert statement which updates a column from an existing row
 // cols represent the columns which are objective to change.
 // if the value of a col is empty the data will be copied from the selected row
