@@ -10,7 +10,7 @@ Install dependencies with `npm i`
 
 Run tests with `npm run test` or continuously with `npm run test:watch`
 
-## Run
+## Run
 
 Execute the script `node index.js`. Then move the files with
 

@@ -13,8 +13,6 @@ files.map(file => {
 
   const doc = parse_yaml(fileContent)
 
- 
-
   function combineComments(before, after) {
     let combined = before.trim() + (after !== '' ? '\n' + after.trim() : '')
     return combined.replace('\n ', '\n')
@@ -43,6 +41,9 @@ files.map(file => {
     })
 
     try {
+      fs.mkdir('./output', { recursive: true }, (err) => {
+        if (err) throw err;
+      });
       fs.writeFileSync(file.target, markdown);
     } catch (err) {
       console.error(err);
