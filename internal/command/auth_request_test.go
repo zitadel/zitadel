@@ -25,7 +25,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 	}
 	type args struct {
 		ctx     context.Context
-		request *domain.AuthRequest
+		request *AuthRequest
 	}
 	tests := []struct {
 		name    string
@@ -46,6 +46,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 								"state",
 								"nonce",
 								[]string{"openid"},
+								[]string{"audience"},
 								domain.OIDCResponseTypeCode,
 								nil,
 								nil,
@@ -61,7 +62,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 			},
 			args{
 				ctx:     authz.WithInstanceID(context.Background(), "instanceID"),
-				request: &domain.AuthRequest{},
+				request: &AuthRequest{},
 			},
 			caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sf3gt", "Errors.AuthRequest.AlreadyExisting"),
 		},
@@ -80,6 +81,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 								"state",
 								"nonce",
 								[]string{"openid"},
+								[]string{"audience"},
 								domain.OIDCResponseTypeCode,
 								&domain.OIDCCodeChallenge{
 									Challenge: "challenge",
@@ -97,25 +99,24 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 			},
 			args{
 				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
-				request: &domain.AuthRequest{
-					ApplicationID: "clientID",
-					CallbackURI:   "redirectURI",
-					TransferState: "state",
-					Prompt:        []domain.Prompt{domain.PromptNone},
-					UiLocales:     []string{"en", "de"},
-					LoginHint:     "loginHint",
-					MaxAuthAge:    gu.Ptr(time.Duration(0)),
-					Request: &domain.AuthRequestOIDC{
-						Scopes:       []string{"openid"},
-						ResponseType: domain.OIDCResponseTypeCode,
-						Nonce:        "nonce",
-						CodeChallenge: &domain.OIDCCodeChallenge{
-							Challenge: "challenge",
-							Method:    domain.CodeChallengeMethodS256,
-						},
+				request: &AuthRequest{
+					LoginClient:  "loginClient",
+					ClientID:     "clientID",
+					RedirectURI:  "redirectURI",
+					State:        "state",
+					Nonce:        "nonce",
+					Scope:        []string{"openid"},
+					Audience:     []string{"audience"},
+					ResponseType: domain.OIDCResponseTypeCode,
+					CodeChallenge: &domain.OIDCCodeChallenge{
+						Challenge: "challenge",
+						Method:    domain.CodeChallengeMethodS256,
 					},
-					UserID:      "hintUserID",
-					LoginClient: "loginClient",
+					Prompt:     []domain.Prompt{domain.PromptNone},
+					UILocales:  []string{"en", "de"},
+					MaxAge:     gu.Ptr(time.Duration(0)),
+					LoginHint:  "loginHint",
+					HintUserID: "hintUserID",
 				},
 			},
 			nil,

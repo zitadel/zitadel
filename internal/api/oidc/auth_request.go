@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -20,12 +20,59 @@ import (
 )
 
 const (
-	loginClientHeader = "x-zitadel-login-client"
+	LoginClientHeader = "x-zitadel-login-client"
 )
 
 func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	headers, _ := http_utils.HeadersFromCtx(ctx)
+	if loginClient := headers.Get(LoginClientHeader); loginClient != "" {
+		return o.createAuthRequestLoginClient(ctx, req, userID, loginClient)
+	}
+
+	return o.createAuthRequest(ctx, req, userID)
+}
+
+func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.AuthRequest, hintUserID, loginClient string) (op.AuthRequest, error) {
+	project, err := o.query.ProjectByClientID(ctx, req.ClientID, false)
+	if err != nil {
+		return nil, err
+	}
+	scope, err := o.assertProjectRoleScopesByProject(ctx, project, req.Scopes)
+	if err != nil {
+		return nil, err
+	}
+	audience, err := o.audienceFromProjectID(ctx, project.ID)
+	if err != nil {
+		return nil, err
+	}
+	authRequest := &command.AuthRequest{
+		LoginClient:   loginClient,
+		ClientID:      req.ClientID,
+		RedirectURI:   req.RedirectURI,
+		State:         req.State,
+		Nonce:         req.Nonce,
+		Scope:         scope,
+		Audience:      audience,
+		ResponseType:  ResponseTypeToBusiness(req.ResponseType),
+		CodeChallenge: CodeChallengeToBusiness(req.CodeChallenge, req.CodeChallengeMethod),
+		Prompt:        PromptToBusiness(req.Prompt),
+		UILocales:     UILocalesToBusiness(req.UILocales),
+		MaxAge:        MaxAgeToBusiness(req.MaxAge),
+		LoginHint:     req.LoginHint,
+		HintUserID:    hintUserID,
+	}
+
+	err = o.command.AddAuthRequest(ctx, authRequest)
+	if err != nil {
+		return nil, err
+	}
+	return &AuthRequestV2{authRequest}, nil
+}
+
+func (o *OPStorage) createAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
@@ -34,18 +81,7 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(err, "OIDC-Gqrfg", "Errors.Internal")
 	}
-	headers, _ := http_utils.HeadersFromCtx(ctx)
-	authRequest := CreateAuthRequestToBusiness(ctx, req, userAgentID, userID, headers.Get(loginClientHeader))
-	if err = o.setAudience(ctx, authRequest); err != nil {
-		return nil, err
-	}
-	if authRequest.LoginClient != "" {
-		err = o.command.AddAuthRequest(ctx, authRequest)
-		if err != nil {
-			return nil, err
-		}
-		return AuthRequestFromBusiness(authRequest)
-	}
+	authRequest := CreateAuthRequestToBusiness(ctx, req, userAgentID, userID)
 	resp, err := o.repo.CreateAuthRequest(ctx, authRequest)
 	if err != nil {
 		return nil, err
@@ -53,26 +89,17 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	return AuthRequestFromBusiness(resp)
 }
 
-func (o *OPStorage) setAudience(ctx context.Context, req *domain.AuthRequest) error {
-	project, err := o.query.ProjectByClientID(ctx, req.ApplicationID, false)
+func (o *OPStorage) audienceFromProjectID(ctx context.Context, projectID string) ([]string, error) {
+	projectIDQuery, err := query.NewAppProjectIDSearchQuery(projectID)
 	if err != nil {
-		return err
-	}
-	projectIDQuery, err := query.NewAppProjectIDSearchQuery(project.ID)
-	if err != nil {
-		return err
+		return nil, err
 	}
 	appIDs, err := o.query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	req.Audience = appIDs
-	req.AppendAudIfNotExisting(project.ID)
 
-	// the following fields are only set for the internal login UI
-	req.ApplicationResourceOwner = project.ResourceOwner
-	req.PrivateLabelingSetting = project.PrivateLabelingSetting
-	return nil
+	return append(appIDs, projectID), nil
 }
 
 func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRequest, err error) {
@@ -266,6 +293,29 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 	project, err := o.query.ProjectByID(ctx, false, projectID, false)
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-w4wIn", "Errors.Internal")
+	}
+	if !project.ProjectRoleAssertion {
+		return scopes, nil
+	}
+	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(project.ID)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
+	}
+	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
+	if err != nil {
+		return nil, err
+	}
+	for _, role := range roles.ProjectRoles {
+		scopes = append(scopes, ScopeProjectRolePrefix+role.Key)
+	}
+	return scopes, nil
+}
+
+func (o *OPStorage) assertProjectRoleScopesByProject(ctx context.Context, project *query.Project, scopes []string) ([]string, error) {
+	for _, scope := range scopes {
+		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
+			return scopes, nil
+		}
 	}
 	if !project.ProjectRoleAssertion {
 		return scopes, nil

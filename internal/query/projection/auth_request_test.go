@@ -29,7 +29,7 @@ func TestAuthRequestProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					authrequest.AddedType,
 					authrequest.AggregateType,
-					[]byte(`{"login_client": "loginClient", "client_id":"clientId","redirect_uri": "redirectURI", "scope": ["openid"], "prompts": [1], "ui_locales": ["en","de"], "max_age": 0, "login_hint": "loginHint", "hint_user_id": "hintUserID"}`),
+					[]byte(`{"login_client": "loginClient", "client_id":"clientId","redirect_uri": "redirectURI", "scope": ["openid"], "prompt": [1], "ui_locales": ["en","de"], "max_age": 0, "login_hint": "loginHint", "hint_user_id": "hintUserID"}`),
 				), authrequest.AddedEventMapper),
 			},
 			reduce: (&authRequestProjection{}).reduceAuthRequestAdded,
@@ -40,7 +40,7 @@ func TestAuthRequestProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.auth_requests (id, instance_id, creation_date, change_date, resource_owner, sequence, login_client, client_id, redirect_uri, scope, prompts, ui_locales, max_age, login_hint, hint_user_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)",
+							expectedStmt: "INSERT INTO projections.auth_requests (id, instance_id, creation_date, change_date, resource_owner, sequence, login_client, client_id, redirect_uri, scope, prompt, ui_locales, max_age, login_hint, hint_user_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",

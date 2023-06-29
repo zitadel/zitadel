@@ -23,6 +23,7 @@ import (
 	"github.com/zitadel/zitadel/cmd"
 	"github.com/zitadel/zitadel/cmd/start"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/http"
 	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -238,7 +239,7 @@ func NewTester(ctx context.Context) *Tester {
 	}
 	tester.createClientConn(ctx)
 	tester.createSystemUser(ctx)
-	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, "https://"+tester.Host())
+	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, http.BuildOrigin(tester.Host(), tester.Config.ExternalSecure))
 
 	return tester
 }
