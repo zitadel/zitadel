@@ -36,6 +36,7 @@ To use private information — such as a database admin credential — without s
 All configuration properties are configurable using environment variables.
 ZITADEL environment variable keys are prefixed with `ZITADEL_`.
 For example, to configure the default ZITADEL IAM admin username and password, set the `zitadel` binary runtime environment variables `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME` and `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD`.
+Currently it is not possible to configure maps of values with environment variables, use a configuration file instead.
 
 <details>
     <summary>List of environment variables for database initialization </summary>
@@ -47,8 +48,6 @@ For example, to configure the default ZITADEL IAM admin username and password, s
     Check the <a href="#runtime-configuration-file">Runtime configuration file</a>for a full reference, if default values are omitted.
     <Defaults />
 </details>
-
-
 
 ### Proxy configuration
 

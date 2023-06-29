@@ -37,7 +37,7 @@ function parseZitadelYaml(file) {
             let grandparent = path.slice(-3, -2)[0]
             
             if(  YAML.isSeq(grandparent) ) {
-              output.find(node => node.env === keys2env(path_array.slice(0, -1))).value = 'array[...]'
+              output.find(node => node.env === keys2env(path_array.slice(0, -1))).value = '(map of values, see files)'
             } else {
               output.find(node => node.env === env).value = value.value
             }
