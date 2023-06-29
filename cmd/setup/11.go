@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"embed"
-	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/zitadel/logging"
@@ -15,10 +14,8 @@ import (
 var (
 	//go:embed 11/11_add_column.sql
 	addEventCreatedAt string
-	//go:embed 11/11_fetch_events.sql
-	fetchCreatedAt string
-	//go:embed 11/11_fill_column.sql
-	fillCreatedAt string
+	//go:embed 11/11_update_events.sql
+	setCreatedAt string
 	//go:embed 11/11_set_column.sql
 	setCreatedAtDetails string
 	//go:embed 11/postgres/create_index.sql
@@ -55,49 +52,22 @@ func (mig *AddEventCreatedAt) Execute(ctx context.Context) error {
 		return err
 	}
 
-	for {
-		var count int
+	for i := 0; ; i++ {
+		var affected int64
 		err = crdb.ExecuteTx(ctx, mig.dbClient.DB, nil, func(tx *sql.Tx) error {
-			rows, err := tx.Query(fetchCreatedAt, mig.BulkAmount)
+			res, err := tx.Exec(setCreatedAt, mig.BulkAmount)
 			if err != nil {
 				return err
 			}
-			defer rows.Close()
 
-			data := make(map[string]time.Time, 20)
-			for rows.Next() {
-				count++
-				var (
-					id           string
-					creationDate time.Time
-				)
-
-				err = rows.Scan(&id, &creationDate)
-				if err != nil {
-					return err
-				}
-
-				data[id] = creationDate
-
-			}
-			if err := rows.Err(); err != nil {
-				return err
-			}
-
-			for id, creationDate := range data {
-				_, err = tx.Exec(fillCreatedAt, creationDate, id)
-				if err != nil {
-					return err
-				}
-			}
-
+			affected, _ = res.RowsAffected()
 			return nil
 		})
 		if err != nil {
 			return err
 		}
-		logging.WithFields("count", count).Info("creation dates set")
-		if count < 20 {
+		logging.WithFields("step", "11", "iteration", i, "affected", affected).Info("set created_at iteration done")
+		if affected < int64(mig.BulkAmount) {
 			break
 		}
 	}

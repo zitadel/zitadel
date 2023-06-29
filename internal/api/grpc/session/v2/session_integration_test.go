@@ -124,6 +124,7 @@ func TestServer_CreateSession(t *testing.T) {
 					},
 				},
 				Metadata: map[string][]byte{"foo": []byte("bar")},
+				Domain:   "domain",
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
@@ -146,6 +147,22 @@ func TestServer_CreateSession(t *testing.T) {
 		{
 			name: "passkey without user error",
 			req: &session.CreateSessionRequest{
+				Challenges: []session.ChallengeKind{
+					session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "passkey without domain (not registered) error",
+			req: &session.CreateSessionRequest{
+				Checks: &session.Checks{
+					User: &session.CheckUser{
+						Search: &session.CheckUser_UserId{
+							UserId: User.GetUserId(),
+						},
+					},
+				},
 				Challenges: []session.ChallengeKind{
 					session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
 				},
@@ -181,6 +198,7 @@ func TestServer_CreateSession_passkey(t *testing.T) {
 		Challenges: []session.ChallengeKind{
 			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
 		},
+		Domain: Tester.Config.ExternalDomain,
 	})
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil)
@@ -308,7 +326,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 	var wantFactors []wantFactor
 
 	// create new, empty session
-	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{})
+	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{Domain: Tester.Config.ExternalDomain})
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, wantFactors...)
 	sessionToken := createResp.GetSessionToken()

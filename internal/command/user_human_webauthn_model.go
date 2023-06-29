@@ -21,6 +21,7 @@ type HumanWebAuthNWriteModel struct {
 	AAGUID            []byte
 	SignCount         uint32
 	WebAuthNTokenName string
+	RPID              string
 
 	State domain.MFAState
 }
@@ -113,6 +114,7 @@ func (wm *HumanWebAuthNWriteModel) Reduce() error {
 func (wm *HumanWebAuthNWriteModel) appendAddedEvent(e *user.HumanWebAuthNAddedEvent) {
 	wm.WebauthNTokenID = e.WebAuthNTokenID
 	wm.Challenge = e.Challenge
+	wm.RPID = e.RPID
 	wm.State = domain.MFAStateNotReady
 }
 
