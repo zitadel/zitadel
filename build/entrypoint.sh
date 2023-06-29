@@ -8,7 +8,7 @@ case $@ in
         ${@:5}
         ;;
     *)
-        if [ ! -z  "$@" ]
+        if [ ! -z '$@' ]
         then
             ZITADEL_ARGS=$@
         fi

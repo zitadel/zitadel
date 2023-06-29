@@ -2,9 +2,6 @@ FROM ubuntu:latest as artifact
 ARG TARGETOS TARGETARCH
 ENV ZITADEL_ARGS=
 
-WORKDIR /app
-ENV PATH="/app:${PATH}"
-
 RUN apt-get update && apt-get install ca-certificates -y
 
 COPY build/entrypoint.sh /app/entrypoint.sh
@@ -18,18 +15,21 @@ RUN useradd -s "" --home / zitadel && \
     chown zitadel /app/entrypoint.sh && \
     chmod +x /app/entrypoint.sh
 
+WORKDIR /app
+ENV PATH="/app:${PATH}"
+
 USER zitadel
 ENTRYPOINT ["entrypoint.sh"]
 
 FROM scratch as final
 
-WORKDIR /app
-ENV PATH="/app:${PATH}"
-HEALTHCHECK NONE
-
 COPY --from=artifact /etc/passwd /etc/passwd
 COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
 COPY --from=artifact /app/zitadel /app/zitadel
+
+WORKDIR /app
+ENV PATH="/app:${PATH}"
+HEALTHCHECK NONE
 
 USER zitadel
 ENTRYPOINT ["zitadel"]
