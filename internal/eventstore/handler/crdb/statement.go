@@ -288,14 +288,21 @@ func NewCopyCol(column, from string) handler.Column {
 
 func NewIsNullCond(column string) handler.Condition {
 	return handler.Condition{
-		Value: specialWhere(func(param string) (clause string, needsParam bool) {
-			return fmt.Sprintf("%s IS NULL", column), false
-		}),
+		Name: column,
+		ParameterOpt: func(string) string {
+			return fmt.Sprintf("%s IS NULL", column)
+		},
 	}
 }
 
-func NewExpressionCond(expr specialWhere) handler.Condition {
-	return handler.Condition{Value: expr}
+func NewLessThanCond(column string, value interface{}) handler.Condition {
+	return handler.Condition{
+		Name:  column,
+		Value: value,
+		ParameterOpt: func(placeholder string) string {
+			return " < " + placeholder
+		},
+	}
 }
 
 // NewCopyStatement creates a new upsert statement which updates a column from an existing row
@@ -397,23 +404,17 @@ func columnsToQuery(cols []handler.Column) (names []string, parameters []string,
 	return names, parameters, values[:parameterIndex]
 }
 
-type specialWhere func(param string) (clause string, needsParam bool)
-
 func conditionsToWhere(cols []handler.Condition, paramOffset int) (wheres []string, values []interface{}) {
 	wheres = make([]string, len(cols))
 	values = make([]interface{}, 0, len(cols))
 
 	for i, col := range cols {
-		param := strconv.Itoa(i + 1 + paramOffset)
-		special, ok := col.Value.(specialWhere)
-		if !ok {
-			wheres[i] = "(" + col.Name + " = $" + param + ")"
-			values = append(values, col.Value)
-			continue
+		param := "$" + strconv.Itoa(i+1+paramOffset)
+		wheres[i] = "(" + col.Name + " = " + param + ")"
+		if col.ParameterOpt != nil {
+			wheres[i] = "(" + col.Name + col.ParameterOpt(param) + ")"
 		}
-		clause, needsValueParam := special(param)
-		wheres[i] = clause
-		if needsValueParam {
+		if col.Value != nil {
 			values = append(values, col.Value)
 		}
 	}

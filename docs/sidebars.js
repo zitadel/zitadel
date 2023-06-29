@@ -169,6 +169,27 @@ module.exports = {
         },
         {
           type: "category",
+          label: "Build your own Login-UI",
+          link: {
+            type: "generated-index",
+            title: "Build your own Login-UI",
+            slug: "/guides/integrate/login-ui",
+            description:
+                "In the following guides you will learn how to create your own login ui with our APIs. The different scenarios like username/password, external identity provider, etc will be shown.",
+
+          },
+          collapsed: true,
+          items: [
+            "guides/integrate/login-ui/username-password",
+            "guides/integrate/login-ui/external-login",
+            "guides/integrate/login-ui/select-account",
+            "guides/integrate/login-ui/password-reset",
+            "guides/integrate/login-ui/logout",
+            "guides/integrate/login-ui/oidc-standard"
+          ],
+        },
+        {
+          type: "category",
           label: "Configure identity providers",
           link: {
             type: "generated-index",
@@ -273,6 +294,7 @@ module.exports = {
         "guides/solution-scenarios/saas",
         "guides/solution-scenarios/domain-discovery",
         "guides/solution-scenarios/configurations",
+        "guides/solution-scenarios/frontend-calling-backend-API",
       ],
     },
     {

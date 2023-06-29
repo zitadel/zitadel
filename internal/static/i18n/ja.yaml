@@ -476,6 +476,7 @@ Errors:
     NotSucceeded: インテントが成功しなかった
     TokenCreationFailed: トークンの作成に失敗しました
     InvalidToken: インテントのトークンが無効である
+    OtherUser: 他のユーザーを意図している
 
 AggregateTypes:
   action: アクション

@@ -51,6 +51,8 @@ const (
 	UserAuthMethodTypeOTP
 	UserAuthMethodTypeU2F
 	UserAuthMethodTypePasswordless
+	UserAuthMethodTypePassword
+	UserAuthMethodTypeIDP
 	userAuthMethodTypeCount
 )
 
