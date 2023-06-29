@@ -5,23 +5,29 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
-	sessionEventPrefix  = "session."
-	AddedType           = sessionEventPrefix + "added"
-	UserCheckedType     = sessionEventPrefix + "user.checked"
-	PasswordCheckedType = sessionEventPrefix + "password.checked"
-	TokenSetType        = sessionEventPrefix + "token.set"
-	MetadataSetType     = sessionEventPrefix + "metadata.set"
-	TerminateType       = sessionEventPrefix + "terminated"
+	sessionEventPrefix    = "session."
+	AddedType             = sessionEventPrefix + "added"
+	UserCheckedType       = sessionEventPrefix + "user.checked"
+	PasswordCheckedType   = sessionEventPrefix + "password.checked"
+	IntentCheckedType     = sessionEventPrefix + "intent.checked"
+	PasskeyChallengedType = sessionEventPrefix + "passkey.challenged"
+	PasskeyCheckedType    = sessionEventPrefix + "passkey.checked"
+	TokenSetType          = sessionEventPrefix + "token.set"
+	MetadataSetType       = sessionEventPrefix + "metadata.set"
+	TerminateType         = sessionEventPrefix + "terminated"
 )
 
 type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	Domain string `json:"domain,omitempty"`
 }
 
 func (e *AddedEvent) Data() interface{} {
@@ -34,6 +40,7 @@ func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 
 func NewAddedEvent(ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	domain string,
 ) *AddedEvent {
 	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -41,6 +48,7 @@ func NewAddedEvent(ctx context.Context,
 			aggregate,
 			AddedType,
 		),
+		Domain: domain,
 	}
 }
 
@@ -139,6 +147,119 @@ func PasswordCheckedEventMapper(event *repository.Event) (eventstore.Event, erro
 	}
 
 	return added, nil
+}
+
+type IntentCheckedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	CheckedAt time.Time `json:"checkedAt"`
+}
+
+func (e *IntentCheckedEvent) Data() interface{} {
+	return e
+}
+
+func (e *IntentCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewIntentCheckedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	checkedAt time.Time,
+) *IntentCheckedEvent {
+	return &IntentCheckedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			IntentCheckedType,
+		),
+		CheckedAt: checkedAt,
+	}
+}
+
+func IntentCheckedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	added := &IntentCheckedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, added)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "SESSION-DGt90", "unable to unmarshal intent checked")
+	}
+
+	return added, nil
+}
+
+type PasskeyChallengedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Challenge          string                             `json:"challenge,omitempty"`
+	AllowedCrentialIDs [][]byte                           `json:"allowedCrentialIDs,omitempty"`
+	UserVerification   domain.UserVerificationRequirement `json:"userVerification,omitempty"`
+}
+
+func (e *PasskeyChallengedEvent) Data() interface{} {
+	return e
+}
+
+func (e *PasskeyChallengedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *PasskeyChallengedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewPasskeyChallengedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	challenge string,
+	allowedCrentialIDs [][]byte,
+	userVerification domain.UserVerificationRequirement,
+) *PasskeyChallengedEvent {
+	return &PasskeyChallengedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			PasskeyChallengedType,
+		),
+		Challenge:          challenge,
+		AllowedCrentialIDs: allowedCrentialIDs,
+		UserVerification:   userVerification,
+	}
+}
+
+type PasskeyCheckedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	CheckedAt time.Time `json:"checkedAt"`
+}
+
+func (e *PasskeyCheckedEvent) Data() interface{} {
+	return e
+}
+
+func (e *PasskeyCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *PasskeyCheckedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewPasskeyCheckedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	checkedAt time.Time,
+) *PasswordCheckedEvent {
+	return &PasswordCheckedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			PasskeyCheckedType,
+		),
+		CheckedAt: checkedAt,
+	}
 }
 
 type TokenSetEvent struct {

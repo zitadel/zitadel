@@ -94,5 +94,4 @@ You might want to check out the following links to find a good library:
 
 - [awesome-auth](https://github.com/casbin/awesome-auth)
 - [OpenID General References](https://openid.net/developers/libraries/)
-- [OpenID certified libraries](https://openid.net/developers/certified/)
-- [OpenID uncertified libraries](https://openid.net/developers/uncertified/)
+- [OpenID certified developer tools](https://openid.net/certified-open-id-developer-tools/)

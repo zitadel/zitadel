@@ -3,12 +3,14 @@ package command
 import (
 	"context"
 
+	"github.com/pquerna/otp"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -43,7 +45,32 @@ func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
 	}
-	human, err := c.getHuman(ctx, userID, resourceowner)
+	prep, err := c.createHumanTOTP(ctx, userID, resourceowner)
+	if err != nil {
+		return nil, err
+	}
+	_, err = c.eventstore.Push(ctx, prep.cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.OTP{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: prep.userAgg.ID,
+		},
+		SecretString: prep.key.Secret(),
+		Url:          prep.key.URL(),
+	}, nil
+}
+
+type preparedTOTP struct {
+	wm      *HumanOTPWriteModel
+	userAgg *eventstore.Aggregate
+	key     *otp.Key
+	cmds    []eventstore.Command
+}
+
+func (c *Commands) createHumanTOTP(ctx context.Context, userID, resourceOwner string) (*preparedTOTP, error) {
+	human, err := c.getHuman(ctx, userID, resourceOwner)
 	if err != nil {
 		logging.Log("COMMAND-DAqe1").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get human for loginname")
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-MM9fs", "Errors.User.NotFound")
@@ -59,7 +86,7 @@ func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-8ugTs", "Errors.Org.DomainPolicy.NotFound")
 	}
 
-	otpWriteModel, err := c.otpWriteModelByID(ctx, userID, resourceowner)
+	otpWriteModel, err := c.otpWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -80,16 +107,13 @@ func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.eventstore.Push(ctx, user.NewHumanOTPAddedEvent(ctx, userAgg, secret))
-	if err != nil {
-		return nil, err
-	}
-	return &domain.OTP{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: human.AggregateID,
+	return &preparedTOTP{
+		wm:      otpWriteModel,
+		userAgg: userAgg,
+		key:     key,
+		cmds: []eventstore.Command{
+			user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
 		},
-		SecretString: key.Secret(),
-		Url:          key.URL(),
 	}, nil
 }
 

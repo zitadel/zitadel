@@ -8,9 +8,9 @@ The individual guides in this section should give you an overview of things to c
 
 When moving from a previous auth solution to ZITADEL, it is important to note that some decisions and features are unique to ZITADEL.
 Without duplicating too much content here are some important features and patterns to consider in terms of solution architecture.
-You can read more about the basic structure and important concepts of ZITADEL in our [concepts section](https://zitadel.com/docs/concepts/introduction).
+You can read more about the basic structure and important concepts of ZITADEL in our [concepts section](/docs/concepts/).
 
-## Multi-Tenancy Architecture
+## Multi-tenancy architecture
 
 Multi-tenancy in ZITADEL can be achieved through either [Instances](/docs/concepts/structure/instance) or [Organizations](/docs/concepts/structure/organizations).
 Where instances represent isolated ZITADEL instances, Organizations provide a more permeable approach to multi-tenancy.
@@ -19,7 +19,7 @@ In most cases, when you want to achieve multi-tenancy, you use Organizations. Ea
 Please also consult our guide on [Solution Scenarios](/docs/guides/solution-scenarios/introduction
 ) for B2C and B2B for more details.
 
-## Delegated Access Management
+## Delegated access management
 
 Some solutions, that offer multi-tenancy, require you to copy applications and settings to each tenant and manage changes individually.
 ZITADEL works differently by using [Granted Projects](/docs/concepts/structure/granted_projects).
@@ -47,17 +47,24 @@ You can store arbitrary key-value pairs of data on objects such as Users or Orga
 Metadata could link a user to a specific backend user-id or represent an "organizational unit" for your business logic.
 Metadata can be access directly with the correct [scopes](/docs/apis/openidoauth/scopes#reserved-scopes) or transformed to custom claims (see above).
 
-## Migrating users
+## Migrating resources
+
+### Migrating users
 
 Migrating users with minimal impact on users can be a challenging task.
 We provide some more information on migrating users and secrets in [this guide](./users.md).
+
+### Migrating clients / applications
+
+After you have set up or imported your applications to ZITADEL, you need to update your client's configurations, such as issuer, clientID or credentials.
+It is not possible to create an application with a pre-defined clientID or import existing credentials.
 
 ## Technical considerations
 
 ### Batch migration
 
 **Batch migration** is the easiest way, if you can afford some minimal downtime to move all users and applications over to ZITADEL.
-See the [User guide](./users.md) for batch migration of users. 
+See the [User guide](./users.md) for batch migration of users.
 
 ### Just-in-time migration
 
@@ -71,7 +78,7 @@ For all other cases, we recommend that the **legacy system orchestrates the migr
 - Update your legacy system to create a user in ZITADEL on their next login, if not already flagged as migrated, by using our APIs (you can set the password and a verified email)
 - Redirect migrated users with a login hint in the [auth request](/docs/apis/openidoauth/authrequest.mdx) to ZITADEL to pre-select the user
 
-In this case the migration can also be done as an import job or also allowing to create user session in both the legacy auth solution and ZITADEL in parallel with identity brokering: 
+In this case the migration can also be done as an import job or also allowing to create user session in both the legacy auth solution and ZITADEL in parallel with identity brokering:
 
 - Setup ZITADEL to use your legacy system as external identity provider (note: you can also use JWT-IDP, if you only have a token).
 - Configure your app to use ZITADEL, which will redirect users automatically to the external identity provider to login.
