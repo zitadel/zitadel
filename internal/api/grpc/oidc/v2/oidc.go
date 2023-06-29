@@ -3,19 +3,26 @@ package oidc
 import (
 	"context"
 
+	"github.com/zitadel/logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	oidc_internal "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
 )
 
 func (s *Server) GetAuthRequest(ctx context.Context, req *oidc_pb.GetAuthRequestRequest) (*oidc_pb.GetAuthRequestResponse, error) {
-	dar, err := s.query.AuthRequestByID(ctx, true, req.GetAuthRequestId())
+	authRequestID, err := oidc_internal.StripIDPrefix(req.GetAuthRequestId())
 	if err != nil {
+		return nil, err
+	}
+	dar, err := s.query.AuthRequestByID(ctx, true, authRequestID)
+	if err != nil {
+		logging.WithError(err).Error("query authRequest by ID")
 		return nil, err
 	}
 	return &oidc_pb.GetAuthRequestResponse{
@@ -25,7 +32,7 @@ func (s *Server) GetAuthRequest(ctx context.Context, req *oidc_pb.GetAuthRequest
 
 func authRequestToPb(a *query.AuthRequest) *oidc_pb.AuthRequest {
 	pba := &oidc_pb.AuthRequest{
-		Id:           a.ID,
+		Id:           oidc_internal.IDPrefix + a.ID,
 		CreationDate: timestamppb.New(a.CreationDate),
 		ClientId:     a.ClientID,
 		Scope:        a.Scope,

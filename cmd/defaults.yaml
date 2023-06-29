@@ -760,6 +760,8 @@ InternalAuthZ:
         - "project.grant.member.write"
         - "project.grant.member.delete"
         - "events.read"
+        - "authrequest.read"
+        - "authrequest.update"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -785,6 +787,7 @@ InternalAuthZ:
         - "project.grant.read"
         - "project.grant.member.read"
         - "events.read"
+        - "authrequest.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
@@ -908,6 +911,8 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "authrequest.read"
+        - "authrequest.update"
     - Role: "ORG_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -941,6 +946,7 @@ InternalAuthZ:
         - "project.grant.read"
         - "project.grant.member.read"
         - "project.grant.user.grant.read"
+        - "authrequest.read"
     - Role: "ORG_SETTINGS_MANAGER"
       Permissions:
         - "org.read"
@@ -1020,6 +1026,8 @@ InternalAuthZ:
         - "user.grant.write"
         - "user.grant.delete"
         - "user.membership.read"
+        - "authrequest.read"
+        - "authrequest.update"
     - Role: "PROJECT_OWNER_VIEWER"
       Permissions:
         - "policy.read"
@@ -1033,6 +1041,7 @@ InternalAuthZ:
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
+        - "authrequest.read"
     - Role: "SELF_MANAGEMENT_GLOBAL"
       Permissions:
         - "org.create"
@@ -1071,6 +1080,7 @@ InternalAuthZ:
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
+        - "authrequest.read"
     - Role: "PROJECT_GRANT_OWNER"
       Permissions:
         - "policy.read"

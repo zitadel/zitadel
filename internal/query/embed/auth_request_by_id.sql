@@ -4,7 +4,7 @@ select
     client_id,
     scope,
     redirect_uri,
-    prompts,
+    prompt,
     ui_locales,
     login_hint,
     max_age,
