@@ -76,6 +76,7 @@ func (t *telemetryPusher) reducers() []handler.AggregateReducer {
 	}}
 }
 
+// TODO: Remove
 func printEvent(event eventstore.Event) {
 	bytes, err := json.MarshalIndent(event, "", "    ")
 	if err != nil {

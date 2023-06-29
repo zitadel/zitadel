@@ -45,7 +45,7 @@ Console:
   InstanceManagementURL: "https://example.com/instances/{{.InstanceID}}"
 
 Projections:
-  RequeueEvery: 20s
+  RequeueEvery: 60s
   Customizations:
     NotificationsQuotas:
 #      RequeueEvery: 1s

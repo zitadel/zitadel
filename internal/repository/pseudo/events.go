@@ -16,9 +16,12 @@ var _ eventstore.Event = (*ScheduledEvent)(nil)
 
 type ScheduledEvent struct {
 	*eventstore.BaseEvent `json:"-"`
-	Timestamp             time.Time        `json:"timestamp"`
-	InstanceIDs           []string         `json:"instanceIDs"`
-	TriggeringEvent       eventstore.Event `json:"triggeringEvent"`
+	// TODO: `json:"-"`
+	Timestamp time.Time `json:"timestamp"`
+	// TODO: `json:"-"`
+	InstanceIDs []string `json:"instanceIDs"`
+	// TODO: `json:"-"`
+	TriggeringEvent eventstore.Event `json:"triggeringEvent"`
 }
 
 func NewScheduledEvent(
