@@ -23,7 +23,7 @@ When you want to send a link to your user, that enables him to register a new pa
 
 If you asked ZITADEL to send the link to the user please make sure to populate the link with the needed values that point towards your registration UI.
 
-[Send Registration Link Documentation](/apis/resources/user_service/user-service-create-passkey-registration-link)
+More detailed information about the API: [Send Registration Link Documentation](/apis/resources/user_service/user-service-create-passkey-registration-link)
 
 Request Example:
 Send either the sendLink or the returnCode (empty message) in the request body, depending on the use case you have.
@@ -42,7 +42,9 @@ curl --request POST \
 }'
 ```
 
-## Response in case of return code
+Response Example:
+The code is only filled if returnCode has been requested in the Request.Passkey
+
 ```bash
 {
 	"details": {
@@ -57,7 +59,7 @@ curl --request POST \
 }
 ```
 
-## Start Passkey Registration
+### Start Passkey Registration
 
 When starting the passkey registration you can optionally send the registration code from the step above to ZITADEL to pair it with a specific user.
 
@@ -68,9 +70,10 @@ By specifying the authenticator type you can choose if the passkey should be cro
 
 The API response will provide you the public key credential options, this will be used by the browser to obtain a signed challenge.
 
-[Start Passkey Registration Documentation](/apis/resources/user_service/user-service-register-passkey)
+More detailed information about the API: [Start Passkey Registration Documentation](/apis/resources/user_service/user-service-register-passkey)
 
-### Request
+Request Example:
+The code only has to be filled if the user did get a registration code.
 
 ```bash
 curl --request POST \
@@ -87,7 +90,7 @@ curl --request POST \
 }'
 ```
 
-### Response
+Response Example:
 
 ```bash
 {
@@ -147,21 +150,21 @@ curl --request POST \
 				}
 			],
 			"rp": {
-				"id": "fabi-t7rlmd.zitadel.app",
+				"id": "example.domain.com",
 				"name": "ZITADEL"
 			},
 			"timeout": 300000,
 			"user": {
 				"displayName": "Minnie Mouse",
 				"id": "MjE4NjYyNTk2OTE4NjQwODk3",
-				"name": "minni-mouse@mouse.com@fabi.zitadel.app"
+				"name": "minni-mouse@mouse.com"
 			}
 		}
 	}
 }
 ```
 
-## Register in Browser
+### Register new Passkey on current device
 
 Now that you have started the registration within ZITADEL, you have to register the credentials in the browser.
 This requires a call to the browser api and looks something like the following.
@@ -180,10 +183,12 @@ For more information about WebAuthN and registering credential flow, read the fo
 
 In the next request you have to verify the Passkey within ZITADEL.
 Include the public key credential you got from the browser in your request.
-Also you can give the Passkey a name, which makes it easier for the user to identify the registered authentication methods.
-Example: Google Pixel, iPhone, Mac Book, etc
+You can give the Passkey a name, which makes it easier for the user to identify the registered authentication methods.
+Example: Google Pixel, iCloud Keychain, Yubikey, etc
 
-[Verify Passkey Registration Documentation](/apis/resources/user_service/user-service-verify-passkey-registration)
+More detailed information about the API: [Verify Passkey Registration Documentation](/apis/resources/user_service/user-service-verify-passkey-registration)
+
+Example Request:
 
 ```bash
 curl --request POST \
@@ -201,22 +206,29 @@ curl --request POST \
       "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQlhXdHh0WGxJeFZZa0pHT1dVaUVmM25zby02aXZKdWw2YmNmWHdMVlFIayIsIm9yaWdpbiI6Imh0dHBzOi8vbG9jYWxob3N0OjgwODAifQ"
     }
   },
-  "passkeyName": "fido key"
+  "passkeyName": "Google Pixel"
 }'
 ```
 
 You have successfully registered a new passkey to the user.
 Next step is to authenticate the user with the new registered passkey.
 
-## Create Session
+## Login with Passkey
+
+### Flow
+
+![Passkey Login(/img/guides/login-ui/passkey-login-flow.png)
+
+
+### Create Session
 
 First step is to ask the user for his username and create a new session with the ZITADEL API.
 When creating the new session make sure to include the challenge for passkey.
 The response will include the public key credential request options for the passkey in the challenges.
 
-[Create Session Documentation](/apis/resources/session_service/session-service-create-session)
+More detailed information about the API: [Create Session Documentation](/apis/resources/session_service/session-service-create-session)
 
-### Request
+Example Request:
 ```bash
 curl --request POST \
   --url https://$ZITADEL_DOMAIN/v2alpha/sessions \
@@ -236,7 +248,7 @@ curl --request POST \
 }'
 ```
 
-### Response
+Example Response:
 ```bash
 {
   "details": {
@@ -257,7 +269,7 @@ curl --request POST \
             }
           ],
           "challenge": "GAOHYz2jE69kJMYo6Laij8yWw9-dKKgbViNhfuy0StA",
-          "rpId": "localhost",
+          "rpId": "example.domain.com",
           "timeout": 300000,
           "userVerification": "required"
         }
@@ -286,9 +298,9 @@ Read the [WebAuthN Guide](https://webauthn.guide/#authentication) for more infor
 Now that you have successfully authenticated in the browser, you can update the session of the user.
 Fill the passkey checks with the credential assertion data you get from the browser.
 
-[Update Session Documentation](/apis/resources/session_service/session-service-set-session)
+More detailed information about the API: [Update Session Documentation](/apis/resources/session_service/session-service-set-session)
 
-### Request
+Example Request:
 
 ```bash
 curl --request PATCH \
