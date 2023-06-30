@@ -199,6 +199,7 @@ You have an API that acts as an OAuth resource server and can be accessed by use
           items: [
             "guides/integrate/login-ui/username-password",
             "guides/integrate/login-ui/external-login",
+            "guides/integrate/login-ui/passkey",
             "guides/integrate/login-ui/select-account",
             "guides/integrate/login-ui/password-reset",
             "guides/integrate/login-ui/logout",
