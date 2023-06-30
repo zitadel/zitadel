@@ -19,7 +19,7 @@ WORKDIR /app
 ENV PATH="/app:${PATH}"
 
 USER zitadel
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
 
 FROM scratch as final
 
@@ -32,4 +32,4 @@ ENV PATH="/app:${PATH}"
 HEALTHCHECK NONE
 
 USER zitadel
-ENTRYPOINT ["zitadel"]
+ENTRYPOINT ["./zitadel"]
