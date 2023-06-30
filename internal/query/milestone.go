@@ -134,7 +134,7 @@ func prepareMilestonesQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				}
 				m.PrimaryDomain = primaryDomain.String
 				m.ReachedDate = reachedDate.Time
-				m.ReachedDate = pushedDate.Time
+				m.PushedDate = pushedDate.Time
 				milestones = append(milestones, m)
 			}
 			if err := rows.Close(); err != nil {
