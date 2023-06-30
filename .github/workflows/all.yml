@@ -4,9 +4,7 @@ on:
   pull_request:
     branches:
       - '**'
-  push:
-    branches:
-      - 'ci/improve-make'
+  workflow_dispatch:
 
 permissions:
   contents: write
