@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/database"
-
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 )

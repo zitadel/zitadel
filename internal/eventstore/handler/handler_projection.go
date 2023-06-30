@@ -6,12 +6,11 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/repository/pseudo"
-
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/pseudo"
 )
 
 const (
