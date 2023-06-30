@@ -31,6 +31,8 @@ func (p *PushedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	p.BaseEvent = b
 }
 
+var PushedEventMapper = eventstore.GenericEventMapper[PushedEvent]
+
 func NewPushedEvent(
 	ctx context.Context,
 	aggregate *Aggregate,

@@ -5,5 +5,5 @@ import (
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(AggregateType, PushedEventType, eventstore.GenericEventMapper[PushedEvent])
+	es.RegisterFilterEventMapper(AggregateType, PushedEventType, PushedEventMapper)
 }

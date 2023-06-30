@@ -3,7 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
@@ -63,7 +62,7 @@ func (p *milestoneProjection) reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  instance.InstanceRemovedEventType,
-					Reduce: p.reduceReachedFunc(milestone.InstanceDeleted),
+					Reduce: p.reduceInstanceRemoved,
 				},
 			},
 		},
@@ -72,11 +71,11 @@ func (p *milestoneProjection) reducers() []handler.AggregateReducer {
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  project.ProjectAddedType,
-					Reduce: p.reduceReachedIfUserEventFunc(milestone.ProjectCreated),
+					Reduce: p.reduceProjectAdded,
 				},
 				{
 					Event:  project.ApplicationAddedType,
-					Reduce: p.reduceReachedIfUserEventFunc(milestone.ApplicationCreated),
+					Reduce: p.reduceApplicationAdded,
 				},
 				{
 					Event:  project.OIDCConfigAddedType,
@@ -104,64 +103,17 @@ func (p *milestoneProjection) reducers() []handler.AggregateReducer {
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  milestone.PushedEventType,
-					Reduce: p.reducePushed,
+					Reduce: p.reduceMilestonePushed,
 				},
 			},
 		},
 	}
 }
 
-func (p *milestoneProjection) reduceReachedIfUserEventFunc(msType milestone.Type) func(event eventstore.Event) (*handler.Statement, error) {
-	return func(event eventstore.Event) (*handler.Statement, error) {
-		if p.isSystemEvent(event) {
-			return crdb.NewNoOpStatement(event), nil
-		}
-		return p.reduceReachedFunc(msType)(event)
-	}
-}
-
-func (p *milestoneProjection) reduceReachedFunc(msType milestone.Type) func(event eventstore.Event) (*handler.Statement, error) {
-	return func(event eventstore.Event) (*handler.Statement, error) {
-		return crdb.NewUpdateStatement(event, []handler.Column{
-			handler.NewCol(MilestoneColumnReachedDate, event.CreationDate()),
-		},
-			[]handler.Condition{
-				handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
-				handler.NewCond(MilestoneColumnType, msType),
-				crdb.NewIsNullCond(MilestoneColumnReachedDate),
-			}), nil
-	}
-}
-
-func (p *milestoneProjection) reducePushed(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*milestone.PushedEvent)
-	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-XJGXK", "reduce.wrong.event.type %s", milestone.PushedEventType)
-	}
-	if e.MilestoneType != milestone.InstanceDeleted {
-		return crdb.NewUpdateStatement(
-			event,
-			[]handler.Column{
-				handler.NewCol(MilestoneColumnPushedDate, event.CreationDate()),
-			},
-			[]handler.Condition{
-				handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
-				handler.NewCond(MilestoneColumnType, e.MilestoneType),
-			},
-		), nil
-	}
-	return crdb.NewDeleteStatement(
-		event,
-		[]handler.Condition{
-			handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
-		},
-	), nil
-}
-
 func (p *milestoneProjection) reduceInstanceAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.InstanceAddedEvent)
-	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-JbHGS", "reduce.wrong.event.type %s", instance.InstanceAddedEventType)
+	e, err := assertEvent[*instance.InstanceAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	allTypes := milestone.AllTypes()
 	statements := make([]func(eventstore.Event) crdb.Exec, 0, len(allTypes))
@@ -179,9 +131,9 @@ func (p *milestoneProjection) reduceInstanceAdded(event eventstore.Event) (*hand
 }
 
 func (p *milestoneProjection) reduceInstanceDomainPrimarySet(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.DomainPrimarySetEvent)
-	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Sfrgf", "reduce.wrong.event.type %s", instance.InstanceDomainPrimarySetEventType)
+	e, err := assertEvent[*instance.DomainPrimarySetEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -195,43 +147,43 @@ func (p *milestoneProjection) reduceInstanceDomainPrimarySet(event eventstore.Ev
 	), nil
 }
 
+func (p *milestoneProjection) reduceProjectAdded(event eventstore.Event) (*handler.Statement, error) {
+	if _, err := assertEvent[*project.ProjectAddedEvent](event); err != nil {
+		return nil, err
+	}
+	return p.reduceReachedIfUserEventFunc(milestone.ProjectCreated)(event)
+}
+
+func (p *milestoneProjection) reduceApplicationAdded(event eventstore.Event) (*handler.Statement, error) {
+	if _, err := assertEvent[*project.ApplicationAddedEvent](event); err != nil {
+		return nil, err
+	}
+	return p.reduceReachedIfUserEventFunc(milestone.ApplicationCreated)(event)
+}
+
 func (p *milestoneProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*project.OIDCConfigAddedEvent)
-	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Rw7Cv", "reduce.wrong.event.type %s", project.OIDCConfigAddedType)
+	e, err := assertEvent[*project.OIDCConfigAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return p.reduceAppConfigAdded(e, e.ClientID)
 }
 
 func (p *milestoneProjection) reduceAPIConfigAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*project.APIConfigAddedEvent)
-	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-QudD2", "reduce.wrong.event.type %s", project.APIConfigAddedType)
+	e, err := assertEvent[*project.APIConfigAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return p.reduceAppConfigAdded(e, e.ClientID)
 }
 
-func (p *milestoneProjection) reduceAppConfigAdded(event eventstore.Event, clientID string) (*handler.Statement, error) {
-	if !p.isSystemEvent(event) {
-		return crdb.NewNoOpStatement(event), nil
-	}
-	return crdb.NewUpdateStatement(
-		event,
-		[]handler.Column{
-			crdb.NewArrayAppendCol(MilestoneColumnIgnoreClientIDs, clientID),
-		},
-		[]handler.Condition{
-			handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
-			handler.NewCond(MilestoneColumnType, milestone.AuthenticationSucceededOnApplication),
-			crdb.NewIsNullCond(MilestoneColumnReachedDate),
-		},
-	), nil
-}
-
 func (p *milestoneProjection) reduceUserTokenAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.UserTokenAddedEvent)
-	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-3xhJ7", "reduce.wrong.event.type %s", user.UserTokenAddedType)
+	e, err := assertEvent[*user.UserTokenAddedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	if p.isSystemEvent(event) {
+		return crdb.NewNoOpStatement(event), nil
 	}
 	statements := []func(eventstore.Event) crdb.Exec{
 		crdb.AddUpdateStatement(
@@ -260,6 +212,77 @@ func (p *milestoneProjection) reduceUserTokenAdded(event eventstore.Event) (*han
 		))
 	}
 	return crdb.NewMultiStatement(e, statements...), nil
+}
+
+func (p *milestoneProjection) reduceInstanceRemoved(event eventstore.Event) (*handler.Statement, error) {
+	if _, err := assertEvent[*instance.InstanceRemovedEvent](event); err != nil {
+		return nil, err
+	}
+	return p.reduceReachedFunc(milestone.InstanceDeleted)(event)
+}
+
+func (p *milestoneProjection) reduceMilestonePushed(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*milestone.PushedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	if e.MilestoneType != milestone.InstanceDeleted {
+		return crdb.NewUpdateStatement(
+			event,
+			[]handler.Column{
+				handler.NewCol(MilestoneColumnPushedDate, event.CreationDate()),
+			},
+			[]handler.Condition{
+				handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(MilestoneColumnType, e.MilestoneType),
+			},
+		), nil
+	}
+	return crdb.NewDeleteStatement(
+		event,
+		[]handler.Condition{
+			handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *milestoneProjection) reduceReachedIfUserEventFunc(msType milestone.Type) func(event eventstore.Event) (*handler.Statement, error) {
+	return func(event eventstore.Event) (*handler.Statement, error) {
+		if p.isSystemEvent(event) {
+			return crdb.NewNoOpStatement(event), nil
+		}
+		return p.reduceReachedFunc(msType)(event)
+	}
+}
+
+func (p *milestoneProjection) reduceReachedFunc(msType milestone.Type) func(event eventstore.Event) (*handler.Statement, error) {
+	return func(event eventstore.Event) (*handler.Statement, error) {
+		return crdb.NewUpdateStatement(event, []handler.Column{
+			handler.NewCol(MilestoneColumnReachedDate, event.CreationDate()),
+		},
+			[]handler.Condition{
+				handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(MilestoneColumnType, msType),
+				crdb.NewIsNullCond(MilestoneColumnReachedDate),
+			}), nil
+	}
+}
+
+func (p *milestoneProjection) reduceAppConfigAdded(event eventstore.Event, clientID string) (*handler.Statement, error) {
+	if !p.isSystemEvent(event) {
+		return crdb.NewNoOpStatement(event), nil
+	}
+	return crdb.NewUpdateStatement(
+		event,
+		[]handler.Column{
+			crdb.NewArrayAppendCol(MilestoneColumnIgnoreClientIDs, clientID),
+		},
+		[]handler.Condition{
+			handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
+			handler.NewCond(MilestoneColumnType, milestone.AuthenticationSucceededOnApplication),
+			crdb.NewIsNullCond(MilestoneColumnReachedDate),
+		},
+	), nil
 }
 
 func (p *milestoneProjection) isSystemEvent(event eventstore.Event) bool {
