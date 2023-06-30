@@ -31,7 +31,7 @@ export default function UsernameForm({ loginSettings, loginName }: Props) {
 
   async function submitLoginName(values: Inputs) {
     setLoading(true);
-    const res = await fetch("/loginnames", {
+    const res = await fetch("/api/loginname", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -53,25 +53,24 @@ export default function UsernameForm({ loginSettings, loginName }: Props) {
       console.log(response);
       if (response.authMethodTypes.length == 1) {
         const method = response.authMethodTypes[0];
-        console.log(method);
-        // switch (method) {
-        //   case AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSWORD:
-        //     return router.push(
-        //       "/password?" +
-        //         new URLSearchParams({ loginName: values.loginName })
-        //     );
-        //   case AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY:
-        //     break;
-        //   // return router.push(
-        //   //   "/passkey/login?" +
-        //   //     new URLSearchParams({ loginName: values.loginName })
-        //   // );
-        //   default:
-        //     return router.push(
-        //       "/password?" +
-        //         new URLSearchParams({ loginName: values.loginName })
-        //     );
-        // }
+        switch (method) {
+          case 1: //AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSWORD:
+            return router.push(
+              "/password?" +
+                new URLSearchParams({ loginName: values.loginName })
+            );
+          case 2: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
+            return router.push(
+              "/passkey/login?" +
+                new URLSearchParams({ loginName: values.loginName })
+            );
+          default:
+            return router.push(
+              "/password?" +
+                new URLSearchParams({ loginName: values.loginName })
+            );
+        }
+      } else {
       }
     });
   }

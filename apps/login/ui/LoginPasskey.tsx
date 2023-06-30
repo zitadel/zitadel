@@ -1,23 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Challenges_Passkey } from "@zitadel/server";
+import { ChallengeKind, Challenges_Passkey } from "@zitadel/server";
 import { coerceToArrayBuffer, coerceToBase64Url } from "#/utils/base64";
 import { Button, ButtonVariants } from "./Button";
 import Alert from "./Alert";
 import { Spinner } from "./Spinner";
 
 type Props = {
+  loginName: string;
   challenge: Challenges_Passkey;
 };
 
-export default function LoginPasskey({ challenge }: Props) {
+export default function LoginPasskey({ loginName, challenge }: Props) {
   const [error, setError] = useState<string>("");
-
   const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
+
+  useEffect(() => {
+    updateSessionForChallenge();
+  }, []);
+
+  async function updateSessionForChallenge() {
+    setLoading(true);
+    const res = await fetch("/api/session", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        loginName,
+        challenges: [1], // request passkey challenge
+      }),
+    });
+
+    setLoading(false);
+    if (!res.ok) {
+      throw new Error("Failed to load authentication methods");
+    }
+    return res.json();
+  }
 
   async function submitLogin(
     passkeyId: string,
@@ -26,7 +50,7 @@ export default function LoginPasskey({ challenge }: Props) {
     sessionId: string
   ) {
     setLoading(true);
-    const res = await fetch("/passkeys/verify", {
+    const res = await fetch("/api/passkeys/verify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -99,13 +123,12 @@ export default function LoginPasskey({ challenge }: Props) {
   }
 
   return (
-    <form className="w-full">
+    <div className="w-full">
       {error && (
         <div className="py-4">
           <Alert>{error}</Alert>
         </div>
       )}
-
       <div className="mt-8 flex w-full flex-row items-center">
         <Button
           type="button"
@@ -127,6 +150,6 @@ export default function LoginPasskey({ challenge }: Props) {
           continue
         </Button>
       </div>
-    </form>
+    </div>
   );
 }

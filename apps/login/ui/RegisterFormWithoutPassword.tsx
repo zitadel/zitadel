@@ -36,7 +36,7 @@ export default function RegisterFormWithoutPassword({ legal }: Props) {
 
   async function submitAndRegister(values: Inputs) {
     setLoading(true);
-    const res = await fetch("/registeruser", {
+    const res = await fetch("/api/registeruser", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -56,7 +56,7 @@ export default function RegisterFormWithoutPassword({ legal }: Props) {
 
   async function createSessionWithLoginName(loginName: string) {
     setLoading(true);
-    const res = await fetch("/session", {
+    const res = await fetch("/api/session", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

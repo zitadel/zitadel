@@ -17,7 +17,7 @@ export default function SessionItem({
 
   async function clearSession(id: string) {
     setLoading(true);
-    const res = await fetch("/session?" + new URLSearchParams({ id }), {
+    const res = await fetch("/api/session?" + new URLSearchParams({ id }), {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

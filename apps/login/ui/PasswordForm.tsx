@@ -30,7 +30,7 @@ export default function PasswordForm({ loginName }: Props) {
   async function submitPassword(values: Inputs) {
     setError("");
     setLoading(true);
-    const res = await fetch("/session", {
+    const res = await fetch("/api/session", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

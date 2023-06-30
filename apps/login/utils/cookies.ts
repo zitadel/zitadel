@@ -55,9 +55,12 @@ export async function updateSessionCookie(
     : [session];
 
   const foundIndex = sessions.findIndex((session) => session.id === id);
-  sessions[foundIndex] = session;
-
-  return setSessionHttpOnlyCookie(sessions);
+  if (foundIndex > -1) {
+    sessions[foundIndex] = session;
+    return setSessionHttpOnlyCookie(sessions);
+  } else {
+    throw "updateSessionCookie: session id now found";
+  }
 }
 
 export async function removeSessionFromCookie(
@@ -119,11 +122,9 @@ export async function getSessionCookieByLoginName(
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
-  console.log("str", stringifiedCookie);
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
 
-    console.log("sessions", sessions);
     const found = sessions.find((s) => s.loginName === loginName);
     if (found) {
       return found;

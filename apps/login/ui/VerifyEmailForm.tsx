@@ -42,7 +42,7 @@ export default function VerifyEmailForm({ userId, code, submit }: Props) {
 
   async function submitCode(values: Inputs) {
     setLoading(true);
-    const res = await fetch("/verifyemail", {
+    const res = await fetch("/api/verifyemail", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -66,7 +66,7 @@ export default function VerifyEmailForm({ userId, code, submit }: Props) {
 
   async function resendCode() {
     setLoading(true);
-    const res = await fetch("/resendverifyemail", {
+    const res = await fetch("/api/resendverifyemail", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

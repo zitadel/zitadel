@@ -86,13 +86,9 @@ export async function setSessionAndUpdateCookie(
               loginName: session.factors?.user?.loginName ?? "",
             };
 
-            return updateSessionCookie(sessionCookie.id, newCookie)
-              .then(() => {
-                return session;
-              })
-              .catch((error) => {
-                throw "could not set cookie";
-              });
+            return updateSessionCookie(sessionCookie.id, newCookie).then(() => {
+              return session;
+            });
           } else {
             throw "could not get session or session does not have loginName";
           }

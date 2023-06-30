@@ -1,10 +1,11 @@
-import { server, deleteSession } from "#/lib/zitadel";
+import { server, deleteSession, getSession, setSession } from "#/lib/zitadel";
 import {
   SessionCookie,
   getMostRecentSessionCookie,
   getSessionCookieById,
   getSessionCookieByLoginName,
   removeSessionFromCookie,
+  updateSessionCookie,
 } from "#/utils/cookies";
 import {
   createSessionAndUpdateCookie,
@@ -59,9 +60,11 @@ export async function PUT(request: NextRequest) {
           domain,
           challenges
         ).then((session) => {
+          console.log(session.challenges);
           return NextResponse.json({
             sessionId: session.id,
             factors: session.factors,
+            challenges: session.challenges,
           });
         });
       })

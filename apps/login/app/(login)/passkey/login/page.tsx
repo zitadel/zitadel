@@ -1,30 +1,30 @@
+import { getSession, server } from "#/lib/zitadel";
 import Alert from "#/ui/Alert";
 import LoginPasskey from "#/ui/LoginPasskey";
-import { ChallengeKind } from "@zitadel/server";
+import UserAvatar from "#/ui/UserAvatar";
+import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
+// import LoginPasskey from "#/ui/LoginPasskey";
+// import {
+//   SessionCookie,
+//   getMostRecentSessionCookie,
+//   getSessionCookieByLoginName,
+// } from "#/utils/cookies";
+// import { setSessionAndUpdateCookie } from "#/utils/session";
+// import { ChallengeKind } from "@zitadel/server";
 
-async function updateSessionAndCookie(loginName: string) {
-  const res = await fetch(
-    `${process.env.VERCEL_URL ?? "http://localhost:3000"}/session`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        loginName,
-        challenges: [ChallengeKind.CHALLENGE_KIND_PASSKEY],
-      }),
-      next: { revalidate: 0 },
-    }
-  );
-
-  const response = await res.json();
-
-  if (!res.ok) {
-    return Promise.reject(response.details);
-  }
-  return response;
-}
+// async function updateSessionAndCookie(loginName: string) {
+//   return getSessionCookieByLoginName(loginName).then((recent) => {
+//     console.log(recent.token);
+//     return setSessionAndUpdateCookie(
+//       recent.id,
+//       recent.token,
+//       recent.loginName,
+//       undefined,
+//       "localhost",
+//       [ChallengeKind.CHALLENGE_KIND_PASSKEY]
+//     );
+//   });
+// }
 
 const title = "Authenticate with a passkey";
 const description =
@@ -36,20 +36,23 @@ export default async function Page({
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
   const { loginName } = searchParams;
-  if (loginName) {
-    console.log(loginName);
-    const session = await updateSessionAndCookie(loginName);
 
-    console.log("sess", session);
-    const challenge = session?.challenges?.passkey;
+  const sessionFactors = await loadSession(loginName);
 
-    console.log(challenge);
+  async function loadSession(loginName?: string) {
+    const recent = await getMostRecentCookieWithLoginname(loginName);
+    return getSession(server, recent.id, recent.token).then((response) => {
+      if (response?.session) {
+        return response.session;
+      }
+    });
+  }
 
-    return (
-      <div className="flex flex-col items-center space-y-4">
-        <h1>{title}</h1>
+  return (
+    <div className="flex flex-col items-center space-y-4">
+      <h1>{title}</h1>
 
-        {/* {sessionFactors && (
+      {sessionFactors && (
         <UserAvatar
           loginName={loginName ?? sessionFactors.factors?.user?.loginName}
           displayName={sessionFactors.factors?.user?.displayName}
@@ -58,40 +61,15 @@ export default async function Page({
       )}
       <p className="ztdl-p mb-6 block">{description}</p>
 
-      {!sessionFactors && (
-        <div className="py-4">
-          <Alert>
-            Could not get the context of the user. Make sure to enter the
-            username first or provide a loginName as searchParam.
-          </Alert>
-        </div>
-      )} */}
+      {!sessionFactors && <div className="py-4"></div>}
 
-        {challenge && <LoginPasskey challenge={challenge} />}
-      </div>
-    );
-  } else {
-    return (
-      <div className="flex flex-col items-center space-y-4">
-        <h1>{title}</h1>
-
-        {/* {sessionFactors && (
-              <UserAvatar
-                loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-                displayName={sessionFactors.factors?.user?.displayName}
-                showDropdown
-              ></UserAvatar>
-            )}
-            <p className="ztdl-p mb-6 block">{description}</p>
-      
-            {!sessionFactors && (
-              <div className="py-4">
-                
-              </div>
-            )} */}
-
+      {!loginName && (
         <Alert>Provide your active session as loginName param</Alert>
-      </div>
-    );
-  }
+      )}
+
+      {loginName && (
+        <LoginPasskey challenge={{} as any} loginName={loginName} />
+      )}
+    </div>
+  );
 }

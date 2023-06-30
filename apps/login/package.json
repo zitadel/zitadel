@@ -37,6 +37,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "7.39.5",
     "sass": "^1.62.0",
+    "swr": "^2.2.0",
     "tinycolor2": "1.4.2"
   },
   "devDependencies": {
