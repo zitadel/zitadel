@@ -158,13 +158,13 @@ module.exports = {
             title: "Token introspection",
             slug: "/guides/integrate/token-introspection",
             description:
-              "Token introspection is the process of checking whether an access token is valid and can be used to access protected resources.
-You have an API that acts as an OAuth resource server and can be accessed by user-facing applications. To validate an access token by calling the ZITADEL introspection API, you can use the JSON Web Token (JWT) Profile (recommended) or Basic Authentication for token introspection. It's crucial to understand that the API is entirely separate from the front end. The API shouldn’t concern itself with the token type received. Instead, it's about how the API chooses to call the introspection endpoint, either through JWT Profile or Basic Authentication. Many APIs assume they might receive a JWT and attempt to verify it based on signature or expiration. However, with ZITADEL, you can send either a JWT or an opaque Bearer token from the client end to the API. This flexibility is one of ZITADEL's standout features.",
+              "Token introspection is the process of checking whether an access token is valid and can be used to access protected resources. You have an API that acts as an OAuth resource server and can be accessed by user-facing applications. To validate an access token by calling the ZITADEL introspection API, you can use the JSON Web Token (JWT) Profile (recommended) or Basic Authentication for token introspection. It's crucial to understand that the API is entirely separate from the front end. The API shouldn’t concern itself with the token type received. Instead, it's about how the API chooses to call the introspection endpoint, either through JWT Profile or Basic Authentication. Many APIs assume they might receive a JWT and attempt to verify it based on signature or expiration. However, with ZITADEL, you can send either a JWT or an opaque Bearer token from the client end to the API. This flexibility is one of ZITADEL's standout features.",
           },
           collapsed: true,
           items: [
             "guides/integrate/token-introspection/private-key-jwt",
             "guides/integrate/token-introspection/basic-auth",
+            "guides/integrate/token-introspection/introspection-response",
           ],
         },
         {
