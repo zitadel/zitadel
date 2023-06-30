@@ -66,12 +66,12 @@ export async function setSessionAndUpdateCookie(
     domain,
     password,
     challenges
-  ).then((session) => {
-    if (session) {
+  ).then((updatedSession) => {
+    if (updatedSession) {
       const sessionCookie: SessionCookie = {
         id: sessionId,
-        token: session.sessionToken,
-        changeDate: session.details?.changeDate?.toString() ?? "",
+        token: updatedSession.sessionToken,
+        changeDate: updatedSession.details?.changeDate?.toString() ?? "",
         loginName: loginName,
       };
 
@@ -81,13 +81,13 @@ export async function setSessionAndUpdateCookie(
             const { session } = response;
             const newCookie: SessionCookie = {
               id: sessionCookie.id,
-              token: sessionCookie.token,
+              token: updatedSession.sessionToken,
               changeDate: session.changeDate?.toString() ?? "",
               loginName: session.factors?.user?.loginName ?? "",
             };
 
             return updateSessionCookie(sessionCookie.id, newCookie).then(() => {
-              return session;
+              return { challenges: updatedSession.challenges, ...session };
             });
           } else {
             throw "could not get session or session does not have loginName";

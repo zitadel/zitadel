@@ -60,7 +60,7 @@ export async function PUT(request: NextRequest) {
           domain,
           challenges
         ).then((session) => {
-          console.log(session.challenges);
+          console.log(session);
           return NextResponse.json({
             sessionId: session.id,
             factors: session.factors,
