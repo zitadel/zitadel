@@ -248,17 +248,17 @@ func (p *milestoneProjection) reduceUserTokenAdded(event eventstore.Event) (*han
 	}
 	// We ignore authentications without app, for example JWT profile or PAT
 	if e.ApplicationID != "" {
-		crdb.AddUpdateStatement(
+		statements = append(statements, crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(MilestoneColumnReachedDate, event.CreationDate()),
 			},
 			[]handler.Condition{
 				handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
 				handler.NewCond(MilestoneColumnType, milestone.AuthenticationSucceededOnApplication),
-				crdb.NewContainsCond(MilestoneColumnIgnoreClientIDs, e.ApplicationID),
+				crdb.Not(crdb.NewTextArrayContainsCond(MilestoneColumnIgnoreClientIDs, e.ApplicationID)),
 				crdb.NewIsNullCond(MilestoneColumnReachedDate),
 			},
-		)
+		))
 	}
 	return crdb.NewMultiStatement(e, statements...), nil
 }

@@ -137,9 +137,9 @@ func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string
 			}
 			queryBuilder.
 				AddQuery().
+				AggregateTypes(aggregateType).
 				SequenceGreater(seq).
-				InstanceID(instanceID).
-				AggregateTypes(aggregateType)
+				InstanceID(instanceID)
 		}
 	}
 

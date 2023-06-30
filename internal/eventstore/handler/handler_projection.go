@@ -118,10 +118,6 @@ func (h *ProjectionHandler) Trigger(ctx context.Context, instances ...string) er
 	if len(instances) > 0 {
 		ids = instances
 	}
-	return h.processEvents(ctx, ids...)
-}
-
-func (h *ProjectionHandler) processEvents(ctx context.Context, ids ...string) error {
 	for {
 		events, hasLimitExceeded, err := h.FetchEvents(ctx, ids...)
 		if err != nil {

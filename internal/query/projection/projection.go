@@ -194,7 +194,7 @@ func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomCo
 // as setup and start currently create them individually, we make sure we get the right one
 // will be refactored when changing to new id based projections
 //
-// NotificationsProjection is not added here, because it does not statement based / has no proprietary projection table
+// Event handlers NotificationsProjection, NotificationsQuotaProjection and NotificationsProjection are not added here, because the do not statement based / have no proprietary projection table
 func newProjectionsList() {
 	projections = []projection{
 		OrgProjection,

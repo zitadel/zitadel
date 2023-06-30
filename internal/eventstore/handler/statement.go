@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"github.com/zitadel/logging"
 
@@ -62,11 +63,10 @@ func NewJSONCol(name string, value interface{}) Column {
 	return NewCol(name, marshalled)
 }
 
-type Condition Column
+type Condition func(param string) (string, interface{})
 
 func NewCond(name string, value interface{}) Condition {
-	return Condition{
-		Name:  name,
-		Value: value,
+	return func(param string) (string, interface{}) {
+		return fmt.Sprintf("%s = %s", name, param), value
 	}
 }

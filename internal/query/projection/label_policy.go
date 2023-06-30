@@ -402,10 +402,10 @@ func (p *labelPolicyProjection) reduceActivated(event eventstore.Event) (*handle
 			handler.NewCol(LabelPolicyDarkLogoURLCol, nil),
 			handler.NewCol(LabelPolicyDarkIconURLCol, nil),
 		},
-		[]handler.Condition{
-			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
-			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
-			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
+		[]handler.Column{
+			handler.NewCol(LabelPolicyIDCol, event.Aggregate().ID),
+			handler.NewCol(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCol(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 

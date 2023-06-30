@@ -14,6 +14,7 @@ const (
 type PushedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 	MilestoneType         Type     `json:"type"`
+	ExternalDomain        string   `json:"externalDomain"`
 	PrimaryDomain         string   `json:"primaryDomain"`
 	Endpoints             []string `json:"endpoints"`
 }
@@ -35,7 +36,7 @@ func NewPushedEvent(
 	aggregate *Aggregate,
 	msType Type,
 	endpoints []string,
-	primaryDomain string,
+	externalDomain, primaryDomain string,
 ) *PushedEvent {
 	return &PushedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
@@ -43,8 +44,9 @@ func NewPushedEvent(
 			&aggregate.Aggregate,
 			PushedEventType,
 		),
-		MilestoneType: msType,
-		Endpoints:     endpoints,
-		PrimaryDomain: primaryDomain,
+		MilestoneType:  msType,
+		Endpoints:      endpoints,
+		ExternalDomain: externalDomain,
+		PrimaryDomain:  primaryDomain,
 	}
 }
