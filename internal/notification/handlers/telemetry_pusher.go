@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -77,17 +76,7 @@ func (t *telemetryPusher) reducers() []handler.AggregateReducer {
 	}}
 }
 
-// TODO: Remove
-func printEvent(event eventstore.Event) {
-	bytes, err := json.MarshalIndent(event, "", "    ")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(event.Type(), string(bytes))
-}
-
 func (t *telemetryPusher) pushMilestones(event eventstore.Event) (*handler.Statement, error) {
-	printEvent(event)
 	ctx := call.WithTimestamp(context.Background())
 	scheduledEvent, ok := event.(*pseudo.ScheduledEvent)
 	if !ok {
@@ -133,7 +122,7 @@ func (t *telemetryPusher) pushMilestones(event eventstore.Event) (*handler.State
 
 func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.ScheduledEvent, ms *query.Milestone) error {
 	ctx = authz.WithInstanceID(ctx, ms.InstanceID)
-	alreadyHandled, err := t.queries.IsAlreadyHandled(ctx, event, map[string]interface{}{"type": ms.Type}, milestone.AggregateType, milestone.PushedEventType)
+	alreadyHandled, err := t.queries.IsAlreadyHandled(ctx, event, map[string]interface{}{"type": ms.Type.String()}, milestone.AggregateType, milestone.PushedEventType)
 	if err != nil {
 		return err
 	}
