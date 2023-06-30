@@ -7,15 +7,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/repository/milestone"
-
-	"github.com/zitadel/zitadel/internal/api/authz"
-
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 

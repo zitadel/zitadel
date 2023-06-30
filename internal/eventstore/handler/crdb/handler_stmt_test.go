@@ -9,8 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/repository/pseudo"
-
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 
@@ -20,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	es_repo_mock "github.com/zitadel/zitadel/internal/eventstore/repository/mock"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/repository/pseudo"
 )
 
 var (
@@ -196,7 +195,6 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 			defer client.Close()
 
 			id.Configure(&id.Config{Identification: id.Identification{PrivateIp: id.PrivateIp{Enabled: true}}})
-
 			h := NewStatementHandler(context.Background(), StatementHandlerConfig{
 				ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
 					ProjectionName: tt.fields.projectionName,
@@ -206,7 +204,6 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				Client: &database.DB{
 					DB: client,
 				},
-
 				Reducers: tt.fields.reducers,
 			})
 
