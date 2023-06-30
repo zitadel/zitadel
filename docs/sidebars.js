@@ -164,7 +164,6 @@ module.exports = {
           items: [
             "guides/integrate/token-introspection/private-key-jwt",
             "guides/integrate/token-introspection/basic-auth",
-            "guides/integrate/token-introspection/introspection-response",
           ],
         },
         {

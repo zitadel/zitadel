@@ -2,6 +2,8 @@
 title: JSON Web Token profile
 ---
 
+import IntrospectionResponse from './_introspection-response.mdx';
+
 This is a guide on how to secure your API using [JSON Web Token (JWT) profile (recommended)](https://zitadel.com/docs/apis/openidoauth/authn-methods#client-secret-basic).  
 
 ## Register the API in ZITADEL and generate private and public keys 
@@ -182,5 +184,9 @@ def introspect_token(self, token_string):
     return token_data
 
 ```
+## Introspection response
+
+<IntrospectionResponse/>
+
 Follow this [tutorial](https://github.com/zitadel/examples-api-access-and-token-introspection/tree/main/api-jwt) to learn how to register an API application using JWT Profile with ZITADEL and test it. 
 
