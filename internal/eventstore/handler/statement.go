@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	"github.com/zitadel/logging"
 
@@ -67,6 +66,6 @@ type Condition func(param string) (string, interface{})
 
 func NewCond(name string, value interface{}) Condition {
 	return func(param string) (string, interface{}) {
-		return fmt.Sprintf("%s = %s", name, param), value
+		return name + " = " + param, value
 	}
 }

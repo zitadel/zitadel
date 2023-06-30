@@ -420,7 +420,9 @@ func TestNewUpdateStatement(t *testing.T) {
 						Value: "val",
 					},
 				},
-				conditions: []handler.Condition{handler.NewCond("col2", 1)},
+				conditions: []handler.Condition{
+					handler.NewCond("col2", 1),
+				},
 			},
 			want: want{
 				table:            "",
@@ -444,8 +446,10 @@ func TestNewUpdateStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				values:     []handler.Column{},
-				conditions: []handler.Condition{handler.NewCond("col2", 1)},
+				values: []handler.Column{},
+				conditions: []handler.Condition{
+					handler.NewCond("col2", 1),
+				},
 			},
 			want: want{
 				table:            "my_table",
@@ -505,7 +509,9 @@ func TestNewUpdateStatement(t *testing.T) {
 						Value: "val",
 					},
 				},
-				conditions: []handler.Condition{handler.NewCond("col2", 1)},
+				conditions: []handler.Condition{
+					handler.NewCond("col2", 1),
+				},
 			},
 			want: want{
 				table:            "my_table",
@@ -545,7 +551,9 @@ func TestNewUpdateStatement(t *testing.T) {
 						Value: "val5",
 					},
 				},
-				conditions: []handler.Condition{handler.NewCond("col2", 1)},
+				conditions: []handler.Condition{
+					handler.NewCond("col2", 1),
+				},
 			},
 			want: want{
 				table:            "my_table",
@@ -610,7 +618,9 @@ func TestNewDeleteStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				conditions: []handler.Condition{handler.NewCond("col2", 1)},
+				conditions: []handler.Condition{
+					handler.NewCond("col2", 1),
+				},
 			},
 			want: want{
 				table:            "",
@@ -658,7 +668,9 @@ func TestNewDeleteStatement(t *testing.T) {
 					previousSequence: 0,
 					aggregateType:    "agg",
 				},
-				conditions: []handler.Condition{handler.NewCond("col1", 1)},
+				conditions: []handler.Condition{
+					handler.NewCond("col1", 1),
+				},
 			},
 			want: want{
 				table:            "my_table",
@@ -812,7 +824,9 @@ func TestNewMultiStatement(t *testing.T) {
 				},
 				execs: []func(eventstore.Event) Exec{
 					AddDeleteStatement(
-						[]handler.Condition{handler.NewCond("col1", 1)},
+						[]handler.Condition{
+							handler.NewCond("col1", 1),
+						},
 					),
 					AddCreateStatement(
 						[]handler.Column{
@@ -842,7 +856,9 @@ func TestNewMultiStatement(t *testing.T) {
 								Value: 1,
 							},
 						},
-						[]handler.Condition{handler.NewCond("col1", 1)},
+						[]handler.Condition{
+							handler.NewCond("col1", 1),
+						},
 					),
 				},
 			},
@@ -929,10 +945,12 @@ func TestNewCopyStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				conds: []handler.Column{{
-					Name:  "col1",
-					Value: 1,
-				}},
+				conds: []handler.Column{
+					{
+						Name:  "col2",
+						Value: 1,
+					},
+				},
 			},
 			want: want{
 				table:            "",
@@ -1027,9 +1045,11 @@ func TestNewCopyStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				conds: []handler.Column{{
-					Name: "col1",
-				}},
+				conds: []handler.Column{
+					{
+						Name: "col",
+					},
+				},
 				from: []handler.Column{},
 			},
 			want: want{
@@ -1354,7 +1374,7 @@ func Test_columnsToQuery(t *testing.T) {
 	}
 }
 
-func Test_columnsToWhere(t *testing.T) {
+func Test_conditionsToWhere(t *testing.T) {
 	type args struct {
 		conds       []handler.Condition
 		paramOffset int
@@ -1379,7 +1399,9 @@ func Test_columnsToWhere(t *testing.T) {
 		{
 			name: "no offset",
 			args: args{
-				conds:       []handler.Condition{handler.NewCond("col1", "val1")},
+				conds: []handler.Condition{
+					handler.NewCond("col1", "val1"),
+				},
 				paramOffset: 0,
 			},
 			want: want{
@@ -1404,7 +1426,9 @@ func Test_columnsToWhere(t *testing.T) {
 		{
 			name: "2 offset",
 			args: args{
-				conds:       []handler.Condition{handler.NewCond("col1", "val1")},
+				conds: []handler.Condition{
+					handler.NewCond("col1", "val1"),
+				},
 				paramOffset: 2,
 			},
 			want: want{
@@ -1415,7 +1439,9 @@ func Test_columnsToWhere(t *testing.T) {
 		{
 			name: "less than",
 			args: args{
-				conds: []handler.Condition{NewLessThanCond("col1", "val1")},
+				conds: []handler.Condition{
+					NewLessThanCond("col1", "val1"),
+				},
 			},
 			want: want{
 				wheres: []string{"(col1 < $1)"},
@@ -1425,7 +1451,9 @@ func Test_columnsToWhere(t *testing.T) {
 		{
 			name: "is null",
 			args: args{
-				conds: []handler.Condition{NewIsNullCond("col1")},
+				conds: []handler.Condition{
+					NewIsNullCond("col1"),
+				},
 			},
 			want: want{
 				wheres: []string{"(col1 IS NULL)"},
@@ -1435,7 +1463,9 @@ func Test_columnsToWhere(t *testing.T) {
 		{
 			name: "text array contains",
 			args: args{
-				conds: []handler.Condition{NewTextArrayContainsCond("col1", "val1")},
+				conds: []handler.Condition{
+					NewTextArrayContainsCond("col1", "val1"),
+				},
 			},
 			want: want{
 				wheres: []string{"(col1 @> $1)"},
@@ -1445,7 +1475,9 @@ func Test_columnsToWhere(t *testing.T) {
 		{
 			name: "not",
 			args: args{
-				conds: []handler.Condition{Not(handler.NewCond("col1", "val1"))},
+				conds: []handler.Condition{
+					Not(handler.NewCond("col1", "val1")),
+				},
 			},
 			want: want{
 				wheres: []string{"(NOT (col1 = $1))"},

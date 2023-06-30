@@ -1,7 +1,6 @@
 package crdb
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -299,7 +298,7 @@ func NewTextArrayContainsCond(column string, value string) handler.Condition {
 	}
 }
 
-// Not is a function instead of a method, so that calling it is well readable
+// Not is a function and not a method, so that calling it is well readable
 // For example conditions := []handler.Condition{ Not(NewTextArrayContainsCond())}
 func Not(condition handler.Condition) handler.Condition {
 	return func(param string) (string, interface{}) {
@@ -412,7 +411,7 @@ func conditionsToWhere(conditions []handler.Condition, paramOffset int) (wheres 
 	values = make([]interface{}, 0, len(conditions))
 	for i, conditionFunc := range conditions {
 		condition, value := conditionFunc("$" + strconv.Itoa(i+1+paramOffset))
-		wheres[i] = fmt.Sprintf("(%s)", condition)
+		wheres[i] = "(" + condition + ")"
 		if value != nil {
 			values = append(values, value)
 		}
