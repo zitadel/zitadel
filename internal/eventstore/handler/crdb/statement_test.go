@@ -6,6 +6,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/zitadel/zitadel/internal/database"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 )
@@ -419,12 +421,7 @@ func TestNewUpdateStatement(t *testing.T) {
 						Value: "val",
 					},
 				},
-				conditions: []handler.Condition{
-					{
-						Name:  "col2",
-						Value: 1,
-					},
-				},
+				conditions: []handler.Condition{handler.NewCond("col2", 1)},
 			},
 			want: want{
 				table:            "",
@@ -448,13 +445,8 @@ func TestNewUpdateStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				values: []handler.Column{},
-				conditions: []handler.Condition{
-					{
-						Name:  "col2",
-						Value: 1,
-					},
-				},
+				values:     []handler.Column{},
+				conditions: []handler.Condition{handler.NewCond("col2", 1)},
 			},
 			want: want{
 				table:            "my_table",
@@ -514,12 +506,7 @@ func TestNewUpdateStatement(t *testing.T) {
 						Value: "val",
 					},
 				},
-				conditions: []handler.Condition{
-					{
-						Name:  "col2",
-						Value: 1,
-					},
-				},
+				conditions: []handler.Condition{handler.NewCond("col2", 1)},
 			},
 			want: want{
 				table:            "my_table",
@@ -559,12 +546,7 @@ func TestNewUpdateStatement(t *testing.T) {
 						Value: "val5",
 					},
 				},
-				conditions: []handler.Condition{
-					{
-						Name:  "col2",
-						Value: 1,
-					},
-				},
+				conditions: []handler.Condition{handler.NewCond("col2", 1)},
 			},
 			want: want{
 				table:            "my_table",
@@ -629,12 +611,7 @@ func TestNewDeleteStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				conditions: []handler.Condition{
-					{
-						Name:  "col2",
-						Value: 1,
-					},
-				},
+				conditions: []handler.Condition{handler.NewCond("col2", 1)},
 			},
 			want: want{
 				table:            "",
@@ -682,12 +659,7 @@ func TestNewDeleteStatement(t *testing.T) {
 					previousSequence: 0,
 					aggregateType:    "agg",
 				},
-				conditions: []handler.Condition{
-					{
-						Name:  "col1",
-						Value: 1,
-					},
-				},
+				conditions: []handler.Condition{handler.NewCond("col1", 1)},
 			},
 			want: want{
 				table:            "my_table",
@@ -841,12 +813,8 @@ func TestNewMultiStatement(t *testing.T) {
 				},
 				execs: []func(eventstore.Event) Exec{
 					AddDeleteStatement(
-						[]handler.Condition{
-							{
-								Name:  "col1",
-								Value: 1,
-							},
-						}),
+						[]handler.Condition{handler.NewCond("col1", 1)},
+					),
 					AddCreateStatement(
 						[]handler.Column{
 							{
@@ -875,12 +843,8 @@ func TestNewMultiStatement(t *testing.T) {
 								Value: 1,
 							},
 						},
-						[]handler.Condition{
-							{
-								Name:  "col1",
-								Value: 1,
-							},
-						}),
+						[]handler.Condition{handler.NewCond("col1", 1)},
+					),
 				},
 			},
 			want: want{
@@ -942,7 +906,7 @@ func TestNewCopyStatement(t *testing.T) {
 		conflictingCols []handler.Column
 		from            []handler.Column
 		to              []handler.Column
-		conds           []handler.Condition
+		conds           []handler.Column
 	}
 	type want struct {
 		aggregateType    eventstore.AggregateType
@@ -966,12 +930,10 @@ func TestNewCopyStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				conds: []handler.Condition{
-					{
-						Name:  "col2",
-						Value: 1,
-					},
-				},
+				conds: []handler.Column{{
+					Name:  "col1",
+					Value: 1,
+				}},
 			},
 			want: want{
 				table:            "",
@@ -995,7 +957,7 @@ func TestNewCopyStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				conds: []handler.Condition{},
+				conds: []handler.Column{},
 				from: []handler.Column{
 					{
 						Name: "col",
@@ -1029,7 +991,7 @@ func TestNewCopyStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				conds: []handler.Condition{},
+				conds: []handler.Column{},
 				from: []handler.Column{
 					{
 						Name: "col",
@@ -1066,11 +1028,9 @@ func TestNewCopyStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				conds: []handler.Condition{
-					{
-						Name: "col",
-					},
-				},
+				conds: []handler.Column{{
+					Name: "col1",
+				}},
 				from: []handler.Column{},
 			},
 			want: want{
@@ -1124,7 +1084,7 @@ func TestNewCopyStatement(t *testing.T) {
 						Name: "col_b",
 					},
 				},
-				conds: []handler.Condition{
+				conds: []handler.Column{
 					{
 						Name:  "id",
 						Value: 2,
@@ -1191,7 +1151,7 @@ func TestNewCopyStatement(t *testing.T) {
 						Name: "col_d",
 					},
 				},
-				conds: []handler.Condition{
+				conds: []handler.Column{
 					{
 						Name:  "id",
 						Value: 2,
@@ -1420,12 +1380,7 @@ func Test_columnsToWhere(t *testing.T) {
 		{
 			name: "no offset",
 			args: args{
-				conds: []handler.Condition{
-					{
-						Name:  "col1",
-						Value: "val1",
-					},
-				},
+				conds:       []handler.Condition{handler.NewCond("col1", "val1")},
 				paramOffset: 0,
 			},
 			want: want{
@@ -1437,14 +1392,8 @@ func Test_columnsToWhere(t *testing.T) {
 			name: "multiple cols",
 			args: args{
 				conds: []handler.Condition{
-					{
-						Name:  "col1",
-						Value: "val1",
-					},
-					{
-						Name:  "col2",
-						Value: "val2",
-					},
+					handler.NewCond("col1", "val1"),
+					handler.NewCond("col2", "val2"),
 				},
 				paramOffset: 0,
 			},
@@ -1456,16 +1405,51 @@ func Test_columnsToWhere(t *testing.T) {
 		{
 			name: "2 offset",
 			args: args{
-				conds: []handler.Condition{
-					{
-						Name:  "col1",
-						Value: "val1",
-					},
-				},
+				conds:       []handler.Condition{handler.NewCond("col1", "val1")},
 				paramOffset: 2,
 			},
 			want: want{
 				wheres: []string{"(col1 = $3)"},
+				values: []interface{}{"val1"},
+			},
+		},
+		{
+			name: "less than",
+			args: args{
+				conds: []handler.Condition{NewLessThanCond("col1", "val1")},
+			},
+			want: want{
+				wheres: []string{"(col1 < $1)"},
+				values: []interface{}{"val1"},
+			},
+		},
+		{
+			name: "is null",
+			args: args{
+				conds: []handler.Condition{NewIsNullCond("col1")},
+			},
+			want: want{
+				wheres: []string{"(col1 IS NULL)"},
+				values: []interface{}{},
+			},
+		},
+		{
+			name: "text array contains",
+			args: args{
+				conds: []handler.Condition{NewTextArrayContainsCond("col1", "val1")},
+			},
+			want: want{
+				wheres: []string{"(col1 @> $1)"},
+				values: []interface{}{database.StringArray{"val1"}},
+			},
+		},
+		{
+			name: "not",
+			args: args{
+				conds: []handler.Condition{Not(handler.NewCond("col1", "val1"))},
+			},
+			want: want{
+				wheres: []string{"(NOT (col1 = $1))"},
 				values: []interface{}{"val1"},
 			},
 		},

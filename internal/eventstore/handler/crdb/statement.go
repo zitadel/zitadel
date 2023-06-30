@@ -304,7 +304,7 @@ func NewTextArrayContainsCond(column string, value string) handler.Condition {
 func Not(condition handler.Condition) handler.Condition {
 	return func(param string) (string, interface{}) {
 		cond, value := condition(param)
-		return "NOT ( " + cond + " )", value
+		return "NOT (" + cond + ")", value
 	}
 }
 
