@@ -93,7 +93,7 @@ func NewStatementHandler(
 		reduceScheduledPseudoEvent: reduceScheduledPseudoEvent,
 	}
 
-	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock, h.initialized, reduceScheduledPseudoEvent)
+	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.searchQuery, h.Lock, h.Unlock, h.initialized, reduceScheduledPseudoEvent)
 
 	return h
 }
@@ -106,18 +106,20 @@ func (h *StatementHandler) Start() {
 	}
 }
 
-func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string) (*eventstore.SearchQueryBuilder, uint64, error) {
+func (h *StatementHandler) searchQuery(ctx context.Context, instanceIDs []string) (*eventstore.SearchQueryBuilder, uint64, error) {
+	if h.reduceScheduledPseudoEvent {
+		return nil, 1, nil
+	}
+	return h.dbSearchQuery(ctx, instanceIDs)
+}
+
+func (h *StatementHandler) dbSearchQuery(ctx context.Context, instanceIDs []string) (*eventstore.SearchQueryBuilder, uint64, error) {
 	sequences, err := h.currentSequences(ctx, h.client.QueryContext, instanceIDs)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	bulkLimit := h.bulkLimit
-	if h.reduceScheduledPseudoEvent {
-		bulkLimit = 1
-	}
-
-	queryBuilder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).Limit(bulkLimit).AllowTimeTravel()
+	queryBuilder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).Limit(h.bulkLimit).AllowTimeTravel()
 
 	for _, aggregateType := range h.aggregates {
 		for _, instanceID := range instanceIDs {
@@ -128,13 +130,6 @@ func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string
 					break
 				}
 			}
-			if h.reduceScheduledPseudoEvent {
-				queryBuilder.
-					AddQuery().
-					SequenceGreater(seq).
-					InstanceID(instanceID)
-				continue
-			}
 			queryBuilder.
 				AddQuery().
 				AggregateTypes(aggregateType).
@@ -142,8 +137,7 @@ func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string
 				InstanceID(instanceID)
 		}
 	}
-
-	return queryBuilder, bulkLimit, nil
+	return queryBuilder, h.bulkLimit, nil
 }
 
 // Update implements handler.Update
