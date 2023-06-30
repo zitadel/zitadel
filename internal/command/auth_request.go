@@ -72,3 +72,43 @@ func (c *Commands) getAuthRequestWriteModel(ctx context.Context, id string) (wri
 	}
 	return writeModel, nil
 }
+
+func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, sessionToken string) error {
+	writeModel, err := c.getAuthRequestWriteModel(ctx, id)
+	if err != nil {
+		return err
+	}
+	if writeModel.AuthRequestState != domain.AuthRequestStateAdded {
+		return errors.ThrowPreconditionFailed(nil, "COMMAND-Sx208nt", "Errors.AuthRequest.AlreadyHandled")
+	}
+	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetCtxData(ctx).OrgID)
+	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
+	if err != nil {
+		return err
+	}
+	if sessionWriteModel.State == domain.SessionStateUnspecified {
+		return errors.ThrowNotFound(nil, "COMMAND-x0099887", "Errors.Session.NotExisting")
+	}
+	if err := c.sessionPermission(ctx, sessionWriteModel, sessionToken, domain.PermissionSessionWrite); err != nil {
+		return err
+	}
+	return c.pushAppendAndReduce(ctx, writeModel, authrequest.NewSessionLinkedEvent(
+		ctx,
+		&authrequest.NewAggregate(id, authz.GetInstance(ctx).InstanceID()).Aggregate,
+		sessionID,
+	))
+}
+
+func (c *Commands) FailAuthRequest(ctx context.Context, id string) error {
+	writeModel, err := c.getAuthRequestWriteModel(ctx, id)
+	if err != nil {
+		return err
+	}
+	if writeModel.AuthRequestState != domain.AuthRequestStateAdded {
+		return errors.ThrowPreconditionFailed(nil, "COMMAND-Sx202nt", "Errors.AuthRequest.AlreadyHandled")
+	}
+	return c.pushAppendAndReduce(ctx, writeModel, authrequest.NewFailedEvent(
+		ctx,
+		&authrequest.NewAggregate(id, authz.GetInstance(ctx).InstanceID()).Aggregate,
+	))
+}

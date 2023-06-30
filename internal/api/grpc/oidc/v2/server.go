@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"github.com/zitadel/oidc/v2/pkg/op"
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -16,6 +17,8 @@ type Server struct {
 	oidc_pb.UnimplementedOIDCServiceServer
 	command *command.Commands
 	query   *query.Queries
+
+	op op.OpenIDProvider
 }
 
 type Config struct{}
@@ -23,10 +26,12 @@ type Config struct{}
 func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
+	op op.OpenIDProvider,
 ) *Server {
 	return &Server{
 		command: command,
 		query:   query,
+		op:      op,
 	}
 }
 

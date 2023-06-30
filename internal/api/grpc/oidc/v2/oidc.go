@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 
+	"github.com/zitadel/oidc/v2/pkg/op"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -67,8 +68,13 @@ func promptToPb(p domain.Prompt) oidc_pb.Prompt {
 	}
 }
 
-func (s *Server) CreateCallback(ctx context.Context, req *oidc_pb.CreateCallbackRequest) (*oidc_pb.CreateCallbackResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateCallback not implemented")
+func (s *Server) LinkSessionToAuthRequest(ctx context.Context, req *oidc_pb.LinkSessionToAuthRequestRequest) (*oidc_pb.LinkSessionToAuthRequestResponse, error) {
+	if err := s.command.LinkSessionToAuthRequest(ctx, req.GetAuthRequestId(), req.GetSessionId(), req.GetSessionToken()); err != nil {
+		return nil, err
+	}
+	return &oidc_pb.LinkSessionToAuthRequestResponse{
+		CallbackUrl: op.AuthCallbackURL(s.op)(ctx, req.GetAuthRequestId()),
+	}, nil
 }
 
 func errorReasonToOIDC(reason oidc_pb.ErrorReason) string {

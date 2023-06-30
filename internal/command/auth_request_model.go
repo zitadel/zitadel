@@ -25,6 +25,7 @@ type AuthRequestWriteModel struct {
 	LoginHint        string
 	HintUserID       string
 	AuthRequestState domain.AuthRequestState
+	SessionID        string
 }
 
 func NewAuthRequestWriteModel(id string) *AuthRequestWriteModel {
@@ -56,6 +57,10 @@ func (m *AuthRequestWriteModel) Reduce() error {
 		case *authrequest.CodeAddedEvent:
 			// TODO: left fold fields ASAP
 			m.AuthRequestState = domain.AuthRequestStateCodeAdded
+		case *authrequest.SessionLinkedEvent:
+			m.SessionID = e.SessionID
+		case *authrequest.FailedEvent:
+			m.AuthRequestState = domain.AuthRequestStateFailed
 		}
 	}
 
