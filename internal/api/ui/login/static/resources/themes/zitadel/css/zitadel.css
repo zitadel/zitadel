@@ -218,7 +218,7 @@ body.waiting * {
 footer {
   width: 100%;
   box-sizing: border-box;
-  background: rgba(0, 0, 0, 0.1254901961);
+  background: #00000020;
   min-height: 50px;
   display: flex;
   align-items: center;
@@ -759,7 +759,7 @@ i {
   letter-spacing: 0.05em;
   font-size: 12px;
   white-space: nowrap;
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1019607843);
+  box-shadow: 0 0 3px #0000001a;
   width: fit-content;
   line-height: 1rem;
 }
@@ -1211,7 +1211,7 @@ i {
 footer {
   width: 100%;
   box-sizing: border-box;
-  background: rgba(0, 0, 0, 0.1254901961);
+  background: #00000020;
   min-height: 50px;
   display: flex;
   align-items: center;
@@ -1752,7 +1752,7 @@ i {
   letter-spacing: 0.05em;
   font-size: 12px;
   white-space: nowrap;
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1019607843);
+  box-shadow: 0 0 3px #0000001a;
   width: fit-content;
   line-height: 1rem;
 }

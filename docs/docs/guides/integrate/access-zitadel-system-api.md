@@ -86,7 +86,7 @@ If your system is exposed without TLS or on a dedicated port, be sure to provide
 If you want to manually create a JWT for a test, you can also use our [ZITADEL Tools](https://github.com/zitadel/zitadel-tools). Download the latest release and run:
 
 ```bash
-./key2jwt -audience=https://custom-domain.com -key=system-user-1.pem -issuer=system-user-1
+zitadel-tools key2jwt --audience=https://custom-domain.com --key=system-user-1.pem --issuer=system-user-1
 ```
 
 ## Call the System API
@@ -145,7 +145,7 @@ You should get a successful response with a `totalResult` number of 1 and the de
 }
 ```
 
-With this token you are allowed to access the whole [ZITADEL System API](/apis/system).
+With this token you are allowed to access the whole [ZITADEL System API](/apis/resources/system).
 
 ## Summary
 

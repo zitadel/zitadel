@@ -18,10 +18,12 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/action"
+	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/session"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
 )
@@ -30,7 +32,9 @@ type Queries struct {
 	eventstore *eventstore.Eventstore
 	client     *database.DB
 
-	idpConfigEncryption crypto.EncryptionAlgorithm
+	idpConfigEncryption  crypto.EncryptionAlgorithm
+	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error)
+	checkPermission      domain.PermissionCheck
 
 	DefaultLanguage                     language.Tag
 	LoginDir                            http.FileSystem
@@ -43,7 +47,17 @@ type Queries struct {
 	multifactors                        domain.MultifactorConfigs
 }
 
-func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *database.DB, projections projection.Config, defaults sd.SystemDefaults, idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
+func StartQueries(
+	ctx context.Context,
+	es *eventstore.Eventstore,
+	sqlClient *database.DB,
+	projections projection.Config,
+	defaults sd.SystemDefaults,
+	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm,
+	zitadelRoles []authz.RoleMapping,
+	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
+	permissionCheck func(q *Queries) domain.PermissionCheck,
+) (repo *Queries, err error) {
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	if err != nil {
 		return nil, fmt.Errorf("unable to start login statik dir")
@@ -63,6 +77,7 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *dat
 		LoginTranslationFileContents:        make(map[string][]byte),
 		NotificationTranslationFileContents: make(map[string][]byte),
 		zitadelRoles:                        zitadelRoles,
+		sessionTokenVerifier:                sessionTokenVerifier,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)
@@ -71,6 +86,8 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *dat
 	action.RegisterEventMappers(repo.eventstore)
 	keypair.RegisterEventMappers(repo.eventstore)
 	usergrant.RegisterEventMappers(repo.eventstore)
+	session.RegisterEventMappers(repo.eventstore)
+	idpintent.RegisterEventMappers(repo.eventstore)
 
 	repo.idpConfigEncryption = idpConfigEncryption
 	repo.multifactors = domain.MultifactorConfigs{
@@ -79,6 +96,8 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *dat
 			Issuer:    defaults.Multifactors.OTP.Issuer,
 		},
 	}
+
+	repo.checkPermission = permissionCheck(repo)
 
 	err = projection.Create(ctx, sqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm)
 	if err != nil {

@@ -167,7 +167,14 @@
     "MORE": "さらに",
     "STEP": "ステップ",
     "SETUP": "セットアップ",
-    "COMINGSOON": "近日公開",
+    "UNSAVEDCHANGES": "未保存の変更",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "この新しいアクションを破棄してもよろしいですか?あなたのアクションは失われます",
+        "CANCEL": "キャンセル",
+        "DISCARD": "破棄"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "ユーザー {{value}} を表示する"
     }
@@ -205,6 +212,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "注意！ 組織のコンテキストが変更されました。"
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "ビューがインスタンスに変更されました。"
     }
   },
   "FILTER": {
@@ -252,6 +262,10 @@
     "TOKENINVALID": {
       "TITLE": "トークンが期限切れになりました。",
       "DESCRIPTION": "下のボタンをクリックして、もう一度ログインする。"
+    },
+    "EXHAUSTED": {
+      "TITLE": "認証されたリクエストのクォータを使い果たしました",
+      "DESCRIPTION": "このZITADELインスタンスの制限を削除または増加させる"
     },
     "INVALID_FORMAT": "不正なフォーマットです",
     "NOTANEMAIL": "入力された値がメールアドレスではありません。",
@@ -1026,7 +1040,8 @@
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български"
     },
     "SMTP": {
       "TITLE": "SMTP設定",
@@ -1220,7 +1235,8 @@
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -1957,7 +1973,8 @@
       "GRANT": {
         "0": "Authorization Code",
         "1": "Implicit",
-        "2": "Refresh Token"
+        "2": "Refresh Token",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2048,6 +2065,10 @@
         "TITLE": "Implicit",
         "DESCRIPTION": "認証エンドポイントから直接トークンを取得します。"
       },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "コンピューターまたはスマートフォンでデバイスを認証します。"
+      },
       "CUSTOM": {
         "TITLE": "Custom",
         "DESCRIPTION": "設定は他のオプションに対応していません。"
@@ -2079,7 +2100,8 @@
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

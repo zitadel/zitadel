@@ -182,6 +182,9 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SWf3g", "reduce.wrong.event.type %s", user.HumanEmailCodeAddedType)
 	}
+	if e.CodeReturned {
+		return crdb.NewNoOpStatement(e), nil
+	}
 	ctx := HandlerContext(event.Aggregate())
 	alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 		user.UserV1EmailCodeAddedType, user.UserV1EmailCodeSentType,
@@ -232,7 +235,7 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 		e,
 		u.metricSuccessfulDeliveriesEmail,
 		u.metricFailedDeliveriesEmail,
-	).SendEmailVerificationCode(notifyUser, origin, code)
+	).SendEmailVerificationCode(notifyUser, origin, code, e.URLTemplate)
 	if err != nil {
 		return nil, err
 	}
@@ -247,6 +250,9 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 	e, ok := event.(*user.HumanPasswordCodeAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Eeg3s", "reduce.wrong.event.type %s", user.HumanPasswordCodeAddedType)
+	}
+	if e.CodeReturned {
+		return crdb.NewNoOpStatement(e), nil
 	}
 	ctx := HandlerContext(event.Aggregate())
 	alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
@@ -314,7 +320,7 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 			u.metricFailedDeliveriesSMS,
 		)
 	}
-	err = notify.SendPasswordCode(notifyUser, origin, code)
+	err = notify.SendPasswordCode(notifyUser, origin, code, e.URLTemplate)
 	if err != nil {
 		return nil, err
 	}
@@ -391,6 +397,9 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-EDtjd", "reduce.wrong.event.type %s", user.HumanPasswordlessInitCodeAddedType)
 	}
+	if e.CodeReturned {
+		return crdb.NewNoOpStatement(e), nil
+	}
 	ctx := HandlerContext(event.Aggregate())
 	alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, map[string]interface{}{"id": e.ID}, user.HumanPasswordlessInitCodeSentType)
 	if err != nil {
@@ -439,7 +448,7 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 		e,
 		u.metricSuccessfulDeliveriesEmail,
 		u.metricFailedDeliveriesEmail,
-	).SendPasswordlessRegistrationLink(notifyUser, origin, code, e.ID)
+	).SendPasswordlessRegistrationLink(notifyUser, origin, code, e.ID, e.URLTemplate)
 	if err != nil {
 		return nil, err
 	}

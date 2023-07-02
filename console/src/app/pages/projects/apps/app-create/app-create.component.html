@@ -2,14 +2,16 @@
   title="{{ 'APP.PAGES.CREATE' | translate }}"
   class="app-create-wrapper"
   [createSteps]="
-    appType?.value?.createType === AppCreateType.OIDC
-      ? appType?.value.oidcAppType !== OIDCAppType.OIDC_APP_TYPE_NATIVE
-        ? 4
-        : 3
-      : appType?.value?.createType === AppCreateType.API
-      ? 3
-      : appType?.value?.createType === AppCreateType.SAML
-      ? 3
+    !devmode
+      ? appType?.value?.createType === AppCreateType.OIDC
+        ? appType?.value.oidcAppType !== OIDCAppType.OIDC_APP_TYPE_NATIVE
+          ? 4
+          : 3
+        : appType?.value?.createType === AppCreateType.API
+        ? 3
+        : appType?.value?.createType === AppCreateType.SAML
+        ? 3
+        : 0
       : 0
   "
   [currentCreateStep]="currentCreateStep"
@@ -58,13 +60,9 @@
       </form>
     </mat-step>
 
-    <!-- skip for native OIDC and SAML applications -->
+    <!-- skip for SAML applications -->
     <mat-step
-      *ngIf="
-        (appType?.value?.createType === AppCreateType.OIDC &&
-          appType?.value.oidcAppType !== OIDCAppType.OIDC_APP_TYPE_NATIVE) ||
-        appType?.value?.createType === AppCreateType.API
-      "
+      *ngIf="appType?.value?.createType === AppCreateType.OIDC || appType?.value?.createType === AppCreateType.API"
       [stepControl]="secondFormGroup"
       [editable]="true"
     >
@@ -93,9 +91,11 @@
         </div>
       </form>
     </mat-step>
-
     <!-- show redirect step only for OIDC apps -->
-    <mat-step *ngIf="appType?.value?.createType === AppCreateType.OIDC" [editable]="true">
+    <mat-step
+      *ngIf="appType?.value?.createType === AppCreateType.OIDC && authMethod?.value !== 'DEVICECODE'"
+      [editable]="true"
+    >
       <ng-template matStepLabel>{{ 'APP.OIDC.REDIRECTSECTION' | translate }}</ng-template>
 
       <p class="step-title">{{ 'APP.OIDC.REDIRECTTITLE' | translate }}</p>
@@ -431,12 +431,19 @@
         </ng-container>
       </div>
 
-      <div class="content" *ngIf="formappType?.value?.createType === AppCreateType.OIDC">
+      <div
+        class="content"
+        *ngIf="
+          formappType?.value?.createType === AppCreateType.OIDC &&
+          !(oidcAppRequest.toObject().appType === OIDCAppType.OIDC_APP_TYPE_NATIVE && grantTypesListContainsOnlyDeviceCode)
+        "
+      >
         <div class="formfield full-width">
           <cnsl-redirect-uris
             class="redirect-section"
             [disabled]="false"
             [(ngModel)]="redirectUris"
+            [ngModelOptions]="{ standalone: true }"
             [getValues]="requestRedirectValuesSubject$"
             title="{{ 'APP.OIDC.REDIRECT' | translate }}"
             [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
@@ -447,6 +454,7 @@
             class="redirect-section"
             [disabled]="false"
             [(ngModel)]="postLogoutUrisList"
+            [ngModelOptions]="{ standalone: true }"
             title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
             [getValues]="requestRedirectValuesSubject$"
             [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"

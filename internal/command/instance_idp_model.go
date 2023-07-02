@@ -113,6 +113,10 @@ func (wm *InstanceOIDCIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCIDPChangedEvent)
 		case *instance.IDPRemovedEvent:
 			wm.OIDCIDPWriteModel.AppendEvents(&e.RemovedEvent)
+		case *instance.OIDCIDPMigratedAzureADEvent:
+			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCIDPMigratedAzureADEvent)
+		case *instance.OIDCIDPMigratedGoogleEvent:
+			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCIDPMigratedGoogleEvent)
 
 			// old events
 		case *instance.IDPConfigAddedEvent:
@@ -141,6 +145,8 @@ func (wm *InstanceOIDCIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.OIDCIDPAddedEventType,
 			instance.OIDCIDPChangedEventType,
 			instance.IDPRemovedEventType,
+			instance.OIDCIDPMigratedAzureADEventType,
+			instance.OIDCIDPMigratedGoogleEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
 		Or(). // old events
@@ -305,6 +311,8 @@ func (wm *InstanceAzureADIDPWriteModel) AppendEvents(events ...eventstore.Event)
 			wm.AzureADIDPWriteModel.AppendEvents(&e.AzureADIDPAddedEvent)
 		case *instance.AzureADIDPChangedEvent:
 			wm.AzureADIDPWriteModel.AppendEvents(&e.AzureADIDPChangedEvent)
+		case *instance.OIDCIDPMigratedAzureADEvent:
+			wm.AzureADIDPWriteModel.AppendEvents(&e.OIDCIDPMigratedAzureADEvent)
 		case *instance.IDPRemovedEvent:
 			wm.AzureADIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		default:
@@ -322,6 +330,7 @@ func (wm *InstanceAzureADIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			instance.AzureADIDPAddedEventType,
 			instance.AzureADIDPChangedEventType,
+			instance.OIDCIDPMigratedAzureADEventType,
 			instance.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
@@ -655,6 +664,8 @@ func (wm *InstanceGoogleIDPWriteModel) AppendEvents(events ...eventstore.Event) 
 			wm.GoogleIDPWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
 		case *instance.GoogleIDPChangedEvent:
 			wm.GoogleIDPWriteModel.AppendEvents(&e.GoogleIDPChangedEvent)
+		case *instance.OIDCIDPMigratedGoogleEvent:
+			wm.GoogleIDPWriteModel.AppendEvents(&e.OIDCIDPMigratedGoogleEvent)
 		case *instance.IDPRemovedEvent:
 			wm.GoogleIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		}
@@ -670,6 +681,7 @@ func (wm *InstanceGoogleIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			instance.GoogleIDPAddedEventType,
 			instance.GoogleIDPChangedEventType,
+			instance.OIDCIDPMigratedGoogleEventType,
 			instance.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).

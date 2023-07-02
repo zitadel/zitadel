@@ -7,7 +7,8 @@ import (
 )
 
 type SQL struct {
-	client *database.DB
+	client                   *database.DB
+	allowOrderByCreationDate bool
 }
 
 func (db *SQL) Health(ctx context.Context) error {

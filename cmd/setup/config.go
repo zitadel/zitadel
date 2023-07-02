@@ -56,21 +56,23 @@ func MustNewConfig(v *viper.Viper) *Config {
 }
 
 type Steps struct {
-	s1ProjectionTable         *ProjectionTable
-	s2AssetsTable             *AssetTable
-	FirstInstance             *FirstInstance
-	s4EventstoreIndexes       *EventstoreIndexesNew
-	s5LastFailed              *LastFailed
-	s6OwnerRemoveColumns      *OwnerRemoveColumns
-	s7LogstoreTables          *LogstoreTables
-	s8AuthTokens              *AuthTokenIndexes
-	s9EventstoreIndexes2      *EventstoreIndexesNew
-	s10EventstoreCreationDate *CorrectCreationDate
+	s1ProjectionTable    *ProjectionTable
+	s2AssetsTable        *AssetTable
+	FirstInstance        *FirstInstance
+	s4EventstoreIndexes  *EventstoreIndexesNew
+	s5LastFailed         *LastFailed
+	s6OwnerRemoveColumns *OwnerRemoveColumns
+	s7LogstoreTables     *LogstoreTables
+	s8AuthTokens         *AuthTokenIndexes
+	s9EventstoreIndexes2 *EventstoreIndexesNew
+	CorrectCreationDate  *CorrectCreationDate
+	AddEventCreatedAt    *AddEventCreatedAt
 }
 
 type encryptionKeyConfig struct {
 	User *crypto.KeyConfig
 	SMTP *crypto.KeyConfig
+	OIDC *crypto.KeyConfig
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

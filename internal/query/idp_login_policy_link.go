@@ -80,27 +80,33 @@ var (
 		name:  projection.IDPLoginPolicyLinkOwnerRemovedCol,
 		table: idpLoginPolicyLinkTable,
 	}
+
+	idpLoginPolicyOwnerTable           = loginPolicyTable.setAlias("login_policy_owner")
+	idpLoginPolicyOwnerIDCol           = LoginPolicyColumnOrgID.setTable(idpLoginPolicyOwnerTable)
+	idpLoginPolicyOwnerInstanceIDCol   = LoginPolicyColumnInstanceID.setTable(idpLoginPolicyOwnerTable)
+	idpLoginPolicyOwnerIsDefaultCol    = LoginPolicyColumnIsDefault.setTable(idpLoginPolicyOwnerTable)
+	idpLoginPolicyOwnerOwnerRemovedCol = LoginPolicyColumnOwnerRemoved.setTable(idpLoginPolicyOwnerTable)
 )
 
 func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string, queries *IDPLoginPolicyLinksSearchQuery, withOwnerRemoved bool) (idps *IDPLoginPolicyLinks, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareIDPLoginPolicyLinksQuery(ctx, q.client)
+	query, scan := prepareIDPLoginPolicyLinksQuery(ctx, q.client, resourceOwner)
 	eq := sq.Eq{
-		IDPLoginPolicyLinkResourceOwnerCol.identifier(): resourceOwner,
-		IDPLoginPolicyLinkInstanceIDCol.identifier():    authz.GetInstance(ctx).InstanceID(),
+		IDPLoginPolicyLinkInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	if !withOwnerRemoved {
 		eq[IDPLoginPolicyLinkOwnerRemovedCol.identifier()] = false
+		eq[idpLoginPolicyOwnerOwnerRemovedCol.identifier()] = false
 	}
+
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-FDbKW", "Errors.Query.InvalidRequest")
 	}
-
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil {
+	if err != nil || rows.Err() != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-ZkKUc", "Errors.Internal")
 	}
 	idps, err = scan(rows)
@@ -111,7 +117,11 @@ func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string,
 	return idps, err
 }
 
-func prepareIDPLoginPolicyLinksQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*IDPLoginPolicyLinks, error)) {
+func prepareIDPLoginPolicyLinksQuery(ctx context.Context, db prepareDatabase, resourceOwner string) (sq.SelectBuilder, func(*sql.Rows) (*IDPLoginPolicyLinks, error)) {
+	resourceOwnerQuery, resourceOwnerArgs, err := prepareIDPLoginPolicyLinksResourceOwnerQuery(ctx, resourceOwner)
+	if err != nil {
+		return sq.SelectBuilder{}, nil
+	}
 	return sq.Select(
 			IDPLoginPolicyLinkIDPIDCol.identifier(),
 			IDPTemplateNameCol.identifier(),
@@ -119,7 +129,12 @@ func prepareIDPLoginPolicyLinksQuery(ctx context.Context, db prepareDatabase) (s
 			IDPTemplateOwnerTypeCol.identifier(),
 			countColumn.identifier()).
 			From(idpLoginPolicyLinkTable.identifier()).
-			LeftJoin(join(IDPTemplateIDCol, IDPLoginPolicyLinkIDPIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(IDPTemplateIDCol, IDPLoginPolicyLinkIDPIDCol)).
+			RightJoin("("+resourceOwnerQuery+") AS "+idpLoginPolicyOwnerTable.alias+" ON "+
+				idpLoginPolicyOwnerIDCol.identifier()+" = "+IDPLoginPolicyLinkResourceOwnerCol.identifier()+" AND "+
+				idpLoginPolicyOwnerInstanceIDCol.identifier()+" = "+IDPLoginPolicyLinkInstanceIDCol.identifier()+
+				" "+db.Timetravel(call.Took(ctx)),
+				resourceOwnerArgs...).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPLoginPolicyLinks, error) {
 			links := make([]*IDPLoginPolicyLink, 0)
@@ -163,4 +178,23 @@ func prepareIDPLoginPolicyLinksQuery(ctx context.Context, db prepareDatabase) (s
 				},
 			}, nil
 		}
+}
+
+func prepareIDPLoginPolicyLinksResourceOwnerQuery(ctx context.Context, resourceOwner string) (string, []interface{}, error) {
+	eqPolicy := sq.Eq{idpLoginPolicyOwnerInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
+	return sq.Select(
+		idpLoginPolicyOwnerIDCol.identifier(),
+		idpLoginPolicyOwnerInstanceIDCol.identifier(),
+		idpLoginPolicyOwnerOwnerRemovedCol.identifier(),
+	).
+		From(idpLoginPolicyOwnerTable.identifier()).
+		Where(
+			sq.And{
+				eqPolicy,
+				sq.Or{
+					sq.Eq{idpLoginPolicyOwnerIDCol.identifier(): resourceOwner},
+					sq.Eq{idpLoginPolicyOwnerIDCol.identifier(): authz.GetInstance(ctx).InstanceID()},
+				},
+			}).
+		Limit(1).OrderBy(idpLoginPolicyOwnerIsDefaultCol.identifier()).ToSql()
 }

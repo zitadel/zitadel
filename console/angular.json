@@ -35,7 +35,8 @@
               "codemirror/mode/javascript/javascript",
               "codemirror/mode/xml/xml",
               "file-saver",
-              "qrcode"
+              "qrcode",
+              "codemirror"
             ]
           },
           "configurations": {
