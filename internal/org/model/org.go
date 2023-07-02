@@ -1,10 +1,9 @@
 package model
 
 import (
-	"strings"
-
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/utils"
 )
 
 type Org struct {
@@ -47,7 +46,8 @@ func (o *Org) GetPrimaryDomain() *OrgDomain {
 }
 
 func (o *Org) nameForDomain(iamDomain string) string {
-	return strings.ToLower(strings.ReplaceAll(o.Name, " ", "-") + "." + iamDomain)
+	// Org name is used to create a domain label. We must sanitize the resulting domain
+	return utils.SanitizeDomain(o.Name, iamDomain)
 }
 
 func (o *Org) AddIAMDomain(iamDomain string) {

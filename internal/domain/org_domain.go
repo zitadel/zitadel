@@ -1,11 +1,10 @@
 package domain
 
 import (
-	"strings"
-
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/utils"
 )
 
 type OrgDomain struct {
@@ -32,7 +31,8 @@ func (domain *OrgDomain) GenerateVerificationCode(codeGenerator crypto.Generator
 }
 
 func NewIAMDomainName(orgName, iamDomain string) string {
-	return strings.ToLower(strings.ReplaceAll(strings.TrimSpace(orgName), " ", "-") + "." + iamDomain)
+	// Org name is used to create a domain label. We must sanitize the resulting domain
+	return utils.SanitizeDomain(orgName, iamDomain)
 }
 
 type OrgDomainValidationType int32
