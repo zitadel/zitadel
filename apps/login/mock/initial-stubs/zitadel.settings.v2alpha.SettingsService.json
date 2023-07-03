@@ -1,0 +1,17 @@
+[
+  {
+    "service": "zitadel.settings.v2alpha.SettingsService",
+    "method": "GetBrandingSettings",
+    "out": {}
+  },
+  {
+    "service": "zitadel.settings.v2alpha.SettingsService",
+    "method": "GetLegalAndSupportSettings",
+    "out": {}
+  },
+  {
+    "service": "zitadel.settings.v2alpha.SettingsService",
+    "method": "GetPasswordComplexitySettings",
+    "out": {}
+  }
+]
