@@ -508,6 +508,8 @@ Errors:
     OtherUser: Намерение, предназначено за друг потребител
   AuthRequest:
     AlreadyExists: Auth Request вече съществува
+    NotExisting: Auth Request не съществува
+    WrongLoginClient: Auth Request, създаден от друг клиент за влизане
 
 AggregateTypes:
   action: Действие

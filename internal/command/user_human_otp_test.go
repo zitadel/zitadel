@@ -528,7 +528,7 @@ func TestCommands_createHumanOTP(t *testing.T) {
 }
 
 func TestCommands_HumanCheckMFAOTPSetup(t *testing.T) {
-	ctx := authz.NewMockContext("inst1", "org1", "user1")
+	ctx := authz.NewMockContext("", "org1", "user1")
 
 	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	key, secret, err := domain.NewOTPKey("example.com", "user1", cryptoAlg)

@@ -34,8 +34,8 @@ type AddedEvent struct {
 	Prompt        []domain.Prompt           `json:"prompt,omitempty"`
 	UILocales     []string                  `json:"ui_locales,omitempty"`
 	MaxAge        *time.Duration            `json:"max_age,omitempty"`
-	LoginHint     string                    `json:"login_hint,omitempty"`
-	HintUserID    string                    `json:"hint_user_id,omitempty"`
+	LoginHint     *string                   `json:"login_hint,omitempty"`
+	HintUserID    *string                   `json:"hint_user_id,omitempty"`
 }
 
 func (e *AddedEvent) Data() interface{} {
@@ -61,7 +61,7 @@ func NewAddedEvent(ctx context.Context,
 	uiLocales []string,
 	maxAge *time.Duration,
 	loginHint,
-	hintUserID string,
+	hintUserID *string,
 ) *AddedEvent {
 	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
