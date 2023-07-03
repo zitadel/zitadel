@@ -5,7 +5,7 @@ describe("/verify", () => {
     removeStub("zitadel.user.v2alpha.UserService", "VerifyEmail");
     addStub("zitadel.user.v2alpha.UserService", "VerifyEmail");
     cy.visit("/verify?userID=123&code=abc&submit=true");
-    cy.location("pathname", { timeout: 10_000 }).should("eq", "/username");
+    cy.location("pathname", { timeout: 10_000 }).should("eq", "/loginname");
   });
   it("shows an error if validation failed", () => {
     removeStub("zitadel.user.v2alpha.UserService", "VerifyEmail");
