@@ -5,7 +5,7 @@ import {
   addSessionToCookie,
   updateSessionCookie,
 } from "./cookies";
-import { ChallengeKind, Session } from "@zitadel/server";
+import { ChallengeKind, Session, Challenges } from "@zitadel/server";
 
 export async function createSessionAndUpdateCookie(
   loginName: string,
@@ -51,20 +51,24 @@ export async function createSessionAndUpdateCookie(
   }
 }
 
+export type SessionWithChallenges = Session & { challenges: Challenges[] };
+
 export async function setSessionAndUpdateCookie(
   sessionId: string,
   sessionToken: string,
   loginName: string,
   password: string | undefined,
+  passkey: { credentialAssertionData: any } | undefined,
   domain: string | undefined,
   challenges: ChallengeKind[] | undefined
-): Promise<Session> {
+): Promise<SessionWithChallenges> {
   return setSession(
     server,
     sessionId,
     sessionToken,
     domain,
     password,
+    passkey,
     challenges
   ).then((updatedSession) => {
     if (updatedSession) {

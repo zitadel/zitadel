@@ -116,6 +116,7 @@ export async function setSession(
   sessionToken: string,
   domain: string | undefined,
   password: string | undefined,
+  passkey: { credentialAssertionData: any } | undefined,
   challenges: ChallengeKind[] | undefined
 ): Promise<SetSessionResponse | undefined> {
   const sessionService = session.getSession(server);
@@ -125,7 +126,7 @@ export async function setSession(
     ? sessionService.setSession(
         {
           ...payload,
-          checks: { password: { password } },
+          checks: { password: { password }, passkey },
         },
         {}
       )

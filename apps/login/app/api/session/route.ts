@@ -1,11 +1,10 @@
-import { server, deleteSession, getSession, setSession } from "#/lib/zitadel";
+import { server, deleteSession } from "#/lib/zitadel";
 import {
   SessionCookie,
   getMostRecentSessionCookie,
   getSessionCookieById,
   getSessionCookieByLoginName,
   removeSessionFromCookie,
-  updateSessionCookie,
 } from "#/utils/cookies";
 import {
   createSessionAndUpdateCookie,
@@ -38,7 +37,7 @@ export async function PUT(request: NextRequest) {
   const body = await request.json();
 
   if (body) {
-    const { loginName, password, challenges } = body;
+    const { loginName, password, challenges, passkey } = body;
 
     const recentPromise: Promise<SessionCookie> = loginName
       ? getSessionCookieByLoginName(loginName).catch((error) => {
@@ -57,6 +56,7 @@ export async function PUT(request: NextRequest) {
           recent.token,
           recent.loginName,
           password,
+          passkey,
           domain,
           challenges
         ).then((session) => {

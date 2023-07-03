@@ -63,23 +63,16 @@ export default function LoginPasskey({ loginName, challenge }: Props) {
     return res.json();
   }
 
-  async function submitLogin(
-    passkeyId: string,
-    passkeyName: string,
-    publicKeyCredential: any,
-    sessionId: string
-  ) {
+  async function submitLogin(data: any) {
     setLoading(true);
-    const res = await fetch("/api/passkeys/verify", {
+    const res = await fetch("/api/session", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        passkeyId,
-        passkeyName,
-        publicKeyCredential,
-        sessionId,
+        loginName,
+        passkey: data,
       }),
     });
 
@@ -95,51 +88,65 @@ export default function LoginPasskey({ loginName, challenge }: Props) {
 
   async function submitLoginAndContinue(): Promise<boolean | void> {
     console.log("login", publicKey);
-    navigator.credentials
-      .get({
-        publicKey,
-      })
-      .then((assertedCredential: any) => {
-        if (assertedCredential) {
-          let authData = new Uint8Array(
-            assertedCredential.response.authenticatorData
-          );
-          let clientDataJSON = new Uint8Array(
-            assertedCredential.response.clientDataJSON
-          );
-          let rawId = new Uint8Array(assertedCredential.rawId);
-          let sig = new Uint8Array(assertedCredential.response.signature);
-          let userHandle = new Uint8Array(
-            assertedCredential.response.userHandle
-          );
-          let data = JSON.stringify({
-            id: assertedCredential.id,
-            rawId: coerceToBase64Url(rawId, "rawId"),
-            type: assertedCredential.type,
-            response: {
-              authenticatorData: coerceToBase64Url(authData, "authData"),
-              clientDataJSON: coerceToBase64Url(
-                clientDataJSON,
-                "clientDataJSON"
-              ),
-              signature: coerceToBase64Url(sig, "sig"),
-              userHandle: coerceToBase64Url(userHandle, "userHandle"),
-            },
-          });
-          console.log(data);
-          // return submitLogin(passkeyId, "", data, sessionId);
-        } else {
-          setLoading(false);
-          setError("An error on retrieving passkey");
-          return null;
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        setLoading(false);
-        //   setError(error);
-        return null;
+    if (publicKey) {
+      console.log(publicKey);
+      (publicKey as any).challenge = coerceToArrayBuffer(
+        (publicKey as any).challenge,
+        "publicKey.challenge"
+      );
+      (publicKey as any).allowCredentials.map((listItem: any) => {
+        listItem.id = coerceToArrayBuffer(
+          listItem.id,
+          "publicKey.allowCredentials.id"
+        );
       });
+      console.log(publicKey);
+      navigator.credentials
+        .get({
+          publicKey,
+        })
+        .then((assertedCredential: any) => {
+          if (assertedCredential) {
+            let authData = new Uint8Array(
+              assertedCredential.response.authenticatorData
+            );
+            let clientDataJSON = new Uint8Array(
+              assertedCredential.response.clientDataJSON
+            );
+            let rawId = new Uint8Array(assertedCredential.rawId);
+            let sig = new Uint8Array(assertedCredential.response.signature);
+            let userHandle = new Uint8Array(
+              assertedCredential.response.userHandle
+            );
+            let data = JSON.stringify({
+              id: assertedCredential.id,
+              rawId: coerceToBase64Url(rawId, "rawId"),
+              type: assertedCredential.type,
+              response: {
+                authenticatorData: coerceToBase64Url(authData, "authData"),
+                clientDataJSON: coerceToBase64Url(
+                  clientDataJSON,
+                  "clientDataJSON"
+                ),
+                signature: coerceToBase64Url(sig, "sig"),
+                userHandle: coerceToBase64Url(userHandle, "userHandle"),
+              },
+            });
+            console.log(data);
+            return submitLogin(data);
+          } else {
+            setLoading(false);
+            setError("An error on retrieving passkey");
+            return null;
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          setLoading(false);
+          //   setError(error);
+          return null;
+        });
+    }
   }
 
   return (

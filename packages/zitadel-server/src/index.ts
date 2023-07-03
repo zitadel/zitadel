@@ -16,6 +16,7 @@ export { LoginSettings } from "./proto/server/zitadel/settings/v2alpha/login_set
 
 export {
   ChallengeKind,
+  Challenges,
   Challenges_Passkey,
 } from "./proto/server/zitadel/session/v2alpha/challenge";
 
