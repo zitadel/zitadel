@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"regexp"
 	"sync"
 	"time"
 
@@ -118,4 +119,20 @@ func (q *Queries) Health(ctx context.Context) error {
 
 type prepareDatabase interface {
 	Timetravel(d time.Duration) string
+}
+
+// cleanStaticQueries removes whitespaces,
+// such as ` `, \t, \n, from queries to improve
+// readability in logs and errors.
+func cleanStaticQueries(qs ...*string) {
+	regex := regexp.MustCompile(`\s+`)
+	for _, q := range qs {
+		*q = regex.ReplaceAllString(*q, " ")
+	}
+}
+
+func init() {
+	cleanStaticQueries(
+		&authRequestByIDQuery,
+	)
 }

@@ -64,8 +64,12 @@ func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.
 		Prompt:        PromptToBusiness(req.Prompt),
 		UILocales:     UILocalesToBusiness(req.UILocales),
 		MaxAge:        MaxAgeToBusiness(req.MaxAge),
-		LoginHint:     req.LoginHint,
-		HintUserID:    hintUserID,
+	}
+	if req.LoginHint != "" {
+		authRequest.LoginHint = &req.LoginHint
+	}
+	if hintUserID != "" {
+		authRequest.HintUserID = &hintUserID
 	}
 
 	err = o.command.AddAuthRequest(ctx, authRequest)

@@ -19,6 +19,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
@@ -29,6 +30,7 @@ type Client struct {
 	Mgmt      mgmt.ManagementServiceClient
 	UserV2    user.UserServiceClient
 	SessionV2 session.SessionServiceClient
+	OIDCv2    oidc_pb.OIDCServiceClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
@@ -38,6 +40,7 @@ func newClient(cc *grpc.ClientConn) Client {
 		Mgmt:      mgmt.NewManagementServiceClient(cc),
 		UserV2:    user.NewUserServiceClient(cc),
 		SessionV2: session.NewSessionServiceClient(cc),
+		OIDCv2:    oidc_pb.NewOIDCServiceClient(cc),
 	}
 }
 

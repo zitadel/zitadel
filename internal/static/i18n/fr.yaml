@@ -490,6 +490,8 @@ Errors:
     OtherUser: Intention destinée à un autre utilisateur
   AuthRequest:
     AlreadyExists: Auth Request existe déjà
+    NotExisting: Auth Request n'existe pas
+    WrongLoginClient: Auth Request créé par un autre client de connexion
 
 AggregateTypes:
   action: Action

@@ -29,8 +29,8 @@ type AuthRequest struct {
 	Prompt        []domain.Prompt
 	UILocales     []string
 	MaxAge        *time.Duration
-	LoginHint     string
-	HintUserID    string
+	LoginHint     *string
+	HintUserID    *string
 }
 
 type AuthenticatedAuthRequest struct {
@@ -41,11 +41,14 @@ type AuthenticatedAuthRequest struct {
 	AuthTime  time.Time
 }
 
+const IDPrefixV2 = "V2_"
+
 func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest) (err error) {
-	authRequest.ID, err = c.idGenerator.Next()
+	authRequestID, err := c.idGenerator.Next()
 	if err != nil {
 		return err
 	}
+	authRequest.ID = IDPrefixV2 + authRequestID
 	writeModel, err := c.getAuthRequestWriteModel(ctx, authRequest.ID)
 	if err != nil {
 		return err

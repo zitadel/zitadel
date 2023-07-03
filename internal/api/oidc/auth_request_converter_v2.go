@@ -8,8 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 )
 
-const IDPrefix = "V2_"
-
 type AuthRequestV2 struct {
 	*command.AuthRequest
 	SessionID string
@@ -19,7 +17,7 @@ type AuthRequestV2 struct {
 }
 
 func (a *AuthRequestV2) GetID() string {
-	return IDPrefix + a.ID
+	return a.ID
 }
 
 func (a *AuthRequestV2) GetACR() string {
