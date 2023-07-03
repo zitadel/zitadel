@@ -82,6 +82,7 @@ jobs:
           key: integration-test-postgres-${{ inputs.core_cache_key }}
           path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
 
+  # TODO: enable as soon as cockroach allows `COCKROACH_ARGS`
   # cockroach:
   #   runs-on: ubuntu-latest
   #   services:

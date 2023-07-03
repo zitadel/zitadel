@@ -32,7 +32,6 @@ jobs:
       - name: Lint skip
         run: |
           echo "Linting outside of pull requests is skipped"
-    
 
   api:
     name: api
