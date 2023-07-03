@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChallengeKind, Challenges_Passkey } from "@zitadel/server";
+import { Challenges_Passkey } from "@zitadel/server";
 import { coerceToArrayBuffer, coerceToBase64Url } from "#/utils/base64";
 import { Button, ButtonVariants } from "./Button";
 import Alert from "./Alert";
@@ -66,7 +66,7 @@ export default function LoginPasskey({ loginName, challenge }: Props) {
   async function submitLogin(data: any) {
     setLoading(true);
     const res = await fetch("/api/session", {
-      method: "POST",
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },

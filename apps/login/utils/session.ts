@@ -51,7 +51,9 @@ export async function createSessionAndUpdateCookie(
   }
 }
 
-export type SessionWithChallenges = Session & { challenges: Challenges[] };
+export type SessionWithChallenges = Session & {
+  challenges: Challenges | undefined;
+};
 
 export async function setSessionAndUpdateCookie(
   sessionId: string,
