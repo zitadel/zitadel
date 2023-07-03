@@ -19,14 +19,13 @@ import (
 
 // AddOIDCSessionAccessToken creates a new OIDC Session, creates an access token and returns its id and expiration
 // if the underlying [AuthRequest] is a OIDC Auth Code Flow, it will set the code as exchange
-func (c *Commands) AddOIDCSessionAccessToken(ctx context.Context, authRequest *AuthRequest) (string, time.Time, error) {
-	cmd, err := c.newOIDCSessionAddEvents(ctx, authRequest)
+func (c *Commands) AddOIDCSessionAccessToken(ctx context.Context, authRequestID string) (string, time.Time, error) {
+	cmd, err := c.newOIDCSessionAddEvents(ctx, authRequestID)
 	if err != nil {
 		return "", time.Time{}, err
 	}
-	cmd.AddSession(ctx, authRequest.ClientID, authRequest.Audience, authRequest.Scope)
-	err = cmd.AddAccessToken(ctx, authRequest.Scope)
-	if err != nil {
+	cmd.AddSession(ctx)
+	if err = cmd.AddAccessToken(ctx, cmd.authRequestWriteModel.Scope); err != nil {
 		return "", time.Time{}, err
 	}
 	cmd.SetAuthRequestSuccessful(ctx)
@@ -37,23 +36,20 @@ func (c *Commands) AddOIDCSessionAccessToken(ctx context.Context, authRequest *A
 // AddOIDCSessionRefreshAndAccessToken creates a new OIDC Session, creates an access token and refresh token
 // it returns the access token id and expiration and the refresh token
 // if the underlying [AuthRequest] is a OIDC Auth Code Flow, it will set the code as exchange
-func (c *Commands) AddOIDCSessionRefreshAndAccessToken(ctx context.Context, authRequest *AuthRequest) (tokenID, refreshToken string, tokenExpiration time.Time, err error) {
-	cmd, err := c.newOIDCSessionAddEvents(ctx, authRequest)
+func (c *Commands) AddOIDCSessionRefreshAndAccessToken(ctx context.Context, authRequestID string) (tokenID, refreshToken string, tokenExpiration time.Time, err error) {
+	cmd, err := c.newOIDCSessionAddEvents(ctx, authRequestID)
 	if err != nil {
 		return "", "", time.Time{}, err
 	}
-	cmd.AddSession(ctx, authRequest.ClientID, authRequest.Audience, authRequest.Scope)
-	err = cmd.AddAccessToken(ctx, authRequest.Scope)
-	if err != nil {
+	cmd.AddSession(ctx)
+	if err = cmd.AddAccessToken(ctx, cmd.authRequestWriteModel.Scope); err != nil {
 		return "", "", time.Time{}, err
 	}
-	err = cmd.AddRefreshToken(ctx)
-	if err != nil {
+	if err = cmd.AddRefreshToken(ctx); err != nil {
 		return "", "", time.Time{}, err
 	}
 	cmd.SetAuthRequestSuccessful(ctx)
-	err = c.pushAppendAndReduce(ctx, cmd.oidcSessionWriteModel, cmd.events...)
-	if err != nil {
+	if err = c.pushAppendAndReduce(ctx, cmd.oidcSessionWriteModel, cmd.events...); err != nil {
 		return "", "", time.Time{}, err
 	}
 	return cmd.PushEvents(ctx)
@@ -97,8 +93,8 @@ func (c *Commands) OIDCSessionByRefreshToken(ctx context.Context, refreshToken s
 	return writeModel, nil
 }
 
-func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, authRequest *AuthRequest) (*OIDCSessionEvents, error) {
-	authRequestWriteModel, err := c.getAuthRequestWriteModel(ctx, authRequest.ID)
+func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, authRequestID string) (*OIDCSessionEvents, error) {
+	authRequestWriteModel, err := c.getAuthRequestWriteModel(ctx, authRequestID)
 	if err != nil {
 		return nil, err
 	}
@@ -199,15 +195,15 @@ type OIDCSessionEvents struct {
 	refreshToken string
 }
 
-func (c *OIDCSessionEvents) AddSession(ctx context.Context, clientID string, audience, scope []string) {
+func (c *OIDCSessionEvents) AddSession(ctx context.Context) {
 	c.events = append(c.events, oidcsession.NewAddedEvent(
 		ctx,
 		c.oidcSessionWriteModel.aggregate,
 		c.sessionWriteModel.UserID,
 		c.sessionWriteModel.AggregateID,
-		clientID,
-		audience,
-		scope,
+		c.authRequestWriteModel.ClientID,
+		c.authRequestWriteModel.Audience,
+		c.authRequestWriteModel.Scope,
 		amr.List(c.sessionWriteModel),
 		c.sessionWriteModel.AuthenticationTime(),
 	),

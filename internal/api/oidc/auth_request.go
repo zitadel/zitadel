@@ -188,7 +188,7 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 		applicationID = authReq.ApplicationID
 		userOrgID = authReq.UserOrgID
 	case *AuthRequestV2:
-		return o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.AuthRequest)
+		return o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.ID)
 	}
 
 	accessTokenLifetime, _, _, _, err := o.getOIDCSettings(ctx)
@@ -210,7 +210,7 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 	// handle V2 request directly
 	switch tokenReq := req.(type) {
 	case *AuthRequestV2:
-		return o.command.AddOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.AuthRequest)
+		return o.command.AddOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.ID)
 	case *RefreshTokenRequestV2:
 		return o.command.ExchangeOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.OIDCSessionWriteModel.AggregateID, refreshToken, tokenReq.RequestedScopes)
 	}

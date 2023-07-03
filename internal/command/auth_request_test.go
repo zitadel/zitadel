@@ -133,3 +133,199 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 		})
 	}
 }
+
+func TestCommands_ExchangeAuthCode(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx  context.Context
+		code string
+	}
+	type res struct {
+		authRequest *AuthenticatedAuthRequest
+		err         error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"empty code error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
+				code: "",
+			},
+			res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfr3s", "Errors.AuthRequest.InvalidCode"),
+			},
+		},
+		{
+			"no code added error",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+					//eventFromEventPusher(
+					//	authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate,
+					//		"loginClient",
+					//		"clientID",
+					//		"redirectURI",
+					//		"state",
+					//		"nonce",
+					//		[]string{"openid"},
+					//		[]string{"audience"},
+					//		domain.OIDCResponseTypeCode,
+					//		&domain.OIDCCodeChallenge{
+					//			Challenge: "challenge",
+					//			Method:    domain.CodeChallengeMethodS256,
+					//		},
+					//		[]domain.Prompt{domain.PromptNone},
+					//		[]string{"en", "de"},
+					//		gu.Ptr(time.Duration(0)),
+					//		"loginHint",
+					//		"hintUserID",
+					//	),
+					//),
+					),
+				),
+			},
+			args{
+				ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
+				code: "authRequestID:codeID",
+			},
+			res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.NoCode"),
+			},
+		},
+		{
+			"invalid code error",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate,
+								"loginClient",
+								"clientID",
+								"redirectURI",
+								"state",
+								"nonce",
+								[]string{"openid"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeCode,
+								&domain.OIDCCodeChallenge{
+									Challenge: "challenge",
+									Method:    domain.CodeChallengeMethodS256,
+								},
+								[]domain.Prompt{domain.PromptNone},
+								[]string{"en", "de"},
+								gu.Ptr(time.Duration(0)),
+								"loginHint",
+								"hintUserID",
+							),
+						),
+						eventFromEventPusher(
+							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate),
+						),
+					),
+				),
+			},
+			args{
+				ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
+				code: "authRequestID:invalidCodeID",
+			},
+			res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-DBNqz", "Errors.AuthRequest.InvalidCode"),
+			},
+		},
+		{
+			"code exchanged",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate,
+								"loginClient",
+								"clientID",
+								"redirectURI",
+								"state",
+								"nonce",
+								[]string{"openid"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeCode,
+								&domain.OIDCCodeChallenge{
+									Challenge: "challenge",
+									Method:    domain.CodeChallengeMethodS256,
+								},
+								[]domain.Prompt{domain.PromptNone},
+								[]string{"en", "de"},
+								gu.Ptr(time.Duration(0)),
+								"loginHint",
+								"hintUserID",
+							),
+						),
+
+						//TODO: session link event
+						//eventFromEventPusher(
+						//	authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate),
+						//),
+						eventFromEventPusher(
+							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate),
+						),
+					),
+					expectPush(
+						eventPusherToEvents(
+							authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate),
+						),
+					),
+				),
+			},
+			args{
+				ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
+				code: "authRequestID:",
+			},
+			res{
+				authRequest: &AuthenticatedAuthRequest{
+					AuthRequest: &AuthRequest{
+						ID:           "authRequestID",
+						LoginClient:  "loginClient",
+						ClientID:     "redirectURI",
+						RedirectURI:  "redirectURI",
+						State:        "state",
+						Nonce:        "nonce",
+						Scope:        []string{"openid"},
+						Audience:     []string{"audience"},
+						ResponseType: domain.OIDCResponseTypeCode,
+						CodeChallenge: &domain.OIDCCodeChallenge{
+							Challenge: "challenge",
+							Method:    domain.CodeChallengeMethodS256,
+						},
+						Prompt:     []domain.Prompt{domain.PromptNone},
+						UILocales:  []string{"en", "de"},
+						MaxAge:     gu.Ptr(time.Duration(0)),
+						LoginHint:  "loginHint",
+						HintUserID: "hintUserID",
+					},
+					SessionID: "sessionID",
+					UserID:    "userID",
+					AMR:       []string{"pwd"},
+					AuthTime:  time.Now(),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := c.ExchangeAuthCode(tt.args.ctx, tt.args.code)
+			assert.Equal(t, tt.res.authRequest, got)
+			assert.ErrorIs(t, tt.res.err, err)
+		})
+	}
+}
