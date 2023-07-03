@@ -2,6 +2,8 @@ package projection
 
 import (
 	"context"
+	"strconv"
+	"strings"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -286,5 +288,11 @@ func (p *milestoneProjection) reduceAppConfigAdded(event eventstore.Event, clien
 }
 
 func (p *milestoneProjection) isSystemEvent(event eventstore.Event) bool {
-	return event.EditorUser() == "" || event.EditorService() == "" || event.EditorService() == "SYSTEM"
+	if _, err := strconv.Atoi(event.EditorUser()); err == nil {
+		return false
+	}
+	lowerEditorService := strings.ToLower(event.EditorService())
+	return lowerEditorService == "" ||
+		lowerEditorService == "system" ||
+		lowerEditorService == "system-api"
 }

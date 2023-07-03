@@ -338,7 +338,6 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		// TODO: Why are these errors not handled?
 		projection.UserProjection.Trigger(ctx)
 		projection.LoginNameProjection.Trigger(ctx)
 	}
