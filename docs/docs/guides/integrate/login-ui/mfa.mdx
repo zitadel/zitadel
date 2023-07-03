@@ -3,6 +3,9 @@ title: Multi-Factor (MFA)
 sidebar_label: Multi-Factor (MFA)
 ---
 
+import MfaOptions from './_list-mfa-options.mdx';
+
+
 Multi-factor authentication (MFA) is a multi-step account authentication which requires to user to enter more than only the password.
 It is highly recommended to use MFA or [Passkeys](/passkey) to make your user accounts more secure.
 
@@ -10,7 +13,7 @@ ZITADEL supports two different Methods:
 - Time-based one time password (TOTP), which are Authenticator apps like Google/Microsoft Authenticator, Authy, etc
 - Universial Second Factor (U2F), which is authentication with your device like Windows Hello, Apple FaceID, Fingerprint, etc.
 
-## OTP Registration
+## TOTP Registration
 
 ### Flow
 
@@ -18,52 +21,67 @@ ZITADEL supports two different Methods:
 
 ### List the Possible Methods
 
-Your user has successfully authenticated, and now you ask him if he wants to setup MFA to have a more secure account.
-When he starts the configuration, first you want him to show the possible methods.
-You can either list it implicitly or call the settings service from ZITADEL to get what is configured on the login settings.
+<MfaOptions/>
 
-More detailed information about the API: [Get Login Settings Documentation](/apis/resources/settings_service/settings-service-get-login-settings)
+### Start TOTP Registration
+
+The user has selected to setup Time-based One-Time-Password (TOTP).
+To show the user the QR to register TOTP with his Authenticator App like Google/Microsoft Authenticator or Authy you have to start the registration on the ZITADEL API.
+Generate the QR Code with the URI from the response.
+For users that do not have a QR Code reader make sure to also show the secret, to enable manual configuration.
 
 Request Example:
 
 ```bash
-curl --request GET \
-  --url https://$ZITADEL_DOMAIN/v2alpha/settings/login \
-  --header 'Accept: application/json' \
-  --header 'Authorization: Bearer '"$TOKEN"''
+curl --request POST \
+    --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER_ID/totp \
+    --header 'Accept: application/json' \
+    --header 'Authorization: Bearer '"$TOKEN"''
+    --header 'Content-Type: application/json' \
+    --data '{}'
 ```
 
 Response Example:
-The relevant part for the list is the second factor and multi factor list.
 
 ```bash
 {
-	"details": {
-		"sequence": "293",
-		"changeDate": "2023-03-29T14:16:55.570482Z",
-		"resourceOwner": "163840776835432705"
-	},
-	"settings": {
-		"allowUsernamePassword": true,
-		"allowRegister": true,
-		"allowExternalIdp": true,
-		"passkeysType": "PASSKEYS_TYPE_ALLOWED",
-		"passwordCheckLifetime": "864000s",
-		"externalLoginCheckLifetime": "864000s",
-		"mfaInitSkipLifetime": "2592000s",
-		"secondFactorCheckLifetime": "64800s",
-		"multiFactorCheckLifetime": "43200s",
-		"secondFactors": [
-			"SECOND_FACTOR_TYPE_OTP",
-			"SECOND_FACTOR_TYPE_U2F"
-		],
-		"multiFactors": [
-			"MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION"
-		],
-		"resourceOwnerType": "RESOURCE_OWNER_TYPE_ORG"
-	}
+  "details": {
+    "sequence": "2",
+    "changeDate": "2023-06-28",
+    "resourceOwner": "69629023906488334"
+  },
+  "uri": "otpauth://totp/ZITADEL:minni-mouse@mouse.com?algorithm=SHA1&digits=6&issuer=ZITADEL&period=30&secret=TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK",
+  "secret": "TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK"
 }
 ```
+
+### Verify TOTP Registration
+
+When the user has added the account to his authenticator app, he has to enter the code from the App to finish the registration.
+This code has to be sent to the verify endpoint in ZITADEL.
+
+Request Example:
+
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER_ID/totp/_verify \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''
+  --header 'Content-Type: application/json' \
+  --data '{
+  "code": "123456"
+}'
+```
+
+## U2F Registration
+
+### Flow
+
+![Register TOTP](/img/guides/login-ui/register-totp-flow.png)
+
+### List the Possible Methods
+
+<MfaOptions/>
 
 ### Start TOTP Registration
 
