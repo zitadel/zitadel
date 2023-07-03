@@ -12,35 +12,35 @@ permissions:
 
 jobs:
 
-  # core:
-  #   uses: ./.github/workflows/core.yml
-  #   with:
-  #     node_version: '18'
-  #     buf_version: 'latest'
-  #     go_version: '1.20'
+  core:
+    uses: ./.github/workflows/core.yml
+    with:
+      node_version: '18'
+      buf_version: 'latest'
+      go_version: '1.20'
     
-  # console:
-  #   uses: ./.github/workflows/console.yml
-  #   with:
-  #     node_version: '18'
-  #     buf_version: 'latest'
+  console:
+    uses: ./.github/workflows/console.yml
+    with:
+      node_version: '18'
+      buf_version: 'latest'
 
-  # version:
-  #   uses: ./.github/workflows/version.yml
-  #   with:
-  #     semantic_version: '19.0.2'
-  #     dry_run: true
+  version:
+    uses: ./.github/workflows/version.yml
+    with:
+      semantic_version: '19.0.2'
+      dry_run: true
 
-  # compile:
-  #   needs: [core, console, version]
-  #   uses: ./.github/workflows/compile.yml
-  #   with:
-  #     go_version: '1.20'
-  #     core_cache_key: ${{ needs.core.outputs.cache_key }}
-  #     console_cache_key: ${{ needs.console.outputs.cache_key }}
-  #     core_cache_path: ${{ needs.core.outputs.cache_path }}
-  #     console_cache_path: ${{ needs.console.outputs.cache_path }}
-  #     version: ${{ needs.version.outputs.version }}
+  compile:
+    needs: [core, console, version]
+    uses: ./.github/workflows/compile.yml
+    with:
+      go_version: '1.20'
+      core_cache_key: ${{ needs.core.outputs.cache_key }}
+      console_cache_key: ${{ needs.console.outputs.cache_key }}
+      core_cache_path: ${{ needs.core.outputs.cache_path }}
+      console_cache_path: ${{ needs.console.outputs.cache_path }}
+      version: ${{ needs.version.outputs.version }}
 
   # core-unit-test:
   #   needs: core
@@ -69,11 +69,11 @@ jobs:
   #     core_cache_key: ${{ needs.core.outputs.cache_key }}
   #     core_cache_path: ${{ needs.core.outputs.cache_path }}
 
-  # container:
-  #   needs: [compile]
-  #   uses: ./.github/workflows/container.yml
-  #   with:
-  #     tag_name: ghcr.io/zitadel/test:${{ github.sha }}
+  container:
+    needs: [compile]
+    uses: ./.github/workflows/container.yml
+    with:
+      tag_name: ghcr.io/zitadel/test:${{ github.sha }}
 
   # e2e:
   #   uses: ./.github/workflows/e2e.yml
@@ -94,8 +94,3 @@ jobs:
   #     semantic_version: '19.0.2'
   #     image_name: 'ghcr.io/zitadel/test'
   #     google_image_name: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/test"
-
-  container:
-    uses: ./.github/workflows/container.yml
-    with:
-      tag_name: ghcr.io/zitadel/test:791e59f441759442c43740ffd08427e66519a787
