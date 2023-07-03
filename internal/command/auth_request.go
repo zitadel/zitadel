@@ -56,7 +56,7 @@ func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest)
 	if writeModel.AuthRequestState != domain.AuthRequestStateUnspecified {
 		return errors.ThrowPreconditionFailed(nil, "COMMAND-Sf3gt", "Errors.AuthRequest.AlreadyExisting")
 	}
-	data, err := c.keyAlgorithm.Encrypt([]byte("V2_" + authRequest.ID + ":"))
+	data, err := c.keyAlgorithm.Encrypt([]byte(authRequest.ID + ":"))
 	if err != nil {
 		return err
 	}

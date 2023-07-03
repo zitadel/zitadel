@@ -27,8 +27,8 @@ type AuthRequestWriteModel struct {
 	Prompt           []domain.Prompt
 	UILocales        []string
 	MaxAge           *time.Duration
-	LoginHint        string
-	HintUserID       string
+	LoginHint        *string
+	HintUserID       *string
 	ExchangeCode     string
 	SessionID        string
 	UserID           string
