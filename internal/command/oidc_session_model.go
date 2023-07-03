@@ -1,0 +1,109 @@
+package command
+
+import (
+	"time"
+
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/oidcsession"
+)
+
+type OIDCSessionWriteModel struct {
+	eventstore.WriteModel
+
+	UserID                     string
+	SessionID                  string
+	ClientID                   string
+	Audience                   []string
+	Scope                      []string
+	AuthMethodsReferences      []string
+	AuthTime                   time.Time
+	State                      domain.OIDCSessionState
+	RefreshTokenID             string
+	RefreshTokenExpiration     time.Time
+	RefreshTokenIdleExpiration time.Time
+
+	aggregate *eventstore.Aggregate
+}
+
+func NewOIDCSessionWriteModel(id string, resourceOwner string) *OIDCSessionWriteModel {
+	return &OIDCSessionWriteModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   id,
+			ResourceOwner: resourceOwner,
+		},
+		aggregate: &oidcsession.NewAggregate(id, resourceOwner).Aggregate,
+	}
+}
+
+func (wm *OIDCSessionWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *oidcsession.AddedEvent:
+			wm.reduceAdded(e)
+		case *oidcsession.AccessTokenAddedEvent:
+			// TODO: does the writemodel even care?
+		case *oidcsession.RefreshTokenAddedEvent:
+			wm.reduceRefreshTokenAdded(e)
+		case *oidcsession.RefreshTokenRenewedEvent:
+			wm.reduceRefreshTokenRenewed(e)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *OIDCSessionWriteModel) Query() *eventstore.SearchQueryBuilder {
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(oidcsession.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			oidcsession.AddedType,
+			oidcsession.AccessTokenAddedType, // TODO: does the writemodel even care?
+			oidcsession.RefreshTokenAddedType,
+			oidcsession.RefreshTokenRenewedType,
+		).
+		Builder()
+
+	if wm.ResourceOwner != "" {
+		query.ResourceOwner(wm.ResourceOwner)
+	}
+	return query
+}
+
+func (wm *OIDCSessionWriteModel) reduceAdded(e *oidcsession.AddedEvent) {
+	wm.UserID = e.UserID
+	wm.SessionID = e.SessionID
+	wm.ClientID = e.ClientID
+	wm.Audience = e.Audience
+	wm.Scope = e.Scope
+	wm.AuthMethodsReferences = e.AuthMethodsReferences
+	wm.AuthTime = e.AuthTime
+	wm.State = domain.OIDCSessionStateActive
+}
+
+func (wm *OIDCSessionWriteModel) reduceRefreshTokenAdded(e *oidcsession.RefreshTokenAddedEvent) {
+	wm.RefreshTokenID = e.ID
+	wm.RefreshTokenExpiration = e.CreationDate().Add(e.Lifetime)
+	wm.RefreshTokenIdleExpiration = e.CreationDate().Add(e.IdleLifetime)
+}
+
+func (wm *OIDCSessionWriteModel) reduceRefreshTokenRenewed(e *oidcsession.RefreshTokenRenewedEvent) {
+	wm.RefreshTokenID = e.ID
+	wm.RefreshTokenIdleExpiration = e.CreationDate().Add(e.IdleLifetime)
+}
+
+func (wm *OIDCSessionWriteModel) CheckRefreshToken(refreshTokenID string) error {
+	if wm.State != domain.OIDCSessionStateActive {
+		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-s3hjk", "Errors.OIDCSession.InvalidRefreshToken") //TODO: i18n
+	}
+	if wm.RefreshTokenID != refreshTokenID {
+		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-28ubl", "Errors.OIDCSession.InvalidRefreshToken") //TODO: i18n
+	}
+	now := time.Now()
+	if wm.RefreshTokenExpiration.Before(now) || wm.RefreshTokenIdleExpiration.Before(now) {
+		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-3jt2w", "Errors.OIDCSession.InvalidRefreshToken") //TODO: i18n
+	}
+	return nil
+}

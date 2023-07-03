@@ -6,6 +6,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 )
@@ -82,4 +83,17 @@ func (m *AuthRequestWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(authrequest.AggregateType).
 		AggregateIDs(m.AggregateID).
 		Builder()
+}
+
+func (m *AuthRequestWriteModel) CheckAuthenticated() error {
+	if m.SessionID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "AUTHR-SF2r2", "Errors.AuthRequest.NotAuthenticated")
+	}
+	if m.ResponseType == domain.OIDCResponseTypeCode && m.AuthRequestState == domain.AuthRequestStateCodeAdded {
+		return nil
+	}
+	if m.AuthRequestState == domain.AuthRequestStateAdded {
+		return nil
+	}
+	return caos_errs.ThrowPreconditionFailed(nil, "AUTHR-sajk3", "Errors.AuthRequest.NotAuthenticated")
 }
