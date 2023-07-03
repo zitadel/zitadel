@@ -15,6 +15,7 @@ const (
 	authRequestEventPrefix = "auth_request."
 	AddedType              = authRequestEventPrefix + "added"
 	CodeAddedType          = authRequestEventPrefix + "code.added"
+	CodeExchangedType      = authRequestEventPrefix + "code.exchanged"
 )
 
 type AddedEvent struct {
@@ -99,7 +100,7 @@ func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 type CodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	//TODO: add necessary fields
+	ExchangeCode string `json:"exchange_code"`
 }
 
 func (e *CodeAddedEvent) Data() interface{} {
@@ -132,4 +133,34 @@ func CodeAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	}
 
 	return added, nil
+}
+
+type CodeExchangedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *CodeExchangedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *CodeExchangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewCodeExchangedEvent(ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *CodeExchangedEvent {
+	return &CodeExchangedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			CodeExchangedType,
+		),
+	}
+}
+
+func CodeExchangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	return &CodeExchangedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
 }

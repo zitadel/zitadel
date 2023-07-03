@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
 	key_repo "github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	proj_repo "github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/session"
@@ -45,6 +46,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	session.RegisterEventMappers(es)
 	idpintent.RegisterEventMappers(es)
 	authrequest.RegisterEventMappers(es)
+	oidcsession.RegisterEventMappers(es)
 	return es
 }
 

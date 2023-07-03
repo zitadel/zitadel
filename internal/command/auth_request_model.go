@@ -1,8 +1,10 @@
 package command
 
 import (
+	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
@@ -10,7 +12,9 @@ import (
 
 type AuthRequestWriteModel struct {
 	eventstore.WriteModel
+	aggregate *eventstore.Aggregate
 
+	LoginClient      string
 	ClientID         string
 	RedirectURI      string
 	State            string
@@ -24,14 +28,18 @@ type AuthRequestWriteModel struct {
 	MaxAge           *time.Duration
 	LoginHint        string
 	HintUserID       string
+	ExchangeCode     string
+	SessionID        string
+	UserID           string
 	AuthRequestState domain.AuthRequestState
 }
 
-func NewAuthRequestWriteModel(id string) *AuthRequestWriteModel {
+func NewAuthRequestWriteModel(ctx context.Context, id string) *AuthRequestWriteModel {
 	return &AuthRequestWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID: id,
 		},
+		aggregate: &authrequest.NewAggregate(id, authz.GetInstance(ctx).InstanceID()).Aggregate,
 	}
 }
 
@@ -39,6 +47,7 @@ func (m *AuthRequestWriteModel) Reduce() error {
 	for _, event := range m.Events {
 		switch e := event.(type) {
 		case *authrequest.AddedEvent:
+			m.LoginClient = e.LoginClient
 			m.ClientID = e.ClientID
 			m.RedirectURI = e.RedirectURI
 			m.State = e.State
@@ -53,9 +62,14 @@ func (m *AuthRequestWriteModel) Reduce() error {
 			m.LoginHint = e.LoginHint
 			m.HintUserID = e.HintUserID
 			m.AuthRequestState = domain.AuthRequestStateAdded
+			//TODO: implement
+		//case *authrequest.SessionSet:
+		//	m.SessionID = e.SessionID
 		case *authrequest.CodeAddedEvent:
-			// TODO: left fold fields ASAP
+			m.ExchangeCode = e.ExchangeCode
 			m.AuthRequestState = domain.AuthRequestStateCodeAdded
+		case *authrequest.CodeExchangedEvent:
+			m.AuthRequestState = domain.AuthRequestStateCodeExchanged
 		}
 	}
 
