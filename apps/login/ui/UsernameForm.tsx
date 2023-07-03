@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, ButtonVariants } from "./Button";
 import { TextInput } from "./Input";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
-import { AuthenticationMethodType, LoginSettings } from "@zitadel/server";
+import { LoginSettings } from "@zitadel/server";
 
 type Inputs = {
   loginName: string;
@@ -15,9 +15,14 @@ type Inputs = {
 type Props = {
   loginSettings: LoginSettings | undefined;
   loginName: string | undefined;
+  submit: boolean;
 };
 
-export default function UsernameForm({ loginSettings, loginName }: Props) {
+export default function UsernameForm({
+  loginSettings,
+  loginName,
+  submit,
+}: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
@@ -28,6 +33,7 @@ export default function UsernameForm({ loginSettings, loginName }: Props) {
   const router = useRouter();
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
 
   async function submitLoginName(values: Inputs) {
     setLoading(true);
@@ -50,14 +56,20 @@ export default function UsernameForm({ loginSettings, loginName }: Props) {
 
   async function setLoginNameAndGetAuthMethods(values: Inputs) {
     return submitLoginName(values).then((response) => {
-      console.log(response);
       if (response.authMethodTypes.length == 1) {
         const method = response.authMethodTypes[0];
         switch (method) {
           case 1: //AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSWORD:
             return router.push(
               "/password?" +
-                new URLSearchParams({ loginName: values.loginName })
+                new URLSearchParams(
+                  loginSettings?.passkeysType === 1
+                    ? {
+                        loginName: values.loginName,
+                        promptPasswordless: `true`, // PasskeysType.PASSKEYS_TYPE_ALLOWED,
+                      }
+                    : { loginName: values.loginName }
+                )
             );
           case 2: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
             return router.push(
@@ -67,15 +79,46 @@ export default function UsernameForm({ loginSettings, loginName }: Props) {
           default:
             return router.push(
               "/password?" +
-                new URLSearchParams({ loginName: values.loginName })
+                new URLSearchParams(
+                  loginSettings?.passkeysType === 1
+                    ? {
+                        loginName: values.loginName,
+                        promptPasswordless: `true`, // PasskeysType.PASSKEYS_TYPE_ALLOWED,
+                      }
+                    : { loginName: values.loginName }
+                )
             );
         }
+      } else if (
+        response.authMethodTypes &&
+        response.authMethodTypes.length === 0
+      ) {
+        setError(
+          "User has no available authentication methods. Contact your administrator to setup authentication for the requested user."
+        );
       } else {
+        // prefer passkey in favor of other methods
+        if (response.authMethodTypes.includes(2)) {
+          return router.push(
+            "/passkey/login?" +
+              new URLSearchParams({
+                loginName: values.loginName,
+                altPassword: `${response.authMethodTypes.includes(1)}`, // show alternative password option
+              })
+          );
+        }
       }
     });
   }
 
   const { errors } = formState;
+
+  useEffect(() => {
+    if (submit && loginName) {
+      // When we navigate to this page, we always want to be redirected if submit is true and the parameters are valid.
+      setLoginNameAndGetAuthMethods({ loginName });
+    }
+  }, []);
 
   return (
     <form className="w-full">

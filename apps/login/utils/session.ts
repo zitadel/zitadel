@@ -37,10 +37,6 @@ export async function createSessionAndUpdateCookie(
 
         return addSessionToCookie(sessionCookie).then(() => {
           return response.session as Session;
-          //     {
-          //     sessionId: createdSession.sessionId,
-          //     factors: response?.session?.factors,
-          //   });
         });
       } else {
         throw "could not get session or session does not have loginName";

@@ -11,9 +11,14 @@ import { Spinner } from "./Spinner";
 type Props = {
   loginName: string;
   challenge: Challenges_Passkey;
+  altPassword: boolean;
 };
 
-export default function LoginPasskey({ loginName, challenge }: Props) {
+export default function LoginPasskey({
+  loginName,
+  challenge,
+  altPassword,
+}: Props) {
   const [error, setError] = useState<string>("");
   const [publicKey, setPublicKey] = useState();
   const [loading, setLoading] = useState<boolean>(false);
@@ -133,7 +138,9 @@ export default function LoginPasskey({ loginName, challenge }: Props) {
               },
             });
             console.log(data);
-            return submitLogin(data);
+            return submitLogin(data).then(() => {
+              return router.push(`/accounts`);
+            });
           } else {
             setLoading(false);
             setError("An error on retrieving passkey");
@@ -157,13 +164,27 @@ export default function LoginPasskey({ loginName, challenge }: Props) {
         </div>
       )}
       <div className="mt-8 flex w-full flex-row items-center">
-        <Button
-          type="button"
-          variant={ButtonVariants.Secondary}
-          onClick={() => router.back()}
-        >
-          back
-        </Button>
+        {altPassword ? (
+          <Button
+            type="button"
+            variant={ButtonVariants.Secondary}
+            onClick={() =>
+              router.push(
+                "/password?" + new URLSearchParams({ loginName, alt: "true" }) // alt is set because password is requested as alternative auth method, so passwordless prompt can be escaped
+              )
+            }
+          >
+            use password
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            variant={ButtonVariants.Secondary}
+            onClick={() => router.back()}
+          >
+            back
+          </Button>
+        )}
 
         <span className="flex-grow"></span>
         <Button

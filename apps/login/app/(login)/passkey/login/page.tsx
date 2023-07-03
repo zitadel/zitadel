@@ -3,28 +3,6 @@ import Alert from "#/ui/Alert";
 import LoginPasskey from "#/ui/LoginPasskey";
 import UserAvatar from "#/ui/UserAvatar";
 import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
-// import LoginPasskey from "#/ui/LoginPasskey";
-// import {
-//   SessionCookie,
-//   getMostRecentSessionCookie,
-//   getSessionCookieByLoginName,
-// } from "#/utils/cookies";
-// import { setSessionAndUpdateCookie } from "#/utils/session";
-// import { ChallengeKind } from "@zitadel/server";
-
-// async function updateSessionAndCookie(loginName: string) {
-//   return getSessionCookieByLoginName(loginName).then((recent) => {
-//     console.log(recent.token);
-//     return setSessionAndUpdateCookie(
-//       recent.id,
-//       recent.token,
-//       recent.loginName,
-//       undefined,
-//       "localhost",
-//       [ChallengeKind.CHALLENGE_KIND_PASSKEY]
-//     );
-//   });
-// }
 
 const title = "Authenticate with a passkey";
 const description =
@@ -35,7 +13,7 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName } = searchParams;
+  const { loginName, altPassword } = searchParams;
 
   const sessionFactors = await loadSession(loginName);
 
@@ -68,7 +46,11 @@ export default async function Page({
       )}
 
       {loginName && (
-        <LoginPasskey challenge={{} as any} loginName={loginName} />
+        <LoginPasskey
+          challenge={{} as any}
+          loginName={loginName}
+          altPassword={altPassword === "true"}
+        />
       )}
     </div>
   );

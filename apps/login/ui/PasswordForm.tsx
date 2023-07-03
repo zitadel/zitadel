@@ -14,9 +14,15 @@ type Inputs = {
 
 type Props = {
   loginName?: string;
+  isAlternative?: boolean; // whether password was requested as alternative auth method
+  promptPasswordless?: boolean;
 };
 
-export default function PasswordForm({ loginName }: Props) {
+export default function PasswordForm({
+  loginName,
+  promptPasswordless,
+  isAlternative,
+}: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
@@ -53,12 +59,17 @@ export default function PasswordForm({ loginName }: Props) {
 
   function submitPasswordAndContinue(value: Inputs): Promise<boolean | void> {
     return submitPassword(value).then((resp: any) => {
-      if (resp.factors && !resp.factors.passwordless) {
+      if (
+        resp.factors &&
+        !resp.factors.passwordless && // if session was not verified with a passkey
+        promptPasswordless && // if explicitly prompted due policy
+        !isAlternative // escaped if password was used as an alternative method
+      ) {
         return router.push(
           `/passkey/add?` +
             new URLSearchParams({
               loginName: resp.factors.user.loginName,
-              prompt: "true",
+              promptPasswordless: "true",
             })
         );
       } else {

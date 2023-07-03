@@ -1,14 +1,9 @@
 import {
-  createSession,
   getSession,
   listAuthenticationMethodTypes,
   server,
 } from "#/lib/zitadel";
-import {
-  SessionCookie,
-  addSessionToCookie,
-  getSessionCookieById,
-} from "#/utils/cookies";
+import { getSessionCookieById } from "#/utils/cookies";
 import { createSessionAndUpdateCookie } from "#/utils/session";
 import { NextRequest, NextResponse } from "next/server";
 

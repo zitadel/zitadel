@@ -19,7 +19,14 @@ export async function POST(request: NextRequest) {
 
     const domain: string = request.nextUrl.hostname;
 
-    return createSessionAndUpdateCookie(loginName, password, domain, undefined);
+    return createSessionAndUpdateCookie(
+      loginName,
+      password,
+      domain,
+      undefined
+    ).then((session) => {
+      return NextResponse.json(session);
+    });
   } else {
     return NextResponse.json(
       { details: "Session could not be created" },
