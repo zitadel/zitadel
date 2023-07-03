@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/oidc/amr"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
@@ -30,7 +31,14 @@ type AuthRequest struct {
 	MaxAge        *time.Duration
 	LoginHint     string
 	HintUserID    string
-	SessionID     string
+}
+
+type AuthenticatedAuthRequest struct {
+	*AuthRequest
+	SessionID string
+	UserID    string
+	AMR       []string
+	AuthTime  time.Time
 }
 
 func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest) (err error) {
@@ -71,54 +79,61 @@ func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest)
 	))
 }
 
-func (c *Commands) ExchangeAuthCode(ctx context.Context, code string) (authRequest *AuthRequest, userID string, err error) {
+func (c *Commands) ExchangeAuthCode(ctx context.Context, code string) (authRequest *AuthenticatedAuthRequest, err error) {
 	split := strings.Split(code, ":")
 	if len(split) != 2 {
-		return nil, "", errors.ThrowPreconditionFailed(nil, "COMMAND-Sfr3s", "Errors.AuthRequest.InvalidCode") //TODO: ?
+		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-Sfr3s", "Errors.AuthRequest.InvalidCode")
 	}
 	writeModel, err := c.getAuthRequestWriteModel(ctx, split[0])
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
-	//TODO: enable as soon as implemented
-	//if writeModel.AuthRequestState != domain.AuthRequestStateCodeAdded {
-	//	return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.NoCode")
-	//}
+	//TODO: remove as soon as implemented
+	if writeModel.AuthRequestState == domain.AuthRequestStateAdded {
+		writeModel.AuthRequestState = domain.AuthRequestStateCodeAdded
+	}
+	if writeModel.AuthRequestState != domain.AuthRequestStateCodeAdded {
+		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.NoCode")
+	}
 	if writeModel.ExchangeCode != split[1] {
-		return nil, "", errors.ThrowPreconditionFailed(nil, "COMMAND-DBNqz", "Errors.AuthRequest.InvalidCode") //TODO: ?
+		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-DBNqz", "Errors.AuthRequest.InvalidCode")
 	}
-	// TODO: where to set exchange event?
-	//err = c.pushAppendAndReduce(ctx, writeModel, authrequest.NewCodeExchangedEvent(ctx,
-	//	&authrequest.NewAggregate(writeModel.AggregateID, authz.GetInstance(ctx).InstanceID()).Aggregate))
-	//if err != nil {
-	//	return nil, err
-	//}
+	err = c.pushAppendAndReduce(ctx, writeModel, authrequest.NewCodeExchangedEvent(ctx,
+		&authrequest.NewAggregate(writeModel.AggregateID, authz.GetInstance(ctx).InstanceID()).Aggregate))
+	if err != nil {
+		return nil, err
+	}
 	//TODO: remove as soon as implemented
 	writeModel.SessionID = "221249418811191853"
 	writeModel.UserID = "220275980948910637"
-	authRequest, userID = authRequestWriteModelToAuthRequest(writeModel)
-	return authRequest, userID, nil
+	writeModel.AMR = []string{amr.PWD}
+	return authRequestWriteModelToAuthenticatedAuthRequest(writeModel), nil
 }
 
-func authRequestWriteModelToAuthRequest(writeModel *AuthRequestWriteModel) (_ *AuthRequest, userID string) {
-	return &AuthRequest{
-		ID:            writeModel.AggregateID,
-		LoginClient:   writeModel.LoginClient,
-		ClientID:      writeModel.ClientID,
-		RedirectURI:   writeModel.RedirectURI,
-		State:         writeModel.State,
-		Nonce:         writeModel.Nonce,
-		Scope:         writeModel.Scope,
-		Audience:      writeModel.Audience,
-		ResponseType:  writeModel.ResponseType,
-		CodeChallenge: writeModel.CodeChallenge,
-		Prompt:        writeModel.Prompt,
-		UILocales:     writeModel.UILocales,
-		MaxAge:        writeModel.MaxAge,
-		LoginHint:     writeModel.LoginHint,
-		HintUserID:    writeModel.HintUserID,
-		SessionID:     writeModel.SessionID,
-	}, writeModel.UserID
+func authRequestWriteModelToAuthenticatedAuthRequest(writeModel *AuthRequestWriteModel) (_ *AuthenticatedAuthRequest) {
+	return &AuthenticatedAuthRequest{
+		AuthRequest: &AuthRequest{
+			ID:            writeModel.AggregateID,
+			LoginClient:   writeModel.LoginClient,
+			ClientID:      writeModel.ClientID,
+			RedirectURI:   writeModel.RedirectURI,
+			State:         writeModel.State,
+			Nonce:         writeModel.Nonce,
+			Scope:         writeModel.Scope,
+			Audience:      writeModel.Audience,
+			ResponseType:  writeModel.ResponseType,
+			CodeChallenge: writeModel.CodeChallenge,
+			Prompt:        writeModel.Prompt,
+			UILocales:     writeModel.UILocales,
+			MaxAge:        writeModel.MaxAge,
+			LoginHint:     writeModel.LoginHint,
+			HintUserID:    writeModel.HintUserID,
+		},
+		SessionID: writeModel.SessionID,
+		UserID:    writeModel.UserID,
+		AMR:       writeModel.AMR,
+		AuthTime:  writeModel.ChangeDate, //TODO: correct?
+	}
 }
 
 func (c *Commands) GetAuthRequestWriteModel(ctx context.Context, id string) (writeModel *AuthRequestWriteModel, err error) {

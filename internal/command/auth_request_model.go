@@ -32,6 +32,7 @@ type AuthRequestWriteModel struct {
 	ExchangeCode     string
 	SessionID        string
 	UserID           string
+	AMR              []string
 	AuthRequestState domain.AuthRequestState
 }
 
@@ -71,6 +72,8 @@ func (m *AuthRequestWriteModel) Reduce() error {
 			m.AuthRequestState = domain.AuthRequestStateCodeAdded
 		case *authrequest.CodeExchangedEvent:
 			m.AuthRequestState = domain.AuthRequestStateCodeExchanged
+		case *authrequest.SucceededEvent:
+			m.AuthRequestState = domain.AuthRequestStateSucceeded
 		}
 	}
 
@@ -89,10 +92,11 @@ func (m *AuthRequestWriteModel) CheckAuthenticated() error {
 	if m.SessionID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "AUTHR-SF2r2", "Errors.AuthRequest.NotAuthenticated")
 	}
-	if m.ResponseType == domain.OIDCResponseTypeCode && m.AuthRequestState == domain.AuthRequestStateCodeAdded {
+	if m.ResponseType == domain.OIDCResponseTypeCode && m.AuthRequestState == domain.AuthRequestStateCodeExchanged {
 		return nil
 	}
-	if m.AuthRequestState == domain.AuthRequestStateAdded {
+	if (m.ResponseType == domain.OIDCResponseTypeIDToken || m.ResponseType == domain.OIDCResponseTypeIDTokenToken) &&
+		m.AuthRequestState == domain.AuthRequestStateAdded {
 		return nil
 	}
 	return caos_errs.ThrowPreconditionFailed(nil, "AUTHR-sajk3", "Errors.AuthRequest.NotAuthenticated")

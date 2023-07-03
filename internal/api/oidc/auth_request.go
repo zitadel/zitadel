@@ -128,11 +128,17 @@ func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (_ op.Au
 		return nil, err
 	}
 	if strings.HasPrefix(plainCode, IDPrefix) {
-		authReq, userID, err := o.command.ExchangeAuthCode(ctx, strings.TrimPrefix(plainCode, IDPrefix))
+		authReq, err := o.command.ExchangeAuthCode(ctx, strings.TrimPrefix(plainCode, IDPrefix))
 		if err != nil {
 			return nil, err
 		}
-		return &AuthRequestV2{AuthRequest: authReq, UserID: userID}, nil
+		return &AuthRequestV2{
+			AuthRequest: authReq.AuthRequest,
+			SessionID:   authReq.SessionID,
+			UserID:      authReq.UserID,
+			AMR:         authReq.AMR,
+			AuthTime:    authReq.AuthTime,
+		}, nil
 	}
 	resp, err := o.repo.AuthRequestByCode(ctx, code)
 	if err != nil {

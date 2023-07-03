@@ -16,6 +16,7 @@ const (
 	AddedType              = authRequestEventPrefix + "added"
 	CodeAddedType          = authRequestEventPrefix + "code.added"
 	CodeExchangedType      = authRequestEventPrefix + "code.exchanged"
+	SucceededType          = authRequestEventPrefix + "succeeded"
 )
 
 type AddedEvent struct {
@@ -161,6 +162,36 @@ func NewCodeExchangedEvent(ctx context.Context,
 
 func CodeExchangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &CodeExchangedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
+}
+
+type SucceededEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *SucceededEvent) Data() interface{} {
+	return nil
+}
+
+func (e *SucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewSucceededEvent(ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *SucceededEvent {
+	return &SucceededEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			SucceededType,
+		),
+	}
+}
+
+func SucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+	return &SucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

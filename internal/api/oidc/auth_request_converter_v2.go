@@ -12,7 +12,10 @@ const IDPrefix = "V2_"
 
 type AuthRequestV2 struct {
 	*command.AuthRequest
-	UserID string
+	SessionID string
+	UserID    string
+	AMR       []string
+	AuthTime  time.Time
 }
 
 func (a *AuthRequestV2) GetID() string {
@@ -24,8 +27,7 @@ func (a *AuthRequestV2) GetACR() string {
 }
 
 func (a *AuthRequestV2) GetAMR() []string {
-	//TODO: get from linked session?
-	return nil
+	return a.AMR
 }
 
 func (a *AuthRequestV2) GetAudience() []string {
@@ -33,7 +35,7 @@ func (a *AuthRequestV2) GetAudience() []string {
 }
 
 func (a *AuthRequestV2) GetAuthTime() time.Time {
-	return time.Time{} //TODO: get from linked session?
+	return a.AuthTime
 }
 
 func (a *AuthRequestV2) GetClientID() string {
@@ -72,11 +74,8 @@ func (a *AuthRequestV2) GetSubject() string {
 	return a.UserID
 }
 
-// Done implements the [op.AuthRequest] interface and will be used to determine if the user has authenticated
-// and the auth request can be redirected back to the client.
-// Since AuthRequestV2 handles the redirect directly in the gRPC OIDC Service, it will always return false.
 func (a *AuthRequestV2) Done() bool {
-	return false
+	return a.UserID != "" && a.SessionID != ""
 }
 
 type RefreshTokenRequestV2 struct {

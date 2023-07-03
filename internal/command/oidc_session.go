@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/oidc/amr"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -28,9 +29,7 @@ func (c *Commands) AddOIDCSessionAccessToken(ctx context.Context, authRequest *A
 	if err != nil {
 		return "", time.Time{}, err
 	}
-	if cmd.authRequestWriteModel.AuthRequestState == domain.AuthRequestStateCodeAdded {
-		cmd.SetCodeExchanged(ctx)
-	}
+	cmd.SetAuthRequestSuccessful(ctx)
 	accessTokenID, _, accessTokenExpiration, err := cmd.PushEvents(ctx)
 	return accessTokenID, accessTokenExpiration, err
 }
@@ -52,9 +51,7 @@ func (c *Commands) AddOIDCSessionRefreshAndAccessToken(ctx context.Context, auth
 	if err != nil {
 		return "", "", time.Time{}, err
 	}
-	if cmd.authRequestWriteModel.AuthRequestState == domain.AuthRequestStateCodeAdded {
-		cmd.SetCodeExchanged(ctx)
-	}
+	cmd.SetAuthRequestSuccessful(ctx)
 	err = c.pushAppendAndReduce(ctx, cmd.oidcSessionWriteModel, cmd.events...)
 	if err != nil {
 		return "", "", time.Time{}, err
@@ -82,6 +79,8 @@ func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context,
 	return cmd.PushEvents(ctx)
 }
 
+// OIDCSessionByRefreshToken computes the current state of an existing OIDCSession by a refresh_token (to start a Refresh Token Grant)
+// if either the session is not active, the token is invalid or expired (incl. idle expiration) an invalid refresh token error will be returned
 func (c *Commands) OIDCSessionByRefreshToken(ctx context.Context, refreshToken string) (*OIDCSessionWriteModel, error) {
 	split := strings.Split(refreshToken, ":")
 	if len(split) != 2 {
@@ -90,10 +89,10 @@ func (c *Commands) OIDCSessionByRefreshToken(ctx context.Context, refreshToken s
 	writeModel := NewOIDCSessionWriteModel(split[0], "")
 	err := c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
-		return nil, err
+		return nil, caos_errs.ThrowPreconditionFailed(err, "OIDCS-SAF31", "Errors.OIDCSession.RefreshTokenInvalid")
 	}
 	if err = writeModel.CheckRefreshToken(split[1]); err != nil {
-		return nil, err
+		return nil, caos_errs.ThrowPreconditionFailed(err, "OIDCS-Sf3nu", "Errors.OIDCSession.RefreshTokenInvalid")
 	}
 	return writeModel, nil
 }
@@ -103,10 +102,12 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, authRequest *Aut
 	if err != nil {
 		return nil, err
 	}
+	//TODO: remove as soon as implemented
+	authRequestWriteModel.SessionID = "221249418811191853"
 	if err = authRequestWriteModel.CheckAuthenticated(); err != nil {
 		return nil, err
 	}
-	sessionWriteModel := NewSessionWriteModel(authRequest.SessionID, authz.GetCtxData(ctx).OrgID)
+	sessionWriteModel := NewSessionWriteModel(authRequestWriteModel.SessionID, authz.GetCtxData(ctx).OrgID)
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
 	if err != nil {
 		return nil, err
@@ -118,7 +119,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, authRequest *Aut
 	if err != nil {
 		return nil, err
 	}
-	seesionID, err := c.idGenerator.Next()
+	sessionID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +127,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, authRequest *Aut
 		eventstore:               c.eventstore,
 		idGenerator:              c.idGenerator,
 		encryptionAlg:            c.keyAlgorithm,
-		oidcSessionWriteModel:    NewOIDCSessionWriteModel(seesionID, authz.GetInstance(ctx).InstanceID()), //TODO: ro?
+		oidcSessionWriteModel:    NewOIDCSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID()), //TODO: ro?
 		sessionWriteModel:        sessionWriteModel,
 		authRequestWriteModel:    authRequestWriteModel,
 		accessTokenLifetime:      accessTokenLifetime,
@@ -207,14 +208,14 @@ func (c *OIDCSessionEvents) AddSession(ctx context.Context, clientID string, aud
 		clientID,
 		audience,
 		scope,
-		nil,                            //TODO: where to get from?
-		c.sessionWriteModel.ChangeDate, //TODO: ?
+		amr.List(c.sessionWriteModel),
+		c.sessionWriteModel.AuthenticationTime(),
 	),
 	)
 }
 
-func (c *OIDCSessionEvents) SetCodeExchanged(ctx context.Context) {
-	c.events = append(c.events, authrequest.NewCodeExchangedEvent(ctx, c.authRequestWriteModel.aggregate))
+func (c *OIDCSessionEvents) SetAuthRequestSuccessful(ctx context.Context) {
+	c.events = append(c.events, authrequest.NewSucceededEvent(ctx, c.authRequestWriteModel.aggregate))
 }
 
 func (c *OIDCSessionEvents) AddAccessToken(ctx context.Context, scope []string) (err error) {
@@ -263,7 +264,7 @@ func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (accessTokenID strin
 	if err != nil {
 		return "", "", time.Time{}, err
 	}
-	return c.accessTokenID, c.refreshToken, pushedEvents[0].CreationDate().Add(c.accessTokenLifetime), nil //TODO: expiration correct?
+	return c.accessTokenID, c.refreshToken, pushedEvents[0].CreationDate().Add(c.accessTokenLifetime), nil
 }
 
 func (c *Commands) tokenTokenLifetimes(ctx context.Context) (accessTokenLifetime time.Duration, refreshTokenLifetime time.Duration, refreshTokenIdleLifetime time.Duration, err error) {
