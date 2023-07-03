@@ -11,7 +11,7 @@ type Props = {
 
 export default function SessionsList({ sessions }: Props) {
   const [list, setList] = useState<Session[]>(sessions);
-
+  console.log(sessions);
   return sessions ? (
     <div className="flex flex-col space-y-2">
       {list

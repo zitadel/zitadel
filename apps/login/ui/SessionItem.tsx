@@ -39,11 +39,14 @@ export default function SessionItem({
   }
 
   const validPassword = session?.factors?.password?.verifiedAt;
+  const validPasskey = session?.factors?.passkey?.verifiedAt;
+
+  const validUser = validPassword || validPasskey;
 
   return (
     <Link
       href={
-        validPassword
+        validUser
           ? `/signedin?` +
             new URLSearchParams({
               loginName: session.factors?.user?.loginName as string,
@@ -68,16 +71,16 @@ export default function SessionItem({
         <span className="text-xs opacity-80">
           {session.factors?.user?.loginName}
         </span>
-        {validPassword && (
+        {validUser && (
           <span className="text-xs opacity-80">
-            {moment(new Date(validPassword)).fromNow()}
+            {moment(new Date(validUser)).fromNow()}
           </span>
         )}
       </div>
 
       <span className="flex-grow"></span>
       <div className="relative flex flex-row items-center">
-        {validPassword ? (
+        {validUser ? (
           <div className="absolute h-2 w-2 bg-green-500 rounded-full mx-2 transform right-0 group-hover:right-6 transition-all"></div>
         ) : (
           <div className="absolute h-2 w-2 bg-red-500 rounded-full mx-2 transform right-0 group-hover:right-6 transition-all"></div>
