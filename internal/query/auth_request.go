@@ -60,7 +60,10 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 	)
 
 	dst := new(AuthRequest)
-	err = q.client.DB.QueryRowContext(ctx, q.authRequestByIDQuery(ctx), id).Scan(
+	err = q.client.DB.QueryRowContext(
+		ctx, q.authRequestByIDQuery(ctx),
+		id, authz.GetInstance(ctx).InstanceID(),
+	).Scan(
 		&dst.ID, &dst.CreationDate, &dst.LoginClient, &dst.ClientID, &scope, &dst.RedirectURI,
 		&prompt, &locales, &dst.LoginHint, &dst.MaxAge, &dst.HintUserID,
 	)

@@ -70,7 +70,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 				"me@example.com",
 				int64(time.Minute),
 				"userID",
-			}, "123"),
+			}, "123", "instanceID"),
 			want: &AuthRequest{
 				ID:           "id",
 				CreationDate: testNow,
@@ -104,7 +104,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 				sql.NullString{},
 				sql.NullInt64{},
 				sql.NullString{},
-			}, "123"),
+			}, "123", "instanceID"),
 			want: &AuthRequest{
 				ID:           "id",
 				CreationDate: testNow,
@@ -125,7 +125,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 				shouldTriggerBulk: false,
 				id:                "123",
 			},
-			expect:  mockQuery(expQuery, cols, nil, "123"),
+			expect:  mockQuery(expQuery, cols, nil, "123", "instanceID"),
 			wantErr: errors.ThrowNotFound(sql.ErrNoRows, "QUERY-Thee9", "Errors.AuthRequest.NotExisting"),
 		},
 		{
@@ -134,7 +134,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 				shouldTriggerBulk: false,
 				id:                "123",
 			},
-			expect:  mockQueryErr(expQuery, sql.ErrConnDone, "123"),
+			expect:  mockQueryErr(expQuery, sql.ErrConnDone, "123", "instanceID"),
 			wantErr: errors.ThrowInternal(sql.ErrConnDone, "QUERY-Ou8ue", "Errors.Internal"),
 		},
 		{
@@ -156,7 +156,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 				sql.NullString{},
 				sql.NullInt64{},
 				sql.NullString{},
-			}, "123"),
+			}, "123", "instanceID"),
 			wantErr: errors.ThrowPermissionDeniedf(nil, "OIDCv2-aL0ag", "Errors.AuthRequest.WrongLoginClient"),
 		},
 	}
@@ -170,6 +170,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 					},
 				}
 				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
+
 				got, err := q.AuthRequestByID(ctx, tt.args.shouldTriggerBulk, tt.args.id, tt.args.checkLoginClient)
 				require.ErrorIs(t, err, tt.wantErr)
 				assert.Equal(t, tt.want, got)

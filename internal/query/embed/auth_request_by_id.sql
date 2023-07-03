@@ -11,5 +11,5 @@ select
     max_age,
     hint_user_id
 from projections.auth_requests %s
-where id = $1
+where id = $1 and instance_id = $2
 limit 1;
