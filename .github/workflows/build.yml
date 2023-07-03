@@ -1,4 +1,4 @@
-name: All in one build
+name: ZITADEL CI/CD
 
 on:
   pull_request:
@@ -13,27 +13,27 @@ permissions:
 jobs:
 
   core:
-    uses: ./.github/workflows/core.yml
+    uses: ./.github/workflows/build-steps/core.yml
     with:
       node_version: '18'
       buf_version: 'latest'
       go_version: '1.20'
     
   console:
-    uses: ./.github/workflows/console.yml
+    uses: ./.github/workflows/build-steps/console.yml
     with:
       node_version: '18'
       buf_version: 'latest'
 
   version:
-    uses: ./.github/workflows/version.yml
+    uses: ./.github/workflows/build-steps/version.yml
     with:
       semantic_version: '19.0.2'
       dry_run: true
 
   compile:
     needs: [core, console, version]
-    uses: ./.github/workflows/compile.yml
+    uses: ./.github/workflows/build-steps/compile.yml
     with:
       go_version: '1.20'
       core_cache_key: ${{ needs.core.outputs.cache_key }}
@@ -44,7 +44,7 @@ jobs:
 
   core-unit-test:
     needs: core
-    uses: ./.github/workflows/core-unit-test.yml
+    uses: ./.github/workflows/build-steps/core-unit-test.yml
     with:
       go_version: '1.20'
       core_cache_key: ${{ needs.core.outputs.cache_key }}
@@ -52,7 +52,7 @@ jobs:
       
   core-integration-test:
     needs: core
-    uses: ./.github/workflows/core-integration-test.yml
+    uses: ./.github/workflows/build-steps/core-integration-test.yml
     with:
       go_version: '1.20'
       core_cache_key: ${{ needs.core.outputs.cache_key }}
@@ -60,7 +60,7 @@ jobs:
   
   lint:
     needs: [core, console]
-    uses: ./.github/workflows/lint.yml
+    uses: ./.github/workflows/build-steps/lint.yml
     with:
       go_version: '1.20'
       node_version: '18'
@@ -71,18 +71,18 @@ jobs:
 
   container:
     needs: [compile]
-    uses: ./.github/workflows/container.yml
+    uses: ./.github/workflows/build-steps/container.yml
     with:
       tag_name: ghcr.io/zitadel/test:${{ github.sha }}
 
   e2e:
-    uses: ./.github/workflows/e2e.yml
+    uses: ./.github/workflows/build-steps/e2e.yml
     needs: [container]
     with:
       tag_name: ${{ needs.container.outputs.tag_name }}-ubuntu
 
   release:
-    uses: ./.github/workflows/release.yml
+    uses: ./.github/workflows/build-steps/release.yml
     needs: [version, core-unit-test, core-integration-test, lint, container, e2e]
     if: ${{ needs.version.outputs.published == 'true' }}
     secrets:

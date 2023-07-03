@@ -1,4 +1,4 @@
-name: Update Homebrew Formula
+name: ZITADEL Update Homebrew Formula
 
 on:
   release:
