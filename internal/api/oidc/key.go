@@ -145,7 +145,7 @@ func (o *OPStorage) ensureIsLatestKey(ctx context.Context, sequence time.Time) (
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
-	return sequence.Equal(maxSequence), nil
+	return sequence.Equal(maxSequence) || sequence.After(maxSequence), nil
 }
 
 func (o *OPStorage) privateKeyToSigningKey(key query.PrivateKey) (_ op.SigningKey, err error) {

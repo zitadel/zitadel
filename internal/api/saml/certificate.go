@@ -109,7 +109,7 @@ func (p *Storage) ensureIsLatestCertificate(ctx context.Context, sequence time.T
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
-	return sequence.Equal(maxSequence), nil
+	return sequence.Equal(maxSequence) || sequence.After(maxSequence), nil
 }
 
 func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage domain.KeyUsage) error {

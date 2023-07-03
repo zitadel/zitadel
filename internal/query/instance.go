@@ -538,7 +538,7 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 				instance.csp.enabled = securityPolicyEnabled.Bool
 			}
 			if instance.ID == "" {
-				return nil, errors.ThrowNotFound(nil, "QUERY-n0wng", "Errors.IAM.NotFound")
+				return nil, errors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.IAM.NotFound")
 			}
 			instance.DefaultLang = language.Make(lang)
 			if err := rows.Close(); err != nil {
