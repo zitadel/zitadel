@@ -29,11 +29,14 @@ type AuthRequest struct {
 	HintUserID    *string
 }
 
+const IDPrefixV2 = "V2_"
+
 func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest) (err error) {
-	authRequest.ID, err = c.idGenerator.Next()
+	authRequestID, err := c.idGenerator.Next()
 	if err != nil {
 		return err
 	}
+	authRequest.ID = IDPrefixV2 + authRequestID
 	writeModel, err := c.getAuthRequestWriteModel(ctx, authRequest.ID)
 	if err != nil {
 		return err

@@ -10,7 +10,6 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	oidc_internal "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
@@ -39,7 +38,7 @@ func Test_authRequestToPb(t *testing.T) {
 		HintUserID: gu.Ptr("userID"),
 	}
 	want := &oidc_pb.AuthRequest{
-		Id:           oidc_internal.IDPrefix + "authID",
+		Id:           "authID",
 		CreationDate: timestamppb.New(now),
 		ClientId:     "clientID",
 		RedirectUri:  "callbackURI",

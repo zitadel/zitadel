@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	oidc_internal "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/integration"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
@@ -57,13 +56,8 @@ func TestServer_GetAuthRequest(t *testing.T) {
 		wantErr       bool
 	}{
 		{
-			name:          "no prefix",
-			AuthRequestID: "123",
-			wantErr:       true,
-		},
-		{
 			name:          "Not found",
-			AuthRequestID: oidc_internal.IDPrefix + "123",
+			AuthRequestID: "123",
 			wantErr:       true,
 		},
 		{

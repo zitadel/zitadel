@@ -39,7 +39,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("id", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",
@@ -74,7 +74,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 					expectPush(
 						[]*repository.Event{eventFromEventPusherWithInstanceID(
 							"instanceID",
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("id", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",

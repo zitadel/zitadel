@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	oidc_internal "github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/integration"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
@@ -58,5 +58,5 @@ func TestOPStorage_CreateAuthRequest(t *testing.T) {
 	clientID := createClient(t)
 
 	id := createAuthRequest(t, clientID)
-	require.Contains(t, id, oidc_internal.IDPrefix)
+	require.Contains(t, id, command.IDPrefixV2)
 }

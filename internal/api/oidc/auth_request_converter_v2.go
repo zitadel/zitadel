@@ -1,31 +1,19 @@
 package oidc
 
 import (
-	"strings"
 	"time"
 
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/errors"
 )
-
-const IDPrefix = "V2_"
-
-func StripIDPrefix(authRequestID string) (string, error) {
-	after, found := strings.CutPrefix(authRequestID, IDPrefix)
-	if !found {
-		return "", errors.ThrowInvalidArgumentf(nil, "OIDC-Aumu8", "auth_request_id wrong version, missing %s prefix", IDPrefix)
-	}
-	return after, nil
-}
 
 type AuthRequestV2 struct {
 	*command.AuthRequest
 }
 
 func (a *AuthRequestV2) GetID() string {
-	return IDPrefix + a.ID
+	return a.ID
 }
 
 func (a *AuthRequestV2) GetACR() string {
