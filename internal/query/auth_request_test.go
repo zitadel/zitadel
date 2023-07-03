@@ -1,7 +1,6 @@
 package query
 
 import (
-	"context"
 	"database/sql"
 	"database/sql/driver"
 	_ "embed"
@@ -13,6 +12,8 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -28,6 +29,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 	cols := []string{
 		projection.AuthRequestColumnID,
 		projection.AuthRequestColumnCreationDate,
+		projection.AuthRequestColumnLoginClient,
 		projection.AuthRequestColumnClientID,
 		projection.AuthRequestColumnScope,
 		projection.AuthRequestColumnRedirectURI,
@@ -40,6 +42,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 	type args struct {
 		shouldTriggerBulk bool
 		id                string
+		checkLoginClient  bool
 	}
 	tests := []struct {
 		name    string
@@ -53,10 +56,12 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 			args: args{
 				shouldTriggerBulk: false,
 				id:                "123",
+				checkLoginClient:  true,
 			},
 			expect: mockQuery(expQuery, cols, []driver.Value{
 				"id",
 				testNow,
+				"loginClient",
 				"clientID",
 				database.StringArray{"a", "b", "c"},
 				"example.com",
@@ -69,6 +74,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 			want: &AuthRequest{
 				ID:           "id",
 				CreationDate: testNow,
+				LoginClient:  "loginClient",
 				ClientID:     "clientID",
 				Scope:        []string{"a", "b", "c"},
 				RedirectURI:  "example.com",
@@ -84,10 +90,12 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 			args: args{
 				shouldTriggerBulk: false,
 				id:                "123",
+				checkLoginClient:  true,
 			},
 			expect: mockQuery(expQuery, cols, []driver.Value{
 				"id",
 				testNow,
+				"loginClient",
 				"clientID",
 				database.StringArray{"a", "b", "c"},
 				"example.com",
@@ -100,6 +108,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 			want: &AuthRequest{
 				ID:           "id",
 				CreationDate: testNow,
+				LoginClient:  "loginClient",
 				ClientID:     "clientID",
 				Scope:        []string{"a", "b", "c"},
 				RedirectURI:  "example.com",
@@ -120,15 +129,6 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 			wantErr: errors.ThrowNotFound(sql.ErrNoRows, "QUERY-Thee9", "Errors.AuthRequest.NotExisting"),
 		},
 		{
-			name: "no rows",
-			args: args{
-				shouldTriggerBulk: false,
-				id:                "123",
-			},
-			expect:  mockQuery(expQuery, cols, nil, "123"),
-			wantErr: errors.ThrowNotFound(sql.ErrNoRows, "QUERY-Thee9", "Errors.AuthRequest.NotExisting"),
-		},
-		{
 			name: "query error",
 			args: args{
 				shouldTriggerBulk: false,
@@ -136,6 +136,28 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 			},
 			expect:  mockQueryErr(expQuery, sql.ErrConnDone, "123"),
 			wantErr: errors.ThrowInternal(sql.ErrConnDone, "QUERY-Ou8ue", "Errors.Internal"),
+		},
+		{
+			name: "wrong login client",
+			args: args{
+				shouldTriggerBulk: false,
+				id:                "123",
+				checkLoginClient:  true,
+			},
+			expect: mockQuery(expQuery, cols, []driver.Value{
+				"id",
+				testNow,
+				"wrongLoginClient",
+				"clientID",
+				database.StringArray{"a", "b", "c"},
+				"example.com",
+				database.EnumArray[domain.Prompt]{domain.PromptLogin, domain.PromptConsent},
+				database.StringArray{"en", "fi"},
+				sql.NullString{},
+				sql.NullInt64{},
+				sql.NullString{},
+			}, "123"),
+			wantErr: errors.ThrowPermissionDeniedf(nil, "OIDCv2-aL0ag", "Errors.AuthRequest.WrongLoginClient"),
 		},
 	}
 	for _, tt := range tests {
@@ -147,7 +169,8 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 						Database: &prepareDB{},
 					},
 				}
-				got, err := q.AuthRequestByID(context.Background(), tt.args.shouldTriggerBulk, tt.args.id)
+				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
+				got, err := q.AuthRequestByID(ctx, tt.args.shouldTriggerBulk, tt.args.id, tt.args.checkLoginClient)
 				require.ErrorIs(t, err, tt.wantErr)
 				assert.Equal(t, tt.want, got)
 			})

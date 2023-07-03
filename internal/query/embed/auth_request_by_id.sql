@@ -1,6 +1,7 @@
 select
     id,
     creation_date,
+    login_client,
     client_id,
     scope,
     redirect_uri,

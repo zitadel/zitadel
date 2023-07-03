@@ -20,13 +20,14 @@ func (s *Server) GetAuthRequest(ctx context.Context, req *oidc_pb.GetAuthRequest
 	if err != nil {
 		return nil, err
 	}
-	dar, err := s.query.AuthRequestByID(ctx, true, authRequestID)
+
+	authRequest, err := s.query.AuthRequestByID(ctx, true, authRequestID, true)
 	if err != nil {
 		logging.WithError(err).Error("query authRequest by ID")
 		return nil, err
 	}
 	return &oidc_pb.GetAuthRequestResponse{
-		AuthRequest: authRequestToPb(dar),
+		AuthRequest: authRequestToPb(authRequest),
 	}, nil
 }
 

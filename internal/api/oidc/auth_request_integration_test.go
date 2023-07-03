@@ -49,7 +49,7 @@ func createClient(t testing.TB) string {
 }
 
 func createAuthRequest(t testing.TB, clientID string) string {
-	redURL, err := Tester.CreateOIDCAuthRequest(CTX, clientID, redirectURI)
+	redURL, err := Tester.CreateOIDCAuthRequest(CTX, clientID, "loginClient", redirectURI)
 	require.NoError(t, err)
 	return redURL
 }

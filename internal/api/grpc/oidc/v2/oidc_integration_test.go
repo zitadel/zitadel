@@ -46,7 +46,7 @@ func TestMain(m *testing.M) {
 func TestServer_GetAuthRequest(t *testing.T) {
 	client, err := Tester.CreateOIDCNativeClient(CTX, redirectURI)
 	require.NoError(t, err)
-	authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), redirectURI)
+	authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), Tester.Users[integration.OrgOwner].ID, redirectURI)
 	require.NoError(t, err)
 	now := time.Now()
 

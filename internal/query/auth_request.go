@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -19,6 +20,7 @@ import (
 type AuthRequest struct {
 	ID           string
 	CreationDate time.Time
+	LoginClient  string
 	ClientID     string
 	Scope        []string
 	RedirectURI  string
@@ -29,6 +31,13 @@ type AuthRequest struct {
 	HintUserID   *string
 }
 
+func (a *AuthRequest) checkLoginClient(ctx context.Context) error {
+	if uid := authz.GetCtxData(ctx).UserID; uid != a.LoginClient {
+		return errors.ThrowPermissionDenied(nil, "OIDCv2-aL0ag", "Errors.AuthRequest.WrongLoginClient")
+	}
+	return nil
+}
+
 //go:embed embed/auth_request_by_id.sql
 var authRequestByIDQuery string
 
@@ -36,7 +45,7 @@ func (q *Queries) authRequestByIDQuery(ctx context.Context) string {
 	return fmt.Sprintf(authRequestByIDQuery, q.client.Timetravel(call.Took(ctx)))
 }
 
-func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, id string) (_ *AuthRequest, err error) {
+func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, id string, checkLoginClient bool) (_ *AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -52,7 +61,7 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 
 	dst := new(AuthRequest)
 	err = q.client.DB.QueryRowContext(ctx, q.authRequestByIDQuery(ctx), id).Scan(
-		&dst.ID, &dst.CreationDate, &dst.ClientID, &scope, &dst.RedirectURI,
+		&dst.ID, &dst.CreationDate, &dst.LoginClient, &dst.ClientID, &scope, &dst.RedirectURI,
 		&prompt, &locales, &dst.LoginHint, &dst.MaxAge, &dst.HintUserID,
 	)
 	if errs.Is(err, sql.ErrNoRows) {
@@ -65,6 +74,12 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 	dst.Scope = scope
 	dst.Prompt = prompt
 	dst.UiLocales = locales
+
+	if checkLoginClient {
+		if err = dst.checkLoginClient(ctx); err != nil {
+			return nil, err
+		}
+	}
 
 	return dst, nil
 }

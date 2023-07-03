@@ -43,7 +43,7 @@ func (s *Tester) CreateOIDCNativeClient(ctx context.Context, redirectURI string)
 	})
 }
 
-func (s *Tester) CreateOIDCAuthRequest(ctx context.Context, clientID, redirectURI string) (authRequestID string, err error) {
+func (s *Tester) CreateOIDCAuthRequest(ctx context.Context, clientID, loginClient, redirectURI string) (authRequestID string, err error) {
 	issuer := http_util.BuildHTTP(s.Config.ExternalDomain, s.Config.Port, s.Config.ExternalSecure)
 	provider, err := rp.NewRelyingPartyOIDC(issuer, clientID, "", redirectURI, []string{oidc.ScopeOpenID})
 	if err != nil {
@@ -58,7 +58,7 @@ func (s *Tester) CreateOIDCAuthRequest(ctx context.Context, clientID, redirectUR
 	if err != nil {
 		return "", err
 	}
-	req.Header.Set(oidc_internal.LoginClientHeader, "loginClient")
+	req.Header.Set(oidc_internal.LoginClientHeader, loginClient)
 
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
