@@ -10,8 +10,7 @@ COMMIT_SHA ?= $(shell git rev-parse HEAD)
 compile: core_build console_build compile_pipeline
 
 .PHONY: compile_pipeline
-compile_pipeline:
-	cp -r console/dist/console/* internal/api/ui/console/static
+compile_pipeline: console_move
 	go build -o zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=$(COMMIT_SHA)' -X 'github.com/zitadel/zitadel/cmd/build.date=$(now)' -X 'github.com/zitadel/zitadel/cmd/build.version=$(VERSION)' "
 	chmod +x zitadel
 
@@ -61,6 +60,10 @@ core_api: core_api_generator core_grpc_dependencies
 
 .PHONY: core_build
 core_build: core_dependencies core_api core_static core_assets
+
+.PHONY: console_move
+console_move:
+	cp -r console/dist/console/* internal/api/ui/console/static
 
 .PHONY: console_dependencies
 console_dependencies:

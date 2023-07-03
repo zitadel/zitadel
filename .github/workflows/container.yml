@@ -35,6 +35,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - 
         uses: actions/download-artifact@v3
+        with:
+          path: .artifacts
+      -
+        name: show
+        run: ls -R .artifacts
       - 
         name: ubuntu
         uses: docker/build-push-action@v4
