@@ -479,6 +479,8 @@ Errors:
     OtherUser: 他のユーザーを意図している
   AuthRequest:
     AlreadyExists: AuthRequestはすでに存在する
+    NotExisting: AuthRequest が存在しません
+    WrongLoginClient: 他のログインクライアントによって作成された AuthRequest
 
 AggregateTypes:
   action: アクション
