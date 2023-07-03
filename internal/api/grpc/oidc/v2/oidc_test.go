@@ -11,16 +11,18 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
 )
 
 func Test_authRequestToPb(t *testing.T) {
 	now := time.Now()
-	arg := &domain.AuthRequest{
-		ID:            "authID",
-		CreationDate:  now,
-		ApplicationID: "clientID",
-		CallbackURI:   "callbackURI",
+	arg := &query.AuthRequest{
+		ID:           "authID",
+		CreationDate: now,
+		ClientID:     "clientID",
+		Scope:        []string{"a", "b", "c"},
+		RedirectURI:  "callbackURI",
 		Prompt: []domain.Prompt{
 			domain.PromptUnspecified,
 			domain.PromptNone,
@@ -30,13 +32,10 @@ func Test_authRequestToPb(t *testing.T) {
 			domain.PromptCreate,
 			999,
 		},
-		UiLocales: []string{"en", "fi"},
-		Request: &domain.AuthRequestOIDC{
-			Scopes: []string{"a", "b", "c"},
-		},
-		LoginHint:  "foo@bar.com",
-		MaxAuthAge: gu.Ptr(time.Minute),
-		UserID:     "userID",
+		UiLocales:  []string{"en", "fi"},
+		LoginHint:  gu.Ptr("foo@bar.com"),
+		MaxAge:     gu.Ptr(time.Minute),
+		HintUserID: gu.Ptr("userID"),
 	}
 	want := &oidc_pb.AuthRequest{
 		Id:           "authID",

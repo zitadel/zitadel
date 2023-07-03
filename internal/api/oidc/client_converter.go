@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"github.com/zitadel/oidc/v2/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
@@ -48,7 +49,7 @@ func (c *Client) GetID() string {
 }
 
 func (c *Client) LoginURL(id string) string {
-	if strings.HasPrefix(id, IDPrefix) {
+	if strings.HasPrefix(id, command.IDPrefixV2) {
 		return c.defaultLoginURLV2 + id
 	}
 	return c.defaultLoginURL + id
