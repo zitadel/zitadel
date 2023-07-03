@@ -97,6 +97,9 @@ func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, qu
 	if err != nil {
 		return nil, err
 	}
+	if err := rows.Err(); err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-asLsI", "Errors.Internal")
+	}
 	milestones.LatestSequence, err = q.latestSequence(ctx, milestonesTable)
 	return milestones, err
 
@@ -139,9 +142,6 @@ func prepareMilestonesQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			}
 			if err := rows.Close(); err != nil {
 				return nil, errors.ThrowInternal(err, "QUERY-CK9mI", "Errors.Query.CloseRows")
-			}
-			if err := rows.Err(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-asLsI", "Errors.Internal")
 			}
 			return &Milestones{
 				Milestones: milestones,
