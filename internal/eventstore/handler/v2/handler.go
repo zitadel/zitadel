@@ -9,6 +9,7 @@ import (
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/jackc/pgconn"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
@@ -48,8 +49,7 @@ type Handler struct {
 	handleActiveInstances time.Duration
 	now                   nowFunc
 
-	triggeredInstancesMu sync.Mutex
-	triggeredInstances   map[string]*sync.Mutex
+	triggeredInstancesSync sync.Map
 }
 
 // nowFunc makes [time.Now] mockable
@@ -75,18 +75,17 @@ func NewHandler(
 	}
 
 	handler := &Handler{
-		projection:            projection,
-		client:                config.Client,
-		es:                    config.Eventstore,
-		bulkLimit:             config.BulkLimit,
-		eventTypes:            aggregates,
-		requeueEvery:          config.RequeueEvery,
-		handleActiveInstances: config.HandleActiveInstances,
-		now:                   time.Now,
-		maxFailureCount:       config.MaxFailureCount,
-		triggeredInstancesMu:  sync.Mutex{},
-		triggeredInstances:    make(map[string]*sync.Mutex),
-		retryFailedAfter:      config.RetryFailedAfter,
+		projection:             projection,
+		client:                 config.Client,
+		es:                     config.Eventstore,
+		bulkLimit:              config.BulkLimit,
+		eventTypes:             aggregates,
+		requeueEvery:           config.RequeueEvery,
+		handleActiveInstances:  config.HandleActiveInstances,
+		now:                    time.Now,
+		maxFailureCount:        config.MaxFailureCount,
+		retryFailedAfter:       config.RetryFailedAfter,
+		triggeredInstancesSync: sync.Map{},
 	}
 
 	return handler
@@ -228,19 +227,14 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 }
 
 func (h *Handler) lockInstance(ctx context.Context) func() {
-	h.triggeredInstancesMu.Lock()
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	instanceMu, ok := h.triggeredInstances[instanceID]
-	if !ok {
-		instanceMu = new(sync.Mutex)
-		h.triggeredInstances[instanceID] = instanceMu
-	}
-	h.triggeredInstancesMu.Unlock()
-	if !instanceMu.TryLock() {
+
+	instanceMu, _ := h.triggeredInstancesSync.LoadOrStore(instanceID, new(sync.Mutex))
+	if !instanceMu.(*sync.Mutex).TryLock() {
 		return nil
 	}
 	return func() {
-		instanceMu.Unlock()
+		instanceMu.(*sync.Mutex).Unlock()
 	}
 }
 
@@ -258,15 +252,20 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 	}()
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	start := time.Now()
 	defer cancel()
+
+	logs := []*logging.Entry{}
 
 	err = crdb.ExecuteTx(ctx, h.client.DB, nil, func(tx *sql.Tx) error {
 		currentState, err := h.currentState(ctx, tx)
+		logs = append(logs, h.log().WithField("took", time.Since(start)).WithField("state", "current state query"))
 		if err != nil {
 			return err
 		}
 
 		events, err := h.es.Filter(ctx, h.eventQuery(currentState))
+		logs = append(logs, h.log().WithField("took", time.Since(start)).WithField("state", "event filter"))
 		if err != nil {
 			h.log().WithError(err).Debug("filter eventstore failed")
 			return err
@@ -276,15 +275,19 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 
 		if len(events) == 0 {
 			h.updateLastUpdated(ctx, tx, currentState)
+			logs = append(logs, h.log().WithField("took", time.Since(start)).WithField("state", "no events"))
 			return nil
 		}
 
 		statements, err := h.eventsToStatements(tx, events, currentState)
 		if len(statements) == 0 {
+			logs = append(logs, h.log().WithField("took", time.Since(start)).WithField("state", "no statements"))
 			return err
 		}
 
-		if err = h.execute(ctx, tx, currentState, statements); err != nil {
+		err = h.execute(ctx, tx, currentState, statements)
+		logs = append(logs, h.log().WithField("took", time.Since(start)).WithField("state", "execute"))
+		if err != nil {
 			return err
 		}
 
@@ -293,7 +296,10 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 		currentState.eventSequence = statements[len(statements)-1].Sequence
 		currentState.eventTimestamp = statements[len(statements)-1].CreationDate
 
-		if err := h.setState(ctx, tx, currentState); err != nil {
+		err = h.setState(ctx, tx, currentState)
+		logs = append(logs, h.log().WithField("took", time.Since(start)).WithField("state", "set state"))
+		if err != nil {
+			h.log().WithField("took", time.Since(start)).Debug("current state query")
 			return err
 		}
 
@@ -306,6 +312,13 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 		additionalIteration = eventAmount == int(h.bulkLimit)
 		return nil
 	})
+
+	if err != nil {
+		for _, log := range logs {
+			log.Debug("errör")
+		}
+		logging.WithFields("took", time.Since(start)).WithError(err).Debug("errör")
+	}
 
 	return additionalIteration, err
 }
