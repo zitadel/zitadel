@@ -13,5 +13,30 @@
     "service": "zitadel.settings.v2alpha.SettingsService",
     "method": "GetPasswordComplexitySettings",
     "out": {}
+  },
+  {
+    "service": "zitadel.settings.v2alpha.SettingsService",
+    "method": "GetLoginSettings",
+    "out": {
+      "allowUsernamePassword": true,
+      "allowRegister": true,
+      "allowExternalIdp": true,
+      "forceMfa": false,
+      "passkeysType": 1,
+      "hidePasswordReset": false,
+      "ignoreUnknownUsernames": false,
+      "defaultRedirectUri": "",
+      "passwordCheckLifetime": { "seconds": 864000, "nanos": 0 },
+      "externalLoginCheckLifetime": { "seconds": 864000, "nanos": 0 },
+      "mfaInitSkipLifetime": { "seconds": 2592000, "nanos": 0 },
+      "secondFactorCheckLifetime": { "seconds": 64800, "nanos": 0 },
+      "multiFactorCheckLifetime": { "seconds": 43200, "nanos": 0 },
+      "secondFactors": [1, 2],
+      "multiFactors": [1],
+      "allowDomainDiscovery": false,
+      "disableLoginWithEmail": false,
+      "disableLoginWithPhone": false,
+      "resourceOwnerType": 1
+    }
   }
 ]
