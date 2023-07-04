@@ -45,7 +45,7 @@ services:
     environment:
       KEY: /key/zitadel-admin-sa.json
       SERVICE: http://zitadel:8080
-      WRITE_ENVIRONMENT_FILE: /apps/login/.env.local
+      WRITE_ENVIRONMENT_FILE: /apps/login/.env.acceptance
     volumes:
       - "./machinekey:/key"
       - "../apps/login:/apps/login"
