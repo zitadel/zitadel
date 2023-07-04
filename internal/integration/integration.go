@@ -8,7 +8,6 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
-	"math/rand"
 	"os"
 	"strings"
 	"sync"
@@ -33,12 +32,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/webauthn"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
 
 var (
 	//go:embed config/zitadel.yaml
@@ -287,38 +281,4 @@ func Contexts(timeout time.Duration) (ctx, errCtx context.Context, cancel contex
 	cancel()
 	ctx, cancel = context.WithTimeout(context.Background(), timeout)
 	return ctx, errCtx, cancel
-}
-
-var letterRunes = []rune("abcdefghijklmnopqrstuvwxyz")
-
-func randStringRunes(n int) string {
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letterRunes[rand.Intn(len(letterRunes))]
-	}
-	return string(b)
-}
-
-func (t *Tester) UseIsolatedInstance(ctx context.Context) (primaryDomain, instanceID string, systemCtx, iamOwnerCtx context.Context) {
-	systemCtx = t.WithAuthorization(ctx, SystemUser)
-	primaryDomain = randStringRunes(5) + ".integration"
-	instance, err := t.Client.System.CreateInstance(systemCtx, &system.CreateInstanceRequest{
-		InstanceName: "testinstance",
-		CustomDomain: primaryDomain,
-		Owner: &system.CreateInstanceRequest_Machine_{
-			Machine: &system.CreateInstanceRequest_Machine{
-				UserName:            "owner",
-				Name:                "owner",
-				PersonalAccessToken: &system.CreateInstanceRequest_PersonalAccessToken{},
-			},
-		},
-	})
-	if err != nil {
-		panic(err)
-	}
-	t.createClientConn(ctx, grpc.WithAuthority(primaryDomain))
-	t.Users[IAMOwner] = User{
-		Token: instance.GetPat(),
-	}
-	return primaryDomain, instance.GetInstanceId(), systemCtx, t.WithAuthorization(ctx, IAMOwner)
 }

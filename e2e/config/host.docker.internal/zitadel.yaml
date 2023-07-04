@@ -1,34 +1,21 @@
 Log:
   Level: info
 
-Telemetry:
-  Enabled: true
-  Endpoints:
-    - https://httpbin.org/post
-
 ExternalDomain: host.docker.internal
 ExternalSecure: false
-
-TLS:
-  Enabled: false
 
 Database:
   cockroach:
     # This makes the e2e config reusable with an out-of-docker zitadel process and an /etc/hosts entry
     Host:  host.docker.internal
 
+TLS:
+  Enabled: false
+
 FirstInstance:
   Org:
     Human:
       PasswordChangeRequired: false
-
-DefaultInstance:
-  Org:
-    Human:
-      PasswordChangeRequired: false
-      Password: "Password1!"
-  LoginPolicy:
-    MfaInitSkipLifetime: "0"
 
 LogStore:
   Access:
@@ -55,8 +42,10 @@ Projections:
   Customizations:
     NotificationsQuotas:
       RequeueEvery: 1s
-    Telemetry:
-      RequeueEvery: 1s
+
+DefaultInstance:
+  LoginPolicy:
+    MfaInitSkipLifetime: "0"
 
 SystemAPIUsers:
 - cypress:
