@@ -24,7 +24,8 @@ describe("/passkey/login", () => {
         sequence: 859,
         factors: {
           user: {
-            loginName: "johndoe@zitadel.com",
+            id: "123",
+            loginName: "zitadel-admin@zitadel.localhost",
           },
           password: undefined,
           passkey: undefined,
@@ -47,10 +48,12 @@ describe("/passkey/login", () => {
       }
     );
 
-    cy.visit("/loginname?loginName=johndoe%40zitadel.com&submit=true");
+    cy.visit(
+      "/loginname?loginName=zitadel-admin%40zitadel.localhost&submit=true"
+    );
     cy.location("pathname", { timeout: 10_000 }).should(
       "eq",
-      "/password?loginName=johndoe%40zitadel.com"
+      "/password?loginName=zitadel-admin%40zitadel.localhost&promptPasswordless=true"
     );
   });
   it("should redirect a user with passwordless authentication to /passkey/login", () => {
@@ -76,6 +79,7 @@ describe("/passkey/login", () => {
         sequence: 859,
         factors: {
           user: {
+            id: "123",
             loginName: "johndoe@zitadel.com",
           },
           password: undefined,
