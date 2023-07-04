@@ -345,9 +345,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return err
 	}
-	if err := apis.RegisterService(ctx, oidc_v2.CreateServer(commands, queries)); err != nil {
-		return err
-	}
+
 	if err := apis.RegisterService(ctx, settings.CreateServer(commands, queries, config.ExternalSecure)); err != nil {
 		return err
 	}
@@ -400,6 +398,11 @@ func startAPIs(
 	}
 	apis.RegisterHandlerOnPrefix(login.HandlerPrefix, l.Handler())
 	apis.HandleFunc(login.EndpointDeviceAuth, login.RedirectDeviceAuthToPrefix)
+
+	// After OIDC provider so that the callback endpoint can be used
+	if err := apis.RegisterService(ctx, oidc_v2.CreateServer(commands, queries, oidcProvider)); err != nil {
+		return err
+	}
 
 	// handle grpc at last to be able to handle the root, because grpc and gateway require a lot of different prefixes
 	apis.RouteGRPC()

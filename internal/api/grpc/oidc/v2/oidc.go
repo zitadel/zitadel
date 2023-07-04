@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"github.com/zitadel/oidc/v2/pkg/op"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
@@ -70,8 +70,15 @@ func promptToPb(p domain.Prompt) oidc_pb.Prompt {
 	}
 }
 
-func (s *Server) CreateCallback(ctx context.Context, req *oidc_pb.CreateCallbackRequest) (*oidc_pb.CreateCallbackResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateCallback not implemented")
+func (s *Server) LinkSessionToAuthRequest(ctx context.Context, req *oidc_pb.LinkSessionToAuthRequestRequest) (*oidc_pb.LinkSessionToAuthRequestResponse, error) {
+	details, err := s.command.LinkSessionToAuthRequest(ctx, req.GetAuthRequestId(), req.GetSessionId(), req.GetSessionToken())
+	if err != nil {
+		return nil, err
+	}
+	return &oidc_pb.LinkSessionToAuthRequestResponse{
+		Details:     object.DomainToDetailsPb(details),
+		CallbackUrl: op.AuthCallbackURL(s.op)(ctx, req.GetAuthRequestId()),
+	}, nil
 }
 
 func errorReasonToOIDC(reason oidc_pb.ErrorReason) string {

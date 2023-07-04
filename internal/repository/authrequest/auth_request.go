@@ -14,7 +14,9 @@ import (
 const (
 	authRequestEventPrefix = "auth_request."
 	AddedType              = authRequestEventPrefix + "added"
+	FailedType             = authRequestEventPrefix + "failed"
 	CodeAddedType          = authRequestEventPrefix + "code.added"
+	SessionLinkedType      = authRequestEventPrefix + "session.linked"
 )
 
 type AddedEvent struct {
@@ -129,6 +131,82 @@ func CodeAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	err := json.Unmarshal(event.Data, added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "AUTHR-Sfe3w", "unable to unmarshal auth request code added")
+	}
+
+	return added, nil
+}
+
+type SessionLinkedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	SessionID string
+}
+
+func (e *SessionLinkedEvent) Data() interface{} {
+	return e
+}
+
+func (e *SessionLinkedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewSessionLinkedEvent(ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	sessionID string,
+) *SessionLinkedEvent {
+	return &SessionLinkedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			SessionLinkedType,
+		),
+		SessionID: sessionID,
+	}
+}
+
+func SessionLinkedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	added := &SessionLinkedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, added)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "AUTHR-Sfe3w", "unable to unmarshal auth request session linked")
+	}
+
+	return added, nil
+}
+
+type FailedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *FailedEvent) Data() interface{} {
+	return e
+}
+
+func (e *FailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewFailedEvent(ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *FailedEvent {
+	return &FailedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			FailedType,
+		),
+	}
+}
+
+func FailedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	added := &FailedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, added)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "AUTHR-Sfe3w", "unable to unmarshal auth request session linked")
 	}
 
 	return added, nil
