@@ -187,10 +187,18 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 	tokens := token(t, clientID, code)
 	assert.NotEmpty(t, tokens.RefreshToken)
 
-	newTokens := refreshToken(t, clientID, tokens.RefreshToken)
+	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
+	require.NoError(t, err)
+
+	newTokens, err := refreshToken(t, clientID, tokens.RefreshToken)
+	require.NoError(t, err)
 	assert.NotEmpty(t, newTokens.AccessToken)
 	assert.NotEmpty(t, newTokens.Extra("id_token"))
 	assert.NotEmpty(t, newTokens.RefreshToken)
+
+	// refresh with an old refresh_token must fail
+	_, err = rp.RefreshAccessToken(provider, tokens.RefreshToken, "", "")
+	require.Error(t, err)
 }
 
 func token(t testing.TB, clientID, code string) *oidc.Tokens[*oidc.IDTokenClaims] {
@@ -204,12 +212,9 @@ func token(t testing.TB, clientID, code string) *oidc.Tokens[*oidc.IDTokenClaims
 	return tokens
 }
 
-func refreshToken(t testing.TB, clientID, refreshToken string) *oauth2.Token {
+func refreshToken(t testing.TB, clientID, refreshToken string) (*oauth2.Token, error) {
 	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
 	require.NoError(t, err)
 
-	tokens, err := rp.RefreshAccessToken(provider, refreshToken, "", "")
-	require.NoError(t, err)
-
-	return tokens
+	return rp.RefreshAccessToken(provider, refreshToken, "", "")
 }
