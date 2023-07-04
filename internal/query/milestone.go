@@ -84,12 +84,14 @@ func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, qu
 	if err != nil {
 		return nil, err
 	}
+	defer func() {
+		if err = rows.Close(); err != nil {
+			err = errors.ThrowInternal(err, "QUERY-CK9mI", "Errors.Query.CloseRows")
+		}
+	}()
 	milestones, err := scan(rows)
 	if err != nil {
 		return nil, err
-	}
-	if err = rows.Close(); err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-CK9mI", "Errors.Query.CloseRows")
 	}
 	if err = rows.Err(); err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-asLsI", "Errors.Internal")
