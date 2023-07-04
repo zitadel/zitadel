@@ -49,9 +49,6 @@ func (c *Commands) AddOIDCSessionRefreshAndAccessToken(ctx context.Context, auth
 		return "", "", time.Time{}, err
 	}
 	cmd.SetAuthRequestSuccessful(ctx)
-	if err = c.pushAppendAndReduce(ctx, cmd.oidcSessionWriteModel, cmd.events...); err != nil {
-		return "", "", time.Time{}, err
-	}
 	return cmd.PushEvents(ctx)
 }
 
@@ -62,14 +59,10 @@ func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context,
 	if err != nil {
 		return "", "", time.Time{}, err
 	}
-	if err = cmd.RenewRefreshToken(ctx); err != nil {
-		return "", "", time.Time{}, err
-	}
 	if err = cmd.AddAccessToken(ctx, scope); err != nil {
 		return "", "", time.Time{}, err
 	}
-	err = c.pushAppendAndReduce(ctx, cmd.oidcSessionWriteModel, cmd.events...)
-	if err != nil {
+	if err = cmd.RenewRefreshToken(ctx); err != nil {
 		return "", "", time.Time{}, err
 	}
 	return cmd.PushEvents(ctx)
@@ -88,7 +81,7 @@ func (c *Commands) OIDCSessionByRefreshToken(ctx context.Context, refreshToken s
 		return nil, caos_errs.ThrowPreconditionFailed(err, "OIDCS-SAF31", "Errors.OIDCSession.RefreshTokenInvalid")
 	}
 	if err = writeModel.CheckRefreshToken(split[1]); err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "OIDCS-Sf3nu", "Errors.OIDCSession.RefreshTokenInvalid")
+		return nil, err
 	}
 	return writeModel, nil
 }
@@ -119,6 +112,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, authRequestID st
 	if err != nil {
 		return nil, err
 	}
+	sessionID = IDPrefixV2 + sessionID
 	return &OIDCSessionEvents{
 		eventstore:               c.eventstore,
 		idGenerator:              c.idGenerator,
@@ -149,13 +143,12 @@ func (c *Commands) decryptRefreshToken(refreshToken string) (refreshTokenID stri
 }
 
 func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, oidcSessionID, refreshToken string) (*OIDCSessionEvents, error) {
-	sessionWriteModel := NewOIDCSessionWriteModel(oidcSessionID, authz.GetCtxData(ctx).OrgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
+	refreshTokenID, err := c.decryptRefreshToken(refreshToken)
 	if err != nil {
 		return nil, err
 	}
-	refreshTokenID, err := c.decryptRefreshToken(refreshToken)
-	if err != nil {
+	sessionWriteModel := NewOIDCSessionWriteModel(oidcSessionID, authz.GetInstance(ctx).InstanceID()) //TODO: ro?
+	if err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}
 	if err = sessionWriteModel.CheckRefreshToken(refreshTokenID); err != nil {
@@ -248,7 +241,7 @@ func (c *OIDCSessionEvents) generateRefreshToken() (refreshTokenID, refreshToken
 	if err != nil {
 		return "", "", err
 	}
-	token, err := c.encryptionAlg.Encrypt([]byte("V2_" + c.oidcSessionWriteModel.AggregateID + ":" + refreshTokenID))
+	token, err := c.encryptionAlg.Encrypt([]byte(c.oidcSessionWriteModel.AggregateID + ":" + refreshTokenID))
 	if err != nil {
 		return "", "", err
 	}
@@ -260,7 +253,9 @@ func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (accessTokenID strin
 	if err != nil {
 		return "", "", time.Time{}, err
 	}
-	return c.accessTokenID, c.refreshToken, pushedEvents[0].CreationDate().Add(c.accessTokenLifetime), nil
+	// prefix the returned id with the oidcSessionID so that we can retrieve it later on
+	// we need to use `-` as a delimiter because the OIDC library uses `:` and will check for a length of 2 parts
+	return c.oidcSessionWriteModel.AggregateID + "-" + c.accessTokenID, c.refreshToken, pushedEvents[0].CreationDate().Add(c.accessTokenLifetime), nil
 }
 
 func (c *Commands) tokenTokenLifetimes(ctx context.Context) (accessTokenLifetime time.Duration, refreshTokenLifetime time.Duration, refreshTokenIdleLifetime time.Duration, err error) {

@@ -56,11 +56,11 @@ func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest)
 	if writeModel.AuthRequestState != domain.AuthRequestStateUnspecified {
 		return errors.ThrowPreconditionFailed(nil, "COMMAND-Sf3gt", "Errors.AuthRequest.AlreadyExisting")
 	}
+	//TODO: remove after implementation
 	data, err := c.keyAlgorithm.Encrypt([]byte(authRequest.ID + ":"))
 	if err != nil {
 		return err
 	}
-	//TODO: remove after implementation
 	fmt.Println(base64.RawURLEncoding.EncodeToString(data))
 	return c.pushAppendAndReduce(ctx, writeModel, authrequest.NewAddedEvent(
 		ctx,

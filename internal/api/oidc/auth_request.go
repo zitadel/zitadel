@@ -132,7 +132,7 @@ func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (_ op.Au
 		return nil, err
 	}
 	if strings.HasPrefix(plainCode, command.IDPrefixV2) {
-		authReq, err := o.command.ExchangeAuthCode(ctx, strings.TrimPrefix(plainCode, command.IDPrefixV2))
+		authReq, err := o.command.ExchangeAuthCode(ctx, plainCode)
 		if err != nil {
 			return nil, err
 		}
@@ -262,7 +262,7 @@ func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken
 		return nil, err
 	}
 	if strings.HasPrefix(plainCode, command.IDPrefixV2) {
-		oidcSession, err := o.command.OIDCSessionByRefreshToken(ctx, strings.TrimPrefix(plainCode, command.IDPrefixV2))
+		oidcSession, err := o.command.OIDCSessionByRefreshToken(ctx, plainCode)
 		if err != nil {
 			return nil, err
 		}
