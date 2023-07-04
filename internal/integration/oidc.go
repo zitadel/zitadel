@@ -13,6 +13,7 @@ import (
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	oidc_internal "github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/pkg/grpc/app"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 )
@@ -124,4 +125,12 @@ func CheckRedirect(url string, headers map[string]string) (*url.URL, error) {
 	defer resp.Body.Close()
 
 	return resp.Location()
+}
+
+func (s *Tester) CreateSession(ctx context.Context, userID string) (string, string, error) {
+	session, err := s.Commands.CreateSession(ctx, []command.SessionCommand{command.CheckUser(userID)}, nil)
+	if err != nil {
+		return "", "", err
+	}
+	return session.ID, session.NewToken, nil
 }

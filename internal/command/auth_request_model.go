@@ -34,6 +34,7 @@ type AuthRequestWriteModel struct {
 	UserID           string
 	AMR              []string
 	AuthRequestState domain.AuthRequestState
+	SessionID        string
 }
 
 func NewAuthRequestWriteModel(ctx context.Context, id string) *AuthRequestWriteModel {
@@ -64,12 +65,13 @@ func (m *AuthRequestWriteModel) Reduce() error {
 			m.LoginHint = e.LoginHint
 			m.HintUserID = e.HintUserID
 			m.AuthRequestState = domain.AuthRequestStateAdded
-			//TODO: implement
-		//case *authrequest.SessionSet:
-		//	m.SessionID = e.SessionID
+		case *authrequest.SessionLinkedEvent:
+			m.SessionID = e.SessionID
 		case *authrequest.CodeAddedEvent:
 			m.ExchangeCode = e.ExchangeCode
 			m.AuthRequestState = domain.AuthRequestStateCodeAdded
+		case *authrequest.FailedEvent:
+			m.AuthRequestState = domain.AuthRequestStateFailed
 		case *authrequest.CodeExchangedEvent:
 			m.AuthRequestState = domain.AuthRequestStateCodeExchanged
 		case *authrequest.SucceededEvent:
