@@ -71,7 +71,7 @@ func promptToPb(p domain.Prompt) oidc_pb.Prompt {
 }
 
 func (s *Server) LinkSessionToAuthRequest(ctx context.Context, req *oidc_pb.LinkSessionToAuthRequestRequest) (*oidc_pb.LinkSessionToAuthRequestResponse, error) {
-	details, err := s.command.LinkSessionToAuthRequest(ctx, req.GetAuthRequestId(), req.GetSessionId(), req.GetSessionToken())
+	details, err := s.command.LinkSessionToAuthRequest(ctx, req.GetAuthRequestId(), req.GetSessionId(), req.GetSessionToken(), true)
 	if err != nil {
 		return nil, err
 	}
