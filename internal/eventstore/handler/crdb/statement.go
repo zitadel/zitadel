@@ -312,7 +312,7 @@ func Not(condition handler.Condition) handler.Condition {
 // if the value of a col is empty the data will be copied from the selected row
 // if the value of a col is not empty the data will be set by the static value
 // conds represent the conditions for the selection subquery
-func NewCopyStatement(event eventstore.Event, conflictCols, from, to, whereEqual []handler.Column, opts ...execOption) *handler.Statement {
+func NewCopyStatement(event eventstore.Event, conflictCols, from, to []handler.Column, nsCond []handler.NamespacedCondition, opts ...execOption) *handler.Statement {
 	columnNames := make([]string, len(to))
 	selectColumns := make([]string, len(from))
 	updateColumns := make([]string, len(columnNames))
@@ -331,13 +331,12 @@ func NewCopyStatement(event eventstore.Event, conflictCols, from, to, whereEqual
 		}
 
 	}
-
-	wheres := make([]string, len(whereEqual))
-	for i, cond := range whereEqual {
-		argCounter++
-		wheres[i] = "copy_table." + cond.Name + " = $" + strconv.Itoa(argCounter)
-		args = append(args, cond.Value)
+	cond := make([]handler.Condition, len(nsCond))
+	for i := range nsCond {
+		cond[i] = nsCond[i]("copy_table")
 	}
+	wheres, values := conditionsToWhere(cond, len(args))
+	args = append(args, values...)
 
 	conflictTargets := make([]string, len(conflictCols))
 	for i, conflictCol := range conflictCols {
@@ -352,7 +351,7 @@ func NewCopyStatement(event eventstore.Event, conflictCols, from, to, whereEqual
 		config.err = handler.ErrNoValues
 	}
 
-	if len(whereEqual) == 0 {
+	if len(cond) == 0 {
 		config.err = handler.ErrNoCondition
 	}
 

@@ -921,7 +921,7 @@ func TestNewCopyStatement(t *testing.T) {
 		conflictingCols []handler.Column
 		from            []handler.Column
 		to              []handler.Column
-		conds           []handler.Column
+		conds           []handler.NamespacedCondition
 	}
 	type want struct {
 		aggregateType    eventstore.AggregateType
@@ -945,11 +945,8 @@ func TestNewCopyStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				conds: []handler.Column{
-					{
-						Name:  "col2",
-						Value: 1,
-					},
+				conds: []handler.NamespacedCondition{
+					handler.NewNamespacedCondition("col2", 1),
 				},
 			},
 			want: want{
@@ -974,7 +971,7 @@ func TestNewCopyStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				conds: []handler.Column{},
+				conds: []handler.NamespacedCondition{},
 				from: []handler.Column{
 					{
 						Name: "col",
@@ -1008,7 +1005,7 @@ func TestNewCopyStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				conds: []handler.Column{},
+				conds: []handler.NamespacedCondition{},
 				from: []handler.Column{
 					{
 						Name: "col",
@@ -1045,10 +1042,8 @@ func TestNewCopyStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				conds: []handler.Column{
-					{
-						Name: "col",
-					},
+				conds: []handler.NamespacedCondition{
+					handler.NewNamespacedCondition("col2", nil),
 				},
 				from: []handler.Column{},
 			},
@@ -1103,15 +1098,9 @@ func TestNewCopyStatement(t *testing.T) {
 						Name: "col_b",
 					},
 				},
-				conds: []handler.Column{
-					{
-						Name:  "id",
-						Value: 2,
-					},
-					{
-						Name:  "state",
-						Value: 3,
-					},
+				conds: []handler.NamespacedCondition{
+					handler.NewNamespacedCondition("id", 2),
+					handler.NewNamespacedCondition("state", 3),
 				},
 			},
 			want: want{
@@ -1122,7 +1111,7 @@ func TestNewCopyStatement(t *testing.T) {
 				executer: &wantExecuter{
 					params: []params{
 						{
-							query: "INSERT INTO my_table (state, id, col_a, col_b) SELECT $1, id, col_a, col_b FROM my_table AS copy_table WHERE copy_table.id = $2 AND copy_table.state = $3 ON CONFLICT () DO UPDATE SET (state, id, col_a, col_b) = ($1, EXCLUDED.id, EXCLUDED.col_a, EXCLUDED.col_b)",
+							query: "INSERT INTO my_table (state, id, col_a, col_b) SELECT $1, id, col_a, col_b FROM my_table AS copy_table WHERE (copy_table.id = $2) AND (copy_table.state = $3) ON CONFLICT () DO UPDATE SET (state, id, col_a, col_b) = ($1, EXCLUDED.id, EXCLUDED.col_a, EXCLUDED.col_b)",
 							args:  []interface{}{1, 2, 3},
 						},
 					},
@@ -1170,15 +1159,9 @@ func TestNewCopyStatement(t *testing.T) {
 						Name: "col_d",
 					},
 				},
-				conds: []handler.Column{
-					{
-						Name:  "id",
-						Value: 2,
-					},
-					{
-						Name:  "state",
-						Value: 3,
-					},
+				conds: []handler.NamespacedCondition{
+					handler.NewNamespacedCondition("id", 2),
+					handler.NewNamespacedCondition("state", 3),
 				},
 			},
 			want: want{
@@ -1189,7 +1172,7 @@ func TestNewCopyStatement(t *testing.T) {
 				executer: &wantExecuter{
 					params: []params{
 						{
-							query: "INSERT INTO my_table (state, id, col_c, col_d) SELECT $1, id, col_a, col_b FROM my_table AS copy_table WHERE copy_table.id = $2 AND copy_table.state = $3 ON CONFLICT () DO UPDATE SET (state, id, col_c, col_d) = ($1, EXCLUDED.id, EXCLUDED.col_a, EXCLUDED.col_b)",
+							query: "INSERT INTO my_table (state, id, col_c, col_d) SELECT $1, id, col_a, col_b FROM my_table AS copy_table WHERE (copy_table.id = $2) AND (copy_table.state = $3) ON CONFLICT () DO UPDATE SET (state, id, col_c, col_d) = ($1, EXCLUDED.id, EXCLUDED.col_a, EXCLUDED.col_b)",
 							args:  []interface{}{1, 2, 3},
 						},
 					},
