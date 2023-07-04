@@ -23,7 +23,9 @@ describe("/passkey/login", () => {
         changeDate: new Date("2023-07-04T07:58:20.126Z"),
         sequence: 859,
         factors: {
-          user: [Object],
+          user: {
+            loginName: "johndoe@zitadel.com",
+          },
           password: undefined,
           passkey: undefined,
           intent: undefined,
@@ -73,7 +75,9 @@ describe("/passkey/login", () => {
         changeDate: new Date("2023-07-04T07:58:20.126Z"),
         sequence: 859,
         factors: {
-          user: [Object],
+          user: {
+            loginName: "johndoe@zitadel.com",
+          },
           password: undefined,
           passkey: undefined,
           intent: undefined,
