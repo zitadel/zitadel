@@ -8,6 +8,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
@@ -70,10 +71,12 @@ func promptToPb(p domain.Prompt) oidc_pb.Prompt {
 }
 
 func (s *Server) LinkSessionToAuthRequest(ctx context.Context, req *oidc_pb.LinkSessionToAuthRequestRequest) (*oidc_pb.LinkSessionToAuthRequestResponse, error) {
-	if err := s.command.LinkSessionToAuthRequest(ctx, req.GetAuthRequestId(), req.GetSessionId(), req.GetSessionToken()); err != nil {
+	details, err := s.command.LinkSessionToAuthRequest(ctx, req.GetAuthRequestId(), req.GetSessionId(), req.GetSessionToken())
+	if err != nil {
 		return nil, err
 	}
 	return &oidc_pb.LinkSessionToAuthRequestResponse{
+		Details:     object.DomainToDetailsPb(details),
 		CallbackUrl: op.AuthCallbackURL(s.op)(ctx, req.GetAuthRequestId()),
 	}, nil
 }

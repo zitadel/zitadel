@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
+	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
@@ -90,7 +91,15 @@ func TestServer_LinkSessionToAuthRequest(t *testing.T) {
 	require.NoError(t, err)
 	authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), Tester.Users[integration.OrgOwner].ID, redirectURI)
 	require.NoError(t, err)
-	sessionID, sessionToken, err := Tester.CreateSession(CTX, Tester.Users[integration.OrgOwner].ID)
+	sessionResp, err := Tester.Client.SessionV2.CreateSession(CTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{
+					UserId: Tester.Users[integration.OrgOwner].ID,
+				},
+			},
+		},
+	})
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -126,21 +135,22 @@ func TestServer_LinkSessionToAuthRequest(t *testing.T) {
 		{
 			name:          "session token invalid",
 			AuthRequestID: authRequestID,
-			SessionID:     sessionID,
+			SessionID:     sessionResp.SessionId,
 			SessionToken:  "invalid",
 			wantErr:       true,
 		},
 		{
 			name:          "success",
 			AuthRequestID: authRequestID,
-			SessionID:     sessionID,
-			SessionToken:  sessionToken,
+			SessionID:     sessionResp.SessionId,
+			SessionToken:  sessionResp.SessionToken,
 			want: &oidc_pb.LinkSessionToAuthRequestResponse{
-				CallbackUrl: "",
+				CallbackUrl: "/oauth/v2/authorize/callback?id=" + authRequestID,
 				Details: &object.Details{
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
