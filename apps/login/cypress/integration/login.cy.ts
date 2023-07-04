@@ -23,11 +23,11 @@ describe("/passkey/login", () => {
     });
 
     removeStub(
-      "zitadel.user.v2alpha.SessionService",
+      "zitadel.user.v2alpha.UserService",
       "ListAuthenticationMethodTypes"
     );
     addStub(
-      "zitadel.user.v2alpha.SessionService",
+      "zitadel.user.v2alpha.UserService",
       "ListAuthenticationMethodTypes",
       {
         authMethodTypes: [1], // 1 for password authentication
@@ -62,11 +62,11 @@ describe("/passkey/login", () => {
     });
 
     removeStub(
-      "zitadel.user.v2alpha.SessionService",
+      "zitadel.user.v2alpha.UserService",
       "ListAuthenticationMethodTypes"
     );
     addStub(
-      "zitadel.user.v2alpha.SessionService",
+      "zitadel.user.v2alpha.UserService",
       "ListAuthenticationMethodTypes",
       {
         authMethodTypes: [2], // 2 for passwordless authentication
