@@ -38,8 +38,6 @@ export async function addSessionToCookie(session: SessionCookie): Promise<any> {
     currentSessions = [...currentSessions, session];
   }
 
-  console.log(currentSessions);
-
   return setSessionHttpOnlyCookie(currentSessions);
 }
 

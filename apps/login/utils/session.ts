@@ -1,5 +1,4 @@
 import { createSession, getSession, server, setSession } from "#/lib/zitadel";
-import { NextResponse } from "next/server";
 import {
   SessionCookie,
   addSessionToCookie,
@@ -21,15 +20,12 @@ export async function createSessionAndUpdateCookie(
     challenges
   );
 
-  console.log("createSession", createdSession);
-
   if (createdSession) {
     return getSession(
       server,
       createdSession.sessionId,
       createdSession.sessionToken
     ).then((response) => {
-      console.log("getSession", response);
       if (response?.session && response.session?.factors?.user?.loginName) {
         const sessionCookie: SessionCookie = {
           id: createdSession.sessionId,

@@ -92,9 +92,7 @@ export default function LoginPasskey({
   }
 
   async function submitLoginAndContinue(): Promise<boolean | void> {
-    console.log("login", publicKey);
     if (publicKey) {
-      console.log(publicKey);
       (publicKey as any).challenge = coerceToArrayBuffer(
         (publicKey as any).challenge,
         "publicKey.challenge"
@@ -105,7 +103,6 @@ export default function LoginPasskey({
           "publicKey.allowCredentials.id"
         );
       });
-      console.log(publicKey);
       navigator.credentials
         .get({
           publicKey,
@@ -137,7 +134,6 @@ export default function LoginPasskey({
                 userHandle: coerceToBase64Url(userHandle, "userHandle"),
               },
             });
-            console.log(data);
             return submitLogin(data).then(() => {
               return router.push(`/accounts`);
             });
