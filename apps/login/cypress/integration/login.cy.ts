@@ -2,11 +2,11 @@ import { addStub, removeStub } from "../support/mock";
 
 describe("/passkey/login", () => {
   it("should redirect a user with password authentication to /password", () => {
-    removeStub("zitadel.user.v2alpha.SessionService", "CreateSession");
-    addStub("zitadel.user.v2alpha.SessionService", "CreateSession", {
+    removeStub("zitadel.session.v2alpha.SessionService", "CreateSession");
+    addStub("zitadel.session.v2alpha.SessionService", "CreateSession", {
       details: {
         sequence: 859,
-        changeDate: new Date("2023-07-04T07:58:20.126Z"),
+        changeDate: "2023-07-04T07:58:20.126Z",
         resourceOwner: "220516472055706145",
       },
       sessionId: "221394658884845598",
@@ -15,12 +15,12 @@ describe("/passkey/login", () => {
       challenges: undefined,
     });
 
-    removeStub("zitadel.user.v2alpha.SessionService", "GetSession");
-    addStub("zitadel.user.v2alpha.SessionService", "GetSession", {
+    removeStub("zitadel.session.v2alpha.SessionService", "GetSession");
+    addStub("zitadel.session.v2alpha.SessionService", "GetSession", {
       session: {
         id: "221394658884845598",
-        creationDate: new Date("2023-07-04T07:58:20.026Z"),
-        changeDate: new Date("2023-07-04T07:58:20.126Z"),
+        creationDate: "2023-07-04T07:58:20.026Z",
+        changeDate: "2023-07-04T07:58:20.126Z",
         sequence: 859,
         factors: {
           user: {
@@ -57,11 +57,11 @@ describe("/passkey/login", () => {
     );
   });
   it("should redirect a user with passwordless authentication to /passkey/login", () => {
-    removeStub("zitadel.user.v2alpha.SessionService", "CreateSession");
-    addStub("zitadel.user.v2alpha.SessionService", "CreateSession", {
+    removeStub("zitadel.session.v2alpha.SessionService", "CreateSession");
+    addStub("zitadel.session.v2alpha.SessionService", "CreateSession", {
       details: {
         sequence: 859,
-        changeDate: new Date("2023-07-04T07:58:20.126Z"),
+        changeDate: "2023-07-04T07:58:20.126Z",
         resourceOwner: "220516472055706145",
       },
       sessionId: "221394658884845598",
@@ -70,12 +70,12 @@ describe("/passkey/login", () => {
       challenges: undefined,
     });
 
-    removeStub("zitadel.user.v2alpha.SessionService", "GetSession");
-    addStub("zitadel.user.v2alpha.SessionService", "GetSession", {
+    removeStub("zitadel.session.v2alpha.SessionService", "GetSession");
+    addStub("zitadel.session.v2alpha.SessionService", "GetSession", {
       session: {
         id: "221394658884845598",
-        creationDate: new Date("2023-07-04T07:58:20.026Z"),
-        changeDate: new Date("2023-07-04T07:58:20.126Z"),
+        creationDate: "2023-07-04T07:58:20.026Z",
+        changeDate: "2023-07-04T07:58:20.126Z",
         sequence: 859,
         factors: {
           user: {
