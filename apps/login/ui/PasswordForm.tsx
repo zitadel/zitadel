@@ -52,7 +52,17 @@ export default function PasswordForm({ loginName }: Props) {
 
   function submitPasswordAndContinue(value: Inputs): Promise<boolean | void> {
     return submitPassword(value).then((resp: any) => {
-      return router.push(`/accounts`);
+      if (resp.factors && !resp.factors.passwordless) {
+        return router.push(
+          `/passkey/add?` +
+            new URLSearchParams({
+              loginName: resp.factors.user.loginName,
+              prompt: "true",
+            })
+        );
+      } else {
+        return router.push(`/accounts`);
+      }
     });
   }
 

@@ -6,13 +6,18 @@ export async function POST(request: NextRequest) {
   if (body) {
     const { email, password, firstName, lastName } = body;
 
-    const userId = await addHumanUser(server, {
+    return addHumanUser(server, {
       email: email,
       firstName,
       lastName,
-      password: password,
-    });
-    return NextResponse.json({ userId });
+      password: password ? password : undefined,
+    })
+      .then((userId) => {
+        return NextResponse.json({ userId });
+      })
+      .catch((error) => {
+        return NextResponse.json(error, { status: 500 });
+      });
   } else {
     return NextResponse.error();
   }

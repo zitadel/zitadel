@@ -51,7 +51,7 @@ docker compose --file ./acceptance/docker-compose.yaml pull
 docker compose --file ./acceptance/docker-compose.yaml run setup
 
 # Configure your shell to use the environment variables written to ./apps/login/.env.acceptance
-source ./apps/login/.env.acceptance
+export $(cat ./apps/login/.env.acceptance | xargs)
 ```
 
 ### Developing Against Your ZITADEL Cloud Instance

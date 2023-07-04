@@ -1,6 +1,7 @@
 import * as settings from "./v2/settings";
 import * as session from "./v2/session";
 import * as user from "./v2/user";
+import * as management from "./management";
 
 import * as login from "./proto/server/zitadel/settings/v2alpha/login_settings";
 import * as password from "./proto/server/zitadel/settings/v2alpha/password_settings";
@@ -28,8 +29,17 @@ export {
 export {
   AddHumanUserResponse,
   VerifyEmailResponse,
+  VerifyPasskeyRegistrationRequest,
+  VerifyPasskeyRegistrationResponse,
+  RegisterPasskeyRequest,
+  RegisterPasskeyResponse,
+  CreatePasskeyRegistrationLinkResponse,
+  CreatePasskeyRegistrationLinkRequest,
 } from "./proto/server/zitadel/user/v2alpha/user_service";
-
+export {
+  SetHumanPasswordResponse,
+  SetHumanPasswordRequest,
+} from "./proto/server/zitadel/management";
 export { type LegalAndSupportSettings } from "./proto/server/zitadel/settings/v2alpha/legal_settings";
 export { type PasswordComplexitySettings } from "./proto/server/zitadel/settings/v2alpha/password_settings";
 export { type ResourceOwnerType } from "./proto/server/zitadel/settings/v2alpha/settings";
@@ -48,6 +58,7 @@ export {
   type ZitadelServerOptions,
   initializeServer,
   user,
+  management,
   session,
   settings,
   login,

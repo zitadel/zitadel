@@ -1,8 +1,4 @@
 import { createChannel, createClientFactory } from "nice-grpc";
-import {
-  SettingsServiceClient,
-  SettingsServiceDefinition,
-} from "./proto/server/zitadel/settings/v2alpha/settings_service";
 import { authMiddleware } from "./middleware";
 import { CompatServiceDefinition } from "nice-grpc/lib/service-definitions";
 

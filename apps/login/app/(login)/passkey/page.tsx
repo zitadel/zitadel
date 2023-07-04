@@ -1,6 +1,5 @@
 import { getSession, server } from "#/lib/zitadel";
 import Alert from "#/ui/Alert";
-import PasswordForm from "#/ui/PasswordForm";
 import UserAvatar from "#/ui/UserAvatar";
 import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
 
@@ -24,9 +23,8 @@ export default async function Page({
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      <h1>{sessionFactors?.factors?.user?.displayName ?? "Password"}</h1>
-      <p className="ztdl-p mb-6 block">Enter your password.</p>
-
+      <h1>Login with Passkey</h1>
+      <p className="ztdl-p mb-6 block">Authenticate with your passkey device</p>
       {!sessionFactors && (
         <div className="py-4">
           <Alert>
@@ -43,8 +41,6 @@ export default async function Page({
           showDropdown
         ></UserAvatar>
       )}
-
-      <PasswordForm loginName={loginName} />
     </div>
   );
 }

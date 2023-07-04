@@ -18,9 +18,17 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   const body = await request.json();
   if (body) {
-    const { loginName } = body;
+    const { loginName, password } = body;
 
-    const createdSession = await createSession(server, loginName);
+    const domain: string = request.nextUrl.hostname;
+
+    const createdSession = await createSession(
+      server,
+      loginName,
+      password,
+      domain
+    );
+
     if (createdSession) {
       return getSession(
         server,
@@ -35,7 +43,10 @@ export async function POST(request: NextRequest) {
             loginName: response.session?.factors?.user?.loginName ?? "",
           };
           return addSessionToCookie(sessionCookie).then(() => {
-            return NextResponse.json({ factors: response?.session?.factors });
+            return NextResponse.json({
+              sessionId: createdSession.sessionId,
+              factors: response?.session?.factors,
+            });
           });
         } else {
           return NextResponse.json(

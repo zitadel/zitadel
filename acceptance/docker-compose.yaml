@@ -1,49 +1,54 @@
-version: '3.8'
+version: "3.8"
 
 services:
   zitadel:
-    user: '${ZITADEL_DEV_UID}'
-    image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}'
+    user: "${ZITADEL_DEV_UID}"
+    image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}"
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
     ports:
-    - "8080:8080"
+      - "8080:8080"
     volumes:
       - ./machinekey:/machinekey
       - ./zitadel.yaml:/zitadel.yaml
     depends_on:
       db:
-        condition: 'service_healthy'
+        condition: "service_healthy"
 
   db:
-    image: 'cockroachdb/cockroach:v22.2.2'
-    command: 'start-single-node --insecure --http-addr :9090'
+    image: "cockroachdb/cockroach:v22.2.2"
+    command: "start-single-node --insecure --http-addr :9090"
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:9090/health?ready=1']
-      interval: '10s'
-      timeout: '30s'
+      test: ["CMD", "curl", "-f", "http://localhost:9090/health?ready=1"]
+      interval: "10s"
+      timeout: "30s"
       retries: 5
-      start_period: '20s'
+      start_period: "20s"
     ports:
       - "26257:26257"
       - "9090:9090"
 
   wait_for_zitadel:
     image: curlimages/curl:8.00.1
-    command: [ "/bin/sh", "-c", "i=0; while ! curl http://zitadel:8080/debug/ready && [ $$i -lt 30 ]; do sleep 1; i=$$((i+1)); done; [ $$i -eq 30 ] && exit 1 || exit 0" ]
+    command:
+      [
+        "/bin/sh",
+        "-c",
+        "i=0; while ! curl http://zitadel:8080/debug/ready && [ $$i -lt 30 ]; do sleep 1; i=$$((i+1)); done; [ $$i -eq 30 ] && exit 1 || exit 0",
+      ]
     depends_on:
       - zitadel
 
   setup:
-    user: '${ZITADEL_DEV_UID}'
+    user: "${ZITADEL_DEV_UID}"
     container_name: setup
     build: .
     environment:
       KEY: /key/zitadel-admin-sa.json
       SERVICE: http://zitadel:8080
-      WRITE_ENVIRONMENT_FILE: /apps/login/.env.local
+      WRITE_ENVIRONMENT_FILE: /apps/login/.env.acceptance
     volumes:
-    - "./machinekey:/key"
-    - "../apps/login:/apps/login"
+      - "./machinekey:/key"
+      - "../apps/login:/apps/login"
     depends_on:
       wait_for_zitadel:
-        condition: 'service_completed_successfully'
+        condition: "service_completed_successfully"
