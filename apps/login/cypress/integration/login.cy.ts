@@ -34,7 +34,7 @@ describe("/passkey/login", () => {
       }
     );
 
-    cy.visit("/loginname?loginName=johndoe%40zitadel.com");
+    cy.visit("/loginname?loginName=johndoe%40zitadel.com&submit=true");
     cy.location("pathname", { timeout: 10_000 }).should(
       "eq",
       "/password?loginName=johndoe%40zitadel.com"
@@ -73,7 +73,7 @@ describe("/passkey/login", () => {
       }
     );
 
-    cy.visit("/loginname?loginName=johndoe%40zitadel.com");
+    cy.visit("/loginname?loginName=johndoe%40zitadel.com&submit=true");
     cy.location("pathname", { timeout: 10_000 }).should(
       "eq",
       "/passkey/login?loginName=zitadel-admin%40zitadel.localhost"
