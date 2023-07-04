@@ -573,7 +573,8 @@ module.exports = {
         "self-hosting/deploy/compose",
         "self-hosting/deploy/knative",
         "self-hosting/deploy/kubernetes",
-        "self-hosting/deploy/loadbalancing-example/loadbalancing-example"
+        "self-hosting/deploy/loadbalancing-example/loadbalancing-example",
+        "self-hosting/deploy/troubleshooting/troubleshooting"
       ],
     },
     {
