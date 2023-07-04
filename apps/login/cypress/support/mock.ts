@@ -3,8 +3,8 @@ export function removeStub(service: string, method: string) {
     url: "http://localhost:22220/v1/stubs",
     method: "DELETE",
     qs: {
-      service: service,
-      method: method,
+      service,
+      method,
     },
   });
 }
@@ -16,9 +16,9 @@ export function addStub(service: string, method: string, out?: any) {
     body: {
       stubs: [
         {
-          service: service,
-          method: method,
-          out: out,
+          service,
+          method,
+          out,
         },
       ],
     },
