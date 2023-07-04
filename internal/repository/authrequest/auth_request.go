@@ -100,44 +100,6 @@ func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return added, nil
 }
 
-type CodeAddedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-
-	ExchangeCode string `json:"exchange_code"`
-}
-
-func (e *CodeAddedEvent) Data() interface{} {
-	return e
-}
-
-func (e *CodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func NewCodeAddedEvent(ctx context.Context,
-	aggregate *eventstore.Aggregate,
-) *CodeAddedEvent {
-	return &CodeAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			CodeAddedType,
-		),
-	}
-}
-
-func CodeAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	added := &CodeAddedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, added)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "AUTHR-Sfe3w", "unable to unmarshal auth request code added")
-	}
-
-	return added, nil
-}
-
 type SessionLinkedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
@@ -209,6 +171,46 @@ func FailedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	err := json.Unmarshal(event.Data, added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "AUTHR-Sfe3w", "unable to unmarshal auth request session linked")
+	}
+
+	return added, nil
+}
+
+type CodeAddedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Code string `json:"code"`
+}
+
+func (e *CodeAddedEvent) Data() interface{} {
+	return e
+}
+
+func (e *CodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewCodeAddedEvent(ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	code string,
+) *CodeAddedEvent {
+	return &CodeAddedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			CodeAddedType,
+		),
+		Code: code,
+	}
+}
+
+func CodeAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	added := &CodeAddedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, added)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "AUTHR-Sfe3w", "unable to unmarshal auth request code added")
 	}
 
 	return added, nil

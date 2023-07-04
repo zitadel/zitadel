@@ -163,6 +163,11 @@ func (o *OPStorage) decryptGrant(grant string) (string, error) {
 func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	if strings.HasPrefix(id, command.IDPrefixV2) {
+		return o.command.AddAuthRequestCode(ctx, id, code)
+	}
+
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		return errors.ThrowPreconditionFailed(nil, "OIDC-Dgus2", "no user agent id")

@@ -184,7 +184,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("id", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",
@@ -211,7 +211,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			},
 			args{
 				ctx:       authz.WithInstanceID(context.Background(), "instanceID"),
-				id:        "id",
+				id:        "V2_id",
 				sessionID: "session",
 			},
 			res{
@@ -224,7 +224,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("id", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",
@@ -254,8 +254,8 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			},
 			args{
 				ctx:       authz.WithInstanceID(context.Background(), "instanceID"),
-				id:        "id",
-				sessionID: "session",
+				id:        "V2_id",
+				sessionID: "sessionID",
 			},
 			res{
 				wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
@@ -267,7 +267,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("id", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",
@@ -296,8 +296,8 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			},
 			args{
 				ctx:          authz.WithInstanceID(context.Background(), "instanceID"),
-				id:           "id",
-				sessionID:    "session",
+				id:           "V2_id",
+				sessionID:    "sessionID",
 				sessionToken: "invalid",
 			},
 			res{
@@ -310,7 +310,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("id", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",
@@ -335,8 +335,8 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					expectPush(
 						[]*repository.Event{eventFromEventPusherWithInstanceID(
 							"instanceID",
-							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("id", "instanceID").Aggregate,
-								"session",
+							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"sessionID",
 							),
 						)}),
 				),
@@ -347,8 +347,8 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			},
 			args{
 				ctx:          authz.WithInstanceID(context.Background(), "instanceID"),
-				id:           "id",
-				sessionID:    "session",
+				id:           "V2_id",
+				sessionID:    "sessionID",
 				sessionToken: "token",
 			},
 			res{
@@ -366,6 +366,127 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			details, err := c.LinkSessionToAuthRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken)
 			require.ErrorIs(t, err, tt.res.wantErr)
 			assert.Equal(t, tt.res.details, details)
+		})
+	}
+}
+
+func TestCommands_AddAuthRequestCode(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx  context.Context
+		id   string
+		code string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr error
+	}{
+		{
+			"empty code error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
+				id:   "V2_authRequestID",
+				code: "",
+			},
+			caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Ht52d", "Errors.AuthRequest.InvalidCode"),
+		},
+		{
+			"no session linked error",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+								"loginClient",
+								"clientID",
+								"redirectURI",
+								"state",
+								"nonce",
+								[]string{"openid"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeCode,
+								&domain.OIDCCodeChallenge{
+									Challenge: "challenge",
+									Method:    domain.CodeChallengeMethodS256,
+								},
+								[]domain.Prompt{domain.PromptNone},
+								[]string{"en", "de"},
+								gu.Ptr(time.Duration(0)),
+								gu.Ptr("loginHint"),
+								gu.Ptr("hintUserID"),
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
+				id:   "V2_authRequestID",
+				code: "code",
+			},
+			caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.AlreadyHandled"),
+		},
+		{
+			"success",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+								"loginClient",
+								"clientID",
+								"redirectURI",
+								"state",
+								"nonce",
+								[]string{"openid"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeCode,
+								&domain.OIDCCodeChallenge{
+									Challenge: "challenge",
+									Method:    domain.CodeChallengeMethodS256,
+								},
+								[]domain.Prompt{domain.PromptNone},
+								[]string{"en", "de"},
+								gu.Ptr(time.Duration(0)),
+								gu.Ptr("loginHint"),
+								gu.Ptr("hintUserID"),
+							),
+						),
+						eventFromEventPusher(
+							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "sessionID"),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID("instanceID",
+								authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
+							),
+						},
+					),
+				),
+			},
+			args{
+				ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
+				id:   "V2_authRequestID",
+				code: "code",
+			},
+			nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			err := c.AddAuthRequestCode(tt.args.ctx, tt.args.id, tt.args.code)
+			assert.ErrorIs(t, tt.wantErr, err)
 		})
 	}
 }
@@ -465,7 +586,7 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate),
+							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate, "code"),
 						),
 					),
 				),
@@ -504,13 +625,12 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 								gu.Ptr("hintUserID"),
 							),
 						),
-
-						//TODO: session link event
-						//eventFromEventPusher(
-						//	authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate),
-						//),
 						eventFromEventPusher(
-							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate),
+							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate,
+								"sessionID"),
+						),
+						eventFromEventPusher(
+							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate, "code"),
 						),
 					),
 					expectPush(

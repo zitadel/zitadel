@@ -64,7 +64,7 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 				authRequestID: "V2_authRequestID",
 			},
 			res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "AUTHR-sajk3", "Errors.AuthRequest.NotAuthenticated"),
+				err: caos_errs.ThrowPreconditionFailed(nil, "AUTHR-SF2r2", "Errors.AuthRequest.NotAuthenticated"),
 			},
 		},
 		{
@@ -93,13 +93,11 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 								gu.Ptr("hintUserID"),
 							),
 						),
-
-						//TODO: session link event
-						//eventFromEventPusher(
-						//	authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
-						//),
 						eventFromEventPusher(
-							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
+							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "sessionID"),
+						),
+						eventFromEventPusher(
+							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
 						),
 						eventFromEventPusher(
 							authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
@@ -142,13 +140,11 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 								gu.Ptr("hintUserID"),
 							),
 						),
-
-						//TODO: session link event
-						//eventFromEventPusher(
-						//	authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
-						//),
 						eventFromEventPusher(
-							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
+							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "sessionID"),
+						),
+						eventFromEventPusher(
+							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
 						),
 						eventFromEventPusher(
 							authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
@@ -252,7 +248,7 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 				authRequestID: "V2_authRequestID",
 			},
 			res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "AUTHR-sajk3", "Errors.AuthRequest.NotAuthenticated"),
+				err: caos_errs.ThrowPreconditionFailed(nil, "AUTHR-SF2r2", "Errors.AuthRequest.NotAuthenticated"),
 			},
 		},
 		{
@@ -281,13 +277,11 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 								gu.Ptr("hintUserID"),
 							),
 						),
-
-						//TODO: session link event
-						//eventFromEventPusher(
-						//	authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
-						//),
 						eventFromEventPusher(
-							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
+							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "sessionID"),
+						),
+						eventFromEventPusher(
+							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
 						),
 						eventFromEventPusher(
 							authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
@@ -330,13 +324,11 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 								gu.Ptr("hintUserID"),
 							),
 						),
-
-						//TODO: session link event
-						//eventFromEventPusher(
-						//	authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
-						//),
 						eventFromEventPusher(
-							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
+							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "sessionID"),
+						),
+						eventFromEventPusher(
+							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
 						),
 						eventFromEventPusher(
 							authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
