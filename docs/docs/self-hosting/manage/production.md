@@ -64,8 +64,6 @@ For example, systemd has journald and kubernetes has fluentd and fluentbit.
 ## Telemetry
 
 If you want to have some data about reached usage milestones pushed to external systems, enable telemetry in the ZITADEL configuration.
-Include https://zitadel.com/usage in the list of endpoints if you want to help the ZITADEL maintainers improve the product's usability by giving them some insights.
-Don't forget to opt in by setting Telemetry.Enabled to true.
 
 The following table describes the milestones that are sent to the endpoints:
 

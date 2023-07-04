@@ -39,7 +39,6 @@ helm install my-zitadel zitadel/zitadel \
   --set zitadel.masterkey="MasterkeyNeedsToHave32Characters" \
   --set zitadel.configmapConfig.ExternalSecure=false \
   --set zitadel.configmapConfig.TLS.Enabled=false \
-  --set zitadel.configmapConfig.Telemetry.Enabled=true \
   --set zitadel.secretConfig.Database.cockroach.User.Password="a-zitadel-db-user-password" \
   --set replicaCount=1
 
@@ -74,7 +73,6 @@ helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
   --set zitadel.masterkey="MasterkeyNeedsToHave32Characters" \
   --set zitadel.configmapConfig.ExternalSecure=false \
   --set zitadel.configmapConfig.TLS.Enabled=false \
-  --set zitadel.configmapConfig.Telemetry.Enabled=true \
   --set zitadel.secretConfig.Database.cockroach.User.Password="a-zitadel-db-user-password" \
   --set replicaCount=1 \
   --set zitadel.configmapConfig.FirstInstance.MachineKeyPath="/machinekey/zitadel-admin-sa.json" \

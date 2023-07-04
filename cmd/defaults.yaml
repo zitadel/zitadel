@@ -27,9 +27,7 @@ Telemetry:
   # Ten redirects are followed.
   # If you change this configuration at runtime, remaining data that is not successfully delivered to the old endpoints is sent to the new endpoints.
   Endpoints:
-    # Include https://zitadel.com/usage if you want to help the ZITADEL maintainers improve the product's usability by giving them some insights.
-    # Don't forget to opt in by setting Telemetry.Enabled to true.
-    - https://zitadel.com/usage
+    - https://httpbin.org/post
 
 # Port ZITADEL will listen on
 Port: 8080
