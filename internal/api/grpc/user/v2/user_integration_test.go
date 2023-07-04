@@ -38,7 +38,7 @@ func TestMain(m *testing.M) {
 		Tester = integration.NewTester(ctx)
 		defer Tester.Done()
 
-		CTX, ErrCTX = Tester.WithSystemAuthorization(ctx, integration.OrgOwner), errCtx
+		CTX, ErrCTX = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
 		Client = Tester.Client.UserV2
 		return m.Run()
 	}())

@@ -3,6 +3,7 @@ package integration
 import (
 	"context"
 	"fmt"
+	"github.com/zitadel/zitadel/pkg/grpc/system"
 	"testing"
 	"time"
 
@@ -29,6 +30,7 @@ type Client struct {
 	Mgmt      mgmt.ManagementServiceClient
 	UserV2    user.UserServiceClient
 	SessionV2 session.SessionServiceClient
+	System    system.SystemServiceClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
@@ -38,6 +40,7 @@ func newClient(cc *grpc.ClientConn) Client {
 		Mgmt:      mgmt.NewManagementServiceClient(cc),
 		UserV2:    user.NewUserServiceClient(cc),
 		SessionV2: session.NewSessionServiceClient(cc),
+		System:    system.NewSystemServiceClient(cc),
 	}
 }
 

@@ -3,129 +3,77 @@
 package handlers_test
 
 import (
-	"context"
-	"os"
+	"bytes"
+	"encoding/json"
+	"io"
+	"net"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-	"github.com/zitadel/zitadel/internal/integration"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	"github.com/zitadel/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
-var (
-	CTX               context.Context
-	Tester            *integration.Tester
-	Client            session.SessionServiceClient
-	User              *user.AddHumanUserResponse
-	GenericOAuthIDPID string
-)
-
-func TestMain(m *testing.M) {
-	os.Exit(func() int {
-		ctx, errCtx, cancel := integration.Contexts(5 * time.Minute)
-		defer cancel()
-
-		Tester = integration.NewTester(ctx)
-		defer Tester.Done()
-		Client = Tester.Client.SessionV2
-
-		CTX, _ = Tester.WithSystemAuthorization(ctx, integration.OrgOwner), errCtx
-		User = Tester.CreateHumanUser(CTX)
-		Tester.RegisterUserPasskey(CTX, User.GetUserId())
-		return m.Run()
-	}())
+func TestServer_TelemetryPusher(t *testing.T) {
+	bodies := make(chan []byte, 0)
+	t.Log("testing against instance with primary domain", PrimaryDomain)
+	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			t.Error(err)
+		}
+		bodies <- body
+		w.WriteHeader(http.StatusOK)
+	}))
+	listener, err := net.Listen("tcp", "localhost:8081")
+	if err != nil {
+		t.Fatal(err)
+	}
+	mockServer.Listener = listener
+	mockServer.Start()
+	t.Cleanup(mockServer.Close)
+	awaitMilestone(t, bodies, "InstanceCreated")
+	project, err := MgmtClient.AddProject(IAMOwnerCtx, &management.AddProjectRequest{Name: "integration"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	awaitMilestone(t, bodies, "ProjectCreated")
+	if _, err = MgmtClient.AddOIDCApp(IAMOwnerCtx, &management.AddOIDCAppRequest{
+		ProjectId: project.GetId(),
+		Name:      "integration",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	awaitMilestone(t, bodies, "ApplicationCreated")
+	if _, err = SystemClient.RemoveInstance(SystemUserCTX, &system.RemoveInstanceRequest{InstanceId: InstanceID}); err != nil {
+		t.Fatal(err)
+	}
+	awaitMilestone(t, bodies, "InstanceDeleted")
 }
 
-func TestServer_TestInstanceCreatedMiletone(t *testing.T) {
-	tests := []struct {
-		name        string
-		req         *session.CreateSessionRequest
-		want        *session.CreateSessionResponse
-		wantErr     bool
-		wantFactors []wantFactor
-	}{
-		{
-			name: "empty session",
-			req: &session.CreateSessionRequest{
-				Metadata: map[string][]byte{"foo": []byte("bar")},
-			},
-			want: &session.CreateSessionResponse{
-				Details: &object.Details{
-					ResourceOwner: Tester.Organisation.ID,
-				},
-			},
-		},
-		{
-			name: "with user",
-			req: &session.CreateSessionRequest{
-				Checks: &session.Checks{
-					User: &session.CheckUser{
-						Search: &session.CheckUser_UserId{
-							UserId: User.GetUserId(),
-						},
-					},
-				},
-				Metadata: map[string][]byte{"foo": []byte("bar")},
-				Domain:   "domain",
-			},
-			want: &session.CreateSessionResponse{
-				Details: &object.Details{
-					ResourceOwner: Tester.Organisation.ID,
-				},
-			},
-			wantFactors: []wantFactor{wantUserFactor},
-		},
-		{
-			name: "password without user error",
-			req: &session.CreateSessionRequest{
-				Checks: &session.Checks{
-					Password: &session.CheckPassword{
-						Password: "Difficult",
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "passkey without user error",
-			req: &session.CreateSessionRequest{
-				Challenges: []session.ChallengeKind{
-					session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "passkey without domain (not registered) error",
-			req: &session.CreateSessionRequest{
-				Checks: &session.Checks{
-					User: &session.CheckUser{
-						Search: &session.CheckUser_UserId{
-							UserId: User.GetUserId(),
-						},
-					},
-				},
-				Challenges: []session.ChallengeKind{
-					session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
-				},
-			},
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.CreateSession(CTX, tt.req)
-			if tt.wantErr {
-				require.Error(t, err)
+func awaitMilestone(t *testing.T, bodies chan []byte, expectMilestoneType string) {
+	for {
+		select {
+		case body := <-bodies:
+			plain := new(bytes.Buffer)
+			if err := json.Indent(plain, body, "", "  "); err != nil {
+				t.Fatal(err)
+			}
+			t.Log("received milestone", plain.String())
+			milestone := struct {
+				Type          string
+				PrimaryDomain string
+			}{}
+			if err := json.Unmarshal(body, &milestone); err != nil {
+				t.Error(err)
+			}
+			if milestone.Type == expectMilestoneType && milestone.PrimaryDomain == PrimaryDomain {
 				return
 			}
-			require.NoError(t, err)
-			integration.AssertDetails(t, tt.want, got)
-
-			verifyCurrentSession(t, got.GetSessionId(), got.GetSessionToken(), got.GetDetails().GetSequence(), time.Minute, tt.req.GetMetadata(), tt.wantFactors...)
-		})
+		case <-time.After(60 * time.Second):
+			t.Fatalf("timed out waiting for milestone")
+		}
 	}
 }
