@@ -41,10 +41,7 @@ jobs:
           path: .artifacts
           name: zitadel-linux-${{ matrix.arch }}
       -
-        name: show
-        run: ls -R .artifacts
-      -
-        name: unpack
+        name: unpack executable
         run: |
           tar -xvf .artifacts/zitadel-linux-${{ matrix.arch }}.tar
           mv zitadel-linux-${{ matrix.arch }}/zitadel ./zitadel
