@@ -46,8 +46,8 @@ jobs:
       -
         name: unpack
         run: |
-          tar -xvf .artifacts/zitadel-linux-amd64/zitadel-linux-${{ matrix.arch }}.tar
-          mv .artifacts/zitadel-linux-amd64/zitadel-linux-${{ matrix.arch }}/zitadel ./zitadel
+          tar -xvf .artifacts/zitadel-linux-${{ matrix.arch }}.tar
+          mv .artifacts/zitadel-linux-${{ matrix.arch }}/zitadel ./zitadel
       - 
         name: ubuntu
         uses: docker/build-push-action@v4
