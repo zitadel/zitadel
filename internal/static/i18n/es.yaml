@@ -492,6 +492,8 @@ Errors:
     AlreadyExists: Auth Request ya existe
     NotExisting: Auth Request no existe
     WrongLoginClient: Auth Request creado por otro cliente de inicio de sesión
+  OIDCSession:
+    RefreshTokenInvalid: El token de refresco no es válido
 
 AggregateTypes:
   action: Acción

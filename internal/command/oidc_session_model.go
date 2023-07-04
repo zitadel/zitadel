@@ -96,14 +96,14 @@ func (wm *OIDCSessionWriteModel) reduceRefreshTokenRenewed(e *oidcsession.Refres
 
 func (wm *OIDCSessionWriteModel) CheckRefreshToken(refreshTokenID string) error {
 	if wm.State != domain.OIDCSessionStateActive {
-		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-s3hjk", "Errors.OIDCSession.RefreshTokenInvalid") //TODO: i18n
+		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-s3hjk", "Errors.OIDCSession.RefreshTokenInvalid")
 	}
 	if wm.RefreshTokenID != refreshTokenID {
-		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-28ubl", "Errors.OIDCSession.RefreshTokenInvalid") //TODO: i18n
+		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-28ubl", "Errors.OIDCSession.RefreshTokenInvalid")
 	}
 	now := time.Now()
 	if wm.RefreshTokenExpiration.Before(now) || wm.RefreshTokenIdleExpiration.Before(now) {
-		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-3jt2w", "Errors.OIDCSession.RefreshTokenInvalid") //TODO: i18n
+		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-3jt2w", "Errors.OIDCSession.RefreshTokenInvalid")
 	}
 	return nil
 }

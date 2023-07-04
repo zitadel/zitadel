@@ -510,6 +510,8 @@ Errors:
     AlreadyExists: Auth Request вече съществува
     NotExisting: Auth Request не съществува
     WrongLoginClient: Auth Request, създаден от друг клиент за влизане
+  OIDCSession:
+    RefreshTokenInvalid: Токенът за опресняване е невалиден
 
 AggregateTypes:
   action: Действие
