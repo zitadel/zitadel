@@ -24,6 +24,7 @@ import {
   ChallengeKind,
   LoginSettings,
   GetLoginSettingsResponse,
+  ListAuthenticationMethodTypesResponse,
 } from "@zitadel/server";
 
 export const zitadelConfig: ZitadelServerOptions = {
@@ -303,7 +304,7 @@ export async function registerPasskey(
  */
 export async function listAuthenticationMethodTypes(
   userId: string
-): Promise<any> {
+): Promise<ListAuthenticationMethodTypesResponse> {
   const userservice = user.getUser(server);
   return userservice.listAuthenticationMethodTypes({
     userId,
