@@ -8935,7 +8935,7 @@ message AddOIDCAppRequest {
     ];
     repeated string additional_origins = 16 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"https://console.zitadel.ch/auth/callback\"]";
+            example: "[\"scheme://localhost:8080\"]";
             description: "Additional origins (other than the redirect_uris) from where the API can be used";
         }
     ];
@@ -9110,7 +9110,7 @@ message UpdateOIDCAppConfigRequest {
     ];
     repeated string additional_origins = 15 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"https://console.zitadel.ch/auth/callback\"]";
+            example: "[\"scheme://localhost:8080\"]";
             description: "Additional origins (other than the redirect_uris) from where the API can be used";
         }
     ];
