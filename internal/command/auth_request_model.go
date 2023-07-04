@@ -11,6 +11,7 @@ import (
 type AuthRequestWriteModel struct {
 	eventstore.WriteModel
 
+	LoginClient      string
 	ClientID         string
 	RedirectURI      string
 	State            string
@@ -40,6 +41,7 @@ func (m *AuthRequestWriteModel) Reduce() error {
 	for _, event := range m.Events {
 		switch e := event.(type) {
 		case *authrequest.AddedEvent:
+			m.LoginClient = e.LoginClient
 			m.ClientID = e.ClientID
 			m.RedirectURI = e.RedirectURI
 			m.State = e.State
