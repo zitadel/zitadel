@@ -7,6 +7,7 @@ import (
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -147,11 +148,15 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 		sessionID    string
 		sessionToken string
 	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
+	type res struct {
+		details *domain.ObjectDetails
 		wantErr error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
 	}{
 		{
 			"authRequest not existing",
@@ -169,7 +174,9 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				id:        "id",
 				sessionID: "session",
 			},
-			caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sx208nt", "Errors.AuthRequest.AlreadyHandled"),
+			res{
+				wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sx208nt", "Errors.AuthRequest.AlreadyHandled"),
+			},
 		},
 		{
 			"session not existing",
@@ -207,7 +214,9 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				id:        "id",
 				sessionID: "session",
 			},
-			caos_errs.ThrowNotFound(nil, "COMMAND-x0099887", "Errors.Session.NotExisting"),
+			res{
+				wantErr: caos_errs.ThrowNotFound(nil, "COMMAND-x0099887", "Errors.Session.NotExisting"),
+			},
 		},
 		{
 			"missing permission",
@@ -248,7 +257,9 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				id:        "id",
 				sessionID: "session",
 			},
-			caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			res{
+				wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			},
 		},
 		{
 			"invalid session token",
@@ -289,7 +300,9 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				sessionID:    "session",
 				sessionToken: "invalid",
 			},
-			caos_errs.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid"),
+			res{
+				wantErr: caos_errs.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid"),
+			},
 		},
 		{
 			"linked",
@@ -338,7 +351,9 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				sessionID:    "session",
 				sessionToken: "token",
 			},
-			nil,
+			res{
+				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -348,8 +363,9 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 				checkPermission:      tt.fields.checkPermission,
 			}
-			err := c.LinkSessionToAuthRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken)
-			assert.ErrorIs(t, tt.wantErr, err)
+			details, err := c.LinkSessionToAuthRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken)
+			require.ErrorIs(t, err, tt.res.wantErr)
+			assert.Equal(t, tt.res.details, details)
 		})
 	}
 }
