@@ -16,9 +16,10 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
-func TestServer_TelemetryPusher(t *testing.T) {
+func TestServer_TelemetryPushMilestones(t *testing.T) {
+	primaryDomain, instanceID, systemUserCTX, iamOwnerCtx := Tester.UseIsolatedInstance(CTX)
 	bodies := make(chan []byte, 0)
-	t.Log("testing against instance with primary domain", PrimaryDomain)
+	t.Log("testing against instance with primary domain", primaryDomain)
 	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
@@ -34,26 +35,26 @@ func TestServer_TelemetryPusher(t *testing.T) {
 	mockServer.Listener = listener
 	mockServer.Start()
 	t.Cleanup(mockServer.Close)
-	awaitMilestone(t, bodies, "InstanceCreated")
-	project, err := MgmtClient.AddProject(IAMOwnerCtx, &management.AddProjectRequest{Name: "integration"})
+	awaitMilestone(t, bodies, primaryDomain, "InstanceCreated")
+	project, err := MgmtClient.AddProject(iamOwnerCtx, &management.AddProjectRequest{Name: "integration"})
 	if err != nil {
 		t.Fatal(err)
 	}
-	awaitMilestone(t, bodies, "ProjectCreated")
-	if _, err = MgmtClient.AddOIDCApp(IAMOwnerCtx, &management.AddOIDCAppRequest{
+	awaitMilestone(t, bodies, primaryDomain, "ProjectCreated")
+	if _, err = MgmtClient.AddOIDCApp(iamOwnerCtx, &management.AddOIDCAppRequest{
 		ProjectId: project.GetId(),
 		Name:      "integration",
 	}); err != nil {
 		t.Fatal(err)
 	}
-	awaitMilestone(t, bodies, "ApplicationCreated")
-	if _, err = SystemClient.RemoveInstance(SystemUserCTX, &system.RemoveInstanceRequest{InstanceId: InstanceID}); err != nil {
+	awaitMilestone(t, bodies, primaryDomain, "ApplicationCreated")
+	if _, err = SystemClient.RemoveInstance(systemUserCTX, &system.RemoveInstanceRequest{InstanceId: instanceID}); err != nil {
 		t.Fatal(err)
 	}
-	awaitMilestone(t, bodies, "InstanceDeleted")
+	awaitMilestone(t, bodies, primaryDomain, "InstanceDeleted")
 }
 
-func awaitMilestone(t *testing.T, bodies chan []byte, expectMilestoneType string) {
+func awaitMilestone(t *testing.T, bodies chan []byte, primaryDomain, expectMilestoneType string) {
 	for {
 		select {
 		case body := <-bodies:
@@ -69,11 +70,11 @@ func awaitMilestone(t *testing.T, bodies chan []byte, expectMilestoneType string
 			if err := json.Unmarshal(body, &milestone); err != nil {
 				t.Error(err)
 			}
-			if milestone.Type == expectMilestoneType && milestone.PrimaryDomain == PrimaryDomain {
+			if milestone.Type == expectMilestoneType && milestone.PrimaryDomain == primaryDomain {
 				return
 			}
 		case <-time.After(60 * time.Second):
-			t.Fatalf("timed out waiting for milestone")
+			t.Fatalf("timed out waiting for milestone %s in domain %s", expectMilestoneType, primaryDomain)
 		}
 	}
 }

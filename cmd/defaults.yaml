@@ -15,16 +15,16 @@ Tracing:
   MetricPrefix: zitadel
 
 Telemetry:
-  # As long as Enabled is true, usage data that is marked as due is also tried to be sent to the configured Telemetry.Endpoints.
-  # Data is marked as due, even if Enabled is false.
-  # This means that switching this to true makes ZITADEL try to send past data that was marked to send.
+  # As long as Enabled is true, ZITADEL tries to send usage data to the configured Telemetry.Endpoints.
+  # Data is projected by ZITADEL even if Enabled is false.
+  # This means that switching this to true makes ZITADEL try to send past data.
   Enabled: false
-  # Push telemetry data to all these endpoints at least once.
+  # Push telemetry data to all these endpoints at least once using an HTTP POST request.
   # If one endpoint returns an unsuccessful response code or times out,
   # ZITADEL retries to push the data point to all configured endpoints until it succeeds.
   # Configure delivery guarantees and intervals in the section Projections.Customizations.Telemetry
   # The endpoints can be reconfigured at runtime.
-  # Three redirects are followed.
+  # Ten redirects are followed.
   # If you change this configuration at runtime, remaining data that is not successfully delivered to the old endpoints is sent to the new endpoints.
   Endpoints:
     # Include https://zitadel.com/usage if you want to help the ZITADEL maintainers improve the product's usability by giving them some insights.
@@ -207,7 +207,7 @@ Projections:
       HandleActiveInstances: 360h
       # As sending telemetry data doesn't result in database statements, retries don't have any effects
       MaxFailureCount: 0
-      # Telemetry data synchronization is not time critical. Setting RequeueEvery every 55 minutes doesn't annoy the database too much.
+      # Telemetry data synchronization is not time critical. Setting RequeueEvery to 55 minutes doesn't annoy the database too much.
       RequeueEvery: 3300s
 
 Auth:
