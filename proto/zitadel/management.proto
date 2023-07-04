@@ -8936,7 +8936,7 @@ message AddOIDCAppRequest {
     repeated string additional_origins = 16 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"scheme://localhost:8080\"]";
-            description: "Additional origins (other than the redirect_uris) from where the API can be used";
+            description: "Additional origins (other than the redirect_uris) from where the API can be used, provided string has to be an origin (scheme://hostname[:port]) without path, query or fragment";
         }
     ];
     bool skip_native_app_success_page = 17 [
@@ -9111,7 +9111,7 @@ message UpdateOIDCAppConfigRequest {
     repeated string additional_origins = 15 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"scheme://localhost:8080\"]";
-            description: "Additional origins (other than the redirect_uris) from where the API can be used";
+            description: "Additional origins (other than the redirect_uris) from where the API can be used, provided string has to be an origin (scheme://hostname[:port]) without path, query or fragment";
         }
     ];
     bool skip_native_app_success_page = 16 [
