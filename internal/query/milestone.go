@@ -3,8 +3,6 @@ package query
 import (
 	"context"
 	"database/sql"
-	"fmt"
-	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -78,14 +76,7 @@ func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, qu
 	if len(instanceIDs) == 0 {
 		instanceIDs = []string{authz.GetInstance(ctx).InstanceID()}
 	}
-	instanceIDParams := make([]string, len(instanceIDs))
-	instanceIDArgs := make([]interface{}, len(instanceIDs))
-	for idx := range instanceIDs {
-		instanceIDParams[idx] = fmt.Sprintf("$%d", idx+1)
-		instanceIDArgs[idx] = instanceIDs[idx]
-	}
-	expr := fmt.Sprintf("%s IN (%s)", MilestoneInstanceIDColID.name, strings.Join(instanceIDParams, ","))
-	stmt, args, err := queries.toQuery(query).Where(sq.Expr(expr, instanceIDArgs...)).ToSql()
+	stmt, args, err := queries.toQuery(query).Where(sq.Eq{MilestoneInstanceIDColID.identifier(): instanceIDs}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-A9i5k", "Errors.Query.SQLStatement")
 	}
