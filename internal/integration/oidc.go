@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -28,8 +29,36 @@ func (s *Tester) CreateOIDCNativeClient(ctx context.Context, redirectURI string)
 		Name:                     fmt.Sprintf("app-%d", time.Now().UnixNano()),
 		RedirectUris:             []string{redirectURI},
 		ResponseTypes:            []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
-		GrantTypes:               []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE},
+		GrantTypes:               []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN},
 		AppType:                  app.OIDCAppType_OIDC_APP_TYPE_NATIVE,
+		AuthMethodType:           app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE,
+		PostLogoutRedirectUris:   nil,
+		Version:                  app.OIDCVersion_OIDC_VERSION_1_0,
+		DevMode:                  false,
+		AccessTokenType:          app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT,
+		AccessTokenRoleAssertion: false,
+		IdTokenRoleAssertion:     false,
+		IdTokenUserinfoAssertion: false,
+		ClockSkew:                nil,
+		AdditionalOrigins:        nil,
+		SkipNativeAppSuccessPage: false,
+	})
+}
+
+func (s *Tester) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI string) (*management.AddOIDCAppResponse, error) {
+	project, err := s.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
+		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return s.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
+		ProjectId:                project.GetId(),
+		Name:                     fmt.Sprintf("app-%d", time.Now().UnixNano()),
+		RedirectUris:             []string{redirectURI},
+		ResponseTypes:            []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_ID_TOKEN_TOKEN},
+		GrantTypes:               []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_IMPLICIT},
+		AppType:                  app.OIDCAppType_OIDC_APP_TYPE_USER_AGENT,
 		AuthMethodType:           app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE,
 		PostLogoutRedirectUris:   nil,
 		Version:                  app.OIDCVersion_OIDC_VERSION_1_0,
@@ -54,24 +83,7 @@ func (s *Tester) CreateOIDCAuthRequest(clientID, loginClient, redirectURI string
 	codeChallenge := oidc.NewSHACodeChallenge(codeVerifier)
 	authURL := rp.AuthURL("state", provider, rp.WithCodeChallenge(codeChallenge))
 
-	req, err := http.NewRequest(http.MethodGet, authURL, nil)
-	if err != nil {
-		return "", err
-	}
-	req.Header.Set(oidc_internal.LoginClientHeader, loginClient)
-
-	client := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
-	}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	loc, err := resp.Location()
+	loc, err := CheckRedirect(authURL, map[string]string{oidc_internal.LoginClientHeader: loginClient})
 	if err != nil {
 		return "", err
 	}
@@ -89,4 +101,27 @@ func (s *Tester) CreateRelyingParty(clientID, redirectURI string, scope ...strin
 		scope = []string{oidc.ScopeOpenID}
 	}
 	return rp.NewRelyingPartyOIDC(issuer, clientID, "", redirectURI, scope)
+}
+
+func CheckRedirect(url string, headers map[string]string) (*url.URL, error) {
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
+
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	return resp.Location()
 }
