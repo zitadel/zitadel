@@ -12,6 +12,7 @@ import (
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	oidc_internal "github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/pkg/grpc/app"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 )
@@ -82,4 +83,12 @@ func (s *Tester) CreateOIDCAuthRequest(ctx context.Context, clientID, loginClien
 		return "", fmt.Errorf("login location has not prefix %s, but is %s", prefixWithHost, loc.String())
 	}
 	return strings.TrimPrefix(loc.String(), prefixWithHost), nil
+}
+
+func (s *Tester) CreateSession(ctx context.Context, userID string) (string, string, error) {
+	session, err := s.Commands.CreateSession(ctx, []command.SessionCommand{command.CheckUser(userID)}, nil)
+	if err != nil {
+		return "", "", err
+	}
+	return session.ID, session.NewToken, nil
 }
