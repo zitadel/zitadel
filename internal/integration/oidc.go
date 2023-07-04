@@ -44,9 +44,8 @@ func (s *Tester) CreateOIDCNativeClient(ctx context.Context, redirectURI string)
 	})
 }
 
-func (s *Tester) CreateOIDCAuthRequest(ctx context.Context, clientID, loginClient, redirectURI string) (authRequestID string, err error) {
-	issuer := http_util.BuildHTTP(s.Config.ExternalDomain, s.Config.Port, s.Config.ExternalSecure)
-	provider, err := rp.NewRelyingPartyOIDC(issuer, clientID, "", redirectURI, []string{oidc.ScopeOpenID})
+func (s *Tester) CreateOIDCAuthRequest(clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
+	provider, err := s.CreateRelyingParty(clientID, redirectURI, scope...)
 	if err != nil {
 		return "", err
 	}
@@ -77,9 +76,17 @@ func (s *Tester) CreateOIDCAuthRequest(ctx context.Context, clientID, loginClien
 		return "", err
 	}
 
-	prefixWithHost := issuer + s.Config.OIDC.DefaultLoginURLV2
+	prefixWithHost := provider.Issuer() + s.Config.OIDC.DefaultLoginURLV2
 	if !strings.HasPrefix(loc.String(), prefixWithHost) {
 		return "", fmt.Errorf("login location has not prefix %s, but is %s", prefixWithHost, loc.String())
 	}
 	return strings.TrimPrefix(loc.String(), prefixWithHost), nil
+}
+
+func (s *Tester) CreateRelyingParty(clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
+	issuer := http_util.BuildHTTP(s.Config.ExternalDomain, s.Config.Port, s.Config.ExternalSecure)
+	if len(scope) == 0 {
+		scope = []string{oidc.ScopeOpenID}
+	}
+	return rp.NewRelyingPartyOIDC(issuer, clientID, "", redirectURI, scope)
 }

@@ -8,8 +8,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zitadel/oidc/v2/pkg/client/rp"
+	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"golang.org/x/oauth2"
 
+	"github.com/zitadel/zitadel/internal/api/oidc/amr"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/integration"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
@@ -17,11 +22,9 @@ import (
 )
 
 var (
-	CTX               context.Context
-	Tester            *integration.Tester
-	Client            session.SessionServiceClient
-	User              *user.AddHumanUserResponse
-	GenericOAuthIDPID string
+	CTX    context.Context
+	Tester *integration.Tester
+	User   *user.AddHumanUserResponse
 )
 
 const (
@@ -35,9 +38,10 @@ func TestMain(m *testing.M) {
 
 		Tester = integration.NewTester(ctx)
 		defer Tester.Done()
-		Client = Tester.Client.SessionV2
 
 		CTX, _ = Tester.WithSystemAuthorization(ctx, integration.OrgOwner), errCtx
+		User = Tester.CreateHumanUser(CTX)
+		Tester.RegisterUserPasskey(CTX, User.GetUserId())
 		return m.Run()
 	}())
 }
@@ -48,8 +52,8 @@ func createClient(t testing.TB) string {
 	return app.GetClientId()
 }
 
-func createAuthRequest(t testing.TB, clientID string) string {
-	redURL, err := Tester.CreateOIDCAuthRequest(CTX, clientID, "loginClient", redirectURI)
+func createAuthRequest(t testing.TB, clientID string, scope ...string) string {
+	redURL, err := Tester.CreateOIDCAuthRequest(clientID, "loginClient", redirectURI, scope...)
 	require.NoError(t, err)
 	return redURL
 }
@@ -59,4 +63,153 @@ func TestOPStorage_CreateAuthRequest(t *testing.T) {
 
 	id := createAuthRequest(t, clientID)
 	require.Contains(t, id, command.IDPrefixV2)
+}
+
+func TestOPStorage_CreateAccessToken(t *testing.T) {
+	clientID := createClient(t)
+
+	id := createAuthRequest(t, clientID)
+	_ = id
+	createResp, err := Tester.Client.SessionV2.CreateSession(CTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{UserId: User.GetUserId()},
+			},
+		},
+		Challenges: []session.ChallengeKind{
+			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
+		},
+	})
+	require.NoError(t, err)
+
+	assertion, err := Tester.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetPasskey().GetPublicKeyCredentialRequestOptions())
+	require.NoError(t, err)
+
+	updateResp, err := Tester.Client.SessionV2.SetSession(CTX, &session.SetSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: createResp.GetSessionToken(),
+		Checks: &session.Checks{
+			Passkey: &session.CheckPasskey{
+				CredentialAssertionData: assertion,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// link session to auth request and get code
+	var code string
+
+	tokens := token(t, clientID, code)
+	assert.NotEmpty(t, tokens.AccessToken)
+	assert.NotEmpty(t, tokens.IDToken)
+	assert.Empty(t, tokens.RefreshToken)
+	assert.Equal(t, []string{amr.UserPresence, amr.MFA}, tokens.IDTokenClaims.AuthenticationMethodsReferences)
+	assert.Equal(t, updateResp.Details.ChangeDate, tokens.IDTokenClaims.AuthTime)
+}
+
+func TestOPStorage_CreateAccessAndRefreshTokens(t *testing.T) {
+	clientID := createClient(t)
+
+	id := createAuthRequest(t, clientID, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	_ = id
+	createResp, err := Tester.Client.SessionV2.CreateSession(CTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{UserId: User.GetUserId()},
+			},
+		},
+		Challenges: []session.ChallengeKind{
+			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
+		},
+	})
+	require.NoError(t, err)
+
+	assertion, err := Tester.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetPasskey().GetPublicKeyCredentialRequestOptions())
+	require.NoError(t, err)
+
+	updateResp, err := Tester.Client.SessionV2.SetSession(CTX, &session.SetSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: createResp.GetSessionToken(),
+		Checks: &session.Checks{
+			Passkey: &session.CheckPasskey{
+				CredentialAssertionData: assertion,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// link session to auth request and get code
+	var code string
+
+	tokens := token(t, clientID, code)
+	assert.NotEmpty(t, tokens.AccessToken)
+	assert.NotEmpty(t, tokens.IDToken)
+	assert.NotEmpty(t, tokens.RefreshToken)
+	assert.Equal(t, []string{amr.UserPresence, amr.MFA}, tokens.IDTokenClaims.AuthenticationMethodsReferences)
+	assert.Equal(t, updateResp.Details.ChangeDate, tokens.IDTokenClaims.AuthTime)
+}
+
+func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
+	clientID := createClient(t)
+
+	id := createAuthRequest(t, clientID, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	_ = id
+	createResp, err := Tester.Client.SessionV2.CreateSession(CTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{UserId: User.GetUserId()},
+			},
+		},
+		Challenges: []session.ChallengeKind{
+			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
+		},
+	})
+	require.NoError(t, err)
+
+	assertion, err := Tester.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetPasskey().GetPublicKeyCredentialRequestOptions())
+	require.NoError(t, err)
+
+	updateResp, err := Tester.Client.SessionV2.SetSession(CTX, &session.SetSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: createResp.GetSessionToken(),
+		Checks: &session.Checks{
+			Passkey: &session.CheckPasskey{
+				CredentialAssertionData: assertion,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// link session to auth request and get code
+	_ = updateResp
+	var code string
+
+	tokens := token(t, clientID, code)
+	assert.NotEmpty(t, tokens.RefreshToken)
+
+	newTokens := refreshToken(t, clientID, tokens.RefreshToken)
+	assert.NotEmpty(t, newTokens.AccessToken)
+	assert.NotEmpty(t, newTokens.Extra("id_token"))
+	assert.NotEmpty(t, newTokens.RefreshToken)
+}
+
+func token(t testing.TB, clientID, code string) *oidc.Tokens[*oidc.IDTokenClaims] {
+	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
+	require.NoError(t, err)
+
+	codeVerifier := "codeVerifier"
+	tokens, err := rp.CodeExchange[*oidc.IDTokenClaims](context.Background(), code, provider, rp.WithCodeVerifier(codeVerifier))
+	require.NoError(t, err)
+
+	return tokens
+}
+
+func refreshToken(t testing.TB, clientID, refreshToken string) *oauth2.Token {
+	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
+	require.NoError(t, err)
+
+	tokens, err := rp.RefreshAccessToken(provider, refreshToken, "", "")
+	require.NoError(t, err)
+
+	return tokens
 }
