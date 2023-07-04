@@ -50,6 +50,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
           <Checkbox
             className="mr-4"
             checked={false}
+            value={"privacypolicy"}
             onChangeVal={(checked: boolean) => {
               setAcceptanceState({
                 ...acceptanceState,
@@ -74,6 +75,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
           <Checkbox
             className="mr-4"
             checked={false}
+            value={"tos"}
             onChangeVal={(checked: boolean) => {
               setAcceptanceState({
                 ...acceptanceState,

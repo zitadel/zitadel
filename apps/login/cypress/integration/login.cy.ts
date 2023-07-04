@@ -1,6 +1,6 @@
 import { addStub, removeStub } from "../support/mock";
 
-describe("/passkey/login", () => {
+describe("login", () => {
   beforeEach(() => {
     removeStub("zitadel.session.v2alpha.SessionService", "CreateSession");
     addStub("zitadel.session.v2alpha.SessionService", "CreateSession", {
