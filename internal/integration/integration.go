@@ -13,8 +13,6 @@ import (
 	"sync"
 	"time"
 
-	http_util "github.com/zitadel/zitadel/internal/api/http"
-
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/client"
@@ -26,6 +24,7 @@ import (
 	"github.com/zitadel/zitadel/cmd"
 	"github.com/zitadel/zitadel/cmd/start"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
