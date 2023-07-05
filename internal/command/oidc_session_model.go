@@ -20,6 +20,7 @@ type OIDCSessionWriteModel struct {
 	AuthMethodsReferences      []string
 	AuthTime                   time.Time
 	State                      domain.OIDCSessionState
+	AccessTokenExpiration      time.Time
 	RefreshTokenID             string
 	RefreshTokenExpiration     time.Time
 	RefreshTokenIdleExpiration time.Time
@@ -43,7 +44,7 @@ func (wm *OIDCSessionWriteModel) Reduce() error {
 		case *oidcsession.AddedEvent:
 			wm.reduceAdded(e)
 		case *oidcsession.AccessTokenAddedEvent:
-			// TODO: does the writemodel even care?
+			wm.reduceAccessTokenAdded(e)
 		case *oidcsession.RefreshTokenAddedEvent:
 			wm.reduceRefreshTokenAdded(e)
 		case *oidcsession.RefreshTokenRenewedEvent:
@@ -60,7 +61,7 @@ func (wm *OIDCSessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			oidcsession.AddedType,
-			oidcsession.AccessTokenAddedType, // TODO: does the writemodel even care?
+			oidcsession.AccessTokenAddedType,
 			oidcsession.RefreshTokenAddedType,
 			oidcsession.RefreshTokenRenewedType,
 		).
@@ -81,6 +82,10 @@ func (wm *OIDCSessionWriteModel) reduceAdded(e *oidcsession.AddedEvent) {
 	wm.AuthMethodsReferences = e.AuthMethodsReferences
 	wm.AuthTime = e.AuthTime
 	wm.State = domain.OIDCSessionStateActive
+}
+
+func (wm *OIDCSessionWriteModel) reduceAccessTokenAdded(e *oidcsession.AccessTokenAddedEvent) {
+	wm.AccessTokenExpiration = e.CreationDate().Add(e.Expiration)
 }
 
 func (wm *OIDCSessionWriteModel) reduceRefreshTokenAdded(e *oidcsession.RefreshTokenAddedEvent) {

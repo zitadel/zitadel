@@ -25,7 +25,8 @@ import (
 )
 
 var (
-	testNow = time.Now()
+	testNow          = time.Now()
+	tokenCreationNow = time.Time{}
 )
 
 func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
@@ -199,7 +200,7 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 			},
 			res{
 				id:         "V2_oidcSessionID-accessTokenID",
-				expiration: testNow.Add(time.Hour),
+				expiration: tokenCreationNow.Add(time.Hour),
 			},
 		},
 	}
@@ -401,7 +402,7 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			res{
 				id:           "V2_oidcSessionID-accessTokenID",
 				refreshToken: "VjJfb2lkY1Nlc3Npb25JRDpyZWZyZXNoVG9rZW5JRA", //V2_oidcSessionID:refreshTokenID
-				expiration:   testNow.Add(time.Hour),
+				expiration:   tokenCreationNow.Add(time.Hour),
 			},
 		},
 	}
