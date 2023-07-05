@@ -18,6 +18,7 @@ This guide assumes you are familiar with [running ZITADEL using the least amount
 ### Runtime configuration file
 
 You can configure the runtime using the `--config` flag of the `zitadel` binary.
+Also, you can use the environment variables listed in the defaults.yaml.
 
 <details><summary>defaults.yaml</summary>
     <CodeBlock language="yaml">{DefaultsYamlSource}</CodeBlock>
@@ -27,6 +28,7 @@ You can configure the runtime using the `--config` flag of the `zitadel` binary.
 
 ZITADEL uses a [different configuration file](https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml) for _database initialization steps_.
 Use the `--steps` flag of the `zitadel` binary to provide this configuration file.
+Also, you can use the environment variables listed in the steps.yaml.
 
 <details><summary>steps.yaml</summary>
     <CodeBlock language="yaml">{StepsYamlSource}</CodeBlock>
