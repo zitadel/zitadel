@@ -10,6 +10,9 @@ on:
       tag_name:
         value: ${{ inputs.tag_name }}
 
+env:
+  REGISTRY_IMAGE: zitadel/test
+
 jobs:
   build:
     name: zitadel
@@ -25,7 +28,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ github.repository }}
+          images: ${{ env.REGISTRY_IMAGE }}
       - 
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -63,7 +66,7 @@ jobs:
           platforms: linux/${{ matrix.arch }}
           # tags: ${{ inputs.tag_name }}-ubuntu
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
       - 
         name: Scratch
         id: build-scratch
@@ -77,7 +80,7 @@ jobs:
           push: true
           # tags: ${{ inputs.tag_name }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
       -
         name: Export ubuntu digest
         run: |
