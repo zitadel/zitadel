@@ -18,6 +18,7 @@ jobs:
     name: zitadel
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         arch: [amd64,arm64]
     steps:
@@ -29,6 +30,14 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ${{ inputs.image_name }}
+          tags: |
+            type=schedule
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix=,suffix=,format=long
       - 
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
