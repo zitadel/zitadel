@@ -11,7 +11,6 @@ export default async function Page({
 
   const loginSettings = await getLoginSettings(server);
 
-  console.log("loginSettings", loginSettings);
   return (
     <div className="flex flex-col items-center space-y-4">
       <h1>Welcome back!</h1>
