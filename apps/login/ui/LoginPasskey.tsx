@@ -10,17 +10,11 @@ import { Spinner } from "./Spinner";
 
 type Props = {
   loginName: string;
-  challenge: Challenges_Passkey;
   altPassword: boolean;
 };
 
-export default function LoginPasskey({
-  loginName,
-  challenge,
-  altPassword,
-}: Props) {
+export default function LoginPasskey({ loginName, altPassword }: Props) {
   const [error, setError] = useState<string>("");
-  const [publicKey, setPublicKey] = useState();
   const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
@@ -30,19 +24,29 @@ export default function LoginPasskey({
   useEffect(() => {
     if (!initialized.current) {
       initialized.current = true;
+      setLoading(true);
       updateSessionForChallenge()
         .then((response) => {
           const pK =
             response.challenges.passkey.publicKeyCredentialRequestOptions
               .publicKey;
           if (pK) {
-            setPublicKey(pK);
+            submitLoginAndContinue(pK)
+              .then(() => {
+                setLoading(false);
+              })
+              .catch((error) => {
+                setError(error);
+                setLoading(false);
+              });
           } else {
             setError("Could not request passkey challenge");
+            setLoading(false);
           }
         })
         .catch((error) => {
           setError(error);
+          setLoading(false);
         });
     }
   }, []);
@@ -91,65 +95,66 @@ export default function LoginPasskey({
     return response;
   }
 
-  async function submitLoginAndContinue(): Promise<boolean | void> {
-    if (publicKey) {
-      (publicKey as any).challenge = coerceToArrayBuffer(
-        (publicKey as any).challenge,
-        "publicKey.challenge"
+  async function submitLoginAndContinue(
+    publicKey: any
+  ): Promise<boolean | void> {
+    publicKey.challenge = coerceToArrayBuffer(
+      publicKey.challenge,
+      "publicKey.challenge"
+    );
+    publicKey.allowCredentials.map((listItem: any) => {
+      listItem.id = coerceToArrayBuffer(
+        listItem.id,
+        "publicKey.allowCredentials.id"
       );
-      (publicKey as any).allowCredentials.map((listItem: any) => {
-        listItem.id = coerceToArrayBuffer(
-          listItem.id,
-          "publicKey.allowCredentials.id"
-        );
-      });
-      navigator.credentials
-        .get({
-          publicKey,
-        })
-        .then((assertedCredential: any) => {
-          if (assertedCredential) {
-            let authData = new Uint8Array(
-              assertedCredential.response.authenticatorData
-            );
-            let clientDataJSON = new Uint8Array(
-              assertedCredential.response.clientDataJSON
-            );
-            let rawId = new Uint8Array(assertedCredential.rawId);
-            let sig = new Uint8Array(assertedCredential.response.signature);
-            let userHandle = new Uint8Array(
-              assertedCredential.response.userHandle
-            );
-            let data = JSON.stringify({
-              id: assertedCredential.id,
-              rawId: coerceToBase64Url(rawId, "rawId"),
-              type: assertedCredential.type,
-              response: {
-                authenticatorData: coerceToBase64Url(authData, "authData"),
-                clientDataJSON: coerceToBase64Url(
-                  clientDataJSON,
-                  "clientDataJSON"
-                ),
-                signature: coerceToBase64Url(sig, "sig"),
-                userHandle: coerceToBase64Url(userHandle, "userHandle"),
-              },
-            });
-            return submitLogin(data).then(() => {
-              return router.push(`/accounts`);
-            });
-          } else {
-            setLoading(false);
-            setError("An error on retrieving passkey");
-            return null;
-          }
-        })
-        .catch((error) => {
-          console.error(error);
+    });
+
+    navigator.credentials
+      .get({
+        publicKey,
+      })
+      .then((assertedCredential: any) => {
+        if (assertedCredential) {
+          let authData = new Uint8Array(
+            assertedCredential.response.authenticatorData
+          );
+          let clientDataJSON = new Uint8Array(
+            assertedCredential.response.clientDataJSON
+          );
+          let rawId = new Uint8Array(assertedCredential.rawId);
+          let sig = new Uint8Array(assertedCredential.response.signature);
+          let userHandle = new Uint8Array(
+            assertedCredential.response.userHandle
+          );
+          let data = JSON.stringify({
+            id: assertedCredential.id,
+            rawId: coerceToBase64Url(rawId, "rawId"),
+            type: assertedCredential.type,
+            response: {
+              authenticatorData: coerceToBase64Url(authData, "authData"),
+              clientDataJSON: coerceToBase64Url(
+                clientDataJSON,
+                "clientDataJSON"
+              ),
+              signature: coerceToBase64Url(sig, "sig"),
+              userHandle: coerceToBase64Url(userHandle, "userHandle"),
+            },
+          });
+          return submitLogin(data).then(() => {
+            return router.push(`/accounts`);
+          });
+        } else {
           setLoading(false);
-          //   setError(error);
+          setError("An error on retrieving passkey");
           return null;
-        });
-    }
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        setLoading(false);
+        //   setError(error);
+        return null;
+      });
   }
 
   return (
@@ -187,8 +192,8 @@ export default function LoginPasskey({
           type="submit"
           className="self-end"
           variant={ButtonVariants.Primary}
-          disabled={loading || !publicKey}
-          onClick={() => submitLoginAndContinue()}
+          disabled={loading}
+          onClick={() => updateSessionForChallenge()}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           continue

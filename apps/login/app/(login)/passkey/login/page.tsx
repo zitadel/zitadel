@@ -47,7 +47,6 @@ export default async function Page({
 
       {loginName && (
         <LoginPasskey
-          challenge={{} as any}
           loginName={loginName}
           altPassword={altPassword === "true"}
         />
