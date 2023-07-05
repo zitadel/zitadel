@@ -72,25 +72,11 @@ func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.
 		authRequest.HintUserID = &hintUserID
 	}
 
-	err = o.command.AddAuthRequest(ctx, authRequest)
+	aar, err := o.command.AddAuthRequest(ctx, authRequest)
 	if err != nil {
 		return nil, err
 	}
-	return &AuthRequestV2{
-		id:            authRequest.ID,
-		amr:           nil,
-		audience:      authRequest.Audience,
-		authTime:      time.Time{},
-		clientID:      authRequest.ClientID,
-		codeChallenge: authRequest.CodeChallenge,
-		nonce:         authRequest.Nonce,
-		redirectURI:   authRequest.RedirectURI,
-		responseType:  authRequest.ResponseType,
-		scope:         authRequest.Scope,
-		state:         authRequest.State,
-		sessionID:     "",
-		userID:        "",
-	}, nil
+	return &AuthRequestV2{aar}, nil
 }
 
 func (o *OPStorage) createAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
@@ -133,21 +119,7 @@ func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRe
 		if err != nil {
 			return nil, err
 		}
-		return &AuthRequestV2{
-			id:            req.AggregateID,
-			amr:           req.AMR,
-			audience:      req.Audience,
-			authTime:      req.AuthTime,
-			clientID:      req.ClientID,
-			codeChallenge: req.CodeChallenge,
-			nonce:         req.Nonce,
-			redirectURI:   req.RedirectURI,
-			responseType:  req.ResponseType,
-			scope:         req.Scope,
-			state:         req.State,
-			sessionID:     req.SessionID,
-			userID:        req.UserID,
-		}, nil
+		return &AuthRequestV2{req}, nil
 	}
 
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
@@ -174,21 +146,7 @@ func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (_ op.Au
 		if err != nil {
 			return nil, err
 		}
-		return &AuthRequestV2{
-			id:            authReq.ID,
-			amr:           authReq.AMR,
-			audience:      authReq.Audience,
-			authTime:      authReq.AuthTime,
-			clientID:      authReq.ClientID,
-			codeChallenge: authReq.CodeChallenge,
-			nonce:         authReq.Nonce,
-			redirectURI:   authReq.RedirectURI,
-			responseType:  authReq.ResponseType,
-			scope:         authReq.Scope,
-			state:         authReq.State,
-			sessionID:     authReq.SessionID,
-			userID:        authReq.UserID,
-		}, nil
+		return &AuthRequestV2{authReq}, nil
 	}
 	resp, err := o.repo.AuthRequestByCode(ctx, code)
 	if err != nil {
@@ -239,7 +197,7 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 		applicationID = authReq.ApplicationID
 		userOrgID = authReq.UserOrgID
 	case *AuthRequestV2:
-		return o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.id)
+		return o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.GetID())
 	}
 
 	accessTokenLifetime, _, _, _, err := o.getOIDCSettings(ctx)
@@ -261,7 +219,7 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 	// handle V2 request directly
 	switch tokenReq := req.(type) {
 	case *AuthRequestV2:
-		return o.command.AddOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.id)
+		return o.command.AddOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.GetID())
 	case *RefreshTokenRequestV2:
 		return o.command.ExchangeOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.OIDCSessionWriteModel.AggregateID, refreshToken, tokenReq.RequestedScopes)
 	}
@@ -478,4 +436,59 @@ func (o *OPStorage) getOIDCSettings(ctx context.Context) (accessTokenLifetime, i
 		return oidcSettings.AccessTokenLifetime, oidcSettings.IdTokenLifetime, oidcSettings.RefreshTokenIdleExpiration, oidcSettings.RefreshTokenExpiration, nil
 	}
 	return o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime, o.defaultRefreshTokenIdleExpiration, o.defaultRefreshTokenExpiration, nil
+}
+
+func CreateErrorCallbackURL(authReq op.AuthRequest, reason, description, uri string, authorizer op.Authorizer) (string, error) {
+	e := struct {
+		Error       string `schema:"error"`
+		Description string `schema:"error_description,omitempty"`
+		URI         string `schema:"error_uri,omitempty"`
+		State       string `schema:"state,omitempty"`
+	}{
+		Error:       reason,
+		Description: description,
+		URI:         uri,
+		State:       authReq.GetState(),
+	}
+	callback, err := op.AuthResponseURL(authReq.GetRedirectURI(), authReq.GetResponseType(), authReq.GetResponseMode(), e, authorizer.Encoder())
+	if err != nil {
+		return "", err
+	}
+	return callback, nil
+}
+
+func CreateCodeCallbackURL(ctx context.Context, authReq op.AuthRequest, authorizer op.Authorizer) (string, error) {
+	code, err := op.CreateAuthRequestCode(ctx, authReq, authorizer.Storage(), authorizer.Crypto())
+	if err != nil {
+		return "", err
+	}
+	codeResponse := struct {
+		code  string
+		state string
+	}{
+		code:  code,
+		state: authReq.GetState(),
+	}
+	callback, err := op.AuthResponseURL(authReq.GetRedirectURI(), authReq.GetResponseType(), authReq.GetResponseMode(), &codeResponse, authorizer.Encoder())
+	if err != nil {
+		return "", err
+	}
+	return callback, err
+}
+
+func CreateTokenCallbackURL(ctx context.Context, req op.AuthRequest, authorizer op.Authorizer) (string, error) {
+	client, err := authorizer.Storage().GetClientByClientID(ctx, req.GetClientID())
+	if err != nil {
+		return "", err
+	}
+	createAccessToken := req.GetResponseType() != oidc.ResponseTypeIDTokenOnly
+	resp, err := op.CreateTokenResponse(ctx, req, client, authorizer, createAccessToken, "", "")
+	if err != nil {
+		return "", err
+	}
+	callback, err := op.AuthResponseURL(req.GetRedirectURI(), req.GetResponseType(), req.GetResponseMode(), resp, authorizer.Encoder())
+	if err != nil {
+		return "", err
+	}
+	return callback, err
 }

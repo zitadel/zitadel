@@ -95,7 +95,7 @@ service OIDCService {
     };
   }
 
-  rpc LinkSessionToAuthRequest (LinkSessionToAuthRequestRequest) returns (LinkSessionToAuthRequestResponse) {
+  rpc CreateCallback (CreateCallbackRequest) returns (CreateCallbackResponse) {
     option (google.api.http) = {
       post: "/v2alpha/oidc/auth_requests/{auth_request_id}"
       body: "*"
@@ -108,8 +108,8 @@ service OIDCService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Link session to the AuthRequest.";
-      description: "Link an existing session to an auth request. With the link the auth request can be finished and tokens can be created under the session."
+      summary: "Finalize an Auth Request and get the callback URL.";
+      description: "Finalize an Auth Request and get the callback URL for success or failure. The user must be redirected to the URL in order to inform the application about the success or failure. On success, the URL contains details for the application to obtain the tokens. This method can only be called once for an Auth request."
       responses: {
         key: "200"
         value: {
@@ -136,18 +136,29 @@ message GetAuthRequestResponse {
   AuthRequest auth_request = 1;
 }
 
-message LinkSessionToAuthRequestRequest {
+message CreateCallbackRequest {
   string auth_request_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      description: "ID of the Auth Request, as obtained from the redirect URL.";
-      example: "\"163840776835432705\"";
+      description: "Set this field when the authorization flow failed. It creates a callback URL to the application, with the error details set.";
+      ref: "https://openid.net/specs/openid-connect-core-1_0.html#AuthError";
     }
   ];
 
-  string session_id = 2 [
+  oneof callback_kind {
+    option (validate.required) = true;
+    Session session = 2;
+    AuthorizationError error = 3 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Set this field when the authorization flow failed. It creates a callback URL to the application, with the error details set.";
+        ref: "https://openid.net/specs/openid-connect-core-1_0.html#AuthError";
+      }
+    ];
+  }
+}
+
+message Session {
+  string session_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
@@ -157,7 +168,7 @@ message LinkSessionToAuthRequestRequest {
     }
   ];
 
-  string session_token = 3 [
+  string session_token = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
@@ -167,12 +178,13 @@ message LinkSessionToAuthRequestRequest {
   ];
 }
 
-message LinkSessionToAuthRequestResponse {
+message CreateCallbackResponse {
   zitadel.object.v2alpha.Details details = 1;
   string callback_url = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Callback URL where the user should be redirected, using a \"302 FOUND\" status. The URl will point to the standard OIDC authorize callback to finish the auth request.";
+      description: "Callback URL where the user should be redirected, using a \"302 FOUND\" status. Contains details for the application to obtain the tokens on success, or error details on failure. Note that this field must be treated as credentials, as the contained code can be used to obtain tokens on behalve of the user.";
       example: "\"https://client.example.org/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj\""
     }
   ];
 }
+
