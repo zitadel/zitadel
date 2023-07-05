@@ -7,8 +7,9 @@ import TabItem from "@theme/TabItem";
 import LinuxUnix from './_linuxunix.mdx'
 import Compose from './_compose.mdx'
 import Helm from './_helm.mdx'
-import Steps from './env/_steps.mdx'
-import Defaults from './env/_defaults.mdx'
+import CodeBlock from '@theme/CodeBlock';
+import DefaultsYamlSource from '!!raw-loader!./defaults.yaml'
+import StepsYamlSource from '!!raw-loader!./steps.yaml'
 
 This guide assumes you are familiar with [running ZITADEL using the least amount of configuration possible](/docs/self-hosting/deploy/overview).
 
@@ -17,12 +18,19 @@ This guide assumes you are familiar with [running ZITADEL using the least amount
 ### Runtime configuration file
 
 You can configure the runtime using the `--config` flag of the `zitadel` binary.
-For a description of all _runtime configuration options_ and their defaults, read the [ZITADEL source code](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml).
+
+<details><summary>defaults.yaml</summary>
+    <CodeBlock language="yaml">{DefaultsYamlSource}</CodeBlock>
+</details>
 
 ### Database initialization file
 
 ZITADEL uses a [different configuration file](https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml) for _database initialization steps_.
 Use the `--steps` flag of the `zitadel` binary to provide this configuration file.
+
+<details><summary>steps.yaml</summary>
+    <CodeBlock language="yaml">{StepsYamlSource}</CodeBlock>
+</details>
 
 ### Multiple configuration files
 
@@ -36,18 +44,7 @@ To use private information — such as a database admin credential — without s
 All configuration properties are configurable using environment variables.
 ZITADEL environment variable keys are prefixed with `ZITADEL_`.
 For example, to configure the default ZITADEL IAM admin username and password, set the `zitadel` binary runtime environment variables `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME` and `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD`.
-Currently it is not possible to configure maps of values with environment variables, use a configuration file instead.
-
-<details>
-    <summary>List of environment variables for database initialization </summary>
-    Check the <a href="#database-initialization-file">Database initialization file</a> for a full reference, if default values are omitted.
-    <Steps />
-</details>
-<details>
-    <summary>List of environment variables for runtime configuration</summary>
-    Check the <a href="#runtime-configuration-file">Runtime configuration file</a>for a full reference, if default values are omitted.
-    <Defaults />
-</details>
+All supported environment variables are listed in the [runtime configuration file](#runtime-configuration-file) and the [database initialization file](#database-initialization-file).
 
 ### Proxy configuration
 
@@ -91,6 +88,10 @@ Open your favorite internet browser at [http://localhost:8080/ui/console](http:/
 This is the IAM admin users login according to your configuration in the [example-zitadel-init-steps.yaml](./example-zitadel-init-steps.yaml):
 - **username**: *root@<span></span>zitadel.localhost*
 - **password**: *RootPassword1!*
+
+## Configuration options
+
+
 
 ## What's next
 

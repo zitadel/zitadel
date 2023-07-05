@@ -1,41 +1,42 @@
 FirstInstance:
-  MachineKeyPath:
-  PatPath:
-  InstanceName: ZITADEL
-  DefaultLanguage: en
+  MachineKeyPath: # ZITADEL_FIRSTINSTANCE_MACHINEKEYPATH
+  PatPath: # ZITADEL_FIRSTINSTANCE_PATPATH
+  InstanceName: ZITADEL # ZITADEL_FIRSTINSTANCE_INSTANCENAME
+  DefaultLanguage: en # ZITADEL_FIRSTINSTANCE_DEFAULTLANGUAGE
   Org:
-    Name: ZITADEL
+    Name: ZITADEL # ZITADEL_FIRSTINSTANCE_ORG_NAME
     Human:
       # in case that UserLoginMustBeDomain is false (default) and you don't overwrite the username with an email,
       # it will be suffixed by the org domain (org-name + domain from config).
       # for example: zitadel-admin in org ZITADEL on domain.tld -> zitadel-admin@zitadel.domain.tld
-      UserName: zitadel-admin
-      FirstName: ZITADEL
-      LastName: Admin
-      NickName:
-      DisplayName:
+      UserName: zitadel-admin # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME
+      FirstName: ZITADEL # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_FIRSTNAME
+      LastName: Admin # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_LASTNAME
+      NickName: # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_NICKNAME
+      DisplayName: # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_DISPLAYNAME
       Email:
-        Address: #uses the username if empty
-        Verified: true
-      PreferredLanguage: en
-      Gender:
+        # uses the username if empty
+        Address: # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_EMAIL_ADDRESS
+        Verified: true # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_EMAIL_VERIFIED
+      PreferredLanguage: en # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PREFERREDLANGUAGE
+      Gender: # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_GENDER
       Phone:
-        Number:
-        Verified:
-      Password: Password1!
-      PasswordChangeRequired: true
+        Number: # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PHONE_NUMBER
+        Verified: # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PHONE_VERIFIED
+      Password: Password1! # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD
+      PasswordChangeRequired: true # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED
     Machine:
       Machine:
-        Username:
-        Name:
+        Username: # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_USERNAME
+        Name: # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_NAME
       MachineKey:
-        ExpirationDate:
-        Type:
+        ExpirationDate: # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINEKEY_EXPIRATIONDATE
+        Type: # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINEKEY_TYPE
       Pat:
-        ExpirationDate:
+        ExpirationDate: # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE
 
 CorrectCreationDate:
-  FailAfter: 5m
+  FailAfter: 5m # ZITADEL_CORRECTCREATIONDATE_FAILAFTER
 
 AddEventCreatedAt:
-  BulkAmount: 100
+  BulkAmount: 100 # ZITADEL_ADDEVENTCREATEDAT_BULKAMOUNT
