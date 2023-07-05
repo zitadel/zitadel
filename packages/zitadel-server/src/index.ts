@@ -12,7 +12,18 @@ export {
   Theme,
 } from "./proto/server/zitadel/settings/v2alpha/branding_settings";
 
-export { Session } from "./proto/server/zitadel/session/v2alpha/session";
+export { LoginSettings } from "./proto/server/zitadel/settings/v2alpha/login_settings";
+
+export {
+  ChallengeKind,
+  Challenges,
+  Challenges_Passkey,
+} from "./proto/server/zitadel/session/v2alpha/challenge";
+
+export {
+  Session,
+  Factors,
+} from "./proto/server/zitadel/session/v2alpha/session";
 export {
   ListSessionsResponse,
   GetSessionResponse,
@@ -25,6 +36,8 @@ export {
   GetBrandingSettingsResponse,
   GetLegalAndSupportSettingsResponse,
   GetGeneralSettingsResponse,
+  GetLoginSettingsResponse,
+  GetLoginSettingsRequest,
 } from "./proto/server/zitadel/settings/v2alpha/settings_service";
 export {
   AddHumanUserResponse,
@@ -35,6 +48,9 @@ export {
   RegisterPasskeyResponse,
   CreatePasskeyRegistrationLinkResponse,
   CreatePasskeyRegistrationLinkRequest,
+  ListAuthenticationMethodTypesResponse,
+  ListAuthenticationMethodTypesRequest,
+  AuthenticationMethodType,
 } from "./proto/server/zitadel/user/v2alpha/user_service";
 export {
   SetHumanPasswordResponse,

@@ -21,6 +21,10 @@ import {
   SetSessionResponse,
   DeleteSessionResponse,
   VerifyPasskeyRegistrationResponse,
+  ChallengeKind,
+  LoginSettings,
+  GetLoginSettingsResponse,
+  ListAuthenticationMethodTypesResponse,
 } from "@zitadel/server";
 
 export const zitadelConfig: ZitadelServerOptions = {
@@ -43,6 +47,15 @@ export async function getBrandingSettings(
   return settingsService
     .getBrandingSettings({}, {})
     .then((resp: GetBrandingSettingsResponse) => resp.settings);
+}
+
+export async function getLoginSettings(
+  server: ZitadelServer
+): Promise<LoginSettings | undefined> {
+  const settingsService = settings.getSettings(server);
+  return settingsService
+    .getLoginSettings({}, {})
+    .then((resp: GetLoginSettingsResponse) => resp.settings);
 }
 
 export async function getGeneralSettings(
@@ -78,29 +91,47 @@ export async function getPasswordComplexitySettings(
 export async function createSession(
   server: ZitadelServer,
   loginName: string,
+  domain: string,
   password: string | undefined,
-  domain: string
+  challenges: ChallengeKind[] | undefined
 ): Promise<CreateSessionResponse | undefined> {
   const sessionService = session.getSession(server);
   return password
     ? sessionService.createSession(
-        { checks: { user: { loginName }, password: { password } }, domain },
+        {
+          checks: { user: { loginName }, password: { password } },
+          challenges,
+          domain,
+        },
         {}
       )
-    : sessionService.createSession({ checks: { user: { loginName } } }, {});
+    : sessionService.createSession(
+        { checks: { user: { loginName } }, domain },
+        {}
+      );
 }
 
 export async function setSession(
   server: ZitadelServer,
   sessionId: string,
   sessionToken: string,
-  password: string
+  domain: string | undefined,
+  password: string | undefined,
+  passkey: { credentialAssertionData: any } | undefined,
+  challenges: ChallengeKind[] | undefined
 ): Promise<SetSessionResponse | undefined> {
   const sessionService = session.getSession(server);
-  return sessionService.setSession(
-    { sessionId, sessionToken, checks: { password: { password } } },
-    {}
-  );
+
+  const payload = { sessionId, sessionToken, challenges, domain };
+  return password
+    ? sessionService.setSession(
+        {
+          ...payload,
+          checks: { password: { password }, passkey },
+        },
+        {}
+      )
+    : sessionService.setSession(payload, {});
 }
 
 export async function getSession(
@@ -262,6 +293,21 @@ export async function registerPasskey(
     code,
     domain,
     // authenticator:
+  });
+}
+
+/**
+ *
+ * @param server
+ * @param userId the id of the user where the email should be set
+ * @returns the newly set email
+ */
+export async function listAuthenticationMethodTypes(
+  userId: string
+): Promise<ListAuthenticationMethodTypesResponse> {
+  const userservice = user.getUser(server);
+  return userservice.listAuthenticationMethodTypes({
+    userId,
   });
 }
 

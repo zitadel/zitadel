@@ -9,8 +9,8 @@ export const demos: { name: string; items: Item[] }[] = [
     name: "Login",
     items: [
       {
-        name: "Username",
-        slug: "username",
+        name: "Loginname",
+        slug: "loginname",
         description: "The entrypoint of the application",
       },
       {

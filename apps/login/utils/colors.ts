@@ -72,16 +72,16 @@ type BrandingColors = {
 export function setTheme(document: any, policy?: Partial<BrandingSettings>) {
   const lP: BrandingColors = {
     lightTheme: {
-      backgroundColor: policy?.lightTheme?.backgroundColor ?? BACKGROUND,
-      fontColor: policy?.lightTheme?.fontColor ?? TEXT,
-      primaryColor: policy?.lightTheme?.primaryColor ?? PRIMARY,
-      warnColor: policy?.lightTheme?.warnColor ?? WARN,
+      backgroundColor: policy?.lightTheme?.backgroundColor || BACKGROUND,
+      fontColor: policy?.lightTheme?.fontColor || TEXT,
+      primaryColor: policy?.lightTheme?.primaryColor || PRIMARY,
+      warnColor: policy?.lightTheme?.warnColor || WARN,
     },
     darkTheme: {
-      backgroundColor: policy?.darkTheme?.backgroundColor ?? DARK_BACKGROUND,
-      fontColor: policy?.darkTheme?.fontColor ?? DARK_TEXT,
-      primaryColor: policy?.darkTheme?.primaryColor ?? DARK_PRIMARY,
-      warnColor: policy?.darkTheme?.warnColor ?? DARK_WARN,
+      backgroundColor: policy?.darkTheme?.backgroundColor || DARK_BACKGROUND,
+      fontColor: policy?.darkTheme?.fontColor || DARK_TEXT,
+      primaryColor: policy?.darkTheme?.primaryColor || DARK_PRIMARY,
+      warnColor: policy?.darkTheme?.warnColor || DARK_WARN,
     },
   };
 

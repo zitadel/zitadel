@@ -29,7 +29,7 @@ export default function RegisterPasskey({ sessionId, isPrompt }: Props) {
   async function submitRegister() {
     setError("");
     setLoading(true);
-    const res = await fetch("/passkeys", {
+    const res = await fetch("/api/passkeys", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -56,7 +56,7 @@ export default function RegisterPasskey({ sessionId, isPrompt }: Props) {
     sessionId: string
   ) {
     setLoading(true);
-    const res = await fetch("/passkeys/verify", {
+    const res = await fetch("/api/passkeys/verify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

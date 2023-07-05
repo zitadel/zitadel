@@ -17,7 +17,7 @@ export default function SessionItem({
 
   async function clearSession(id: string) {
     setLoading(true);
-    const res = await fetch("/session?" + new URLSearchParams({ id }), {
+    const res = await fetch("/api/session?" + new URLSearchParams({ id }), {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -39,18 +39,22 @@ export default function SessionItem({
   }
 
   const validPassword = session?.factors?.password?.verifiedAt;
+  const validPasskey = session?.factors?.passkey?.verifiedAt;
+
+  const validUser = validPassword || validPasskey;
 
   return (
     <Link
       href={
-        validPassword
+        validUser
           ? `/signedin?` +
             new URLSearchParams({
               loginName: session.factors?.user?.loginName as string,
             })
-          : `/password?` +
+          : `/loginname?` +
             new URLSearchParams({
               loginName: session.factors?.user?.loginName as string,
+              submit: "true",
             })
       }
       className="group flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light hover:shadow-lg dark:hover:bg-white/10 py-2 px-4 rounded-md transition-all"
@@ -68,16 +72,16 @@ export default function SessionItem({
         <span className="text-xs opacity-80">
           {session.factors?.user?.loginName}
         </span>
-        {validPassword && (
+        {validUser && (
           <span className="text-xs opacity-80">
-            {moment(new Date(validPassword)).fromNow()}
+            {moment(new Date(validUser)).fromNow()}
           </span>
         )}
       </div>
 
       <span className="flex-grow"></span>
       <div className="relative flex flex-row items-center">
-        {validPassword ? (
+        {validUser ? (
           <div className="absolute h-2 w-2 bg-green-500 rounded-full mx-2 transform right-0 group-hover:right-6 transition-all"></div>
         ) : (
           <div className="absolute h-2 w-2 bg-red-500 rounded-full mx-2 transform right-0 group-hover:right-6 transition-all"></div>

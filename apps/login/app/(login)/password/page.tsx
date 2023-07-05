@@ -9,7 +9,7 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName } = searchParams;
+  const { loginName, promptPasswordless, alt } = searchParams;
   const sessionFactors = await loadSession(loginName);
 
   async function loadSession(loginName?: string) {
@@ -44,7 +44,11 @@ export default async function Page({
         ></UserAvatar>
       )}
 
-      <PasswordForm loginName={loginName} />
+      <PasswordForm
+        loginName={loginName}
+        promptPasswordless={promptPasswordless === "true"}
+        isAlternative={alt === "true"}
+      />
     </div>
   );
 }

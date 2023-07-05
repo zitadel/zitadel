@@ -15,3 +15,11 @@ The Login UI should provide the following functionality:
 ## Documentation
 
 https://beta.nextjs.org/docs
+
+<!--
+
+This can be uncommented once @zitadel/... packages are available in the public npm registry
+
+## Deploy your own
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Ftypescript%2Ftree%2Fmain%2Fapps%2Flogin&env=ZITADEL_API_URL,ZITADEL_SERVICE_USER_TOKEN&demo-title=Next.js%20Login&demo-description=A%20Login%20Application%20built%20with%20Next.js) -->

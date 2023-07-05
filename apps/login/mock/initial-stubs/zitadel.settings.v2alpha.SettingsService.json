@@ -7,11 +7,29 @@
   {
     "service": "zitadel.settings.v2alpha.SettingsService",
     "method": "GetLegalAndSupportSettings",
-    "out": {}
+    "out": {
+      "data": {
+        "settings": {
+          "tosLink": "http://whatever.com/help",
+          "privacyPolicyLink": "http://whatever.com/help",
+          "helpLink": "http://whatever.com/help"
+        }
+      }
+    }
   },
   {
     "service": "zitadel.settings.v2alpha.SettingsService",
     "method": "GetPasswordComplexitySettings",
-    "out": {}
+    "out": {
+      "data": {
+        "settings": {
+          "minLength": 8,
+          "requiresUppercase": true,
+          "requiresLowercase": true,
+          "requiresNumber": true,
+          "requiresSymbol": true
+        }
+      }
+    }
   }
 ]

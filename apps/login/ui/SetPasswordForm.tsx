@@ -47,7 +47,7 @@ export default function SetPasswordForm({
 
   async function submitRegister(values: Inputs) {
     setLoading(true);
-    const res = await fetch("/registeruser", {
+    const res = await fetch("/api/registeruser", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -71,7 +71,7 @@ export default function SetPasswordForm({
     loginName: string,
     password: string
   ) {
-    const res = await fetch("/session", {
+    const res = await fetch("/api/session", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

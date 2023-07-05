@@ -19,6 +19,7 @@ function setSessionHttpOnlyCookie(sessions: SessionCookie[]) {
     path: "/",
   });
 }
+
 export async function addSessionToCookie(session: SessionCookie): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -37,7 +38,7 @@ export async function addSessionToCookie(session: SessionCookie): Promise<any> {
     currentSessions = [...currentSessions, session];
   }
 
-  setSessionHttpOnlyCookie(currentSessions);
+  return setSessionHttpOnlyCookie(currentSessions);
 }
 
 export async function updateSessionCookie(
@@ -52,9 +53,12 @@ export async function updateSessionCookie(
     : [session];
 
   const foundIndex = sessions.findIndex((session) => session.id === id);
-  sessions[foundIndex] = session;
-
-  return setSessionHttpOnlyCookie(sessions);
+  if (foundIndex > -1) {
+    sessions[foundIndex] = session;
+    return setSessionHttpOnlyCookie(sessions);
+  } else {
+    throw "updateSessionCookie: session id now found";
+  }
 }
 
 export async function removeSessionFromCookie(
@@ -88,11 +92,11 @@ export async function getMostRecentSessionCookie(): Promise<any> {
 
     return latest;
   } else {
-    return Promise.reject();
+    return Promise.reject("no session cookie found");
   }
 }
 
-export async function getSessionCookieById(id: string): Promise<any> {
+export async function getSessionCookieById(id: string): Promise<SessionCookie> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -107,6 +111,26 @@ export async function getSessionCookieById(id: string): Promise<any> {
     }
   } else {
     return Promise.reject();
+  }
+}
+
+export async function getSessionCookieByLoginName(
+  loginName: string
+): Promise<SessionCookie> {
+  const cookiesList = cookies();
+  const stringifiedCookie = cookiesList.get("sessions");
+
+  if (stringifiedCookie?.value) {
+    const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
+
+    const found = sessions.find((s) => s.loginName === loginName);
+    if (found) {
+      return found;
+    } else {
+      return Promise.reject("no cookie found with loginName: " + loginName);
+    }
+  } else {
+    return Promise.reject("no session cookie found");
   }
 }
 
