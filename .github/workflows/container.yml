@@ -25,7 +25,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ inputs.tag_name }}
+          images: ${{ github.repository }}
       - 
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -61,9 +61,9 @@ jobs:
           file: build/Dockerfile
           target: artifact
           platforms: linux/${{ matrix.arch }}
-          tags: ${{ inputs.tag_name }}-ubuntu
+          # tags: ${{ inputs.tag_name }}-ubuntu
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=${{ inputs.tag_name }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
       - 
         name: Scratch
         id: build-scratch
@@ -75,7 +75,9 @@ jobs:
           target: final
           platforms: linux/${{ matrix.arch }}
           push: true
-          tags: ${{ inputs.tag_name }}
+          # tags: ${{ inputs.tag_name }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
       -
         name: Export ubuntu digest
         run: |
@@ -89,7 +91,7 @@ jobs:
           digest="${{ steps.build-scratch.outputs.digest }}"
           touch "/tmp/digests/scratch/${digest#sha256:}"
       -
-        name: Upload ubuntu digest
+        name: Upload digest
         uses: actions/upload-artifact@v3
         with:
           name: digests
