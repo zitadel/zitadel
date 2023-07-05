@@ -12,6 +12,6 @@ case $@ in
         then
             ZITADEL_ARGS="$@"
         fi
-        /app/zitadel-${TARGETARCH} ${ZITADEL_ARGS}
+        /app/zitadel ${ZITADEL_ARGS}
         ;;
 esac

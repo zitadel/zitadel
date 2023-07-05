@@ -5,7 +5,7 @@ ENV ZITADEL_ARGS=
 RUN apt-get update && apt-get install ca-certificates -y
 
 COPY build/entrypoint.sh /app/entrypoint.sh
-COPY .executables/ /app/
+COPY zitadel /app/zitadel
 
 RUN useradd -s "" --home / zitadel && \
     chown zitadel /app/zitadel && \
@@ -30,4 +30,4 @@ ENV PATH="/app:${PATH}"
 HEALTHCHECK NONE
 
 USER zitadel
-ENTRYPOINT ["/app/zitadel-${TARGETARCH}"]
+ENTRYPOINT ["/app/zitadel"]
