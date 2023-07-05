@@ -31,16 +31,5 @@
         }
       }
     }
-  },
-  {
-    "service": "zitadel.settings.v2alpha.SettingsService",
-    "method": "GetLoginSettings",
-    "out": {
-      "data": {
-        "settings": {
-          "passkeysType": 1
-        }
-      }
-    }
   }
 ]
