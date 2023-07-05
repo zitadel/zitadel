@@ -72,7 +72,7 @@ jobs:
           file: build/Dockerfile
           target: artifact
           platforms: linux/${{ matrix.arch }}
-          # tags: ${{ inputs.tag_name }}-ubuntu
+          tags: '${{ inputs.image_name }}:${{ inputs.image_tag }}-ubuntu'
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ inputs.image_name }},push-by-digest=true,name-canonical=true,push=true
       - 
@@ -86,7 +86,7 @@ jobs:
           target: final
           platforms: linux/${{ matrix.arch }}
           push: true
-          # tags: ${{ inputs.tag_name }}
+          tags: '${{ inputs.image_name }}:${{ inputs.image_tag }}'
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ inputs.image_name }},push-by-digest=true,name-canonical=true,push=true
       -
