@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/dop251/goja"
 	"github.com/zitadel/logging"
@@ -23,7 +22,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/user/model"
 )
 
 const (
@@ -121,23 +119,9 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo *oidc.UserInfo, tokenID, subject, origin string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-
-	var token *model.TokenView
-	if strings.HasPrefix(tokenID, IDPrefix) {
-		authReq, err := o.command.GetAuthRequestWriteModel(ctx, strings.TrimPrefix(tokenID, IDPrefix))
-		if err != nil {
-			return err
-		}
-		token = &model.TokenView{
-			UserID:        "220275980948910637",
-			ApplicationID: authReq.ClientID,
-			Scopes:        authReq.Scope,
-		}
-	} else {
-		token, err = o.repo.TokenByIDs(ctx, subject, tokenID)
-		if err != nil {
-			return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
-		}
+	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
+	if err != nil {
+		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
 	if token.ApplicationID != "" {
 		app, err := o.query.AppByOIDCClientID(ctx, token.ApplicationID, false)
@@ -170,26 +154,9 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo *oidc.Us
 }
 
 func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection *oidc.IntrospectionResponse, tokenID, subject, clientID string) (err error) {
-	var token *model.TokenView
-	if strings.HasPrefix(tokenID, IDPrefix) {
-		authReq, err := o.command.GetAuthRequestWriteModel(ctx, strings.TrimPrefix(tokenID, IDPrefix))
-		if err != nil {
-			return err
-		}
-		token = &model.TokenView{
-			UserID:        "220275980948910637",
-			ApplicationID: authReq.ClientID,
-			Scopes:        authReq.Scope,
-			Audience:      authReq.Audience,
-			Expiration:    time.Now().Add(1 * time.Hour),
-			CreationDate:  authReq.ChangeDate,
-			ID:            tokenID,
-		}
-	} else {
-		token, err = o.repo.TokenByIDs(ctx, subject, tokenID)
-		if err != nil {
-			return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
-		}
+	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
+	if err != nil {
+		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
 	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID, false)
 	if err != nil {
