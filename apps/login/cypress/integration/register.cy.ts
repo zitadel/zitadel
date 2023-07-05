@@ -1,9 +1,8 @@
-import { addStub, removeStub } from "../support/mock";
+import { stub } from "../support/mock";
 
 describe("register", () => {
   beforeEach(() => {
-    removeStub("zitadel.user.v2alpha.UserService", "AddHumanUser");
-    addStub("zitadel.user.v2alpha.UserService", "AddHumanUser", {
+    stub("zitadel.user.v2alpha.UserService", "AddHumanUser", {
       data: {
         userId: "123",
       },
