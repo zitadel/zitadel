@@ -63,7 +63,7 @@ func (s *Tester) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI s
 		AuthMethodType:           app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE,
 		PostLogoutRedirectUris:   nil,
 		Version:                  app.OIDCVersion_OIDC_VERSION_1_0,
-		DevMode:                  false,
+		DevMode:                  true,
 		AccessTokenType:          app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT,
 		AccessTokenRoleAssertion: false,
 		IdTokenRoleAssertion:     false,
@@ -85,6 +85,32 @@ func (s *Tester) CreateOIDCAuthRequest(clientID, loginClient, redirectURI string
 	authURL := rp.AuthURL("state", provider, rp.WithCodeChallenge(codeChallenge))
 
 	loc, err := CheckRedirect(authURL, map[string]string{oidc_internal.LoginClientHeader: loginClient})
+	if err != nil {
+		return "", err
+	}
+
+	prefixWithHost := provider.Issuer() + s.Config.OIDC.DefaultLoginURLV2
+	if !strings.HasPrefix(loc.String(), prefixWithHost) {
+		return "", fmt.Errorf("login location has not prefix %s, but is %s", prefixWithHost, loc.String())
+	}
+	return strings.TrimPrefix(loc.String(), prefixWithHost), nil
+}
+
+func (s *Tester) CreateOIDCAuthRequestImplicit(clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
+	provider, err := s.CreateRelyingParty(clientID, redirectURI, scope...)
+	if err != nil {
+		return "", err
+	}
+
+	authURL := rp.AuthURL("state", provider)
+	parsed, err := url.Parse(authURL)
+	if err != nil {
+		return "", err
+	}
+	queries := parsed.Query()
+	queries.Set("response_type", string(oidc.ResponseTypeIDToken))
+	parsed.RawQuery = queries.Encode()
+	loc, err := CheckRedirect(parsed.String(), map[string]string{oidc_internal.LoginClientHeader: loginClient})
 	if err != nil {
 		return "", err
 	}

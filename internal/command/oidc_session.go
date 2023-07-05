@@ -91,8 +91,6 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, authRequestID st
 	if err != nil {
 		return nil, err
 	}
-	//TODO: remove as soon as implemented
-	//authRequestWriteModel.SessionID = "221249418811191853"
 	if err = authRequestWriteModel.CheckAuthenticated(); err != nil {
 		return nil, err
 	}
