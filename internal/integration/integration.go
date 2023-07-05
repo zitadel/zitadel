@@ -13,6 +13,8 @@ import (
 	"sync"
 	"time"
 
+	http_util "github.com/zitadel/zitadel/internal/api/http"
+
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/client"
@@ -60,6 +62,10 @@ const (
 	SystemUser // SystemUser is a user with access to the system service.
 )
 
+const (
+	FirstInstanceUsersKey = "first"
+)
+
 // User information with a Personal Access Token.
 type User struct {
 	*query.User
@@ -72,7 +78,7 @@ type Tester struct {
 
 	Instance     authz.Instance
 	Organisation *query.Org
-	Users        map[UserType]User
+	Users        map[string]map[UserType]User
 
 	Client   Client
 	WebAuthN *webauthn.Client
@@ -133,7 +139,7 @@ const (
 	MachineUser = "integration"
 )
 
-func (s *Tester) createMachineUser(ctx context.Context) {
+func (s *Tester) createMachineUser(ctx context.Context, instanceId string) {
 	var err error
 
 	s.Instance, err = s.Queries.InstanceByHost(ctx, s.Host())
@@ -174,43 +180,43 @@ func (s *Tester) createMachineUser(ctx context.Context) {
 	_, err = s.Commands.AddPersonalAccessToken(ctx, pat)
 	logging.OnError(err).Fatal("add pat")
 
-	s.Users = map[UserType]User{
-		OrgOwner: {
-			User:  user,
-			Token: pat.Token,
-		},
+	if s.Users == nil {
+		s.Users = make(map[string]map[UserType]User)
+	}
+	if s.Users[instanceId] == nil {
+		s.Users[instanceId] = make(map[UserType]User)
+	}
+	s.Users[instanceId][OrgOwner] = User{
+		User:  user,
+		Token: pat.Token,
 	}
 }
 
 func (s *Tester) WithAuthorization(ctx context.Context, u UserType) context.Context {
+	return s.WithInstanceAuthorization(ctx, u, FirstInstanceUsersKey)
+}
+
+func (s *Tester) WithInstanceAuthorization(ctx context.Context, u UserType, instanceID string) context.Context {
 	if u == SystemUser {
 		s.ensureSystemUser()
 	}
-	return metadata.AppendToOutgoingContext(ctx, "Authorization", fmt.Sprintf("Bearer %s", s.Users[u].Token))
+	return metadata.AppendToOutgoingContext(ctx, "Authorization", fmt.Sprintf("Bearer %s", s.Users[instanceID][u].Token))
 }
 
 func (s *Tester) ensureSystemUser() {
 	const ISSUER = "tester"
-
-	if _, ok := s.Users[SystemUser]; ok {
+	if s.Users[FirstInstanceUsersKey] == nil {
+		s.Users[FirstInstanceUsersKey] = make(map[UserType]User)
+	}
+	if _, ok := s.Users[FirstInstanceUsersKey][SystemUser]; ok {
 		return
 	}
-	domain := viper.Get("ExternalDomain").(string)
-	port := viper.Get("ExternalPort").(int)
-	protocol := "http"
-	secure := viper.Get("ExternalSecure").(bool)
-	if secure {
-		protocol = "https"
-	}
-	audience := fmt.Sprintf("%s://%s:%d", protocol, domain, port)
-
+	audience := http_util.BuildOrigin(s.Host(), s.Server.Config.ExternalSecure)
 	signer, err := client.NewSignerFromPrivateKeyByte(systemUserKey, "")
 	logging.OnError(err).Fatal("system key signer")
-
 	jwt, err := client.SignedJWTProfileAssertion(ISSUER, []string{audience}, time.Hour, signer)
 	logging.OnError(err).Fatal("system key jwt")
-
-	s.Users[SystemUser] = User{Token: jwt}
+	s.Users[FirstInstanceUsersKey][SystemUser] = User{Token: jwt}
 }
 
 // Done send an interrupt signal to cleanly shutdown the server.
@@ -257,7 +263,11 @@ func NewTester(ctx context.Context) *Tester {
 	}
 	logging.OnError(err).Fatal()
 
-	tester := new(Tester)
+	tester := Tester{
+		Users: map[string]map[UserType]User{
+			FirstInstanceUsersKey: make(map[UserType]User),
+		},
+	}
 	tester.wg.Add(1)
 	go func(wg *sync.WaitGroup) {
 		logging.OnError(cmd.Execute()).Fatal()
@@ -270,10 +280,10 @@ func NewTester(ctx context.Context) *Tester {
 		logging.OnError(ctx.Err()).Fatal("waiting for integration tester server")
 	}
 	tester.createClientConn(ctx)
-	tester.createMachineUser(ctx)
+	tester.createMachineUser(ctx, FirstInstanceUsersKey)
 	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, "https://"+tester.Host())
 
-	return tester
+	return &tester
 }
 
 func Contexts(timeout time.Duration) (ctx, errCtx context.Context, cancel context.CancelFunc) {

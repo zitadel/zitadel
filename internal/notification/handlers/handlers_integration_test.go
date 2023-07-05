@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	CTX          context.Context
+	SystemCTX    context.Context
 	Tester       *integration.Tester
 	SystemClient system.SystemServiceClient
 	MgmtClient   management.ManagementServiceClient
@@ -23,9 +23,9 @@ var (
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
 		ctx, _, cancel := integration.Contexts(5 * time.Minute)
-		CTX = ctx
 		defer cancel()
 		Tester = integration.NewTester(ctx)
+		SystemCTX = Tester.WithAuthorization(ctx, integration.SystemUser)
 		MgmtClient = Tester.Client.Mgmt
 		SystemClient = Tester.Client.System
 		defer Tester.Done()

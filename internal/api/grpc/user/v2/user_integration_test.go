@@ -454,7 +454,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddIDPLinkRequest{
-					UserId: Tester.Users[integration.OrgOwner].ID,
+					UserId: Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID,
 					IdpLink: &user.IDPLink{
 						IdpId:    "idpID",
 						UserId:   "userID",
@@ -470,7 +470,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddIDPLinkRequest{
-					UserId: Tester.Users[integration.OrgOwner].ID,
+					UserId: Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID,
 					IdpLink: &user.IDPLink{
 						IdpId:    idpID,
 						UserId:   "userID",

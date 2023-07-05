@@ -18,7 +18,7 @@ import (
 )
 
 func TestServer_TelemetryPushMilestones(t *testing.T) {
-	primaryDomain, instanceID, systemUserCTX, iamOwnerCtx := Tester.UseIsolatedInstance(CTX)
+	primaryDomain, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(SystemCTX)
 	bodies := make(chan []byte, 0)
 	t.Log("testing against instance with primary domain", primaryDomain)
 	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +55,9 @@ func TestServer_TelemetryPushMilestones(t *testing.T) {
 		t.Fatal(err)
 	}
 	awaitMilestone(t, bodies, primaryDomain, "ApplicationCreated")
-	if _, err = SystemClient.RemoveInstance(systemUserCTX, &system.RemoveInstanceRequest{InstanceId: instanceID}); err != nil {
+	// TODO: trigger and await milestone AuthenticationSucceededOnInstance
+	// TODO: trigger and await milestone AuthenticationSucceededOnApplication
+	if _, err = SystemClient.RemoveInstance(SystemCTX, &system.RemoveInstanceRequest{InstanceId: instanceID}); err != nil {
 		t.Fatal(err)
 	}
 	awaitMilestone(t, bodies, primaryDomain, "InstanceDeleted")

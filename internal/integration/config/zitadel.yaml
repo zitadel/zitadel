@@ -39,11 +39,6 @@ Quotas:
 
 Projections:
   RequeueEvery: 1s
-  Customizations:
-    NotificationsQuotas:
-      RequeueEvery: 1s
-    Telemetry:
-      RequeueEvery: 1s
 
 DefaultInstance:
   LoginPolicy:

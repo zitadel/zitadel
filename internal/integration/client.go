@@ -44,8 +44,7 @@ func newClient(cc *grpc.ClientConn) Client {
 	}
 }
 
-func (t *Tester) UseIsolatedInstance(ctx context.Context) (primaryDomain, instanceID string, systemCtx, iamOwnerCtx context.Context) {
-	systemCtx = t.WithAuthorization(ctx, SystemUser)
+func (t *Tester) UseIsolatedInstance(systemCtx context.Context) (primaryDomain, instanceID string, iamOwnerCtx context.Context) {
 	primaryDomain = randString(5) + ".integration"
 	instance, err := t.Client.System.CreateInstance(systemCtx, &system.CreateInstanceRequest{
 		InstanceName: "testinstance",
@@ -61,11 +60,14 @@ func (t *Tester) UseIsolatedInstance(ctx context.Context) (primaryDomain, instan
 	if err != nil {
 		panic(err)
 	}
-	t.createClientConn(ctx, grpc.WithAuthority(primaryDomain))
-	t.Users[IAMOwner] = User{
-		Token: instance.GetPat(),
+	t.createClientConn(systemCtx, grpc.WithAuthority(primaryDomain))
+	instanceId := instance.GetInstanceId()
+	t.Users[instanceId] = map[UserType]User{
+		IAMOwner: {
+			Token: instance.GetPat(),
+		},
 	}
-	return primaryDomain, instance.GetInstanceId(), systemCtx, t.WithAuthorization(ctx, IAMOwner)
+	return primaryDomain, instanceID, t.WithInstanceAuthorization(systemCtx, IAMOwner, instanceID)
 }
 
 func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse {
