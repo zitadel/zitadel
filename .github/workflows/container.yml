@@ -84,15 +84,15 @@ jobs:
       -
         name: Export ubuntu digest
         run: |
-          mkdir -p /tmp/digests/ubuntu
+          mkdir -p /tmp/digests
           digest="${{ steps.build-ubuntu.outputs.digest }}"
-          touch "/tmp/digests/ubuntu/${digest#sha256:}"
+          touch "/tmp/digests/${digest#sha256:}"
       -
         name: Export scratch digest
         run: |
-          mkdir -p /tmp/digests/scratch
+          mkdir -p /tmp/digests
           digest="${{ steps.build-scratch.outputs.digest }}"
-          touch "/tmp/digests/scratch/${digest#sha256:}"
+          touch "/tmp/digests/${digest#sha256:}"
       -
         name: Upload digest
         uses: actions/upload-artifact@v3
