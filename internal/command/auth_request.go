@@ -145,16 +145,10 @@ func (c *Commands) AddAuthRequestCode(ctx context.Context, authRequestID, code s
 		return errors.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.AlreadyHandled") //TODO: key
 	}
 	return c.pushAppendAndReduce(ctx, writeModel, authrequest.NewCodeAddedEvent(ctx,
-		&authrequest.NewAggregate(writeModel.AggregateID, authz.GetInstance(ctx).InstanceID()).Aggregate,
-		code,
-	))
+		&authrequest.NewAggregate(writeModel.AggregateID, authz.GetInstance(ctx).InstanceID()).Aggregate))
 }
 
 func (c *Commands) ExchangeAuthCode(ctx context.Context, code string) (authRequest *AuthenticatedAuthRequest, err error) {
-	//split := strings.Split(code, ":")
-	//if len(split) != 2 {
-	//	return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-Sfr3s", "Errors.AuthRequest.InvalidCode")
-	//}
 	writeModel, err := c.getAuthRequestWriteModel(ctx, code)
 	if err != nil {
 		return nil, err
@@ -162,9 +156,6 @@ func (c *Commands) ExchangeAuthCode(ctx context.Context, code string) (authReque
 	if writeModel.AuthRequestState != domain.AuthRequestStateCodeAdded {
 		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.NoCode")
 	}
-	//if writeModel.ExchangeCode != split[1] {
-	//	return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-DBNqz", "Errors.AuthRequest.InvalidCode")
-	//}
 	err = c.pushAppendAndReduce(ctx, writeModel, authrequest.NewCodeExchangedEvent(ctx,
 		&authrequest.NewAggregate(writeModel.AggregateID, authz.GetInstance(ctx).InstanceID()).Aggregate))
 	if err != nil {

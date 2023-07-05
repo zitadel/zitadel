@@ -187,8 +187,6 @@ func FailedEventMapper(event *repository.Event) (eventstore.Event, error) {
 
 type CodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-
-	Code string `json:"code"`
 }
 
 func (e *CodeAddedEvent) Data() interface{} {
@@ -201,7 +199,6 @@ func (e *CodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint
 
 func NewCodeAddedEvent(ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	code string,
 ) *CodeAddedEvent {
 	return &CodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -209,7 +206,6 @@ func NewCodeAddedEvent(ctx context.Context,
 			aggregate,
 			CodeAddedType,
 		),
-		Code: code,
 	}
 }
 

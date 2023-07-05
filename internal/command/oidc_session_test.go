@@ -103,7 +103,7 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
+							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 						),
 						eventFromEventPusher(
 							authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
@@ -155,7 +155,7 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
+							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 						),
 						eventFromEventPusher(
 							authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
@@ -297,7 +297,7 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
+							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 						),
 						eventFromEventPusher(
 							authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
@@ -349,7 +349,7 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
+							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 						),
 						eventFromEventPusher(
 							authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),

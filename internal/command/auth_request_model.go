@@ -29,7 +29,6 @@ type AuthRequestWriteModel struct {
 	MaxAge           *time.Duration
 	LoginHint        *string
 	HintUserID       *string
-	ExchangeCode     string
 	SessionID        string
 	UserID           string
 	AuthTime         time.Time
@@ -71,7 +70,6 @@ func (m *AuthRequestWriteModel) Reduce() error {
 			m.AuthTime = e.AuthTime
 			m.AMR = e.AMR
 		case *authrequest.CodeAddedEvent:
-			m.ExchangeCode = e.Code
 			m.AuthRequestState = domain.AuthRequestStateCodeAdded
 		case *authrequest.FailedEvent:
 			m.AuthRequestState = domain.AuthRequestStateFailed

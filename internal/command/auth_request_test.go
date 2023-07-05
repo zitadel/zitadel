@@ -794,7 +794,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID("instanceID",
-								authrequest.NewCodeAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
+								authrequest.NewCodeAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 							),
 						},
 					),
@@ -963,7 +963,7 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							authrequest.NewCodeAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
+							authrequest.NewCodeAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 						),
 					),
 					expectPush(
