@@ -31,7 +31,6 @@ jobs:
         with:
           images: ${{ inputs.image_name }}
           tags: |
-            type=schedule
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
@@ -131,6 +130,13 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: '${{ inputs.image_name }}:${{ inputs.image_tag }}'
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix=,suffix=,format=long
       - 
         name: Login to Docker registry
         uses: docker/login-action@v2
@@ -143,7 +149,7 @@ jobs:
         working-directory: /tmp/digests
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ inputs.image_name }}:${{ inputs.image_tag }}@sha256:%s ' *)
+            $(printf '${{ inputs.image_name }}@sha256:%s ' *)
       -
         name: Inspect image
         run: |
