@@ -1,4 +1,4 @@
-//go:build !race
+//go:build unit && !race
 
 // The library github.com/benbjohnson/clock fails when race is enabled
 // https://github.com/benbjohnson/clock/issues/44
