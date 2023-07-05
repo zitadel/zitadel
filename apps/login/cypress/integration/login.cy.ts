@@ -72,7 +72,7 @@ describe("login", () => {
               resourceOwner: "220516472055706145",
             },
             sessionToken:
-                "SDMc7DlYXPgwRJ-Tb5NlLqynysHjEae3csWsKzoZWLplRji0AYY3HgAkrUEBqtLCvOayLJPMd0ax4Q",
+              "SDMc7DlYXPgwRJ-Tb5NlLqynysHjEae3csWsKzoZWLplRji0AYY3HgAkrUEBqtLCvOayLJPMd0ax4Q",
             challenges: undefined,
           },
         });
@@ -82,7 +82,10 @@ describe("login", () => {
         cy.location("pathname", { timeout: 10_000 }).should("eq", "/password");
         cy.get('input[type="password"]').focus().type("MyStrongPassword!1");
         cy.get('button[type="submit"]').click();
-        cy.location("pathname", { timeout: 10_000 }).should("eq", "/passkey/add");
+        cy.location("pathname", { timeout: 10_000 }).should(
+          "eq",
+          "/passkey/add"
+        );
       });
     });
   });
