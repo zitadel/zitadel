@@ -54,7 +54,7 @@ func NewTelemetryPusher(
 ) *telemetryPusher {
 	p := new(telemetryPusher)
 	handlerCfg.ProjectionName = TelemetryProjectionTable
-	handlerCfg.Reducers = []handler.AggregateReducer{{}}
+	handlerCfg.Reducers = p.reducers()
 	p.cfg = telemetryCfg
 	p.StatementHandler = crdb.NewStatementHandler(ctx, handlerCfg)
 	p.commands = commands

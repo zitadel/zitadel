@@ -184,9 +184,6 @@ func (p *milestoneProjection) reduceUserTokenAdded(event eventstore.Event) (*han
 	if err != nil {
 		return nil, err
 	}
-	if p.isSystemEvent(event) {
-		return crdb.NewNoOpStatement(event), nil
-	}
 	statements := []func(eventstore.Event) crdb.Exec{
 		crdb.AddUpdateStatement(
 			[]handler.Column{
@@ -288,7 +285,7 @@ func (p *milestoneProjection) reduceAppConfigAdded(event eventstore.Event, clien
 }
 
 func (p *milestoneProjection) isSystemEvent(event eventstore.Event) bool {
-	if _, err := strconv.Atoi(event.EditorUser()); err == nil {
+	if userId, err := strconv.Atoi(event.EditorUser()); err == nil && userId > 0 {
 		return false
 	}
 	lowerEditorService := strings.ToLower(event.EditorService())
