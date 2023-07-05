@@ -129,13 +129,8 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: '${{ inputs.image_name }}:${{ inputs.image_tag }}'
+          images: '${{ inputs.image_name }}'
           tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=ref,event=branch
-            type=ref,event=pr
             type=sha,prefix=,suffix=,format=long
       - 
         name: Login to Docker registry
@@ -153,4 +148,4 @@ jobs:
       -
         name: Inspect image
         run: |
-          docker buildx imagetools inspect ${{ inputs.image_name }}:${{ steps.meta.outputs.version }}
+          docker buildx imagetools inspect ${{ inputs.image_name }}:${{ inputs.image_tag }}
