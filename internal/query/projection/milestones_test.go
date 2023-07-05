@@ -266,25 +266,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceUserTokenAdded system event",
-			args: args{
-				event: getEvent(toSystemEvent(timedTestEvent(
-					repository.EventType(user.UserTokenAddedType),
-					user.AggregateType,
-					[]byte(`{"applicationId": "client-id"}`),
-					now,
-				)), user.UserTokenAddedEventMapper),
-			},
-			reduce: (&milestoneProjection{}).reduceUserTokenAdded,
-			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("user"),
-				sequence:         15,
-				previousSequence: 10,
-				executer:         &testExecuter{},
-			},
-		},
-		{
-			name: "reduceUserTokenAdded user event",
+			name: "reduceUserTokenAdded",
 			args: args{
 				event: getEvent(timedTestEvent(
 					repository.EventType(user.UserTokenAddedType),
