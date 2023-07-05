@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 	"time"
 
@@ -24,6 +25,12 @@ func TestServer_TelemetryPushMilestones(t *testing.T) {
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			t.Error(err)
+		}
+		if r.Header.Get("single-value") != "single-value" {
+			t.Error("single-value header not set")
+		}
+		if reflect.DeepEqual(r.Header.Get("multi-value"), "multi-value-1,multi-value-2") {
+			t.Error("single-value header not set")
 		}
 		bodies <- body
 		w.WriteHeader(http.StatusOK)

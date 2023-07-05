@@ -30,15 +30,16 @@ const (
 type TelemetryPusherConfig struct {
 	Enabled   bool
 	Endpoints []string
+	Headers   http.Header
 }
 
 type telemetryPusher struct {
 	crdb.StatementHandler
+	cfg                            TelemetryPusherConfig
 	commands                       *command.Commands
 	queries                        *NotificationQueries
 	metricSuccessfulDeliveriesJSON string
 	metricFailedDeliveriesJSON     string
-	endpoints                      []string
 }
 
 func NewTelemetryPusher(
@@ -56,7 +57,7 @@ func NewTelemetryPusher(
 	if telemetryCfg.Enabled {
 		handlerCfg.Reducers = p.reducers()
 	}
-	p.endpoints = telemetryCfg.Endpoints
+	p.cfg = telemetryCfg
 	p.StatementHandler = crdb.NewStatementHandler(ctx, handlerCfg)
 	p.commands = commands
 	p.queries = queries
@@ -129,12 +130,13 @@ func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.Sched
 	if alreadyHandled {
 		return nil
 	}
-	for _, endpoint := range t.endpoints {
+	for _, endpoint := range t.cfg.Endpoints {
 		if err := types.SendJSON(
 			ctx,
 			webhook.Config{
 				CallURL: endpoint,
 				Method:  http.MethodPost,
+				Headers: t.cfg.Headers,
 			},
 			t.queries.GetFileSystemProvider,
 			t.queries.GetLogProvider,
@@ -146,5 +148,5 @@ func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.Sched
 			return err
 		}
 	}
-	return t.commands.MilestonePushed(ctx, ms.Type, t.endpoints, ms.PrimaryDomain)
+	return t.commands.MilestonePushed(ctx, ms.Type, t.cfg.Endpoints, ms.PrimaryDomain)
 }

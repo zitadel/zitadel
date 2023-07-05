@@ -8,6 +8,11 @@ Telemetry:
   Enabled: true
   Endpoints:
   - http://localhost:8081
+  Headers:
+    single-value: "single-value"
+    multi-value:
+    - "multi-value-1"
+    - "multi-value-2"
 
 FirstInstance:
   Org:

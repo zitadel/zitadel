@@ -28,6 +28,12 @@ Telemetry:
   # If you change this configuration at runtime, remaining data that is not successfully delivered to the old endpoints is sent to the new endpoints.
   Endpoints:
     - https://httpbin.org/post
+  # These headers are sent with every request to the configured endpoints.
+  Headers:
+  # single-value: "single-value"
+  # multi-value:
+  #   - "multi-value-1"
+  #   - "multi-value-2"
 
 # Port ZITADEL will listen on
 Port: 8080
