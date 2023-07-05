@@ -84,13 +84,16 @@ func TestOPStorage_CreateAuthRequest(t *testing.T) {
 
 func TestOPStorage_CreateAccessToken_code(t *testing.T) {
 	clientID := createClient(t)
-
 	authRequestID := createAuthRequest(t, clientID, redirectURI)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
-	linkResp, err := Tester.Client.OIDCv2.LinkSessionToAuthRequest(CTXLOGIN, &oidc_pb.LinkSessionToAuthRequestRequest{
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
-		SessionId:     sessionID,
-		SessionToken:  sessionToken,
+    CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
 	})
 	require.NoError(t, err)
 
@@ -121,13 +124,16 @@ func assertTokens(t *testing.T, tokens *oidc.Tokens[*oidc.IDTokenClaims], requir
 
 func TestOPStorage_CreateAccessToken_implicit(t *testing.T) {
 	clientID := createImplicitClient(t)
-
 	authRequestID := createAuthRequestImplicit(t, clientID, redirectURIImplicit)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
-	linkResp, err := Tester.Client.OIDCv2.LinkSessionToAuthRequest(CTXLOGIN, &oidc_pb.LinkSessionToAuthRequestRequest{
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
-		SessionId:     sessionID,
-		SessionToken:  sessionToken,
+    CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
 	})
 	require.NoError(t, err)
 
@@ -162,13 +168,16 @@ func TestOPStorage_CreateAccessToken_implicit(t *testing.T) {
 
 func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
 	clientID := createClient(t)
-
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
-	linkResp, err := Tester.Client.OIDCv2.LinkSessionToAuthRequest(CTXLOGIN, &oidc_pb.LinkSessionToAuthRequestRequest{
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
-		SessionId:     sessionID,
-		SessionToken:  sessionToken,
+    CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
 	})
 	require.NoError(t, err)
 
@@ -189,13 +198,16 @@ func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
 
 func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 	clientID := createClient(t)
-
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
-	linkResp, err := Tester.Client.OIDCv2.LinkSessionToAuthRequest(CTXLOGIN, &oidc_pb.LinkSessionToAuthRequestRequest{
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
-		SessionId:     sessionID,
-		SessionToken:  sessionToken,
+    CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
 	})
 	require.NoError(t, err)
 

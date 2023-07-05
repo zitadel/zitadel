@@ -35,6 +35,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
+		want    *AuthenticatedAuthRequest
 		wantErr error
 	}{
 		{
@@ -68,6 +69,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 				ctx:     mockCtx,
 				request: &AuthRequest{},
 			},
+			nil,
 			caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sf3gt", "Errors.AuthRequest.AlreadyExisting"),
 		},
 		{
@@ -124,6 +126,28 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 					HintUserID: gu.Ptr("hintUserID"),
 				},
 			},
+			&AuthenticatedAuthRequest{
+				AuthRequest: &AuthRequest{
+					ID:           "V2_id",
+					LoginClient:  "loginClient",
+					ClientID:     "clientID",
+					RedirectURI:  "redirectURI",
+					State:        "state",
+					Nonce:        "nonce",
+					Scope:        []string{"openid"},
+					Audience:     []string{"audience"},
+					ResponseType: domain.OIDCResponseTypeCode,
+					CodeChallenge: &domain.OIDCCodeChallenge{
+						Challenge: "challenge",
+						Method:    domain.CodeChallengeMethodS256,
+					},
+					Prompt:     []domain.Prompt{domain.PromptNone},
+					UILocales:  []string{"en", "de"},
+					MaxAge:     gu.Ptr(time.Duration(0)),
+					LoginHint:  gu.Ptr("loginHint"),
+					HintUserID: gu.Ptr("hintUserID"),
+				},
+			},
 			nil,
 		},
 	}
@@ -133,8 +157,9 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			err := c.AddAuthRequest(tt.args.ctx, tt.args.request)
-			assert.ErrorIs(t, tt.wantErr, err)
+			got, err := c.AddAuthRequest(tt.args.ctx, tt.args.request)
+			require.ErrorIs(t, tt.wantErr, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -155,6 +180,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 	}
 	type res struct {
 		details *domain.ObjectDetails
+		authReq *AuthenticatedAuthRequest
 		wantErr error
 	}
 	tests := []struct {
@@ -164,7 +190,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 		res    res
 	}{
 		{
-			"authRequest not existing",
+			"authRequest not found",
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
@@ -177,7 +203,49 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			args{
 				ctx:       mockCtx,
 				id:        "id",
-				sessionID: "session",
+				sessionID: "sessionID",
+			},
+			res{
+				wantErr: caos_errs.ThrowNotFound(nil, "COMMAND-jae5P", "Errors.AuthRequest.NotExisting"),
+			},
+		},
+		{
+			"authRequest not existing",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("id", "instanceID").Aggregate,
+								"loginClient",
+								"clientID",
+								"redirectURI",
+								"state",
+								"nonce",
+								[]string{"openid"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeCode,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+							),
+						),
+						eventFromEventPusher(
+							authrequest.NewFailedEvent(mockCtx, &authrequest.NewAggregate("id", "instanceID").Aggregate),
+						),
+					),
+				),
+				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+					return nil
+				},
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx:       mockCtx,
+				id:        "id",
+				sessionID: "sessionID",
 			},
 			res{
 				wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sx208nt", "Errors.AuthRequest.AlreadyHandled"),
@@ -216,7 +284,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			args{
 				ctx:              authz.NewMockContext("instanceID", "orgID", "wrongLoginClient"),
 				id:               "id",
-				sessionID:        "session",
+				sessionID:        "sessionID",
 				sessionToken:     "token",
 				checkLoginClient: true,
 			},
@@ -258,7 +326,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			args{
 				ctx:       mockCtx,
 				id:        "V2_id",
-				sessionID: "session",
+				sessionID: "sessionID",
 			},
 			res{
 				wantErr: caos_errs.ThrowNotFound(nil, "COMMAND-x0099887", "Errors.Session.NotExisting"),
@@ -356,7 +424,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("id", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",
@@ -390,8 +458,8 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					expectPush(
 						[]*repository.Event{eventFromEventPusherWithInstanceID(
 							"instanceID",
-							authrequest.NewSessionLinkedEvent(mockCtx, &authrequest.NewAggregate("id", "instanceID").Aggregate,
-								"session",
+							authrequest.NewSessionLinkedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"sessionID",
 								"userID",
 								testNow,
 								[]string{amr.PWD},
@@ -405,12 +473,27 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			},
 			args{
 				ctx:          mockCtx,
-				id:           "id",
-				sessionID:    "session",
+				id:           "V2_id",
+				sessionID:    "sessionID",
 				sessionToken: "token",
 			},
 			res{
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
+				authReq: &AuthenticatedAuthRequest{
+					AuthRequest: &AuthRequest{
+						ID:           "V2_id",
+						LoginClient:  "loginClient",
+						ClientID:     "clientID",
+						RedirectURI:  "redirectURI",
+						State:        "state",
+						Nonce:        "nonce",
+						Scope:        []string{"openid"},
+						Audience:     []string{"audience"},
+						ResponseType: domain.OIDCResponseTypeCode,
+					},
+					SessionID: "sessionID",
+					AMR:       []string{},
+				},
 			},
 		},
 		{
@@ -475,6 +558,21 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			},
 			res{
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
+				authReq: &AuthenticatedAuthRequest{
+					AuthRequest: &AuthRequest{
+						ID:           "V2_id",
+						LoginClient:  "loginClient",
+						ClientID:     "clientID",
+						RedirectURI:  "redirectURI",
+						State:        "state",
+						Nonce:        "nonce",
+						Scope:        []string{"openid"},
+						Audience:     []string{"audience"},
+						ResponseType: domain.OIDCResponseTypeCode,
+					},
+					SessionID: "sessionID",
+					AMR:       []string{},
+				},
 			},
 		},
 	}
@@ -485,9 +583,111 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 				checkPermission:      tt.fields.checkPermission,
 			}
-			details, err := c.LinkSessionToAuthRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLoginClient)
+			details, got, err := c.LinkSessionToAuthRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLoginClient)
 			require.ErrorIs(t, err, tt.res.wantErr)
 			assert.Equal(t, tt.res.details, details)
+			assert.Equal(t, tt.res.authReq, got)
+		})
+	}
+}
+
+func TestCommands_FailAuthRequest(t *testing.T) {
+	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient")
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx context.Context
+		id  string
+	}
+	type res struct {
+		details *domain.ObjectDetails
+		authReq *AuthenticatedAuthRequest
+		wantErr error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"authRequest not existing",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+				),
+			},
+			args{
+				ctx: mockCtx,
+				id:  "foo",
+			},
+			res{
+				wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sx202nt", "Errors.AuthRequest.AlreadyHandled"),
+			},
+		},
+		{
+			"failed",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"loginClient",
+								"clientID",
+								"redirectURI",
+								"state",
+								"nonce",
+								[]string{"openid"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeCode,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{eventFromEventPusherWithInstanceID(
+							"instanceID",
+							authrequest.NewFailedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate),
+						)}),
+				),
+			},
+			args{
+				ctx: mockCtx,
+				id:  "V2_id",
+			},
+			res{
+				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
+				authReq: &AuthenticatedAuthRequest{
+					AuthRequest: &AuthRequest{
+						ID:           "V2_id",
+						LoginClient:  "loginClient",
+						ClientID:     "clientID",
+						RedirectURI:  "redirectURI",
+						State:        "state",
+						Nonce:        "nonce",
+						Scope:        []string{"openid"},
+						Audience:     []string{"audience"},
+						ResponseType: domain.OIDCResponseTypeCode,
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			details, got, err := c.FailAuthRequest(tt.args.ctx, tt.args.id)
+			require.ErrorIs(t, err, tt.res.wantErr)
+			assert.Equal(t, tt.res.details, details)
+			assert.Equal(t, tt.res.authReq, got)
 		})
 	}
 }

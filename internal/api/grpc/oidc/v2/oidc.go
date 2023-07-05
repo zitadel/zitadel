@@ -4,12 +4,13 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/op"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
+	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
 )
@@ -70,14 +71,52 @@ func promptToPb(p domain.Prompt) oidc_pb.Prompt {
 	}
 }
 
-func (s *Server) LinkSessionToAuthRequest(ctx context.Context, req *oidc_pb.LinkSessionToAuthRequestRequest) (*oidc_pb.LinkSessionToAuthRequestResponse, error) {
-	details, err := s.command.LinkSessionToAuthRequest(ctx, req.GetAuthRequestId(), req.GetSessionId(), req.GetSessionToken(), true)
+func (s *Server) CreateCallback(ctx context.Context, req *oidc_pb.CreateCallbackRequest) (*oidc_pb.CreateCallbackResponse, error) {
+	switch v := req.GetCallbackKind().(type) {
+	case *oidc_pb.CreateCallbackRequest_Error:
+		return s.failAuthRequest(ctx, req.GetAuthRequestId(), v.Error)
+	case *oidc_pb.CreateCallbackRequest_Session:
+		return s.linkSessionToAuthRequest(ctx, req.GetAuthRequestId(), v.Session)
+	default:
+		return nil, errors.ThrowUnimplementedf(nil, "OIDCv2-zee7A", "verification oneOf %T in method CreateCallback not implemented", v)
+	}
+}
+
+func (s *Server) failAuthRequest(ctx context.Context, authRequestID string, ae *oidc_pb.AuthorizationError) (*oidc_pb.CreateCallbackResponse, error) {
+	details, aar, err := s.command.FailAuthRequest(ctx, authRequestID) // should we store the reason?
 	if err != nil {
 		return nil, err
 	}
-	return &oidc_pb.LinkSessionToAuthRequestResponse{
+	authReq := &oidc.AuthRequestV2{AuthenticatedAuthRequest: aar}
+	callback, err := oidc.CreateErrorCallbackURL(authReq, errorReasonToOIDC(ae.GetError()), ae.GetErrorDescription(), ae.GetErrorUri(), s.op)
+	if err != nil {
+		return nil, err
+	}
+	return &oidc_pb.CreateCallbackResponse{
 		Details:     object.DomainToDetailsPb(details),
-		CallbackUrl: op.AuthCallbackURL(s.op)(ctx, req.GetAuthRequestId()),
+		CallbackUrl: callback,
+	}, nil
+}
+
+func (s *Server) linkSessionToAuthRequest(ctx context.Context, authRequestID string, session *oidc_pb.Session) (*oidc_pb.CreateCallbackResponse, error) {
+	details, aar, err := s.command.LinkSessionToAuthRequest(ctx, authRequestID, session.GetSessionId(), session.GetSessionToken(), true)
+	if err != nil {
+		return nil, err
+	}
+	authReq := &oidc.AuthRequestV2{AuthenticatedAuthRequest: aar}
+
+	var callback string
+	if aar.ResponseType == domain.OIDCResponseTypeCode {
+		callback, err = oidc.CreateCodeCallbackURL(ctx, authReq, s.op)
+	} else {
+		callback, err = oidc.CreateTokenCallbackURL(ctx, authReq, s.op)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &oidc_pb.CreateCallbackResponse{
+		Details:     object.DomainToDetailsPb(details),
+		CallbackUrl: callback,
 	}, nil
 }
 
