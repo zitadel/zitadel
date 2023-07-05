@@ -11,6 +11,7 @@ import { Spinner } from "./Spinner";
 import AuthenticationMethodRadio, {
   methods,
 } from "./AuthenticationMethodRadio";
+import Alert from "./Alert";
 
 type Inputs =
   | {
@@ -31,6 +32,7 @@ export default function RegisterFormWithoutPassword({ legal }: Props) {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [selected, setSelected] = useState(methods[0]);
+  const [error, setError] = useState<string>("");
 
   const router = useRouter();
 
@@ -49,7 +51,8 @@ export default function RegisterFormWithoutPassword({ legal }: Props) {
     });
     setLoading(false);
     if (!res.ok) {
-      throw new Error("Failed to register user");
+      const error = await res.json();
+      throw new Error(error.details);
     }
     return res.json();
   }
@@ -79,14 +82,20 @@ export default function RegisterFormWithoutPassword({ legal }: Props) {
   ) {
     return withPassword
       ? router.push(`/register?` + new URLSearchParams(value))
-      : submitAndRegister(value).then((resp: any) => {
-          createSessionWithLoginName(value.email).then(({ factors }) => {
-            return router.push(
-              `/passkey/add?` +
-                new URLSearchParams({ loginName: factors.user.loginName })
-            );
+      : submitAndRegister(value)
+          .then((resp: any) => {
+            createSessionWithLoginName(value.email).then(({ factors }) => {
+              setError("");
+              return router.push(
+                `/passkey/add?` +
+                  new URLSearchParams({ loginName: factors.user.loginName })
+              );
+            });
+          })
+          .catch((errorDetails: Error) => {
+            setLoading(false);
+            setError(errorDetails.message);
           });
-        });
   }
 
   const { errors } = formState;
@@ -145,6 +154,12 @@ export default function RegisterFormWithoutPassword({ legal }: Props) {
           selectionChanged={setSelected}
         />
       </div>
+
+      {error && (
+        <div className="py-4">
+          <Alert>{error}</Alert>
+        </div>
+      )}
 
       <div className="mt-8 flex w-full flex-row items-center justify-between">
         <Button
