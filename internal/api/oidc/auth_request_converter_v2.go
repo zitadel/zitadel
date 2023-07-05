@@ -6,18 +6,27 @@ import (
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 type AuthRequestV2 struct {
-	*command.AuthRequest
-	SessionID string
-	UserID    string
-	AMR       []string
-	AuthTime  time.Time
+	id            string
+	amr           []string
+	audience      []string
+	authTime      time.Time
+	clientID      string
+	codeChallenge *domain.OIDCCodeChallenge
+	nonce         string
+	redirectURI   string
+	responseType  domain.OIDCResponseType
+	scope         []string
+	state         string
+	sessionID     string
+	userID        string
 }
 
 func (a *AuthRequestV2) GetID() string {
-	return a.ID
+	return a.id
 }
 
 func (a *AuthRequestV2) GetACR() string {
@@ -25,35 +34,35 @@ func (a *AuthRequestV2) GetACR() string {
 }
 
 func (a *AuthRequestV2) GetAMR() []string {
-	return a.AMR
+	return a.amr
 }
 
 func (a *AuthRequestV2) GetAudience() []string {
-	return a.Audience
+	return a.audience
 }
 
 func (a *AuthRequestV2) GetAuthTime() time.Time {
-	return a.AuthTime
+	return a.authTime
 }
 
 func (a *AuthRequestV2) GetClientID() string {
-	return a.ClientID
+	return a.clientID
 }
 
 func (a *AuthRequestV2) GetCodeChallenge() *oidc.CodeChallenge {
-	return CodeChallengeToOIDC(a.CodeChallenge)
+	return CodeChallengeToOIDC(a.codeChallenge)
 }
 
 func (a *AuthRequestV2) GetNonce() string {
-	return a.Nonce
+	return a.nonce
 }
 
 func (a *AuthRequestV2) GetRedirectURI() string {
-	return a.RedirectURI
+	return a.redirectURI
 }
 
 func (a *AuthRequestV2) GetResponseType() oidc.ResponseType {
-	return ResponseTypeToOIDC(a.ResponseType)
+	return ResponseTypeToOIDC(a.responseType)
 }
 
 func (a *AuthRequestV2) GetResponseMode() oidc.ResponseMode {
@@ -61,19 +70,19 @@ func (a *AuthRequestV2) GetResponseMode() oidc.ResponseMode {
 }
 
 func (a *AuthRequestV2) GetScopes() []string {
-	return a.Scope
+	return a.scope
 }
 
 func (a *AuthRequestV2) GetState() string {
-	return a.State
+	return a.state
 }
 
 func (a *AuthRequestV2) GetSubject() string {
-	return a.UserID
+	return a.userID
 }
 
 func (a *AuthRequestV2) Done() bool {
-	return a.UserID != "" && a.SessionID != ""
+	return a.userID != "" && a.sessionID != ""
 }
 
 type RefreshTokenRequestV2 struct {

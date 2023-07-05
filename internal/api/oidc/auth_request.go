@@ -76,7 +76,21 @@ func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.
 	if err != nil {
 		return nil, err
 	}
-	return &AuthRequestV2{AuthRequest: authRequest}, nil
+	return &AuthRequestV2{
+		id:            authRequest.ID,
+		amr:           nil,
+		audience:      authRequest.Audience,
+		authTime:      time.Time{},
+		clientID:      authRequest.ClientID,
+		codeChallenge: authRequest.CodeChallenge,
+		nonce:         authRequest.Nonce,
+		redirectURI:   authRequest.RedirectURI,
+		responseType:  authRequest.ResponseType,
+		scope:         authRequest.Scope,
+		state:         authRequest.State,
+		sessionID:     "",
+		userID:        "",
+	}, nil
 }
 
 func (o *OPStorage) createAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
@@ -112,6 +126,30 @@ func (o *OPStorage) audienceFromProjectID(ctx context.Context, projectID string)
 func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	if strings.HasPrefix(id, command.IDPrefixV2) {
+		//req, err := o.query.AuthRequestByID(ctx, true, id, true) //TODO: !!!!
+		req, err := o.command.GetAuthRequestWriteModel(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		return &AuthRequestV2{
+			id:            req.AggregateID,
+			amr:           req.AMR,
+			audience:      req.Audience,
+			authTime:      req.AuthTime,
+			clientID:      req.ClientID,
+			codeChallenge: req.CodeChallenge,
+			nonce:         req.Nonce,
+			redirectURI:   req.RedirectURI,
+			responseType:  req.ResponseType,
+			scope:         req.Scope,
+			state:         req.State,
+			sessionID:     req.SessionID,
+			userID:        req.UserID,
+		}, nil
+	}
+
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-D3g21", "no user agent id")
@@ -137,11 +175,19 @@ func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (_ op.Au
 			return nil, err
 		}
 		return &AuthRequestV2{
-			AuthRequest: authReq.AuthRequest,
-			SessionID:   authReq.SessionID,
-			UserID:      authReq.UserID,
-			AMR:         authReq.AMR,
-			AuthTime:    authReq.AuthTime,
+			id:            authReq.ID,
+			amr:           authReq.AMR,
+			audience:      authReq.Audience,
+			authTime:      authReq.AuthTime,
+			clientID:      authReq.ClientID,
+			codeChallenge: authReq.CodeChallenge,
+			nonce:         authReq.Nonce,
+			redirectURI:   authReq.RedirectURI,
+			responseType:  authReq.ResponseType,
+			scope:         authReq.Scope,
+			state:         authReq.State,
+			sessionID:     authReq.SessionID,
+			userID:        authReq.UserID,
 		}, nil
 	}
 	resp, err := o.repo.AuthRequestByCode(ctx, code)
@@ -193,7 +239,7 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 		applicationID = authReq.ApplicationID
 		userOrgID = authReq.UserOrgID
 	case *AuthRequestV2:
-		return o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.ID)
+		return o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.id)
 	}
 
 	accessTokenLifetime, _, _, _, err := o.getOIDCSettings(ctx)
@@ -215,7 +261,7 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 	// handle V2 request directly
 	switch tokenReq := req.(type) {
 	case *AuthRequestV2:
-		return o.command.AddOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.ID)
+		return o.command.AddOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.id)
 	case *RefreshTokenRequestV2:
 		return o.command.ExchangeOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.OIDCSessionWriteModel.AggregateID, refreshToken, tokenReq.RequestedScopes)
 	}

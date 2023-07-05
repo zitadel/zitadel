@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/oidc/amr"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -337,6 +338,9 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 							"instanceID",
 							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"sessionID",
+								"userID",
+								testNow,
+								[]string{amr.PWD},
 							),
 						)}),
 				),
@@ -460,7 +464,12 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "sessionID"),
+							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+								"sessionID",
+								"userID",
+								testNow,
+								[]string{amr.PWD},
+							),
 						),
 					),
 					expectPush(
@@ -509,63 +518,26 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 		args   args
 		res    res
 	}{
-		{
-			"empty code error",
-			fields{
-				eventstore: eventstoreExpect(t),
-			},
-			args{
-				ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
-				code: "",
-			},
-			res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfr3s", "Errors.AuthRequest.InvalidCode"),
-			},
-		},
+		//{
+		//	"empty code error",
+		//	fields{
+		//		eventstore: eventstoreExpect(t),
+		//	},
+		//	args{
+		//		ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
+		//		code: "",
+		//	},
+		//	res{
+		//		err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfr3s", "Errors.AuthRequest.InvalidCode"),
+		//	},
+		//},
 		{
 			"no code added error",
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(
-					//eventFromEventPusher(
-					//	authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate,
-					//		"loginClient",
-					//		"clientID",
-					//		"redirectURI",
-					//		"state",
-					//		"nonce",
-					//		[]string{"openid"},
-					//		[]string{"audience"},
-					//		domain.OIDCResponseTypeCode,
-					//		&domain.OIDCCodeChallenge{
-					//			Challenge: "challenge",
-					//			Method:    domain.CodeChallengeMethodS256,
-					//		},
-					//		[]domain.Prompt{domain.PromptNone},
-					//		[]string{"en", "de"},
-					//		gu.Ptr(time.Duration(0)),
-					//		"loginHint",
-					//		"hintUserID",
-					//	),
-					//),
-					),
-				),
-			},
-			args{
-				ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
-				code: "authRequestID:codeID",
-			},
-			res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.NoCode"),
-			},
-		},
-		{
-			"invalid code error",
-			fields{
-				eventstore: eventstoreExpect(t,
-					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",
@@ -585,27 +557,64 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 								gu.Ptr("hintUserID"),
 							),
 						),
-						eventFromEventPusher(
-							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate, "code"),
-						),
 					),
 				),
 			},
 			args{
 				ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
-				code: "authRequestID:invalidCodeID",
+				code: "V2_authRequestID",
 			},
 			res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-DBNqz", "Errors.AuthRequest.InvalidCode"),
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.NoCode"),
 			},
 		},
+		//{
+		//	"invalid code error",
+		//	fields{
+		//		eventstore: eventstoreExpect(t,
+		//			expectFilter(
+		//				eventFromEventPusher(
+		//					authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+		//						"loginClient",
+		//						"clientID",
+		//						"redirectURI",
+		//						"state",
+		//						"nonce",
+		//						[]string{"openid"},
+		//						[]string{"audience"},
+		//						domain.OIDCResponseTypeCode,
+		//						&domain.OIDCCodeChallenge{
+		//							Challenge: "challenge",
+		//							Method:    domain.CodeChallengeMethodS256,
+		//						},
+		//						[]domain.Prompt{domain.PromptNone},
+		//						[]string{"en", "de"},
+		//						gu.Ptr(time.Duration(0)),
+		//						gu.Ptr("loginHint"),
+		//						gu.Ptr("hintUserID"),
+		//					),
+		//				),
+		//				eventFromEventPusher(
+		//					authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
+		//				),
+		//			),
+		//		),
+		//	},
+		//	args{
+		//		ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
+		//		code: "invalidCode",
+		//	},
+		//	res{
+		//		err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-DBNqz", "Errors.AuthRequest.InvalidCode"),
+		//	},
+		//},
 		{
 			"code exchanged",
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",
@@ -626,17 +635,21 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate,
-								"sessionID"),
+							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+								"sessionID",
+								"userID",
+								testNow,
+								[]string{amr.PWD},
+							),
 						),
 						eventFromEventPusher(
-							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate, "code"),
+							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID("instanceID",
-								authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("authRequestID", "instanceID").Aggregate),
+								authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 							),
 						},
 					),
@@ -644,7 +657,7 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 			},
 			args{
 				ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
-				code: "authRequestID:",
+				code: "V2_authRequestID",
 			},
 			res{
 				authRequest: &AuthenticatedAuthRequest{

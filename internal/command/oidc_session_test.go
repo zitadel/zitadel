@@ -94,7 +94,12 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "sessionID"),
+							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+								"sessionID",
+								"userID",
+								testNow,
+								[]string{amr.PWD},
+							),
 						),
 						eventFromEventPusher(
 							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
@@ -141,7 +146,12 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "sessionID"),
+							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+								"sessionID",
+								"userID",
+								testNow,
+								[]string{amr.PWD},
+							),
 						),
 						eventFromEventPusher(
 							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
@@ -278,7 +288,12 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "sessionID"),
+							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+								"sessionID",
+								"userID",
+								testNow,
+								[]string{amr.PWD},
+							),
 						),
 						eventFromEventPusher(
 							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
@@ -325,7 +340,12 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "sessionID"),
+							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+								"sessionID",
+								"userID",
+								testNow,
+								[]string{amr.PWD},
+							),
 						),
 						eventFromEventPusher(
 							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),

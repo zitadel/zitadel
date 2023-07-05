@@ -32,6 +32,7 @@ type AuthRequestWriteModel struct {
 	ExchangeCode     string
 	SessionID        string
 	UserID           string
+	AuthTime         time.Time
 	AMR              []string
 	AuthRequestState domain.AuthRequestState
 }
@@ -66,6 +67,9 @@ func (m *AuthRequestWriteModel) Reduce() error {
 			m.AuthRequestState = domain.AuthRequestStateAdded
 		case *authrequest.SessionLinkedEvent:
 			m.SessionID = e.SessionID
+			m.UserID = e.UserID
+			m.AuthTime = e.AuthTime
+			m.AMR = e.AMR
 		case *authrequest.CodeAddedEvent:
 			m.ExchangeCode = e.Code
 			m.AuthRequestState = domain.AuthRequestStateCodeAdded

@@ -2,10 +2,10 @@ package command
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/oidc/amr"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
@@ -53,12 +53,6 @@ func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest)
 	if writeModel.AuthRequestState != domain.AuthRequestStateUnspecified {
 		return errors.ThrowPreconditionFailed(nil, "COMMAND-Sf3gt", "Errors.AuthRequest.AlreadyExisting")
 	}
-	//TODO: remove after implementation
-	//data, err := c.keyAlgorithm.Encrypt([]byte(authRequest.ID + ":"))
-	//if err != nil {
-	//	return err
-	//}
-	//fmt.Println(base64.RawURLEncoding.EncodeToString(data))
 	return c.pushAppendAndReduce(ctx, writeModel, authrequest.NewAddedEvent(
 		ctx,
 		&authrequest.NewAggregate(authRequest.ID, authz.GetInstance(ctx).InstanceID()).Aggregate,
@@ -102,6 +96,9 @@ func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, 
 	if err := c.pushAppendAndReduce(ctx, writeModel, authrequest.NewSessionLinkedEvent(
 		ctx, &authrequest.NewAggregate(id, authz.GetInstance(ctx).InstanceID()).Aggregate,
 		sessionID,
+		sessionWriteModel.UserID,
+		sessionWriteModel.AuthenticationTime(),
+		amr.List(sessionWriteModel),
 	)); err != nil {
 		return nil, err
 	}
@@ -140,29 +137,25 @@ func (c *Commands) AddAuthRequestCode(ctx context.Context, authRequestID, code s
 }
 
 func (c *Commands) ExchangeAuthCode(ctx context.Context, code string) (authRequest *AuthenticatedAuthRequest, err error) {
-	split := strings.Split(code, ":")
-	if len(split) != 2 {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-Sfr3s", "Errors.AuthRequest.InvalidCode")
-	}
-	writeModel, err := c.getAuthRequestWriteModel(ctx, split[0])
+	//split := strings.Split(code, ":")
+	//if len(split) != 2 {
+	//	return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-Sfr3s", "Errors.AuthRequest.InvalidCode")
+	//}
+	writeModel, err := c.getAuthRequestWriteModel(ctx, code)
 	if err != nil {
 		return nil, err
 	}
 	if writeModel.AuthRequestState != domain.AuthRequestStateCodeAdded {
 		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.NoCode")
 	}
-	if writeModel.ExchangeCode != split[1] {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-DBNqz", "Errors.AuthRequest.InvalidCode")
-	}
+	//if writeModel.ExchangeCode != split[1] {
+	//	return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-DBNqz", "Errors.AuthRequest.InvalidCode")
+	//}
 	err = c.pushAppendAndReduce(ctx, writeModel, authrequest.NewCodeExchangedEvent(ctx,
 		&authrequest.NewAggregate(writeModel.AggregateID, authz.GetInstance(ctx).InstanceID()).Aggregate))
 	if err != nil {
 		return nil, err
 	}
-	//TODO: remove as soon as implemented
-	//writeModel.SessionID = "221249418811191853"
-	//writeModel.UserID = "220275980948910637"
-	//writeModel.AMR = []string{amr.PWD}
 	return authRequestWriteModelToAuthenticatedAuthRequest(writeModel), nil
 }
 
@@ -188,7 +181,7 @@ func authRequestWriteModelToAuthenticatedAuthRequest(writeModel *AuthRequestWrit
 		SessionID: writeModel.SessionID,
 		UserID:    writeModel.UserID,
 		AMR:       writeModel.AMR,
-		AuthTime:  writeModel.ChangeDate, //TODO: correct?
+		AuthTime:  writeModel.AuthTime,
 	}
 }
 

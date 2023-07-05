@@ -103,7 +103,10 @@ func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 type SessionLinkedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	SessionID string
+	SessionID string    `json:"session_id"`
+	UserID    string    `json:"user_id"`
+	AuthTime  time.Time `json:"auth_time"`
+	AMR       []string  `json:"amr"`
 }
 
 func (e *SessionLinkedEvent) Data() interface{} {
@@ -116,7 +119,10 @@ func (e *SessionLinkedEvent) UniqueConstraints() []*eventstore.EventUniqueConstr
 
 func NewSessionLinkedEvent(ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	sessionID string,
+	sessionID,
+	userID string,
+	authTime time.Time,
+	amr []string,
 ) *SessionLinkedEvent {
 	return &SessionLinkedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -125,6 +131,9 @@ func NewSessionLinkedEvent(ctx context.Context,
 			SessionLinkedType,
 		),
 		SessionID: sessionID,
+		UserID:    userID,
+		AuthTime:  authTime,
+		AMR:       amr,
 	}
 }
 
