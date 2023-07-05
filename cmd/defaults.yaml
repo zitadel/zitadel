@@ -34,6 +34,8 @@ Telemetry:
   # multi-value:
   #   - "multi-value-1"
   #   - "multi-value-2"
+  # The maximum number of data points that are queried before they are sent to the configured endpoints.
+  Limit: 100 # ZITADEL_TELEMETRY_LIMIT
 
 # Port ZITADEL will listen on
 Port: 8080

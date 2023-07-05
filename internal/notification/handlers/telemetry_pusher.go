@@ -31,6 +31,7 @@ type TelemetryPusherConfig struct {
 	Enabled   bool
 	Endpoints []string
 	Headers   http.Header
+	Limit     uint64
 }
 
 type telemetryPusher struct {
@@ -98,7 +99,7 @@ func (t *telemetryPusher) pushMilestones(event eventstore.Event) (*handler.State
 	}
 	unpushedMilestones, err := t.queries.Queries.SearchMilestones(ctx, scheduledEvent.InstanceIDs, &query.MilestonesSearchQueries{
 		SearchRequest: query.SearchRequest{
-			Limit:         100,
+			Limit:         t.cfg.Limit,
 			SortingColumn: query.MilestoneReachedDateColID,
 			Asc:           true,
 		},
