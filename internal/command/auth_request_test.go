@@ -22,6 +22,7 @@ import (
 )
 
 func TestCommands_AddAuthRequest(t *testing.T) {
+	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient")
 	type fields struct {
 		eventstore  *eventstore.Eventstore
 		idGenerator id.Generator
@@ -43,7 +44,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",
@@ -65,7 +66,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 				idGenerator: mock.NewIDGeneratorExpectIDs(t, "id"),
 			},
 			args{
-				ctx:     authz.WithInstanceID(context.Background(), "instanceID"),
+				ctx:     mockCtx,
 				request: &AuthRequest{},
 			},
 			nil,
@@ -77,33 +78,34 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{eventFromEventPusherWithInstanceID(
-							"instanceID",
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
-								"loginClient",
-								"clientID",
-								"redirectURI",
-								"state",
-								"nonce",
-								[]string{"openid"},
-								[]string{"audience"},
-								domain.OIDCResponseTypeCode,
-								&domain.OIDCCodeChallenge{
-									Challenge: "challenge",
-									Method:    domain.CodeChallengeMethodS256,
-								},
-								[]domain.Prompt{domain.PromptNone},
-								[]string{"en", "de"},
-								gu.Ptr(time.Duration(0)),
-								gu.Ptr("loginHint"),
-								gu.Ptr("hintUserID"),
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID("instanceID",
+								authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+									"loginClient",
+									"clientID",
+									"redirectURI",
+									"state",
+									"nonce",
+									[]string{"openid"},
+									[]string{"audience"},
+									domain.OIDCResponseTypeCode,
+									&domain.OIDCCodeChallenge{
+										Challenge: "challenge",
+										Method:    domain.CodeChallengeMethodS256,
+									},
+									[]domain.Prompt{domain.PromptNone},
+									[]string{"en", "de"},
+									gu.Ptr(time.Duration(0)),
+									gu.Ptr("loginHint"),
+									gu.Ptr("hintUserID"),
+								),
 							),
-						)}),
+						}),
 				),
 				idGenerator: mock.NewIDGeneratorExpectIDs(t, "id"),
 			},
 			args{
-				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
+				ctx: mockCtx,
 				request: &AuthRequest{
 					LoginClient:  "loginClient",
 					ClientID:     "clientID",
@@ -442,7 +444,16 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate)),
+							session.NewAddedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate),
+						),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+								"userID", testNow),
+						),
+						eventFromEventPusher(
+							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+								testNow),
+						),
 					),
 					expectPush(
 						[]*repository.Event{eventFromEventPusherWithInstanceID(
@@ -511,7 +522,16 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate)),
+							session.NewAddedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate),
+						),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+								"userID", testNow),
+						),
+						eventFromEventPusher(
+							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+								testNow),
+						),
 					),
 					expectPush(
 						[]*repository.Event{eventFromEventPusherWithInstanceID(
@@ -673,6 +693,7 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 }
 
 func TestCommands_AddAuthRequestCode(t *testing.T) {
+	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient")
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -693,7 +714,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 				eventstore: eventstoreExpect(t),
 			},
 			args{
-				ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
+				ctx:  mockCtx,
 				id:   "V2_authRequestID",
 				code: "",
 			},
@@ -705,7 +726,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",
@@ -729,7 +750,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 				),
 			},
 			args{
-				ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
+				ctx:  mockCtx,
 				id:   "V2_authRequestID",
 				code: "code",
 			},
@@ -741,7 +762,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",
@@ -762,7 +783,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+							authrequest.NewSessionLinkedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
 								"sessionID",
 								"userID",
 								testNow,
@@ -773,14 +794,14 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID("instanceID",
-								authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
+								authrequest.NewCodeAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
 							),
 						},
 					),
 				),
 			},
 			args{
-				ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
+				ctx:  mockCtx,
 				id:   "V2_authRequestID",
 				code: "code",
 			},
@@ -799,6 +820,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 }
 
 func TestCommands_ExchangeAuthCode(t *testing.T) {
+	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient")
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -822,7 +844,7 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 		//		eventstore: eventstoreExpect(t),
 		//	},
 		//	args{
-		//		ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
+		//		ctx:  mockCtx
 		//		code: "",
 		//	},
 		//	res{
@@ -835,7 +857,7 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",
@@ -859,7 +881,7 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 				),
 			},
 			args{
-				ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
+				ctx:  mockCtx,
 				code: "V2_authRequestID",
 			},
 			res{
@@ -872,7 +894,7 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 		//		eventstore: eventstoreExpect(t,
 		//			expectFilter(
 		//				eventFromEventPusher(
-		//					authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+		//					authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
 		//						"loginClient",
 		//						"clientID",
 		//						"redirectURI",
@@ -893,13 +915,13 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 		//					),
 		//				),
 		//				eventFromEventPusher(
-		//					authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
+		//					authrequest.NewCodeAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
 		//				),
 		//			),
 		//		),
 		//	},
 		//	args{
-		//		ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
+		//		ctx:  mockCtx
 		//		code: "invalidCode",
 		//	},
 		//	res{
@@ -912,7 +934,7 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",
@@ -933,7 +955,7 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+							authrequest.NewSessionLinkedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
 								"sessionID",
 								"userID",
 								testNow,
@@ -941,26 +963,26 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
+							authrequest.NewCodeAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID("instanceID",
-								authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
+								authrequest.NewCodeExchangedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 							),
 						},
 					),
 				),
 			},
 			args{
-				ctx:  authz.WithInstanceID(context.Background(), "instanceID"),
+				ctx:  mockCtx,
 				code: "V2_authRequestID",
 			},
 			res{
 				authRequest: &AuthenticatedAuthRequest{
 					AuthRequest: &AuthRequest{
-						ID:           "authRequestID",
+						ID:           "V2_authRequestID",
 						LoginClient:  "loginClient",
 						ClientID:     "clientID",
 						RedirectURI:  "redirectURI",
@@ -982,7 +1004,6 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 					SessionID: "sessionID",
 					UserID:    "userID",
 					AMR:       []string{"pwd"},
-					AuthTime:  testNow,
 				},
 			},
 		},
@@ -993,8 +1014,14 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 				eventstore: tt.fields.eventstore,
 			}
 			got, err := c.ExchangeAuthCode(tt.args.ctx, tt.args.code)
-			assert.Equal(t, tt.res.authRequest, got)
 			assert.ErrorIs(t, tt.res.err, err)
+
+			if err == nil {
+				// equal on time won't work -> test separately and clear it before comparing the rest
+				assert.WithinRange(t, got.AuthTime, testNow, testNow)
+				got.AuthTime = time.Time{}
+			}
+			assert.Equal(t, tt.res.authRequest, got)
 		})
 	}
 }

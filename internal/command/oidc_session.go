@@ -251,9 +251,13 @@ func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (accessTokenID strin
 	if err != nil {
 		return "", "", time.Time{}, err
 	}
+	err = AppendAndReduce(c.oidcSessionWriteModel, pushedEvents...)
+	if err != nil {
+		return "", "", time.Time{}, err
+	}
 	// prefix the returned id with the oidcSessionID so that we can retrieve it later on
 	// we need to use `-` as a delimiter because the OIDC library uses `:` and will check for a length of 2 parts
-	return c.oidcSessionWriteModel.AggregateID + "-" + c.accessTokenID, c.refreshToken, pushedEvents[0].CreationDate().Add(c.accessTokenLifetime), nil
+	return c.oidcSessionWriteModel.AggregateID + "-" + c.accessTokenID, c.refreshToken, c.oidcSessionWriteModel.AccessTokenExpiration, nil
 }
 
 func (c *Commands) tokenTokenLifetimes(ctx context.Context) (accessTokenLifetime time.Duration, refreshTokenLifetime time.Duration, refreshTokenIdleLifetime time.Duration, err error) {
