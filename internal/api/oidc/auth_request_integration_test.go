@@ -20,7 +20,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/integration"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
@@ -65,13 +64,13 @@ func createImplicitClient(t testing.TB) string {
 }
 
 func createAuthRequest(t testing.TB, clientID, redirectURI string, scope ...string) string {
-	redURL, err := Tester.CreateOIDCAuthRequest(clientID, integration.LoginUser, redirectURI, scope...)
+	redURL, err := Tester.CreateOIDCAuthRequest(clientID, Tester.Users[integration.Login].ID, redirectURI, scope...)
 	require.NoError(t, err)
 	return redURL
 }
 
 func createAuthRequestImplicit(t testing.TB, clientID, redirectURI string, scope ...string) string {
-	redURL, err := Tester.CreateOIDCAuthRequestImplicit(clientID, integration.LoginUser, redirectURI, scope...)
+	redURL, err := Tester.CreateOIDCAuthRequestImplicit(clientID, Tester.Users[integration.Login].ID, redirectURI, scope...)
 	require.NoError(t, err)
 	return redURL
 }
@@ -86,38 +85,12 @@ func TestOPStorage_CreateAuthRequest(t *testing.T) {
 func TestOPStorage_CreateAccessToken_code(t *testing.T) {
 	clientID := createClient(t)
 
-	id := createAuthRequest(t, clientID, redirectURI)
-	_ = id
-	createResp, err := Tester.Client.SessionV2.CreateSession(CTXLOGIN, &session.CreateSessionRequest{
-		Checks: &session.Checks{
-			User: &session.CheckUser{
-				Search: &session.CheckUser_UserId{UserId: User.GetUserId()},
-			},
-		},
-		Challenges: []session.ChallengeKind{
-			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
-		},
-	})
-	require.NoError(t, err)
-
-	assertion, err := Tester.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetPasskey().GetPublicKeyCredentialRequestOptions())
-	require.NoError(t, err)
-
-	updateResp, err := Tester.Client.SessionV2.SetSession(CTXLOGIN, &session.SetSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: createResp.GetSessionToken(),
-		Checks: &session.Checks{
-			Passkey: &session.CheckPasskey{
-				CredentialAssertionData: assertion,
-			},
-		},
-	})
-	require.NoError(t, err)
-
+	authRequestID := createAuthRequest(t, clientID, redirectURI)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.LinkSessionToAuthRequest(CTXLOGIN, &oidc_pb.LinkSessionToAuthRequestRequest{
-		AuthRequestId: id,
-		SessionId:     createResp.GetSessionId(),
-		SessionToken:  updateResp.GetSessionToken(),
+		AuthRequestId: authRequestID,
+		SessionId:     sessionID,
+		SessionToken:  sessionToken,
 	})
 	require.NoError(t, err)
 
@@ -128,52 +101,33 @@ func TestOPStorage_CreateAccessToken_code(t *testing.T) {
 
 	tokens, err := exchangeTokens(t, clientID, code)
 	require.NoError(t, err)
-	assert.NotEmpty(t, tokens.AccessToken)
-	assert.NotEmpty(t, tokens.IDToken)
-	assert.Empty(t, tokens.RefreshToken)
-	assert.Equal(t, []string{amr.UserPresence, amr.MFA}, tokens.IDTokenClaims.AuthenticationMethodsReferences)
-	assert.WithinRange(t, tokens.IDTokenClaims.AuthTime.AsTime().UTC(), createResp.Details.ChangeDate.AsTime().Add(-1*time.Second), updateResp.Details.ChangeDate.AsTime())
+	assertTokens(t, tokens, false)
+	assertTokenClaims(t, tokens.IDTokenClaims, startTime, changeTime)
 
 	// exchange with a used code must fail
 	_, err = exchangeTokens(t, clientID, code)
 	require.Error(t, err)
 }
 
+func assertTokens(t *testing.T, tokens *oidc.Tokens[*oidc.IDTokenClaims], requireRefreshToken bool) {
+	assert.NotEmpty(t, tokens.AccessToken)
+	assert.NotEmpty(t, tokens.IDToken)
+	if requireRefreshToken {
+		assert.NotEmpty(t, tokens.RefreshToken)
+	} else {
+		assert.Empty(t, tokens.RefreshToken)
+	}
+}
+
 func TestOPStorage_CreateAccessToken_implicit(t *testing.T) {
 	clientID := createImplicitClient(t)
 
-	id := createAuthRequestImplicit(t, clientID, redirectURIImplicit)
-
-	createResp, err := Tester.Client.SessionV2.CreateSession(CTXLOGIN, &session.CreateSessionRequest{
-		Checks: &session.Checks{
-			User: &session.CheckUser{
-				Search: &session.CheckUser_UserId{UserId: User.GetUserId()},
-			},
-		},
-		Challenges: []session.ChallengeKind{
-			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
-		},
-	})
-	require.NoError(t, err)
-
-	assertion, err := Tester.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetPasskey().GetPublicKeyCredentialRequestOptions())
-	require.NoError(t, err)
-
-	updateResp, err := Tester.Client.SessionV2.SetSession(CTXLOGIN, &session.SetSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: createResp.GetSessionToken(),
-		Checks: &session.Checks{
-			Passkey: &session.CheckPasskey{
-				CredentialAssertionData: assertion,
-			},
-		},
-	})
-	require.NoError(t, err)
-
+	authRequestID := createAuthRequestImplicit(t, clientID, redirectURIImplicit)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.LinkSessionToAuthRequest(CTXLOGIN, &oidc_pb.LinkSessionToAuthRequestRequest{
-		AuthRequestId: id,
-		SessionId:     createResp.GetSessionId(),
-		SessionToken:  updateResp.GetSessionToken(),
+		AuthRequestId: authRequestID,
+		SessionId:     sessionID,
+		SessionToken:  sessionToken,
 	})
 	require.NoError(t, err)
 
@@ -196,8 +150,7 @@ func TestOPStorage_CreateAccessToken_implicit(t *testing.T) {
 
 	claims, err := rp.VerifyTokens[*oidc.IDTokenClaims](context.Background(), accessToken, idToken, provider.IDTokenVerifier())
 	require.NoError(t, err)
-	assert.Equal(t, []string{amr.UserPresence, amr.MFA}, claims.AuthenticationMethodsReferences)
-	assert.WithinRange(t, claims.AuthTime.AsTime().UTC(), createResp.Details.ChangeDate.AsTime().Add(-1*time.Second), updateResp.Details.ChangeDate.AsTime())
+	assertTokenClaims(t, claims, startTime, changeTime)
 
 	// callback on a succeeded request must fail
 	callback, err = integration.CheckRedirect(callbackURI, Tester.WithSystemAuthorizationHTTP(integration.Login))
@@ -210,38 +163,12 @@ func TestOPStorage_CreateAccessToken_implicit(t *testing.T) {
 func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
 	clientID := createClient(t)
 
-	id := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
-	_ = id
-	createResp, err := Tester.Client.SessionV2.CreateSession(CTXLOGIN, &session.CreateSessionRequest{
-		Checks: &session.Checks{
-			User: &session.CheckUser{
-				Search: &session.CheckUser_UserId{UserId: User.GetUserId()},
-			},
-		},
-		Challenges: []session.ChallengeKind{
-			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
-		},
-	})
-	require.NoError(t, err)
-
-	assertion, err := Tester.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetPasskey().GetPublicKeyCredentialRequestOptions())
-	require.NoError(t, err)
-
-	updateResp, err := Tester.Client.SessionV2.SetSession(CTXLOGIN, &session.SetSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: createResp.GetSessionToken(),
-		Checks: &session.Checks{
-			Passkey: &session.CheckPasskey{
-				CredentialAssertionData: assertion,
-			},
-		},
-	})
-	require.NoError(t, err)
-
+	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.LinkSessionToAuthRequest(CTXLOGIN, &oidc_pb.LinkSessionToAuthRequestRequest{
-		AuthRequestId: id,
-		SessionId:     createResp.GetSessionId(),
-		SessionToken:  updateResp.GetSessionToken(),
+		AuthRequestId: authRequestID,
+		SessionId:     sessionID,
+		SessionToken:  sessionToken,
 	})
 	require.NoError(t, err)
 
@@ -252,11 +179,8 @@ func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
 
 	tokens, err := exchangeTokens(t, clientID, code)
 	require.NoError(t, err)
-	assert.NotEmpty(t, tokens.AccessToken)
-	assert.NotEmpty(t, tokens.IDToken)
-	assert.NotEmpty(t, tokens.RefreshToken)
-	assert.Equal(t, []string{amr.UserPresence, amr.MFA}, tokens.IDTokenClaims.AuthenticationMethodsReferences)
-	assert.WithinRange(t, tokens.IDTokenClaims.AuthTime.AsTime().UTC(), createResp.Details.ChangeDate.AsTime().Add(-1*time.Second), updateResp.Details.ChangeDate.AsTime())
+	assertTokens(t, tokens, true)
+	assertTokenClaims(t, tokens.IDTokenClaims, startTime, changeTime)
 
 	// exchange with a used code must fail
 	_, err = exchangeTokens(t, clientID, code)
@@ -266,38 +190,12 @@ func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
 func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 	clientID := createClient(t)
 
-	id := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
-	_ = id
-	createResp, err := Tester.Client.SessionV2.CreateSession(CTXLOGIN, &session.CreateSessionRequest{
-		Checks: &session.Checks{
-			User: &session.CheckUser{
-				Search: &session.CheckUser_UserId{UserId: User.GetUserId()},
-			},
-		},
-		Challenges: []session.ChallengeKind{
-			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
-		},
-	})
-	require.NoError(t, err)
-
-	assertion, err := Tester.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetPasskey().GetPublicKeyCredentialRequestOptions())
-	require.NoError(t, err)
-
-	updateResp, err := Tester.Client.SessionV2.SetSession(CTXLOGIN, &session.SetSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: createResp.GetSessionToken(),
-		Checks: &session.Checks{
-			Passkey: &session.CheckPasskey{
-				CredentialAssertionData: assertion,
-			},
-		},
-	})
-	require.NoError(t, err)
-
+	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.LinkSessionToAuthRequest(CTXLOGIN, &oidc_pb.LinkSessionToAuthRequestRequest{
-		AuthRequestId: id,
-		SessionId:     createResp.GetSessionId(),
-		SessionToken:  updateResp.GetSessionToken(),
+		AuthRequestId: authRequestID,
+		SessionId:     sessionID,
+		SessionToken:  sessionToken,
 	})
 	require.NoError(t, err)
 
@@ -313,11 +211,18 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
 	require.NoError(t, err)
 
+	// test actual refresh grant
 	newTokens, err := refreshTokens(t, clientID, tokens.RefreshToken)
 	require.NoError(t, err)
+	idToken, _ := newTokens.Extra("id_token").(string)
+	assert.NotEmpty(t, idToken)
 	assert.NotEmpty(t, newTokens.AccessToken)
-	assert.NotEmpty(t, newTokens.Extra("id_token"))
 	assert.NotEmpty(t, newTokens.RefreshToken)
+
+	// auth time must still be the initial
+	claims, err := rp.VerifyTokens[*oidc.IDTokenClaims](context.Background(), newTokens.AccessToken, idToken, provider.IDTokenVerifier())
+	require.NoError(t, err)
+	assertTokenClaims(t, claims, startTime, changeTime)
 
 	// refresh with an old refresh_token must fail
 	_, err = rp.RefreshAccessToken(provider, tokens.RefreshToken, "", "")
@@ -337,4 +242,9 @@ func refreshTokens(t testing.TB, clientID, refreshToken string) (*oauth2.Token, 
 	require.NoError(t, err)
 
 	return rp.RefreshAccessToken(provider, refreshToken, "", "")
+}
+
+func assertTokenClaims(t *testing.T, claims *oidc.IDTokenClaims, sessionStart, sessionChange time.Time) {
+	assert.Equal(t, []string{amr.UserPresence, amr.MFA}, claims.AuthenticationMethodsReferences)
+	assert.WithinRange(t, claims.AuthTime.AsTime().UTC(), sessionStart.Add(-1*time.Second), sessionChange.Add(1*time.Second))
 }

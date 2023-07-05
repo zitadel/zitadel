@@ -89,7 +89,7 @@ func TestServer_GetAuthRequest(t *testing.T) {
 func TestServer_LinkSessionToAuthRequest(t *testing.T) {
 	client, err := Tester.CreateOIDCNativeClient(CTX, redirectURI)
 	require.NoError(t, err)
-	authRequestID, err := Tester.CreateOIDCAuthRequest(client.GetClientId(), integration.LoginUser, redirectURI)
+	authRequestID, err := Tester.CreateOIDCAuthRequest(client.GetClientId(), Tester.Users[integration.Login].ID, redirectURI)
 	require.NoError(t, err)
 	sessionResp, err := Tester.Client.SessionV2.CreateSession(CTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
