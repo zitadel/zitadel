@@ -138,16 +138,18 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 }
 
 func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
+	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient")
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		tokenVerifier   func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
 		checkPermission domain.PermissionCheck
 	}
 	type args struct {
-		ctx          context.Context
-		id           string
-		sessionID    string
-		sessionToken string
+		ctx              context.Context
+		id               string
+		sessionID        string
+		sessionToken     string
+		checkLoginClient bool
 	}
 	type res struct {
 		details *domain.ObjectDetails
@@ -171,7 +173,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
-				ctx:       authz.WithInstanceID(context.Background(), "instanceID"),
+				ctx:       mockCtx,
 				id:        "id",
 				sessionID: "session",
 			},
@@ -180,12 +182,53 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			},
 		},
 		{
+			"wrong login client",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("id", "instanceID").Aggregate,
+								"loginClient",
+								"clientID",
+								"redirectURI",
+								"state",
+								"nonce",
+								[]string{"openid"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeCode,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+							),
+						),
+					),
+				),
+				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+					return nil
+				},
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx:              authz.NewMockContext("instanceID", "orgID", "wrongLoginClient"),
+				id:               "id",
+				sessionID:        "session",
+				sessionToken:     "token",
+				checkLoginClient: true,
+			},
+			res{
+				wantErr: caos_errs.ThrowPermissionDenied(nil, "COMMAND-rai9Y", "Errors.AuthRequest.WrongLoginClient"),
+			},
+		},
+		{
 			"session not existing",
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",
@@ -211,7 +254,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
-				ctx:       authz.WithInstanceID(context.Background(), "instanceID"),
+				ctx:       mockCtx,
 				id:        "V2_id",
 				sessionID: "session",
 			},
@@ -225,7 +268,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",
@@ -245,7 +288,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
+							session.NewAddedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate)),
 					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
@@ -254,7 +297,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
-				ctx:       authz.WithInstanceID(context.Background(), "instanceID"),
+				ctx:       mockCtx,
 				id:        "V2_id",
 				sessionID: "sessionID",
 			},
@@ -268,7 +311,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",
@@ -288,7 +331,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
+							session.NewAddedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate)),
 					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
@@ -296,7 +339,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				},
 			},
 			args{
-				ctx:          authz.WithInstanceID(context.Background(), "instanceID"),
+				ctx:          mockCtx,
 				id:           "V2_id",
 				sessionID:    "sessionID",
 				sessionToken: "invalid",
@@ -311,7 +354,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("id", "instanceID").Aggregate,
 								"loginClient",
 								"clientID",
 								"redirectURI",
@@ -331,12 +374,66 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
+							session.NewAddedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate)),
 					),
 					expectPush(
 						[]*repository.Event{eventFromEventPusherWithInstanceID(
 							"instanceID",
-							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							authrequest.NewSessionLinkedEvent(mockCtx, &authrequest.NewAggregate("id", "instanceID").Aggregate,
+								"session",
+								"userID",
+								testNow,
+								[]string{amr.PWD},
+							),
+						)}),
+				),
+				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+					return nil
+				},
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx:          mockCtx,
+				id:           "id",
+				sessionID:    "session",
+				sessionToken: "token",
+			},
+			res{
+				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
+			},
+		},
+		{
+			"linked with login client check",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"loginClient",
+								"clientID",
+								"redirectURI",
+								"state",
+								"nonce",
+								[]string{"openid"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeCode,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate)),
+					),
+					expectPush(
+						[]*repository.Event{eventFromEventPusherWithInstanceID(
+							"instanceID",
+							authrequest.NewSessionLinkedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"sessionID",
 								"userID",
 								testNow,
@@ -350,10 +447,11 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:          authz.WithInstanceID(context.Background(), "instanceID"),
-				id:           "V2_id",
-				sessionID:    "sessionID",
-				sessionToken: "token",
+				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient"),
+				id:               "V2_id",
+				sessionID:        "sessionID",
+				sessionToken:     "token",
+				checkLoginClient: true,
 			},
 			res{
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
@@ -367,7 +465,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 				checkPermission:      tt.fields.checkPermission,
 			}
-			details, err := c.LinkSessionToAuthRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken)
+			details, err := c.LinkSessionToAuthRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLoginClient)
 			require.ErrorIs(t, err, tt.res.wantErr)
 			assert.Equal(t, tt.res.details, details)
 		})

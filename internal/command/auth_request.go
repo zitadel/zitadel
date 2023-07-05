@@ -73,10 +73,13 @@ func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest)
 	))
 }
 
-func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, sessionToken string) (*domain.ObjectDetails, error) {
+func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, sessionToken string, checkLoginClient bool) (*domain.ObjectDetails, error) {
 	writeModel, err := c.getAuthRequestWriteModel(ctx, id)
 	if err != nil {
 		return nil, err
+	}
+	if checkLoginClient && authz.GetCtxData(ctx).UserID != writeModel.LoginClient {
+		return nil, errors.ThrowPermissionDenied(nil, "COMMAND-rai9Y", "Errors.AuthRequest.WrongLoginClient")
 	}
 	if writeModel.AuthRequestState != domain.AuthRequestStateAdded {
 		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-Sx208nt", "Errors.AuthRequest.AlreadyHandled")
