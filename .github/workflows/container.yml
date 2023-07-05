@@ -61,10 +61,9 @@ jobs:
           file: build/Dockerfile
           target: artifact
           platforms: linux/${{ matrix.arch }}
-          push: true
           tags: ${{ inputs.tag_name }}-ubuntu
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=zitadel/test,push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ inputs.tag_name }},push-by-digest=true,name-canonical=true,push=true
       - 
         name: Scratch
         id: build-scratch
