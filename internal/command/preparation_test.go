@@ -1,3 +1,5 @@
+//go:build unit
+
 // this is a helper file for tests
 package command
 

@@ -1,6 +1,7 @@
+//go:build !race
+
 // The library github.com/benbjohnson/clock fails when race is enabled
 // https://github.com/benbjohnson/clock/issues/44
-//go:build !race
 
 package logstore_test
 

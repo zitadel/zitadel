@@ -1,3 +1,5 @@
+//go:build unit
+
 package robots_txt
 
 import (
