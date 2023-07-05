@@ -14,9 +14,6 @@ jobs:
   zitadel:
     name: zitadel
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        arch: [amd64,arm64]
     steps:
       - 
         uses: actions/checkout@v3
@@ -39,12 +36,14 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: .artifacts
-          name: zitadel-linux-${{ matrix.arch }}
       -
         name: unpack executable
         run: |
-          tar -xvf .artifacts/zitadel-linux-${{ matrix.arch }}.tar
-          mv zitadel-linux-${{ matrix.arch }}/zitadel ./zitadel
+          tar -xvf .artifacts/zitadel-linux-amd64.tar
+          tar -xvf .artifacts/zitadel-linux-arm64.tar
+          mkdir ./.executables
+          mv zitadel-linux-amd64/zitadel .executables/zitadel-amd64
+          mv zitadel-linux-arm64/zitadel .executables/zitadel-arm64
       - 
         name: ubuntu
         uses: docker/build-push-action@v4
@@ -53,7 +52,7 @@ jobs:
           context: .
           file: build/Dockerfile
           target: artifact
-          platforms: linux/${{ matrix.arch }}
+          platforms: linux/arm64,linux/amd64
           push: true
           tags: ${{ inputs.tag_name }}-ubuntu
       - 
@@ -64,6 +63,6 @@ jobs:
           context: .
           file: build/Dockerfile
           target: final
-          platforms: linux/${{ matrix.arch }}
+          platforms: linux/arm64,linux/amd64
           push: true
           tags: ${{ inputs.tag_name }}
