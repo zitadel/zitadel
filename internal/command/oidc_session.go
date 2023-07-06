@@ -197,8 +197,7 @@ func (c *OIDCSessionEvents) AddSession(ctx context.Context) {
 		c.authRequestWriteModel.Scope,
 		amr.List(c.sessionWriteModel),
 		c.sessionWriteModel.AuthenticationTime(),
-	),
-	)
+	))
 }
 
 func (c *OIDCSessionEvents) SetAuthRequestSuccessful(ctx context.Context) {

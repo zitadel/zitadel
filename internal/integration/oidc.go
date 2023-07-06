@@ -103,14 +103,15 @@ func (s *Tester) CreateOIDCAuthRequestImplicit(clientID, loginClient, redirectUR
 	}
 
 	authURL := rp.AuthURL("state", provider)
-	parsed, err := url.Parse(authURL)
-	if err != nil {
-		return "", err
-	}
+
+	// implicit is not natively supported so let's just overwrite the response type
+	parsed, _ := url.Parse(authURL)
 	queries := parsed.Query()
 	queries.Set("response_type", string(oidc.ResponseTypeIDToken))
 	parsed.RawQuery = queries.Encode()
-	loc, err := CheckRedirect(parsed.String(), map[string]string{oidc_internal.LoginClientHeader: loginClient})
+	authURL = parsed.String()
+
+	loc, err := CheckRedirect(authURL, map[string]string{oidc_internal.LoginClientHeader: loginClient})
 	if err != nil {
 		return "", err
 	}

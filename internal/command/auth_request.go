@@ -142,7 +142,7 @@ func (c *Commands) AddAuthRequestCode(ctx context.Context, authRequestID, code s
 		return err
 	}
 	if writeModel.AuthRequestState != domain.AuthRequestStateAdded || writeModel.SessionID == "" {
-		return errors.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.AlreadyHandled") //TODO: key
+		return errors.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.AlreadyHandled")
 	}
 	return c.pushAppendAndReduce(ctx, writeModel, authrequest.NewCodeAddedEvent(ctx,
 		&authrequest.NewAggregate(writeModel.AggregateID, authz.GetInstance(ctx).InstanceID()).Aggregate))

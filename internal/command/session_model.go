@@ -58,12 +58,12 @@ func (wm *SessionWriteModel) IsPasskeyChecked() bool {
 }
 
 func (wm *SessionWriteModel) IsU2FChecked() bool {
-	//TODO implement me
+	//TODO implement with https://github.com/zitadel/zitadel/issues/5477
 	return false
 }
 
 func (wm *SessionWriteModel) IsOTPChecked() bool {
-	//TODO implement me
+	//TODO implement with https://github.com/zitadel/zitadel/issues/5477
 	return false
 }
 
@@ -229,6 +229,7 @@ func (wm *SessionWriteModel) AuthenticationTime() time.Time {
 		wm.PasswordCheckedAt,
 		wm.PasskeyCheckedAt,
 		wm.IntentCheckedAt,
+		// TODO: add U2F and OTP check https://github.com/zitadel/zitadel/issues/5477
 	} {
 		if check.After(authTime) {
 			authTime = check

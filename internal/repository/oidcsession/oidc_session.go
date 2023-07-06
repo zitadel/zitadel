@@ -26,7 +26,7 @@ type AddedEvent struct {
 	ClientID              string
 	Audience              []string
 	Scope                 []string
-	AuthMethodsReferences []string //TODO: correct type?
+	AuthMethodsReferences []string
 	AuthTime              time.Time
 }
 
