@@ -30,7 +30,7 @@ type AuthRequest struct {
 	HintUserID    *string
 }
 
-type AuthenticatedAuthRequest struct {
+type CurrentAuthRequest struct {
 	*AuthRequest
 	SessionID string
 	UserID    string
@@ -40,7 +40,7 @@ type AuthenticatedAuthRequest struct {
 
 const IDPrefixV2 = "V2_"
 
-func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest) (_ *AuthenticatedAuthRequest, err error) {
+func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest) (_ *CurrentAuthRequest, err error) {
 	authRequestID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -74,10 +74,10 @@ func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest)
 	if err != nil {
 		return nil, err
 	}
-	return authRequestWriteModelToAuthenticatedAuthRequest(writeModel), nil
+	return authRequestWriteModelToCurrentAuthRequest(writeModel), nil
 }
 
-func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, sessionToken string, checkLoginClient bool) (*domain.ObjectDetails, *AuthenticatedAuthRequest, error) {
+func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, sessionToken string, checkLoginClient bool) (*domain.ObjectDetails, *CurrentAuthRequest, error) {
 	writeModel, err := c.getAuthRequestWriteModel(ctx, id)
 	if err != nil {
 		return nil, nil, err
@@ -112,10 +112,10 @@ func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, 
 	)); err != nil {
 		return nil, nil, err
 	}
-	return writeModelToObjectDetails(&writeModel.WriteModel), authRequestWriteModelToAuthenticatedAuthRequest(writeModel), nil
+	return writeModelToObjectDetails(&writeModel.WriteModel), authRequestWriteModelToCurrentAuthRequest(writeModel), nil
 }
 
-func (c *Commands) FailAuthRequest(ctx context.Context, id string) (*domain.ObjectDetails, *AuthenticatedAuthRequest, error) {
+func (c *Commands) FailAuthRequest(ctx context.Context, id string) (*domain.ObjectDetails, *CurrentAuthRequest, error) {
 	writeModel, err := c.getAuthRequestWriteModel(ctx, id)
 	if err != nil {
 		return nil, nil, err
@@ -130,7 +130,7 @@ func (c *Commands) FailAuthRequest(ctx context.Context, id string) (*domain.Obje
 	if err != nil {
 		return nil, nil, err
 	}
-	return writeModelToObjectDetails(&writeModel.WriteModel), authRequestWriteModelToAuthenticatedAuthRequest(writeModel), nil
+	return writeModelToObjectDetails(&writeModel.WriteModel), authRequestWriteModelToCurrentAuthRequest(writeModel), nil
 }
 
 func (c *Commands) AddAuthRequestCode(ctx context.Context, authRequestID, code string) (err error) {
@@ -148,7 +148,7 @@ func (c *Commands) AddAuthRequestCode(ctx context.Context, authRequestID, code s
 		&authrequest.NewAggregate(writeModel.AggregateID, authz.GetInstance(ctx).InstanceID()).Aggregate))
 }
 
-func (c *Commands) ExchangeAuthCode(ctx context.Context, code string) (authRequest *AuthenticatedAuthRequest, err error) {
+func (c *Commands) ExchangeAuthCode(ctx context.Context, code string) (authRequest *CurrentAuthRequest, err error) {
 	if code == "" {
 		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-Sf3g2", "Errors.AuthRequest.InvalidCode")
 	}
@@ -164,11 +164,11 @@ func (c *Commands) ExchangeAuthCode(ctx context.Context, code string) (authReque
 	if err != nil {
 		return nil, err
 	}
-	return authRequestWriteModelToAuthenticatedAuthRequest(writeModel), nil
+	return authRequestWriteModelToCurrentAuthRequest(writeModel), nil
 }
 
-func authRequestWriteModelToAuthenticatedAuthRequest(writeModel *AuthRequestWriteModel) (_ *AuthenticatedAuthRequest) {
-	return &AuthenticatedAuthRequest{
+func authRequestWriteModelToCurrentAuthRequest(writeModel *AuthRequestWriteModel) (_ *CurrentAuthRequest) {
+	return &CurrentAuthRequest{
 		AuthRequest: &AuthRequest{
 			ID:            writeModel.AggregateID,
 			LoginClient:   writeModel.LoginClient,
@@ -193,12 +193,12 @@ func authRequestWriteModelToAuthenticatedAuthRequest(writeModel *AuthRequestWrit
 	}
 }
 
-func (c *Commands) GetAuthRequestWriteModel(ctx context.Context, id string) (writeModel *AuthenticatedAuthRequest, err error) {
+func (c *Commands) GetCurrentAuthRequest(ctx context.Context, id string) (_ *CurrentAuthRequest, err error) {
 	wm, err := c.getAuthRequestWriteModel(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	return authRequestWriteModelToAuthenticatedAuthRequest(wm), nil
+	return authRequestWriteModelToCurrentAuthRequest(wm), nil
 }
 
 func (c *Commands) getAuthRequestWriteModel(ctx context.Context, id string) (writeModel *AuthRequestWriteModel, err error) {

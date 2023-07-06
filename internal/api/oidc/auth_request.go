@@ -114,7 +114,7 @@ func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRe
 	defer func() { span.EndWithError(err) }()
 
 	if strings.HasPrefix(id, command.IDPrefixV2) {
-		req, err := o.command.GetAuthRequestWriteModel(ctx, id)
+		req, err := o.command.GetCurrentAuthRequest(ctx, id)
 		if err != nil {
 			return nil, err
 		}

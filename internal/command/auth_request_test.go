@@ -35,7 +35,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *AuthenticatedAuthRequest
+		want    *CurrentAuthRequest
 		wantErr error
 	}{
 		{
@@ -126,7 +126,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 					HintUserID: gu.Ptr("hintUserID"),
 				},
 			},
-			&AuthenticatedAuthRequest{
+			&CurrentAuthRequest{
 				AuthRequest: &AuthRequest{
 					ID:           "V2_id",
 					LoginClient:  "loginClient",
@@ -180,7 +180,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 	}
 	type res struct {
 		details *domain.ObjectDetails
-		authReq *AuthenticatedAuthRequest
+		authReq *CurrentAuthRequest
 		wantErr error
 	}
 	tests := []struct {
@@ -479,7 +479,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			},
 			res{
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
-				authReq: &AuthenticatedAuthRequest{
+				authReq: &CurrentAuthRequest{
 					AuthRequest: &AuthRequest{
 						ID:           "V2_id",
 						LoginClient:  "loginClient",
@@ -559,7 +559,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			},
 			res{
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
-				authReq: &AuthenticatedAuthRequest{
+				authReq: &CurrentAuthRequest{
 					AuthRequest: &AuthRequest{
 						ID:           "V2_id",
 						LoginClient:  "loginClient",
@@ -608,7 +608,7 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 	}
 	type res struct {
 		details *domain.ObjectDetails
-		authReq *AuthenticatedAuthRequest
+		authReq *CurrentAuthRequest
 		wantErr error
 	}
 	tests := []struct {
@@ -669,7 +669,7 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 			},
 			res{
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
-				authReq: &AuthenticatedAuthRequest{
+				authReq: &CurrentAuthRequest{
 					AuthRequest: &AuthRequest{
 						ID:           "V2_id",
 						LoginClient:  "loginClient",
@@ -758,7 +758,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 			args{
 				ctx:  mockCtx,
 				id:   "V2_authRequestID",
-				code: "code",
+				code: "V2_authRequestID",
 			},
 			caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.AlreadyHandled"),
 		},
@@ -809,7 +809,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 			args{
 				ctx:  mockCtx,
 				id:   "V2_authRequestID",
-				code: "code",
+				code: "V2_authRequestID",
 			},
 			nil,
 		},
@@ -835,7 +835,7 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 		code string
 	}
 	type res struct {
-		authRequest *AuthenticatedAuthRequest
+		authRequest *CurrentAuthRequest
 		err         error
 	}
 	tests := []struct {
@@ -946,7 +946,7 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 				code: "V2_authRequestID",
 			},
 			res{
-				authRequest: &AuthenticatedAuthRequest{
+				authRequest: &CurrentAuthRequest{
 					AuthRequest: &AuthRequest{
 						ID:           "V2_authRequestID",
 						LoginClient:  "loginClient",

@@ -91,13 +91,17 @@ func (m *AuthRequestWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
+// CheckAuthenticated checks that the auth request exists, a session must have been linked
+// and in case of a Code Flow the code must have been exchanged
 func (m *AuthRequestWriteModel) CheckAuthenticated() error {
 	if m.SessionID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "AUTHR-SF2r2", "Errors.AuthRequest.NotAuthenticated")
 	}
+	// in case of OIDC Code Flow, the code must have been exchanged
 	if m.ResponseType == domain.OIDCResponseTypeCode && m.AuthRequestState == domain.AuthRequestStateCodeExchanged {
 		return nil
 	}
+	// in case of OIDC Implicit Flow, check that the requests exists, but has not succeeded yet
 	if (m.ResponseType == domain.OIDCResponseTypeIDToken || m.ResponseType == domain.OIDCResponseTypeIDTokenToken) &&
 		m.AuthRequestState == domain.AuthRequestStateAdded {
 		return nil

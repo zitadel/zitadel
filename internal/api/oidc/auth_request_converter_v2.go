@@ -9,7 +9,7 @@ import (
 )
 
 type AuthRequestV2 struct {
-	*command.AuthenticatedAuthRequest
+	*command.CurrentAuthRequest
 }
 
 func (a *AuthRequestV2) GetID() string {

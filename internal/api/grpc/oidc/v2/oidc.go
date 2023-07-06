@@ -90,7 +90,7 @@ func (s *Server) failAuthRequest(ctx context.Context, authRequestID string, ae *
 	if err != nil {
 		return nil, err
 	}
-	authReq := &oidc.AuthRequestV2{AuthenticatedAuthRequest: aar}
+	authReq := &oidc.AuthRequestV2{CurrentAuthRequest: aar}
 	callback, err := oidc.CreateErrorCallbackURL(authReq, errorReasonToOIDC(ae.GetError()), ae.GetErrorDescription(), ae.GetErrorUri(), s.op)
 	if err != nil {
 		return nil, err
@@ -106,7 +106,7 @@ func (s *Server) linkSessionToAuthRequest(ctx context.Context, authRequestID str
 	if err != nil {
 		return nil, err
 	}
-	authReq := &oidc.AuthRequestV2{AuthenticatedAuthRequest: aar}
+	authReq := &oidc.AuthRequestV2{CurrentAuthRequest: aar}
 	ctx = op.ContextWithIssuer(ctx, http.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), s.externalSecure))
 	var callback string
 	if aar.ResponseType == domain.OIDCResponseTypeCode {
