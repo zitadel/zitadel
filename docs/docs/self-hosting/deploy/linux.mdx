@@ -5,6 +5,8 @@ title: Linux
 import Disclaimer from './_disclaimer.mdx'
 import DefaultUser from './_defaultuser.mdx'
 import Next from './_next.mdx'
+import NoteInstanceNotFound from './troubleshooting/_note_instance_not_found.mdx';
+
 
 ## Install CockroachDB
 
@@ -38,6 +40,8 @@ ZITADEL_EXTERNALSECURE=false zitadel start-from-init --masterkey "MasterkeyNeeds
 
 <DefaultUser components={props.components} />
 
+<NoteInstanceNotFound/>
+
 ## VideoGuide
 <iframe width="100%" height="315" src="https://www.youtube.com/embed/YVLua-q7dbs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
@@ -54,3 +58,5 @@ This key can be used to provision resources with for example [Terraform](/docs/g
 
 <Next components={props.components} />
 <Disclaimer components={props.components} />
+
+
