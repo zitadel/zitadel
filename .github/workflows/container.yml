@@ -39,7 +39,7 @@ jobs:
         with:
           images: ${{ inputs.image_name }}
           tags: |
-            type=sha,prefix=,suffix=ubuntu,format=long
+            type=sha,prefix=,suffix=-ubuntu,format=long
       - 
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
