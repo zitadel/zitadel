@@ -36,7 +36,7 @@ func TestMain(m *testing.M) {
 		defer Tester.Done()
 		Client = Tester.Client.SessionV2
 
-		CTX, _ = Tester.WithSystemAuthorization(ctx, integration.OrgOwner), errCtx
+		CTX, _ = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
 		User = Tester.CreateHumanUser(CTX)
 		Tester.RegisterUserPasskey(CTX, User.GetUserId())
 		return m.Run()

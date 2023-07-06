@@ -5,6 +5,8 @@ title: Knative
 import Disclaimer from './_disclaimer.mdx'
 import DefaultUser from './_defaultuser.mdx'
 import Next from './_next.mdx'
+import NoteInstanceNotFound from './troubleshooting/_note_instance_not_found.mdx';
+
 
 ## Install Knative
 
@@ -31,7 +33,7 @@ kn service create zitadel \
 --env ZITADEL_EXTERNALPORT=80 \
 --env ZITADEL_TLS_ENABLED=false \
 --env ZITADEL_EXTERNALDOMAIN=zitadel.default.127.0.0.1.sslip.io \
---arg "start-from-init" --arg "--masterkey" --arg "MasterkeyNeedsToHave32Characters" 
+--arg "start-from-init" --arg "--masterkey" --arg "MasterkeyNeedsToHave32Characters"
 ```
 
 ### Knavite yaml
@@ -58,6 +60,8 @@ If you didn't configure something else, this is the default IAM admin users logi
 
 * username: zitadel-admin@<span></span>zitadel.zitadel.default.127.0.0.1.sslip.io
 * password: Password1!
+
+<NoteInstanceNotFound/>
 
 ## VideoGuide
 <iframe width="100%" height="315" src="https://www.youtube.com/embed/m3TXmz3cK7E" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>

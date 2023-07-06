@@ -337,7 +337,7 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Drh5w", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
 	}
 	ctx := HandlerContext(event.Aggregate())
-	alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil,
+	alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil, user.AggregateType,
 		user.UserDomainClaimedType, user.UserDomainClaimedSentType)
 	if err != nil {
 		return nil, err
@@ -465,7 +465,7 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Yko2z8", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
 	}
 	ctx := HandlerContext(event.Aggregate())
-	alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil, user.HumanPasswordChangeSentType)
+	alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil, user.AggregateType, user.HumanPasswordChangeSentType)
 	if err != nil {
 		return nil, err
 	}
@@ -594,5 +594,5 @@ func (u *userNotifier) checkIfCodeAlreadyHandledOrExpired(ctx context.Context, e
 	if event.CreationDate().Add(expiry).Before(time.Now().UTC()) {
 		return true, nil
 	}
-	return u.queries.IsAlreadyHandled(ctx, event, data, eventTypes...)
+	return u.queries.IsAlreadyHandled(ctx, event, data, user.AggregateType, eventTypes...)
 }
