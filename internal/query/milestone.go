@@ -21,11 +21,11 @@ type Milestones struct {
 }
 
 type Milestone struct {
-	InstanceID    string
-	Type          milestone.Type
-	ReachedDate   time.Time
-	PushedDate    time.Time
-	PrimaryDomain string
+	InstanceID    string         `json:"instanceId"`
+	Type          milestone.Type `json:"type"`
+	ReachedDate   time.Time      `json:"reached"`
+	PushedDate    time.Time      `json:"-"`
+	PrimaryDomain string         `json:"primaryDomain"`
 }
 
 type MilestonesSearchQueries struct {

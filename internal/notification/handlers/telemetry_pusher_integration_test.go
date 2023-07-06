@@ -73,8 +73,8 @@ func awaitMilestone(t *testing.T, bodies chan []byte, primaryDomain, expectMiles
 			}
 			t.Log("received milestone", plain.String())
 			milestone := struct {
-				Type          string
-				PrimaryDomain string
+				Type          string `json:"type"`
+				PrimaryDomain string `json:"primaryDomain"`
 			}{}
 			if err := json.Unmarshal(body, &milestone); err != nil {
 				t.Error(err)
