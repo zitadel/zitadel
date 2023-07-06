@@ -1,3 +1,7 @@
+// Package amr maps zitadel session factors to Authentication Method Reference Values
+// as defined in [RFC 8176, section 2].
+//
+// [RFC 8176, section 2]: https://datatracker.ietf.org/doc/html/rfc8176#section-2
 package amr
 
 const (

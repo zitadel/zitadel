@@ -17,8 +17,8 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 )
 
-// AddOIDCSessionAccessToken creates a new OIDC Session, creates an access token and returns its id and expiration
-// if the underlying [AuthRequest] is a OIDC Auth Code Flow, it will set the code as exchange
+// AddOIDCSessionAccessToken creates a new OIDC Session, creates an access token and returns its id and expiration.
+// If the underlying [AuthRequest] is a OIDC Auth Code Flow, it will set the code as exchanged.
 func (c *Commands) AddOIDCSessionAccessToken(ctx context.Context, authRequestID string) (string, time.Time, error) {
 	cmd, err := c.newOIDCSessionAddEvents(ctx, authRequestID)
 	if err != nil {
@@ -33,9 +33,9 @@ func (c *Commands) AddOIDCSessionAccessToken(ctx context.Context, authRequestID 
 	return accessTokenID, accessTokenExpiration, err
 }
 
-// AddOIDCSessionRefreshAndAccessToken creates a new OIDC Session, creates an access token and refresh token
-// it returns the access token id and expiration and the refresh token
-// if the underlying [AuthRequest] is a OIDC Auth Code Flow, it will set the code as exchange
+// AddOIDCSessionRefreshAndAccessToken creates a new OIDC Session, creates an access token and refresh token.
+// It returns the access token id, expiration and the refresh token.
+// If the underlying [AuthRequest] is a OIDC Auth Code Flow, it will set the code as exchanged.
 func (c *Commands) AddOIDCSessionRefreshAndAccessToken(ctx context.Context, authRequestID string) (tokenID, refreshToken string, tokenExpiration time.Time, err error) {
 	cmd, err := c.newOIDCSessionAddEvents(ctx, authRequestID)
 	if err != nil {
@@ -52,8 +52,8 @@ func (c *Commands) AddOIDCSessionRefreshAndAccessToken(ctx context.Context, auth
 	return cmd.PushEvents(ctx)
 }
 
-// ExchangeOIDCSessionRefreshAndAccessToken updates an existing OIDC Session, creates a new access and refresh token
-// it returns the access token id and expiration and the new refresh token
+// ExchangeOIDCSessionRefreshAndAccessToken updates an existing OIDC Session, creates a new access and refresh token.
+// It returns the access token id and expiration and the new refresh token.
 func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context, oidcSessionID, refreshToken string, scope []string) (tokenID, newRefreshToken string, tokenExpiration time.Time, err error) {
 	cmd, err := c.newOIDCSessionUpdateEvents(ctx, oidcSessionID, refreshToken)
 	if err != nil {
@@ -68,8 +68,8 @@ func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context,
 	return cmd.PushEvents(ctx)
 }
 
-// OIDCSessionByRefreshToken computes the current state of an existing OIDCSession by a refresh_token (to start a Refresh Token Grant)
-// if either the session is not active, the token is invalid or expired (incl. idle expiration) an invalid refresh token error will be returned
+// OIDCSessionByRefreshToken computes the current state of an existing OIDCSession by a refresh_token (to start a Refresh Token Grant).
+// If either the session is not active, the token is invalid or expired (incl. idle expiration) an invalid refresh token error will be returned.
 func (c *Commands) OIDCSessionByRefreshToken(ctx context.Context, refreshToken string) (*OIDCSessionWriteModel, error) {
 	split := strings.Split(refreshToken, ":")
 	if len(split) != 2 {
