@@ -42,10 +42,10 @@ func TestMain(m *testing.M) {
 		Tester = integration.NewTester(ctx)
 		defer Tester.Done()
 
-		CTX, _ = Tester.WithSystemAuthorization(ctx, integration.OrgOwner), errCtx
+		CTX, _ = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
 		User = Tester.CreateHumanUser(CTX)
 		Tester.RegisterUserPasskey(CTX, User.GetUserId())
-		CTXLOGIN, _ = Tester.WithSystemAuthorization(ctx, integration.Login), errCtx
+		CTXLOGIN, _ = Tester.WithAuthorization(ctx, integration.Login), errCtx
 		return m.Run()
 	}())
 }
@@ -63,13 +63,13 @@ func createImplicitClient(t testing.TB) string {
 }
 
 func createAuthRequest(t testing.TB, clientID, redirectURI string, scope ...string) string {
-	redURL, err := Tester.CreateOIDCAuthRequest(clientID, Tester.Users[integration.Login].ID, redirectURI, scope...)
+	redURL, err := Tester.CreateOIDCAuthRequest(clientID, Tester.Users[integration.FirstInstanceUsersKey][integration.Login].ID, redirectURI, scope...)
 	require.NoError(t, err)
 	return redURL
 }
 
 func createAuthRequestImplicit(t testing.TB, clientID, redirectURI string, scope ...string) string {
-	redURL, err := Tester.CreateOIDCAuthRequestImplicit(clientID, Tester.Users[integration.Login].ID, redirectURI, scope...)
+	redURL, err := Tester.CreateOIDCAuthRequestImplicit(clientID, Tester.Users[integration.FirstInstanceUsersKey][integration.Login].ID, redirectURI, scope...)
 	require.NoError(t, err)
 	return redURL
 }

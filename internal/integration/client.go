@@ -65,11 +65,9 @@ func (t *Tester) UseIsolatedInstance(iamOwnerCtx, systemCtx context.Context) (pr
 	}
 	t.createClientConn(iamOwnerCtx, grpc.WithAuthority(primaryDomain))
 	instanceId = instance.GetInstanceId()
-	t.Users[instanceId] = map[UserType]User{
-		IAMOwner: {
-			Token: instance.GetPat(),
-		},
-	}
+	t.Users.Set(instanceId, IAMOwner, &User{
+		Token: instance.GetPat(),
+	})
 	return primaryDomain, instanceId, t.WithInstanceAuthorization(iamOwnerCtx, IAMOwner, instanceId)
 }
 
