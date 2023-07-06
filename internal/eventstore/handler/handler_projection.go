@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/pseudo"
 )
 
 const (
@@ -51,19 +52,20 @@ type NowFunc func() time.Time
 
 type ProjectionHandler struct {
 	Handler
-	ProjectionName        string
-	reduce                Reduce
-	update                Update
-	searchQuery           SearchQuery
-	triggerProjection     *time.Timer
-	lock                  Lock
-	unlock                Unlock
-	requeueAfter          time.Duration
-	retryFailedAfter      time.Duration
-	retries               int
-	concurrentInstances   int
-	handleActiveInstances time.Duration
-	nowFunc               NowFunc
+	ProjectionName             string
+	reduce                     Reduce
+	update                     Update
+	searchQuery                SearchQuery
+	triggerProjection          *time.Timer
+	lock                       Lock
+	unlock                     Unlock
+	requeueAfter               time.Duration
+	retryFailedAfter           time.Duration
+	retries                    int
+	concurrentInstances        int
+	handleActiveInstances      time.Duration
+	nowFunc                    NowFunc
+	reduceScheduledPseudoEvent bool
 }
 
 func NewProjectionHandler(
@@ -75,32 +77,35 @@ func NewProjectionHandler(
 	lock Lock,
 	unlock Unlock,
 	initialized <-chan bool,
+	reduceScheduledPseudoEvent bool,
 ) *ProjectionHandler {
 	concurrentInstances := int(config.ConcurrentInstances)
 	if concurrentInstances < 1 {
 		concurrentInstances = 1
 	}
 	h := &ProjectionHandler{
-		Handler:               NewHandler(config.HandlerConfig),
-		ProjectionName:        config.ProjectionName,
-		reduce:                reduce,
-		update:                update,
-		searchQuery:           query,
-		lock:                  lock,
-		unlock:                unlock,
-		requeueAfter:          config.RequeueEvery,
-		triggerProjection:     time.NewTimer(0), // first trigger is instant on startup
-		retryFailedAfter:      config.RetryFailedAfter,
-		retries:               int(config.Retries),
-		concurrentInstances:   concurrentInstances,
-		handleActiveInstances: config.HandleActiveInstances,
-		nowFunc:               time.Now,
+		Handler:                    NewHandler(config.HandlerConfig),
+		ProjectionName:             config.ProjectionName,
+		reduce:                     reduce,
+		update:                     update,
+		searchQuery:                query,
+		lock:                       lock,
+		unlock:                     unlock,
+		requeueAfter:               config.RequeueEvery,
+		triggerProjection:          time.NewTimer(0), // first trigger is instant on startup
+		retryFailedAfter:           config.RetryFailedAfter,
+		retries:                    int(config.Retries),
+		concurrentInstances:        concurrentInstances,
+		handleActiveInstances:      config.HandleActiveInstances,
+		nowFunc:                    time.Now,
+		reduceScheduledPseudoEvent: reduceScheduledPseudoEvent,
 	}
 
 	go func() {
 		<-initialized
-		go h.subscribe(ctx)
-
+		if !h.reduceScheduledPseudoEvent {
+			go h.subscribe(ctx)
+		}
 		go h.schedule(ctx)
 	}()
 
@@ -184,6 +189,13 @@ func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Ev
 
 // FetchEvents checks the current sequences and filters for newer events
 func (h *ProjectionHandler) FetchEvents(ctx context.Context, instances ...string) ([]eventstore.Event, bool, error) {
+	if h.reduceScheduledPseudoEvent {
+		return h.fetchPseudoEvents(ctx, instances...)
+	}
+	return h.fetchDBEvents(ctx, instances...)
+}
+
+func (h *ProjectionHandler) fetchDBEvents(ctx context.Context, instances ...string) ([]eventstore.Event, bool, error) {
 	eventQuery, eventsLimit, err := h.searchQuery(ctx, instances)
 	if err != nil {
 		return nil, false, err
@@ -193,6 +205,10 @@ func (h *ProjectionHandler) FetchEvents(ctx context.Context, instances ...string
 		return nil, false, err
 	}
 	return events, int(eventsLimit) == len(events), err
+}
+
+func (h *ProjectionHandler) fetchPseudoEvents(ctx context.Context, instances ...string) ([]eventstore.Event, bool, error) {
+	return []eventstore.Event{pseudo.NewScheduledEvent(ctx, time.Now(), instances...)}, false, nil
 }
 
 func (h *ProjectionHandler) subscribe(ctx context.Context) {
