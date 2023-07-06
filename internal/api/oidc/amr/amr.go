@@ -1,11 +1,16 @@
 package amr
 
 const (
-	// DEPRECATED: use `PWD` instead
-	Password     = "password"
-	PWD          = "pwd"
-	MFA          = "mfa"
-	OTP          = "otp"
+	// Password states that the users password has been verified
+	// Deprecated: use `PWD` instead
+	Password = "password"
+	// PWD states that the users password has been verified
+	PWD = "pwd"
+	// MFA states that multiple factors have been verified (e.g. pwd and otp or passkey)
+	MFA = "mfa"
+	// OTP states that a one time password has been verified (e.g. TOTP)
+	OTP = "otp"
+	// UserPresence states that the end users presence has been verified (e.g. passkey and u2f)
 	UserPresence = "user"
 )
 

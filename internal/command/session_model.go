@@ -58,12 +58,12 @@ func (wm *SessionWriteModel) IsPasskeyChecked() bool {
 }
 
 func (wm *SessionWriteModel) IsU2FChecked() bool {
-	//TODO implement with https://github.com/zitadel/zitadel/issues/5477
+	// TODO: implement with https://github.com/zitadel/zitadel/issues/5477
 	return false
 }
 
 func (wm *SessionWriteModel) IsOTPChecked() bool {
-	//TODO implement with https://github.com/zitadel/zitadel/issues/5477
+	// TODO: implement with https://github.com/zitadel/zitadel/issues/5477
 	return false
 }
 

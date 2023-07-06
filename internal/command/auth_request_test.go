@@ -844,19 +844,19 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 		args   args
 		res    res
 	}{
-		//{
-		//	"empty code error",
-		//	fields{
-		//		eventstore: eventstoreExpect(t),
-		//	},
-		//	args{
-		//		ctx:  mockCtx
-		//		code: "",
-		//	},
-		//	res{
-		//		err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfr3s", "Errors.AuthRequest.InvalidCode"),
-		//	},
-		//},
+		{
+			"empty code error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:  mockCtx,
+				code: "",
+			},
+			res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sf3g2", "Errors.AuthRequest.InvalidCode"),
+			},
+		},
 		{
 			"no code added error",
 			fields{
@@ -894,46 +894,6 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.NoCode"),
 			},
 		},
-		//{
-		//	"invalid code error",
-		//	fields{
-		//		eventstore: eventstoreExpect(t,
-		//			expectFilter(
-		//				eventFromEventPusher(
-		//					authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
-		//						"loginClient",
-		//						"clientID",
-		//						"redirectURI",
-		//						"state",
-		//						"nonce",
-		//						[]string{"openid"},
-		//						[]string{"audience"},
-		//						domain.OIDCResponseTypeCode,
-		//						&domain.OIDCCodeChallenge{
-		//							Challenge: "challenge",
-		//							Method:    domain.CodeChallengeMethodS256,
-		//						},
-		//						[]domain.Prompt{domain.PromptNone},
-		//						[]string{"en", "de"},
-		//						gu.Ptr(time.Duration(0)),
-		//						gu.Ptr("loginHint"),
-		//						gu.Ptr("hintUserID"),
-		//					),
-		//				),
-		//				eventFromEventPusher(
-		//					authrequest.NewCodeAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate, "code"),
-		//				),
-		//			),
-		//		),
-		//	},
-		//	args{
-		//		ctx:  mockCtx
-		//		code: "invalidCode",
-		//	},
-		//	res{
-		//		err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-DBNqz", "Errors.AuthRequest.InvalidCode"),
-		//	},
-		//},
 		{
 			"code exchanged",
 			fields{

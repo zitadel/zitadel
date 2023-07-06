@@ -149,6 +149,9 @@ func (c *Commands) AddAuthRequestCode(ctx context.Context, authRequestID, code s
 }
 
 func (c *Commands) ExchangeAuthCode(ctx context.Context, code string) (authRequest *AuthenticatedAuthRequest, err error) {
+	if code == "" {
+		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-Sf3g2", "Errors.AuthRequest.InvalidCode")
+	}
 	writeModel, err := c.getAuthRequestWriteModel(ctx, code)
 	if err != nil {
 		return nil, err
