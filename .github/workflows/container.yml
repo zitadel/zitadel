@@ -133,6 +133,7 @@ jobs:
           images: '${{ inputs.image_name }}'
           tags: |
             type=sha,prefix=,suffix=,format=long
+            type=sha,prefix=,suffix=-ubuntu,format=long
       - 
         name: Login to Docker registry
         uses: docker/login-action@v2
