@@ -18,9 +18,7 @@ import (
 )
 
 func TestServer_TelemetryPushMilestones(t *testing.T) {
-	primaryDomain, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(SystemCTX)
 	bodies := make(chan []byte, 0)
-	t.Log("testing against instance with primary domain", primaryDomain)
 	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
@@ -42,13 +40,15 @@ func TestServer_TelemetryPushMilestones(t *testing.T) {
 	mockServer.Listener = listener
 	mockServer.Start()
 	t.Cleanup(mockServer.Close)
+	primaryDomain, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(CTX, SystemCTX)
+	t.Log("testing against instance with primary domain", primaryDomain)
 	awaitMilestone(t, bodies, primaryDomain, "InstanceCreated")
-	project, err := MgmtClient.AddProject(iamOwnerCtx, &management.AddProjectRequest{Name: "integration"})
+	project, err := Tester.Client.Mgmt.AddProject(iamOwnerCtx, &management.AddProjectRequest{Name: "integration"})
 	if err != nil {
 		t.Fatal(err)
 	}
 	awaitMilestone(t, bodies, primaryDomain, "ProjectCreated")
-	if _, err = MgmtClient.AddOIDCApp(iamOwnerCtx, &management.AddOIDCAppRequest{
+	if _, err = Tester.Client.Mgmt.AddOIDCApp(iamOwnerCtx, &management.AddOIDCAppRequest{
 		ProjectId: project.GetId(),
 		Name:      "integration",
 	}); err != nil {
@@ -57,7 +57,7 @@ func TestServer_TelemetryPushMilestones(t *testing.T) {
 	awaitMilestone(t, bodies, primaryDomain, "ApplicationCreated")
 	// TODO: trigger and await milestone AuthenticationSucceededOnInstance
 	// TODO: trigger and await milestone AuthenticationSucceededOnApplication
-	if _, err = SystemClient.RemoveInstance(SystemCTX, &system.RemoveInstanceRequest{InstanceId: instanceID}); err != nil {
+	if _, err = Tester.Client.System.RemoveInstance(SystemCTX, &system.RemoveInstanceRequest{InstanceId: instanceID}); err != nil {
 		t.Fatal(err)
 	}
 	awaitMilestone(t, bodies, primaryDomain, "InstanceDeleted")
