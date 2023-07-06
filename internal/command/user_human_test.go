@@ -3901,18 +3901,3 @@ func TestAddHumanCommand(t *testing.T) {
 		})
 	}
 }
-
-func mockEmailCode(code string, exp time.Duration) func(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCode, error) {
-	return func(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCode, error) {
-		return &CryptoCode{
-			Crypted: &crypto.CryptoValue{
-				CryptoType: crypto.TypeEncryption,
-				Algorithm:  "enc",
-				KeyID:      "id",
-				Crypted:    []byte(code),
-			},
-			Plain:  code,
-			Expiry: exp,
-		}, nil
-	}
-}
