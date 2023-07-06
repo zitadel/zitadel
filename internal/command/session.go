@@ -23,8 +23,10 @@ type SessionCommands struct {
 
 	sessionWriteModel  *SessionWriteModel
 	passwordWriteModel *HumanPasswordWriteModel
+	intentWriteModel   *IDPIntentWriteModel
 	eventstore         *eventstore.Eventstore
 	userPasswordAlg    crypto.HashAlgorithm
+	intentAlg          crypto.EncryptionAlgorithm
 	createToken        func(sessionID string) (id string, token string, err error)
 	now                func() time.Time
 }
@@ -35,6 +37,7 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 		sessionWriteModel: session,
 		eventstore:        c.eventstore,
 		userPasswordAlg:   c.userPasswordAlg,
+		intentAlg:         c.idpConfigEncryption,
 		createToken:       c.sessionTokenCreator,
 		now:               time.Now,
 	}
@@ -80,6 +83,42 @@ func CheckPassword(password string) SessionCommand {
 	}
 }
 
+// CheckIntent defines a check for a succeeded intent to be executed for a session update
+func CheckIntent(intentID, token string) SessionCommand {
+	return func(ctx context.Context, cmd *SessionCommands) error {
+		if cmd.sessionWriteModel.UserID == "" {
+			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfw3r", "Errors.User.UserIDMissing")
+		}
+		if err := crypto.CheckToken(cmd.intentAlg, token, intentID); err != nil {
+			return err
+		}
+		cmd.intentWriteModel = NewIDPIntentWriteModel(intentID, "")
+		err := cmd.eventstore.FilterToQueryReducer(ctx, cmd.intentWriteModel)
+		if err != nil {
+			return err
+		}
+		if cmd.intentWriteModel.State != domain.IDPIntentStateSucceeded {
+			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4bw", "Errors.Intent.NotSucceeded")
+		}
+		if cmd.intentWriteModel.UserID != "" {
+			if cmd.intentWriteModel.UserID != cmd.sessionWriteModel.UserID {
+				return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser")
+			}
+		} else {
+			linkWriteModel := NewUserIDPLinkWriteModel(cmd.sessionWriteModel.UserID, cmd.intentWriteModel.IDPID, cmd.intentWriteModel.IDPUserID, cmd.intentWriteModel.ResourceOwner)
+			err := cmd.eventstore.FilterToQueryReducer(ctx, linkWriteModel)
+			if err != nil {
+				return err
+			}
+			if linkWriteModel.State != domain.UserIDPLinkStateActive {
+				return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser")
+			}
+		}
+		cmd.sessionWriteModel.IntentChecked(ctx, cmd.now())
+		return nil
+	}
+}
+
 // Exec will execute the commands specified and returns an error on the first occurrence
 func (s *SessionCommands) Exec(ctx context.Context) error {
 	for _, cmd := range s.cmds {
@@ -118,7 +157,7 @@ func (s *SessionCommands) commands(ctx context.Context) (string, []eventstore.Co
 	return token, s.sessionWriteModel.commands, nil
 }
 
-func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, metadata map[string][]byte) (set *SessionChanged, err error) {
+func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, sessionDomain string, metadata map[string][]byte) (set *SessionChanged, err error) {
 	sessionID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -128,8 +167,8 @@ func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, met
 	if err != nil {
 		return nil, err
 	}
+	sessionWriteModel.Start(ctx, sessionDomain)
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
-	cmd.sessionWriteModel.Start(ctx)
 	return c.updateSession(ctx, cmd, metadata)
 }
 

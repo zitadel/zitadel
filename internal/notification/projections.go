@@ -29,6 +29,8 @@ func Start(
 	ctx context.Context,
 	userHandlerCustomConfig projection.CustomConfig,
 	quotaHandlerCustomConfig projection.CustomConfig,
+	telemetryHandlerCustomConfig projection.CustomConfig,
+	telemetryCfg handlers.TelemetryPusherConfig,
 	externalPort uint16,
 	externalSecure bool,
 	commands *command.Commands,
@@ -74,4 +76,15 @@ func Start(
 		metricSuccessfulDeliveriesJSON,
 		metricFailedDeliveriesJSON,
 	).Start()
+	if telemetryCfg.Enabled {
+		handlers.NewTelemetryPusher(
+			ctx,
+			telemetryCfg,
+			projection.ApplyCustomConfig(telemetryHandlerCustomConfig),
+			commands,
+			q,
+			metricSuccessfulDeliveriesJSON,
+			metricFailedDeliveriesJSON,
+		).Start()
+	}
 }

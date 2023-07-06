@@ -47,6 +47,7 @@ import (
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/authz"
 	authz_repo "github.com/zitadel/zitadel/internal/authz/repository"
+	authz_es "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/eventstore"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
@@ -145,6 +146,11 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		keys.SAML,
 		config.InternalAuthZ.RolePermissionMappings,
 		sessionTokenVerifier,
+		func(q *query.Queries) domain.PermissionCheck {
+			return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+				return internal_authz.CheckPermission(ctx, &authz_es.UserMembershipRepo{Queries: q}, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
+			}
+		},
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
@@ -201,14 +207,14 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		return err
 	}
 
-	usageReporter := logstore.UsageReporterFunc(commands.ReportUsage)
+	usageReporter := logstore.UsageReporterFunc(commands.ReportQuotaUsage)
 	actionsLogstoreSvc := logstore.New(queries, usageReporter, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	if actionsLogstoreSvc.Enabled() {
 		logging.Warn("execution logs are currently in beta")
 	}
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	notification.Start(ctx, config.Projections.Customizations["notifications"], config.Projections.Customizations["notificationsquotas"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
+	notification.Start(ctx, config.Projections.Customizations["notifications"], config.Projections.Customizations["notificationsquotas"], config.Projections.Customizations["telemetry"], *config.Telemetry, config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
 
 	router := mux.NewRouter()
 	tlsConfig, err := config.TLS.Config()

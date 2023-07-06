@@ -435,22 +435,21 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectPush(
 						eventPusherToEvents(
-							func() eventstore.Command {
-								event, _ := idpintent.NewSucceededEvent(
-									context.Background(),
-									&idpintent.NewAggregate("id", "ro").Aggregate,
-									[]byte(`{"RawInfo":{"id":"id"}}`),
-									"",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("accessToken"),
-									},
-									"",
-								)
-								return event
-							}(),
+							idpintent.NewSucceededEvent(
+								context.Background(),
+								&idpintent.NewAggregate("id", "ro").Aggregate,
+								[]byte(`{"sub":"id","preferred_username":"username"}`),
+								"id",
+								"username",
+								"",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("accessToken"),
+								},
+								"idToken",
+							),
 						),
 					),
 				),
@@ -458,18 +457,20 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				writeModel: NewIDPIntentWriteModel("id", "ro"),
-				idpSession: &oauth.Session{
+				idpSession: &openid.Session{
 					Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 						Token: &oauth2.Token{
 							AccessToken: "accessToken",
 						},
+						IDToken: "idToken",
 					},
 				},
-				idpUser: &oauth.UserMapper{
-					RawInfo: map[string]interface{}{
-						"id": "id",
+				idpUser: openid.NewUser(&oidc.UserInfo{
+					Subject: "id",
+					UserInfoProfile: oidc.UserInfoProfile{
+						PreferredUsername: "username",
 					},
-				},
+				}),
 			},
 			res{
 				token: "aWQ",
