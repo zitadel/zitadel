@@ -199,6 +199,7 @@ module.exports = {
             "guides/integrate/login-ui/username-password",
             "guides/integrate/login-ui/external-login",
             "guides/integrate/login-ui/passkey",
+            "guides/integrate/login-ui/mfa",
             "guides/integrate/login-ui/select-account",
             "guides/integrate/login-ui/password-reset",
             "guides/integrate/login-ui/logout",
@@ -573,7 +574,8 @@ module.exports = {
         "self-hosting/deploy/compose",
         "self-hosting/deploy/knative",
         "self-hosting/deploy/kubernetes",
-        "self-hosting/deploy/loadbalancing-example/loadbalancing-example"
+        "self-hosting/deploy/loadbalancing-example/loadbalancing-example",
+        "self-hosting/deploy/troubleshooting/troubleshooting"
       ],
     },
     {

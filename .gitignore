@@ -60,6 +60,7 @@ docs/docs/apis/auth
 docs/docs/apis/admin
 docs/docs/apis/mgmt
 docs/docs/apis/system
+docs/docs/apis/proto
 **/.sass-cache
 /internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css
 /internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css.map
