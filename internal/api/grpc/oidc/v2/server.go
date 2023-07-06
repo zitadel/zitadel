@@ -18,7 +18,8 @@ type Server struct {
 	command *command.Commands
 	query   *query.Queries
 
-	op op.OpenIDProvider
+	op             op.OpenIDProvider
+	externalSecure bool
 }
 
 type Config struct{}
@@ -27,11 +28,13 @@ func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
 	op op.OpenIDProvider,
+	externalSecure bool,
 ) *Server {
 	return &Server{
-		command: command,
-		query:   query,
-		op:      op,
+		command:        command,
+		query:          query,
+		op:             op,
+		externalSecure: externalSecure,
 	}
 }
 

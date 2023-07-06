@@ -4,10 +4,13 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v2/pkg/op"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -104,7 +107,7 @@ func (s *Server) linkSessionToAuthRequest(ctx context.Context, authRequestID str
 		return nil, err
 	}
 	authReq := &oidc.AuthRequestV2{AuthenticatedAuthRequest: aar}
-
+	ctx = op.ContextWithIssuer(ctx, http.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), s.externalSecure))
 	var callback string
 	if aar.ResponseType == domain.OIDCResponseTypeCode {
 		callback, err = oidc.CreateCodeCallbackURL(ctx, authReq, s.op)

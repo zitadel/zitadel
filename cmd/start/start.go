@@ -403,7 +403,7 @@ func startAPIs(
 	apis.HandleFunc(login.EndpointDeviceAuth, login.RedirectDeviceAuthToPrefix)
 
 	// After OIDC provider so that the callback endpoint can be used
-	if err := apis.RegisterService(ctx, oidc_v2.CreateServer(commands, queries, oidcProvider)); err != nil {
+	if err := apis.RegisterService(ctx, oidc_v2.CreateServer(commands, queries, oidcProvider, config.ExternalSecure)); err != nil {
 		return err
 	}
 
