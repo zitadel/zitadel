@@ -74,13 +74,12 @@ jobs:
     uses: ./.github/workflows/container.yml
     with:
       image_name: 'ghcr.io/zitadel/test'
-      image_tag: ${{ github.sha }}
 
   e2e:
     uses: ./.github/workflows/e2e.yml
     needs: [container]
     with:
-      tag_name: ${{ needs.container.outputs.tag_name }}-ubuntu
+      image: ${{ needs.container.outputs.image }}-ubuntu
 
   release:
     uses: ./.github/workflows/release.yml
@@ -91,7 +90,7 @@ jobs:
     with:
       node_version: '16'
       buf_version: 'latest'
-      tag_name: ${{ needs.container.outputs.tag_name }}
+      image: ${{ needs.container.outputs.image }}
       semantic_version: '19.0.2'
       image_name: 'ghcr.io/zitadel/test'
       google_image_name: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"

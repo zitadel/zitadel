@@ -6,12 +6,9 @@ on:
       image_name:
         required: true
         type: string
-      image_tag:
-        required: true
-        type: string
     outputs:
-      tag_name:
-        value: '${{ inputs.image_name }}:${{ inputs.image_tag }}'
+      image:
+        value: '${{ inputs.image_name }}:${{ github.sha }}'
 
 jobs:
   build:
@@ -158,4 +155,4 @@ jobs:
       -
         name: Inspect image
         run: |
-          docker buildx imagetools inspect ${{ inputs.image_name }}:${{ inputs.image_tag }}${{ matrix.suffix }}
+          docker buildx imagetools inspect ${{ inputs.image_name }}:${{ github.sha }}${{ matrix.suffix }}

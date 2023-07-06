@@ -3,7 +3,7 @@ name: "ZITADEL e2e Tests"
 on:
   workflow_call:
     inputs:
-      tag_name:
+      image:
         required: true
         type: string
 
@@ -31,7 +31,7 @@ jobs:
           --health-retries 5
           --health-start-period 10s
       zitadel:
-        image: ${{ inputs.tag_name }}
+        image: ${{ inputs.image }}
         credentials:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
@@ -74,7 +74,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      ZITADEL_IMAGE: ${{ inputs.tag_name }}
+      ZITADEL_IMAGE: ${{ inputs.image }}
     steps:
       - 
         name: Checkout Repository

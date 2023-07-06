@@ -12,7 +12,7 @@ on:
       semantic_version:
         required: true
         type: string
-      tag_name:
+      image:
         required: true
         type: string
       image_name:
@@ -30,7 +30,7 @@ jobs:
   version:
     uses: ./.github/workflows/version.yml
     with:
-      semantic_version: '19.0.2'
+      semantic_version: ${{ inputs.semantic_version }}
       dry_run: true
 
   docker:
@@ -62,20 +62,20 @@ jobs:
       run: |
         docker buildx imagetools create \
           --tag ${{ inputs.image_name }}:${{ needs.version.outputs.version }} \
-          ${{ inputs.tag_name }}
+          ${{ inputs.image }}
         docker buildx imagetools create \
           --tag ${{ inputs.image_name }}:${{ needs.version.outputs.version }}-ubuntu \
-          ${{ inputs.tag_name }}-ubuntu        
+          ${{ inputs.image }}-ubuntu        
         docker buildx imagetools create \
           --tag ${{ inputs.google_image_name }}:${{ needs.version.outputs.version }} \
-          ${{ inputs.tag_name }}
+          ${{ inputs.image }}
     -
       name: Publish latest
       if: ${{ github.ref_name == 'main' }}
       run: |
         docker buildx imagetools create \
           --tag ${{ inputs.image_name }}:latest \
-          ${{ inputs.tag_name }}
+          ${{ inputs.image }}
         docker buildx imagetools create \
           --tag ${{ inputs.image_name }}:latest-ubuntu \
-          ${{ inputs.tag_name }}-ubuntu
+          ${{ inputs.image }}-ubuntu
