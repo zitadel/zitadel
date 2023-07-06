@@ -93,15 +93,15 @@ jobs:
       -
         name: Export ubuntu digest
         run: |
-          mkdir -p /tmp/digests
+          mkdir -p /tmp/digests/ubuntu
           digest="${{ steps.build-ubuntu.outputs.digest }}"
-          touch "/tmp/digests/${digest#sha256:}"
+          touch "/tmp/digests/ubuntu/${digest#sha256:}"
       -
         name: Export scratch digest
         run: |
-          mkdir -p /tmp/digests
+          mkdir -p /tmp/digests/scratch
           digest="${{ steps.build-scratch.outputs.digest }}"
-          touch "/tmp/digests/${digest#sha256:}"
+          touch "/tmp/digests/scratch/${digest#sha256:}"
       -
         name: Upload digest
         uses: actions/upload-artifact@v3
@@ -115,6 +115,15 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - build
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [scratch, ubuntu]
+        include:
+          - image: scratch
+            suffix: ''
+          - image: ubuntu
+            suffix: '-ubuntu'
     steps:
       -
         name: Download digests
@@ -132,8 +141,7 @@ jobs:
         with:
           images: '${{ inputs.image_name }}'
           tags: |
-            type=sha,prefix=,suffix=,format=long
-            type=sha,prefix=,suffix=-ubuntu,format=long
+            type=sha,prefix=,suffix=${{ matrix.suffix }},format=long
       - 
         name: Login to Docker registry
         uses: docker/login-action@v2
@@ -143,11 +151,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Create manifest list and push
-        working-directory: /tmp/digests
+        working-directory: /tmp/digests/${{ matrix.image }}
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
             $(printf '${{ inputs.image_name }}@sha256:%s ' *)
       -
         name: Inspect image
         run: |
-          docker buildx imagetools inspect ${{ inputs.image_name }}:${{ inputs.image_tag }}
+          docker buildx imagetools inspect ${{ inputs.image_name }}:${{ inputs.image_tag }}${{ matrix.suffix }}
