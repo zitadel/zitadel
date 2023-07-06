@@ -430,8 +430,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Request a code to reset a password";
-      description: "Request a code to reset a password";
+      summary: "Change password";
+      description: "Change the password of a user with either a verification code or the current password.";
       responses: {
         key: "200"
         value: {
@@ -574,7 +574,7 @@ message RegisterPasskeyRequest{
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      example: "\"163840776835432705\"";
     }
   ];
   optional PasskeyRegistrationCode code = 2 [
@@ -587,13 +587,18 @@ message RegisterPasskeyRequest{
       description: "\"Optionally specify the authenticator type of the passkey device (platform or cross-platform). If none is provided, both values are allowed.\"";
     }
   ];
+  string domain = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Domain on which the user is authenticated.\"";
+    }
+  ];
 }
 
 message RegisterPasskeyResponse{
   zitadel.object.v2alpha.Details details = 1;
   string passkey_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"fabde5c8-c13f-481d-a90b-5e59a001a076\""
+      example: "\"163840776835432705\""
     }
   ];
   google.protobuf.Struct public_key_credential_creation_options = 3 [
@@ -611,7 +616,7 @@ message VerifyPasskeyRegistrationRequest{
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      example: "\"163840776835432705\"";
     }
   ];
   string passkey_id = 2 [
@@ -620,7 +625,7 @@ message VerifyPasskeyRegistrationRequest{
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      example: "\"fabde5c8-c13f-481d-a90b-5e59a001a076\"";
+      example: "\"163840776835432705\"";
     }
   ];
   google.protobuf.Struct public_key_credential = 3 [
@@ -655,7 +660,12 @@ message RegisterU2FRequest{
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      example: "\"163840776835432705\"";
+    }
+  ];
+  string domain = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Domain on which the user is authenticated.\"";
     }
   ];
 }
@@ -664,7 +674,7 @@ message RegisterU2FResponse{
   zitadel.object.v2alpha.Details details = 1;
   string u2f_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"fabde5c8-c13f-481d-a90b-5e59a001a076\""
+      example: "\"163840776835432705\""
     }
   ];
   google.protobuf.Struct public_key_credential_creation_options = 3 [
@@ -682,7 +692,7 @@ message VerifyU2FRegistrationRequest{
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      example: "\"163840776835432705\"";
     }
   ];
   string u2f_id = 2 [
@@ -691,7 +701,7 @@ message VerifyU2FRegistrationRequest{
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      example: "\"fabde5c8-c13f-481d-a90b-5e59a001a076\"";
+      example: "\"163840776835432705\"";
     }
   ];
   google.protobuf.Struct public_key_credential = 3 [
@@ -726,7 +736,7 @@ message RegisterTOTPRequest {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      example: "\"163840776835432705\"";
     }
   ];
 }
@@ -752,7 +762,7 @@ message VerifyTOTPRegistrationRequest {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      example: "\"163840776835432705\"";
     }
   ];
   string code = 2 [
@@ -776,7 +786,7 @@ message CreatePasskeyRegistrationLinkRequest{
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      example: "\"163840776835432705\"";
     }
   ];
   // if no medium is specified, an email is sent with the default url
@@ -803,7 +813,7 @@ message StartIdentityProviderFlowRequest{
       description: "ID for existing identity provider"
       min_length: 1;
       max_length: 200;
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      example: "\"163840776835432705\"";
     }
   ];
   string success_url = 2 [
@@ -845,7 +855,7 @@ message RetrieveIdentityProviderInformationRequest{
       description: "ID of the intent, previously returned on the success response of the IDP callback"
       min_length: 1;
       max_length: 200;
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      example: "\"163840776835432705\"";
     }
   ];
   string token = 2 [

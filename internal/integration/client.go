@@ -21,6 +21,7 @@ import (
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
+	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
@@ -31,6 +32,7 @@ type Client struct {
 	UserV2    user.UserServiceClient
 	SessionV2 session.SessionServiceClient
 	OIDCv2    oidc_pb.OIDCServiceClient
+	System    system.SystemServiceClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
@@ -41,7 +43,34 @@ func newClient(cc *grpc.ClientConn) Client {
 		UserV2:    user.NewUserServiceClient(cc),
 		SessionV2: session.NewSessionServiceClient(cc),
 		OIDCv2:    oidc_pb.NewOIDCServiceClient(cc),
+		System:    system.NewSystemServiceClient(cc),
 	}
+}
+
+func (t *Tester) UseIsolatedInstance(iamOwnerCtx, systemCtx context.Context) (primaryDomain, instanceId string, authenticatedIamOwnerCtx context.Context) {
+	primaryDomain = randString(5) + ".integration"
+	instance, err := t.Client.System.CreateInstance(systemCtx, &system.CreateInstanceRequest{
+		InstanceName: "testinstance",
+		CustomDomain: primaryDomain,
+		Owner: &system.CreateInstanceRequest_Machine_{
+			Machine: &system.CreateInstanceRequest_Machine{
+				UserName:            "owner",
+				Name:                "owner",
+				PersonalAccessToken: &system.CreateInstanceRequest_PersonalAccessToken{},
+			},
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
+	t.createClientConn(iamOwnerCtx, grpc.WithAuthority(primaryDomain))
+	instanceId = instance.GetInstanceId()
+	t.Users[instanceId] = map[UserType]User{
+		IAMOwner: {
+			Token: instance.GetPat(),
+		},
+	}
+	return primaryDomain, instanceId, t.WithInstanceAuthorization(iamOwnerCtx, IAMOwner, instanceId)
 }
 
 func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse {
@@ -92,6 +121,7 @@ func (s *Tester) RegisterUserPasskey(ctx context.Context, userID string) {
 	pkr, err := s.Client.UserV2.RegisterPasskey(ctx, &user.RegisterPasskeyRequest{
 		UserId: userID,
 		Code:   reg.GetCode(),
+		Domain: s.Config.ExternalDomain,
 	})
 	logging.OnError(err).Fatal("create user passkey")
 	attestationResponse, err := s.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
