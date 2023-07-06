@@ -47,7 +47,7 @@ func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRe
 	}
 	challengeResponse, cmds := s.challengesToCommand(req.GetChallenges(), checks)
 
-	set, err := s.command.CreateSession(ctx, cmds, metadata)
+	set, err := s.command.CreateSession(ctx, cmds, req.GetDomain(), metadata)
 	if err != nil {
 		return nil, err
 	}
@@ -107,6 +107,7 @@ func sessionToPb(s *query.Session) *session.Session {
 		Sequence:     s.Sequence,
 		Factors:      factorsToPb(s),
 		Metadata:     s.Metadata,
+		Domain:       s.Domain,
 	}
 }
 

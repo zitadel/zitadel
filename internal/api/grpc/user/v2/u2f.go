@@ -12,7 +12,7 @@ import (
 
 func (s *Server) RegisterU2F(ctx context.Context, req *user.RegisterU2FRequest) (*user.RegisterU2FResponse, error) {
 	return u2fRegistrationDetailsToPb(
-		s.command.RegisterUserU2F(ctx, req.GetUserId(), authz.GetCtxData(ctx).ResourceOwner),
+		s.command.RegisterUserU2F(ctx, req.GetUserId(), authz.GetCtxData(ctx).ResourceOwner, req.GetDomain()),
 	)
 }
 

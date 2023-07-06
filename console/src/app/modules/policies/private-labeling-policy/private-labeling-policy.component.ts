@@ -31,6 +31,7 @@ import {
 } from 'src/app/services/theme.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import * as opentype from 'opentype.js';
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
@@ -87,6 +88,8 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public View: any = View;
   public ColorType: any = ColorType;
   public AssetType: any = AssetType;
+
+  public fontName = '';
 
   public refreshPreview: EventEmitter<void> = new EventEmitter();
   public org!: Org.AsObject;
@@ -180,6 +183,10 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       if (file) {
         const formData = new FormData();
         formData.append('file', file);
+
+        this.getFontName(file);
+        this.previewNewFont(file);
+
         switch (this.serviceType) {
           case PolicyComponentServiceType.MGMT:
             return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.MGMTFONT, formData, this.org.id));
@@ -199,6 +206,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
             this.getPreviewData().then((data) => {
               if (data.policy) {
                 this.previewData = data.policy;
+                this.fontName = '';
               }
             });
           }, 1000);
@@ -374,6 +382,11 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       .then((data) => {
         if (data.policy) {
           this.previewData = data.policy;
+          if (this.previewData?.fontUrl) {
+            this.fetchFontMetadataAndPreview(this.previewData.fontUrl);
+          } else {
+            this.fontName = 'Could not parse font name';
+          }
           this.loading = false;
         }
       })
@@ -385,6 +398,11 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       .then((data) => {
         if (data.policy) {
           this.data = data.policy;
+          if (this.data?.fontUrl) {
+            this.fetchFontMetadataAndPreview(this.data?.fontUrl);
+          } else {
+            this.fontName = 'Could not parse font name';
+          }
           this.loading = false;
         }
       })
@@ -676,6 +694,45 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       .catch((error) => {
         this.toast.showError(error);
       });
+  }
+
+  private fetchFontMetadataAndPreview(url: string): void {
+    fetch(url)
+      .then((res) => res.blob())
+      .then((blob) => {
+        this.getFontName(blob);
+        this.previewNewFont(blob);
+      });
+  }
+
+  private getFontName(blob: Blob): void {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target && e.target.result) {
+        try {
+          const font = opentype.parse(e.target.result);
+          this.fontName = font.names.fullName['en'];
+        } catch (e) {
+          this.fontName = 'Could not parse font name';
+        }
+      }
+    };
+    reader.readAsArrayBuffer(blob);
+  }
+
+  private previewNewFont(blob: Blob): void {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      if (e.target) {
+        let customFont = new FontFace('brandingFont', `url(${e.target.result})`);
+        // typescript complains that add is not found but
+        // indeed it is https://developer.mozilla.org/en-US/docs/Web/API/FontFaceSet/add
+        // @ts-ignore
+        document.fonts.add(customFont);
+      }
+    };
+    reader.readAsDataURL(blob);
   }
 
   // /**
