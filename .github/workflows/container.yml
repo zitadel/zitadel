@@ -86,7 +86,7 @@ jobs:
           target: final
           platforms: linux/${{ matrix.arch }}
           push: true
-           # tags: '${{ inputs.image_name }}:${{ inputs.image_tag }}'
+          # tags: '${{ inputs.image_name }}:${{ inputs.image_tag }}'
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ inputs.image_name }},push-by-digest=true,name-canonical=true,push=true
       -
