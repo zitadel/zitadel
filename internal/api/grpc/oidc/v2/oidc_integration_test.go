@@ -4,10 +4,13 @@ package oidc_test
 
 import (
 	"context"
+	"net/url"
 	"os"
+	"regexp"
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -26,7 +29,8 @@ var (
 )
 
 const (
-	redirectURI = "oidc_integration_test://callback"
+	redirectURI         = "oidcIntegrationTest://callback"
+	redirectURIImplicit = "http://localhost:9999/callback"
 )
 
 func TestMain(m *testing.M) {
@@ -47,7 +51,7 @@ func TestMain(m *testing.M) {
 func TestServer_GetAuthRequest(t *testing.T) {
 	client, err := Tester.CreateOIDCNativeClient(CTX, redirectURI)
 	require.NoError(t, err)
-	authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), Tester.Users[integration.OrgOwner].ID, redirectURI)
+	authRequestID, err := Tester.CreateOIDCAuthRequest(client.GetClientId(), Tester.Users[integration.OrgOwner].ID, redirectURI)
 	require.NoError(t, err)
 	now := time.Now()
 
@@ -86,10 +90,8 @@ func TestServer_GetAuthRequest(t *testing.T) {
 	}
 }
 
-func TestServer_LinkSessionToAuthRequest(t *testing.T) {
+func TestServer_CreateCallback(t *testing.T) {
 	client, err := Tester.CreateOIDCNativeClient(CTX, redirectURI)
-	require.NoError(t, err)
-	authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), Tester.Users[integration.OrgOwner].ID, redirectURI)
 	require.NoError(t, err)
 	sessionResp, err := Tester.Client.SessionV2.CreateSession(CTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
@@ -103,49 +105,126 @@ func TestServer_LinkSessionToAuthRequest(t *testing.T) {
 	require.NoError(t, err)
 
 	tests := []struct {
-		name          string
-		AuthRequestID string
-		SessionID     string
-		SessionToken  string
-		AuthError     string
-		want          *oidc_pb.LinkSessionToAuthRequestResponse
-		wantErr       bool
+		name      string
+		req       *oidc_pb.CreateCallbackRequest
+		AuthError string
+		want      *oidc_pb.CreateCallbackResponse
+		wantURL   *url.URL
+		wantErr   bool
 	}{
 		{
-			name:          "Not found",
-			AuthRequestID: "123",
-			SessionID:     "",
-			SessionToken:  "",
-			wantErr:       true,
+			name: "Not found",
+			req: &oidc_pb.CreateCallbackRequest{
+				AuthRequestId: "123",
+				CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				},
+			},
+			wantErr: true,
 		},
 		{
-			name:          "auth error",
-			AuthRequestID: "",
-			SessionID:     "",
-			SessionToken:  "",
-			wantErr:       true,
+			name: "session not found",
+			req: &oidc_pb.CreateCallbackRequest{
+				AuthRequestId: func() string {
+					authRequestID, err := Tester.CreateOIDCAuthRequest(client.GetClientId(), Tester.Users[integration.OrgOwner].ID, redirectURI)
+					require.NoError(t, err)
+					return authRequestID
+				}(),
+				CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    "foo",
+						SessionToken: "bar",
+					},
+				},
+			},
+			wantErr: true,
 		},
 		{
-			name:          "session not found",
-			AuthRequestID: authRequestID,
-			SessionID:     "",
-			SessionToken:  "",
-			wantErr:       true,
+			name: "session token invalid",
+			req: &oidc_pb.CreateCallbackRequest{
+				AuthRequestId: func() string {
+					authRequestID, err := Tester.CreateOIDCAuthRequest(client.GetClientId(), Tester.Users[integration.OrgOwner].ID, redirectURI)
+					require.NoError(t, err)
+					return authRequestID
+				}(),
+				CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: "bar",
+					},
+				},
+			},
+			wantErr: true,
 		},
 		{
-			name:          "session token invalid",
-			AuthRequestID: authRequestID,
-			SessionID:     sessionResp.SessionId,
-			SessionToken:  "invalid",
-			wantErr:       true,
+			name: "fail callback",
+			req: &oidc_pb.CreateCallbackRequest{
+				AuthRequestId: func() string {
+					authRequestID, err := Tester.CreateOIDCAuthRequest(client.GetClientId(), Tester.Users[integration.OrgOwner].ID, redirectURI)
+					require.NoError(t, err)
+					return authRequestID
+				}(),
+				CallbackKind: &oidc_pb.CreateCallbackRequest_Error{
+					Error: &oidc_pb.AuthorizationError{
+						Error:            oidc_pb.ErrorReason_ERROR_REASON_ACCESS_DENIED,
+						ErrorDescription: gu.Ptr("nope"),
+						ErrorUri:         gu.Ptr("https://example.com/docs"),
+					},
+				},
+			},
+			want: &oidc_pb.CreateCallbackResponse{
+				CallbackUrl: regexp.QuoteMeta(`oidcintegrationtest://callback?error=access_denied&error_description=nope&error_uri=https%3A%2F%2Fexample.com%2Fdocs&state=state`),
+				Details: &object.Details{
+					ResourceOwner: Tester.Instance.InstanceID(),
+				},
+			},
+			wantErr: false,
 		},
 		{
-			name:          "success",
-			AuthRequestID: authRequestID,
-			SessionID:     sessionResp.SessionId,
-			SessionToken:  sessionResp.SessionToken,
-			want: &oidc_pb.LinkSessionToAuthRequestResponse{
-				CallbackUrl: "/oauth/v2/authorize/callback?id=" + authRequestID,
+			name: "code callback",
+			req: &oidc_pb.CreateCallbackRequest{
+				AuthRequestId: func() string {
+					authRequestID, err := Tester.CreateOIDCAuthRequest(client.GetClientId(), Tester.Users[integration.OrgOwner].ID, redirectURI)
+					require.NoError(t, err)
+					return authRequestID
+				}(),
+				CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				},
+			},
+			want: &oidc_pb.CreateCallbackResponse{
+				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
+				Details: &object.Details{
+					ResourceOwner: Tester.Instance.InstanceID(),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "implicit",
+			req: &oidc_pb.CreateCallbackRequest{
+				AuthRequestId: func() string {
+					client, err := Tester.CreateOIDCImplicitFlowClient(CTX, redirectURIImplicit)
+					require.NoError(t, err)
+					authRequestID, err := Tester.CreateOIDCAuthRequestImplicit(client.GetClientId(), Tester.Users[integration.OrgOwner].ID, redirectURIImplicit)
+					require.NoError(t, err)
+					return authRequestID
+				}(),
+				CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				},
+			},
+			want: &oidc_pb.CreateCallbackResponse{
+				CallbackUrl: `http:\/\/localhost:9999\/callback#access_token=(.*)&expires_in=(.*)&id_token=(.*)&state=state&token_type=Bearer`,
 				Details: &object.Details{
 					ResourceOwner: Tester.Instance.InstanceID(),
 				},
@@ -155,17 +234,16 @@ func TestServer_LinkSessionToAuthRequest(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.LinkSessionToAuthRequest(CTX, &oidc_pb.LinkSessionToAuthRequestRequest{
-				AuthRequestId: tt.AuthRequestID,
-				SessionId:     tt.SessionID,
-				SessionToken:  tt.SessionToken,
-			})
+			got, err := Client.CreateCallback(CTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
+			if tt.want != nil {
+				assert.Regexp(t, regexp.MustCompile(tt.want.CallbackUrl), got.GetCallbackUrl())
+			}
 		})
 	}
 }

@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"encoding/base64"
 	"strings"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -48,6 +50,7 @@ func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.
 	if err != nil {
 		return nil, err
 	}
+	audience = domain.AddAudScopeToAudience(ctx, audience, scope)
 	authRequest := &command.AuthRequest{
 		LoginClient:   loginClient,
 		ClientID:      req.ClientID,
@@ -69,11 +72,11 @@ func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.
 		authRequest.HintUserID = &hintUserID
 	}
 
-	err = o.command.AddAuthRequest(ctx, authRequest)
+	aar, err := o.command.AddAuthRequest(ctx, authRequest)
 	if err != nil {
 		return nil, err
 	}
-	return &AuthRequestV2{authRequest}, nil
+	return &AuthRequestV2{aar}, nil
 }
 
 func (o *OPStorage) createAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
@@ -109,6 +112,15 @@ func (o *OPStorage) audienceFromProjectID(ctx context.Context, projectID string)
 func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	if strings.HasPrefix(id, command.IDPrefixV2) {
+		req, err := o.command.GetCurrentAuthRequest(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		return &AuthRequestV2{req}, nil
+	}
+
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-D3g21", "no user agent id")
@@ -124,6 +136,17 @@ func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (_ op.Au
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	plainCode, err := o.decryptGrant(code)
+	if err != nil {
+		return nil, err
+	}
+	if strings.HasPrefix(plainCode, command.IDPrefixV2) {
+		authReq, err := o.command.ExchangeAuthCode(ctx, plainCode)
+		if err != nil {
+			return nil, err
+		}
+		return &AuthRequestV2{authReq}, nil
+	}
 	resp, err := o.repo.AuthRequestByCode(ctx, code)
 	if err != nil {
 		return nil, err
@@ -131,9 +154,23 @@ func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (_ op.Au
 	return AuthRequestFromBusiness(resp)
 }
 
+// decryptGrant decrypts a code or refresh_token
+func (o *OPStorage) decryptGrant(grant string) (string, error) {
+	decodedGrant, err := base64.RawURLEncoding.DecodeString(grant)
+	if err != nil {
+		return "", err
+	}
+	return o.encAlg.DecryptString(decodedGrant, o.encAlg.EncryptionKeyID())
+}
+
 func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	if strings.HasPrefix(id, command.IDPrefixV2) {
+		return o.command.AddAuthRequestCode(ctx, id, code)
+	}
+
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		return errors.ThrowPreconditionFailed(nil, "OIDC-Dgus2", "no user agent id")
@@ -151,12 +188,15 @@ func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) (err error
 func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) (_ string, _ time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
 	var userAgentID, applicationID, userOrgID string
-	authReq, ok := req.(*AuthRequest)
-	if ok {
+	switch authReq := req.(type) {
+	case *AuthRequest:
 		userAgentID = authReq.AgentID
 		applicationID = authReq.ApplicationID
 		userOrgID = authReq.UserOrgID
+	case *AuthRequestV2:
+		return o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.GetID())
 	}
 
 	accessTokenLifetime, _, _, _, err := o.getOIDCSettings(ctx)
@@ -174,6 +214,15 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.TokenRequest, refreshToken string) (_, _ string, _ time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	// handle V2 request directly
+	switch tokenReq := req.(type) {
+	case *AuthRequestV2:
+		return o.command.AddOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.GetID())
+	case *RefreshTokenRequestV2:
+		return o.command.ExchangeOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.OIDCSessionWriteModel.AggregateID, refreshToken, tokenReq.RequestedScopes)
+	}
+
 	userAgentID, applicationID, userOrgID, authTime, authMethodsReferences := getInfoFromRequest(req)
 	scopes, err := o.assertProjectRoleScopes(ctx, applicationID, req.GetScopes())
 	if err != nil {
@@ -212,7 +261,22 @@ func getInfoFromRequest(req op.TokenRequest) (string, string, string, time.Time,
 	return "", "", "", time.Time{}, nil
 }
 
-func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken string) (op.RefreshTokenRequest, error) {
+func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken string) (_ op.RefreshTokenRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	plainCode, err := o.decryptGrant(refreshToken)
+	if err != nil {
+		return nil, err
+	}
+	if strings.HasPrefix(plainCode, command.IDPrefixV2) {
+		oidcSession, err := o.command.OIDCSessionByRefreshToken(ctx, plainCode)
+		if err != nil {
+			return nil, err
+		}
+		return &RefreshTokenRequestV2{OIDCSessionWriteModel: oidcSession}, nil
+	}
+
 	tokenView, err := o.repo.RefreshTokenByToken(ctx, refreshToken)
 	if err != nil {
 		return nil, err
@@ -371,4 +435,59 @@ func (o *OPStorage) getOIDCSettings(ctx context.Context) (accessTokenLifetime, i
 		return oidcSettings.AccessTokenLifetime, oidcSettings.IdTokenLifetime, oidcSettings.RefreshTokenIdleExpiration, oidcSettings.RefreshTokenExpiration, nil
 	}
 	return o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime, o.defaultRefreshTokenIdleExpiration, o.defaultRefreshTokenExpiration, nil
+}
+
+func CreateErrorCallbackURL(authReq op.AuthRequest, reason, description, uri string, authorizer op.Authorizer) (string, error) {
+	e := struct {
+		Error       string `schema:"error"`
+		Description string `schema:"error_description,omitempty"`
+		URI         string `schema:"error_uri,omitempty"`
+		State       string `schema:"state,omitempty"`
+	}{
+		Error:       reason,
+		Description: description,
+		URI:         uri,
+		State:       authReq.GetState(),
+	}
+	callback, err := op.AuthResponseURL(authReq.GetRedirectURI(), authReq.GetResponseType(), authReq.GetResponseMode(), e, authorizer.Encoder())
+	if err != nil {
+		return "", err
+	}
+	return callback, nil
+}
+
+func CreateCodeCallbackURL(ctx context.Context, authReq op.AuthRequest, authorizer op.Authorizer) (string, error) {
+	code, err := op.CreateAuthRequestCode(ctx, authReq, authorizer.Storage(), authorizer.Crypto())
+	if err != nil {
+		return "", err
+	}
+	codeResponse := struct {
+		code  string
+		state string
+	}{
+		code:  code,
+		state: authReq.GetState(),
+	}
+	callback, err := op.AuthResponseURL(authReq.GetRedirectURI(), authReq.GetResponseType(), authReq.GetResponseMode(), &codeResponse, authorizer.Encoder())
+	if err != nil {
+		return "", err
+	}
+	return callback, err
+}
+
+func CreateTokenCallbackURL(ctx context.Context, req op.AuthRequest, authorizer op.Authorizer) (string, error) {
+	client, err := authorizer.Storage().GetClientByClientID(ctx, req.GetClientID())
+	if err != nil {
+		return "", err
+	}
+	createAccessToken := req.GetResponseType() != oidc.ResponseTypeIDTokenOnly
+	resp, err := op.CreateTokenResponse(ctx, req, client, authorizer, createAccessToken, "", "")
+	if err != nil {
+		return "", err
+	}
+	callback, err := op.AuthResponseURL(req.GetRedirectURI(), req.GetResponseType(), req.GetResponseMode(), resp, authorizer.Encoder())
+	if err != nil {
+		return "", err
+	}
+	return callback, err
 }

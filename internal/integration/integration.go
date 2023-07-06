@@ -54,6 +54,7 @@ type UserType int
 const (
 	Unspecified UserType = iota
 	OrgOwner
+	Login
 )
 
 // User information with a Personal Access Token.
@@ -126,6 +127,7 @@ func (s *Tester) pollHealth(ctx context.Context) (err error) {
 
 const (
 	SystemUser = "integration"
+	LoginUser  = "loginClient"
 )
 
 func (s *Tester) createSystemUser(ctx context.Context) {
@@ -139,7 +141,7 @@ func (s *Tester) createSystemUser(ctx context.Context) {
 	logging.OnError(err).Fatal("query organisation")
 
 	query, err := query.NewUserUsernameSearchQuery(SystemUser, query.TextEquals)
-	logging.OnError(err).Fatal("user query")
+	logging.WithFields("username", LoginUser).OnError(err).Fatal("user query")
 	user, err := s.Queries.GetUser(ctx, true, true, query)
 
 	if errors.Is(err, sql.ErrNoRows) {
@@ -152,11 +154,11 @@ func (s *Tester) createSystemUser(ctx context.Context) {
 			Description:     "who cares?",
 			AccessTokenType: domain.OIDCTokenTypeJWT,
 		})
-		logging.OnError(err).Fatal("add machine user")
+		logging.WithFields("username", SystemUser).OnError(err).Fatal("add machine user")
 		user, err = s.Queries.GetUser(ctx, true, true, query)
 
 	}
-	logging.OnError(err).Fatal("get user")
+	logging.WithFields("username", SystemUser).OnError(err).Fatal("get user")
 
 	_, err = s.Commands.AddOrgMember(ctx, s.Organisation.ID, user.ID, "ORG_OWNER")
 	target := new(caos_errs.AlreadyExistsError)
@@ -167,7 +169,7 @@ func (s *Tester) createSystemUser(ctx context.Context) {
 	scopes := []string{oidc.ScopeOpenID, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner}
 	pat := command.NewPersonalAccessToken(user.ResourceOwner, user.ID, time.Now().Add(time.Hour), scopes, domain.UserTypeMachine)
 	_, err = s.Commands.AddPersonalAccessToken(ctx, pat)
-	logging.OnError(err).Fatal("add pat")
+	logging.WithFields("username", SystemUser).OnError(err).Fatal("add pat")
 
 	s.Users = map[UserType]User{
 		OrgOwner: {
@@ -177,8 +179,53 @@ func (s *Tester) createSystemUser(ctx context.Context) {
 	}
 }
 
+func (s *Tester) createLoginClient(ctx context.Context) {
+	var err error
+
+	s.Instance, err = s.Queries.InstanceByHost(ctx, s.Host())
+	logging.OnError(err).Fatal("query instance")
+	ctx = authz.WithInstance(ctx, s.Instance)
+
+	s.Organisation, err = s.Queries.OrgByID(ctx, true, s.Instance.DefaultOrganisationID())
+	logging.OnError(err).Fatal("query organisation")
+
+	query, err := query.NewUserUsernameSearchQuery(LoginUser, query.TextEquals)
+	logging.WithFields("username", LoginUser).OnError(err).Fatal("user query")
+	user, err := s.Queries.GetUser(ctx, true, true, query)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		_, err = s.Commands.AddMachine(ctx, &command.Machine{
+			ObjectRoot: models.ObjectRoot{
+				ResourceOwner: s.Organisation.ID,
+			},
+			Username:        LoginUser,
+			Name:            LoginUser,
+			Description:     "who cares?",
+			AccessTokenType: domain.OIDCTokenTypeJWT,
+		})
+		logging.WithFields("username", LoginUser).OnError(err).Fatal("add machine user")
+		user, err = s.Queries.GetUser(ctx, true, true, query)
+
+	}
+	logging.WithFields("username", LoginUser).OnError(err).Fatal("get user")
+
+	scopes := []string{oidc.ScopeOpenID, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner}
+	pat := command.NewPersonalAccessToken(user.ResourceOwner, user.ID, time.Now().Add(time.Hour), scopes, domain.UserTypeMachine)
+	_, err = s.Commands.AddPersonalAccessToken(ctx, pat)
+	logging.OnError(err).Fatal("add pat")
+
+	s.Users[Login] = User{
+		User:  user,
+		Token: pat.Token,
+	}
+}
+
 func (s *Tester) WithSystemAuthorization(ctx context.Context, u UserType) context.Context {
 	return metadata.AppendToOutgoingContext(ctx, "Authorization", fmt.Sprintf("Bearer %s", s.Users[u].Token))
+}
+
+func (s *Tester) WithSystemAuthorizationHTTP(u UserType) map[string]string {
+	return map[string]string{"Authorization": fmt.Sprintf("Bearer %s", s.Users[u].Token)}
 }
 
 // Done send an interrupt signal to cleanly shutdown the server.
@@ -239,6 +286,7 @@ func NewTester(ctx context.Context) *Tester {
 	}
 	tester.createClientConn(ctx)
 	tester.createSystemUser(ctx)
+	tester.createLoginClient(ctx)
 	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, http.BuildOrigin(tester.Host(), tester.Config.ExternalSecure))
 
 	return tester

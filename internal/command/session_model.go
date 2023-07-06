@@ -49,6 +49,24 @@ type SessionWriteModel struct {
 	aggregate *eventstore.Aggregate
 }
 
+func (wm *SessionWriteModel) IsPasswordChecked() bool {
+	return !wm.PasswordCheckedAt.IsZero()
+}
+
+func (wm *SessionWriteModel) IsPasskeyChecked() bool {
+	return !wm.PasskeyCheckedAt.IsZero()
+}
+
+func (wm *SessionWriteModel) IsU2FChecked() bool {
+	// TODO: implement with https://github.com/zitadel/zitadel/issues/5477
+	return false
+}
+
+func (wm *SessionWriteModel) IsOTPChecked() bool {
+	// TODO: implement with https://github.com/zitadel/zitadel/issues/5477
+	return false
+}
+
 func NewSessionWriteModel(sessionID string, resourceOwner string) *SessionWriteModel {
 	return &SessionWriteModel{
 		WriteModel: eventstore.WriteModel{
@@ -202,4 +220,20 @@ func (wm *SessionWriteModel) ChangeMetadata(ctx context.Context, metadata map[st
 	if changed {
 		wm.commands = append(wm.commands, session.NewMetadataSetEvent(ctx, wm.aggregate, wm.Metadata))
 	}
+}
+
+// AuthenticationTime returns the time the user authenticated using the latest time of all checks
+func (wm *SessionWriteModel) AuthenticationTime() time.Time {
+	var authTime time.Time
+	for _, check := range []time.Time{
+		wm.PasswordCheckedAt,
+		wm.PasskeyCheckedAt,
+		wm.IntentCheckedAt,
+		// TODO: add U2F and OTP check https://github.com/zitadel/zitadel/issues/5477
+	} {
+		if check.After(authTime) {
+			authTime = check
+		}
+	}
+	return authTime
 }

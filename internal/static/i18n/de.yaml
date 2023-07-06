@@ -492,7 +492,8 @@ Errors:
     AlreadyExists: Auth Request existiert bereits
     NotExisting: Auth Request existiert nicht
     WrongLoginClient: Auth Request wurde von einem anderen Login-Client erstellt
-
+  OIDCSession:
+    RefreshTokenInvalid: Refresh Token ist ungültig
 AggregateTypes:
   action: Action
   instance: Instanz

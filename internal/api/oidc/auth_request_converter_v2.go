@@ -9,7 +9,7 @@ import (
 )
 
 type AuthRequestV2 struct {
-	*command.AuthRequest
+	*command.CurrentAuthRequest
 }
 
 func (a *AuthRequestV2) GetID() string {
@@ -21,8 +21,7 @@ func (a *AuthRequestV2) GetACR() string {
 }
 
 func (a *AuthRequestV2) GetAMR() []string {
-	//TODO: get from linked session?
-	return nil
+	return a.AMR
 }
 
 func (a *AuthRequestV2) GetAudience() []string {
@@ -30,7 +29,7 @@ func (a *AuthRequestV2) GetAudience() []string {
 }
 
 func (a *AuthRequestV2) GetAuthTime() time.Time {
-	return time.Time{} //TODO: get from linked session?
+	return a.AuthTime
 }
 
 func (a *AuthRequestV2) GetClientID() string {
@@ -66,9 +65,42 @@ func (a *AuthRequestV2) GetState() string {
 }
 
 func (a *AuthRequestV2) GetSubject() string {
-	return "" //TODO: get from linked session?
+	return a.UserID
 }
 
 func (a *AuthRequestV2) Done() bool {
-	return false //TODO: get from linked session?
+	return a.UserID != "" && a.SessionID != ""
+}
+
+type RefreshTokenRequestV2 struct {
+	*command.OIDCSessionWriteModel
+	RequestedScopes []string
+}
+
+func (r *RefreshTokenRequestV2) GetAMR() []string {
+	return r.AuthMethodsReferences
+}
+
+func (r *RefreshTokenRequestV2) GetAudience() []string {
+	return r.Audience
+}
+
+func (r *RefreshTokenRequestV2) GetAuthTime() time.Time {
+	return r.AuthTime
+}
+
+func (r *RefreshTokenRequestV2) GetClientID() string {
+	return r.ClientID
+}
+
+func (r *RefreshTokenRequestV2) GetScopes() []string {
+	return r.Scope
+}
+
+func (r *RefreshTokenRequestV2) GetSubject() string {
+	return r.UserID
+}
+
+func (r *RefreshTokenRequestV2) SetCurrentScopes(scopes []string) {
+	r.RequestedScopes = scopes
 }

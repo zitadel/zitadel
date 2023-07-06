@@ -17,6 +17,8 @@ const (
 	FailedType             = authRequestEventPrefix + "failed"
 	CodeAddedType          = authRequestEventPrefix + "code.added"
 	SessionLinkedType      = authRequestEventPrefix + "session.linked"
+	CodeExchangedType      = authRequestEventPrefix + "code.exchanged"
+	SucceededType          = authRequestEventPrefix + "succeeded"
 )
 
 type AddedEvent struct {
@@ -98,48 +100,13 @@ func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return added, nil
 }
 
-type CodeAddedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-
-	//TODO: add necessary fields
-}
-
-func (e *CodeAddedEvent) Data() interface{} {
-	return e
-}
-
-func (e *CodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func NewCodeAddedEvent(ctx context.Context,
-	aggregate *eventstore.Aggregate,
-) *CodeAddedEvent {
-	return &CodeAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			CodeAddedType,
-		),
-	}
-}
-
-func CodeAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	added := &CodeAddedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, added)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "AUTHR-Sfe3w", "unable to unmarshal auth request code added")
-	}
-
-	return added, nil
-}
-
 type SessionLinkedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	SessionID string
+	SessionID string    `json:"session_id"`
+	UserID    string    `json:"user_id"`
+	AuthTime  time.Time `json:"auth_time"`
+	AMR       []string  `json:"amr"`
 }
 
 func (e *SessionLinkedEvent) Data() interface{} {
@@ -152,7 +119,10 @@ func (e *SessionLinkedEvent) UniqueConstraints() []*eventstore.EventUniqueConstr
 
 func NewSessionLinkedEvent(ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	sessionID string,
+	sessionID,
+	userID string,
+	authTime time.Time,
+	amr []string,
 ) *SessionLinkedEvent {
 	return &SessionLinkedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -161,6 +131,9 @@ func NewSessionLinkedEvent(ctx context.Context,
 			SessionLinkedType,
 		),
 		SessionID: sessionID,
+		UserID:    userID,
+		AuthTime:  authTime,
+		AMR:       amr,
 	}
 }
 
@@ -210,4 +183,100 @@ func FailedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	}
 
 	return added, nil
+}
+
+type CodeAddedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *CodeAddedEvent) Data() interface{} {
+	return e
+}
+
+func (e *CodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewCodeAddedEvent(ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *CodeAddedEvent {
+	return &CodeAddedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			CodeAddedType,
+		),
+	}
+}
+
+func CodeAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	added := &CodeAddedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, added)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "AUTHR-Sfe3w", "unable to unmarshal auth request code added")
+	}
+
+	return added, nil
+}
+
+type CodeExchangedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *CodeExchangedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *CodeExchangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewCodeExchangedEvent(ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *CodeExchangedEvent {
+	return &CodeExchangedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			CodeExchangedType,
+		),
+	}
+}
+
+func CodeExchangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	return &CodeExchangedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
+}
+
+type SucceededEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *SucceededEvent) Data() interface{} {
+	return nil
+}
+
+func (e *SucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewSucceededEvent(ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *SucceededEvent {
+	return &SucceededEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			SucceededType,
+		),
+	}
+}
+
+func SucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+	return &SucceededEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
 }

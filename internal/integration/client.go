@@ -160,3 +160,33 @@ func (s *Tester) CreateSuccessfulIntent(t *testing.T, idpID, userID, idpUserID s
 	require.NoError(t, err)
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
 }
+
+func (s *Tester) CreatePasskeySession(t *testing.T, ctx context.Context, userID string) (id, token string, start, change time.Time) {
+	createResp, err := s.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{UserId: userID},
+			},
+		},
+		Challenges: []session.ChallengeKind{
+			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
+		},
+	})
+	require.NoError(t, err)
+
+	assertion, err := s.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetPasskey().GetPublicKeyCredentialRequestOptions())
+	require.NoError(t, err)
+
+	updateResp, err := s.Client.SessionV2.SetSession(ctx, &session.SetSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: createResp.GetSessionToken(),
+		Checks: &session.Checks{
+			Passkey: &session.CheckPasskey{
+				CredentialAssertionData: assertion,
+			},
+		},
+	})
+	require.NoError(t, err)
+	return createResp.GetSessionId(), updateResp.GetSessionToken(),
+		createResp.GetDetails().GetChangeDate().AsTime(), updateResp.GetDetails().GetChangeDate().AsTime()
+}

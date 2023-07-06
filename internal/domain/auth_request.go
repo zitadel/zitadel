@@ -122,6 +122,7 @@ const (
 	AuthRequestStateUnspecified AuthRequestState = iota
 	AuthRequestStateAdded
 	AuthRequestStateCodeAdded
+	AuthRequestStateCodeExchanged
 	AuthRequestStateFailed
 	AuthRequestStateSucceeded
 )

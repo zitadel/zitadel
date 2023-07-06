@@ -481,6 +481,8 @@ Errors:
     AlreadyExists: AuthRequestはすでに存在する
     NotExisting: AuthRequest が存在しません
     WrongLoginClient: 他のログインクライアントによって作成された AuthRequest
+  OIDCSession:
+    RefreshTokenInvalid: 無効なリフレッシュトークンです
 
 AggregateTypes:
   action: アクション
