@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	instance_repo "github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	proj_repo "github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/quota"
@@ -124,6 +125,7 @@ func StartCommands(
 	quota.RegisterEventMappers(repo.eventstore)
 	session.RegisterEventMappers(repo.eventstore)
 	idpintent.RegisterEventMappers(repo.eventstore)
+	milestone.RegisterEventMappers(repo.eventstore)
 
 	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)

@@ -435,24 +435,21 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectPush(
 						eventPusherToEvents(
-							func() eventstore.Command {
-								event, _ := idpintent.NewSucceededEvent(
-									context.Background(),
-									&idpintent.NewAggregate("id", "ro").Aggregate,
-									[]byte(`{"sub":"id","preferred_username":"username"}`),
-									"id",
-									"username",
-									"",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("accessToken"),
-									},
-									"idToken",
-								)
-								return event
-							}(),
+							idpintent.NewSucceededEvent(
+								context.Background(),
+								&idpintent.NewAggregate("id", "ro").Aggregate,
+								[]byte(`{"sub":"id","preferred_username":"username"}`),
+								"id",
+								"username",
+								"",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("accessToken"),
+								},
+								"idToken",
+							),
 						),
 					),
 				),

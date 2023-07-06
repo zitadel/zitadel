@@ -17,22 +17,22 @@ import (
 
 // RegisterUserPasskey creates a passkey registration for the current authenticated user.
 // UserID, usually taken from the request is compared against the user ID in the context.
-func (c *Commands) RegisterUserPasskey(ctx context.Context, userID, resourceOwner string, authenticator domain.AuthenticatorAttachment) (*domain.WebAuthNRegistrationDetails, error) {
+func (c *Commands) RegisterUserPasskey(ctx context.Context, userID, resourceOwner, rpID string, authenticator domain.AuthenticatorAttachment) (*domain.WebAuthNRegistrationDetails, error) {
 	if err := authz.UserIDInCTX(ctx, userID); err != nil {
 		return nil, err
 	}
-	return c.registerUserPasskey(ctx, userID, resourceOwner, authenticator)
+	return c.registerUserPasskey(ctx, userID, resourceOwner, rpID, authenticator)
 }
 
 // RegisterUserPasskeyWithCode registers a new passkey for a unauthenticated user id.
 // The resource is protected by the code, identified by the codeID.
-func (c *Commands) RegisterUserPasskeyWithCode(ctx context.Context, userID, resourceOwner string, authenticator domain.AuthenticatorAttachment, codeID, code string, alg crypto.EncryptionAlgorithm) (*domain.WebAuthNRegistrationDetails, error) {
+func (c *Commands) RegisterUserPasskeyWithCode(ctx context.Context, userID, resourceOwner string, authenticator domain.AuthenticatorAttachment, codeID, code, rpID string, alg crypto.EncryptionAlgorithm) (*domain.WebAuthNRegistrationDetails, error) {
 	event, err := c.verifyUserPasskeyCode(ctx, userID, resourceOwner, codeID, code, alg)
 	if err != nil {
 		return nil, err
 	}
 
-	return c.registerUserPasskey(ctx, userID, resourceOwner, authenticator, event)
+	return c.registerUserPasskey(ctx, userID, resourceOwner, rpID, authenticator, event)
 }
 
 type eventCallback func(context.Context, *eventstore.Aggregate) eventstore.Command
@@ -64,25 +64,25 @@ func (c *Commands) verifyUserPasskeyCodeFailed(ctx context.Context, wm *HumanPas
 	logging.WithFields("userID", userAgg.ID).OnError(err).Error("RegisterUserPasskeyWithCode push failed")
 }
 
-func (c *Commands) registerUserPasskey(ctx context.Context, userID, resourceOwner string, authenticator domain.AuthenticatorAttachment, events ...eventCallback) (*domain.WebAuthNRegistrationDetails, error) {
-	wm, userAgg, webAuthN, err := c.createUserPasskey(ctx, userID, resourceOwner, authenticator)
+func (c *Commands) registerUserPasskey(ctx context.Context, userID, resourceOwner, rpID string, authenticator domain.AuthenticatorAttachment, events ...eventCallback) (*domain.WebAuthNRegistrationDetails, error) {
+	wm, userAgg, webAuthN, err := c.createUserPasskey(ctx, userID, resourceOwner, rpID, authenticator)
 	if err != nil {
 		return nil, err
 	}
 	return c.pushUserPasskey(ctx, wm, userAgg, webAuthN, events...)
 }
 
-func (c *Commands) createUserPasskey(ctx context.Context, userID, resourceOwner string, authenticator domain.AuthenticatorAttachment) (*HumanWebAuthNWriteModel, *eventstore.Aggregate, *domain.WebAuthNToken, error) {
+func (c *Commands) createUserPasskey(ctx context.Context, userID, resourceOwner, rpID string, authenticator domain.AuthenticatorAttachment) (*HumanWebAuthNWriteModel, *eventstore.Aggregate, *domain.WebAuthNToken, error) {
 	passwordlessTokens, err := c.getHumanPasswordlessTokens(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	return c.addHumanWebAuthN(ctx, userID, resourceOwner, false, passwordlessTokens, authenticator, domain.UserVerificationRequirementRequired)
+	return c.addHumanWebAuthN(ctx, userID, resourceOwner, rpID, passwordlessTokens, authenticator, domain.UserVerificationRequirementRequired)
 }
 
 func (c *Commands) pushUserPasskey(ctx context.Context, wm *HumanWebAuthNWriteModel, userAgg *eventstore.Aggregate, webAuthN *domain.WebAuthNToken, events ...eventCallback) (*domain.WebAuthNRegistrationDetails, error) {
 	cmds := make([]eventstore.Command, len(events)+1)
-	cmds[0] = user.NewHumanPasswordlessAddedEvent(ctx, userAgg, wm.WebauthNTokenID, webAuthN.Challenge)
+	cmds[0] = user.NewHumanPasswordlessAddedEvent(ctx, userAgg, wm.WebauthNTokenID, webAuthN.Challenge, webAuthN.RPID)
 	for i, event := range events {
 		cmds[i+1] = event(ctx, userAgg)
 	}

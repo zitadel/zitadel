@@ -21,7 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-func TestCommands_AddUserOTP(t *testing.T) {
+func TestCommands_AddUserTOTP(t *testing.T) {
 	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 
@@ -175,7 +175,7 @@ func TestCommands_AddUserOTP(t *testing.T) {
 					},
 				},
 			}
-			got, err := c.AddUserOTP(ctx, tt.args.userID, tt.args.resourceowner)
+			got, err := c.AddUserTOTP(ctx, tt.args.userID, tt.args.resourceowner)
 			require.ErrorIs(t, err, tt.wantErr)
 			if tt.want {
 				require.NotNil(t, got)
@@ -187,7 +187,7 @@ func TestCommands_AddUserOTP(t *testing.T) {
 	}
 }
 
-func TestCommands_CheckUserOTP(t *testing.T) {
+func TestCommands_CheckUserTOTP(t *testing.T) {
 	ctx := authz.NewMockContext("inst1", "org1", "user1")
 
 	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
@@ -252,7 +252,7 @@ func TestCommands_CheckUserOTP(t *testing.T) {
 					},
 				},
 			}
-			got, err := c.CheckUserOTP(ctx, tt.args.userID, tt.args.code, tt.args.resourceOwner)
+			got, err := c.CheckUserTOTP(ctx, tt.args.userID, tt.args.code, tt.args.resourceOwner)
 			require.ErrorIs(t, err, tt.wantErr)
 			if tt.want {
 				require.NotNil(t, got)

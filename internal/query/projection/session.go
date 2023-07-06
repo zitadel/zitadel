@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	SessionsProjectionTable = "projections.sessions1"
+	SessionsProjectionTable = "projections.sessions3"
 
 	SessionColumnID                = "id"
 	SessionColumnCreationDate      = "creation_date"
@@ -22,11 +22,13 @@ const (
 	SessionColumnSequence          = "sequence"
 	SessionColumnState             = "state"
 	SessionColumnResourceOwner     = "resource_owner"
+	SessionColumnDomain            = "domain"
 	SessionColumnInstanceID        = "instance_id"
 	SessionColumnCreator           = "creator"
 	SessionColumnUserID            = "user_id"
 	SessionColumnUserCheckedAt     = "user_checked_at"
 	SessionColumnPasswordCheckedAt = "password_checked_at"
+	SessionColumnIntentCheckedAt   = "intent_checked_at"
 	SessionColumnPasskeyCheckedAt  = "passkey_checked_at"
 	SessionColumnMetadata          = "metadata"
 	SessionColumnTokenID           = "token_id"
@@ -48,11 +50,13 @@ func newSessionProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(SessionColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(SessionColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(SessionColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(SessionColumnDomain, crdb.ColumnTypeText),
 			crdb.NewColumn(SessionColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(SessionColumnCreator, crdb.ColumnTypeText),
 			crdb.NewColumn(SessionColumnUserID, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnUserCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnPasswordCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
+			crdb.NewColumn(SessionColumnIntentCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnPasskeyCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnMetadata, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnTokenID, crdb.ColumnTypeText, crdb.Nullable()),
@@ -80,6 +84,10 @@ func (p *sessionProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  session.PasswordCheckedType,
 					Reduce: p.reducePasswordChecked,
+				},
+				{
+					Event:  session.IntentCheckedType,
+					Reduce: p.reduceIntentChecked,
 				},
 				{
 					Event:  session.PasskeyCheckedType,
@@ -134,6 +142,7 @@ func (p *sessionProjection) reduceSessionAdded(event eventstore.Event) (*handler
 			handler.NewCol(SessionColumnCreationDate, e.CreationDate()),
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(SessionColumnDomain, e.Domain),
 			handler.NewCol(SessionColumnState, domain.SessionStateActive),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
 			handler.NewCol(SessionColumnCreator, e.User),
@@ -173,6 +182,26 @@ func (p *sessionProjection) reducePasswordChecked(event eventstore.Event) (*hand
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
 			handler.NewCol(SessionColumnPasswordCheckedAt, e.CheckedAt),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceIntentChecked(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*session.IntentCheckedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SDgr2", "reduce.wrong.event.type %s", session.IntentCheckedType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnIntentCheckedAt, e.CheckedAt),
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnID, e.Aggregate().ID),
