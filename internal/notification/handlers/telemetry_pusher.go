@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/zitadel/logging"
 
@@ -128,6 +129,7 @@ func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.Sched
 	if alreadyHandled {
 		return nil
 	}
+
 	for _, endpoint := range t.cfg.Endpoints {
 		if err := types.SendJSON(
 			ctx,
@@ -138,7 +140,19 @@ func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.Sched
 			},
 			t.queries.GetFileSystemProvider,
 			t.queries.GetLogProvider,
-			ms,
+			&struct {
+				InstanceID     string         `json:"instanceId"`
+				ExternalDomain string         `json:"externalDomain"`
+				PrimaryDomain  string         `json:"primaryDomain"`
+				Type           milestone.Type `json:"type"`
+				ReachedDate    time.Time      `json:"reached"`
+			}{
+				InstanceID:     ms.InstanceID,
+				ExternalDomain: t.queries.externalDomain,
+				PrimaryDomain:  ms.PrimaryDomain,
+				Type:           ms.Type,
+				ReachedDate:    ms.ReachedDate,
+			},
 			event,
 			t.metricSuccessfulDeliveriesJSON,
 			t.metricFailedDeliveriesJSON,
