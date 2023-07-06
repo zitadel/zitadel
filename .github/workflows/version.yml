@@ -21,12 +21,14 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     outputs:
-      version: v${{ steps.semantic.outputs.new_release_version }}
+      version: ${{ steps.output.outputs.VERSION }}
       published: ${{ steps.semantic.outputs.new_release_published }}
     steps:
-    - name: Source checkout
+    - 
+      name: Source checkout
       uses: actions/checkout@v3
-    - name: Semantic Release
+    - 
+      name: Semantic Release
       uses: cycjimmy/semantic-release-action@v3
       id: semantic
       env:
@@ -36,3 +38,8 @@ jobs:
         semantic_version: ${{ inputs.semantic_version }}
         extra_plugins: |
           @semantic-release/exec@6.0.3
+    -
+      name: output
+      id: output
+      run:
+        if [[ ! -z "${{ steps.semantic.outputs.new_release_version }}" ]]; then echo "VERSION=v${{ steps.semantic.outputs.new_release_version }}" >> "$GITHUB_OUTPUT"; else echo "VERSION=" >> "$GITHUB_OUTPUT";fi
