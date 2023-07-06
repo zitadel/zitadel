@@ -5,6 +5,8 @@ title: Kubernetes
 import Disclaimer from './_disclaimer.mdx'
 import DefaultUser from './_defaultuser.mdx'
 import Next from './_next.mdx'
+import NoteInstanceNotFound from './troubleshooting/_note_instance_not_found.mdx';
+
 
 Installation and configuration details are described in the [open source ZITADEL charts repo](https://github.com/zitadel/zitadel-charts).
 By default, the chart installs a secure and highly available ZITADEL instance.
@@ -45,6 +47,8 @@ kubectl port-forward svc/my-zitadel 8080
 ```
 
 <DefaultUser components={props.components} />
+
+<NoteInstanceNotFound/>
 
 ## Setup ZITADEL and a Service Account Admin
 

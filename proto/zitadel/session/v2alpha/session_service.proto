@@ -245,6 +245,11 @@ message CreateSessionRequest{
     }
   ];
   repeated ChallengeKind challenges = 3;
+  string domain = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Domain on which the session was created. Will be used for Passkey and U2F challenges.\"";
+    }
+  ];
 }
 
 message CreateSessionResponse{

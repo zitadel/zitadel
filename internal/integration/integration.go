@@ -15,6 +15,7 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v2/pkg/client"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -23,6 +24,7 @@ import (
 	"github.com/zitadel/zitadel/cmd"
 	"github.com/zitadel/zitadel/cmd/start"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -40,6 +42,8 @@ var (
 	cockroachYAML []byte
 	//go:embed config/postgres.yaml
 	postgresYAML []byte
+	//go:embed config/system-user-key.pem
+	systemUserKey []byte
 )
 
 // UserType provides constants that give
@@ -53,6 +57,12 @@ type UserType int
 const (
 	Unspecified UserType = iota
 	OrgOwner
+	IAMOwner
+	SystemUser // SystemUser is a user with access to the system service.
+)
+
+const (
+	FirstInstanceUsersKey = "first"
 )
 
 // User information with a Personal Access Token.
@@ -67,7 +77,7 @@ type Tester struct {
 
 	Instance     authz.Instance
 	Organisation *query.Org
-	Users        map[UserType]User
+	Users        map[string]map[UserType]User
 
 	Client   Client
 	WebAuthN *webauthn.Client
@@ -80,11 +90,12 @@ func (s *Tester) Host() string {
 	return fmt.Sprintf("%s:%d", s.Config.ExternalDomain, s.Config.Port)
 }
 
-func (s *Tester) createClientConn(ctx context.Context) {
+func (s *Tester) createClientConn(ctx context.Context, opts ...grpc.DialOption) {
 	target := s.Host()
-	cc, err := grpc.DialContext(ctx, target,
-		grpc.WithBlock(), grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
+	cc, err := grpc.DialContext(ctx, target, append(opts,
+		grpc.WithBlock(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)...)
 	if err != nil {
 		s.Shutdown <- os.Interrupt
 		s.wg.Wait()
@@ -124,10 +135,10 @@ func (s *Tester) pollHealth(ctx context.Context) (err error) {
 }
 
 const (
-	SystemUser = "integration"
+	MachineUser = "integration"
 )
 
-func (s *Tester) createSystemUser(ctx context.Context) {
+func (s *Tester) createMachineUser(ctx context.Context, instanceId string) {
 	var err error
 
 	s.Instance, err = s.Queries.InstanceByHost(ctx, s.Host())
@@ -137,7 +148,7 @@ func (s *Tester) createSystemUser(ctx context.Context) {
 	s.Organisation, err = s.Queries.OrgByID(ctx, true, s.Instance.DefaultOrganisationID())
 	logging.OnError(err).Fatal("query organisation")
 
-	query, err := query.NewUserUsernameSearchQuery(SystemUser, query.TextEquals)
+	query, err := query.NewUserUsernameSearchQuery(MachineUser, query.TextEquals)
 	logging.OnError(err).Fatal("user query")
 	user, err := s.Queries.GetUser(ctx, true, true, query)
 
@@ -146,8 +157,8 @@ func (s *Tester) createSystemUser(ctx context.Context) {
 			ObjectRoot: models.ObjectRoot{
 				ResourceOwner: s.Organisation.ID,
 			},
-			Username:        SystemUser,
-			Name:            SystemUser,
+			Username:        MachineUser,
+			Name:            MachineUser,
 			Description:     "who cares?",
 			AccessTokenType: domain.OIDCTokenTypeJWT,
 		})
@@ -168,16 +179,43 @@ func (s *Tester) createSystemUser(ctx context.Context) {
 	_, err = s.Commands.AddPersonalAccessToken(ctx, pat)
 	logging.OnError(err).Fatal("add pat")
 
-	s.Users = map[UserType]User{
-		OrgOwner: {
-			User:  user,
-			Token: pat.Token,
-		},
+	if s.Users == nil {
+		s.Users = make(map[string]map[UserType]User)
+	}
+	if s.Users[instanceId] == nil {
+		s.Users[instanceId] = make(map[UserType]User)
+	}
+	s.Users[instanceId][OrgOwner] = User{
+		User:  user,
+		Token: pat.Token,
 	}
 }
 
-func (s *Tester) WithSystemAuthorization(ctx context.Context, u UserType) context.Context {
-	return metadata.AppendToOutgoingContext(ctx, "Authorization", fmt.Sprintf("Bearer %s", s.Users[u].Token))
+func (s *Tester) WithAuthorization(ctx context.Context, u UserType) context.Context {
+	return s.WithInstanceAuthorization(ctx, u, FirstInstanceUsersKey)
+}
+
+func (s *Tester) WithInstanceAuthorization(ctx context.Context, u UserType, instanceID string) context.Context {
+	if u == SystemUser {
+		s.ensureSystemUser()
+	}
+	return metadata.AppendToOutgoingContext(ctx, "Authorization", fmt.Sprintf("Bearer %s", s.Users[instanceID][u].Token))
+}
+
+func (s *Tester) ensureSystemUser() {
+	const ISSUER = "tester"
+	if s.Users[FirstInstanceUsersKey] == nil {
+		s.Users[FirstInstanceUsersKey] = make(map[UserType]User)
+	}
+	if _, ok := s.Users[FirstInstanceUsersKey][SystemUser]; ok {
+		return
+	}
+	audience := http_util.BuildOrigin(s.Host(), s.Server.Config.ExternalSecure)
+	signer, err := client.NewSignerFromPrivateKeyByte(systemUserKey, "")
+	logging.OnError(err).Fatal("system key signer")
+	jwt, err := client.SignedJWTProfileAssertion(ISSUER, []string{audience}, time.Hour, signer)
+	logging.OnError(err).Fatal("system key jwt")
+	s.Users[FirstInstanceUsersKey][SystemUser] = User{Token: jwt}
 }
 
 // Done send an interrupt signal to cleanly shutdown the server.
@@ -224,7 +262,11 @@ func NewTester(ctx context.Context) *Tester {
 	}
 	logging.OnError(err).Fatal()
 
-	tester := new(Tester)
+	tester := Tester{
+		Users: map[string]map[UserType]User{
+			FirstInstanceUsersKey: make(map[UserType]User),
+		},
+	}
 	tester.wg.Add(1)
 	go func(wg *sync.WaitGroup) {
 		logging.OnError(cmd.Execute()).Fatal()
@@ -237,10 +279,10 @@ func NewTester(ctx context.Context) *Tester {
 		logging.OnError(ctx.Err()).Fatal("waiting for integration tester server")
 	}
 	tester.createClientConn(ctx)
-	tester.createSystemUser(ctx)
+	tester.createMachineUser(ctx, FirstInstanceUsersKey)
 	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, "https://"+tester.Host())
 
-	return tester
+	return &tester
 }
 
 func Contexts(timeout time.Duration) (ctx, errCtx context.Context, cancel context.CancelFunc) {
