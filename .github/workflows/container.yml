@@ -30,13 +30,13 @@ jobs:
           tags: |
             type=sha,prefix=,suffix=,format=long
       -
-        name: Ubuntu meta
-        id: ubuntu-meta
+        name: Debug meta
+        id: debug-meta
         uses: docker/metadata-action@v4
         with:
           images: ${{ inputs.image_name }}
           tags: |
-            type=sha,prefix=,suffix=-ubuntu,format=long
+            type=sha,prefix=,suffix=-debug,format=long
       - 
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -63,8 +63,8 @@ jobs:
           tar -xvf .artifacts/zitadel-linux-${{ matrix.arch }}.tar
           mv zitadel-linux-${{ matrix.arch }}/zitadel ./zitadel
       - 
-        name: Ubuntu
-        id: build-ubuntu
+        name: Debug
+        id: build-debian
         uses: docker/build-push-action@v4
         timeout-minutes: 4
         with:
@@ -72,7 +72,7 @@ jobs:
           file: build/Dockerfile
           target: artifact
           platforms: linux/${{ matrix.arch }}
-          labels: ${{ steps.ubuntu-meta.outputs.labels }}
+          labels: ${{ steps.debug-meta.outputs.labels }}
           outputs: type=image,name=${{ inputs.image_name }},push-by-digest=true,name-canonical=true,push=true
       - 
         name: Scratch
@@ -88,11 +88,11 @@ jobs:
           labels: ${{ steps.scratch-meta.outputs.labels }}
           outputs: type=image,name=${{ inputs.image_name }},push-by-digest=true,name-canonical=true,push=true
       -
-        name: Export ubuntu digest
+        name: Export debug digest
         run: |
-          mkdir -p /tmp/digests/ubuntu
-          digest="${{ steps.build-ubuntu.outputs.digest }}"
-          touch "/tmp/digests/ubuntu/${digest#sha256:}"
+          mkdir -p /tmp/digests/debug
+          digest="${{ steps.build-debian.outputs.digest }}"
+          touch "/tmp/digests/debug/${digest#sha256:}"
       -
         name: Export scratch digest
         run: |
@@ -115,12 +115,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [scratch, ubuntu]
+        image: [scratch, debug]
         include:
           - image: scratch
             suffix: ''
-          - image: ubuntu
-            suffix: '-ubuntu'
+          - image: debug
+            suffix: '-debug'
     steps:
       -
         name: Download digests

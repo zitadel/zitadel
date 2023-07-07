@@ -79,7 +79,7 @@ jobs:
     uses: ./.github/workflows/e2e.yml
     needs: [container]
     with:
-      image: ${{ needs.container.outputs.image }}-ubuntu
+      image: ${{ needs.container.outputs.image }}-debug
 
   release:
     uses: ./.github/workflows/release.yml

@@ -62,7 +62,6 @@ jobs:
         GOARCH="${{matrix.goarch}}" \
         VERSION="${{ inputs.version }}" \
         COMMIT_SHA="${{ github.sha }}" \
-        CPPFLAGS="-DPNG_ARM_NEON_OPT=0" \
         make compile_pipeline
     -
       name: create folder

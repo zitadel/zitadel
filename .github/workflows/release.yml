@@ -64,8 +64,8 @@ jobs:
           --tag ${{ inputs.image_name }}:${{ needs.version.outputs.version }} \
           ${{ inputs.image }}
         docker buildx imagetools create \
-          --tag ${{ inputs.image_name }}:${{ needs.version.outputs.version }}-ubuntu \
-          ${{ inputs.image }}-ubuntu        
+          --tag ${{ inputs.image_name }}:${{ needs.version.outputs.version }}-debug \
+          ${{ inputs.image }}-debug        
         docker buildx imagetools create \
           --tag ${{ inputs.google_image_name }}:${{ needs.version.outputs.version }} \
           ${{ inputs.image }}
@@ -77,5 +77,5 @@ jobs:
           --tag ${{ inputs.image_name }}:latest \
           ${{ inputs.image }}
         docker buildx imagetools create \
-          --tag ${{ inputs.image_name }}:latest-ubuntu \
-          ${{ inputs.image }}-ubuntu
+          --tag ${{ inputs.image_name }}:latest-debug \
+          ${{ inputs.image }}-debug
