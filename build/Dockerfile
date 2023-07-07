@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM ubuntu:latest as artifact
+FROM --platform=$BUILDPLATFORM debian:latest as artifact
 ENV ZITADEL_ARGS=
 
 RUN apt-get update && apt-get install ca-certificates -y
