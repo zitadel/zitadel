@@ -79,7 +79,7 @@ service SessionService {
   // Search sessions
   rpc ListSessions (ListSessionsRequest) returns (ListSessionsResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/sessions/_search"
+      post: "/v2alpha/sessions/search"
       body: "*"
     };
 

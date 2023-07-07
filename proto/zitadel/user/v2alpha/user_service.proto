@@ -136,7 +136,7 @@ service UserService {
   // Verify the email with the provided code
   rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/{user_id}/email/_verify"
+      post: "/v2alpha/users/{user_id}/email/verify"
       body: "*"
     };
 
@@ -296,7 +296,7 @@ service UserService {
 
   rpc VerifyTOTPRegistration (VerifyTOTPRegistrationRequest) returns (VerifyTOTPRegistrationResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/{user_id}/totp/_verify"
+      post: "/v2alpha/users/{user_id}/totp/verify"
       body: "*"
     };
 
@@ -318,9 +318,9 @@ service UserService {
   }
 
   // Start an IDP authentication (for external login, registration or linking)
-  rpc StartIdentityProviderFlow (StartIdentityProviderFlowRequest) returns (StartIdentityProviderFlowResponse) {
+  rpc StartIdentityProviderIntent (StartIdentityProviderIntentRequest) returns (StartIdentityProviderIntentResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/idps/{idp_id}/start"
+      post: "/v2alpha/idp_intents/start"
       body: "*"
     };
 
@@ -342,9 +342,9 @@ service UserService {
     };
   }
 
-  rpc RetrieveIdentityProviderInformation (RetrieveIdentityProviderInformationRequest) returns (RetrieveIdentityProviderInformationResponse) {
+  rpc RetrieveIdentityProviderIntent (RetrieveIdentityProviderIntentRequest) returns (RetrieveIdentityProviderIntentResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/intents/{intent_id}/information"
+      post: "/v2alpha/idp_intents/{intent_id}"
       body: "*"
     };
 
@@ -369,7 +369,7 @@ service UserService {
   // Link an IDP to an existing user
   rpc AddIDPLink (AddIDPLinkRequest) returns (AddIDPLinkResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/users/{user_id}/links"
+      post: "/v2alpha/users/{user_id}/links"
       body: "*"
     };
 
@@ -806,7 +806,7 @@ message CreatePasskeyRegistrationLinkResponse{
   ];
 }
 
-message StartIdentityProviderFlowRequest{
+message StartIdentityProviderIntentRequest{
   string idp_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -836,7 +836,7 @@ message StartIdentityProviderFlowRequest{
   ];
 }
 
-message StartIdentityProviderFlowResponse{
+message StartIdentityProviderIntentResponse{
   zitadel.object.v2alpha.Details details = 1;
   oneof next_step {
     string auth_url = 2 [
@@ -848,7 +848,7 @@ message StartIdentityProviderFlowResponse{
   }
 }
 
-message RetrieveIdentityProviderInformationRequest{
+message RetrieveIdentityProviderIntentRequest{
   string intent_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -869,7 +869,7 @@ message RetrieveIdentityProviderInformationRequest{
   ];
 }
 
-message RetrieveIdentityProviderInformationResponse{
+message RetrieveIdentityProviderIntentResponse{
   zitadel.object.v2alpha.Details details = 1;
   IDPInformation idp_information = 2;
 }

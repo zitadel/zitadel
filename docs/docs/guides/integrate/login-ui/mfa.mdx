@@ -69,7 +69,7 @@ Request Example:
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER_ID/totp/_verify \
+  --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER_ID/totp/verify \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''
   --header 'Content-Type: application/json' \
