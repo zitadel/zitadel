@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
@@ -52,8 +50,7 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err = projection.AuthRequestProjection.Trigger(ctx)
-		logging.OnError(err).Error("trigger failed")
+		ctx = projection.AuthRequestProjection.Trigger(ctx)
 	}
 
 	var (
