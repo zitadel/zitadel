@@ -20,7 +20,7 @@ jobs:
         arch: [amd64,arm64]
         include:
           - amd64:
-            platforms: linux/amd64,linux/x86_64
+            platforms: linux/amd64
           - arm64:
             platforms: linux/arm64,linux/arm64/v8
     steps:
