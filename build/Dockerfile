@@ -23,11 +23,9 @@ FROM scratch as final
 
 COPY --from=artifact /etc/passwd /etc/passwd
 COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
-COPY --from=artifact /app/zitadel /app/zitadel
+COPY --from=artifact /app/zitadel /
 
-WORKDIR /app
-ENV PATH="/app:${PATH}"
 HEALTHCHECK NONE
 
 USER zitadel
-ENTRYPOINT ["/app/zitadel"]
+ENTRYPOINT ["/zitadel"]
