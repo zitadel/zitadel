@@ -171,10 +171,11 @@ Running the tests with docker doesn't require you to take care of other dependen
 
 ```bash
 # Build the production binary (unit tests are executed, too)
-GOOS=linux make compile
+make core_build console_build
+GOOS=linux make compile_pipeline
 
 # Pack the binary into a docker image
-DOCKER_BUILDKIT=1 docker build --file build/Dockerfile .artifacts/zitadel -t zitadel:local
+DOCKER_BUILDKIT=1 docker build --file build/Dockerfile . -t zitadel:local
 
 # If you made changes in the e2e directory, make sure you reformat the files
 make console_lint
