@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/id"
@@ -71,8 +72,9 @@ func (ua *userAgentHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if err == nil {
 		ctx := context.WithValue(r.Context(), userAgentKey, agent.ID)
+		allowedHosts := authz.GetInstance(r.Context()).SecurityPolicyAllowedOrigins()
 		r = r.WithContext(ctx)
-		ua.setUserAgent(w, r.Host, agent)
+		ua.setUserAgent(w, r.Host, agent, len(allowedHosts) > 0)
 	}
 	ua.nextHandler.ServeHTTP(w, r)
 }
@@ -94,8 +96,8 @@ func (ua *userAgentHandler) getUserAgent(r *http.Request) (*UserAgent, error) {
 	return userAgent, nil
 }
 
-func (ua *userAgentHandler) setUserAgent(w http.ResponseWriter, host string, agent *UserAgent) error {
-	err := ua.cookieHandler.SetEncryptedCookie(w, ua.cookieName, host, agent)
+func (ua *userAgentHandler) setUserAgent(w http.ResponseWriter, host string, agent *UserAgent, iframe bool) error {
+	err := ua.cookieHandler.SetEncryptedCookie(w, ua.cookieName, host, agent, iframe)
 	if err != nil {
 		return errors.ThrowPermissionDenied(err, "HTTP-AqgqdA", "cannot set user agent cookie")
 	}
