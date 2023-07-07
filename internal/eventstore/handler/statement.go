@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -62,11 +61,18 @@ func NewJSONCol(name string, value interface{}) Column {
 	return NewCol(name, marshalled)
 }
 
-type Condition Column
+type Condition func(param string) (string, interface{})
+
+type NamespacedCondition func(namespace string) Condition
 
 func NewCond(name string, value interface{}) Condition {
-	return Condition{
-		Name:  name,
-		Value: value,
+	return func(param string) (string, interface{}) {
+		return name + " = " + param, value
+	}
+}
+
+func NewNamespacedCondition(name string, value interface{}) NamespacedCondition {
+	return func(namespace string) Condition {
+		return NewCond(namespace+"."+name, value)
 	}
 }
