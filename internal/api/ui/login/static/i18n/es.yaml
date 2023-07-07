@@ -1,0 +1,430 @@
+Login:
+  Title: ¡Hola de nuevo!
+  Description: Introduce tus datos de inicio de sesión.
+  TitleLinking: Inicio de sesión para vincular un usuario
+  DescriptionLinking: Introduce tus datos de inicio de sesión para vincular tu usuario externo con un usuario ZITADEL.
+  LoginNameLabel: Nombre de inicio de sesión
+  UsernamePlaceHolder: username
+  LoginnamePlaceHolder: username@dominio
+  ExternalUserDescription: Inicia sesión con un usuario externo.
+  MustBeMemberOfOrg: El usuario debe ser miembro de la organización {{.OrgName}}.
+  RegisterButtonText: registrar
+  NextButtonText: siguiente
+
+LDAP:
+  Title: Inicio de sesión
+  Description: Introduce tus datos de inicio de sesión.
+  LoginNameLabel: Nombre de inicio de sesión
+  PasswordLabel: Contraseña
+  NextButtonText: siguiente
+
+SelectAccount:
+  Title: Seleccionar cuenta
+  Description: Utiliza tu cuenta ZITADEL
+  TitleLinking: Selecciona tu cuenta para vincular el usuario
+  DescriptionLinking: Selecciona tu cuenta para vincular con tu usuario externo.
+  OtherUser: Otro Usuario
+  SessionState0: activo
+  SessionState1: inactivo
+  MustBeMemberOfOrg: El usuario debe ser miembro de la organización {{.OrgName}}.
+
+Password:
+  Title: Contraseña
+  Description: Introduce tus datos de inicio de sesión.
+  PasswordLabel: Contraseña
+  MinLength: Longitud mínima
+  HasUppercase: Una letra mayúscula
+  HasLowercase: Una letra minúscula
+  HasNumber: Número
+  HasSymbol: Símbolo
+  Confirmation: Las contraseñas coinciden
+  ResetLinkText: restablecer contraseña
+  BackButtonText: atrás
+  NextButtonText: siguiente
+
+UsernameChange:
+  Title: Cambiar nombre de usuario
+  Description: Introduce tu nuevo nombre de usuario
+  UsernameLabel: Nombre de usuario
+  CancelButtonText: cancelar
+  NextButtonText: siguiente
+
+UsernameChangeDone:
+  Title: Nombre de usuario cambiado
+  Description: Tu nombre de usuario se cambió correctamente.
+  NextButtonText: siguiente
+
+InitPassword:
+  Title: Establecer contraseña
+  Description: Habrás recibido un código, que tendrás que introducir en el siguiente campo, para establecer tu nueva contraseña.
+  CodeLabel: Código
+  NewPasswordLabel: Nueva contraseña
+  NewPasswordConfirmLabel: Confirmar contraseña
+  ResendButtonText: reenviar código
+  NextButtonText: siguiente
+
+InitPasswordDone:
+  Title: Contraseña establecida
+  Description: La contraseña se estableció correctamente
+  NextButtonText: siguiente
+  CancelButtonText: cancelar
+
+InitUser:
+  Title: Activar usuario
+  Description: Verifica tu email con el siguiente código y establece tu contraseña.
+  CodeLabel: Código
+  NewPasswordLabel: Nueva contraseña
+  NewPasswordConfirm: Confirmar contraseña
+  NextButtonText: siguiente
+  ResendButtonText: reenviar código
+
+InitUserDone:
+  Title: Usuario activado
+  Description: Email verificado y contraseña establecida correctamente
+  NextButtonText: siguiente
+  CancelButtonText: cancelar
+
+InitMFAPrompt:
+  Title: Configuración de doble factor
+  Description: La autenticación de doble factor te proporciona seguridad adicional para tu cuenta de usuario. Ésta asegura que solo tú tienes acceso a tu cuenta.
+  Provider0: App autenticadora (p.e Google/Microsoft Authenticator, Authy)
+  Provider1: Dependiente de un dispositivo (p.e FaceID, Windows Hello, Huella dactilar)
+  NextButtonText: siguiente
+  SkipButtonText: saltar
+
+InitMFAOTP:
+  Title: Verificación de doble factor
+  Description: Crea tu doble factor de autenticación. Descarga una aplicación autenticadora si todavía no tienes una.
+  OTPDescription: Escanea el código con tu app autenticadora (p.e Google/Microsoft Authenticator, Authy) o copia el secreto e inserta el código generado más abajo.
+  SecretLabel: Secreto
+  CodeLabel: Código
+  NextButtonText: siguiente
+  CancelButtonText: cancelar
+
+InitMFAU2F:
+  Title: Añadir clave de seguridad
+  Description: Una clave de seguridad es un método de verificación que puede integrarse en tu teléfono móvil, con Bluetooth, o conectándolo directamente en el puerto USB de tu ordenador.
+  TokenNameLabel: Nombre de la clave de seguridad / dispositivo
+  NotSupported: WebAuthN no está soportado por tu navegador. Por favor asegúrate de que está actualizado o utiliza uno diferente (p.e. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Añadir clave de seguridad
+  ErrorRetry: Reintentar, crear un nuevo challenge o elegir un método diferente.
+
+InitMFADone:
+  Title: Clave de seguridad verificada
+  Description: ¡Genial! Acabas de configurar satisfactoriamente tu doble factor y has hecho que tu cuenta sea más segura. El doble factor tendrá que introducirse en cada inicio de sesión.
+  NextButtonText: siguiente
+  CancelButtonText: cancelar
+
+MFAProvider:
+  Provider0: App autenticadora (p.e Google/Microsoft Authenticator, Authy)
+  Provider1: Dependiente de un dispositivo (p.e FaceID, Windows Hello, Huella dactilar)
+  ChooseOther: o elige otra opción
+
+VerifyMFAOTP:
+  Title: Verificar doble factor
+  Description: Verifica tu doble factor
+  CodeLabel: Código
+  NextButtonText: siguiente
+
+VerifyMFAU2F:
+  Title: Verificación de doble factor
+  Description: Verifica tu doble factor de autenticación con el dispositivo registrado (p.e FaceID, Windows Hello, Huella dactilar)
+  NotSupported: WebAuthN no está soportado por tu navegador. Por favor asegúrate de que está actualizado o utiliza uno diferente (p.e. Chrome, Safari, Firefox)
+  ErrorRetry: Inténtalo nuevamente, crea una nueva petición o elige otro método.
+  ValidateTokenButtonText: Verificar doble factor
+
+Passwordless:
+  Title: Inicio de sesión sin contraseña
+  Description: Iniciar sesión con métodos de autenticación proporcionados por tu dispositivo como FaceID, Windows Hello o tu huella dactilar.
+  NotSupported: WebAuthN no está soportado por tu navegador. Por favor asegúrate de que está actualizado o utiliza uno diferente (p.e. Chrome, Safari, Firefox)
+  ErrorRetry: Inténtalo nuevamente, crea un nuevo reto (challenge) o elige un método diferente.
+  LoginWithPwButtonText: Inicio de sesión con contraseña
+  ValidateTokenButtonText: Inicio de sesión sin contraseña
+
+PasswordlessPrompt:
+  Title: Configuración de acceso sin contraseña
+  Description: ¿Te gustaría configurar tu inicio de sesión sin contraseña? (métodos de autenticación de tu dispositivo como FaceID, Windows Hello o tu huella dactilar)
+  DescriptionInit: Necesitas configurar tu inicio de sesión sin contraseña. Utiliza el enlace que se te ha proporcionado para registrar tu dispositivo.
+  PasswordlessButtonText: Adelante con el inicio sin contraseñas
+  NextButtonText: siguiente
+  SkipButtonText: saltar
+
+PasswordlessRegistration:
+  Title: Configuración de acceso sin contraseña
+  Description: Añade tu medio de autenticación proporcionando un nombre (p.e MyMobilePhone, MacBook, etc) y después haz clic en el botón 'Registrar acceso sin contraseña'.
+  TokenNameLabel: Nombre del dispositivo
+  NotSupported: WebAuthN no está soportado por tu navegador. Por favor asegúrate de que está actualizado o utiliza uno diferente (p.e. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Registrar acceso sin contraseña
+  ErrorRetry: Inténtalo nuevamente, crea un nuevo reto (challenge) o elige un método diferente.
+
+PasswordlessRegistrationDone:
+  Title: Configuración de acceso sin contraseña
+  Description: Se añadió con éxito el dispositivo para iniciar sesión sin contraseña.
+  DescriptionClose: Ya puedes cerrar esta ventana.
+  NextButtonText: siguiente
+  CancelButtonText: cancelar
+
+PasswordChange:
+  Title: Cambiar contraseña
+  Description: Cambia tu contraseña. Introduce tu contraseña anterior y la nueva.
+  OldPasswordLabel: Contraseña anterior
+  NewPasswordLabel: Nueva contraseña
+  NewPasswordConfirmLabel: Confirmación de contraseña
+  CancelButtonText: cancelar
+  NextButtonText: siguiente
+  Footer: Pie
+
+PasswordChangeDone:
+  Title: Cambiar contraseña
+  Description: Tu contraseña se cambió correctamente.
+  NextButtonText: siguiente
+
+PasswordResetDone:
+  Title: Se ha enviado un enlace para restablecer la contraseña
+  Description: Comprueba tu email para restablecer la contraseña.
+  NextButtonText: siguiente
+
+EmailVerification:
+  Title: Verificación de email
+  Description: Te hemos enviado un email para verificar tu dirección. Por favor introduce el código en el siguiente campo.
+  CodeLabel: Código
+  NextButtonText: siguiente
+  ResendButtonText: reenviar código
+
+EmailVerificationDone:
+  Title: Verificación de email
+  Description: Tu dirección de email se ha verificado correctamente.
+  NextButtonText: siguiente
+  CancelButtonText: cancelar
+  LoginButtonText: iniciar sesión
+
+RegisterOption:
+  Title: Opciones de registro
+  Description: Elige cómo te gustaría registrarte
+  RegisterUsernamePasswordButtonText: Con nombre de usuario y contraseña
+  ExternalLoginDescription: o regístrate con un usuario externo
+  LoginButtonText: iniciar sesión
+
+RegistrationUser:
+  Title: Registro
+  Description: Introduce tus datos de usuario. Tu email se utilizará como nombre de inicio de sesión.
+  DescriptionOrgRegister: Introduce tus datos de usuario.
+  EmailLabel: Email
+  UsernameLabel: Nombre de usuario
+  FirstnameLabel: Nombre
+  LastnameLabel: Apellidos
+  LanguageLabel: Idioma
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  GenderLabel: Género
+  Female: Mujer
+  Male: Hombre
+  Diverse: Diverso / X
+  PasswordLabel: Contraseña
+  PasswordConfirmLabel: Confirmación de contraseña
+  TosAndPrivacyLabel: Términos y condiciones
+  TosConfirm: Acepto los
+  TosLinkText: TDS
+  PrivacyConfirm: Acepto la
+  PrivacyLinkText: política de privacidad
+  ExternalLogin: o regístrate con un usuario externo
+  BackButtonText: inicio de sesión
+  NextButtonText: siguiente
+
+ExternalRegistrationUserOverview:
+  Title: Registro de usuarios externos
+  Description: Hemos tomado los detalles de tu usuario del proveedor seleccionado. Ahora puedes cambiarlos o completarlos.
+  EmailLabel: Email
+  UsernameLabel: Nombre de usuario
+  FirstnameLabel: Nombre
+  LastnameLabel: Apellidos
+  NicknameLabel: Apodo
+  PhoneLabel: Número de teléfono
+  LanguageLabel: Idioma
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Japanese: 日本語
+  Polish: Polski
+  Spanish: Español
+  TosAndPrivacyLabel: Términos y condiciones
+  TosConfirm: Acepto los
+  TosLinkText: TDS
+  PrivacyConfirm: Acepto la
+  PrivacyLinkText: política de privacidad
+  ExternalLogin: o regístrate con un usuario externo
+  BackButtonText: atrás
+  NextButtonText: guardar
+
+RegistrationOrg:
+  Title: Registro de organización
+  Description: Introduce el nombre de tu organización y tus datos de usuario.
+  OrgNameLabel: Nombre de organización
+  EmailLabel: Email
+  UsernameLabel: Nombre de usuario
+  FirstnameLabel: Nombre
+  LastnameLabel: Apellidos
+  PasswordLabel: Contraseña
+  PasswordConfirmLabel: Confirmación de contraseña
+  TosAndPrivacyLabel: Términos y condiciones
+  TosConfirm: Acepto los
+  TosLinkText: TDS
+  PrivacyConfirm: Acepto la
+  PrivacyLinkText: política de privacidad
+  SaveButtonText: Crear organización
+
+LoginSuccess:
+  Title: Se inició sesión con éxito
+  AutoRedirectDescription: Se te redirigirá a tu aplicación automáticamente. Si no fuera así, haz clic en el botón siguiente. Puedes cerrar esta ventana posteriormente.
+  RedirectedDescription: Ya puedes cerrar esta ventana.
+  NextButtonText: siguiente
+
+LogoutDone:
+  Title: Cerraste sesión
+  Description: Cerraste la sesión con éxito.
+  LoginButtonText: iniciar sesión
+
+LinkingUsersDone:
+  Title: Vinculación de usuario
+  Description: usuario vinculado con éxito.
+  CancelButtonText: cancelar
+  NextButtonText: siguiente
+
+ExternalNotFound:
+  Title: Usuario externo no encontrado
+  Description: Usuario externo no encontrado. ¿Quieres vincular tu usuario o autoregistrar uno nuevo?
+  LinkButtonText: Vincular
+  AutoRegisterButtonText: registrar
+  TosAndPrivacyLabel: Términos y condiciones
+  TosConfirm: Acepto los
+  TosLinkText: TDS
+  PrivacyConfirm: Acepto la
+  PrivacyLinkText: política de privacidad
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+
+Footer:
+  PoweredBy: Powered By
+  Tos: TDS
+  PrivacyPolicy: Política de privacidad
+  Help: Ayuda
+  SupportEmail: Email de soporte
+
+Errors:
+  Internal: Se produjo un error interno
+  AuthRequest:
+    NotFound: No pude encontrar la petición de autenticación (authrequest)
+    UserAgentNotCorresponding: El User Agent no se corresponde
+    UserAgentNotFound: No se encontró el ID del User Agent
+    TokenNotFound: No se encontró el Token
+    RequestTypeNotSupported: El tipo de petición no está soportado
+    MissingParameters: Faltan parámetros requeridos
+  User:
+    NotFound: El usuario no pudo ser encontrado
+    AlreadyExists: El usuario ya existe
+    Inactive: El usuario está inactivo
+    NotFoundOnOrg: El usuario no pudo encontrarse en la organización elegida
+    NotAllowedOrg: El usuario no es miembro de la organización requerida
+    NotMatchingUserID: El usuario y el usuario contenido en la petición de autenticación (authrequest) no coinciden
+    UserIDMissing: El ID de usuario está vacío
+    Invalid: Datos de usuario no válidos
+    DomainNotAllowedAsUsername: El dominio ya está reservado y no puede usarse
+    NotAllowedToLink: El usuario no está autorizado para vincularse con un proveedor de inicio de sesión externo
+    Profile:
+      NotFound: Perfil no encontrado
+      NotChanged: El perfil no ha cambiado
+      Empty: El perfil está vacío
+      FirstNameEmpty: El nombre del perfil está vacío
+      LastNameEmpty: Los apellidos del perfil están vacíos
+      IDMissing: Falta el ID del perfil
+    Email:
+      NotFound: Email no encontrado
+      Invalid: El email no es válido
+      AlreadyVerified: El email ya ha sido verificado
+      NotChanged: El email no ha cambiado
+      Empty: El email está vacío
+      IDMissing: Falta el ID del email
+    Phone:
+      NotFound: Teléfono no encontrado
+      Invalid: El teléfono no es válido
+      AlreadyVerified: El teléfono ya ha sido verificado
+      Empty: El teléfono está vacío
+      NotChanged: El teléfono no ha cambiado
+    Address:
+      NotFound: Dirección no encontrada
+      NotChanged: La dirección no cambió
+    Username:
+      AlreadyExists: El nombre de usuario ya está cogido
+      Reserved: El nombre de usuario ya está cogido
+      Empty: El nombre de usuario está vacío
+    Password:
+      ConfirmationWrong: La confirmación de la contraseña es incorrecta
+      Empty: La contraseña está vacía
+      Invalid: La contraseña no es válida
+      InvalidAndLocked: La contraseña no es válida y el usuario está bloqueado, contacta con tu administrador.
+    UsernameOrPassword:
+      Invalid: El nombre de usuario o la contraseña no son válidos
+    PasswordComplexityPolicy:
+      NotFound: No se encontró una política de contraseñas
+      MinLength: La contraseña es demasiada corta
+      HasLower: La contraseña debe contener una letra minúscula
+      HasUpper: La contraseña debe contener una letra mayúscula
+      HasNumber: La contraseña debe contener un número
+      HasSymbol: La contraseña debe contener un símbolo
+    Code:
+      Expired: El código ha caducado
+      Invalid: El código no es válido
+      Empty: El código está vacío
+      CryptoCodeNil: El código criptográfico es nulo
+      NotFound: No pude encontrar el código
+      GeneratorAlgNotSupported: Algoritmo de generación no soportado
+    EmailVerify:
+      UserIDEmpty: El ID de usuario está vacío
+    ExternalData:
+      CouldNotRead: Los datos externos no pudieron leerse correctamente
+    MFA:
+      NoProviders: No hay proveedores multifactor disponibles
+      OTP:
+        AlreadyReady: El multifactor OTP (OneTimePassword) ya está configurado
+        NotExisting: El multifactor OTP (OneTimePassword) no existe
+        InvalidCode: Código no válido
+        NotReady: El multifactor OTP (OneTimePassword) no está listo
+    Locked: El usuario está bloqueado
+    SomethingWentWrong: Algo fue mal
+    NotActive: El usuario no está activo
+    ExternalIDP:
+      IDPTypeNotImplemented: El tipo de IDP no está implementado
+      NotAllowed: El proveedor de inicio de sesión externo no está permitido
+      IDPConfigIDEmpty: El ID del proveedor de identidad está vacío
+      ExternalUserIDEmpty: El ID de usuario externo está vacío
+      UserDisplayNameEmpty: El nombre mostrado del usuario está vacío
+      NoExternalUserData: No se recibieron datos del usuario externo
+      CreationNotAllowed: La creación de un nuevo usuario no está permitida para este proveedor
+      LinkingNotAllowed: La vinculación de un usuario no está permitida para este proveedor
+    GrantRequired: El inicio de sesión no es posible. Se requiere que el usuario tenga al menos una concesión sobre la aplicación. Por favor contacta con tu administrador.
+    ProjectRequired: El inicio de sesión no es posible. La organización del usuario debe tener el acceso concedido para el proyecto. Por favor contacta con tu administrador.
+  IdentityProvider:
+    InvalidConfig: La configuración del proveedor de identidades no es válida
+  IAM:
+    LockoutPolicy:
+      NotExisting: No existe política de bloqueo
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: El registro no está permitido
+
+optional: (opcional)

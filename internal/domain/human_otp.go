@@ -17,10 +17,17 @@ type OTP struct {
 	State        MFAState
 }
 
+type TOTP struct {
+	*ObjectDetails
+
+	Secret string
+	URI    string
+}
+
 func NewOTPKey(issuer, accountName string, cryptoAlg crypto.EncryptionAlgorithm) (*otp.Key, *crypto.CryptoValue, error) {
 	key, err := totp.Generate(totp.GenerateOpts{Issuer: issuer, AccountName: accountName})
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, caos_errs.ThrowInternal(err, "TOTP-ieY3o", "Errors.Internal")
 	}
 	encryptedSecret, err := crypto.Encrypt([]byte(key.Secret()), cryptoAlg)
 	if err != nil {

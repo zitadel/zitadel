@@ -59,6 +59,7 @@ docs/docs/apis/auth
 docs/docs/apis/admin
 docs/docs/apis/mgmt
 docs/docs/apis/system
+docs/docs/apis/proto
 
 # local
 build/local/*.env

@@ -19,7 +19,7 @@ yarn install
 then to run the app:
 
 ```bash
-npm run dev
+yarn dev
 ```
 
 then open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -28,10 +28,11 @@ then open [http://localhost:3000](http://localhost:3000) with your browser to se
 
 Before we can start building our application, we have to do a few configuration steps in ZITADEL Console.
 You will need to provide some information about your app.
+
 Navigate to your Project, then add a new application at the top of the page.
 Select Web application type and continue.
-We recommend you use [Authorization Code](/apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](/apis/openidoauth/grant-types#proof-key-for-code-exchange) for all web applications.
-As the requests from your application to ZITADEL are made on NextJS serverside, you can select `CODE` in the next step. This makes sure you still get a secret which is then used in combination with PKCE. Note that the secret never gets exposed on the browser and is therefore kept in a confidential environment.
+We use [Authorization Code](/apis/openidoauth/grant-types#authorization-code)for our NextJS application.
+Select `CODE` in the next step. This makes sure you still get a secret. Note that the secret never gets exposed on the browser and is therefore kept in a confidential environment.
 
 ![Create app in console](/img/nextjs/app-create.png)
 
@@ -39,7 +40,7 @@ As the requests from your application to ZITADEL are made on NextJS serverside, 
 
 With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 
-> If you are following along with the [example](https://github.com/zitadel/zitadel-angular), set dev mode to `true` and the Redirect URIs to <http://localhost:300/api/auth/callback/zitadel>.
+> If you are following along with the [example](https://github.com/zitadel/zitadel-angular), set dev mode to `true` and the Redirect URIs to <http://localhost:3000/api/auth/callback/zitadel>.
 
 If you want to redirect the users back to a route on your application after they have logged out, add an optional redirect in the Post Logout URIs field.
 
@@ -135,14 +136,10 @@ ZitadelProvider({
 ...
 ```
 
-We recommend using the Authentication Code flow secured by PKCE for the Authentication flow.
-To be able to connect to ZITADEL, navigate to your Console Projects, create or select an existing project and add your app selecting WEB, then PKCE, and then add `http://localhost:3000/api/auth/callback/zitadel` as redirect url to your app.
-
+To be able to connect to ZITADEL, make sure to add `http://localhost:3000/api/auth/callback/zitadel` as redirect url to your app.
 For simplicity reasons we set the default to the one that next-auth provides us. You'll be able to change the redirect later if you want to.
 
 Hit Create, then in the detail view of your application make sure to enable dev mode. Dev mode ensures that you can start an auth flow from a non https endpoint for testing.
-
-> Note that we get a clientId but no clientSecret because it is not needed for our authentication flow.
 
 Now go to Token settings and check the checkbox for **User Info inside ID Token** to get your users name directly on authentication.
 

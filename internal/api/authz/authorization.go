@@ -14,11 +14,16 @@ const (
 	authenticated = "authenticated"
 )
 
-func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID string, verifier *TokenVerifier, authConfig Config, requiredAuthOption Option, method string) (ctxSetter func(context.Context) context.Context, err error) {
+// CheckUserAuthorization verifies that:
+// - the token is active,
+// - the organisation (**either** provided by ID or verified domain) exists
+// - the user is permitted to call the requested endpoint (permission option in proto)
+// it will pass the [CtxData] and permission of the user into the ctx [context.Context]
+func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, orgDomain string, verifier *TokenVerifier, authConfig Config, requiredAuthOption Option, method string) (ctxSetter func(context.Context) context.Context, err error) {
 	ctx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	ctxData, err := VerifyTokenAndCreateCtxData(ctx, token, orgID, verifier, method)
+	ctxData, err := VerifyTokenAndCreateCtxData(ctx, token, orgID, orgDomain, verifier, method)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +34,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID s
 		}, nil
 	}
 
-	requestedPermissions, allPermissions, err := getUserMethodPermissions(ctx, verifier, requiredAuthOption.Permission, authConfig, ctxData)
+	requestedPermissions, allPermissions, err := getUserPermissions(ctx, verifier, requiredAuthOption.Permission, authConfig.RolePermissionMappings, ctxData, ctxData.OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -110,37 +115,12 @@ func HasGlobalPermission(perms []string) bool {
 	return false
 }
 
-func HasGlobalExplicitPermission(perms []string, permToCheck string) bool {
-	for _, perm := range perms {
-		p, ctxID := SplitPermission(perm)
-		if p == permToCheck {
-			if ctxID == "" {
-				return true
-			}
-		}
-	}
-	return false
-}
-
 func GetAllPermissionCtxIDs(perms []string) []string {
 	ctxIDs := make([]string, 0)
 	for _, perm := range perms {
 		_, ctxID := SplitPermission(perm)
 		if ctxID != "" {
 			ctxIDs = append(ctxIDs, ctxID)
-		}
-	}
-	return ctxIDs
-}
-
-func GetExplicitPermissionCtxIDs(perms []string, searchPerm string) []string {
-	ctxIDs := make([]string, 0)
-	for _, perm := range perms {
-		p, ctxID := SplitPermission(perm)
-		if p == searchPerm {
-			if ctxID != "" {
-				ctxIDs = append(ctxIDs, ctxID)
-			}
 		}
 	}
 	return ctxIDs

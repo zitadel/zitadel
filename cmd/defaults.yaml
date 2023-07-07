@@ -14,6 +14,29 @@ Tracing:
   Fraction: 1.0
   MetricPrefix: zitadel
 
+Telemetry:
+  # As long as Enabled is true, ZITADEL tries to send usage data to the configured Telemetry.Endpoints.
+  # Data is projected by ZITADEL even if Enabled is false.
+  # This means that switching this to true makes ZITADEL try to send past data.
+  Enabled: false
+  # Push telemetry data to all these endpoints at least once using an HTTP POST request.
+  # If one endpoint returns an unsuccessful response code or times out,
+  # ZITADEL retries to push the data point to all configured endpoints until it succeeds.
+  # Configure delivery guarantees and intervals in the section Projections.Customizations.Telemetry
+  # The endpoints can be reconfigured at runtime.
+  # Ten redirects are followed.
+  # If you change this configuration at runtime, remaining data that is not successfully delivered to the old endpoints is sent to the new endpoints.
+  Endpoints:
+    - https://httpbin.org/post
+  # These headers are sent with every request to the configured endpoints.
+  Headers:
+  # single-value: "single-value"
+  # multi-value:
+  #   - "multi-value-1"
+  #   - "multi-value-2"
+  # The maximum number of data points that are queried before they are sent to the configured endpoints.
+  Limit: 100 # ZITADEL_TELEMETRY_LIMIT
+
 # Port ZITADEL will listen on
 Port: 8080
 # Port ZITADEL is exposed on, it can differ from port e.g. if you proxy the traffic
@@ -147,16 +170,51 @@ AssetStorage:
     MaxAge: 5s
     SharedMaxAge: 168h #7d
 
+# The Projections section defines the behaviour for the scheduled and synchronous events projections.
 Projections:
+  # Time interval between scheduled projections
   RequeueEvery: 60s
+  # Time between retried database statements resulting from projected events
   RetryFailedAfter: 1s
+  # Retried execution number of database statements resulting from projected events
   MaxFailureCount: 5
+  # Number of concurrent projection routines. Values of 0 and below are overwritten to 1
   ConcurrentInstances: 1
+  # Limit of returned events per query
   BulkLimit: 200
-  MaxIterators: 1
+  # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
+  # from HandleActiveInstances duration in the past until the projections current time
+  # Defaults to twice the RequeueEvery duration
+  HandleActiveInstances: 120s
+  # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
-    projects:
+    Projects:
       BulkLimit: 2000
+    # The Notifications projection is used for sending emails and SMS to users
+    Notifications:
+      # As notification projections don't result in database statements, retries don't have any effects
+      MaxFailureCount: 0
+    # The NotificationsQuotas projection is used for calling quota webhooks
+    NotificationsQuotas:
+      # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
+      # An instance is active, as long as there are projected events on the instance, that are not older than the HandleActiveInstances duration.
+      # Delivery guarantee requirements are higher for quota webhooks
+      # Defaults to 45 days
+      HandleActiveInstances: 1080h
+      # As quota notification projections don't result in database statements, retries don't have any effects
+      MaxFailureCount: 0
+      # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the database too much.
+      RequeueEvery: 300s
+    Telemetry:
+      # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
+      # An instance is active, as long as there are projected events on the instance, that are not older than the HandleActiveInstances duration.
+      # Telemetry delivery guarantee requirements are a bit higher than normal data projections, as they are not interactively retryable.
+      # Defaults to 15 days
+      HandleActiveInstances: 360h
+      # As sending telemetry data doesn't result in database statements, retries don't have any effects
+      MaxFailureCount: 0
+      # Telemetry data synchronization is not time critical. Setting RequeueEvery to 55 minutes doesn't annoy the database too much.
+      RequeueEvery: 3300s
 
 Auth:
   SearchLimit: 1000
@@ -210,6 +268,8 @@ OIDC:
       Path: /oidc/v1/end_session
     Keys:
       Path: /oauth/v2/keys
+    DeviceAuth:
+      Path: /oauth/v2/device_authorization
 
 SAML:
   ProviderConfig:
@@ -242,6 +302,7 @@ Console:
   LongCache:
     MaxAge: 12h
     SharedMaxAge: 168h #7d
+  InstanceManagementURL: ""
 
 Notification:
   Repository:
@@ -296,6 +357,8 @@ SystemDefaults:
     ApplicationKeySize: 2048
   Multifactors:
     OTP:
+      # If this is empty, the issuer is the requested domain
+      # This is helpful in scenarios with multiple ZITADEL environments or virtual instances
       Issuer: "ZITADEL"
   DomainVerification:
     VerificationGenerator:
@@ -371,6 +434,7 @@ Quotas:
 
 Eventstore:
   PushTimeout: 15s
+  AllowOrderByCreationDate: false
 
 DefaultInstance:
   InstanceName:
@@ -485,6 +549,7 @@ DefaultInstance:
     TOSLink: https://zitadel.com/docs/legal/terms-of-service
     PrivacyLink: https://zitadel.com/docs/legal/privacy-policy
     HelpLink: ""
+    SupportEmail: ""
   NotificationPolicy:
     PasswordChange: true
   LabelPolicy:
@@ -530,7 +595,7 @@ DefaultInstance:
       Title: Zitadel - User initialisieren
       PreHeader: User initialisieren
       Subject: User initialisieren
-      Greeting: Hallo {{.FirstName}} {{.LastName}},
+      Greeting: Hallo {{.DisplayName}},
       Text: Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen &lt;br&gt;&lt;strong&gt;{{.PreferredLoginName}}&lt;/strong&gt;&lt;br&gt; kannst du dich anmelden. Nutze den untenstehenden Button, um die Initialisierung abzuschliessen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du dieses Mail nicht angefordert hast, kannst du es einfach ignorieren.
       ButtonText: Initialisierung abschliessen
     - MessageTextType: PasswordReset
@@ -538,7 +603,7 @@ DefaultInstance:
       Title: Zitadel - Passwort zurücksetzen
       PreHeader: Passwort zurücksetzen
       Subject: Passwort zurücksetzen
-      Greeting: Hallo {{.FirstName}} {{.LastName}},
+      Greeting: Hallo {{.DisplayName}},
       Text: Wir haben eine Anfrage für das Zurücksetzen deines Passwortes bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du dieses Mail nicht angefordert hast, kannst du es ignorieren.
       ButtonText: Passwort zurücksetzen
     - MessageTextType: VerifyEmail
@@ -546,7 +611,7 @@ DefaultInstance:
       Title: Zitadel - Email verifizieren
       PreHeader: Email verifizieren
       Subject: Email verifizieren
-      Greeting: Hallo {{.FirstName}} {{.LastName}},
+      Greeting: Hallo {{.DisplayName}},
       Text: Eine neue E-Mail Adresse wurde hinzugefügt. Bitte verwende den untenstehenden Button um diese zu verifizieren &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du deine E-Mail Adresse nicht selber hinzugefügt hast, kannst du dieses E-Mail ignorieren.
       ButtonText: Email verifizieren
     - MessageTextType: VerifyPhone
@@ -554,7 +619,7 @@ DefaultInstance:
       Title: Zitadel - Telefonnummer verifizieren
       PreHeader: Telefonnummer verifizieren
       Subject: Telefonnummer verifizieren
-      Greeting: Hallo {{.FirstName}} {{.LastName}},
+      Greeting: Hallo {{.DisplayName}},
       Text: Eine Telefonnummer wurde hinzugefügt. Bitte verifiziere diese in dem du folgenden Code eingibst (Code {{.Code}})
       ButtonText: Telefon verifizieren
     - MessageTextType: DomainClaimed
@@ -562,7 +627,7 @@ DefaultInstance:
       Title: Zitadel - Domain wurde beansprucht
       PreHeader: Email / Username ändern
       Subject: Domain wurde beansprucht
-      Greeting: Hallo {{.FirstName}} {{.LastName}},
+      Greeting: Hallo {{.DisplayName}},
       Text: Die Domain {{.Domain}} wurde von einer Organisation beansprucht. Dein derzeitiger User {{.Username}} ist nicht Teil dieser Organisation. Daher musst du beim nächsten Login eine neue Email hinterlegen. Für diesen Login haben wir dir einen temporären Usernamen ({{.TempUsername}}) erstellt.
       ButtonText: Login
     - MessageTextType: PasswordChange
@@ -570,7 +635,7 @@ DefaultInstance:
       Title: ZITADEL - Passwort von Benutzer wurde geändert
       PreHeader: Passwort Änderung
       Subject: Passwort von Benutzer wurde geändert
-      Greeting: Hallo {{.FirstName}} {{.LastName}},
+      Greeting: Hallo {{.DisplayName}},
       Text: Das Password vom Benutzer wurde geändert. Wenn diese Änderung von jemand anderem gemacht wurde, empfehlen wir die sofortige Zurücksetzung ihres Passworts.
       ButtonText: Login
     - MessageTextType: InitCode
@@ -578,7 +643,7 @@ DefaultInstance:
       Title: Zitadel - Initialize User
       PreHeader: Initialize User
       Subject: Initialize User
-      Greeting: Hello {{.FirstName}} {{.LastName}},
+      Greeting: Hello {{.DisplayName}},
       Text: This user was created in Zitadel. Use the username {{.PreferredLoginName}} to login. Please click the button below to finish the initialization process. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
       ButtonText: Finish initialization
     - MessageTextType: PasswordReset
@@ -586,7 +651,7 @@ DefaultInstance:
       Title: Zitadel - Reset password
       PreHeader: Reset password
       Subject: Reset password
-      Greeting: Hello {{.FirstName}} {{.LastName}},
+      Greeting: Hello {{.DisplayName}},
       Text: We received a password reset request. Please use the button below to reset your password. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
       ButtonText: Reset password
     - MessageTextType: VerifyEmail
@@ -594,7 +659,7 @@ DefaultInstance:
       Title: Zitadel - Verify email
       PreHeader: Verify email
       Subject: Verify email
-      Greeting: Hello {{.FirstName}} {{.LastName}},
+      Greeting: Hello {{.DisplayName}},
       Text: A new email has been added. Please use the button below to verify your mail. (Code {{.Code}}) If you din't add a new email, please ignore this email.
       ButtonText: Verify email
     - MessageTextType: VerifyPhone
@@ -602,7 +667,7 @@ DefaultInstance:
       Title: Zitadel - Verify phone
       PreHeader: Verify phone
       Subject: Verify phone
-      Greeting: Hello {{.FirstName}} {{.LastName}},
+      Greeting: Hello {{.DisplayName}},
       Text: A new phonenumber has been added. Please use the following code to verify it {{.Code}}.
       ButtonText: Verify phone
     - MessageTextType: DomainClaimed
@@ -610,7 +675,7 @@ DefaultInstance:
       Title: Zitadel - Domain has been claimed
       PreHeader: Change email / username
       Subject: Domain has been claimed
-      Greeting: Hello {{.FirstName}} {{.LastName}},
+      Greeting: Hello {{.DisplayName}},
       Text: The domain {{.Domain}} has been claimed by an organisation. Your current user {{.UserName}} is not part of this organisation. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
       ButtonText: Login
     - MessageTextType: PasswordChange
@@ -618,7 +683,7 @@ DefaultInstance:
       Title: ZITADEL - Password of user has changed
       PreHeader: Change password
       Subject: Password of user has changed
-      Greeting: Hello {{.FirstName}} {{.LastName}},
+      Greeting: Hello {{.DisplayName}},
       Text: The password of your user has changed. If this change was not done by you, please be advised to immediately reset your password.
       ButtonText: Login
 
@@ -705,6 +770,7 @@ InternalAuthZ:
         - "user.grant.delete"
         - "user.membership.read"
         - "user.credential.write"
+        - "user.passkey.write"
         - "policy.read"
         - "policy.write"
         - "policy.delete"
@@ -781,6 +847,7 @@ InternalAuthZ:
         - "user.grant.delete"
         - "user.membership.read"
         - "user.credential.write"
+        - "user.passkey.write"
         - "policy.read"
         - "policy.write"
         - "policy.delete"
@@ -817,6 +884,7 @@ InternalAuthZ:
         - "user.grant.write"
         - "user.grant.delete"
         - "user.membership.read"
+        - "user.passkey.write"
         - "project.read"
         - "project.member.read"
         - "project.role.read"
@@ -852,6 +920,7 @@ InternalAuthZ:
         - "user.grant.delete"
         - "user.membership.read"
         - "user.credential.write"
+        - "user.passkey.write"
         - "policy.read"
         - "policy.write"
         - "policy.delete"

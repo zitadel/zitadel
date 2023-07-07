@@ -2,7 +2,6 @@
 title: Rate Limit Policy
 custom_edit_url: null
 ---
-## Introduction
 
 This policy is an annex to the [Terms of Service](terms-of-service) and clarifies your obligations while using our Services, specifically how we will use rate limiting to enforce certain aspects of our [Acceptable Use Policy](acceptable-use-policy).
 
@@ -12,18 +11,32 @@ To ensure the availability of our Services and to avoid slow or failed requests 
 
 ## How is the rate limit implemented
 
-ZITADEL Clouds rate limit is built around a `IP` oriented model. Please be aware that we also utilize a service for DDoS mitigation.
+ZITADEL Clouds rate limit is built around a `IP` oriented model.
+Please be aware that we also utilize a service for DDoS mitigation.
 So if you simply change your `IP` address and run the same request again and again you might be get blocked at some point.
 
 If you are blocked you will receive a `http status 429`.
 
-:::tip
+:::tip Implement exponential backoff
 You should consider to implement [exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff) into your application to prevent a blocking loop.
+:::
+
+:::info Raising limits
+We understand that there are certain scenarios where your users access ZITADEL from shared IP Addresses.
+For example if you use a corporate proxy or Network Address Translation NAT.
+Please [get in touch](https://zitadel.com/contact) with us to discuss your requirements and we'll find a solution.
 :::
 
 ## What rate limits do apply
 
-For ZITADEL Cloud, we have a rate limiting rule for login paths (login, register and reset features) and for API paths each. Learn more about [the exact rules](/apis/ratelimits).
+For ZITADEL Cloud, we have a rate limiting rule for login paths (login, register and reset features) and for API paths each.
+
+Rate limits are implemented with the following rules:
+
+| Path                     | Description                            | Rate Limiting                        | One Minute Banning                     |
+|--------------------------|----------------------------------------|--------------------------------------|----------------------------------------|
+| /ui/login*               | Global Login, Register and Reset Limit | 10 requests per second over a minute | 15 requests per second over 3 minutes |
+| All other paths | All gRPC- and REST APIs as well as the ZITADEL Customer Portal | 10 requests per second over a minute       | 10 requests per second over 3 minutes   |
 
 ## Load Testing
 

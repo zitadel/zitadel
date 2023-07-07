@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	AppProjectionTable = "projections.apps4"
+	AppProjectionTable = "projections.apps5"
 	AppAPITable        = AppProjectionTable + "_" + appAPITableSuffix
 	AppOIDCTable       = AppProjectionTable + "_" + appOIDCTableSuffix
 	AppSAMLTable       = AppProjectionTable + "_" + appSAMLTableSuffix
@@ -57,6 +57,7 @@ const (
 	AppOIDCConfigColumnIDTokenUserinfoAssertion = "id_token_userinfo_assertion"
 	AppOIDCConfigColumnClockSkew                = "clock_skew"
 	AppOIDCConfigColumnAdditionalOrigins        = "additional_origins"
+	AppOIDCConfigColumnSkipNativeAppSuccessPage = "skip_native_app_success_page"
 
 	appSAMLTableSuffix             = "saml_configs"
 	AppSAMLConfigColumnAppID       = "app_id"
@@ -122,6 +123,7 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppOIDCConfigColumnIDTokenUserinfoAssertion, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(AppOIDCConfigColumnClockSkew, crdb.ColumnTypeInt64, crdb.Default(0)),
 			crdb.NewColumn(AppOIDCConfigColumnAdditionalOrigins, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			crdb.NewColumn(AppOIDCConfigColumnSkipNativeAppSuccessPage, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(AppOIDCConfigColumnInstanceID, AppOIDCConfigColumnAppID),
 			appOIDCTableSuffix,
@@ -463,6 +465,7 @@ func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(AppOIDCConfigColumnIDTokenUserinfoAssertion, e.IDTokenUserinfoAssertion),
 				handler.NewCol(AppOIDCConfigColumnClockSkew, e.ClockSkew),
 				handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, database.StringArray(e.AdditionalOrigins)),
+				handler.NewCol(AppOIDCConfigColumnSkipNativeAppSuccessPage, e.SkipNativeAppSuccessPage),
 			},
 			crdb.WithTableSuffix(appOIDCTableSuffix),
 		),
@@ -527,6 +530,9 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 	}
 	if e.AdditionalOrigins != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, database.StringArray(*e.AdditionalOrigins)))
+	}
+	if e.SkipNativeAppSuccessPage != nil {
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnSkipNativeAppSuccessPage, *e.SkipNativeAppSuccessPage))
 	}
 
 	if len(cols) == 0 {

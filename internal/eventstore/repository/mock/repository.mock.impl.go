@@ -29,8 +29,12 @@ func (m *MockRepository) ExpectFilterEventsError(err error) *MockRepository {
 	return m
 }
 
-func (m *MockRepository) ExpectInstanceIDs(instanceIDs ...string) *MockRepository {
-	m.EXPECT().InstanceIDs(gomock.Any(), gomock.Any()).Return(instanceIDs, nil)
+func (m *MockRepository) ExpectInstanceIDs(hasFilters []*repository.Filter, instanceIDs ...string) *MockRepository {
+	matcher := gomock.Any()
+	if len(hasFilters) > 0 {
+		matcher = &filterQueryMatcher{Filters: [][]*repository.Filter{hasFilters}}
+	}
+	m.EXPECT().InstanceIDs(gomock.Any(), matcher).Return(instanceIDs, nil)
 	return m
 }
 
@@ -61,6 +65,28 @@ func (m *MockRepository) ExpectPushFailed(err error, expectedEvents []*repositor
 				expectedUniqueConstraints = []*repository.UniqueConstraint{}
 			}
 			assert.Equal(m.ctrl.T, expectedUniqueConstraints, uniqueConstraints)
+			return err
+		},
+	)
+	return m
+}
+
+func (m *MockRepository) ExpectRandomPush(expectedEvents []*repository.Event, expectedUniqueConstraints ...*repository.UniqueConstraint) *MockRepository {
+	m.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
+			assert.Len(m.ctrl.T, events, len(expectedEvents))
+			assert.Len(m.ctrl.T, expectedUniqueConstraints, len(uniqueConstraints))
+			return nil
+		},
+	)
+	return m
+}
+
+func (m *MockRepository) ExpectRandomPushFailed(err error, expectedEvents []*repository.Event, expectedUniqueConstraints ...*repository.UniqueConstraint) *MockRepository {
+	m.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
+			assert.Len(m.ctrl.T, events, len(expectedEvents))
+			assert.Len(m.ctrl.T, expectedUniqueConstraints, len(uniqueConstraints))
 			return err
 		},
 	)

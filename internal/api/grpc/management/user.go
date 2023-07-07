@@ -26,12 +26,20 @@ import (
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func (s *Server) GetUserByID(ctx context.Context, req *mgmt_pb.GetUserByIDRequest) (*mgmt_pb.GetUserByIDResponse, error) {
+func (s *Server) getUserByID(ctx context.Context, id string) (*query.User, error) {
 	owner, err := query.NewUserResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID, query.TextEquals)
 	if err != nil {
 		return nil, err
 	}
-	user, err := s.query.GetUserByID(ctx, true, req.Id, false, owner)
+	user, err := s.query.GetUserByID(ctx, true, id, false, owner)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (s *Server) GetUserByID(ctx context.Context, req *mgmt_pb.GetUserByIDRequest) (*mgmt_pb.GetUserByIDResponse, error) {
+	user, err := s.getUserByID(ctx, req.GetId())
 	if err != nil {
 		return nil, err
 	}
@@ -210,17 +218,14 @@ func (s *Server) BulkRemoveUserMetadata(ctx context.Context, req *mgmt_pb.BulkRe
 }
 
 func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequest) (*mgmt_pb.AddHumanUserResponse, error) {
-	details, err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, AddHumanUserRequestToAddHuman(req))
+	human := AddHumanUserRequestToAddHuman(req)
+	err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, human, true)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddHumanUserResponse{
-		UserId: details.ID,
-		Details: obj_grpc.AddToDetailsPb(
-			details.Sequence,
-			details.EventDate,
-			details.ResourceOwner,
-		),
+		UserId:  human.ID,
+		Details: obj_grpc.DomainToAddDetailsPb(human.Details),
 	}, nil
 }
 
@@ -244,7 +249,6 @@ func AddHumanUserRequestToAddHuman(req *mgmt_pb.AddHumanUserRequest) *command.Ad
 		PasswordChangeRequired: true,
 		Passwordless:           false,
 		Register:               false,
-		ExternalIDP:            false,
 	}
 	if req.Phone != nil {
 		human.Phone = command.Phone{
@@ -789,13 +793,18 @@ func (s *Server) GenerateMachineSecret(ctx context.Context, req *mgmt_pb.Generat
 	if err != nil {
 		return nil, err
 	}
+	user, err := s.getUserByID(ctx, req.GetUserId())
+	if err != nil {
+		return nil, err
+	}
+
 	set := new(command.GenerateMachineSecret)
 	details, err := s.command.GenerateMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, secretGenerator, set)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GenerateMachineSecretResponse{
-		ClientId:     set.ClientID,
+		ClientId:     user.PreferredLoginName,
 		ClientSecret: set.ClientSecret,
 		Details:      obj_grpc.DomainToAddDetailsPb(details),
 	}, nil

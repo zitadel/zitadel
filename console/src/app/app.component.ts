@@ -19,6 +19,7 @@ import { KeyboardShortcutsService } from './services/keyboard-shortcuts/keyboard
 import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
+import { fallbackLanguage, supportedLanguages, supportedLanguagesRegexp } from './utils/language';
 
 @Component({
   selector: 'cnsl-root',
@@ -201,7 +202,7 @@ export class AppComponent implements OnDestroy {
       }
     });
 
-    this.activatedRoute.queryParams.pipe(filter((params) => !!params.org)).subscribe((params) => {
+    this.activatedRoute.queryParams.pipe(filter((params) => !!params['org'])).subscribe((params) => {
       const { org } = params;
       this.authService.getActiveOrg(org);
     });
@@ -252,7 +253,7 @@ export class AppComponent implements OnDestroy {
   }
 
   public prepareRoute(outlet: RouterOutlet): boolean {
-    return outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation;
+    return outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation'];
   }
 
   public onSetTheme(theme: string): void {
@@ -267,15 +268,15 @@ export class AppComponent implements OnDestroy {
   }
 
   private setLanguage(): void {
-    this.translate.addLangs(['en', 'de', 'fr', 'it', 'pl', 'zh']);
-    this.translate.setDefaultLang('en');
+    this.translate.addLangs(supportedLanguages);
+    this.translate.setDefaultLang(fallbackLanguage);
 
     this.authService.user.subscribe((userprofile) => {
       if (userprofile) {
-        const cropped = navigator.language.split('-')[0] ?? 'en';
-        const fallbackLang = cropped.match(/en|de|fr|it|pl|zh/) ? cropped : 'en';
+        const cropped = navigator.language.split('-')[0] ?? fallbackLanguage;
+        const fallbackLang = cropped.match(supportedLanguagesRegexp) ? cropped : fallbackLanguage;
 
-        const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de|fr|it|pl|zh/)
+        const lang = userprofile?.human?.profile?.preferredLanguage.match(supportedLanguagesRegexp)
           ? userprofile.human.profile?.preferredLanguage
           : fallbackLang;
         this.translate.use(lang);

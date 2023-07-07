@@ -304,3 +304,21 @@ func uniqueConstraintActionToRepository(action UniqueConstraintAction) repositor
 		return repository.UniqueConstraintAdd
 	}
 }
+
+type BaseEventSetter[T any] interface {
+	Event
+	SetBaseEvent(*BaseEvent)
+	*T
+}
+
+func GenericEventMapper[T any, PT BaseEventSetter[T]](event *repository.Event) (Event, error) {
+	e := PT(new(T))
+	e.SetBaseEvent(BaseEventFromRepo(event))
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "V2-Thai6", "unable to unmarshal event")
+	}
+
+	return e, nil
+}

@@ -24,15 +24,15 @@ type verifierMock struct{}
 func (v *verifierMock) VerifyAccessToken(ctx context.Context, token, clientID, projectID string) (string, string, string, string, string, error) {
 	return "", "", "", "", "", nil
 }
-func (v *verifierMock) SearchMyMemberships(ctx context.Context) ([]*authz.Membership, error) {
+func (v *verifierMock) SearchMyMemberships(ctx context.Context, orgID string) ([]*authz.Membership, error) {
 	return nil, nil
 }
 
 func (v *verifierMock) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (string, []string, error) {
 	return "", nil, nil
 }
-func (v *verifierMock) ExistsOrg(ctx context.Context, orgID string) error {
-	return nil
+func (v *verifierMock) ExistsOrg(ctx context.Context, orgID, domain string) (string, error) {
+	return orgID, nil
 }
 func (v *verifierMock) VerifierClientID(ctx context.Context, appName string) (string, string, error) {
 	return "", "", nil

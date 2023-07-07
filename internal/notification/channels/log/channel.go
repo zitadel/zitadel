@@ -15,7 +15,10 @@ func InitStdoutChannel(config Config) channels.NotificationChannel {
 
 	return channels.HandleMessageFunc(func(message channels.Message) error {
 
-		content := message.GetContent()
+		content, err := message.GetContent()
+		if err != nil {
+			return err
+		}
 		if config.Compact {
 			content = html2text.HTML2Text(content)
 		}

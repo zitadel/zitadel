@@ -72,6 +72,7 @@
           margin-right: 1rem;
           background-color: if($is-dark-theme, map-get($background, state), #e4e7e4);
           box-shadow: 0 0 3px #0000001a;
+          border: 1px solid rgba(#8795a1, 0.2);
 
           i {
             font-size: 1rem;

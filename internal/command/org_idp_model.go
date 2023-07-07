@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -112,6 +113,10 @@ func (wm *OrgOIDCIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCIDPAddedEvent)
 		case *org.OIDCIDPChangedEvent:
 			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCIDPChangedEvent)
+		case *org.OIDCIDPMigratedAzureADEvent:
+			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCIDPMigratedAzureADEvent)
+		case *org.OIDCIDPMigratedGoogleEvent:
+			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCIDPMigratedGoogleEvent)
 		case *org.IDPRemovedEvent:
 			wm.OIDCIDPWriteModel.AppendEvents(&e.RemovedEvent)
 
@@ -141,6 +146,8 @@ func (wm *OrgOIDCIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.OIDCIDPAddedEventType,
 			org.OIDCIDPChangedEventType,
+			org.OIDCIDPMigratedAzureADEventType,
+			org.OIDCIDPMigratedGoogleEventType,
 			org.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
@@ -310,6 +317,8 @@ func (wm *OrgAzureADIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 			wm.AzureADIDPWriteModel.AppendEvents(&e.AzureADIDPAddedEvent)
 		case *org.AzureADIDPChangedEvent:
 			wm.AzureADIDPWriteModel.AppendEvents(&e.AzureADIDPChangedEvent)
+		case *org.OIDCIDPMigratedAzureADEvent:
+			wm.AzureADIDPWriteModel.AppendEvents(&e.OIDCIDPMigratedAzureADEvent)
 		case *org.IDPRemovedEvent:
 			wm.AzureADIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		default:
@@ -327,6 +336,7 @@ func (wm *OrgAzureADIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.AzureADIDPAddedEventType,
 			org.AzureADIDPChangedEventType,
+			org.OIDCIDPMigratedAzureADEventType,
 			org.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
@@ -662,6 +672,8 @@ func (wm *OrgGoogleIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 			wm.GoogleIDPWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
 		case *org.GoogleIDPChangedEvent:
 			wm.GoogleIDPWriteModel.AppendEvents(&e.GoogleIDPChangedEvent)
+		case *org.OIDCIDPMigratedGoogleEvent:
+			wm.GoogleIDPWriteModel.AppendEvents(&e.OIDCIDPMigratedGoogleEvent)
 		case *org.IDPRemovedEvent:
 			wm.GoogleIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		default:
@@ -679,6 +691,7 @@ func (wm *OrgGoogleIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.GoogleIDPAddedEventType,
 			org.GoogleIDPChangedEventType,
+			org.OIDCIDPMigratedGoogleEventType,
 			org.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
@@ -754,16 +767,16 @@ func (wm *OrgLDAPIDPWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id,
-	oldName,
-	name,
-	host,
-	port string,
-	tls bool,
-	baseDN,
-	userObjectClass,
-	userUniqueAttribute,
-	admin string,
-	password string,
+	name string,
+	servers []string,
+	startTLS bool,
+	baseDN string,
+	bindDN string,
+	bindPassword string,
+	userBase string,
+	userObjectClasses []string,
+	userFilters []string,
+	timeout time.Duration,
 	secretCrypto crypto.Crypto,
 	attributes idp.LDAPAttributes,
 	options idp.Options,
@@ -771,14 +784,15 @@ func (wm *OrgLDAPIDPWriteModel) NewChangedEvent(
 
 	changes, err := wm.LDAPIDPWriteModel.NewChanges(
 		name,
-		host,
-		port,
-		tls,
+		servers,
+		startTLS,
 		baseDN,
-		userObjectClass,
-		userUniqueAttribute,
-		admin,
-		password,
+		bindDN,
+		bindPassword,
+		userBase,
+		userObjectClasses,
+		userFilters,
+		timeout,
 		secretCrypto,
 		attributes,
 		options,
@@ -786,7 +800,7 @@ func (wm *OrgLDAPIDPWriteModel) NewChangedEvent(
 	if err != nil || len(changes) == 0 {
 		return nil, err
 	}
-	return org.NewLDAPIDPChangedEvent(ctx, aggregate, id, oldName, changes)
+	return org.NewLDAPIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type OrgIDPRemoveWriteModel struct {

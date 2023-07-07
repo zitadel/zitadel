@@ -87,9 +87,10 @@ type InstanceSetup struct {
 		PasswordChange bool
 	}
 	PrivacyPolicy struct {
-		TOSLink     string
-		PrivacyLink string
-		HelpLink    string
+		TOSLink      string
+		PrivacyLink  string
+		HelpLink     string
+		SupportEmail domain.EmailAddress
 	}
 	LabelPolicy struct {
 		PrimaryColor        string
@@ -242,7 +243,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeU2F),
 		prepareAddMultiFactorToDefaultLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
 
-		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
+		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink, setup.PrivacyPolicy.SupportEmail),
 		prepareAddDefaultNotificationPolicy(instanceAgg, setup.NotificationPolicy.PasswordChange),
 		prepareAddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
@@ -332,8 +333,9 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			validations = append(validations, prepareAddUserMachineKey(machineKey, c.machineKeySize))
 		}
 	} else if setup.Org.Human != nil {
+		setup.Org.Human.ID = userID
 		validations = append(validations,
-			AddHumanCommand(userAgg, setup.Org.Human, c.userPasswordAlg, c.userEncryption),
+			c.AddHumanCommand(setup.Org.Human, orgID, c.userPasswordAlg, c.userEncryption, true),
 		)
 	}
 

@@ -15,6 +15,8 @@ const (
 	EndpointExternalLoginCallback    = "/login/externalidp/callback"
 	EndpointJWTAuthorize             = "/login/jwt/authorize"
 	EndpointJWTCallback              = "/login/jwt/callback"
+	EndpointLDAPLogin                = "/login/ldap"
+	EndpointLDAPCallback             = "/login/ldap/callback"
 	EndpointPasswordlessLogin        = "/login/passwordless"
 	EndpointPasswordlessRegistration = "/login/passwordless/init"
 	EndpointPasswordlessPrompt       = "/login/passwordless/prompt"
@@ -44,6 +46,9 @@ const (
 
 	EndpointResources        = "/resources"
 	EndpointDynamicResources = "/resources/dynamic"
+
+	EndpointDeviceAuth       = "/device"
+	EndpointDeviceAuthAction = "/device/{action}"
 )
 
 var (
@@ -102,6 +107,10 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointRegisterOrg, login.handleRegisterOrg).Methods(http.MethodGet)
 	router.HandleFunc(EndpointRegisterOrg, login.handleRegisterOrgCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointLoginSuccess, login.handleLoginSuccess).Methods(http.MethodGet)
+	router.HandleFunc(EndpointLDAPLogin, login.handleLDAP).Methods(http.MethodGet)
+	router.HandleFunc(EndpointLDAPCallback, login.handleLDAPCallback).Methods(http.MethodPost)
 	router.SkipClean(true).Handle("", http.RedirectHandler(HandlerPrefix+"/", http.StatusMovedPermanently))
+	router.HandleFunc(EndpointDeviceAuth, login.handleDeviceAuthUserCode).Methods(http.MethodGet, http.MethodPost)
+	router.HandleFunc(EndpointDeviceAuthAction, login.handleDeviceAuthAction).Methods(http.MethodGet, http.MethodPost)
 	return router
 }

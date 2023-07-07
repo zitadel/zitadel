@@ -2,6 +2,7 @@ package instance
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -14,6 +15,8 @@ const (
 	OAuthIDPChangedEventType            eventstore.EventType = "instance.idp.oauth.changed"
 	OIDCIDPAddedEventType               eventstore.EventType = "instance.idp.oidc.added"
 	OIDCIDPChangedEventType             eventstore.EventType = "instance.idp.oidc.changed"
+	OIDCIDPMigratedAzureADEventType     eventstore.EventType = "instance.idp.oidc.migrated.azure"
+	OIDCIDPMigratedGoogleEventType      eventstore.EventType = "instance.idp.oidc.migrated.google"
 	JWTIDPAddedEventType                eventstore.EventType = "instance.idp.jwt.added"
 	JWTIDPChangedEventType              eventstore.EventType = "instance.idp.jwt.changed"
 	AzureADIDPAddedEventType            eventstore.EventType = "instance.idp.azure.added"
@@ -28,8 +31,8 @@ const (
 	GitLabSelfHostedIDPChangedEventType eventstore.EventType = "instance.idp.gitlab_self_hosted.changed"
 	GoogleIDPAddedEventType             eventstore.EventType = "instance.idp.google.added"
 	GoogleIDPChangedEventType           eventstore.EventType = "instance.idp.google.changed"
-	LDAPIDPAddedEventType               eventstore.EventType = "instance.idp.ldap.added"
-	LDAPIDPChangedEventType             eventstore.EventType = "instance.idp.ldap.changed"
+	LDAPIDPAddedEventType               eventstore.EventType = "instance.idp.ldap.v2.added"
+	LDAPIDPChangedEventType             eventstore.EventType = "instance.idp.ldap.v2.changed"
 	IDPRemovedEventType                 eventstore.EventType = "instance.idp.removed"
 )
 
@@ -195,6 +198,90 @@ func OIDCIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error
 	}
 
 	return &OIDCIDPChangedEvent{OIDCIDPChangedEvent: *e.(*idp.OIDCIDPChangedEvent)}, nil
+}
+
+type OIDCIDPMigratedAzureADEvent struct {
+	idp.OIDCIDPMigratedAzureADEvent
+}
+
+func NewOIDCIDPMigratedAzureADEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID string,
+	clientSecret *crypto.CryptoValue,
+	scopes []string,
+	tenant string,
+	isEmailVerified bool,
+	options idp.Options,
+) *OIDCIDPMigratedAzureADEvent {
+	return &OIDCIDPMigratedAzureADEvent{
+		OIDCIDPMigratedAzureADEvent: *idp.NewOIDCIDPMigratedAzureADEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				OIDCIDPMigratedAzureADEventType,
+			),
+			id,
+			name,
+			clientID,
+			clientSecret,
+			scopes,
+			tenant,
+			isEmailVerified,
+			options,
+		),
+	}
+}
+
+func OIDCIDPMigratedAzureADEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.OIDCIDPMigratedAzureADEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OIDCIDPMigratedAzureADEvent{OIDCIDPMigratedAzureADEvent: *e.(*idp.OIDCIDPMigratedAzureADEvent)}, nil
+}
+
+type OIDCIDPMigratedGoogleEvent struct {
+	idp.OIDCIDPMigratedGoogleEvent
+}
+
+func NewOIDCIDPMigratedGoogleEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID string,
+	clientSecret *crypto.CryptoValue,
+	scopes []string,
+	options idp.Options,
+) *OIDCIDPMigratedGoogleEvent {
+	return &OIDCIDPMigratedGoogleEvent{
+		OIDCIDPMigratedGoogleEvent: *idp.NewOIDCIDPMigratedGoogleEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				OIDCIDPMigratedGoogleEventType,
+			),
+			id,
+			name,
+			clientID,
+			clientSecret,
+			scopes,
+			options,
+		),
+	}
+}
+
+func OIDCIDPMigratedGoogleEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.OIDCIDPMigratedGoogleEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OIDCIDPMigratedGoogleEvent{OIDCIDPMigratedGoogleEvent: *e.(*idp.OIDCIDPMigratedGoogleEvent)}, nil
 }
 
 type JWTIDPAddedEvent struct {
@@ -751,15 +838,16 @@ func NewLDAPIDPAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id,
-	name,
-	host,
-	port string,
-	tls bool,
-	baseDN,
-	userObjectClass,
-	userUniqueAttribute,
-	admin string,
-	password *crypto.CryptoValue,
+	name string,
+	servers []string,
+	startTLS bool,
+	baseDN string,
+	bindDN string,
+	bindPassword *crypto.CryptoValue,
+	userBase string,
+	userObjectClasses []string,
+	userFilters []string,
+	timeout time.Duration,
 	attributes idp.LDAPAttributes,
 	options idp.Options,
 ) *LDAPIDPAddedEvent {
@@ -773,14 +861,15 @@ func NewLDAPIDPAddedEvent(
 			),
 			id,
 			name,
-			host,
-			port,
-			tls,
+			servers,
+			startTLS,
 			baseDN,
-			userObjectClass,
-			userUniqueAttribute,
-			admin,
-			password,
+			bindDN,
+			bindPassword,
+			userBase,
+			userObjectClasses,
+			userFilters,
+			timeout,
 			attributes,
 			options,
 		),
@@ -803,8 +892,7 @@ type LDAPIDPChangedEvent struct {
 func NewLDAPIDPChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	id,
-	oldName string,
+	id string,
 	changes []idp.LDAPIDPChanges,
 ) (*LDAPIDPChangedEvent, error) {
 
@@ -815,7 +903,6 @@ func NewLDAPIDPChangedEvent(
 			LDAPIDPChangedEventType,
 		),
 		id,
-		oldName,
 		changes,
 	)
 	if err != nil {

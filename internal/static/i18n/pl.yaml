@@ -53,6 +53,7 @@ Errors:
     NotFoundOnOrg: Użytkownik nie został znaleziony w wybranej organizacji
     NotAllowedOrg: Użytkownik nie jest członkiem wymaganej organizacji
     UserIDMissing: Brakuje ID użytkownika
+    UserIDWrong: "Żądanie użytkownika nie jest równe uwierzytelnionemu użytkownikowi"
     DomainPolicyNil: Polityka organizacji jest pusta
     EmailAsUsernameNotAllowed: Adres e-mail nie jest dozwolony jako nazwa użytkownika
     Invalid: Dane użytkownika są nieprawidłowe
@@ -67,6 +68,7 @@ Errors:
     NoChanges: Nie znaleziono zmian
     InitCodeNotFound: Kod inicjalizacji nie znaleziony
     UsernameNotChanged: Nazwa użytkownika nie została zmieniona
+    InvalidURLTemplate: Szablon URL jest nieprawidłowy
     Profile:
       NotFound: Profil nie znaleziony
       NotChanged: Profil nie zmieniony
@@ -241,6 +243,9 @@ Errors:
       NotFound: Polityka powiadomień nie znaleziona
       NotChanged: Polityka powiadomień nie zmieniona
       AlreadyExists: Polityka powiadomień już istnieje
+    LabelPolicy:
+      NotFound: Nie znaleziono polityki marki własnej
+      NotChanged: Polityka dotycząca marek własnych nie została zmieniona
   Project:
     ProjectIDMissing: Identyfikator projektu brak
     AlreadyExists: Projekt już istnieje w organizacji
@@ -466,6 +471,23 @@ Errors:
     Execution:
       StorageFailed: Zapisywanie dziennika wykonania akcji do bazy danych nie powiodło się
       ScanFailed: Zapytanie o użycie dla sekund wykonania akcji nie powiodło się
+  Session:
+    NotExisting: Sesja nie istnieje
+    Terminated: Sesja już zakończona
+    Token:
+      Invalid: Token sesji jest nieprawidłowy
+    Passkey:
+      NoChallenge: Sesja bez wyzwania klucza
+  Intent:
+    IDPMissing: Brak identyfikatora IDP w żądaniu
+    SuccessURLMissing: Brak adresu URL powodzenia w żądaniu
+    FailureURLMissing: Brak adresu URL niepowodzenia w żądaniu
+    StateMissing: Brak parametru stanu w żądaniu
+    NotStarted: Intencja nie została rozpoczęta lub już się zakończyła
+    NotSucceeded: intencja nie powiodła się
+    TokenCreationFailed: Tworzenie tokena nie powiodło się
+    InvalidToken: Token intencji jest nieprawidłowy
+    OtherUser: Intencja przeznaczona dla innego użytkownika
 
 AggregateTypes:
   action: Działanie

@@ -31,17 +31,17 @@ func (wm *UserIDPLinkWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.UserIDPLinkAddedEvent:
-			if e.IDPConfigID != wm.IDPConfigID && e.ExternalUserID != wm.ExternalUserID {
+			if e.IDPConfigID != wm.IDPConfigID || e.ExternalUserID != wm.ExternalUserID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
 		case *user.UserIDPLinkRemovedEvent:
-			if e.IDPConfigID != wm.IDPConfigID && e.ExternalUserID != wm.ExternalUserID {
+			if e.IDPConfigID != wm.IDPConfigID || e.ExternalUserID != wm.ExternalUserID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
 		case *user.UserIDPLinkCascadeRemovedEvent:
-			if e.IDPConfigID != wm.IDPConfigID && e.ExternalUserID != wm.ExternalUserID {
+			if e.IDPConfigID != wm.IDPConfigID || e.ExternalUserID != wm.ExternalUserID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)

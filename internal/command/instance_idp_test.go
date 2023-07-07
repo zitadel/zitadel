@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +19,6 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/idp"
-	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -1089,6 +1089,474 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateInstanceGenericOIDCProvider(tt.args.ctx, tt.args.id, tt.args.provider)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
+	type fields struct {
+		eventstore   *eventstore.Eventstore
+		secretCrypto crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx      context.Context
+		id       string
+		provider AzureADProvider
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+
+		{
+			"invalid name",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AzureADProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdf3g", ""))
+				},
+			},
+		},
+		{
+			"invalid client id",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AzureADProvider{
+					Name: "name",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Fhbr2", ""))
+				},
+			},
+		},
+		{
+			"invalid client secret",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AzureADProvider{
+					Name:     "name",
+					ClientID: "clientID",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dzh3g", ""))
+				},
+			},
+		},
+		{
+			name: "not found",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: AzureADProvider{
+					Name:         "name",
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+				},
+			},
+			res: res{
+				err: caos_errors.IsNotFound,
+			},
+		},
+		{
+			name: "migrate ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewOIDCIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								nil,
+								false,
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"instance1",
+								func() eventstore.Command {
+									event := instance.NewOIDCIDPMigratedAzureADEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+										"id1",
+										"name",
+										"clientID",
+										&crypto.CryptoValue{
+											CryptoType: crypto.TypeEncryption,
+											Algorithm:  "enc",
+											KeyID:      "id",
+											Crypted:    []byte("clientSecret"),
+										},
+										nil,
+										"",
+										false,
+										idp.Options{},
+									)
+									return event
+								}(),
+							),
+						},
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: AzureADProvider{
+					Name:         "name",
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+		{
+			name: "migrate ok full",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewOIDCIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								nil,
+								false,
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"instance1",
+								func() eventstore.Command {
+									event := instance.NewOIDCIDPMigratedAzureADEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+										"id1",
+										"name",
+										"clientID",
+										&crypto.CryptoValue{
+											CryptoType: crypto.TypeEncryption,
+											Algorithm:  "enc",
+											KeyID:      "id",
+											Crypted:    []byte("clientSecret"),
+										},
+										[]string{"openid"},
+										"tenant",
+										true,
+										idp.Options{
+											IsCreationAllowed: true,
+											IsLinkingAllowed:  true,
+											IsAutoCreation:    true,
+											IsAutoUpdate:      true,
+										},
+									)
+									return event
+								}(),
+							),
+						},
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: AzureADProvider{
+					Name:          "name",
+					ClientID:      "clientID",
+					ClientSecret:  "clientSecret",
+					Scopes:        []string{"openid"},
+					Tenant:        "tenant",
+					EmailVerified: true,
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:          tt.fields.eventstore,
+				idpConfigEncryption: tt.fields.secretCrypto,
+			}
+			got, err := c.MigrateInstanceGenericOIDCToAzureADProvider(tt.args.ctx, tt.args.id, tt.args.provider)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
+	type fields struct {
+		eventstore   *eventstore.Eventstore
+		secretCrypto crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx      context.Context
+		id       string
+		provider GoogleProvider
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid clientID",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
+				provider: GoogleProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D3fvs", ""))
+				},
+			},
+		},
+		{
+			"invalid clientSecret",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: GoogleProvider{
+					ClientID: "clientID",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-W2vqs", ""))
+				},
+			},
+		},
+		{
+			name: "not found",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: GoogleProvider{
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+				},
+			},
+			res: res{
+				err: caos_errors.IsNotFound,
+			},
+		},
+		{
+			name: "migrate ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewOIDCIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								nil,
+								false,
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"instance1",
+								instance.NewOIDCIDPMigratedGoogleEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+									"id1",
+									"",
+									"clientID",
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("clientSecret"),
+									},
+									nil,
+									idp.Options{},
+								)),
+						},
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: GoogleProvider{
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+		{
+			name: "migrate ok full",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewOIDCIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								nil,
+								false,
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"instance1",
+								instance.NewOIDCIDPMigratedGoogleEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+									"id1",
+									"",
+									"clientID",
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("clientSecret"),
+									},
+									[]string{"openid"},
+									idp.Options{
+										IsCreationAllowed: true,
+										IsLinkingAllowed:  true,
+										IsAutoCreation:    true,
+										IsAutoUpdate:      true,
+									},
+								)),
+						},
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: GoogleProvider{
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					Scopes:       []string{"openid"},
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:          tt.fields.eventstore,
+				idpConfigEncryption: tt.fields.secretCrypto,
+			}
+			got, err := c.MigrateInstanceGenericOIDCToGoogleProvider(tt.args.ctx, tt.args.id, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -3678,24 +4146,6 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid host",
-			fields{
-				eventstore:  eventstoreExpect(t),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-			},
-			args{
-				ctx: authz.WithInstanceID(context.Background(), "instance1"),
-				provider: LDAPProvider{
-					Name: "name",
-				},
-			},
-			res{
-				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SDVg2", ""))
-				},
-			},
-		},
-		{
 			"invalid baseDN",
 			fields{
 				eventstore:  eventstoreExpect(t),
@@ -3705,7 +4155,6 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				provider: LDAPProvider{
 					Name: "name",
-					Host: "host",
 				},
 			},
 			res{
@@ -3715,7 +4164,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid userObjectClass",
+			"invalid bindDN",
 			fields{
 				eventstore:  eventstoreExpect(t),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -3724,7 +4173,6 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				provider: LDAPProvider{
 					Name:   "name",
-					Host:   "host",
 					BaseDN: "baseDN",
 				},
 			},
@@ -3735,7 +4183,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid userUniqueAttribute",
+			"invalid bindPassword",
 			fields{
 				eventstore:  eventstoreExpect(t),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -3743,10 +4191,9 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				provider: LDAPProvider{
-					Name:            "name",
-					Host:            "host",
-					BaseDN:          "baseDN",
-					UserObjectClass: "userObjectClass",
+					Name:   "name",
+					BindDN: "binddn",
+					BaseDN: "baseDN",
 				},
 			},
 			res{
@@ -3756,7 +4203,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid admin",
+			"invalid userBase",
 			fields{
 				eventstore:  eventstoreExpect(t),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -3764,11 +4211,10 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				provider: LDAPProvider{
-					Name:                "name",
-					Host:                "host",
-					BaseDN:              "baseDN",
-					UserObjectClass:     "userObjectClass",
-					UserUniqueAttribute: "userUniqueAttribute",
+					Name:         "name",
+					BindDN:       "binddn",
+					BaseDN:       "baseDN",
+					BindPassword: "password",
 				},
 			},
 			res{
@@ -3778,7 +4224,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid password",
+			"invalid servers",
 			fields{
 				eventstore:  eventstoreExpect(t),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -3786,17 +4232,63 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				provider: LDAPProvider{
-					Name:                "name",
-					Host:                "host",
-					BaseDN:              "baseDN",
-					UserObjectClass:     "userObjectClass",
-					UserUniqueAttribute: "userUniqueAttribute",
-					Admin:               "admin",
+					Name:         "name",
+					BindDN:       "binddn",
+					BaseDN:       "baseDN",
+					BindPassword: "password",
+					UserBase:     "user",
 				},
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdf5h", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAx905n", ""))
+				},
+			},
+		},
+		{
+			"invalid userObjectClasses",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: LDAPProvider{
+					Name:         "name",
+					Servers:      []string{"server"},
+					BindDN:       "binddn",
+					BaseDN:       "baseDN",
+					BindPassword: "password",
+					UserBase:     "user",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-S1x905n", ""))
+				},
+			},
+		},
+		{
+			"invalid userFilters",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: LDAPProvider{
+					Name:              "name",
+					Servers:           []string{"server"},
+					BindDN:            "binddn",
+					BaseDN:            "baseDN",
+					BindPassword:      "password",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-aAx905n", ""))
 				},
 			},
 		},
@@ -3812,24 +4304,24 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 								instance.NewLDAPIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 									"id1",
 									"name",
-									"host",
-									"",
+									[]string{"server"},
 									false,
 									"baseDN",
-									"userObjectClass",
-									"userUniqueAttribute",
-									"admin",
+									"dn",
 									&crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
 										KeyID:      "id",
 										Crypted:    []byte("password"),
 									},
+									"user",
+									[]string{"object"},
+									[]string{"filter"},
+									time.Second*30,
 									idp.LDAPAttributes{},
 									idp.Options{},
 								)),
 						},
-						uniqueConstraintsFromEventConstraintWithInstanceID("instance1", idpconfig.NewAddIDPConfigNameUniqueConstraint("name", "instance1")),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -3838,13 +4330,16 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				provider: LDAPProvider{
-					Name:                "name",
-					Host:                "host",
-					BaseDN:              "baseDN",
-					UserObjectClass:     "userObjectClass",
-					UserUniqueAttribute: "userUniqueAttribute",
-					Admin:               "admin",
-					Password:            "password",
+					Name:              "name",
+					Servers:           []string{"server"},
+					StartTLS:          false,
+					BaseDN:            "baseDN",
+					BindDN:            "dn",
+					BindPassword:      "password",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+					UserFilters:       []string{"filter"},
+					Timeout:           time.Second * 30,
 				},
 			},
 			res: res{
@@ -3864,19 +4359,20 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 								instance.NewLDAPIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 									"id1",
 									"name",
-									"host",
-									"port",
-									true,
+									[]string{"server"},
+									false,
 									"baseDN",
-									"userObjectClass",
-									"userUniqueAttribute",
-									"admin",
+									"dn",
 									&crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
 										KeyID:      "id",
 										Crypted:    []byte("password"),
 									},
+									"user",
+									[]string{"object"},
+									[]string{"filter"},
+									time.Second*30,
 									idp.LDAPAttributes{
 										IDAttribute:                "id",
 										FirstNameAttribute:         "firstName",
@@ -3900,7 +4396,6 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 									},
 								)),
 						},
-						uniqueConstraintsFromEventConstraintWithInstanceID("instance1", idpconfig.NewAddIDPConfigNameUniqueConstraint("name", "instance1")),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -3909,15 +4404,16 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				provider: LDAPProvider{
-					Name:                "name",
-					Host:                "host",
-					Port:                "port",
-					TLS:                 true,
-					BaseDN:              "baseDN",
-					UserObjectClass:     "userObjectClass",
-					UserUniqueAttribute: "userUniqueAttribute",
-					Admin:               "admin",
-					Password:            "password",
+					Name:              "name",
+					Servers:           []string{"server"},
+					StartTLS:          false,
+					BaseDN:            "baseDN",
+					BindDN:            "dn",
+					BindPassword:      "password",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+					UserFilters:       []string{"filter"},
+					Timeout:           time.Second * 30,
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "id",
 						FirstNameAttribute:         "firstName",
@@ -4021,24 +4517,6 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid host",
-			fields{
-				eventstore: eventstoreExpect(t),
-			},
-			args{
-				ctx: authz.WithInstanceID(context.Background(), "instance1"),
-				id:  "id1",
-				provider: LDAPProvider{
-					Name: "name",
-				},
-			},
-			res{
-				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dz62d", ""))
-				},
-			},
-		},
-		{
 			"invalid baseDN",
 			fields{
 				eventstore: eventstoreExpect(t),
@@ -4048,7 +4526,6 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				id:  "id1",
 				provider: LDAPProvider{
 					Name: "name",
-					Host: "host",
 				},
 			},
 			res{
@@ -4058,7 +4535,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid userObjectClass",
+			"invalid bindDN",
 			fields{
 				eventstore: eventstoreExpect(t),
 			},
@@ -4067,7 +4544,6 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				id:  "id1",
 				provider: LDAPProvider{
 					Name:   "name",
-					Host:   "host",
 					BaseDN: "baseDN",
 				},
 			},
@@ -4078,7 +4554,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid userUniqueAttribute",
+			"invalid userbase",
 			fields{
 				eventstore: eventstoreExpect(t),
 			},
@@ -4086,37 +4562,80 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
 				provider: LDAPProvider{
-					Name:            "name",
-					Host:            "host",
-					BaseDN:          "baseDN",
-					UserObjectClass: "userObjectClass",
-				},
-			},
-			res{
-				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-ASFt6", ""))
-				},
-			},
-		},
-		{
-			"invalid admin",
-			fields{
-				eventstore: eventstoreExpect(t),
-			},
-			args{
-				ctx: authz.WithInstanceID(context.Background(), "instance1"),
-				id:  "id1",
-				provider: LDAPProvider{
-					Name:                "name",
-					Host:                "host",
-					BaseDN:              "baseDN",
-					UserObjectClass:     "userObjectClass",
-					UserUniqueAttribute: "userUniqueAttribute",
+					Name:   "name",
+					BaseDN: "baseDN",
+					BindDN: "bindDN",
 				},
 			},
 			res{
 				err: func(err error) bool {
 					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DG45z", ""))
+				},
+			},
+		},
+		{
+			"invalid servers",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: LDAPProvider{
+					Name:     "name",
+					BaseDN:   "baseDN",
+					BindDN:   "bindDN",
+					UserBase: "user",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAx945n", ""))
+				},
+			},
+		},
+		{
+			"invalid userObjectClasses",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: LDAPProvider{
+					Name:     "name",
+					Servers:  []string{"server"},
+					BaseDN:   "baseDN",
+					BindDN:   "bindDN",
+					UserBase: "user",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-S1x605n", ""))
+				},
+			},
+		},
+		{
+			"invalid userFilters",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: LDAPProvider{
+					Name:              "name",
+					Servers:           []string{"server"},
+					BaseDN:            "baseDN",
+					BindDN:            "bindDN",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-aAx901n", ""))
 				},
 			},
 		},
@@ -4131,16 +4650,20 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
 				provider: LDAPProvider{
-					Name:                "name",
-					Host:                "host",
-					BaseDN:              "baseDN",
-					UserObjectClass:     "userObjectClass",
-					UserUniqueAttribute: "userUniqueAttribute",
-					Admin:               "admin",
+					Name:              "name",
+					Servers:           []string{"server"},
+					BaseDN:            "baseDN",
+					BindDN:            "binddn",
+					BindPassword:      "password",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+					UserFilters:       []string{"filter"},
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowNotFound(nil, "INST-ASF3F", ""))
+				},
 			},
 		},
 		{
@@ -4152,19 +4675,20 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 							instance.NewLDAPIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 								"id1",
 								"name",
-								"host",
-								"",
+								[]string{"server"},
 								false,
-								"baseDN",
-								"userObjectClass",
-								"userUniqueAttribute",
-								"admin",
+								"basedn",
+								"binddn",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
 									KeyID:      "id",
 									Crypted:    []byte("password"),
 								},
+								"user",
+								[]string{"object"},
+								[]string{"filter"},
+								time.Second*30,
 								idp.LDAPAttributes{},
 								idp.Options{},
 							)),
@@ -4175,12 +4699,15 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
 				provider: LDAPProvider{
-					Name:                "name",
-					Host:                "host",
-					BaseDN:              "baseDN",
-					UserObjectClass:     "userObjectClass",
-					UserUniqueAttribute: "userUniqueAttribute",
-					Admin:               "admin",
+					Name:              "name",
+					Servers:           []string{"server"},
+					StartTLS:          false,
+					BaseDN:            "basedn",
+					BindDN:            "binddn",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+					UserFilters:       []string{"filter"},
+					Timeout:           time.Second * 30,
 				},
 			},
 			res: res{
@@ -4196,19 +4723,20 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 							instance.NewLDAPIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 								"id1",
 								"name",
-								"host",
-								"port",
+								[]string{"server"},
 								false,
-								"baseDN",
-								"userObjectClass",
-								"userUniqueAttribute",
-								"admin",
+								"basedn",
+								"binddn",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
 									KeyID:      "id",
 									Crypted:    []byte("password"),
 								},
+								"user",
+								[]string{"object"},
+								[]string{"filter"},
+								time.Second*30,
 								idp.LDAPAttributes{},
 								idp.Options{},
 							)),
@@ -4221,22 +4749,22 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 									t := true
 									event, _ := instance.NewLDAPIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 										"id1",
-										"name",
 										[]idp.LDAPIDPChanges{
 											idp.ChangeLDAPName("new name"),
-											idp.ChangeLDAPHost("new host"),
-											idp.ChangeLDAPPort("new port"),
-											idp.ChangeLDAPTLS(true),
-											idp.ChangeLDAPBaseDN("new baseDN"),
-											idp.ChangeLDAPUserObjectClass("new userObjectClass"),
-											idp.ChangeLDAPUserUniqueAttribute("new userUniqueAttribute"),
-											idp.ChangeLDAPAdmin("new admin"),
-											idp.ChangeLDAPPassword(&crypto.CryptoValue{
+											idp.ChangeLDAPServers([]string{"new server"}),
+											idp.ChangeLDAPStartTLS(true),
+											idp.ChangeLDAPBaseDN("new basedn"),
+											idp.ChangeLDAPBindDN("new binddn"),
+											idp.ChangeLDAPBindPassword(&crypto.CryptoValue{
 												CryptoType: crypto.TypeEncryption,
 												Algorithm:  "enc",
 												KeyID:      "id",
 												Crypted:    []byte("new password"),
 											}),
+											idp.ChangeLDAPUserBase("new user"),
+											idp.ChangeLDAPUserObjectClasses([]string{"new object"}),
+											idp.ChangeLDAPUserFilters([]string{"new filter"}),
+											idp.ChangeLDAPTimeout(time.Second * 20),
 											idp.ChangeLDAPAttributes(idp.LDAPAttributeChanges{
 												IDAttribute:                stringPointer("new id"),
 												FirstNameAttribute:         stringPointer("new firstName"),
@@ -4264,8 +4792,6 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 								}(),
 							),
 						},
-						uniqueConstraintsFromEventConstraintWithInstanceID("instance1", idpconfig.NewRemoveIDPConfigNameUniqueConstraint("name", "instance1")),
-						uniqueConstraintsFromEventConstraintWithInstanceID("instance1", idpconfig.NewAddIDPConfigNameUniqueConstraint("new name", "instance1")),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -4274,15 +4800,16 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
 				provider: LDAPProvider{
-					Name:                "new name",
-					Host:                "new host",
-					Port:                "new port",
-					TLS:                 true,
-					BaseDN:              "new baseDN",
-					UserObjectClass:     "new userObjectClass",
-					UserUniqueAttribute: "new userUniqueAttribute",
-					Admin:               "new admin",
-					Password:            "new password",
+					Name:              "new name",
+					Servers:           []string{"new server"},
+					StartTLS:          true,
+					BaseDN:            "new basedn",
+					BindDN:            "new binddn",
+					BindPassword:      "new password",
+					UserBase:          "new user",
+					UserObjectClasses: []string{"new object"},
+					UserFilters:       []string{"new filter"},
+					Timeout:           time.Second * 20,
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "new id",
 						FirstNameAttribute:         "new firstName",

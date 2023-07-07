@@ -235,12 +235,6 @@ func AddDeleteStatement(conditions []handler.Condition, opts ...execOption) func
 	}
 }
 
-func AddCopyStatement(conflict, from, to []handler.Column, conditions []handler.Condition, opts ...execOption) func(eventstore.Event) Exec {
-	return func(event eventstore.Event) Exec {
-		return NewCopyStatement(event, conflict, from, to, conditions, opts...).Execute
-	}
-}
-
 func NewArrayAppendCol(column string, value interface{}) handler.Column {
 	return handler.Column{
 		Name:  column,
@@ -285,12 +279,40 @@ func NewCopyCol(column, from string) handler.Column {
 	}
 }
 
+func NewLessThanCond(column string, value interface{}) handler.Condition {
+	return func(param string) (string, interface{}) {
+		return column + " < " + param, value
+	}
+}
+
+func NewIsNullCond(column string) handler.Condition {
+	return func(param string) (string, interface{}) {
+		return column + " IS NULL", nil
+	}
+}
+
+// NewTextArrayContainsCond returns a handler.Condition that checks if the column that stores an array of text contains the given value
+func NewTextArrayContainsCond(column string, value string) handler.Condition {
+	return func(param string) (string, interface{}) {
+		return column + " @> " + param, database.StringArray{value}
+	}
+}
+
+// Not is a function and not a method, so that calling it is well readable
+// For example conditions := []handler.Condition{ Not(NewTextArrayContainsCond())}
+func Not(condition handler.Condition) handler.Condition {
+	return func(param string) (string, interface{}) {
+		cond, value := condition(param)
+		return "NOT (" + cond + ")", value
+	}
+}
+
 // NewCopyStatement creates a new upsert statement which updates a column from an existing row
 // cols represent the columns which are objective to change.
 // if the value of a col is empty the data will be copied from the selected row
 // if the value of a col is not empty the data will be set by the static value
 // conds represent the conditions for the selection subquery
-func NewCopyStatement(event eventstore.Event, conflictCols, from, to []handler.Column, conds []handler.Condition, opts ...execOption) *handler.Statement {
+func NewCopyStatement(event eventstore.Event, conflictCols, from, to []handler.Column, nsCond []handler.NamespacedCondition, opts ...execOption) *handler.Statement {
 	columnNames := make([]string, len(to))
 	selectColumns := make([]string, len(from))
 	updateColumns := make([]string, len(columnNames))
@@ -309,13 +331,12 @@ func NewCopyStatement(event eventstore.Event, conflictCols, from, to []handler.C
 		}
 
 	}
-
-	wheres := make([]string, len(conds))
-	for i, cond := range conds {
-		argCounter++
-		wheres[i] = "copy_table." + cond.Name + " = $" + strconv.Itoa(argCounter)
-		args = append(args, cond.Value)
+	cond := make([]handler.Condition, len(nsCond))
+	for i := range nsCond {
+		cond[i] = nsCond[i]("copy_table")
 	}
+	wheres, values := conditionsToWhere(cond, len(args))
+	args = append(args, values...)
 
 	conflictTargets := make([]string, len(conflictCols))
 	for i, conflictCol := range conflictCols {
@@ -330,7 +351,7 @@ func NewCopyStatement(event eventstore.Event, conflictCols, from, to []handler.C
 		config.err = handler.ErrNoValues
 	}
 
-	if len(conds) == 0 {
+	if len(cond) == 0 {
 		config.err = handler.ErrNoCondition
 	}
 
@@ -384,15 +405,16 @@ func columnsToQuery(cols []handler.Column) (names []string, parameters []string,
 	return names, parameters, values[:parameterIndex]
 }
 
-func conditionsToWhere(cols []handler.Condition, paramOffset int) (wheres []string, values []interface{}) {
-	wheres = make([]string, len(cols))
-	values = make([]interface{}, len(cols))
-
-	for i, col := range cols {
-		wheres[i] = "(" + col.Name + " = $" + strconv.Itoa(i+1+paramOffset) + ")"
-		values[i] = col.Value
+func conditionsToWhere(conditions []handler.Condition, paramOffset int) (wheres []string, values []interface{}) {
+	wheres = make([]string, len(conditions))
+	values = make([]interface{}, 0, len(conditions))
+	for i, conditionFunc := range conditions {
+		condition, value := conditionFunc("$" + strconv.Itoa(i+1+paramOffset))
+		wheres[i] = "(" + condition + ")"
+		if value != nil {
+			values = append(values, value)
+		}
 	}
-
 	return wheres, values
 }
 

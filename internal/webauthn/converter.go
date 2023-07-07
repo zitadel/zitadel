@@ -1,15 +1,16 @@
 package webauthn
 
 import (
-	"github.com/duo-labs/webauthn/protocol"
-	"github.com/duo-labs/webauthn/webauthn"
+	"github.com/go-webauthn/webauthn/protocol"
+	"github.com/go-webauthn/webauthn/webauthn"
+
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
-func WebAuthNsToCredentials(webAuthNs []*domain.WebAuthNToken) []webauthn.Credential {
+func WebAuthNsToCredentials(webAuthNs []*domain.WebAuthNToken, rpID string) []webauthn.Credential {
 	creds := make([]webauthn.Credential, 0)
 	for _, webAuthN := range webAuthNs {
-		if webAuthN.State == domain.MFAStateReady {
+		if webAuthN.State == domain.MFAStateReady && webAuthN.RPID == rpID {
 			creds = append(creds, webauthn.Credential{
 				ID:              webAuthN.KeyID,
 				PublicKey:       webAuthN.PublicKey,

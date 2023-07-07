@@ -73,7 +73,6 @@ COPY --from=go-stub /go/src/github.com/zitadel/zitadel/openapi/statik/statik.go 
 COPY --from=go-stub /go/src/github.com/zitadel/zitadel/pkg/grpc pkg/grpc
 COPY --from=go-stub /go/src/github.com/zitadel/zitadel/openapi/v2/zitadel openapi/v2/zitadel
 COPY --from=go-stub /go/src/github.com/zitadel/zitadel/openapi/statik/statik.go openapi/statik/statik.go
-COPY --from=go-stub /go/src/github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go internal/protoc/protoc-gen-authoption/templates.gen.go
 COPY --from=go-stub /go/src/github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go internal/protoc/protoc-gen-authoption/authoption/options.pb.go
 COPY --from=go-stub /go/src/github.com/zitadel/zitadel/docs/apis/proto docs/docs/apis/proto
 COPY --from=go-stub /go/src/github.com/zitadel/zitadel/docs/apis/assets docs/docs/apis/assets
@@ -98,7 +97,7 @@ RUN rm -r cockroach-${COCKROACH_VERSION}.linux-amd64
 
 # Migrations for cockroach-secure
 RUN go install github.com/rakyll/statik \
-    && go test -race -v -coverprofile=profile.cov $(go list ./... | grep -v /operator/)
+    && go test -race -coverprofile=profile.cov $(go list ./... | grep -v /operator/)
 
 #######################
 ## Go test results

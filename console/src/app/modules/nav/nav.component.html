@@ -83,7 +83,7 @@
                 </a>
 
                 <a
-                  *ngIf="customerPortalLink"
+                  *ngIf="customerPortalLink$ | async as customerPortalLink"
                   class="nav-item external-link"
                   [href]="customerPortalLink"
                   target="_blank"
@@ -111,7 +111,7 @@
                 <span class="label">{{ 'MENU.DASHBOARD' | translate }}</span>
               </a>
 
-              <ng-container class="org-list" *ngIf="org" [@navAnimation]="org">
+              <ng-container class="org-list" *ngIf="org">
                 <ng-template cnslHasRole [hasRole]="['org.read']">
                   <a
                     class="nav-item"
@@ -232,8 +232,6 @@
         <ng-template
           cdkConnectedOverlay
           [cdkConnectedOverlayOrigin]="trigger"
-          [flexibleDimensions]="true"
-          [lockPosition]="true"
           [cdkConnectedOverlayOffsetY]="10"
           [cdkConnectedOverlayHasBackdrop]="true"
           [cdkConnectedOverlayPositions]="positions"

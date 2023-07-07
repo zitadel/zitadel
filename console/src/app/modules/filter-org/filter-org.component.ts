@@ -3,13 +3,14 @@ import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
-import { OrgNameQuery, OrgQuery, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
+import { OrgNameQuery, OrgQuery, OrgState, OrgStateQuery } from 'src/app/proto/generated/zitadel/org_pb';
 import { UserNameQuery } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { FilterComponent } from '../filter/filter.component';
 
 enum SubQuery {
   NAME,
+  STATE,
 }
 
 @Component({
@@ -21,9 +22,9 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
   public SubQuery: any = SubQuery;
   public searchQueries: OrgQuery[] = [];
 
-  public states: OrgState[] = [OrgState.ORG_STATE_ACTIVE, OrgState.ORG_STATE_INACTIVE];
+  public states: OrgState[] = [OrgState.ORG_STATE_ACTIVE, OrgState.ORG_STATE_INACTIVE, OrgState.ORG_STATE_REMOVED];
 
-  constructor(router: Router, protected route: ActivatedRoute) {
+  constructor(router: Router, protected override route: ActivatedRoute) {
     super(router, route);
   }
 
@@ -37,12 +38,16 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
         const orgQueries = filters.map((filter) => {
           if (filter.nameQuery) {
             const orgQuery = new OrgQuery();
-
             const orgNameQuery = new OrgNameQuery();
             orgNameQuery.setName(filter.nameQuery.name);
             orgNameQuery.setMethod(filter.nameQuery.method);
-
             orgQuery.setNameQuery(orgNameQuery);
+            return orgQuery;
+          } else if (filter.stateQuery) {
+            const orgQuery = new OrgQuery();
+            const orgStateQuery = new OrgStateQuery();
+            orgStateQuery.setState(filter.stateQuery.state);
+            orgQuery.setStateQuery(orgStateQuery);
             return orgQuery;
           } else {
             return undefined;
@@ -64,11 +69,16 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
           const nq = new OrgNameQuery();
           nq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
           nq.setName('');
-
           const oq = new OrgQuery();
           oq.setNameQuery(nq);
-
           this.searchQueries.push(oq);
+          break;
+        case SubQuery.STATE:
+          const sq = new OrgStateQuery();
+          sq.setState(OrgState.ORG_STATE_ACTIVE);
+          const osq = new OrgQuery();
+          osq.setStateQuery(sq);
+          this.searchQueries.push(osq);
           break;
       }
     } else {
@@ -77,6 +87,12 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
           const index_dn = this.searchQueries.findIndex((q) => (q as OrgQuery).toObject().nameQuery !== undefined);
           if (index_dn > -1) {
             this.searchQueries.splice(index_dn, 1);
+          }
+          break;
+        case SubQuery.STATE:
+          const index_sn = this.searchQueries.findIndex((q) => (q as OrgQuery).toObject().stateQuery !== undefined);
+          if (index_sn > -1) {
+            this.searchQueries.splice(index_sn, 1);
           }
           break;
       }
@@ -88,6 +104,10 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
     switch (subquery) {
       case SubQuery.NAME:
         (query as OrgNameQuery).setName(value);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        break;
+      case SubQuery.STATE:
+        (query as OrgStateQuery).setState(value);
         this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         break;
     }
@@ -102,6 +122,13 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
         } else {
           return undefined;
         }
+      case SubQuery.STATE:
+        const sn = this.searchQueries.find((q) => (q as OrgQuery).toObject().stateQuery !== undefined);
+        if (sn) {
+          return (sn as OrgQuery).getStateQuery();
+        } else {
+          return undefined;
+        }
     }
   }
 
@@ -110,7 +137,7 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
     this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
   }
 
-  public emitFilter(): void {
+  public override emitFilter(): void {
     this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
     this.showFilter = false;
     this.filterOpen.emit(false);

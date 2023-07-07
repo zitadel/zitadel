@@ -298,6 +298,7 @@ func addAzureADProviderToCommand(req *mgmt_pb.AddAzureADProviderRequest) command
 		Tenant:        idp_grpc.AzureADTenantToCommand(req.Tenant),
 		EmailVerified: req.EmailVerified,
 		IDPOptions:    idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Scopes:        req.Scopes,
 	}
 }
 
@@ -309,6 +310,7 @@ func updateAzureADProviderToCommand(req *mgmt_pb.UpdateAzureADProviderRequest) c
 		Tenant:        idp_grpc.AzureADTenantToCommand(req.Tenant),
 		EmailVerified: req.EmailVerified,
 		IDPOptions:    idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Scopes:        req.Scopes,
 	}
 }
 
@@ -422,32 +424,34 @@ func updateGoogleProviderToCommand(req *mgmt_pb.UpdateGoogleProviderRequest) com
 
 func addLDAPProviderToCommand(req *mgmt_pb.AddLDAPProviderRequest) command.LDAPProvider {
 	return command.LDAPProvider{
-		Name:                req.Name,
-		Host:                req.Host,
-		Port:                req.Port,
-		TLS:                 req.Tls,
-		BaseDN:              req.BaseDn,
-		UserObjectClass:     req.UserObjectClass,
-		UserUniqueAttribute: req.UserUniqueAttribute,
-		Admin:               req.Admin,
-		Password:            req.Password,
-		LDAPAttributes:      idp_grpc.LDAPAttributesToCommand(req.Attributes),
-		IDPOptions:          idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:              req.Name,
+		Servers:           req.Servers,
+		StartTLS:          req.StartTls,
+		BaseDN:            req.BaseDn,
+		BindDN:            req.BindDn,
+		BindPassword:      req.BindPassword,
+		UserBase:          req.UserBase,
+		UserObjectClasses: req.UserObjectClasses,
+		UserFilters:       req.UserFilters,
+		Timeout:           req.Timeout.AsDuration(),
+		LDAPAttributes:    idp_grpc.LDAPAttributesToCommand(req.Attributes),
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
 func updateLDAPProviderToCommand(req *mgmt_pb.UpdateLDAPProviderRequest) command.LDAPProvider {
 	return command.LDAPProvider{
-		Name:                req.Name,
-		Host:                req.Host,
-		Port:                req.Port,
-		TLS:                 req.Tls,
-		BaseDN:              req.BaseDn,
-		UserObjectClass:     req.UserObjectClass,
-		UserUniqueAttribute: req.UserUniqueAttribute,
-		Admin:               req.Admin,
-		Password:            req.Password,
-		LDAPAttributes:      idp_grpc.LDAPAttributesToCommand(req.Attributes),
-		IDPOptions:          idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:              req.Name,
+		Servers:           req.Servers,
+		StartTLS:          req.StartTls,
+		BaseDN:            req.BaseDn,
+		BindDN:            req.BindDn,
+		BindPassword:      req.BindPassword,
+		UserBase:          req.UserBase,
+		UserObjectClasses: req.UserObjectClasses,
+		UserFilters:       req.UserFilters,
+		Timeout:           req.Timeout.AsDuration(),
+		LDAPAttributes:    idp_grpc.LDAPAttributesToCommand(req.Attributes),
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }

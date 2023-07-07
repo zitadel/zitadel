@@ -27,7 +27,7 @@ func TestSession_FetchUser(t *testing.T) {
 		httpMock     func()
 		authURL      string
 		code         string
-		tokens       *oidc.Tokens
+		tokens       *oidc.Tokens[*oidc.IDTokenClaims]
 		scopes       []string
 		options      []oauth.ProviderOpts
 	}
@@ -93,7 +93,7 @@ func TestSession_FetchUser(t *testing.T) {
 						Reply(http.StatusInternalServerError)
 				},
 				authURL: "https://github.com/login/oauth/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&state=testState",
-				tokens: &oidc.Tokens{
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
 						TokenType:   oidc.BearerToken,
@@ -122,7 +122,7 @@ func TestSession_FetchUser(t *testing.T) {
 						JSON(userinfo())
 				},
 				authURL: "https://github.com/login/oauth/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&state=testState",
-				tokens: &oidc.Tokens{
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
 						TokenType:   oidc.BearerToken,

@@ -42,7 +42,7 @@ type AuthRequest struct {
 	PrivateLabelingSetting   PrivateLabelingSetting
 	SelectedIDPConfigID      string
 	LinkingUsers             []*ExternalUser
-	PossibleSteps            []NextStep
+	PossibleSteps            []NextStep `json:"-"`
 	PasswordVerified         bool
 	MFAsVerified             []MFAType
 	Audience                 []string
@@ -122,6 +122,8 @@ func NewAuthRequestFromType(requestType AuthRequestType) (*AuthRequest, error) {
 		return &AuthRequest{Request: &AuthRequestOIDC{}}, nil
 	case AuthRequestTypeSAML:
 		return &AuthRequest{Request: &AuthRequestSAML{}}, nil
+	case AuthRequestTypeDevice:
+		return &AuthRequest{Request: &AuthRequestDevice{}}, nil
 	}
 	return nil, errors.ThrowInvalidArgument(nil, "DOMAIN-ds2kl", "invalid request type")
 }
@@ -183,4 +185,13 @@ func (a *AuthRequest) GetScopeOrgID() string {
 		}
 	}
 	return ""
+}
+
+func (a *AuthRequest) Done() bool {
+	for _, step := range a.PossibleSteps {
+		if step.Type() == NextStepRedirectToCallback {
+			return true
+		}
+	}
+	return false
 }

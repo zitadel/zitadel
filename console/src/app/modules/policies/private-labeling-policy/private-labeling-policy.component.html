@@ -306,7 +306,7 @@
                 "
                 [colorType]="ColorType.BACKGROUNDDARK"
                 (previewChanged)="previewData.backgroundColorDark !== $event ? setDarkBackgroundColorAndSave($event) : null"
-                name="Background Color"
+                name="{{ 'POLICY.PRIVATELABELING.BACKGROUNDCOLOR' | translate }}"
                 [color]="data.backgroundColorDark"
                 [previewColor]="previewData.backgroundColorDark"
               ></cnsl-color>
@@ -328,7 +328,7 @@
                 "
                 [colorType]="ColorType.PRIMARY"
                 (previewChanged)="previewData.primaryColorDark !== $event ? setDarkPrimaryColorAndSave($event) : null"
-                name="Primary Color"
+                name="{{ 'POLICY.PRIVATELABELING.PRIMARYCOLOR' | translate }}"
                 [color]="data.primaryColorDark"
                 [previewColor]="previewData.primaryColorDark"
               >
@@ -351,7 +351,7 @@
                 "
                 [colorType]="ColorType.WARN"
                 (previewChanged)="previewData.warnColorDark !== $event ? setDarkWarnColorAndSave($event) : null"
-                name="Warn Color"
+                name="{{ 'POLICY.PRIVATELABELING.WARNCOLOR' | translate }}"
                 [color]="data.warnColorDark"
                 [previewColor]="previewData.warnColorDark"
               >
@@ -374,7 +374,7 @@
                 "
                 [colorType]="ColorType.FONTDARK"
                 (previewChanged)="previewData.fontColorDark !== $event ? setDarkFontColorAndSave($event) : null"
-                name="Font Color"
+                name="{{ 'POLICY.PRIVATELABELING.FONTCOLOR' | translate }}"
                 [color]="data.fontColorDark"
                 [previewColor]="previewData.fontColorDark"
               >
@@ -401,7 +401,7 @@
                 "
                 [colorType]="ColorType.BACKGROUNDLIGHT"
                 (previewChanged)="previewData.backgroundColor !== $event ? setBackgroundColorAndSave($event) : null"
-                name="Background Color"
+                name="{{ 'POLICY.PRIVATELABELING.BACKGROUNDCOLOR' | translate }}"
                 [color]="data.backgroundColor"
                 [previewColor]="previewData.backgroundColor"
               ></cnsl-color>
@@ -423,7 +423,7 @@
                 "
                 [colorType]="ColorType.PRIMARY"
                 (previewChanged)="previewData.primaryColor !== $event ? setPrimaryColorAndSave($event) : null"
-                name="Primary Color"
+                name="{{ 'POLICY.PRIVATELABELING.PRIMARYCOLOR' | translate }}"
                 [color]="data.primaryColor"
                 [previewColor]="previewData.primaryColor"
               >
@@ -445,7 +445,7 @@
                     | async) === false
                 "
                 [colorType]="ColorType.WARN"
-                name="Warn Color"
+                name="{{ 'POLICY.PRIVATELABELING.WARNCOLOR' | translate }}"
                 (previewChanged)="previewData.warnColor !== $event ? setWarnColorAndSave($event) : null"
                 [color]="data.warnColor"
                 [previewColor]="previewData.warnColor"
@@ -468,7 +468,7 @@
                 "
                 [colorType]="ColorType.FONTLIGHT"
                 (previewChanged)="previewData.fontColor !== $event ? setFontColorAndSave($event) : null"
-                name="Font Color"
+                name="{{ 'POLICY.PRIVATELABELING.FONTCOLOR' | translate }}"
                 [color]="data.fontColor"
                 [previewColor]="previewData.fontColor"
               ></cnsl-color>
@@ -492,7 +492,9 @@
           </cnsl-info-section>
           <div class="font-preview" *ngIf="previewData.fontUrl; else addFontButton">
             <mat-icon class="icon">text_fields</mat-icon>
-
+            <span class="font-name" [ngStyle]="fontName ? { 'font-family': 'brandingFont' } : { '': '' }">{{
+              fontName
+            }}</span>
             <span class="fill-space"></span>
 
             <button
@@ -634,6 +636,7 @@
           class="preview"
           [ngClass]="{ darkmode: theme === Theme.DARK, lightmode: theme === Theme.LIGHT }"
           [policy]="view === View.PREVIEW ? previewData : data"
+          [ngStyle]="fontName ? { 'font-family': 'brandingFont' } : { '': '' }"
         >
         </cnsl-preview>
       </div>

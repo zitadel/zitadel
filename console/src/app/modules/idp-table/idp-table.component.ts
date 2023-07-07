@@ -2,7 +2,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -31,6 +31,8 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { OverlayWorkflowService } from 'src/app/services/overlay/overlay-workflow.service';
+import { ContextChangedWorkflowOverlays } from 'src/app/services/overlay/workflows';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
@@ -60,7 +62,13 @@ export class IdpTableComponent implements OnInit {
   public IDPStylingType: any = IDPStylingType;
   public loginPolicy!: LoginPolicy.AsObject;
 
-  constructor(public translate: TranslateService, private toast: ToastService, private dialog: MatDialog) {
+  constructor(
+    private workflowService: OverlayWorkflowService,
+    public translate: TranslateService,
+    private toast: ToastService,
+    private dialog: MatDialog,
+    private router: Router,
+  ) {
     this.selection.changed.subscribe(() => {
       this.changedSelection.emit(this.selection.selected);
     });
@@ -142,31 +150,17 @@ export class IdpTableComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
-        if (this.serviceType === PolicyComponentServiceType.MGMT) {
-          (this.service as ManagementService).removeOrgIDP(idp.id).then(
-            () => {
-              this.toast.showInfo('IDP.TOAST.DELETED', true);
-              setTimeout(() => {
-                this.refreshPage();
-              }, 1000);
-            },
-            (error) => {
-              this.toast.showError(error);
-            },
-          );
-        } else {
-          (this.service as AdminService).removeIDP(idp.id).then(
-            () => {
-              this.toast.showInfo('IDP.TOAST.DELETED', true);
-              setTimeout(() => {
-                this.refreshPage();
-              }, 1000);
-            },
-            (error) => {
-              this.toast.showError(error);
-            },
-          );
-        }
+        this.service.deleteProvider(idp.id).then(
+          () => {
+            this.toast.showInfo('IDP.TOAST.DELETED', true);
+            setTimeout(() => {
+              this.refreshPage();
+            }, 1000);
+          },
+          (error) => {
+            this.toast.showError(error);
+          },
+        );
       }
     });
   }
@@ -240,6 +234,8 @@ export class IdpTableComponent implements OnInit {
           return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'google', row.id];
         case ProviderType.PROVIDER_TYPE_GITLAB:
           return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'gitlab', row.id];
+        case ProviderType.PROVIDER_TYPE_LDAP:
+          return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'ldap', row.id];
         case ProviderType.PROVIDER_TYPE_GITLAB_SELF_HOSTED:
           return [
             row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org',
@@ -251,6 +247,16 @@ export class IdpTableComponent implements OnInit {
           return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'github', row.id];
       }
     }
+  }
+
+  navigateToIDP(row: Provider.AsObject) {
+    this.router.navigate(this.routerLinkForRow(row)).then(() => {
+      if (this.serviceType === PolicyComponentServiceType.MGMT && row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM) {
+        setTimeout(() => {
+          this.workflowService.startWorkflow(ContextChangedWorkflowOverlays, null);
+        }, 1000);
+      }
+    });
   }
 
   private async getIdps(): Promise<IDPLoginPolicyLink.AsObject[]> {

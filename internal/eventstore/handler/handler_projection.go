@@ -10,6 +10,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/pseudo"
 )
 
 const (
@@ -20,11 +21,12 @@ const (
 
 type ProjectionHandlerConfig struct {
 	HandlerConfig
-	ProjectionName      string
-	RequeueEvery        time.Duration
-	RetryFailedAfter    time.Duration
-	Retries             uint
-	ConcurrentInstances uint
+	ProjectionName        string
+	RequeueEvery          time.Duration
+	RetryFailedAfter      time.Duration
+	Retries               uint
+	ConcurrentInstances   uint
+	HandleActiveInstances time.Duration
 }
 
 // Update updates the projection with the given statements
@@ -43,19 +45,25 @@ type Lock func(context.Context, time.Duration, ...string) <-chan error
 // Unlock releases the mutex of the projection
 type Unlock func(...string) error
 
+// NowFunc makes time.Now() mockable
+type NowFunc func() time.Time
+
 type ProjectionHandler struct {
 	Handler
-	ProjectionName      string
-	reduce              Reduce
-	update              Update
-	searchQuery         SearchQuery
-	triggerProjection   *time.Timer
-	lock                Lock
-	unlock              Unlock
-	requeueAfter        time.Duration
-	retryFailedAfter    time.Duration
-	retries             int
-	concurrentInstances int
+	ProjectionName             string
+	reduce                     Reduce
+	update                     Update
+	searchQuery                SearchQuery
+	triggerProjection          *time.Timer
+	lock                       Lock
+	unlock                     Unlock
+	requeueAfter               time.Duration
+	retryFailedAfter           time.Duration
+	retries                    int
+	concurrentInstances        int
+	handleActiveInstances      time.Duration
+	nowFunc                    NowFunc
+	reduceScheduledPseudoEvent bool
 }
 
 func NewProjectionHandler(
@@ -67,30 +75,35 @@ func NewProjectionHandler(
 	lock Lock,
 	unlock Unlock,
 	initialized <-chan bool,
+	reduceScheduledPseudoEvent bool,
 ) *ProjectionHandler {
 	concurrentInstances := int(config.ConcurrentInstances)
 	if concurrentInstances < 1 {
 		concurrentInstances = 1
 	}
 	h := &ProjectionHandler{
-		Handler:             NewHandler(config.HandlerConfig),
-		ProjectionName:      config.ProjectionName,
-		reduce:              reduce,
-		update:              update,
-		searchQuery:         query,
-		lock:                lock,
-		unlock:              unlock,
-		requeueAfter:        config.RequeueEvery,
-		triggerProjection:   time.NewTimer(0), // first trigger is instant on startup
-		retryFailedAfter:    config.RetryFailedAfter,
-		retries:             int(config.Retries),
-		concurrentInstances: concurrentInstances,
+		Handler:                    NewHandler(config.HandlerConfig),
+		ProjectionName:             config.ProjectionName,
+		reduce:                     reduce,
+		update:                     update,
+		searchQuery:                query,
+		lock:                       lock,
+		unlock:                     unlock,
+		requeueAfter:               config.RequeueEvery,
+		triggerProjection:          time.NewTimer(0), // first trigger is instant on startup
+		retryFailedAfter:           config.RetryFailedAfter,
+		retries:                    int(config.Retries),
+		concurrentInstances:        concurrentInstances,
+		handleActiveInstances:      config.HandleActiveInstances,
+		nowFunc:                    time.Now,
+		reduceScheduledPseudoEvent: reduceScheduledPseudoEvent,
 	}
 
 	go func() {
 		<-initialized
-		go h.subscribe(ctx)
-
+		if !h.reduceScheduledPseudoEvent {
+			go h.subscribe(ctx)
+		}
 		go h.schedule(ctx)
 	}()
 
@@ -150,6 +163,13 @@ func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Ev
 
 // FetchEvents checks the current sequences and filters for newer events
 func (h *ProjectionHandler) FetchEvents(ctx context.Context, instances ...string) ([]eventstore.Event, bool, error) {
+	if h.reduceScheduledPseudoEvent {
+		return h.fetchPseudoEvents(ctx, instances...)
+	}
+	return h.fetchDBEvents(ctx, instances...)
+}
+
+func (h *ProjectionHandler) fetchDBEvents(ctx context.Context, instances ...string) ([]eventstore.Event, bool, error) {
 	eventQuery, eventsLimit, err := h.searchQuery(ctx, instances)
 	if err != nil {
 		return nil, false, err
@@ -159,6 +179,10 @@ func (h *ProjectionHandler) FetchEvents(ctx context.Context, instances ...string
 		return nil, false, err
 	}
 	return events, int(eventsLimit) == len(events), err
+}
+
+func (h *ProjectionHandler) fetchPseudoEvents(ctx context.Context, instances ...string) ([]eventstore.Event, bool, error) {
+	return []eventstore.Event{pseudo.NewScheduledEvent(ctx, time.Now(), instances...)}, false, nil
 }
 
 func (h *ProjectionHandler) subscribe(ctx context.Context) {
@@ -215,7 +239,7 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 			errs := h.lock(lockCtx, h.requeueAfter, "system")
 			if err, ok := <-errs; err != nil || !ok {
 				cancelLock()
-				logging.WithFields("projection", h.ProjectionName).OnError(err).Warn("initial lock failed for first schedule")
+				logging.WithFields("projection", h.ProjectionName).OnError(err).Debug("initial lock failed for first schedule")
 				h.triggerProjection.Reset(h.requeueAfter)
 				continue
 			}
@@ -223,8 +247,9 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 		}
 		if succeededOnce {
 			// since we have at least one successful run, we can restrict it to events not older than
-			// twice the requeue time (just to be sure not to miss an event)
-			query = query.CreationDateAfter(time.Now().Add(-2 * h.requeueAfter))
+			// h.handleActiveInstances (just to be sure not to miss an event)
+			// This ensures that only instances with recent events on the handler are projected
+			query = query.CreationDateAfter(h.nowFunc().Add(-1 * h.handleActiveInstances))
 		}
 		ids, err := h.Eventstore.InstanceIDs(ctx, query.Builder())
 		if err != nil {
@@ -244,7 +269,7 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 			//wait until projection is locked
 			if err, ok := <-errs; err != nil || !ok {
 				cancelInstanceLock()
-				logging.WithFields("projection", h.ProjectionName).OnError(err).Warn("initial lock failed")
+				logging.WithFields("projection", h.ProjectionName).OnError(err).Debug("initial lock failed")
 				failed = true
 				continue
 			}

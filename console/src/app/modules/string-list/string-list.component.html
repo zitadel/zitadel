@@ -1,0 +1,43 @@
+<div class="form-array-list">
+  <div class="form-field-list">
+    <div class="list-header-wrapper">
+      <p class="list-header cnsl-secondary-text">{{ title }}*</p>
+      <button
+        class="add-element-btn"
+        matTooltip="{{ 'ACTIONS.ADD' | translate }}"
+        type="button"
+        mat-icon-button
+        (click)="addArrayEntry()"
+      >
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+    <ng-container *ngFor="let formControl of formArray.controls; index as i">
+      <div class="element-row">
+        <cnsl-form-field class="formfield" [hideRequiredMarker]="true">
+          <input cnslInput title="{{ 'IDP.SERVERS' | translate }}" [formControl]="$any(formControl)" required />
+        </cnsl-form-field>
+
+        <button
+          class="add-element-btn"
+          [disabled]="i === 0 && formArray.controls.length === 1 && formControl.value === ''"
+          [matTooltip]="
+            i === 0 && formArray.controls.length === 1 ? ('ACTIONS.CLEAR' | translate) : ('ACTIONS.REMOVE' | translate)
+          "
+          type="button"
+          mat-icon-button
+          color="warn"
+          (click)="i === 0 && formArray.controls.length === 1 ? clearEntryAtIndex(i) : removeEntryAtIndex(i)"
+        >
+          <i *ngIf="i === 0 && formArray.controls.length === 1; else removeIcon" class="las la-times-circle"></i>
+          <ng-template #removeIcon>
+            <i class="las la-minus-circle"></i>
+          </ng-template>
+        </button>
+      </div>
+    </ng-container>
+    <span class="control-error" *ngIf="control.touched && control.errors && control.errors['errorsatleastone']">{{
+      control.errors['errorsatleastone'].i18nKey | translate
+    }}</span>
+  </div>
+</div>

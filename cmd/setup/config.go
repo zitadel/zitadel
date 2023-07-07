@@ -65,11 +65,14 @@ type Steps struct {
 	s7LogstoreTables     *LogstoreTables
 	s8AuthTokens         *AuthTokenIndexes
 	s9EventstoreIndexes2 *EventstoreIndexesNew
+	CorrectCreationDate  *CorrectCreationDate
+	AddEventCreatedAt    *AddEventCreatedAt
 }
 
 type encryptionKeyConfig struct {
 	User *crypto.KeyConfig
 	SMTP *crypto.KeyConfig
+	OIDC *crypto.KeyConfig
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

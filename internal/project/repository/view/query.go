@@ -16,5 +16,14 @@ func ProjectByIDQuery(id, instanceID string, latestSequence uint64) (*es_models.
 		AggregateTypeFilter(project.AggregateType).
 		LatestSequenceFilter(latestSequence).
 		InstanceIDFilter(instanceID).
+		EventTypesFilter(
+			es_models.EventType(project.ProjectAddedType),
+			es_models.EventType(project.ProjectChangedType),
+			es_models.EventType(project.ProjectDeactivatedType),
+			es_models.EventType(project.ProjectReactivatedType),
+			es_models.EventType(project.ProjectRemovedType),
+			es_models.EventType(project.OIDCConfigAddedType),
+			es_models.EventType(project.ApplicationRemovedType),
+		).
 		SearchQuery(), nil
 }

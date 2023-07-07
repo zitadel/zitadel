@@ -229,7 +229,7 @@ service SystemService {
     };
   }
 
-  // Returns the domain of an instance
+  // Removes the domain of an instance
   rpc RemoveDomain(RemoveDomainRequest) returns (RemoveDomainResponse) {
     option (google.api.http) = {
       delete: "/instances/{instance_id}/domains/{domain}";
@@ -240,7 +240,7 @@ service SystemService {
     };
   }
 
-  // Returns the domain of an instance
+  // Sets the primary domain of an instance
   rpc SetPrimaryDomain(SetPrimaryDomainRequest) returns (SetPrimaryDomainResponse) {
     option (google.api.http) = {
       post: "/instances/{instance_id}/domains/_set_primary";

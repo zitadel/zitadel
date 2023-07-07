@@ -118,6 +118,7 @@ func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (_ *Org
 	query, args, err := stmt.Where(sq.Eq{
 		OrgColumnDomain.identifier():     domain,
 		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		OrgColumnState.identifier():      domain_pkg.OrgStateActive,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-TYUCE", "Errors.Query.SQLStatement")
@@ -179,12 +180,20 @@ func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUniqu
 	return scan(row)
 }
 
-func (q *Queries) ExistsOrg(ctx context.Context, id string) (err error) {
+func (q *Queries) ExistsOrg(ctx context.Context, id, domain string) (verifiedID string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	_, err = q.OrgByID(ctx, true, id)
-	return err
+	var org *Org
+	if id != "" {
+		org, err = q.OrgByID(ctx, true, id)
+	} else {
+		org, err = q.OrgByVerifiedDomain(ctx, domain)
+	}
+	if err != nil {
+		return "", err
+	}
+	return org.ID, nil
 }
 
 func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (orgs *Orgs, err error) {
@@ -220,7 +229,7 @@ func NewOrgNameSearchQuery(method TextComparison, value string) (SearchQuery, er
 	return NewTextQuery(OrgColumnName, value, method)
 }
 
-func NewOrgStateSearchQuery(value int32) (SearchQuery, error) {
+func NewOrgStateSearchQuery(value domain_pkg.OrgState) (SearchQuery, error) {
 	return NewNumberQuery(OrgColumnState, value, NumberEquals)
 }
 

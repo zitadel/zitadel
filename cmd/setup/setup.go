@@ -45,6 +45,8 @@ Requirements:
 		},
 	}
 
+	cmd.AddCommand(NewCleanup())
+
 	Flags(cmd)
 
 	return cmd
@@ -73,6 +75,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.FirstInstance.instanceSetup = config.DefaultInstance
 	steps.FirstInstance.userEncryptionKey = config.EncryptionKeys.User
 	steps.FirstInstance.smtpEncryptionKey = config.EncryptionKeys.SMTP
+	steps.FirstInstance.oidcEncryptionKey = config.EncryptionKeys.OIDC
 	steps.FirstInstance.masterKey = masterKey
 	steps.FirstInstance.db = dbClient.DB
 	steps.FirstInstance.es = eventstoreClient
@@ -88,6 +91,9 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s7LogstoreTables = &LogstoreTables{dbClient: dbClient.DB, username: config.Database.Username(), dbType: config.Database.Type()}
 	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: dbClient}
 	steps.s9EventstoreIndexes2 = New09(dbClient)
+	steps.CorrectCreationDate.dbClient = dbClient
+	steps.AddEventCreatedAt.dbClient = dbClient
+	steps.AddEventCreatedAt.step10 = steps.CorrectCreationDate
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -123,6 +129,10 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.OnError(err).Fatal("unable to migrate step 8")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s9EventstoreIndexes2)
 	logging.OnError(err).Fatal("unable to migrate step 9")
+	err = migration.Migrate(ctx, eventstoreClient, steps.CorrectCreationDate)
+	logging.OnError(err).Fatal("unable to migrate step 10")
+	err = migration.Migrate(ctx, eventstoreClient, steps.AddEventCreatedAt)
+	logging.OnError(err).Fatal("unable to migrate step 11")
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)

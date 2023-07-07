@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	IDPTemplateTable                 = "projections.idp_templates4"
+	IDPTemplateTable                 = "projections.idp_templates5"
 	IDPTemplateOAuthTable            = IDPTemplateTable + "_" + IDPTemplateOAuthSuffix
 	IDPTemplateOIDCTable             = IDPTemplateTable + "_" + IDPTemplateOIDCSuffix
 	IDPTemplateJWTTable              = IDPTemplateTable + "_" + IDPTemplateJWTSuffix
@@ -38,7 +38,7 @@ const (
 	IDPTemplateGitLabSuffix           = "gitlab"
 	IDPTemplateGitLabSelfHostedSuffix = "gitlab_self_hosted"
 	IDPTemplateGoogleSuffix           = "google"
-	IDPTemplateLDAPSuffix             = "ldap"
+	IDPTemplateLDAPSuffix             = "ldap2"
 
 	IDPTemplateIDCol                = "id"
 	IDPTemplateCreationDateCol      = "creation_date"
@@ -125,14 +125,15 @@ const (
 
 	LDAPIDCol                         = "idp_id"
 	LDAPInstanceIDCol                 = "instance_id"
-	LDAPHostCol                       = "host"
-	LDAPPortCol                       = "port"
-	LDAPTlsCol                        = "tls"
+	LDAPServersCol                    = "servers"
+	LDAPStartTLSCol                   = "start_tls"
 	LDAPBaseDNCol                     = "base_dn"
-	LDAPUserObjectClassCol            = "user_object_class"
-	LDAPUserUniqueAttributeCol        = "user_unique_attribute"
-	LDAPAdminCol                      = "admin"
-	LDAPPasswordCol                   = "password"
+	LDAPBindDNCol                     = "bind_dn"
+	LDAPBindPasswordCol               = "bind_password"
+	LDAPUserBaseCol                   = "user_base"
+	LDAPUserObjectClassesCol          = "user_object_classes"
+	LDAPUserFiltersCol                = "user_filters"
+	LDAPTimeoutCol                    = "timeout"
 	LDAPIDAttributeCol                = "id_attribute"
 	LDAPFirstNameAttributeCol         = "first_name_attribute"
 	LDAPLastNameAttributeCol          = "last_name_attribute"
@@ -293,14 +294,15 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(LDAPIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LDAPInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(LDAPHostCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPPortCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPTlsCol, crdb.ColumnTypeBool, crdb.Nullable()),
-			crdb.NewColumn(LDAPBaseDNCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPUserObjectClassCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPUserUniqueAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPAdminCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPPasswordCol, crdb.ColumnTypeJSONB, crdb.Nullable()),
+			crdb.NewColumn(LDAPServersCol, crdb.ColumnTypeTextArray),
+			crdb.NewColumn(LDAPStartTLSCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(LDAPBaseDNCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LDAPBindDNCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LDAPBindPasswordCol, crdb.ColumnTypeJSONB),
+			crdb.NewColumn(LDAPUserBaseCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LDAPUserObjectClassesCol, crdb.ColumnTypeTextArray),
+			crdb.NewColumn(LDAPUserFiltersCol, crdb.ColumnTypeTextArray),
+			crdb.NewColumn(LDAPTimeoutCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(LDAPIDAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(LDAPFirstNameAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(LDAPLastNameAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
@@ -346,11 +348,19 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceOIDCIDPChanged,
 				},
 				{
+					Event:  instance.OIDCIDPMigratedAzureADEventType,
+					Reduce: p.reduceOIDCIDPMigratedAzureAD,
+				},
+				{
+					Event:  instance.OIDCIDPMigratedGoogleEventType,
+					Reduce: p.reduceOIDCIDPMigratedGoogle,
+				},
+				{
 					Event:  instance.JWTIDPAddedEventType,
 					Reduce: p.reduceJWTIDPAdded,
 				},
 				{
-					Event:  instance.JWTIDPAddedEventType,
+					Event:  instance.JWTIDPChangedEventType,
 					Reduce: p.reduceJWTIDPChanged,
 				},
 				{
@@ -434,6 +444,10 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceLDAPIDPChanged,
 				},
 				{
+					Event:  instance.IDPConfigRemovedEventType,
+					Reduce: p.reduceIDPConfigRemoved,
+				},
+				{
 					Event:  instance.IDPRemovedEventType,
 					Reduce: p.reduceIDPRemoved,
 				},
@@ -463,11 +477,19 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceOIDCIDPChanged,
 				},
 				{
+					Event:  org.OIDCIDPMigratedAzureADEventType,
+					Reduce: p.reduceOIDCIDPMigratedAzureAD,
+				},
+				{
+					Event:  org.OIDCIDPMigratedGoogleEventType,
+					Reduce: p.reduceOIDCIDPMigratedGoogle,
+				},
+				{
 					Event:  org.JWTIDPAddedEventType,
 					Reduce: p.reduceJWTIDPAdded,
 				},
 				{
-					Event:  org.JWTIDPAddedEventType,
+					Event:  org.JWTIDPChangedEventType,
 					Reduce: p.reduceJWTIDPChanged,
 				},
 				{
@@ -549,6 +571,10 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.LDAPIDPChangedEventType,
 					Reduce: p.reduceLDAPIDPChanged,
+				},
+				{
+					Event:  org.IDPConfigRemovedEventType,
+					Reduce: p.reduceIDPConfigRemoved,
 				},
 				{
 					Event:  org.IDPRemovedEventType,
@@ -742,6 +768,106 @@ func (p *idpTemplateProjection) reduceOIDCIDPChanged(event eventstore.Event) (*h
 	return crdb.NewMultiStatement(
 		&idpEvent,
 		ops...,
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.OIDCIDPMigratedAzureADEvent
+	switch e := event.(type) {
+	case *org.OIDCIDPMigratedAzureADEvent:
+		idpEvent = e.OIDCIDPMigratedAzureADEvent
+	case *instance.OIDCIDPMigratedAzureADEvent:
+		idpEvent = e.OIDCIDPMigratedAzureADEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzureAD),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(OIDCIDCol, idpEvent.ID),
+				handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(AzureADIDCol, idpEvent.ID),
+				handler.NewCol(AzureADInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(AzureADClientIDCol, idpEvent.ClientID),
+				handler.NewCol(AzureADClientSecretCol, idpEvent.ClientSecret),
+				handler.NewCol(AzureADScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(AzureADTenantCol, idpEvent.Tenant),
+				handler.NewCol(AzureADIsEmailVerified, idpEvent.IsEmailVerified),
+			},
+			crdb.WithTableSuffix(IDPTemplateAzureADSuffix),
+		),
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceOIDCIDPMigratedGoogle(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.OIDCIDPMigratedGoogleEvent
+	switch e := event.(type) {
+	case *org.OIDCIDPMigratedGoogleEvent:
+		idpEvent = e.OIDCIDPMigratedGoogleEvent
+	case *instance.OIDCIDPMigratedGoogleEvent:
+		idpEvent = e.OIDCIDPMigratedGoogleEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedGoogleEventType, instance.OIDCIDPMigratedGoogleEventType})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGoogle),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(OIDCIDCol, idpEvent.ID),
+				handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(GoogleIDCol, idpEvent.ID),
+				handler.NewCol(GoogleInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(GoogleClientIDCol, idpEvent.ClientID),
+				handler.NewCol(GoogleClientSecretCol, idpEvent.ClientSecret),
+				handler.NewCol(GoogleScopesCol, database.StringArray(idpEvent.Scopes)),
+			},
+			crdb.WithTableSuffix(IDPTemplateGoogleSuffix),
+		),
 	), nil
 }
 
@@ -1663,14 +1789,15 @@ func (p *idpTemplateProjection) reduceLDAPIDPAdded(event eventstore.Event) (*han
 			[]handler.Column{
 				handler.NewCol(LDAPIDCol, idpEvent.ID),
 				handler.NewCol(LDAPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(LDAPHostCol, idpEvent.Host),
-				handler.NewCol(LDAPPortCol, idpEvent.Port),
-				handler.NewCol(LDAPTlsCol, idpEvent.TLS),
+				handler.NewCol(LDAPServersCol, database.StringArray(idpEvent.Servers)),
+				handler.NewCol(LDAPStartTLSCol, idpEvent.StartTLS),
 				handler.NewCol(LDAPBaseDNCol, idpEvent.BaseDN),
-				handler.NewCol(LDAPUserObjectClassCol, idpEvent.UserObjectClass),
-				handler.NewCol(LDAPUserUniqueAttributeCol, idpEvent.UserUniqueAttribute),
-				handler.NewCol(LDAPAdminCol, idpEvent.Admin),
-				handler.NewCol(LDAPPasswordCol, idpEvent.Password),
+				handler.NewCol(LDAPBindDNCol, idpEvent.BindDN),
+				handler.NewCol(LDAPBindPasswordCol, idpEvent.BindPassword),
+				handler.NewCol(LDAPUserBaseCol, idpEvent.UserBase),
+				handler.NewCol(LDAPUserObjectClassesCol, database.StringArray(idpEvent.UserObjectClasses)),
+				handler.NewCol(LDAPUserFiltersCol, database.StringArray(idpEvent.UserFilters)),
+				handler.NewCol(LDAPTimeoutCol, idpEvent.Timeout),
 				handler.NewCol(LDAPIDAttributeCol, idpEvent.IDAttribute),
 				handler.NewCol(LDAPFirstNameAttributeCol, idpEvent.FirstNameAttribute),
 				handler.NewCol(LDAPLastNameAttributeCol, idpEvent.LastNameAttribute),
@@ -1729,6 +1856,25 @@ func (p *idpTemplateProjection) reduceLDAPIDPChanged(event eventstore.Event) (*h
 	return crdb.NewMultiStatement(
 		&idpEvent,
 		ops...,
+	), nil
+}
+func (p *idpTemplateProjection) reduceIDPConfigRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idpconfig.IDPConfigRemovedEvent
+	switch e := event.(type) {
+	case *org.IDPConfigRemovedEvent:
+		idpEvent = e.IDPConfigRemovedEvent
+	case *instance.IDPConfigRemovedEvent:
+		idpEvent = e.IDPConfigRemovedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAFet", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
+	}
+
+	return crdb.NewDeleteStatement(
+		&idpEvent,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ConfigID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+		},
 	), nil
 }
 
@@ -1962,29 +2108,32 @@ func reduceGoogleIDPChangedColumns(idpEvent idp.GoogleIDPChangedEvent) []handler
 
 func reduceLDAPIDPChangedColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Column {
 	ldapCols := make([]handler.Column, 0, 4)
-	if idpEvent.Host != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPHostCol, *idpEvent.Host))
+	if idpEvent.Servers != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPServersCol, database.StringArray(idpEvent.Servers)))
 	}
-	if idpEvent.Port != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPPortCol, *idpEvent.Port))
-	}
-	if idpEvent.TLS != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPTlsCol, *idpEvent.TLS))
+	if idpEvent.StartTLS != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPStartTLSCol, *idpEvent.StartTLS))
 	}
 	if idpEvent.BaseDN != nil {
 		ldapCols = append(ldapCols, handler.NewCol(LDAPBaseDNCol, *idpEvent.BaseDN))
 	}
-	if idpEvent.UserObjectClass != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPUserObjectClassCol, *idpEvent.UserObjectClass))
+	if idpEvent.BindDN != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPBindDNCol, *idpEvent.BindDN))
 	}
-	if idpEvent.UserUniqueAttribute != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPUserUniqueAttributeCol, *idpEvent.UserUniqueAttribute))
+	if idpEvent.BindPassword != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPBindPasswordCol, idpEvent.BindPassword))
 	}
-	if idpEvent.Admin != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPAdminCol, *idpEvent.Admin))
+	if idpEvent.UserBase != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPUserBaseCol, *idpEvent.UserBase))
 	}
-	if idpEvent.Password != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPPasswordCol, *idpEvent.Password))
+	if idpEvent.UserObjectClasses != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPUserObjectClassesCol, database.StringArray(idpEvent.UserObjectClasses)))
+	}
+	if idpEvent.UserFilters != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPUserFiltersCol, database.StringArray(idpEvent.UserFilters)))
+	}
+	if idpEvent.Timeout != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPTimeoutCol, *idpEvent.Timeout))
 	}
 	if idpEvent.IDAttribute != nil {
 		ldapCols = append(ldapCols, handler.NewCol(LDAPIDAttributeCol, *idpEvent.IDAttribute))

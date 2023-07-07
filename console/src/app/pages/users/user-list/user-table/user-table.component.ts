@@ -96,7 +96,7 @@ export class UserTableComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParams.pipe(take(1)).subscribe((params) => {
       this.getData(this.INITIAL_PAGE_SIZE, 0, this.type);
-      if (params.deferredReload) {
+      if (params['deferredReload']) {
         setTimeout(() => {
           this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type);
         }, 2000);
@@ -204,6 +204,7 @@ export class UserTableComponent implements OnInit {
           sortingField = UserFieldName.USER_FIELD_NAME_CREATION_DATE;
           break;
       }
+
     this.userService
       .listUsers(
         limit,

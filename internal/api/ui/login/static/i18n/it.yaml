@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: registrare
   NextButtonText: Avanti
 
+LDAP:
+  Title: Accesso
+  Description: Inserisci i tuoi dati di accesso.
+  LoginNameLabel: Nome di accesso
+  PasswordLabel: Password
+  NextButtonText: Avanti
+
 SelectAccount:
   Title: Seleziona l'account
   Description: Usa il tuo account ZITADEL
@@ -165,6 +172,7 @@ PasswordChange:
   NewPasswordConfirmLabel: Conferma della password
   CancelButtonText: annulla
   NextButtonText: Avanti
+  Footer: Piè di pagina
 
 PasswordChangeDone:
   Title: Reimposta password
@@ -212,6 +220,9 @@ RegistrationUser:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
   GenderLabel: Genere
   Female: Femminile
   Male: Maschile
@@ -243,6 +254,8 @@ ExternalRegistrationUserOverview:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
   TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
   TosLinkText: Termini di servizio
@@ -302,12 +315,33 @@ ExternalNotFound:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+
+DeviceAuth:
+  Title: Autorizzazione del dispositivo
+  UserCode:
+    Label: Codice utente
+    Description: Inserire il codice utente presentato sul dispositivo.
+    ButtonNext: prossimo
+  Action:
+    Description: Concedi l'accesso al dispositivo.
+    GrantDevice: stai per concedere il dispositivo
+    AccessToScopes: accesso ai seguenti ambiti
+    Button:
+      Allow: permettere
+      Deny: negare
+  Done:
+    Description: Fatto.
+    Approved: Autorizzazione del dispositivo approvata. Ora puoi tornare al dispositivo.
+    Denied: Autorizzazione dispositivo negata. Ora puoi tornare al dispositivo.
 
 Footer:
   PoweredBy: Alimentato da
   Tos: Termini di servizio
   PrivacyPolicy: l'informativa sulla privacy
   Help: Aiuto
+  SupportEmail: E-mail di supporto
 
 Errors:
   Internal: Si è verificato un errore interno
@@ -407,5 +441,10 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Impostazioni di blocco non esistenti
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: la registrazione non è consentita.
+  DeviceAuth:
+    NotExisting: Il codice utente non esiste
 
 optional: (opzionale)
