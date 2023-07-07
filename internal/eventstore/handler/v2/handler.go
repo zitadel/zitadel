@@ -255,17 +255,13 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 	start := time.Now()
 	defer cancel()
 
-	logs := []*logging.Entry{}
-
 	err = crdb.ExecuteTx(ctx, h.client.DB, nil, func(tx *sql.Tx) error {
 		currentState, err := h.currentState(ctx, tx)
-		logs = append(logs, h.log().WithField("took", time.Since(start)).WithField("state", "current state query"))
 		if err != nil {
 			return err
 		}
 
 		events, err := h.es.Filter(ctx, h.eventQuery(currentState))
-		logs = append(logs, h.log().WithField("took", time.Since(start)).WithField("state", "event filter"))
 		if err != nil {
 			h.log().WithError(err).Debug("filter eventstore failed")
 			return err
@@ -275,18 +271,15 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 
 		if len(events) == 0 {
 			h.updateLastUpdated(ctx, tx, currentState)
-			logs = append(logs, h.log().WithField("took", time.Since(start)).WithField("state", "no events"))
 			return nil
 		}
 
 		statements, err := h.eventsToStatements(tx, events, currentState)
 		if len(statements) == 0 {
-			logs = append(logs, h.log().WithField("took", time.Since(start)).WithField("state", "no statements"))
 			return err
 		}
 
 		err = h.execute(ctx, tx, currentState, statements)
-		logs = append(logs, h.log().WithField("took", time.Since(start)).WithField("state", "execute"))
 		if err != nil {
 			return err
 		}
@@ -297,7 +290,6 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 		currentState.eventTimestamp = statements[len(statements)-1].CreationDate
 
 		err = h.setState(ctx, tx, currentState)
-		logs = append(logs, h.log().WithField("took", time.Since(start)).WithField("state", "set state"))
 		if err != nil {
 			h.log().WithField("took", time.Since(start)).Debug("current state query")
 			return err
@@ -312,13 +304,6 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 		additionalIteration = eventAmount == int(h.bulkLimit)
 		return nil
 	})
-
-	if err != nil {
-		for _, log := range logs {
-			log.Debug("errör")
-		}
-		logging.WithFields("took", time.Since(start)).WithError(err).Debug("errör")
-	}
 
 	return additionalIteration, err
 }
