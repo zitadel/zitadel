@@ -155,7 +155,7 @@ func CheckRedirect(url string, headers map[string]string) (*url.URL, error) {
 }
 
 func (s *Tester) CreateSession(ctx context.Context, userID string) (string, string, error) {
-	session, err := s.Commands.CreateSession(ctx, []command.SessionCommand{command.CheckUser(userID)}, nil)
+	session, err := s.Commands.CreateSession(ctx, []command.SessionCommand{command.CheckUser(userID)}, "domain.tld", nil)
 	if err != nil {
 		return "", "", err
 	}

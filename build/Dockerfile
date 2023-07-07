@@ -11,6 +11,7 @@ RUN adduser -D zitadel && \
 ## Scratch Image
 #######################
 FROM scratch as final
+LABEL org.opencontainers.image.source="https://github.com/zitadel/zitadel"
 COPY --from=artifact /etc/passwd /etc/passwd
 COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
 COPY --from=artifact /app /

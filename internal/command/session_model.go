@@ -16,6 +16,7 @@ type PasskeyChallengeModel struct {
 	Challenge          string
 	AllowedCrentialIDs [][]byte
 	UserVerification   domain.UserVerificationRequirement
+	RPID               string
 }
 
 func (p *PasskeyChallengeModel) WebAuthNLogin(human *domain.Human, credentialAssertionData []byte) (*domain.WebAuthNLogin, error) {
@@ -28,6 +29,7 @@ func (p *PasskeyChallengeModel) WebAuthNLogin(human *domain.Human, credentialAss
 		Challenge:               p.Challenge,
 		AllowedCredentialIDs:    p.AllowedCrentialIDs,
 		UserVerification:        p.UserVerification,
+		RPID:                    p.RPID,
 	}, nil
 }
 
@@ -41,6 +43,7 @@ type SessionWriteModel struct {
 	IntentCheckedAt   time.Time
 	PasskeyCheckedAt  time.Time
 	Metadata          map[string][]byte
+	Domain            string
 	State             domain.SessionState
 
 	PasskeyChallenge *PasskeyChallengeModel
@@ -127,6 +130,7 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 func (wm *SessionWriteModel) reduceAdded(e *session.AddedEvent) {
+	wm.Domain = e.Domain
 	wm.State = domain.SessionStateActive
 }
 
@@ -148,6 +152,7 @@ func (wm *SessionWriteModel) reducePasskeyChallenged(e *session.PasskeyChallenge
 		Challenge:          e.Challenge,
 		AllowedCrentialIDs: e.AllowedCrentialIDs,
 		UserVerification:   e.UserVerification,
+		RPID:               wm.Domain,
 	}
 }
 
@@ -164,8 +169,10 @@ func (wm *SessionWriteModel) reduceTerminate() {
 	wm.State = domain.SessionStateTerminated
 }
 
-func (wm *SessionWriteModel) Start(ctx context.Context) {
-	wm.commands = append(wm.commands, session.NewAddedEvent(ctx, wm.aggregate))
+func (wm *SessionWriteModel) Start(ctx context.Context, domain string) {
+	wm.commands = append(wm.commands, session.NewAddedEvent(ctx, wm.aggregate, domain))
+	// set the domain so checks can use it
+	wm.Domain = domain
 }
 
 func (wm *SessionWriteModel) UserChecked(ctx context.Context, userID string, checkedAt time.Time) error {

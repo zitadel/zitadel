@@ -19,6 +19,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	instance_repo "github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	proj_repo "github.com/zitadel/zitadel/internal/repository/project"
@@ -137,6 +138,7 @@ func StartCommands(
 	idpintent.RegisterEventMappers(repo.eventstore)
 	authrequest.RegisterEventMappers(repo.eventstore)
 	oidcsession.RegisterEventMappers(repo.eventstore)
+	milestone.RegisterEventMappers(repo.eventstore)
 
 	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)

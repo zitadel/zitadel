@@ -163,7 +163,7 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate),
+							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate, "domain.tld"),
 						),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,
@@ -357,7 +357,7 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate),
+							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate, "domain.tld"),
 						),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,
