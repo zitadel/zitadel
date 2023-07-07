@@ -31,6 +31,7 @@ func Start(
 	quotaHandlerCustomConfig projection.CustomConfig,
 	telemetryHandlerCustomConfig projection.CustomConfig,
 	telemetryCfg handlers.TelemetryPusherConfig,
+	externalDomain string,
 	externalPort uint16,
 	externalSecure bool,
 	commands *command.Commands,
@@ -56,7 +57,7 @@ func Start(
 	logging.WithFields("metric", metricSuccessfulDeliveriesJSON).OnError(err).Panic("unable to register counter")
 	err = metrics.RegisterCounter(metricFailedDeliveriesJSON, "Failed JSON message deliveries")
 	logging.WithFields("metric", metricFailedDeliveriesJSON).OnError(err).Panic("unable to register counter")
-	q := handlers.NewNotificationQueries(queries, es, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption, statikFS)
+	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption, statikFS)
 	handlers.NewUserNotifier(
 		ctx,
 		projection.ApplyCustomConfig(userHandlerCustomConfig),
