@@ -23,8 +23,8 @@ jobs:
             debug_platforms: linux/amd64
             scratch_platforms: linux/amd64
           - arm64:
-            debug_platforms: linux/arm64v8
-            scratch_platforms: linux/arm64,linux/arm64/v8
+            debug_platforms: linux/arm64/v8
+            scratch_platforms: linux/arm64/v8
     steps:
       - 
         uses: actions/checkout@v3
