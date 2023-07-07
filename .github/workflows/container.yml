@@ -22,7 +22,7 @@ jobs:
           - amd64:
             platforms: linux/amd64,linux/x86_64
           - arm64:
-            platforms: linux/arm64,linux/arm64/v8,linux/arm64/v7,linux/arm64/v6
+            platforms: linux/arm64,linux/arm64/v8
     steps:
       - 
         uses: actions/checkout@v3
