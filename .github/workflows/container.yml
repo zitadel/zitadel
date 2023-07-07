@@ -153,7 +153,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      -
+      - 
         name: Create manifest list and push
         working-directory: /tmp/digests/${{ matrix.image }}
         run: |
