@@ -8,8 +8,6 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
@@ -235,7 +233,7 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwn
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.UserGrantProjection.Trigger(ctx)
+		ctx = projection.UserGrantProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareUserGrantQuery(ctx, q.client)
@@ -260,9 +258,7 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, sh
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		logging.OnError(
-			projection.UserGrantProjection.Trigger(ctx),
-		).Debug("unable to trigger")
+		ctx = projection.UserGrantProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareUserGrantsQuery(ctx, q.client)
