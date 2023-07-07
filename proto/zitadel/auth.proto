@@ -361,7 +361,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Profile";
             summary: "Get My Profile";
-            description: "Returns the profile information of the authenticated user, this includes first name, last name, etc."
+            description: "Returns the profile information of the authenticated user, this includes given name, family name, etc."
         };
     }
 
@@ -378,7 +378,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Profile";
             summary: "Update My Profile";
-            description: "Change the profile information of the authenticated user. This includes information like first name, last name, language, etc."
+            description: "Change the profile information of the authenticated user. This includes information like given name, family name, language, etc."
         };
     }
 
