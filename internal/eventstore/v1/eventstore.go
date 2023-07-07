@@ -22,9 +22,9 @@ type eventstore struct {
 	repo repository.Repository
 }
 
-func Start(db *database.DB) (Eventstore, error) {
+func Start(db *database.DB, allowOrderByCreationDate bool) (Eventstore, error) {
 	return &eventstore{
-		repo: z_sql.Start(db),
+		repo: z_sql.Start(db, allowOrderByCreationDate),
 	}, nil
 }
 

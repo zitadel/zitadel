@@ -94,7 +94,7 @@ describe('quotas', () => {
         });
       });
 
-      it('authenticated requests are limited', () => {
+      it('only authenticated requests are limited', () => {
         cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
           cy.get<Context>('@ctx').then((ctx) => {
             const start = new Date();
@@ -107,16 +107,11 @@ describe('quotas', () => {
                 },
               });
             });
+            expectCookieDoesntExist();
             const expiresMax = new Date();
-            expiresMax.setMinutes(expiresMax.getMinutes() + 2);
-            cy.getCookie('zitadel.quota.limiting').then((cookie) => {
-              expect(cookie.value).to.equal('false');
-              const cookieExpiry = new Date();
-              cookieExpiry.setTime(cookie.expiry * 1000);
-              expect(cookieExpiry).to.be.within(start, expiresMax);
-            });
+            expiresMax.setMinutes(expiresMax.getMinutes() + 20);
             cy.request({
-              url: urls[0],
+              url: urls[1],
               method: 'GET',
               auth: {
                 bearer: ctx.api.token,
@@ -127,12 +122,28 @@ describe('quotas', () => {
             });
             cy.getCookie('zitadel.quota.limiting').then((cookie) => {
               expect(cookie.value).to.equal('true');
+              const cookieExpiry = new Date();
+              cookieExpiry.setTime(cookie.expiry * 1000);
+              expect(cookieExpiry).to.be.within(start, expiresMax);
             });
             createHumanUser(ctx.api, testUserName, false).then((res) => {
               expect(res.status).to.equal(429);
             });
+            // visit limited console
+            cy.visit('/users/me');
+            cy.contains('#authenticated-requests-exhausted-dialog button', 'Continue').click();
+            const upgradeInstancePage = `https://example.com/instances/${ctx.instanceId}`;
+            cy.origin(upgradeInstancePage, { args: { upgradeInstancePage } }, ({ upgradeInstancePage }) => {
+              cy.location('href').should('equal', upgradeInstancePage);
+            });
+            // upgrade instance
             ensureQuotaIsRemoved(ctx, Unit.AuthenticatedRequests);
+            // visit upgraded console again
+            cy.visit('/users/me');
+            cy.get('[data-e2e="top-view-title"]');
+            expectCookieDoesntExist();
             createHumanUser(ctx.api, testUserName);
+            expectCookieDoesntExist();
           });
         });
       });
@@ -301,3 +312,9 @@ describe('quotas', () => {
     });
   });
 });
+
+function expectCookieDoesntExist() {
+  cy.getCookie('zitadel.quota.limiting').then((cookie) => {
+    expect(cookie).to.be.null;
+  });
+}

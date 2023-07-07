@@ -6,7 +6,7 @@ The ZITADEL API has different possibilities to create users.
 This can be used, if you are building your own registration page.
 
 Use the following API call to create your users:
-[Create User (Human)](/apis/mgmt/management-service-import-human-user.api.mdx)
+[Create User (Human)](/apis/resources/mgmt/management-service-import-human-user.api.mdx)
 
 ## With Username and Password
 
@@ -31,7 +31,7 @@ If nothing is requested, the type will not be restricted and all possibilities o
 
 If you already have a user in ZITADEL, it is possible to add passwordless later.
 
-[Add Passwordless Registration ](/apis/mgmt)
+[Add Passwordless Registration ](/apis/resources/mgmt)
 
 Send the user_id in the request and you will get a link and an expiration as response.
 You can then customize the link the same as described above in the creation process.
@@ -39,7 +39,7 @@ You can then customize the link the same as described above in the creation proc
 The second possibility is to send the link directly to the user per email.
 Use the following request in that case:
 
-[Send Passwordless Registration ](/apis/mgmt)
+[Send Passwordless Registration ](/apis/resources/mgmt)
 
 ## Verified Email Address
 

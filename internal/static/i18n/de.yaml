@@ -53,6 +53,7 @@ Errors:
     NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
     NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
     UserIDMissing: User ID fehlt
+    UserIDWrong: "Der Anforderungsbenutzer ist nicht gleich dem authentifizierten Benutzer"
     DomainPolicyNil: Organisation Policy ist leer
     EmailAsUsernameNotAllowed: Benutzername darf keine E-Mail Adresse sein
     Invalid: Benutzerdaten sind ungültig
@@ -67,6 +68,7 @@ Errors:
     NoChanges: Keine Änderungen gefunden
     InitCodeNotFound: Kein Initialisierungs-Code gefunden
     UsernameNotChanged: Benutzername wurde nicht verändert
+    InvalidURLTemplate: URL Template ist ungültig
     Profile:
       NotFound: Profil nicht gefunden
       NotChanged: Profil nicht verändert
@@ -81,7 +83,6 @@ Errors:
       NotChanged: Email wurde nicht geändert
       Empty: Email ist leer
       IDMissing: Email ID fehlt
-      InvalidURLTemplate: URL Template ist ungültig
     Phone:
       NotFound: Telefonnummer nicht gefunden
       Invalid: Telefonnummer ist ungültig
@@ -470,6 +471,23 @@ Errors:
     Execution:
       StorageFailed: Das Speichern des Action Logs in der Datenbank ist fehlgeschlagen
       ScanFailed: Das Abfragen der verbrauchten Actions Sekunden ist fehlgeschlagen
+  Session:
+    NotExisting: Session existiert nicht
+    Terminated: Session bereits beendet
+    Token:
+      Invalid: Session Token ist ungültig
+    Passkey:
+      NoChallenge: Sitzung ohne Passkey-Herausforderung
+  Intent:
+    IDPMissing: IDP ID fehlt im Request
+    SuccessURLMissing: Success URL fehlt im Request
+    FailureURLMissing: Failure URL fehlt im Request
+    StateMissing: State parameter fehlt im Request
+    NotStarted: Intent wurde nicht gestartet oder wurde bereits beendet
+    NotSucceeded: Intent war nicht erfolgreich
+    TokenCreationFailed: Tokenerstellung schlug fehl
+    InvalidToken: Intent Token ist ungültig
+    OtherUser: Intent ist für anderen Benutzer gedacht
 
 AggregateTypes:
   action: Action

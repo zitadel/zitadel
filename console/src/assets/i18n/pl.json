@@ -166,7 +166,14 @@
     "NEXT": "Następny",
     "MORE": "więcej",
     "STEP": "Krok",
-    "COMINGSOON": "Coming soon",
+    "UNSAVEDCHANGES": "Niezapisane zmiany",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Czy na pewno chcesz odrzucić to nowe działanie? Twoje działanie zostanie utracone",
+        "CANCEL": "Anuluj",
+        "DISCARD": "Wyrzucać"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Pokaż użytkownika {{value}}"
     }
@@ -204,6 +211,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "Uwaga! Kontekst organizacji uległ zmianie."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "Widok właśnie zmienił się na instancję!"
     }
   },
   "FILTER": {
@@ -251,6 +261,10 @@
     "TOKENINVALID": {
       "TITLE": "Twój token autoryzacji wygasł.",
       "DESCRIPTION": "Kliknij przycisk poniżej, aby ponownie się zalogować."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Twój limit uwierzytelnionych wniosków został wyczerpany.",
+      "DESCRIPTION": "Usuń lub zwiększ limit dla tej instancji ZITADEL."
     },
     "INVALID_FORMAT": "Format jest nieprawidłowy.",
     "NOTANEMAIL": "Podana wartość nie jest adresem e-mail.",
@@ -1025,7 +1039,8 @@
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български"
     },
     "SMTP": {
       "TITLE": "Ustawienia SMTP",
@@ -1224,7 +1239,8 @@
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български"
       },
       "KEYS": {
         "emailVerificationDoneText": "Weryfikacja adresu e-mail zakończona",
@@ -1966,7 +1982,8 @@
       "GRANT": {
         "0": "Kod autoryzacyjny",
         "1": "Implicite",
-        "2": "Token odświeżający"
+        "2": "Token odświeżający",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Podstawowy",
@@ -2057,6 +2074,10 @@
         "TITLE": "Implicit",
         "DESCRIPTION": "Pobierz tokeny bezpośrednio z punktu autoryzacyjnego"
       },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autoryzuj urządzenie na komputerze lub smartfonie."
+      },
       "CUSTOM": {
         "TITLE": "Niestandardowy",
         "DESCRIPTION": "Twoje ustawienie nie odpowiada żadnej innej opcji."
@@ -2088,7 +2109,8 @@
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български"
   },
   "MEMBER": {
     "ADD": "Dodaj managera",

@@ -23,6 +23,7 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	user_model "github.com/zitadel/zitadel/internal/user/model"
 	user_view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 const unknownUserID = "UNKNOWN"
@@ -64,7 +65,9 @@ type privacyPolicyProvider interface {
 type userSessionViewProvider interface {
 	UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error)
 	UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error)
+	GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*repository.CurrentSequence, error)
 }
+
 type userViewProvider interface {
 	UserByID(string, string) (*user_view_model.UserView, error)
 }
@@ -244,6 +247,8 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 	}
 	err = repo.checkExternalUserLogin(ctx, request, externalUser.IDPConfigID, externalUser.ExternalUserID)
 	if errors.IsNotFound(err) {
+		// clear potential user information (e.g. when username was entered but another external user was returned)
+		request.SetUserInfo("", "", "", "", "", request.UserOrgID)
 		if err := repo.setLinkingUser(ctx, request, externalUser); err != nil {
 			return err
 		}
@@ -273,6 +278,16 @@ func (repo *AuthRequestRepo) SetExternalUserLogin(ctx context.Context, authReqID
 		return err
 	}
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
+func (repo *AuthRequestRepo) SetLinkingUser(ctx context.Context, request *domain.AuthRequest, externalUser *domain.ExternalUser) error {
+	for i, user := range request.LinkingUsers {
+		if user.ExternalUserID == externalUser.ExternalUserID {
+			request.LinkingUsers[i] = externalUser
+			return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+		}
+	}
+	return nil
 }
 
 func (repo *AuthRequestRepo) setLinkingUser(ctx context.Context, request *domain.AuthRequest, externalUser *domain.ExternalUser) error {
@@ -654,7 +669,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 				preferredLoginName += "@" + request.RequestedPrimaryDomain
 			}
 		}
-		user, err = repo.checkLoginNameInputForResourceOwner(request, preferredLoginName)
+		user, err = repo.checkLoginNameInputForResourceOwner(ctx, request, preferredLoginName)
 	} else {
 		user, err = repo.checkLoginNameInput(ctx, request, preferredLoginName)
 	}
@@ -729,12 +744,12 @@ func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *
 
 func (repo *AuthRequestRepo) checkLoginNameInput(ctx context.Context, request *domain.AuthRequest, loginNameInput string) (*user_view_model.UserView, error) {
 	// always check the loginname first
-	user, err := repo.View.UserByLoginName(loginNameInput, request.InstanceID)
+	user, err := repo.View.UserByLoginName(ctx, loginNameInput, request.InstanceID)
 	if err == nil {
 		// and take the user regardless if there would be a user with that email or phone
 		return user, repo.checkLoginPolicyWithResourceOwner(ctx, request, user.ResourceOwner)
 	}
-	user, emailErr := repo.View.UserByEmail(loginNameInput, request.InstanceID)
+	user, emailErr := repo.View.UserByEmail(ctx, loginNameInput, request.InstanceID)
 	if emailErr == nil {
 		// if there was a single user with the specified email
 		// load and check the login policy
@@ -747,7 +762,7 @@ func (repo *AuthRequestRepo) checkLoginNameInput(ctx context.Context, request *d
 			return user, nil
 		}
 	}
-	user, phoneErr := repo.View.UserByPhone(loginNameInput, request.InstanceID)
+	user, phoneErr := repo.View.UserByPhone(ctx, loginNameInput, request.InstanceID)
 	if phoneErr == nil {
 		// if there was a single user with the specified phone
 		// load and check the login policy
@@ -765,9 +780,9 @@ func (repo *AuthRequestRepo) checkLoginNameInput(ctx context.Context, request *d
 	return nil, err
 }
 
-func (repo *AuthRequestRepo) checkLoginNameInputForResourceOwner(request *domain.AuthRequest, loginNameInput string) (*user_view_model.UserView, error) {
+func (repo *AuthRequestRepo) checkLoginNameInputForResourceOwner(ctx context.Context, request *domain.AuthRequest, loginNameInput string) (*user_view_model.UserView, error) {
 	// always check the loginname first
-	user, err := repo.View.UserByLoginNameAndResourceOwner(loginNameInput, request.RequestedOrgID, request.InstanceID)
+	user, err := repo.View.UserByLoginNameAndResourceOwner(ctx, loginNameInput, request.RequestedOrgID, request.InstanceID)
 	if err == nil {
 		// and take the user regardless if there would be a user with that email or phone
 		return user, nil
@@ -775,7 +790,7 @@ func (repo *AuthRequestRepo) checkLoginNameInputForResourceOwner(request *domain
 	if request.LoginPolicy != nil && !request.LoginPolicy.DisableLoginWithEmail {
 		// if login by email is allowed and there was a single user with the specified email
 		// take that user (and ignore possible phone number matches)
-		user, emailErr := repo.View.UserByEmailAndResourceOwner(loginNameInput, request.RequestedOrgID, request.InstanceID)
+		user, emailErr := repo.View.UserByEmailAndResourceOwner(ctx, loginNameInput, request.RequestedOrgID, request.InstanceID)
 		if emailErr == nil {
 			return user, nil
 		}
@@ -783,7 +798,7 @@ func (repo *AuthRequestRepo) checkLoginNameInputForResourceOwner(request *domain
 	if request.LoginPolicy != nil && !request.LoginPolicy.DisableLoginWithPhone {
 		// if login by phone is allowed and there was a single user with the specified phone
 		// take that user
-		user, phoneErr := repo.View.UserByPhoneAndResourceOwner(loginNameInput, request.RequestedOrgID, request.InstanceID)
+		user, phoneErr := repo.View.UserByPhoneAndResourceOwner(ctx, loginNameInput, request.RequestedOrgID, request.InstanceID)
 		if phoneErr == nil {
 			return user, nil
 		}
@@ -1298,12 +1313,20 @@ func userSessionsByUserAgentID(provider userSessionViewProvider, agentID, instan
 }
 
 func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eventProvider userEventProvider, agentID string, user *user_model.UserView) (*user_model.UserSessionView, error) {
-	session, err := provider.UserSessionByIDs(agentID, user.ID, authz.GetInstance(ctx).InstanceID())
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	session, err := provider.UserSessionByIDs(agentID, user.ID, instanceID)
 	if err != nil {
 		if !errors.IsNotFound(err) {
 			return nil, err
 		}
+		sequence, err := provider.GetLatestUserSessionSequence(ctx, instanceID)
+		logging.WithFields("instanceID", instanceID, "userID", user.ID).
+			OnError(err).
+			Errorf("could not get current sequence for userSessionByIDs")
 		session = &user_view_model.UserSessionView{UserAgentID: agentID, UserID: user.ID}
+		if sequence != nil {
+			session.Sequence = sequence.CurrentSequence
+		}
 	}
 	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence)
 	if err != nil {

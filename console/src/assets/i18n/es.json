@@ -167,7 +167,14 @@
     "MORE": "más",
     "STEP": "Paso",
     "SETUP": "Configurar",
-    "COMINGSOON": "Próximamente",
+    "UNSAVEDCHANGES": "Cambios no guardados",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "¿Estás seguro de que quieres descartar esta nueva acción? Tu acción se perderá",
+        "CANCEL": "Cancelar",
+        "DISCARD": "Descartar"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Mostrar usuario {{value}}"
     }
@@ -205,6 +212,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "¡Atención! El contexto de la organización ha cambiado."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "¡La vista acaba de cambiar a instancia!"
     }
   },
   "FILTER": {
@@ -252,6 +262,10 @@
     "TOKENINVALID": {
       "TITLE": "Tu token de autorización token ha caducado.",
       "DESCRIPTION": "Haz clic en el botón más abajo para iniciar sesión otra vez."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Su cuota de solicitudes autenticadas se ha agotado.",
+      "DESCRIPTION": "Borrar o aumentar el límite de esta instancia de ZITADEL."
     },
     "INVALID_FORMAT": "El formato no es valido.",
     "NOTANEMAIL": "El valor proporcionado no es una dirección de email.",
@@ -1026,7 +1040,8 @@
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български"
     },
     "SMTP": {
       "TITLE": "Ajustes SMTP",
@@ -1225,7 +1240,8 @@
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificación de email realizada",
@@ -1962,7 +1978,8 @@
       "GRANT": {
         "0": "Código de autorización",
         "1": "Implícito",
-        "2": "Token de refresco"
+        "2": "Token de refresco",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Básico",
@@ -2053,6 +2070,10 @@
         "TITLE": "Implícita",
         "DESCRIPTION": "Obtén los tokens directamente del endpoint de autorización"
       },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autorizar el dispositivo en una computadora o teléfono."
+      },
       "CUSTOM": {
         "TITLE": "Personalizada",
         "DESCRIPTION": "Tu configuración no se corresponde con alguna de las otras opciones."
@@ -2084,7 +2105,8 @@
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български"
   },
   "MEMBER": {
     "ADD": "Añadir un Mánager",

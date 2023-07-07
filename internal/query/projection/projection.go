@@ -64,7 +64,10 @@ var (
 	NotificationPolicyProjection        *notificationPolicyProjection
 	NotificationsProjection             interface{}
 	NotificationsQuotaProjection        interface{}
+	TelemetryPusherProjection           interface{}
 	DeviceAuthProjection                *deviceAuthProjection
+	SessionProjection                   *sessionProjection
+	MilestoneProjection                 *milestoneProjection
 )
 
 type projection interface {
@@ -141,6 +144,8 @@ func Create(ctx context.Context, sqlClient *database.DB, es *eventstore.Eventsto
 	SecurityPolicyProjection = newSecurityPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["security_policies"]))
 	NotificationPolicyProjection = newNotificationPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["notification_policies"]))
 	DeviceAuthProjection = newDeviceAuthProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["device_auth"]))
+	SessionProjection = newSessionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["sessions"]))
+	MilestoneProjection = newMilestoneProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["milestones"]))
 	newProjectionsList()
 	return nil
 }
@@ -189,7 +194,7 @@ func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomCo
 // as setup and start currently create them individually, we make sure we get the right one
 // will be refactored when changing to new id based projections
 //
-// NotificationsProjection is not added here, because it does not statement based / has no proprietary projection table
+// Event handlers NotificationsProjection, NotificationsQuotaProjection and NotificationsProjection are not added here, because they do not reduce to database statements
 func newProjectionsList() {
 	projections = []projection{
 		OrgProjection,
@@ -237,5 +242,7 @@ func newProjectionsList() {
 		SecurityPolicyProjection,
 		NotificationPolicyProjection,
 		DeviceAuthProjection,
+		SessionProjection,
+		MilestoneProjection,
 	}
 }

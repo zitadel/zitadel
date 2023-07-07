@@ -1,5 +1,7 @@
 package domain
 
+import "context"
+
 type Permissions struct {
 	Permissions []string
 }
@@ -21,3 +23,12 @@ func (p *Permissions) appendPermission(ctxID, permission string) {
 	}
 	p.Permissions = append(p.Permissions, permission)
 }
+
+type PermissionCheck func(ctx context.Context, permission, orgID, resourceID string) (err error)
+
+const (
+	PermissionUserWrite     = "user.write"
+	PermissionUserRead      = "user.read"
+	PermissionSessionWrite  = "session.write"
+	PermissionSessionDelete = "session.delete"
+)

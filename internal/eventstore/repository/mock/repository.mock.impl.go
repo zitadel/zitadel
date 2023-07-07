@@ -70,3 +70,25 @@ func (m *MockRepository) ExpectPushFailed(err error, expectedEvents []*repositor
 	)
 	return m
 }
+
+func (m *MockRepository) ExpectRandomPush(expectedEvents []*repository.Event, expectedUniqueConstraints ...*repository.UniqueConstraint) *MockRepository {
+	m.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
+			assert.Len(m.ctrl.T, events, len(expectedEvents))
+			assert.Len(m.ctrl.T, expectedUniqueConstraints, len(uniqueConstraints))
+			return nil
+		},
+	)
+	return m
+}
+
+func (m *MockRepository) ExpectRandomPushFailed(err error, expectedEvents []*repository.Event, expectedUniqueConstraints ...*repository.UniqueConstraint) *MockRepository {
+	m.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
+			assert.Len(m.ctrl.T, events, len(expectedEvents))
+			assert.Len(m.ctrl.T, expectedUniqueConstraints, len(uniqueConstraints))
+			return err
+		},
+	)
+	return m
+}

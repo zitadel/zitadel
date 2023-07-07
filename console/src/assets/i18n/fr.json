@@ -166,7 +166,14 @@
     "NEXT": "Suivant",
     "MORE": "plus",
     "STEP": "Étape",
-    "COMINGSOON": "Coming soon",
+    "UNSAVEDCHANGES": "Modifications non enregistrées",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Voulez-vous vraiment annuler cette nouvelle action ? Votre action sera perdue",
+        "CANCEL": "Annuler",
+        "DISCARD": "Jeter"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Afficher l'utilisateur{{value}}"
     }
@@ -204,6 +211,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "Attention ! Le contexte de l'organisation a changé."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "La vue vient de changer en instance !"
     }
   },
   "FILTER": {
@@ -251,6 +261,10 @@
     "TOKENINVALID": {
       "TITLE": "Votre jeton d'autorisation a expiré.",
       "DESCRIPTION": "Cliquez sur le bouton ci-dessous pour vous reconnecter."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Ton quota de demandes authentifiées est épuisé.",
+      "DESCRIPTION": "Supprimez ou augmentez la limite de cette instance ZITADEL."
     },
     "INVALID_FORMAT": "Le format n'est pas valide",
     "NOTANEMAIL": "La valeur donnée n'est pas une adresse e-mail",
@@ -1025,7 +1039,8 @@
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български"
     },
     "SMTP": {
       "TITLE": "Paramètres SMTP",
@@ -1224,7 +1239,8 @@
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'email effectuée",
@@ -1966,7 +1982,8 @@
       "GRANT": {
         "0": "Code d'autorisation",
         "1": "Implicite",
-        "2": "Rafraîchir le jeton"
+        "2": "Rafraîchir le jeton",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2045,6 +2062,10 @@
         "TITLE": "Implicite",
         "DESCRIPTION": "Obtenir les jetons directement à partir du point final d'autorisation"
       },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autoriser l'appareil sur un ordinateur ou un smartphone."
+      },
       "CUSTOM": {
         "TITLE": "Personnalisé",
         "DESCRIPTION": "Votre paramètre ne correspond à aucune autre option."
@@ -2076,7 +2097,8 @@
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български"
   },
   "MEMBER": {
     "ADD": "Ajouter un manager",

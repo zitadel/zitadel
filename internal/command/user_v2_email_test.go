@@ -24,7 +24,7 @@ import (
 func TestCommands_ChangeUserEmail(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
-		checkPermission permissionCheck
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		userID        string
@@ -174,7 +174,7 @@ func TestCommands_ChangeUserEmail(t *testing.T) {
 func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
-		checkPermission permissionCheck
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		userID        string
@@ -199,7 +199,7 @@ func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 				email:         "email-changed@test.ch",
 				urlTmpl:       "{{",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "USERv2-ooD8p", "Errors.User.Email.InvalidURLTemplate"),
+			wantErr: caos_errs.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
 		},
 		{
 			name: "permission missing",
@@ -300,7 +300,7 @@ func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 func TestCommands_ChangeUserEmailReturnCode(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
-		checkPermission permissionCheck
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		userID        string
@@ -410,7 +410,7 @@ func TestCommands_ChangeUserEmailReturnCode(t *testing.T) {
 func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
-		checkPermission permissionCheck
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		userID        string
@@ -569,7 +569,7 @@ func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
-		checkPermission permissionCheck
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		userID        string

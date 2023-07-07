@@ -72,7 +72,7 @@ const features = [
               description=""
             />
             <ListElement
-              link="/docs/concepts/introduction"
+              link="/docs/concepts"
               type={ICONTYPE.TASKS}
               title="Concepts"
               description=""
@@ -154,19 +154,19 @@ const features = [
       <div className={styles.apilinks}>
         <ListWrapper>
           <ListElement
-            link="/docs/apis/auth/authentication-api-aka-auth"
+            link="/docs/apis/resources/auth/authentication-api-aka-auth"
             type={ICONTYPE.APIS}
             title="Authenticated User"
             description="All operations on the currently authenticated user."
           />
           <ListElement
-            link="/docs/apis/mgmt/management-api"
+            link="/docs/apis/resources/mgmt/management-api"
             type={ICONTYPE.APIS}
             title="Organization Objects"
             description="Mutate IAM objects like organizations, projects, clients, users etc."
           />
           <ListElement
-            link="/docs/apis/admin/administration-api-aka-admin"
+            link="/docs/apis/resources/admin/administration-api-aka-admin"
             type={ICONTYPE.APIS}
             title="Instance Objects"
             description="Configure and manage the IAM instance."

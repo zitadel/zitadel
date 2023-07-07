@@ -83,7 +83,7 @@ module.exports = {
         },
         {
           type: "doc",
-          docId: "legal/introduction",
+          docId: "legal",
           label: "Legal",
           position: "right",
         },
@@ -234,35 +234,49 @@ module.exports = {
         config: {
           auth: {
             specPath: ".artifacts/openapi/zitadel/auth.swagger.json",
-            outputDir: "docs/apis/auth",
+            outputDir: "docs/apis/resources/auth",
             sidebarOptions: {
               groupPathsBy: "tag",
             },
           },
           mgmt: {
             specPath: ".artifacts/openapi/zitadel/management.swagger.json",
-            outputDir: "docs/apis/mgmt",
+            outputDir: "docs/apis/resources/mgmt",
             sidebarOptions: {
               groupPathsBy: "tag",
             },
           },
           admin: {
             specPath: ".artifacts/openapi/zitadel/admin.swagger.json",
-            outputDir: "docs/apis/admin",
+            outputDir: "docs/apis/resources/admin",
             sidebarOptions: {
               groupPathsBy: "tag",
             },
           },
           system: {
             specPath: ".artifacts/openapi/zitadel/system.swagger.json",
-            outputDir: "docs/apis/system",
+            outputDir: "docs/apis/resources/system",
             sidebarOptions: {
               groupPathsBy: "tag",
             },
           },
           user: {
             specPath: ".artifacts/openapi/zitadel/user/v2alpha/user_service.swagger.json",
-            outputDir: "docs/apis/user_service",
+            outputDir: "docs/apis/resources/user_service",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
+          session: {
+            specPath: ".artifacts/openapi/zitadel/session/v2alpha/session_service.swagger.json",
+            outputDir: "docs/apis/resources/session_service",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
+          settings: {
+            specPath: ".artifacts/openapi/zitadel/settings/v2alpha/settings_service.swagger.json",
+            outputDir: "docs/apis/resources/settings_service",
             sidebarOptions: {
               groupPathsBy: "tag",
             },
