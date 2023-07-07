@@ -2,8 +2,7 @@ name: ZITADEL CI/CD
 
 on:
   pull_request:
-    branches:
-      - '**'
+  merge_group:
   workflow_dispatch:
 
 permissions:
