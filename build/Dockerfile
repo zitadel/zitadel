@@ -1,5 +1,4 @@
-FROM ubuntu:latest as artifact
-ARG TARGETOS TARGETARCH
+FROM --platform=$BUILDPLATFORM debian:latest as artifact
 ENV ZITADEL_ARGS=
 
 RUN apt-get update && apt-get install ca-certificates -y

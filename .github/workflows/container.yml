@@ -150,7 +150,7 @@ jobs:
         name: Create manifest list and push
         working-directory: /tmp/digests/${{ matrix.image }}
         run: |
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") -f $DOCKER_METADATA_OUTPUT_BAKE_FILE \
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
             $(printf '${{ inputs.image_name }}@sha256:%s ' *)
       -
         name: Inspect image
