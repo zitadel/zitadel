@@ -242,7 +242,7 @@ ExternalRegistrationUserOverview:
   Description: We have taken your user details from the selected provider. You can now change or complete them.
   EmailLabel: E-Mail
   UsernameLabel: Username
-  FirstnameLabel: First name
+  FirstnameLabel: Given name
   LastnameLabel: Family name
   NicknameLabel: Nickname
   PhoneLabel: Phonenumber
@@ -270,7 +270,7 @@ RegistrationOrg:
   OrgNameLabel: Organization name
   EmailLabel: E-Mail
   UsernameLabel: Username
-  FirstnameLabel: First name
+  FirstnameLabel: Given name
   LastnameLabel: Family name
   PasswordLabel: Password
   PasswordConfirmLabel: Password confirmation
