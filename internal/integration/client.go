@@ -199,6 +199,7 @@ func (s *Tester) CreatePasskeySession(t *testing.T, ctx context.Context, userID 
 		Challenges: []session.ChallengeKind{
 			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
 		},
+		Domain: s.Config.ExternalDomain,
 	})
 	require.NoError(t, err)
 

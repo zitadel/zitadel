@@ -237,7 +237,7 @@ func (s *Tester) createLoginClient(ctx context.Context) {
 	_, err = s.Commands.AddPersonalAccessToken(ctx, pat)
 	logging.OnError(err).Fatal("add pat")
 
-	s.Users.Set(s.Instance.InstanceID(), Login, &User{
+	s.Users.Set(FirstInstanceUsersKey, Login, &User{
 		User:  user,
 		Token: pat.Token,
 	})
