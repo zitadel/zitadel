@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/api/service"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -29,6 +30,47 @@ var (
 )
 
 func TestProjectionHandler_Trigger(t *testing.T) {
+	const pause = time.Millisecond
+
+	startCtx := call.WithTimestamp(context.Background())
+	start := call.FromContext(startCtx)
+
+	h := &ProjectionHandler{
+		Handler: Handler{
+			Eventstore: eventstore.NewEventstore(eventstore.TestConfig(
+				es_repo_mock.NewRepo(t).ExpectFilterEvents(
+					&repository.Event{
+						ID:                        "id",
+						Sequence:                  1,
+						PreviousAggregateSequence: 0,
+						CreationDate:              time.Now(),
+						Type:                      "test.added",
+						Version:                   "v1",
+						AggregateID:               "testid",
+						AggregateType:             "testAgg",
+					},
+				),
+			)),
+		},
+		ProjectionName: "test",
+		reduce:         testReduce(newTestStatement("testAgg", 1, 0)),
+		update:         testUpdate(t, 1, 0, nil),
+		searchQuery: testQuery(
+			eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+				AddQuery().
+				AggregateTypes("test").
+				Builder(),
+			5, nil,
+		),
+	}
+
+	time.Sleep(pause)
+	endCtx := h.Trigger(startCtx)
+	// check if the new context has a call timestamp that's later than start+pause.
+	assert.WithinRange(t, call.FromContext(endCtx), start.Add(pause), start.Add(pause+time.Second))
+}
+
+func TestProjectionHandler_TriggerErr(t *testing.T) {
 	type fields struct {
 		reduce     Reduce
 		update     Update
@@ -223,7 +265,8 @@ func TestProjectionHandler_Trigger(t *testing.T) {
 				searchQuery:    tt.fields.query,
 			}
 
-			err := h.Trigger(tt.args.ctx, tt.args.instances...)
+			// context timestamp is checked in [TestProjectionHandler_Trigger]
+			_, err := h.TriggerErr(tt.args.ctx, tt.args.instances...)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error %v", err)
 			}
