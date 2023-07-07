@@ -18,11 +18,6 @@ jobs:
       fail-fast: false
       matrix:
         arch: [amd64,arm64]
-        include:
-          - amd64:
-            platforms: linux/amd64
-          - arm64:
-            platforms: linux/arm64/v8
     steps:
       - 
         uses: actions/checkout@v3
@@ -76,7 +71,7 @@ jobs:
           context: .
           file: build/Dockerfile
           target: artifact
-          platforms: ${{ matrix.platforms }}
+          platforms: linux/${{ matrix.arch }}
           labels: ${{ steps.debug-meta.outputs.labels }}
           outputs: type=image,name=${{ inputs.image_name }},push-by-digest=true,name-canonical=true,push=true
       - 
@@ -88,7 +83,7 @@ jobs:
           context: .
           file: build/Dockerfile
           target: final
-          platforms: ${{ matrix.platforms }}
+          platforms: linux/${{ matrix.arch }}
           push: true
           labels: ${{ steps.scratch-meta.outputs.labels }}
           outputs: type=image,name=${{ inputs.image_name }},push-by-digest=true,name-canonical=true,push=true
