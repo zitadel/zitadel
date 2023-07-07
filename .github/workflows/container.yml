@@ -73,7 +73,7 @@ jobs:
         name: Debug
         id: build-debug
         uses: docker/build-push-action@v4
-        timeout-minutes: 4
+        timeout-minutes: 2
         with:
           context: .
           file: build/Dockerfile
