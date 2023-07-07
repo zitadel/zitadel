@@ -18,6 +18,11 @@ jobs:
       fail-fast: false
       matrix:
         arch: [amd64,arm64]
+        include:
+          - amd64:
+            platforms: linux/amd64,linux/x86_64
+          - arm64:
+            platforms: linux/arm64,linux/arm64/v8,linux/arm64/v7,linux/arm64/v6
     steps:
       - 
         uses: actions/checkout@v3
@@ -64,14 +69,14 @@ jobs:
           mv zitadel-linux-${{ matrix.arch }}/zitadel ./zitadel
       - 
         name: Debug
-        id: build-debian
+        id: build-debug
         uses: docker/build-push-action@v4
         timeout-minutes: 4
         with:
           context: .
           file: build/Dockerfile
           target: artifact
-          platforms: linux/${{ matrix.arch }}
+          platforms: ${{ matrix.platforms }}
           labels: ${{ steps.debug-meta.outputs.labels }}
           outputs: type=image,name=${{ inputs.image_name }},push-by-digest=true,name-canonical=true,push=true
       - 
@@ -83,7 +88,7 @@ jobs:
           context: .
           file: build/Dockerfile
           target: final
-          platforms: linux/${{ matrix.arch }}
+          platforms: ${{ matrix.platforms }}
           push: true
           labels: ${{ steps.scratch-meta.outputs.labels }}
           outputs: type=image,name=${{ inputs.image_name }},push-by-digest=true,name-canonical=true,push=true
@@ -91,7 +96,7 @@ jobs:
         name: Export debug digest
         run: |
           mkdir -p /tmp/digests/debug
-          digest="${{ steps.build-debian.outputs.digest }}"
+          digest="${{ steps.build-debug.outputs.digest }}"
           touch "/tmp/digests/debug/${digest#sha256:}"
       -
         name: Export scratch digest
