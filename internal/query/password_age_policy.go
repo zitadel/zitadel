@@ -86,7 +86,7 @@ func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, shouldTriggerBulk 
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.PasswordAgeProjection.Trigger(ctx)
+		ctx = projection.PasswordAgeProjection.Trigger(ctx)
 	}
 	eq := sq.Eq{PasswordAgeColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
@@ -116,7 +116,7 @@ func (q *Queries) DefaultPasswordAgePolicy(ctx context.Context, shouldTriggerBul
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.PasswordAgeProjection.Trigger(ctx)
+		ctx = projection.PasswordAgeProjection.Trigger(ctx)
 	}
 
 	stmt, scan := preparePasswordAgePolicyQuery(ctx, q.client)

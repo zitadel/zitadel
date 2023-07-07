@@ -20,6 +20,7 @@ import (
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
+	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
@@ -29,6 +30,7 @@ type Client struct {
 	Mgmt      mgmt.ManagementServiceClient
 	UserV2    user.UserServiceClient
 	SessionV2 session.SessionServiceClient
+	System    system.SystemServiceClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
@@ -38,7 +40,34 @@ func newClient(cc *grpc.ClientConn) Client {
 		Mgmt:      mgmt.NewManagementServiceClient(cc),
 		UserV2:    user.NewUserServiceClient(cc),
 		SessionV2: session.NewSessionServiceClient(cc),
+		System:    system.NewSystemServiceClient(cc),
 	}
+}
+
+func (t *Tester) UseIsolatedInstance(iamOwnerCtx, systemCtx context.Context) (primaryDomain, instanceId string, authenticatedIamOwnerCtx context.Context) {
+	primaryDomain = randString(5) + ".integration"
+	instance, err := t.Client.System.CreateInstance(systemCtx, &system.CreateInstanceRequest{
+		InstanceName: "testinstance",
+		CustomDomain: primaryDomain,
+		Owner: &system.CreateInstanceRequest_Machine_{
+			Machine: &system.CreateInstanceRequest_Machine{
+				UserName:            "owner",
+				Name:                "owner",
+				PersonalAccessToken: &system.CreateInstanceRequest_PersonalAccessToken{},
+			},
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
+	t.createClientConn(iamOwnerCtx, grpc.WithAuthority(primaryDomain))
+	instanceId = instance.GetInstanceId()
+	t.Users[instanceId] = map[UserType]User{
+		IAMOwner: {
+			Token: instance.GetPat(),
+		},
+	}
+	return primaryDomain, instanceId, t.WithInstanceAuthorization(iamOwnerCtx, IAMOwner, instanceId)
 }
 
 func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse {

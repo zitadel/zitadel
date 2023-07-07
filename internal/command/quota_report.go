@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
-// ReportUsage calls notification hooks and emits the notified events
-func (c *Commands) ReportUsage(ctx context.Context, dueNotifications []*quota.NotificationDueEvent) error {
+// ReportQuotaUsage writes a slice of *quota.NotificationDueEvent directly to the eventstore
+func (c *Commands) ReportQuotaUsage(ctx context.Context, dueNotifications []*quota.NotificationDueEvent) error {
 	cmds := make([]eventstore.Command, len(dueNotifications))
 	for idx, notification := range dueNotifications {
 		cmds[idx] = notification
