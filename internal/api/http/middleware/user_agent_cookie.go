@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -72,9 +74,11 @@ func (ua *userAgentHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if err == nil {
 		ctx := context.WithValue(r.Context(), userAgentKey, agent.ID)
-		allowedHosts := authz.GetInstance(r.Context()).SecurityPolicyAllowedOrigins()
+		instance := authz.GetInstance(r.Context())
+		allowedHosts := instance.SecurityPolicyAllowedOrigins()
 		r = r.WithContext(ctx)
-		ua.setUserAgent(w, r.Host, agent, len(allowedHosts) > 0)
+		err = ua.setUserAgent(w, r.Host, agent, len(allowedHosts) > 0)
+		logging.WithFields("instanceID", instance.InstanceID()).OnError(err).Error("unable to set user agent cookie")
 	}
 	ua.nextHandler.ServeHTTP(w, r)
 }
