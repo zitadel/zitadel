@@ -1,219 +1,219 @@
 Login:
-  Title: Welcome back!
-  Description: Enter your login data.
-  TitleLinking: Login for user linking
-  DescriptionLinking: Enter your login data to link your external user with a ZITADEL user.
-  LoginNameLabel: Loginname
-  UsernamePlaceHolder: username
+  Title: Добредојдовте назад!
+  Description: Внесете ги вашите податоци за најава.
+  TitleLinking: Најава за поврзување на корисник
+  DescriptionLinking: Внесете ги вашите податоци за најава за да го поврзете вашиот надворешен корисник со корисник на ZITADEL.
+  LoginNameLabel: Корисничко име за најава
+  UsernamePlaceHolder: корисничко име
   LoginnamePlaceHolder: username@domain
-  ExternalUserDescription: Login with an external user.
-  MustBeMemberOfOrg: The user must be member of the {{.OrgName}} organization.
-  RegisterButtonText: register
-  NextButtonText: next
+  ExternalUserDescription: Најава со надворешен корисник.
+  MustBeMemberOfOrg: Корисникот мора да биде член на организацијата {{.OrgName}}.
+  RegisterButtonText: регистрирај се
+  NextButtonText: следно
 
 LDAP:
-  Title: Login
-  Description: Enter your login data.
-  LoginNameLabel: Loginname
-  PasswordLabel: Password
-  NextButtonText: next
+  Title: Најава
+  Description: Внесете ги вашите податоци за најава.
+  LoginNameLabel: Корисничко име за најава
+  PasswordLabel: Лозинка
+  NextButtonText: следно
 
 SelectAccount:
-  Title: Select account
-  Description: Use your ZITADEL-Account
-  TitleLinking: Select account for user linking
-  DescriptionLinking: Select your account to link with your external user.
-  OtherUser: Other User
-  SessionState0: active
-  SessionState1: inactive
-  MustBeMemberOfOrg: The user must be member of the {{.OrgName}} organization.
+  Title: Изберете корисничка сметка
+  Description: Користете ја вашата ZITADEL корисничка сметка
+  TitleLinking: Изберете корисничка сметка за поврзување на корисник
+  DescriptionLinking: Изберете ја вашата корисничка сметка за да ја поврзете со вашиот надворешен корисник.
+  OtherUser: Друг корисник
+  SessionState0: активна
+  SessionState1: неактивна
+  MustBeMemberOfOrg: Корисникот мора да биде член на организацијата {{.OrgName}}.
 
 Password:
-  Title: Password
-  Description: Enter your login data.
-  PasswordLabel: Password
-  MinLength: Minimum length
-  HasUppercase: Uppercase letter
-  HasLowercase: Lowercase letter
-  HasNumber: Number
-  HasSymbol: Symbol
-  Confirmation: Confirmation match
-  ResetLinkText: reset password
-  BackButtonText: back
-  NextButtonText: next
+  Title: Лозинка
+  Description: Внесете ги вашите податоци за најава.
+  PasswordLabel: Лозинка
+  MinLength: Минимална должина
+  HasUppercase: Голема буква
+  HasLowercase: Мала буква
+  HasNumber: Број
+  HasSymbol: Симбол
+  Confirmation: Потврда на лозинка
+  ResetLinkText: ресетирај лозинка
+  BackButtonText: назад
+  NextButtonText: следно
 
 UsernameChange:
-  Title: Change Username
-  Description: Set your new username
-  UsernameLabel: Username
-  CancelButtonText: cancel
-  NextButtonText: next
+  Title: Промена на корисничко име
+  Description: Поставете го вашето ново корисничко име
+  UsernameLabel: Корисничко име
+  CancelButtonText: откажи
+  NextButtonText: следно
 
 UsernameChangeDone:
-  Title: Username changed
-  Description: Your username was changed successfully.
-  NextButtonText: next
+  Title: Корисничкото име е променето
+  Description: Вашето корисничко име е успешно променето.
+  NextButtonText: следно
 
 InitPassword:
-  Title: Set Password
-  Description: You have received a code, which you have to enter in the form below, to set your new password.
-  CodeLabel: Code
-  NewPasswordLabel: New Password
-  NewPasswordConfirmLabel: Confirm Password
-  ResendButtonText: resend code
-  NextButtonText: next
+  Title: Поставете лозинка
+  Description: Добивте код кој треба да го внесете во формата подолу за да поставите нова лозинка.
+  CodeLabel: Код
+  NewPasswordLabel: Нова лозинка
+  NewPasswordConfirmLabel: Потврда на лозинка
+  ResendButtonText: повторно испрати код
+  NextButtonText: следно
 
 InitPasswordDone:
-  Title: Password set
-  Description: Password successfully set
-  NextButtonText: next
-  CancelButtonText: cancel
+  Title: Лозинката е поставена
+  Description: Лозинката е успешно поставена.
+  NextButtonText: следно
+  CancelButtonText: откажи
 
 InitUser:
-  Title: Activate User
-  Description: Verify your e-mail with the code below and set your password.
-  CodeLabel: Code
-  NewPasswordLabel: New Password
-  NewPasswordConfirm: Confirm Password
-  NextButtonText: next
-  ResendButtonText: resend code
+  Title: Активирајте корисник
+  Description: Проверете ја вашата е-пошта со кодот подолу и поставете ја вашата лозинка.
+  CodeLabel: Код
+  NewPasswordLabel: Нова лозинка
+  NewPasswordConfirm: Потврда на лозинка
+  NextButtonText: следно
+  ResendButtonText: повторно испрати код
 
 InitUserDone:
-  Title: User activated
-  Description: Email verified and Password successfully set
-  NextButtonText: next
-  CancelButtonText: cancel
+  Title: Корисникот е активиран
+  Description: Е-поштата е верифицирана и лозинката е успешно поставена.
+  NextButtonText: следно
+  CancelButtonText: откажи
 
 InitMFAPrompt:
-  Title: 2-Factor Setup
-  Description: 2-factor authentication gives you an additional security for your user account. This ensures that only you have access to your account.
-  Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
-  Provider1: Device dependent (e.g FaceID, Windows Hello, Fingerprint)
-  NextButtonText: next
-  SkipButtonText: skip
+  Title: Подесување на 2-факторска автентикација
+  Description: 2-факторската автентикација ви дава дополнителна безбедност за вашата корисничка сметка. Ова обезбедува само вие да имате пристап до вашата сметка.
+  Provider0: Апликација за автентикација (на пример Google/Microsoft Authenticator, Authy)
+  Provider1: Во зависност од вашиот уред (на пример FaceID, Windows Hello, отпечаток од прст)
+  NextButtonText: следно
+  SkipButtonText: прескокни
 
 InitMFAOTP:
-  Title: 2-Factor Verification
-  Description: Create your 2-factor. Download an authenticator app if you do not already have one.
-  OTPDescription: Scan the code with your authenticator app (e.g Google/Microsoft Authenticator, Authy) or copy the secret and insert the generated code below.
-  SecretLabel: Secret
-  CodeLabel: Code
-  NextButtonText: next
-  CancelButtonText: cancel
+  Title: Потврда на 2-факторска автентикација
+  Description: Креирајте ја вашата 2-факторска автентикација. Превземете апликација за автентикација доколку сѐ уште немате една.
+  OTPDescription: Скенирајте го кодот со вашата апликација за автентикација (на пример Google/Microsoft Authenticator, Authy) или копирајте го тајниот клуч и вметнете го генерираниот код подолу.
+  SecretLabel: Таен клуч
+  CodeLabel: Код
+  NextButtonText: следно
+  CancelButtonText: откажи
 
 InitMFAU2F:
-  Title: Add security key
-  Description: A security key is a verification method that can be built into your phone, use Bluetooth, or plug directly into your computer's USB port.
-  TokenNameLabel: Name of the security key / device
-  NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Add security key
-  ErrorRetry: Retry, create a new challenge or choose a different method.
+  Title: Додајте безбедносен клуч
+  Description: Безбедносниот клуч е метод на верификација кој може да се интегрира во вашиот телефон, да користи Bluetooth или директно да се поврзе во USB приклучокот на вашиот компјутер.
+  TokenNameLabel: Име на безбедносниот клуч / уред
+  NotSupported: WebAuthN не е поддржан од вашиот прелистувач. Ве молиме проверете дали е ажуриран со најновата верзија или пак користете друг прелистувач (на пример Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Додајте безбедносен клуч
+  ErrorRetry: Обидете се повторно, креирајте нов предизвик или изберете друг метод.
 
 InitMFADone:
-  Title: Security key verified
-  Description: Awesome! You just successfully set up your 2-factor and made your account way more secure. The Factor has to be entered on each login.
-  NextButtonText: next
-  CancelButtonText: cancel
+  Title: Потврден безбедносен клуч
+  Description: Одлично! Успешно ја подесивте вашата 2-факторска автентикација и ја зголемивте безбедноста на вашата корисничка сметка. Факторот мора да се користи при секоја најава.
+  NextButtonText: следно
+  CancelButtonText: откажи
 
 MFAProvider:
-  Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
-  Provider1: Device dependent (e.g FaceID, Windows Hello, Fingerprint)
-  ChooseOther: or choose another option
+  Provider0: Апликација за автентикација (на пример Google/Microsoft Authenticator, Authy)
+  Provider1: Во зависност од вашиот уред (на пример FaceID, Windows Hello, отпечаток од прст)
+  ChooseOther: или изберете друга опција
 
 VerifyMFAOTP:
-  Title: Verify 2-Factor
-  Description: Verify your second factor
-  CodeLabel: Code
-  NextButtonText: next
+  Title: Потврда на 2-факторска автентикација
+  Description: Потврдете ја 2-факторска автентикација
+  CodeLabel: Код
+  NextButtonText: следно
 
 VerifyMFAU2F:
-  Title: 2-Factor Verification
-  Description: Verify your 2-Factor with the registered device (e.g FaceID, Windows Hello, Fingerprint)
-  NotSupported: WebAuthN is not supported by your browser. Make sure you are using the newest version or change your browser to a supported one (Chrome, Safari, Firefox)
-  ErrorRetry: Retry, create a new request or choose a other method.
-  ValidateTokenButtonText: Verify 2-Factor
+  Title: Потврда на 2-факторска автентикација
+  Description: Потврдете ја вашата 2-факторска автентикација со регистрираниот уред (на пример FaceID, Windows Hello, отпечаток од прст)
+  NotSupported: WebAuthN не е поддржан од вашиот прелистувач. Ве молиме проверете дали е ажуриран со најновата верзија или пак користете друг прелистувач (Chrome, Safari, Firefox)
+  ErrorRetry: Обидете се повторно, креирајте нов барање или изберете друг метод.
+  ValidateTokenButtonText: Потврди 2-факторска автентикација
 
 Passwordless:
-  Title: Login passwordless
-  Description: Login with authentication methods provided by your device like FaceID, Windows Hello or Fingerprint.
-  NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
-  ErrorRetry: Retry, create a new challenge or choose a different method.
-  LoginWithPwButtonText: Login with password
-  ValidateTokenButtonText: Login with passwordless
+  Title: Најава без лозинка
+  Description: Најавете се со методи за автентикација кои ги нуди вашиот уред, како FaceID, Windows Hello или отпечаток од прст.
+  NotSupported: WebAuthN не е поддржан од вашиот прелистувач. Ве молиме проверете дали е ажуриран со најновата верзија или пак користете друг прелистувач (на пример Chrome, Safari, Firefox)
+  ErrorRetry: Обидете се повторно, креирајте нов предизвик или изберете друг метод.
+  LoginWithPwButtonText: Најава со лозинка
+  ValidateTokenButtonText: Најава без лозинка
 
 PasswordlessPrompt:
-  Title: Passwordless setup
-  Description: Would you like to setup passwordless login? (Authentication methods of your device like FaceID, Windows Hello or Fingerprint)
-  DescriptionInit: You need to set up passwordless login. Use the link you were given to register your device.
-  PasswordlessButtonText: Go passwordless
-  NextButtonText: next
-  SkipButtonText: skip
+  Title: Подесување на најава без лозинка
+  Description: Дали сакате да подесите најава без лозинка? (Методи за автентикација на вашиот уред, како FaceID, Windows Hello или отпечаток од прст)
+  DescriptionInit: Мора да подесите најава без лозинка. Користете го линкот што ви беше даден за регистрација на вашиот уред.
+  PasswordlessButtonText: Отиди на најава без лозинка
+  NextButtonText: следно
+  SkipButtonText: прескокни
 
 PasswordlessRegistration:
-  Title: Passwordless setup
-  Description: Add your authentication by providing a name (e.g MyMobilePhone, MacBook, etc) and then clicking on the 'Register passwordless' button below.
-  TokenNameLabel: Name of the device
-  NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Register passwordless
-  ErrorRetry: Retry, create a new challenge or choose a different method.
+  Title: Подесување на најава без лозинка
+  Description: Додадете ја вашата автентикација со давање на име (на пример, МојМобиленТелефон, MacBook итн) и кликнете на копчето 'Регистрирај најава без лозинка' подолу.
+  TokenNameLabel: Име на уредот
+  NotSupported: WebAuthN не е поддржан од вашиот прелистувач. Ве молиме проверете дали е ажуриран со најновата верзија или пак користете друг прелистувач (на пример, Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Регистрирај најава без лозинка
+  ErrorRetry: Обидете се повторно, креирајте нов предизвик или изберете друг метод.
 
 PasswordlessRegistrationDone:
-  Title: Passwordless set up
-  Description: Device for passwordless successfully added.
-  DescriptionClose: You can now close this window.
-  NextButtonText: next
-  CancelButtonText: cancel
+  Title: Подесена најава без лозинка
+  Description: Уредот за најава без лозинка е успешно додаден.
+  DescriptionClose: Сега можете да го затворите овој прозорец.
+  NextButtonText: следно
+  CancelButtonText: откажи
 
 PasswordChange:
-  Title: Change Password
-  Description: Change your password. Enter your old and new password.
-  OldPasswordLabel: Old Password
-  NewPasswordLabel: New Password
-  NewPasswordConfirmLabel: Password confirmation
-  CancelButtonText: cancel
-  NextButtonText: next
-  Footer: Footer
+  Title: Промена на лозинка
+  Description: Променете ја вашата лозинка. Внесете ја старата и новата лозинка.
+  OldPasswordLabel: Стара лозинка
+  NewPasswordLabel: Нова лозинка
+  NewPasswordConfirmLabel: Потврда на лозинка
+  CancelButtonText: откажи
+  NextButtonText: следно
+  Footer: Футер
 
 PasswordChangeDone:
-  Title: Change Password
-  Description: Your password was changed successfully.
-  NextButtonText: next
+  Title: Промена на лозинка
+  Description: Вашата лозинка беше успешно променета.
+  NextButtonText: следно
 
 PasswordResetDone:
-  Title: Password reset link sent
-  Description: Check your email to reset your password.
-  NextButtonText: next
+  Title: Пратен линк за ресетирање на лозинка
+  Description: Проверете ја вашата е-пошта за ресетирање на лозинката.
+  NextButtonText: следно
 
 EmailVerification:
-  Title: E-Mail Verification
-  Description: We have sent you an email to verify your address. Please enter the code in the form below.
-  CodeLabel: Code
-  NextButtonText: next
-  ResendButtonText: resend code
+  Title: Верификација на е-пошта
+  Description: Ви пративме е-пошта за да ја верификувате вашата адреса за е-пошта. Ве молиме внесете го кодот во формата подолу.
+  CodeLabel: Код
+  NextButtonText: следно
+  ResendButtonText: испрати повторно
 
 EmailVerificationDone:
-  Title: E-Mail Verification
-  Description: Your email address has been successfully verified.
-  NextButtonText: next
-  CancelButtonText: cancel
-  LoginButtonText: login
+  Title: Верификација на е-пошта
+  Description: Вашата е-пошта беше успешно верифицирана.
+  NextButtonText: следно
+  CancelButtonText: откажи
+  LoginButtonText: најава
 
 RegisterOption:
-  Title: Registration Options
-  Description: Choose how you'd like to register
-  RegisterUsernamePasswordButtonText: With username password
-  ExternalLoginDescription: or register with an external user
-  LoginButtonText: login
+  Title: Опции за регистрација
+  Description: Изберете како сакате да се регистрирате
+  RegisterUsernamePasswordButtonText: Со корисничко име и лозинка
+  ExternalLoginDescription: или регистрирајте се со надворешен корисник
+  LoginButtonText: најава
 
 RegistrationUser:
-  Title: Registration
-  Description: Enter your Userdata. Your email address will be used as loginname.
-  DescriptionOrgRegister: Enter your Userdata.
-  EmailLabel: E-Mail
-  UsernameLabel: Username
-  FirstnameLabel: Given name
-  LastnameLabel: Family name
-  LanguageLabel: Language
+  Title: Регистрација
+  Description: Внесете ги вашите кориснички податоци. Вашата е-пошта ќе се користи како корисничко име.
+  DescriptionOrgRegister: Внесете ги вашите кориснички податоци.
+  EmailLabel: Е-пошта
+  UsernameLabel: Корисничко име
+  FirstnameLabel: Име
+  LastnameLabel: Презиме
+  LanguageLabel: Јазик
   German: Deutsch
   English: English
   Italian: Italiano
@@ -223,31 +223,31 @@ RegistrationUser:
   Japanese: 日本語
   Spanish: Español
   Macedonian: Македонски
-  GenderLabel: Gender
-  Female: Female
-  Male: Male
-  Diverse: diverse / X
-  PasswordLabel: Password
-  PasswordConfirmLabel: Password confirmation
-  TosAndPrivacyLabel: Terms and conditions
-  TosConfirm: I accept the
-  TosLinkText: TOS
-  PrivacyConfirm: I accept the
-  PrivacyLinkText: privacy policy
-  ExternalLogin: or register with an external user
-  BackButtonText: login
-  NextButtonText: next
+  GenderLabel: Пол
+  Female: Женски
+  Male: Машки
+  Diverse: различен / X
+  PasswordLabel: Лозинка
+  PasswordConfirmLabel: Потврда на лозинка
+  TosAndPrivacyLabel: Правила и услови
+  TosConfirm: Се согласувам со
+  TosLinkText: правилата за користење
+  PrivacyConfirm: Се согласувам со
+  PrivacyLinkText: политиката за приватност
+  ExternalLogin: или регистрирајте се со надворешен корисник
+  BackButtonText: најава
+  NextButtonText: следно
 
 ExternalRegistrationUserOverview:
-  Title: External User Registration
-  Description: We have taken your user details from the selected provider. You can now change or complete them.
-  EmailLabel: E-Mail
-  UsernameLabel: Username
-  FirstnameLabel: Given name
-  LastnameLabel: Family name
-  NicknameLabel: Nickname
-  PhoneLabel: Phonenumber
-  LanguageLabel: Language
+  Title: Регистрација на надворешен корисник
+  Description: Ги преземаме вашите податоци за корисник од избраниот провајдер. Сега можете да ги промените или дополните.
+  EmailLabel: Е-пошта
+  UsernameLabel: Корисничко име
+  FirstnameLabel: Име
+  LastnameLabel: Презиме
+  NicknameLabel: Прекар
+  PhoneLabel: Телефонски број
+  LanguageLabel: Јазик
   German: Deutsch
   English: English
   Italian: Italiano
@@ -257,59 +257,59 @@ ExternalRegistrationUserOverview:
   Polish: Polski
   Spanish: Español
   Macedonian: Македонски
-  TosAndPrivacyLabel: Terms and conditions
-  TosConfirm: I accept the
-  TosLinkText: TOS
-  PrivacyConfirm: I accept the
-  PrivacyLinkText: privacy policy
-  ExternalLogin: or register with an external user
-  BackButtonText: back
-  NextButtonText: save
+  TosAndPrivacyLabel: Правила и услови
+  TosConfirm: Се согласувам со
+  TosLinkText: правилата за користење
+  PrivacyConfirm: Се согласувам со
+  PrivacyLinkText: политиката за приватност
+  ExternalLogin: или регистрирајте се со надворешен корисник
+  BackButtonText: назад
+  NextButtonText: зачувај
 
 RegistrationOrg:
-  Title: Organization Registration
-  Description: Enter your organization name and userdata.
-  OrgNameLabel: Organization name
-  EmailLabel: E-Mail
-  UsernameLabel: Username
-  FirstnameLabel: Given name
-  LastnameLabel: Family name
-  PasswordLabel: Password
-  PasswordConfirmLabel: Password confirmation
-  TosAndPrivacyLabel: Terms and conditions
-  TosConfirm: I accept the
-  TosLinkText: TOS
-  PrivacyConfirm: I accept the
-  PrivacyLinkText: privacy policy
-  SaveButtonText: Create organization
+  Title: Регистрација на организација
+  Description: Внесете го името и податоците на вашата организација.
+  OrgNameLabel: Име на организација
+  EmailLabel: Е-пошта
+  UsernameLabel: Корисничко име
+  FirstnameLabel: Име
+  LastnameLabel: Презиме
+  PasswordLabel: Лозинка
+  PasswordConfirmLabel: Потврда на лозинка
+  TosAndPrivacyLabel: Правила и услови
+  TosConfirm: Се согласувам со
+  TosLinkText: правилата за користење
+  PrivacyConfirm: Се согласувам со
+  PrivacyLinkText: политиката за приватност
+  SaveButtonText: Креирај организација
 
 LoginSuccess:
-  Title: Login successful
-  AutoRedirectDescription: You will be directed back to your application automatically. If not, click on the button below. You can close the window afterwards.
-  RedirectedDescription: You can now close this window.
-  NextButtonText: next
+  Title: Успешна најава
+  AutoRedirectDescription: Ќе бидете автоматски пренасочени назад кон вашата апликација. Доколку не сте автоматски пренасочени, кликнете на копчето подолу. Потоа можете да го затворите прозорецот.
+  RedirectedDescription: Сега можете да го затворите овој прозорец.
+  NextButtonText: следно
 
 LogoutDone:
-  Title: Logged out
-  Description: You have logged out successfully.
-  LoginButtonText: login
+  Title: Одјавени
+  Description: Успешно сте одјавени.
+  LoginButtonText: најава
 
 LinkingUsersDone:
-  Title: Userlinking
-  Description: Userlinking done.
-  CancelButtonText: cancel
-  NextButtonText: next
+  Title: Поврзување на корисници
+  Description: Поврзувањето на корисници е завршено.
+  CancelButtonText: откажи
+  NextButtonText: следно
 
 ExternalNotFound:
-  Title: External User not found
-  Description: External user not found. Do you want to link your user or auto register a new one.
-  LinkButtonText: Link
-  AutoRegisterButtonText: register
-  TosAndPrivacyLabel: Terms and conditions
-  TosConfirm: I accept the
-  TosLinkText: TOS
-  PrivacyConfirm: I accept the
-  PrivacyLinkText: privacy policy
+  Title: Не е пронајден надворешен корисник
+  Description: Надворешниот корисник не е пронајден. Дали сакате да го поврзете вашиот корисник или автоматски да регистрирате нов.
+  LinkButtonText: Поврзи
+  AutoRegisterButtonText: регистрирај
+  TosAndPrivacyLabel: Правила и услови
+  TosConfirm: Се согласувам со
+  TosLinkText: правилата за користење
+  PrivacyConfirm: Се согласувам со
+  PrivacyLinkText: политиката за приватност
   German: Deutsch
   English: English
   Italian: Italiano
@@ -320,134 +320,134 @@ ExternalNotFound:
   Spanish: Español
   Bulgarian: Български
   Macedonian: Македонски
-  
+
 DeviceAuth:
-  Title: Device Authorization
+  Title: Овластување преку уред
   UserCode:
-    Label: User Code
-    Description: Enter the user code presented on the device.
-    ButtonNext: next
+    Label: Код на корисник
+    Description: Внесете го кодот на корисникот прикажан на уредот.
+    ButtonNext: следно
   Action:
-    Description: Grant device access.
-    GrantDevice: you are about to grant device
-    AccessToScopes: access to the following scopes
+    Description: Овластување за пристап за уред.
+    GrantDevice: со ова ќе овозможите уредот да има право за
+    AccessToScopes: пристап до следниве области
     Button:
-      Allow: allow
-      Deny: deny
+      Allow: овозможи
+      Deny: одбиј
   Done:
-    Description: Done.
-    Approved: Device authorization approved. You can now return to the device.
-    Denied: Device authorization denied. You can now return to the device.
+    Description: Завршено.
+    Approved: Овластувањето на уредот е одобрено. Сега можете да се вратите на уредот.
+    Denied: Овластувањето на уредот е одбиено. Сега можете да се вратите на уредот.
 
 Footer:
-  PoweredBy: Powered By
-  Tos: TOS
-  PrivacyPolicy: Privacy policy
-  Help: Help
-  SupportEmail: Support E-mail
+  PoweredBy: Поддржано од
+  Tos: Услови за користење
+  PrivacyPolicy: Политика за приватност
+  Help: Помош
+  SupportEmail: Е-пошта за поддршка
 
 Errors:
-  Internal: An internal error occurred
+  Internal: Се појави внатрешна грешка
   AuthRequest:
-    NotFound: Could not find authrequest
-    UserAgentNotCorresponding: User Agent does not correspond
-    UserAgentNotFound: User Agent ID not found
-    TokenNotFound: Token not found
-    RequestTypeNotSupported: Request type is not supported
-    MissingParameters: Required parameters missing
+    NotFound: Не може да се пронајде барањето за автентикација
+    UserAgentNotCorresponding: User Agent не се совпаѓа
+    UserAgentNotFound: Не е пронајден User Agent ID
+    TokenNotFound: Токенот не е пронајден
+    RequestTypeNotSupported: Типот на барање не е подржан
+    MissingParameters: Недостасуваат задолжителни параметри
   User:
-    NotFound: User could not be found
-    AlreadyExists: User already exists
-    Inactive: User is inactive
-    NotFoundOnOrg: User could not be found on chosen organization
-    NotAllowedOrg: User is no member of the required organization
-    NotMatchingUserID: User and user in authrequest don't match
-    UserIDMissing: UserID is empty
-    Invalid: Invalid userdata
-    DomainNotAllowedAsUsername: Domain is already reserved and cannot be used
-    NotAllowedToLink: User is not allowed to link with external login provider
+    NotFound: Корисникот не е пронајден
+    AlreadyExists: Корисникот веќе постои
+    Inactive: Корисникот е неактивен
+    NotFoundOnOrg: Корисникот не е пронајден во избраната организација
+    NotAllowedOrg: Корисникот не е член на бараната организација
+    NotMatchingUserID: Корисникот и корисникот во барањето за автентикација не се совпаѓаат
+    UserIDMissing: ID на корисник е празно
+    Invalid: Невалидни кориснички податоци
+    DomainNotAllowedAsUsername: Доменот е веќе резервиран и не може да се користи
+    NotAllowedToLink: Корисникот нема дозвола да се поврзе со надворешен провајдер за најава
     Profile:
-      NotFound: Profile not found
-      NotChanged: Profile not changed
-      Empty: Profile is empty
-      FirstNameEmpty: Given name in profile is empty
-      LastNameEmpty: Family name in profile is empty
-      IDMissing: Profile ID is missing
+      NotFound: Профилот не е пронајден
+      NotChanged: Профилот не е променет
+      Empty: Профилот е празен
+      FirstNameEmpty: Името во профилот е празно
+      LastNameEmpty: Презимето во профилот е празно
+      IDMissing: ID на профил е празно
     Email:
-      NotFound: Email not found
-      Invalid: Email is invalid
-      AlreadyVerified: Email is already verified
-      NotChanged: Email not changed
-      Empty: Email is empty
-      IDMissing: Email ID is missing
+      NotFound: Е-поштата не е пронајдена
+      Invalid: Е-поштата не е валидна
+      AlreadyVerified: Е-поштата веќе е верифицирана
+      NotChanged: Е-поштата не е променета
+      Empty: Е-поштата е празна
+      IDMissing: ID на е-пошта е празно
     Phone:
-      NotFound: Phone not found
-      Invalid: Phone is invalid
-      AlreadyVerified: Phone already verified
-      Empty: Phone is empty
-      NotChanged: Phone not changed
+      NotFound: Телефонскиот број не е пронајден
+      Invalid: Телефонскиот број не е валиден
+      AlreadyVerified: Телефонскиот број е веќе верифициран
+      Empty: Телефонскиот број е празен
+      NotChanged: Телефонскиот број не е променет
     Address:
-      NotFound: Address not found
-      NotChanged: Address not changed
+      NotFound: Адресата не е пронајдена
+      NotChanged: Адресата не е променета
     Username:
-      AlreadyExists: Username already taken
-      Reserved: Username is already taken
-      Empty: Username is empty
+      AlreadyExists: Корисничкото име е веќе зафатено
+      Reserved: Корисничкото име е веќе зафатено
+      Empty: Корисничкото име е празно
     Password:
-      ConfirmationWrong: Password confirmation is wrong
-      Empty: Password is empty
-      Invalid: Password is invalid
-      InvalidAndLocked: Password is invalid and user is locked, contact your administrator.
+      ConfirmationWrong: Потврдата на лозинката не е точна
+      Empty: Лозинката е празна
+      Invalid: Лозинката не е валидна
+      InvalidAndLocked: Лозинката не е валидна и корисникот е заклучен, контактирајте со вашиот администратор.
     UsernameOrPassword:
-      Invalid: Username or Password is invalid
+      Invalid: Корисничкото име и/или лозинката не се валидни
     PasswordComplexityPolicy:
-      NotFound: Password policy not found
-      MinLength: Password is too short
-      HasLower: Password must contain lower letter
-      HasUpper: Password must contain upper letter
-      HasNumber: Password must contain number
-      HasSymbol: Password must contain symbol
+      NotFound: Политиката за сложеност на лозинката не е пронајдена
+      MinLength: Лозинката е прекратка
+      HasLower: Лозинката мора да содржи мала буква
+      HasUpper: Лозинката мора да содржи голема буква
+      HasNumber: Лозинката мора да содржи број
+      HasSymbol: Лозинката мора да содржи симбол
     Code:
-      Expired: Code is expired
-      Invalid: Code is invalid
-      Empty: Code is empty
-      CryptoCodeNil: Crypto code is nil
-      NotFound: Could not find code
-      GeneratorAlgNotSupported: Unsupported generator algorithm
+      Expired: Кодот е истечен
+      Invalid: Кодот не е валиден
+      Empty: Кодот е празен
+      CryptoCodeNil: Крипто кодот е nil
+      NotFound: Кодот не е пронајден
+      GeneratorAlgNotSupported: Неподдржан алгоритам на генераторот
     EmailVerify:
-      UserIDEmpty: UserID is empty
+      UserIDEmpty: ID на корисник е празно
     ExternalData:
-      CouldNotRead: External data could not be read correctly
+      CouldNotRead: Надворешните податоци не можеа да се прочитаат точно
     MFA:
-      NoProviders: No available multifactor providers
+      NoProviders: Нема достапни провајдери за мултифакторна автентикација
       OTP:
-        AlreadyReady: Multifactor OTP (OneTimePassword) is already setup
-        NotExisting: Multifactor OTP (OneTimePassword) doesn't exist
-        InvalidCode: Invalid code
-        NotReady: Multifactor OTP (OneTimePassword) isn't ready
-    Locked: User is locked
-    SomethingWentWrong: Something went wrong
-    NotActive: User is not active
+        AlreadyReady: Мултифакторната OTP (Еднократна Лозинка) е веќе подесена
+        NotExisting: Мултифакторната OTP (Еднократна Лозинка) не постои
+        InvalidCode: Невалиден код
+        NotReady: Мултифакторната OTP (Еднократна Лозинка) не е подготвена
+    Locked: Корисникот е заклучен
+    SomethingWentWrong: Се случи нешто неочекувано
+    NotActive: Корисникот не е активен
     ExternalIDP:
-      IDPTypeNotImplemented: IDP Type is not implemented
-      NotAllowed: External Login Provider not allowed
-      IDPConfigIDEmpty: Identity Provider ID is empty
-      ExternalUserIDEmpty: External User ID is empty
-      UserDisplayNameEmpty: User Display Name is empty
-      NoExternalUserData: No external User Data received
-      CreationNotAllowed: Creation of a new user is not allowed on this Provider
-      LinkingNotAllowed: Linking of a user is not allowed on this Provider
-    GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
-    ProjectRequired: Login not possible. The organization of the user must be granted to the project. Please contact your administrator.
+      IDPTypeNotImplemented: Типот на идентитетски надворешен провајдер не е имплементиран
+      NotAllowed: Надворешниот идентитетски провајдер за најава не е дозволен
+      IDPConfigIDEmpty: ID на надворешниот идентитетски провајдер е празно
+      ExternalUserIDEmpty: ID на надворешниот корисник е празно
+      UserDisplayNameEmpty: Приказното име на корисникот е празно
+      NoExternalUserData: Нема преземени податоци за надворешен корисник
+      CreationNotAllowed: Креирањето на нов корисник не е дозволено на овој провајдер
+      LinkingNotAllowed: Поврзувањето на корисник не е дозволено на овој провајдер
+    GrantRequired: Не е можно најавување. Корисникот мора да има барем едно овластување за апликацијата. Ве молиме контактирајте го вашиот администратор.
+    ProjectRequired: Не е можно најавување. Организацијата на корисникот мора да биде доделена на проектот. Ве молиме контактирајте го вашиот администратор.
   IdentityProvider:
-    InvalidConfig: Identity Provider configuration is invalid
+    InvalidConfig: Конфигурацијата на идентитетскиот провајдер не е валидна
   IAM:
     LockoutPolicy:
-      NotExisting: Lockout Policy not existing
+      NotExisting: Политиката за заклучување не постои
   Org:
     LoginPolicy:
-      RegistrationNotAllowed: Registration is not allowed
+      RegistrationNotAllowed: Не е дозволена регистрација
   DeviceAuth:
-    NotExisting: User Code doesn't exist
+    NotExisting: Кодот на корисникот не постои
 
-optional: (optional)
+optional: (опционално)
