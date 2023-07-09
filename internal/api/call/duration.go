@@ -9,12 +9,18 @@ type durationKey struct{}
 
 var key *durationKey = (*durationKey)(nil)
 
-// WithTimestamp sets [time.Now()] adds the call field to the context
-// if it's not already set
+// WithTimestamp sets [time.Now()] to the call field in the context
+// if it's not already set.
 func WithTimestamp(parent context.Context) context.Context {
 	if parent.Value(key) != nil {
 		return parent
 	}
+	return ResetTimestamp(parent)
+}
+
+// ResetTimestamp sets [time.Now()] to the call field in the context,
+// overwriting any previously set call timestamp.
+func ResetTimestamp(parent context.Context) context.Context {
 	return context.WithValue(parent, key, time.Now())
 }
 
