@@ -29,19 +29,23 @@ export class SearchOrgAutocompleteComponent implements OnInit, OnDestroy {
         debounceTime(200),
         tap(() => (this.isLoading = true)),
         switchMap((value) => {
-          const query = new OrgQuery();
+          const stateQuery = new OrgQuery();
           const orgStateQuery = new OrgStateQuery();
           orgStateQuery.setState(OrgState.ORG_STATE_ACTIVE);
-          query.setStateQuery(orgStateQuery);
+          stateQuery.setStateQuery(orgStateQuery);
+
+          let queries: OrgQuery[] = [stateQuery];
 
           if (value) {
+            const nameQuery = new OrgQuery();
             const orgNameQuery = new OrgNameQuery();
             orgNameQuery.setName(value);
             orgNameQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-            query.setNameQuery(orgNameQuery);
+            nameQuery.setNameQuery(orgNameQuery);
+            queries = [stateQuery, nameQuery];
           }
 
-          return from(this.auth.listMyProjectOrgs(undefined, 0, query ? [query] : undefined)).pipe(
+          return from(this.auth.listMyProjectOrgs(undefined, 0, queries)).pipe(
             map((resp) => {
               return resp.resultList.sort((left, right) => left.name.localeCompare(right.name));
             }),
@@ -60,7 +64,7 @@ export class SearchOrgAutocompleteComponent implements OnInit, OnDestroy {
     orgStateQuery.setState(OrgState.ORG_STATE_ACTIVE);
     query.setStateQuery(orgStateQuery);
 
-    this.auth.listMyProjectOrgs(undefined, 0, query ? [query] : undefined).then((orgs) => {
+    this.auth.listMyProjectOrgs(undefined, 0, [query]).then((orgs) => {
       this.filteredOrgs = orgs.resultList;
     });
   }
