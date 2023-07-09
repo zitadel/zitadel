@@ -106,7 +106,10 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
       .subscribe((userresp: ListUsersResponse.AsObject | unknown) => {
         this.isLoading = false;
         if (this.target === UserTarget.SELF && userresp) {
-          this.filteredUsers = (userresp as ListUsersResponse.AsObject).resultList;
+          const filteredUsers = (userresp as ListUsersResponse.AsObject).resultList;
+          this.filteredUsers = filteredUsers.filter((filteredUser) => {
+            return !this.users.map((u) => u.id).includes(filteredUser.id);
+          });
         }
       });
   }
