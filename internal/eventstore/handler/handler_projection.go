@@ -6,9 +6,11 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/pseudo"
 )
@@ -110,27 +112,51 @@ func NewProjectionHandler(
 	return h
 }
 
-// Trigger handles all events for the provided instances (or current instance from context if non specified)
-// by calling FetchEvents and Process until the amount of events is smaller than the BulkLimit
-func (h *ProjectionHandler) Trigger(ctx context.Context, instances ...string) error {
-	ids := []string{authz.GetInstance(ctx).InstanceID()}
-	if len(instances) > 0 {
-		ids = instances
+func triggerInstances(ctx context.Context, instances []string) []string {
+	if len(instances) == 0 {
+		instances = append(instances, authz.GetInstance(ctx).InstanceID())
 	}
+	return instances
+}
+
+// Trigger handles all events for the provided instances (or current instance from context if non specified)
+// by calling FetchEvents and Process until the amount of events is smaller than the BulkLimit.
+// If a bulk action was executed, the call timestamp in context will be reset for subsequent queries.
+// The returned context is never nil. It is either the original context or an updated context.
+//
+// If Trigger encounters an error, it is only logged. If the error is important for the caller,
+// use TriggerErr instead.
+func (h *ProjectionHandler) Trigger(ctx context.Context, instances ...string) context.Context {
+	instances = triggerInstances(ctx, instances)
+	ctx, err := h.TriggerErr(ctx, instances...)
+	logging.OnError(err).WithFields(logrus.Fields{
+		"projection":  h.ProjectionName,
+		"instanceIDs": instances,
+	}).Error("trigger failed")
+	return ctx
+}
+
+// TriggerErr handles all events for the provided instances (or current instance from context if non specified)
+// by calling FetchEvents and Process until the amount of events is smaller than the BulkLimit.
+// If a bulk action was executed, the call timestamp in context will be reset for subsequent queries.
+// The returned context is never nil. It is either the original context or an updated context.
+func (h *ProjectionHandler) TriggerErr(ctx context.Context, instances ...string) (context.Context, error) {
+	instances = triggerInstances(ctx, instances)
 	for {
-		events, hasLimitExceeded, err := h.FetchEvents(ctx, ids...)
+		events, hasLimitExceeded, err := h.FetchEvents(ctx, instances...)
 		if err != nil {
-			return err
+			return ctx, err
 		}
 		if len(events) == 0 {
-			return nil
+			return ctx, nil
 		}
 		_, err = h.Process(ctx, events...)
+		ctx = call.ResetTimestamp(ctx)
 		if err != nil {
-			return err
+			return ctx, err
 		}
 		if !hasLimitExceeded {
-			return nil
+			return ctx, nil
 		}
 	}
 }
@@ -274,7 +300,7 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 				continue
 			}
 			go h.cancelOnErr(lockInstanceCtx, errs, cancelInstanceLock)
-			err = h.Trigger(lockInstanceCtx, instances...)
+			_, err = h.TriggerErr(lockInstanceCtx, instances...)
 			if err != nil {
 				logging.WithFields("projection", h.ProjectionName, "instanceIDs", instances).WithError(err).Error("trigger failed")
 				failed = true
