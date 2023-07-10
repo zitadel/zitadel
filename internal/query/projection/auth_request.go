@@ -73,6 +73,14 @@ func (p *authRequestProjection) reducers() []handler.AggregateReducer {
 					Event:  authrequest.AddedType,
 					Reduce: p.reduceAuthRequestAdded,
 				},
+				{
+					Event:  authrequest.SucceededType,
+					Reduce: p.reduceAuthRequestEnded,
+				},
+				{
+					Event:  authrequest.FailedType,
+					Reduce: p.reduceAuthRequestEnded,
+				},
 			},
 		},
 		{
@@ -111,6 +119,24 @@ func (p *authRequestProjection) reduceAuthRequestAdded(event eventstore.Event) (
 			handler.NewCol(AuthRequestColumnMaxAge, e.MaxAge),
 			handler.NewCol(AuthRequestColumnLoginHint, e.LoginHint),
 			handler.NewCol(AuthRequestColumnHintUserID, e.HintUserID),
+		},
+	), nil
+}
+
+func (p *authRequestProjection) reduceAuthRequestEnded(event eventstore.Event) (*handler.Statement, error) {
+	switch event.(type) {
+	case *authrequest.SucceededEvent,
+		*authrequest.FailedEvent:
+		break
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ASF3h", "reduce.wrong.event.type %s", []eventstore.EventType{authrequest.SucceededType, authrequest.FailedType})
+	}
+
+	return crdb.NewDeleteStatement(
+		event,
+		[]handler.Condition{
+			handler.NewCond(AuthRequestColumnID, event.Aggregate().ID),
+			handler.NewCond(AuthRequestColumnInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }

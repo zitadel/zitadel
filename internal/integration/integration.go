@@ -166,10 +166,9 @@ func (s *Tester) createMachineUser(ctx context.Context, instanceId string) {
 	s.Organisation, err = s.Queries.OrgByID(ctx, true, s.Instance.DefaultOrganisationID())
 	logging.OnError(err).Fatal("query organisation")
 
-	query, err := query.NewUserUsernameSearchQuery(MachineUser, query.TextEquals)
+	usernameQuery, err := query.NewUserUsernameSearchQuery(MachineUser, query.TextEquals)
 	logging.OnError(err).Fatal("user query")
-	user, err := s.Queries.GetUser(ctx, true, true, query)
-
+	user, err := s.Queries.GetUser(ctx, true, true, usernameQuery)
 	if errors.Is(err, sql.ErrNoRows) {
 		_, err = s.Commands.AddMachine(ctx, &command.Machine{
 			ObjectRoot: models.ObjectRoot{
@@ -181,8 +180,7 @@ func (s *Tester) createMachineUser(ctx context.Context, instanceId string) {
 			AccessTokenType: domain.OIDCTokenTypeJWT,
 		})
 		logging.WithFields("username", SystemUser).OnError(err).Fatal("add machine user")
-		user, err = s.Queries.GetUser(ctx, true, true, query)
-
+		user, err = s.Queries.GetUser(ctx, true, true, usernameQuery)
 	}
 	logging.WithFields("username", SystemUser).OnError(err).Fatal("get user")
 
@@ -212,10 +210,9 @@ func (s *Tester) createLoginClient(ctx context.Context) {
 	s.Organisation, err = s.Queries.OrgByID(ctx, true, s.Instance.DefaultOrganisationID())
 	logging.OnError(err).Fatal("query organisation")
 
-	query, err := query.NewUserUsernameSearchQuery(LoginUser, query.TextEquals)
+	usernameQuery, err := query.NewUserUsernameSearchQuery(LoginUser, query.TextEquals)
 	logging.WithFields("username", LoginUser).OnError(err).Fatal("user query")
-	user, err := s.Queries.GetUser(ctx, true, true, query)
-
+	user, err := s.Queries.GetUser(ctx, true, true, usernameQuery)
 	if errors.Is(err, sql.ErrNoRows) {
 		_, err = s.Commands.AddMachine(ctx, &command.Machine{
 			ObjectRoot: models.ObjectRoot{
@@ -227,8 +224,7 @@ func (s *Tester) createLoginClient(ctx context.Context) {
 			AccessTokenType: domain.OIDCTokenTypeJWT,
 		})
 		logging.WithFields("username", LoginUser).OnError(err).Fatal("add machine user")
-		user, err = s.Queries.GetUser(ctx, true, true, query)
-
+		user, err = s.Queries.GetUser(ctx, true, true, usernameQuery)
 	}
 	logging.WithFields("username", LoginUser).OnError(err).Fatal("get user")
 

@@ -115,7 +115,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, authRequestID st
 		eventstore:               c.eventstore,
 		idGenerator:              c.idGenerator,
 		encryptionAlg:            c.keyAlgorithm,
-		oidcSessionWriteModel:    NewOIDCSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID()), //TODO: ro?
+		oidcSessionWriteModel:    NewOIDCSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID()),
 		sessionWriteModel:        sessionWriteModel,
 		authRequestWriteModel:    authRequestWriteModel,
 		accessTokenLifetime:      accessTokenLifetime,
@@ -145,7 +145,7 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, oidcSessionID
 	if err != nil {
 		return nil, err
 	}
-	sessionWriteModel := NewOIDCSessionWriteModel(oidcSessionID, authz.GetInstance(ctx).InstanceID()) //TODO: ro?
+	sessionWriteModel := NewOIDCSessionWriteModel(oidcSessionID, authz.GetInstance(ctx).InstanceID())
 	if err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}

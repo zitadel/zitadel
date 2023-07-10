@@ -63,6 +63,60 @@ func TestAuthRequestProjection_reduces(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "reduceAuthRequestFailed",
+			args: args{
+				event: getEvent(testEvent(
+					authrequest.FailedType,
+					authrequest.AggregateType,
+					[]byte(`{"reason": 0}`),
+				), authrequest.FailedEventMapper),
+			},
+			reduce: (&authRequestProjection{}).reduceAuthRequestEnded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("auth_request"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.auth_requests WHERE (id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceAuthRequestSucceeded",
+			args: args{
+				event: getEvent(testEvent(
+					authrequest.SucceededType,
+					authrequest.AggregateType,
+					nil,
+				), authrequest.SucceededEventMapper),
+			},
+			reduce: (&authRequestProjection{}).reduceAuthRequestEnded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("auth_request"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.auth_requests WHERE (id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
