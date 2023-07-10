@@ -1781,6 +1781,8 @@
     "DELETE": "削除",
     "DELETE_TITLE": "IDPの削除",
     "DELETE_DESCRIPTION": "IDプロバイダーを削除しようとしています。変更は取消できません。本当によろしいですか？",
+    "REMOVE_WARN_TITLE": "IDPを削除する",
+    "REMOVE_WARN_DESCRIPTION": "ID プロバイダーを削除しようとしています。これにより、ユーザーが使用できる IDP の選択が削除され、すでに登録されているユーザーは再度ログインできなくなります。続けてもよろしいですか?",
     "DELETE_SELECTION_TITLE": "IDPの削除",
     "DELETE_SELECTION_DESCRIPTION": "IDプロバイダーを削除しようとしています。変更は取消できません。本当によろしいですか？",
     "EMPTY": "IDPは利用できません",

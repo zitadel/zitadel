@@ -110,7 +110,7 @@ func StartCommands(
 		webauthnConfig:        webAuthN,
 		httpClient:            httpClient,
 		checkPermission:       permissionCheck,
-		newCode:               newCryptoCodeWithExpiry,
+		newCode:               newCryptoCode,
 		sessionTokenCreator:   sessionTokenCreator(idGenerator, sessionAlg),
 		sessionTokenVerifier:  sessionTokenVerifier,
 	}

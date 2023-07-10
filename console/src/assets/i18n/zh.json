@@ -1789,6 +1789,8 @@
     "DELETE": "删除",
     "DELETE_TITLE": "删除 IDP",
     "DELETE_DESCRIPTION": "您即将删除身份提供者。由此产生的变化是不可撤销的。你真的想这样做吗？",
+    "REMOVE_WARN_TITLE": "删除国内流离失所者",
+    "REMOVE_WARN_DESCRIPTION": "您即将删除身份提供者。这将为您的用户删除可用 IDP 的选择，并且已经注册的用户将无法再次登录。您确定要继续吗？",
     "DELETE_SELECTION_TITLE": "删除 IDP",
     "DELETE_SELECTION_DESCRIPTION": "您即将删除身份提供者。由此产生的变化是不可撤销的。你真的想这样做吗？",
     "EMPTY": "没有可用的 IDP",
