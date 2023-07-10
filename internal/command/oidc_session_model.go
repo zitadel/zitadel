@@ -85,7 +85,7 @@ func (wm *OIDCSessionWriteModel) reduceAdded(e *oidcsession.AddedEvent) {
 }
 
 func (wm *OIDCSessionWriteModel) reduceAccessTokenAdded(e *oidcsession.AccessTokenAddedEvent) {
-	wm.AccessTokenExpiration = e.CreationDate().Add(e.Expiration)
+	wm.AccessTokenExpiration = e.CreationDate().Add(e.Lifetime)
 }
 
 func (wm *OIDCSessionWriteModel) reduceRefreshTokenAdded(e *oidcsession.RefreshTokenAddedEvent) {

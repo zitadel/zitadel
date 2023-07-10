@@ -21,13 +21,13 @@ const (
 type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID                string
-	SessionID             string
-	ClientID              string
-	Audience              []string
-	Scope                 []string
-	AuthMethodsReferences []string
-	AuthTime              time.Time
+	UserID                string    `json:"userID"`
+	SessionID             string    `json:"sessionID"`
+	ClientID              string    `json:"clientID"`
+	Audience              []string  `json:"audience"`
+	Scope                 []string  `json:"scope"`
+	AuthMethodsReferences []string  `json:"authMethodsReferences"`
+	AuthTime              time.Time `json:"authTime"`
 }
 
 func (e *AddedEvent) Data() interface{} {
@@ -79,9 +79,9 @@ func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 type AccessTokenAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID         string
-	Scope      []string
-	Expiration time.Duration
+	ID       string        `json:"id"`
+	Scope    []string      `json:"scope"`
+	Lifetime time.Duration `json:"lifetime"`
 }
 
 func (e *AccessTokenAddedEvent) Data() interface{} {
@@ -97,7 +97,7 @@ func NewAccessTokenAddedEvent(
 	aggregate *eventstore.Aggregate,
 	id string,
 	scope []string,
-	expiration time.Duration,
+	lifetime time.Duration,
 ) *AccessTokenAddedEvent {
 	return &AccessTokenAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -105,9 +105,9 @@ func NewAccessTokenAddedEvent(
 			aggregate,
 			AccessTokenAddedType,
 		),
-		ID:         id,
-		Scope:      scope,
-		Expiration: expiration,
+		ID:       id,
+		Scope:    scope,
+		Lifetime: lifetime,
 	}
 }
 
@@ -126,9 +126,9 @@ func AccessTokenAddedEventMapper(event *repository.Event) (eventstore.Event, err
 type RefreshTokenAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID           string
-	Lifetime     time.Duration
-	IdleLifetime time.Duration
+	ID           string        `json:"id"`
+	Lifetime     time.Duration `json:"lifetime"`
+	IdleLifetime time.Duration `json:"idleLifetime"`
 }
 
 func (e *RefreshTokenAddedEvent) Data() interface{} {
@@ -173,8 +173,8 @@ func RefreshTokenAddedEventMapper(event *repository.Event) (eventstore.Event, er
 type RefreshTokenRenewedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID           string
-	IdleLifetime time.Duration
+	ID           string        `json:"id"`
+	IdleLifetime time.Duration `json:"idleLifetime"`
 }
 
 func (e *RefreshTokenRenewedEvent) Data() interface{} {
