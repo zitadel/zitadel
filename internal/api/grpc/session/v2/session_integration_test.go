@@ -18,11 +18,10 @@ import (
 )
 
 var (
-	CTX               context.Context
-	Tester            *integration.Tester
-	Client            session.SessionServiceClient
-	User              *user.AddHumanUserResponse
-	GenericOAuthIDPID string
+	CTX    context.Context
+	Tester *integration.Tester
+	Client session.SessionServiceClient
+	User   *user.AddHumanUserResponse
 )
 
 func TestMain(m *testing.M) {
