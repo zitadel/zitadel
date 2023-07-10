@@ -4,7 +4,6 @@ package oidc_test
 
 import (
 	"context"
-	"encoding/json"
 	"net/url"
 	"os"
 	"testing"
@@ -284,22 +283,9 @@ func TestOPStorage_SetIntrospectionFromToken(t *testing.T) {
 		ExpirationDate: nil,
 	})
 	require.NoError(t, err)
-	for {
-		keys, err := Tester.Client.Mgmt.ListAppKeys(CTX, &management.ListAppKeysRequest{
-			AppId:     api.GetAppId(),
-			ProjectId: project.GetId(),
-		})
-		if err == nil && keys.GetDetails().GetProcessedSequence() >= keyResp.GetDetails().GetSequence() {
-			break
-		}
-		select {
-		case <-CTX.Done():
-			t.Fatal(CTX.Err(), err)
-		case <-time.After(time.Second):
-			t.Log("retrying ListAppKeys")
-			continue
-		}
-	}
+	resourceServer, err := Tester.CreateResourceServer(keyResp.GetKeyDetails())
+	require.NoError(t, err)
+
 	scope := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess}
 	authRequestID := createAuthRequest(t, app.GetClientId(), redirectURI, scope...)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
@@ -322,20 +308,11 @@ func TestOPStorage_SetIntrospectionFromToken(t *testing.T) {
 	assertIDTokenClaims(t, tokens.IDTokenClaims, startTime, changeTime)
 
 	// test actual introspection
-	var key struct {
-		Key string `json:"key"`
-	}
-	err = json.Unmarshal(keyResp.GetKeyDetails(), &key)
-	require.NoError(t, err)
-	resourceServer, err := Tester.CreateResourceServer(api.GetClientId(), keyResp.GetId(), []byte(key.Key))
-	require.NoError(t, err)
-
 	introspection, err := rs.Introspect(context.Background(), resourceServer, tokens.AccessToken)
 	require.NoError(t, err)
-	audience := []string{app.GetClientId(), api.GetClientId(), project.GetId()}
 	assertIntrospection(t, introspection,
 		Tester.OIDCIssuer(), app.GetClientId(),
-		scope, audience,
+		scope, []string{app.GetClientId(), api.GetClientId(), project.GetId()},
 		tokens.Expiry, tokens.Expiry.Add(-12*time.Hour))
 }
 

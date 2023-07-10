@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/zitadel/oidc/v2/pkg/client"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/client/rs"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
@@ -143,8 +144,12 @@ func (s *Tester) CreateRelyingParty(clientID, redirectURI string, scope ...strin
 	return rp.NewRelyingPartyOIDC(s.OIDCIssuer(), clientID, "", redirectURI, scope)
 }
 
-func (s *Tester) CreateResourceServer(clientID, keyID string, key []byte) (rs.ResourceServer, error) {
-	return rs.NewResourceServerJWTProfile(s.OIDCIssuer(), clientID, keyID, key)
+func (s *Tester) CreateResourceServer(keyFileData []byte) (rs.ResourceServer, error) {
+	keyFile, err := client.ConfigFromKeyFileData(keyFileData)
+	if err != nil {
+		return nil, err
+	}
+	return rs.NewResourceServerJWTProfile(s.OIDCIssuer(), keyFile.ClientID, keyFile.KeyID, []byte(keyFile.Key))
 }
 
 func CheckRedirect(url string, headers map[string]string) (*url.URL, error) {
