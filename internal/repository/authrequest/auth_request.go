@@ -151,6 +151,8 @@ func SessionLinkedEventMapper(event *repository.Event) (eventstore.Event, error)
 
 type FailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	Reason domain.OIDCErrorReason `json:"reason,omitempty"`
 }
 
 func (e *FailedEvent) Data() interface{} {
@@ -161,8 +163,10 @@ func (e *FailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewFailedEvent(ctx context.Context,
+func NewFailedEvent(
+	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	reason domain.OIDCErrorReason,
 ) *FailedEvent {
 	return &FailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -170,6 +174,7 @@ func NewFailedEvent(ctx context.Context,
 			aggregate,
 			FailedType,
 		),
+		Reason: reason,
 	}
 }
 

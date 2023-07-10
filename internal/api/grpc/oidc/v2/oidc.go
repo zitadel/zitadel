@@ -86,7 +86,7 @@ func (s *Server) CreateCallback(ctx context.Context, req *oidc_pb.CreateCallback
 }
 
 func (s *Server) failAuthRequest(ctx context.Context, authRequestID string, ae *oidc_pb.AuthorizationError) (*oidc_pb.CreateCallbackResponse, error) {
-	details, aar, err := s.command.FailAuthRequest(ctx, authRequestID) // should we store the reason?
+	details, aar, err := s.command.FailAuthRequest(ctx, authRequestID, errorReasonToDomain(ae.GetError()))
 	if err != nil {
 		return nil, err
 	}
@@ -121,6 +121,47 @@ func (s *Server) linkSessionToAuthRequest(ctx context.Context, authRequestID str
 		Details:     object.DomainToDetailsPb(details),
 		CallbackUrl: callback,
 	}, nil
+}
+
+func errorReasonToDomain(errorReason oidc_pb.ErrorReason) domain.OIDCErrorReason {
+	switch errorReason {
+	case oidc_pb.ErrorReason_ERROR_REASON_UNSPECIFIED:
+		return domain.OIDCErrorReasonUnspecified
+	case oidc_pb.ErrorReason_ERROR_REASON_INVALID_REQUEST:
+		return domain.OIDCErrorReasonInvalidRequest
+	case oidc_pb.ErrorReason_ERROR_REASON_UNAUTHORIZED_CLIENT:
+		return domain.OIDCErrorReasonUnauthorizedClient
+	case oidc_pb.ErrorReason_ERROR_REASON_ACCESS_DENIED:
+		return domain.OIDCErrorReasonAccessDenied
+	case oidc_pb.ErrorReason_ERROR_REASON_UNSUPPORTED_RESPONSE_TYPE:
+		return domain.OIDCErrorReasonUnsupportedResponseType
+	case oidc_pb.ErrorReason_ERROR_REASON_INVALID_SCOPE:
+		return domain.OIDCErrorReasonInvalidScope
+	case oidc_pb.ErrorReason_ERROR_REASON_SERVER_ERROR:
+		return domain.OIDCErrorReasonServerError
+	case oidc_pb.ErrorReason_ERROR_REASON_TEMPORARY_UNAVAILABLE:
+		return domain.OIDCErrorReasonTemporaryUnavailable
+	case oidc_pb.ErrorReason_ERROR_REASON_INTERACTION_REQUIRED:
+		return domain.OIDCErrorReasonInteractionRequired
+	case oidc_pb.ErrorReason_ERROR_REASON_LOGIN_REQUIRED:
+		return domain.OIDCErrorReasonLoginRequired
+	case oidc_pb.ErrorReason_ERROR_REASON_ACCOUNT_SELECTION_REQUIRED:
+		return domain.OIDCErrorReasonAccountSelectionRequired
+	case oidc_pb.ErrorReason_ERROR_REASON_CONSENT_REQUIRED:
+		return domain.OIDCErrorReasonConsentRequired
+	case oidc_pb.ErrorReason_ERROR_REASON_INVALID_REQUEST_URI:
+		return domain.OIDCErrorReasonInvalidRequestURI
+	case oidc_pb.ErrorReason_ERROR_REASON_INVALID_REQUEST_OBJECT:
+		return domain.OIDCErrorReasonInvalidRequestObject
+	case oidc_pb.ErrorReason_ERROR_REASON_REQUEST_NOT_SUPPORTED:
+		return domain.OIDCErrorReasonRequestNotSupported
+	case oidc_pb.ErrorReason_ERROR_REASON_REQUEST_URI_NOT_SUPPORTED:
+		return domain.OIDCErrorReasonRequestURINotSupported
+	case oidc_pb.ErrorReason_ERROR_REASON_REGISTRATION_NOT_SUPPORTED:
+		return domain.OIDCErrorReasonRegistrationNotSupported
+	default:
+		return domain.OIDCErrorReasonUnspecified
+	}
 }
 
 func errorReasonToOIDC(reason oidc_pb.ErrorReason) string {

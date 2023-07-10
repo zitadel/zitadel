@@ -233,7 +233,8 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							authrequest.NewFailedEvent(mockCtx, &authrequest.NewAggregate("id", "instanceID").Aggregate),
+							authrequest.NewFailedEvent(mockCtx, &authrequest.NewAggregate("id", "instanceID").Aggregate,
+								domain.OIDCErrorReasonUnspecified),
 						),
 					),
 				),
@@ -603,8 +604,9 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx context.Context
-		id  string
+		ctx    context.Context
+		id     string
+		reason domain.OIDCErrorReason
 	}
 	type res struct {
 		details *domain.ObjectDetails
@@ -625,8 +627,9 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 				),
 			},
 			args{
-				ctx: mockCtx,
-				id:  "foo",
+				ctx:    mockCtx,
+				id:     "foo",
+				reason: domain.OIDCErrorReasonLoginRequired,
 			},
 			res{
 				wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sx202nt", "Errors.AuthRequest.AlreadyHandled"),
@@ -659,13 +662,15 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 					expectPush(
 						[]*repository.Event{eventFromEventPusherWithInstanceID(
 							"instanceID",
-							authrequest.NewFailedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate),
+							authrequest.NewFailedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								domain.OIDCErrorReasonLoginRequired),
 						)}),
 				),
 			},
 			args{
-				ctx: mockCtx,
-				id:  "V2_id",
+				ctx:    mockCtx,
+				id:     "V2_id",
+				reason: domain.OIDCErrorReasonLoginRequired,
 			},
 			res{
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
@@ -690,7 +695,7 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			details, got, err := c.FailAuthRequest(tt.args.ctx, tt.args.id)
+			details, got, err := c.FailAuthRequest(tt.args.ctx, tt.args.id, tt.args.reason)
 			require.ErrorIs(t, err, tt.res.wantErr)
 			assert.Equal(t, tt.res.details, details)
 			assert.Equal(t, tt.res.authReq, got)

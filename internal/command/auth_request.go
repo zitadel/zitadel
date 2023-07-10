@@ -115,7 +115,7 @@ func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, 
 	return writeModelToObjectDetails(&writeModel.WriteModel), authRequestWriteModelToCurrentAuthRequest(writeModel), nil
 }
 
-func (c *Commands) FailAuthRequest(ctx context.Context, id string) (*domain.ObjectDetails, *CurrentAuthRequest, error) {
+func (c *Commands) FailAuthRequest(ctx context.Context, id string, reason domain.OIDCErrorReason) (*domain.ObjectDetails, *CurrentAuthRequest, error) {
 	writeModel, err := c.getAuthRequestWriteModel(ctx, id)
 	if err != nil {
 		return nil, nil, err
@@ -126,6 +126,7 @@ func (c *Commands) FailAuthRequest(ctx context.Context, id string) (*domain.Obje
 	err = c.pushAppendAndReduce(ctx, writeModel, authrequest.NewFailedEvent(
 		ctx,
 		&authrequest.NewAggregate(id, authz.GetInstance(ctx).InstanceID()).Aggregate,
+		reason,
 	))
 	if err != nil {
 		return nil, nil, err
