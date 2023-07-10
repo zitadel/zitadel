@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/common-nighthawk/go-figure"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
@@ -41,19 +42,7 @@ Requirements:
 
 			startConfig := MustNewConfig(viper.GetViper())
 
-			// Show basic information
-			figure.NewFigure("Zitadel", "", true).Print()
-			http := "http"
-			if startConfig.TLS.Enabled || startConfig.ExternalSecure {
-				http = "https"
-			}
-			fmt.Printf("\n ===============================================================\n\n")
-			fmt.Printf(" Version          : %s\n", build.Version())
-			fmt.Printf(" TLS enabled      : %v\n", startConfig.TLS.Enabled)
-			fmt.Printf(" External Secure  : %v\n", startConfig.ExternalSecure)
-			fmt.Printf(" Console URL      : %s://%s:%v/ui/console\n", http, startConfig.ExternalDomain, startConfig.ExternalPort)
-			fmt.Printf(" Health Check URL : %s://%s:%v/debug/healthz\n", http, startConfig.ExternalDomain, startConfig.ExternalPort)
-			fmt.Printf("\n ===============================================================\n\n")
+			showBasicInformation(startConfig)
 
 			err = startZitadel(startConfig, masterKey, server)
 			logging.OnError(err).Fatal("unable to start zitadel")
@@ -64,4 +53,31 @@ Requirements:
 	setup.Flags(cmd)
 
 	return cmd
+}
+
+func showBasicInformation(startConfig *Config) {
+	// Show basic information
+	fmt.Println(color.MagentaString(figure.NewFigure("Zitadel", "", true).String()))
+	http := "http"
+	if startConfig.TLS.Enabled || startConfig.ExternalSecure {
+		http = "https"
+	}
+
+	consoleURL := fmt.Sprintf("%s://%s:%v/ui/console\n", http, startConfig.ExternalDomain, startConfig.ExternalPort)
+	healthCheckURL := fmt.Sprintf("%s://%s:%v/debug/healthz\n", http, startConfig.ExternalDomain, startConfig.ExternalPort)
+
+	insecure := !startConfig.TLS.Enabled && !startConfig.ExternalSecure
+
+	fmt.Printf(" ===============================================================\n\n")
+	fmt.Printf(" Version          : %s\n", build.Version())
+	fmt.Printf(" TLS enabled      : %v\n", startConfig.TLS.Enabled)
+	fmt.Printf(" External Secure  : %v\n", startConfig.ExternalSecure)
+	fmt.Printf(" Console URL      : %s", color.BlueString(consoleURL))
+	fmt.Printf(" Health Check URL : %s", color.BlueString(healthCheckURL))
+	if insecure {
+		fmt.Printf("\n %s: you're using plain http without TLS. Be aware this is \n", color.RedString("Warning"))
+		fmt.Printf(" not a secure setup and should only be used for test systems.         \n")
+		fmt.Printf(" Visit: %s    \n", color.CyanString("https://zitadel.com/docs/self-hosting/manage/tls_modes"))
+	}
+	fmt.Printf("\n ===============================================================\n\n")
 }
