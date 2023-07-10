@@ -192,7 +192,7 @@ func (s *Tester) createMachineUser(ctx context.Context, instanceId string) {
 		logging.OnError(err).Fatal("add org member")
 	}
 
-	scopes := []string{oidc.ScopeOpenID, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner}
+	scopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner}
 	pat := command.NewPersonalAccessToken(user.ResourceOwner, user.ID, time.Now().Add(time.Hour), scopes, domain.UserTypeMachine)
 	_, err = s.Commands.AddPersonalAccessToken(ctx, pat)
 	logging.WithFields("username", SystemUser).OnError(err).Fatal("add pat")
