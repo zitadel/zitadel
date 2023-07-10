@@ -73,8 +73,8 @@ Errors:
       NotFound: Profile not found
       NotChanged: Profile not changed
       Empty: Profile is empty
-      FirstNameEmpty: First name in profile is empty
-      LastNameEmpty: Last name in profile is empty
+      FirstNameEmpty: Given name in profile is empty
+      LastNameEmpty: Family name in profile is empty
       IDMissing: Profile ID is missing
     Email:
       NotFound: Email not found
@@ -488,6 +488,12 @@ Errors:
     TokenCreationFailed: Token creation failed
     InvalidToken: Intent Token is invalid
     OtherUser: Intent meant for another user
+  AuthRequest:
+    AlreadyExists: Auth Request already exists
+    NotExisting: Auth Request does not exist
+    WrongLoginClient: Auth Request created by other login client
+  OIDCSession:
+    RefreshTokenInvalid: Refresh Token is invalid
 
 AggregateTypes:
   action: Action

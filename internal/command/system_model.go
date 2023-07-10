@@ -181,8 +181,5 @@ func (wm *SystemConfigWriteModel) changeConfig(validation *SystemConfigChangesVa
 }
 
 func (wm *SystemConfigWriteModel) changeURIs(validation *SystemConfigChangesValidation, inst *systemConfigChangesInstanceModel, commands *Commands, domain string) {
-	if commands.checkUpdateConsoleRedirectURIs(domain, inst.RedirectUris, inst.PostLogoutRedirectUris) {
-		return
-	}
 	validation.Validations = append(validation.Validations, commands.prepareUpdateConsoleRedirectURIs(domain))
 }

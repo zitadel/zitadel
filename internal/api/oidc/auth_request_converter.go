@@ -12,18 +12,10 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/oidc/amr"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/user/model"
-)
-
-const (
-	// DEPRECATED: use `amrPWD` instead
-	amrPassword     = "password"
-	amrPWD          = "pwd"
-	amrMFA          = "mfa"
-	amrOTP          = "otp"
-	amrUserPresence = "user"
 )
 
 type AuthRequest struct {
@@ -40,19 +32,19 @@ func (a *AuthRequest) GetACR() string {
 }
 
 func (a *AuthRequest) GetAMR() []string {
-	amr := make([]string, 0)
+	list := make([]string, 0)
 	if a.PasswordVerified {
-		amr = append(amr, amrPassword, amrPWD)
+		list = append(list, amr.Password, amr.PWD)
 	}
 	if len(a.MFAsVerified) > 0 {
-		amr = append(amr, amrMFA)
+		list = append(list, amr.MFA)
 		for _, mfa := range a.MFAsVerified {
 			if amrMFA := AMRFromMFAType(mfa); amrMFA != "" {
-				amr = append(amr, amrMFA)
+				list = append(list, amrMFA)
 			}
 		}
 	}
-	return amr
+	return list
 }
 
 func (a *AuthRequest) GetAudience() []string {
@@ -271,10 +263,10 @@ func CodeChallengeToOIDC(challenge *domain.OIDCCodeChallenge) *oidc.CodeChalleng
 func AMRFromMFAType(mfaType domain.MFAType) string {
 	switch mfaType {
 	case domain.MFATypeOTP:
-		return amrOTP
+		return amr.OTP
 	case domain.MFATypeU2F,
 		domain.MFATypeU2FUserVerification:
-		return amrUserPresence
+		return amr.UserPresence
 	default:
 		return ""
 	}
