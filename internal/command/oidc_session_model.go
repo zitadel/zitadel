@@ -20,6 +20,7 @@ type OIDCSessionWriteModel struct {
 	AuthMethodsReferences      []string
 	AuthTime                   time.Time
 	State                      domain.OIDCSessionState
+	AccessTokenCreation        time.Time
 	AccessTokenExpiration      time.Time
 	RefreshTokenID             string
 	RefreshTokenExpiration     time.Time
@@ -111,4 +112,70 @@ func (wm *OIDCSessionWriteModel) CheckRefreshToken(refreshTokenID string) error 
 		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-3jt2w", "Errors.OIDCSession.RefreshTokenInvalid")
 	}
 	return nil
+}
+
+type OIDCSessionAccessTokenWriteModel struct {
+	eventstore.WriteModel
+
+	UserID                string
+	SessionID             string
+	ClientID              string
+	Audience              []string
+	Scope                 []string
+	AuthMethodsReferences []string
+	AuthTime              time.Time
+	State                 domain.OIDCSessionState
+	AccessTokenID         string
+	AccessTokenCreation   time.Time
+	AccessTokenExpiration time.Time
+}
+
+func NewOIDCSessionAccessTokenWriteModel(id string) *OIDCSessionAccessTokenWriteModel {
+	return &OIDCSessionAccessTokenWriteModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID: id,
+		},
+	}
+}
+
+func (wm *OIDCSessionAccessTokenWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *oidcsession.AddedEvent:
+			wm.reduceAdded(e)
+		case *oidcsession.AccessTokenAddedEvent:
+			wm.reduceAccessTokenAdded(e)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *OIDCSessionAccessTokenWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AllowTimeTravel().
+		AddQuery().
+		AggregateTypes(oidcsession.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			oidcsession.AddedType,
+			oidcsession.AccessTokenAddedType,
+		).
+		Builder()
+}
+
+func (wm *OIDCSessionAccessTokenWriteModel) reduceAdded(e *oidcsession.AddedEvent) {
+	wm.UserID = e.UserID
+	wm.SessionID = e.SessionID
+	wm.ClientID = e.ClientID
+	wm.Audience = e.Audience
+	wm.Scope = e.Scope
+	wm.AuthMethodsReferences = e.AuthMethodsReferences
+	wm.AuthTime = e.AuthTime
+	wm.State = domain.OIDCSessionStateActive
+}
+
+func (wm *OIDCSessionAccessTokenWriteModel) reduceAccessTokenAdded(e *oidcsession.AccessTokenAddedEvent) {
+	wm.AccessTokenID = e.ID
+	wm.AccessTokenCreation = e.CreationDate()
+	wm.AccessTokenExpiration = e.CreationDate().Add(e.Lifetime)
 }
