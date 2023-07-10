@@ -1,241 +1,241 @@
 {
   "APP_NAME": "ZITADEL",
   "PAGINATOR": {
-    "PREVIOUS": "Previous",
-    "NEXT": "Next",
-    "COUNT": "Total Results",
-    "MORE": "More"
+    "PREVIOUS": "Претходно",
+    "NEXT": "Следно",
+    "COUNT": "Вкупнo резултати",
+    "MORE": "Повеќе"
   },
   "FOOTER": {
     "LINKS": {
-      "CONTACT": "Contact",
-      "TOS": "Terms of Service",
-      "PP": "Privacy Policy"
+      "CONTACT": "Контакт",
+      "TOS": "Услови за користење",
+      "PP": "Политика на приватност"
     },
     "THEME": {
-      "DARK": "Dark",
-      "LIGHT": "Light"
+      "DARK": "Темно",
+      "LIGHT": "Светло"
     }
   },
   "HOME": {
-    "WELCOME": "Get started with ZITADEL",
-    "DISCLAIMER": "ZITADEL treats your data confidentially and securely.",
-    "DISCLAIMERLINK": "Further information",
+    "WELCOME": "Започнете со ZITADEL",
+    "DISCLAIMER": "ZITADEL ги третира вашите податоци доверливо и безбедно.",
+    "DISCLAIMERLINK": "Дополнителни информации",
     "DOCUMENTATION": {
-      "TITLE": "Documentation",
-      "DESCRIPTION": "Get started with ZITADEL quickly."
+      "TITLE": "Документација",
+      "DESCRIPTION": "Започнете брзо со ZITADEL."
     },
     "GETSTARTED": {
-      "TITLE": "Get started with ZITADEL",
-      "DESCRIPTION": "Get started with ZITADEL quickly."
+      "TITLE": "Започнете со ZITADEL",
+      "DESCRIPTION": "Започнете брзо со ZITADEL."
     },
     "QUICKSTARTS": {
-      "LABEL": "First Steps",
-      "TITLE": "Quickstarts",
-      "DESCRIPTION": "Get started with ZITADEL quickly."
+      "LABEL": "Први чекори",
+      "TITLE": "Брзи чекори",
+      "DESCRIPTION": "Започнете брзо со ZITADEL."
     },
     "SHORTCUTS": {
-      "SHORTCUTS": "Shortcuts",
-      "SETTINGS": "Available shortcuts",
-      "PROJECTS": "Projects",
-      "REORDER": "Hold and drag the tile to move it",
-      "ADD": "Hold and drag a tile to add"
+      "SHORTCUTS": "Кратенки",
+      "SETTINGS": "Достапни кратенки",
+      "PROJECTS": "Проекти",
+      "REORDER": "Држете и повчелечете ја ставката за да ја поместите",
+      "ADD": "Држете и повчелечете ја ставката за да ја додадете"
     }
   },
   "ONBOARDING": {
-    "DESCRIPTION": "Your onboarding process",
-    "MOREDESCRIPTION": "more shortcuts",
-    "COMPLETED": "completed",
-    "DISMISS": "No thanks, I'm a pro.",
+    "DESCRIPTION": "Вашиот процес на приклучување",
+    "MOREDESCRIPTION": "повеќе кратенки",
+    "COMPLETED": "завршено",
+    "DISMISS": "Не ви благодарам, јас сум професионалец.",
     "CARD": {
-      "TITLE": "Get your ZITADEL running",
-      "DESCRIPTION": "This checklist helps to setup your instance and guides your through the most essential steps"
+      "TITLE": "Почнете со ZITADEL",
+      "DESCRIPTION": "Оваа листа со чекори помага при подесувањето на вашата инстанца и ве води низ најважните чекори"
     },
     "EVENTS": {
       "instance.policy.label.added": {
-        "title": "Setup your brand",
-        "description": "Define coloring and shape of your login and upload your logo and icons.",
-        "action": "Setup branding"
+        "title": "Подесете го вашиот бренд",
+        "description": "Дефинирајте боја и форма за вашиот процез за најава и прикачете ги вашите лого и икони.",
+        "action": "Подеси го брендот"
       },
       "instance.smtp.config.added": {
-        "title": "Setup your SMTP settings",
-        "description": "Set your own mail server settings.",
-        "action": "Setup SMTP"
+        "title": "Подесете го вашиот SMTP",
+        "description": "Подесете го вашиот сервер за е-пошта.",
+        "action": "Подеси SMTP"
       },
       "project.added": {
-        "title": "Create a project",
-        "description": "Add a project and define its roles and authorizations.",
-        "action": "Create project"
+        "title": "Креирајте проект",
+        "description": "Додадете проект и дефинирајте ги неговите улоги и овластувања.",
+        "action": "Креирај проект"
       },
       "project.application.added": {
-        "title": "Create an application",
-        "description": "Create a web, native, api or saml application and setup your authentication flow.",
-        "action": "Create app"
+        "title": "Креирајте апликација",
+        "description": "Креирајте веб, нативна, API или SAML апликација и подесете го вашите автентикациски правила.",
+        "action": "Креирај апликација"
       },
       "user.human.added": {
-        "title": "Add users",
-        "description": "Add your application users",
-        "action": "Add user"
+        "title": "Додадете корисници",
+        "description": "Додадете ги корисниците на вашата апликација",
+        "action": "Додади корисник"
       },
       "user.grant.added": {
-        "title": "Grant users",
-        "description": "Allow users to access your application and setup their role.",
-        "action": "Grant user"
+        "title": "Овластете корисници",
+        "description": "Дозволете на корисниците да пристапат до вашата апликација и поставете им улога.",
+        "action": "Овласти корисник"
       }
     }
   },
   "MENU": {
-    "INSTANCE": "Instance",
-    "DASHBOARD": "Home",
-    "PERSONAL_INFO": "Personal Information",
-    "DOCUMENTATION": "Documentation",
-    "INSTANCEOVERVIEW": "Instance",
-    "ORGS": "Organizations",
-    "VIEWS": "Views",
-    "EVENTS": "Events",
-    "FAILEDEVENTS": "Failed Events",
-    "ORGANIZATION": "Organization",
-    "DOMAINS": "Domains",
-    "PROJECT": "Projects",
-    "PROJECTOVERVIEW": "Overview",
-    "PROJECTGRANTS": "Grants",
-    "ROLES": "Roles",
-    "GRANTEDPROJECT": "Granted Projects",
-    "HUMANUSERS": "Users",
-    "MACHINEUSERS": "Service Users",
-    "LOGOUT": "Logout All Users",
-    "NEWORG": "New Organization",
-    "IAMADMIN": "You are an IAM Administrator. Note that you have extended permissions.",
-    "SHOWORGS": "Show All Organizations",
-    "GRANTS": "Authorizations",
-    "ACTIONS": "Actions",
-    "PRIVACY": "Privacy",
-    "TOS": "Terms of Service",
-    "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboard shortcuts",
-    "SETTINGS": "Settings",
-    "CUSTOMERPORTAL": "Customer Portal"
+    "INSTANCE": "Инстанца",
+    "DASHBOARD": "Дома",
+    "PERSONAL_INFO": "Лични информации",
+    "DOCUMENTATION": "Документација",
+    "INSTANCEOVERVIEW": "Инстанца",
+    "ORGS": "Организации",
+    "VIEWS": "Прегледи",
+    "EVENTS": "Настани",
+    "FAILEDEVENTS": "Неуспешни настани",
+    "ORGANIZATION": "Организација",
+    "DOMAINS": "Домени",
+    "PROJECT": "Проекти",
+    "PROJECTOVERVIEW": "Преглед",
+    "PROJECTGRANTS": "Овластувања",
+    "ROLES": "Улоги",
+    "GRANTEDPROJECT": "Доделени проекти",
+    "HUMANUSERS": "Корисници",
+    "MACHINEUSERS": "Сервисни корисници",
+    "LOGOUT": "Одјави ги сите корисници",
+    "NEWORG": "Нова организација",
+    "IAMADMIN": "Вие сте администратор на IAM. Имате проширени овластувања.",
+    "SHOWORGS": "Прикажи ги сите организации",
+    "GRANTS": "Овластувања",
+    "ACTIONS": "Акции",
+    "PRIVACY": "Приватност",
+    "TOS": "Услови на користење",
+    "OPENSHORTCUTSTOOLTIP": "Внесете ? за прикажување на кратенки за тастатура",
+    "SETTINGS": "Подесувања",
+    "CUSTOMERPORTAL": "Портал за клиенти"
   },
   "ACTIONS": {
-    "ACTIONS": "Actions",
-    "FILTER": "Filter",
-    "RENAME": "Rename",
-    "SET": "Set",
-    "COPY": "Copy to Clipboard",
-    "COPIED": "Copied to clipboard.",
-    "RESET": "Reset",
-    "RESETDEFAULT": "Reset to Default",
-    "RESETTO": "Reset to: ",
-    "RESETCURRENT": "Reset to current",
-    "SHOW": "Show",
-    "HIDE": "Hide",
-    "SAVE": "Save",
-    "SAVENOW": "Save now",
-    "NEW": "New",
-    "ADD": "Add",
-    "CREATE": "Create",
-    "CONTINUE": "Continue",
-    "BACK": "Back",
-    "CLOSE": "Close",
-    "CLEAR": "Clear",
-    "CANCEL": "Cancel",
-    "INFO": "Info",
+    "ACTIONS": "Акции",
+    "FILTER": "Филтер",
+    "RENAME": "Преименувај",
+    "SET": "Постави",
+    "COPY": "Копирај во клипборд",
+    "COPIED": "Копирано во клипборд.",
+    "RESET": "Ресетирај",
+    "RESETDEFAULT": "Ресетирај на стандардно",
+    "RESETTO": "Ресетирај на: ",
+    "RESETCURRENT": "Ресетирај на тековно",
+    "SHOW": "Прикажи",
+    "HIDE": "Скриј",
+    "SAVE": "Зачувај",
+    "SAVENOW": "Зачувај сега",
+    "NEW": "Нов",
+    "ADD": "Додади",
+    "CREATE": "Креирај",
+    "CONTINUE": "Продолжи",
+    "BACK": "Назад",
+    "CLOSE": "Затвори",
+    "CLEAR": "Исчисти",
+    "CANCEL": "Откажи",
+    "INFO": "Инфо",
     "OK": "OK",
-    "SELECT": "Select",
-    "VIEW": "Show",
-    "SELECTIONDELETE": "Delete selection",
-    "DELETE": "Delete",
-    "REMOVE": "Remove",
-    "VERIFY": "Verify",
-    "FINISH": "Finish",
-    "FINISHED": "Close",
-    "CHANGE": "Change",
-    "REACTIVATE": "Reactivate",
-    "ACTIVATE": "Activate",
-    "DEACTIVATE": "Deactivate",
-    "REFRESH": "Refresh",
-    "LOGIN": "Login",
-    "EDIT": "Edit",
-    "PIN": "Pin / Unpin",
-    "CONFIGURE": "Configure",
-    "SEND": "Send",
-    "NEWVALUE": "New Value",
-    "RESTORE": "Restore",
-    "CONTINUEWITHOUTSAVE": "Continue without saving",
-    "OF": "of",
-    "PREVIOUS": "Previous",
-    "NEXT": "Next",
-    "MORE": "more",
-    "STEP": "Step",
-    "SETUP": "Setup",
-    "UNSAVEDCHANGES": "Unsaved changes",
+    "SELECT": "Избери",
+    "VIEW": "Прикажи",
+    "SELECTIONDELETE": "Избриши избор",
+    "DELETE": "Избриши",
+    "REMOVE": "Отстрани",
+    "VERIFY": "Потврди",
+    "FINISH": "Заврши",
+    "FINISHED": "Затвори",
+    "CHANGE": "Промени",
+    "REACTIVATE": "Реактивирај",
+    "ACTIVATE": "Активирај",
+    "DEACTIVATE": "Деактивирај",
+    "REFRESH": "Освежи",
+    "LOGIN": "Најава",
+    "EDIT": "Уреди",
+    "PIN": "Закачи / Откачи",
+    "CONFIGURE": "Конфигурирај",
+    "SEND": "Испрати",
+    "NEWVALUE": "Нова вредност",
+    "RESTORE": "Врати",
+    "CONTINUEWITHOUTSAVE": "Продолжи без зачувување",
+    "OF": "од",
+    "PREVIOUS": "Претходно",
+    "NEXT": "Следно",
+    "MORE": "повеќе",
+    "STEP": "Чекор",
+    "SETUP": "Подесување",
+    "UNSAVEDCHANGES": "Незачувани промени",
     "UNSAVED": {
       "DIALOG": {
-        "DESCRIPTION": "Are you sure you want to discard this new action? Your action will be lost",
-        "CANCEL": "Cancel",
-        "DISCARD": "Discard"
+        "DESCRIPTION": "Дали сте сигурни дека сакате да ја отфрлите оваа нова акција? Вашата акција ќе се изгуби",
+        "CANCEL": "Откажи",
+        "DISCARD": "Отфрли"
       }
     },
     "TABLE": {
-      "SHOWUSER": "Show user {{value}}"
+      "SHOWUSER": "Прикажи корисник {{value}}"
     }
   },
   "MEMBERROLES": {
-    "IAM_OWNER": "Has control over the whole instance, including all organizations",
-    "IAM_OWNER_VIEWER": "Has permission to review the whole instance, including all organizations",
-    "IAM_ORG_MANAGER": "Has permission to create and manage organizations",
-    "IAM_USER_MANAGER": "Has permission to create and manage users",
-    "ORG_OWNER": "Has permission over the whole organization",
-    "ORG_USER_MANAGER": "Has permission to create and manage users of the organization",
-    "ORG_OWNER_VIEWER": "Has permission to review the whole organization",
-    "ORG_USER_PERMISSION_EDITOR": "Has permission to manage user grants",
-    "ORG_PROJECT_PERMISSION_EDITOR": "Has permission to manage project grants",
-    "ORG_PROJECT_CREATOR": "Has permission to create his own projects and underlying settings",
-    "PROJECT_OWNER": "Has permission over the whole project",
-    "PROJECT_OWNER_VIEWER": "Has permission to review the whole project",
-    "PROJECT_OWNER_GLOBAL": "Has permission over the whole project",
-    "PROJECT_OWNER_VIEWER_GLOBAL": "Has permission to review the whole project",
-    "PROJECT_GRANT_OWNER": "Has permission to manage the project grant",
-    "PROJECT_GRANT_OWNER_VIEWER": "Has permission to review the project grant"
+    "IAM_OWNER": "Има контрола врз целата инстанца, вклучувајќи ги сите организации",
+    "IAM_OWNER_VIEWER": "Има дозвола за преглед на целата инстанца, вклучувајќи ги сите организации",
+    "IAM_ORG_MANAGER": "Има дозвола за креирање и менаџирање на организации",
+    "IAM_USER_MANAGER": "Има дозвола за креирање и менаџирање на корисници",
+    "ORG_OWNER": "Има дозвола врз целата организација",
+    "ORG_USER_MANAGER": "Има дозвола за креирање и менаџирање на корисници во организацијата",
+    "ORG_OWNER_VIEWER": "Има дозвола за преглед на целата организација",
+    "ORG_USER_PERMISSION_EDITOR": "Има дозвола за менаџирање на овластувања на корисници",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Има дозвола за менаџирање на овластувања на проекти",
+    "ORG_PROJECT_CREATOR": "Има дозвола за креирање на сопствени проекти и нивни подесувања",
+    "PROJECT_OWNER": "Има дозвола врз целиот проект",
+    "PROJECT_OWNER_VIEWER": "Има дозвола за преглед на целиот проект",
+    "PROJECT_OWNER_GLOBAL": "Има дозвола врз целиот проект",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Има дозвола за преглед на целиот проект",
+    "PROJECT_GRANT_OWNER": "Има дозвола за менаџирање на овластувања на проектот",
+    "PROJECT_GRANT_OWNER_VIEWER": "Има дозвола за преглед на овластувањата на проектот"
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
-      "TEXT": "All organization settings and tables in console are based on a selected organization. Click this button to switch organization or create a new one."
+      "TEXT": "Сите подесувања и табели во конзолата за организација се базираат на избраната организација. Кликнете на оваа копче за промена на организација или креирање на нова."
     },
     "INSTANCE": {
-      "TEXT": "Click here to get to the instance settings. Note that you have only access to this button if you have enhanced permissions."
+      "TEXT": "Кликнете тука за пристап до подесувањата на инстанцата. Имате пристап до ова копче само доколку имате надградени овластувања."
     },
     "PROFILE": {
-      "TEXT": "Here you can switch between your user accounts and manage your sessions and profile."
+      "TEXT": "Овде можете да се префрлате помеѓу вашите кориснички сметки и да ги менаџирате вашите сесии и профил."
     },
     "NAV": {
-      "TEXT": "This navigation changes based on your selected organization above or your instance"
+      "TEXT": "Оваа навигација се менува врз основа на избраната организација горе или врз основа на вашата инстанца"
     },
     "CONTEXTCHANGED": {
-      "TEXT": "The organization context has changed."
+      "TEXT": "Контекстот на организацијата е променет."
     },
     "SWITCHEDTOINSTANCE": {
-      "TEXT": "The view just changed to instance!"
+      "TEXT": "Приказот се смени на инстанца!"
     }
   },
   "FILTER": {
-    "TITLE": "Filter",
-    "STATE": "Status",
-    "DISPLAYNAME": "User Display Name",
-    "EMAIL": "Email",
-    "USERNAME": "User Name",
-    "ORGNAME": "Organization Name",
-    "PROJECTNAME": "Project Name",
-    "RESOURCEOWNER": "Resource Owner",
+    "TITLE": "Филтер",
+    "STATE": "Статус",
+    "DISPLAYNAME": "Име за приказ на корисникот",
+    "EMAIL": "Е-пошта",
+    "USERNAME": "Корисничко име",
+    "ORGNAME": "Име на организацијата",
+    "PROJECTNAME": "Име на проектот",
+    "RESOURCEOWNER": "Сопственик на ресурсот",
     "METHODS": {
-      "5": "contains",
-      "7": "ends with",
-      "1": "equals"
+      "5": "содржи",
+      "7": "завршува со",
+      "1": "е еднакво на"
     }
   },
   "KEYBOARDSHORTCUTS": {
-    "TITLE": "Keyboard Shortcuts",
-    "UNDERORGCONTEXT": "Within organization pages",
-    "SIDEWIDE": "Site-wide shortcuts",
+    "TITLE": "Кратенки на тастатура",
+    "UNDERORGCONTEXT": "Во страници на организацијата",
+    "SIDEWIDE": "Кратенки кои важат за целиот сајт",
     "SHORTCUTS": {
       "HOME": "<strong>G</strong>o to <strong>H</strong>ome",
       "INSTANCE": "<strong>G</strong>o to <strong>I</strong>instance",
@@ -250,788 +250,788 @@
       "DOMAINS": "<strong>G</strong>o to <strong>D</strong>omains"
     }
   },
-  "RESOURCEID": "Resource Id",
-  "NAME": "Name",
-  "VERSION": "Version",
+  "RESOURCEID": "ID на ресурсот",
+  "NAME": "Име",
+  "VERSION": "Верзија",
   "TABLE": {
-    "NOROWS": "No data"
+    "NOROWS": "Нема податоци"
   },
   "ERRORS": {
-    "REQUIRED": "Please fill in this field.",
-    "ATLEASTONE": "Provide at least one value.",
+    "REQUIRED": "Ве молиме пополнете го ова поле.",
+    "ATLEASTONE": "Внесете барем една вредност.",
     "TOKENINVALID": {
-      "TITLE": "Your authorization token has expired.",
-      "DESCRIPTION": "Click the button below to log in again."
+      "TITLE": "Вашиот авторизациски токен е истечен.",
+      "DESCRIPTION": "Кликнете на копчето подолу за повторна најава."
     },
     "EXHAUSTED": {
-      "TITLE": "Your quota for authenticated requests is exhausted.",
-      "DESCRIPTION": "Remove or increase the quota limit for this ZITADEL instance."
+      "TITLE": "Вашиот квота за автентицирани барања е надмината.",
+      "DESCRIPTION": "Отстранете или зголемете ја квотата за оваа ZITADEL инстанца."
     },
-    "INVALID_FORMAT": "The formatting is invalid.",
-    "NOTANEMAIL": "The given value is not an e-mail address.",
-    "MINLENGTH": "Must be at least {{requiredLength}} characters long.",
-    "UPPERCASEMISSING": "Must include an uppercase character.",
-    "LOWERCASEMISSING": "Must include a lowercase character.",
-    "SYMBOLERROR": "Must include a symbol or punctuation mark.",
-    "NUMBERERROR": "Must include a digit.",
-    "PWNOTEQUAL": "The passwords provided do not match.",
-    "PHONE": "The phone number must start with 00 or +."
+    "INVALID_FORMAT": "Невалиден формат.",
+    "NOTANEMAIL": "Внесената вредност не е е-пошта.",
+    "MINLENGTH": "Мора да биде најмалку {{requiredLength}} карактери долга.",
+    "UPPERCASEMISSING": "Мора да содржи голема буква.",
+    "LOWERCASEMISSING": "Мора да содржи мала буква.",
+    "SYMBOLERROR": "Мора да содржи симбол или знак за интерпункција.",
+    "NUMBERERROR": "Мора да содржи цифра.",
+    "PWNOTEQUAL": "Внесените лозинки не се совпаѓаат.",
+    "PHONE": "Телефонскиот број мора да почне со 00 или +."
   },
   "USER": {
     "SETTINGS": {
-      "TITLE": "Settings",
-      "GENERAL": "General",
-      "IDP": "Identity Providers",
-      "SECURITY": "Password and Security",
-      "KEYS": "Keys",
-      "PAT": "Personal Access Tokens",
-      "USERGRANTS": "Authorizations",
-      "MEMBERSHIPS": "Memberships",
-      "METADATA": "Metadata"
+      "TITLE": "Подесувања",
+      "GENERAL": "Општо",
+      "IDP": "Идентитетски провајдери",
+      "SECURITY": "Лозинка и Безбедност",
+      "KEYS": "Клучеви",
+      "PAT": "Токени за Личен Пристап",
+      "USERGRANTS": "Овластувања",
+      "MEMBERSHIPS": "Членства",
+      "METADATA": "Метаподатоци"
     },
-    "TITLE": "Personal Information",
-    "DESCRIPTION": "Manage your information and security settings.",
+    "TITLE": "Лични Информации",
+    "DESCRIPTION": "Управувајте со вашите информации и подесувања за безбедност.",
     "PAGES": {
-      "LIST": "Users",
-      "TITLE": "User",
-      "DESCRIPTION": "Create new users in your organization and manage existing ones.",
-      "LISTMACHINE": "Service Users",
-      "DESCRIPTIONMACHINE": "Create and manage Service Users of your organization",
-      "DETAIL": "Detail",
-      "CREATE": "Create",
-      "MY": "My Information",
-      "LOGINNAMES": "Login names",
-      "LOGINMETHODS": "Login methods",
-      "LOGINNAMESDESC": "These are your login names:",
-      "NOUSER": "No associated user.",
-      "REACTIVATE": "Reactivate",
-      "DEACTIVATE": "Deactivate",
-      "FILTER": "Filter",
-      "STATE": "Status",
-      "DELETE": "Delete User",
-      "UNLOCK": "Unlock User",
-      "GENERATESECRET": "Generate Client Secret",
-      "REMOVESECRET": "Remove Client Secret",
-      "LOCKEDDESCRIPTION": "This user has been locked out due to exceeding the maximum login attempts and must be unlocked to be used again.",
-      "DELETEACCOUNT": "Delete Account",
-      "DELETEACCOUNT_DESC": "If you perform this action, you will be logged out and will no longer have access to your account. This action is not reversible, so please continue with caution.",
-      "DELETEACCOUNT_BTN": "Delete Account",
-      "DELETEACCOUNT_SUCCESS": "Account deleted successfully!"
+      "LIST": "Корисници",
+      "TITLE": "Корисник",
+      "DESCRIPTION": "Креирајте нови корисници во вашата организација и менаџирајте ги постоечките.",
+      "LISTMACHINE": "Сервисни Корисници",
+      "DESCRIPTIONMACHINE": "Креирајте и менаџирајте сервисни корисници во вашата организација",
+      "DETAIL": "Детали",
+      "CREATE": "Креирај",
+      "MY": "Мои Информации",
+      "LOGINNAMES": "Имиња за најавување",
+      "LOGINMETHODS": "Методи за најавување",
+      "LOGINNAMESDESC": "Овие се вашите имиња за најавување:",
+      "NOUSER": "Нема поврзан корисник.",
+      "REACTIVATE": "Реактивирај",
+      "DEACTIVATE": "Деактивирај",
+      "FILTER": "Филтер",
+      "STATE": "Статус",
+      "DELETE": "Избриши Корисник",
+      "UNLOCK": "Отклучи Корисник",
+      "GENERATESECRET": "Генерирај Клиентска Тајна",
+      "REMOVESECRET": "Отстрани Клиентска Тајна",
+      "LOCKEDDESCRIPTION": "Овој корисник е заклучен поради надминатиот максимален број на обиди за најавување и мора да се отклучи за повторна употреба.",
+      "DELETEACCOUNT": "Избриши Корисничка Сметка",
+      "DELETEACCOUNT_DESC": "Ако ја извршите оваа акција, ќе бидете одјавени и нема да имате повеќе пристап до вашата корисничка сметка. Оваа акција не може да се поништи, затоа продолжете само ако сте сигурни.",
+      "DELETEACCOUNT_BTN": "Избриши Корисничка Сметка",
+      "DELETEACCOUNT_SUCCESS": "Корисничката Сметка е успешно избришана!"
     },
     "DETAILS": {
-      "DATECREATED": "Created",
-      "DATECHANGED": "Changed"
+      "DATECREATED": "Креирано",
+      "DATECHANGED": "Променето"
     },
     "DIALOG": {
-      "DELETE_TITLE": "Delete User",
-      "DELETE_SELF_TITLE": "Delete Account",
-      "DELETE_DESCRIPTION": "You are about to permanently delete a user. Are you sure?",
-      "DELETE_SELF_DESCRIPTION": "You are about to permanently delete your personal account. This will log you out and delete your user. This action cannot be undone!",
-      "DELETE_AUTH_DESCRIPTION": "You are about to permanently delete your personal account. Are you sure?",
-      "TYPEUSERNAME": "Type '{{value}}', to confirm and delete the user.",
-      "USERNAME": "Loginname",
-      "DELETE_BTN": "Delete permanently"
+      "DELETE_TITLE": "Избриши Корисник",
+      "DELETE_SELF_TITLE": "Избриши Корисниќка Сметка",
+      "DELETE_DESCRIPTION": "Дали сте сигурни дека сакате перманентно да го избришете корисникот?",
+      "DELETE_SELF_DESCRIPTION": "Дали сте сигурни дека сакате перманентно да ја избришете вашата лична корисничка сметка? Ова ќе ве одјави и ќе го избрише вашето корисничко име. Оваа акција не може да се поништи!",
+      "DELETE_AUTH_DESCRIPTION": "Дали сте сигурни дека сакате перманентно да ја избришете вашата лична корисничка сметка?",
+      "TYPEUSERNAME": "Внесете '{{value}}', за да потврдите и да го избришете корисникот.",
+      "USERNAME": "Корисничко име",
+      "DELETE_BTN": "Избриши перманентно"
     },
     "SENDEMAILDIALOG": {
-      "TITLE": "Send Email Notification",
-      "DESCRIPTION": "Click the button below to send a notification to the current email address or change the email address in the field.",
-      "NEWEMAIL": "New email address"
+      "TITLE": "Испрати Известување преку Е-пошта",
+      "DESCRIPTION": "Кликнете на копчето подолу за испраќање на известување до тековната адреса за е-пошта или променете ја адресата за е-пошта во полето.",
+      "NEWEMAIL": "Нова адреса за е-пошта"
     },
     "SECRETDIALOG": {
-      "CLIENTSECRET": "Client Secret",
-      "CLIENTSECRET_DESCRIPTION": "Keep your client secret at a safe place as it will disappear once the dialog is closed."
+      "CLIENTSECRET": "Клиентска Тајна",
+      "CLIENTSECRET_DESCRIPTION": "Чувајте ја вашата клиентска тајна на безбедно место бидејќи ќе исчезне откако ќе се затвори дијалогот."
     },
     "TABLE": {
-      "DEACTIVATE": "Deactivate",
-      "ACTIVATE": "Activate",
-      "CHANGEDATE": "Last Modified",
-      "CREATIONDATE": "Created At",
+      "DEACTIVATE": "Деактивирај",
+      "ACTIVATE": "Активирај",
+      "CHANGEDATE": "Последна промена",
+      "CREATIONDATE": "Креирано на",
       "TYPES": {
-        "HUMAN": "Users",
-        "MACHINE": "Service Users"
+        "HUMAN": "Корисници",
+        "MACHINE": "Сервисни Корисници"
       },
       "FILTER": {
-        "0": "Filter for DisplayName",
-        "1": "Filter for Username",
-        "2": "filter for DisplayName",
-        "3": "filter for Username",
-        "4": "filter for Email",
-        "5": "filter for DisplayName",
-        "10": "filter for organization name",
-        "12": "filter for project name"
+        "0": "Филтер за Име за Приказ",
+        "1": "Филтер за Корисничко Име",
+        "2": "филтер за Име за Приказ",
+        "3": "филтер за Корисничко Име",
+        "4": "филтер за Е-пошта",
+        "5": "филтер за Име за Приказ",
+        "10": "филтер за име на организација",
+        "12": "филтер за име на проект"
       },
-      "EMPTY": "No entries"
+      "EMPTY": "Нема записи"
     },
     "PASSWORDLESS": {
-      "SEND": "Send registration link",
-      "TABLETYPE": "Type",
-      "TABLESTATE": "Status",
-      "NAME": "Name",
-      "EMPTY": "No device set",
-      "TITLE": "Passwordless Authentication",
-      "DESCRIPTION": "Add WebAuthn based Authentication Methods to log onto ZITADEL passwordless.",
-      "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
-      "U2F": "Add method",
-      "U2F_DIALOG_TITLE": "Verify authenticator",
-      "U2F_DIALOG_DESCRIPTION": "Enter a name for your used passwordless Login",
-      "U2F_SUCCESS": "Passwordless Auth created successfully!",
-      "U2F_ERROR": "An error during setup occurred!",
-      "U2F_NAME": "Authenticator Name",
+      "SEND": "Испрати линк за регистрација",
+      "TABLETYPE": "Тип",
+      "TABLESTATE": "Статус",
+      "NAME": "Име",
+      "EMPTY": "Нема поставен уред",
+      "TITLE": "Најава без лозинка",
+      "DESCRIPTION": "Додајте методи за автентикација базирани на WebAuthn за најава на ZITADEL без лозинки.",
+      "MANAGE_DESCRIPTION": "Управувајте со методите за втор фактор на вашите корисници.",
+      "U2F": "Додајте метод",
+      "U2F_DIALOG_TITLE": "Потврдете го автентикаторот",
+      "U2F_DIALOG_DESCRIPTION": "Внесете име за вашата користена најва без лозинка",
+      "U2F_SUCCESS": "Најава без лозинка е успешно креирана!",
+      "U2F_ERROR": "Се појави грешка при подесувањето!",
+      "U2F_NAME": "Име на автентикатор",
       "TYPE": {
-        "0": "No MFA defined",
-        "1": "One Time Password (OTP)",
-        "2": "Fingerprint, Security Keys, Face ID and other"
+        "0": "Нема дефиниран MFA",
+        "1": "Еднократна Лозинка (OTP)",
+        "2": "Отпечаток на прст, безбедносни клучеви, Face ID и други"
       },
       "STATE": {
-        "0": "No State",
-        "1": "Not Ready",
-        "2": "Ready",
-        "3": "Deleted"
+        "0": "Нема Статус",
+        "1": "Не е Спремно",
+        "2": "Спремно",
+        "3": "Избришано"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Remove Passwordless Authentication Method",
-        "DELETE_DESCRIPTION": "You are about to delete a passwordless Authentication method. Are you sure?",
-        "ADD_TITLE": "Passwordless Authentication",
-        "ADD_DESCRIPTION": "Select one of the available options for creating a passwordless authentication method.",
-        "SEND_DESCRIPTION": "Send yourself a registration link to your email address.",
-        "SEND": "Send registration link",
-        "SENT": "The email was successfully delivered. Check your mailbox to continue with the setup.",
-        "QRCODE_DESCRIPTION": "Generate QR code for scanning with another device.",
-        "QRCODE": "Generate QR code",
-        "QRCODE_SCAN": "Scan this QR code to continue with the setup on your device.",
-        "NEW_DESCRIPTION": "Use this device to set up Passwordless.",
-        "NEW": "Add New"
+        "DELETE_TITLE": "Отстрани метод за најава без лозинка",
+        "DELETE_DESCRIPTION": "Дали сте сигурни дека сакате да го избришете методот за најава без лозинка? ",
+        "ADD_TITLE": "Најава без лозинка",
+        "ADD_DESCRIPTION": "Изберете една од достапните опции за креирање на метод за најава без лозинка.",
+        "SEND_DESCRIPTION": "Испратете линк за регистрација на вашата е-пошта.",
+        "SEND": "Испрати линк за регистрација",
+        "SENT": "Е-поштата беше успешно доставена. Проверете го вашето сандаче за е-пошта за да продолжите со подесувањето.",
+        "QRCODE_DESCRIPTION": "Генерирајте QR-код за скенирање со друг уред.",
+        "QRCODE": "Генерирај QR-код",
+        "QRCODE_SCAN": "Скенирајте го овој QR-код за да продолжите со подесувањето на вашиот уред.",
+        "NEW_DESCRIPTION": "Користете го овој уред за подесување на најава без лозинка",
+        "NEW": "Додај ново"
       }
     },
     "MFA": {
-      "TABLETYPE": "Type",
-      "TABLESTATE": "Status",
-      "NAME": "Name",
-      "EMPTY": "No additional factors",
-      "TITLE": "Multifactor Authentication",
-      "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
-      "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
-      "ADD": "Add Factor",
-      "OTP": "Authenticator App for OTP (One-Time Password)",
-      "OTP_DIALOG_TITLE": "Add OTP",
-      "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
-      "U2F": "Fingerprint, Security Keys, Face ID and other",
-      "U2F_DIALOG_TITLE": "Verify Factor",
-      "U2F_DIALOG_DESCRIPTION": "Enter a name for your used universal Multifactor.",
-      "U2F_SUCCESS": "Factor added successfully!",
-      "U2F_ERROR": "An error during setup occurred!",
-      "U2F_NAME": "Authenticator Name",
+      "TABLETYPE": "Тип",
+      "TABLESTATE": "Статус",
+      "NAME": "Име",
+      "EMPTY": "Нема дополнителни фактори",
+      "TITLE": "Мултифакторска автентикација",
+      "DESCRIPTION": "Додадете втор фактор за оптимална безбедност на вашиот профил.",
+      "MANAGE_DESCRIPTION": "Управувајте со методите за втор фактор за вашите корисници.",
+      "ADD": "Додади фактор",
+      "OTP": "Апликација за автентикација со OTP (Еднократна Лозинка)",
+      "OTP_DIALOG_TITLE": "Додади OTP",
+      "OTP_DIALOG_DESCRIPTION": "Скенирајте го QR-кодот со автентикатор апликација и внесете го кодот подолу за да го верификувате и активирате методот OTP.",
+      "U2F": "Отпечаток на прст, безбедносни клучеви, Face ID и други",
+      "U2F_DIALOG_TITLE": "Верифицирај фактор",
+      "U2F_DIALOG_DESCRIPTION": "Внесете име за вашиот универзален мултифактор.",
+      "U2F_SUCCESS": "Факторот е успешно додаден!",
+      "U2F_ERROR": "Се појави грешка при подесувањето!",
+      "U2F_NAME": "Име на автентикатор",
       "TYPE": {
-        "0": "No MFA defined",
-        "1": "One Time Password (OTP)",
-        "2": "Fingerprint, Security Keys, Face ID and other"
+        "0": "Нема дефинирана MFA",
+        "1": "Еднократна лозинка (OTP)",
+        "2": "Отпечаток на прст, безбедносни клучеви, Face ID и други"
       },
       "STATE": {
-        "0": "No State",
-        "1": "Not Ready",
-        "2": "Ready",
-        "3": "Deleted"
+        "0": "Без состојба",
+        "1": "Не е подготвено",
+        "2": "Подготвено",
+        "3": "Избришано"
       },
       "DIALOG": {
-        "MFA_DELETE_TITLE": "Remove Secondfactor",
-        "MFA_DELETE_DESCRIPTION": "You are about to delete a second factor. Are you sure?",
-        "ADD_MFA_TITLE": "Add Second Factor",
-        "ADD_MFA_DESCRIPTION": "Select one of the following options."
+        "MFA_DELETE_TITLE": "Отстрани втор фактор",
+        "MFA_DELETE_DESCRIPTION": "Дали сте сигурни дека сакате да го избришете вториот фактор? ",
+        "ADD_MFA_TITLE": "Додади втор фактор",
+        "ADD_MFA_DESCRIPTION": "Изберете една од следниве опции."
       }
     },
     "EXTERNALIDP": {
-      "TITLE": "External Identity Providers",
+      "TITLE": "Надворешни IDP",
       "DESC": "",
-      "IDPCONFIGID": "IDP Config ID",
-      "IDPNAME": "IDP Name",
-      "USERDISPLAYNAME": "External Name",
-      "EXTERNALUSERID": "External User ID",
-      "EMPTY": "No external IDP found",
+      "IDPCONFIGID": "ID на конфигурација на IDP",
+      "IDPNAME": "Име на IDP",
+      "USERDISPLAYNAME": "Надворешно име",
+      "EXTERNALUSERID": "Надоврешен ID на корисник",
+      "EMPTY": "Не е пронајден надворешен IDP",
       "DIALOG": {
-        "DELETE_TITLE": "Remove IDP",
-        "DELETE_DESCRIPTION": "You are about to delete an Identity Provider from a user. Do you really want to continue?"
+        "DELETE_TITLE": "Отстрани IDP",
+        "DELETE_DESCRIPTION": "Дали сте сигурни дека сакате да го избришете IDP од корисникот? "
       }
     },
     "CREATE": {
-      "TITLE": "Create a New User",
-      "DESCRIPTION": "Please provide the necessary information.",
-      "NAMEANDEMAILSECTION": "Name and E-mail",
-      "GENDERLANGSECTION": "Gender and Language",
-      "PHONESECTION": "Phone numbers",
-      "PASSWORDSECTION": "Initial Password",
-      "ADDRESSANDPHONESECTION": "Phone number",
-      "INITMAILDESCRIPTION": "If both options are selected, no email for initialization will be sent. If only one of the options is selected, a mail to provide / verify the data will be sent."
+      "TITLE": "Креирај нов корисник",
+      "DESCRIPTION": "Ве молиме внесете ги потребните информации.",
+      "NAMEANDEMAILSECTION": "Име и е-пошта",
+      "GENDERLANGSECTION": "Пол и јазик",
+      "PHONESECTION": "Телефонски броеви",
+      "PASSWORDSECTION": "Почетна лозинка",
+      "ADDRESSANDPHONESECTION": "Телефонски број",
+      "INITMAILDESCRIPTION": "Ако се изберат двете опции, нема да се испрати е-пошта за иницијализација. Ако се избере само една од опциите, ќе биде испратена е-пошта за обезбедување / верификација на податоците."
     },
     "CODEDIALOG": {
-      "TITLE": "Verify Phone Number",
-      "DESCRIPTION": "Enter the code you received by text message to verify your phone number.",
-      "CODE": "Code"
+      "TITLE": "Верификација на телефонски број",
+      "DESCRIPTION": "Внесете го кодот кој го добивте преку SMS порака за да го верифицирате вашиот телефонски број.",
+      "CODE": "Код"
     },
     "DATA": {
-      "STATE": "Status",
-      "STATE0": "Unknown",
-      "STATE1": "Active",
-      "STATE2": "Inactive",
-      "STATE3": "Deleted",
-      "STATE4": "Locked",
-      "STATE5": "Suspended",
-      "STATE6": "Initial"
+      "STATE": "Статус",
+      "STATE0": "Непознат",
+      "STATE1": "Активен",
+      "STATE2": "Неактивен",
+      "STATE3": "Избришан",
+      "STATE4": "Заклучен",
+      "STATE5": "Суспендиран",
+      "STATE6": "Почетен"
     },
     "PROFILE": {
-      "TITLE": "Profile",
-      "EMAIL": "E-mail",
-      "PHONE": "Phone number",
-      "PHONE_HINT": "Use 00 or the + symbol followed by the calling country code, or select the country from the dropdown and finally enter the phone number",
-      "USERNAME": "User Name",
-      "CHANGEUSERNAME": "modify",
-      "CHANGEUSERNAME_TITLE": "Change username",
-      "CHANGEUSERNAME_DESC": "Enter the new name in the field below.",
-      "FIRSTNAME": "Given Name",
-      "LASTNAME": "Family Name",
-      "NICKNAME": "Nickname",
-      "DISPLAYNAME": "Display Name",
-      "PREFERRED_LANGUAGE": "Language",
-      "GENDER": "Gender",
-      "PASSWORD": "Password",
+      "TITLE": "Профил",
+      "EMAIL": "Е-пошта",
+      "PHONE": "Телефонски број",
+      "PHONE_HINT": "Користете 00 или + и потоа дополнителниот број на земјата, или изберете ја земјата од листата и на крај внесете го телефонскиот број",
+      "USERNAME": "Корисничко име",
+      "CHANGEUSERNAME": "промени",
+      "CHANGEUSERNAME_TITLE": "Промени корисничко име",
+      "CHANGEUSERNAME_DESC": "Внесете го новото име во полето подолу.",
+      "FIRSTNAME": "Име",
+      "LASTNAME": "Презиме",
+      "NICKNAME": "Прекар",
+      "DISPLAYNAME": "Име за приказ",
+      "PREFERRED_LANGUAGE": "Јазик",
+      "GENDER": "Пол",
+      "PASSWORD": "Лозинка",
       "AVATAR": {
-        "UPLOADTITLE": "Upload your Profile Picture",
-        "UPLOADBTN": "Choose file",
-        "UPLOAD": "Upload",
-        "CURRENT": "Current Picture",
-        "PREVIEW": "Preview",
-        "DELETESUCCESS": "Deleted successfully!",
-        "CROPPERERROR": "An error while uploading your file occurred. Try a different format and size if necessary."
+        "UPLOADTITLE": "Поставете ја вашата слика за профил",
+        "UPLOADBTN": "Изберете датотека",
+        "UPLOAD": "Прикачи",
+        "CURRENT": "Моментална слика",
+        "PREVIEW": "Преглед",
+        "DELETESUCCESS": "Успешно избришано!",
+        "CROPPERERROR": "Се појави грешка при прикачувањето на вашата датотека. Пробајте со слика од различен формат и големина."
       },
-      "COUNTRY": "Country"
+      "COUNTRY": "Држава"
     },
     "MACHINE": {
-      "TITLE": "Service User Details",
-      "USERNAME": "User Name",
-      "NAME": "Name",
-      "DESCRIPTION": "Description",
-      "KEYSTITLE": "Keys",
-      "KEYSDESC": "Define your keys and add an optional expiration date.",
-      "TOKENSTITLE": "Personal Access Tokens",
-      "TOKENSDESC": "Personal access tokens function like ordinary OAuth access tokens.",
-      "ID": "Key ID",
-      "TYPE": "Type",
-      "EXPIRATIONDATE": "Expiration date",
-      "CHOOSEDATEAFTER": "Enter a valid expiration after",
-      "CHOOSEEXPIRY": "Select an expiration date",
-      "CREATIONDATE": "Creation Date",
-      "KEYDETAILS": "Key Details",
-      "ACCESSTOKENTYPE": "Access Token Type",
+      "TITLE": "Детали за севисен корисник",
+      "USERNAME": "Корисничко име",
+      "NAME": "Име",
+      "DESCRIPTION": "Опис",
+      "KEYSTITLE": "Клучеви",
+      "KEYSDESC": "Дефинирајте ги вашите клучеви и додадете опционален датум на истекување.",
+      "TOKENSTITLE": "Токени за личен пристап",
+      "TOKENSDESC": "Токените за личен пристап функционираат како обични OAuth токени за пристап.",
+      "ID": "ID на клуч",
+      "TYPE": "Тип",
+      "EXPIRATIONDATE": "Датум на истекување",
+      "CHOOSEDATEAFTER": "Внесете валиден датум по",
+      "CHOOSEEXPIRY": "Изберете датум на истекување",
+      "CREATIONDATE": "Датум на креирање",
+      "KEYDETAILS": "Детали за клучот",
+      "ACCESSTOKENTYPE": "Тип на токен за пристап",
       "ACCESSTOKENTYPES": {
         "0": "Bearer",
         "1": "JWT"
       },
       "ADD": {
-        "TITLE": "Add Key",
-        "DESCRIPTION": "Select your key type and choose an optional expiration date."
+        "TITLE": "Додадете клуч",
+        "DESCRIPTION": "Изберете го типот на клуч и изберете опционален датум на истекување."
       },
       "ADDED": {
-        "TITLE": "The key was created",
-        "DESCRIPTION": "Download the key as it won't be visible after closing this dialog!"
+        "TITLE": "Клучот е креиран",
+        "DESCRIPTION": "Преземете го клучот бидејќи нема да биде видлив после затворање на овој дијалог!"
       },
       "KEYTYPES": {
         "1": "JSON"
       },
       "DIALOG": {
         "DELETE_KEY": {
-          "TITLE": "Delete Key",
-          "DESCRIPTION": "Do you want to delete the selected key? This cannot be undone."
+          "TITLE": "Избриши клуч",
+          "DESCRIPTION": "Дали сакате да го избришете избраниот клуч? Ова не може да се врати."
         }
       }
     },
     "PASSWORD": {
-      "TITLE": "Password",
-      "LABEL": "A secure password helps to protect the account",
-      "DESCRIPTION": "Enter the new password according to the policy below.",
-      "OLD": "Current Password",
-      "NEW": "New Password",
-      "CONFIRM": "Confirm New Password",
-      "NEWINITIAL": "Password",
-      "CONFIRMINITIAL": "Confirm Password",
-      "RESET": "Reset Current Password",
-      "SET": "Set New Password",
-      "RESENDNOTIFICATION": "Send Password Reset Link",
-      "REQUIRED": "Some required fields are missing.",
-      "MINLENGTHERROR": "Has to be at least {{value}} characters long."
+      "TITLE": "Лозинка",
+      "LABEL": "Безбедна лозинка помага за заштита на корисничката сметка",
+      "DESCRIPTION": "Внесете ја новата лозинка според полисата подолу.",
+      "OLD": "Моментална лозинка",
+      "NEW": "Нова лозинка",
+      "CONFIRM": "Потврди нова лозинка",
+      "NEWINITIAL": "Лозинка",
+      "CONFIRMINITIAL": "Потврди лозинка",
+      "RESET": "Ресетирај моментална лозинка",
+      "SET": "Постави нова лозинка",
+      "RESENDNOTIFICATION": "Испрати линк за ресетирање на лозинката",
+      "REQUIRED": "Некои задолжителни полиња не се пополнети.",
+      "MINLENGTHERROR": "Мора да биде најмалку {{value}} карактери долга."
     },
     "ID": "ID",
-    "EMAIL": "E-mail",
-    "PHONE": "Phone number",
-    "PHONEEMPTY": "No phone number defined",
-    "PHONEVERIFIED": "Phone number verified.",
-    "EMAILVERIFIED": "Email verified",
-    "NOTVERIFIED": "not verified",
-    "PREFERRED_LOGINNAME": "Preferred Loginname",
-    "ISINITIAL": "User is not active, yet.",
+    "EMAIL": "E-пошта",
+    "PHONE": "Телефонски број",
+    "PHONEEMPTY": "Нема дефиниран телефонски број",
+    "PHONEVERIFIED": "Телефонскиот број е верифициран.",
+    "EMAILVERIFIED": "Е-поштата е верифицирана",
+    "NOTVERIFIED": "не е верифицирано",
+    "PREFERRED_LOGINNAME": "Предпочитано корисничко име",
+    "ISINITIAL": "Корисникот сè уште не е активен.",
     "LOGINMETHODS": {
-      "TITLE": "Contact Information",
-      "DESCRIPTION": "The provided information is used to send important information, like password reset e-mails to you.",
+      "TITLE": "Контакт податоци",
+      "DESCRIPTION": "Внесените податоци се користат за праќање на важни информации, како ресетирање на лозинката преку е-пошта до вас.",
       "EMAIL": {
-        "TITLE": "E-mail",
-        "VALID": "validated",
-        "ISVERIFIED": "Email Verified",
-        "ISVERIFIEDDESC": "If the email is indicated as verified, no email verification request will be made.",
-        "RESEND": "Resend Verification E-mail",
-        "EDITTITLE": "Change Email",
-        "EDITDESC": "Enter the new email in the field below."
+        "TITLE": "Е-пошта",
+        "VALID": "верифицирано",
+        "ISVERIFIED": "Верифицирана е-пошта",
+        "ISVERIFIEDDESC": "Доколку е-поштата е обележана како верифицирана, нема да се испрати барање за верификација на е-поштата.",
+        "RESEND": "Повторно испрати верификација за е-пошта",
+        "EDITTITLE": "Промени е-пошта",
+        "EDITDESC": "Внесете ја новата е-пошта во полето подолу."
       },
       "PHONE": {
-        "TITLE": "Phone",
-        "VALID": "validated",
-        "RESEND": "Resend Verification Text Message",
-        "EDITTITLE": "Change number",
-        "EDITVALUE": "Phone number",
-        "EDITDESC": "Enter the new phone number in the field below.",
-        "DELETETITLE": "Delete phone number",
-        "DELETEDESC": "Do you really want to delete the phone number"
+        "TITLE": "Телефонски број",
+        "VALID": "верифицирано",
+        "RESEND": "Повторно испрати верификација со SMS порака",
+        "EDITTITLE": "Промени телефонски број",
+        "EDITVALUE": "Телефонски број",
+        "EDITDESC": "Внесете го новиот телефонски број во полето подолу.",
+        "DELETETITLE": "Избриши телефонски број",
+        "DELETEDESC": "Дали навистина сакате да го избришете телефонскиот број"
       },
-      "RESENDCODE": "Resend Code",
-      "ENTERCODE": "Verify",
-      "ENTERCODE_DESC": "Verify Code"
+      "RESENDCODE": "Повторно испрати код",
+      "ENTERCODE": "Верифицирај",
+      "ENTERCODE_DESC": "Внесете го кодот за верификација"
     },
     "GRANTS": {
-      "TITLE": "User Grants",
-      "DESCRIPTION": "Grant this user access to certain projects",
+      "TITLE": "Овластувања за корисникот",
+      "DESCRIPTION": "Овозможете на овој корисник пристап до одредени проекти",
       "CREATE": {
-        "TITLE": "Create User Grant",
-        "DESCRIPTION": "Search for the organization, the project and the corresponding project roles."
+        "TITLE": "Креирајте овластување за корисник",
+        "DESCRIPTION": "Пребарајте ја организацијата, проектот и соодветните улоги на проектот."
       },
-      "PROJECTNAME": "Project Name",
-      "PROJECT-OWNED": "Project",
-      "PROJECT-GRANTED": "Granted project",
+      "PROJECTNAME": "Име на проектот",
+      "PROJECT-OWNED": "Проект",
+      "PROJECT-GRANTED": "Дозволен проект",
       "FILTER": {
-        "0": "filter for user",
-        "1": "filter for domain",
-        "2": "filter for projectname",
-        "3": "filter for rolename"
+        "0": "филтрирај за корисник",
+        "1": "филтрирај за домен",
+        "2": "филтрирај за име на проект",
+        "3": "филтрирај за име на улога"
       }
     },
     "STATE": {
-      "0": "Unknown",
-      "1": "Active",
-      "2": "Inactive",
-      "3": "Deleted",
-      "4": "Locked",
-      "5": "Suspended",
-      "6": "Initial"
+      "0": "Непознато",
+      "1": "Активно",
+      "2": "Неактивно",
+      "3": "Избришано",
+      "4": "Заклучено",
+      "5": "Суспендирано",
+      "6": "Иницијално"
     },
     "SEARCH": {
-      "ADDITIONAL": "Loginname (current organization)",
-      "ADDITIONAL-EXTERNAL": "Loginname (external organization)"
+      "ADDITIONAL": "Корисничко име (тековна организација)",
+      "ADDITIONAL-EXTERNAL": "Корисничко име (надворешна организација)"
     },
     "TARGET": {
-      "SELF": "If you want to grant a user of an other organization",
-      "EXTERNAL": "To grant a user of your organization",
-      "CLICKHERE": "click here"
+      "SELF": "Доколку сакате да доделите пристап на корисник од друга организација",
+      "EXTERNAL": "Доделете пристап на корисник од вашата организација",
+      "CLICKHERE": "кликнете овде"
     },
-    "SIGNEDOUT": "You are signed out. Click the button \"Sign In\" to sign in again.",
-    "SIGNEDOUT_BTN": "Sign In",
-    "EDITACCOUNT": "Edit Account",
-    "ADDACCOUNT": "Log in With Another Account",
-    "RESENDINITIALEMAIL": "Resend activation mail",
-    "RESENDEMAILNOTIFICATION": "Resend Email notification",
+    "SIGNEDOUT": "Одјавени сте. Кликнете на копчето \"Најави се\" за повторна најава.",
+    "SIGNEDOUT_BTN": "Најави се",
+    "EDITACCOUNT": "Уреди профил",
+    "ADDACCOUNT": "Најави се со друга корисничка сметка",
+    "RESENDINITIALEMAIL": "Повторно испрати е-пошта за активација",
+    "RESENDEMAILNOTIFICATION": "Повторно испрати е-пошта за известување",
     "TOAST": {
-      "CREATED": "User created successfully.",
-      "SAVED": "Profile saved successfully.",
-      "USERNAMECHANGED": "Username changed.",
-      "EMAILSAVED": "E-mail saved successfully.",
-      "INITEMAILSENT": "Initialization mail sent.",
-      "PHONESAVED": "Phone saved successfully.",
-      "PHONEREMOVED": "Phone has been removed.",
-      "PHONEVERIFIED": "Phone verified successfully.",
-      "PHONEVERIFICATIONSENT": "Phone verification code sent.",
-      "EMAILVERIFICATIONSENT": "E-mail verification code sent.",
-      "OTPREMOVED": "OTP removed.",
-      "U2FREMOVED": "Factor removed.",
-      "PASSWORDLESSREMOVED": "Passwordless removed.",
-      "INITIALPASSWORDSET": "Initial password set.",
-      "PASSWORDNOTIFICATIONSENT": "Password change notification sent.",
-      "PASSWORDCHANGED": "Password changed successfully.",
-      "REACTIVATED": "User reactivated.",
-      "DEACTIVATED": "User deactivated.",
-      "SELECTEDREACTIVATED": "Selected users reactivated.",
-      "SELECTEDDEACTIVATED": "Selected users deactivated.",
-      "SELECTEDKEYSDELETED": "Selected keys deleted.",
-      "KEYADDED": "Key added!",
-      "MACHINEADDED": "Service User created!",
-      "DELETED": "User deleted successfully!",
-      "UNLOCKED": "User unlocked successfully!",
-      "PASSWORDLESSREGISTRATIONSENT": "Registration Link sent successfully.",
-      "SECRETGENERATED": "Secret generated successfully!",
-      "SECRETREMOVED": "Secret removed successfully!"
+      "CREATED": "Корисникот е успешно креиран.",
+      "SAVED": "Профилот е успешно зачуван.",
+      "USERNAMECHANGED": "Корисничкото име е променето.",
+      "EMAILSAVED": "Е-поштата е успешно зачувана.",
+      "INITEMAILSENT": "Активационата е-пошта е испратена.",
+      "PHONESAVED": "Телефонскиот број е успешно зачуван.",
+      "PHONEREMOVED": "Телефонскиот број е отстранет.",
+      "PHONEVERIFIED": "Телефонскиот број е успешно верифициран.",
+      "PHONEVERIFICATIONSENT": "Испратен е код за верификација на телефонскиот број.",
+      "EMAILVERIFICATIONSENT": "Испратен е код за верификација на е-поштата.",
+      "OTPREMOVED": "OTP-от е отстранет.",
+      "U2FREMOVED": "Факторот е отстранет.",
+      "PASSWORDLESSREMOVED": "Најава без лозинка е отстранета.",
+      "INITIALPASSWORDSET": "Иницијалната лозинка е поставена.",
+      "PASSWORDNOTIFICATIONSENT": "Испратено е известување за промена на лозинка.",
+      "PASSWORDCHANGED": "Лозинката е успешно променета.",
+      "REACTIVATED": "Корисникот е реактивиран.",
+      "DEACTIVATED": "Корисникот е деактивиран.",
+      "SELECTEDREACTIVATED": "Избраните корисници се реактивирани.",
+      "SELECTEDDEACTIVATED": "Избраните корисници се деактивирани.",
+      "SELECTEDKEYSDELETED": "Избраните клучеви се избришани.",
+      "KEYADDED": "Клучот е додаден!",
+      "MACHINEADDED": "Сервисниот корисник е креиран!",
+      "DELETED": "Корисникот е успешно избришан!",
+      "UNLOCKED": "Корисникот е успешно отклучен!",
+      "PASSWORDLESSREGISTRATIONSENT": "Линкот за регистрација е успешно испратен.",
+      "SECRETGENERATED": "Тајната е успешно генерирана!",
+      "SECRETREMOVED": "Тајната е успешно отстранета!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "ZITADEL Manager Roles",
-      "DESCRIPTION": "These are all member grants of the user. You can modify them also on organization, project, or IAM detail pages.",
-      "ORGCONTEXT": "You see all organizations and projects that are related to the currently selected organization.",
-      "USERCONTEXT": "You see all organizations and projects to which you are authorized. Including other organizations.",
-      "CREATIONDATE": "Creation Date",
-      "CHANGEDATE": "Last Modified",
-      "DISPLAYNAME": "Display Name",
-      "REMOVE": "Remove",
-      "TYPE": "Type",
-      "ORGID": "Organization ID",
-      "UPDATED": "The membership was updated.",
-      "NOPERMISSIONTOEDIT": "You are missing the required permissions to edit roles!",
+      "TITLE": "Улоги на ZITADEL менаџер",
+      "DESCRIPTION": "Овие се сите овластувања за членување на корисникот. Истите може да ги менувате и на страните за детали за организација, проект или IAM.",
+      "ORGCONTEXT": "Ги гледате сите организации и проекти поврзани со тековно избраната организација.",
+      "USERCONTEXT": "Ги гледате сите организации и проекти до кои имате овластување, вклучувајќи и други организации.",
+      "CREATIONDATE": "Датум на креирање",
+      "CHANGEDATE": "Последна промена",
+      "DISPLAYNAME": "Име за приказ",
+      "REMOVE": "Отстрани",
+      "TYPE": "Тип",
+      "ORGID": "ID на организација",
+      "UPDATED": "Членството е ажурирано.",
+      "NOPERMISSIONTOEDIT": "Ви недостигаат потребните овластувања за промена на улоги!",
       "TYPES": {
-        "UNKNOWN": "Unknown",
-        "ORG": "Organization",
-        "PROJECT": "Project",
-        "GRANTEDPROJECT": "Granted Project"
+        "UNKNOWN": "Непознато",
+        "ORG": "Организација",
+        "PROJECT": "Проект",
+        "GRANTEDPROJECT": "Дозволен проект"
       }
     },
     "PERSONALACCESSTOKEN": {
       "ID": "ID",
-      "TOKEN": "Token",
+      "TOKEN": "Токен",
       "ADD": {
-        "TITLE": "Generate new Personal Access Token",
-        "DESCRIPTION": "Define a custom expiration for the token.",
-        "CHOOSEEXPIRY": "Select an expiration date",
-        "CHOOSEDATEAFTER": "Enter a valid expiration after"
+        "TITLE": "Генерирај нов токен за личен пристап",
+        "DESCRIPTION": "Дефинирајте истекување за токенот.",
+        "CHOOSEEXPIRY": "Изберете датум на истекување",
+        "CHOOSEDATEAFTER": "Внесете валиден датум на истекување по"
       },
       "ADDED": {
-        "TITLE": "Personal Access Token",
-        "DESCRIPTION": "Make sure to copy your personal access token. You won't be able to see it again!"
+        "TITLE": "Токен за личен пристап",
+        "DESCRIPTION": "Копирајте гои зачувајте го вашиот токен за личен пристап. Нема да можете да го видите повторно!"
       },
       "DELETE": {
-        "TITLE": "Delete Token",
-        "DESCRIPTION": "You are about to delete the personal access token. Are you sure?"
+        "TITLE": "Избриши токен",
+        "DESCRIPTION": "Дали сте сигурни дека сакате да го избришете токенот за личен пристап?"
       },
-      "DELETED": "Token deleted with success."
+      "DELETED": "Токенот е успешно избришан."
     }
   },
   "METADATA": {
-    "TITLE": "Metadata",
+    "TITLE": "Метаподатоци",
     "DESCRIPTION": "",
-    "KEY": "Key",
-    "VALUE": "Value",
-    "ADD": "New Entry",
-    "SAVE": "Save",
-    "EMPTY": "No metadata",
-    "SETSUCCESS": "Element saved successfully",
-    "REMOVESUCCESS": "Element deleted successfully"
+    "KEY": "Клуч",
+    "VALUE": "Вредност",
+    "ADD": "Нов внес",
+    "SAVE": "Зачувај",
+    "EMPTY": "Нема метаподатоци",
+    "SETSUCCESS": "Елементот е успешно зачуван",
+    "REMOVESUCCESS": "Елементот е успешно избришан"
   },
   "FLOWS": {
-    "TITLE": "Actions and Flows",
-    "DESCRIPTION": "Define scripts to execute on a certain event.",
-    "ACTIONSTITLE": "Actions",
-    "ACTIONSDESCRIPTION": "These are your scripts that you can run in the flows.",
+    "TITLE": "Акции и Flows",
+    "DESCRIPTION": "Дефинирајте скрипти за извршување при одреден тригер.",
+    "ACTIONSTITLE": "Акции",
+    "ACTIONSDESCRIPTION": "Овие се вашите скрипти кои можете да ги извршите во flows.",
     "FLOWSTITLE": "Flows",
-    "FLOWSDESCRIPTION": "Flows of a certain type execute actions at the time of a trigger.",
+    "FLOWSDESCRIPTION": "Flows од одреден тип извршуваат дејности во моментот на тригерот.",
     "ID": "ID",
-    "NAME": "Name",
-    "STATE": "State",
+    "NAME": "Име",
+    "STATE": "Статус",
     "STATES": {
-      "0": "no status",
-      "1": "inactive",
-      "2": "active"
+      "0": "нема статус",
+      "1": "неактивен",
+      "2": "активен"
     },
-    "ADDTRIGGER": "Add trigger",
-    "FLOWCHANGED": "The flow was changed successfully",
-    "FLOWCLEARED": "The flow was reset successfully",
-    "TIMEOUT": "Timeout",
-    "TIMEOUTINSEC": "Timeout in seconds",
-    "ALLOWEDTOFAIL": "Allowed To Fail",
-    "SCRIPT": "Script",
-    "FLOWTYPE": "Flow Type",
-    "TRIGGERTYPE": "Trigger Type",
-    "ACTIONS": "Actions",
-    "ACTIONSMAX": "Based on your Tier, you have available a limited Number of Actions ({{value}}). Make sure to deactivate those you are not in need or consider upgrading your tier.",
+    "ADDTRIGGER": "Додади тригер",
+    "FLOWCHANGED": "Flow е успешно променет",
+    "FLOWCLEARED": "Flow е успешно ресетиран",
+    "TIMEOUT": "Временски лимит",
+    "TIMEOUTINSEC": "Временски лимит во секунди",
+    "ALLOWEDTOFAIL": "Дозволено да не успее",
+    "SCRIPT": "Скрипта",
+    "FLOWTYPE": "Тип на Flow",
+    "TRIGGERTYPE": "Тип на тригер",
+    "ACTIONS": "Акции",
+    "ACTIONSMAX": "Според вашиот Tier, имате достапни ограничен број на акции ({{value}}). Проверете дали сте ги оневозможиле оние што не ви се потребни или размислете за надградба на вашиот Tier.",
     "DIALOG": {
       "ADD": {
-        "TITLE": "Create an Action"
+        "TITLE": "Креирај акција"
       },
       "UPDATE": {
-        "TITLE": "Update Action"
+        "TITLE": "Ажурирај акција"
       },
       "DELETEACTION": {
-        "TITLE": "Delete Action?",
-        "DESCRIPTION": "You are about to delete an action. This cannot be reverted. Are you sure?",
-        "DELETE_SUCCESS": "Action deleted successfully."
+        "TITLE": "Избриши акција?",
+        "DESCRIPTION": "Дали сте сигурни дека сакате да ја избришете акцијата? Ова не може да се врати. Дали сте сигурни?",
+        "DELETE_SUCCESS": "Акцијага е успешно избришана."
       },
       "CLEAR": {
-        "TITLE": "Clear flow?",
-        "DESCRIPTION": "You are about to reset the flow along with its triggers and actions. This change cannot be restored. Are you sure?"
+        "TITLE": "Ресетирај Flow?",
+        "DESCRIPTION": "Дали сте сигурни дека сакате да го ресетирате Flow заедно со неговите тригери и акции? Оваа промена не може да се врати. Дали сте сигурни?"
       },
       "REMOVEACTIONSLIST": {
-        "TITLE": "Delete selected Actions?",
-        "DESCRIPTION": "Are you sure you want to delete the selected actions from the flow?"
+        "TITLE": "Избриши ги избраните акции?",
+        "DESCRIPTION": "Дали сте сигурни дека сакате да ги избришете избраните акции од Flow?"
       }
     },
     "TOAST": {
-      "ACTIONSSET": "Actions set",
-      "ACTIONREACTIVATED": "Actions reactivated with success",
-      "ACTIONDEACTIVATED": "Actions deactivated with success"
+      "ACTIONSSET": "Акциите се поставени",
+      "ACTIONREACTIVATED": "Акциите се успешно реактивирани",
+      "ACTIONDEACTIVATED": "Акциите се успешно оневозможени"
     }
   },
   "IAM": {
-    "TITLE": "Instance",
-    "DESCRIPTION": "Manage your instance settings and Organizations",
+    "TITLE": "Инстанца",
+    "DESCRIPTION": "Управувајте со подесувањата на вашата инстанца и организациите",
     "POLICIES": {
-      "TITLE": "System Policies and Access Settings",
-      "DESCRIPTION": "Manage your global Policies and Management Access Settings."
+      "TITLE": "Системски политики и подесувања за пристап",
+      "DESCRIPTION": "Управувајте со глобалните политики и подесувањата за пристап до управување."
     },
     "EVENTSTORE": {
-      "TITLE": "IAM Storage Administration",
-      "DESCRIPTION": "Manage your ZITADEL views and failed events."
+      "TITLE": "Управување со складиштето на IAM",
+      "DESCRIPTION": "Управувајте со прегледите на ZITADEL и неуспешните настани."
     },
     "MEMBER": {
-      "TITLE": "Managers",
-      "DESCRIPTION": "These Managers are allowed to make changes in your instance."
+      "TITLE": "Менаџери",
+      "DESCRIPTION": "Овие менаџери имаат дозвола да направат промени во вашата инстанца."
     },
     "PAGES": {
-      "STATE": "Status",
-      "DOMAINLIST": "Domains"
+      "STATE": "Статус",
+      "DOMAINLIST": "Домени"
     },
     "STATE": {
-      "0": "Unspecified",
-      "1": "Creating",
-      "2": "Running",
-      "3": "Stopping",
-      "4": "Stopped"
+      "0": "Ненаведено",
+      "1": "Креирање",
+      "2": "Во тек",
+      "3": "Стопирање",
+      "4": "Сопрено"
     },
     "VIEWS": {
-      "TITLE": "Views",
-      "DESCRIPTION": "This card shows your ZITADEL views.",
-      "VIEWNAME": "Name",
-      "DATABASE": "Database",
-      "SEQUENCE": "Sequence",
-      "EVENTTIMESTAMP": "Timestamp",
-      "LASTSPOOL": "Successful spool",
-      "ACTIONS": "Actions",
-      "CLEAR": "Clear",
-      "CLEARED": "View was successfully cleared!",
+      "TITLE": "Прегледи",
+      "DESCRIPTION": "Оваа картичка ги прикажува вашите ZITADEL прегледи.",
+      "VIEWNAME": "Име",
+      "DATABASE": "База на податоци",
+      "SEQUENCE": "Секвенца",
+      "EVENTTIMESTAMP": "Временска ознака",
+      "LASTSPOOL": "Успешен spool",
+      "ACTIONS": "Акцији",
+      "CLEAR": "Исчисти",
+      "CLEARED": "Прегледот е успешно исчистен!",
       "DIALOG": {
-        "VIEW_CLEAR_TITLE": "Clear View",
-        "VIEW_CLEAR_DESCRIPTION": "You are about to clear a view. Clearing a view creates a process during which data is possibly not available for endusers. Are you really sure?"
+        "VIEW_CLEAR_TITLE": "Исчисти преглед",
+        "VIEW_CLEAR_DESCRIPTION": "Дали сте сигурни дека сакате да го исчистите прегледот? Чистењето на прегледот создава процес за време на кој податоците може да не бидат достапни за крајните корисници. Дали сте сигурни?"
       }
     },
     "FAILEDEVENTS": {
-      "TITLE": "Failed Events",
-      "DESCRIPTION": "This card shows your failed events.",
-      "VIEWNAME": "Name",
-      "DATABASE": "Database",
-      "FAILEDSEQUENCE": "Failed Sequence",
-      "FAILURECOUNT": "Failure Count",
-      "LASTFAILED": "Last failed at",
-      "ERRORMESSAGE": "Error Message",
-      "ACTIONS": "Actions",
-      "DELETE": "Remove",
-      "DELETESUCCESS": "Failed events removed."
+      "TITLE": "Неуспешни настани",
+      "DESCRIPTION": "Оваа картичка ги прикажува вашите неуспешни настани.",
+      "VIEWNAME": "Име",
+      "DATABASE": "База на податоци",
+      "FAILEDSEQUENCE": "Неуспешна секвенца",
+      "FAILURECOUNT": "Број на неуспешности",
+      "LASTFAILED": "Последно неуспешен на",
+      "ERRORMESSAGE": "Порака за грешка",
+      "ACTIONS": "Акции",
+      "DELETE": "Отстрани",
+      "DELETESUCCESS": "Неуспешните настани се отстранети."
     },
     "EVENTS": {
-      "TITLE": "Events",
-      "DESCRIPTION": "This view shows all occured events.",
-      "EDITOR": "Editor",
-      "EDITORID": "Editor ID",
-      "AGGREGATE": "Aggregate",
-      "AGGREGATEID": "Aggregate ID",
-      "AGGREGATETYPE": "Aggregate Type",
-      "RESOURCEOWNER": "Resource Owner",
-      "SEQUENCE": "Sequence",
-      "CREATIONDATE": "Created At",
-      "TYPE": "Type",
-      "PAYLOAD": "Payload",
+      "TITLE": "Настани",
+      "DESCRIPTION": "Овој преглед ги прикажува сите настани.",
+      "EDITOR": "Уредник",
+      "EDITORID": "ID на уредник",
+      "AGGREGATE": "Агрегација",
+      "AGGREGATEID": "ID на агрегација",
+      "AGGREGATETYPE": "Тип на агрегација",
+      "RESOURCEOWNER": "Сопственик на ресурсот",
+      "SEQUENCE": "Секвенца",
+      "CREATIONDATE": "Креирано на",
+      "TYPE": "Тип",
+      "PAYLOAD": "Податоци",
       "FILTERS": {
-        "BTN": "Filter",
+        "BTN": "Филтер",
         "USER": {
           "IDLABEL": "ID",
-          "CHECKBOX": "Filter by Editor"
+          "CHECKBOX": "Филтер според уредникот"
         },
         "AGGREGATE": {
-          "TYPELABEL": "Aggregate Type",
+          "TYPELABEL": "Тип на агрегација",
           "IDLABEL": "ID",
-          "CHECKBOX": "Filter by Aggregate"
+          "CHECKBOX": "Филтер според агрегација"
         },
         "TYPE": {
-          "TYPELABEL": "Type",
-          "CHECKBOX": "Filter by Type"
+          "TYPELABEL": "Тип",
+          "CHECKBOX": "Филтер според типот"
         },
         "RESOURCEOWNER": {
           "LABEL": "ID",
-          "CHECKBOX": "Filter by Resource Owner"
+          "CHECKBOX": "Филтер според сопственикот на ресурсот"
         },
         "SEQUENCE": {
-          "LABEL": "Sequence",
-          "CHECKBOX": "Filter by Sequence",
-          "SORT": "Sorting",
-          "ASC": "Ascending",
-          "DESC": "Descending"
+          "LABEL": "Секвенца",
+          "CHECKBOX": "Филтер според секвенцата",
+          "SORT": "Сортирање",
+          "ASC": "Растечки",
+          "DESC": "Опаѓачки"
         },
         "CREATIONDATE": {
-          "LABEL": "Creation Date",
-          "CHECKBOX": "Filter by Creation Date"
+          "LABEL": "Датум на креирање",
+          "CHECKBOX": "Филтер според датумот на креирање"
         },
-        "OTHER": "other",
-        "OTHERS": "others"
+        "OTHER": "друго",
+        "OTHERS": "други"
       },
       "DIALOG": {
-        "TITLE": "Event Detail"
+        "TITLE": "Детали за настанот"
       }
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manager removed.",
-      "MEMBERSADDED": "Managers added.",
-      "MEMBERADDED": "Manager added.",
-      "MEMBERCHANGED": "Manager changed.",
-      "ROLEREMOVED": "Role removed.",
-      "ROLECHANGED": "Role changed.",
-      "REACTIVATED": "Reactivated",
-      "DEACTIVATED": "Deactivated"
+      "MEMBERREMOVED": "Менаџерот е отстранет.",
+      "MEMBERSADDED": "Менаџерите се додадени.",
+      "MEMBERADDED": "Менаџерот е додаден.",
+      "MEMBERCHANGED": "Менаџерот е променет.",
+      "ROLEREMOVED": "Улогата е отстранета.",
+      "ROLECHANGED": "Улогата е променета.",
+      "REACTIVATED": "Реактивиран",
+      "DEACTIVATED": "Деактивиран"
     }
   },
   "ORG": {
     "PAGES": {
-      "NAME": "Name",
+      "NAME": "Име",
       "ID": "ID",
-      "CREATIONDATE": "Creation Date",
-      "DATECHANGED": "Changed",
-      "FILTER": "Filter",
-      "FILTERPLACEHOLDER": "Filter for the name",
-      "LIST": "Organizations",
-      "LISTDESCRIPTION": "Choose an organization.",
-      "ACTIVE": "Active",
-      "CREATE": "Create Organization",
-      "DEACTIVATE": "Deactivate Organization",
-      "REACTIVATE": "Reactivate Organization",
-      "NOPERMISSION": "You don't have the permission to access organization settings.",
-      "USERSELFACCOUNT": "Use your personal account as organization owner",
-      "ORGDETAIL_TITLE": "Enter the name and domain of your new organization.",
-      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organization.",
-      "ORGDETAILUSER_TITLE": "Configure Organization Owner",
-      "DELETE": "Delete organization",
-      "DEFAULTLABEL": "Default",
-      "SETASDEFAULT": "Set as default organization",
-      "DEFAULTORGSET": "Default organization changed successfully",
+      "CREATIONDATE": "Датум на креирање",
+      "DATECHANGED": "Променето",
+      "FILTER": "Филтер",
+      "FILTERPLACEHOLDER": "Филтер за име",
+      "LIST": "Организации",
+      "LISTDESCRIPTION": "Изберете организација.",
+      "ACTIVE": "Активна",
+      "CREATE": "Креирај организација",
+      "DEACTIVATE": "Деактивирај организација",
+      "REACTIVATE": "Реактивирај организација",
+      "NOPERMISSION": "Нематеовластувања за пристап до подесување на организацијата.",
+      "USERSELFACCOUNT": "Користете ја вашата лична корисничка сметка како сопственик на организацијата",
+      "ORGDETAIL_TITLE": "Внесете го името и доменот на вашата нова организација.",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Внесете го името на вашата нова организација.",
+      "ORGDETAILUSER_TITLE": "Конфигурирајте го сопственикот на организацијата",
+      "DELETE": "Избриши организација",
+      "DEFAULTLABEL": "Стандардна",
+      "SETASDEFAULT": "Постави како стандардна организација",
+      "DEFAULTORGSET": "Стандардната организација е успешно променета",
       "RENAME": {
-        "ACTION": "Rename",
-        "TITLE": "Rename Organization",
-        "DESCRIPTION": "Enter the new name for your organization",
-        "BTN": "Rename"
+        "ACTION": "Преименувај",
+        "TITLE": "Преименувај организација",
+        "DESCRIPTION": "Внесете го новото име за вашата организација",
+        "BTN": "Преименувај"
       },
       "ORGDOMAIN": {
-        "TITLE": "Organization Domain Ownership Verification",
-        "VERIFICATION": "To verify the ownership of your domain, you need to download a verification file and upload it at the provided URL listed below, or place a TXT Record DNS entry for the provided URL. To complete, click the button to verify.",
-        "VERIFICATION_SKIP": "You can skip verification for now and continue to create your organization, but in order to use your organization this step has to be completed!",
-        "VERIFICATION_VALIDATION_DESC": "The tokens are checked regularly to ensure you are still owner of the domain.",
-        "VERIFICATION_NEWTOKEN_TITLE": "Request New Token",
-        "VERIFICATION_NEWTOKEN_DESC": "If you want to request a new token, select you preferred method. If you want to validate a persisting token, click the button above.",
-        "VERIFICATION_VALIDATION_ONGOING": "A verification token has already been requested. Click on the button to trigger a verification check.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Type of the token:",
-        "VERIFICATION_SUCCESSFUL": "Domain successfully verified!",
-        "REQUESTNEWTOKEN": "Request new token",
+        "TITLE": "Потврда за сопственост на доменот на организацијата",
+        "VERIFICATION": "За да ја потврдите сопственоста на вашиот домен, треба да преземете датотека за потврда и да ја прикачите на препратената URL адреса наведена подолу, или да поставите запис на DNS (TXT Record) за препратената URL адреса. За да завршите, кликнете на копчето за верификација.",
+        "VERIFICATION_SKIP": "Можете да ја прескокнете верификацијата за сега и да продолжите со креирањето на вашата организација, но за да ја користите вашата организација, овој чекор треба да се заврши!",
+        "VERIFICATION_VALIDATION_DESC": "Токените редовно се проверуваат за да се осигура дека сѐ уште сте сопственик на доменот.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Побарај нов токен",
+        "VERIFICATION_NEWTOKEN_DESC": "Ако сакате да побарате нов токен, изберете ја вашата посакувана метода. Ако сакате да валидирате веќе постоечки токен, кликнете на копчето погоре.",
+        "VERIFICATION_VALIDATION_ONGOING": "Веќе е баран верификациски токен. Кликнете на копчето за да покренете проверка на верификацијата.",
+        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Тип на токенот:",
+        "VERIFICATION_SUCCESSFUL": "Доменот е успешно верифициран!",
+        "REQUESTNEWTOKEN": "Побарај нов токен",
         "TYPES": {
           "1": "HTTP",
           "2": "DNS"
         }
       },
-      "DOWNLOAD_FILE": "Download File",
-      "SELECTORGTOOLTIP": "Select this organization.",
-      "PRIMARYDOMAIN": "Primary Domain",
-      "STATE": "State",
-      "USEPASSWORD": "Set Initial Password",
-      "USEPASSWORDDESC": "The user does not have to set the password during initialization."
+      "DOWNLOAD_FILE": "Преземи датотека",
+      "SELECTORGTOOLTIP": "Изберете ја оваа организација.",
+      "PRIMARYDOMAIN": "Основен домен",
+      "STATE": "Статус",
+      "USEPASSWORD": "Постави почетна лозинка",
+      "USEPASSWORDDESC": "Корисникот не мора да постави лозинката при иницијализација."
     },
     "LIST": {
-      "TITLE": "Organizations",
-      "DESCRIPTION": "These are the organizations on your instance"
+      "TITLE": "Организации",
+      "DESCRIPTION": "Овие се организациите на вашата инстанца"
     },
     "DOMAINS": {
-      "NEW": "Add Domain",
-      "TITLE": "Domains",
-      "DESCRIPTION": "Configure your domains. This domain can be used to log in with your users.",
-      "SETPRIMARY": "Set as Primary",
+      "NEW": "Додади домен",
+      "TITLE": "Домени",
+      "DESCRIPTION": "Конфигурирајте ги вашите домени. Овој домен може да се користи за најава на вашите корисници.",
+      "SETPRIMARY": "Постави како основен",
       "DELETE": {
-        "TITLE": "Delete Domain",
-        "DESCRIPTION": "You are about to delete one of your domains. Note that your users can no longer use this domain for their login."
+        "TITLE": "Избриши домен",
+        "DESCRIPTION": "Се подготвувате да го избришете вашиот домен. Имајте предвид дека вашите корисници повеќе нема да можат да го користат овој домен за најава."
       },
       "ADD": {
-        "TITLE": "Add Domain",
-        "DESCRIPTION": "You are about to add a domain for your organization. After successful process, you users will be able to use the domain for their login."
+        "TITLE": "Додади домен",
+        "DESCRIPTION": "Се подготвувате да додадете домен за вашата организација. По успешна процедура, вашите корисници ќе можат да го користат доменот за најава."
       }
     },
     "STATE": {
-      "0": "Not defined",
-      "1": "Active",
-      "2": "Deactivated",
-      "3": "Removed"
+      "0": "Ненаведено",
+      "1": "Активна",
+      "2": "Неактивна",
+      "3": "Избришана"
     },
     "MEMBER": {
-      "TITLE": "Organization Managers",
-      "DESCRIPTION": "Define the users who can change your organizations preferences."
+      "TITLE": "Менаџери на организацијата",
+      "DESCRIPTION": "Дефинирајте ги корисниците кои можат да ги менуваат преференците на вашата организација."
     },
     "TOAST": {
-      "UPDATED": "Organization updated successfully.",
-      "DEACTIVATED": "Organization deactivated.",
-      "REACTIVATED": "Organization reactivated.",
-      "DOMAINADDED": "Added domain.",
-      "DOMAINREMOVED": "Removed domain.",
-      "MEMBERADDED": "Manager added.",
-      "MEMBERREMOVED": "Manager removed.",
-      "MEMBERCHANGED": "Manager changed.",
-      "SETPRIMARY": "Primary domain set.",
-      "DELETED": "Organisation deleted successfully",
-      "ORG_WAS_DELETED": "Organisation has been deleted."
+      "UPDATED": "Организацијата е успешно ажурирана.",
+      "DEACTIVATED": "Организацијата е деактивирана.",
+      "REACTIVATED": "Организацијата е реактивирана",
+      "DOMAINADDED": "Додаден домен.",
+      "DOMAINREMOVED": "Отстранет домен.",
+      "MEMBERADDED": "Додаден менаџер.",
+      "MEMBERREMOVED": "Отстранет менаџер.",
+      "MEMBERCHANGED": "Променет менаџер.",
+      "SETPRIMARY": "Поставен основен домен.",
+      "DELETED": "Организацијата успешно избришана",
+      "ORG_WAS_DELETED": "Организацијата е избришана."
     },
     "DIALOG": {
       "DEACTIVATE": {
-        "TITLE": "Deactivate organization",
-        "DESCRIPTION": "You are about to deactivate your organization. Users won't be able to login afterwards. Are you sure to proceed?"
+        "TITLE": "Деактивирај организација",
+        "DESCRIPTION": "Се подготвувате да ја деактивирате вашата организација. Корисниците повеќе нема да можат да се најават. Дали сте сигурни дека сакате да продолжите?"
       },
       "REACTIVATE": {
-        "TITLE": "Reactivate organization",
-        "DESCRIPTION": "You are about to reactivate your organization. Users will be able to login again. Are you sure to proceed?"
+        "TITLE": "Реактивирај организација",
+        "DESCRIPTION": "Се подготвувате да ја реактивирате вашата организација. Корисниците повторно ќе можат да се најават. Дали сте сигурни дека сакате да продолжите?"
       },
       "DELETE": {
-        "TITLE": "Delete organization",
-        "DESCRIPTION": "You are about to delete your organization. This initiates a process where all organization related data will be deleted. You can not revert this action as for now.",
-        "TYPENAME": "Type '{{value}}', to delete your organization.",
-        "ORGNAME": "Name",
-        "BTN": "Delete"
+        "TITLE": "Избриши организација",
+        "DESCRIPTION": "Се подготвувате да ја избришете вашата организација. Ова ќе започне процес со кој што сите податоци поврзани со организацијата ќе бидат избришани. Оваа промена не може да се врати.",
+        "TYPENAME": "Внесете '{{value}}' за да ја избришете вашата организација.",
+        "ORGNAME": "Име",
+        "BTN": "Избриши"
       }
     }
   },
   "SETTINGS": {
     "INSTANCE": {
-      "TITLE": "Instance Settings",
-      "DESCRIPTION": "These settings will apply to all your organizations unless they have been overridden."
+      "TITLE": "Подесувања за инстанца",
+      "DESCRIPTION": "Овие подесувања ќе се применуваат на сите ваши организации, освен ако не се пребришани."
     },
     "ORG": {
-      "TITLE": "Organization Settings",
-      "DESCRIPTION": "These settings extend and overwrite your instance settings."
+      "TITLE": "Подесувања за организација",
+      "DESCRIPTION": "Овие подесувања ги прошируваат и препишуваат подесувањата на вашата инстанца."
     },
     "LIST": {
-      "GENERAL": "General",
-      "LOGIN": "Login Behavior and Security",
-      "LOCKOUT": "Lockout",
-      "COMPLEXITY": "Password complexity",
-      "NOTIFICATIONS": "Notification settings",
-      "NOTIFICATIONS_DESC": "SMTP and SMS Settings",
-      "MESSAGETEXTS": "Message Texts",
+      "GENERAL": "Генерални",
+      "LOGIN": "Правила и безбедност при најава",
+      "LOCKOUT": "Забрана на пристап",
+      "COMPLEXITY": "Сложеност на лозинката",
+      "NOTIFICATIONS": "Подесувања за известувања",
+      "NOTIFICATIONS_DESC": "Подесувања за SMTP и SMS",
+      "MESSAGETEXTS": "Текстови на пораки",
       "IDP": "Identity Providers",
-      "DOMAIN": "Domain settings",
-      "LOGINTEXTS": "Login Interface Texts",
-      "BRANDING": "Branding",
-      "PRIVACYPOLICY": "Privacy Policy",
-      "OIDC": "OIDC Token lifetime and expiration",
-      "SECRETS": "Secret Appearance",
-      "SECURITY": "Security settings"
+      "DOMAIN": "Подесувања за домен",
+      "LOGINTEXTS": "Текстови на интерфејс за најава",
+      "BRANDING": "Брендирање",
+      "PRIVACYPOLICY": "Политика за приватност",
+      "OIDC": "OIDC времетраење и истекување на токени",
+      "SECRETS": "Изглед на тајни",
+      "SECURITY": "Подесувања за безбедност"
     },
     "GROUPS": {
-      "NOTIFICATIONS": "Notifications",
-      "LOGIN": "Login and Access",
-      "DOMAIN": "Domain",
-      "TEXTS": "Texts and Languages",
-      "APPEARANCE": "Appearance",
-      "OTHER": "Other"
+      "NOTIFICATIONS": "Известувања",
+      "LOGIN": "Најава и пристап",
+      "DOMAIN": "Домен",
+      "TEXTS": "Текстови и јазици",
+      "APPEARANCE": "Изглед",
+      "OTHER": "Друго"
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Default Language",
+    "DEFAULTLANGUAGE": "Стандарден јазик",
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
@@ -1045,193 +1045,193 @@
       "mk": "Македонски"
     },
     "SMTP": {
-      "TITLE": "SMTP Settings",
-      "SENDERADDRESS": "Sender Email Address",
-      "SENDERNAME": "Sender Name",
-      "HOSTANDPORT": "Host And Port",
-      "USER": "User",
-      "PASSWORD": "Password",
-      "SETPASSWORD": "Set SMTP Password",
-      "PASSWORDSET": "SMTP Password was set successfully.",
+      "TITLE": "SMTP подесувања",
+      "SENDERADDRESS": "Адреса на испраќачот",
+      "SENDERNAME": "Име на испраќачот",
+      "HOSTANDPORT": "Host и Port",
+      "USER": "Корисник",
+      "PASSWORD": "Лозинка",
+      "SETPASSWORD": "Постави SMTP лозинка",
+      "PASSWORDSET": "SMTP лозинката е успешно поставена.",
       "TLS": "Transport Layer Security (TLS)",
-      "SAVED": "Saved successfully!",
-      "REQUIREDWARN": "To send notifications from your domain, you have to enter your SMTP data."
+      "SAVED": "Успешно зачувано!",
+      "REQUIREDWARN": "За да испраќате известувања од вашиот домен, мора да ги внесете вашите SMTP податоци."
     },
     "SMS": {
-      "TITLE": "SMS Settings",
-      "PROVIDERS": "Providers",
-      "PROVIDER": "SMS Provider",
-      "ADDPROVIDER": "Add SMS Provider",
-      "ADDPROVIDERDESCRIPTION": "Choose one of the available providers and enter the required data.",
-      "REMOVEPROVIDER": "Remove Provider",
-      "REMOVEPROVIDER_DESC": "You are about to delete a provider configuration. Do you want to continue?",
+      "TITLE": "SMS подесувања",
+      "PROVIDERS": "Провајдери",
+      "PROVIDER": "SMS провајдер",
+      "ADDPROVIDER": "Додади SMS провајдер",
+      "ADDPROVIDERDESCRIPTION": "Изберете еден од достапните провајдери и внесете ги потребните податоци.",
+      "REMOVEPROVIDER": "Отстрани провајдер",
+      "REMOVEPROVIDER_DESC": "Се подготвувате да го избришете конфигурацијата на провајдерот. Дали сакате да продолжите?",
       "SMSPROVIDERSTATE": {
-        "0": "Unspecified",
-        "1": "Active",
-        "2": "Inactive"
+        "0": "Ненаведено",
+        "1": "Активно",
+        "2": "Неактивно"
       },
-      "ACTIVATED": "Provider activated.",
-      "DEACTIVATED": "Provider deactivated.",
+      "ACTIVATED": "Провајдерот е активиран.",
+      "DEACTIVATED": "Провајдерот е деактивиран.",
       "TWILIO": {
         "SID": "Sid",
-        "TOKEN": "Token",
-        "SENDERNUMBER": "Sender Number",
-        "ADDED": "Twilio added successfully.",
-        "REMOVED": "Twilio removed",
-        "CHANGETOKEN": "Change Token",
-        "SETTOKEN": "Set Token",
-        "TOKENSET": "Token successfully set."
+        "TOKEN": "Токен",
+        "SENDERNUMBER": "Број на испраќач",
+        "ADDED": "Twilio e успешно додаден.",
+        "REMOVED": "Twilio отстранет",
+        "CHANGETOKEN": "Смени токен",
+        "SETTOKEN": "Постави токен",
+        "TOKENSET": "Токенот е успешно поставен."
       }
     },
     "OIDC": {
-      "TITLE": "OIDC Settings",
-      "ACCESSTOKENLIFETIME": "Access Token Lifetime",
-      "IDTOKENLIFETIME": "Id Token Lifetime",
-      "REFRESHTOKENEXPIRATION": "Refresh Token Expiration",
-      "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
-      "INHOURS": "hours",
-      "INDAYS": "Days"
+      "TITLE": "OIDC подесувања",
+      "ACCESSTOKENLIFETIME": "Времетраење на токенот за пристап",
+      "IDTOKENLIFETIME": "Времетраење на ID токенот",
+      "REFRESHTOKENEXPIRATION": "Истекување на токенот за освежување",
+      "REFRESHTOKENIDLEEXPIRATION": "Истекување на неактивниот токен за освежување",
+      "INHOURS": "часа",
+      "INDAYS": "дена"
     },
     "SECRETS": {
-      "TITLE": "Secret Appearance",
-      "TYPES": "Secret Types",
+      "TITLE": "Изглед на тајни",
+      "TYPES": "Типови на тајни",
       "TYPE": {
-        "1": "Initialization Mail",
-        "2": "Email verification",
-        "3": "Phone verification",
-        "4": "Password Reset",
-        "5": "Passwordless Initialization",
-        "6": "App Secret"
+        "1": "Иницијализациона е-пошта",
+        "2": "Е-пошта за верификација",
+        "3": "Телефонска верификација",
+        "4": "Промена на лозинка",
+        "5": "Иницијализација на најава без лозинка",
+        "6": "Апликациска тајна"
       },
-      "ADDGENERATOR": "Define Secret Appearance",
-      "GENERATORTYPE": "Type",
-      "EXPIRY": "Expiration (in hours)",
-      "INCLUDEDIGITS": "Include Numbers",
-      "INCLUDESYMBOLS": "Include Symbols",
-      "INCLUDELOWERLETTERS": "Include Lower letters",
-      "INCLUDEUPPERLETTERS": "Include Upper letters",
-      "LENGTH": "Length",
-      "UPDATED": "Settings updated."
+      "ADDGENERATOR": "Дефинирајте изглед на тајна",
+      "GENERATORTYPE": "Тип",
+      "EXPIRY": "Истекување (во часови)",
+      "INCLUDEDIGITS": "Вклучи цифри",
+      "INCLUDESYMBOLS": "Вклучи симболи",
+      "INCLUDELOWERLETTERS": "Вклучи мали букви",
+      "INCLUDEUPPERLETTERS": "Вклучи големи букви",
+      "LENGTH": "Должина",
+      "UPDATED": "Подесувањата се успешно ажурирани."
     },
     "SECURITY": {
-      "DESCRIPTION": "This setting sets the CSP to allow framing from a set of allowed domains. Note that by enabling the use of iFrames, you run the risk of allowing clickjacking.",
-      "IFRAMEENABLED": "Allow iFrame",
-      "ALLOWEDORIGINS": "Allowed URLs"
+      "DESCRIPTION": "Ова подесување поставува CSP за дозволување на фрејминг од одредени дозволени домени. Имајте предвид дека овозможувањето на употребата на iFrame-ови може да ви изложи на ризик од clickjacking.",
+      "IFRAMEENABLED": "Овозможи iFrame",
+      "ALLOWEDORIGINS": "Дозволени URLs"
     },
     "DIALOG": {
       "RESET": {
-        "DEFAULTTITLE": "Reset Setting",
-        "DEFAULTDESCRIPTION": "You are about to reset your settings to the default configuration of your instance. Are you sure you want to continue?",
-        "LOGINPOLICY_DESCRIPTION": "Warning: If your continue, Identity Provider settings will be reset to the instance setting too."
+        "DEFAULTTITLE": "Ресетирање на подесувањата",
+        "DEFAULTDESCRIPTION": "Се подготвувате да ги ресетирате вашите подесувања на стандардната конфигурација на вашата инстанца. Дали сте сигурни дека сакате да продолжите?",
+        "LOGINPOLICY_DESCRIPTION": "Предупредување: Ако продолжите, подесувањата за IDP ќе бидат ресетирани според подесувањата на инстанцата."
       }
     }
   },
   "POLICY": {
-    "TITLE": "Explore Settings",
-    "DESCRIPTION": "Pre-packaged settings that enhance your security.",
-    "APPLIEDTO": "Applied to",
+    "TITLE": "Истражете ги подесувањата",
+    "DESCRIPTION": "Групирани подесувања кои ја зголемуваат вашата безбедност.",
+    "APPLIEDTO": "Применето на",
     "PWD_COMPLEXITY": {
-      "TITLE": "Password Complexity",
-      "DESCRIPTION": "Ensures that all set passwords correspond to a specific pattern",
-      "SYMBOLANDNUMBERERROR": "Must consist of a digit and a symbol/punctuation mark.",
-      "SYMBOLERROR": "Must include a symbol/punctuation mark.",
-      "NUMBERERROR": "Must include a digit.",
-      "PATTERNERROR": "The password does not meet the required pattern."
+      "TITLE": "Сложеност на лозинката",
+      "DESCRIPTION": "Осигурува дека сите поставени лозинки одговараат на одреден модел",
+      "SYMBOLANDNUMBERERROR": "Мора да се состои од цифра и симбол/ознака за интерпункција.",
+      "SYMBOLERROR": "Мора да содржи симбол/ознака за интерпункција.",
+      "NUMBERERROR": "Мора да содржи цифра.",
+      "PATTERNERROR": "Лозинката не соодветствува на бараниот модел."
     },
     "NOTIFICATION": {
-      "TITLE": "Notification",
-      "DESCRIPTION": "Determines on which changes, notifications will be sent.",
-      "PASSWORDCHANGE": "Password change"
+      "TITLE": "Известување",
+      "DESCRIPTION": "Одредува на кои промени ќе се испраќаат известувања.",
+      "PASSWORDCHANGE": "Промена на лозинка"
     },
     "PRIVATELABELING": {
-      "TITLE": "Branding",
-      "DESCRIPTION": "Give the login your personalized style and modify its behavior.",
-      "PREVIEW_DESCRIPTION": "Changes of the policy will automatically deployed to preview environment.",
-      "BTN": "Select File",
-      "ACTIVATEPREVIEW": "Apply configuration",
-      "DARK": "Dark Mode",
-      "LIGHT": "Light Mode",
-      "CHANGEVIEW": "Change View",
-      "ACTIVATED": "Policy changes are now LIVE",
-      "THEME": "Theme",
-      "COLORS": "Colors",
-      "FONT": "Font",
-      "ADVANCEDBEHAVIOR": "Advanced Behavior",
-      "DROP": "Drop image here or",
-      "RELEASE": "Release",
-      "DROPFONT": "Drop font file here",
-      "RELEASEFONT": "Release",
-      "USEOFLOGO": "Your Logo will be used in the Login as well as emails, while the icon is used for smaller UI elements like in the organization switcher in console",
-      "MAXSIZE": "The maximum size is limited to 524kB",
-      "EMAILNOSVG": "The SVG file format is not supported in emails. Therefore upload your logo in PNG or other supported format.",
-      "MAXSIZEEXCEEDED": "Maximum size of 524kB exceeded.",
-      "NOSVGSUPPORTED": "SVG are not supported!",
-      "FONTINLOGINONLY": "The font is currently only displayed in the login interface.",
-      "BACKGROUNDCOLOR": "Background color",
-      "PRIMARYCOLOR": "Primary color",
-      "WARNCOLOR": "Warning color",
-      "FONTCOLOR": "Font color",
+      "TITLE": "Брендирање",
+      "DESCRIPTION": "Додадете личен стил на најавата и модифицирајте ги правилата за најава.",
+      "PREVIEW_DESCRIPTION": "Промените во политиката автоматски се активираат на preview околина.",
+      "BTN": "Изберете датотека",
+      "ACTIVATEPREVIEW": "Аплицирај конфигурација",
+      "DARK": "Темен режим",
+      "LIGHT": "Светол режим",
+      "CHANGEVIEW": "Смени изглед",
+      "ACTIVATED": "Промените во политиката сега се ВО ЖИВО",
+      "THEME": "Тема",
+      "COLORS": "Бои",
+      "FONT": "Фонт",
+      "ADVANCEDBEHAVIOR": "Напредни можности",
+      "DROP": "Поставете ја сликата тука или",
+      "RELEASE": "Ослободи",
+      "DROPFONT": "Поставете ја фонт датотеката тука",
+      "RELEASEFONT": "Ослободи",
+      "USEOFLOGO": "Вашето лого ќе се користи на најавата, како и во е-пошти, додека иконата се користи за помали елементи на корисничкиот интерфејс, како префрлачот за организации во конзолата",
+      "MAXSIZE": "Максималната големина е ограничена на 524kB",
+      "EMAILNOSVG": "Форматот на датотеката SVG не е поддржан во е-поштите. Затоа поставете го вашето лого во PNG или друг формат кој е поддржан.",
+      "MAXSIZEEXCEEDED": "Превишена е максималната големина од 524kB.",
+      "NOSVGSUPPORTED": "Форматот SVG не е поддржан!",
+      "FONTINLOGINONLY": "Фонтот моментално е прикажан само во интерфејсот за најава.",
+      "BACKGROUNDCOLOR": "Боја на позадина",
+      "PRIMARYCOLOR": "Основна боја",
+      "WARNCOLOR": "Боја на предупредување",
+      "FONTCOLOR": "Боја на фонтот",
       "VIEWS": {
-        "PREVIEW": "Preview",
-        "CURRENT": "Current Configuration"
+        "PREVIEW": "Преглед",
+        "CURRENT": "Тековна конфигурација"
       },
       "PREVIEW": {
-        "TITLE": "Login",
-        "SECOND": "login with your ZITADEL-Account.",
-        "ERROR": "User could not be found!",
-        "PRIMARYBUTTON": "next",
-        "SECONDARYBUTTON": "register"
+        "TITLE": "Најава",
+        "SECOND": "најавете се со вашиот ZITADEL-Aкаунт.",
+        "ERROR": "Корисникот не е пронајден!",
+        "PRIMARYBUTTON": "следно",
+        "SECONDARYBUTTON": "регистрирај се"
       }
     },
     "PWD_AGE": {
-      "TITLE": "Password Aging",
-      "DESCRIPTION": "You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed."
+      "TITLE": "Важност на лозинка",
+      "DESCRIPTION": "Можете да поставите политика за истекување на лозинките. Оваа политика издава предупредување откако ќе помени одреденото време на истекување."
     },
     "PWD_LOCKOUT": {
-      "TITLE": "Lockout Policy",
-      "DESCRIPTION": "Set a maximum number of password-retries, after which accounts will be blocked."
+      "TITLE": "Политика за забрана на пристап",
+      "DESCRIPTION": "Поставете максимален број на неуспешни обиди за внес на лозинка, по кои корисничките сметки ќе бидат блокирани."
     },
     "DOMAIN_POLICY": {
-      "TITLE": "Domain Settings"
+      "TITLE": "Подесувања за доменот"
     },
     "PRIVATELABELING_POLICY": {
-      "TITLE": "Branding",
-      "BTN": "Select File",
-      "DESCRIPTION": "Customize the appearance of the Login",
-      "ACTIVATEPREVIEW": "Activate Configuration"
+      "TITLE": "Брендирање",
+      "BTN": "Изберете датотека",
+      "DESCRIPTION": "Прилагодете го изгледот на најавата",
+      "ACTIVATEPREVIEW": "Активирај конфигурација"
     },
     "LOGIN_POLICY": {
-      "TITLE": "Login Settings",
-      "DESCRIPTION": "Define how Users can be authenticated and configure Identity Providers",
-      "DESCRIPTIONCREATEADMIN": "Users can choose from the available identity providers below.",
-      "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organization only.",
-      "ADVANCED": "Advanced",
-      "LIFETIMEDURATIONS": "Login Lifetimes",
-      "SAVED": "Saved successfully!"
+      "TITLE": "Подесувања за најава",
+      "DESCRIPTION": "Дефинирајте како корисниците можат да се автентицираат и конфигурирајте Identity Providers",
+      "DESCRIPTIONCREATEADMIN": "Корисниците можат да избираат од достапните IDPs подолу.",
+      "DESCRIPTIONCREATEMGMT": "Корисниците можат да избираат од достапните IDPs подолу. Забелешка: Можете да користите системски поставени IDPs, како и IDPs поставени само за вашата организација.",
+      "ADVANCED": "Напредно",
+      "LIFETIMEDURATIONS": "Време на траење на најавата",
+      "SAVED": "Успешно зачувано!"
     },
     "PRIVACY_POLICY": {
-      "TITLE": "Privacy Policy and TOS",
-      "DESCRIPTION": "Set your Privacy Policy and Terms of Service Links",
-      "TOSLINK": "Link to Terms of Service",
-      "POLICYLINK": "Link to Privacy Policy",
-      "HELPLINK": "Link to Help",
-      "SUPPORTEMAIL": "Support Email",
-      "SAVED": "Saved successfully!",
-      "RESET_TITLE": "Restore Default Values",
-      "RESET_DESCRIPTION": "You are about to restore the default Links for TOS and Privacy Policy. Do you really want to continue?"
+      "TITLE": "Политика за приватност и Услови за користење",
+      "DESCRIPTION": "Поставете линкови кон вашите Политика за приватност и Услови за користење",
+      "TOSLINK": "Линк кон Условите за користење",
+      "POLICYLINK": "Линк кон Политиката за приватност",
+      "HELPLINK": "Линк кон Помош",
+      "SUPPORTEMAIL": "Е-пошта за поддршка",
+      "SAVED": "Успешно зачувано!",
+      "RESET_TITLE": "Врати на стандардни вредности",
+      "RESET_DESCRIPTION": "Се подготвувате да ги вратите стандардните линкови за Условите за користење и Политиката за приватност. Дали сте сигурни дека сакате да продолжите?"
     },
     "LOGIN_TEXTS": {
-      "TITLE": "Login Interface Texts",
-      "DESCRIPTION": "Define your texts for the login interfaces. If texts are empty, the default Value shown as the placeholder will be used.",
-      "DESCRIPTION_SHORT": "Define your texts for the login interfaces.",
-      "NEWERVERSIONEXISTS": "Newer Version exists",
-      "CURRENTDATE": "Current configuration",
-      "CHANGEDATE": "Newer Version from",
-      "KEYNAME": "Login Screen / Interface",
-      "RESET_TITLE": "Restore Default Values",
-      "RESET_DESCRIPTION": "You are about to restore all default values. All changes you have made will be permanently deleted. Do you really want to continue?",
-      "UNSAVED_TITLE": "Continue without saving?",
-      "UNSAVED_DESCRIPTION": "You have made changes without saving. Do you want to save now?",
+      "TITLE": "Текстови на интерфејсот за најава",
+      "DESCRIPTION": "Дефинирајте ги вашите текстови за интерфејсите за најава. Ако текстовите се празни, ќе се користи стандардната вредност.",
+      "DESCRIPTION_SHORT": "Дефинирајте ги вашите текстови за интерфејсите за најава.",
+      "NEWERVERSIONEXISTS": "Постои понова верзија",
+      "CURRENTDATE": "Тековна конфигурација",
+      "CHANGEDATE": "Понова верзија од",
+      "KEYNAME": "Екран / интерфејс за најава",
+      "RESET_TITLE": "Врати на стандардни вредности",
+      "RESET_DESCRIPTION": "Се подготвувате да ги вратите сите стандардни вредности. Сите промени што ги направивте ќе бидат трајно избришани. Дали сте сигурни дека сакате да продолжите?",
+      "UNSAVED_TITLE": "Дали сакате да продолжите без зачувување?",
+      "UNSAVED_DESCRIPTION": "Имате направено промени без зачувување. Дали сакате да ги зачувате сега?",
       "LOCALE": "Locale Code",
       "LOCALES": {
         "de": "Deutsch",
@@ -1246,742 +1246,742 @@
         "mk": "Македонски"
       },
       "KEYS": {
-        "emailVerificationDoneText": "Email verification done",
-        "emailVerificationText": "Email verification",
-        "externalUserNotFoundText": "External user not found",
-        "footerText": "Footer",
-        "initMfaDoneText": "Initialize MFA done",
-        "initMfaOtpText": "Initialize MFA",
-        "initMfaPromptText": "Initialize MFA Prompt",
-        "initMfaU2fText": "Initialize Universal Second Factor",
-        "initPasswordDoneText": "Initialize password done",
-        "initPasswordText": "Initialize password",
-        "initializeDoneText": "Initialize user done",
-        "initializeUserText": "Initialize user",
-        "linkingUserDoneText": "Linking user done",
-        "loginText": "Login",
-        "logoutText": "Logout",
-        "mfaProvidersText": "MFA Providers",
-        "passwordChangeDoneText": "Password change done",
-        "passwordChangeText": "Password change",
-        "passwordResetDoneText": "Password reset done",
-        "passwordText": "Password",
-        "registrationOptionText": "Registration Options",
-        "registrationOrgText": "Register Org",
-        "registrationUserText": "Register User",
-        "selectAccountText": "Select Account",
-        "successLoginText": "Login with success",
-        "usernameChangeDoneText": "Username change done",
-        "usernameChangeText": "Username change",
-        "verifyMfaOtpText": "Verify OTP",
-        "verifyMfaU2fText": "Verify Universal Second Factor",
-        "passwordlessPromptText": "Passwordless Prompt",
-        "passwordlessRegistrationDoneText": "Passwordless Registration Done",
-        "passwordlessRegistrationText": "Passwordless Registration",
-        "passwordlessText": "Passwordless",
-        "externalRegistrationUserOverviewText": "External Registration User Overview"
+        "emailVerificationDoneText": "Е-поштата е верифицирана",
+        "emailVerificationText": "Верификација на е-пошта",
+        "externalUserNotFoundText": "Надворешниот корисник не е пронајден",
+        "footerText": "Футер",
+        "initMfaDoneText": "Иницијализацијата на MFA е завршена",
+        "initMfaOtpText": "Иницијализација на MFA",
+        "initMfaPromptText": "Иницијализација на MFA (Prompt)",
+        "initMfaU2fText": "Иницијализација на Universal Second Factor",
+        "initPasswordDoneText": "Иницијализацијата на лозинката е завршена",
+        "initPasswordText": "Иницијализација на лозинка",
+        "initializeDoneText": "Иницијализацијата на корисникот е завршена",
+        "initializeUserText": "Иницијализација на корисник",
+        "linkingUserDoneText": "Поврзувањето на корисникот е завршено",
+        "loginText": "Најава",
+        "logoutText": "Одјава",
+        "mfaProvidersText": "MFA провајдери",
+        "passwordChangeDoneText": "Промената на лозинката е завршена",
+        "passwordChangeText": "Промена на лозинка",
+        "passwordResetDoneText": "Ресетирањето на лозинката е завршено",
+        "passwordText": "Лозинка",
+        "registrationOptionText": "Опции за регистрација",
+        "registrationOrgText": "Регистрирај организација",
+        "registrationUserText": "Регистрирај корисник",
+        "selectAccountText": "Избери корисничка сметка",
+        "successLoginText": "Најавата е успешна",
+        "usernameChangeDoneText": "Завршена е промената на корисничкото име",
+        "usernameChangeText": "Промена на корисничкото име",
+        "verifyMfaOtpText": "Верификација на OTP",
+        "verifyMfaU2fText": "Верификација на Universal Second Factor",
+        "passwordlessPromptText": "Најава без лозинка (Prompt)",
+        "passwordlessRegistrationDoneText": "Регистрацијата за лозинка без најава завршена",
+        "passwordlessRegistrationText": "Регистрација за лозинка без најава",
+        "passwordlessText": "Најава без лозинка",
+        "externalRegistrationUserOverviewText": "Преглед на надворешно регистрирани корисници"
       }
     },
     "MESSAGE_TEXTS": {
-      "TITLE": "Message Texts",
-      "DESCRIPTION": "Define your texts for your notification mails.",
-      "TYPE": "Notification",
+      "TITLE": "Текстови на пораки",
+      "DESCRIPTION": "Дефинирајте ги текстовите за вашите известувања по е-пошта.",
+      "TYPE": "Известување",
       "TYPES": {
-        "INIT": "Initialization",
-        "VE": "Verify Email",
-        "VP": "Verify Phone",
-        "PR": "Password Reset",
-        "DC": "Domain Claim",
-        "PL": "Passwordless",
-        "PC": "Password Change"
+        "INIT": "Иницијализација",
+        "VE": "Верификација на е-пошта",
+        "VP": "Верификација на телефонски број",
+        "PR": "Ресетирање на лозинка",
+        "DC": "Зафатница на домен",
+        "PL": "Лозинка без лозинка",
+        "PC": "Промена на лозинка"
       },
       "CHIPS": {
-        "firstname": "Given name",
-        "lastname": "Family name",
-        "code": "Code",
-        "preferredLoginName": "Preferred Login Name",
-        "displayName": "Displayname",
-        "nickName": "Nickname",
-        "loginnames": "Login names",
-        "domain": "Domain",
-        "lastEmail": "Last email",
-        "lastPhone": "Last phone",
-        "verifiedEmail": "Verified email",
-        "verifiedPhone": "Verified phone",
-        "changedate": "Change date",
-        "username": "Username",
-        "tempUsername": "Temp username"
+        "firstname": "Име",
+        "lastname": "Презиме",
+        "code": "Код",
+        "preferredLoginName": "Посакувано корисничко име",
+        "displayName": "Име за приказ",
+        "nickName": "Прекар",
+        "loginnames": "Кориснички имиња",
+        "domain": "Домен",
+        "lastEmail": "Последна е-пошта",
+        "lastPhone": "Последен телефонски број",
+        "verifiedEmail": "Верифицирана е-пошта",
+        "verifiedPhone": "Верифициран телефонски број",
+        "changedate": "Датум на промена",
+        "username": "Корисничко име",
+        "tempUsername": "Привремено корисничко име"
       },
       "TOAST": {
-        "UPDATED": "Custom Texts saved."
+        "UPDATED": "Прилагодените текстови се зачувани."
       }
     },
-    "DEFAULTLABEL": "The current settings corresponds to the standard of your Instance.",
-    "BTN_INSTALL": "Setup",
-    "BTN_EDIT": "Modify",
+    "DEFAULTLABEL": "Моменталните подесувања одговараат на стандардите на вашата инстанца.",
+    "BTN_INSTALL": "Подеси",
+    "BTN_EDIT": "Промени",
     "DATA": {
-      "DESCRIPTION": "Description",
-      "MINLENGTH": "minimum length",
-      "HASNUMBER": "has number",
-      "HASSYMBOL": "has symbol",
-      "HASLOWERCASE": "has lowercase",
-      "HASUPPERCASE": "has uppercase",
-      "SHOWLOCKOUTFAILURES": "show lockout failures",
-      "MAXATTEMPTS": "Password maximum Attempts",
-      "EXPIREWARNDAYS": "Expiration Warning after day",
-      "MAXAGEDAYS": "Max Age in days",
-      "USERLOGINMUSTBEDOMAIN": "Add organization domain as suffix to loginnames",
-      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
-      "VALIDATEORGDOMAINS": "Validate Org domains",
-      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
-      "ALLOWUSERNAMEPASSWORD": "Username Password allowed",
-      "ALLOWEXTERNALIDP": "External IDP allowed",
-      "ALLOWREGISTER": "Register allowed",
-      "ALLOWUSERNAMEPASSWORD_DESC": "The conventional login with user name and password is allowed.",
-      "ALLOWEXTERNALIDP_DESC": "The login is allowed for the underlying identity providers",
-      "ALLOWREGISTER_DESC": "If the option is selected, an additional step for registering a user appears in the login.",
-      "FORCEMFA": "Force MFA",
-      "FORCEMFA_DESC": "If the option is selected, users have to configure a second factor for login.",
-      "HIDEPASSWORDRESET": "Hide Password reset",
-      "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process.",
-      "HIDELOGINNAMESUFFIX": "Hide Loginname suffix",
-      "HIDELOGINNAMESUFFIX_DESC": "Hides the login name suffix in the login interface",
-      "IGNOREUNKNOWNUSERNAMES": "Ignore unknown usernames",
-      "IGNOREUNKNOWNUSERNAMES_DESC": "If the option is selected, the password screen will be displayed in the login process even if the user was not found. The error on the password check will not disclose if the username or password was wrong.",
-      "ALLOWDOMAINDISCOVERY": "Domain discovery allowed",
-      "ALLOWDOMAINDISCOVERY_DESC": "If the option is selected, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the organization domains and will redirect to the registration of that organisation on success.",
-      "DISABLELOGINWITHEMAIL": "Disable login with email address",
-      "DISABLELOGINWITHPHONE": "Disable login with phone number",
-      "DEFAULTREDIRECTURI": "Default Redirect URI",
-      "DEFAULTREDIRECTURI_DESC": "Defines where the user will be redirected to if the login has started without an app context (e.g. from mail)",
-      "ERRORMSGPOPUP": "Show Error in Dialog",
-      "DISABLEWATERMARK": "Hide Watermark",
-      "DISABLEWATERMARK_DESC": "Hide Powered by ZITADEL watermark in the login interface",
-      "PASSWORDCHECKLIFETIME": "Password Check Lifetime",
-      "EXTERNALLOGINCHECKLIFETIME": "External Login Check Lifetime",
-      "MFAINITSKIPLIFETIME": "Multifactor Init Lifetime",
-      "SECONDFACTORCHECKLIFETIME": "Second Factor Check Lifetime",
-      "MULTIFACTORCHECKLIFETIME": "Multifactor Check Lifetime",
-      "INHOURS": "hours"
+      "DESCRIPTION": "Опис",
+      "MINLENGTH": "минимална должина",
+      "HASNUMBER": "има бројка",
+      "HASSYMBOL": "има симбол",
+      "HASLOWERCASE": "има мали букви",
+      "HASUPPERCASE": "има големи букви",
+      "SHOWLOCKOUTFAILURES": "прикажи неуспешни заклучувања",
+      "MAXATTEMPTS": "Максимален број на обиди за лозинка",
+      "EXPIREWARNDAYS": "Предупредување за истекување по ден",
+      "MAXAGEDAYS": "Максимална возраст во денови",
+      "USERLOGINMUSTBEDOMAIN": "Додади организациски домен како суфикс на корисничките имиња",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Ако го овозможите ова подесување, сите кориснички имиња ќе имаат суфикс на организацискиот домен. Доколку ова подесување е оневозможено, морате да се осигурате дека корисничките имиња се уникатни низ сите организации.",
+      "VALIDATEORGDOMAINS": "Валидирај организациски домени",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP адресата на испраќачот се поклопува со доменот на инстанцата",
+      "ALLOWUSERNAMEPASSWORD": "Дозволено корисничко име и лозинка",
+      "ALLOWEXTERNALIDP": "Дозволен надворешен IDP",
+      "ALLOWREGISTER": "Дозволена регистрација",
+      "ALLOWUSERNAMEPASSWORD_DESC": "Дозволена е конвенционална најава со корисничко име и лозинка.",
+      "ALLOWEXTERNALIDP_DESC": "Најавата е дозволена за поддржуваните IDPs",
+      "ALLOWREGISTER_DESC": "Доколку е избрана опцијата, се прикажува дополнителен чекор за регистрирање на корисник во најавата.",
+      "FORCEMFA": "Задолжителна MFA",
+      "FORCEMFA_DESC": "Доколку е избрана опцијата, корисниците мораат да конфигурираат втор фактор за најава.",
+      "HIDEPASSWORDRESET": "Сокриј го ресетирањето на лозинка",
+      "HIDEPASSWORDRESET_DESC": "Доколку е избрана опцијата, корисникот нема да може да ја ресетира својата лозинка во процесот на најава.",
+      "HIDELOGINNAMESUFFIX": "Сокриј го суфиксот на корисничкото име",
+      "HIDELOGINNAMESUFFIX_DESC": "Сокриј го суфиксот на корисничкото име во интерфејсот за најава",
+      "IGNOREUNKNOWNUSERNAMES": "Занемари непознати кориснички имиња",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Доколку е избрана опцијата, екранот за лозинка ќе се прикаже во процесот на најава, дури и ако корисникот не бил пронајден. Грешката при проверката на лозинката нема да открие дали корисничкото име или лозинката се погрешни.",
+      "ALLOWDOMAINDISCOVERY": "Дозволи откривање на домени",
+      "ALLOWDOMAINDISCOVERY_DESC": "Доколку е избрана опцијата, суфиксот (@domain.com) на непознатото корисничко име внесено на екранот за најава ќе биде спореден со организациските домени и при успех ќе пренасочи кон регистрацијата на таа организација.",
+      "DISABLELOGINWITHEMAIL": "Оневозможи најава со е-пошта",
+      "DISABLELOGINWITHPHONE": "Оневозможи најава со телефонски број",
+      "DEFAULTREDIRECTURI": "Стандардно Redirect URI",
+      "DEFAULTREDIRECTURI_DESC": "Дефинира каде корисникот ќе биде пренасочен ако најавата започне без контекст на апликација (на пример, од е-пошта)",
+      "ERRORMSGPOPUP": "Прикажи грешка во дијалог",
+      "DISABLEWATERMARK": "Сокриј Watermark",
+      "DISABLEWATERMARK_DESC": "Сокриј го Powered by ZITADEL watermark во интерфејсот за најава",
+      "PASSWORDCHECKLIFETIME": "Времетраење на проверката на лозинка",
+      "EXTERNALLOGINCHECKLIFETIME": "Времетраење на проверката на надворешна најава",
+      "MFAINITSKIPLIFETIME": "Времетраење на иницијализацијата на Multifactor",
+      "SECONDFACTORCHECKLIFETIME": "Времетраење на проверката на втор фактор",
+      "MULTIFACTORCHECKLIFETIME": "Времетраење на проверката на Multifactor",
+      "INHOURS": "часови"
     },
-    "RESET": "Reset to Instance default",
-    "CREATECUSTOM": "Create Custom Policy",
+    "RESET": "Ресетирај на стандардните поставки на инстанцата",
+    "CREATECUSTOM": "Креирај прилагодена политика",
     "TOAST": {
-      "SET": "Policy set successfully!",
-      "RESETSUCCESS": "Policy reset successfully!",
-      "UPLOADSUCCESS": "Uploaded successfully!",
-      "DELETESUCCESS": "Deleted successfully!",
-      "UPLOADFAILED": "Upload failed!"
+      "SET": "Политиката е успешно поставена!",
+      "RESETSUCCESS": "Политиката е успешно ресетирана!",
+      "UPLOADSUCCESS": "Успешно прикачено!",
+      "DELETESUCCESS": "Успешно избришано!",
+      "UPLOADFAILED": "Неуспешно прикачување!"
     }
   },
   "ORG_DETAIL": {
-    "TITLE": "Organization",
-    "DESCRIPTION": "Here you can edit the configuration of your organization and manage the members.",
+    "TITLE": "Организација",
+    "DESCRIPTION": "Овде можете да ја уредувате конфигурацијата на вашата организација и да управувате со членовите.",
     "DETAIL": {
-      "TITLE": "Detail",
-      "NAME": "Name",
-      "DOMAIN": "Domain",
+      "TITLE": "Детали",
+      "NAME": "Име",
+      "DOMAIN": "Домен",
       "STATE": {
-        "0": "Not defined",
-        "1": "Active",
-        "2": "Inactive"
+        "0": "Не е дефинирано",
+        "1": "Активно",
+        "2": "Неактивно"
       }
     },
     "MEMBER": {
-      "TITLE": "Members",
-      "USERNAME": "User Name",
-      "DISPLAYNAME": "Display Name",
-      "LOGINNAME": "Login Name",
-      "EMAIL": "E-mail",
-      "ROLES": "Roles",
-      "ADD": "Add Member",
-      "ADDDESCRIPTION": "Enter the names of the users to be added."
+      "TITLE": "Членови",
+      "USERNAME": "Корисничко име",
+      "DISPLAYNAME": "Име за приказ",
+      "LOGINNAME": "Корисничко име за најава",
+      "EMAIL": "Е-пошта",
+      "ROLES": "Улоги",
+      "ADD": "Додади член",
+      "ADDDESCRIPTION": "Внесете ги имињата на корисниците кои сакате да ги додадете."
     },
     "TABLE": {
-      "TOTAL": "Entries total",
-      "SELECTION": "Selected Elements",
-      "DEACTIVATE": "Deactivate User",
-      "ACTIVATE": "Activate User",
-      "DELETE": "Delete User",
-      "CLEAR": "Clear selection"
+      "TOTAL": "Вкупно записи",
+      "SELECTION": "Избрани елементи",
+      "DEACTIVATE": "Деактивирај корисник",
+      "ACTIVATE": "Активирај корисник",
+      "DELETE": "Избриши корисник",
+      "CLEAR": "Исчисти избор"
     }
   },
   "PROJECT": {
     "PAGES": {
-      "TITLE": "Project",
-      "DESCRIPTION": "Here you can define applications, manage roles and grant other organizations to use your project.",
-      "DELETE": "Delete Project",
-      "LIST": "Projects",
-      "LISTDESCRIPTION": "If you can't find a project, contact a project owner or someone with the corresponding rights to gain project access.",
-      "DETAIL": "Detail",
-      "CREATE": "Create Project",
-      "CREATE_DESC": "Insert your project's name.",
-      "ROLE": "Role",
-      "NOITEMS": "No projects",
-      "ZITADELPROJECT": "This belongs to the ZITADEL project. Beware: If you make changes ZITADEL may not behave as intended.",
+      "TITLE": "Проект",
+      "DESCRIPTION": "Овде можете да дефинирате апликации, да управувате со улоги и да дозволите на други организации да го користат вашиот проект.",
+      "DELETE": "Избриши проект",
+      "LIST": "Проекти",
+      "LISTDESCRIPTION": "Ако не можете да најдете проект, контактирајте го сопственикот на проектот или некого со соодветни права за да добиете пристап до проектот.",
+      "DETAIL": "Детали",
+      "CREATE": "Креирај проект",
+      "CREATE_DESC": "Внесете го името на вашиот проект.",
+      "ROLE": "Улога",
+      "NOITEMS": "Нема проекти",
+      "ZITADELPROJECT": "Ова припаѓа на ZITADEL проектот. Внимание: Ако направите промени, ZITADEL може да не работи како што е предвидено.",
       "TYPE": {
-        "OWNED": "Owned Projects",
-        "GRANTED": "Granted Projects",
-        "OWNED_SINGULAR": "Owned Project",
-        "GRANTED_SINGULAR": "Granted Project"
+        "OWNED": "Сопствени проекти",
+        "GRANTED": "Доделени проекти",
+        "OWNED_SINGULAR": "Сопствен проект",
+        "GRANTED_SINGULAR": "Доделен проект"
       },
       "PRIVATELABEL": {
-        "TITLE": "Branding Setting",
+        "TITLE": "Подесувања за брендирање",
         "0": {
-          "TITLE": "Unspecified",
-          "DESC": "As soon as the user is identified, the branding of the organization of the identified user will be shown, before the system default is shown."
+          "TITLE": "Неспецифицирано",
+          "DESC": "Откако корисникот ќе биде идентификуван, ќе се прикаже брендирањето на организацијата на идентификуваниот корисник, пред да се прикаже стандардното системско брендирање."
         },
         "1": {
-          "TITLE": "Use project setting",
-          "DESC": "The branding of the organization which owns the project will be shown"
+          "TITLE": "Користи ги подесувањата на проектот",
+          "DESC": "Ќе се прикаже брендирањето на организацијата која е сопственик на проектот."
         },
         "2": {
-          "TITLE": "Use User Organization setting",
-          "DESC": "The branding of the organization of the project will be shown, but as soon as the user is identified, the setting of the organization of the identified user, will be shown."
+          "TITLE": "Користи ги подесувањата на организацијата на корисникот",
+          "DESC": "Ќе се прикаже брендирањето на организацијата на проектот, но откако корисникот ќе биде идентификуван, ќе се прикаже подесувањето на организацијата на идентификуваниот корисник."
         },
         "DIALOG": {
-          "TITLE": "Branding Setting",
-          "DESCRIPTION": "Select the behavior of the login, when using the project."
+          "TITLE": "Подесувања за брендирање",
+          "DESCRIPTION": "Изберете го однесувањето на најавата при користење на проектот."
         }
       },
-      "PINNED": "Pinned",
-      "ALL": "All",
-      "CREATEDON": "Created on",
-      "LASTMODIFIED": "Last modified on",
-      "ADDNEW": "Create New Project",
+      "PINNED": "Прикачен",
+      "ALL": "Сите",
+      "CREATEDON": "Креиран на",
+      "LASTMODIFIED": "Последно променет на",
+      "ADDNEW": "Креирај нов проект",
       "DIALOG": {
         "REACTIVATE": {
-          "TITLE": "Reactivate Project",
-          "DESCRIPTION": "Do you really want to reactivate your project?"
+          "TITLE": "Реактивирај проект",
+          "DESCRIPTION": "Дали навистина сакате да го реактивирате вашиот проект?"
         },
         "DEACTIVATE": {
-          "TITLE": "Deactivate Project",
-          "DESCRIPTION": "Do you really want to deactivate your project?"
+          "TITLE": "Деактивирај проект",
+          "DESCRIPTION": "Дали навистина сакате да го деактивирате вашиот проект?"
         },
         "DELETE": {
-          "TITLE": "Delete Project",
-          "DESCRIPTION": "Do you really want to delete your project?",
-          "TYPENAME": "Type the name of the project to delete it permanently."
+          "TITLE": "Избриши проект",
+          "DESCRIPTION": "Дали навистина сакате да го избришете вашиот проект?",
+          "TYPENAME": "Напишете го името на проектот за да го избришете перманентно."
         }
       }
     },
     "SETTINGS": {
-      "TITLE": "Settings",
+      "TITLE": "Подесувања",
       "DESCRIPTION": ""
     },
     "STATE": {
-      "TITLE": "Status",
-      "0": "Not defined",
-      "1": "Active",
-      "2": "Inactive"
+      "TITLE": "Статус",
+      "0": "Не е дефинирано",
+      "1": "Активно",
+      "2": "Неактивно"
     },
     "TYPE": {
-      "TITLE": "Type",
-      "0": "Unknown type",
-      "1": "Owned",
-      "2": "Granted"
+      "TITLE": "Тип",
+      "0": "Непознат тип",
+      "1": "Сопствен",
+      "2": "Доделен"
     },
-    "NAME": "Name",
+    "NAME": "Име",
     "NAMEDIALOG": {
-      "TITLE": "Rename Project",
-      "DESCRIPTION": "Enter the new name for your project",
-      "NAME": "New Name"
+      "TITLE": "Преименувај проект",
+      "DESCRIPTION": "Внесете го новото име за вашиот проект",
+      "NAME": "Ново име"
     },
     "MEMBER": {
-      "TITLE": "Managers",
-      "TITLEDESC": "Managers can make changes to this project based on their role.",
-      "DESCRIPTION": "These managers may be able to edit your project.",
-      "USERNAME": "User Name",
-      "DISPLAYNAME": "Display Name",
-      "LOGINNAME": "Loginname",
-      "EMAIL": "E-mail",
-      "ROLES": "Roles",
-      "USERID": "User ID"
+      "TITLE": "Менаџери",
+      "TITLEDESC": "Менаџерите можат да направат промени на овој проект врз основа на нивната улога.",
+      "DESCRIPTION": "Овие менаџери можеби ќе можат да го уредат вашиот проект.",
+      "USERNAME": "Корисничко име",
+      "DISPLAYNAME": "Име за приказ",
+      "LOGINNAME": "Корисничко име за најава",
+      "EMAIL": "Е-пошта",
+      "ROLES": "Улоги",
+      "USERID": "ID на корисник"
     },
     "GRANT": {
-      "EMPTY": "No granted organization.",
-      "TITLE": "Project Grants",
-      "DESCRIPTION": "Allow an other organization to use your project.",
-      "EDITTITLE": "Edit roles",
+      "EMPTY": "Нема доделена организација.",
+      "TITLE": "Доделување на проект",
+      "DESCRIPTION": "Овозможете на друга организација да го користи вашиот проект.",
+      "EDITTITLE": "Уреди улоги",
       "CREATE": {
-        "TITLE": "Create Organization Grant",
-        "SEL_USERS": "Select the users you wish to grant access",
-        "SEL_PROJECT": "Search for a project",
-        "SEL_ROLES": "Select the roles you want to be added to the grant",
-        "SEL_USER": "Select users",
-        "SEL_ORG": "Set the domain",
-        "SEL_ORG_DESC": "Enter the complete domain to specify the organization to grant.",
-        "ORG_TITLE": "Organization",
-        "ORG_DESCRIPTION": "You are about to grant a user for the organization {{name}}.",
-        "ORG_DESCRIPTION_DESC": "Switch the context in the header above to grant a user for another organization.",
-        "SEL_ORG_FORMFIELD": "Complete Domain",
-        "SEL_ORG_BUTTON": "Search Organization",
-        "FOR_ORG": "The grant is created for:"
+        "TITLE": "Креирај овластување за организација",
+        "SEL_USERS": "Изберете ги корисниците на кои сакате да им дозволите пристап",
+        "SEL_PROJECT": "Пребарајте проект",
+        "SEL_ROLES": "Изберете ги улогите кои сакате да бидат додадени на овластувањето",
+        "SEL_USER": "Изберете корисници",
+        "SEL_ORG": "Подесете го доменот",
+        "SEL_ORG_DESC": "Внесете го комплетниот домен за да ја специфицирате организацијата на која сакате да и дозволите пристап.",
+        "ORG_TITLE": "Организација",
+        "ORG_DESCRIPTION": "Сакате да дозволите пристап на корисник за организацијата {{name}}.",
+        "ORG_DESCRIPTION_DESC": "Променете го контекстот во header-от погоре за да дозволите пристап на корисник за друга организација.",
+        "SEL_ORG_FORMFIELD": "Комплетен домен",
+        "SEL_ORG_BUTTON": "Пребарај организација",
+        "FOR_ORG": "Овластување е креирано за:"
       },
       "DETAIL": {
-        "TITLE": "Project Grant",
-        "DESC": "You can select which roles can be used by the specified organization, and elect managers",
-        "MEMBERTITLE": "Managers",
-        "MEMBERDESC": "These are the managers of the granted organization. Add users here who should gain access to edit the data of the project.",
-        "PROJECTNAME": "Project Name",
-        "GRANTEDORG": "Granted Organization",
-        "RESOURCEOWNER": "Resource Owner"
+        "TITLE": "Доделување на проект",
+        "DESC": "Можете да изберете кои улоги може да се користат од специфицираната организација и да изберете менаџери",
+        "MEMBERTITLE": "Менаџери",
+        "MEMBERDESC": "Овие се менаџерите на доделената организација. Додадете корисници овде кои треба да добијат пристап за уредување на податоците на проектот.",
+        "PROJECTNAME": "Име на проект",
+        "GRANTEDORG": "Доделена организација",
+        "RESOURCEOWNER": "Сопственик на ресурсот"
       },
-      "STATE": "Status",
+      "STATE": "Статус",
       "STATES": {
-        "1": "Active",
-        "2": "Inactive"
+        "1": "Активно",
+        "2": "Неактивно"
       },
-      "ALL": "All",
-      "SHOWDETAIL": "Show Details",
-      "USER": "User",
-      "MEMBERS": "Managers",
-      "ORG": "Organization",
-      "PROJECTNAME": "Project Name",
-      "GRANTEDORG": "Granted Organization",
-      "GRANTEDORGDOMAIN": "Domain",
-      "RESOURCEOWNER": "Resource Owner",
-      "GRANTEDORGNAME": "Organization Name",
-      "GRANTID": "Grant Id",
-      "CREATIONDATE": "Creation Date",
-      "CHANGEDATE": "Last modified",
-      "DATES": "Dates",
-      "ROLENAMESLIST": "Roles",
-      "NOROLES": "No roles",
-      "TYPE": "Type",
+      "ALL": "Сите",
+      "SHOWDETAIL": "Прикажи детали",
+      "USER": "Корисник",
+      "MEMBERS": "Менаџери",
+      "ORG": "Организација",
+      "PROJECTNAME": "Име на проект",
+      "GRANTEDORG": "Доделена организација",
+      "GRANTEDORGDOMAIN": "Домен",
+      "RESOURCEOWNER": "Сопственик на ресурсот",
+      "GRANTEDORGNAME": "Име на организацијата",
+      "GRANTID": "ID на овластување",
+      "CREATIONDATE": "Датум на креирање",
+      "CHANGEDATE": "Последно изменето",
+      "DATES": "Датуми",
+      "ROLENAMESLIST": "Улоги",
+      "NOROLES": "Нема улоги",
+      "TYPE": "Тип",
       "TOAST": {
-        "PROJECTGRANTUSERGRANTADDED": "Project grant created.",
-        "PROJECTGRANTADDED": "Project grant created.",
-        "PROJECTGRANTCHANGED": "Project grant changed.",
-        "PROJECTGRANTMEMBERADDED": "Grant manager added.",
-        "PROJECTGRANTMEMBERCHANGED": "Grant manager changed.",
-        "PROJECTGRANTMEMBERREMOVED": "Grant manager removed.",
-        "PROJECTGRANTUPDATED": "Project Grant updated"
+        "PROJECTGRANTUSERGRANTADDED": "Овластувањето за проект е креирано.",
+        "PROJECTGRANTADDED": "Овластувањето за проект е креирано.",
+        "PROJECTGRANTCHANGED": "Овластувањето за проект е променето.",
+        "PROJECTGRANTMEMBERADDED": "Менаџерот за овластувањето е додаден.",
+        "PROJECTGRANTMEMBERCHANGED": "Менаџерот за овластувањето е променет.",
+        "PROJECTGRANTMEMBERREMOVED": "Менаџерот за овластувањето е отстранет.",
+        "PROJECTGRANTUPDATED": "Овластувањето за проект е ажурирано"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Delete project grant",
-        "DELETE_DESCRIPTION": "You are about to delete a project grant. Are you sure?"
+        "DELETE_TITLE": "Избриши овластување за проект",
+        "DELETE_DESCRIPTION": "Дали сте сигурни дека сакате да го избришете овластувањето на проект?"
       },
-      "ROLES": "Project Roles"
+      "ROLES": "Улоги на проект"
     },
     "APP": {
-      "TITLE": "Applications",
-      "NAME": "Name",
-      "NAMEREQUIRED": "A name ist required."
+      "TITLE": "Апликации",
+      "NAME": "Име",
+      "NAMEREQUIRED": "Името е задолжително."
     },
     "ROLE": {
-      "EMPTY": "No role has been created yet.",
-      "ADDNEWLINE": "Add additional role",
-      "KEY": "Key",
-      "TITLE": "Roles",
-      "DESCRIPTION": "Define some roles which can be used to create project-grants.",
-      "NAME": "Name",
-      "DISPLAY_NAME": "Display Name",
-      "GROUP": "Group",
-      "ACTIONS": "Actions",
-      "ADDTITLE": "Create Role",
-      "ADDDESCRIPTION": "Enter the data for the new role.",
-      "EDITTITLE": "Edit Role",
-      "EDITDESCRIPTION": "Enter the new data for the role.",
-      "DELETE": "Delete Role",
-      "CREATIONDATE": "Created",
-      "CHANGEDATE": "Last Modified",
-      "SELECTGROUPTOOLTIP": "Select all Roles of the group {{group}}.",
-      "OPTIONS": "Options",
+      "EMPTY": "Сѐ уште не е креирана улога.",
+      "ADDNEWLINE": "Додај дополнителна улога",
+      "KEY": "Клуч",
+      "TITLE": "Улоги",
+      "DESCRIPTION": "Дефинирајте некои улоги кои можат да се користат за креирање на проектни овластувања.",
+      "NAME": "Име",
+      "DISPLAY_NAME": "Име за приказ",
+      "GROUP": "Група",
+      "ACTIONS": "Акции",
+      "ADDTITLE": "Креирај улога",
+      "ADDDESCRIPTION": "Внесете ги податоците за новата улога.",
+      "EDITTITLE": "Уреди улога",
+      "EDITDESCRIPTION": "Внесете ги новите податоци за улогата.",
+      "DELETE": "Избриши улога",
+      "CREATIONDATE": "Креирано",
+      "CHANGEDATE": "Последна промена",
+      "SELECTGROUPTOOLTIP": "Изберете ги сите улоги од групата {{group}}.",
+      "OPTIONS": "Опции",
       "ASSERTION": "Assert Roles on Authentication",
-      "ASSERTION_DESCRIPTION": "Role information is sent from Userinfo endpoint and depending on your application settings in tokens and other types.",
-      "CHECK": "Check authorization on Authentication",
-      "CHECK_DESCRIPTION": "If set, users are only allowed to authenticate if any role is assigned to their account.",
+      "ASSERTION_DESCRIPTION": "Информациите за улогите се праќаат од Userinfo endpoint и зависно од подесувањата на апликацијата во токените и другите типови.",
+      "CHECK": "Проверка на овластување при автентикација",
+      "CHECK_DESCRIPTION": "Ако е активирано, корисниците имаат дозвола да се автентицираат само доколку им е доделена некоја улога на нивниот профил.",
       "DIALOG": {
-        "DELETE_TITLE": "Delete role",
-        "DELETE_DESCRIPTION": "You are about to delete a project role. Are you sure?"
+        "DELETE_TITLE": "Избриши улога",
+        "DELETE_DESCRIPTION": "Дали сте сигурни дека сакате да ја избришете улогата?"
       }
     },
-    "HAS_PROJECT": "Check for Project on Authentication",
-    "HAS_PROJECT_DESCRIPTION": "It is checked whether the user's organization has this project. If not, the user cannot be authenticated.",
+    "HAS_PROJECT": "Проверка за проект при автентикација",
+    "HAS_PROJECT_DESCRIPTION": "Се проверува дали организацијата на корисникот го има овој проект. Доколку го нема, корисникот нема да може да се автентицира.",
     "TABLE": {
-      "TOTAL": "Entries total:",
-      "SELECTION": "Selected Elements",
-      "DEACTIVATE": "Deactivate Project",
-      "ACTIVATE": "Activate Project",
-      "DELETE": "Delete Project",
-      "ORGNAME": "Organization Name",
-      "ORGDOMAIN": "Organization Domain",
-      "STATE": "Status",
-      "TYPE": "Type",
-      "CREATIONDATE": "Created at",
-      "CHANGEDATE": "Last modified",
-      "RESOURCEOWNER": "Owner",
-      "SHOWTABLE": "Show table",
-      "SHOWGRID": "Show grid",
-      "EMPTY": "No project found"
+      "TOTAL": "Вкупно записи:",
+      "SELECTION": "Избрани елементи",
+      "DEACTIVATE": "Деактивирај проект",
+      "ACTIVATE": "Активирај проект",
+      "DELETE": "Избриши проект",
+      "ORGNAME": "Име на организација",
+      "ORGDOMAIN": "Домен на организација",
+      "STATE": "Статус",
+      "TYPE": "Тип",
+      "CREATIONDATE": "Креиран на",
+      "CHANGEDATE": "Последна измена",
+      "RESOURCEOWNER": "Сопственик",
+      "SHOWTABLE": "Прикажи табела",
+      "SHOWGRID": "Прикажи грид",
+      "EMPTY": "Не е пронајден проект"
     },
     "TOAST": {
-      "MEMBERREMOVED": "Manager removed.",
-      "MEMBERSADDED": "Managers added.",
-      "MEMBERADDED": "Manager added.",
-      "MEMBERCHANGED": "Manager changed.",
-      "ROLESCREATED": "Roles created.",
-      "ROLEREMOVED": "Role removed.",
-      "ROLECHANGED": "Role changed.",
-      "REACTIVATED": "Reactivated.",
-      "DEACTIVATED": "Deactivated.",
-      "CREATED": "Project created.",
-      "UPDATED": "Project changed.",
-      "GRANTUPDATED": "Grant changed.",
-      "DELETED": "Project deleted."
+      "MEMBERREMOVED": "Менаџерот е отстранет.",
+      "MEMBERSADDED": "Менаџерите се додадени.",
+      "MEMBERADDED": "Менаџерот е додаден.",
+      "MEMBERCHANGED": "Менаџерот е променет.",
+      "ROLESCREATED": "Улогите се креирани.",
+      "ROLEREMOVED": "Улогата е отстранета.",
+      "ROLECHANGED": "Улогата е променета.",
+      "REACTIVATED": "Реактивирано.",
+      "DEACTIVATED": "Деактивирано.",
+      "CREATED": "Проектот е креиран.",
+      "UPDATED": "Проектот е променет.",
+      "GRANTUPDATED": "Доделувањето е променето.",
+      "DELETED": "Проектот е избришан."
     }
   },
   "ROLES": {
     "DIALOG": {
-      "DELETE_TITLE": "Delete role",
-      "DELETE_DESCRIPTION": "You are about to delete a role. Are you sure?"
+      "DELETE_TITLE": "Избриши улога",
+      "DELETE_DESCRIPTION": "Дали сте сигурни дека сакате да ја избришете улогата?"
     }
   },
   "NEXTSTEPS": {
-    "TITLE": "Next Steps"
+    "TITLE": "Следни чекори"
   },
   "IDP": {
     "LIST": {
       "TITLE": "Identity Providers",
-      "DESCRIPTION": "Manage your Identity Provider configuration, which can then be activated in your Login Settings.",
-      "ACTIVETITLE": "Active Identity Providers"
+      "DESCRIPTION": "Управувајте со конфигурацијата на вашите IDPs, кои потоа може да се активираат во вашите подесувања за најавување.",
+      "ACTIVETITLE": "Активни IDPs"
     },
     "CREATE": {
-      "TITLE": "Add provider",
-      "DESCRIPTION": "Select one ore more of the following providers.",
-      "STEPPERTITLE": "Create Provider",
+      "TITLE": "Додади провајдер",
+      "DESCRIPTION": "Изберете еден или повеќе од следниве провајдери.",
+      "STEPPERTITLE": "Креирај провајдер",
       "OIDC": {
-        "TITLE": "OIDC Provider",
-        "DESCRIPTION": "Enter the required data for your OIDC provider."
+        "TITLE": "OIDC провајдер",
+        "DESCRIPTION": "Внесете ги потребните податоци за вашиот OIDC провајдер."
       },
       "OAUTH": {
-        "TITLE": "OAuth Provider",
-        "DESCRIPTION": "Enter the required data for your OAuth provider."
+        "TITLE": "OAuth провајдер",
+        "DESCRIPTION": "Внесете ги потребните податоци за вашиот OAuth провајдер."
       },
       "JWT": {
-        "TITLE": "JWT Provider",
-        "DESCRIPTION": "Enter the required data for your JWT provider."
+        "TITLE": "JWT провајдер",
+        "DESCRIPTION": "Внесете ги потребните податоци за вашиот JWT провајдер."
       },
       "GOOGLE": {
-        "TITLE": "Google Provider",
-        "DESCRIPTION": "Enter the credentials for your Google Identity Provider"
+        "TITLE": "Google провајдер",
+        "DESCRIPTION": "Внесете ги податоците за вашиот Google провајдер на идентитети"
       },
       "GITLAB": {
-        "TITLE": "Gitlab Provider",
-        "DESCRIPTION": "Enter the credentials for your Gitlab Identity Provider"
+        "TITLE": "Gitlab провајдер",
+        "DESCRIPTION": "Внесете ги податоците за вашиот Gitlab провајдер на идентитети"
       },
       "GITLABSELFHOSTED": {
-        "TITLE": "Gitlab Self Hosted Provider",
-        "DESCRIPTION": "Enter the credentials for your Gitlab Self Hosted Identity Provider"
+        "TITLE": "Gitlab Self Hosted провајдер",
+        "DESCRIPTION": "Внесете ги податоците за вашиот Gitlab Self Hosted провајдер на идентитети"
       },
       "GITHUBES": {
-        "TITLE": "GitHub Enterprise Server Provider",
-        "DESCRIPTION": "Enter the credentials for your GitHub Enterprise Server Identity Provider"
+        "TITLE": "GitHub Enterprise Server провајдер",
+        "DESCRIPTION": "Внесете ги податоците за вашиот GitHub Enterprise Server провајдер на идентитети"
       },
       "GITHUB": {
-        "TITLE": "Github Provider",
-        "DESCRIPTION": "Enter the credentials for your Github Identity Provider"
+        "TITLE": "Github провајдер",
+        "DESCRIPTION": "Внесете ги податоците за вашиот Github провајдер на идентитети"
       },
       "AZUREAD": {
-        "TITLE": "Microsoft Provider",
-        "DESCRIPTION": "Enter the credentials for your Microsoft Identity Provider"
+        "TITLE": "Microsoft провајдер",
+        "DESCRIPTION": "Внесете ги податоците за вашиот Microsoft провајдер на идентитети"
       },
       "LDAP": {
         "TITLE": "Active Directory / LDAP",
-        "DESCRIPTION": "Enter the credentials for your LDAP Provider"
+        "DESCRIPTION": "Внесете ги податоците за вашиот LDAP провајдер"
       }
     },
     "DETAIL": {
-      "TITLE": "Identity Provider",
-      "DESCRIPTION": "Update your provider configuration",
-      "DATECREATED": "Created",
-      "DATECHANGED": "Changed"
+      "TITLE": "Провајдер на идентитети",
+      "DESCRIPTION": "Ажурирајте ја конфигурацијата на вашиот провајдер",
+      "DATECREATED": "Креирано",
+      "DATECHANGED": "Променето"
     },
     "OPTIONS": {
-      "ISAUTOCREATION": "Automatic creation",
-      "ISAUTOCREATION_DESC": "If selected, an account will be created if it does not exist yet.",
-      "ISAUTOUPDATE": "Automatic update",
-      "ISAUTOUPDATE_DESC": "If selected, accounts are updated on reauthentication.",
-      "ISCREATIONALLOWED": "Account creation allowed",
-      "ISCREATIONALLOWED_DESC": "Determines whether accounts can be created.",
-      "ISLINKINGALLOWED": "Account linking allowed",
-      "ISLINKINGALLOWED_DESC": "Determines whether an identity can be linked to an existing account."
+      "ISAUTOCREATION": "Автоматско креирање",
+      "ISAUTOCREATION_DESC": "Доколку е избрано, корисничка сметка ќе биде креиран ако сè уште не постои.",
+      "ISAUTOUPDATE": "Автоматско ажурирање",
+      "ISAUTOUPDATE_DESC": "Доколку е избрано, корисничките сметки се ажурираат при повторно најавување.",
+      "ISCREATIONALLOWED": "Дозволено креирање на кориснички сметки",
+      "ISCREATIONALLOWED_DESC": "Одредува дали може да се креираат кориснички сметки.",
+      "ISLINKINGALLOWED": "Дозволено поврзување на кориснички сметки",
+      "ISLINKINGALLOWED_DESC": "Одредува дали може да се поврзе идентитет со постоечка корисничка сметка."
     },
     "OWNERTYPES": {
-      "0": "unknown",
-      "1": "Instance",
-      "2": "Organization"
+      "0": "непознато",
+      "1": "Инстанца",
+      "2": "Организација"
     },
     "STATES": {
-      "1": "active",
-      "2": "inactive"
+      "1": "активно",
+      "2": "неактивно"
     },
     "AZUREADTENANTTYPES": {
       "3": "Tenant ID",
-      "0": "Common",
-      "1": "Organizations",
-      "2": "Consumers"
+      "0": "Заедничко",
+      "1": "Организации",
+      "2": "Корисници"
     },
     "AZUREADTENANTTYPE": "Tenant Type",
     "AZUREADTENANTID": "Tenant ID",
-    "EMAILVERIFIED": "Email verified",
-    "NAMEHINT": "If specified it will be shown in the login interface.",
-    "OPTIONAL": "optional",
-    "LDAPATTRIBUTES": "LDAP Attributes",
-    "UPDATEBINDPASSWORD": "update Bind Password",
-    "UPDATECLIENTSECRET": "update client secret",
-    "ADD": "Add Identity Provider",
-    "TYPE": "Type",
-    "OWNER": "Owner",
+    "EMAILVERIFIED": "Е-пошта верифицирана",
+    "NAMEHINT": "Ако е наведено, ќе биде прикажано во интерфејсот за најавување.",
+    "OPTIONAL": "незадолжително",
+    "LDAPATTRIBUTES": "LDAP атрибути",
+    "UPDATEBINDPASSWORD": "ажурирање на лозинка за поврзување",
+    "UPDATECLIENTSECRET": "ажурирање на клиентска тајна",
+    "ADD": "Додај IDP",
+    "TYPE": "Тип",
+    "OWNER": "Сопственик",
     "ID": "ID",
-    "NAME": "Name",
-    "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
-    "TOKENENDPOINT": "Token Endpoint",
-    "USERENDPOINT": "User Endpoint",
-    "IDATTRIBUTE": "ID Attribute",
-    "AVAILABILITY": "Availability",
-    "AVAILABLE": "available",
-    "AVAILABLEBUTINACTIVE": "available but inactive",
-    "SETAVAILABLE": "set as available",
-    "SETUNAVAILABLE": "set as not available",
-    "CONFIG": "Configuration",
-    "STATE": "Status",
+    "NAME": "Име",
+    "AUTHORIZATIONENDPOINT": "Точка на авторизација",
+    "TOKENENDPOINT": "Точка на токени",
+    "USERENDPOINT": "Точка на корисник",
+    "IDATTRIBUTE": "ID атрибут",
+    "AVAILABILITY": "Достапност",
+    "AVAILABLE": "достапно",
+    "AVAILABLEBUTINACTIVE": "достапно, но неактивно",
+    "SETAVAILABLE": "постави како достапно",
+    "SETUNAVAILABLE": "постави како недостапно",
+    "CONFIG": "Конфигурација",
+    "STATE": "Статус",
     "ISSUER": "Issuer",
-    "SCOPESLIST": "Scopes List",
-    "CLIENTID": "Client ID",
-    "CLIENTSECRET": "Client Secret",
-    "LDAPCONNECTION": "Connection",
-    "LDAPUSERBINDING": "User binding",
+    "SCOPESLIST": "Листа на опсези",
+    "CLIENTID": "Client Id",
+    "CLIENTSECRET": "Клиентска Тајна",
+    "LDAPCONNECTION": "Конекција",
+    "LDAPUSERBINDING": "Врска на корисник",
     "BASEDN": "BaseDn",
     "BINDDN": "BindDn",
-    "BINDPASSWORD": "Bind Password",
-    "SERVERS": "Servers",
+    "BINDPASSWORD": "Лозинка на поврзување",
+    "SERVERS": "Сервери",
     "STARTTLS": "Start TLS",
-    "TIMEOUT": "Timeout in seconds",
-    "USERBASE": "Userbase",
-    "USERFILTERS": "User filters",
-    "USEROBJECTCLASSES": "User Object Classes",
-    "REQUIRED": "required",
-    "LDAPIDATTRIBUTE": "ID attribute",
-    "AVATARURLATTRIBUTE": "Avatar Url attribute",
-    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
-    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
-    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Given name attribute",
-    "LASTNAMEATTRIBUTE": "Family name attribute",
-    "NICKNAMEATTRIBUTE": "Nickname attribute",
-    "PHONEATTRIBUTE": "Phone attribute",
-    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
-    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
-    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
-    "PROFILEATTRIBUTE": "Profile attribute",
-    "IDPDISPLAYNAMMAPPING": "IDP Display Name Mapping",
-    "USERNAMEMAPPING": "Username Mapping",
-    "DATES": "Dates",
-    "CREATIONDATE": "Created At",
-    "CHANGEDATE": "Last Modified",
-    "DEACTIVATE": "Deactivate",
-    "ACTIVATE": "Activate",
-    "DELETE": "Delete",
-    "DELETE_TITLE": "Delete IDP",
-    "DELETE_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
-    "DELETE_SELECTION_TITLE": "Delete IDP",
-    "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
-    "EMPTY": "No IDP available",
+    "TIMEOUT": "Тајмаут во секунди",
+    "USERBASE": "База на корисници",
+    "USERFILTERS": "Филтри за корисник",
+    "USEROBJECTCLASSES": "Класи на објекти за корисник",
+    "REQUIRED": "задолжително",
+    "LDAPIDATTRIBUTE": "ID атрибут за",
+    "AVATARURLATTRIBUTE": "Аватар URL атрибут",
+    "DISPLAYNAMEATTRIBUTE": "Атрибут за име за приказ",
+    "EMAILATTRIBUTEATTRIBUTE": "Атрибут за е-пошта",
+    "EMAILVERIFIEDATTRIBUTE": "Атрибут за верифицирана е-пошта",
+    "FIRSTNAMEATTRIBUTE": "Атрибут за име",
+    "LASTNAMEATTRIBUTE": "Атрибут за презиме",
+    "NICKNAMEATTRIBUTE": "Атрибут за прекар",
+    "PHONEATTRIBUTE": "Атрибут за телефонски број",
+    "PHONEVERIFIEDATTRIBUTE": "Атрибут за верифициран телефонски број",
+    "PREFERREDLANGUAGEATTRIBUTE": "Атрибут за посакуван јазик",
+    "PREFERREDUSERNAMEATTRIBUTE": "Атрибут за посакувано корисничко име",
+    "PROFILEATTRIBUTE": "Атрибут за профил",
+    "IDPDISPLAYNAMMAPPING": "Мапирање на името за приказ на IDP",
+    "USERNAMEMAPPING": "Мапирање на корисничкото име",
+    "DATES": "Датуми",
+    "CREATIONDATE": "Креирано на",
+    "CHANGEDATE": "Последно изменето",
+    "DEACTIVATE": "Деактивирај",
+    "ACTIVATE": "Активирај",
+    "DELETE": "Избриши",
+    "DELETE_TITLE": "Избриши IDP",
+    "DELETE_DESCRIPTION": "Дали сте сигурни дека сакате да го избришете IDP? Промените се неповратни.",
+    "DELETE_SELECTION_TITLE": "Избриши IDP",
+    "DELETE_SELECTION_DESCRIPTION": "Дали сте сигурни дека сакате да го избришете IDP? Промените се неповратни.",
+    "EMPTY": "Нема достапни провајдери на идентитети",
     "OIDC": {
-      "GENERAL": "General Information",
-      "TITLE": "OIDC Configuration",
-      "DESCRIPTION": "Enter the data for the OIDC Identity Provider."
+      "GENERAL": "Општи информации",
+      "TITLE": "Конфигурација на OIDC",
+      "DESCRIPTION": "Внесете ги податоците за OIDC IDP."
     },
     "JWT": {
-      "TITLE": "JWT Configuration",
-      "DESCRIPTION": "Enter the data for JWT Identity Provider.",
-      "HEADERNAME": "Header Name",
-      "JWTENDPOINT": "JWT Endpoint",
-      "JWTKEYSENDPOINT": "JWT Keys Endpoint"
+      "TITLE": "JWT Конфигурација",
+      "DESCRIPTION": "Внесете ги податоците за JWT IDP.",
+      "HEADERNAME": "Име на хедер",
+      "JWTENDPOINT": "JWT Крајна точка",
+      "JWTKEYSENDPOINT": "JWT Крајна точка за клучеви"
     },
     "TOAST": {
-      "SAVED": "Successfully saved.",
-      "REACTIVATED": "Idp reactivated.",
-      "DEACTIVATED": "Idp deactivated.",
-      "SELECTEDREACTIVATED": "Selected Idps reactivated.",
-      "SELECTEDDEACTIVATED": "Selected Idps deactivated.",
-      "SELECTEDKEYSDELETED": "Selected Idps deleted.",
-      "DELETED": "Idp removed successfully!",
-      "ADDED": "Added successfully.",
-      "REMOVED": "Removed successfully."
+      "SAVED": "Успешно зачувано.",
+      "REACTIVATED": "IDP повторно активиран.",
+      "DEACTIVATED": "IDP деактивиран.",
+      "SELECTEDREACTIVATED": "Избраните IDPs се повторно активирани.",
+      "SELECTEDDEACTIVATED": "Избраните IDPs се деактивирани.",
+      "SELECTEDKEYSDELETED": "Избраните IDPs се избришани.",
+      "DELETED": "IDP успешно отстранет!",
+      "ADDED": "Успешно додадено.",
+      "REMOVED": "Успешно отстрането."
     }
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Passwordless",
-      "MULTIFACTORDESCRIPTION": "Define your Multifactors for your passwordless Authentication here.",
-      "SECONDFACTORTITLE": "Multifactor Authentication",
-      "SECONDFACTORDESCRIPTION": "Define further possible factors with which you can secure your password authentication."
+      "MULTIFACTORTITLE": "Без лозинка",
+      "MULTIFACTORDESCRIPTION": "Дефинирајте ги овде вашите мултифактори за најава без лозинка.",
+      "SECONDFACTORTITLE": "Мултифактор автентикација",
+      "SECONDFACTORDESCRIPTION": "Дефинирајте дополнителни можни фактори со кои можете да ја обезбедите вашата автентикација со лозинка."
     },
     "CREATE": {
-      "TITLE": "New Factor",
-      "DESCRIPTION": "Select your new Factor type."
+      "TITLE": "Нов фактор",
+      "DESCRIPTION": "Изберете нов тип на фактор."
     },
     "DELETE": {
-      "TITLE": "Delete Factor",
-      "DESCRIPTION": "You are about to delete a Factor from Login Settings. Are you sure?"
+      "TITLE": "Избриши фактор",
+      "DESCRIPTION": "Дали сте сигурни дека сакате да го избришете факторот од подесувањата за најава?"
     },
     "TOAST": {
-      "ADDED": "Added successfully.",
-      "SAVED": "Saved successfully.",
-      "DELETED": "Removed successfully"
+      "ADDED": "Успешно додадено.",
+      "SAVED": "Успешно зачувано.",
+      "DELETED": "Успешно отстрането."
     },
-    "TYPE": "Type",
+    "TYPE": "Тип",
     "MULTIFACTORTYPES": {
-      "0": "Unknown",
-      "1": "Fingerprint, Security Keys, Face ID and other"
+      "0": "Непознато",
+      "1": "Отпечаток на прст, безбедносни клучеви, Face ID и другo"
     },
     "SECONDFACTORTYPES": {
-      "0": "Unknown",
-      "1": "One Time Password (OTP)",
-      "2": "Fingerprint, Security Keys, Face ID and other"
+      "0": "Непознато",
+      "1": "Еднократна лозинка (OTP)",
+      "2": "Отисок на прст, безбедносни клучеви, Face ID и другo"
     }
   },
   "LOGINPOLICY": {
     "CREATE": {
-      "TITLE": "Login Settings",
-      "DESCRIPTION": "Define how your users can be authenticated on your organization."
+      "TITLE": "Подесување за најава",
+      "DESCRIPTION": "Дефинирајте како вашите корисници можат да бидат автентицирани во вашата организација."
     },
-    "IDPS": "Identity Providers",
+    "IDPS": "Провајдери на идентитет",
     "ADDIDP": {
-      "TITLE": "Add Identity Provider",
-      "DESCRIPTION": "You can select predefined or self-created providers for authentication.",
-      "SELECTIDPS": "Identity providers"
+      "TITLE": "Додади IDP",
+      "DESCRIPTION": "Можете да изберете предефинирани или самокреирани IDPs.",
+      "SELECTIDPS": "Провајдери на идентитет"
     },
-    "PASSWORDLESS": "Passwordless Login",
+    "PASSWORDLESS": "Најавување без лозинка",
     "PASSWORDLESSTYPE": {
-      "0": "Not allowed",
-      "1": "Allowed"
+      "0": "Не е дозволено",
+      "1": "Дозволено"
     }
   },
   "APP": {
-    "LIST": "Applications",
-    "COMPLIANCE": "OIDC Compliance",
+    "LIST": "Апликации",
+    "COMPLIANCE": "OIDC Соодветност",
     "URLS": "URLs",
-    "CONFIGURATION": "Configuration",
-    "TOKEN": "Token Settings",
+    "CONFIGURATION": "Конфигурација",
+    "TOKEN": "Подесувања за токени",
     "PAGES": {
-      "TITLE": "Application",
+      "TITLE": "Апликација",
       "ID": "ID",
-      "DESCRIPTION": "Here you can edit your application data and it's configuration.",
-      "CREATE": "Create application",
-      "CREATE_SELECT_PROJECT": "Select your project first",
-      "CREATE_NEW_PROJECT": "or create a new one <a href='{{url}}' title='Create project'>here</a>.",
-      "CREATE_DESC_TITLE": "Enter Your Application Details Step by Step",
-      "CREATE_DESC_SUB": "A recommended configuration will be automatically generated.",
-      "STATE": "Status",
-      "DATECREATED": "Created",
-      "DATECHANGED": "Changed",
+      "DESCRIPTION": "Овде можете да уредите податоците за вашата апликација и нејзината конфигурација.",
+      "CREATE": "Креирај апликација",
+      "CREATE_SELECT_PROJECT": "Прво изберете го вашиот проект",
+      "CREATE_NEW_PROJECT": "или креирајте нов <a href='{{url}}' title='Креирај проект'>тука</a>.",
+      "CREATE_DESC_TITLE": "Внесете ги деталите за вашата апликација чекор по чекор",
+      "CREATE_DESC_SUB": "Автоматски ќе биде генерирана препорачана конфигурација.",
+      "STATE": "Статус",
+      "DATECREATED": "Создадено",
+      "DATECHANGED": "Изменето",
       "URLS": "URLs",
-      "DELETE": "Delete App",
+      "DELETE": "Избриши апликација",
       "DETAIL": {
-        "TITLE": "Detail",
+        "TITLE": "Детали",
         "STATE": {
-          "0": "Not defined",
-          "1": "Active",
-          "2": "Inactive"
+          "0": "Недефинирано",
+          "1": "Активно",
+          "2": "Неактивно"
         }
       },
       "DIALOG": {
         "CONFIG": {
-          "TITLE": "Change OIDC Configuration"
+          "TITLE": "Промени OIDC конфигурација"
         },
         "DELETE": {
-          "TITLE": "Delete App",
-          "DESCRIPTION": "Do you really want to delete this application?"
+          "TITLE": "Избриши апликација",
+          "DESCRIPTION": "Дали сте сигурни дека сакате да ја избришете оваа апликација?"
         }
       },
       "NEXTSTEPS": {
-        "TITLE": "Next Steps",
+        "TITLE": "Следни Чекори",
         "0": {
-          "TITLE": "Add roles",
-          "DESC": "Enter your project roles"
+          "TITLE": "Додади улоги",
+          "DESC": "Внесете ги улогите за вашиот проект"
         },
         "1": {
-          "TITLE": "Add users",
-          "DESC": "Add new users of your organization"
+          "TITLE": "Додади корисници",
+          "DESC": "Додади нови корисници од вашата организација"
         },
         "2": {
-          "TITLE": "Help & Support",
-          "DESC": "Read our documentation on creating applications or contact our support"
+          "TITLE": "Помош и Поддршка",
+          "DESC": "Прочитајте ја нашата документација за креирање на апликации или контактирајте ја нашата поддршка"
         }
       }
     },
     "NAMEDIALOG": {
-      "TITLE": "Rename App",
-      "DESCRIPTION": "Enter the new name for your app",
-      "NAME": "New Name"
+      "TITLE": "Преименувај апликација",
+      "DESCRIPTION": "Внесете го новото име на вашата апликација",
+      "NAME": "Ново име"
     },
-    "NAME": "Name",
-    "TYPE": "Application Type",
-    "AUTHMETHOD": "Authentication Method",
-    "AUTHMETHODSECTION": "Authentication Method",
-    "GRANT": "Grant Types",
-    "ADDITIONALORIGINS": "Additional Origins",
-    "ADDITIONALORIGINSDESC": "If you want to add additional Origins to your app which is not used as a redirect you can do that here.",
+    "NAME": "Име",
+    "TYPE": "Тип на апликација",
+    "AUTHMETHOD": "Метод на автентикација",
+    "AUTHMETHODSECTION": "Метод на автентикација",
+    "GRANT": "Типови на овластувања",
+    "ADDITIONALORIGINS": "Дополнителни Origins",
+    "ADDITIONALORIGINSDESC": "Ако сакате да додадете дополнителни Origins на вашата апликација кои не се користат како Redirect, можете да го направите тоа тука.",
     "ORIGINS": "Origins",
-    "NOTANORIGIN": "The entered value is not an origin",
-    "PROSWITCH": "I'm a pro. Skip this wizard.",
-    "NAMEANDTYPESECTION": "Name and Type",
-    "TITLEFIRST": "Name of the application",
-    "TYPETITLE": "Type of application",
+    "NOTANORIGIN": "Внесената вредност е невалиден Origin",
+    "PROSWITCH": "Јас сум професионалец. Прескокни го овој водич.",
+    "NAMEANDTYPESECTION": "Име и Тип",
+    "TITLEFIRST": "Име на апликацијата",
+    "TYPETITLE": "Тип на апликација",
     "OIDC": {
-      "WELLKNOWN": "Further links can be retrieved from the <a href='{{url}}' title='Discovery endpoint' target='_blank'>discovery endpoint</a>.",
+      "WELLKNOWN": "Дополнителни линкови може да се добијат од <a href='{{url}}' title='Discovery endpoint' target='_blank'>Discovery endpoint</a>.",
       "INFO": {
         "ISSUER": "Issuer",
         "CLIENTID": "Client Id"
       },
-      "CURRENT": "Current Config",
-      "TOKENSECTIONTITLE": "AuthToken Options",
-      "REDIRECTSECTIONTITLE": "Redirect Settings",
-      "REDIRECTTITLE": "Specify the URIs where the login will redirect to.",
-      "POSTREDIRECTTITLE": "This is the redirect URI after logout.",
-      "REDIRECTDESCRIPTIONWEB": "Redirect URIs must begin with https://. http:// is only valid with enabled development mode.",
-      "REDIRECTDESCRIPTIONNATIVE": "Redirect URIs must begin with your own protocol, http://127.0.0.1, http://[::1] or http://localhost.",
-      "REDIRECTNOTVALID": "This redirect URI is not valid.",
-      "COMMAORENTERSEPERATION": "separate with ↵",
-      "TYPEREQUIRED": "The type is required.",
-      "TITLE": "OIDC Configuration",
-      "CLIENTID": "Client ID",
-      "CLIENTSECRET": "Client Secret",
-      "CLIENTSECRET_NOSECRET": "With your chosen authentication flow, no secret is required and is therefore not available.",
-      "CLIENTSECRET_DESCRIPTION": "Keep your client secret at a safe place as it will disappear once the dialog is closed.",
-      "REGENERATESECRET": "Regenerate Client Secret",
-      "DEVMODE": "Development Mode",
-      "DEVMODEDESC": "Beware: With development mode enabled redirect URIs will not be validated.",
-      "SKIPNATIVEAPPSUCCESSPAGE": "Skip Login Success Page",
-      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Skip the success page after a login for this native app.",
+      "CURRENT": "Тековна конфигурација",
+      "TOKENSECTIONTITLE": "Опции за автентикациски токени",
+      "REDIRECTSECTIONTITLE": "Подесување за пренасочување",
+      "REDIRECTTITLE": "Наведете URIs каде што ќе се пренасочи најавата.",
+      "POSTREDIRECTTITLE": "Ова е URI за пренасочување по одјавата.",
+      "REDIRECTDESCRIPTIONWEB": "URIs за пренасочување мора да започнуваат со https://. http:// е валидно само со овозможен development mode.",
+      "REDIRECTDESCRIPTIONNATIVE": "URIs за пренасочување мора да започнуваат со вашиот протокол, http://127.0.0.1, http://[::1] или http://localhost.",
+      "REDIRECTNOTVALID": "Ова URI за пренасочување не е валидно.",
+      "COMMAORENTERSEPERATION": "одделувајте со ↵",
+      "TYPEREQUIRED": "Типот е задолжителен.",
+      "TITLE": "OIDC Конфигурација",
+      "CLIENTID": "Client Id",
+      "CLIENTSECRET": "Клиентска тајна",
+      "CLIENTSECRET_NOSECRET": "Со избраната метода за автентикација, не е потребна тајна и поради тоа не е достапна.",
+      "CLIENTSECRET_DESCRIPTION": "Чувајте ја вашата клиентска тајна на безбедно место, бидејќи ќе исчезне откако ќе се затвори дијалогот.",
+      "REGENERATESECRET": "Генерирај нова клиентска тајна",
+      "DEVMODE": "Development mode",
+      "DEVMODEDESC": "Внимавајте: Со овозможен Development mode, URIs за пренасочување нема да бидат валидирани.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Прескокни страница за успешна најава",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Прескокнете ја страницата за успешна најава за оваа нативна апликација.",
       "REDIRECT": "Redirect URIs",
       "REDIRECTSECTION": "Redirect URIs",
-      "POSTLOGOUTREDIRECT": "Post Logout URIs",
-      "RESPONSESECTION": "Response Types",
-      "GRANTSECTION": "Grant Types",
-      "GRANTTITLE": "Select your grant types. Note: Implicit is only available for browser-based applications.",
+      "POSTLOGOUTREDIRECT": "URIs по одјавувањето",
+      "RESPONSESECTION": "Типови на одговори",
+      "GRANTSECTION": "Типови на овластувања",
+      "GRANTTITLE": "Изберете ги вашите типови на овластувања. Забелешка: Implicit е достапен само за апликации базирани на веб-прелистувачи.",
       "APPTYPE": {
-        "0": "Web",
-        "1": "User Agent",
-        "2": "Native"
+        "0": "Веб",
+        "1": "Кориснички Агент",
+        "2": "Нативна"
       },
-      "RESPONSETYPE": "Response Types",
+      "RESPONSETYPE": "Типови на Одговори",
       "RESPONSE": {
-        "0": "Code",
-        "1": "ID Token",
-        "2": "Token-ID Token"
+        "0": "Код",
+        "1": "ID Токен",
+        "2": "Токен-ID Токен"
       },
-      "REFRESHTOKEN": "Refresh Token",
-      "GRANTTYPE": "Grant Types",
+      "REFRESHTOKEN": "Токен за Освежување",
+      "GRANTTYPE": "Типови на Овластувања",
       "GRANT": {
-        "0": "Authorization Code",
+        "0": "Код на Овластување",
         "1": "Implicit",
-        "2": "Refresh Token",
-        "3": "Device Code"
+        "2": "Токен за Освежување",
+        "3": "Код од Уред"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -1989,34 +1989,34 @@
         "2": "None",
         "3": "Private Key JWT"
       },
-      "TOKENTYPE": "Auth Token Type",
+      "TOKENTYPE": "Тип на Auth Token",
       "TOKENTYPE0": "Bearer Token",
       "TOKENTYPE1": "JWT",
-      "UNSECUREREDIRECT": "I sure hope you know what you are doing.",
-      "OVERVIEWSECTION": "Overview",
-      "OVERVIEWTITLE": "You are now done. Review your configuration.",
-      "ACCESSTOKENROLEASSERTION": "Add user roles to the access token",
-      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "If selected, the requested roles of the authenticated user are added to the access token.",
-      "IDTOKENROLEASSERTION": "User roles inside ID Token",
-      "IDTOKENROLEASSERTION_DESCRIPTION": "If selected, the requested roles of the authenticated user are added to the ID token.",
-      "IDTOKENUSERINFOASSERTION": "User Info inside ID Token",
-      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Enables clients to retrieve profile, email, phone and address claims from ID token.",
-      "CLOCKSKEW": "Enables clients to handle clock skew of OP and client. The duration (0-5s) will be added to exp claim and subtracted from iats, auth_time and nbf.",
-      "RECOMMENDED": "recommended",
-      "NOTRECOMMENDED": "not recommended",
+      "UNSECUREREDIRECT": "Сигурноста на Пренасочувањето не е обезбедена. Ве молиме имајте предвид што правите.",
+      "OVERVIEWSECTION": "Преглед",
+      "OVERVIEWTITLE": "Сега е комплетирано. Прегледајте ја вашата конфигурација.",
+      "ACCESSTOKENROLEASSERTION": "Додадете улоги на корисникот во токенот за пристап",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Ако е избрано, се додаваат бараните улоги на автентицираниот корисник во токенот за пристап.",
+      "IDTOKENROLEASSERTION": "Улоги на корисникот внатре во ID токенот",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Ако е избрано, се додаваат бараните улоги на автентицираниот корисник во ID токенот.",
+      "IDTOKENUSERINFOASSERTION": "Информации за корисникот внатре во ID токенот",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Овозможува клиентите да добијат информации за профилот, е-поштата, телефонскиот број и адресите од ID токенот.",
+      "CLOCKSKEW": "Овозможува клиентите да се справуваат со временски неподесеностите меѓу OP и клиентот. Времетраењето (0-5 сек.) ќе биде додадено на exp claim и одземено од iats, auth_time и nbf.",
+      "RECOMMENDED": "препорачано",
+      "NOTRECOMMENDED": "не препорачано",
       "SELECTION": {
         "APPTYPE": {
           "WEB": {
-            "TITLE": "Web",
-            "DESCRIPTION": "Regular Web applications like .net, PHP, Node.js, Java, etc."
+            "TITLE": "Веб",
+            "DESCRIPTION": "Редовни веб апликации како .net, PHP, Node.js, Java итн."
           },
           "NATIVE": {
-            "TITLE": "Native",
-            "DESCRIPTION": "Mobile Apps, Desktop, Smart Devices, etc."
+            "TITLE": "Нативно",
+            "DESCRIPTION": "Мобилни апликации, десктоп, паметни уреди итн."
           },
           "USERAGENT": {
-            "TITLE": "User Agent",
-            "DESCRIPTION": "Single Page Applications (SPA) and in general all JS frameworks executed in browsers"
+            "TITLE": "Кориснички Агент",
+            "DESCRIPTION": "Single Page Applications (SPA) и воопшто сите JS frameworks кои се извршуваат во прелистувачите"
           }
         }
       }
@@ -2025,10 +2025,10 @@
       "INFO": {
         "CLIENTID": "Client Id"
       },
-      "REGENERATESECRET": "Regenerate Client Secret",
+      "REGENERATESECRET": "Регенерирај клиентска тајна",
       "SELECTION": {
         "TITLE": "API",
-        "DESCRIPTION": "APIs in general"
+        "DESCRIPTION": "APIs воопшто"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2038,66 +2038,66 @@
     "SAML": {
       "SELECTION": {
         "TITLE": "SAML",
-        "DESCRIPTION": "SAML Applications"
+        "DESCRIPTION": "SAML Апликации"
       },
-      "CONFIGSECTION": "SAML Configuration",
-      "URL": "Url where Metadata file is located",
-      "OR": "or",
-      "XML": "Upload Metadata XML",
+      "CONFIGSECTION": "SAML Конфигурација",
+      "URL": "URL каде што се наоѓа Metadata датотеката",
+      "OR": "или",
+      "XML": "Подигни Metadata XML",
       "METADATA": "Metadata",
-      "METADATAFROMFILE": "Metadata from File"
+      "METADATAFROMFILE": "Metadata од датотека"
     },
     "AUTHMETHODS": {
       "CODE": {
         "TITLE": "Code",
-        "DESCRIPTION": "Exchange the authorization code for the tokens"
+        "DESCRIPTION": "Замени го авторизацискиот код за токени"
       },
       "PKCE": {
         "TITLE": "PKCE",
-        "DESCRIPTION": "Use a random hash instead of a static client secret for more security"
+        "DESCRIPTION": "Користи random hash наместо статичка клиентска тајна за поголема безбедност"
       },
       "POST": {
         "TITLE": "POST",
-        "DESCRIPTION": "Send client_id and client_secret as part of the form"
+        "DESCRIPTION": "Испрати client_id и client_secret како дел од формата"
       },
       "PK_JWT": {
         "TITLE": "Private Key JWT",
-        "DESCRIPTION": "Use a private key to authorize your application"
+        "DESCRIPTION": "Користи приватен клуч за авторизација на твојата апликација"
       },
       "BASIC": {
         "TITLE": "Basic",
-        "DESCRIPTION": "Authentication with Username and Password"
+        "DESCRIPTION": "Автентикација со Корисничко име и Лозинка"
       },
       "IMPLICIT": {
         "TITLE": "Implicit",
-        "DESCRIPTION": "Get the tokens directly from the authorization endpoint"
+        "DESCRIPTION": "Добиј токени директно од авторизациската точка"
       },
       "DEVICECODE": {
         "TITLE": "Device Code",
-        "DESCRIPTION": "Authorize the device on a computer or smartphone."
+        "DESCRIPTION": "Авторизирај го уредот на компјутер или смартфон."
       },
       "CUSTOM": {
         "TITLE": "Custom",
-        "DESCRIPTION": "Your setting doesn't correspond to any other option."
+        "DESCRIPTION": "Твојата поставка не одговара на ниту една друга опција."
       }
     },
     "TOAST": {
-      "REACTIVATED": "Application reactivated.",
-      "DEACTIVATED": "Application deactivated.",
-      "OIDCUPDATED": "App updated.",
-      "APIUPDATED": "App updated",
-      "UPDATED": "App updated.",
-      "CREATED": "App created.",
-      "CLIENTSECRETREGENERATED": "client secret generated.",
-      "DELETED": "App deleted.",
-      "CONFIGCHANGED": "Changes detected!"
+      "REACTIVATED": "Апликацијата е реактивирана.",
+      "DEACTIVATED": "Апликацијата е деактивирана.",
+      "OIDCUPDATED": "Апликацијата е ажурирана.",
+      "APIUPDATED": "Апликацијата е ажурирана",
+      "UPDATED": "Апликацијата е ажурирана.",
+      "CREATED": "Апликацијата е креирана.",
+      "CLIENTSECRETREGENERATED": "Клиентската тајна е генерирана.",
+      "DELETED": "Апликацијата е избришана.",
+      "CONFIGCHANGED": "Детектирани промени!"
     }
   },
   "GENDERS": {
-    "0": "Unknown",
-    "1": "Female",
-    "2": "Male",
-    "3": "Other"
+    "0": "Непознато",
+    "1": "Женски",
+    "2": "Машки",
+    "3": "Друго"
   },
   "LANGUAGES": {
     "de": "Deutsch",
@@ -2112,76 +2112,76 @@
     "mk": "Македонски"
   },
   "MEMBER": {
-    "ADD": "Add a Manager",
-    "CREATIONTYPE": "Creation Type",
+    "ADD": "Додај Менаџер",
+    "CREATIONTYPE": "Тип на креирање",
     "CREATIONTYPES": {
       "3": "IAM",
-      "2": "Organization",
-      "0": "Owned Project",
-      "1": "Granted Project",
-      "4": "Project"
+      "2": "Организација",
+      "0": "Сопствен Проект",
+      "1": "Доделен Проект",
+      "4": "Проект"
     },
-    "EDITROLE": "Edit roles",
-    "EDITFOR": "Edit the roles for the user: {{value}}",
+    "EDITROLE": "Уреди улоги",
+    "EDITFOR": "Уреди улоги за корисникот: {{value}}",
     "DIALOG": {
-      "DELETE_TITLE": "Remove Manager",
-      "DELETE_DESCRIPTION": "You are about to remove a manager. Are you sure?"
+      "DELETE_TITLE": "Отстрани Менаџер",
+      "DELETE_DESCRIPTION": "Дали сте сигурни дека сакате да го отстраните менаџерот?"
     }
   },
-  "ROLESLABEL": "Roles",
+  "ROLESLABEL": "Улоги",
   "GRANTS": {
-    "TITLE": "Authorizations",
-    "DESC": "These are all authorizations on your organization.",
-    "DELETE": "Delete Authorization",
-    "EMPTY": "No authorization found",
-    "ADD": "Create Authorization",
-    "ADD_BTN": "New",
+    "TITLE": "Овластувања",
+    "DESC": "Овие се сите овластувања на вашата организација.",
+    "DELETE": "Избриши Овластување",
+    "EMPTY": "Не се пронајдени овластувања",
+    "ADD": "Креирај Овластување",
+    "ADD_BTN": "Ново",
     "PROJECT": {
-      "TITLE": "Authorization",
-      "DESCRIPTION": "Define authorizations for the specified project. Note that you can only see entries of projects and users for which you have the permissions."
+      "TITLE": "Овластување",
+      "DESCRIPTION": "Дефинирајте овластувања за одредениот проект. Забелешка: Можете да гледате само записи за проекти и корисници за кои имате овластувања."
     },
     "USER": {
-      "TITLE": "Authorization",
-      "DESCRIPTION": "Define authorizations for the specified user. Note that you can only see entries of projects and users for which you have the permissions."
+      "TITLE": "Овластување",
+      "DESCRIPTION": "Дефинирајте овластувања за одредениот корисник. Забелешка: Можете да гледате само записи за проекти и корисници за кои имате овластувања."
     },
     "CREATE": {
-      "TITLE": "Create authorization",
-      "DESCRIPTION": "Search for the organization, the project, and the corresponding roles."
+      "TITLE": "Креирај овластување",
+      "DESCRIPTION": "Пребарајте ја организацијата, проектот и соодветните улоги."
     },
     "EDIT": {
-      "TITLE": "Change authorization"
+      "TITLE": "Промени овластување"
     },
     "DETAIL": {
-      "TITLE": "Authorization Detail",
-      "DESCRIPTION": "Here you can see all the details of the authorization."
+      "TITLE": "Детали за овластувањето",
+      "DESCRIPTION": "Тука можете да ги видите сите детали за овластувањето."
     },
     "TOAST": {
-      "UPDATED": "Authorization updated.",
-      "REMOVED": "Authorization removed",
-      "BULKREMOVED": "Authorizations removed."
+      "UPDATED": "Овластувањето е ажурирано.",
+      "REMOVED": "Овластувањето е отстрането",
+      "BULKREMOVED": "Овластувањата се отстранети."
     },
     "DIALOG": {
-      "DELETE_TITLE": "Delete authorization",
-      "DELETE_DESCRIPTION": "You are about to delete an authorization. Do you want to continue?",
-      "BULK_DELETE_TITLE": "Delete authorizations",
-      "BULK_DELETE_DESCRIPTION": "You are about to delete multiple authorizations. Do you want to continue?"
+      "DELETE_TITLE": "Избриши овластување",
+      "DELETE_DESCRIPTION": "Дали сте сигурни дека сакате да го избришете ова овластување?",
+      "BULK_DELETE_TITLE": "Избриши овластувања",
+      "BULK_DELETE_DESCRIPTION": "Дали сте сигурни дека сакате да ги избришете овие овластувања?"
     }
   },
   "CHANGES": {
-    "LISTTITLE": "Last Changes",
-    "BOTTOM": "You've reached the end of the list.",
-    "LOADMORE": "Load more",
+    "LISTTITLE": "Последни Промени",
+    "BOTTOM": "Стигнавте до крајот на листата.",
+    "LOADMORE": "Вчитај повеќе",
     "ORG": {
-      "TITLE": "Activity",
-      "DESCRIPTION": "Here you can see the latest events that have generated an organization change."
+      "TITLE": "Активност",
+      "DESCRIPTION": "Овде можете да ги видите најновите настани кои предизвикале промена во организацијата."
     },
     "PROJECT": {
-      "TITLE": "Activity",
-      "DESCRIPTION": "Here you can see the latest events that have generated a project change."
+      "TITLE": "Активност",
+      "DESCRIPTION": "Овде можете да ги видите најновите настани кои предизвикале промена во проектот."
     },
     "USER": {
-      "TITLE": "Activity",
-      "DESCRIPTION": "Here you can see the latest events that have generated a user change."
+      "TITLE": "Активност",
+      "DESCRIPTION": "Овде можете да ги видите најновите настани кои предизвикале промена во корисникот."
     }
   }
 }
