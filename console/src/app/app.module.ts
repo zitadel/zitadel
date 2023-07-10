@@ -1,5 +1,6 @@
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import localePt from '@angular/common/locales/pt';
 import localeBg from '@angular/common/locales/bg';
 import localeDe from '@angular/common/locales/de';
 import localeEn from '@angular/common/locales/en';
@@ -83,7 +84,8 @@ registerLocaleData(localeZh);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/zh.json'));
 registerLocaleData(localeBg);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/bg.json'));
-
+registerLocaleData(localePt);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/pt.json'));
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {
     return from(import(`../assets/i18n/${lang}.json`));

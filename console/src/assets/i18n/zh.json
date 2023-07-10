@@ -1040,7 +1040,8 @@
       "ja": "日本語",
       "pl": "Polski",
       "zh": "简体中文",
-      "bg": "Български"
+      "bg": "Български",
+			"pt": "Portuguese"
     },
     "SMTP": {
       "TITLE": "SMTP 设置",
@@ -1239,7 +1240,8 @@
         "ja": "日本語",
         "pl": "Polski",
         "zh": "简体中文",
-        "bg": "Български"
+        "bg": "Български",
+        "pt": "Portuguese"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -2099,7 +2101,8 @@
     "ja": "日本語",
     "pl": "Polski",
     "zh": "简体中文",
-    "bg": "Български"
+    "bg": "Български",
+    "pt": "Portuguese"
   },
   "MEMBER": {
     "ADD": "添加管理者",
