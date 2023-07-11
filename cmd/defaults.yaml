@@ -270,6 +270,7 @@ OIDC:
       Path: /oauth/v2/keys
     DeviceAuth:
       Path: /oauth/v2/device_authorization
+  DefaultLoginURLV2: "/login?authRequest="
 
 SAML:
   ProviderConfig:
@@ -1070,6 +1071,10 @@ InternalAuthZ:
     - Role: "SELF_MANAGEMENT_GLOBAL"
       Permissions:
         - "org.create"
+        - "policy.read"
+        - "user.self.delete"
+    - Role: "ORG_USER_SELF_MANAGER"
+      Permissions:
         - "policy.read"
         - "user.self.delete"
     - Role: "PROJECT_OWNER_GLOBAL"

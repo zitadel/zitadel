@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -132,7 +133,7 @@ func (c *Commands) addUserPasskeyCode(ctx context.Context, userID, resourceOwner
 	if err != nil {
 		return nil, err
 	}
-	code, err := c.newCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg)
+	code, err := c.newPasskeyCode(ctx, c.eventstore.Filter, alg)
 	if err != nil {
 		return nil, err
 	}
@@ -153,4 +154,8 @@ func (c *Commands) addUserPasskeyCode(ctx context.Context, userID, resourceOwner
 		CodeID:        codeID,
 		Code:          code.Plain,
 	}, nil
+}
+
+func (c *Commands) newPasskeyCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCode, error) {
+	return c.newCode(ctx, filter, domain.SecretGeneratorTypePasswordlessInitCode, alg)
 }

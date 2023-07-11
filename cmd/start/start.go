@@ -32,6 +32,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/admin"
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
+	oidc_v2 "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/session/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/settings/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/system"
@@ -192,6 +193,9 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		&http.Client{},
 		permissionCheck,
 		sessionTokenVerifier,
+		config.OIDC.DefaultAccessTokenLifetime,
+		config.OIDC.DefaultRefreshTokenExpiration,
+		config.OIDC.DefaultRefreshTokenIdleExpiration,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
@@ -344,6 +348,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return err
 	}
+
 	if err := apis.RegisterService(ctx, settings.CreateServer(commands, queries, config.ExternalSecure)); err != nil {
 		return err
 	}
@@ -396,6 +401,11 @@ func startAPIs(
 	}
 	apis.RegisterHandlerOnPrefix(login.HandlerPrefix, l.Handler())
 	apis.HandleFunc(login.EndpointDeviceAuth, login.RedirectDeviceAuthToPrefix)
+
+	// After OIDC provider so that the callback endpoint can be used
+	if err := apis.RegisterService(ctx, oidc_v2.CreateServer(commands, queries, oidcProvider, config.ExternalSecure)); err != nil {
+		return err
+	}
 
 	// handle grpc at last to be able to handle the root, because grpc and gateway require a lot of different prefixes
 	apis.RouteGRPC()
