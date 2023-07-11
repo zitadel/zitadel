@@ -22,9 +22,9 @@ FROM scratch as final
 
 COPY --from=artifact /etc/passwd /etc/passwd
 COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
-COPY --from=artifact /app/zitadel /
+COPY --from=artifact /app/zitadel /app/zitadel
 
 HEALTHCHECK NONE
 
 USER zitadel
-ENTRYPOINT ["/zitadel"]
+ENTRYPOINT ["/app/zitadel"]
