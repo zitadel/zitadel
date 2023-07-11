@@ -5,6 +5,8 @@ on:
     branches:
       - '**'
   merge_group:
+    branches:
+      - '**'
   workflow_dispatch:
 
 permissions:
