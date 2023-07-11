@@ -18,7 +18,7 @@ ENV PATH="/app:${PATH}"
 USER zitadel
 ENTRYPOINT ["/app/entrypoint.sh"]
 
-FROM scratch as final
+FROM --platform=$BUILDPLATFORM scratch as final
 
 COPY --from=artifact /etc/passwd /etc/passwd
 COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
