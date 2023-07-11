@@ -123,7 +123,7 @@ func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo *oidc.Use
 	defer func() { span.EndWithError(err) }()
 
 	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
-		token, err := o.accessTokenV2ByToken(ctx, tokenID)
+		token, err := o.query.GetAccessToken(ctx, tokenID)
 		if err != nil {
 			return err
 		}
@@ -168,7 +168,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 	defer func() { span.EndWithError(err) }()
 
 	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
-		token, err := o.accessTokenV2ByToken(ctx, tokenID)
+		token, err := o.query.GetAccessToken(ctx, tokenID)
 		if err != nil {
 			return err
 		}
@@ -239,24 +239,6 @@ func (o *OPStorage) ClientCredentials(ctx context.Context, clientID, clientSecre
 		id:        clientID,
 		tokenType: accessTokenTypeToOIDC(user.Machine.AccessTokenType),
 	}, nil
-}
-
-func (o *OPStorage) accessTokenV2ByToken(ctx context.Context, token string) (model *command.OIDCSessionAccessTokenWriteModel, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	split := strings.Split(token, "-")
-	if len(split) != 2 {
-		return nil, errors.ThrowPermissionDenied(nil, "OIDC-SAhtk", "invalid token")
-	}
-	model = command.NewOIDCSessionAccessTokenWriteModel(split[0])
-	if err = o.eventstore.FilterToQueryReducer(ctx, model); err != nil {
-		return nil, errors.ThrowPermissionDenied(err, "OIDC-M2u9w", "invalid token")
-	}
-	if model.AccessTokenID != split[1] {
-		return nil, errors.ThrowPermissionDenied(nil, "OIDC-Pf3gj", "invalid token")
-	}
-	return model, nil
 }
 
 // isOriginAllowed checks whether a call by the client to the endpoint is allowed from the provided origin
