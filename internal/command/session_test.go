@@ -432,7 +432,7 @@ func TestCommands_updateSession(t *testing.T) {
 				ctx: context.Background(),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					cmds: []SessionCommand{
+					sessionCommands: []SessionCommand{
 						func(ctx context.Context, cmd *SessionCommands) error {
 							return caos_errs.ThrowInternal(nil, "id", "check failed")
 						},
@@ -452,7 +452,7 @@ func TestCommands_updateSession(t *testing.T) {
 				ctx: context.Background(),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					cmds:              []SessionCommand{},
+					sessionCommands:   []SessionCommand{},
 				},
 			},
 			res{
@@ -487,7 +487,7 @@ func TestCommands_updateSession(t *testing.T) {
 				ctx: context.Background(),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					cmds: []SessionCommand{
+					sessionCommands: []SessionCommand{
 						CheckUser("userID"),
 						CheckPassword("password"),
 					},
@@ -499,12 +499,7 @@ func TestCommands_updateSession(t *testing.T) {
 							),
 							eventFromEventPusher(
 								user.NewHumanPasswordChangedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeHash,
-										Algorithm:  "hash",
-										KeyID:      "",
-										Crypted:    []byte("password"),
-									}, false, ""),
+									"$plain$x$password", false, ""),
 							),
 						),
 					),
@@ -513,7 +508,7 @@ func TestCommands_updateSession(t *testing.T) {
 							"token",
 							nil
 					},
-					userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+					hasher: mockSwapper("x"),
 					now: func() time.Time {
 						return testNow
 					},
@@ -541,7 +536,7 @@ func TestCommands_updateSession(t *testing.T) {
 				ctx: context.Background(),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					cmds: []SessionCommand{
+					sessionCommands: []SessionCommand{
 						CheckUser("userID"),
 						CheckIntent("intent", "aW50ZW50"),
 					},
@@ -580,7 +575,7 @@ func TestCommands_updateSession(t *testing.T) {
 				ctx: context.Background(),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					cmds: []SessionCommand{
+					sessionCommands: []SessionCommand{
 						CheckUser("userID"),
 						CheckIntent("intent", "aW50ZW50"),
 					},
@@ -629,7 +624,7 @@ func TestCommands_updateSession(t *testing.T) {
 				ctx: context.Background(),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					cmds: []SessionCommand{
+					sessionCommands: []SessionCommand{
 						CheckUser("userID"),
 						CheckIntent("intent2", "aW50ZW50"),
 					},
@@ -674,7 +669,7 @@ func TestCommands_updateSession(t *testing.T) {
 				ctx: context.Background(),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					cmds: []SessionCommand{
+					sessionCommands: []SessionCommand{
 						CheckUser("userID"),
 						CheckIntent("intent", "aW50ZW50"),
 					},

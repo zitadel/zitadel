@@ -5,6 +5,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/zitadel/passwap"
+	"github.com/zitadel/passwap/bcrypt"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -47,7 +50,8 @@ type Commands struct {
 	smtpEncryption              crypto.EncryptionAlgorithm
 	smsEncryption               crypto.EncryptionAlgorithm
 	userEncryption              crypto.EncryptionAlgorithm
-	userPasswordAlg             crypto.HashAlgorithm
+	userPasswordHasher          *passwap.Swapper
+	codeAlg                     crypto.HashAlgorithm
 	machineKeySize              int
 	applicationKeySize          int
 	domainVerificationAlg       crypto.EncryptionAlgorithm
@@ -104,6 +108,7 @@ func StartCommands(
 		smtpEncryption:        smtpEncryption,
 		smsEncryption:         smsEncryption,
 		userEncryption:        userEncryption,
+		userPasswordHasher:    passwap.NewSwapper(bcrypt.New(defaults.SecretGenerators.PasswordSaltCost)),
 		domainVerificationAlg: domainVerificationEncryption,
 		keyAlgorithm:          oidcEncryption,
 		certificateAlgorithm:  samlEncryption,
@@ -127,7 +132,7 @@ func StartCommands(
 	idpintent.RegisterEventMappers(repo.eventstore)
 	milestone.RegisterEventMappers(repo.eventstore)
 
-	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
+	repo.codeAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
 	repo.applicationKeySize = int(defaults.SecretGenerators.ApplicationKeySize)
 

@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/passwap"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -305,8 +305,8 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 
 func TestCommandSide_VerifyInitCode(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		userPasswordAlg crypto.HashAlgorithm
+		eventstore         *eventstore.Eventstore
+		userPasswordHasher *passwap.Swapper
 	}
 	type args struct {
 		ctx             context.Context
@@ -584,18 +584,13 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 							eventFromEventPusher(
 								user.NewHumanPasswordChangedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeHash,
-										Algorithm:  "hash",
-										KeyID:      "",
-										Crypted:    []byte("password"),
-									},
+									"$plain$x$password",
 									false,
 									"")),
 						},
 					),
 				),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				userPasswordHasher: mockSwapper("x"),
 			},
 			args: args{
 				ctx:             context.Background(),
@@ -615,8 +610,8 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore,
-				userPasswordAlg: tt.fields.userPasswordAlg,
+				eventstore:         tt.fields.eventstore,
+				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
 			err := r.HumanVerifyInitCode(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.code, tt.args.password, tt.args.secretGenerator)
 			if tt.res.err == nil {

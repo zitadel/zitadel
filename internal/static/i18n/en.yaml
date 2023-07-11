@@ -120,6 +120,7 @@ Errors:
       Empty: Password is empty
       Invalid: Password is invalid
       NotSet: User has not set a password
+      NotChanged: Password not changed
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is too short

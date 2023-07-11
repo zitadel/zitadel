@@ -6,6 +6,8 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/passwap"
+
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -49,8 +51,8 @@ type AddHuman struct {
 	Phone Phone
 	// Password is optional
 	Password string
-	// BcryptedPassword is optional
-	BcryptedPassword string
+	// EncodedPasswordHash is optional
+	EncodedPasswordHash string
 	// PasswordChangeRequired is used if the `Password`-field is set
 	PasswordChangeRequired bool
 	Passwordless           bool
@@ -127,7 +129,7 @@ func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *Ad
 		c.AddHumanCommand(
 			human,
 			resourceOwner,
-			c.userPasswordAlg,
+			c.userPasswordHasher,
 			c.userEncryption,
 			allowInitMail,
 		))
@@ -151,10 +153,10 @@ func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *Ad
 type humanCreationCommand interface {
 	eventstore.Command
 	AddPhoneData(phoneNumber domain.PhoneNumber)
-	AddPasswordData(secret *crypto.CryptoValue, changeRequired bool)
+	AddPasswordData(encoded string, changeRequired bool)
 }
 
-func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, passwordAlg crypto.HashAlgorithm, codeAlg crypto.EncryptionAlgorithm, allowInitMail bool) preparation.Validation {
+func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *passwap.Swapper, codeAlg crypto.EncryptionAlgorithm, allowInitMail bool) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if err := human.Validate(); err != nil {
 			return nil, err
@@ -210,7 +212,7 @@ func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, passwordAlg cr
 				createCmd.AddPhoneData(human.Phone.Number)
 			}
 
-			if err := addHumanCommandPassword(ctx, filter, createCmd, human, passwordAlg); err != nil {
+			if err := addHumanCommandPassword(ctx, filter, createCmd, human, hasher); err != nil {
 				return nil, err
 			}
 
@@ -316,13 +318,13 @@ func (c *Commands) addHumanCommandCheckID(ctx context.Context, filter preparatio
 	return nil
 }
 
-func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQueryReducer, createCmd humanCreationCommand, human *AddHuman, passwordAlg crypto.HashAlgorithm) (err error) {
+func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQueryReducer, createCmd humanCreationCommand, human *AddHuman, hasher *passwap.Swapper) (err error) {
 	if human.Password != "" {
 		if err = humanValidatePassword(ctx, filter, human.Password); err != nil {
 			return err
 		}
 
-		secret, err := crypto.Hash([]byte(human.Password), passwordAlg)
+		secret, err := hasher.Hash(human.Password)
 		if err != nil {
 			return err
 		}
@@ -330,8 +332,8 @@ func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQue
 		return nil
 	}
 
-	if human.BcryptedPassword != "" {
-		createCmd.AddPasswordData(crypto.FillHash([]byte(human.BcryptedPassword), passwordAlg), human.PasswordChangeRequired)
+	if human.EncodedPasswordHash != "" {
+		createCmd.AddPasswordData(human.EncodedPasswordHash, human.PasswordChangeRequired)
 	}
 	return nil
 }
@@ -578,7 +580,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 
 	human.EnsureDisplayName()
 	if human.Password != nil {
-		if err := human.HashPasswordIfExisting(pwPolicy, c.userPasswordAlg, human.Password.ChangeRequired); err != nil {
+		if err := human.HashPasswordIfExisting(pwPolicy, c.userPasswordHasher, human.Password.ChangeRequired); err != nil {
 			return nil, nil, err
 		}
 	}
@@ -677,10 +679,10 @@ func createAddHumanEvent(ctx context.Context, aggregate *eventstore.Aggregate, h
 			human.StreetAddress)
 	}
 	if human.Password != nil {
-		addEvent.AddPasswordData(human.Password.SecretCrypto, human.Password.ChangeRequired)
+		addEvent.AddPasswordData(human.Password.EncodedSecret, human.Password.ChangeRequired)
 	}
 	if human.HashedPassword != nil {
-		addEvent.AddPasswordData(human.HashedPassword.SecretCrypto, false)
+		addEvent.AddPasswordData(human.HashedPassword.EncodedSecret, false)
 	}
 	return addEvent
 }
@@ -711,10 +713,10 @@ func createRegisterHumanEvent(ctx context.Context, aggregate *eventstore.Aggrega
 			human.StreetAddress)
 	}
 	if human.Password != nil {
-		addEvent.AddPasswordData(human.Password.SecretCrypto, human.Password.ChangeRequired)
+		addEvent.AddPasswordData(human.Password.EncodedSecret, human.Password.ChangeRequired)
 	}
 	if human.HashedPassword != nil {
-		addEvent.AddPasswordData(human.HashedPassword.SecretCrypto, false)
+		addEvent.AddPasswordData(human.HashedPassword.EncodedSecret, false)
 	}
 	return addEvent
 }

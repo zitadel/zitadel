@@ -120,6 +120,7 @@ Errors:
       Empty: Hasło jest puste
       Invalid: Hasło jest nieprawidłowe
       NotSet: Użytkownik nie ustawił hasła
+      NotChanged: Hasło nie zostało zmienione
     PasswordComplexityPolicy:
       NotFound: Polityka hasła nie znaleziona
       MinLength: Hasło jest zbyt krótkie

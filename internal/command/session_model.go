@@ -1,15 +1,12 @@
 package command
 
 import (
-	"bytes"
-	"context"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/session"
-	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 )
 
 type PasskeyChallengeModel struct {
@@ -48,7 +45,6 @@ type SessionWriteModel struct {
 
 	PasskeyChallenge *PasskeyChallengeModel
 
-	commands  []eventstore.Command
 	aggregate *eventstore.Aggregate
 }
 
@@ -149,64 +145,4 @@ func (wm *SessionWriteModel) reduceTokenSet(e *session.TokenSetEvent) {
 
 func (wm *SessionWriteModel) reduceTerminate() {
 	wm.State = domain.SessionStateTerminated
-}
-
-func (wm *SessionWriteModel) Start(ctx context.Context, domain string) {
-	wm.commands = append(wm.commands, session.NewAddedEvent(ctx, wm.aggregate, domain))
-	// set the domain so checks can use it
-	wm.Domain = domain
-}
-
-func (wm *SessionWriteModel) UserChecked(ctx context.Context, userID string, checkedAt time.Time) error {
-	wm.commands = append(wm.commands, session.NewUserCheckedEvent(ctx, wm.aggregate, userID, checkedAt))
-	// set the userID so other checks can use it
-	wm.UserID = userID
-	return nil
-}
-
-func (wm *SessionWriteModel) PasswordChecked(ctx context.Context, checkedAt time.Time) {
-	wm.commands = append(wm.commands, session.NewPasswordCheckedEvent(ctx, wm.aggregate, checkedAt))
-}
-
-func (wm *SessionWriteModel) IntentChecked(ctx context.Context, checkedAt time.Time) {
-	wm.commands = append(wm.commands, session.NewIntentCheckedEvent(ctx, wm.aggregate, checkedAt))
-}
-
-func (wm *SessionWriteModel) PasskeyChallenged(ctx context.Context, challenge string, allowedCrentialIDs [][]byte, userVerification domain.UserVerificationRequirement) {
-	wm.commands = append(wm.commands, session.NewPasskeyChallengedEvent(ctx, wm.aggregate, challenge, allowedCrentialIDs, userVerification))
-}
-
-func (wm *SessionWriteModel) PasskeyChecked(ctx context.Context, checkedAt time.Time, tokenID string, signCount uint32) {
-	wm.commands = append(wm.commands,
-		session.NewPasskeyCheckedEvent(ctx, wm.aggregate, checkedAt),
-		usr_repo.NewHumanPasswordlessSignCountChangedEvent(ctx, wm.aggregate, tokenID, signCount),
-	)
-}
-
-func (wm *SessionWriteModel) SetToken(ctx context.Context, tokenID string) {
-	wm.commands = append(wm.commands, session.NewTokenSetEvent(ctx, wm.aggregate, tokenID))
-}
-
-func (wm *SessionWriteModel) ChangeMetadata(ctx context.Context, metadata map[string][]byte) {
-	var changed bool
-	for key, value := range metadata {
-		currentValue, exists := wm.Metadata[key]
-
-		if len(value) != 0 {
-			// if a value is provided, and it's not equal, change it
-			if !bytes.Equal(currentValue, value) {
-				wm.Metadata[key] = value
-				changed = true
-			}
-		} else {
-			// if there's no / an empty value, we only need to remove it on existing entries
-			if exists {
-				delete(wm.Metadata, key)
-				changed = true
-			}
-		}
-	}
-	if changed {
-		wm.commands = append(wm.commands, session.NewMetadataSetEvent(ctx, wm.aggregate, wm.Metadata))
-	}
 }

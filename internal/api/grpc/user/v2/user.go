@@ -48,7 +48,7 @@ func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 			return nil, err
 		}
 	}
-	bcryptedPassword, err := hashedPasswordToCommand(req.GetHashedPassword())
+	encodedPasswordHash, err := hashedPasswordToCommand(req.GetHashedPassword())
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 		Gender:                 genderToDomain(req.GetProfile().GetGender()),
 		Phone:                  command.Phone{}, // TODO: add as soon as possible
 		Password:               req.GetPassword().GetPassword(),
-		BcryptedPassword:       bcryptedPassword,
+		EncodedPasswordHash:    encodedPasswordHash,
 		PasswordChangeRequired: passwordChangeRequired,
 		Passwordless:           false,
 		Register:               false,
