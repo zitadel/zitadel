@@ -9,8 +9,11 @@ You can migrate from a generic OIDC provider to the following supported template
 - AzureAD
 - Google
 
-To migrate you only have to use the [Migrate Generic OIDC Identity Provider (Instance)](/docs/apis/resources/admin/admin-service-migrate-generic-oidc-provider#migrate-generic-oidc-identity-provider) or [Migrate Generic OIDC Identity Provider (Organization)](/docs/apis/resources/mgmt/management-service-migrate-generic-oidc-provider#migrate-generic-oidc-identity-provider) call,
-which only changes the type of the provider and doesn't delete the already linked user to the provider.
+To migrate, you either use the [Migrate Generic OIDC Identity Provider (Instance)](/docs/apis/resources/admin/admin-service-migrate-generic-oidc-provider#migrate-generic-oidc-identity-provider) or [Migrate Generic OIDC Identity Provider (Organization)](/docs/apis/resources/mgmt/management-service-migrate-generic-oidc-provider#migrate-generic-oidc-identity-provider) API request.
+These calls change the type of the provider and don't delete any linked users. 
+
+:::note Linked users will not notice the change and be able to login as usual.
+:::
 
 ### Google Configuration
 
@@ -21,12 +24,13 @@ The available configuration is described in [Google Configuration](./google).
 The available configuration is described in [AzureAD Configuration](./azure-ad).
 
 ## Migrate with Terraform
-
-To migrate to a specific provider there are only a couple steps:
+Please note that you only have to perform this migration if you already have an existing IDP with linked users, that should not loose the connection to the provider.
+If that isn't you case please just add a new provider from scratch. 
+To migrate to a specific provider, you need to follow a few essential steps:
 - Have an already existing IDP, which has to be migrated as to not lose the existing links of users to users of the external IDP
-- Create a desired IDP as Terraform resource for example [Google](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs/resources/idp_google).
-- Make the corresponding API call to [migrate the IDP](./migrate#google-configuration), save the ID of the IDP for the import
-- Before applying the Terraform resources again, import the new IDP resource.
+1. Create a desired IDP as Terraform resource for example [Google](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs/resources/idp_google).
+2. Make the corresponding API call to [migrate the IDP](./migrate#google-configuration), save the ID of the IDP for the import
+3. Before applying the Terraform resources again, import the new IDP resource.
 ```bash
 #resource "zitadel_idp_google" "google" {
 #  name                = "Google"
@@ -41,5 +45,4 @@ To migrate to a specific provider there are only a couple steps:
 
 # terraform import zitadel_idp_google.*resource_name* *id*:*client_secret*
 terraform import zitadel_idp_google.google 222302827723096428:GOCSPX-*****
-```
-- Then you can also apply the resource again, and there should be no changes and the IDP can again be maintained with Terraform
+You have now migrated your provider and you should be able to apply the resource again. There should be no changes and the IDP is maintained by Terraform again.
