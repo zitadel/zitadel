@@ -83,6 +83,10 @@ func (wm *OIDCSessionWriteModel) reduceAdded(e *oidcsession.AddedEvent) {
 	wm.AuthMethodsReferences = e.AuthMethodsReferences
 	wm.AuthTime = e.AuthTime
 	wm.State = domain.OIDCSessionStateActive
+	if wm.ResourceOwner == "" {
+		wm.ResourceOwner = e.Aggregate().ResourceOwner
+		wm.aggregate = &oidcsession.NewAggregate(wm.AggregateID, e.Aggregate().ResourceOwner).Aggregate
+	}
 }
 
 func (wm *OIDCSessionWriteModel) reduceAccessTokenAdded(e *oidcsession.AccessTokenAddedEvent) {

@@ -78,15 +78,27 @@ func (wm *OIDCSessionAccessTokenReadModel) reduceAccessTokenAdded(e *oidcsession
 	wm.AccessTokenExpiration = e.CreationDate().Add(e.Lifetime)
 }
 
-func (q *Queries) GetAccessToken(ctx context.Context, token string) (model *OIDCSessionAccessTokenReadModel, err error) {
+// ActiveAccessTokenByToken will check if the token is active by retrieving the OIDCSession events from the eventstore.
+// refreshed or expired tokens will return an error
+func (q *Queries) ActiveAccessTokenByToken(ctx context.Context, token string) (model *OIDCSessionAccessTokenReadModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	split := strings.Split(token, "-")
 	if len(split) != 2 {
 		return nil, caos_errs.ThrowPermissionDenied(nil, "QUERY-SAhtk", "Errors.OIDCSession.Token.Invalid")
 	}
-	return q.GetAccessTokenByOIDCSessionAndTokenID(ctx, split[0], split[1])
+	model, err = q.accessTokenByOIDCSessionAndTokenID(ctx, split[0], split[1])
+	if err != nil {
+		return nil, err
+	}
+	if !model.AccessTokenExpiration.After(time.Now()) {
+		return nil, caos_errs.ThrowPermissionDenied(nil, "QUERY-SAF3rf", "Errors.OIDCSession.Token.Expired")
+	}
+	return
 }
 
-func (q *Queries) GetAccessTokenByOIDCSessionAndTokenID(ctx context.Context, oidcSessionID, tokenID string) (model *OIDCSessionAccessTokenReadModel, err error) {
+func (q *Queries) accessTokenByOIDCSessionAndTokenID(ctx context.Context, oidcSessionID, tokenID string) (model *OIDCSessionAccessTokenReadModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

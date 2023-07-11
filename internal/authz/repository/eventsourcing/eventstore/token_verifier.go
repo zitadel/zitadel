@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/view"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
@@ -92,6 +93,14 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	if !ok {
 		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-Reb32", "invalid token")
 	}
+	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
+		userID, clientID, resourceOwner, err = repo.verifyAccessTokenV2(ctx, tokenID, verifierClientID, projectID)
+		return
+	}
+	if sessionID, ok := strings.CutPrefix(tokenID, authz.SessionTokenPrefix); ok {
+		userID, clientID, resourceOwner, err = repo.verifySessionToken(ctx, sessionID, tokenString)
+		return
+	}
 	_, tokenSpan := tracing.NewNamedSpan(ctx, "token")
 	token, err := repo.tokenByID(ctx, tokenID, subject)
 	tokenSpan.EndWithError(err)
@@ -110,6 +119,33 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 		}
 	}
 	return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-Zxfako", "invalid audience")
+}
+
+func (repo *TokenVerifierRepo) verifyAccessTokenV2(ctx context.Context, token, verifierClientID, projectID string) (userID, clientID, resourceOwner string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	activeToken, err := repo.Query.ActiveAccessTokenByToken(ctx, token)
+	if err != nil {
+		return "", "", "", err
+	}
+	for _, aud := range activeToken.Audience {
+		if verifierClientID == aud || projectID == aud {
+			return activeToken.UserID, activeToken.ClientID, activeToken.ResourceOwner, nil
+		}
+	}
+	return "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-Zxfako", "invalid audience")
+}
+
+func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID, token string) (userID, clientID, resourceOwner string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	activeToken, err := repo.Query.SessionByID(ctx, true, sessionID, token)
+	if err != nil {
+		return "", "", "", err
+	}
+	return activeToken.UserFactor.UserID, "", activeToken.UserFactor.ResourceOwner, nil
 }
 
 func (repo *TokenVerifierRepo) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error) {

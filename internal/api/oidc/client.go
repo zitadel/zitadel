@@ -123,7 +123,7 @@ func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo *oidc.Use
 	defer func() { span.EndWithError(err) }()
 
 	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
-		token, err := o.query.GetAccessToken(ctx, tokenID)
+		token, err := o.query.ActiveAccessTokenByToken(ctx, tokenID)
 		if err != nil {
 			return err
 		}
@@ -168,7 +168,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 	defer func() { span.EndWithError(err) }()
 
 	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
-		token, err := o.query.GetAccessToken(ctx, tokenID)
+		token, err := o.query.ActiveAccessTokenByToken(ctx, tokenID)
 		if err != nil {
 			return err
 		}
