@@ -1,9 +1,6 @@
 name: ZITADEL CI/CD
 
-on:
-  pull_request:
-  merge_group:
-  workflow_dispatch:
+on: [pull_request, merge_group, workflow_dispatch]
 
 permissions:
   contents: write
