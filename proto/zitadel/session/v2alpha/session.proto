@@ -74,6 +74,11 @@ message UserFactor {
       description: "\"display name of the checked user\"";
     }
   ];
+  string resource_owner = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"resource owner of the checked user\"";
+    }
+  ];
 }
 
 message PasswordFactor {
