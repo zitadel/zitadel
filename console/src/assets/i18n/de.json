@@ -1040,7 +1040,8 @@
       "ja": "日本語",
       "pl": "Polski",
       "zh": "简体中文",
-      "bg": "Български"
+      "bg": "Български",
+      "mk": "Македонски"
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -1240,7 +1241,8 @@
         "ja": "日本語",
         "pl": "Polski",
         "zh": "简体中文",
-        "bg": "Български"
+        "bg": "Български",
+        "mk": "Македонски"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -2111,7 +2113,8 @@
     "ja": "日本語",
     "pl": "Polski",
     "zh": "简体中文",
-    "bg": "Български"
+    "bg": "Български",
+    "mk": "Македонски"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",
