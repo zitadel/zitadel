@@ -139,7 +139,8 @@ func (wm *HumanPasswordReadModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserV1PasswordCodeAddedType,
 			user.UserV1EmailVerifiedType,
 			user.UserV1PasswordCheckFailedType,
-			user.UserV1PasswordCheckSucceededType).
+			user.UserV1PasswordCheckSucceededType,
+			user.UserV1PasswordHashUpdatedType).
 		Builder()
 
 	if wm.ResourceOwner != "" {

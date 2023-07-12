@@ -285,6 +285,10 @@ func (e *HumanPasswordHashUpdatedEvent) UniqueConstraints() []*eventstore.EventU
 	return nil
 }
 
+func (e *HumanPasswordHashUpdatedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
 func NewHumanPasswordHashUpdatedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
