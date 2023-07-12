@@ -20,7 +20,7 @@ type OIDCSessionAccessTokenReadModel struct {
 	ClientID              string
 	Audience              []string
 	Scope                 []string
-	AuthMethodsReferences []string
+	AuthMethods           []domain.UserAuthMethodType
 	AuthTime              time.Time
 	State                 domain.OIDCSessionState
 	AccessTokenID         string
@@ -67,7 +67,7 @@ func (wm *OIDCSessionAccessTokenReadModel) reduceAdded(e *oidcsession.AddedEvent
 	wm.ClientID = e.ClientID
 	wm.Audience = e.Audience
 	wm.Scope = e.Scope
-	wm.AuthMethodsReferences = e.AuthMethodsReferences
+	//wm.AuthMethods = e.AuthMethods
 	wm.AuthTime = e.AuthTime
 	wm.State = domain.OIDCSessionStateActive
 }
