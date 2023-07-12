@@ -25,7 +25,7 @@ The available configuration is described in [AzureAD Configuration](./azure-ad).
 
 ## Migrate with Terraform
 Please note that you only have to perform this migration if you already have an existing IDP with linked users, that should not loose the connection to the provider.
-If that isn't you case please just add a new provider from scratch. 
+If that isn't your case please just add a new provider from scratch. 
 To migrate to a specific provider, you need to follow a few essential steps:
 1. Create a desired IDP as Terraform resource for example [Google](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs/resources/idp_google).
 2. Make the corresponding API call to [migrate the IDP](./migrate#google-configuration), save the ID of the IDP for the import
