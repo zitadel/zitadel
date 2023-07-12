@@ -15,11 +15,13 @@ require (
 	github.com/benbjohnson/clock v1.3.0
 	github.com/boombuler/barcode v1.0.1
 	github.com/cockroachdb/cockroach-go/v2 v2.3.3
+	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/descope/virtualwebauthn v1.0.2
 	github.com/dop251/goja v0.0.0-20230402114112-623f9dda9079
 	github.com/dop251/goja_nodejs v0.0.0-20230322100729-2550c7b6c124
 	github.com/drone/envsubst v1.0.3
 	github.com/envoyproxy/protoc-gen-validate v0.10.1
+	github.com/fatih/color v1.13.0
 	github.com/go-ldap/ldap/v3 v3.4.4
 	github.com/go-webauthn/webauthn v0.8.2
 	github.com/golang/glog v1.1.1
@@ -87,8 +89,6 @@ require (
 
 require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.37.0 // indirect
-	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
-	github.com/fatih/color v1.15.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
@@ -97,7 +97,7 @@ require (
 	github.com/google/pprof v0.0.0-20230323073829-e72429f035bd // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
-	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
 	github.com/smartystreets/assertions v1.0.0 // indirect
