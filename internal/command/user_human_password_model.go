@@ -37,11 +37,11 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
-			wm.EncodedHash = secretOrEncodedHash(e.Secret, e.EncodedHash)
+			wm.EncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			wm.SecretChangeRequired = e.ChangeRequired
 			wm.UserState = domain.UserStateActive
 		case *user.HumanRegisteredEvent:
-			wm.EncodedHash = secretOrEncodedHash(e.Secret, e.EncodedHash)
+			wm.EncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			wm.SecretChangeRequired = e.ChangeRequired
 			wm.UserState = domain.UserStateActive
 		case *user.HumanInitialCodeAddedEvent:
@@ -49,7 +49,7 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 		case *user.HumanInitializedCheckSucceededEvent:
 			wm.UserState = domain.UserStateActive
 		case *user.HumanPasswordChangedEvent:
-			wm.EncodedHash = secretOrEncodedHash(e.Secret, e.EncodedHash)
+			wm.EncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			wm.SecretChangeRequired = e.ChangeRequired
 			wm.Code = nil
 			wm.PasswordCheckFailedCount = 0
@@ -74,15 +74,6 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 		}
 	}
 	return wm.WriteModel.Reduce()
-}
-
-// secretOrEncodedHash returns the legacy *crypto.CryptoValue if it is not nil.
-// orherwise it will returns the encoded hash string.
-func secretOrEncodedHash(secret *crypto.CryptoValue, encoded string) string {
-	if secret != nil {
-		return string(secret.Crypted)
-	}
-	return encoded
 }
 
 func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {

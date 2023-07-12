@@ -121,8 +121,8 @@ func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human 
 		human.Password.ChangeRequired = req.PasswordChangeRequired
 	}
 
-	if req.HashedPassword != nil && req.HashedPassword.Value != "" && req.HashedPassword.Algorithm != "" {
-		human.HashedPassword = domain.NewHashedPassword(req.HashedPassword.Value, req.HashedPassword.Algorithm)
+	if req.HashedPassword != nil && req.HashedPassword.Value != "" {
+		human.HashedPassword = domain.NewHashedPassword(req.HashedPassword.Value)
 	}
 	links = make([]*domain.UserIDPLink, len(req.Idps))
 	for i, idp := range req.Idps {

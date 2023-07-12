@@ -303,3 +303,12 @@ func NewHumanPasswordHashUpdatedEvent(
 		EncodedHash: encoded,
 	}
 }
+
+// SecretOrEncodedHash returns the legacy *crypto.CryptoValue if it is not nil.
+// orherwise it will returns the encoded hash string.
+func SecretOrEncodedHash(secret *crypto.CryptoValue, encoded string) string {
+	if secret != nil {
+		return string(secret.Crypted)
+	}
+	return encoded
+}

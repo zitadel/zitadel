@@ -11,7 +11,7 @@ type HashedPassword struct {
 	EncodedSecret string
 }
 
-func NewHashedPassword(password, algorithm string) *HashedPassword {
+func NewHashedPassword(password string) *HashedPassword {
 	return &HashedPassword{
 		SecretString:  password,
 		EncodedSecret: password,
