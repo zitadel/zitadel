@@ -52,24 +52,6 @@ type SessionWriteModel struct {
 	aggregate *eventstore.Aggregate
 }
 
-func (wm *SessionWriteModel) IsPasswordChecked() bool {
-	return !wm.PasswordCheckedAt.IsZero()
-}
-
-func (wm *SessionWriteModel) IsPasskeyChecked() bool {
-	return !wm.PasskeyCheckedAt.IsZero()
-}
-
-func (wm *SessionWriteModel) IsU2FChecked() bool {
-	// TODO: implement with https://github.com/zitadel/zitadel/issues/5477
-	return false
-}
-
-func (wm *SessionWriteModel) IsOTPChecked() bool {
-	// TODO: implement with https://github.com/zitadel/zitadel/issues/5477
-	return false
-}
-
 func NewSessionWriteModel(sessionID string, resourceOwner string) *SessionWriteModel {
 	return &SessionWriteModel{
 		WriteModel: eventstore.WriteModel{
@@ -243,4 +225,26 @@ func (wm *SessionWriteModel) AuthenticationTime() time.Time {
 		}
 	}
 	return authTime
+}
+
+// AuthMethodTypes returns a list of UserAuthMethodTypes based on succeeded checks
+func (wm *SessionWriteModel) AuthMethodTypes() []domain.UserAuthMethodType {
+	types := make([]domain.UserAuthMethodType, 0, domain.UserAuthMethodTypeIDP)
+	if !wm.PasswordCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypePassword)
+	}
+	if !wm.PasskeyCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypePasswordless)
+	}
+	if !wm.IntentCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypeIDP)
+	}
+	// TODO: add checks with https://github.com/zitadel/zitadel/issues/5477
+	//if !wm.TOTPCheckedAt.IsZero() {
+	//	types = append(types, domain.UserAuthMethodTypeOTP)
+	//}
+	//if !wm.U2FCheckedAt.IsZero() {
+	//	types = append(types, domain.UserAuthMethodTypeU2F)
+	//}
+	return types
 }

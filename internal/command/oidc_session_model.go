@@ -17,7 +17,7 @@ type OIDCSessionWriteModel struct {
 	ClientID                   string
 	Audience                   []string
 	Scope                      []string
-	AuthMethodsReferences      []string
+	AuthMethods                []domain.UserAuthMethodType
 	AuthTime                   time.Time
 	State                      domain.OIDCSessionState
 	AccessTokenExpiration      time.Time
@@ -79,7 +79,7 @@ func (wm *OIDCSessionWriteModel) reduceAdded(e *oidcsession.AddedEvent) {
 	wm.ClientID = e.ClientID
 	wm.Audience = e.Audience
 	wm.Scope = e.Scope
-	wm.AuthMethodsReferences = e.AuthMethodsReferences
+	wm.AuthMethods = e.AuthMethods
 	wm.AuthTime = e.AuthTime
 	wm.State = domain.OIDCSessionStateActive
 }
