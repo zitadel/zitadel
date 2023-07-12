@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/zitadel/passwap"
-	"github.com/zitadel/passwap/bcrypt"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
@@ -108,7 +107,6 @@ func StartCommands(
 		smtpEncryption:        smtpEncryption,
 		smsEncryption:         smsEncryption,
 		userEncryption:        userEncryption,
-		userPasswordHasher:    passwap.NewSwapper(bcrypt.New(defaults.SecretGenerators.PasswordSaltCost)),
 		domainVerificationAlg: domainVerificationEncryption,
 		keyAlgorithm:          oidcEncryption,
 		certificateAlgorithm:  samlEncryption,
@@ -133,6 +131,10 @@ func StartCommands(
 	milestone.RegisterEventMappers(repo.eventstore)
 
 	repo.codeAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
+	repo.userPasswordHasher, err = defaults.PasswordHasher.BuildSwapper()
+	if err != nil {
+		return nil, err
+	}
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
 	repo.applicationKeySize = int(defaults.SecretGenerators.ApplicationKeySize)
 
