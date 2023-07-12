@@ -12,7 +12,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/api/oidc/amr"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/user/model"
@@ -34,10 +33,10 @@ func (a *AuthRequest) GetACR() string {
 func (a *AuthRequest) GetAMR() []string {
 	list := make([]string, 0)
 	if a.PasswordVerified {
-		list = append(list, amr.Password, amr.PWD)
+		list = append(list, Password, PWD)
 	}
 	if len(a.MFAsVerified) > 0 {
-		list = append(list, amr.MFA)
+		list = append(list, MFA)
 		for _, mfa := range a.MFAsVerified {
 			if amrMFA := AMRFromMFAType(mfa); amrMFA != "" {
 				list = append(list, amrMFA)
@@ -263,10 +262,10 @@ func CodeChallengeToOIDC(challenge *domain.OIDCCodeChallenge) *oidc.CodeChalleng
 func AMRFromMFAType(mfaType domain.MFAType) string {
 	switch mfaType {
 	case domain.MFATypeOTP:
-		return amr.OTP
+		return OTP
 	case domain.MFATypeU2F,
 		domain.MFATypeU2FUserVerification:
-		return amr.UserPresence
+		return UserPresence
 	default:
 		return ""
 	}

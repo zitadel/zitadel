@@ -1,14 +1,16 @@
-package amr
+package oidc
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 func TestAMR(t *testing.T) {
 	type args struct {
-		model AuthenticationMethodReference
+		methodTypes []domain.UserAuthMethodType
 	}
 	tests := []struct {
 		name string
@@ -18,76 +20,50 @@ func TestAMR(t *testing.T) {
 		{
 			"no checks, empty",
 			args{
-				new(test),
+				nil,
 			},
 			[]string{},
 		},
 		{
 			"pw checked",
 			args{
-				&test{pwChecked: true},
+				[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 			},
 			[]string{PWD},
 		},
 		{
 			"passkey checked",
 			args{
-				&test{passkeyChecked: true},
+				[]domain.UserAuthMethodType{domain.UserAuthMethodTypePasswordless},
 			},
 			[]string{UserPresence, MFA},
 		},
 		{
 			"u2f checked",
 			args{
-				&test{u2fChecked: true},
+				[]domain.UserAuthMethodType{domain.UserAuthMethodTypeU2F},
 			},
 			[]string{UserPresence},
 		},
 		{
 			"otp checked",
 			args{
-				&test{otpChecked: true},
+				[]domain.UserAuthMethodType{domain.UserAuthMethodTypeOTP},
 			},
 			[]string{OTP},
 		},
 		{
 			"multiple checked",
 			args{
-				&test{
-					pwChecked:  true,
-					u2fChecked: true,
-				},
+				[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword, domain.UserAuthMethodTypeU2F},
 			},
 			[]string{PWD, UserPresence, MFA},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := List(tt.args.model)
+			got := AuthMethodTypesToAMR(tt.args.methodTypes)
 			assert.Equal(t, tt.want, got)
 		})
 	}
-}
-
-type test struct {
-	pwChecked      bool
-	passkeyChecked bool
-	u2fChecked     bool
-	otpChecked     bool
-}
-
-func (t test) IsPasswordChecked() bool {
-	return t.pwChecked
-}
-
-func (t test) IsPasskeyChecked() bool {
-	return t.passkeyChecked
-}
-
-func (t test) IsU2FChecked() bool {
-	return t.u2fChecked
-}
-
-func (t test) IsOTPChecked() bool {
-	return t.otpChecked
 }

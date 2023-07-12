@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/oidc/amr"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -216,7 +215,7 @@ func (c *OIDCSessionEvents) AddSession(ctx context.Context) {
 		c.authRequestWriteModel.ClientID,
 		c.authRequestWriteModel.Audience,
 		c.authRequestWriteModel.Scope,
-		amr.List(c.sessionWriteModel),
+		c.sessionWriteModel.AuthMethodTypes(),
 		c.sessionWriteModel.AuthenticationTime(),
 	))
 }
