@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -21,13 +22,13 @@ const (
 type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID                string    `json:"userID"`
-	SessionID             string    `json:"sessionID"`
-	ClientID              string    `json:"clientID"`
-	Audience              []string  `json:"audience"`
-	Scope                 []string  `json:"scope"`
-	AuthMethodsReferences []string  `json:"authMethodsReferences"`
-	AuthTime              time.Time `json:"authTime"`
+	UserID      string                      `json:"userID"`
+	SessionID   string                      `json:"sessionID"`
+	ClientID    string                      `json:"clientID"`
+	Audience    []string                    `json:"audience"`
+	Scope       []string                    `json:"scope"`
+	AuthMethods []domain.UserAuthMethodType `json:"authMethods"`
+	AuthTime    time.Time                   `json:"authTime"`
 }
 
 func (e *AddedEvent) Data() interface{} {
@@ -45,7 +46,7 @@ func NewAddedEvent(ctx context.Context,
 	clientID string,
 	audience,
 	scope []string,
-	authMethodsReferences []string,
+	authMethods []domain.UserAuthMethodType,
 	authTime time.Time,
 ) *AddedEvent {
 	return &AddedEvent{
@@ -54,13 +55,13 @@ func NewAddedEvent(ctx context.Context,
 			aggregate,
 			AddedType,
 		),
-		UserID:                userID,
-		SessionID:             sessionID,
-		ClientID:              clientID,
-		Audience:              audience,
-		Scope:                 scope,
-		AuthMethodsReferences: authMethodsReferences,
-		AuthTime:              authTime,
+		UserID:      userID,
+		SessionID:   sessionID,
+		ClientID:    clientID,
+		Audience:    audience,
+		Scope:       scope,
+		AuthMethods: authMethods,
+		AuthTime:    authTime,
 	}
 }
 
