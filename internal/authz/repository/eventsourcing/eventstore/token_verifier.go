@@ -30,7 +30,6 @@ import (
 
 type TokenVerifierRepo struct {
 	TokenVerificationKey crypto.EncryptionAlgorithm
-	IAMID                string
 	Eventstore           v1.Eventstore
 	View                 *view.View
 	Query                *query.Queries
@@ -138,7 +137,7 @@ func (repo *TokenVerifierRepo) verifyAccessTokenV2(ctx context.Context, token, v
 	if err = verifyAudience(activeToken.Audience, verifierClientID, projectID); err != nil {
 		return "", "", "", err
 	}
-	if err = repo.checkAuthentication(ctx, activeToken.AuthMethods, activeToken.UserID, activeToken.ResourceOwner); err != nil {
+	if err = repo.checkAuthentication(ctx, activeToken.AuthMethods, activeToken.UserID); err != nil {
 		return "", "", "", err
 	}
 	return activeToken.UserID, activeToken.ClientID, activeToken.ResourceOwner, nil
@@ -148,14 +147,33 @@ func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	session, err := repo.Query.SessionByID(ctx, true, sessionID, token)
+	session, err := repo.Query.SessionByID(ctx, false, sessionID, token)
 	if err != nil {
 		return "", "", "", err
 	}
-	if err = repo.checkAuthentication(ctx, authMethodsFromSession(session), session.UserFactor.UserID, session.UserFactor.ResourceOwner); err != nil {
+	if err = repo.checkAuthentication(ctx, authMethodsFromSession(session), session.UserFactor.UserID); err != nil {
 		return "", "", "", err
 	}
 	return session.UserFactor.UserID, "", session.UserFactor.ResourceOwner, nil
+}
+
+// checkAuthentication ensures the session or token was authenticated (at least a single [domain.UserAuthMethodType]).
+// It will also check if there was a multi factor authentication, if either MFA is forced by the login policy or if the user has set up any
+func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMethods []domain.UserAuthMethodType, userID string) error {
+	if len(authMethods) == 0 {
+		return caos_errs.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "authentication required")
+	}
+	if domain.HasMFA(authMethods) {
+		return nil
+	}
+	availableAuthMethods, forceMFA, err := repo.Query.ListUserAuthMethodTypesRequired(setCallerCtx(ctx, userID), userID, false)
+	if err != nil {
+		return err
+	}
+	if forceMFA || domain.HasMFA(availableAuthMethods) {
+		return caos_errs.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "mfa required")
+	}
+	return nil
 }
 
 func authMethodsFromSession(session *query.Session) []domain.UserAuthMethodType {
@@ -181,31 +199,10 @@ func authMethodsFromSession(session *query.Session) []domain.UserAuthMethodType 
 	return types
 }
 
-func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMethods []domain.UserAuthMethodType, userID, resourceOwner string) error {
-	if len(authMethods) == 0 {
-		return caos_errs.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "authentication required")
-	}
-	if domain.HasMFA(authMethods) {
-		return nil
-	}
-	loginPolicy, err := repo.Query.LoginPolicyByID(ctx, false, resourceOwner, false)
-	if err != nil {
-		return err
-	}
-	if loginPolicy.ForceMFA {
-		return caos_errs.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "mfa required")
-	}
+func setCallerCtx(ctx context.Context, userID string) context.Context {
 	ctxData := authz.GetCtxData(ctx)
 	ctxData.UserID = userID
-	ctx = authz.SetCtxData(ctx, ctxData)
-	availableAuthMethods, err := repo.Query.ListActiveUserAuthMethodTypes(ctx, userID, false)
-	if err != nil {
-		return err
-	}
-	if !domain.HasMFA(availableAuthMethods.AuthMethodTypes) {
-		return nil
-	}
-	return caos_errs.ThrowPermissionDenied(nil, "AUTHZ-FNEg0", "mfa required")
+	return authz.SetCtxData(ctx, ctxData)
 }
 
 func (repo *TokenVerifierRepo) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error) {
