@@ -1040,7 +1040,8 @@
       "ja": "日本語",
       "pl": "Polski",
       "zh": "简体中文",
-      "bg": "Български"
+      "bg": "Български",
+      "mk": "Македонски"
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -1240,7 +1241,8 @@
         "ja": "日本語",
         "pl": "Polski",
         "zh": "简体中文",
-        "bg": "Български"
+        "bg": "Български",
+        "mk": "Македонски"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1784,6 +1786,8 @@
     "DELETE": "Löschen",
     "DELETE_TITLE": "IDP löschen",
     "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identitätsanbieter zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
+    "REMOVE_WARN_TITLE": "IDP entfernen?",
+    "REMOVE_WARN_DESCRIPTION": "Sie sind dabei, einen Identitätsanbieter zu entfernen. Dadurch wird die Auswahl des verfügbaren IDP für Ihre Benutzer entfernt und bereits registrierte Benutzer können sich nicht erneut anmelden. Wollen Sie wirklich fortfahren?",
     "DELETE_SELECTION_TITLE": "Identitätsanbieter löschen",
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identitätsanbieter zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
     "EMPTY": "Kein IDP vorhanden",
@@ -2109,7 +2113,8 @@
     "ja": "日本語",
     "pl": "Polski",
     "zh": "简体中文",
-    "bg": "Български"
+    "bg": "Български",
+    "mk": "Македонски"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

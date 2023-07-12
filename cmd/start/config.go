@@ -25,6 +25,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
@@ -65,6 +66,7 @@ type Config struct {
 	Eventstore        *eventstore.Config
 	LogStore          *logstore.Configs
 	Quotas            *QuotasConfig
+	Telemetry         *handlers.TelemetryPusherConfig
 }
 
 type QuotasConfig struct {

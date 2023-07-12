@@ -1040,7 +1040,8 @@
       "ja": "日本語",
       "pl": "Polski",
       "zh": "简体中文",
-      "bg": "Български"
+      "bg": "Български",
+      "mk": "Македонски"
     },
     "SMTP": {
       "TITLE": "Paramètres SMTP",
@@ -1240,7 +1241,8 @@
         "ja": "日本語",
         "pl": "Polski",
         "zh": "简体中文",
-        "bg": "Български"
+        "bg": "Български",
+        "mk": "Македонски"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'email effectuée",
@@ -1788,6 +1790,8 @@
     "DELETE": "Supprimer",
     "DELETE_TITLE": "Supprimer Idp",
     "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer un fournisseur d'identité. Les changements qui en résultent sont irrévocables. Voulez-vous vraiment le faire ?",
+    "REMOVE_WARN_TITLE": "Supprimer le fournisseur d'identité",
+    "REMOVE_WARN_DESCRIPTION": "Vous êtes sur le point de supprimer un fournisseur d'identité. Cela supprimera la sélection de l'IDP disponible pour vos utilisateurs et les utilisateurs déjà enregistrés ne pourront plus se reconnecter. Êtes-vous sûr de continuer ?",
     "DELETE_SELECTION_TITLE": "Supprimer Idp",
     "DELETE_SELECTION_DESCRIPTION": "Vous êtes sur le point de supprimer un fournisseur d'identité. Les changements qui en résultent sont irrévocables. Voulez-vous vraiment le faire ?",
     "EMPTY": "Aucun IDP disponible",
@@ -2098,7 +2102,8 @@
     "ja": "日本語",
     "pl": "Polski",
     "zh": "简体中文",
-    "bg": "Български"
+    "bg": "Български",
+    "mk": "Македонски"
   },
   "MEMBER": {
     "ADD": "Ajouter un manager",

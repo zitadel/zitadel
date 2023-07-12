@@ -19,7 +19,9 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
+	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
@@ -29,6 +31,8 @@ type Client struct {
 	Mgmt      mgmt.ManagementServiceClient
 	UserV2    user.UserServiceClient
 	SessionV2 session.SessionServiceClient
+	OIDCv2    oidc_pb.OIDCServiceClient
+	System    system.SystemServiceClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
@@ -38,7 +42,33 @@ func newClient(cc *grpc.ClientConn) Client {
 		Mgmt:      mgmt.NewManagementServiceClient(cc),
 		UserV2:    user.NewUserServiceClient(cc),
 		SessionV2: session.NewSessionServiceClient(cc),
+		OIDCv2:    oidc_pb.NewOIDCServiceClient(cc),
+		System:    system.NewSystemServiceClient(cc),
 	}
+}
+
+func (t *Tester) UseIsolatedInstance(iamOwnerCtx, systemCtx context.Context) (primaryDomain, instanceId string, authenticatedIamOwnerCtx context.Context) {
+	primaryDomain = randString(5) + ".integration"
+	instance, err := t.Client.System.CreateInstance(systemCtx, &system.CreateInstanceRequest{
+		InstanceName: "testinstance",
+		CustomDomain: primaryDomain,
+		Owner: &system.CreateInstanceRequest_Machine_{
+			Machine: &system.CreateInstanceRequest_Machine{
+				UserName:            "owner",
+				Name:                "owner",
+				PersonalAccessToken: &system.CreateInstanceRequest_PersonalAccessToken{},
+			},
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
+	t.createClientConn(iamOwnerCtx, grpc.WithAuthority(primaryDomain))
+	instanceId = instance.GetInstanceId()
+	t.Users.Set(instanceId, IAMOwner, &User{
+		Token: instance.GetPat(),
+	})
+	return primaryDomain, instanceId, t.WithInstanceAuthorization(iamOwnerCtx, IAMOwner, instanceId)
 }
 
 func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse {
@@ -157,4 +187,35 @@ func (s *Tester) CreateSuccessfulIntent(t *testing.T, idpID, userID, idpUserID s
 	token, err := s.Commands.SucceedIDPIntent(ctx, writeModel, idpUser, idpSession, userID)
 	require.NoError(t, err)
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
+}
+
+func (s *Tester) CreatePasskeySession(t *testing.T, ctx context.Context, userID string) (id, token string, start, change time.Time) {
+	createResp, err := s.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{UserId: userID},
+			},
+		},
+		Challenges: []session.ChallengeKind{
+			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
+		},
+		Domain: s.Config.ExternalDomain,
+	})
+	require.NoError(t, err)
+
+	assertion, err := s.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetPasskey().GetPublicKeyCredentialRequestOptions())
+	require.NoError(t, err)
+
+	updateResp, err := s.Client.SessionV2.SetSession(ctx, &session.SetSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: createResp.GetSessionToken(),
+		Checks: &session.Checks{
+			Passkey: &session.CheckPasskey{
+				CredentialAssertionData: assertion,
+			},
+		},
+	})
+	require.NoError(t, err)
+	return createResp.GetSessionId(), updateResp.GetSessionToken(),
+		createResp.GetDetails().GetChangeDate().AsTime(), updateResp.GetDetails().GetChangeDate().AsTime()
 }
