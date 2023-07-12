@@ -34,6 +34,10 @@ func AuthMethodTypesToAMR(methodTypes []domain.UserAuthMethodType) []string {
 			amr = append(amr, UserPresence)
 		case domain.UserAuthMethodTypeOTP:
 			amr = append(amr, OTP)
+		case domain.UserAuthMethodTypeIDP:
+			// no AMR value according to specification
+		case domain.UserAuthMethodTypeUnspecified:
+			// ignore
 		}
 	}
 	if mfa || len(amr) >= 2 {

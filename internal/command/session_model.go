@@ -240,11 +240,13 @@ func (wm *SessionWriteModel) AuthMethodTypes() []domain.UserAuthMethodType {
 		types = append(types, domain.UserAuthMethodTypeIDP)
 	}
 	// TODO: add checks with https://github.com/zitadel/zitadel/issues/5477
-	//if !wm.TOTPCheckedAt.IsZero() {
-	//	types = append(types, domain.UserAuthMethodTypeOTP)
-	//}
-	//if !wm.U2FCheckedAt.IsZero() {
-	//	types = append(types, domain.UserAuthMethodTypeU2F)
-	//}
+	/*
+		if !wm.TOTPCheckedAt.IsZero() {
+			types = append(types, domain.UserAuthMethodTypeOTP)
+		}
+		if !wm.U2FCheckedAt.IsZero() {
+			types = append(types, domain.UserAuthMethodTypeU2F)
+		}
+	*/
 	return types
 }
