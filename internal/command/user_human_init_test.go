@@ -6,9 +6,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/text/language"
-
 	"github.com/zitadel/passwap"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"

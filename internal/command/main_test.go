@@ -8,10 +8,9 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"golang.org/x/text/language"
-
 	"github.com/zitadel/passwap"
 	"github.com/zitadel/passwap/verifier"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"

@@ -4,9 +4,8 @@ import (
 	"context"
 	"strings"
 
-	"golang.org/x/text/language"
-
 	"github.com/zitadel/passwap"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -156,6 +155,7 @@ type humanCreationCommand interface {
 	AddPasswordData(encoded string, changeRequired bool)
 }
 
+//nolint:gocognit
 func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *passwap.Swapper, codeAlg crypto.EncryptionAlgorithm, allowInitMail bool) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if err := human.Validate(); err != nil {
