@@ -533,7 +533,6 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 
 func TestCommandSide_ChangePassword(t *testing.T) {
 	type fields struct {
-		eventstore         *eventstore.Eventstore
 		userPasswordHasher *passwap.Swapper
 	}
 	type args struct {
@@ -552,73 +551,63 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 		name   string
 		fields fields
 		args   args
+		expect []expect
 		res    res
 	}{
 		{
-			name: "userid missing, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
+			name:   "userid missing, invalid argument error",
+			fields: fields{},
 			args: args{
 				ctx:           context.Background(),
 				oldPassword:   "password",
 				newPassword:   "password1",
 				resourceOwner: "org1",
 			},
+			expect: []expect{},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
-			name: "old password missing, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
+			name:   "old password missing, invalid argument error",
+			fields: fields{},
 			args: args{
 				ctx:           context.Background(),
 				userID:        "user1",
 				newPassword:   "password1",
 				resourceOwner: "org1",
 			},
+			expect: []expect{},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
-			name: "new password missing, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
+			name:   "new password missing, invalid argument error",
+			fields: fields{},
 			args: args{
 				ctx:           context.Background(),
 				userID:        "user1",
 				oldPassword:   "password",
 				resourceOwner: "org1",
 			},
+			expect: []expect{},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
-			name: "user not existing, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-				),
-			},
+			name:   "user not existing, precondition error",
+			fields: fields{},
 			args: args{
 				ctx:           context.Background(),
 				userID:        "user1",
 				resourceOwner: "org1",
 				oldPassword:   "password",
 				newPassword:   "password1",
+			},
+			expect: []expect{
+				expectFilter(),
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -627,25 +616,6 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 		{
 			name: "existing password empty, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-					),
-				),
 				userPasswordHasher: mockSwapper("x"),
 			},
 			args: args{
@@ -655,43 +625,31 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				newPassword:   "password1",
 				resourceOwner: "org1",
 			},
+			expect: []expect{
+				expectFilter(
+					eventFromEventPusher(
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.German,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
+						),
+					),
+				),
+			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
 			},
 		},
 		{
-			name: "password not matching, precondition error",
+			name: "password not matching, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-						eventFromEventPusher(
-							user.NewHumanEmailVerifiedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-						eventFromEventPusher(
-							user.NewHumanPasswordChangedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"$plain$x$password",
-								false,
-								"")),
-					),
-				),
 				userPasswordHasher: mockSwapper("x"),
 			},
 			args: args{
@@ -701,6 +659,47 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				newPassword:   "password1",
 				resourceOwner: "org1",
 			},
+			expect: []expect{
+				expectFilter(
+					eventFromEventPusher(
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.German,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$password",
+							false,
+							"")),
+				),
+				expectFilter(
+					eventFromEventPusher(
+						org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							1,
+							false,
+							false,
+							false,
+							false,
+						),
+					),
+				),
+			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
 			},
@@ -708,60 +707,6 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 		{
 			name: "change password, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-						eventFromEventPusher(
-							user.NewHumanEmailVerifiedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-						eventFromEventPusher(
-							user.NewHumanPasswordChangedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"$plain$x$password",
-								false,
-								"")),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								1,
-								false,
-								false,
-								false,
-								false,
-							),
-						),
-					),
-					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPasswordChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"$plain$x$password",
-									false,
-									"",
-								),
-							),
-						},
-					),
-				),
 				userPasswordHasher: mockSwapper("x"),
 			},
 			args: args{
@@ -770,6 +715,59 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				resourceOwner: "org1",
 				oldPassword:   "password",
 				newPassword:   "password1",
+			},
+			expect: []expect{
+				expectFilter(
+					eventFromEventPusher(
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.German,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$password",
+							false,
+							"")),
+				),
+				expectFilter(
+					eventFromEventPusher(
+						org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							1,
+							false,
+							false,
+							false,
+							false,
+						),
+					),
+				),
+				expectPush(
+					[]*repository.Event{
+						eventFromEventPusher(
+							user.NewHumanPasswordChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"$plain$x$password",
+								false,
+								"",
+							),
+						),
+					},
+				),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -781,7 +779,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore,
+				eventstore:         eventstoreExpect(t, tt.expect...),
 				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
 			got, err := r.ChangePassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.oldPassword, tt.args.newPassword, tt.args.agentID)

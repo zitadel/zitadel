@@ -82,7 +82,7 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 	if password != "" {
 		passwordWriteModel := NewHumanPasswordWriteModel(userID, existingCode.ResourceOwner)
 		passwordWriteModel.UserState = domain.UserStateActive
-		passwordCommand, err := c.setPasswordCommand(ctx, passwordWriteModel, password)
+		passwordCommand, err := c.setPasswordCommand(ctx, passwordWriteModel, password, false)
 		if err != nil {
 			return err
 		}

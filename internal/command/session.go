@@ -225,7 +225,7 @@ func (s *SessionCommands) commands(ctx context.Context) (string, []eventstore.Co
 		return "", nil, err
 	}
 	s.SetToken(ctx, tokenID)
-	return token, append(s.eventCommands, s.eventCommands...), nil
+	return token, s.eventCommands, nil
 }
 
 func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, sessionDomain string, metadata map[string][]byte) (set *SessionChanged, err error) {

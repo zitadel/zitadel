@@ -140,7 +140,6 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 
 func TestCommands_CreateSession(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
 		idGenerator  id.Generator
 		tokenCreator func(sessionID string) (string, string, error)
 	}
@@ -158,6 +157,7 @@ func TestCommands_CreateSession(t *testing.T) {
 		name   string
 		fields fields
 		args   args
+		expect []expect
 		res    res
 	}{
 		{
@@ -168,6 +168,7 @@ func TestCommands_CreateSession(t *testing.T) {
 			args{
 				ctx: context.Background(),
 			},
+			[]expect{},
 			res{
 				err: caos_errs.ThrowInternal(nil, "id", "generator failed"),
 			},
@@ -176,12 +177,12 @@ func TestCommands_CreateSession(t *testing.T) {
 			"eventstore failed",
 			fields{
 				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
-				eventstore: eventstoreExpect(t,
-					expectFilterError(caos_errs.ThrowInternal(nil, "id", "filter failed")),
-				),
 			},
 			args{
 				ctx: context.Background(),
+			},
+			[]expect{
+				expectFilterError(caos_errs.ThrowInternal(nil, "id", "filter failed")),
 			},
 			res{
 				err: caos_errs.ThrowInternal(nil, "id", "filter failed"),
@@ -191,17 +192,6 @@ func TestCommands_CreateSession(t *testing.T) {
 			"empty session",
 			fields{
 				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
-				eventstore: eventstoreExpect(t,
-					expectFilter(),
-					expectPush(
-						eventPusherToEvents(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, ""),
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								"tokenID",
-							),
-						),
-					),
-				),
 				tokenCreator: func(sessionID string) (string, string, error) {
 					return "tokenID",
 						"token",
@@ -210,6 +200,17 @@ func TestCommands_CreateSession(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("", "org1", ""),
+			},
+			[]expect{
+				expectFilter(),
+				expectPush(
+					eventPusherToEvents(
+						session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, ""),
+						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							"tokenID",
+						),
+					),
+				),
 			},
 			res{
 				want: &SessionChanged{
@@ -223,17 +224,6 @@ func TestCommands_CreateSession(t *testing.T) {
 			"empty session with domain",
 			fields{
 				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
-				eventstore: eventstoreExpect(t,
-					expectFilter(),
-					expectPush(
-						eventPusherToEvents(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld"),
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								"tokenID",
-							),
-						),
-					),
-				),
 				tokenCreator: func(sessionID string) (string, string, error) {
 					return "tokenID",
 						"token",
@@ -243,6 +233,17 @@ func TestCommands_CreateSession(t *testing.T) {
 			args{
 				ctx:    authz.NewMockContext("", "org1", ""),
 				domain: "domain.tld",
+			},
+			[]expect{
+				expectFilter(),
+				expectPush(
+					eventPusherToEvents(
+						session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld"),
+						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							"tokenID",
+						),
+					),
+				),
 			},
 			res{
 				want: &SessionChanged{
@@ -257,7 +258,7 @@ func TestCommands_CreateSession(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          eventstoreExpect(t, tt.expect...),
 				idGenerator:         tt.fields.idGenerator,
 				sessionTokenCreator: tt.fields.tokenCreator,
 			}

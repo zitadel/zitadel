@@ -30,7 +30,7 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password stri
 	if err = c.checkPermission(ctx, domain.PermissionUserWrite, wm.ResourceOwner, userID); err != nil {
 		return nil, err
 	}
-	return c.setPassword(ctx, wm, password)
+	return c.setPassword(ctx, wm, password, oneTime)
 }
 
 func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID, code, password, userAgentID string) (objectDetails *domain.ObjectDetails, err error) {
@@ -57,11 +57,11 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID,
 		return nil, err
 	}
 
-	return c.setPassword(ctx, wm, password)
+	return c.setPassword(ctx, wm, password, false)
 }
 
-func (c *Commands) setPassword(ctx context.Context, wm *HumanPasswordWriteModel, password string) (objectDetails *domain.ObjectDetails, err error) {
-	command, err := c.setPasswordCommand(ctx, wm, password)
+func (c *Commands) setPassword(ctx context.Context, wm *HumanPasswordWriteModel, password string, changeRequired bool) (objectDetails *domain.ObjectDetails, err error) {
+	command, err := c.setPasswordCommand(ctx, wm, password, changeRequired)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (c *Commands) setPassword(ctx context.Context, wm *HumanPasswordWriteModel,
 	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
 
-func (c *Commands) setPasswordCommand(ctx context.Context, wm *HumanPasswordWriteModel, password string) (_ eventstore.Command, err error) {
+func (c *Commands) setPasswordCommand(ctx context.Context, wm *HumanPasswordWriteModel, password string, changeRequired bool) (_ eventstore.Command, err error) {
 	if err = c.canUpdatePassword(ctx, password, wm); err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func (c *Commands) setPasswordCommand(ctx context.Context, wm *HumanPasswordWrit
 	if err = convertPasswapErr(err); err != nil {
 		return nil, err
 	}
-	return user.NewHumanPasswordChangedEvent(ctx, UserAggregateFromWriteModel(&wm.WriteModel), encoded, false, ""), nil
+	return user.NewHumanPasswordChangedEvent(ctx, UserAggregateFromWriteModel(&wm.WriteModel), encoded, changeRequired, ""), nil
 }
 
 func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword, userAgentID string) (objectDetails *domain.ObjectDetails, err error) {
