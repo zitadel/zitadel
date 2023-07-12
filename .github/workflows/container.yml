@@ -34,7 +34,7 @@ jobs:
         id: debug-meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ inputs.image_name }}
+          images: ${{ inputs.image_name }}-debug
           tags: |
             type=sha,prefix=,suffix=-debug,format=long
       - 
@@ -72,8 +72,9 @@ jobs:
           file: build/Dockerfile
           target: artifact
           platforms: linux/${{ matrix.arch }}
+          push: true
           labels: ${{ steps.debug-meta.outputs.labels }}
-          outputs: type=image,name=${{ inputs.image_name }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ inputs.image_name }}-debug,push-by-digest=true,name-canonical=true,push=true
       - 
         name: Scratch
         id: build-scratch
