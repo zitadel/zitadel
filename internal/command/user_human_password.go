@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"errors"
 
 	"github.com/zitadel/logging"
 	"github.com/zitadel/passwap"
@@ -280,14 +281,14 @@ func (c *Commands) passwordWriteModel(ctx context.Context, userID, resourceOwner
 }
 
 func convertPasswapErr(err error) error {
-	switch err {
-	case nil:
+	if err == nil {
 		return nil
-	case passwap.ErrPasswordMismatch:
-		return caos_errs.ThrowInvalidArgument(err, "COMMAND-3M0fs", "Errors.User.Password.Invalid")
-	case passwap.ErrPasswordNoChange:
-		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-Aesh5", "Errors.User.Password.NotChanged")
-	default:
-		return caos_errs.ThrowInternal(err, "COMMAND-CahN2", "Errors.Internal")
 	}
+	if errors.Is(err, passwap.ErrPasswordMismatch) {
+		return caos_errs.ThrowInvalidArgument(err, "COMMAND-3M0fs", "Errors.User.Password.Invalid")
+	}
+	if errors.Is(err, passwap.ErrPasswordNoChange) {
+		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-Aesh5", "Errors.User.Password.NotChanged")
+	}
+	return caos_errs.ThrowInternal(err, "COMMAND-CahN2", "Errors.Internal")
 }

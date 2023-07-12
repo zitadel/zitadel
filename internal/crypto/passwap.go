@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/passwap/md5"
 	"github.com/zitadel/passwap/scrypt"
 	"github.com/zitadel/passwap/verifier"
+
 	"github.com/zitadel/zitadel/internal/errors"
 )
 
@@ -82,7 +83,9 @@ func (c *HasherConfig) buildHasher() (hasher passwap.Hasher, err error) {
 		// Discuss: the setup commands seems to run without taking defaults.yaml into acount.
 		// That means if the Hasher is not configured in steps, migrations break.
 		// On top of that, such failure seems to corrupt the database in a way
-		// that migrations keep failing untill the database recreated.
+		// that migrations keep failing until the database recreated.
+	case HashNameArgon2, HashNameMd5:
+		fallthrough
 	default:
 		return nil, fmt.Errorf("invalid name %q", c.Algorithm)
 	}

@@ -3,14 +3,13 @@ package command
 import (
 	"context"
 	"errors"
+	"io"
 	"testing"
 	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/zitadel/passwap"
-	"golang.org/x/text/language"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -18,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"golang.org/x/text/language"
 )
 
 func TestCommandSide_SetOneTimePassword(t *testing.T) {
@@ -1577,6 +1577,44 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			if tt.res.err != nil && !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
 			}
+		})
+	}
+}
+
+func Test_convertPasswapErr(t *testing.T) {
+	type args struct {
+		err error
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr error
+	}{
+		{
+			name:    "nil",
+			args:    args{nil},
+			wantErr: nil,
+		},
+		{
+			name:    "mismatch",
+			args:    args{passwap.ErrPasswordMismatch},
+			wantErr: caos_errs.ThrowInvalidArgument(passwap.ErrPasswordMismatch, "COMMAND-3M0fs", "Errors.User.Password.Invalid"),
+		},
+		{
+			name:    "no change",
+			args:    args{passwap.ErrPasswordNoChange},
+			wantErr: caos_errs.ThrowPreconditionFailed(passwap.ErrPasswordNoChange, "COMMAND-Aesh5", "Errors.User.Password.NotChanged"),
+		},
+		{
+			name:    "other",
+			args:    args{io.ErrClosedPipe},
+			wantErr: caos_errs.ThrowInternal(io.ErrClosedPipe, "COMMAND-CahN2", "Errors.Internal"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := convertPasswapErr(tt.args.err)
+			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}
 }
