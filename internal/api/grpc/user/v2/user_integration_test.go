@@ -38,7 +38,7 @@ func TestMain(m *testing.M) {
 		Tester = integration.NewTester(ctx)
 		defer Tester.Done()
 
-		CTX, ErrCTX = Tester.WithSystemAuthorization(ctx, integration.OrgOwner), errCtx
+		CTX, ErrCTX = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
 		Client = Tester.Client.UserV2
 		return m.Run()
 	}())
@@ -454,7 +454,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddIDPLinkRequest{
-					UserId: Tester.Users[integration.OrgOwner].ID,
+					UserId: Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID,
 					IdpLink: &user.IDPLink{
 						IdpId:    "idpID",
 						UserId:   "userID",
@@ -470,7 +470,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddIDPLinkRequest{
-					UserId: Tester.Users[integration.OrgOwner].ID,
+					UserId: Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID,
 					IdpLink: &user.IDPLink{
 						IdpId:    idpID,
 						UserId:   "userID",
@@ -540,7 +540,7 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 					ResourceOwner: Tester.Organisation.ID,
 				},
 				NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{
-					AuthUrl: "https://example.com/oauth/v2/authorize?client_id=clientID&prompt=select_account&redirect_uri=https%3A%2F%2Flocalhost%3A8080%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=",
+					AuthUrl: "https://example.com/oauth/v2/authorize?client_id=clientID&prompt=select_account&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=",
 				},
 			},
 			wantErr: false,

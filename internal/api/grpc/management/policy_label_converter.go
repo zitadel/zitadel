@@ -10,9 +10,11 @@ func AddLabelPolicyToDomain(p *mgmt_pb.AddCustomLabelPolicyRequest) *domain.Labe
 		PrimaryColor:        p.PrimaryColor,
 		BackgroundColor:     p.BackgroundColor,
 		WarnColor:           p.WarnColor,
+		FontColor:           p.FontColor,
 		PrimaryColorDark:    p.PrimaryColorDark,
 		BackgroundColorDark: p.BackgroundColorDark,
 		WarnColorDark:       p.WarnColorDark,
+		FontColorDark:       p.FontColorDark,
 		HideLoginNameSuffix: p.HideLoginNameSuffix,
 		DisableWatermark:    p.DisableWatermark,
 	}

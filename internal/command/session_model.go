@@ -210,3 +210,43 @@ func (wm *SessionWriteModel) ChangeMetadata(ctx context.Context, metadata map[st
 		wm.commands = append(wm.commands, session.NewMetadataSetEvent(ctx, wm.aggregate, wm.Metadata))
 	}
 }
+
+// AuthenticationTime returns the time the user authenticated using the latest time of all checks
+func (wm *SessionWriteModel) AuthenticationTime() time.Time {
+	var authTime time.Time
+	for _, check := range []time.Time{
+		wm.PasswordCheckedAt,
+		wm.PasskeyCheckedAt,
+		wm.IntentCheckedAt,
+		// TODO: add U2F and OTP check https://github.com/zitadel/zitadel/issues/5477
+	} {
+		if check.After(authTime) {
+			authTime = check
+		}
+	}
+	return authTime
+}
+
+// AuthMethodTypes returns a list of UserAuthMethodTypes based on succeeded checks
+func (wm *SessionWriteModel) AuthMethodTypes() []domain.UserAuthMethodType {
+	types := make([]domain.UserAuthMethodType, 0, domain.UserAuthMethodTypeIDP)
+	if !wm.PasswordCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypePassword)
+	}
+	if !wm.PasskeyCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypePasswordless)
+	}
+	if !wm.IntentCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypeIDP)
+	}
+	// TODO: add checks with https://github.com/zitadel/zitadel/issues/5477
+	/*
+		if !wm.TOTPCheckedAt.IsZero() {
+			types = append(types, domain.UserAuthMethodTypeOTP)
+		}
+		if !wm.U2FCheckedAt.IsZero() {
+			types = append(types, domain.UserAuthMethodTypeU2F)
+		}
+	*/
+	return types
+}
