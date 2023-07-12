@@ -218,6 +218,7 @@ RegistrationUser:
   Polish: Polonês
   Japanese: Japonês
   Spanish: Espanhol
+  Bulgarian: Búlgaro
   Portuguese: Português
   GenderLabel: Gênero
   Female: Feminino
@@ -314,6 +315,7 @@ ExternalNotFound:
   Japanese: Japonês
   Spanish: Espanhol
   Bulgarian: Búlgaro
+  Portuguese: Português
 DeviceAuth:
   Title: Autorização de dispositivo
   UserCode:
