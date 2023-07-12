@@ -382,7 +382,7 @@ func assertIntrospection(
 	assertOIDCTime(t, introspection.IssuedAt, creation)
 	assertOIDCTime(t, introspection.NotBefore, creation)
 	assert.Equal(t, User.GetUserId(), introspection.Subject)
-	assert.Equal(t, audience, []string(introspection.Audience))
+	assert.ElementsMatch(t, audience, introspection.Audience)
 	assert.Equal(t, issuer, introspection.Issuer)
 	assert.NotEmpty(t, introspection.JWTID)
 	assert.NotEmpty(t, introspection.Username)

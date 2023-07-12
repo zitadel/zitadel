@@ -67,7 +67,7 @@ func (wm *OIDCSessionAccessTokenReadModel) reduceAdded(e *oidcsession.AddedEvent
 	wm.ClientID = e.ClientID
 	wm.Audience = e.Audience
 	wm.Scope = e.Scope
-	//wm.AuthMethods = e.AuthMethods
+	wm.AuthMethods = e.AuthMethods
 	wm.AuthTime = e.AuthTime
 	wm.State = domain.OIDCSessionStateActive
 }
