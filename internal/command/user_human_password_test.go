@@ -1563,6 +1563,194 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			},
 			res: res{},
 		},
+		{
+			name: "check password, ok, updated hash",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPasswordChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"$plain$v$password",
+								false,
+								"")),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewHumanPasswordCheckSucceededEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&user.AuthRequestInfo{
+										ID:          "request1",
+										UserAgentID: "agent1",
+									},
+								),
+							),
+							eventFromEventPusher(
+								user.NewHumanPasswordHashUpdatedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"$plain$x$password",
+								),
+							),
+						},
+					),
+				),
+				userPasswordHasher: mockSwapper("x"),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+				authReq: &domain.AuthRequest{
+					ID:      "request1",
+					AgentID: "agent1",
+				},
+			},
+			res: res{},
+		},
+		{
+			name: "regression test old version event",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							&user.HumanPasswordChangedEvent{
+								BaseEvent: *eventstore.NewBaseEventForPush(
+									context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									user.HumanPasswordChangedType,
+								),
+								Secret: &crypto.CryptoValue{
+									CryptoType: crypto.TypeHash,
+									Algorithm:  "plain",
+									KeyID:      "",
+									Crypted:    []byte("$plain$v$password"),
+								},
+								ChangeRequired: false,
+							},
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewHumanPasswordCheckSucceededEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&user.AuthRequestInfo{
+										ID:          "request1",
+										UserAgentID: "agent1",
+									},
+								),
+							),
+							eventFromEventPusher(
+								user.NewHumanPasswordHashUpdatedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"$plain$x$password",
+								),
+							),
+						},
+					),
+				),
+				userPasswordHasher: mockSwapper("x"),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+				authReq: &domain.AuthRequest{
+					ID:      "request1",
+					AgentID: "agent1",
+				},
+			},
+			res: res{},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
