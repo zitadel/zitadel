@@ -260,7 +260,7 @@ func (c *Commands) addHumanCommandEmail(ctx context.Context, filter preparation.
 	// email not verified or
 	// user not registered and password set
 	if allowInitMail && human.shouldAddInitCode() {
-		initCode, err := newUserInitCode(ctx, filter, codeAlg)
+		initCode, err := c.newUserInitCode(ctx, filter, codeAlg)
 		if err != nil {
 			return nil, err
 		}
@@ -294,7 +294,7 @@ func (c *Commands) addHumanCommandPhone(ctx context.Context, filter preparation.
 	if human.Phone.Verified {
 		return append(cmds, user.NewHumanPhoneVerifiedEvent(ctx, &a.Aggregate)), nil
 	}
-	phoneCode, err := newPhoneCode(ctx, filter, codeAlg)
+	phoneCode, err := c.newPhoneCode(ctx, filter, codeAlg)
 	if err != nil {
 		return nil, err
 	}

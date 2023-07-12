@@ -507,6 +507,12 @@ Errors:
     TokenCreationFailed: Неуспешно създаване на токен
     InvalidToken: Знакът за намерение е невалиден
     OtherUser: Намерение, предназначено за друг потребител
+  AuthRequest:
+    AlreadyExists: Auth Request вече съществува
+    NotExisting: Auth Request не съществува
+    WrongLoginClient: Auth Request, създаден от друг клиент за влизане
+  OIDCSession:
+    RefreshTokenInvalid: Токенът за опресняване е невалиден
 
 AggregateTypes:
   action: Действие

@@ -540,7 +540,7 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 					ResourceOwner: Tester.Organisation.ID,
 				},
 				NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{
-					AuthUrl: "https://example.com/oauth/v2/authorize?client_id=clientID&prompt=select_account&redirect_uri=https%3A%2F%2Flocalhost%3A8080%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=",
+					AuthUrl: "https://example.com/oauth/v2/authorize?client_id=clientID&prompt=select_account&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=",
 				},
 			},
 			wantErr: false,

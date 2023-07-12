@@ -489,6 +489,12 @@ Errors:
     TokenCreationFailed: Fallo en la creación del token
     InvalidToken: El token de la intención no es válido
     OtherUser: Destinado a otro usuario
+  AuthRequest:
+    AlreadyExists: Auth Request ya existe
+    NotExisting: Auth Request no existe
+    WrongLoginClient: Auth Request creado por otro cliente de inicio de sesión
+  OIDCSession:
+    RefreshTokenInvalid: El token de refresco no es válido
 
 AggregateTypes:
   action: Acción
