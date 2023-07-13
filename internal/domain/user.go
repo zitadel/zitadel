@@ -77,7 +77,8 @@ func HasMFA(methods []UserAuthMethodType) bool {
 			factors++
 		case UserAuthMethodTypeIDP:
 			factors++
-		case UserAuthMethodTypeUnspecified:
+		case UserAuthMethodTypeUnspecified,
+			userAuthMethodTypeCount:
 			// ignore
 		}
 	}

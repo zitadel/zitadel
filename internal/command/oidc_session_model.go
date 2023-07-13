@@ -83,8 +83,9 @@ func (wm *OIDCSessionWriteModel) reduceAdded(e *oidcsession.AddedEvent) {
 	wm.AuthMethods = e.AuthMethods
 	wm.AuthTime = e.AuthTime
 	wm.State = domain.OIDCSessionStateActive
+	// the write model might be initialized without resource owner,
+	// so update the aggregate
 	if wm.ResourceOwner == "" {
-		wm.ResourceOwner = e.Aggregate().ResourceOwner
 		wm.aggregate = &oidcsession.NewAggregate(wm.AggregateID, e.Aggregate().ResourceOwner).Aggregate
 	}
 }
