@@ -302,7 +302,7 @@ type plainHasher struct {
 }
 
 func (h plainHasher) Hash(password string) (string, error) {
-	return strings.Join([]string{"", "plain", h.x, "password"}, "$"), nil
+	return strings.Join([]string{"", "plain", h.x, password}, "$"), nil
 }
 
 func (h plainHasher) Verify(encoded, password string) (verifier.Result, error) {

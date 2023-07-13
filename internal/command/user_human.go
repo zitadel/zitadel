@@ -685,8 +685,8 @@ func createAddHumanEvent(ctx context.Context, aggregate *eventstore.Aggregate, h
 	if human.Password != nil {
 		addEvent.AddPasswordData(human.Password.EncodedSecret, human.Password.ChangeRequired)
 	}
-	if human.HashedPassword != nil {
-		addEvent.AddPasswordData(human.HashedPassword.EncodedSecret, false)
+	if human.HashedPassword != "" {
+		addEvent.AddPasswordData(human.HashedPassword, false)
 	}
 	return addEvent
 }
@@ -719,8 +719,8 @@ func createRegisterHumanEvent(ctx context.Context, aggregate *eventstore.Aggrega
 	if human.Password != nil {
 		addEvent.AddPasswordData(human.Password.EncodedSecret, human.Password.ChangeRequired)
 	}
-	if human.HashedPassword != nil {
-		addEvent.AddPasswordData(human.HashedPassword.EncodedSecret, false)
+	if human.HashedPassword != "" {
+		addEvent.AddPasswordData(human.HashedPassword, false)
 	}
 	return addEvent
 }

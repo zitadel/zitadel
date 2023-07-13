@@ -16,7 +16,7 @@ type Human struct {
 	Username string
 	State    UserState
 	*Password
-	*HashedPassword
+	HashedPassword string
 	*Profile
 	*Email
 	*Phone
@@ -115,7 +115,7 @@ func (u *Human) IsInitialState(passwordless, externalIDPs bool) bool {
 	if externalIDPs {
 		return false
 	}
-	return u.Email == nil || !u.IsEmailVerified || !passwordless && (u.Password == nil || u.Password.SecretString == "") && (u.HashedPassword == nil || u.HashedPassword.SecretString == "")
+	return u.Email == nil || !u.IsEmailVerified || !passwordless && (u.Password == nil || u.Password.SecretString == "") && u.HashedPassword == ""
 }
 
 func NewInitUserCode(generator crypto.Generator) (*InitUserCode, error) {

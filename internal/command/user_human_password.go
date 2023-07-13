@@ -135,9 +135,7 @@ func (c *Commands) canUpdatePassword(ctx context.Context, newPassword string, wm
 	if err != nil {
 		return err
 	}
-	if policy == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-s8ifS", "Errors.User.PasswordComplexityPolicy.NotFound")
-	}
+
 	if err := policy.Check(newPassword); err != nil {
 		return err
 	}

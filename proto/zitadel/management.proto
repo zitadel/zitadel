@@ -7413,6 +7413,7 @@ message ImportHumanUserRequest {
             }
         ];
         reserved 2; // was algortithm, which is actually obtained from the encoded hash
+        reserved "algortithm";
     }
     message IDP {
         string config_id = 1 [

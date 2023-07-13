@@ -762,7 +762,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 						eventFromEventPusher(
 							user.NewHumanPasswordChangedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
-								"$plain$x$password",
+								"$plain$x$password1",
 								false,
 								"",
 							),
