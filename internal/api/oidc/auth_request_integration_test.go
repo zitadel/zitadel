@@ -19,6 +19,11 @@ import (
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
 )
 
+var (
+	armPasskey  = []string{oidc_api.UserPresence, oidc_api.MFA}
+	armPassword = []string{oidc_api.PWD}
+)
+
 func TestOPStorage_CreateAuthRequest(t *testing.T) {
 	clientID := createClient(t)
 
@@ -46,7 +51,7 @@ func TestOPStorage_CreateAccessToken_code(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
 
 	// callback on a succeeded request must fail
 	linkResp, err = Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -100,7 +105,7 @@ func TestOPStorage_CreateAccessToken_implicit(t *testing.T) {
 	require.NoError(t, err)
 	claims, err := rp.VerifyTokens[*oidc.IDTokenClaims](context.Background(), accessToken, idToken, provider.IDTokenVerifier())
 	require.NoError(t, err)
-	assertIDTokenClaims(t, claims, startTime, changeTime)
+	assertIDTokenClaims(t, claims, armPasskey, startTime, changeTime)
 
 	// callback on a succeeded request must fail
 	linkResp, err = Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -135,7 +140,7 @@ func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
 }
 
 func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
@@ -160,7 +165,7 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
 
 	// test actual refresh grant
 	newTokens, err := refreshTokens(t, clientID, tokens.RefreshToken)
@@ -172,7 +177,7 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 	claims, err := rp.VerifyTokens[*oidc.IDTokenClaims](context.Background(), newTokens.AccessToken, idToken, provider.IDTokenVerifier())
 	require.NoError(t, err)
 	// auth time must still be the initial
-	assertIDTokenClaims(t, claims, startTime, changeTime)
+	assertIDTokenClaims(t, claims, armPasskey, startTime, changeTime)
 
 	// refresh with an old refresh_token must fail
 	_, err = rp.RefreshAccessToken(provider, tokens.RefreshToken, "", "")
@@ -213,8 +218,8 @@ func assertTokens(t *testing.T, tokens *oidc.Tokens[*oidc.IDTokenClaims], requir
 	}
 }
 
-func assertIDTokenClaims(t *testing.T, claims *oidc.IDTokenClaims, sessionStart, sessionChange time.Time) {
+func assertIDTokenClaims(t *testing.T, claims *oidc.IDTokenClaims, arm []string, sessionStart, sessionChange time.Time) {
 	assert.Equal(t, User.GetUserId(), claims.Subject)
-	assert.Equal(t, []string{oidc_api.UserPresence, oidc_api.MFA}, claims.AuthenticationMethodsReferences)
+	assert.Equal(t, arm, claims.AuthenticationMethodsReferences)
 	assertOIDCTimeRange(t, claims.AuthTime, sessionStart, sessionChange)
 }

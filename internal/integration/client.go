@@ -137,6 +137,14 @@ func (s *Tester) RegisterUserPasskey(ctx context.Context, userID string) {
 	logging.OnError(err).Fatal("create user passkey")
 }
 
+func (s *Tester) SetUserPassword(ctx context.Context, userID, password string) {
+	_, err := s.Client.UserV2.SetPassword(ctx, &user.SetPasswordRequest{
+		UserId:      userID,
+		NewPassword: &user.Password{Password: password},
+	})
+	logging.OnError(err).Fatal("set user password")
+}
+
 func (s *Tester) AddGenericOAuthProvider(t *testing.T) string {
 	ctx := authz.WithInstance(context.Background(), s.Instance)
 	id, _, err := s.Commands.AddOrgGenericOAuthProvider(ctx, s.Organisation.ID, command.GenericOAuthProvider{
@@ -221,4 +229,21 @@ func (s *Tester) CreatePasskeySession(t *testing.T, ctx context.Context, userID 
 	require.NoError(t, err)
 	return createResp.GetSessionId(), updateResp.GetSessionToken(),
 		createResp.GetDetails().GetChangeDate().AsTime(), updateResp.GetDetails().GetChangeDate().AsTime()
+}
+
+func (s *Tester) CreatePasswordSession(t *testing.T, ctx context.Context, userID, password string) (id, token string, start, change time.Time) {
+	createResp, err := s.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{UserId: userID},
+			},
+			Password: &session.CheckPassword{
+				Password: password,
+			},
+		},
+		Domain: s.Config.ExternalDomain,
+	})
+	require.NoError(t, err)
+	return createResp.GetSessionId(), createResp.GetSessionToken(),
+		createResp.GetDetails().GetChangeDate().AsTime(), createResp.GetDetails().GetChangeDate().AsTime()
 }

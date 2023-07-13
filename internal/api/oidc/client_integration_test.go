@@ -38,7 +38,7 @@ func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
 
 	// test actual userinfo
 	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
@@ -84,7 +84,7 @@ func TestOPStorage_SetIntrospectionFromToken(t *testing.T) {
 	tokens, err := exchangeTokens(t, app.GetClientId(), code)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
 
 	// test actual introspection
 	introspection, err := rs.Introspect(context.Background(), resourceServer, tokens.AccessToken)
