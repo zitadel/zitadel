@@ -2,6 +2,7 @@ package crypto
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/passwap"
@@ -13,6 +14,20 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 )
+
+type PasswordHasher struct {
+	*passwap.Swapper
+	Prefixes []string
+}
+
+func (h *PasswordHasher) EncodingSupported(encodedHash string) bool {
+	for _, prefix := range h.Prefixes {
+		if strings.HasPrefix(encodedHash, prefix) {
+			return true
+		}
+	}
+	return false
+}
 
 type HashName string
 
@@ -30,36 +45,60 @@ type PasswordHashConfig struct {
 	Hasher    HasherConfig
 }
 
-func (c *PasswordHashConfig) BuildSwapper() (*passwap.Swapper, error) {
-	verifiers, err := c.buildVerifiers()
+func (c *PasswordHashConfig) PasswordHasher() (*PasswordHasher, error) {
+	verifiers, vPrefixes, err := c.buildVerifiers()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "CRYPT-sahW9", "password hash config invalid")
 	}
-	hasher, err := c.Hasher.buildHasher()
+	hasher, hPrefixes, err := c.Hasher.buildHasher()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "CRYPT-Que4r", "password hash config invalid")
 	}
-	return passwap.NewSwapper(hasher, verifiers...), nil
+	return &PasswordHasher{
+		Swapper:  passwap.NewSwapper(hasher, verifiers...),
+		Prefixes: append(hPrefixes, vPrefixes...),
+	}, nil
+}
+
+type prefixVerifier struct {
+	prefixes []string
+	verifier verifier.Verifier
 }
 
 // map HashNames to Verifier instances.
-var knowVerifiers = map[HashName]verifier.Verifier{
-	HashNameArgon2: argon2.Verifier,
-	HashNameBcrypt: bcrypt.Verifier,
-	HashNameMd5:    md5.Verifier,
-	HashNameScrypt: scrypt.Verifier,
+var knowVerifiers = map[HashName]prefixVerifier{
+	HashNameArgon2: {
+		// only argon2i and argon2id are suppored.
+		// The Prefix constant also covers argon2d.
+		prefixes: []string{argon2.Prefix},
+		verifier: argon2.Verifier,
+	},
+	HashNameBcrypt: {
+		prefixes: []string{bcrypt.Prefix},
+		verifier: bcrypt.Verifier,
+	},
+	HashNameMd5: {
+		prefixes: []string{md5.Prefix},
+		verifier: md5.Verifier,
+	},
+	HashNameScrypt: {
+		prefixes: []string{scrypt.Prefix, scrypt.Prefix_Linux},
+		verifier: scrypt.Verifier,
+	},
 }
 
-func (c *PasswordHashConfig) buildVerifiers() ([]verifier.Verifier, error) {
-	verifiers := make([]verifier.Verifier, len(c.Verifiers))
+func (c *PasswordHashConfig) buildVerifiers() (verifiers []verifier.Verifier, prefixes []string, err error) {
+	verifiers = make([]verifier.Verifier, len(c.Verifiers))
+	prefixes = make([]string, 0, len(c.Verifiers)+1)
 	for i, name := range c.Verifiers {
 		v, ok := knowVerifiers[name]
 		if !ok {
-			return nil, fmt.Errorf("invalid verifier %q", name)
+			return nil, nil, fmt.Errorf("invalid verifier %q", name)
 		}
-		verifiers[i] = v
+		verifiers[i] = v.verifier
+		prefixes = append(prefixes, v.prefixes...)
 	}
-	return verifiers, nil
+	return verifiers, prefixes, nil
 }
 
 type HasherConfig struct {
@@ -67,7 +106,7 @@ type HasherConfig struct {
 	Params    map[string]any `mapstructure:",remain"`
 }
 
-func (c *HasherConfig) buildHasher() (hasher passwap.Hasher, err error) {
+func (c *HasherConfig) buildHasher() (hasher passwap.Hasher, prefixes []string, err error) {
 	switch c.Algorithm {
 	case HashNameArgon2i:
 		return c.argon2i()
@@ -78,11 +117,11 @@ func (c *HasherConfig) buildHasher() (hasher passwap.Hasher, err error) {
 	case HashNameScrypt:
 		return c.scrypt()
 	case "":
-		return nil, fmt.Errorf("missing hasher algorithm")
+		return nil, nil, fmt.Errorf("missing hasher algorithm")
 	case HashNameArgon2, HashNameMd5:
 		fallthrough
 	default:
-		return nil, fmt.Errorf("invalid algorithm %q", c.Algorithm)
+		return nil, nil, fmt.Errorf("invalid algorithm %q", c.Algorithm)
 	}
 }
 
@@ -115,20 +154,20 @@ func (c *HasherConfig) argon2Params(p argon2.Params) (argon2.Params, error) {
 	return p, nil
 }
 
-func (c *HasherConfig) argon2i() (passwap.Hasher, error) {
+func (c *HasherConfig) argon2i() (passwap.Hasher, []string, error) {
 	p, err := c.argon2Params(argon2.RecommendedIParams)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return argon2.NewArgon2i(p), nil
+	return argon2.NewArgon2i(p), []string{argon2.Prefix}, nil
 }
 
-func (c *HasherConfig) argon2id() (passwap.Hasher, error) {
+func (c *HasherConfig) argon2id() (passwap.Hasher, []string, error) {
 	p, err := c.argon2Params(argon2.RecommendedIDParams)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return argon2.NewArgon2id(p), nil
+	return argon2.NewArgon2id(p), []string{argon2.Prefix}, nil
 }
 
 func (c *HasherConfig) bcryptCost() (int, error) {
@@ -141,12 +180,12 @@ func (c *HasherConfig) bcryptCost() (int, error) {
 	return dst.Cost, nil
 }
 
-func (c *HasherConfig) bcrypt() (passwap.Hasher, error) {
+func (c *HasherConfig) bcrypt() (passwap.Hasher, []string, error) {
 	cost, err := c.bcryptCost()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return bcrypt.New(cost), nil
+	return bcrypt.New(cost), []string{bcrypt.Prefix}, nil
 }
 
 func (c *HasherConfig) scryptParams() (scrypt.Params, error) {
@@ -161,10 +200,10 @@ func (c *HasherConfig) scryptParams() (scrypt.Params, error) {
 	return p, nil
 }
 
-func (c *HasherConfig) scrypt() (passwap.Hasher, error) {
+func (c *HasherConfig) scrypt() (passwap.Hasher, []string, error) {
 	p, err := c.scryptParams()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return scrypt.New(p), nil
+	return scrypt.New(p), []string{scrypt.Prefix, scrypt.Prefix_Linux}, nil
 }

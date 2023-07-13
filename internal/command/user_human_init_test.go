@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/zitadel/passwap"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -306,7 +305,7 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 func TestCommandSide_VerifyInitCode(t *testing.T) {
 	type fields struct {
 		eventstore         *eventstore.Eventstore
-		userPasswordHasher *passwap.Swapper
+		userPasswordHasher *crypto.PasswordHasher
 	}
 	type args struct {
 		ctx             context.Context
@@ -590,7 +589,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 						},
 					),
 				),
-				userPasswordHasher: mockSwapper("x"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:             context.Background(),

@@ -319,12 +319,15 @@ func (h plainHasher) Verify(encoded, password string) (verifier.Result, error) {
 	return verifier.OK, nil
 }
 
-// mockSwapper creates a swapper for plain (cleartext) password used in tests.
+// mockPasswordHasher creates a swapper for plain (cleartext) password used in tests.
 // x can be set to arbitrary info which triggers updates when different from the
 // setting in the encoded hashes. (normally cost parameters)
 //
 // With `x` set to "foo", the following encoded string would be produced by Hash:
 // $plain$foo$password
-func mockSwapper(x string) *passwap.Swapper {
-	return passwap.NewSwapper(plainHasher{x: x})
+func mockPasswordHasher(x string) *crypto.PasswordHasher {
+	return &crypto.PasswordHasher{
+		Swapper:  passwap.NewSwapper(plainHasher{x: x}),
+		Prefixes: []string{"$plain$"},
+	}
 }

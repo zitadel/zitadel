@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/zitadel/passwap"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -32,7 +30,7 @@ type SessionCommands struct {
 	eventstore         *eventstore.Eventstore
 	eventCommands      []eventstore.Command
 
-	hasher      *passwap.Swapper
+	hasher      *crypto.PasswordHasher
 	intentAlg   crypto.EncryptionAlgorithm
 	createToken func(sessionID string) (id string, token string, err error)
 	now         func() time.Time

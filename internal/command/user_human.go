@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/zitadel/passwap"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -75,7 +74,7 @@ type AddLink struct {
 	IDPExternalID string
 }
 
-func (h *AddHuman) Validate() (err error) {
+func (h *AddHuman) Validate(hasher *crypto.PasswordHasher) (err error) {
 	if err := h.Email.Validate(); err != nil {
 		return err
 	}
@@ -100,6 +99,11 @@ func (h *AddHuman) Validate() (err error) {
 	for _, metadataEntry := range h.Metadata {
 		if err := metadataEntry.Valid(); err != nil {
 			return err
+		}
+	}
+	if h.EncodedPasswordHash != "" {
+		if !hasher.EncodingSupported(h.EncodedPasswordHash) {
+			return errors.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.InvalidArgument")
 		}
 	}
 	return nil
@@ -156,9 +160,9 @@ type humanCreationCommand interface {
 }
 
 //nolint:gocognit
-func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *passwap.Swapper, codeAlg crypto.EncryptionAlgorithm, allowInitMail bool) preparation.Validation {
+func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *crypto.PasswordHasher, codeAlg crypto.EncryptionAlgorithm, allowInitMail bool) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if err := human.Validate(); err != nil {
+		if err := human.Validate(hasher); err != nil {
 			return nil, err
 		}
 
@@ -318,7 +322,7 @@ func (c *Commands) addHumanCommandCheckID(ctx context.Context, filter preparatio
 	return nil
 }
 
-func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQueryReducer, createCmd humanCreationCommand, human *AddHuman, hasher *passwap.Swapper) (err error) {
+func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQueryReducer, createCmd humanCreationCommand, human *AddHuman, hasher *crypto.PasswordHasher) (err error) {
 	if human.Password != "" {
 		if err = humanValidatePassword(ctx, filter, human.Password); err != nil {
 			return err

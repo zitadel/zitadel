@@ -509,7 +509,7 @@ func TestCommands_updateSession(t *testing.T) {
 							"token",
 							nil
 					},
-					hasher: mockSwapper("x"),
+					hasher: mockPasswordHasher("x"),
 					now: func() time.Time {
 						return testNow
 					},

@@ -24,7 +24,7 @@ import (
 func TestCommandSide_SetOneTimePassword(t *testing.T) {
 	type fields struct {
 		eventstore         *eventstore.Eventstore
-		userPasswordHasher *passwap.Swapper
+		userPasswordHasher *crypto.PasswordHasher
 		checkPermission    domain.PermissionCheck
 	}
 	type args struct {
@@ -103,7 +103,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 						),
 					),
 				),
-				userPasswordHasher: mockSwapper("x"),
+				userPasswordHasher: mockPasswordHasher("x"),
 				checkPermission:    newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
@@ -170,7 +170,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 						},
 					),
 				),
-				userPasswordHasher: mockSwapper("x"),
+				userPasswordHasher: mockPasswordHasher("x"),
 				checkPermission:    newMockPermissionCheckAllowed(),
 			},
 			args: args{
@@ -237,7 +237,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 						},
 					),
 				),
-				userPasswordHasher: mockSwapper("x"),
+				userPasswordHasher: mockPasswordHasher("x"),
 				checkPermission:    newMockPermissionCheckAllowed(),
 			},
 			args: args{
@@ -279,7 +279,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 	type fields struct {
 		eventstore         *eventstore.Eventstore
 		userEncryption     crypto.EncryptionAlgorithm
-		userPasswordHasher *passwap.Swapper
+		userPasswordHasher *crypto.PasswordHasher
 	}
 	type args struct {
 		ctx           context.Context
@@ -494,7 +494,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 						},
 					),
 				),
-				userPasswordHasher: mockSwapper("x"),
+				userPasswordHasher: mockPasswordHasher("x"),
 				userEncryption:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -534,7 +534,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 
 func TestCommandSide_ChangePassword(t *testing.T) {
 	type fields struct {
-		userPasswordHasher *passwap.Swapper
+		userPasswordHasher *crypto.PasswordHasher
 	}
 	type args struct {
 		ctx           context.Context
@@ -617,7 +617,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 		{
 			name: "existing password empty, precondition error",
 			fields: fields{
-				userPasswordHasher: mockSwapper("x"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -651,7 +651,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 		{
 			name: "password not matching, invalid argument error",
 			fields: fields{
-				userPasswordHasher: mockSwapper("x"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -708,7 +708,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 		{
 			name: "change password, ok",
 			fields: fields{
-				userPasswordHasher: mockSwapper("x"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1094,7 +1094,7 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 func TestCommandSide_CheckPassword(t *testing.T) {
 	type fields struct {
 		eventstore         *eventstore.Eventstore
-		userPasswordHasher *passwap.Swapper
+		userPasswordHasher *crypto.PasswordHasher
 	}
 	type args struct {
 		ctx           context.Context
@@ -1290,7 +1290,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 						),
 					),
 				),
-				userPasswordHasher: mockSwapper("x"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1371,7 +1371,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 						},
 					),
 				),
-				userPasswordHasher: mockSwapper("x"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1462,7 +1462,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 						},
 					),
 				),
-				userPasswordHasher: mockSwapper("x"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1550,7 +1550,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 						},
 					),
 				),
-				userPasswordHasher: mockSwapper("x"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1639,7 +1639,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 						},
 					),
 				),
-				userPasswordHasher: mockSwapper("x"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1738,7 +1738,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 						},
 					),
 				),
-				userPasswordHasher: mockSwapper("x"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:           context.Background(),

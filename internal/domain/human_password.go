@@ -3,8 +3,6 @@ package domain
 import (
 	"time"
 
-	"github.com/zitadel/passwap"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -32,7 +30,7 @@ type PasswordCode struct {
 	NotificationType NotificationType
 }
 
-func (p *Password) HashPasswordIfExisting(policy *PasswordComplexityPolicy, hasher *passwap.Swapper) error {
+func (p *Password) HashPasswordIfExisting(policy *PasswordComplexityPolicy, hasher *crypto.PasswordHasher) error {
 	if p.SecretString == "" {
 		return nil
 	}

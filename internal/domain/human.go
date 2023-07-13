@@ -4,8 +4,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zitadel/passwap"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
@@ -105,7 +103,7 @@ func (u *Human) EnsureDisplayName() {
 	u.DisplayName = u.Username
 }
 
-func (u *Human) HashPasswordIfExisting(policy *PasswordComplexityPolicy, hasher *passwap.Swapper, onetime bool) error {
+func (u *Human) HashPasswordIfExisting(policy *PasswordComplexityPolicy, hasher *crypto.PasswordHasher, onetime bool) error {
 	if u.Password != nil {
 		u.Password.ChangeRequired = onetime
 		return u.Password.HashPasswordIfExisting(policy, hasher)

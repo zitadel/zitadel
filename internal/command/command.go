@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/zitadel/passwap"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -51,7 +49,7 @@ type Commands struct {
 	smtpEncryption                  crypto.EncryptionAlgorithm
 	smsEncryption                   crypto.EncryptionAlgorithm
 	userEncryption                  crypto.EncryptionAlgorithm
-	userPasswordHasher              *passwap.Swapper
+	userPasswordHasher              *crypto.PasswordHasher
 	codeAlg                         crypto.HashAlgorithm
 	machineKeySize                  int
 	applicationKeySize              int
@@ -144,7 +142,7 @@ func StartCommands(
 	milestone.RegisterEventMappers(repo.eventstore)
 
 	repo.codeAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
-	repo.userPasswordHasher, err = defaults.PasswordHasher.BuildSwapper()
+	repo.userPasswordHasher, err = defaults.PasswordHasher.PasswordHasher()
 	if err != nil {
 		return nil, err
 	}
