@@ -220,6 +220,7 @@ RegistrationUser:
   Spanish: Espanhol
   Bulgarian: Búlgaro
   Portuguese: Português
+  Macedonian: Македонски
   GenderLabel: Gênero
   Female: Feminino
   Male: Masculino
@@ -253,6 +254,8 @@ ExternalRegistrationUserOverview:
   Japanese: Japonês
   Polish: Polonês
   Spanish: Espanhol
+  Portuguese: Português
+  Macedonian: Македонски
   TosAndPrivacyLabel: Termos e condições
   TosConfirm: Eu aceito os
   TosLinkText: termos de serviço
@@ -316,6 +319,7 @@ ExternalNotFound:
   Spanish: Espanhol
   Bulgarian: Búlgaro
   Portuguese: Português
+  Macedonian: Македонски
 DeviceAuth:
   Title: Autorização de dispositivo
   UserCode:

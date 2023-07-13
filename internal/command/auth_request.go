@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/oidc/amr"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
@@ -32,10 +31,10 @@ type AuthRequest struct {
 
 type CurrentAuthRequest struct {
 	*AuthRequest
-	SessionID string
-	UserID    string
-	AMR       []string
-	AuthTime  time.Time
+	SessionID   string
+	UserID      string
+	AuthMethods []domain.UserAuthMethodType
+	AuthTime    time.Time
 }
 
 const IDPrefixV2 = "V2_"
@@ -108,7 +107,7 @@ func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, 
 		sessionID,
 		sessionWriteModel.UserID,
 		sessionWriteModel.AuthenticationTime(),
-		amr.List(sessionWriteModel),
+		sessionWriteModel.AuthMethodTypes(),
 	)); err != nil {
 		return nil, nil, err
 	}
@@ -187,10 +186,10 @@ func authRequestWriteModelToCurrentAuthRequest(writeModel *AuthRequestWriteModel
 			LoginHint:     writeModel.LoginHint,
 			HintUserID:    writeModel.HintUserID,
 		},
-		SessionID: writeModel.SessionID,
-		UserID:    writeModel.UserID,
-		AMR:       writeModel.AMR,
-		AuthTime:  writeModel.AuthTime,
+		SessionID:   writeModel.SessionID,
+		UserID:      writeModel.UserID,
+		AuthMethods: writeModel.AuthMethods,
+		AuthTime:    writeModel.AuthTime,
 	}
 }
 

@@ -1,0 +1,456 @@
+Login:
+  Title: Добредојдовте назад!
+  Description: Внесете ги вашите податоци за најава.
+  TitleLinking: Најава за поврзување на корисник
+  DescriptionLinking: Внесете ги вашите податоци за најава за да го поврзете вашиот надворешен корисник со корисник на ZITADEL.
+  LoginNameLabel: Корисничко име за најава
+  UsernamePlaceHolder: корисничко име
+  LoginnamePlaceHolder: username@domain
+  ExternalUserDescription: Најава со надворешен корисник.
+  MustBeMemberOfOrg: Корисникот мора да биде член на организацијата {{.OrgName}}.
+  RegisterButtonText: регистрирај се
+  NextButtonText: следно
+
+LDAP:
+  Title: Најава
+  Description: Внесете ги вашите податоци за најава.
+  LoginNameLabel: Корисничко име за најава
+  PasswordLabel: Лозинка
+  NextButtonText: следно
+
+SelectAccount:
+  Title: Изберете корисничка сметка
+  Description: Користете ја вашата ZITADEL корисничка сметка
+  TitleLinking: Изберете корисничка сметка за поврзување на корисник
+  DescriptionLinking: Изберете ја вашата корисничка сметка за да ја поврзете со вашиот надворешен корисник.
+  OtherUser: Друг корисник
+  SessionState0: активна
+  SessionState1: неактивна
+  MustBeMemberOfOrg: Корисникот мора да биде член на организацијата {{.OrgName}}.
+
+Password:
+  Title: Лозинка
+  Description: Внесете ги вашите податоци за најава.
+  PasswordLabel: Лозинка
+  MinLength: Минимална должина
+  HasUppercase: Голема буква
+  HasLowercase: Мала буква
+  HasNumber: Број
+  HasSymbol: Симбол
+  Confirmation: Потврда на лозинка
+  ResetLinkText: ресетирај лозинка
+  BackButtonText: назад
+  NextButtonText: следно
+
+UsernameChange:
+  Title: Промена на корисничко име
+  Description: Поставете го вашето ново корисничко име
+  UsernameLabel: Корисничко име
+  CancelButtonText: откажи
+  NextButtonText: следно
+
+UsernameChangeDone:
+  Title: Корисничкото име е променето
+  Description: Вашето корисничко име е успешно променето.
+  NextButtonText: следно
+
+InitPassword:
+  Title: Поставете лозинка
+  Description: Добивте код кој треба да го внесете во формата подолу за да поставите нова лозинка.
+  CodeLabel: Код
+  NewPasswordLabel: Нова лозинка
+  NewPasswordConfirmLabel: Потврда на лозинка
+  ResendButtonText: повторно испрати код
+  NextButtonText: следно
+
+InitPasswordDone:
+  Title: Лозинката е поставена
+  Description: Лозинката е успешно поставена.
+  NextButtonText: следно
+  CancelButtonText: откажи
+
+InitUser:
+  Title: Активирајте корисник
+  Description: Проверете ја вашата е-пошта со кодот подолу и поставете ја вашата лозинка.
+  CodeLabel: Код
+  NewPasswordLabel: Нова лозинка
+  NewPasswordConfirm: Потврда на лозинка
+  NextButtonText: следно
+  ResendButtonText: повторно испрати код
+
+InitUserDone:
+  Title: Корисникот е активиран
+  Description: Е-поштата е верифицирана и лозинката е успешно поставена.
+  NextButtonText: следно
+  CancelButtonText: откажи
+
+InitMFAPrompt:
+  Title: Подесување на 2-факторска автентикација
+  Description: 2-факторската автентикација ви дава дополнителна безбедност за вашата корисничка сметка. Ова обезбедува само вие да имате пристап до вашата сметка.
+  Provider0: Апликација за автентикација (на пример Google/Microsoft Authenticator, Authy)
+  Provider1: Во зависност од вашиот уред (на пример FaceID, Windows Hello, отпечаток од прст)
+  NextButtonText: следно
+  SkipButtonText: прескокни
+
+InitMFAOTP:
+  Title: Потврда на 2-факторска автентикација
+  Description: Креирајте ја вашата 2-факторска автентикација. Превземете апликација за автентикација доколку сѐ уште немате една.
+  OTPDescription: Скенирајте го кодот со вашата апликација за автентикација (на пример Google/Microsoft Authenticator, Authy) или копирајте го тајниот клуч и вметнете го генерираниот код подолу.
+  SecretLabel: Таен клуч
+  CodeLabel: Код
+  NextButtonText: следно
+  CancelButtonText: откажи
+
+InitMFAU2F:
+  Title: Додајте безбедносен клуч
+  Description: Безбедносниот клуч е метод на верификација кој може да се интегрира во вашиот телефон, да користи Bluetooth или директно да се поврзе во USB приклучокот на вашиот компјутер.
+  TokenNameLabel: Име на безбедносниот клуч / уред
+  NotSupported: WebAuthN не е поддржан од вашиот прелистувач. Ве молиме проверете дали е ажуриран со најновата верзија или пак користете друг прелистувач (на пример Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Додајте безбедносен клуч
+  ErrorRetry: Обидете се повторно, креирајте нов предизвик или изберете друг метод.
+
+InitMFADone:
+  Title: Потврден безбедносен клуч
+  Description: Одлично! Успешно ја подесивте вашата 2-факторска автентикација и ја зголемивте безбедноста на вашата корисничка сметка. Факторот мора да се користи при секоја најава.
+  NextButtonText: следно
+  CancelButtonText: откажи
+
+MFAProvider:
+  Provider0: Апликација за автентикација (на пример Google/Microsoft Authenticator, Authy)
+  Provider1: Во зависност од вашиот уред (на пример FaceID, Windows Hello, отпечаток од прст)
+  ChooseOther: или изберете друга опција
+
+VerifyMFAOTP:
+  Title: Потврда на 2-факторска автентикација
+  Description: Потврдете ја 2-факторска автентикација
+  CodeLabel: Код
+  NextButtonText: следно
+
+VerifyMFAU2F:
+  Title: Потврда на 2-факторска автентикација
+  Description: Потврдете ја вашата 2-факторска автентикација со регистрираниот уред (на пример FaceID, Windows Hello, отпечаток од прст)
+  NotSupported: WebAuthN не е поддржан од вашиот прелистувач. Ве молиме проверете дали е ажуриран со најновата верзија или пак користете друг прелистувач (Chrome, Safari, Firefox)
+  ErrorRetry: Обидете се повторно, креирајте нов барање или изберете друг метод.
+  ValidateTokenButtonText: Потврди 2-факторска автентикација
+
+Passwordless:
+  Title: Најава без лозинка
+  Description: Најавете се со методи за автентикација кои ги нуди вашиот уред, како FaceID, Windows Hello или отпечаток од прст.
+  NotSupported: WebAuthN не е поддржан од вашиот прелистувач. Ве молиме проверете дали е ажуриран со најновата верзија или пак користете друг прелистувач (на пример Chrome, Safari, Firefox)
+  ErrorRetry: Обидете се повторно, креирајте нов предизвик или изберете друг метод.
+  LoginWithPwButtonText: Најава со лозинка
+  ValidateTokenButtonText: Најава без лозинка
+
+PasswordlessPrompt:
+  Title: Подесување на најава без лозинка
+  Description: Дали сакате да подесите најава без лозинка? (Методи за автентикација на вашиот уред, како FaceID, Windows Hello или отпечаток од прст)
+  DescriptionInit: Мора да подесите најава без лозинка. Користете го линкот што ви беше даден за регистрација на вашиот уред.
+  PasswordlessButtonText: Отиди на најава без лозинка
+  NextButtonText: следно
+  SkipButtonText: прескокни
+
+PasswordlessRegistration:
+  Title: Подесување на најава без лозинка
+  Description: Додадете ја вашата автентикација со давање на име (на пример, МојМобиленТелефон, MacBook итн) и кликнете на копчето 'Регистрирај најава без лозинка' подолу.
+  TokenNameLabel: Име на уредот
+  NotSupported: WebAuthN не е поддржан од вашиот прелистувач. Ве молиме проверете дали е ажуриран со најновата верзија или пак користете друг прелистувач (на пример, Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Регистрирај најава без лозинка
+  ErrorRetry: Обидете се повторно, креирајте нов предизвик или изберете друг метод.
+
+PasswordlessRegistrationDone:
+  Title: Подесена најава без лозинка
+  Description: Уредот за најава без лозинка е успешно додаден.
+  DescriptionClose: Сега можете да го затворите овој прозорец.
+  NextButtonText: следно
+  CancelButtonText: откажи
+
+PasswordChange:
+  Title: Промена на лозинка
+  Description: Променете ја вашата лозинка. Внесете ја старата и новата лозинка.
+  OldPasswordLabel: Стара лозинка
+  NewPasswordLabel: Нова лозинка
+  NewPasswordConfirmLabel: Потврда на лозинка
+  CancelButtonText: откажи
+  NextButtonText: следно
+  Footer: Футер
+
+PasswordChangeDone:
+  Title: Промена на лозинка
+  Description: Вашата лозинка беше успешно променета.
+  NextButtonText: следно
+
+PasswordResetDone:
+  Title: Пратен линк за ресетирање на лозинка
+  Description: Проверете ја вашата е-пошта за ресетирање на лозинката.
+  NextButtonText: следно
+
+EmailVerification:
+  Title: Верификација на е-пошта
+  Description: Ви пративме е-пошта за да ја верификувате вашата адреса за е-пошта. Ве молиме внесете го кодот во формата подолу.
+  CodeLabel: Код
+  NextButtonText: следно
+  ResendButtonText: испрати повторно
+
+EmailVerificationDone:
+  Title: Верификација на е-пошта
+  Description: Вашата е-пошта беше успешно верифицирана.
+  NextButtonText: следно
+  CancelButtonText: откажи
+  LoginButtonText: најава
+
+RegisterOption:
+  Title: Опции за регистрација
+  Description: Изберете како сакате да се регистрирате
+  RegisterUsernamePasswordButtonText: Со корисничко име и лозинка
+  ExternalLoginDescription: или регистрирајте се со надворешен корисник
+  LoginButtonText: најава
+
+RegistrationUser:
+  Title: Регистрација
+  Description: Внесете ги вашите кориснички податоци. Вашата е-пошта ќе се користи како корисничко име.
+  DescriptionOrgRegister: Внесете ги вашите кориснички податоци.
+  EmailLabel: Е-пошта
+  UsernameLabel: Корисничко име
+  FirstnameLabel: Име
+  LastnameLabel: Презиме
+  LanguageLabel: Јазик
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Portuguese: Português
+  Macedonian: Македонски
+  GenderLabel: Пол
+  Female: Женски
+  Male: Машки
+  Diverse: различен / X
+  PasswordLabel: Лозинка
+  PasswordConfirmLabel: Потврда на лозинка
+  TosAndPrivacyLabel: Правила и услови
+  TosConfirm: Се согласувам со
+  TosLinkText: правилата за користење
+  PrivacyConfirm: Се согласувам со
+  PrivacyLinkText: политиката за приватност
+  ExternalLogin: или регистрирајте се со надворешен корисник
+  BackButtonText: најава
+  NextButtonText: следно
+
+ExternalRegistrationUserOverview:
+  Title: Регистрација на надворешен корисник
+  Description: Ги преземаме вашите податоци за корисник од избраниот провајдер. Сега можете да ги промените или дополните.
+  EmailLabel: Е-пошта
+  UsernameLabel: Корисничко име
+  FirstnameLabel: Име
+  LastnameLabel: Презиме
+  NicknameLabel: Прекар
+  PhoneLabel: Телефонски број
+  LanguageLabel: Јазик
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Japanese: 日本語
+  Polish: Polski
+  Spanish: Español
+  Portuguese: Português
+  Macedonian: Македонски
+  TosAndPrivacyLabel: Правила и услови
+  TosConfirm: Се согласувам со
+  TosLinkText: правилата за користење
+  PrivacyConfirm: Се согласувам со
+  PrivacyLinkText: политиката за приватност
+  ExternalLogin: или регистрирајте се со надворешен корисник
+  BackButtonText: назад
+  NextButtonText: зачувај
+
+RegistrationOrg:
+  Title: Регистрација на организација
+  Description: Внесете го името и податоците на вашата организација.
+  OrgNameLabel: Име на организација
+  EmailLabel: Е-пошта
+  UsernameLabel: Корисничко име
+  FirstnameLabel: Име
+  LastnameLabel: Презиме
+  PasswordLabel: Лозинка
+  PasswordConfirmLabel: Потврда на лозинка
+  TosAndPrivacyLabel: Правила и услови
+  TosConfirm: Се согласувам со
+  TosLinkText: правилата за користење
+  PrivacyConfirm: Се согласувам со
+  PrivacyLinkText: политиката за приватност
+  SaveButtonText: Креирај организација
+
+LoginSuccess:
+  Title: Успешна најава
+  AutoRedirectDescription: Ќе бидете автоматски пренасочени назад кон вашата апликација. Доколку не сте автоматски пренасочени, кликнете на копчето подолу. Потоа можете да го затворите прозорецот.
+  RedirectedDescription: Сега можете да го затворите овој прозорец.
+  NextButtonText: следно
+
+LogoutDone:
+  Title: Одјавени
+  Description: Успешно сте одјавени.
+  LoginButtonText: најава
+
+LinkingUsersDone:
+  Title: Поврзување на корисници
+  Description: Поврзувањето на корисници е завршено.
+  CancelButtonText: откажи
+  NextButtonText: следно
+
+ExternalNotFound:
+  Title: Не е пронајден надворешен корисник
+  Description: Надворешниот корисник не е пронајден. Дали сакате да го поврзете вашиот корисник или автоматски да регистрирате нов.
+  LinkButtonText: Поврзи
+  AutoRegisterButtonText: регистрирај
+  TosAndPrivacyLabel: Правила и услови
+  TosConfirm: Се согласувам со
+  TosLinkText: правилата за користење
+  PrivacyConfirm: Се согласувам со
+  PrivacyLinkText: политиката за приватност
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+
+DeviceAuth:
+  Title: Овластување преку уред
+  UserCode:
+    Label: Код на корисник
+    Description: Внесете го кодот на корисникот прикажан на уредот.
+    ButtonNext: следно
+  Action:
+    Description: Овластување за пристап за уред.
+    GrantDevice: со ова ќе овозможите уредот да има право за
+    AccessToScopes: пристап до следниве области
+    Button:
+      Allow: овозможи
+      Deny: одбиј
+  Done:
+    Description: Завршено.
+    Approved: Овластувањето на уредот е одобрено. Сега можете да се вратите на уредот.
+    Denied: Овластувањето на уредот е одбиено. Сега можете да се вратите на уредот.
+
+Footer:
+  PoweredBy: Поддржано од
+  Tos: Услови за користење
+  PrivacyPolicy: Политика за приватност
+  Help: Помош
+  SupportEmail: Е-пошта за поддршка
+
+Errors:
+  Internal: Се појави внатрешна грешка
+  AuthRequest:
+    NotFound: Не може да се пронајде барањето за автентикација
+    UserAgentNotCorresponding: User Agent не се совпаѓа
+    UserAgentNotFound: Не е пронајден User Agent ID
+    TokenNotFound: Токенот не е пронајден
+    RequestTypeNotSupported: Типот на барање не е подржан
+    MissingParameters: Недостасуваат задолжителни параметри
+  User:
+    NotFound: Корисникот не е пронајден
+    AlreadyExists: Корисникот веќе постои
+    Inactive: Корисникот е неактивен
+    NotFoundOnOrg: Корисникот не е пронајден во избраната организација
+    NotAllowedOrg: Корисникот не е член на бараната организација
+    NotMatchingUserID: Корисникот и корисникот во барањето за автентикација не се совпаѓаат
+    UserIDMissing: ID на корисник е празно
+    Invalid: Невалидни кориснички податоци
+    DomainNotAllowedAsUsername: Доменот е веќе резервиран и не може да се користи
+    NotAllowedToLink: Корисникот нема дозвола да се поврзе со надворешен провајдер за најава
+    Profile:
+      NotFound: Профилот не е пронајден
+      NotChanged: Профилот не е променет
+      Empty: Профилот е празен
+      FirstNameEmpty: Името во профилот е празно
+      LastNameEmpty: Презимето во профилот е празно
+      IDMissing: ID на профил е празно
+    Email:
+      NotFound: Е-поштата не е пронајдена
+      Invalid: Е-поштата не е валидна
+      AlreadyVerified: Е-поштата веќе е верифицирана
+      NotChanged: Е-поштата не е променета
+      Empty: Е-поштата е празна
+      IDMissing: ID на е-пошта е празно
+    Phone:
+      NotFound: Телефонскиот број не е пронајден
+      Invalid: Телефонскиот број не е валиден
+      AlreadyVerified: Телефонскиот број е веќе верифициран
+      Empty: Телефонскиот број е празен
+      NotChanged: Телефонскиот број не е променет
+    Address:
+      NotFound: Адресата не е пронајдена
+      NotChanged: Адресата не е променета
+    Username:
+      AlreadyExists: Корисничкото име е веќе зафатено
+      Reserved: Корисничкото име е веќе зафатено
+      Empty: Корисничкото име е празно
+    Password:
+      ConfirmationWrong: Потврдата на лозинката не е точна
+      Empty: Лозинката е празна
+      Invalid: Лозинката не е валидна
+      InvalidAndLocked: Лозинката не е валидна и корисникот е заклучен, контактирајте со вашиот администратор.
+    UsernameOrPassword:
+      Invalid: Корисничкото име и/или лозинката не се валидни
+    PasswordComplexityPolicy:
+      NotFound: Политиката за сложеност на лозинката не е пронајдена
+      MinLength: Лозинката е прекратка
+      HasLower: Лозинката мора да содржи мала буква
+      HasUpper: Лозинката мора да содржи голема буква
+      HasNumber: Лозинката мора да содржи број
+      HasSymbol: Лозинката мора да содржи симбол
+    Code:
+      Expired: Кодот е истечен
+      Invalid: Кодот не е валиден
+      Empty: Кодот е празен
+      CryptoCodeNil: Крипто кодот е nil
+      NotFound: Кодот не е пронајден
+      GeneratorAlgNotSupported: Неподдржан алгоритам на генераторот
+    EmailVerify:
+      UserIDEmpty: ID на корисник е празно
+    ExternalData:
+      CouldNotRead: Надворешните податоци не можеа да се прочитаат точно
+    MFA:
+      NoProviders: Нема достапни провајдери за мултифакторна автентикација
+      OTP:
+        AlreadyReady: Мултифактор OTP (Еднократна Лозинка) е веќе подесена
+        NotExisting: Мултифактор OTP (Еднократна Лозинка) не постои
+        InvalidCode: Невалиден код
+        NotReady: Мултифактор OTP (Еднократна Лозинка) не е подготвена
+    Locked: Корисникот е заклучен
+    SomethingWentWrong: Се случи нешто неочекувано
+    NotActive: Корисникот не е активен
+    ExternalIDP:
+      IDPTypeNotImplemented: Типот на идентитетски надворешен провајдер не е имплементиран
+      NotAllowed: Надворешниот идентитетски провајдер за најава не е дозволен
+      IDPConfigIDEmpty: ID на надворешниот идентитетски провајдер е празно
+      ExternalUserIDEmpty: ID на надворешниот корисник е празно
+      UserDisplayNameEmpty: Приказното име на корисникот е празно
+      NoExternalUserData: Нема преземени податоци за надворешен корисник
+      CreationNotAllowed: Креирањето на нов корисник не е дозволено на овој провајдер
+      LinkingNotAllowed: Поврзувањето на корисник не е дозволено на овој провајдер
+    GrantRequired: Не е можно најавување. Корисникот мора да има барем едно овластување за апликацијата. Ве молиме контактирајте го вашиот администратор.
+    ProjectRequired: Не е можно најавување. Организацијата на корисникот мора да биде доделена на проектот. Ве молиме контактирајте го вашиот администратор.
+  IdentityProvider:
+    InvalidConfig: Конфигурацијата на идентитетскиот провајдер не е валидна
+  IAM:
+    LockoutPolicy:
+      NotExisting: Политиката за заклучување не постои
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Не е дозволена регистрација
+  DeviceAuth:
+    NotExisting: Кодот на корисникот не постои
+
+optional: (опционално)
