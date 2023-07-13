@@ -21,9 +21,9 @@ type PasskeyCodeDetails struct {
 	Code   string
 }
 
-type PasskeyRegistrationDetails struct {
+type WebAuthNRegistrationDetails struct {
 	*ObjectDetails
 
-	PasskeyID                          string
+	ID                                 string
 	PublicKeyCredentialCreationOptions []byte
 }

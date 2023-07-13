@@ -166,7 +166,14 @@
     "NEXT": "Weiter",
     "MORE": "mehr",
     "STEP": "Schritt",
-    "COMINGSOON": "Coming soon",
+    "UNSAVEDCHANGES": "Nicht gespeicherte Änderungen",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Möchten Sie diese neue Aktion wirklich verwerfen? Ihre Aktion geht verloren",
+        "CANCEL": "Abbrechen",
+        "DISCARD": "Verwerfen"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Zeige Benutzer {{value}}"
     }
@@ -204,6 +211,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "Achtung! Soeben wurde die Organisation gewechselt."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "Soeben wurde die Ansicht auf Instanz gewechselt."
     }
   },
   "FILTER": {
@@ -1029,7 +1039,9 @@
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български",
+      "mk": "Македонски"
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -1228,7 +1240,9 @@
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български",
+        "mk": "Македонски"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1772,6 +1786,8 @@
     "DELETE": "Löschen",
     "DELETE_TITLE": "IDP löschen",
     "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identitätsanbieter zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
+    "REMOVE_WARN_TITLE": "IDP entfernen?",
+    "REMOVE_WARN_DESCRIPTION": "Sie sind dabei, einen Identitätsanbieter zu entfernen. Dadurch wird die Auswahl des verfügbaren IDP für Ihre Benutzer entfernt und bereits registrierte Benutzer können sich nicht erneut anmelden. Wollen Sie wirklich fortfahren?",
     "DELETE_SELECTION_TITLE": "Identitätsanbieter löschen",
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identitätsanbieter zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
     "EMPTY": "Kein IDP vorhanden",
@@ -2096,7 +2112,9 @@
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български",
+    "mk": "Македонски"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

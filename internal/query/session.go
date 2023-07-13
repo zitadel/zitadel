@@ -29,9 +29,12 @@ type Session struct {
 	Sequence       uint64
 	State          domain.SessionState
 	ResourceOwner  string
+	Domain         string
 	Creator        string
 	UserFactor     SessionUserFactor
 	PasswordFactor SessionPasswordFactor
+	IntentFactor   SessionIntentFactor
+	PasskeyFactor  SessionPasskeyFactor
 	Metadata       map[string][]byte
 }
 
@@ -44,6 +47,14 @@ type SessionUserFactor struct {
 
 type SessionPasswordFactor struct {
 	PasswordCheckedAt time.Time
+}
+
+type SessionIntentFactor struct {
+	IntentCheckedAt time.Time
+}
+
+type SessionPasskeyFactor struct {
+	PasskeyCheckedAt time.Time
 }
 
 type SessionsSearchQueries struct {
@@ -88,6 +99,10 @@ var (
 		name:  projection.SessionColumnResourceOwner,
 		table: sessionsTable,
 	}
+	SessionColumnDomain = Column{
+		name:  projection.SessionColumnDomain,
+		table: sessionsTable,
+	}
 	SessionColumnInstanceID = Column{
 		name:  projection.SessionColumnInstanceID,
 		table: sessionsTable,
@@ -108,6 +123,14 @@ var (
 		name:  projection.SessionColumnPasswordCheckedAt,
 		table: sessionsTable,
 	}
+	SessionColumnIntentCheckedAt = Column{
+		name:  projection.SessionColumnIntentCheckedAt,
+		table: sessionsTable,
+	}
+	SessionColumnPasskeyCheckedAt = Column{
+		name:  projection.SessionColumnPasskeyCheckedAt,
+		table: sessionsTable,
+	}
 	SessionColumnMetadata = Column{
 		name:  projection.SessionColumnMetadata,
 		table: sessionsTable,
@@ -118,9 +141,13 @@ var (
 	}
 )
 
-func (q *Queries) SessionByID(ctx context.Context, id, sessionToken string) (_ *Session, err error) {
+func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string) (_ *Session, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	if shouldTriggerBulk {
+		ctx = projection.SessionProjection.Trigger(ctx)
+	}
 
 	query, scan := prepareSessionQuery(ctx, q.client)
 	stmt, args, err := query.Where(
@@ -193,11 +220,14 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			SessionColumnState.identifier(),
 			SessionColumnResourceOwner.identifier(),
 			SessionColumnCreator.identifier(),
+			SessionColumnDomain.identifier(),
 			SessionColumnUserID.identifier(),
 			SessionColumnUserCheckedAt.identifier(),
 			LoginNameNameCol.identifier(),
 			HumanDisplayNameCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
+			SessionColumnIntentCheckedAt.identifier(),
+			SessionColumnPasskeyCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			SessionColumnToken.identifier(),
 		).From(sessionsTable.identifier()).
@@ -212,8 +242,11 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				loginName         sql.NullString
 				displayName       sql.NullString
 				passwordCheckedAt sql.NullTime
+				intentCheckedAt   sql.NullTime
+				passkeyCheckedAt  sql.NullTime
 				metadata          database.Map[[]byte]
 				token             sql.NullString
+				sessionDomain     sql.NullString
 			)
 
 			err := row.Scan(
@@ -224,11 +257,14 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&session.State,
 				&session.ResourceOwner,
 				&session.Creator,
+				&sessionDomain,
 				&userID,
 				&userCheckedAt,
 				&loginName,
 				&displayName,
 				&passwordCheckedAt,
+				&intentCheckedAt,
+				&passkeyCheckedAt,
 				&metadata,
 				&token,
 			)
@@ -240,11 +276,14 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				return nil, "", errors.ThrowInternal(err, "QUERY-SAder", "Errors.Internal")
 			}
 
+			session.Domain = sessionDomain.String
 			session.UserFactor.UserID = userID.String
 			session.UserFactor.UserCheckedAt = userCheckedAt.Time
 			session.UserFactor.LoginName = loginName.String
 			session.UserFactor.DisplayName = displayName.String
 			session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
+			session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
+			session.PasskeyFactor.PasskeyCheckedAt = passkeyCheckedAt.Time
 			session.Metadata = metadata
 
 			return session, token.String, nil
@@ -260,11 +299,14 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			SessionColumnState.identifier(),
 			SessionColumnResourceOwner.identifier(),
 			SessionColumnCreator.identifier(),
+			SessionColumnDomain.identifier(),
 			SessionColumnUserID.identifier(),
 			SessionColumnUserCheckedAt.identifier(),
 			LoginNameNameCol.identifier(),
 			HumanDisplayNameCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
+			SessionColumnIntentCheckedAt.identifier(),
+			SessionColumnPasskeyCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			countColumn.identifier(),
 		).From(sessionsTable.identifier()).
@@ -282,7 +324,10 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					loginName         sql.NullString
 					displayName       sql.NullString
 					passwordCheckedAt sql.NullTime
+					intentCheckedAt   sql.NullTime
+					passkeyCheckedAt  sql.NullTime
 					metadata          database.Map[[]byte]
+					sessionDomain     sql.NullString
 				)
 
 				err := rows.Scan(
@@ -293,11 +338,14 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&session.State,
 					&session.ResourceOwner,
 					&session.Creator,
+					&sessionDomain,
 					&userID,
 					&userCheckedAt,
 					&loginName,
 					&displayName,
 					&passwordCheckedAt,
+					&intentCheckedAt,
+					&passkeyCheckedAt,
 					&metadata,
 					&sessions.Count,
 				)
@@ -305,11 +353,14 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				if err != nil {
 					return nil, errors.ThrowInternal(err, "QUERY-SAfeg", "Errors.Internal")
 				}
+				session.Domain = sessionDomain.String
 				session.UserFactor.UserID = userID.String
 				session.UserFactor.UserCheckedAt = userCheckedAt.Time
 				session.UserFactor.LoginName = loginName.String
 				session.UserFactor.DisplayName = displayName.String
 				session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
+				session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
+				session.PasskeyFactor.PasskeyCheckedAt = passkeyCheckedAt.Time
 				session.Metadata = metadata
 
 				sessions.Sessions = append(sessions.Sessions, session)

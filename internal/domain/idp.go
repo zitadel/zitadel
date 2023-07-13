@@ -9,6 +9,7 @@ const (
 	IDPStateActive
 	IDPStateInactive
 	IDPStateRemoved
+	IDPStateMigrated
 
 	idpStateCount
 )
@@ -18,7 +19,7 @@ func (s IDPState) Valid() bool {
 }
 
 func (s IDPState) Exists() bool {
-	return s != IDPStateUnspecified && s != IDPStateRemoved
+	return s != IDPStateUnspecified && s != IDPStateRemoved && s != IDPStateMigrated
 }
 
 type IDPType int32
@@ -47,12 +48,13 @@ func (t IDPType) GetCSSClass() string {
 	case IDPTypeGitLab,
 		IDPTypeGitLabSelfHosted:
 		return "gitlab"
+	case IDPTypeAzureAD:
+		return "azure"
 	case IDPTypeUnspecified,
 		IDPTypeOIDC,
 		IDPTypeJWT,
 		IDPTypeOAuth,
-		IDPTypeLDAP,
-		IDPTypeAzureAD:
+		IDPTypeLDAP:
 		fallthrough
 	default:
 		return ""

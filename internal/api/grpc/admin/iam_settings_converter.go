@@ -62,6 +62,14 @@ func UpdateSecretGeneratorToConfig(req *admin_pb.UpdateSecretGeneratorRequest) *
 	}
 }
 
+func SecretGeneratorsToPb(generators []*query.SecretGenerator) []*settings_pb.SecretGenerator {
+	list := make([]*settings_pb.SecretGenerator, len(generators))
+	for i, generator := range generators {
+		list[i] = SecretGeneratorToPb(generator)
+	}
+	return list
+}
+
 func SecretGeneratorToPb(generator *query.SecretGenerator) *settings_pb.SecretGenerator {
 	mapped := &settings_pb.SecretGenerator{
 		Length:              uint32(generator.Length),

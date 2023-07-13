@@ -1629,7 +1629,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Create Key for machine user";
+            summary: "Delete Key for machine user";
             description: "Delete a specific key from a user. The user will not be able to authenticate with that key afterward."
             tags: "Users";
             tags: "User Machine";
@@ -6558,6 +6558,24 @@ service ManagementService {
         };
     }
 
+    // Migrate an existing OIDC identity provider in the organization
+    rpc MigrateGenericOIDCProvider(MigrateGenericOIDCProviderRequest) returns (MigrateGenericOIDCProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/generic_oidc/{id}/_migrate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Migrate Generic OIDC Identity Provider";
+            description: "";
+        };
+    }
+
     // Add a new JWT identity provider in the organization
     rpc AddJWTProvider(AddJWTProviderRequest) returns (AddJWTProviderResponse) {
         option (google.api.http) = {
@@ -8917,8 +8935,8 @@ message AddOIDCAppRequest {
     ];
     repeated string additional_origins = 16 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"https://console.zitadel.ch/auth/callback\"]";
-            description: "Additional origins (other than the redirect_uris) from where the API can be used";
+            example: "[\"scheme://localhost:8080\"]";
+            description: "Additional origins (other than the redirect_uris) from where the API can be used, provided string has to be an origin (scheme://hostname[:port]) without path, query or fragment";
         }
     ];
     bool skip_native_app_success_page = 17 [
@@ -9092,8 +9110,8 @@ message UpdateOIDCAppConfigRequest {
     ];
     repeated string additional_origins = 15 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"https://console.zitadel.ch/auth/callback\"]";
-            description: "Additional origins (other than the redirect_uris) from where the API can be used";
+            example: "[\"scheme://localhost:8080\"]";
+            description: "Additional origins (other than the redirect_uris) from where the API can be used, provided string has to be an origin (scheme://hostname[:port]) without path, query or fragment";
         }
     ];
     bool skip_native_app_success_page = 16 [
@@ -11523,6 +11541,23 @@ message UpdateGenericOIDCProviderRequest {
 }
 
 message UpdateGenericOIDCProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message MigrateGenericOIDCProviderRequest{
+    string id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+    oneof template {
+        AddAzureADProviderRequest azure = 2;
+        AddGoogleProviderRequest google = 3;
+    }
+}
+
+message MigrateGenericOIDCProviderResponse{
     zitadel.v1.ObjectDetails details = 1;
 }
 

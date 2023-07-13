@@ -167,7 +167,14 @@
     "MORE": "さらに",
     "STEP": "ステップ",
     "SETUP": "セットアップ",
-    "COMINGSOON": "近日公開",
+    "UNSAVEDCHANGES": "未保存の変更",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "この新しいアクションを破棄してもよろしいですか?あなたのアクションは失われます",
+        "CANCEL": "キャンセル",
+        "DISCARD": "破棄"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "ユーザー {{value}} を表示する"
     }
@@ -205,6 +212,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "注意！ 組織のコンテキストが変更されました。"
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "ビューがインスタンスに変更されました。"
     }
   },
   "FILTER": {
@@ -1030,7 +1040,9 @@
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български",
+      "mk": "Македонски"
     },
     "SMTP": {
       "TITLE": "SMTP設定",
@@ -1224,7 +1236,9 @@
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български",
+        "mk": "Македонски"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -1767,6 +1781,8 @@
     "DELETE": "削除",
     "DELETE_TITLE": "IDPの削除",
     "DELETE_DESCRIPTION": "IDプロバイダーを削除しようとしています。変更は取消できません。本当によろしいですか？",
+    "REMOVE_WARN_TITLE": "IDPを削除する",
+    "REMOVE_WARN_DESCRIPTION": "ID プロバイダーを削除しようとしています。これにより、ユーザーが使用できる IDP の選択が削除され、すでに登録されているユーザーは再度ログインできなくなります。続けてもよろしいですか?",
     "DELETE_SELECTION_TITLE": "IDPの削除",
     "DELETE_SELECTION_DESCRIPTION": "IDプロバイダーを削除しようとしています。変更は取消できません。本当によろしいですか？",
     "EMPTY": "IDPは利用できません",
@@ -2088,7 +2104,9 @@
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български",
+    "mk": "Македонски"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

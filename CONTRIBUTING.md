@@ -1,3 +1,4 @@
+
 # Contributing to ZITADEL
 
 ## Introduction
@@ -34,7 +35,11 @@ Follow [@zitadel](https://twitter.com/zitadel) on twitter
 
 We strongly recommend to [talk to us](https://zitadel.com/contact) before you start contributing to streamline our and your work.
 
-We accept contributions through pull requests. You need a github account for that. If you are unfamiliar with git have a look at Github's documentation on [creating forks](https://help.github.com/articles/fork-a-repo) and [creating pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork). Please draft the pull request as soon as possible. Go through the following checklist before you submit the final pull request:
+We accept contributions through pull requests.
+You need a github account for that.
+If you are unfamiliar with git have a look at Github's documentation on [creating forks](https://help.github.com/articles/fork-a-repo) and [creating pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork).
+Please draft the pull request as soon as possible.
+Go through the following checklist before you submit the final pull request:
 
 ### Submit a pull request (PR)
 
@@ -61,7 +66,8 @@ We accept contributions through pull requests. You need a github account for tha
 
 ### Review a pull request
 
-The reviewers will provide you feedback and approve your changes as soon as they are satisfied. If we ask you for changes in the code, you can follow the [GitHub Guide](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/incorporating-feedback-in-your-pull-request) to incorporate feedback in your pull request.
+The reviewers will provide you feedback and approve your changes as soon as they are satisfied.
+If we ask you for changes in the code, you can follow the [GitHub Guide](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/incorporating-feedback-in-your-pull-request) to incorporate feedback in your pull request.
 
 <!-- TODO: how to do this via git -->
 <!-- TODO: change commit message via git -->
@@ -87,6 +93,16 @@ This is optional to indicate which component is affected. In doubt, leave blank 
 #### Short summary
 
 Provide a brief description of the change.
+
+### Quality assurance
+
+Please make sure you cover your changes with tests before marking a Pull Request as ready for review:
+
+- [ ] Integration tests against the gRPC server ensure that one or multiple API calls that belong together return the expected results.
+- [ ] Integration tests against the gRPC server ensure that probable good and bad read and write permissions are tested.
+- [ ] Integration tests against the gRPC server ensure that the API is easily usable despite eventual consistency.
+- [ ] Integration tests against the gRPC server ensure that all probable login and registration flows are covered."
+- [ ] Integration tests ensure that certain commands send expected notifications.
 
 ## Contribute
 
@@ -208,7 +224,7 @@ export INTEGRATION_DB_FLAVOR="cockroach" ZITADEL_MASTERKEY="MasterkeyNeedsToHave
 docker compose -f internal/integration/config/docker-compose.yaml up --wait ${INTEGRATION_DB_FLAVOR}
 go run main.go init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 go run main.go setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
-go test -tags=integration -race -parallel 1 ./internal/integration ./internal/api/grpc/...
+go test -count 1 -tags=integration -race -p 1 ./internal/integration ./internal/api/grpc/... ./internal/api/oidc
 docker compose -f internal/integration/config/docker-compose.yaml down
 ```
 

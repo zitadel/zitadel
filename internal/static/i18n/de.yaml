@@ -476,6 +476,8 @@ Errors:
     Terminated: Session bereits beendet
     Token:
       Invalid: Session Token ist ungültig
+    Passkey:
+      NoChallenge: Sitzung ohne Passkey-Herausforderung
   Intent:
     IDPMissing: IDP ID fehlt im Request
     SuccessURLMissing: Success URL fehlt im Request
@@ -485,7 +487,13 @@ Errors:
     NotSucceeded: Intent war nicht erfolgreich
     TokenCreationFailed: Tokenerstellung schlug fehl
     InvalidToken: Intent Token ist ungültig
-
+    OtherUser: Intent ist für anderen Benutzer gedacht
+  AuthRequest:
+    AlreadyExists: Auth Request existiert bereits
+    NotExisting: Auth Request existiert nicht
+    WrongLoginClient: Auth Request wurde von einem anderen Login-Client erstellt
+  OIDCSession:
+    RefreshTokenInvalid: Refresh Token ist ungültig
 AggregateTypes:
   action: Action
   instance: Instanz

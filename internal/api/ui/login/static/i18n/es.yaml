@@ -222,6 +222,8 @@ RegistrationUser:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Macedonian: Македонски
   GenderLabel: Género
   Female: Mujer
   Male: Hombre
@@ -255,6 +257,7 @@ ExternalRegistrationUserOverview:
   Japanese: 日本語
   Polish: Polski
   Spanish: Español
+  Macedonian: Македонски
   TosAndPrivacyLabel: Términos y condiciones
   TosConfirm: Acepto los
   TosLinkText: TDS
@@ -316,7 +319,8 @@ ExternalNotFound:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
-
+  Macedonian: Македонски
+  
 Footer:
   PoweredBy: Powered By
   Tos: TDS
