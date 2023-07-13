@@ -3761,7 +3761,7 @@ func TestAddHumanCommand(t *testing.T) {
 				hasher: mockPasswordHasher("x"),
 			},
 			want: Want{
-				ValidationErr: caos_errs.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.InvalidArgument"),
+				ValidationErr: caos_errs.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.User.Password.NotSupported"),
 			},
 		},
 		{
