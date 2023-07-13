@@ -123,6 +123,7 @@ Errors:
       Invalid: Паролата е невалидна
       NotSet: Потребителят не е задал парола
       NotChanged: Паролата не е променена
+      NotSupported: Хеш кодирането на паролата не се поддържа
     PasswordComplexityPolicy:
       NotFound: Политиката за парола не е намерена
       MinLength: Паролата е твърде кратка

@@ -121,6 +121,7 @@ Errors:
       Invalid: La password non è valida
       NotSet: L'utente non ha impostato una password
       NotChanged: Password non modificata
+      NotSupported: Codifica hash password non supportata
     PasswordComplexityPolicy:
       NotFound: Impostazioni di complessità password non trovati
       MinLength: La password è troppo corta

@@ -103,7 +103,7 @@ func (h *AddHuman) Validate(hasher *crypto.PasswordHasher) (err error) {
 	}
 	if h.EncodedPasswordHash != "" {
 		if !hasher.EncodingSupported(h.EncodedPasswordHash) {
-			return errors.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.InvalidArgument")
+			return errors.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.User.Password.NotSupported")
 		}
 	}
 	return nil

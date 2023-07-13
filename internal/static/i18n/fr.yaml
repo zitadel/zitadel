@@ -121,6 +121,7 @@ Errors:
       Invalid: Le mot de passe n'est pas valide
       NotSet: L'utilisateur n'a pas défini de mot de passe
       NotChanged: Mot de passe non modifié
+      NotSupported: Encodage de hachage de mot de passe non pris en charge
     PasswordComplexityPolicy:
       NotFound: Politique de mot de passe non trouvée
       MinLength: Le mot de passe est trop court

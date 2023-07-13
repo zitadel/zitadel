@@ -121,6 +121,7 @@ Errors:
       Invalid: Password is invalid
       NotSet: User has not set a password
       NotChanged: Password not changed
+      NotSupported: Password hash encoding not supported
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is too short
