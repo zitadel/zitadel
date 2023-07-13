@@ -60,6 +60,36 @@ func TestPasswordHashConfig_BuildSwapper(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "missing algorithm",
+			fields: fields{
+				Hasher: HasherConfig{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid md5",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNameMd5,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid argon2",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNameArgon2,
+					Params: map[string]any{
+						"time":    3,
+						"memory":  32768,
+						"threads": 4,
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
 			name: "argon2i, error",
 			fields: fields{
 				Hasher: HasherConfig{

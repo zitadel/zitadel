@@ -78,16 +78,11 @@ func (c *HasherConfig) buildHasher() (hasher passwap.Hasher, err error) {
 	case HashNameScrypt:
 		return c.scrypt()
 	case "":
-		// return nil, fmt.Errorf("missing hasher name")
-		return nil, nil
-		// Discuss: the setup commands seems to run without taking defaults.yaml into acount.
-		// That means if the Hasher is not configured in steps, migrations break.
-		// On top of that, such failure seems to corrupt the database in a way
-		// that migrations keep failing until the database recreated.
+		return nil, fmt.Errorf("missing hasher algorithm")
 	case HashNameArgon2, HashNameMd5:
 		fallthrough
 	default:
-		return nil, fmt.Errorf("invalid name %q", c.Algorithm)
+		return nil, fmt.Errorf("invalid algorithm %q", c.Algorithm)
 	}
 }
 
