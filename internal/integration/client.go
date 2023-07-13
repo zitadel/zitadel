@@ -17,6 +17,7 @@ import (
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
@@ -29,6 +30,7 @@ type Client struct {
 	CC        *grpc.ClientConn
 	Admin     admin.AdminServiceClient
 	Mgmt      mgmt.ManagementServiceClient
+	Auth      auth.AuthServiceClient
 	UserV2    user.UserServiceClient
 	SessionV2 session.SessionServiceClient
 	OIDCv2    oidc_pb.OIDCServiceClient
@@ -40,6 +42,7 @@ func newClient(cc *grpc.ClientConn) Client {
 		CC:        cc,
 		Admin:     admin.NewAdminServiceClient(cc),
 		Mgmt:      mgmt.NewManagementServiceClient(cc),
+		Auth:      auth.NewAuthServiceClient(cc),
 		UserV2:    user.NewUserServiceClient(cc),
 		SessionV2: session.NewSessionServiceClient(cc),
 		OIDCv2:    oidc_pb.NewOIDCServiceClient(cc),
