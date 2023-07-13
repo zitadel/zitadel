@@ -494,6 +494,10 @@ Errors:
     WrongLoginClient: Auth Request wurde von einem anderen Login-Client erstellt
   OIDCSession:
     RefreshTokenInvalid: Refresh Token ist ungültig
+    Token:
+      Invalid: Token ist ungültig
+      Expired: Token ist abgelaufen
+
 AggregateTypes:
   action: Action
   instance: Instanz

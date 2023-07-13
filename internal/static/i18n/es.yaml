@@ -494,6 +494,9 @@ Errors:
     WrongLoginClient: Auth Request creado por otro cliente de inicio de sesión
   OIDCSession:
     RefreshTokenInvalid: El token de refresco no es válido
+    Token:
+      Invalid: El token no es válido
+      Expired: El token ha caducado
 
 AggregateTypes:
   action: Acción

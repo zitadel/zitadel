@@ -494,6 +494,9 @@ Errors:
     WrongLoginClient: Auth Request créé par un autre client de connexion
   OIDCSession:
     RefreshTokenInvalid: Le jeton de rafraîchissement n'est pas valide
+    Token:
+      Invalid: Le jeton n'est pas valide
+      Expired: Le jeton est expiré
 
 AggregateTypes:
   action: Action

@@ -494,6 +494,9 @@ Errors:
     WrongLoginClient: 其他登录客户端创建的AuthRequest
   OIDCSession:
     RefreshTokenInvalid: Refresh Token 无效
+    Token:
+      Invalid: 令牌无效
+      Expired: 令牌已过期
 
 AggregateTypes:
   action: 动作

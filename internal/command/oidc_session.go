@@ -139,7 +139,7 @@ func (c *Commands) getResourceOwnerOfSessionUser(ctx context.Context, userID, in
 		AggregateIDs(userID).
 		Builder())
 	if err != nil || len(events) != 1 {
-		return "", caos_errs.ThrowInternal(err, "OIDCS-sferh", "Errors.OIDCSession.RetrieveResourceOwner")
+		return "", caos_errs.ThrowInternal(err, "OIDCS-sferh", "Errors.Internal")
 	}
 	return events[0].Aggregate().ResourceOwner, nil
 }
