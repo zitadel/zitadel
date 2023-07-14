@@ -120,6 +120,8 @@ Errors:
       Empty: Passwort ist leer
       Invalid: Passwort ungültig
       NotSet: Benutzer hat kein Passwort gesetzt
+      NotChanged: Passwort nicht geändert
+      NotSupported: Passwort-Hash-Kodierung wird nicht unterstützt
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
       MinLength: Passwort ist zu kurz

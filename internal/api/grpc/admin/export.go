@@ -577,15 +577,14 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 			}
 			if withPasswords {
 				ctx, pwspan := tracing.NewSpan(ctx)
-				hashedPassword, hashAlgorithm, err := s.query.GetHumanPassword(ctx, org, user.ID)
+				encodedHash, err := s.query.GetHumanPassword(ctx, org, user.ID)
 				pwspan.EndWithError(err)
 				if err != nil && !caos_errors.IsNotFound(err) {
 					return nil, nil, nil, nil, err
 				}
-				if err == nil && hashedPassword != nil {
+				if err == nil && encodedHash != "" {
 					dataUser.User.HashedPassword = &management_pb.ImportHumanUserRequest_HashedPassword{
-						Value:     string(hashedPassword),
-						Algorithm: hashAlgorithm,
+						Value: encodedHash,
 					}
 				}
 			}
