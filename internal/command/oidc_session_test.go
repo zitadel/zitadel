@@ -191,7 +191,7 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 							),
 							eventFromEventPusherWithInstanceID("instanceID",
 								oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-									"accessTokenID", []string{"openid"}, time.Hour),
+									"at_accessTokenID", []string{"openid"}, time.Hour),
 							),
 							eventFromEventPusherWithInstanceID("instanceID",
 								authrequest.NewSucceededEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
@@ -207,7 +207,7 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 				authRequestID: "V2_authRequestID",
 			},
 			res{
-				id:         "V2_oidcSessionID-accessTokenID",
+				id:         "V2_oidcSessionID-at_accessTokenID",
 				expiration: tokenCreationNow.Add(time.Hour),
 			},
 		},
@@ -392,11 +392,11 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 							),
 							eventFromEventPusherWithInstanceID("instanceID",
 								oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-									"accessTokenID", []string{"openid", "offline_access"}, time.Hour),
+									"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour),
 							),
 							eventFromEventPusherWithInstanceID("instanceID",
 								oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-									"refreshTokenID", 7*24*time.Hour, 24*time.Hour),
+									"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 							),
 							eventFromEventPusherWithInstanceID("instanceID",
 								authrequest.NewSucceededEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
@@ -415,8 +415,8 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 				authRequestID: "V2_authRequestID",
 			},
 			res{
-				id:           "V2_oidcSessionID-accessTokenID",
-				refreshToken: "VjJfb2lkY1Nlc3Npb25JRDpyZWZyZXNoVG9rZW5JRA", //V2_oidcSessionID:refreshTokenID
+				id:           "V2_oidcSessionID-at_accessTokenID",
+				refreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
 				expiration:   tokenCreationNow.Add(time.Hour),
 			},
 		},
@@ -476,10 +476,10 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			args{
 				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
 				oidcSessionID: "V2_oidcSessionID",
-				refreshToken:  "aW52YWxpZA",
+				refreshToken:  "aW52YWxpZA", //invalid
 			},
 			res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "OIDCS-Sj3lk", "Errors.OIDCSession.RefreshTokenInvalid"),
+				err: caos_errs.ThrowPreconditionFailed(nil, "OIDCS-JOI23", "Errors.OIDCSession.RefreshTokenInvalid"),
 			},
 		},
 		{
@@ -493,7 +493,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			args{
 				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
 				oidcSessionID: "V2_oidcSessionID",
-				refreshToken:  "VjJfb2lkY1Nlc3Npb25JRDpyZWZyZXNoVG9rZW5JRA",
+				refreshToken:  "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
 			},
 			res{
 				err: caos_errs.ThrowPreconditionFailed(nil, "OIDCS-s3hjk", "Errors.OIDCSession.RefreshTokenInvalid"),
@@ -519,7 +519,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			args{
 				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
 				oidcSessionID: "V2_oidcSessionID",
-				refreshToken:  "VjJfb2lkY1Nlc3Npb25JRDpyZWZyZXNoVG9rZW5JRA",
+				refreshToken:  "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
 			},
 			res{
 				err: caos_errs.ThrowPreconditionFailed(nil, "OIDCS-28ubl", "Errors.OIDCSession.RefreshTokenInvalid"),
@@ -536,11 +536,11 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 						),
 						eventFromEventPusher(
 							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
 						),
 						eventFromEventPusher(
 							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"refreshTokenID", 7*24*time.Hour, 24*time.Hour),
+								"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 						),
 					),
 				),
@@ -549,7 +549,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			args{
 				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
 				oidcSessionID: "V2_oidcSessionID",
-				refreshToken:  "VjJfb2lkY1Nlc3Npb25JRDpyZWZyZXNoVG9rZW5JRA",
+				refreshToken:  "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
 			},
 			res{
 				err: caos_errs.ThrowPreconditionFailed(nil, "OIDCS-3jt2w", "Errors.OIDCSession.RefreshTokenInvalid"),
@@ -566,11 +566,11 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 						),
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
 						),
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"refreshTokenID", 7*24*time.Hour, 24*time.Hour),
+								"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 						),
 					),
 					expectFilter(), // token lifetime
@@ -578,11 +578,11 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID("instanceID",
 								oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-									"accessTokenID", []string{"openid", "offline_access"}, time.Hour),
+									"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour),
 							),
 							eventFromEventPusherWithInstanceID("instanceID",
 								oidcsession.NewRefreshTokenRenewedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-									"refreshTokenID2", 24*time.Hour),
+									"rt_refreshTokenID2", 24*time.Hour),
 							),
 						},
 					),
@@ -596,12 +596,12 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			args{
 				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
 				oidcSessionID: "V2_oidcSessionID",
-				refreshToken:  "VjJfb2lkY1Nlc3Npb25JRDpyZWZyZXNoVG9rZW5JRA",
+				refreshToken:  "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
 				scope:         []string{"openid", "offline_access"},
 			},
 			res{
-				id:           "V2_oidcSessionID-accessTokenID",
-				refreshToken: "VjJfb2lkY1Nlc3Npb25JRDpyZWZyZXNoVG9rZW5JRDI",
+				id:           "V2_oidcSessionID-at_accessTokenID",
+				refreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDI6dXNlcklE", // V2_oidcSessionID-rt_refreshTokenID2:userID%
 				expiration:   time.Time{}.Add(time.Hour),
 			},
 		},
@@ -672,7 +672,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 			},
 			args{
 				ctx:          authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken: "V2_oidcSessionID:refreshTokenID",
+				refreshToken: "V2_oidcSessionID-rt_refreshTokenID:userID",
 			},
 			res{
 				err: caos_errs.ThrowPreconditionFailed(nil, "OIDCS-s3hjk", "Errors.OIDCSession.RefreshTokenInvalid"),
@@ -689,7 +689,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 						),
 						eventFromEventPusher(
 							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
 						),
 					),
 				),
@@ -697,7 +697,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 			},
 			args{
 				ctx:          authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken: "V2_oidcSessionID:refreshTokenID",
+				refreshToken: "V2_oidcSessionID-rt_refreshTokenID:userID",
 			},
 			res{
 				err: caos_errs.ThrowPreconditionFailed(nil, "OIDCS-28ubl", "Errors.OIDCSession.RefreshTokenInvalid"),
@@ -714,11 +714,11 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 						),
 						eventFromEventPusher(
 							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
 						),
 						eventFromEventPusher(
 							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"refreshTokenID", 7*24*time.Hour, 24*time.Hour),
+								"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 						),
 					),
 				),
@@ -726,7 +726,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 			},
 			args{
 				ctx:          authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken: "V2_oidcSessionID:refreshTokenID",
+				refreshToken: "V2_oidcSessionID-rt_refreshTokenID:userID",
 			},
 			res{
 				err: caos_errs.ThrowPreconditionFailed(nil, "OIDCS-3jt2w", "Errors.OIDCSession.RefreshTokenInvalid"),
@@ -743,11 +743,11 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 						),
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
 						),
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"refreshTokenID", 7*24*time.Hour, 24*time.Hour),
+								"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 						),
 					),
 				),
@@ -755,7 +755,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 			},
 			args{
 				ctx:          authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken: "V2_oidcSessionID:refreshTokenID",
+				refreshToken: "V2_oidcSessionID-rt_refreshTokenID:userID",
 			},
 			res{
 				model: &OIDCSessionWriteModel{
@@ -771,7 +771,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 					AuthMethods:                []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 					AuthTime:                   testNow,
 					State:                      domain.OIDCSessionStateActive,
-					RefreshTokenID:             "refreshTokenID",
+					RefreshTokenID:             "rt_refreshTokenID",
 					RefreshTokenExpiration:     testNow.Add(7 * 24 * time.Hour),
 					RefreshTokenIdleExpiration: testNow.Add(24 * time.Hour),
 				},

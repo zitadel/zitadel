@@ -212,8 +212,52 @@ func TestOPStorage_RevokeToken_access_token(t *testing.T) {
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
 
-	err = rp.RevokeToken(provider, tokens.AccessToken, "")
+	// revoke access token
+	err = rp.RevokeToken(provider, tokens.AccessToken, "access_token")
+	require.NoError(t, err)
+
+	// userinfo must fail
+	_, err = rp.Userinfo(tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
 	require.Error(t, err)
+
+	// refresh grant must still work
+	_, err = refreshTokens(t, clientID, tokens.RefreshToken)
+	require.NoError(t, err)
+
+	// revocation with the same access token must not fail (with or without hint)
+	err = rp.RevokeToken(provider, tokens.AccessToken, "access_token")
+	require.NoError(t, err)
+	err = rp.RevokeToken(provider, tokens.AccessToken, "")
+	require.NoError(t, err)
+}
+
+func TestOPStorage_RevokeToken_access_token_invalid_token_hint_type(t *testing.T) {
+	clientID := createClient(t)
+	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
+	require.NoError(t, err)
+	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+		AuthRequestId: authRequestID,
+		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// code exchange
+	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+	tokens, err := exchangeTokens(t, clientID, code)
+	require.NoError(t, err)
+	assertTokens(t, tokens, true)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+
+	// revoke access token
+	err = rp.RevokeToken(provider, tokens.AccessToken, "refresh_token")
+	require.NoError(t, err)
 
 	// userinfo must fail
 	_, err = rp.Userinfo(tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
@@ -224,7 +268,7 @@ func TestOPStorage_RevokeToken_access_token(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestOPStorage_RevokeToken_refresh_access(t *testing.T) {
+func TestOPStorage_RevokeToken_refresh_token(t *testing.T) {
 	clientID := createClient(t)
 	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
 	require.NoError(t, err)
@@ -249,8 +293,8 @@ func TestOPStorage_RevokeToken_refresh_access(t *testing.T) {
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
 
 	// revoke refresh token -> invalidates also access token
-	err = rp.RevokeToken(provider, tokens.RefreshToken, "")
-	require.Error(t, err)
+	err = rp.RevokeToken(provider, tokens.RefreshToken, "refresh_token")
+	require.NoError(t, err)
 
 	// userinfo must fail
 	_, err = rp.Userinfo(tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
@@ -258,6 +302,79 @@ func TestOPStorage_RevokeToken_refresh_access(t *testing.T) {
 
 	// refresh must fail
 	_, err = refreshTokens(t, clientID, tokens.RefreshToken)
+	require.Error(t, err)
+
+	// revocation with the same refresh token must not fail (with or without hint)
+	err = rp.RevokeToken(provider, tokens.RefreshToken, "refresh_token")
+	require.NoError(t, err)
+	err = rp.RevokeToken(provider, tokens.RefreshToken, "")
+	require.NoError(t, err)
+}
+
+func TestOPStorage_RevokeToken_refresh_token_invalid_token_type_hint(t *testing.T) {
+	clientID := createClient(t)
+	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
+	require.NoError(t, err)
+	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+		AuthRequestId: authRequestID,
+		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// code exchange
+	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+	tokens, err := exchangeTokens(t, clientID, code)
+	require.NoError(t, err)
+	assertTokens(t, tokens, true)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+
+	// revoke refresh token even with a wrong hint
+	err = rp.RevokeToken(provider, tokens.RefreshToken, "access_token")
+	require.NoError(t, err)
+
+	// userinfo must fail
+	_, err = rp.Userinfo(tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
+	require.Error(t, err)
+
+	// refresh must fail
+	_, err = refreshTokens(t, clientID, tokens.RefreshToken)
+	require.Error(t, err)
+}
+
+func TestOPStorage_RevokeToken_invalid_client(t *testing.T) {
+	clientID := createClient(t)
+	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+		AuthRequestId: authRequestID,
+		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// code exchange
+	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+	tokens, err := exchangeTokens(t, clientID, code)
+	require.NoError(t, err)
+	assertTokens(t, tokens, true)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+
+	// simulate second client (not part of the audience) trying to revoke the token
+	otherClientID := createClient(t)
+	provider, err := Tester.CreateRelyingParty(otherClientID, redirectURI)
+	require.NoError(t, err)
+	err = rp.RevokeToken(provider, tokens.AccessToken, "")
 	require.Error(t, err)
 }
 
