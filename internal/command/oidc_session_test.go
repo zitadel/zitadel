@@ -808,3 +808,208 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 		})
 	}
 }
+
+func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
+	type fields struct {
+		eventstore   *eventstore.Eventstore
+		keyAlgorithm crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx      context.Context
+		token    string
+		clientID string
+	}
+	type res struct {
+		model *OIDCSessionWriteModel
+		err   error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid token",
+			fields{
+				eventstore:   eventstoreExpect(t),
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx:   authz.WithInstanceID(context.Background(), "instanceID"),
+				token: "invalid",
+			},
+			res{
+				err: nil,
+			},
+		},
+		{
+			"refresh_token inactive",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"userID", "sessionID", "clientID", []string{"clientID"}, []string{"openid", "profile", "offline_access"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
+						),
+					),
+				),
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instanceID"),
+				token:    "V2_oidcSessionID-rt_refreshTokenID",
+				clientID: "clientID",
+			},
+			res{
+				err: nil,
+			},
+		},
+		{
+			"refresh_token invalid client",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"userID", "sessionID", "otherClientID", []string{"otherClientID"}, []string{"openid", "profile", "offline_access"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
+						),
+					),
+				),
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instanceID"),
+				token:    "V2_oidcSessionID-rt_refreshTokenID",
+				clientID: "clientID",
+			},
+			res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "OIDCS-SKjl3", "Errors.OIDCSession.InvalidClient"),
+			},
+		},
+		{
+			"refresh_token revoked",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"userID", "sessionID", "clientID", []string{"clientID"}, []string{"openid", "profile", "offline_access"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
+						),
+					),
+					expectPush([]*repository.Event{
+						eventFromEventPusherWithInstanceID("instanceID",
+							oidcsession.NewRefreshTokenRevokedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate),
+						),
+					}),
+				),
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instanceID"),
+				token:    "V2_oidcSessionID-rt_refreshTokenID",
+				clientID: "clientID",
+			},
+			res{
+				err: nil,
+			},
+		},
+		{
+			"access_token inactive session",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"userID", "sessionID", "clientID", []string{"clientID"}, []string{"openid", "profile", "offline_access"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
+						),
+					),
+				),
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instanceID"),
+				token:    "V2_oidcSessionID-at_accessTokenID",
+				clientID: "clientID",
+			},
+			res{
+				err: nil,
+			},
+		},
+		{
+			"access_token invalid client",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"userID", "sessionID", "otherClientID", []string{"otherClientID"}, []string{"openid", "profile", "offline_access"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
+						),
+					),
+				),
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instanceID"),
+				token:    "V2_oidcSessionID-at_accessTokenID",
+				clientID: "clientID",
+			},
+			res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "OIDCS-SKjl3", "Errors.OIDCSession.InvalidClient"),
+			},
+		},
+		{
+			"access_token revoked",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"userID", "sessionID", "clientID", []string{"clientID"}, []string{"openid", "profile", "offline_access"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
+						),
+					),
+					expectPush([]*repository.Event{
+						eventFromEventPusherWithInstanceID("instanceID",
+							oidcsession.NewAccessTokenRevokedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate),
+						),
+					}),
+				),
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instanceID"),
+				token:    "V2_oidcSessionID-at_accessTokenID",
+				clientID: "clientID",
+			},
+			res{
+				err: nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:   tt.fields.eventstore,
+				keyAlgorithm: tt.fields.keyAlgorithm,
+			}
+			err := c.RevokeOIDCSessionToken(tt.args.ctx, tt.args.token, tt.args.clientID)
+			require.ErrorIs(t, err, tt.res.err)
+		})
+	}
+}
