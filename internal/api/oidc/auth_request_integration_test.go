@@ -184,10 +184,6 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 	require.Error(t, err)
 }
 
-func TestOPStorage_GetRefreshTokenInfo(t *testing.T) {
-
-}
-
 func TestOPStorage_RevokeToken_access_token(t *testing.T) {
 	clientID := createClient(t)
 	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
@@ -376,10 +372,6 @@ func TestOPStorage_RevokeToken_invalid_client(t *testing.T) {
 	require.NoError(t, err)
 	err = rp.RevokeToken(provider, tokens.AccessToken, "")
 	require.Error(t, err)
-}
-
-func TestOPStorage_TerminateSession(t *testing.T) {
-
 }
 
 func exchangeTokens(t testing.TB, clientID, code string) (*oidc.Tokens[*oidc.IDTokenClaims], error) {
