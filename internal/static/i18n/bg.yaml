@@ -514,6 +514,9 @@ Errors:
     WrongLoginClient: Auth Request, създаден от друг клиент за влизане
   OIDCSession:
     RefreshTokenInvalid: Токенът за опресняване е невалиден
+    Token:
+      Invalid: Токенът е невалиден
+      Expired: Токенът е изтекъл
 
 AggregateTypes:
   action: Действие
