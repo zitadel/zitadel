@@ -234,7 +234,7 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil)
 
-	intentID, token, _, _ := Tester.CreateSuccessfulIntent(t, idpID, User.GetUserId(), "id")
+	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, idpID, User.GetUserId(), "id")
 	updateResp, err := Client.SetSession(CTX, &session.SetSessionRequest{
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),
@@ -265,7 +265,7 @@ func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil)
 
 	idpUserID := "id"
-	intentID, token, _, _ := Tester.CreateSuccessfulIntent(t, idpID, "", idpUserID)
+	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, idpID, "", idpUserID)
 	updateResp, err := Client.SetSession(CTX, &session.SetSessionRequest{
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),

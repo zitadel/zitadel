@@ -568,7 +568,9 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t)
 	intentID := Tester.CreateIntent(t, idpID)
-	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulIntent(t, idpID, "", "id")
+	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulOAuthIntent(t, idpID, "", "id")
+	ldapIntentID := Tester.CreateIntent(t, idpID)
+	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Tester.CreateSuccessfulLDAPIntent(t, ldapIntentID, "", "id")
 	type args struct {
 		ctx context.Context
 		req *user.RetrieveIdentityProviderInformationRequest
@@ -615,6 +617,43 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 					ChangeDate:    timestamppb.New(changeDate),
 					ResourceOwner: Tester.Organisation.ID,
 					Sequence:      sequence,
+				},
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Oauth{
+						Oauth: &user.IDPOAuthAccessInformation{
+							AccessToken: "accessToken",
+							IdToken:     gu.Ptr("idToken"),
+						},
+					},
+					IdpId:    idpID,
+					UserId:   "id",
+					UserName: "username",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"sub":                "id",
+							"preferred_username": "username",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "retrieve successful ldap intent",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderInformationRequest{
+					IntentId: ldapSuccessfulID,
+					Token:    ldapToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderInformationResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(ldapChangeDate),
+					ResourceOwner: Tester.Organisation.ID,
+					Sequence:      ldapSequence,
 				},
 				IdpInformation: &user.IDPInformation{
 					Access: &user.IDPInformation_Oauth{

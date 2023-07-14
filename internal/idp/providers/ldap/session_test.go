@@ -220,11 +220,11 @@ func TestProvider_mapLDAPEntryToUser(t *testing.T) {
 			want: want{
 				user: &User{
 					id:                "",
-					firstName:         "",
-					lastName:          "",
-					displayName:       "",
-					nickName:          "",
-					preferredUsername: "",
+					FirstName:         "",
+					LastName:          "",
+					DisplayName:       "",
+					NickName:          "",
+					PreferredUsername: "",
 					email:             "",
 					emailVerified:     false,
 					phone:             "",
@@ -352,11 +352,11 @@ func TestProvider_mapLDAPEntryToUser(t *testing.T) {
 			want: want{
 				user: &User{
 					id:                "id",
-					firstName:         "first",
-					lastName:          "last",
-					displayName:       "display",
-					nickName:          "nick",
-					preferredUsername: "preferred",
+					FirstName:         "first",
+					LastName:          "last",
+					DisplayName:       "display",
+					NickName:          "nick",
+					PreferredUsername: "preferred",
 					email:             "email",
 					emailVerified:     false,
 					phone:             "phone",

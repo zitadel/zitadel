@@ -6,6 +6,6 @@ import (
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
 	es.RegisterFilterEventMapper(AggregateType, StartedEventType, StartedEventMapper).
-		RegisterFilterEventMapper(AggregateType, SucceededEventType, SucceededEventMapper).
+		RegisterFilterEventMapper(AggregateType, OAuthSucceededEventType, OAuthSucceededEventMapper).
 		RegisterFilterEventMapper(AggregateType, FailedEventType, FailedEventMapper)
 }

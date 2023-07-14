@@ -12,15 +12,18 @@ import (
 type IDPIntentWriteModel struct {
 	eventstore.WriteModel
 
-	SuccessURL     *url.URL
-	FailureURL     *url.URL
-	IDPID          string
-	IDPUser        []byte
-	IDPUserID      string
-	IDPUserName    string
+	SuccessURL  *url.URL
+	FailureURL  *url.URL
+	IDPID       string
+	IDPUser     []byte
+	IDPUserID   string
+	IDPUserName string
+	UserID      string
+
 	IDPAccessToken *crypto.CryptoValue
 	IDPIDToken     string
-	UserID         string
+
+	IDPEntryAttributes map[string][]string
 
 	State     domain.IDPIntentState
 	aggregate *eventstore.Aggregate
@@ -41,8 +44,10 @@ func (wm *IDPIntentWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *idpintent.StartedEvent:
 			wm.reduceStartedEvent(e)
-		case *idpintent.SucceededEvent:
-			wm.reduceSucceededEvent(e)
+		case *idpintent.OAuthSucceededEvent:
+			wm.reduceOAuthSucceededEvent(e)
+		case *idpintent.LDAPSucceededEvent:
+			wm.reduceLDAPSucceededEvent(e)
 		case *idpintent.FailedEvent:
 			wm.reduceFailedEvent(e)
 		}
@@ -58,7 +63,7 @@ func (wm *IDPIntentWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			idpintent.StartedEventType,
-			idpintent.SucceededEventType,
+			idpintent.OAuthSucceededEventType,
 			idpintent.FailedEventType,
 		).
 		Builder()
@@ -71,7 +76,16 @@ func (wm *IDPIntentWriteModel) reduceStartedEvent(e *idpintent.StartedEvent) {
 	wm.State = domain.IDPIntentStateStarted
 }
 
-func (wm *IDPIntentWriteModel) reduceSucceededEvent(e *idpintent.SucceededEvent) {
+func (wm *IDPIntentWriteModel) reduceLDAPSucceededEvent(e *idpintent.LDAPSucceededEvent) {
+	wm.UserID = e.UserID
+	wm.IDPUser = e.IDPUser
+	wm.IDPUserID = e.IDPUserID
+	wm.IDPUserName = e.IDPUserName
+	wm.IDPEntryAttributes = e.EntryAttributes
+	wm.State = domain.IDPIntentStateSucceeded
+}
+
+func (wm *IDPIntentWriteModel) reduceOAuthSucceededEvent(e *idpintent.OAuthSucceededEvent) {
 	wm.UserID = e.UserID
 	wm.IDPUser = e.IDPUser
 	wm.IDPUserID = e.IDPUserID

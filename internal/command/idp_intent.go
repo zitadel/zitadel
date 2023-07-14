@@ -50,28 +50,28 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID st
 	}
 }
 
-func (c *Commands) LoginWithLDAP(ctx context.Context, intentID string, username string, password string, callbackURL string) (*IDPIntentWriteModel, idp.User, error) {
+func (c *Commands) LoginWithLDAP(ctx context.Context, intentID string, username string, password string) (*IDPIntentWriteModel, idp.User, *ldap.Session, error) {
 	intent, err := c.GetActiveIntent(ctx, intentID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
-	provider, err := c.GetProvider(ctx, intent.IDPID, callbackURL)
+	provider, err := c.GetProvider(ctx, intent.IDPID, "")
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	ldapProvider, ok := provider.(*ldap.Provider)
 	if !ok {
-		return nil, nil, errors.ThrowInvalidArgument(nil, "IDP-9a02j2n2bh", "Errors.ExternalIDP.IDPTypeNotImplemented")
+		return nil, nil, nil, errors.ThrowInvalidArgument(nil, "IDP-9a02j2n2bh", "Errors.ExternalIDP.IDPTypeNotImplemented")
 	}
 
 	session := &ldap.Session{Provider: ldapProvider, User: username, Password: password}
 	user, err := session.FetchUser(ctx)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-	return intent, user, nil
+	return intent, user, session, nil
 }
 
 func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureURL, resourceOwner string) (string, *domain.ObjectDetails, error) {
@@ -145,7 +145,7 @@ func getIDPIntentWriteModel(ctx context.Context, writeModel *IDPIntentWriteModel
 	return writeModel.Reduce()
 }
 
-func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, idpSession idp.Session, userID string) (string, error) {
+func (c *Commands) SucceedOAuthIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, idpSession idp.Session, userID string) (string, error) {
 	token, err := c.idpConfigEncryption.Encrypt([]byte(writeModel.AggregateID))
 	if err != nil {
 		return "", err
@@ -158,7 +158,7 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 	if err != nil {
 		return "", err
 	}
-	cmd := idpintent.NewSucceededEvent(
+	cmd := idpintent.NewOAuthSucceededEvent(
 		ctx,
 		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
 		idpInfo,
@@ -175,7 +175,7 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 	return base64.RawURLEncoding.EncodeToString(token), nil
 }
 
-func (c *Commands) SucceedLDAPIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, userID string) (string, error) {
+func (c *Commands) SucceedLDAPIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, userID string, attributes map[string][]string) (string, error) {
 	token, err := c.idpConfigEncryption.Encrypt([]byte(writeModel.AggregateID))
 	if err != nil {
 		return "", err
@@ -184,17 +184,15 @@ func (c *Commands) SucceedLDAPIDPIntent(ctx context.Context, writeModel *IDPInte
 	if err != nil {
 		return "", err
 	}
-	cmd, err := idpintent.NewSucceededEvent(
+	cmd := idpintent.NewLDAPSucceededEvent(
 		ctx,
 		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
 		idpInfo,
+		idpUser.GetID(),
+		idpUser.GetPreferredUsername(),
 		userID,
-		nil,
-		"",
+		attributes,
 	)
-	if err != nil {
-		return "", err
-	}
 	err = c.pushAppendAndReduce(ctx, writeModel, cmd)
 	if err != nil {
 		return "", err

@@ -869,15 +869,31 @@ message StartIdentityProviderFlowResponse{
         example: "\"https://accounts.google.com/o/oauth2/v2/auth?client_id=clientID&callback=https%3A%2F%2Fzitadel.cloud%2Fidps%2Fcallback\"";
       }
     ];
-    string token = 3 [
+    Intent intent = 3 [
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "token of the intent"
-        min_length: 1;
-        max_length: 200;
-        example: "\"SJKL3ioIDpo342ioqw98fjp3sdf32wahb=\"";
+        description: "Intent information"
       }
     ];
   }
+}
+
+message Intent {
+  string intent_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the intent"
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432705=\"";
+    }
+  ];
+  string token = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "token of the intent"
+      min_length: 1;
+      max_length: 200;
+      example: "\"SJKL3ioIDpo342ioqw98fjp3sdf32wahb=\"";
+    }
+  ];
 }
 
 message RetrieveIdentityProviderInformationRequest{

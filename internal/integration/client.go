@@ -10,10 +10,12 @@ import (
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
+	"golang.org/x/text/language"
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -163,7 +165,7 @@ func (s *Tester) CreateIntent(t *testing.T, idpID string) string {
 	return id
 }
 
-func (s *Tester) CreateSuccessfulIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+func (s *Tester) CreateSuccessfulOAuthIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
 	ctx := authz.WithInstance(context.Background(), s.Instance)
 	intentID := s.CreateIntent(t, idpID)
 	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Organisation.ID)
@@ -184,7 +186,33 @@ func (s *Tester) CreateSuccessfulIntent(t *testing.T, idpID, userID, idpUserID s
 			IDToken: "idToken",
 		},
 	}
-	token, err := s.Commands.SucceedIDPIntent(ctx, writeModel, idpUser, idpSession, userID)
+	token, err := s.Commands.SucceedOAuthIDPIntent(ctx, writeModel, idpUser, idpSession, userID)
+	require.NoError(t, err)
+	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
+}
+
+func (s *Tester) CreateSuccessfulLDAPIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+	ctx := authz.WithInstance(context.Background(), s.Instance)
+	intentID := s.CreateIntent(t, idpID)
+	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Organisation.ID)
+	require.NoError(t, err)
+	idpUser := ldap.NewUser(
+		"id",
+		"",
+		"",
+		"",
+		"",
+		"username",
+		"",
+		false,
+		"",
+		false,
+		language.Tag{},
+		"",
+		"",
+	)
+	attributes := map[string][]string{"id": {idpUserID}}
+	token, err := s.Commands.SucceedLDAPIDPIntent(ctx, writeModel, idpUser, userID, attributes)
 	require.NoError(t, err)
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
 }

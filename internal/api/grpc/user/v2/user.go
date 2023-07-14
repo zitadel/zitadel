@@ -142,7 +142,7 @@ func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartI
 		return nil, err
 	}
 	if req.GetLdap() != nil {
-		intent, externalUser, err := s.command.LoginWithLDAP(ctx, id, req.GetLdap().GetUsername(), req.GetLdap().GetPassword(), s.idpCallback(ctx)) //TODO callback is irrelevant
+		intent, externalUser, idpSession, err := s.command.LoginWithLDAP(ctx, id, req.GetLdap().GetUsername(), req.GetLdap().GetPassword())
 		if err != nil {
 			return nil, err
 		}
@@ -165,13 +165,18 @@ func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartI
 		if len(links.Links) == 1 {
 			userID = links.Links[0].UserID
 		}
-		token, err := s.command.SucceedLDAPIDPIntent(ctx, intent, externalUser, userID)
+		attributes := make(map[string][]string, 0)
+		for _, item := range idpSession.Entry.Attributes {
+			attributes[item.Name] = item.Values
+		}
+
+		token, err := s.command.SucceedLDAPIDPIntent(ctx, intent, externalUser, userID, attributes)
 		if err != nil {
 			return nil, err
 		}
 		return &user.StartIdentityProviderFlowResponse{
 			Details:  object.DomainToDetailsPb(details),
-			NextStep: &user.StartIdentityProviderFlowResponse_Token{Token: token},
+			NextStep: &user.StartIdentityProviderFlowResponse_Intent{Intent: &user.Intent{IntentId: id, Token: token}},
 		}, nil
 	} else {
 		authURL, err := s.command.AuthURLFromProvider(ctx, req.GetIdpId(), id, s.idpCallback(ctx))
