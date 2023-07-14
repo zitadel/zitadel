@@ -485,6 +485,9 @@ Errors:
     WrongLoginClient: 他のログインクライアントによって作成された AuthRequest
   OIDCSession:
     RefreshTokenInvalid: 無効なリフレッシュトークンです
+    Token:
+      Invalid: トークンが無効です
+      Expired: トークンの有効期限が切れている
 
 AggregateTypes:
   action: アクション

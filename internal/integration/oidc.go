@@ -8,25 +8,20 @@ import (
 	"strings"
 	"time"
 
+	"github.com/zitadel/oidc/v2/pkg/client"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
+	"github.com/zitadel/oidc/v2/pkg/client/rs"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	oidc_internal "github.com/zitadel/zitadel/internal/api/oidc"
-	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/pkg/grpc/app"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func (s *Tester) CreateOIDCNativeClient(ctx context.Context, redirectURI string) (*management.AddOIDCAppResponse, error) {
-	project, err := s.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
-		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
-	})
-	if err != nil {
-		return nil, err
-	}
+func (s *Tester) CreateOIDCNativeClient(ctx context.Context, redirectURI, projectID string) (*management.AddOIDCAppResponse, error) {
 	return s.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
-		ProjectId:                project.GetId(),
+		ProjectId:                projectID,
 		Name:                     fmt.Sprintf("app-%d", time.Now().UnixNano()),
 		RedirectUris:             []string{redirectURI},
 		ResponseTypes:            []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
@@ -71,6 +66,20 @@ func (s *Tester) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI s
 		ClockSkew:                nil,
 		AdditionalOrigins:        nil,
 		SkipNativeAppSuccessPage: false,
+	})
+}
+
+func (s *Tester) CreateProject(ctx context.Context) (*management.AddProjectResponse, error) {
+	return s.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
+		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
+	})
+}
+
+func (s *Tester) CreateAPIClient(ctx context.Context, projectID string) (*management.AddAPIAppResponse, error) {
+	return s.Client.Mgmt.AddAPIApp(ctx, &management.AddAPIAppRequest{
+		ProjectId:      projectID,
+		Name:           fmt.Sprintf("api-%d", time.Now().UnixNano()),
+		AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
 	})
 }
 
@@ -123,12 +132,23 @@ func (s *Tester) CreateOIDCAuthRequestImplicit(clientID, loginClient, redirectUR
 	return strings.TrimPrefix(loc.String(), prefixWithHost), nil
 }
 
+func (s *Tester) OIDCIssuer() string {
+	return http_util.BuildHTTP(s.Config.ExternalDomain, s.Config.Port, s.Config.ExternalSecure)
+}
+
 func (s *Tester) CreateRelyingParty(clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
-	issuer := http_util.BuildHTTP(s.Config.ExternalDomain, s.Config.Port, s.Config.ExternalSecure)
 	if len(scope) == 0 {
 		scope = []string{oidc.ScopeOpenID}
 	}
-	return rp.NewRelyingPartyOIDC(issuer, clientID, "", redirectURI, scope)
+	return rp.NewRelyingPartyOIDC(s.OIDCIssuer(), clientID, "", redirectURI, scope)
+}
+
+func (s *Tester) CreateResourceServer(keyFileData []byte) (rs.ResourceServer, error) {
+	keyFile, err := client.ConfigFromKeyFileData(keyFileData)
+	if err != nil {
+		return nil, err
+	}
+	return rs.NewResourceServerJWTProfile(s.OIDCIssuer(), keyFile.ClientID, keyFile.KeyID, []byte(keyFile.Key))
 }
 
 func CheckRedirect(url string, headers map[string]string) (*url.URL, error) {
@@ -152,12 +172,4 @@ func CheckRedirect(url string, headers map[string]string) (*url.URL, error) {
 	defer resp.Body.Close()
 
 	return resp.Location()
-}
-
-func (s *Tester) CreateSession(ctx context.Context, userID string) (string, string, error) {
-	session, err := s.Commands.CreateSession(ctx, []command.SessionCommand{command.CheckUser(userID)}, "domain.tld", nil)
-	if err != nil {
-		return "", "", err
-	}
-	return session.ID, session.NewToken, nil
 }

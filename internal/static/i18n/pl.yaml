@@ -496,6 +496,9 @@ Errors:
     WrongLoginClient: Auth Request utworzony przez innego klienta logowania
   OIDCSession:
     RefreshTokenInvalid: Refresh Token jest nieprawidłowy
+    Token:
+      Invalid: Token jest nieprawidłowy
+      Expired: Token wygasł
 
 AggregateTypes:
   action: Działanie
