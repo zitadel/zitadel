@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -1459,6 +1460,54 @@ func Test_columnsToWhere(t *testing.T) {
 			},
 			want: want{
 				wheres: []string{"(col1 = $3)"},
+				values: []interface{}{"val1"},
+			},
+		},
+		{
+			name: "less than",
+			args: args{
+				conds: []Condition{
+					NewLessThanCond("col1", "val1"),
+				},
+			},
+			want: want{
+				wheres: []string{"(col1 < $1)"},
+				values: []interface{}{"val1"},
+			},
+		},
+		{
+			name: "is null",
+			args: args{
+				conds: []Condition{
+					NewIsNullCond("col1"),
+				},
+			},
+			want: want{
+				wheres: []string{"(col1 IS NULL)"},
+				values: []interface{}{},
+			},
+		},
+		{
+			name: "text array contains",
+			args: args{
+				conds: []Condition{
+					NewTextArrayContainsCond("col1", "val1"),
+				},
+			},
+			want: want{
+				wheres: []string{"(col1 @> $1)"},
+				values: []interface{}{database.TextArray{"val1"}},
+			},
+		},
+		{
+			name: "not",
+			args: args{
+				conds: []Condition{
+					Not(NewCond("col1", "val1")),
+				},
+			},
+			want: want{
+				wheres: []string{"(NOT (col1 = $1))"},
 				values: []interface{}{"val1"},
 			},
 		},
