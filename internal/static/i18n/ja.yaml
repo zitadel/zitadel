@@ -112,6 +112,8 @@ Errors:
       Empty: パスワードは空です
       Invalid: 無効なパスワードです
       NotSet: パスワードが未設置です
+      NotChanged: パスワードは変更されていません
+      NotSupported: パスワードハッシュエンコードはサポートされていません
     PasswordComplexityPolicy:
       NotFound: パスワードポリシーが見つかりません
       MinLength: パスワードが短すぎます
