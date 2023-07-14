@@ -135,9 +135,8 @@ func TestSessionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&sessionProjection{}).reduceIntentChecked,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("session"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("session"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -276,7 +275,7 @@ func TestSessionProjection_reduces(t *testing.T) {
 			name: "reducePasswordChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(user.HumanPasswordChangedType),
+					user.HumanPasswordChangedType,
 					user.AggregateType,
 					[]byte(`{"secret": {
 								"cryptoType": 0,
@@ -288,9 +287,8 @@ func TestSessionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&sessionProjection{}).reducePasswordChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("user"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("user"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

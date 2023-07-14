@@ -151,6 +151,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 				return internal_authz.CheckPermission(ctx, &authz_es.UserMembershipRepo{Queries: q}, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 			}
 		},
+		config.SystemAPIUsers,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)

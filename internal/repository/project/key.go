@@ -107,7 +107,7 @@ func ApplicationKeyRemovedEventMapper(event eventstore.Event) (eventstore.Event,
 	}
 	err := event.Unmarshal(applicationKeyRemoved)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-5Gm9s", "unable to unmarshal application key removed")
+		return nil, errors.ThrowInternal(err, "USER-cjLeA", "unable to unmarshal application key removed")
 	}
 
 	return applicationKeyRemoved, nil

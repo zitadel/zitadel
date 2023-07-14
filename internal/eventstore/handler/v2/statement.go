@@ -410,6 +410,7 @@ func conditionsToWhere(conds []Condition, paramOffset int) (wheres []string, val
 	for i, cond := range conds {
 		paramOffset++
 		wheres[i], values[i] = cond("$" + strconv.Itoa(paramOffset))
+		wheres[i] = "(" + wheres[i] + ")"
 	}
 
 	return wheres, values

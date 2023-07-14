@@ -4,6 +4,7 @@ import (
 	"context"
 	"strconv"
 
+	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -24,10 +25,12 @@ const (
 	MilestoneColumnIgnoreClientIDs = "ignore_client_ids"
 )
 
-type milestoneProjection struct{}
+type milestoneProjection struct {
+	systemUsers map[string]*internal_authz.SystemAPIUser
+}
 
-func newMilestoneProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(milestoneProjection))
+func newMilestoneProjection(ctx context.Context, config handler.Config, systemUsers map[string]*internal_authz.SystemAPIUser) *handler.Handler {
+	return handler.NewHandler(ctx, &config, &milestoneProjection{systemUsers: systemUsers})
 }
 
 func (*milestoneProjection) Name() string {
@@ -289,9 +292,14 @@ func (p *milestoneProjection) isSystemEvent(event eventstore.Event) bool {
 	if userId, err := strconv.Atoi(event.Creator()); err == nil && userId > 0 {
 		return false
 	}
-	return true
-	// lowerEditorService := strings.ToLower(event.EditorService())
-	// return lowerEditorService == "" ||
-	// 	lowerEditorService == "system" ||
-	// 	lowerEditorService == "system-api"
+
+	// check if it is a hard coded event creator
+	for _, creator := range []string{"", "system", "OIDC", "LOGIN", "SYSTEM"} {
+		if creator == event.Creator() {
+			return true
+		}
+	}
+
+	_, ok := p.systemUsers[event.Creator()]
+	return ok
 }

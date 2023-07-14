@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -173,22 +172,22 @@ func TestCommands_pushUserU2F(t *testing.T) {
 		{
 			name: "push error",
 			expectPush: func(challenge string) expect {
-				return expectPushFailed(io.ErrClosedPipe, []*repository.Event{eventFromEventPusher(
+				return expectPushFailed(io.ErrClosedPipe,
 					user.NewHumanU2FAddedEvent(ctx,
 						userAgg, "123", challenge, "rpID",
 					),
-				)})
+				)
 			},
 			wantErr: io.ErrClosedPipe,
 		},
 		{
 			name: "success",
 			expectPush: func(challenge string) expect {
-				return expectPush([]*repository.Event{eventFromEventPusher(
+				return expectPush(
 					user.NewHumanU2FAddedEvent(ctx,
 						userAgg, "123", challenge, "rpID",
 					),
-				)})
+				)
 			},
 		},
 	}

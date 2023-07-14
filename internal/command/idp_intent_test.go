@@ -436,7 +436,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 							event := idpintent.NewSucceededEvent(
 								context.Background(),
 								&idpintent.NewAggregate("id", "ro").Aggregate,
-								[]byte(`{"RawInfo":{"id":"id"}}`),
+								[]byte(`{"sub":"id","preferred_username":"username"}`),
 								"id",
 								"username",
 								"",

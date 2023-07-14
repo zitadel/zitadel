@@ -20,6 +20,7 @@ func testEvent(
 
 func toSystemEvent(event *repository.Event) *repository.Event {
 	event.EditorService = "SYSTEM"
+	event.EditorUser = "SYSTEM"
 	return event
 }
 

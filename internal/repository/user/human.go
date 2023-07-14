@@ -124,7 +124,7 @@ func HumanAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(humanAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-5Gm9s", "unable to unmarshal human added")
+		return nil, errors.ThrowInternal(err, "USER-vGlhy", "unable to unmarshal human added")
 	}
 
 	return humanAdded, nil

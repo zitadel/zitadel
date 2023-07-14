@@ -91,6 +91,9 @@ func (*BaseEvent) Revision() uint16 {
 }
 
 func (e *BaseEvent) Unmarshal(ptr any) error {
+	if len(e.Data) == 0 {
+		return nil
+	}
 	return json.Unmarshal(e.Data, ptr)
 }
 

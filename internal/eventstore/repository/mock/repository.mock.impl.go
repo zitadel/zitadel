@@ -171,21 +171,29 @@ func (e *mockEvent) CreatedAt() time.Time {
 	return e.createdAt
 }
 
-func (m *MockRepository) ExpectRandomPush(expectedEvents []eventstore.Command) *MockRepository {
-	m.MockPusher.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx context.Context, events []*repository.Event) error {
-			assert.Len(m.MockPusher.ctrl.T, events, len(expectedEvents))
-			return nil
+func (m *MockRepository) ExpectRandomPush(expectedCommands []eventstore.Command) *MockRepository {
+	m.MockPusher.EXPECT().Push(gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx context.Context, commands ...eventstore.Command) ([]eventstore.Event, error) {
+			assert.Len(m.MockPusher.ctrl.T, commands, len(expectedCommands))
+
+			events := make([]eventstore.Event, len(commands))
+			for i, command := range commands {
+				events[i] = &mockEvent{
+					Command: command,
+				}
+			}
+
+			return events, nil
 		},
 	)
 	return m
 }
 
 func (m *MockRepository) ExpectRandomPushFailed(err error, expectedEvents []eventstore.Command) *MockRepository {
-	m.MockPusher.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx context.Context, events []*repository.Event) error {
+	m.MockPusher.EXPECT().Push(gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx context.Context, events ...eventstore.Command) ([]eventstore.Event, error) {
 			assert.Len(m.MockPusher.ctrl.T, events, len(expectedEvents))
-			return err
+			return nil, err
 		},
 	)
 	return m

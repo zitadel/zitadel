@@ -58,7 +58,7 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 					expectFilter(),
 				),
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-MM9fs", "Errors.User.NotFound"),
+			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SqyJz", "Errors.User.NotFound"),
 		},
 		{
 			name: "push error",
@@ -104,9 +104,9 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 						),
 					),
 					expectFilter(),
-					expectRandomPushFailed(io.ErrClosedPipe, []eventstore.Command{eventFromEventPusher(
+					expectRandomPushFailed(io.ErrClosedPipe, []eventstore.Command{
 						user.NewHumanOTPAddedEvent(ctx, userAgg, nil),
-					)}),
+					}),
 				),
 			},
 			wantErr: io.ErrClosedPipe,
@@ -155,9 +155,9 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 						),
 					),
 					expectFilter(),
-					expectRandomPush([]eventstore.Command{eventFromEventPusher(
+					expectRandomPush([]eventstore.Command{
 						user.NewHumanOTPAddedEvent(ctx, userAgg, nil),
-					)}),
+					}),
 				),
 			},
 			want: true,

@@ -100,7 +100,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s12ChangeEvents = &ChangeEvents{dbClient: dbClient}
 	steps.s13CurrentStates = &CurrentProjectionState{dbClient: dbClient}
 
-	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil)
+	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
 
 	repeatableSteps := []migration.RepeatableMigration{

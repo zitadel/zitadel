@@ -119,7 +119,7 @@ func UserIDPLinkRemovedEventMapper(event eventstore.Event) (eventstore.Event, er
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-5Gm9s", "unable to unmarshal user external idp removed")
+		return nil, errors.ThrowInternal(err, "USER-eAWoT", "unable to unmarshal user external idp removed")
 	}
 
 	return e, nil
