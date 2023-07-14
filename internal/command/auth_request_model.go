@@ -32,7 +32,7 @@ type AuthRequestWriteModel struct {
 	SessionID        string
 	UserID           string
 	AuthTime         time.Time
-	AMR              []string
+	AuthMethods      []domain.UserAuthMethodType
 	AuthRequestState domain.AuthRequestState
 }
 
@@ -68,7 +68,7 @@ func (m *AuthRequestWriteModel) Reduce() error {
 			m.SessionID = e.SessionID
 			m.UserID = e.UserID
 			m.AuthTime = e.AuthTime
-			m.AMR = e.AMR
+			m.AuthMethods = e.AuthMethods
 		case *authrequest.CodeAddedEvent:
 			m.AuthRequestState = domain.AuthRequestStateCodeAdded
 		case *authrequest.FailedEvent:

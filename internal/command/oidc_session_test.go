@@ -9,9 +9,9 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/oidc/amr"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -22,6 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/session"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 var (
@@ -99,7 +100,7 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 								"sessionID",
 								"userID",
 								testNow,
-								[]string{amr.PWD},
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 							),
 						),
 						eventFromEventPusher(
@@ -109,7 +110,7 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 							authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 						),
 					),
-					expectFilter(),
+					expectFilter(), // inactive session
 				),
 			},
 			args{
@@ -151,7 +152,7 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 								"sessionID",
 								"userID",
 								testNow,
-								[]string{amr.PWD},
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 							),
 						),
 						eventFromEventPusher(
@@ -174,15 +175,22 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 								testNow),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstName", "lastName", "", "", language.English, domain.GenderUnspecified, "", false,
+							),
+						),
+					),
 					expectFilter(), // token lifetime
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID("instanceID",
-								oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
-									"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid"}, []string{amr.PWD}, testNow),
+								oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+									"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
 							),
 							eventFromEventPusherWithInstanceID("instanceID",
-								oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
+								oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 									"accessTokenID", []string{"openid"}, time.Hour),
 							),
 							eventFromEventPusherWithInstanceID("instanceID",
@@ -293,7 +301,7 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 								"sessionID",
 								"userID",
 								testNow,
-								[]string{amr.PWD},
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 							),
 						),
 						eventFromEventPusher(
@@ -303,7 +311,7 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 							authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 						),
 					),
-					expectFilter(),
+					expectFilter(), // inactive session
 				),
 			},
 			args{
@@ -345,7 +353,7 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 								"sessionID",
 								"userID",
 								testNow,
-								[]string{amr.PWD},
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 							),
 						),
 						eventFromEventPusher(
@@ -368,19 +376,26 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 								testNow),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstName", "lastName", "", "", language.English, domain.GenderUnspecified, "", false,
+							),
+						),
+					),
 					expectFilter(), // token lifetime
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID("instanceID",
-								oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
-									"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "offline_access"}, []string{amr.PWD}, testNow),
+								oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+									"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "offline_access"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
 							),
 							eventFromEventPusherWithInstanceID("instanceID",
-								oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
+								oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 									"accessTokenID", []string{"openid", "offline_access"}, time.Hour),
 							),
 							eventFromEventPusherWithInstanceID("instanceID",
-								oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
+								oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 									"refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 							),
 							eventFromEventPusherWithInstanceID("instanceID",
@@ -490,11 +505,11 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
-								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"}, []string{amr.PWD}, testNow),
+							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
 						),
 						eventFromEventPusher(
-							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
+							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
 						),
 					),
@@ -516,15 +531,15 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
-								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"}, []string{amr.PWD}, testNow),
+							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
 						),
 						eventFromEventPusher(
-							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
+							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
 						),
 						eventFromEventPusher(
-							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
+							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 						),
 					),
@@ -546,15 +561,15 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusherWithCreationDateNow(
-							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
-								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"}, []string{amr.PWD}, testNow),
+							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
+							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
+							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 						),
 					),
@@ -562,11 +577,11 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID("instanceID",
-								oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
+								oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 									"accessTokenID", []string{"openid", "offline_access"}, time.Hour),
 							),
 							eventFromEventPusherWithInstanceID("instanceID",
-								oidcsession.NewRefreshTokenRenewedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
+								oidcsession.NewRefreshTokenRenewedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 									"refreshTokenID2", 24*time.Hour),
 							),
 						},
@@ -669,11 +684,11 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
-								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"}, []string{amr.PWD}, testNow),
+							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
 						),
 						eventFromEventPusher(
-							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
+							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
 						),
 					),
@@ -694,15 +709,15 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
-								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"}, []string{amr.PWD}, testNow),
+							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
 						),
 						eventFromEventPusher(
-							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
+							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
 						),
 						eventFromEventPusher(
-							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
+							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 						),
 					),
@@ -723,15 +738,15 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusherWithCreationDateNow(
-							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
-								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"}, []string{amr.PWD}, testNow),
+							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
+							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "instanceID").Aggregate,
+							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 						),
 					),
@@ -753,7 +768,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 					ClientID:                   "clientID",
 					Audience:                   []string{"audience"},
 					Scope:                      []string{"openid", "profile", "offline_access"},
-					AuthMethodsReferences:      []string{amr.PWD},
+					AuthMethods:                []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 					AuthTime:                   testNow,
 					State:                      domain.OIDCSessionStateActive,
 					RefreshTokenID:             "refreshTokenID",
@@ -783,7 +798,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 				assert.Equal(t, tt.res.model.ClientID, got.ClientID)
 				assert.Equal(t, tt.res.model.Audience, got.Audience)
 				assert.Equal(t, tt.res.model.Scope, got.Scope)
-				assert.Equal(t, tt.res.model.AuthMethodsReferences, got.AuthMethodsReferences)
+				assert.Equal(t, tt.res.model.AuthMethods, got.AuthMethods)
 				assert.WithinRange(t, got.AuthTime, tt.res.model.AuthTime.Add(-2*time.Second), tt.res.model.AuthTime.Add(2*time.Second))
 				assert.Equal(t, tt.res.model.State, got.State)
 				assert.Equal(t, tt.res.model.RefreshTokenID, got.RefreshTokenID)

@@ -244,7 +244,7 @@ func (c *Commands) VerifyAPIClientSecret(ctx context.Context, projectID, appID, 
 
 	projectAgg := ProjectAggregateFromWriteModel(&app.WriteModel)
 	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
-	err = crypto.CompareHash(app.ClientSecret, []byte(secret), c.userPasswordAlg)
+	err = crypto.CompareHash(app.ClientSecret, []byte(secret), c.codeAlg)
 	spanPasswordComparison.EndWithError(err)
 	if err == nil {
 		_, err = c.eventstore.Push(ctx, project_repo.NewAPIConfigSecretCheckSucceededEvent(ctx, projectAgg, app.AppID))

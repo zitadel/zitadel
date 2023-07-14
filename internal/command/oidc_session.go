@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/oidc/amr"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -15,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 // AddOIDCSessionAccessToken creates a new OIDC Session, creates an access token and returns its id and expiration.
@@ -102,6 +102,10 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, authRequestID st
 	if sessionWriteModel.State != domain.SessionStateActive {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "OIDCS-sjkl3", "Errors.Session.Terminated")
 	}
+	resourceOwner, err := c.getResourceOwnerOfSessionUser(ctx, sessionWriteModel.UserID, sessionWriteModel.InstanceID)
+	if err != nil {
+		return nil, err
+	}
 	accessTokenLifetime, refreshTokenLifeTime, refreshTokenIdleLifetime, err := c.tokenTokenLifetimes(ctx)
 	if err != nil {
 		return nil, err
@@ -115,13 +119,29 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, authRequestID st
 		eventstore:               c.eventstore,
 		idGenerator:              c.idGenerator,
 		encryptionAlg:            c.keyAlgorithm,
-		oidcSessionWriteModel:    NewOIDCSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID()),
+		oidcSessionWriteModel:    NewOIDCSessionWriteModel(sessionID, resourceOwner),
 		sessionWriteModel:        sessionWriteModel,
 		authRequestWriteModel:    authRequestWriteModel,
 		accessTokenLifetime:      accessTokenLifetime,
 		refreshTokenLifeTime:     refreshTokenLifeTime,
 		refreshTokenIdleLifetime: refreshTokenIdleLifetime,
 	}, nil
+}
+
+func (c *Commands) getResourceOwnerOfSessionUser(ctx context.Context, userID, instanceID string) (string, error) {
+	events, err := c.eventstore.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		InstanceID(instanceID).
+		AllowTimeTravel().
+		OrderAsc().
+		Limit(1).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(userID).
+		Builder())
+	if err != nil || len(events) != 1 {
+		return "", caos_errs.ThrowInternal(err, "OIDCS-sferh", "Errors.Internal")
+	}
+	return events[0].Aggregate().ResourceOwner, nil
 }
 
 func (c *Commands) decryptRefreshToken(refreshToken string) (refreshTokenID string, err error) {
@@ -145,7 +165,7 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, oidcSessionID
 	if err != nil {
 		return nil, err
 	}
-	sessionWriteModel := NewOIDCSessionWriteModel(oidcSessionID, authz.GetInstance(ctx).InstanceID())
+	sessionWriteModel := NewOIDCSessionWriteModel(oidcSessionID, "")
 	if err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}
@@ -195,7 +215,7 @@ func (c *OIDCSessionEvents) AddSession(ctx context.Context) {
 		c.authRequestWriteModel.ClientID,
 		c.authRequestWriteModel.Audience,
 		c.authRequestWriteModel.Scope,
-		amr.List(c.sessionWriteModel),
+		c.sessionWriteModel.AuthMethodTypes(),
 		c.sessionWriteModel.AuthenticationTime(),
 	))
 }

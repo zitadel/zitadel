@@ -49,7 +49,9 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_GetAuthRequest(t *testing.T) {
-	client, err := Tester.CreateOIDCNativeClient(CTX, redirectURI)
+	project, err := Tester.CreateProject(CTX)
+	require.NoError(t, err)
+	client, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, project.GetId())
 	require.NoError(t, err)
 	authRequestID, err := Tester.CreateOIDCAuthRequest(client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
 	require.NoError(t, err)
@@ -91,7 +93,9 @@ func TestServer_GetAuthRequest(t *testing.T) {
 }
 
 func TestServer_CreateCallback(t *testing.T) {
-	client, err := Tester.CreateOIDCNativeClient(CTX, redirectURI)
+	project, err := Tester.CreateProject(CTX)
+	require.NoError(t, err)
+	client, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, project.GetId())
 	require.NoError(t, err)
 	sessionResp, err := Tester.Client.SessionV2.CreateSession(CTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{

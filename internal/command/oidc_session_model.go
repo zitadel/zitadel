@@ -17,9 +17,10 @@ type OIDCSessionWriteModel struct {
 	ClientID                   string
 	Audience                   []string
 	Scope                      []string
-	AuthMethodsReferences      []string
+	AuthMethods                []domain.UserAuthMethodType
 	AuthTime                   time.Time
 	State                      domain.OIDCSessionState
+	AccessTokenCreation        time.Time
 	AccessTokenExpiration      time.Time
 	RefreshTokenID             string
 	RefreshTokenExpiration     time.Time
@@ -79,9 +80,14 @@ func (wm *OIDCSessionWriteModel) reduceAdded(e *oidcsession.AddedEvent) {
 	wm.ClientID = e.ClientID
 	wm.Audience = e.Audience
 	wm.Scope = e.Scope
-	wm.AuthMethodsReferences = e.AuthMethodsReferences
+	wm.AuthMethods = e.AuthMethods
 	wm.AuthTime = e.AuthTime
 	wm.State = domain.OIDCSessionStateActive
+	// the write model might be initialized without resource owner,
+	// so update the aggregate
+	if wm.ResourceOwner == "" {
+		wm.aggregate = &oidcsession.NewAggregate(wm.AggregateID, e.Aggregate().ResourceOwner).Aggregate
+	}
 }
 
 func (wm *OIDCSessionWriteModel) reduceAccessTokenAdded(e *oidcsession.AccessTokenAddedEvent) {

@@ -5,7 +5,6 @@ package oidc_test
 import (
 	"context"
 	"net/url"
-	"os"
 	"testing"
 	"time"
 
@@ -15,64 +14,15 @@ import (
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
 
-	"github.com/zitadel/zitadel/internal/api/oidc/amr"
+	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/integration"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
 var (
-	CTX      context.Context
-	CTXLOGIN context.Context
-	Tester   *integration.Tester
-	User     *user.AddHumanUserResponse
+	armPasskey  = []string{oidc_api.UserPresence, oidc_api.MFA}
+	armPassword = []string{oidc_api.PWD}
 )
-
-const (
-	redirectURI         = "oidcIntegrationTest://callback"
-	redirectURIImplicit = "http://localhost:9999/callback"
-)
-
-func TestMain(m *testing.M) {
-	os.Exit(func() int {
-		ctx, errCtx, cancel := integration.Contexts(5 * time.Minute)
-		defer cancel()
-
-		Tester = integration.NewTester(ctx)
-		defer Tester.Done()
-
-		CTX, _ = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
-		User = Tester.CreateHumanUser(CTX)
-		Tester.RegisterUserPasskey(CTX, User.GetUserId())
-		CTXLOGIN, _ = Tester.WithAuthorization(ctx, integration.Login), errCtx
-		return m.Run()
-	}())
-}
-
-func createClient(t testing.TB) string {
-	app, err := Tester.CreateOIDCNativeClient(CTX, redirectURI)
-	require.NoError(t, err)
-	return app.GetClientId()
-}
-
-func createImplicitClient(t testing.TB) string {
-	app, err := Tester.CreateOIDCImplicitFlowClient(CTX, redirectURIImplicit)
-	require.NoError(t, err)
-	return app.GetClientId()
-}
-
-func createAuthRequest(t testing.TB, clientID, redirectURI string, scope ...string) string {
-	redURL, err := Tester.CreateOIDCAuthRequest(clientID, Tester.Users[integration.FirstInstanceUsersKey][integration.Login].ID, redirectURI, scope...)
-	require.NoError(t, err)
-	return redURL
-}
-
-func createAuthRequestImplicit(t testing.TB, clientID, redirectURI string, scope ...string) string {
-	redURL, err := Tester.CreateOIDCAuthRequestImplicit(clientID, Tester.Users[integration.FirstInstanceUsersKey][integration.Login].ID, redirectURI, scope...)
-	require.NoError(t, err)
-	return redURL
-}
 
 func TestOPStorage_CreateAuthRequest(t *testing.T) {
 	clientID := createClient(t)
@@ -101,7 +51,7 @@ func TestOPStorage_CreateAccessToken_code(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
-	assertTokenClaims(t, tokens.IDTokenClaims, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
 
 	// callback on a succeeded request must fail
 	linkResp, err = Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -155,7 +105,7 @@ func TestOPStorage_CreateAccessToken_implicit(t *testing.T) {
 	require.NoError(t, err)
 	claims, err := rp.VerifyTokens[*oidc.IDTokenClaims](context.Background(), accessToken, idToken, provider.IDTokenVerifier())
 	require.NoError(t, err)
-	assertTokenClaims(t, claims, startTime, changeTime)
+	assertIDTokenClaims(t, claims, armPasskey, startTime, changeTime)
 
 	// callback on a succeeded request must fail
 	linkResp, err = Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -190,7 +140,7 @@ func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertTokenClaims(t, tokens.IDTokenClaims, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
 }
 
 func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
@@ -215,7 +165,7 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertTokenClaims(t, tokens.IDTokenClaims, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
 
 	// test actual refresh grant
 	newTokens, err := refreshTokens(t, clientID, tokens.RefreshToken)
@@ -227,7 +177,7 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 	claims, err := rp.VerifyTokens[*oidc.IDTokenClaims](context.Background(), newTokens.AccessToken, idToken, provider.IDTokenVerifier())
 	require.NoError(t, err)
 	// auth time must still be the initial
-	assertTokenClaims(t, claims, startTime, changeTime)
+	assertIDTokenClaims(t, claims, armPasskey, startTime, changeTime)
 
 	// refresh with an old refresh_token must fail
 	_, err = rp.RefreshAccessToken(provider, tokens.RefreshToken, "", "")
@@ -268,8 +218,8 @@ func assertTokens(t *testing.T, tokens *oidc.Tokens[*oidc.IDTokenClaims], requir
 	}
 }
 
-func assertTokenClaims(t *testing.T, claims *oidc.IDTokenClaims, sessionStart, sessionChange time.Time) {
+func assertIDTokenClaims(t *testing.T, claims *oidc.IDTokenClaims, arm []string, sessionStart, sessionChange time.Time) {
 	assert.Equal(t, User.GetUserId(), claims.Subject)
-	assert.Equal(t, []string{amr.UserPresence, amr.MFA}, claims.AuthenticationMethodsReferences)
-	assert.WithinRange(t, claims.AuthTime.AsTime().UTC(), sessionStart.Add(-1*time.Second), sessionChange.Add(1*time.Second))
+	assert.Equal(t, arm, claims.AuthenticationMethodsReferences)
+	assertOIDCTimeRange(t, claims.AuthTime, sessionStart, sessionChange)
 }

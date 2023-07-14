@@ -120,6 +120,8 @@ Errors:
       Empty: Le mot de passe est vide
       Invalid: Le mot de passe n'est pas valide
       NotSet: L'utilisateur n'a pas défini de mot de passe
+      NotChanged: Mot de passe non modifié
+      NotSupported: Encodage de hachage de mot de passe non pris en charge
     PasswordComplexityPolicy:
       NotFound: Politique de mot de passe non trouvée
       MinLength: Le mot de passe est trop court
@@ -494,6 +496,9 @@ Errors:
     WrongLoginClient: Auth Request créé par un autre client de connexion
   OIDCSession:
     RefreshTokenInvalid: Le jeton de rafraîchissement n'est pas valide
+    Token:
+      Invalid: Le jeton n'est pas valide
+      Expired: Le jeton est expiré
 
 AggregateTypes:
   action: Action
