@@ -16,6 +16,7 @@ import (
 
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/integration"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
 )
 
@@ -23,6 +24,37 @@ var (
 	armPasskey  = []string{oidc_api.UserPresence, oidc_api.MFA}
 	armPassword = []string{oidc_api.PWD}
 )
+
+func TestOPStorage_TerminateSession(t *testing.T) {
+	clientID := createClient(t)
+	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
+	require.NoError(t, err)
+	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+		AuthRequestId: authRequestID,
+		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// code exchange
+	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+	tokens, err := exchangeTokens(t, clientID, code)
+	require.NoError(t, err)
+	assertTokens(t, tokens, true)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+
+	endSession, err := rp.EndSession(provider, tokens.IDToken, "", "state")
+	require.NoError(t, err)
+	logout, err := integration.CheckRedirect(endSession.String(), nil)
+	require.NoError(t, err)
+	require.NotNil(t, logout)
+}
 
 func TestOPStorage_CreateAuthRequest(t *testing.T) {
 	clientID := createClient(t)

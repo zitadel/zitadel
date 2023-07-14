@@ -476,7 +476,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			args{
 				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
 				oidcSessionID: "V2_oidcSessionID",
-				refreshToken:  "aW52YWxpZA", //invalid
+				refreshToken:  "aW52YWxpZA", // invalid
 			},
 			res{
 				err: caos_errs.ThrowPreconditionFailed(nil, "OIDCS-JOI23", "Errors.OIDCSession.RefreshTokenInvalid"),
@@ -820,8 +820,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 		clientID string
 	}
 	type res struct {
-		model *OIDCSessionWriteModel
-		err   error
+		err error
 	}
 	tests := []struct {
 		name   string
