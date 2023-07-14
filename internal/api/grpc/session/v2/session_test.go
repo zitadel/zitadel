@@ -108,11 +108,11 @@ func Test_sessionsToPb(t *testing.T) {
 			Sequence:     123,
 			Factors: &session.Factors{
 				User: &session.UserFactor{
-					VerifiedAt:    timestamppb.New(past),
-					Id:            "345",
-					LoginName:     "donald",
-					DisplayName:   "donald duck",
-					ResourceOwner: "org1",
+					VerifiedAt:     timestamppb.New(past),
+					Id:             "345",
+					LoginName:      "donald",
+					DisplayName:    "donald duck",
+					OrganisationId: "org1",
 				},
 			},
 			Metadata: map[string][]byte{"hello": []byte("world")},
@@ -124,11 +124,11 @@ func Test_sessionsToPb(t *testing.T) {
 			Sequence:     123,
 			Factors: &session.Factors{
 				User: &session.UserFactor{
-					VerifiedAt:    timestamppb.New(past),
-					Id:            "345",
-					LoginName:     "donald",
-					DisplayName:   "donald duck",
-					ResourceOwner: "org1",
+					VerifiedAt:     timestamppb.New(past),
+					Id:             "345",
+					LoginName:      "donald",
+					DisplayName:    "donald duck",
+					OrganisationId: "org1",
 				},
 				Password: &session.PasswordFactor{
 					VerifiedAt: timestamppb.New(past),
@@ -143,11 +143,11 @@ func Test_sessionsToPb(t *testing.T) {
 			Sequence:     123,
 			Factors: &session.Factors{
 				User: &session.UserFactor{
-					VerifiedAt:    timestamppb.New(past),
-					Id:            "345",
-					LoginName:     "donald",
-					DisplayName:   "donald duck",
-					ResourceOwner: "org1",
+					VerifiedAt:     timestamppb.New(past),
+					Id:             "345",
+					LoginName:      "donald",
+					DisplayName:    "donald duck",
+					OrganisationId: "org1",
 				},
 				Passkey: &session.PasskeyFactor{
 					VerifiedAt: timestamppb.New(past),
