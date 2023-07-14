@@ -21,3 +21,9 @@ func (h *Handler) logEvent(event eventstore.Event) *logging.Entry {
 		WithField("instance", event.Aggregate().InstanceID).
 		WithField("aggregate", event.Aggregate().Type)
 }
+
+func (h *Handler) logStatement(statement *Statement) *logging.Entry {
+	return h.log().WithField("sequence", statement.Sequence).
+		WithField("instance", statement.InstanceID).
+		WithField("aggregate", statement.AggregateType)
+}

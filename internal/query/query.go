@@ -34,6 +34,7 @@ type Queries struct {
 
 	idpConfigEncryption  crypto.EncryptionAlgorithm
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error)
+	checkPermission      domain.PermissionCheck
 
 	DefaultLanguage                     language.Tag
 	LoginDir                            http.FileSystem
@@ -55,6 +56,7 @@ func StartQueries(
 	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	zitadelRoles []authz.RoleMapping,
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
+	permissionCheck func(q *Queries) domain.PermissionCheck,
 ) (repo *Queries, err error) {
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	if err != nil {
@@ -94,6 +96,8 @@ func StartQueries(
 			Issuer:    defaults.Multifactors.OTP.Issuer,
 		},
 	}
+
+	repo.checkPermission = permissionCheck(repo)
 
 	err = projection.Create(ctx, sqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm)
 	if err != nil {

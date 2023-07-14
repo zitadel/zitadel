@@ -433,10 +433,12 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectPush(
 						func() eventstore.Command {
-							event, _ := idpintent.NewSucceededEvent(
+							event := idpintent.NewSucceededEvent(
 								context.Background(),
 								&idpintent.NewAggregate("id", "ro").Aggregate,
 								[]byte(`{"RawInfo":{"id":"id"}}`),
+								"id",
+								"username",
 								"",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -444,7 +446,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 									KeyID:      "id",
 									Crypted:    []byte("accessToken"),
 								},
-								"",
+								"idToken",
 							)
 							return event
 						}(),
@@ -454,18 +456,20 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				writeModel: NewIDPIntentWriteModel("id", "ro"),
-				idpSession: &oauth.Session{
+				idpSession: &openid.Session{
 					Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 						Token: &oauth2.Token{
 							AccessToken: "accessToken",
 						},
+						IDToken: "idToken",
 					},
 				},
-				idpUser: &oauth.UserMapper{
-					RawInfo: map[string]interface{}{
-						"id": "id",
+				idpUser: openid.NewUser(&oidc.UserInfo{
+					Subject: "id",
+					UserInfoProfile: oidc.UserInfoProfile{
+						PreferredUsername: "username",
 					},
-				},
+				}),
 			},
 			res{
 				token: "aWQ",

@@ -66,6 +66,27 @@ func (q *NotNullQuery) comp() sq.Sqlizer {
 	return sq.NotEq{q.Column.identifier(): nil}
 }
 
+type IsNullQuery struct {
+	Column Column
+}
+
+func NewIsNullQuery(col Column) (*IsNullQuery, error) {
+	if col.isZero() {
+		return nil, ErrMissingColumn
+	}
+	return &IsNullQuery{
+		Column: col,
+	}, nil
+}
+
+func (q *IsNullQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (q *IsNullQuery) comp() sq.Sqlizer {
+	return sq.Eq{q.Column.identifier(): nil}
+}
+
 type orQuery struct {
 	queries []SearchQuery
 }

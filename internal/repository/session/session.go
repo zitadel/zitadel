@@ -14,6 +14,7 @@ const (
 	AddedType             = sessionEventPrefix + "added"
 	UserCheckedType       = sessionEventPrefix + "user.checked"
 	PasswordCheckedType   = sessionEventPrefix + "password.checked"
+	IntentCheckedType     = sessionEventPrefix + "intent.checked"
 	PasskeyChallengedType = sessionEventPrefix + "passkey.challenged"
 	PasskeyCheckedType    = sessionEventPrefix + "passkey.checked"
 	TokenSetType          = sessionEventPrefix + "token.set"
@@ -23,6 +24,8 @@ const (
 
 type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	Domain string `json:"domain,omitempty"`
 }
 
 func (e *AddedEvent) Payload() interface{} {
@@ -35,6 +38,7 @@ func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 
 func NewAddedEvent(ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	domain string,
 ) *AddedEvent {
 	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -42,6 +46,7 @@ func NewAddedEvent(ctx context.Context,
 			aggregate,
 			AddedType,
 		),
+		Domain: domain,
 	}
 }
 
@@ -138,6 +143,47 @@ func PasswordCheckedEventMapper(event eventstore.Event) (eventstore.Event, error
 	err := event.Unmarshal(added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SESSION-DGt21", "unable to unmarshal password checked")
+	}
+
+	return added, nil
+}
+
+type IntentCheckedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	CheckedAt time.Time `json:"checkedAt"`
+}
+
+func (e *IntentCheckedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *IntentCheckedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewIntentCheckedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	checkedAt time.Time,
+) *IntentCheckedEvent {
+	return &IntentCheckedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			IntentCheckedType,
+		),
+		CheckedAt: checkedAt,
+	}
+}
+
+func IntentCheckedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	added := &IntentCheckedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := event.Unmarshal(added)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "SESSION-DGt90", "unable to unmarshal intent checked")
 	}
 
 	return added, nil

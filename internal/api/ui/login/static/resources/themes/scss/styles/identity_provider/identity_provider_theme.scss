@@ -10,26 +10,11 @@
     color: var(--zitadel-color-text-500);
 
     &:hover {
-      @include lgn-idp-elevation(1);
+      border-color: var(--zitadel-color-input-border-hover);
     }
 
     &:not([disabled]):active {
-      @include lgn-idp-elevation(2);
-    }
-
-    &.google {
-      color: var(--zitadel-color-google-text);
-      background-color: var(--zitadel-color-google-background);
-    }
-
-    &.github {
-      color: var(--zitadel-color-github-text);
-      background-color: var(--zitadel-color-github-background);
-    }
-
-    &.gitlab {
-      color: var(--zitadel-color-gitlab-text);
-      background-color: var(--zitadel-color-gitlab-background);
+      border-color: var(--zitadel-color-input-border-active);
     }
   }
 

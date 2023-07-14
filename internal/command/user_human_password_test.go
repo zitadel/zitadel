@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -21,6 +22,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		userPasswordAlg crypto.HashAlgorithm
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx           context.Context
@@ -69,6 +71,49 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "missing permission, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+				),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+				oneTime:       true,
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+				},
 			},
 		},
 		{
@@ -124,6 +169,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 					),
 				),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -191,6 +237,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 					),
 				),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -211,6 +258,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 			r := &Commands{
 				eventstore:      tt.fields.eventstore,
 				userPasswordAlg: tt.fields.userPasswordAlg,
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.SetPassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.password, tt.args.oneTime)
 			if tt.res.err == nil {
@@ -226,19 +274,19 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 	}
 }
 
-func TestCommandSide_SetPassword(t *testing.T) {
+func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
+		userEncryption  crypto.EncryptionAlgorithm
 		userPasswordAlg crypto.HashAlgorithm
 	}
 	type args struct {
-		ctx             context.Context
-		userID          string
-		code            string
-		resourceOwner   string
-		password        string
-		agentID         string
-		secretGenerator crypto.Generator
+		ctx           context.Context
+		userID        string
+		code          string
+		resourceOwner string
+		password      string
+		agentID       string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -368,14 +416,14 @@ func TestCommandSide_SetPassword(t *testing.T) {
 						),
 					),
 				),
+				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:             context.Background(),
-				userID:          "user1",
-				code:            "test",
-				resourceOwner:   "org1",
-				password:        "password",
-				secretGenerator: GetMockSecretGenerator(t),
+				ctx:           context.Background(),
+				userID:        "user1",
+				code:          "test",
+				resourceOwner: "org1",
+				password:      "password",
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -447,14 +495,14 @@ func TestCommandSide_SetPassword(t *testing.T) {
 					),
 				),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				userEncryption:  crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:             context.Background(),
-				userID:          "user1",
-				resourceOwner:   "org1",
-				password:        "password",
-				code:            "a",
-				secretGenerator: GetMockSecretGenerator(t),
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+				code:          "a",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -468,13 +516,17 @@ func TestCommandSide_SetPassword(t *testing.T) {
 			r := &Commands{
 				eventstore:      tt.fields.eventstore,
 				userPasswordAlg: tt.fields.userPasswordAlg,
+				userEncryption:  tt.fields.userEncryption,
 			}
-			err := r.SetPasswordWithVerifyCode(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.code, tt.args.password, tt.args.agentID, tt.args.secretGenerator)
+			got, err := r.SetPasswordWithVerifyCode(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.code, tt.args.password, tt.args.agentID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
 			if tt.res.err != nil && !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
 			}
 		})
 	}

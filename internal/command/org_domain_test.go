@@ -646,7 +646,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 			},
 			res: res{
 				wantToken: "a",
-				wantURL:   "https://domain.ch/.well-known/zitadel-challenge/a",
+				wantURL:   "https://domain.ch/.well-known/zitadel-challenge/a.txt",
 			},
 		},
 	}

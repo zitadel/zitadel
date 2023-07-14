@@ -261,7 +261,7 @@ func AddDeleteStatement(conditions []Condition, opts ...execOption) func(eventst
 	}
 }
 
-func AddCopyStatement(conflict, from, to []Column, conditions []Condition, opts ...execOption) func(eventstore.Event) Exec {
+func AddCopyStatement(conflict, from, to []Column, conditions []NamespacedCondition, opts ...execOption) func(eventstore.Event) Exec {
 	return func(event eventstore.Event) Exec {
 		return NewCopyStatement(event, conflict, from, to, conditions, opts...).Execute
 	}
@@ -316,7 +316,7 @@ func NewCopyCol(column, from string) Column {
 // if the value of a col is empty the data will be copied from the selected row
 // if the value of a col is not empty the data will be set by the static value
 // conds represent the conditions for the selection subquery
-func NewCopyStatement(event eventstore.Event, conflictCols, from, to []Column, conds []Condition, opts ...execOption) *Statement {
+func NewCopyStatement(event eventstore.Event, conflictCols, from, to []Column, nsCond []NamespacedCondition, opts ...execOption) *Statement {
 	columnNames := make([]string, len(to))
 	selectColumns := make([]string, len(from))
 	updateColumns := make([]string, len(columnNames))
@@ -335,13 +335,12 @@ func NewCopyStatement(event eventstore.Event, conflictCols, from, to []Column, c
 		}
 
 	}
-
-	wheres := make([]string, len(conds))
-	for i, cond := range conds {
-		argCounter++
-		wheres[i] = "copy_table." + cond.Name + " = $" + strconv.Itoa(argCounter)
-		args = append(args, cond.Value)
+	cond := make([]Condition, len(nsCond))
+	for i := range nsCond {
+		cond[i] = nsCond[i]("copy_table")
 	}
+	wheres, values := conditionsToWhere(cond, len(args))
+	args = append(args, values...)
 
 	conflictTargets := make([]string, len(conflictCols))
 	for i, conflictCol := range conflictCols {
@@ -356,7 +355,7 @@ func NewCopyStatement(event eventstore.Event, conflictCols, from, to []Column, c
 		config.err = ErrNoValues
 	}
 
-	if len(conds) == 0 {
+	if len(cond) == 0 {
 		config.err = ErrNoCondition
 	}
 
@@ -404,13 +403,13 @@ func columnsToQuery(cols []Column) (names []string, parameters []string, values 
 	return names, parameters, values[:parameterIndex]
 }
 
-func conditionsToWhere(cols []Condition, paramOffset int) (wheres []string, values []interface{}) {
-	wheres = make([]string, len(cols))
-	values = make([]interface{}, len(cols))
+func conditionsToWhere(conds []Condition, paramOffset int) (wheres []string, values []interface{}) {
+	wheres = make([]string, len(conds))
+	values = make([]any, len(conds))
 
-	for i, col := range cols {
-		wheres[i] = "(" + col.Name + " = $" + strconv.Itoa(i+1+paramOffset) + ")"
-		values[i] = col.Value
+	for i, cond := range conds {
+		paramOffset++
+		wheres[i], values[i] = cond("$" + strconv.Itoa(paramOffset))
 	}
 
 	return wheres, values
@@ -438,12 +437,45 @@ func NewJSONCol(name string, value interface{}) Column {
 	return NewCol(name, marshalled)
 }
 
-type Condition Column
+type Condition func(param string) (string, interface{})
+
+type NamespacedCondition func(namespace string) Condition
 
 func NewCond(name string, value interface{}) Condition {
-	return Condition{
-		Name:  name,
-		Value: value,
+	return func(param string) (string, interface{}) {
+		return name + " = " + param, value
+	}
+}
+
+func NewNamespacedCondition(name string, value interface{}) NamespacedCondition {
+	return func(namespace string) Condition {
+		return NewCond(namespace+"."+name, value)
+	}
+}
+
+func NewLessThanCond(column string, value interface{}) Condition {
+	return func(param string) (string, interface{}) {
+		return column + " < " + param, value
+	}
+}
+
+func NewIsNullCond(column string) Condition {
+	return NewCond(column, nil)
+}
+
+// NewTextArrayContainsCond returns a Condition that checks if the column that stores an array of text contains the given value
+func NewTextArrayContainsCond(column string, value string) Condition {
+	return func(param string) (string, interface{}) {
+		return column + " @> " + param, database.TextArray[string]{value}
+	}
+}
+
+// Not is a function and not a method, so that calling it is well readable
+// For example conditions := []Condition{ Not(NewTextArrayContainsCond())}
+func Not(condition Condition) Condition {
+	return func(param string) (string, interface{}) {
+		cond, value := condition(param)
+		return "NOT (" + cond + ")", value
 	}
 }
 

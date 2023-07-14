@@ -1,0 +1,65 @@
+---
+title: Frontend and API communication 
+---
+
+This guide contains a use case and ZITADEL integration.
+
+In a typical web application architecture, the front-end and back-end communicate to exchange data and provide functionality to users. Let's consider a use case where a front-end application needs to communicate with a back-end API using secure authentication and authorization. Let’s explore how ZITADEL can be used to add front-end login and facilitate this communication. 
+
+Single-Page Applications (SPAs) are web applications that run entirely in the browser, without a back-end server. In ZITADEL SPAs should use the Authorization Code Grant with PKCE or the Implicit Grant (if PKCE is not feasible) to obtain an access token.
+
+While APIs are vital for communication between applications and services, they don't directly participate in user authentication. Instead, they often authorize client requests based on access tokens issued by an authorization server. APIs in ZITADEL use grant types like JWT Profile or Basic Authentication to access the authorization server's introspection endpoint for token validation.
+
+## A real-world scenario
+
+Suppose there is a news portal web app that allows users to browse through various news articles and personalize their news feed based on their preferences. The back-end API handles fetching and delivering news content from the database.
+
+**Front-End Login**: A user visits the news portal and opts to log in for a personalized news feed. They are redirected to the Identity Provider’s (IdP) login page, where they authenticate with their credentials. Upon successful authentication, the IdP issues access and ID tokens to the front-end app.
+
+** Back-End API Communication**: When the user browses through the news feed, the front-end app makes an API request to the back-end, including the access token in the Authorization header. The back-end API, upon receiving the request, uses the IdP’s introspection endpoint to validate the access token. Once validated, it fetches personalized news data based on the user's preferences from the news database.
+
+While it is true that the back-end API typically needs to authenticate with the IdP, in this specific use case, the back-end API can work with a client credential / JWT since it's not a public client. This means that instead of relying on user-specific authentication, the back-end API can obtain a client credential (such as a client ID and client secret) from the IdP to authenticate itself and validate the access token received from the front-end app. This approach ensures secure communication between the front-end app, the back-end API, and the IdP, while still allowing the back-end API to access user-specific data and provide personalized news feeds.
+
+## A simplified example with a React frontend and a Python Flask API
+
+In this example, the application is a web-based quote generator that employs a secure user authentication system via ZITADEL. The functionality of the app is outlined below:
+
+1. Upon starting, the application provides a login button
+2. The user is then redirected to ZITADEL's login page to enter their credentials.
+3. Once the login is successful, the application then greets the user by extracting the user's name, thus providing a personalized experience. 
+4. The application presents an option for the user to generate a quote via a button. Upon pressing this button, the front-end application communicates with the back-end API using the user's access token received from ZITADEL.
+5. The back-end API introspects the access token for validity using ZITADEL's introspection endpoint. If the token is valid, the API generates a quote and sends it as a response to the front-end application, which is then displayed to the user in their browser.
+
+## Setting up the applications and ZITADEL
+
+
+All code and instructions to run the sample application can be found at [https://github.com/zitadel/example-quote-generator-app/](https://github.com/zitadel/example-quote-generator-app/). You can also find the steps for the integration between the front-end, back-end API, and ZITADEL in the README.md. 
+
+You can create the front-end application (User Agent) and the API in the same project or in a different project. In this example, we have created both in one. Configure the applications with appropriate settings (as instructed).
+
+<img src="/docs/img/guides/solution-scenarios/frontend-calling-backend-API_1.png" alt="User Agent and API applications in a single project"/>
+
+
+### Front-end login with ZITADEL
+
+- You must create a User Agent application in your project to add login to your React application using the Authorization Code with PKCE flow. This allows the front-end application to integrate with ZITADEL to enable user authentication and authorization.
+- In the React front-end application, configure the ZITADEL OIDC client settings, including the client ID, ZITADEL URLs, redirect URIs, and required scopes.
+- Implement the login flow, authentication callbacks, and token handling logic in the front-end application.
+- When a user visits the front-end application, they are presented with a login option.
+- Upon clicking the login button, the frontend initiates the Authorization Code with PKCE authentication flow and redirects the user to the ZITADEL login page. The user enters their credentials and authenticates with ZITADEL. Authorization Code Flow returns an authorization code to the client application, which can then exchange it for an ID token and an access token directly. This provides the benefit of not exposing any tokens to the user agent and possibly other malicious applications with access to the user agent. 
+- You must set up the required scopes and claims to ensure the front-end and back-end can exchange data securely. It’s important to note that when specifying the scope when calling the token API, the scope must contain the project ID of the ZITADEL project in which the API resides (to enable token validation by the back-end API):`scope:'openid profile email urn:zitadel:iam:org:project:id:<API_PROJECT_ID>:aud'`
+- Also, we want to include user info inside the token to avoid calling the user info endpoint, so go to Token Settings in the front-end app and select User Info inside ID Token.
+- After a successful authentication, ZITADEL generates an access token and an ID token.
+- The front-end application receives these tokens and stores them securely (e.g., in browser storage).
+
+### Token exchange and user information
+
+- Once the frontend obtains the tokens, it can extract certain information from the ID token itself (e.g., user ID, email, etc.) without making an additional request.
+- If more user information is required, the frontend can use the access token to call the ZITADEL User Info endpoint. This endpoint provides additional user details, such as name, profile picture, etc.
+
+### Back-end API communication
+
+- To communicate with the back-end API, the front-end includes the access token in the Authorization header of API requests.
+- The back-end API receives the request and needs to validate and authorize the token before processing the request.
+- The API performs token introspection using ZITADEL's introspection endpoint to validate the access token. This API uses Basic Authentication to invoke the [introspection endpoint](/docs/apis/openidoauth/endpoints#introspection_endpoint), which means it sends its client ID and client secret along with the access token received. 
+- If the token is valid and active, the API proceeds to handle the requested action or fetch data from the underlying data sources.

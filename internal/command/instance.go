@@ -499,6 +499,9 @@ func (c *Commands) ChangeSystemConfig(ctx context.Context, externalDomain string
 		if err != nil {
 			return err
 		}
+		if len(cmds) == 0 {
+			continue
+		}
 		_, err = c.eventstore.Push(ctx, cmds...)
 		if err != nil {
 			return err

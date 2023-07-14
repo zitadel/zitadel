@@ -73,6 +73,8 @@ type HumanPasswordCodeAddedEvent struct {
 	Code             *crypto.CryptoValue     `json:"code,omitempty"`
 	Expiry           time.Duration           `json:"expiry,omitempty"`
 	NotificationType domain.NotificationType `json:"notificationType,omitempty"`
+	URLTemplate      string                  `json:"url_template,omitempty"`
+	CodeReturned     bool                    `json:"code_returned,omitempty"`
 }
 
 func (e *HumanPasswordCodeAddedEvent) Payload() interface{} {
@@ -90,6 +92,18 @@ func NewHumanPasswordCodeAddedEvent(
 	expiry time.Duration,
 	notificationType domain.NotificationType,
 ) *HumanPasswordCodeAddedEvent {
+	return NewHumanPasswordCodeAddedEventV2(ctx, aggregate, code, expiry, notificationType, "", false)
+}
+
+func NewHumanPasswordCodeAddedEventV2(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	code *crypto.CryptoValue,
+	expiry time.Duration,
+	notificationType domain.NotificationType,
+	urlTemplate string,
+	codeReturned bool,
+) *HumanPasswordCodeAddedEvent {
 	return &HumanPasswordCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -99,6 +113,8 @@ func NewHumanPasswordCodeAddedEvent(
 		Code:             code,
 		Expiry:           expiry,
 		NotificationType: notificationType,
+		URLTemplate:      urlTemplate,
+		CodeReturned:     codeReturned,
 	}
 }
 

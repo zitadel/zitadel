@@ -339,11 +339,10 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.UserProjection.Trigger(ctx)
+		ctx, err = projection.UserProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
-		err = projection.LoginNameProjection.Trigger(ctx)
+		ctx, err = projection.LoginNameProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
-		ctx = call.WithTimestamp(ctx)
 	}
 
 	query, scan := prepareUserQuery(ctx, q.client)
@@ -371,11 +370,10 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwner
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err = projection.UserProjection.Trigger(ctx)
+		ctx, err = projection.UserProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
-		err = projection.LoginNameProjection.Trigger(ctx)
+		ctx, err = projection.LoginNameProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
-		ctx = call.WithTimestamp(ctx)
 	}
 
 	query, scan := prepareUserQuery(ctx, q.client)
@@ -474,9 +472,9 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		err = projection.UserProjection.Trigger(ctx)
+		ctx, err = projection.UserProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
-		err = projection.LoginNameProjection.Trigger(ctx)
+		ctx, err = projection.LoginNameProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 
@@ -505,9 +503,9 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		err = projection.UserProjection.Trigger(ctx)
+		ctx, err = projection.UserProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
-		err = projection.LoginNameProjection.Trigger(ctx)
+		ctx, err = projection.LoginNameProjection.Trigger(ctx)
 		logging.OnError(err).Debug("trigger failed")
 	}
 

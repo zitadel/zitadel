@@ -39,13 +39,14 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 	type args struct {
 		userID        string
 		resourceOwner string
+		rpID          string
 		authenticator domain.AuthenticatorAttachment
 	}
 	tests := []struct {
 		name    string
 		fields  fields
 		args    args
-		want    *domain.PasskeyRegistrationDetails
+		want    *domain.WebAuthNRegistrationDetails
 		wantErr error
 	}{
 		{
@@ -120,7 +121,7 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 				idGenerator:    tt.fields.idGenerator,
 				webauthnConfig: webauthnConfig,
 			}
-			_, err := c.RegisterUserPasskey(ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authenticator)
+			_, err := c.RegisterUserPasskey(ctx, tt.args.userID, tt.args.resourceOwner, tt.args.rpID, tt.args.authenticator)
 			require.ErrorIs(t, err, tt.wantErr)
 			// successful case can't be tested due to random challenge.
 		})
@@ -147,6 +148,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 	type args struct {
 		userID        string
 		resourceOwner string
+		rpID          string
 		authenticator domain.AuthenticatorAttachment
 		codeID        string
 		code          string
@@ -221,7 +223,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 				idGenerator:    tt.fields.idGenerator,
 				webauthnConfig: webauthnConfig,
 			}
-			_, err := c.RegisterUserPasskeyWithCode(ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authenticator, tt.args.codeID, tt.args.code, alg)
+			_, err := c.RegisterUserPasskeyWithCode(ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authenticator, tt.args.codeID, tt.args.code, tt.args.rpID, alg)
 			require.ErrorIs(t, err, tt.wantErr)
 			// successful case can't be tested due to random challenge.
 		})
@@ -375,7 +377,7 @@ func TestCommands_pushUserPasskey(t *testing.T) {
 		expectFilter(eventFromEventPusher(
 			user.NewHumanWebAuthNAddedEvent(eventstore.NewBaseEventForPush(
 				ctx, &org.NewAggregate("org1").Aggregate, user.HumanPasswordlessTokenAddedType,
-			), "111", "challenge"),
+			), "111", "challenge", "rpID"),
 		)),
 	}
 
@@ -393,7 +395,7 @@ func TestCommands_pushUserPasskey(t *testing.T) {
 			expectPush: func(challenge string) expect {
 				return expectPushFailed(io.ErrClosedPipe,
 					user.NewHumanPasswordlessAddedEvent(ctx,
-						userAgg, "123", challenge,
+						userAgg, "123", challenge, "rpID",
 					),
 				)
 			},
@@ -405,7 +407,7 @@ func TestCommands_pushUserPasskey(t *testing.T) {
 			expectPush: func(challenge string) expect {
 				return expectPush(
 					user.NewHumanPasswordlessAddedEvent(ctx,
-						userAgg, "123", challenge,
+						userAgg, "123", challenge, "rpID",
 					),
 				)
 			},
@@ -416,7 +418,7 @@ func TestCommands_pushUserPasskey(t *testing.T) {
 			expectPush: func(challenge string) expect {
 				return expectPush(
 					user.NewHumanPasswordlessAddedEvent(ctx,
-						userAgg, "123", challenge,
+						userAgg, "123", challenge, "rpID",
 					),
 					user.NewHumanPasswordlessInitCodeCheckSucceededEvent(ctx, userAgg, "123"),
 				)
@@ -435,7 +437,7 @@ func TestCommands_pushUserPasskey(t *testing.T) {
 				webauthnConfig: webauthnConfig,
 				idGenerator:    id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			}
-			wm, userAgg, webAuthN, err := c.createUserPasskey(ctx, "user1", "org1", domain.AuthenticatorAttachmentCrossPlattform)
+			wm, userAgg, webAuthN, err := c.createUserPasskey(ctx, "user1", "org1", "rpID", domain.AuthenticatorAttachmentCrossPlattform)
 			require.NoError(t, err)
 
 			c.eventstore = eventstoreExpect(t, tt.expectPush(webAuthN.Challenge))
@@ -444,7 +446,7 @@ func TestCommands_pushUserPasskey(t *testing.T) {
 			require.ErrorIs(t, err, tt.wantErr)
 			if tt.wantErr == nil {
 				assert.NotEmpty(t, got.PublicKeyCredentialCreationOptions)
-				assert.Equal(t, "123", got.PasskeyID)
+				assert.Equal(t, "123", got.ID)
 				assert.Equal(t, "org1", got.ObjectDetails.ResourceOwner)
 			}
 		})

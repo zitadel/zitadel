@@ -27,6 +27,7 @@ func NewHumanU2FAddedEvent(
 	aggregate *eventstore.Aggregate,
 	webAuthNTokenID,
 	challenge string,
+	rpID string,
 ) *HumanU2FAddedEvent {
 	return &HumanU2FAddedEvent{
 		HumanWebAuthNAddedEvent: *NewHumanWebAuthNAddedEvent(
@@ -37,6 +38,7 @@ func NewHumanU2FAddedEvent(
 			),
 			webAuthNTokenID,
 			challenge,
+			rpID,
 		),
 	}
 }

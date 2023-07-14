@@ -487,6 +487,7 @@ Errors:
     NotSucceeded: l'intento non è andato a buon fine
     TokenCreationFailed: creazione del token fallita
     InvalidToken: Il token dell'intento non è valido
+    OtherUser: Intento destinato a un altro utente
 
 AggregateTypes:
   action: Azione

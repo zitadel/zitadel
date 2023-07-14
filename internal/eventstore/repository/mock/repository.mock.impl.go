@@ -170,3 +170,23 @@ func (e *mockEvent) Sequence() uint64 {
 func (e *mockEvent) CreatedAt() time.Time {
 	return e.createdAt
 }
+
+func (m *MockRepository) ExpectRandomPush(expectedEvents []eventstore.Command) *MockRepository {
+	m.MockPusher.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx context.Context, events []*repository.Event) error {
+			assert.Len(m.MockPusher.ctrl.T, events, len(expectedEvents))
+			return nil
+		},
+	)
+	return m
+}
+
+func (m *MockRepository) ExpectRandomPushFailed(err error, expectedEvents []eventstore.Command) *MockRepository {
+	m.MockPusher.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx context.Context, events []*repository.Event) error {
+			assert.Len(m.MockPusher.ctrl.T, events, len(expectedEvents))
+			return err
+		},
+	)
+	return m
+}

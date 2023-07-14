@@ -16,7 +16,7 @@ import (
 )
 
 func (s *Server) GetSession(ctx context.Context, req *session.GetSessionRequest) (*session.GetSessionResponse, error) {
-	res, err := s.query.SessionByID(ctx, req.GetSessionId(), req.GetSessionToken())
+	res, err := s.query.SessionByID(ctx, true, req.GetSessionId(), req.GetSessionToken())
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRe
 	}
 	challengeResponse, cmds := s.challengesToCommand(req.GetChallenges(), checks)
 
-	set, err := s.command.CreateSession(ctx, cmds, metadata)
+	set, err := s.command.CreateSession(ctx, cmds, req.GetDomain(), metadata)
 	if err != nil {
 		return nil, err
 	}
@@ -107,6 +107,7 @@ func sessionToPb(s *query.Session) *session.Session {
 		Sequence:     s.Sequence,
 		Factors:      factorsToPb(s),
 		Metadata:     s.Metadata,
+		Domain:       s.Domain,
 	}
 }
 
@@ -119,6 +120,7 @@ func factorsToPb(s *query.Session) *session.Factors {
 		User:     user,
 		Password: passwordFactorToPb(s.PasswordFactor),
 		Passkey:  passkeyFactorToPb(s.PasskeyFactor),
+		Intent:   intentFactorToPb(s.IntentFactor),
 	}
 }
 
@@ -128,6 +130,15 @@ func passwordFactorToPb(factor query.SessionPasswordFactor) *session.PasswordFac
 	}
 	return &session.PasswordFactor{
 		VerifiedAt: timestamppb.New(factor.PasswordCheckedAt),
+	}
+}
+
+func intentFactorToPb(factor query.SessionIntentFactor) *session.IntentFactor {
+	if factor.IntentCheckedAt.IsZero() {
+		return nil
+	}
+	return &session.IntentFactor{
+		VerifiedAt: timestamppb.New(factor.IntentCheckedAt),
 	}
 }
 
@@ -228,6 +239,9 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	}
 	if password := checks.GetPassword(); password != nil {
 		sessionChecks = append(sessionChecks, command.CheckPassword(password.GetPassword()))
+	}
+	if intent := checks.GetIntent(); intent != nil {
+		sessionChecks = append(sessionChecks, command.CheckIntent(intent.GetIntentId(), intent.GetToken()))
 	}
 	if passkey := checks.GetPasskey(); passkey != nil {
 		sessionChecks = append(sessionChecks, s.command.CheckPasskey(passkey.GetCredentialAssertionData()))

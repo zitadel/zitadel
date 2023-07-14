@@ -9,7 +9,6 @@ import (
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/jackc/pgconn"
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
@@ -117,11 +116,11 @@ func (h *Handler) schedule(ctx context.Context) {
 			scheduledCtx := call.WithTimestamp(ctx)
 			for _, instance := range instances {
 				instanceCtx := authz.WithInstanceID(scheduledCtx, instance)
-				err = h.Trigger(instanceCtx)
+				_, err = h.Trigger(instanceCtx)
 				instanceFailed = instanceFailed || err != nil
 				h.log().WithField("instance", instance).OnError(err).Info("scheduled trigger failed")
 
-				for ; err != nil; err = h.Trigger(instanceCtx) {
+				for ; err != nil; _, err = h.Trigger(instanceCtx) {
 					instanceFailed = instanceFailed || err != nil
 					h.log().WithField("instance", instance).OnError(err).Info("scheduled trigger failed")
 					if err == nil {
@@ -160,7 +159,7 @@ func (h *Handler) subscribe(ctx context.Context) {
 					continue
 				}
 				queueCtx = authz.WithInstanceID(queueCtx, e.Aggregate().InstanceID)
-				err := h.Trigger(queueCtx)
+				_, err := h.Trigger(queueCtx)
 				h.log().OnError(err).Debug("trigger of queued event failed")
 				if err == nil {
 					solvedInstances = append(solvedInstances, e.Aggregate().InstanceID)
@@ -207,13 +206,13 @@ func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]str
 	return h.es.InstanceIDs(ctx, query.Builder())
 }
 
-func (h *Handler) Trigger(ctx context.Context) (err error) {
+func (h *Handler) Trigger(ctx context.Context) (_ context.Context, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	cancel := h.lockInstance(ctx)
 	if cancel == nil {
-		return nil
+		return call.ResetTimestamp(ctx), nil
 	}
 	defer cancel()
 
@@ -221,7 +220,7 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 		additionalIteration, err := h.processEvents(ctx)
 		h.log().WithField("iteration", i).Debug("trigger iteration")
 		if !additionalIteration || err != nil {
-			return err
+			return call.ResetTimestamp(ctx), err
 		}
 	}
 }
