@@ -10,6 +10,11 @@ on:
       image:
         value: '${{ inputs.image_name }}:${{ github.sha }}'
 
+env:
+  default_labels: |
+    org.opencontainers.image.documentation=https://zitadel.com/docs
+    org.opencontainers.image.vendor=CAOS AG
+
 jobs:
   build:
     name: zitadel
@@ -27,6 +32,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ${{ inputs.image_name }}
+          labels: ${{ env.default_labels}}
           tags: |
             type=sha,prefix=,suffix=,format=long
       -
@@ -35,6 +41,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ${{ inputs.image_name }}
+          labels: ${{ env.default_labels}}
           tags: |
             type=sha,prefix=,suffix=-debug,format=long
       - 
