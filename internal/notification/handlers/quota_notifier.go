@@ -68,7 +68,7 @@ func (u *quotaNotifier) reduceNotificationDue(event eventstore.Event) (*handler.
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DLxdE", "reduce.wrong.event.type %s", quota.NotificationDueEventType)
 	}
 	ctx := HandlerContext(event.Aggregate())
-	alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, map[string]interface{}{"dueEventID": e.ID}, quota.NotifiedEventType)
+	alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, map[string]interface{}{"dueEventID": e.ID}, quota.AggregateType, quota.NotifiedEventType)
 	if err != nil {
 		return nil, err
 	}

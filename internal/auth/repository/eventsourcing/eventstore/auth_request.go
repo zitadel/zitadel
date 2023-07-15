@@ -719,6 +719,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 
 func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *domain.AuthRequest, loginName string) bool {
 	// check if there's a suffix in the loginname
+	loginName = strings.TrimSpace(strings.ToLower(loginName))
 	index := strings.LastIndex(loginName, "@")
 	if index < 0 {
 		return false

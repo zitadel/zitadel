@@ -335,7 +335,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	} else if setup.Org.Human != nil {
 		setup.Org.Human.ID = userID
 		validations = append(validations,
-			c.AddHumanCommand(setup.Org.Human, orgID, c.userPasswordAlg, c.userEncryption, true),
+			c.AddHumanCommand(setup.Org.Human, orgID, c.userPasswordHasher, c.userEncryption, true),
 		)
 	}
 
@@ -500,6 +500,9 @@ func (c *Commands) ChangeSystemConfig(ctx context.Context, externalDomain string
 		cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, instanceValidations.Validations...)
 		if err != nil {
 			return err
+		}
+		if len(cmds) == 0 {
+			continue
 		}
 		_, err = c.eventstore.Push(ctx, cmds...)
 		if err != nil {

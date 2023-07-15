@@ -104,6 +104,10 @@
   --zitadel-color-gitlab-background: #ffffff;
   --zitadel-color-qr: var(--zitadel-color-black);
   --zitadel-color-qr-background: var(--zitadel-color-white);
+  --google-image-src: url(../../../images/idp/google.png);
+  --github-image-src: url(../../../images/idp/github.png);
+  --gitlab-image-src: url(../../../images/idp/gitlab.png);
+  --azure-image-src: url(../../../images/idp/ms.svg);
 }
 
 .lgn-dark-theme {
@@ -192,6 +196,10 @@
   --zitadel-color-github-background: #ffffff;
   --zitadel-color-gitlab-text: #8b8d8d;
   --zitadel-color-gitlab-background: #ffffff;
+  --google-image-src: url(../../../images/idp/google.png);
+  --github-image-src: url(../../../images/idp/github-white.png);
+  --gitlab-image-src: url(../../../images/idp/gitlab.png);
+  --azure-image-src: url(../../../images/idp/ms.svg);
 }
 
 body {
@@ -547,6 +555,7 @@ a.sub-formfield-link {
   border-radius: 0.5rem;
   border-width: 1px;
   border-style: solid;
+  transition: border-color 0.2s ease-in-out;
 }
 .lgn-idp span.logo {
   height: 46px;
@@ -561,7 +570,7 @@ a.sub-formfield-link {
 .lgn-idp.google span.logo {
   height: 46px;
   width: 46px;
-  background-image: url("../../../images/idp/google.png");
+  background-image: var(--google-image-src);
   background-size: 25px;
   background-position: center;
   background-repeat: no-repeat;
@@ -570,7 +579,7 @@ a.sub-formfield-link {
 .lgn-idp.github span.logo {
   height: 46px;
   width: 46px;
-  background-image: url("../../../images/idp/github.png");
+  background-image: var(--github-image-src);
   background-size: 25px;
   background-position: center;
   background-repeat: no-repeat;
@@ -579,8 +588,17 @@ a.sub-formfield-link {
 .lgn-idp.gitlab span.logo {
   height: 46px;
   width: 46px;
-  background-image: url("../../../images/idp/gitlab.png");
+  background-image: var(--gitlab-image-src);
   background-size: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 5px;
+}
+.lgn-idp.azure span.logo {
+  height: 46px;
+  width: 46px;
+  background-image: var(--azure-image-src);
+  background-size: 25px;
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 5px;
@@ -1540,6 +1558,7 @@ a.sub-formfield-link {
   border-radius: 0.5rem;
   border-width: 1px;
   border-style: solid;
+  transition: border-color 0.2s ease-in-out;
 }
 .lgn-idp span.logo {
   height: 46px;
@@ -1554,7 +1573,7 @@ a.sub-formfield-link {
 .lgn-idp.google span.logo {
   height: 46px;
   width: 46px;
-  background-image: url("../../../images/idp/google.png");
+  background-image: var(--google-image-src);
   background-size: 25px;
   background-position: center;
   background-repeat: no-repeat;
@@ -1563,7 +1582,7 @@ a.sub-formfield-link {
 .lgn-idp.github span.logo {
   height: 46px;
   width: 46px;
-  background-image: url("../../../images/idp/github.png");
+  background-image: var(--github-image-src);
   background-size: 25px;
   background-position: center;
   background-repeat: no-repeat;
@@ -1572,8 +1591,17 @@ a.sub-formfield-link {
 .lgn-idp.gitlab span.logo {
   height: 46px;
   width: 46px;
-  background-image: url("../../../images/idp/gitlab.png");
+  background-image: var(--gitlab-image-src);
   background-size: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 5px;
+}
+.lgn-idp.azure span.logo {
+  height: 46px;
+  width: 46px;
+  background-image: var(--azure-image-src);
+  background-size: 25px;
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 5px;
@@ -3082,22 +3110,10 @@ ul li i.lgn-valid {
   color: var(--zitadel-color-text-500);
 }
 .lgn-idp:hover {
-  box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+  border-color: var(--zitadel-color-input-border-hover);
 }
 .lgn-idp:not([disabled]):active {
-  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
-}
-.lgn-idp.google {
-  color: var(--zitadel-color-google-text);
-  background-color: var(--zitadel-color-google-background);
-}
-.lgn-idp.github {
-  color: var(--zitadel-color-github-text);
-  background-color: var(--zitadel-color-github-background);
-}
-.lgn-idp.gitlab {
-  color: var(--zitadel-color-gitlab-text);
-  background-color: var(--zitadel-color-gitlab-background);
+  border-color: var(--zitadel-color-input-border-active);
 }
 
 .lgn-idp-providers .lgn-idp-desc {

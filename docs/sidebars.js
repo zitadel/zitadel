@@ -199,6 +199,7 @@ module.exports = {
             "guides/integrate/login-ui/username-password",
             "guides/integrate/login-ui/external-login",
             "guides/integrate/login-ui/passkey",
+            "guides/integrate/login-ui/mfa",
             "guides/integrate/login-ui/select-account",
             "guides/integrate/login-ui/password-reset",
             "guides/integrate/login-ui/logout",
@@ -224,6 +225,7 @@ module.exports = {
             "guides/integrate/identity-providers/gitlab",
             "guides/integrate/identity-providers/ldap",
             "guides/integrate/identity-providers/openldap",
+            "guides/integrate/identity-providers/migrate",
             "guides/integrate/identity-providers/google-oidc",
             "guides/integrate/identity-providers/azuread-oidc",
           ],
@@ -485,6 +487,20 @@ module.exports = {
         },
         {
           type: "category",
+          label: "OIDC lifecycle (Alpha)",
+          link: {
+            type: "generated-index",
+            title: "OIDC service API (Alpha)",
+            slug: "/apis/resources/oidc_service",
+            description:
+              "Get OIDC Auth Request details and create callback URLs.\n"+
+              "\n"+
+              "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+          },
+          items: require("./docs/apis/resources/oidc_service/sidebar.js"),
+        },
+        {
+          type: "category",
           label: "Settings lifecycle (alpha)",
           link: {
             type: "generated-index",
@@ -573,7 +589,8 @@ module.exports = {
         "self-hosting/deploy/compose",
         "self-hosting/deploy/knative",
         "self-hosting/deploy/kubernetes",
-        "self-hosting/deploy/loadbalancing-example/loadbalancing-example"
+        "self-hosting/deploy/loadbalancing-example/loadbalancing-example",
+        "self-hosting/deploy/troubleshooting/troubleshooting"
       ],
     },
     {
