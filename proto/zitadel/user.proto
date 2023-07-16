@@ -184,7 +184,17 @@ message SearchQuery {
         StateQuery state_query = 7;
         TypeQuery type_query = 8;
         LoginNameQuery login_name_query = 9;
+        InUserIDQuery in_user_ids_query = 10;
     }
+}
+
+message InUserIDQuery {
+    repeated string user_ids = 1 [        
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {            
+            description: "the ids of the users to include"
+            example: "[\"69629023906488334\",\"69622366012355662\"]";
+        }
+    ];
 }
 
 message UserNameQuery {

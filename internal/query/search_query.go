@@ -156,6 +156,10 @@ const (
 	columnCompareMax
 )
 
+type InTextQuery struct {
+	Column Column
+	Values []string
+}
 type TextQuery struct {
 	Column  Column
 	Text    string
@@ -167,7 +171,21 @@ var (
 	ErrInvalidCompare  = errors.New("invalid compare")
 	ErrMissingColumn   = errors.New("missing column")
 	ErrInvalidNumber   = errors.New("value is no number")
+	ErrEmptyValues     = errors.New("values array must not be empty")
 )
+
+func NewInTextQuery(col Column, values []string) (*InTextQuery, error) {
+	if len(values) <= 0 {
+		return nil, ErrEmptyValues
+	}
+	if col.isZero() {
+		return nil, ErrMissingColumn
+	}
+	return &InTextQuery{
+		Column: col,
+		Values: values,
+	}, nil
+}
 
 func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery, error) {
 	if compare < 0 || compare >= textCompareMax {
@@ -181,6 +199,15 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery,
 		Text:    value,
 		Compare: compare,
 	}, nil
+}
+
+func (q *InTextQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (s *InTextQuery) comp() sq.Sqlizer {
+	//This translates to an IN query
+	return sq.Eq{s.Column.identifier(): s.Values}
 }
 
 func (q *TextQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
