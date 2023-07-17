@@ -14,3 +14,8 @@ export {
   ZitadelUIProvider,
   type ZitadelUIProps,
 } from "./components/ZitadelUIProvider";
+
+export {
+  SignInWithIDP,
+  type SignInWithIDPProps,
+} from "./components/SignInWithIDP";

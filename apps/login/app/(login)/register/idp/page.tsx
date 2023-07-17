@@ -1,0 +1,20 @@
+import { getLegalAndSupportSettings, server } from "#/lib/zitadel";
+
+import { SignInWithIDP } from "@zitadel/react";
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Record<string | number | symbol, string | undefined>;
+}) {
+  const legal = await getLegalAndSupportSettings(server);
+
+  return (
+    <div className="flex flex-col items-center space-y-4">
+      <h1>Register</h1>
+      <p className="ztdl-p">Create your ZITADEL account.</p>
+
+      {legal && <SignInWithIDP server={server}></SignInWithIDP>}
+    </div>
+  );
+}

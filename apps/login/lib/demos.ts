@@ -39,6 +39,11 @@ export const demos: { name: string; items: Item[] }[] = [
         description: "Create your ZITADEL account",
       },
       {
+        name: "IDP Register",
+        slug: "register/idp",
+        description: "Register with an Identity Provider",
+      },
+      {
         name: "Verify email",
         slug: "verify",
         description: "Verify your account with an email code",
