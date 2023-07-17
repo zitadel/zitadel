@@ -1,0 +1,74 @@
+name: ZITADEL Update Homebrew Formula
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  homebrew-releaser:
+    runs-on: ubuntu-latest
+    name: homebrew-releaser
+    steps:
+      - name: Release my project to my Homebrew tap
+        uses: Justintime50/homebrew-releaser@v1
+        with:
+          # The name of the homebrew tap to publish your formula to as it appears on GitHub.
+          # Required - strings
+          homebrew_owner: zitadel
+          homebrew_tap: homebrew-tap
+
+          # The name of the folder in your homebrew tap where formula will be committed to.
+          # Default is shown - string
+          formula_folder: Formula
+
+          # The Personal Access Token (saved as a repo secret) that has `repo` permissions for the repo running the action AND Homebrew tap you want to release to.
+          # Required - string
+          github_token: ${{ secrets.CR_PAT }}
+
+          # Git author info used to commit to the homebrew tap.
+          # Defaults are shown - strings
+          commit_owner: homebrew-releaser
+          commit_email: homebrew-releaser@zitadel.com
+
+          # Custom dependencies in case other formulas are needed to build the current one.
+          # Optional - multiline string
+          depends_on: |
+            "go" => :optional
+            "git"
+
+          # Custom install command for your formula.
+          # Required - string
+          install: 'bin.install "zitadel"'
+
+          # Custom test command for your formula so you can run `brew test`.
+          # Optional - string
+          test: 'ystem "#{bin}/zitadel -v"'
+
+          # Allows you to set a custom download strategy. Note that you'll need
+          # to implement the strategy and add it to your tap repository.
+          # Example: https://docs.brew.sh/Formula-Cookbook#specifying-the-download-strategy-explicitly
+          # Optional - string
+        #   download_strategy: CurlDownloadStrategy
+
+          # Allows you to add a custom require_relative at the top of the formula template.
+          # Optional - string
+        #   custom_require: custom_download_strategy
+
+          # Adds URL and checksum targets for different OS and architecture pairs. Using this option assumes 
+          # a tar archive exists on your GitHub repo with the following URL pattern (this cannot be customized):
+          # https://github.com/{GITHUB_OWNER}/{REPO_NAME}/releases/download/{TAG}/{REPO_NAME}-{VERSION}-{OPERATING_SYSTEM}-{ARCHITECTURE}.tar.gz'
+          # Darwin AMD pre-existing path example: https://github.com/justintime50/myrepo/releases/download/v1.2.0/myrepo-1.2.0-darwin-amd64.tar.gz
+          # Linux ARM pre-existing path example: https://github.com/justintime50/myrepo/releases/download/v1.2.0/myrepo-1.2.0-linux-arm64.tar.gz
+          # Optional - booleans
+          target_darwin_amd64: true
+          target_darwin_arm64: true
+          target_linux_amd64: true
+          target_linux_arm64: true
+
+          # Skips committing the generated formula to a homebrew tap (useful for local testing).
+          # Default is shown - boolean
+          skip_commit: true
+
+          # Logs debugging info to console.
+          # Default is shown - boolean
+          debug: true
