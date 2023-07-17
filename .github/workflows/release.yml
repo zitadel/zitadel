@@ -3,12 +3,6 @@ name: Release
 on:
   workflow_call:
     inputs:
-      node_version:
-        required: true
-        type: string
-      buf_version:
-        required: true
-        type: string
       semantic_version:
         required: true
         type: string
