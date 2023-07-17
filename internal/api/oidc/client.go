@@ -163,6 +163,18 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo *oidc.Us
 	return o.setUserinfo(ctx, userInfo, userID, applicationID, scopes, nil)
 }
 
+// SetUserinfoFromRequest extends the SetUserinfoFromScopes during the id_token generation.
+// This is required for V2 tokens to be able to set the sessionID (`sid`) claim.
+func (o *OPStorage) SetUserinfoFromRequest(ctx context.Context, userinfo *oidc.UserInfo, request op.IDTokenRequest, _ []string) error {
+	switch t := request.(type) {
+	case *AuthRequestV2:
+		userinfo.AppendClaims("sid", t.SessionID)
+	case *RefreshTokenRequestV2:
+		userinfo.AppendClaims("sid", t.SessionID)
+	}
+	return nil
+}
+
 func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection *oidc.IntrospectionResponse, tokenID, subject, clientID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

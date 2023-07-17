@@ -254,13 +254,23 @@ func (c *Commands) UpdateSession(ctx context.Context, sessionID, sessionToken st
 	return c.updateSession(ctx, cmd, metadata)
 }
 
-func (c *Commands) TerminateSession(ctx context.Context, sessionID, sessionToken string) (*domain.ObjectDetails, error) {
+func (c *Commands) TerminateSession(ctx context.Context, sessionID string, sessionToken string) (*domain.ObjectDetails, error) {
+	return c.terminateSession(ctx, sessionID, sessionToken, true)
+}
+
+func (c *Commands) TerminateSessionWithoutTokenCheck(ctx context.Context, sessionID string) (*domain.ObjectDetails, error) {
+	return c.terminateSession(ctx, sessionID, "", false)
+}
+
+func (c *Commands) terminateSession(ctx context.Context, sessionID, sessionToken string, mustCheckToken bool) (*domain.ObjectDetails, error) {
 	sessionWriteModel := NewSessionWriteModel(sessionID, "")
 	if err := c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}
-	if err := c.sessionPermission(ctx, sessionWriteModel, sessionToken, domain.PermissionSessionDelete); err != nil {
-		return nil, err
+	if mustCheckToken {
+		if err := c.sessionPermission(ctx, sessionWriteModel, sessionToken, domain.PermissionSessionDelete); err != nil {
+			return nil, err
+		}
 	}
 	if sessionWriteModel.State != domain.SessionStateActive {
 		return writeModelToObjectDetails(&sessionWriteModel.WriteModel), nil

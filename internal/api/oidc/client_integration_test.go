@@ -51,7 +51,7 @@ func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
 func TestOPStorage_SetIntrospectionFromToken(t *testing.T) {
 	project, err := Tester.CreateProject(CTX)
 	require.NoError(t, err)
-	app, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, project.GetId())
+	app, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
 	require.NoError(t, err)
 	api, err := Tester.CreateAPIClient(CTX, project.GetId())
 	require.NoError(t, err)
