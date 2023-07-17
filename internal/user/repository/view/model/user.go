@@ -380,7 +380,7 @@ func (u *UserView) setPasswordData(event *models.Event) error {
 		logging.Log("MODEL-sdw4r").WithError(err).Error("could not unmarshal event data")
 		return errors.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
-	u.PasswordSet = password.Secret != nil
+	u.PasswordSet = password.Secret != nil || password.EncodedHash != ""
 	u.PasswordInitRequired = !u.PasswordSet
 	u.PasswordChangeRequired = password.ChangeRequired
 	u.PasswordChanged = event.CreationDate

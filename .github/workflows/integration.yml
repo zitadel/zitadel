@@ -22,7 +22,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.19
+          go-version: '1.20'
       - name: Source checkout
         uses: actions/checkout@v3
       - name: Set up Docker Buildx
@@ -43,7 +43,7 @@ jobs:
           go run main.go init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
           go run main.go setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
       - name: Run integration tests
-        run: go test -tags=integration -race -p 1 -v -coverprofile=profile.cov -coverpkg=./internal/...,./cmd/... ./internal/integration ./internal/api/grpc/... ./internal/notification/handlers/...
+        run: go test -tags=integration -race -p 1 -v -coverprofile=profile.cov -coverpkg=./internal/...,./cmd/... ./internal/integration ./internal/api/grpc/... ./internal/notification/handlers/... ./internal/api/oidc
       - name: Publish go coverage
         uses: codecov/codecov-action@v3.1.0
         with:
