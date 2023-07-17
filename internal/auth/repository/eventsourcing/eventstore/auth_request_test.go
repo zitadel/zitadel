@@ -1439,6 +1439,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		userSession *user_model.UserSessionView
 		request     *domain.AuthRequest
 		user        *user_model.UserView
+		isInternal  bool
 	}
 	tests := []struct {
 		name        string
@@ -1472,6 +1473,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 						MFAMaxSetUp: domain.MFALevelNotSetUp,
 					},
 				},
+				isInternal: true,
 			},
 			nil,
 			false,
@@ -1490,6 +1492,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 						MFAMaxSetUp: domain.MFALevelNotSetUp,
 					},
 				},
+				isInternal: true,
 			},
 			nil,
 			true,
@@ -1509,6 +1512,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 						MFAMaxSetUp: domain.MFALevelNotSetUp,
 					},
 				},
+				isInternal: true,
 			},
 			&domain.MFAPromptStep{
 				MFAProviders: []domain.MFAType{
@@ -1533,6 +1537,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 						MFAMaxSetUp: domain.MFALevelNotSetUp,
 					},
 				},
+				isInternal: true,
 			},
 			&domain.MFAPromptStep{
 				Required: true,
@@ -1557,6 +1562,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 						MFAInitSkipped: testNow,
 					},
 				},
+				isInternal: true,
 			},
 			nil,
 			true,
@@ -1578,6 +1584,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 					},
 				},
 				userSession: &user_model.UserSessionView{SecondFactorVerification: testNow.Add(-5 * time.Hour)},
+				isInternal:  true,
 			},
 			nil,
 			true,
@@ -1599,6 +1606,32 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 					},
 				},
 				userSession: &user_model.UserSessionView{},
+				isInternal:  true,
+			},
+
+			&domain.MFAVerificationStep{
+				MFAProviders: []domain.MFAType{domain.MFATypeOTP},
+			},
+			false,
+			nil,
+		},
+		{
+			"external checked, check and false", //TODO: ?
+			args{
+				request: &domain.AuthRequest{
+					LoginPolicy: &domain.LoginPolicy{
+						SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						SecondFactorCheckLifetime: 18 * time.Hour,
+					},
+				},
+				user: &user_model.UserView{
+					HumanView: &user_model.HumanView{
+						MFAMaxSetUp: domain.MFALevelSecondFactor,
+						OTPState:    user_model.MFAStateReady,
+					},
+				},
+				userSession: &user_model.UserSessionView{},
+				isInternal:  true,
 			},
 
 			&domain.MFAVerificationStep{
@@ -1611,7 +1644,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			repo := &AuthRequestRepo{}
-			got, ok, err := repo.mfaChecked(tt.args.userSession, tt.args.request, tt.args.user)
+			got, ok, err := repo.mfaChecked(tt.args.userSession, tt.args.request, tt.args.user, tt.args.isInternal)
 			if (tt.errFunc != nil && !tt.errFunc(err)) || (err != nil && tt.errFunc == nil) {
 				t.Errorf("got wrong err: %v ", err)
 				return

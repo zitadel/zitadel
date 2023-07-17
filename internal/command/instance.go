@@ -70,6 +70,7 @@ type InstanceSetup struct {
 		AllowRegister              bool
 		AllowExternalIDP           bool
 		ForceMFA                   bool
+		ForceMFALocalOnly          bool
 		HidePasswordReset          bool
 		IgnoreUnknownUsername      bool
 		AllowDomainDiscovery       bool
@@ -226,6 +227,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LoginPolicy.AllowRegister,
 			setup.LoginPolicy.AllowExternalIDP,
 			setup.LoginPolicy.ForceMFA,
+			setup.LoginPolicy.ForceMFALocalOnly,
 			setup.LoginPolicy.HidePasswordReset,
 			setup.LoginPolicy.IgnoreUnknownUsername,
 			setup.LoginPolicy.AllowDomainDiscovery,
