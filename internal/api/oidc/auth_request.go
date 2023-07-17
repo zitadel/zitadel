@@ -265,12 +265,12 @@ func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	plainCode, err := o.decryptGrant(refreshToken)
+	plainToken, err := o.decryptGrant(refreshToken)
 	if err != nil {
 		return nil, err
 	}
-	if strings.HasPrefix(plainCode, command.IDPrefixV2) {
-		oidcSession, err := o.command.OIDCSessionByRefreshToken(ctx, plainCode)
+	if strings.HasPrefix(plainToken, command.IDPrefixV2) {
+		oidcSession, err := o.command.OIDCSessionByRefreshToken(ctx, plainToken)
 		if err != nil {
 			return nil, err
 		}
@@ -308,7 +308,25 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 	return err
 }
 
-func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID string) *oidc.Error {
+func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID string) (err *oidc.Error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if strings.HasPrefix(token, command.IDPrefixV2) {
+		err := o.command.RevokeOIDCSessionToken(ctx, token, clientID)
+		if err == nil {
+			return nil
+		}
+		if errors.IsPreconditionFailed(err) {
+			return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
+		}
+		return oidc.ErrServerError().WithParent(err)
+	}
+
+	return o.revokeTokenV1(ctx, token, userID, clientID)
+}
+
+func (o *OPStorage) revokeTokenV1(ctx context.Context, token, userID, clientID string) *oidc.Error {
 	refreshToken, err := o.repo.RefreshTokenByID(ctx, token, userID)
 	if err == nil {
 		if refreshToken.ClientID != clientID {
@@ -338,6 +356,17 @@ func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID str
 }
 
 func (o *OPStorage) GetRefreshTokenInfo(ctx context.Context, clientID string, token string) (userID string, tokenID string, err error) {
+	plainToken, err := o.decryptGrant(token)
+	if err != nil {
+		return "", "", op.ErrInvalidRefreshToken
+	}
+	if strings.HasPrefix(plainToken, command.IDPrefixV2) {
+		oidcSession, err := o.command.OIDCSessionByRefreshToken(ctx, plainToken)
+		if err != nil {
+			return "", "", op.ErrInvalidRefreshToken
+		}
+		return oidcSession.UserID, oidcSession.OIDCRefreshTokenID(oidcSession.RefreshTokenID), nil
+	}
 	refreshToken, err := o.repo.RefreshTokenByToken(ctx, token)
 	if err != nil {
 		return "", "", op.ErrInvalidRefreshToken
