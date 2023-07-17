@@ -127,7 +127,7 @@ We add the label "good first issue" for problems we think are a good starting po
 
 By executing the commands from this section, you run everything you need to develop the ZITADEL backend locally.
 Using [Docker Compose](https://docs.docker.com/compose/), you run a [CockroachDB](https://www.cockroachlabs.com/docs/stable/start-a-local-cluster-in-docker-mac.html) on your local machine.
-With [goreleaser](https://opencollective.com/goreleaser), you build a debuggable ZITADEL binary and run it using [delve](https://github.com/go-delve/delve).
+With [make](https://www.gnu.org/software/make/), you build a debuggable ZITADEL binary and run it using [delve](https://github.com/go-delve/delve).
 Then, you test your changes via the console your binary is serving at http://<span because="breaks the link"></span>localhost:8080 and by verifying the database.
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
 
@@ -136,8 +136,7 @@ ZITADEL uses [golangci-lint](https://golangci-lint.run) for code quality checks.
 The commands in this section are tested against the following software versions:
 
 - [Docker version 20.10.17](https://docs.docker.com/engine/install/)
-- [Goreleaser version v1.8.3](https://goreleaser.com/install/)
-- [Go version 1.19](https://go.dev/doc/install)
+- [Go version 1.20](https://go.dev/doc/install)
 - [Delve 1.9.1](https://github.com/go-delve/delve/tree/v1.9.1/Documentation/installation)
 
 Make some changes to the source code, then run the database locally.
@@ -150,16 +149,15 @@ docker compose --file ./e2e/docker-compose.yaml up --detach db
 Build the binary. This takes some minutes, but you can speed up rebuilds.
 
 ```bash
-# You just need goreleasers build part (--snapshot) and you just need to target your current platform (--single-target)
-goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
+make compile
 ```
 
 > Note: With this command, several steps are executed.
 > For speeding up rebuilds, you can reexecute only specific steps you think are necessary based on your changes.  
-> Generating gRPC stubs: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-copy -o .`  
-> Running unit tests: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-codecov`  
-> Generating the console: `DOCKER_BUILDKIT=1 docker build -f build/console/Dockerfile . --target angular-export -o internal/api/ui/console/static/`  
-> Build the binary: `goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel --skip-before`
+> Generating gRPC stubs: `make core_api`  
+> Running unit tests: `make core_unit_test`  
+> Generating the console: `make console_build console_move`  
+> Build the binary: `make compile`
 
 You can now run and debug the binary in .artifacts/zitadel/zitadel using your favourite IDE, for example GoLand.
 You can test if ZITADEL does what you expect by using the UI at http://localhost:8080/ui/console.
@@ -167,19 +165,20 @@ Also, you can verify the data by running `cockroach sql --database zitadel --ins
 
 As soon as you are ready to battle test your changes, run the end-to-end tests.
 
-#### Running the tests with docker
+#### Running the tests
 
-Running the tests with docker doesn't require you to take care of other dependencies than docker and goreleaser.
+Running the tests with docker doesn't require you to take care of other dependencies than docker and make.
 
 ```bash
 # Build the production binary (unit tests are executed, too)
-goreleaser build --id prod --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
+make core_build console_build
+GOOS=linux make compile_pipeline
 
 # Pack the binary into a docker image
-DOCKER_BUILDKIT=1 docker build --file build/Dockerfile .artifacts/zitadel -t zitadel:local
+DOCKER_BUILDKIT=1 docker build --file build/Dockerfile . -t zitadel:local
 
 # If you made changes in the e2e directory, make sure you reformat the files
-(cd ./e2e && npm run lint:fix)
+make console_lint
 
 # Run the tests
 ZITADEL_IMAGE=zitadel:local docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml run --service-ports e2e
@@ -222,9 +221,7 @@ In order to run the integrations tests for the gRPC API, PostgreSQL and Cockroac
 ```bash
 export INTEGRATION_DB_FLAVOR="cockroach" ZITADEL_MASTERKEY="MasterkeyNeedsToHave32Characters"
 docker compose -f internal/integration/config/docker-compose.yaml up --wait ${INTEGRATION_DB_FLAVOR}
-go run main.go init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
-go run main.go setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
-go test -count 1 -tags=integration -race -p 1 ./internal/integration ./internal/api/grpc/... ./internal/api/oidc
+make core_integration_test
 docker compose -f internal/integration/config/docker-compose.yaml down
 ```
 

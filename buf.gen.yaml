@@ -1,0 +1,21 @@
+version: v1
+plugins:
+  - plugin: go
+    out: .artifacts/grpc
+  - plugin: go-grpc
+    out: .artifacts/grpc
+  - plugin: grpc-gateway
+    out: .artifacts/grpc
+    opt: 
+    - allow_delete_body=true
+  - plugin: openapiv2
+    out: .artifacts/grpc
+    opt: 
+    - allow_delete_body=true
+  - plugin: validate
+    out: .artifacts/grpc
+    opt: lang=go
+  - plugin: authoption
+    out: .artifacts/grpc
+  - plugin: zitadel
+    out: .artifacts/grpc
