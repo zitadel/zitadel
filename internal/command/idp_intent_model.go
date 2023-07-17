@@ -64,6 +64,7 @@ func (wm *IDPIntentWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			idpintent.StartedEventType,
 			idpintent.OAuthSucceededEventType,
+			idpintent.LDAPSucceededEventType,
 			idpintent.FailedEventType,
 		).
 		Builder()

@@ -16,6 +16,11 @@ message IDPInformation{
         description: "OAuth/OIDC access (and id_token) returned by the identity provider"
       }
     ];
+    IDPLDAPAccessInformation ldap = 6 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "LDAP entity attributes returned by the identity provider"
+      }
+    ];
   }
   string idp_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -45,6 +50,10 @@ message IDPInformation{
 message IDPOAuthAccessInformation{
   string access_token = 1;
   optional string id_token = 2;
+}
+
+message IDPLDAPAccessInformation{
+  google.protobuf.Struct attributes = 1;
 }
 
 message IDPLink {

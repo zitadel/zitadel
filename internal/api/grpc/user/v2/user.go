@@ -205,42 +205,68 @@ func (s *Server) RetrieveIdentityProviderInformation(ctx context.Context, req *u
 }
 
 func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.EncryptionAlgorithm) (_ *user.RetrieveIdentityProviderInformationResponse, err error) {
-	var idToken *string
-	if intent.IDPIDToken != "" {
-		idToken = &intent.IDPIDToken
-	}
-	var accessToken string
-	if intent.IDPAccessToken != nil {
-		accessToken, err = crypto.DecryptString(intent.IDPAccessToken, alg)
-		if err != nil {
-			return nil, err
-		}
-	}
+
 	rawInformation := new(structpb.Struct)
 	err = rawInformation.UnmarshalJSON(intent.IDPUser)
 	if err != nil {
 		return nil, err
 	}
 
-	return &user.RetrieveIdentityProviderInformationResponse{
+	information := &user.RetrieveIdentityProviderInformationResponse{
 		Details: &object_pb.Details{
 			Sequence:      intent.ProcessedSequence,
 			ChangeDate:    timestamppb.New(intent.ChangeDate),
 			ResourceOwner: intent.ResourceOwner,
 		},
 		IdpInformation: &user.IDPInformation{
-			Access: &user.IDPInformation_Oauth{
-				Oauth: &user.IDPOAuthAccessInformation{
-					AccessToken: accessToken,
-					IdToken:     idToken,
-				},
-			},
 			IdpId:          intent.IDPID,
 			UserId:         intent.IDPUserID,
 			UserName:       intent.IDPUserName,
 			RawInformation: rawInformation,
 		},
-	}, nil
+	}
+
+	if intent.IDPIDToken != "" || intent.IDPAccessToken != nil {
+		var idToken *string
+		if intent.IDPIDToken != "" {
+			idToken = &intent.IDPIDToken
+		}
+		var accessToken string
+		if intent.IDPAccessToken != nil {
+			accessToken, err = crypto.DecryptString(intent.IDPAccessToken, alg)
+			if err != nil {
+				return nil, err
+			}
+		}
+		information.IdpInformation.Access = &user.IDPInformation_Oauth{
+			Oauth: &user.IDPOAuthAccessInformation{
+				AccessToken: accessToken,
+				IdToken:     idToken,
+			},
+		}
+	}
+
+	if intent.IDPEntryAttributes != nil {
+		values := make(map[string]interface{}, 0)
+		for k, v := range intent.IDPEntryAttributes {
+			intValues := make([]interface{}, len(v))
+			for i, value := range v {
+				intValues[i] = value
+			}
+			values[k] = intValues
+		}
+		attributes, err := structpb.NewStruct(values)
+		if err != nil {
+			return nil, err
+		}
+		information.IdpInformation.Access = &user.IDPInformation_Ldap{
+			Ldap: &user.IDPLDAPAccessInformation{
+				Attributes: attributes,
+			},
+		}
+	}
+
+	return information, nil
 }
 
 func (s *Server) checkIntentToken(token string, intentID string) error {

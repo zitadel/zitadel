@@ -569,8 +569,7 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t)
 	intentID := Tester.CreateIntent(t, idpID)
 	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulOAuthIntent(t, idpID, "", "id")
-	ldapIntentID := Tester.CreateIntent(t, idpID)
-	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Tester.CreateSuccessfulLDAPIntent(t, ldapIntentID, "", "id")
+	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Tester.CreateSuccessfulLDAPIntent(t, idpID, "", "id")
 	type args struct {
 		ctx context.Context
 		req *user.RetrieveIdentityProviderInformationRequest
@@ -656,10 +655,17 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 					Sequence:      ldapSequence,
 				},
 				IdpInformation: &user.IDPInformation{
-					Access: &user.IDPInformation_Oauth{
-						Oauth: &user.IDPOAuthAccessInformation{
-							AccessToken: "accessToken",
-							IdToken:     gu.Ptr("idToken"),
+					Access: &user.IDPInformation_Ldap{
+						Ldap: &user.IDPLDAPAccessInformation{
+							Attributes: func() *structpb.Struct {
+								s, err := structpb.NewStruct(map[string]interface{}{
+									"id":                 []interface{}{"id"},
+									"preferred_username": []interface{}{"username"},
+									"language":           []interface{}{"und"},
+								})
+								require.NoError(t, err)
+								return s
+							}(),
 						},
 					},
 					IdpId:    idpID,
@@ -667,8 +673,9 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 					UserName: "username",
 					RawInformation: func() *structpb.Struct {
 						s, err := structpb.NewStruct(map[string]interface{}{
-							"sub":                "id",
+							"id":                 "id",
 							"preferred_username": "username",
+							"language":           "und",
 						})
 						require.NoError(t, err)
 						return s
@@ -687,7 +694,7 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			grpc.AllFieldsEqual(t, got.ProtoReflect(), tt.want.ProtoReflect(), grpc.CustomMappers)
+			grpc.AllFieldsEqual(t, tt.want.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
 		})
 	}
 }

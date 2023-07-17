@@ -148,7 +148,7 @@ func NewLDAPSucceededEvent(
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			OAuthSucceededEventType,
+			LDAPSucceededEventType,
 		),
 		IDPUser:         idpUser,
 		IDPUserID:       idpUserID,
