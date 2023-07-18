@@ -1,0 +1,32 @@
+<form>
+  <cnsl-form-field class="full-width">
+    <cnsl-label>{{ 'PROJECT.GRANT.CREATE.SEL_ORG_FORMFIELD' | translate }}</cnsl-label>
+    <input
+      cnslInput
+      type="text"
+      placeholder="Organization XY"
+      #nameInput
+      [formControl]="myControl"
+      [matAutocomplete]="auto"
+      data-e2e="add-org-input"
+    />
+
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
+      <mat-option *ngIf="isLoading" class="is-loading">
+        <mat-spinner diameter="30"></mat-spinner>
+      </mat-option>
+      <mat-option *ngFor="let org of filteredOrgs" [value]="org">
+        <div class="org-option" data-e2e="org-option">
+          <div class="org-option-column">
+            <span>{{ org.name }}</span>
+            <span class="fill-space"></span>
+            <span class="smaller cnsl-secondary-text">{{ org.primaryDomain }}</span>
+          </div>
+        </div>
+      </mat-option>
+    </mat-autocomplete>
+    <span class="org-autocomplete-target-desc">
+      {{ 'PROJECT.GRANT.CREATE.SEL_ORG_DESC' | translate }}
+    </span>
+  </cnsl-form-field>
+</form>
