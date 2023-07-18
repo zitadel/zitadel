@@ -1504,13 +1504,11 @@
         "SEL_PROJECT": "プロジェクトを検索する",
         "SEL_ROLES": "許可するロールを選択する",
         "SEL_USER": "ユーザーを選択する",
-        "SEL_ORG": "ドメインを設定する",
-        "SEL_ORG_DESC": "完全なドメインを入力して、アクセスを許可する組織を指定する。",
-        "ORG_TITLE": "組織",
+        "SEL_ORG": "組織を検索する",
+        "SEL_ORG_DESC": "付与する組織を検索する",
         "ORG_DESCRIPTION": "組織 {{name}} にユーザーをグラントします。",
         "ORG_DESCRIPTION_DESC": "上記のヘッダーのコンテキストを切り替えることで、別組織のユーザーにグラントできます。",
-        "SEL_ORG_FORMFIELD": "完全なドメイン",
-        "SEL_ORG_BUTTON": "組織を検索する",
+        "SEL_ORG_FORMFIELD": "組織",
         "FOR_ORG": "グラントが以下に対して作成されます："
       },
       "DETAIL": {

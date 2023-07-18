@@ -1,0 +1,38 @@
+.full-width {
+  width: 100%;
+}
+
+input {
+  max-width: 500px;
+}
+
+.org-option {
+  display: flex;
+  align-items: center;
+
+  .org-option-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+
+    span {
+      line-height: normal;
+    }
+
+    .fill-space {
+      flex: 1;
+    }
+
+    .smaller {
+      font-size: 13px;
+    }
+  }
+}
+
+.org-autocomplete-target-desc {
+  font-size: 14px;
+  display: block;
+  margin-top: 0.5rem;
+}
