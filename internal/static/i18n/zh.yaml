@@ -499,6 +499,7 @@ Errors:
     Token:
       Invalid: 令牌无效
       Expired: 令牌已过期
+    InvalidClient: 没有为该客户发放令牌
 
 AggregateTypes:
   action: 动作

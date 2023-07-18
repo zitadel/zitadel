@@ -43,6 +43,9 @@ func (wm *OIDCSessionAccessTokenReadModel) Reduce() error {
 			wm.reduceAdded(e)
 		case *oidcsession.AccessTokenAddedEvent:
 			wm.reduceAccessTokenAdded(e)
+		case *oidcsession.AccessTokenRevokedEvent,
+			*oidcsession.RefreshTokenRevokedEvent:
+			wm.reduceTokenRevoked(event)
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -57,6 +60,8 @@ func (wm *OIDCSessionAccessTokenReadModel) Query() *eventstore.SearchQueryBuilde
 		EventTypes(
 			oidcsession.AddedType,
 			oidcsession.AccessTokenAddedType,
+			oidcsession.AccessTokenRevokedType,
+			oidcsession.RefreshTokenRevokedType,
 		).
 		Builder()
 }
@@ -76,6 +81,11 @@ func (wm *OIDCSessionAccessTokenReadModel) reduceAccessTokenAdded(e *oidcsession
 	wm.AccessTokenID = e.ID
 	wm.AccessTokenCreation = e.CreationDate()
 	wm.AccessTokenExpiration = e.CreationDate().Add(e.Lifetime)
+}
+
+func (wm *OIDCSessionAccessTokenReadModel) reduceTokenRevoked(e eventstore.Event) {
+	wm.AccessTokenID = ""
+	wm.AccessTokenExpiration = e.CreationDate()
 }
 
 // ActiveAccessTokenByToken will check if the token is active by retrieving the OIDCSession events from the eventstore.

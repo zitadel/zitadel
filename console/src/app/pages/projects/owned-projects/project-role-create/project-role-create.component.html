@@ -12,15 +12,15 @@
         <div class="newrole">
           <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'PROJECT.ROLE.KEY' | translate }}</cnsl-label>
-            <input cnslInput formControlName="key" />
+            <input cnslInput formControlName="key" data-e2e="role-key-input" />
           </cnsl-form-field>
           <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'PROJECT.ROLE.DISPLAY_NAME' | translate }}</cnsl-label>
-            <input cnslInput formControlName="displayName" />
+            <input cnslInput formControlName="displayName" data-e2e="role-display-name-input" />
           </cnsl-form-field>
           <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'PROJECT.ROLE.GROUP' | translate }}</cnsl-label>
-            <input cnslInput formControlName="group" />
+            <input cnslInput formControlName="group" data-e2e="role-group-input" />
           </cnsl-form-field>
         </div>
         <button
@@ -36,7 +36,14 @@
       </ng-container>
     </div>
 
-    <button class="add-line-btn" color="primary" type="button" mat-stroked-button (click)="addEntry()">
+    <button
+      class="add-line-btn"
+      color="primary"
+      type="button"
+      data-e2e="new-project-role-button"
+      mat-stroked-button
+      (click)="addEntry()"
+    >
       {{ 'PROJECT.ROLE.ADDNEWLINE' | translate }}
     </button>
 

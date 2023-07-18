@@ -1508,13 +1508,11 @@
         "SEL_PROJECT": "Wyszukaj projekt",
         "SEL_ROLES": "Wybierz role, które mają zostać dodane do udzielenia ",
         "SEL_USER": "Wybierz użytkowników",
-        "SEL_ORG": "Ustaw domenę",
-        "SEL_ORG_DESC": "Wprowadź pełną domenę, aby określić organizację, której chcesz udzielić dostępu.",
-        "ORG_TITLE": "Organizacja",
+        "SEL_ORG": "Wyszukaj organizację",
+        "SEL_ORG_DESC": "Wyszukaj organizację, której chcesz przyznać.",
         "ORG_DESCRIPTION": "Masz zamiar udzielić użytkownikowi dostęp dla organizacji {{name}}.",
         "ORG_DESCRIPTION_DESC": "Przełącz kontekst w nagłówku powyżej, aby udzielić użytkownikowi dostępu dla innej organizacji.",
-        "SEL_ORG_FORMFIELD": "Pełna domena",
-        "SEL_ORG_BUTTON": "Wyszukaj organizację",
+        "SEL_ORG_FORMFIELD": "Organizacja",
         "FOR_ORG": "Dostęp udzielany:"
       },
       "DETAIL": {

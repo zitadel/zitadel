@@ -499,6 +499,7 @@ Errors:
     Token:
       Invalid: Token non è valido
       Expired: Token è scaduto
+    InvalidClient: Il token non è stato emesso per questo cliente
 
 AggregateTypes:
   action: Azione
