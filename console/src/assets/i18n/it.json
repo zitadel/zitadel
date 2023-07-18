@@ -1508,13 +1508,11 @@
         "SEL_PROJECT": "Cerca un progetto",
         "SEL_ROLES": "Seleziona i ruoli che vuoi aggiungere",
         "SEL_USER": "Seleziona utenti",
-        "SEL_ORG": "Impostare il dominio",
-        "SEL_ORG_DESC": "Inserisci il dominio completo per specificare l'organizzazione da concedere.",
-        "ORG_TITLE": "Organizzazione",
+        "SEL_ORG": "Cerca un'organizzazione",
+        "SEL_ORG_DESC": "Cerca l'organizzazione da concedere.",
         "ORG_DESCRIPTION": "Stai per concedere un utente per l'organizzazione {{name}}.",
         "ORG_DESCRIPTION_DESC": "Cambia il contesto nell'intestazione qui sopra per concedere un utente per un'altra organizzazione.",
-        "SEL_ORG_FORMFIELD": "Dominio completo",
-        "SEL_ORG_BUTTON": "Ricerca organizzazione",
+        "SEL_ORG_FORMFIELD": "Organizzazione",
         "FOR_ORG": "Org grant \u00e8 creato per:"
       },
       "DETAIL": {

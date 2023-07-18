@@ -1509,13 +1509,11 @@
         "SEL_PROJECT": "Buscar un proyecto",
         "SEL_ROLES": "Selecciona los roles que quieres que se añadan a la concesión",
         "SEL_USER": "Seleccionar usuarios",
-        "SEL_ORG": "Establecer el dominio",
-        "SEL_ORG_DESC": "Introduce el dominio completo para especificar la organización concesionaria.",
-        "ORG_TITLE": "Organización",
+        "SEL_ORG": "Buscar una organización",
+        "SEL_ORG_DESC": "Busca la organización concesionaria.",
         "ORG_DESCRIPTION": "Estás a punto de conceder acceso a un usuario para la organización {{name}}.",
         "ORG_DESCRIPTION_DESC": "Cambia el contexto en la cabecera superior para conceder acceso a un usuario para otra organización.",
-        "SEL_ORG_FORMFIELD": "Completar dominio",
-        "SEL_ORG_BUTTON": "Buscar organización",
+        "SEL_ORG_FORMFIELD": "Organización",
         "FOR_ORG": "La concesión se creó para:"
       },
       "DETAIL": {

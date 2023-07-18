@@ -1508,13 +1508,11 @@
         "SEL_ROLES": "Selektiere die gewünschten Rollen für das Erstellen der Berechtigung.",
         "SEL_PROJECT": "Suchen nach Projekt",
         "SEL_USER": "Benutzer auswählen",
-        "SEL_ORG": "Suchen nach Domain",
-        "SEL_ORG_DESC": "Gebe die vollständige Domain ein, um Resultate zu erhalten.",
-        "ORG_TITLE": "Organisation",
+        "SEL_ORG": "Durchsuchen Sie eine Organisation",
+        "SEL_ORG_DESC": "Suchen Sie nach der zu gewährenden Organisation.",
         "ORG_DESCRIPTION": "Du bist im Begriff, einen Benutzer für die Organisation {{name}} zu berechtigen.",
         "ORG_DESCRIPTION_DESC": "Wechsle den Kontext, um die Organisation zu wechseln.",
-        "SEL_ORG_FORMFIELD": "Vollständige Domain",
-        "SEL_ORG_BUTTON": "Suche Organisation",
+        "SEL_ORG_FORMFIELD": "Organisation",
         "FOR_ORG": "Die Berechtigung wird erstellt für:"
       },
       "DETAIL": {
