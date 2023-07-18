@@ -155,3 +155,7 @@ func (t *RefreshTokenView) appendRenewedEvent(event *es_models.Event) error {
 func (t *RefreshTokenView) appendRemovedEvent(event *es_models.Event) {
 	t.Expiration = event.CreationDate
 }
+
+func (t *RefreshTokenView) getRelevantEventTypes() {
+
+}
