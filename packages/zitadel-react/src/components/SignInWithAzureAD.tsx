@@ -1,9 +1,9 @@
 import { SignInWithIdentityProviderProps } from "./SignInWith";
 
-export interface SignInWithGitlabProps
+export interface SignInWithAzureADProps
   extends SignInWithIdentityProviderProps {}
 
-export function SignInWithGitlab(props: SignInWithGitlabProps) {
+export function SignInWithAzureAD(props: SignInWithAzureADProps) {
   return (
     <div className="ztdl-cursor-pointer ztdl-flex ztdl-flex-row ztdl-items-center ztdl-bg-white ztdl-text-black dark:ztdl-bg-transparent dark:ztdl-text-white border ztdl-border-divider-light dark:ztdl-border-divider-dark rounded-md px-4 text-sm">
       <div className="ztdl-h-12 ztdl-w-12 flex items-center justify-center">
@@ -32,9 +32,9 @@ export function SignInWithGitlab(props: SignInWithGitlabProps) {
           />
         </svg>
       </div>
-      <span className="ztdl-ml-4">Sign in with Gitlab</span>
+      <span className="ztdl-ml-4">Sign in with AzureAD</span>
     </div>
   );
 }
 
-SignInWithGitlab.displayName = "SignInWithGitlab";
+SignInWithAzureAD.displayName = "SignInWithAzureAD";

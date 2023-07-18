@@ -11,9 +11,19 @@ export {
 } from "./components/SignInWithGitlab";
 
 export {
-  ZitadelUIProvider,
-  type ZitadelUIProps,
-} from "./components/ZitadelUIProvider";
+  SignInWithAzureAD,
+  type SignInWithAzureADProps,
+} from "./components/SignInWithAzureAD";
+
+export {
+  SignInWithGithub,
+  type SignInWithGithubProps,
+} from "./components/SignInWithGithub";
+
+export {
+  ZitadelReactProvider,
+  type ZitadelReactProps,
+} from "./components/ZitadelReactProvider";
 
 export {
   SignInWithIDP,

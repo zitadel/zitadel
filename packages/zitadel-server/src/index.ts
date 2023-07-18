@@ -12,7 +12,11 @@ export {
   Theme,
 } from "./proto/server/zitadel/settings/v2alpha/branding_settings";
 
-export { LoginSettings } from "./proto/server/zitadel/settings/v2alpha/login_settings";
+export {
+  LoginSettings,
+  IdentityProvider,
+  IdentityProviderType,
+} from "./proto/server/zitadel/settings/v2alpha/login_settings";
 
 export {
   ChallengeKind,
@@ -38,6 +42,8 @@ export {
   GetGeneralSettingsResponse,
   GetLoginSettingsResponse,
   GetLoginSettingsRequest,
+  GetActiveIdentityProvidersResponse,
+  GetActiveIdentityProvidersRequest,
 } from "./proto/server/zitadel/settings/v2alpha/settings_service";
 export {
   AddHumanUserResponse,
@@ -56,6 +62,7 @@ export {
   SetHumanPasswordResponse,
   SetHumanPasswordRequest,
 } from "./proto/server/zitadel/management";
+export * from "./proto/server/zitadel/idp";
 export { type LegalAndSupportSettings } from "./proto/server/zitadel/settings/v2alpha/legal_settings";
 export { type PasswordComplexitySettings } from "./proto/server/zitadel/settings/v2alpha/password_settings";
 export { type ResourceOwnerType } from "./proto/server/zitadel/settings/v2alpha/settings";

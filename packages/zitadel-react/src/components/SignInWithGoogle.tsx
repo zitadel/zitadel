@@ -1,12 +1,12 @@
 import * as React from "react";
+import { SignInWithIdentityProviderProps } from "./SignInWith";
 
-export interface SignInWithGoogleProps {
-  children?: React.ReactNode;
-}
+export interface SignInWithGoogleProps
+  extends SignInWithIdentityProviderProps {}
 
 export function SignInWithGoogle(props: SignInWithGoogleProps) {
   return (
-    <div className="ztdl-cursor-pointer ztdl-flex ztdl-flex-row ztdl-items-center ztdl-bg-white ztdl-text-black dark:ztdl-bg-transparent dark:ztdl-text-white border ztdl-border-divider-light dark:ztdl-border-divider-dark rounded-md px-4 text-sm">
+    <div className="ztdl-w-full ztdl-cursor-pointer ztdl-flex ztdl-flex-row ztdl-items-center ztdl-bg-white ztdl-text-black dark:ztdl-bg-transparent dark:ztdl-text-white border ztdl-border-divider-light dark:ztdl-border-divider-dark rounded-md px-4 text-sm">
       <div className="ztdl-h-12 ztdl-w-12 ztdl-flex ztdl-items-center ztdl-justify-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"

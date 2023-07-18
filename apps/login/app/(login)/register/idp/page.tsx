@@ -1,6 +1,6 @@
 import { getLegalAndSupportSettings, server } from "#/lib/zitadel";
 
-import { SignInWithIDP } from "@zitadel/react";
+import { SignInWithIDP } from "@zitadel/next";
 
 export default async function Page({
   searchParams,

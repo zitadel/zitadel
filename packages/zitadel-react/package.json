@@ -48,7 +48,6 @@
     "access": "public"
   },
   "peerDependencies": {
-    "react": "18.2.0",
-    "@zitadel/server": "workspace:*"
+    "react": "18.2.0"
   }
 }
