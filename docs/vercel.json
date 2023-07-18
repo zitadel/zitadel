@@ -16,5 +16,7 @@
     ],
     "redirects": [
         { "source": "/", "destination": "/docs" }
+        { "source": "/docs/apis/:slug*", "destination": "/docs/resources/:slug*", "permanent": true }
+        
     ]
 }
