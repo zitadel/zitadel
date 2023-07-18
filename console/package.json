@@ -59,7 +59,7 @@
     "@angular/cli": "^16.1.1",
     "@angular/compiler-cli": "^16.1.2",
     "@angular/language-service": "^16.1.2",
-    "@bufbuild/buf": "^1.18.0-1",
+    "@bufbuild/buf": "^1.24.0",
     "@types/file-saver": "^2.0.2",
     "@types/google-protobuf": "^3.15.3",
     "@types/jasmine": "~4.3.3",
