@@ -659,9 +659,9 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 						Ldap: &user.IDPLDAPAccessInformation{
 							Attributes: func() *structpb.Struct {
 								s, err := structpb.NewStruct(map[string]interface{}{
-									"id":                 []interface{}{"id"},
-									"preferred_username": []interface{}{"username"},
-									"language":           []interface{}{"und"},
+									"id":       []interface{}{"id"},
+									"username": []interface{}{"username"},
+									"language": []interface{}{"en"},
 								})
 								require.NoError(t, err)
 								return s
@@ -673,9 +673,9 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 					UserName: "username",
 					RawInformation: func() *structpb.Struct {
 						s, err := structpb.NewStruct(map[string]interface{}{
-							"id":                 "id",
-							"preferred_username": "username",
-							"language":           "und",
+							"id":                "id",
+							"preferredUsername": "username",
+							"preferredLanguage": "en",
 						})
 						require.NoError(t, err)
 						return s

@@ -196,22 +196,24 @@ func (s *Tester) CreateSuccessfulLDAPIntent(t *testing.T, idpID, userID, idpUser
 	intentID := s.CreateIntent(t, idpID)
 	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Organisation.ID)
 	require.NoError(t, err)
+	username := "username"
+	lang := language.Make("en")
 	idpUser := ldap.NewUser(
-		"id",
+		idpUserID,
 		"",
 		"",
 		"",
 		"",
-		"username",
-		"",
-		false,
+		username,
 		"",
 		false,
-		language.Tag{},
+		"",
+		false,
+		lang,
 		"",
 		"",
 	)
-	attributes := map[string][]string{"id": {idpUserID}}
+	attributes := map[string][]string{"id": {idpUserID}, "username": {username}, "language": {lang.String()}}
 	token, err := s.Commands.SucceedLDAPIDPIntent(ctx, writeModel, idpUser, userID, attributes)
 	require.NoError(t, err)
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
