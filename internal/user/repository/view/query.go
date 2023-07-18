@@ -6,7 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-func UserByIDQuery(id, instanceID string, latestSequence uint64, eventTypes ...es_models.EventType) (*es_models.SearchQuery, error) {
+func UserByIDQuery(id, instanceID string, latestSequence uint64, eventTypes []es_models.EventType) (*es_models.SearchQuery, error) {
 	if id == "" {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d8isw", "Errors.User.UserIDMissing")
 	}
@@ -14,12 +14,9 @@ func UserByIDQuery(id, instanceID string, latestSequence uint64, eventTypes ...e
 		AddQuery().
 		AggregateTypeFilter(user.AggregateType).
 		AggregateIDFilter(id).
-		EventTypesFilter().
+		EventTypesFilter(eventTypes...).
 		LatestSequenceFilter(latestSequence).
 		InstanceIDFilter(instanceID).
 		SearchQuery()
-	if len(eventTypes) > 0 {
-		query.AddQuery().EventTypesFilter(eventTypes...)
-	}
 	return query, nil
 }

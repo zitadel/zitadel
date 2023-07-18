@@ -44,7 +44,7 @@ func (repo *UserRepo) UserEventsByID(ctx context.Context, id string, sequence ui
 }
 
 func (r *UserRepo) getUserEvents(ctx context.Context, userID string, sequence uint64, eventTypes []models.EventType) ([]*models.Event, error) {
-	query, err := usr_view.UserByIDQuery(userID, authz.GetInstance(ctx).InstanceID(), sequence, eventTypes...)
+	query, err := usr_view.UserByIDQuery(userID, authz.GetInstance(ctx).InstanceID(), sequence, eventTypes)
 	if err != nil {
 		return nil, err
 	}
