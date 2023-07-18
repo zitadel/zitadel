@@ -20,8 +20,11 @@ type OIDCSessionWriteModel struct {
 	AuthMethods                []domain.UserAuthMethodType
 	AuthTime                   time.Time
 	State                      domain.OIDCSessionState
+	AccessTokenID              string
+	AccessTokenCreation        time.Time
 	AccessTokenExpiration      time.Time
 	RefreshTokenID             string
+	RefreshToken               string
 	RefreshTokenExpiration     time.Time
 	RefreshTokenIdleExpiration time.Time
 
@@ -45,10 +48,14 @@ func (wm *OIDCSessionWriteModel) Reduce() error {
 			wm.reduceAdded(e)
 		case *oidcsession.AccessTokenAddedEvent:
 			wm.reduceAccessTokenAdded(e)
+		case *oidcsession.AccessTokenRevokedEvent:
+			wm.reduceAccessTokenRevoked(e)
 		case *oidcsession.RefreshTokenAddedEvent:
 			wm.reduceRefreshTokenAdded(e)
 		case *oidcsession.RefreshTokenRenewedEvent:
 			wm.reduceRefreshTokenRenewed(e)
+		case *oidcsession.RefreshTokenRevokedEvent:
+			wm.reduceRefreshTokenRevoked(e)
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -64,6 +71,7 @@ func (wm *OIDCSessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 			oidcsession.AccessTokenAddedType,
 			oidcsession.RefreshTokenAddedType,
 			oidcsession.RefreshTokenRenewedType,
+			oidcsession.RefreshTokenRevokedType,
 		).
 		Builder()
 
@@ -82,10 +90,21 @@ func (wm *OIDCSessionWriteModel) reduceAdded(e *oidcsession.AddedEvent) {
 	wm.AuthMethods = e.AuthMethods
 	wm.AuthTime = e.AuthTime
 	wm.State = domain.OIDCSessionStateActive
+	// the write model might be initialized without resource owner,
+	// so update the aggregate
+	if wm.ResourceOwner == "" {
+		wm.aggregate = &oidcsession.NewAggregate(wm.AggregateID, e.Aggregate().ResourceOwner).Aggregate
+	}
 }
 
 func (wm *OIDCSessionWriteModel) reduceAccessTokenAdded(e *oidcsession.AccessTokenAddedEvent) {
+	wm.AccessTokenID = e.ID
 	wm.AccessTokenExpiration = e.CreationDate().Add(e.Lifetime)
+}
+
+func (wm *OIDCSessionWriteModel) reduceAccessTokenRevoked(e *oidcsession.AccessTokenRevokedEvent) {
+	wm.AccessTokenID = ""
+	wm.AccessTokenExpiration = e.CreationDate()
 }
 
 func (wm *OIDCSessionWriteModel) reduceRefreshTokenAdded(e *oidcsession.RefreshTokenAddedEvent) {
@@ -97,6 +116,14 @@ func (wm *OIDCSessionWriteModel) reduceRefreshTokenAdded(e *oidcsession.RefreshT
 func (wm *OIDCSessionWriteModel) reduceRefreshTokenRenewed(e *oidcsession.RefreshTokenRenewedEvent) {
 	wm.RefreshTokenID = e.ID
 	wm.RefreshTokenIdleExpiration = e.CreationDate().Add(e.IdleLifetime)
+}
+
+func (wm *OIDCSessionWriteModel) reduceRefreshTokenRevoked(e *oidcsession.RefreshTokenRevokedEvent) {
+	wm.RefreshTokenID = ""
+	wm.RefreshTokenExpiration = e.CreationDate()
+	wm.RefreshTokenIdleExpiration = e.CreationDate()
+	wm.AccessTokenID = ""
+	wm.AccessTokenExpiration = e.CreationDate()
 }
 
 func (wm *OIDCSessionWriteModel) CheckRefreshToken(refreshTokenID string) error {
@@ -111,4 +138,30 @@ func (wm *OIDCSessionWriteModel) CheckRefreshToken(refreshTokenID string) error 
 		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-3jt2w", "Errors.OIDCSession.RefreshTokenInvalid")
 	}
 	return nil
+}
+
+func (wm *OIDCSessionWriteModel) CheckAccessToken(accessTokenID string) error {
+	if wm.State != domain.OIDCSessionStateActive {
+		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-KL2pk", "Errors.OIDCSession.Token.Invalid")
+	}
+	if wm.AccessTokenID != accessTokenID {
+		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-JLKW2", "Errors.OIDCSession.Token.Invalid")
+	}
+	if wm.AccessTokenExpiration.Before(time.Now()) {
+		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-3j3md", "Errors.OIDCSession.Token.Invalid")
+	}
+	return nil
+}
+
+func (wm *OIDCSessionWriteModel) CheckClient(clientID string) error {
+	for _, aud := range wm.Audience {
+		if aud == clientID {
+			return nil
+		}
+	}
+	return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-SKjl3", "Errors.OIDCSession.InvalidClient")
+}
+
+func (wm *OIDCSessionWriteModel) OIDCRefreshTokenID(refreshTokenID string) string {
+	return wm.AggregateID + TokenDelimiter + refreshTokenID
 }

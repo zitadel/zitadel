@@ -17,6 +17,7 @@ import (
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
@@ -29,6 +30,7 @@ type Client struct {
 	CC        *grpc.ClientConn
 	Admin     admin.AdminServiceClient
 	Mgmt      mgmt.ManagementServiceClient
+	Auth      auth.AuthServiceClient
 	UserV2    user.UserServiceClient
 	SessionV2 session.SessionServiceClient
 	OIDCv2    oidc_pb.OIDCServiceClient
@@ -40,6 +42,7 @@ func newClient(cc *grpc.ClientConn) Client {
 		CC:        cc,
 		Admin:     admin.NewAdminServiceClient(cc),
 		Mgmt:      mgmt.NewManagementServiceClient(cc),
+		Auth:      auth.NewAuthServiceClient(cc),
 		UserV2:    user.NewUserServiceClient(cc),
 		SessionV2: session.NewSessionServiceClient(cc),
 		OIDCv2:    oidc_pb.NewOIDCServiceClient(cc),
@@ -134,6 +137,14 @@ func (s *Tester) RegisterUserPasskey(ctx context.Context, userID string) {
 	logging.OnError(err).Fatal("create user passkey")
 }
 
+func (s *Tester) SetUserPassword(ctx context.Context, userID, password string) {
+	_, err := s.Client.UserV2.SetPassword(ctx, &user.SetPasswordRequest{
+		UserId:      userID,
+		NewPassword: &user.Password{Password: password},
+	})
+	logging.OnError(err).Fatal("set user password")
+}
+
 func (s *Tester) AddGenericOAuthProvider(t *testing.T) string {
 	ctx := authz.WithInstance(context.Background(), s.Instance)
 	id, _, err := s.Commands.AddOrgGenericOAuthProvider(ctx, s.Organisation.ID, command.GenericOAuthProvider{
@@ -218,4 +229,21 @@ func (s *Tester) CreatePasskeySession(t *testing.T, ctx context.Context, userID 
 	require.NoError(t, err)
 	return createResp.GetSessionId(), updateResp.GetSessionToken(),
 		createResp.GetDetails().GetChangeDate().AsTime(), updateResp.GetDetails().GetChangeDate().AsTime()
+}
+
+func (s *Tester) CreatePasswordSession(t *testing.T, ctx context.Context, userID, password string) (id, token string, start, change time.Time) {
+	createResp, err := s.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{UserId: userID},
+			},
+			Password: &session.CheckPassword{
+				Password: password,
+			},
+		},
+		Domain: s.Config.ExternalDomain,
+	})
+	require.NoError(t, err)
+	return createResp.GetSessionId(), createResp.GetSessionToken(),
+		createResp.GetDetails().GetChangeDate().AsTime(), createResp.GetDetails().GetChangeDate().AsTime()
 }

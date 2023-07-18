@@ -48,7 +48,10 @@ type HumanAddedEvent struct {
 	Region        string `json:"region,omitempty"`
 	StreetAddress string `json:"streetAddress,omitempty"`
 
+	// New events only use EncodedHash. However, the secret field
+	// is preserved to handle events older than the switch to Passwap.
 	Secret         *crypto.CryptoValue `json:"secret,omitempty"`
+	EncodedHash    string              `json:"encodedHash,omitempty"`
 	ChangeRequired bool                `json:"changeRequired,omitempty"`
 }
 
@@ -81,10 +84,10 @@ func (e *HumanAddedEvent) AddPhoneData(
 }
 
 func (e *HumanAddedEvent) AddPasswordData(
-	secret *crypto.CryptoValue,
+	encoded string,
 	changeRequired bool,
 ) {
-	e.Secret = secret
+	e.EncodedHash = encoded
 	e.ChangeRequired = changeRequired
 }
 
@@ -149,8 +152,12 @@ type HumanRegisteredEvent struct {
 	PostalCode            string              `json:"postalCode,omitempty"`
 	Region                string              `json:"region,omitempty"`
 	StreetAddress         string              `json:"streetAddress,omitempty"`
-	Secret                *crypto.CryptoValue `json:"secret,omitempty"`
-	ChangeRequired        bool                `json:"changeRequired,omitempty"`
+
+	// New events only use EncodedHash. However, the secret field
+	// is preserved to handle events older than the switch to Passwap.
+	Secret         *crypto.CryptoValue `json:"secret,omitempty"` // legacy
+	EncodedHash    string              `json:"encodedHash,omitempty"`
+	ChangeRequired bool                `json:"changeRequired,omitempty"`
 }
 
 func (e *HumanRegisteredEvent) Data() interface{} {
@@ -182,10 +189,10 @@ func (e *HumanRegisteredEvent) AddPhoneData(
 }
 
 func (e *HumanRegisteredEvent) AddPasswordData(
-	secret *crypto.CryptoValue,
+	encoded string,
 	changeRequired bool,
 ) {
-	e.Secret = secret
+	e.EncodedHash = encoded
 	e.ChangeRequired = changeRequired
 }
 

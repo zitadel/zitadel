@@ -1,0 +1,104 @@
+name: Lint
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+      go_version:
+        required: true
+        type: string
+      buf_version:
+        required: true
+        type: string
+      go_lint_version:
+        required: true
+        type: string
+      core_cache_key:
+        required: true
+        type: string
+      core_cache_path:
+        required: true
+        type: string
+
+jobs:
+
+  lint-skip:
+    name: lint skip
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' }}
+    steps:
+      - name: Lint skip
+        run: |
+          echo "Linting outside of pull requests is skipped"
+
+  api:
+    name: api
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+    - 
+      uses: actions/checkout@v3
+    - 
+      uses: bufbuild/buf-setup-action@v1
+      with:
+        version: ${{ inputs.buf_version }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+    - 
+      name: lint
+      uses: bufbuild/buf-lint-action@v1
+    - 
+      uses: bufbuild/buf-breaking-action@v1
+      with:
+        against: "https://github.com/${{ github.repository }}.git#branch=main"
+
+  console:
+    if: ${{ github.event_name == 'pull_request' }}
+    name: console
+    runs-on: ubuntu-latest
+    steps:
+    -
+      name: Checkout
+      uses: actions/checkout@v3
+    -
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node_version }}
+        cache: 'yarn'
+        cache-dependency-path: console/yarn.lock
+    -
+      run: cd console && yarn install
+    -
+      name: lint
+      run: make console_lint
+
+  core:
+    name: core
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+    -
+      name: Checkout
+      uses: actions/checkout@v3
+    - 
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ github.event.inputs.go_version }}
+    - 
+      uses: actions/cache/restore@v3
+      timeout-minutes: 1
+      name: restore core
+      with:
+        path: ${{ inputs.core_cache_path }}
+        key: ${{ inputs.core_cache_key }}
+        fail-on-cache-miss: true
+    - 
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: ${{ inputs.go_lint_version }}
+        github-token: ${{ github.token }}
+        only-new-issues: true
+        skip-pkg-cache: true
+        skip-build-cache: true

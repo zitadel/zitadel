@@ -42,7 +42,7 @@ func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID strin
 	var pat *PersonalAccessToken
 	if o.Human != nil {
 		o.Human.ID = userID
-		validations = append(validations, c.AddHumanCommand(o.Human, orgID, c.userPasswordAlg, c.userEncryption, true))
+		validations = append(validations, c.AddHumanCommand(o.Human, orgID, c.userPasswordHasher, c.userEncryption, true))
 	} else if o.Machine != nil {
 		validations = append(validations, AddMachineCommand(userAgg, o.Machine.Machine))
 		if o.Machine.Pat != nil {

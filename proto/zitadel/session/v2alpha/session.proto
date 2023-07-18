@@ -74,6 +74,11 @@ message UserFactor {
       description: "\"display name of the checked user\"";
     }
   ];
+  string organisation_id = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"organisation id of the checked user\"";
+    }
+  ];
 }
 
 message PasswordFactor {
