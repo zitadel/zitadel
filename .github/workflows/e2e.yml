@@ -1,66 +1,104 @@
 name: "ZITADEL e2e Tests"
 
 on:
-  workflow_run:
-    workflows: [ZITADEL Release]
-    types:
-      - completed
-  workflow_dispatch:
+  workflow_call:
     inputs:
-      releaseversion:
-        description: 'Release version to test'
+      image:
         required: true
-        default: 'latest'
+        type: string
 
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
         browser: [firefox, chrome]
-    runs-on: ubuntu-20.04
+    services:
+      # we currently use postgres because cockroach doesn't work
+      postgres:
+        image: postgres
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: zitadel
+          PGUSER: zitadel
+          POSTGRES_DB: zitadel
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --health-start-period 10s
+      zitadel:
+        image: ${{ inputs.image }}
+        credentials:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        options: >-
+          --health-cmd "zitadel ready"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --health-start-period 10s
+          --add-host host.docker.internal:host-gateway
+        ports:
+          - 8080:8080
+        env:
+          ZITADEL_ARGS: "start-from-init --masterkeyFromEnv"
+          ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
+          ZITADEL_LOG_LEVEL: debug
+          ZITADEL_EXTERNALDOMAIN: localhost
+          ZITADEL_EXTERNALSECURE: "false"
+          ZITADEL_TLS_ENABLED: "false"
+          ZITADEL_DATABASE_POSTGRES_HOST: postgres
+          ZITADEL_DATABASE_POSTGRES_PORT: "5432"
+          ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
+          ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS: "20"
+          ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS: "10"
+          ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
+          ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
+          ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: zitadel
+          ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
+          ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: "false"
+          ZITADEL_LOGSTORE_ACCESS_DATABASE_ENABLED: "true"
+          ZITADEL_LOGSTORE_ACCESS_DATABASE_DEBOUNCE_MINFREQUENCY: 0s
+          ZITADEL_LOGSTORE_ACCESS_DATABASE_DEBOUNCE_MAXBULKSIZE: "0"
+          ZITADEL_LOGSTORE_EXECUTION_DATABASE_ENABLED: "true"
+          ZITADEL_LOGSTORE_EXECUTION_STDOUT_ENABLED: "false"
+          ZITADEL_QUOTAS_ACCESS_EXHAUSTEDCOOKIEKEY: "zitadel.quota.limiting"
+          ZITADEL_QUOTAS_ACCESS_EXHAUSTEDCOOKIEMAXAGE: 60s
+          ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_REQUEUEEVERY: 1s
+          ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_MFAINITSKIPLIFETIME: "0"
+          ZITADEL_SYSTEMAPIUSERS: "{\"cypress\": {\"keyData\": \"LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF6aStGRlNKTDdmNXl3NEtUd3pnTQpQMzRlUEd5Y20vTStrVDBNN1Y0Q2d4NVYzRWFESXZUUUtUTGZCYUVCNDV6YjlMdGpJWHpEdzByWFJvUzJoTzZ0CmgrQ1lRQ3ozS0N2aDA5QzBJenhaaUIySVMzSC9hVCs1Qng5RUZZK3ZuQWtaamNjYnlHNVlOUnZtdE9sbnZJZUkKSDdxWjB0RXdrUGZGNUdFWk5QSlB0bXkzVUdWN2lvZmRWUVMxeFJqNzMrYU13NXJ2SDREOElkeWlBQzNWZWtJYgpwdDBWajBTVVgzRHdLdG9nMzM3QnpUaVBrM2FYUkYwc2JGaFFvcWRKUkk4TnFnWmpDd2pxOXlmSTV0eXhZc3duCitKR3pIR2RIdlczaWRPRGxtd0V0NUsycGFzaVJJV0syT0dmcSt3MEVjbHRRSGFidXFFUGdabG1oQ2tSZE5maXgKQndJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==\"}}"
+
+    runs-on: ubuntu-latest
     env:
-      ZITADEL_IMAGE_REGISTRY: 'ghcr.io/zitadel/zitadel'
+      ZITADEL_IMAGE: ${{ inputs.image }}
     steps:
-      - name: Checkout Repository
+      - 
+        name: Checkout Repository
         uses: actions/checkout@v3
-      - name: Set TAG env manual trigger
-        if: github.event_name == 'workflow_dispatch'
-        run: echo "ZITADEL_IMAGE=${ZITADEL_IMAGE_REGISTRY}:${{ github.event.inputs.releaseversion }}" >> $GITHUB_ENV
-      - name: get latest tag
-        uses: actions-ecosystem/action-get-latest-tag@v1
-        id: get-latest-tag
-        with: 
-           semver_only: true  
-      - name: Set TAG env on ZITADEL release
-        if: github.event_name == 'workflow_run'
-        run: echo "ZITADEL_IMAGE=${ZITADEL_IMAGE_REGISTRY}:${{ steps.get-latest-tag.outputs.tag }}" >> $GITHUB_ENV
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      - 
+        name: Cypress run
+        uses: cypress-io/github-action@v5
+        env:
+          CYPRESS_BASE_URL: http://localhost:8080/ui/console
+          CYPRESS_WEBHOOK_HANDLER_HOST: host.docker.internal
+          CYPRESS_DATABASE_CONNECTION_URL: 'postgresql://zitadel@localhost:5432/zitadel'
+          CYPRESS_BACKEND_URL: http://localhost:8080
         with:
-          driver: docker
-          install: true
-      - name: Test ${{ matrix.browser }}
-        run: docker compose run --service-ports e2e --browser ${{ matrix.browser }}
-        working-directory: e2e/config/host.docker.internal
-      - name: Ensure Artifacts Directory Exists
-        run: mkdir -p ./.artifacts
-      - name: Save ZITADEL Logs
-        if: always()
-        run: docker compose logs zitadel > ../../../.artifacts/e2e-compose-zitadel.log
-        working-directory: e2e/config/host.docker.internal
-      - name: Save Prepare Logs
-        if: always()
-        run: docker compose logs prepare > ../../../.artifacts/e2e-compose-prepare.log
-        working-directory: e2e/config/host.docker.internal
-      - name: Archive production tests ${{ matrix.browser }}
-        if: always()
+          working-directory: e2e
+          browser: ${{ matrix.browser }}
+          command: npm run e2e
+          config-file: cypress.config.ts
+      - 
         uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: production-tests-${{ matrix.browser }}
           path: |
-            e2e/cypress/results
-            e2e/cypress/videos
             e2e/cypress/screenshots
-            .artifacts/e2e-compose-zitadel.log
-            .artifacts/e2e-compose-prepare.log
+            e2e/cypress/videos
+            e2e/cypress/results
           retention-days: 30

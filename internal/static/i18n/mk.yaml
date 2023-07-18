@@ -490,6 +490,16 @@ Errors:
     TokenCreationFailed: Неуспешно креирање на токен
     InvalidToken: Токенот за намера е невалиден
     OtherUser: Намерата е за друг корисник
+  AuthRequest:
+    AlreadyExists: Барањето за автентикација веќе постои
+    NotExisting: Барањето за автентикација не постои
+    WrongLoginClient: Барањето за автификација беше креирано од друг клиент за најавување
+  OIDCSession:
+    RefreshTokenInvalid: Токенот за освежување е неважечки
+    Token:
+      Invalid: токенот е неважечки
+      Expired: токенот е истечен
+    InvalidClient: Токен не беше издаден на овој клиент
 
 AggregateTypes:
   action: Акција
