@@ -1616,7 +1616,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			nil,
 		},
 		{
-			"external checked, check and false", //TODO: ?
+			"external not checked or forced but set up, want step",
 			args{
 				request: &domain.AuthRequest{
 					LoginPolicy: &domain.LoginPolicy{
@@ -1631,13 +1631,84 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 					},
 				},
 				userSession: &user_model.UserSessionView{},
-				isInternal:  true,
+				isInternal:  false,
 			},
-
 			&domain.MFAVerificationStep{
 				MFAProviders: []domain.MFAType{domain.MFATypeOTP},
 			},
 			false,
+			nil,
+		},
+		{
+			"external not forced but checked",
+			args{
+				request: &domain.AuthRequest{
+					LoginPolicy: &domain.LoginPolicy{
+						SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						SecondFactorCheckLifetime: 18 * time.Hour,
+					},
+				},
+				user: &user_model.UserView{
+					HumanView: &user_model.HumanView{
+						MFAMaxSetUp: domain.MFALevelSecondFactor,
+						OTPState:    user_model.MFAStateReady,
+					},
+				},
+				userSession: &user_model.UserSessionView{SecondFactorVerification: testNow.Add(-5 * time.Hour)},
+				isInternal:  false,
+			},
+			nil,
+			true,
+			nil,
+		},
+		{
+			"external not checked but required, want step",
+			args{
+				request: &domain.AuthRequest{
+					LoginPolicy: &domain.LoginPolicy{
+						SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						SecondFactorCheckLifetime: 18 * time.Hour,
+						ForceMFA:                  true,
+					},
+				},
+				user: &user_model.UserView{
+					HumanView: &user_model.HumanView{
+						MFAMaxSetUp: domain.MFALevelNotSetUp,
+					},
+				},
+				userSession: &user_model.UserSessionView{},
+				isInternal:  false,
+			},
+			&domain.MFAPromptStep{
+				Required: true,
+				MFAProviders: []domain.MFAType{
+					domain.MFATypeOTP,
+				},
+			},
+			false,
+			nil,
+		},
+		{
+			"external not checked but local required",
+			args{
+				request: &domain.AuthRequest{
+					LoginPolicy: &domain.LoginPolicy{
+						SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						SecondFactorCheckLifetime: 18 * time.Hour,
+						ForceMFA:                  true,
+						ForceMFALocalOnly:         true,
+					},
+				},
+				user: &user_model.UserView{
+					HumanView: &user_model.HumanView{
+						MFAMaxSetUp: domain.MFALevelNotSetUp,
+					},
+				},
+				userSession: &user_model.UserSessionView{},
+				isInternal:  false,
+			},
+			nil,
+			true,
 			nil,
 		},
 	}

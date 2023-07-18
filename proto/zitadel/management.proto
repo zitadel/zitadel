@@ -9656,7 +9656,7 @@ message AddCustomLoginPolicyRequest {
     ];
     bool force_mfa_local_only = 20 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "if activated, only local authenticated users are forced to use MFA if `force_mfa` is activated. Authentication through IDPs won't prompt a MFA step in the login."
+            description: "if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login."
         }
     ];
 }
@@ -9705,7 +9705,7 @@ message UpdateCustomLoginPolicyRequest {
     ];
     bool force_mfa_local_only = 17 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "if activated, only local authenticated users are forced to use MFA if `force_mfa` is activated. Authentication through IDPs won't prompt a MFA step in the login."
+            description: "if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login."
         }
     ];
 }
