@@ -55,7 +55,7 @@ func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (
 		}
 	}
 
-	events, esErr := repo.getUserEvents(ctx, userID, token.InstanceID, token.Sequence, token.GetRelevantEventTypes()...)
+	events, esErr := repo.getUserEvents(ctx, userID, token.InstanceID, token.Sequence, token.GetRelevantEventTypes())
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
 	}
@@ -77,7 +77,7 @@ func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (
 	return model.TokenViewToModel(token), nil
 }
 
-func (r *TokenRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64, eventTypes ...models.EventType) ([]*models.Event, error) {
+func (r *TokenRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64, eventTypes []models.EventType) ([]*models.Event, error) {
 	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence, eventTypes...)
 	if err != nil {
 		return nil, err

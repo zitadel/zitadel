@@ -163,7 +163,7 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 				"userID", event.AggregateID,
 				"eventType", event.Type,
 			).Info("user not found in view")
-			query, err := usr_view.UserByIDQuery(event.AggregateID, event.InstanceID, 0)
+			query, err := usr_view.UserByIDQuery(event.AggregateID, event.InstanceID, 0, user.EventTypes()...)
 			if err != nil {
 				return err
 			}
@@ -191,7 +191,7 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 				"userID", event.AggregateID,
 				"eventType", event.Type,
 			).Info("user not found in view")
-			query, err := usr_view.UserByIDQuery(event.AggregateID, event.InstanceID, 0)
+			query, err := usr_view.UserByIDQuery(event.AggregateID, event.InstanceID, 0, user.EventTypes()...)
 			if err != nil {
 				return err
 			}

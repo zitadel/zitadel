@@ -14,6 +14,7 @@ func UserByIDQuery(id, instanceID string, latestSequence uint64, eventTypes ...e
 		AddQuery().
 		AggregateTypeFilter(user.AggregateType).
 		AggregateIDFilter(id).
+		EventTypesFilter().
 		LatestSequenceFilter(latestSequence).
 		InstanceIDFilter(instanceID).
 		SearchQuery()
