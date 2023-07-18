@@ -62,7 +62,7 @@ func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, tokenID, userID
 		}
 	}
 
-	events, esErr := r.getUserEvents(ctx, userID, tokenView.InstanceID, tokenView.Sequence, tokenView.getRelevantEventTypes())
+	events, esErr := r.getUserEvents(ctx, userID, tokenView.InstanceID, tokenView.Sequence, tokenView.GetRelevantEventTypes()...)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-BHB52", "Errors.User.RefreshToken.Invalid")
 	}
