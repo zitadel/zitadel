@@ -16,6 +16,6 @@
     ],
     "redirects": [
         { "source": "/", "destination": "/docs" },
-        { "source": "/docs/apis/:slug*", "destination": "/docs/resources/:slug*", "permanent": true }
+        { "source": "/docs/apis/:slug*", "destination": "/docs/apis/resources/:slug*", "permanent": true }
     ]
 }
