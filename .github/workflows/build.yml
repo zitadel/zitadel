@@ -1,6 +1,14 @@
 name: ZITADEL CI/CD
 
-on: [pull_request, merge_group, workflow_dispatch]
+on:
+  push:
+    tags-ignore:
+      - "*"
+    branches:
+      - "**"
+  pull_request:
+  merge_group:
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -80,12 +88,11 @@ jobs:
   release:
     uses: ./.github/workflows/release.yml
     needs: [version, core-unit-test, core-integration-test, lint, container, e2e]
+    # TODO: trigger release on workflow_dispatch if: ${{ github.event_name == 'workflow_dispatch' }}
     if: ${{ needs.version.outputs.published == 'true' }}
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
     with:
-      node_version: '16'
-      buf_version: 'latest'
       image: ${{ needs.container.outputs.image }}
       semantic_version: '19.0.2'
       image_name: 'ghcr.io/zitadel/zitadel'

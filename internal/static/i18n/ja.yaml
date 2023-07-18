@@ -488,6 +488,7 @@ Errors:
     Token:
       Invalid: トークンが無効です
       Expired: トークンの有効期限が切れている
+    InvalidClient: トークンが発行されていません
 
 AggregateTypes:
   action: アクション
