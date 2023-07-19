@@ -271,6 +271,7 @@ OIDC:
     DeviceAuth:
       Path: /oauth/v2/device_authorization
   DefaultLoginURLV2: "/login?authRequest="
+  DefaultLogoutURLV2: "/logout?post_logout_redirect="
 
 SAML:
   ProviderConfig:
