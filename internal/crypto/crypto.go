@@ -10,7 +10,7 @@ import (
 
 const (
 	TypeEncryption CryptoType = iota
-	TypeHash
+	TypeHash                  // Depcrecated: use [passwap.Swapper] instead
 )
 
 type Crypto interface {
@@ -26,6 +26,7 @@ type EncryptionAlgorithm interface {
 	DecryptString(hashed []byte, keyID string) (string, error)
 }
 
+// Depcrecated: use [passwap.Swapper] instead
 type HashAlgorithm interface {
 	Crypto
 	Hash(value []byte) ([]byte, error)

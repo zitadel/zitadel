@@ -1,0 +1,45 @@
+name: Version
+
+on:
+  workflow_call:
+    inputs:
+      semantic_version:
+        required: true
+        type: string
+      dry_run:
+        required: true
+        type: boolean
+    outputs:
+        version: 
+            value: ${{ jobs.generate.outputs.version }}
+        published: 
+            value: ${{jobs.generate.outputs.published }}
+
+jobs:
+  generate:
+    runs-on: ubuntu-22.04
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    outputs:
+      version: ${{ steps.output.outputs.VERSION }}
+      published: ${{ steps.semantic.outputs.new_release_published }}
+    steps:
+    - 
+      name: Source checkout
+      uses: actions/checkout@v3
+    - 
+      name: Semantic Release
+      uses: cycjimmy/semantic-release-action@v3
+      id: semantic
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        dry_run: ${{ inputs.dry_run }}
+        semantic_version: ${{ inputs.semantic_version }}
+        extra_plugins: |
+          @semantic-release/exec@6.0.3
+    -
+      name: output
+      id: output
+      run:
+        if [[ ! -z "${{ steps.semantic.outputs.new_release_version }}" ]]; then echo "VERSION=v${{ steps.semantic.outputs.new_release_version }}" >> "$GITHUB_OUTPUT"; else echo "VERSION=" >> "$GITHUB_OUTPUT";fi

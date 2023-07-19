@@ -19,8 +19,8 @@ import (
 )
 
 func mockCode(code string, exp time.Duration) cryptoCodeFunc {
-	return func(ctx context.Context, filter preparation.FilterToQueryReducer, _ domain.SecretGeneratorType, alg crypto.Crypto) (*CryptoCodeWithExpiry, error) {
-		return &CryptoCodeWithExpiry{
+	return func(ctx context.Context, filter preparation.FilterToQueryReducer, _ domain.SecretGeneratorType, alg crypto.Crypto) (*CryptoCode, error) {
+		return &CryptoCode{
 			Crypted: &crypto.CryptoValue{
 				CryptoType: crypto.TypeEncryption,
 				Algorithm:  "enc",
@@ -89,7 +89,7 @@ func Test_newCryptoCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := newCryptoCodeWithExpiry(context.Background(), tt.eventstore.Filter, tt.args.typ, tt.args.alg)
+			got, err := newCryptoCode(context.Background(), tt.eventstore.Filter, tt.args.typ, tt.args.alg)
 			require.ErrorIs(t, err, tt.wantErr)
 			if tt.wantErr == nil {
 				require.NotNil(t, got)
@@ -105,7 +105,7 @@ func Test_verifyCryptoCode(t *testing.T) {
 	es := eventstoreExpect(t, expectFilter(
 		eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypeVerifyEmailCode)),
 	))
-	code, err := newCryptoCodeWithExpiry(context.Background(), es.Filter, domain.SecretGeneratorTypeVerifyEmailCode, crypto.CreateMockHashAlg(gomock.NewController(t)))
+	code, err := newCryptoCode(context.Background(), es.Filter, domain.SecretGeneratorTypeVerifyEmailCode, crypto.CreateMockHashAlg(gomock.NewController(t)))
 	require.NoError(t, err)
 
 	type args struct {
