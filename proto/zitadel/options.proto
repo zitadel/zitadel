@@ -6,7 +6,6 @@ import "google/protobuf/descriptor.proto";
 
 option go_package = "github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption/authoption";
 
-
 extend google.protobuf.MethodOptions {
     AuthOption auth_option = 50000;
 }
