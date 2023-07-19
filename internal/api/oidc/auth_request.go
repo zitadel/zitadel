@@ -308,7 +308,7 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 	return err
 }
 
-func (o *OPStorage) TerminateSessionWithRequest(ctx context.Context, endSessionRequest *op.EndSessionRequest) (redirectURI string, err error) {
+func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionRequest *op.EndSessionRequest) (redirectURI string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
