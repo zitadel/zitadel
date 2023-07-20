@@ -222,6 +222,7 @@ RegistrationUser:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Portuguese: Português
   Macedonian: Македонски
   GenderLabel: Пол
   Female: Женски
@@ -256,6 +257,7 @@ ExternalRegistrationUserOverview:
   Japanese: 日本語
   Polish: Polski
   Spanish: Español
+  Portuguese: Português
   Macedonian: Македонски
   TosAndPrivacyLabel: Правила и услови
   TosConfirm: Се согласувам со
@@ -319,6 +321,7 @@ ExternalNotFound:
   Japanese: 日本語
   Spanish: Español
   Bulgarian: Български
+  Portuguese: Português
   Macedonian: Македонски
 
 DeviceAuth:
