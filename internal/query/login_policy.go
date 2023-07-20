@@ -26,6 +26,7 @@ type LoginPolicy struct {
 	AllowUsernamePassword      bool
 	AllowExternalIDPs          bool
 	ForceMFA                   bool
+	ForceMFALocalOnly          bool
 	SecondFactors              database.EnumArray[domain.SecondFactorType]
 	MultiFactors               database.EnumArray[domain.MultiFactorType]
 	PasswordlessType           domain.PasswordlessType
@@ -93,6 +94,10 @@ var (
 	}
 	LoginPolicyColumnForceMFA = Column{
 		name:  projection.LoginPolicyForceMFACol,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnForceMFALocalOnly = Column{
+		name:  projection.LoginPolicyForceMFALocalOnlyCol,
 		table: loginPolicyTable,
 	}
 	LoginPolicyColumnSecondFactors = Column{
@@ -351,6 +356,7 @@ func prepareLoginPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			LoginPolicyColumnAllowUsernamePassword.identifier(),
 			LoginPolicyColumnAllowExternalIDPs.identifier(),
 			LoginPolicyColumnForceMFA.identifier(),
+			LoginPolicyColumnForceMFALocalOnly.identifier(),
 			LoginPolicyColumnSecondFactors.identifier(),
 			LoginPolicyColumnMultiFactors.identifier(),
 			LoginPolicyColumnPasswordlessType.identifier(),
@@ -381,6 +387,7 @@ func prepareLoginPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Select
 					&p.AllowUsernamePassword,
 					&p.AllowExternalIDPs,
 					&p.ForceMFA,
+					&p.ForceMFALocalOnly,
 					&p.SecondFactors,
 					&p.MultiFactors,
 					&p.PasswordlessType,

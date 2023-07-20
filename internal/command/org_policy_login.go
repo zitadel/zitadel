@@ -21,6 +21,7 @@ type AddLoginPolicy struct {
 	AllowExternalIDP           bool
 	IDPProviders               []*AddLoginPolicyIDP
 	ForceMFA                   bool
+	ForceMFALocalOnly          bool
 	SecondFactors              []domain.SecondFactorType
 	MultiFactors               []domain.MultiFactorType
 	PasswordlessType           domain.PasswordlessType
@@ -47,6 +48,7 @@ type ChangeLoginPolicy struct {
 	AllowRegister              bool
 	AllowExternalIDP           bool
 	ForceMFA                   bool
+	ForceMFALocalOnly          bool
 	PasswordlessType           domain.PasswordlessType
 	HidePasswordReset          bool
 	IgnoreUnknownUsernames     bool
@@ -425,6 +427,7 @@ func prepareAddLoginPolicy(a *org.Aggregate, policy *AddLoginPolicy) preparation
 				policy.AllowRegister,
 				policy.AllowExternalIDP,
 				policy.ForceMFA,
+				policy.ForceMFALocalOnly,
 				policy.HidePasswordReset,
 				policy.IgnoreUnknownUsernames,
 				policy.AllowDomainDiscovery,

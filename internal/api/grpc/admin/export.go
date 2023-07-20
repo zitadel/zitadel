@@ -430,6 +430,7 @@ func (s *Server) getLoginPolicy(ctx context.Context, orgID string, orgIDPs []str
 			AllowRegister:              queriedLogin.AllowRegister,
 			AllowExternalIdp:           queriedLogin.AllowExternalIDPs,
 			ForceMfa:                   queriedLogin.ForceMFA,
+			ForceMfaLocalOnly:          queriedLogin.ForceMFALocalOnly,
 			PasswordlessType:           policy_pb.PasswordlessType(queriedLogin.PasswordlessType),
 			HidePasswordReset:          queriedLogin.HidePasswordReset,
 			IgnoreUnknownUsernames:     queriedLogin.IgnoreUnknownUsernames,
