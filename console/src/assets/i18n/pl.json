@@ -1341,6 +1341,8 @@
       "ALLOWREGISTER_DESC": "Jeśli ta opcja jest zaznaczona, pojawi się dodatkowy krok rejestracji użytkownika w procesie logowania.",
       "FORCEMFA": "Wymuś MFA",
       "FORCEMFA_DESC": "Jeśli ta opcja jest zaznaczona, użytkownicy muszą skonfigurować drugi czynnik logowania.",
+      "FORCEMFALOCALONLY": "Wymuś MFA dla lokalnych użytkowników",
+      "FORCEMFALOCALONLY_DESC": "Jeśli ta opcja jest zaznaczona, lokalni uwierzytelnieni użytkownicy muszą skonfigurować drugi czynnik logowania.",
       "HIDEPASSWORDRESET": "Ukryj reset hasła",
       "HIDEPASSWORDRESET_DESC": "Jeśli ta opcja jest zaznaczona, użytkownik nie może zresetować swojego hasła w procesie logowania.",
       "HIDELOGINNAMESUFFIX": "Ukryj sufiks nazwy użytkownika",

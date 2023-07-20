@@ -1340,6 +1340,8 @@
       "ALLOWREGISTER_DESC": "如果选择了该选项，登录中会出现一个用于注册用户的附加步骤。",
       "FORCEMFA": "强制使用 MFA",
       "FORCEMFA_DESC": "如果选择该选项，用户必须配置第二身份认证登录因素。",
+      "FORCEMFALOCALONLY": "对本地用户强制执行 MFA",
+      "FORCEMFALOCALONLY_DESC": "如果选择该选项，本地经过身份验证的用户必须配置第二个登录因素。",
       "HIDEPASSWORDRESET": "隐藏密码重置按钮",
       "HIDEPASSWORDRESET_DESC": "如果选择该选项，则用户无法在登录过程中重置其密码。",
       "HIDELOGINNAMESUFFIX": "隐藏登录名后缀",

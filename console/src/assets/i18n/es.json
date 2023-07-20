@@ -1342,6 +1342,8 @@
       "ALLOWREGISTER_DESC": "Si esta opción es seleccionada, aparece un paso adicional durante el inicio de sesión para registrar un usuario.",
       "FORCEMFA": "Forzar MFA",
       "FORCEMFA_DESC": "Si esta opción es seleccionada, los usuarios tendrán que configurar un doble factor para iniciar sesión.",
+      "FORCEMFALOCALONLY": "Forzar MFA para usuarios locales",
+      "FORCEMFALOCALONLY_DESC": "Si esta opción es seleccionada, los usuarios autenticados localmente tendrán que configurar un doble factor para iniciar sesión",
       "HIDEPASSWORDRESET": "Ocultar restablecer contraseña",
       "HIDEPASSWORDRESET_DESC": "Si esta opción es seleccionada, el usuario no podrá restablecer su contraseña en el proceso de inicio de sesión.",
       "HIDELOGINNAMESUFFIX": "Ocultar sufijo del nombre de inicio de sesión",
