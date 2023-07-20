@@ -15,30 +15,31 @@ import (
 )
 
 var (
-	loginPolicyQuery = `SELECT projections.login_policies4.aggregate_id,` +
-		` projections.login_policies4.creation_date,` +
-		` projections.login_policies4.change_date,` +
-		` projections.login_policies4.sequence,` +
-		` projections.login_policies4.allow_register,` +
-		` projections.login_policies4.allow_username_password,` +
-		` projections.login_policies4.allow_external_idps,` +
-		` projections.login_policies4.force_mfa,` +
-		` projections.login_policies4.second_factors,` +
-		` projections.login_policies4.multi_factors,` +
-		` projections.login_policies4.passwordless_type,` +
-		` projections.login_policies4.is_default,` +
-		` projections.login_policies4.hide_password_reset,` +
-		` projections.login_policies4.ignore_unknown_usernames,` +
-		` projections.login_policies4.allow_domain_discovery,` +
-		` projections.login_policies4.disable_login_with_email,` +
-		` projections.login_policies4.disable_login_with_phone,` +
-		` projections.login_policies4.default_redirect_uri,` +
-		` projections.login_policies4.password_check_lifetime,` +
-		` projections.login_policies4.external_login_check_lifetime,` +
-		` projections.login_policies4.mfa_init_skip_lifetime,` +
-		` projections.login_policies4.second_factor_check_lifetime,` +
-		` projections.login_policies4.multi_factor_check_lifetime` +
-		` FROM projections.login_policies4` +
+	loginPolicyQuery = `SELECT projections.login_policies5.aggregate_id,` +
+		` projections.login_policies5.creation_date,` +
+		` projections.login_policies5.change_date,` +
+		` projections.login_policies5.sequence,` +
+		` projections.login_policies5.allow_register,` +
+		` projections.login_policies5.allow_username_password,` +
+		` projections.login_policies5.allow_external_idps,` +
+		` projections.login_policies5.force_mfa,` +
+		` projections.login_policies5.force_mfa_local_only,` +
+		` projections.login_policies5.second_factors,` +
+		` projections.login_policies5.multi_factors,` +
+		` projections.login_policies5.passwordless_type,` +
+		` projections.login_policies5.is_default,` +
+		` projections.login_policies5.hide_password_reset,` +
+		` projections.login_policies5.ignore_unknown_usernames,` +
+		` projections.login_policies5.allow_domain_discovery,` +
+		` projections.login_policies5.disable_login_with_email,` +
+		` projections.login_policies5.disable_login_with_phone,` +
+		` projections.login_policies5.default_redirect_uri,` +
+		` projections.login_policies5.password_check_lifetime,` +
+		` projections.login_policies5.external_login_check_lifetime,` +
+		` projections.login_policies5.mfa_init_skip_lifetime,` +
+		` projections.login_policies5.second_factor_check_lifetime,` +
+		` projections.login_policies5.multi_factor_check_lifetime` +
+		` FROM projections.login_policies5` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	loginPolicyCols = []string{
 		"aggregate_id",
@@ -49,6 +50,7 @@ var (
 		"allow_username_password",
 		"allow_external_idps",
 		"force_mfa",
+		"force_mfa_local_only",
 		"second_factors",
 		"multi_factors",
 		"passwordless_type",
@@ -66,15 +68,15 @@ var (
 		"multi_factor_check_lifetime",
 	}
 
-	prepareLoginPolicy2FAsStmt = `SELECT projections.login_policies4.second_factors` +
-		` FROM projections.login_policies4` +
+	prepareLoginPolicy2FAsStmt = `SELECT projections.login_policies5.second_factors` +
+		` FROM projections.login_policies5` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	prepareLoginPolicy2FAsCols = []string{
 		"second_factors",
 	}
 
-	prepareLoginPolicyMFAsStmt = `SELECT projections.login_policies4.multi_factors` +
-		` FROM projections.login_policies4` +
+	prepareLoginPolicyMFAsStmt = `SELECT projections.login_policies5.multi_factors` +
+		` FROM projections.login_policies5` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	prepareLoginPolicyMFAsCols = []string{
 		"multi_factors",
@@ -126,6 +128,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						true,
 						database.EnumArray[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
 						database.EnumArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 						domain.PasswordlessTypeAllowed,
@@ -153,6 +156,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				AllowUsernamePassword:      true,
 				AllowExternalIDPs:          true,
 				ForceMFA:                   true,
+				ForceMFALocalOnly:          true,
 				SecondFactors:              database.EnumArray[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
 				MultiFactors:               database.EnumArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 				PasswordlessType:           domain.PasswordlessTypeAllowed,

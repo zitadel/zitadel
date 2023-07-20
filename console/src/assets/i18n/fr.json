@@ -1041,6 +1041,7 @@
       "pl": "Polski",
       "zh": "简体中文",
       "bg": "Български",
+			"pt": "Portuguese",
       "mk": "Македонски"
     },
     "SMTP": {
@@ -1242,6 +1243,7 @@
         "pl": "Polski",
         "zh": "简体中文",
         "bg": "Български",
+        "pt": "Portuguese",
         "mk": "Македонски"
       },
       "KEYS": {
@@ -1341,6 +1343,8 @@
       "ALLOWREGISTER_DESC": "Si l'option est sélectionnée, une étape supplémentaire pour l'enregistrement d'un utilisateur apparaît dans la connexion.",
       "FORCEMFA": "Forcer MFA",
       "FORCEMFA_DESC": "Si l'option est sélectionnée, les utilisateurs doivent configurer un deuxième facteur pour la connexion.",
+      "FORCEMFALOCALONLY": "Forcer MFA pour les utilisateurs locaux",
+      "FORCEMFALOCALONLY_DESC": "Si l'option est sélectionnée, les utilisateurs locaux authentifiés doivent configurer un deuxième facteur pour la connexion.",
       "HIDEPASSWORDRESET": "Masquer la réinitialisation du mot de passe",
       "HIDEPASSWORDRESET_DESC": "Si l'option est sélectionnée, l'utilisateur ne peut pas réinitialiser son mot de passe lors du processus de connexion.",
       "HIDELOGINNAMESUFFIX": "Masquer le suffixe du nom de connexion",
@@ -2101,6 +2105,7 @@
     "pl": "Polski",
     "zh": "简体中文",
     "bg": "Български",
+    "pt": "Portuguese",
     "mk": "Македонски"
   },
   "MEMBER": {
