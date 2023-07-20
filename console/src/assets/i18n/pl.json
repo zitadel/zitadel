@@ -1040,7 +1040,9 @@
       "ja": "日本語",
       "pl": "Polski",
       "zh": "简体中文",
-      "bg": "Български"
+      "bg": "Български",
+			"pt": "Portuguese",
+      "mk": "Македонски"
     },
     "SMTP": {
       "TITLE": "Ustawienia SMTP",
@@ -1240,7 +1242,9 @@
         "ja": "日本語",
         "pl": "Polski",
         "zh": "简体中文",
-        "bg": "Български"
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски"
       },
       "KEYS": {
         "emailVerificationDoneText": "Weryfikacja adresu e-mail zakończona",
@@ -1339,6 +1343,8 @@
       "ALLOWREGISTER_DESC": "Jeśli ta opcja jest zaznaczona, pojawi się dodatkowy krok rejestracji użytkownika w procesie logowania.",
       "FORCEMFA": "Wymuś MFA",
       "FORCEMFA_DESC": "Jeśli ta opcja jest zaznaczona, użytkownicy muszą skonfigurować drugi czynnik logowania.",
+      "FORCEMFALOCALONLY": "Wymuś MFA dla lokalnych użytkowników",
+      "FORCEMFALOCALONLY_DESC": "Jeśli ta opcja jest zaznaczona, lokalni uwierzytelnieni użytkownicy muszą skonfigurować drugi czynnik logowania.",
       "HIDEPASSWORDRESET": "Ukryj reset hasła",
       "HIDEPASSWORDRESET_DESC": "Jeśli ta opcja jest zaznaczona, użytkownik nie może zresetować swojego hasła w procesie logowania.",
       "HIDELOGINNAMESUFFIX": "Ukryj sufiks nazwy użytkownika",
@@ -1506,13 +1512,11 @@
         "SEL_PROJECT": "Wyszukaj projekt",
         "SEL_ROLES": "Wybierz role, które mają zostać dodane do udzielenia ",
         "SEL_USER": "Wybierz użytkowników",
-        "SEL_ORG": "Ustaw domenę",
-        "SEL_ORG_DESC": "Wprowadź pełną domenę, aby określić organizację, której chcesz udzielić dostępu.",
-        "ORG_TITLE": "Organizacja",
+        "SEL_ORG": "Wyszukaj organizację",
+        "SEL_ORG_DESC": "Wyszukaj organizację, której chcesz przyznać.",
         "ORG_DESCRIPTION": "Masz zamiar udzielić użytkownikowi dostęp dla organizacji {{name}}.",
         "ORG_DESCRIPTION_DESC": "Przełącz kontekst w nagłówku powyżej, aby udzielić użytkownikowi dostępu dla innej organizacji.",
-        "SEL_ORG_FORMFIELD": "Pełna domena",
-        "SEL_ORG_BUTTON": "Wyszukaj organizację",
+        "SEL_ORG_FORMFIELD": "Organizacja",
         "FOR_ORG": "Dostęp udzielany:"
       },
       "DETAIL": {
@@ -1788,6 +1792,8 @@
     "DELETE": "Usuń",
     "DELETE_TITLE": "Usuń dostawcę tożsamości",
     "DELETE_DESCRIPTION": "Zamierzasz usunąć dostawcę tożsamości. Spowoduje to nieodwracalne zmiany. Czy na pewno chcesz to zrobić?",
+    "REMOVE_WARN_TITLE": "Usuń dostawcę tożsamości",
+    "REMOVE_WARN_DESCRIPTION": "Zamierzasz usunąć dostawcę tożsamości. Spowoduje to usunięcie wyboru dostępnego dostawcy tożsamości dla Twoich użytkowników, a już zarejestrowani użytkownicy nie będą mogli zalogować się ponownie. Czy na pewno chcesz kontynuować?",
     "DELETE_SELECTION_TITLE": "Usuń dostawcę tożsamości",
     "DELETE_SELECTION_DESCRIPTION": "Zamierzasz usunąć dostawcę tożsamości. Spowoduje to nieodwracalne zmiany. Czy na pewno chcesz to zrobić?",
     "EMPTY": "Brak dostawcy tożsamości dostępnego",
@@ -2110,7 +2116,9 @@
     "ja": "日本語",
     "pl": "Polski",
     "zh": "简体中文",
-    "bg": "Български"
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски"
   },
   "MEMBER": {
     "ADD": "Dodaj managera",

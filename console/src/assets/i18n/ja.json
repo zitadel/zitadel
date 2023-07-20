@@ -1041,7 +1041,9 @@
       "ja": "日本語",
       "pl": "Polski",
       "zh": "简体中文",
-      "bg": "Български"
+      "bg": "Български",
+			"pt": "Portuguese",
+      "mk": "Македонски"
     },
     "SMTP": {
       "TITLE": "SMTP設定",
@@ -1236,7 +1238,9 @@
         "ja": "日本語",
         "pl": "Polski",
         "zh": "简体中文",
-        "bg": "Български"
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -1335,6 +1339,8 @@
       "ALLOWREGISTER_DESC": "このオプションが選択されている場合、ユーザーを登録するための追加のステップがログインに表示されます。",
       "FORCEMFA": "MFAを強制する",
       "FORCEMFA_DESC": "このオプションが選択されている場合、ユーザーはログイン用の二要素認証を構成する必要があります。",
+      "FORCEMFALOCALONLY": "ローカル ユーザーに MFA を強制する",
+      "FORCEMFALOCALONLY_DESC": "オプションが選択されている場合、ローカル認証されたユーザーはログインの 2 番目の要素を構成する必要があります。",
       "HIDEPASSWORDRESET": "パスワードリセットを非表示にする",
       "HIDEPASSWORDRESET_DESC": "このオプションが選択されている場合、ユーザーはログイン過程ででパスワードをリセットできません。",
       "HIDELOGINNAMESUFFIX": "ログイン名の接尾辞を非表示にする",
@@ -1502,13 +1508,11 @@
         "SEL_PROJECT": "プロジェクトを検索する",
         "SEL_ROLES": "許可するロールを選択する",
         "SEL_USER": "ユーザーを選択する",
-        "SEL_ORG": "ドメインを設定する",
-        "SEL_ORG_DESC": "完全なドメインを入力して、アクセスを許可する組織を指定する。",
-        "ORG_TITLE": "組織",
+        "SEL_ORG": "組織を検索する",
+        "SEL_ORG_DESC": "付与する組織を検索する",
         "ORG_DESCRIPTION": "組織 {{name}} にユーザーをグラントします。",
         "ORG_DESCRIPTION_DESC": "上記のヘッダーのコンテキストを切り替えることで、別組織のユーザーにグラントできます。",
-        "SEL_ORG_FORMFIELD": "完全なドメイン",
-        "SEL_ORG_BUTTON": "組織を検索する",
+        "SEL_ORG_FORMFIELD": "組織",
         "FOR_ORG": "グラントが以下に対して作成されます："
       },
       "DETAIL": {
@@ -1779,6 +1783,8 @@
     "DELETE": "削除",
     "DELETE_TITLE": "IDPの削除",
     "DELETE_DESCRIPTION": "IDプロバイダーを削除しようとしています。変更は取消できません。本当によろしいですか？",
+    "REMOVE_WARN_TITLE": "IDPを削除する",
+    "REMOVE_WARN_DESCRIPTION": "ID プロバイダーを削除しようとしています。これにより、ユーザーが使用できる IDP の選択が削除され、すでに登録されているユーザーは再度ログインできなくなります。続けてもよろしいですか?",
     "DELETE_SELECTION_TITLE": "IDPの削除",
     "DELETE_SELECTION_DESCRIPTION": "IDプロバイダーを削除しようとしています。変更は取消できません。本当によろしいですか？",
     "EMPTY": "IDPは利用できません",
@@ -2101,7 +2107,9 @@
     "ja": "日本語",
     "pl": "Polski",
     "zh": "简体中文",
-    "bg": "Български"
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

@@ -1,12 +1,15 @@
 package query
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
 	"fmt"
 	"regexp"
 	"testing"
+
+	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/domain"
 )
@@ -52,6 +55,30 @@ var (
 		"password_set",
 		"method_type",
 		"idps_count",
+	}
+	prepareAuthMethodTypesRequiredStmt = `SELECT projections.users8_notifications.password_set,` +
+		` auth_method_types.method_type,` +
+		` user_idps_count.count,` +
+		` auth_methods_force_mfa.force_mfa,` +
+		` auth_methods_force_mfa.force_mfa_local_only` +
+		` FROM projections.users8` +
+		` LEFT JOIN projections.users8_notifications ON projections.users8.id = projections.users8_notifications.user_id AND projections.users8.instance_id = projections.users8_notifications.instance_id` +
+		` LEFT JOIN (SELECT DISTINCT(auth_method_types.method_type), auth_method_types.user_id, auth_method_types.instance_id FROM projections.user_auth_methods4 AS auth_method_types` +
+		` WHERE auth_method_types.state = $1) AS auth_method_types` +
+		` ON auth_method_types.user_id = projections.users8.id AND auth_method_types.instance_id = projections.users8.instance_id` +
+		` LEFT JOIN (SELECT user_idps_count.user_id, user_idps_count.instance_id, COUNT(user_idps_count.user_id) AS count FROM projections.idp_user_links3 AS user_idps_count` +
+		` GROUP BY user_idps_count.user_id, user_idps_count.instance_id) AS user_idps_count` +
+		` ON user_idps_count.user_id = projections.users8.id AND user_idps_count.instance_id = projections.users8.instance_id` +
+		` LEFT JOIN (SELECT auth_methods_force_mfa.force_mfa, auth_methods_force_mfa.force_mfa_local_only, auth_methods_force_mfa.instance_id, auth_methods_force_mfa.aggregate_id FROM projections.login_policies5 AS auth_methods_force_mfa ORDER BY auth_methods_force_mfa.is_default) AS auth_methods_force_mfa` +
+		` ON (auth_methods_force_mfa.aggregate_id = projections.users8.instance_id OR auth_methods_force_mfa.aggregate_id = projections.users8.resource_owner) AND auth_methods_force_mfa.instance_id = projections.users8.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms
+`
+	prepareAuthMethodTypesRequiredCols = []string{
+		"password_set",
+		"method_type",
+		"idps_count",
+		"force_mfa",
+		"force_mfa_local_only",
 	}
 )
 
@@ -288,10 +315,147 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			},
 			object: nil,
 		},
+		{
+			name: "prepareUserAuthMethodTypesRequiredQuery no result",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*testUserAuthMethodTypesRequired, error)) {
+				builder, scan := prepareUserAuthMethodTypesRequiredQuery(ctx, db)
+				return builder, func(rows *sql.Rows) (*testUserAuthMethodTypesRequired, error) {
+					authMethods, forceMFA, forceMFALocalOnly, err := scan(rows)
+					if err != nil {
+						return nil, err
+					}
+					return &testUserAuthMethodTypesRequired{authMethods: authMethods, forceMFA: forceMFA, forceMFALocalOnly: forceMFALocalOnly}, nil
+				}
+			},
+			want: want{
+				sqlExpectations: mockQueries(
+					regexp.QuoteMeta(prepareAuthMethodTypesRequiredStmt),
+					nil,
+					nil,
+				),
+			},
+			object: &testUserAuthMethodTypesRequired{authMethods: []domain.UserAuthMethodType{}, forceMFA: false},
+		},
+		{
+			name: "prepareUserAuthMethodTypesRequiredQuery one second factor",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*testUserAuthMethodTypesRequired, error)) {
+				builder, scan := prepareUserAuthMethodTypesRequiredQuery(ctx, db)
+				return builder, func(rows *sql.Rows) (*testUserAuthMethodTypesRequired, error) {
+					authMethods, forceMFA, forceMFALocalOnly, err := scan(rows)
+					if err != nil {
+						return nil, err
+					}
+					return &testUserAuthMethodTypesRequired{authMethods: authMethods, forceMFA: forceMFA, forceMFALocalOnly: forceMFALocalOnly}, nil
+				}
+			},
+			want: want{
+				sqlExpectations: mockQueries(
+					regexp.QuoteMeta(prepareAuthMethodTypesRequiredStmt),
+					prepareAuthMethodTypesRequiredCols,
+					[][]driver.Value{
+						{
+							true,
+							domain.UserAuthMethodTypePasswordless,
+							1,
+							true,
+							true,
+						},
+					},
+				),
+			},
+			object: &testUserAuthMethodTypesRequired{
+				authMethods: []domain.UserAuthMethodType{
+					domain.UserAuthMethodTypePasswordless,
+					domain.UserAuthMethodTypePassword,
+					domain.UserAuthMethodTypeIDP,
+				},
+				forceMFA:          true,
+				forceMFALocalOnly: true,
+			},
+		},
+		{
+			name: "prepareUserAuthMethodTypesRequiredQuery multiple second factors",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*testUserAuthMethodTypesRequired, error)) {
+				builder, scan := prepareUserAuthMethodTypesRequiredQuery(ctx, db)
+				return builder, func(rows *sql.Rows) (*testUserAuthMethodTypesRequired, error) {
+					authMethods, forceMFA, forceMFALocalOnly, err := scan(rows)
+					if err != nil {
+						return nil, err
+					}
+					return &testUserAuthMethodTypesRequired{authMethods: authMethods, forceMFA: forceMFA, forceMFALocalOnly: forceMFALocalOnly}, nil
+				}
+			},
+			want: want{
+				sqlExpectations: mockQueries(
+					regexp.QuoteMeta(prepareAuthMethodTypesRequiredStmt),
+					prepareAuthMethodTypesRequiredCols,
+					[][]driver.Value{
+						{
+							true,
+							domain.UserAuthMethodTypePasswordless,
+							1,
+							true,
+							true,
+						},
+						{
+							true,
+							domain.UserAuthMethodTypeOTP,
+							1,
+							true,
+							true,
+						},
+					},
+				),
+			},
+
+			object: &testUserAuthMethodTypesRequired{
+				authMethods: []domain.UserAuthMethodType{
+					domain.UserAuthMethodTypePasswordless,
+					domain.UserAuthMethodTypeOTP,
+					domain.UserAuthMethodTypePassword,
+					domain.UserAuthMethodTypeIDP,
+				},
+				forceMFA:          true,
+				forceMFALocalOnly: true,
+			},
+		},
+		{
+			name: "prepareUserAuthMethodTypesRequiredQuery sql err",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*testUserAuthMethodTypesRequired, error)) {
+				builder, scan := prepareUserAuthMethodTypesRequiredQuery(ctx, db)
+				return builder, func(rows *sql.Rows) (*testUserAuthMethodTypesRequired, error) {
+					authMethods, forceMFA, forceMFALocalOnly, err := scan(rows)
+					if err != nil {
+						return nil, err
+					}
+					return &testUserAuthMethodTypesRequired{authMethods: authMethods, forceMFA: forceMFA, forceMFALocalOnly: forceMFALocalOnly}, nil
+				}
+			},
+			want: want{
+				sqlExpectations: mockQueryErr(
+					regexp.QuoteMeta(prepareAuthMethodTypesRequiredStmt),
+					sql.ErrConnDone,
+				),
+				err: func(err error) (error, bool) {
+					if !errors.Is(err, sql.ErrConnDone) {
+						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
+					}
+					return nil, true
+				},
+			},
+			object: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
+}
+
+// testUserAuthMethodTypesRequired is required as assetPrepare is only able to return a single object from scan
+type testUserAuthMethodTypesRequired struct {
+	authMethods       []domain.UserAuthMethodType
+	forceMFA          bool
+	forceMFALocalOnly bool
 }

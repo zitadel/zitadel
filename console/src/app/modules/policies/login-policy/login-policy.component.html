@@ -99,6 +99,28 @@
     {{ 'POLICY.DATA.FORCEMFA' | translate }}
   </mat-checkbox>
 </div>
+<div *ngIf="loginData" class="login-policy-row">
+  <mat-checkbox
+    card-actions
+    class="login-policy-toggle"
+    color="primary"
+    ngDefaultControl
+    [(ngModel)]="loginData.forceMfaLocalOnly"
+    [disabled]="
+      ([
+        serviceType === PolicyComponentServiceType.ADMIN
+          ? 'iam.policy.write'
+          : serviceType === PolicyComponentServiceType.MGMT
+          ? 'policy.write'
+          : ''
+      ]
+        | hasRole
+        | async) === false
+    "
+  >
+    {{ 'POLICY.DATA.FORCEMFALOCALONLY' | translate }}
+  </mat-checkbox>
+</div>
 <cnsl-card class="max-card-width" *ngIf="loginData">
   <cnsl-factor-table
     [service]="service"

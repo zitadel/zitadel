@@ -1040,7 +1040,9 @@
       "ja": "日本語",
       "pl": "Polski",
       "zh": "简体中文",
-      "bg": "Български"
+      "bg": "Български",
+			"pt": "Portuguese",
+      "mk": "Македонски"
     },
     "SMTP": {
       "TITLE": "Impostazioni SMTP",
@@ -1240,7 +1242,9 @@
         "ja": "日本語",
         "pl": "Polski",
         "zh": "简体中文",
-        "bg": "Български"
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -1339,6 +1343,8 @@
       "ALLOWREGISTER_DESC": "Se l'opzione \u00e8 selezionata, nel login apparirà un passo aggiuntivo per la registrazione di un utente.",
       "FORCEMFA": "Forza MFA",
       "FORCEMFA_DESC": "Se l'opzione \u00e8 selezionata, gli utenti devono configurare un secondo fattore per il login.",
+      "FORCEMFALOCALONLY": "Forza MFA per gli utenti locali",
+      "FORCEMFALOCALONLY_DESC": "Se l'opzione è selezionata, gli utenti locali autenticati devono configurare un secondo fattore per l'accesso.",
       "HIDEPASSWORDRESET": "Nascondi ripristino della password",
       "HIDEPASSWORDRESET_DESC": "Se l'opzione \u00e8 selezionata, l'utente non pu\u00f2 resettare la sua password nel interfaccia login.",
       "HIDELOGINNAMESUFFIX": "Nascondi il suffisso del nome utente",
@@ -1506,13 +1512,11 @@
         "SEL_PROJECT": "Cerca un progetto",
         "SEL_ROLES": "Seleziona i ruoli che vuoi aggiungere",
         "SEL_USER": "Seleziona utenti",
-        "SEL_ORG": "Impostare il dominio",
-        "SEL_ORG_DESC": "Inserisci il dominio completo per specificare l'organizzazione da concedere.",
-        "ORG_TITLE": "Organizzazione",
+        "SEL_ORG": "Cerca un'organizzazione",
+        "SEL_ORG_DESC": "Cerca l'organizzazione da concedere.",
         "ORG_DESCRIPTION": "Stai per concedere un utente per l'organizzazione {{name}}.",
         "ORG_DESCRIPTION_DESC": "Cambia il contesto nell'intestazione qui sopra per concedere un utente per un'altra organizzazione.",
-        "SEL_ORG_FORMFIELD": "Dominio completo",
-        "SEL_ORG_BUTTON": "Ricerca organizzazione",
+        "SEL_ORG_FORMFIELD": "Organizzazione",
         "FOR_ORG": "Org grant \u00e8 creato per:"
       },
       "DETAIL": {
@@ -1788,6 +1792,8 @@
     "DELETE": "Rimuovi IDP",
     "DELETE_TITLE": "Rimuovi IDP",
     "DELETE_DESCRIPTION": "Stai per rimuovere un fornitore di identit\u00e0. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
+    "REMOVE_WARN_TITLE": "Rimuovi IDP",
+    "REMOVE_WARN_DESCRIPTION": "Stai per rimuovere un provider di identità. Questo rimuoverà la selezione dell'IDP disponibile per i tuoi utenti e gli utenti già registrati non potranno accedere nuovamente. Sei sicuro di continuare?",
     "DELETE_SELECTION_TITLE": "Rimuovere IDP",
     "DELETE_SELECTION_DESCRIPTION": "Stai per rimuovere un fornitore di identit\u00e0. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
     "EMPTY": "Nessun IDP disponible",
@@ -2110,7 +2116,9 @@
     "ja": "日本語",
     "pl": "Polski",
     "zh": "简体中文",
-    "bg": "Български"
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

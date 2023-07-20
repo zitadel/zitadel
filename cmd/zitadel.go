@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/cmd/key"
+	"github.com/zitadel/zitadel/cmd/ready"
 	"github.com/zitadel/zitadel/cmd/setup"
 	"github.com/zitadel/zitadel/cmd/start"
 )
@@ -55,6 +56,7 @@ func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server
 		start.NewStartFromInit(server),
 		start.NewStartFromSetup(server),
 		key.New(),
+		ready.New(),
 	)
 
 	cmd.InitDefaultVersionFlag()

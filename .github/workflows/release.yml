@@ -1,0 +1,75 @@
+name: Release
+
+on:
+  workflow_call:
+    inputs:
+      semantic_version:
+        required: true
+        type: string
+      image:
+        required: true
+        type: string
+      image_name:
+        required: true
+        type: string
+      google_image_name:
+        required: true
+        type: string
+    secrets:
+      GCR_JSON_KEY_BASE64:
+        description: 'base64 endcrypted key to connect to Google'
+        required: true
+
+jobs:
+  version:
+    uses: ./.github/workflows/version.yml
+    with:
+      semantic_version: ${{ inputs.semantic_version }}
+      dry_run: true
+
+  docker:
+    runs-on: ubuntu-22.04
+    needs: [ version ]
+    steps:
+    -
+      name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+    -
+      name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - 
+      name: Login to Docker registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    -
+      name: Login to Google Artifact Registry
+      uses: docker/login-action@v2
+      with:
+        registry: europe-docker.pkg.dev
+        username: _json_key_base64
+        password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
+    -
+      name: Publish ${{ needs.version.outputs.version }}
+      run: |
+        docker buildx imagetools create \
+          --tag ${{ inputs.image_name }}:${{ needs.version.outputs.version }} \
+          ${{ inputs.image }}
+        docker buildx imagetools create \
+          --tag ${{ inputs.image_name }}:${{ needs.version.outputs.version }}-debug \
+          ${{ inputs.image }}-debug        
+        docker buildx imagetools create \
+          --tag ${{ inputs.google_image_name }}:${{ needs.version.outputs.version }} \
+          ${{ inputs.image }}
+    -
+      name: Publish latest
+      if: ${{ github.ref_name == 'main' }}
+      run: |
+        docker buildx imagetools create \
+          --tag ${{ inputs.image_name }}:latest \
+          ${{ inputs.image }}
+        docker buildx imagetools create \
+          --tag ${{ inputs.image_name }}:latest-debug \
+          ${{ inputs.image }}-debug

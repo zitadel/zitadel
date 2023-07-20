@@ -3,10 +3,13 @@ package command
 import (
 	"context"
 	"database/sql"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/golang/mock/gomock"
+	"github.com/zitadel/passwap"
+	"github.com/zitadel/passwap/verifier"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -16,9 +19,11 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
 	action_repo "github.com/zitadel/zitadel/internal/repository/action"
+	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
 	key_repo "github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	proj_repo "github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/session"
@@ -43,6 +48,8 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	action_repo.RegisterEventMappers(es)
 	session.RegisterEventMappers(es)
 	idpintent.RegisterEventMappers(es)
+	authrequest.RegisterEventMappers(es)
+	oidcsession.RegisterEventMappers(es)
 	return es
 }
 
@@ -287,5 +294,40 @@ func newMockPermissionCheckAllowed() domain.PermissionCheck {
 func newMockPermissionCheckNotAllowed() domain.PermissionCheck {
 	return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
 		return errors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied")
+	}
+}
+
+type plainHasher struct {
+	x string // arbitrary info that triggers update when different from encoding
+}
+
+func (h plainHasher) Hash(password string) (string, error) {
+	return strings.Join([]string{"", "plain", h.x, password}, "$"), nil
+}
+
+func (h plainHasher) Verify(encoded, password string) (verifier.Result, error) {
+	nodes := strings.Split(encoded, "$")
+	if len(nodes) != 4 || nodes[1] != "plain" {
+		return verifier.Skip, nil
+	}
+	if nodes[3] != password {
+		return verifier.Fail, nil
+	}
+	if nodes[2] != h.x {
+		return verifier.NeedUpdate, nil
+	}
+	return verifier.OK, nil
+}
+
+// mockPasswordHasher creates a swapper for plain (cleartext) password used in tests.
+// x can be set to arbitrary info which triggers updates when different from the
+// setting in the encoded hashes. (normally cost parameters)
+//
+// With `x` set to "foo", the following encoded string would be produced by Hash:
+// $plain$foo$password
+func mockPasswordHasher(x string) *crypto.PasswordHasher {
+	return &crypto.PasswordHasher{
+		Swapper:  passwap.NewSwapper(plainHasher{x: x}),
+		Prefixes: []string{"$plain$"},
 	}
 }

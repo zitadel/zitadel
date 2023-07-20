@@ -270,6 +270,8 @@ OIDC:
       Path: /oauth/v2/keys
     DeviceAuth:
       Path: /oauth/v2/device_authorization
+  DefaultLoginURLV2: "/login?authRequest="
+  DefaultLogoutURLV2: "/logout?post_logout_redirect="
 
 SAML:
   ProviderConfig:
@@ -355,6 +357,51 @@ SystemDefaults:
     PasswordSaltCost: 14
     MachineKeySize: 2048
     ApplicationKeySize: 2048
+  PasswordHasher:
+  # Set hasher configuration for user passwords.
+  # Passwords previously hashed with a different algorithm
+  # or cost are automatically re-hashed using this config,
+  # upon password validation or update.
+    Hasher:
+      Algorithm: "bcrypt"
+      Cost: 14
+
+    # Other supported Hasher configs:
+
+    # Hasher:
+    #   Algorithm: "argon2i"
+    #   Time: 3
+    #   Memory: 32768
+    #   Threads: 4
+
+    # Hasher:
+    #   Algorithm: "argon2id"
+    #   Time: 1
+    #   Memory: 65536
+    #   Threads: 4
+
+    # Hasher:
+    #   Algorithm: "scrypt"
+    #   Cost: 15
+    
+    # Verifiers enable the possibility of verifying
+    # passwords that are previously hashed using another
+    # algorithm then the Hasher.
+    # This can be used when migrating from one algorithm to another,
+    # or when importing users with hashed passwords.
+    # There is no need to enable a Verifier of the same algorithm
+    # as the Hasher.
+    #
+    # The format of the encoded hash strings must comply
+    # with https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md
+    # https://passlib.readthedocs.io/en/stable/modular_crypt_format.html
+    #
+    # Supported verifiers: (uncomment to enable)
+    # Verifiers:
+    #   - "argon2" # verifier for both argon2i and argon2id.
+    #   - "bcrypt"
+    #   - "md5"
+    #   - "scrypt"
   Multifactors:
     OTP:
       # If this is empty, the issuer is the requested domain
@@ -1070,6 +1117,10 @@ InternalAuthZ:
     - Role: "SELF_MANAGEMENT_GLOBAL"
       Permissions:
         - "org.create"
+        - "policy.read"
+        - "user.self.delete"
+    - Role: "ORG_USER_SELF_MANAGER"
+      Permissions:
         - "policy.read"
         - "user.self.delete"
     - Role: "PROJECT_OWNER_GLOBAL"

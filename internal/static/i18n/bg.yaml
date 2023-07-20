@@ -122,6 +122,8 @@ Errors:
       Empty: Паролата е празна
       Invalid: Паролата е невалидна
       NotSet: Потребителят не е задал парола
+      NotChanged: Паролата не е променена
+      NotSupported: Хеш кодирането на паролата не се поддържа
     PasswordComplexityPolicy:
       NotFound: Политиката за парола не е намерена
       MinLength: Паролата е твърде кратка
@@ -506,6 +508,15 @@ Errors:
     TokenCreationFailed: Неуспешно създаване на токен
     InvalidToken: Знакът за намерение е невалиден
     OtherUser: Намерение, предназначено за друг потребител
+  AuthRequest:
+    AlreadyExists: Auth Request вече съществува
+    NotExisting: Auth Request не съществува
+    WrongLoginClient: Auth Request, създаден от друг клиент за влизане
+  OIDCSession:
+    RefreshTokenInvalid: Токенът за опресняване е невалиден
+    Token:
+      Invalid: Токенът е невалиден
+      Expired: Токенът е изтекъл
 
 AggregateTypes:
   action: Действие

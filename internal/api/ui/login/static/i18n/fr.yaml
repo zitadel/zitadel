@@ -223,6 +223,8 @@ RegistrationUser:
   Japanese: 日本語
   Spanish: Español
   Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   GenderLabel: Genre
   Female: Femme
   Male: Homme
@@ -256,6 +258,7 @@ ExternalRegistrationUserOverview:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Macedonian: Македонски
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
@@ -317,6 +320,7 @@ ExternalNotFound:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Macedonian: Македонски
 
 DeviceAuth:
   Title: Autorisation de l'appareil

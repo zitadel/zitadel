@@ -1040,7 +1040,9 @@
       "ja": "日本語",
       "pl": "Polski",
       "zh": "简体中文",
-      "bg": "Български"
+      "bg": "Български",
+			"pt": "Portuguese",
+      "mk": "Македонски"
     },
     "SMTP": {
       "TITLE": "SMTP 设置",
@@ -1239,7 +1241,9 @@
         "ja": "日本語",
         "pl": "Polski",
         "zh": "简体中文",
-        "bg": "Български"
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -1338,6 +1342,8 @@
       "ALLOWREGISTER_DESC": "如果选择了该选项，登录中会出现一个用于注册用户的附加步骤。",
       "FORCEMFA": "强制使用 MFA",
       "FORCEMFA_DESC": "如果选择该选项，用户必须配置第二身份认证登录因素。",
+      "FORCEMFALOCALONLY": "对本地用户强制执行 MFA",
+      "FORCEMFALOCALONLY_DESC": "如果选择该选项，本地经过身份验证的用户必须配置第二个登录因素。",
       "HIDEPASSWORDRESET": "隐藏密码重置按钮",
       "HIDEPASSWORDRESET_DESC": "如果选择该选项，则用户无法在登录过程中重置其密码。",
       "HIDELOGINNAMESUFFIX": "隐藏登录名后缀",
@@ -1505,13 +1511,11 @@
         "SEL_PROJECT": "搜索项目",
         "SEL_ROLES": "选择要添加到授权中的角色",
         "SEL_USER": "选择一个或多个用户",
-        "SEL_ORG": "选择一个组织",
-        "SEL_ORG_DESC": "输入完整的域以指定要授予的组织。",
-        "ORG_TITLE": "组织",
+        "SEL_ORG": "搜索组织",
+        "SEL_ORG_DESC": "搜索要授予的组织",
         "ORG_DESCRIPTION": "您即将授予组织 {{name}} 的用户。",
         "ORG_DESCRIPTION_DESC": "切换上面标题中的上下文以授予另一个组织的用户。",
-        "SEL_ORG_FORMFIELD": "完整域名",
-        "SEL_ORG_BUTTON": "搜索组织",
+        "SEL_ORG_FORMFIELD": "组织",
         "FOR_ORG": "授予组织:"
       },
       "DETAIL": {
@@ -1787,6 +1791,8 @@
     "DELETE": "删除",
     "DELETE_TITLE": "删除 IDP",
     "DELETE_DESCRIPTION": "您即将删除身份提供者。由此产生的变化是不可撤销的。你真的想这样做吗？",
+    "REMOVE_WARN_TITLE": "删除国内流离失所者",
+    "REMOVE_WARN_DESCRIPTION": "您即将删除身份提供者。这将为您的用户删除可用 IDP 的选择，并且已经注册的用户将无法再次登录。您确定要继续吗？",
     "DELETE_SELECTION_TITLE": "删除 IDP",
     "DELETE_SELECTION_DESCRIPTION": "您即将删除身份提供者。由此产生的变化是不可撤销的。你真的想这样做吗？",
     "EMPTY": "没有可用的 IDP",
@@ -2097,7 +2103,9 @@
     "ja": "日本語",
     "pl": "Polski",
     "zh": "简体中文",
-    "bg": "Български"
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски"
   },
   "MEMBER": {
     "ADD": "添加管理者",
