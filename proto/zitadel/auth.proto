@@ -870,7 +870,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Memberships"
             summary: "List My ZITADEL Manager Roles";
-            description: "Show all the permissions my user has in ZITADEL (ZITADEL Manager)."
+            description: "Show all the management roles my user has in ZITADEL (ZITADEL Manager)."
         };
     }
 
