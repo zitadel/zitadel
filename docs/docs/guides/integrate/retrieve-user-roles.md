@@ -380,7 +380,7 @@ In [APIs listed under user grants in the management API](/docs/category/apis/res
 
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 
-#### **1. [Search user grants](https://zitadel.com/docs/apis/resources/mgmt/management-service-list-user-grants)​**
+#### **1. [Search user grants](/docs/apis/resources/mgmt/management-service-list-user-grants)​**
 
 Returns a list of user roles that match the search queries. A user with manager permissions will call this API and will also have to reside in the same organization as the user. 
 
