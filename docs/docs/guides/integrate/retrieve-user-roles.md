@@ -268,7 +268,7 @@ curl -L -X POST 'https://$ZITADEL_DOMAIN/auth/v1/permissions/zitadel/me/_search'
 }
 ```
 
-#### **[3. List my authorizations/grants​](https://zitadel.com/docs/apis/resources/auth/auth-service-list-my-user-grants)**
+#### **[3. List my authorizations/grants​](/docs/apis/resources/auth/auth-service-list-my-user-grants)**
 
 Returns a list of user grants the authenticated user has. User grants consist of an organization, a project and roles.
 
