@@ -220,7 +220,7 @@ curl -L -X POST 'https://$ZITADEL_DOMAIN/auth/v1/permissions/me/_search' \
 }
 ```
 
-#### **2.[List my ZITADEL permissions](https://zitadel.com/docs/apis/resources/auth/auth-service-list-my-zitadel-permissions)​**
+#### **2.[List my ZITADEL permissions](/docs/apis/resources/auth/auth-service-list-my-zitadel-permissions)​**
 
 Returns a list of permissions the authenticated user has in ZITADEL based on the manager roles the user has. (e.g: `ORG_OWNER` = `org.read`, `org.write`, ...).
 
