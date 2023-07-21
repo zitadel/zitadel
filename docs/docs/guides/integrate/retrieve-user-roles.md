@@ -192,7 +192,7 @@ This request can be tested out in the following way:
 Now we will use the auth API to retrieve roles from a logged in user using the user’s token
 The base URL is: **https://$ZITADEL_DOMAIN/auth/v1**
 
-Let’s start with a user who has multiple roles in different organizations in a multi-tenanted set up. You can use the logged in user’s token or the machine user’s token to retrieve the authorizations using the [APIs listed under user authorizations/grants in the auth API](https://zitadel.com/docs/category/apis/resources/auth/user-authorizations-grants). 
+Let’s start with a user who has multiple roles in different organizations in a multi-tenanted set up. You can use the logged in user’s token or the machine user’s token to retrieve the authorizations using the [APIs listed under user authorizations/grants in the auth API](/docs/category/apis/resources/auth/user-authorizations-grants). 
 
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 
