@@ -146,11 +146,11 @@ func AddMachineUserRequestToCommand(req *mgmt_pb.AddMachineUserRequest, resource
 	}
 }
 
-func UpdateHumanProfileRequestToDomain(req *mgmt_pb.UpdateHumanProfileRequest) *domain.Profile {
+func UpdateHumanProfileRequestToDomain(req *mgmt_pb.UpdateHumanProfileRequest, orgID string) *domain.Profile {
 	preferredLanguage, err := language.Parse(req.PreferredLanguage)
 	logging.Log("MANAG-GPcYv").OnError(err).Debug("language malformed")
 	return &domain.Profile{
-		ObjectRoot:        models.ObjectRoot{AggregateID: req.UserId},
+		ObjectRoot:        models.ObjectRoot{AggregateID: req.UserId, ResourceOwner: orgID},
 		FirstName:         req.FirstName,
 		LastName:          req.LastName,
 		NickName:          req.NickName,
