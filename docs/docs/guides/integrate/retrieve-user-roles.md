@@ -94,7 +94,7 @@ curl --request GET \
  --header 'Authorization: Bearer <TOKEN>'
 ```
 
-If the access token is valid, the information about the user (depending on the granted scopes) is returned. Check the [Claims page](https://zitadel.com/docs/apis/openidoauth/claims) for more details. 
+If the access token is valid, the information about the user (depending on the granted scopes) is returned. Check the [Claims page](/docs/apis/openidoauth/claims) for more details. 
 
 **Sample responses:**
 
