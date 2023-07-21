@@ -15,10 +15,10 @@ Human or service users can be assigned roles. You can do this via the ZITADEL Co
 
 Follow the links below to assign roles to your users. 
 
-- [Add application roles via the ZITADEL Console](https://zitadel.com/docs/guides/manage/console/roles)
-- [Add manager roles via the ZITADEL Console](https://zitadel.com/docs/guides/manage/console/managers)
-- [Add application  roles via the ZITADEL Management API](https://zitadel.com/docs/category/apis/resources/mgmt/project-roles)
-- [Add manager roles to users via the ZITADEL Management API](https://zitadel.com/docs/category/apis/resources/mgmt/members)
+- [Add application roles via the ZITADEL Console](/docs/guides/manage/console/roles)
+- [Add manager roles via the ZITADEL Console](/docs/guides/manage/console/managers)
+- [Add application roles via the ZITADEL Management API](/docs/category/apis/resources/mgmt/project-roles)
+- [Add manager roles to users via the ZITADEL Management API](/category/apis/resources/mgmt/members)
 
 ## Retrieve roles
 
