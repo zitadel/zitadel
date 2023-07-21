@@ -143,7 +143,10 @@ This request can be tested out in the following way:
 4. If you unselect the **‘Assert Roles on Authentication’** checkbox, you will not see the roles.
 
 
-**2. Scope used:** `openid email profile urn:zitadel:iam:org:project:id:223281986649719041:aud urn:iam:org:project:roles urn:zitadel:iam:org:projects:roles`
+**2. Scope used:** `openid email profile urn:zitadel:iam:org:project:id:{projectId}:aud urn:iam:org:project:roles urn:zitadel:iam:org:projects:roles`
+
+:::note
+In order to stay up-to-date with the latest ZITADEL standards, we recommend that you use the roles from the identifier `urn:zitadel:iam:org:project:{projectId}:roles` rather than `urn:zitadel:iam:org:project:roles`. While both identifiers are maintained for backwards compatibility, the format which includes the specific ID represents our more recent model.
 
 **Sample response:** 
 
