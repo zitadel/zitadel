@@ -64,6 +64,7 @@ const (
 
 const (
 	FirstInstanceUsersKey = "first"
+	UserPassword          = "VeryS3cret!"
 )
 
 // User information with a Personal Access Token.

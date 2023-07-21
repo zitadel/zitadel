@@ -21,7 +21,7 @@ func (a *AuthRequestV2) GetACR() string {
 }
 
 func (a *AuthRequestV2) GetAMR() []string {
-	return a.AMR
+	return AuthMethodTypesToAMR(a.AuthMethods)
 }
 
 func (a *AuthRequestV2) GetAudience() []string {
@@ -78,7 +78,7 @@ type RefreshTokenRequestV2 struct {
 }
 
 func (r *RefreshTokenRequestV2) GetAMR() []string {
-	return r.AuthMethodsReferences
+	return AuthMethodTypesToAMR(r.AuthMethods)
 }
 
 func (r *RefreshTokenRequestV2) GetAudience() []string {

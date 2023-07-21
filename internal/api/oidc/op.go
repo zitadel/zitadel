@@ -42,6 +42,7 @@ type Config struct {
 	CustomEndpoints                   *EndpointConfig
 	DeviceAuth                        *DeviceAuthorizationConfig
 	DefaultLoginURLV2                 string
+	DefaultLogoutURLV2                string
 }
 
 type EndpointConfig struct {
@@ -67,6 +68,7 @@ type OPStorage struct {
 	eventstore                        *eventstore.Eventstore
 	defaultLoginURL                   string
 	defaultLoginURLV2                 string
+	defaultLogoutURLV2                string
 	defaultAccessTokenLifetime        time.Duration
 	defaultIdTokenLifetime            time.Duration
 	signingKeyAlgorithm               string
@@ -184,6 +186,7 @@ func newStorage(config Config, command *command.Commands, query *query.Queries, 
 		eventstore:                        es,
 		defaultLoginURL:                   fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
 		defaultLoginURLV2:                 config.DefaultLoginURLV2,
+		defaultLogoutURLV2:                config.DefaultLogoutURLV2,
 		signingKeyAlgorithm:               config.SigningKeyAlgorithm,
 		defaultAccessTokenLifetime:        config.DefaultAccessTokenLifetime,
 		defaultIdTokenLifetime:            config.DefaultIdTokenLifetime,

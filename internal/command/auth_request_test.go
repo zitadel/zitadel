@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/oidc/amr"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -463,7 +462,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								"sessionID",
 								"userID",
 								testNow,
-								[]string{amr.PWD},
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 							),
 						)}),
 				),
@@ -492,9 +491,9 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 						Audience:     []string{"audience"},
 						ResponseType: domain.OIDCResponseTypeCode,
 					},
-					SessionID: "sessionID",
-					UserID:    "userID",
-					AMR:       []string{amr.PWD},
+					SessionID:   "sessionID",
+					UserID:      "userID",
+					AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 				},
 			},
 		},
@@ -542,7 +541,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								"sessionID",
 								"userID",
 								testNow,
-								[]string{amr.PWD},
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 							),
 						)}),
 				),
@@ -572,9 +571,9 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 						Audience:     []string{"audience"},
 						ResponseType: domain.OIDCResponseTypeCode,
 					},
-					SessionID: "sessionID",
-					UserID:    "userID",
-					AMR:       []string{amr.PWD},
+					SessionID:   "sessionID",
+					UserID:      "userID",
+					AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 				},
 			},
 		},
@@ -798,7 +797,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 								"sessionID",
 								"userID",
 								testNow,
-								[]string{amr.PWD},
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 							),
 						),
 					),
@@ -930,7 +929,7 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 								"sessionID",
 								"userID",
 								testNow,
-								[]string{amr.PWD},
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 							),
 						),
 						eventFromEventPusher(
@@ -972,9 +971,9 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 						LoginHint:  gu.Ptr("loginHint"),
 						HintUserID: gu.Ptr("hintUserID"),
 					},
-					SessionID: "sessionID",
-					UserID:    "userID",
-					AMR:       []string{"pwd"},
+					SessionID:   "sessionID",
+					UserID:      "userID",
+					AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 				},
 			},
 		},
