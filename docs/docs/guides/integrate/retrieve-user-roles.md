@@ -449,7 +449,7 @@ curl -L -X POST 'https://$ZITADEL_DOMAIN/management/v1/users/grants/_search' \
 }
 ```
 
-#### **2. [User grant by ID](https://zitadel.com/docs/apis/resources/mgmt/management-service-get-user-grant-by-id)​** 
+#### **2. [User grant by ID](/docs/apis/resources/mgmt/management-service-get-user-grant-by-id)​** 
 
 Returns a user grant per ID. A user grant is a role a user has for a specific project and organization.
 
