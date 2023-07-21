@@ -215,6 +215,8 @@ RegistrationUser:
   Japanese: 日本語
   Spanish: Español
   Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   GenderLabel: 性別
   Female: 女性
   Male: 男性
@@ -248,6 +250,7 @@ ExternalRegistrationUserOverview:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Macedonian: Македонски
   TosAndPrivacyLabel: 利用規約
   TosConfirm: 私は利用規約を承諾します。
   TosLinkText: TOS
@@ -309,6 +312,7 @@ ExternalNotFound:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Macedonian: Македонски
 
 DeviceAuth:
   Title: デバイス認証

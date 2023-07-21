@@ -73,8 +73,8 @@ Errors:
       NotFound: Profile not found
       NotChanged: Profile not changed
       Empty: Profile is empty
-      FirstNameEmpty: First name in profile is empty
-      LastNameEmpty: Last name in profile is empty
+      FirstNameEmpty: Given name in profile is empty
+      LastNameEmpty: Family name in profile is empty
       IDMissing: Profile ID is missing
     Email:
       NotFound: Email not found
@@ -120,6 +120,8 @@ Errors:
       Empty: Password is empty
       Invalid: Password is invalid
       NotSet: User has not set a password
+      NotChanged: Password not changed
+      NotSupported: Password hash encoding not supported
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is too short
@@ -488,6 +490,16 @@ Errors:
     TokenCreationFailed: Token creation failed
     InvalidToken: Intent Token is invalid
     OtherUser: Intent meant for another user
+  AuthRequest:
+    AlreadyExists: Auth Request already exists
+    NotExisting: Auth Request does not exist
+    WrongLoginClient: Auth Request created by other login client
+  OIDCSession:
+    RefreshTokenInvalid: Refresh Token is invalid
+    Token:
+      Invalid: Token is invalid
+      Expired: Token is expired
+    InvalidClient: Token was not issued for this client
 
 AggregateTypes:
   action: Action

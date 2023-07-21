@@ -486,8 +486,8 @@
       "CHANGEUSERNAME": "modify",
       "CHANGEUSERNAME_TITLE": "Change username",
       "CHANGEUSERNAME_DESC": "Enter the new name in the field below.",
-      "FIRSTNAME": "First Name",
-      "LASTNAME": "Last Name",
+      "FIRSTNAME": "Given Name",
+      "LASTNAME": "Family Name",
       "NICKNAME": "Nickname",
       "DISPLAYNAME": "Display Name",
       "PREFERRED_LANGUAGE": "Language",
@@ -1041,7 +1041,9 @@
       "ja": "日本語",
       "pl": "Polski",
       "zh": "简体中文",
-      "bg": "Български"
+      "bg": "Български",
+			"pt": "Portuguese",
+      "mk": "Македонски"
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
@@ -1241,7 +1243,9 @@
         "ja": "日本語",
         "pl": "Polski",
         "zh": "简体中文",
-        "bg": "Български"
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1294,8 +1298,8 @@
         "PC": "Password Change"
       },
       "CHIPS": {
-        "firstname": "Firstname",
-        "lastname": "Lastname",
+        "firstname": "Given name",
+        "lastname": "Family name",
         "code": "Code",
         "preferredLoginName": "Preferred Login Name",
         "displayName": "Displayname",
@@ -1340,6 +1344,8 @@
       "ALLOWREGISTER_DESC": "If the option is selected, an additional step for registering a user appears in the login.",
       "FORCEMFA": "Force MFA",
       "FORCEMFA_DESC": "If the option is selected, users have to configure a second factor for login.",
+      "FORCEMFALOCALONLY": "Force MFA for local authenticated users",
+      "FORCEMFALOCALONLY_DESC": "If the option is selected, local authenticated users have to configure a second factor for login.",
       "HIDEPASSWORDRESET": "Hide Password reset",
       "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process.",
       "HIDELOGINNAMESUFFIX": "Hide Loginname suffix",
@@ -1499,7 +1505,7 @@
     "GRANT": {
       "EMPTY": "No granted organization.",
       "TITLE": "Project Grants",
-      "DESCRIPTION": "Allow an other organization to use your project.",
+      "DESCRIPTION": "Allow another organization to use your project.",
       "EDITTITLE": "Edit roles",
       "CREATE": {
         "TITLE": "Create Organization Grant",
@@ -1507,13 +1513,11 @@
         "SEL_PROJECT": "Search for a project",
         "SEL_ROLES": "Select the roles you want to be added to the grant",
         "SEL_USER": "Select users",
-        "SEL_ORG": "Set the domain",
-        "SEL_ORG_DESC": "Enter the complete domain to specify the organization to grant.",
-        "ORG_TITLE": "Organization",
+        "SEL_ORG": "Search an organization",
+        "SEL_ORG_DESC": "Search the organization to grant.",
         "ORG_DESCRIPTION": "You are about to grant a user for the organization {{name}}.",
         "ORG_DESCRIPTION_DESC": "Switch the context in the header above to grant a user for another organization.",
-        "SEL_ORG_FORMFIELD": "Complete Domain",
-        "SEL_ORG_BUTTON": "Search Organization",
+        "SEL_ORG_FORMFIELD": "Organization",
         "FOR_ORG": "The grant is created for:"
       },
       "DETAIL": {
@@ -1766,8 +1770,8 @@
     "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
     "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
     "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
-    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "FIRSTNAMEATTRIBUTE": "Given name attribute",
+    "LASTNAMEATTRIBUTE": "Family name attribute",
     "NICKNAMEATTRIBUTE": "Nickname attribute",
     "PHONEATTRIBUTE": "Phone attribute",
     "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
@@ -1784,6 +1788,8 @@
     "DELETE": "Delete",
     "DELETE_TITLE": "Delete IDP",
     "DELETE_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
+    "REMOVE_WARN_TITLE": "Remove IDP",
+    "REMOVE_WARN_DESCRIPTION": "You are about to remove an identity provider. This will remove the selection of the available IDP for your users and already registered users won't be able to login again. Are you sure to continue?",
     "DELETE_SELECTION_TITLE": "Delete IDP",
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
     "EMPTY": "No IDP available",
@@ -2106,7 +2112,9 @@
     "ja": "日本語",
     "pl": "Polski",
     "zh": "简体中文",
-    "bg": "Български"
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски"
   },
   "MEMBER": {
     "ADD": "Add a Manager",

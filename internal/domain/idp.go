@@ -48,12 +48,13 @@ func (t IDPType) GetCSSClass() string {
 	case IDPTypeGitLab,
 		IDPTypeGitLabSelfHosted:
 		return "gitlab"
+	case IDPTypeAzureAD:
+		return "azure"
 	case IDPTypeUnspecified,
 		IDPTypeOIDC,
 		IDPTypeJWT,
 		IDPTypeOAuth,
-		IDPTypeLDAP,
-		IDPTypeAzureAD:
+		IDPTypeLDAP:
 		fallthrough
 	default:
 		return ""

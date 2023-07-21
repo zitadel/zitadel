@@ -361,7 +361,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Profile";
             summary: "Get My Profile";
-            description: "Returns the profile information of the authenticated user, this includes first name, last name, etc."
+            description: "Returns the profile information of the authenticated user, this includes given name, family name, etc."
         };
     }
 
@@ -378,7 +378,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Profile";
             summary: "Update My Profile";
-            description: "Change the profile information of the authenticated user. This includes information like first name, last name, language, etc."
+            description: "Change the profile information of the authenticated user. This includes information like given name, family name, language, etc."
         };
     }
 
@@ -820,7 +820,7 @@ service AuthService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authorizations/Grants"
-            summary: "List My Authorizations/Grants";
+            summary: "List My Organizations";
             description: "Returns a list of the organizations where the authenticated user has any authorizations/user grants. The request is made in the context of the requested project. This request can be used in multi-tenancy applications to show the user a tenant switcher."
         };
     }
@@ -852,7 +852,7 @@ service AuthService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authorizations/Grants"
-            summary: "List My Project Permissions";
+            summary: "List My Project Roles";
             description: "Returns a list of roles for the authenticated user and for the requesting project (based on the token)."
         };
     }
@@ -869,8 +869,8 @@ service AuthService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Memberships"
-            summary: "List My ZITADEL Permissions";
-            description: "Show all the permissions my user has in ZITADEL (ZITADEL Manager)."
+            summary: "List My ZITADEL Manager Roles";
+            description: "Show all the management roles my user has in ZITADEL (ZITADEL Manager)."
         };
     }
 

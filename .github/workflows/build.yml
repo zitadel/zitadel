@@ -1,0 +1,99 @@
+name: ZITADEL CI/CD
+
+on:
+  push:
+    tags-ignore:
+      - "*"
+    branches:
+      - "**"
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+
+  core:
+    uses: ./.github/workflows/core.yml
+    with:
+      node_version: '18'
+      buf_version: 'latest'
+      go_version: '1.20'
+    
+  console:
+    uses: ./.github/workflows/console.yml
+    with:
+      node_version: '18'
+      buf_version: 'latest'
+
+  version:
+    uses: ./.github/workflows/version.yml
+    with:
+      semantic_version: '19.0.2'
+      dry_run: true
+
+  compile:
+    needs: [core, console, version]
+    uses: ./.github/workflows/compile.yml
+    with:
+      go_version: '1.20'
+      core_cache_key: ${{ needs.core.outputs.cache_key }}
+      console_cache_key: ${{ needs.console.outputs.cache_key }}
+      core_cache_path: ${{ needs.core.outputs.cache_path }}
+      console_cache_path: ${{ needs.console.outputs.cache_path }}
+      version: ${{ needs.version.outputs.version }}
+
+  core-unit-test:
+    needs: core
+    uses: ./.github/workflows/core-unit-test.yml
+    with:
+      go_version: '1.20'
+      core_cache_key: ${{ needs.core.outputs.cache_key }}
+      core_cache_path: ${{ needs.core.outputs.cache_path }}
+      
+  core-integration-test:
+    needs: core
+    uses: ./.github/workflows/core-integration-test.yml
+    with:
+      go_version: '1.20'
+      core_cache_key: ${{ needs.core.outputs.cache_key }}
+      core_cache_path: ${{ needs.core.outputs.cache_path }}
+  
+  lint:
+    needs: [core, console]
+    uses: ./.github/workflows/lint.yml
+    with:
+      go_version: '1.20'
+      node_version: '18'
+      buf_version: 'latest'
+      go_lint_version: 'v1.53.2'
+      core_cache_key: ${{ needs.core.outputs.cache_key }}
+      core_cache_path: ${{ needs.core.outputs.cache_path }}
+
+  container:
+    needs: [compile]
+    uses: ./.github/workflows/container.yml
+    with:
+      image_name: 'ghcr.io/zitadel/zitadel'
+
+  e2e:
+    uses: ./.github/workflows/e2e.yml
+    needs: [container]
+    with:
+      image: ${{ needs.container.outputs.image }}-debug
+
+  release:
+    uses: ./.github/workflows/release.yml
+    needs: [version, core-unit-test, core-integration-test, lint, container, e2e]
+    # TODO: trigger release on workflow_dispatch if: ${{ github.event_name == 'workflow_dispatch' }}
+    if: ${{ needs.version.outputs.published == 'true' }}
+    secrets:
+      GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
+    with:
+      image: ${{ needs.container.outputs.image }}
+      semantic_version: '19.0.2'
+      image_name: 'ghcr.io/zitadel/zitadel'
+      google_image_name: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"

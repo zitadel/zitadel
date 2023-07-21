@@ -120,6 +120,8 @@ Errors:
       Empty: Hasło jest puste
       Invalid: Hasło jest nieprawidłowe
       NotSet: Użytkownik nie ustawił hasła
+      NotChanged: Hasło nie zostało zmienione
+      NotSupported: Kodowanie skrótu hasła nie jest obsługiwane
     PasswordComplexityPolicy:
       NotFound: Polityka hasła nie znaleziona
       MinLength: Hasło jest zbyt krótkie
@@ -488,6 +490,16 @@ Errors:
     TokenCreationFailed: Tworzenie tokena nie powiodło się
     InvalidToken: Token intencji jest nieprawidłowy
     OtherUser: Intencja przeznaczona dla innego użytkownika
+  AuthRequest:
+    AlreadyExists: Auth Request już istnieje
+    NotExisting: Auth Request nie istnieje
+    WrongLoginClient: Auth Request utworzony przez innego klienta logowania
+  OIDCSession:
+    RefreshTokenInvalid: Refresh Token jest nieprawidłowy
+    Token:
+      Invalid: Token jest nieprawidłowy
+      Expired: Token wygasł
+    InvalidClient: Token nie został wydany dla tego klienta
 
 AggregateTypes:
   action: Działanie

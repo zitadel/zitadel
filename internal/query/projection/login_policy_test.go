@@ -24,7 +24,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "org reduceLoginPolicyAdded",
+			name: "org reduceLoginPolicyAdded without forceMFALocalOnly",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LoginPolicyAddedEventType),
@@ -57,7 +57,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_policies4 (aggregate_id, instance_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, ignore_unknown_usernames, allow_domain_discovery, disable_login_with_email, disable_login_with_phone, default_redirect_uri, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)",
+							expectedStmt: "INSERT INTO projections.login_policies5 (aggregate_id, instance_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, force_mfa_local_only, passwordless_type, is_default, hide_password_reset, ignore_unknown_usernames, allow_domain_discovery, disable_login_with_email, disable_login_with_phone, default_redirect_uri, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -68,6 +68,73 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 								true,
 								false,
 								false,
+								false,
+								domain.PasswordlessTypeAllowed,
+								false,
+								true,
+								true,
+								true,
+								true,
+								true,
+								"https://example.com/redirect",
+								time.Millisecond * 10,
+								time.Millisecond * 10,
+								time.Millisecond * 10,
+								time.Millisecond * 10,
+								time.Millisecond * 10,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceLoginPolicyAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.LoginPolicyAddedEventType),
+					org.AggregateType,
+					[]byte(`{
+						"allowUsernamePassword": true,
+						"allowRegister": true,
+						"allowExternalIdp": true,
+						"forceMFA": true,
+						"forceMFALocalOnly": true,
+						"hidePasswordReset": true,
+						"ignoreUnknownUsernames": true,
+						"allowDomainDiscovery": true,
+						"disableLoginWithEmail": true,
+						"disableLoginWithPhone": true,
+						"passwordlessType": 1,
+						"defaultRedirectURI": "https://example.com/redirect",
+						"passwordCheckLifetime": 10000000,
+						"externalLoginCheckLifetime": 10000000,
+						"mfaInitSkipLifetime": 10000000,
+						"secondFactorCheckLifetime": 10000000,
+						"multiFactorCheckLifetime": 10000000
+					}`),
+				), org.LoginPolicyAddedEventMapper),
+			},
+			reduce: (&loginPolicyProjection{}).reduceLoginPolicyAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.login_policies5 (aggregate_id, instance_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, force_mfa_local_only, passwordless_type, is_default, hide_password_reset, ignore_unknown_usernames, allow_domain_discovery, disable_login_with_email, disable_login_with_phone, default_redirect_uri, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								"instance-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								true,
+								true,
+								true,
+								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 								false,
 								true,
@@ -99,6 +166,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 						"allowRegister": true,
 						"allowExternalIdp": true,
 						"forceMFA": true,
+						"forceMFALocalOnly": true,
 						"hidePasswordReset": true,
 						"ignoreUnknownUsernames": true,
 						"allowDomainDiscovery": true,
@@ -121,10 +189,11 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies4 SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset, ignore_unknown_usernames, allow_domain_discovery, disable_login_with_email, disable_login_with_phone, default_redirect_uri, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) WHERE (aggregate_id = $19) AND (instance_id = $20)",
+							expectedStmt: "UPDATE projections.login_policies5 SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, force_mfa_local_only, passwordless_type, hide_password_reset, ignore_unknown_usernames, allow_domain_discovery, disable_login_with_email, disable_login_with_phone, default_redirect_uri, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19) WHERE (aggregate_id = $20) AND (instance_id = $21)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
+								true,
 								true,
 								true,
 								true,
@@ -168,7 +237,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies4 SET (change_date, sequence, multi_factors) = ($1, $2, array_append(multi_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.login_policies5 SET (change_date, sequence, multi_factors) = ($1, $2, array_append(multi_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -200,7 +269,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies4 SET (change_date, sequence, multi_factors) = ($1, $2, array_remove(multi_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.login_policies5 SET (change_date, sequence, multi_factors) = ($1, $2, array_remove(multi_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -230,7 +299,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.login_policies4 WHERE (aggregate_id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.login_policies5 WHERE (aggregate_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -259,7 +328,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies4 SET (change_date, sequence, second_factors) = ($1, $2, array_append(second_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.login_policies5 SET (change_date, sequence, second_factors) = ($1, $2, array_append(second_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -291,7 +360,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies4 SET (change_date, sequence, second_factors) = ($1, $2, array_remove(second_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.login_policies5 SET (change_date, sequence, second_factors) = ($1, $2, array_remove(second_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -314,8 +383,9 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{
 						"allowUsernamePassword": true,
 						"allowRegister": true,
-						"allowExternalIdp": false,
-						"forceMFA": false,
+						"allowExternalIdp": true,
+						"forceMFA": true,
+						"forceMFALocalOnly": true,
 						"hidePasswordReset": true,
 						"ignoreUnknownUsernames": true,
 						"allowDomainDiscovery": true,
@@ -338,7 +408,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_policies4 (aggregate_id, instance_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, ignore_unknown_usernames, allow_domain_discovery, disable_login_with_email, disable_login_with_phone, default_redirect_uri, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)",
+							expectedStmt: "INSERT INTO projections.login_policies5 (aggregate_id, instance_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, force_mfa_local_only, passwordless_type, is_default, hide_password_reset, ignore_unknown_usernames, allow_domain_discovery, disable_login_with_email, disable_login_with_phone, default_redirect_uri, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -347,8 +417,9 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 								uint64(15),
 								true,
 								true,
-								false,
-								false,
+								true,
+								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 								true,
 								true,
@@ -380,6 +451,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			"allowRegister": true,
 			"allowExternalIdp": true,
 			"forceMFA": true,
+			"forceMFALocalOnly": true,
 			"hidePasswordReset": true,
 			"ignoreUnknownUsernames": true,
 			"allowDomainDiscovery": true,
@@ -397,10 +469,11 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies4 SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset, ignore_unknown_usernames, allow_domain_discovery, disable_login_with_email, disable_login_with_phone, default_redirect_uri) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) WHERE (aggregate_id = $14) AND (instance_id = $15)",
+							expectedStmt: "UPDATE projections.login_policies5 SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, force_mfa_local_only, passwordless_type, hide_password_reset, ignore_unknown_usernames, allow_domain_discovery, disable_login_with_email, disable_login_with_phone, default_redirect_uri) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) WHERE (aggregate_id = $15) AND (instance_id = $16)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
+								true,
 								true,
 								true,
 								true,
@@ -439,7 +512,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies4 SET (change_date, sequence, multi_factors) = ($1, $2, array_append(multi_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.login_policies5 SET (change_date, sequence, multi_factors) = ($1, $2, array_append(multi_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -471,7 +544,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies4 SET (change_date, sequence, multi_factors) = ($1, $2, array_remove(multi_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.login_policies5 SET (change_date, sequence, multi_factors) = ($1, $2, array_remove(multi_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -503,7 +576,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies4 SET (change_date, sequence, second_factors) = ($1, $2, array_append(second_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.login_policies5 SET (change_date, sequence, second_factors) = ($1, $2, array_append(second_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -535,7 +608,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies4 SET (change_date, sequence, second_factors) = ($1, $2, array_remove(second_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.login_policies5 SET (change_date, sequence, second_factors) = ($1, $2, array_remove(second_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -565,7 +638,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies4 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (aggregate_id = $5)",
+							expectedStmt: "UPDATE projections.login_policies5 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (aggregate_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -595,7 +668,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.login_policies4 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.login_policies5 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
