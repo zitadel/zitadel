@@ -376,7 +376,7 @@ Now we will use the management API to retrieve user roles under an admin user.
 
 The base URL is: **https://$ZITADEL_DOMAIN/management/v1**
 
-In [APIs listed under user grants in the management API](https://zitadel.com/docs/category/apis/resources/mgmt/user-grants), you will see that you can use the management API to retrieve and modify user grants. The two API paths that we are interested in to fetch user roles are given below.
+In [APIs listed under user grants in the management API](/docs/category/apis/resources/mgmt/user-grants), you will see that you can use the management API to retrieve and modify user grants. The two API paths that we are interested in to fetch user roles are given below.
 
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 
