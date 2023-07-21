@@ -201,7 +201,7 @@ Let’s start with a user who has multiple roles in different organizations in a
 **Scope used:** `openid urn:zitadel:iam:org:project:id:zitadel:aud`
 
 
-#### **1. [List my project roles](https://zitadel.com/docs/apis/resources/auth/auth-service-list-my-project-permissions)**
+#### **1. [List my project roles](/docs/apis/resources/auth/auth-service-list-my-project-permissions)**
 
 Returns a list of roles for the authenticated user and for the requesting project (based on the token).
 
