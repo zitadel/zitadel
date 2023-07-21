@@ -93,6 +93,10 @@ func NewUserGrantGrantIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantGrantID, id, TextEquals)
 }
 
+func NewUserGrantIDSearchQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(UserGrantID, id, TextEquals)
+}
+
 func NewUserGrantUserTypeQuery(typ domain.UserType) (SearchQuery, error) {
 	return NewNumberQuery(UserTypeCol, typ, NumberEquals)
 }
