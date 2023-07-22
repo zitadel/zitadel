@@ -26,6 +26,9 @@ type AuthRequest struct {
 	InstanceID    string
 	Request       Request
 
+	LoginAs    bool
+	UserOrigID string
+
 	levelOfAssurance         LevelOfAssurance
 	UserID                   string
 	UserName                 string

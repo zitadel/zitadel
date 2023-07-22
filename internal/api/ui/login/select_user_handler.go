@@ -13,7 +13,8 @@ const (
 )
 
 type userSelectionFormData struct {
-	UserID string `schema:"userID"`
+	UserID  string `schema:"userID"`
+	LoginAs bool   `schema:"loginAs"`
 }
 
 func (l *Login) renderUserSelection(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, selectionData *domain.SelectUserStep) {
@@ -42,6 +43,14 @@ func (l *Login) handleSelectUser(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authSession, err)
 		return
 	}
+
+	authSession.LoginAs = data.LoginAs
+	err = l.updateAuthRequest(r.Context(), authSession)
+	if err != nil {
+		l.renderError(w, r, authSession, err)
+		return
+	}
+
 	if data.UserID == "0" {
 		l.renderLogin(w, r, authSession, nil)
 		return
