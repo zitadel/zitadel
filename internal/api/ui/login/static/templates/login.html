@@ -34,6 +34,8 @@
 
     <div class="lgn-actions lgn-reverse-order">
         <button class="lgn-raised-button lgn-primary lgn-initial-focus" id="submit-button" type="submit">{{t "Login.NextButtonText"}}</button>
+        <span class="space"></span>
+        <button class="lgn-stroked-button lgn-accent" id="back-button" type="button">{{t "Password.BackButtonText"}}</button>
         <span class="fill-space"></span>
         {{if hasRegistration}}
         <button class="lgn-stroked-button" name="register" value="true" formnovalidate>{{t "Login.RegisterButtonText"}}</button>
@@ -59,5 +61,6 @@
 <script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
 <script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
 <script src="{{ resourceUrl "scripts/input_suffix_offset.js" }}"></script>
+<script src="{{ resourceUrl "scripts/go_back.js" }}"></script>
 
 {{template "main-bottom" .}}
