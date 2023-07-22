@@ -24,7 +24,7 @@ LDAP:
 
 SelectAccount:
   Title: Select account
-  Description: Use your PRI-Account
+  Description: Use your ZITADEL-Account
   TitleLinking: Select account for user linking
   DescriptionLinking: Select your account to link with your external user.
   OtherUser: Other User
