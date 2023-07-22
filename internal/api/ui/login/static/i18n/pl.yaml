@@ -11,6 +11,10 @@ Login:
   RegisterButtonText: zarejestruj
   NextButtonText: dalej
 
+LoginAs:
+  Title: Login as
+  SelectUserLogin: Select user login.
+
 LDAP:
   Title: Rejestracja
   Description: Wprowadź swoje dane logowania.
@@ -20,7 +24,7 @@ LDAP:
 
 SelectAccount:
   Title: Wybierz konto
-  Description: Użyj swojego konta ZITADEL
+  Description: Użyj swojego konta PRI
   TitleLinking: Wybierz konto do połączenia z użytkownikiem
   DescriptionLinking: Wybierz swoje konto, aby połączyć je z twoim zewnętrznym użytkownikiem.
   OtherUser: Inny użytkownik

@@ -20,7 +20,7 @@ LDAP:
 
 SelectAccount:
   Title: Seleccionar cuenta
-  Description: Utiliza tu cuenta ZITADEL
+  Description: Utiliza tu cuenta PRI
   TitleLinking: Selecciona tu cuenta para vincular el usuario
   DescriptionLinking: Selecciona tu cuenta para vincular con tu usuario externo.
   OtherUser: Otro Usuario

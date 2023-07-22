@@ -20,7 +20,7 @@ LDAP:
   NextButtonText: следващия
 SelectAccount:
   Title: Изберете акаунт
-  Description: Използвайте вашия ZITADEL-акаунт
+  Description: Използвайте вашия PRI-акаунт
   TitleLinking: Изберете акаунт за свързване на потребител
   DescriptionLinking: 'Изберете своя акаунт, който да свържете с вашия външен потребител.'
   OtherUser: Друг потребител
