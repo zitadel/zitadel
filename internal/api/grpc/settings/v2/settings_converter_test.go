@@ -39,8 +39,10 @@ func Test_loginSettingsToPb(t *testing.T) {
 		SecondFactorCheckLifetime:  time.Microsecond,
 		MultiFactorCheckLifetime:   time.Nanosecond,
 		SecondFactors: []domain.SecondFactorType{
-			domain.SecondFactorTypeOTP,
+			domain.SecondFactorTypeTOTP,
 			domain.SecondFactorTypeU2F,
+			domain.SecondFactorTypeOTPEmail,
+			domain.SecondFactorTypeOTPSMS,
 		},
 		MultiFactors: []domain.MultiFactorType{
 			domain.MultiFactorTypeU2FWithPIN,
@@ -67,8 +69,10 @@ func Test_loginSettingsToPb(t *testing.T) {
 		SecondFactorCheckLifetime:  durationpb.New(time.Microsecond),
 		MultiFactorCheckLifetime:   durationpb.New(time.Nanosecond),
 		SecondFactors: []settings.SecondFactorType{
-			settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP,
+			settings.SecondFactorType_SECOND_FACTOR_TYPE_TOTP,
 			settings.SecondFactorType_SECOND_FACTOR_TYPE_U2F,
+			settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_EMAIL,
+			settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
 		},
 		MultiFactors: []settings.MultiFactorType{
 			settings.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
@@ -146,8 +150,8 @@ func Test_secondFactorTypeToPb(t *testing.T) {
 		want settings.SecondFactorType
 	}{
 		{
-			args: args{domain.SecondFactorTypeOTP},
-			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP,
+			args: args{domain.SecondFactorTypeTOTP},
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_TOTP,
 		},
 		{
 			args: args{domain.SecondFactorTypeU2F},

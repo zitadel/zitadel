@@ -4,7 +4,7 @@ type SecondFactorType int32
 
 const (
 	SecondFactorTypeUnspecified SecondFactorType = iota
-	SecondFactorTypeOTP
+	SecondFactorTypeTOTP
 	SecondFactorTypeU2F
 	SecondFactorTypeOTPEmail
 	SecondFactorTypeOTPSMS

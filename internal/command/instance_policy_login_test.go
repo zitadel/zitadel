@@ -884,7 +884,7 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
-								domain.SecondFactorTypeOTP,
+								domain.SecondFactorTypeTOTP,
 							),
 						),
 					),
@@ -892,7 +892,7 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				factor: domain.SecondFactorTypeOTP,
+				factor: domain.SecondFactorTypeTOTP,
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
@@ -910,7 +910,7 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 								"INSTANCE",
 								instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
-									domain.SecondFactorTypeOTP),
+									domain.SecondFactorTypeTOTP),
 							),
 						},
 					),
@@ -918,7 +918,7 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
-				factor: domain.SecondFactorTypeOTP,
+				factor: domain.SecondFactorTypeTOTP,
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -991,7 +991,7 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
-								domain.SecondFactorTypeOTP,
+								domain.SecondFactorTypeTOTP,
 							),
 						),
 					),
@@ -1080,7 +1080,7 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				factor: domain.SecondFactorTypeOTP,
+				factor: domain.SecondFactorTypeTOTP,
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -1095,13 +1095,13 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
-								domain.SecondFactorTypeOTP,
+								domain.SecondFactorTypeTOTP,
 							),
 						),
 						eventFromEventPusher(
 							instance.NewLoginPolicySecondFactorRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
-								domain.SecondFactorTypeOTP,
+								domain.SecondFactorTypeTOTP,
 							),
 						),
 					),
@@ -1109,7 +1109,7 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				factor: domain.SecondFactorTypeOTP,
+				factor: domain.SecondFactorTypeTOTP,
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -1182,7 +1182,7 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
-								domain.SecondFactorTypeOTP,
+								domain.SecondFactorTypeTOTP,
 							),
 						),
 					),
@@ -1191,7 +1191,7 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 							eventFromEventPusher(
 								instance.NewLoginPolicySecondFactorRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
-									domain.SecondFactorTypeOTP),
+									domain.SecondFactorTypeTOTP),
 							),
 						},
 					),
@@ -1199,7 +1199,7 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				factor: domain.SecondFactorTypeOTP,
+				factor: domain.SecondFactorTypeTOTP,
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1284,7 +1284,7 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
-								domain.SecondFactorTypeOTP,
+								domain.SecondFactorTypeTOTP,
 							),
 						),
 					),

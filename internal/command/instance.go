@@ -241,7 +241,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LoginPolicy.SecondFactorCheckLifetime,
 			setup.LoginPolicy.MultiFactorCheckLifetime,
 		),
-		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeOTP),
+		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeTOTP),
 		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeU2F),
 		prepareAddMultiFactorToDefaultLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
 
