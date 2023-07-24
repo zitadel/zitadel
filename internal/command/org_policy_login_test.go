@@ -1520,7 +1520,7 @@ func TestCommandSide_AddSecondFactorLoginPolicy(t *testing.T) {
 			},
 		},
 		{
-			name: "add factor, ok",
+			name: "add factor totp, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -1543,6 +1543,91 @@ func TestCommandSide_AddSecondFactorLoginPolicy(t *testing.T) {
 			},
 			res: res{
 				want: domain.SecondFactorTypeOTP,
+			},
+		},
+		{
+			name: "add factor otp email, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate,
+									domain.SecondFactorTypeOTPEmail),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				factor:        domain.SecondFactorTypeOTPEmail,
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: domain.SecondFactorTypeOTPEmail,
+			},
+		},
+		{
+			name: "add factor otp sms, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate,
+									domain.SecondFactorTypeOTPSMS),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				factor:        domain.SecondFactorTypeOTPSMS,
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: domain.SecondFactorTypeOTPSMS,
+			},
+		},
+		{
+			name: "add factor totp, add otp sms, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								domain.SecondFactorTypeOTP,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate,
+									domain.SecondFactorTypeOTPSMS),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				factor:        domain.SecondFactorTypeOTPSMS,
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: domain.SecondFactorTypeOTPSMS,
 			},
 		},
 	}
@@ -1632,7 +1717,7 @@ func TestCommandSide_RemoveSecondFactoroginPolicy(t *testing.T) {
 			},
 		},
 		{
-			name: "factor removed, not found error",
+			name: "factor totp removed, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -1662,7 +1747,67 @@ func TestCommandSide_RemoveSecondFactoroginPolicy(t *testing.T) {
 			},
 		},
 		{
-			name: "add factor, ok",
+			name: "factor otp email removed, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								domain.SecondFactorTypeOTPEmail,
+							),
+						),
+						eventFromEventPusher(
+							org.NewLoginPolicySecondFactorRemovedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								domain.SecondFactorTypeOTPEmail,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				factor:        domain.SecondFactorTypeOTPEmail,
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "factor otp sms removed, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								domain.SecondFactorTypeOTPSMS,
+							),
+						),
+						eventFromEventPusher(
+							org.NewLoginPolicySecondFactorRemovedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								domain.SecondFactorTypeOTPSMS,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				factor:        domain.SecondFactorTypeOTPSMS,
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "add factor totp, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -1688,6 +1833,76 @@ func TestCommandSide_RemoveSecondFactoroginPolicy(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				factor:        domain.SecondFactorTypeOTP,
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "add factor otp email, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								domain.SecondFactorTypeOTPEmail,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewLoginPolicySecondFactorRemovedEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate,
+									domain.SecondFactorTypeOTPEmail),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				factor:        domain.SecondFactorTypeOTPEmail,
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "add factor otp sms, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								domain.SecondFactorTypeOTPSMS,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewLoginPolicySecondFactorRemovedEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate,
+									domain.SecondFactorTypeOTPSMS),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				factor:        domain.SecondFactorTypeOTPSMS,
 				resourceOwner: "org1",
 			},
 			res: res{

@@ -19,6 +19,10 @@ func SecondFactorTypeToDomain(secondFactorType policy_pb.SecondFactorType) domai
 		return domain.SecondFactorTypeOTP
 	case policy_pb.SecondFactorType_SECOND_FACTOR_TYPE_U2F:
 		return domain.SecondFactorTypeU2F
+	case policy_pb.SecondFactorType_SECOND_FACTOR_TYPE_OTP_EMAIL:
+		return domain.SecondFactorTypeOTPEmail
+	case policy_pb.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS:
+		return domain.SecondFactorTypeOTPSMS
 	default:
 		return domain.SecondFactorTypeUnspecified
 	}

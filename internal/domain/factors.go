@@ -6,6 +6,8 @@ const (
 	SecondFactorTypeUnspecified SecondFactorType = iota
 	SecondFactorTypeOTP
 	SecondFactorTypeU2F
+	SecondFactorTypeOTPEmail
+	SecondFactorTypeOTPSMS
 
 	secondFactorCount
 )
