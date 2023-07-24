@@ -121,9 +121,7 @@ func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human 
 		human.Password.ChangeRequired = req.PasswordChangeRequired
 	}
 
-	if req.HashedPassword != nil && req.HashedPassword.Value != "" && req.HashedPassword.Algorithm != "" {
-		human.HashedPassword = domain.NewHashedPassword(req.HashedPassword.Value, req.HashedPassword.Algorithm)
-	}
+	human.HashedPassword = req.GetHashedPassword().GetValue()
 	links = make([]*domain.UserIDPLink, len(req.Idps))
 	for i, idp := range req.Idps {
 		links[i] = &domain.UserIDPLink{
@@ -148,11 +146,11 @@ func AddMachineUserRequestToCommand(req *mgmt_pb.AddMachineUserRequest, resource
 	}
 }
 
-func UpdateHumanProfileRequestToDomain(req *mgmt_pb.UpdateHumanProfileRequest) *domain.Profile {
+func UpdateHumanProfileRequestToDomain(req *mgmt_pb.UpdateHumanProfileRequest, orgID string) *domain.Profile {
 	preferredLanguage, err := language.Parse(req.PreferredLanguage)
 	logging.Log("MANAG-GPcYv").OnError(err).Debug("language malformed")
 	return &domain.Profile{
-		ObjectRoot:        models.ObjectRoot{AggregateID: req.UserId},
+		ObjectRoot:        models.ObjectRoot{AggregateID: req.UserId, ResourceOwner: orgID},
 		FirstName:         req.FirstName,
 		LastName:          req.LastName,
 		NickName:          req.NickName,

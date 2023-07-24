@@ -104,6 +104,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 			ExternalDomain: config.ExternalDomain,
 			ExternalPort:   config.ExternalPort,
 			ExternalSecure: config.ExternalSecure,
+			defaults:       config.SystemDefaults,
 		},
 		&projectionTables{
 			es:      eventstoreClient,

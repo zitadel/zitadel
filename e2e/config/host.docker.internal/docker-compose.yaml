@@ -1,17 +1,21 @@
 version: '3.8'
 
 services:
-  zitadel:
-    extends:
-      file: '../localhost/docker-compose.yaml'
-      service: 'zitadel'
-    volumes:
-      - ./zitadel.yaml:/zitadel.yaml
 
   db:
     extends:
       file: '../localhost/docker-compose.yaml'
       service: 'db'
+
+  zitadel:
+    depends_on:
+      db:
+        condition: 'service_healthy'
+    extends:
+      file: '../localhost/docker-compose.yaml'
+      service: 'zitadel'
+    volumes:
+      - ./zitadel.yaml:/zitadel.yaml
 
   prepare:
     image: node:18-alpine3.15

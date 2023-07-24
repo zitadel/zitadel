@@ -65,6 +65,7 @@ func (wm *InstanceLoginPolicyWriteModel) NewChangedEvent(
 	allowRegister,
 	allowExternalIDP,
 	forceMFA,
+	forceMFALocalOnly,
 	hidePasswordReset,
 	ignoreUnknownUsernames,
 	allowDomainDiscovery,
@@ -91,6 +92,9 @@ func (wm *InstanceLoginPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.ForceMFA != forceMFA {
 		changes = append(changes, policy.ChangeForceMFA(forceMFA))
+	}
+	if wm.ForceMFALocalOnly != forceMFALocalOnly {
+		changes = append(changes, policy.ChangeForceMFALocalOnly(forceMFALocalOnly))
 	}
 	if passwordlessType.Valid() && wm.PasswordlessType != passwordlessType {
 		changes = append(changes, policy.ChangePasswordlessType(passwordlessType))

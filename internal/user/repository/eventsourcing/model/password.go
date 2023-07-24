@@ -15,6 +15,7 @@ type Password struct {
 	es_models.ObjectRoot
 
 	Secret         *crypto.CryptoValue `json:"secret,omitempty"`
+	EncodedHash    string              `json:"encodedHash,omitempty"`
 	ChangeRequired bool                `json:"changeRequired,omitempty"`
 }
 

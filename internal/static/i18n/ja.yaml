@@ -112,6 +112,8 @@ Errors:
       Empty: パスワードは空です
       Invalid: 無効なパスワードです
       NotSet: パスワードが未設置です
+      NotChanged: パスワードは変更されていません
+      NotSupported: パスワードハッシュエンコードはサポートされていません
     PasswordComplexityPolicy:
       NotFound: パスワードポリシーが見つかりません
       MinLength: パスワードが短すぎます
@@ -477,6 +479,16 @@ Errors:
     TokenCreationFailed: トークンの作成に失敗しました
     InvalidToken: インテントのトークンが無効である
     OtherUser: 他のユーザーを意図している
+  AuthRequest:
+    AlreadyExists: AuthRequestはすでに存在する
+    NotExisting: AuthRequest が存在しません
+    WrongLoginClient: 他のログインクライアントによって作成された AuthRequest
+  OIDCSession:
+    RefreshTokenInvalid: 無効なリフレッシュトークンです
+    Token:
+      Invalid: トークンが無効です
+      Expired: トークンの有効期限が切れている
+    InvalidClient: トークンが発行されていません
 
 AggregateTypes:
   action: アクション

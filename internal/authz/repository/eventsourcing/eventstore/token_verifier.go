@@ -15,7 +15,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/view"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -28,7 +30,6 @@ import (
 
 type TokenVerifierRepo struct {
 	TokenVerificationKey crypto.EncryptionAlgorithm
-	IAMID                string
 	Eventstore           v1.Eventstore
 	View                 *view.View
 	Query                *query.Queries
@@ -92,6 +93,21 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	if !ok {
 		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-Reb32", "invalid token")
 	}
+	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
+		userID, clientID, resourceOwner, err = repo.verifyAccessTokenV2(ctx, tokenID, verifierClientID, projectID)
+		return
+	}
+	if sessionID, ok := strings.CutPrefix(tokenID, authz.SessionTokenPrefix); ok {
+		userID, clientID, resourceOwner, err = repo.verifySessionToken(ctx, sessionID, tokenString)
+		return
+	}
+	return repo.verifyAccessTokenV1(ctx, tokenID, subject, verifierClientID, projectID)
+}
+
+func (repo *TokenVerifierRepo) verifyAccessTokenV1(ctx context.Context, tokenID, subject, verifierClientID, projectID string) (userID string, agentID string, clientID, prefLang, resourceOwner string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	_, tokenSpan := tracing.NewNamedSpan(ctx, "token")
 	token, err := repo.tokenByID(ctx, tokenID, subject)
 	tokenSpan.EndWithError(err)
@@ -104,12 +120,98 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	if token.IsPAT {
 		return token.UserID, "", "", "", token.ResourceOwner, nil
 	}
-	for _, aud := range token.Audience {
-		if verifierClientID == aud || projectID == aud {
-			return token.UserID, token.UserAgentID, token.ApplicationID, token.PreferredLanguage, token.ResourceOwner, nil
+	if err = verifyAudience(token.Audience, verifierClientID, projectID); err != nil {
+		return "", "", "", "", "", err
+	}
+	return token.UserID, token.UserAgentID, token.ApplicationID, token.PreferredLanguage, token.ResourceOwner, nil
+}
+
+func (repo *TokenVerifierRepo) verifyAccessTokenV2(ctx context.Context, token, verifierClientID, projectID string) (userID, clientID, resourceOwner string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	activeToken, err := repo.Query.ActiveAccessTokenByToken(ctx, token)
+	if err != nil {
+		return "", "", "", err
+	}
+	if err = verifyAudience(activeToken.Audience, verifierClientID, projectID); err != nil {
+		return "", "", "", err
+	}
+	if err = repo.checkAuthentication(ctx, activeToken.AuthMethods, activeToken.UserID); err != nil {
+		return "", "", "", err
+	}
+	return activeToken.UserID, activeToken.ClientID, activeToken.ResourceOwner, nil
+}
+
+func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID, token string) (userID, clientID, resourceOwner string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	session, err := repo.Query.SessionByID(ctx, false, sessionID, token)
+	if err != nil {
+		return "", "", "", err
+	}
+	if err = repo.checkAuthentication(ctx, authMethodsFromSession(session), session.UserFactor.UserID); err != nil {
+		return "", "", "", err
+	}
+	return session.UserFactor.UserID, "", session.UserFactor.ResourceOwner, nil
+}
+
+// checkAuthentication ensures the session or token was authenticated (at least a single [domain.UserAuthMethodType]).
+// It will also check if there was a multi factor authentication, if either MFA is forced by the login policy or if the user has set up any
+func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMethods []domain.UserAuthMethodType, userID string) error {
+	if len(authMethods) == 0 {
+		return caos_errs.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "authentication required")
+	}
+	if domain.HasMFA(authMethods) {
+		return nil
+	}
+	availableAuthMethods, forceMFA, forceMFALocalOnly, err := repo.Query.ListUserAuthMethodTypesRequired(setCallerCtx(ctx, userID), userID, false)
+	if err != nil {
+		return err
+	}
+	if domain.RequiresMFA(forceMFA, forceMFALocalOnly, hasIDPAuthentication(authMethods)) || domain.HasMFA(availableAuthMethods) {
+		return caos_errs.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "mfa required")
+	}
+	return nil
+}
+
+func hasIDPAuthentication(authMethods []domain.UserAuthMethodType) bool {
+	for _, method := range authMethods {
+		if method == domain.UserAuthMethodTypeIDP {
+			return true
 		}
 	}
-	return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-Zxfako", "invalid audience")
+	return false
+}
+
+func authMethodsFromSession(session *query.Session) []domain.UserAuthMethodType {
+	types := make([]domain.UserAuthMethodType, 0, domain.UserAuthMethodTypeIDP)
+	if !session.PasswordFactor.PasswordCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypePassword)
+	}
+	if !session.PasskeyFactor.PasskeyCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypePasswordless)
+	}
+	if !session.IntentFactor.IntentCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypeIDP)
+	}
+	// TODO: add checks with https://github.com/zitadel/zitadel/issues/5477
+	/*
+		if !session.TOTPFactor.TOTPCheckedAt.IsZero() {
+			types = append(types, domain.UserAuthMethodTypeOTP)
+		}
+		if !session.U2FFactor.U2FCheckedAt.IsZero() {
+			types = append(types, domain.UserAuthMethodTypeU2F)
+		}
+	*/
+	return types
+}
+
+func setCallerCtx(ctx context.Context, userID string) context.Context {
+	ctxData := authz.GetCtxData(ctx)
+	ctxData.UserID = userID
+	return authz.SetCtxData(ctx, ctxData)
 }
 
 func (repo *TokenVerifierRepo) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error) {
@@ -182,6 +284,15 @@ func (repo *TokenVerifierRepo) decryptAccessToken(token string) (string, error) 
 		return "", caos_errs.ThrowUnauthenticated(nil, "APP-8EF0zZ", "invalid token")
 	}
 	return tokenIDSubject, nil
+}
+
+func verifyAudience(audience []string, verifierClientID, projectID string) error {
+	for _, aud := range audience {
+		if verifierClientID == aud || projectID == aud {
+			return nil
+		}
+	}
+	return caos_errs.ThrowUnauthenticated(nil, "APP-Zxfako", "invalid audience")
 }
 
 type openIDKeySet struct {
