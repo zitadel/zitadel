@@ -158,7 +158,7 @@ make compile
 > Generating the console: `make console_build console_move`  
 > Build the binary: `make compile`
 
-You can now run and debug the binary in .artifacts/zitadel/zitadel using your favourite IDE, for example GoLand.
+You can now run and debug the binary in ./zitadel using your favourite IDE, for example GoLand.
 You can test if ZITADEL does what you expect by using the UI at http://localhost:8080/ui/console.
 Also, you can verify the data by running `cockroach sql --database zitadel --insecure` and running SQL queries.
 
