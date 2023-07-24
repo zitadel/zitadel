@@ -496,15 +496,6 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 			apiFields,
 			action.Script,
 			action.Name,
-			append(actions.ActionToOptions(action), )...,
-		)
-
-		err = actions.Run(
-			actionCtx,
-			ctxFields,
-			apiFields,
-			action.Script,
-			action.Name,
 			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
 		)
 		cancel()

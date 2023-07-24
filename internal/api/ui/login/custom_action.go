@@ -133,7 +133,7 @@ func (l *Login) runPostExternalAuthenticationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -204,7 +204,7 @@ func (l *Login) runPostInternalAuthenticationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -305,7 +305,7 @@ func (l *Login) runPreCreationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -363,7 +363,7 @@ func (l *Login) runPostCreationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
