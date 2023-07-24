@@ -352,7 +352,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 					),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("INST§ANCE",
+							eventFromEventPusherWithInstanceID("INSTANCE",
 								newSecretGeneratorChangedEvent(context.Background(),
 									domain.SecretGeneratorTypeInitCode,
 									8,
