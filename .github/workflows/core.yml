@@ -53,18 +53,16 @@ jobs:
           with:
             github_token: ${{ github.token }}
             version: ${{ inputs.buf_version }}
-        
-        - 
+        -
           # node to install sass
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
           uses: actions/setup-node@v3
           with:
             node-version: ${{ inputs.node_version }}
-        - 
+        -
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-          run: npm install -g sass
-        
-        - 
+          run: npm install -g sass@1.64.1
+        -
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
           uses: actions/setup-go@v4
           with:
@@ -78,4 +76,3 @@ jobs:
           with:
             key: ${{ steps.cache.outputs.cache-primary-key }}
             path: ${{ env.cache_path }}
-        
