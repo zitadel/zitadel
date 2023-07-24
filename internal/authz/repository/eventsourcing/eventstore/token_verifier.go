@@ -166,14 +166,23 @@ func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMeth
 	if domain.HasMFA(authMethods) {
 		return nil
 	}
-	availableAuthMethods, forceMFA, err := repo.Query.ListUserAuthMethodTypesRequired(setCallerCtx(ctx, userID), userID, false)
+	availableAuthMethods, forceMFA, forceMFALocalOnly, err := repo.Query.ListUserAuthMethodTypesRequired(setCallerCtx(ctx, userID), userID, false)
 	if err != nil {
 		return err
 	}
-	if forceMFA || domain.HasMFA(availableAuthMethods) {
+	if domain.RequiresMFA(forceMFA, forceMFALocalOnly, hasIDPAuthentication(authMethods)) || domain.HasMFA(availableAuthMethods) {
 		return caos_errs.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "mfa required")
 	}
 	return nil
+}
+
+func hasIDPAuthentication(authMethods []domain.UserAuthMethodType) bool {
+	for _, method := range authMethods {
+		if method == domain.UserAuthMethodTypeIDP {
+			return true
+		}
+	}
+	return false
 }
 
 func authMethodsFromSession(session *query.Session) []domain.UserAuthMethodType {
