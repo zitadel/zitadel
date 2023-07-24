@@ -1102,7 +1102,9 @@
         "3": "Phone verification",
         "4": "Password Reset",
         "5": "Passwordless Initialization",
-        "6": "App Secret"
+        "6": "App Secret",
+        "7": "One Time Password (OTP) - SMS",
+        "8": "One Time Password (OTP) - Email"
       },
       "ADDGENERATOR": "Define Secret Appearance",
       "GENERATORTYPE": "Type",

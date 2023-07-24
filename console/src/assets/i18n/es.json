@@ -1102,7 +1102,9 @@
         "3": "Verificación de teléfono",
         "4": "Restablecimiento de contraseña",
         "5": "Inicialización de acceso sin contraseña",
-        "6": "Secreto de App"
+        "6": "Secreto de App",
+        "7": "One Time Password (OTP) - SMS",
+        "8": "One Time Password (OTP) - email"
       },
       "ADDGENERATOR": "Definir apariencia del secreto",
       "GENERATORTYPE": "Tipo",

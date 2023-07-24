@@ -48,6 +48,8 @@ type InstanceSetup struct {
 		PasswordVerificationCode *crypto.GeneratorConfig
 		PasswordlessInitCode     *crypto.GeneratorConfig
 		DomainVerification       *crypto.GeneratorConfig
+		OTPSMS                   *crypto.GeneratorConfig
+		OTPEmail                 *crypto.GeneratorConfig
 	}
 	PasswordComplexityPolicy struct {
 		MinLength    uint64
@@ -201,6 +203,8 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordResetCode, setup.SecretGenerators.PasswordVerificationCode),
 		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordlessInitCode, setup.SecretGenerators.PasswordlessInitCode),
 		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyDomain, setup.SecretGenerators.DomainVerification),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeOTPSMS, setup.SecretGenerators.OTPSMS),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeOTPEmail, setup.SecretGenerators.OTPEmail),
 
 		prepareAddDefaultPasswordComplexityPolicy(
 			instanceAgg,

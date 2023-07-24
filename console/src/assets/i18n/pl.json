@@ -1101,7 +1101,9 @@
         "3": "Weryfikacja telefonu",
         "4": "Resetowanie hasła",
         "5": "Inicjalizacja bez hasła",
-        "6": "Sekret aplikacji"
+        "6": "Sekret aplikacji",
+        "7": "Hasło jednorazowe (OTP) - SMS",
+        "8": "Hasło jednorazowe (OTP) — e-mail"
       },
       "ADDGENERATOR": "Zdefiniuj wygląd sekretu",
       "GENERATORTYPE": "Typ",

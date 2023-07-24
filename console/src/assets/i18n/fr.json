@@ -1101,7 +1101,9 @@
         "3": "Vérification par téléphone",
         "4": "Réinitialisation du mot de passe",
         "5": "Initialisation sans mot de passe",
-        "6": "Secret de l'application"
+        "6": "Secret de l'application",
+        "7": "Mot de passe à usage unique (OTP) - SMS",
+        "8": "Mot de passe à usage unique (OTP) - e-mail"
       },
       "ADDGENERATOR": "Définir l'apparence du secret",
       "GENERATORTYPE": "Type",
