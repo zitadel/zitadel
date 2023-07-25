@@ -17,6 +17,7 @@ const (
 	sslDisabledMode = "disable"
 	sslRequireMode  = "require"
 	sslAllowMode    = "allow"
+	sslPreferMode   = "prefer"
 )
 
 type Config struct {
@@ -124,7 +125,7 @@ func (c *Config) checkSSL(user User) {
 		return
 	}
 
-	if user.SSL.Mode == sslRequireMode || user.SSL.Mode == sslAllowMode {
+	if user.SSL.Mode == sslRequireMode || user.SSL.Mode == sslAllowMode || user.SSL.Mode == sslPreferMode {
 		return
 	}
 
