@@ -1,6 +1,5 @@
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import localePt from '@angular/common/locales/pt';
 import localeBg from '@angular/common/locales/bg';
 import localeDe from '@angular/common/locales/de';
 import localeEn from '@angular/common/locales/en';
@@ -10,6 +9,7 @@ import localeIt from '@angular/common/locales/it';
 import localeJa from '@angular/common/locales/ja';
 import localeMk from '@angular/common/locales/mk';
 import localePl from '@angular/common/locales/pl';
+import localePt from '@angular/common/locales/pt';
 import localeZh from '@angular/common/locales/zh';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
