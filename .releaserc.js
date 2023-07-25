@@ -1,8 +1,7 @@
 module.exports = {
   branches: [
-    { name: "main" }, 
     { name: "next" },
-    { name: "ci/improve-make", prerelease: "2.29-ignore-me" }
+    { name: "next-rc", prerelease: "rc" }
   ],
   plugins: [
     "@semantic-release/commit-analyzer",
