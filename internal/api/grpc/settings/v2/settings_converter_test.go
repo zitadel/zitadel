@@ -67,7 +67,7 @@ func Test_loginSettingsToPb(t *testing.T) {
 		SecondFactorCheckLifetime:  durationpb.New(time.Microsecond),
 		MultiFactorCheckLifetime:   durationpb.New(time.Nanosecond),
 		SecondFactors: []settings.SecondFactorType{
-			settings.SecondFactorType_SECOND_FACTOR_TYPE_TOTP,
+			settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP,
 			settings.SecondFactorType_SECOND_FACTOR_TYPE_U2F,
 			settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_EMAIL,
 			settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
