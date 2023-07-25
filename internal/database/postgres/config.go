@@ -13,6 +13,8 @@ import (
 
 const (
 	sslDisabledMode = "disable"
+	sslRequireMode  = "require"
+	sslAllowMode    = "allow"
 )
 
 type Config struct {
@@ -113,6 +115,18 @@ type SSL struct {
 func (s *Config) checkSSL(user User) {
 	if user.SSL.Mode == sslDisabledMode || user.SSL.Mode == "" {
 		user.SSL = SSL{Mode: sslDisabledMode}
+	}
+
+	if user.SSL.Mode == sslRequireMode || user.SSL.Mode == sslAllowMode {
+		return
+	}
+
+	if user.SSL.RootCert == "" {
+		logging.WithFields(
+			"cert set", user.SSL.Cert != "",
+			"key set", user.SSL.Key != "",
+			"rootCert set", user.SSL.RootCert != "",
+		).Fatal("at least ssl root cert has to be set")
 	}
 }
 
