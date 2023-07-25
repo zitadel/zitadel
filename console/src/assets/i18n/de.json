@@ -1847,8 +1847,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
-      "1": "One Time Password (OTP)",
-      "2": "Fingerabdruck, Security Keys, Face ID und andere"
+      "1": "One Time Password per Authenticator App (TOTP)",
+      "2": "Fingerabdruck, Security Keys, Face ID und andere",
+      "3": "One Time Password per Email (Email OTP)",
+      "4": "One Time Password per SMS (SMS OTP)"
     }
   },
   "LOGINPOLICY": {

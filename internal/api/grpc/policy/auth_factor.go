@@ -42,6 +42,10 @@ func ModelSecondFactorTypeToPb(secondFactorType domain.SecondFactorType) policy_
 		return policy_pb.SecondFactorType_SECOND_FACTOR_TYPE_OTP
 	case domain.SecondFactorTypeU2F:
 		return policy_pb.SecondFactorType_SECOND_FACTOR_TYPE_U2F
+	case domain.SecondFactorTypeOTPEmail:
+		return policy_pb.SecondFactorType_SECOND_FACTOR_TYPE_OTP_EMAIL
+	case domain.SecondFactorTypeOTPSMS:
+		return policy_pb.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS
 	default:
 		return policy_pb.SecondFactorType_SECOND_FACTOR_TYPE_UNSPECIFIED
 	}

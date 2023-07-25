@@ -1848,8 +1848,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Nieznany",
-      "1": "Jednorazowe hasło (OTP)",
-      "2": "Odcisk palca, klucze bezpieczeństwa, Face ID i inne"
+      "1": "Hasło jednorazowe dla aplikacji uwierzytelniającej (TOTP)",
+      "2": "Odcisk palca, Klucze Bezpieczeństwa, Face ID i inne",
+      "3": "Hasło jednorazowe dla wiadomości e-mail (Email OTP)",
+      "4": "Hasło jednorazowe dla wiadomości SMS (SMS OTP)"
     }
   },
   "LOGINPOLICY": {
