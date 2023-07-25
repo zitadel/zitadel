@@ -21,8 +21,8 @@ core_dependencies:
 .PHONY: core_static
 core_static:
 	go install github.com/rakyll/statik@v0.1.7
-	go generate internal/api/ui/login/statik/generate.go
 	go generate internal/api/ui/login/static/resources/generate.go
+	go generate internal/api/ui/login/statik/generate.go
 	go generate internal/notification/statik/generate.go
 	go generate internal/statik/generate.go
 
