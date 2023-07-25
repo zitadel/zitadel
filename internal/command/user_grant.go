@@ -37,22 +37,26 @@ func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant
 	if err != nil {
 		return nil, nil, err
 	}
-	userGrant.AggregateID, err = c.idGenerator.Next()
+	aggID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
 	}
-
-	addedUserGrant := NewUserGrantWriteModel(userGrant.AggregateID, resourceOwner)
-	userGrantAgg := UserGrantAggregateFromWriteModel(&addedUserGrant.WriteModel)
-	command = usergrant.NewUserGrantAddedEvent(
+	addedUserGrant, err := c.userGrantWriteModelByID(ctx, aggID, resourceOwner)
+	if err != nil {
+		return nil, nil, err
+	}
+	// check if usergrant is already existing
+	if addedUserGrant.State != domain.UserGrantStateUnspecified && addedUserGrant.State != domain.UserGrantStateRemoved {
+		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-kVfMa", "Errors.UserGrant.AlreadyExists")
+	}
+	return usergrant.NewUserGrantAddedEvent(
 		ctx,
-		userGrantAgg,
+		UserGrantAggregateFromWriteModel(&addedUserGrant.WriteModel),
 		userGrant.UserID,
 		userGrant.ProjectID,
 		userGrant.ProjectGrantID,
 		userGrant.RoleKeys,
-	)
-	return command, addedUserGrant, nil
+	), addedUserGrant, nil
 }
 
 func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string) (_ *domain.UserGrant, err error) {
