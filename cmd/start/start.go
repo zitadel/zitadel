@@ -455,7 +455,7 @@ func shutdownServer(ctx context.Context, server *http.Server) error {
 }
 
 func showBasicInformation(startConfig *Config) {
-	fmt.Println(color.MagentaString(figure.NewFigure("Zitadel", "", true).String()))
+	fmt.Println(color.MagentaString(figure.NewFigure("ZITADEL", "", true).String()))
 	http := "http"
 	if startConfig.TLS.Enabled || startConfig.ExternalSecure {
 		http = "https"
