@@ -98,6 +98,7 @@ func machineID() (uint16, error) {
 	if GeneratorConfig.Identification.PrivateIp.Enabled {
 		ip, err := lower16BitPrivateIP()
 		if err == nil {
+			logging.WithFields("ip", ip).Info("sonyflake machine id")
 			return ip, nil
 		}
 		errors = append(errors, fmt.Sprintf("failed to get Private IP address %s", err))
@@ -106,6 +107,7 @@ func machineID() (uint16, error) {
 	if GeneratorConfig.Identification.Hostname.Enabled {
 		hn, err := hostname()
 		if err == nil {
+			logging.WithFields("hostname", hn).Info("sonyflake machine id")
 			return hn, nil
 		}
 		errors = append(errors, fmt.Sprintf("failed to get Hostname %s", err))
@@ -114,6 +116,7 @@ func machineID() (uint16, error) {
 	if GeneratorConfig.Identification.Webhook.Enabled {
 		cid, err := metadataWebhookID()
 		if err == nil {
+			logging.WithFields("webhook", cid).Info("sonyflake machine id")
 			return cid, nil
 		}
 		errors = append(errors, fmt.Sprintf("failed to query metadata webhook %s", err))
