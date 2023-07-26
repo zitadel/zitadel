@@ -17,33 +17,33 @@ Tracing:
 # Port ZITADEL will listen on
 Port: 8080 # ZITADEL_PORT
 # Port ZITADEL is exposed on, it can differ from port e.g. if you proxy the traffic
-# !!! Changing this after initial setup breaks your system !!!
+# !!! Changing this after the initial setup breaks your system !!!
 ExternalPort: 8080 # ZITADEL_EXTERNAL_PORT
-# Domain / hostname ZITADEL is exposed externally
-# !!! Changing this after initial setup breaks your system !!!
+# Domain/hostname ZITADEL is exposed externally
+# !!! Changing this after the initial setup breaks your system !!!
 ExternalDomain: localhost # ZITADEL_EXTERNAL_DOMAIN
 # specifies if ZITADEL is exposed externally through TLS
 # this must be set to true even if TLS is not enabled on ZITADEL itself
 # but TLS traffic is terminated on a reverse proxy
-# !!! Changing this after initial setup breaks your system !!!
+# !!! Changing this after the initial setup breaks your system !!!
 ExternalSecure: true # ZITADEL_EXTERNALSECURE
 TLS:
-  # if enabled, ZITADEL will serve all traffic over TLS (HTTPS and gRPC)
+  # If enabled, ZITADEL will serve all traffic over TLS (HTTPS and gRPC)
   # you must then also provide a private key and certificate to be used for the connection
   # either directly or by a path to the corresponding file
   Enabled: true # ZITADEL_TLS_ENABLED
-  # Path to the private key of the TLS certificate, it will be loaded into the Key
-  # and overwrite any exising value
+  # Path to the private key of the TLS certificate, will be loaded into the key
+  # and overwrite any existing value
   # E.g. /path/to/key/file.pem
   KeyPath: # ZITADEL_TLS_KEYPATH
   # Private key of the TLS certificate (KeyPath has a higher priority than Key)
   # base64 encoded content of a pem file
   Key: # ZITADEL_TLS_KEY
-  # Path to the certificate for the TLS connection, it will be loaded into the Cert
-  # and overwrite any exising value
+  # Path to the certificate for the TLS connection, will be loaded into the Cert
+  # and overwrite any existing value
   # E.g. /path/to/cert/file.pem
   CertPath: # ZITADEL_TLS_CERTPATH
-  # Certificate for the TLS connection (CertPath will this overwrite, if specified)
+  # Certificate for the TLS connection (CertPath will this overwrite if specified)
   # base64 encoded content of a pem file
   Cert: # ZITADEL_TLS_CERT
 
@@ -110,14 +110,14 @@ Database:
         Key: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_KEY
 
 Machine:
-  # Cloud hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.
+  # Cloud-hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.
   Identification:
     # Use private IP to identify machines uniquely
     PrivateIp:
       Enabled: true # ZITADEL_MACHINE_IDENTIFICATION_PRIVATEIP_ENABLED
     # Use hostname to identify machines uniquely
     # You want the process to be identified uniquely, so this works well in k8s where each pod gets its own
-    # unique host name, but not as well in some other hosting environments.
+    # unique hostname, but not as well in some other hosting environments.
     Hostname:
       Enabled: false # ZITADEL_MACHINE_IDENTIFICATION_HOSTNAME_ENABLED
     # Use a webhook response to identify machines uniquely
@@ -152,7 +152,7 @@ AssetStorage:
     # 168h are 7 days
     SharedMaxAge: 168h # ZITADEL_ASSETSTORAGE_CACHE_SHAREDMAXAGE
 
-# The Projections section defines the behaviour for the scheduled and synchronous events projections.
+# The Projections section defines the behavior for the scheduled and synchronous events projections.
 Projections:
   # Time interval between scheduled projections
   RequeueEvery: 60s # ZITADEL_PROJECTIONS_REQUEUEEVERY
@@ -164,8 +164,8 @@ Projections:
   ConcurrentInstances: 1 # ZITADEL_PROJECTIONS_CONCURRENTINSTANCES
   # Limit of returned events per query
   BulkLimit: 200 # ZITADEL_PROJECTIONS_BULKLIMIT
-  # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
-  # from HandleActiveInstances duration in the past until the projections current time
+  # Only instances are projected, for which at least a projection-relevant event exists within the timeframe
+  # from HandleActiveInstances duration in the past until the projection's current time
   # Defaults to twice the RequeueEvery duration
   HandleActiveInstances: 120s # ZITADEL_PROJECTIONS_HANDLEACTIVEINSTANCES
   # In the Customizations section, all settings from above can be overwritten for each specific projection
@@ -216,7 +216,7 @@ OIDC:
   SigningKeyAlgorithm: RS256 # ZITADEL_OIDC_SIGNINGKEYALGORITHM
   # Sets the default values for lifetime and expiration for OIDC
   # This default can be overwritten in the default instance configuration and for each instance during runtime
-  # !!! Changing this after initial setup will have no impact without a restart !!!
+  # !!! Changing this after the initial setup will have no impact without a restart !!!
   DefaultAccessTokenLifetime: 12h # ZITADEL_OIDC_DEFAULTACCESSTOKENLIFETIME
   DefaultIdTokenLifetime: 12h # ZITADEL_OIDC_DEFAULTIDTOKENLIFETIME
   # 720h are 30 days, one month
@@ -225,7 +225,7 @@ OIDC:
   DefaultRefreshTokenExpiration: 2160h # ZITADEL_OIDC_DEFAULTREFRESHTOKENEXPIRATION
   Cache:
     MaxAge: 12h # ZITADEL_OIDC_CACHE_MAXAGE
-    # 168h are 7 days, one week
+    # 168h is 7 days, one week
     SharedMaxAge: 168h # ZITADEL_OIDC_CACHE_SHAREDMAXAGE
   CustomEndpoints:
     Auth:
@@ -267,7 +267,7 @@ Login:
   CSRFCookieName: zitadel.login.csrf # ZITADEL_LOGIN_CSRFCOOKIENAME
   Cache:
     MaxAge: 12h # ZITADEL_LOGIN_CACHE_MAXAGE
-    # 168h are 7 days, one week
+    # 168h is 7 days, one week
     SharedMaxAge: 168h # ZITADEL_LOGIN_CACHE_SHAREDMAXAGE
 
 Console:
@@ -276,7 +276,7 @@ Console:
     SharedMaxAge: 5m # ZITADEL_CONSOLE_SHORTCACHE_SHAREDMAXAGE
   LongCache:
     MaxAge: 12h # ZITADEL_CONSOLE_LONGCACHE_MAXAGE
-    # 168h are 7 days, one week
+    # 168h is 7 days, one week
     SharedMaxAge: 168h # ZITADEL_CONSOLE_LONGCACHE_SHAREDMAXAGE
   InstanceManagementURL: "" # ZITADEL_CONSOLE_INSTANCEMANAGEMENTURL
 
@@ -318,7 +318,7 @@ EncryptionKeys:
   UserAgentCookieKeyID: "userAgentCookieKey" # ZITADEL_ENCRYPTIONKEYS_USERAGENTCOOKIEKEYID
 
 SystemAPIUsers:
-# add keys for authentication of the systemAPI here:
+# Add keys for authentication of the systemAPI here:
 # you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
 # - superuser:
 #     Path: /path/to/superuser/key.pem  # you can provide the key either by reference with the path
@@ -355,7 +355,7 @@ SystemDefaults:
 
 Actions:
   HTTP:
-    # wildcard sub domains are currently unsupported
+    # Wildcard sub domains are currently unsupported
     DenyList:
       - localhost
       - "127.0.0.1"
@@ -371,15 +371,15 @@ LogStore:
       # CleanupInterval defines the time between cleanup iterations
       CleanupInterval: 4h # ZITADEL_LOGSTORE_ACCESS_DATABASE_CLEANUPINTERVAL
       # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
-      # Log entries are held in-memory until one of the conditions MinFrequency or MaxBulkSize meets.
+      # Log entries are held in memory until one of the conditions MinFrequency or MaxBulkSize meets.
       Debounce:
         MinFrequency: 2m # ZITADEL_LOGSTORE_ACCESS_DATABASE_DEBOUNCE_MINFREQUENCY
         MaxBulkSize: 100 # ZITADEL_LOGSTORE_ACCESS_DATABASE_DEBOUNCE_MAXBULKSIZE
     Stdout:
-      # If enabled, all access logs are printed to the binaries standard output
+      # If enabled, all access logs are printed to the binary's standard output
       Enabled: false # ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED
       # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
-      # Log entries are held in-memory until one of the conditions MinFrequency or MaxBulkSize meets.
+      # Log entries are held in memory until one of the conditions MinFrequency or MaxBulkSize meets.
       Debounce:
         MinFrequency: 0s # ZITADEL_LOGSTORE_ACCESS_STDOUT_DEBOUNCE_MINFREQUENCY
         MaxBulkSize: 0 # ZITADEL_LOGSTORE_ACCESS_STDOUT_DEBOUNCE_MAXBULKSIZE
@@ -393,15 +393,15 @@ LogStore:
       # CleanupInterval defines the time between cleanup iterations
       CleanupInterval: 4h # ZITADEL_LOGSTORE_EXECUTION_DATABASE_CLEANUPINTERVAL
       # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
-      # Log entries are held in-memory until one of the conditions MinFrequency or MaxBulkSize meets.
+      # Log entries are held in memory until one of the conditions MinFrequency or MaxBulkSize meets.
       Debounce:
         MinFrequency: 0s # ZITADEL_LOGSTORE_EXECUTION_DATABASE_DEBOUNCE_MINFREQUENCY
         MaxBulkSize: 0 # ZITADEL_LOGSTORE_EXECUTION_DATABASE_DEBOUNCE_MAXBULKSIZE
     Stdout:
-      # If enabled, all execution logs are printed to the binaries standard output
+      # If enabled, all execution logs are printed to the binary's standard output
       Enabled: true # ZITADEL_LOGSTORE_EXECUTION_STDOUT_ENABLED
       # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
-      # Log entries are held in-memory until one of the conditions MinFrequency or MaxBulkSize meets.
+      # Log entries are held in memory until one of the conditions MinFrequency or MaxBulkSize meets.
       Debounce:
         MinFrequency: 0s # ZITADEL_LOGSTORE_EXECUTION_STDOUT_DEBOUNCE_MINFREQUENCY
         MaxBulkSize: 0 # ZITADEL_LOGSTORE_EXECUTION_STDOUT_DEBOUNCE_MAXBULKSIZE
@@ -420,13 +420,13 @@ DefaultInstance:
   DefaultLanguage: en # ZITADEL_DEFAULTINSTANCE_DEFAULTLANGUAGE
   Org:
     Name: ZITADEL # ZITADEL_DEFAULTINSTANCE_ORG_NAME
-    # In the DefaultInstance.Org.Human section, the initial organizations admin user with role IAM_OWNER is defined.
+    # In the DefaultInstance.Org.Human section, the initial organization's admin user with the role IAM_OWNER is defined.
     # ZITADEL either creates a human user or a machine user.
     # If DefaultInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role, not a human user.
     Human:
-      # in case that UserLoginMustBeDomain is false (default) and if you don't overwrite the username with an email,
+      # In case that UserLoginMustBeDomain is false (default) and if you don't overwrite the username with an email,
       # it will be suffixed by the org domain (org-name + domain from config).
-      # for example: zitadel-admin in org `My Org` on domain.tld -> zitadel-admin@my-org.domain.tld
+      # for example zitadel-admin in org `My Org` on domain.tld -> zitadel-admin@my-org.domain.tld
       UserName: zitadel-admin # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_USERNAME
       FirstName: ZITADEL # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_FIRSTNAME
       LastName: Admin # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_LASTNAME
@@ -441,7 +441,7 @@ DefaultInstance:
         Number: # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_PHONE_NUMBER
         Verified: # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_PHONE_VERIFIED
       Password: # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_PASSWORD
-    # In the DefaultInstance.Org.Machine section, the initial organizations admin user with role IAM_OWNER is defined.
+    # In the DefaultInstance.Org.Machine section, the initial organization's admin user with the role IAM_OWNER is defined.
     # ZITADEL either creates a human user or a machine user.
     # If DefaultInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role, not a human user.
     Machine:
@@ -574,14 +574,14 @@ DefaultInstance:
     RefreshTokenExpiration: 2160h # ZITADEL_DEFAULTINSTANCE_OIDCSETTINGS_REFRESHTOKENEXPIRATION
   # this configuration sets the default email configuration
   SMTPConfiguration:
-    # configuration of the host
+    # Configuration of the host
     SMTP:
       # must include the port, like smtp.mailtrap.io:2525. IPv6 is also supported, like [2001:db8::1]:2525
       Host: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_HOST
       User: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_USER
       Password: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_PASSWORD
     TLS: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_SSL
-    # if the host of the sender is different from ExternalDomain set DefaultInstance.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain to false
+    # If the host of the sender is different from ExternalDomain set DefaultInstance.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain to false
     From: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_FROM
     FromName: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_FROMNAME
   MessageTexts:
@@ -663,15 +663,15 @@ DefaultInstance:
       PreHeader: Verify phone
       Subject: Verify phone
       Greeting: Hello {{.DisplayName}},
-      Text: A new phonenumber has been added. Please use the following code to verify it {{.Code}}.
+      Text: A new phone number has been added. Please use the following code to verify it {{.Code}}.
       ButtonText: Verify phone
     - MessageTextType: DomainClaimed
       Language: en
       Title: Zitadel - Domain has been claimed
-      PreHeader: Change email / username
+      PreHeader: Change email/username
       Subject: Domain has been claimed
       Greeting: Hello {{.DisplayName}},
-      Text: The domain {{.Domain}} has been claimed by an organisation. Your current user {{.UserName}} is not part of this organisation. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
+      Text: The domain {{.Domain}} has been claimed by an organization. Your current user {{.UserName}} is not part of this organization. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
       ButtonText: Login
     - MessageTextType: PasswordChange
       Language: en
@@ -683,7 +683,7 @@ DefaultInstance:
       ButtonText: Login
 
   Quotas:
-    # Items takes a slice of quota configurations, whereas for each unit type and instance, one or zero quotas may exist.
+    # Items take a slice of quota configurations, whereas, for each unit type and instance, one or zero quotas may exist.
     # The following unit types are supported
 
     # "requests.all.authenticated"
@@ -698,7 +698,7 @@ DefaultInstance:
     # The sum of all actions run durations in seconds
     Items:
 #      - Unit: "requests.all.authenticated"
-#        # From defines the starting time from which the current quota period is calculated from.
+#        # From defines the starting time from which the current quota period is calculated.
 #        # This is relevant for querying the current usage.
 #        From: "2023-01-01T00:00:00Z"
 #        # ResetInterval defines the quota periods duration

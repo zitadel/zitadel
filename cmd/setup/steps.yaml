@@ -7,13 +7,13 @@ FirstInstance:
   DefaultLanguage: en # ZITADEL_FIRSTINSTANCE_DEFAULTLANGUAGE
   Org:
     Name: ZITADEL # ZITADEL_FIRSTINSTANCE_ORG_NAME
-    # In the FirstInstance.Org.Human section, the initial organizations admin user with role IAM_OWNER is defined.
+    # In the FirstInstance.Org.Human section, the initial organization's admin user with the role IAM_OWNER is defined.
     # ZITADEL either creates a human user or a machine user.
     # If FirstInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role, not a human user.
     Human:
-      # in case that UserLoginMustBeDomain is false (default) and you don't overwrite the username with an email,
+      # In case UserLoginMustBeDomain is false (default) and you don't overwrite the username with an email,
       # it will be suffixed by the org domain (org-name + domain from config).
-      # for example: zitadel-admin in org ZITADEL on domain.tld -> zitadel-admin@zitadel.domain.tld
+      # for example zitadel-admin in org ZITADEL on domain.tld -> zitadel-admin@zitadel.domain.tld
       UserName: zitadel-admin # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME
       FirstName: ZITADEL # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_FIRSTNAME
       LastName: Admin # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_LASTNAME
@@ -30,7 +30,7 @@ FirstInstance:
         Verified: # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PHONE_VERIFIED
       Password: Password1! # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD
       PasswordChangeRequired: true # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED
-    # In the FirstInstance.Org.Machine section, the initial organizations admin user with role IAM_OWNER is defined.
+    # In the FirstInstance.Org.Machine section, the initial organization's admin user with the role IAM_OWNER is defined.
     # ZITADEL either creates a human user or a machine user.
     # If FirstInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role, not a human user.
     Machine:
