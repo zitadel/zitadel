@@ -6674,7 +6674,7 @@ message SetDefaultVerifySMSOTPMessageTextRequest {
     string text = 6 [
         (validate.rules).string = {max_len: 800},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Please use the one-time password \\\"{{.OTP}}\\\" within the next five minutes to authenticate to ZITADEL.\""
+            example: "\"Please visit {{ .VerifyURL }} or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at ZITADEL within the next five minutes.\""
             max_length: 800;
         }
     ];
@@ -6748,7 +6748,7 @@ message SetDefaultVerifyEmailOTPMessageTextRequest {
     string text = 6 [
         (validate.rules).string = {max_len: 800},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Please use the \\\"Authenticate\\\" button or copy and paste the one-time password {{.OTP}} to the authentication screen in order to authenticate at ZITADEL within the next five minutes.\""
+            example: "\"Please use the \\\"Authenticate\\\" button or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at ZITADEL within the next five minutes.\""
             max_length: 800;
         }
     ];

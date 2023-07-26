@@ -26,6 +26,19 @@ VerifyPhone:
   Greeting: 'Ciao {{.DisplayName}},'
   Text: È stato aggiunto un nuovo numero di telefono. Usa il seguente codice per verificarlo {{.Code}}
   ButtonText: Verifica
+VerifyEmailOTP:
+  Title: "ZITADEL - Verifica la password monouso"
+  PreHeader: "Verifica la password monouso"
+  Subject: "Verifica la password monouso"
+  Greeting: "Ciao {{.FirstName}} {{.LastName}},"
+  Text: "Si prega di utilizzare il pulsante 'Autentica' o copiare la password monouso {{.OTP}} e incollarla nella schermata di autenticazione per autenticarsi a ZITADEL entro i prossimi cinque minuti."
+  ButtonText: "Autentica"
+VerifySMSOTP:
+  Title: "ZITADEL - Verifica la password monouso"
+  PreHeader: "Verifica la password monouso"
+  Subject: "Verifica la password monouso"
+  Greeting: "Ciao {{.FirstName}} {{.LastName}},"
+  Text: "Si prega di visitare {{ .VerifyURL }} o copiare la password monouso {{.OTP}} e incollarla nella schermata di autenticazione per autenticarsi a ZITADEL entro i prossimi cinque minuti."
 DomainClaimed:
   Title: ZITADEL - Il dominio è stato rivendicato
   PreHeader: Cambiare email / nome utente

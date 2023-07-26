@@ -26,13 +26,25 @@ VerifyPhone:
   Greeting: Hallo {{.DisplayName}},
   Text: Eine Telefonnummer wurde hinzugefügt. Bitte verifiziere diese in dem du folgenden Code eingibst&lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; 
   ButtonText: Telefon verifizieren
+VerifyEmailOTP:
+  Title: "ZITADEL - Einmalpasswort verifizieren"
+  PreHeader: "Einmalpasswort verifizieren"
+  Subject: "Einmalpasswort verifizieren"
+  Greeting: "Hallo {{.FirstName}} {{.LastName}},"
+  Text: "Bitte nutzen Sie den 'Authentifizieren'-Button oder kopieren Sie das Einmalpasswort {{.OTP}} und fügen Sie es in den Authentifizierungsbildschirm ein, um sich innerhalb der nächsten fünf Minuten bei ZITADEL zu authentifizieren."
+  ButtonText: "Authentifizieren"
+VerifySMSOTP:
+  Title: "ZITADEL - Einmalpasswort verifizieren"
+  PreHeader: "Einmalpasswort verifizieren"
+  Subject: "Einmalpasswort verifizieren"
+  Greeting: "Hallo {{.FirstName}} {{.LastName}},"
+  Text: "Bitte besuchen Sie {{ .VerifyURL }} oder kopieren Sie das Einmalpasswort {{.OTP}} und fügen Sie es in den Authentifizierungsbildschirm ein, um sich innerhalb der nächsten fünf Minuten bei ZITADEL zu authentifizieren."
 DomainClaimed:
   Title: ZITADEL - Domain wurde beansprucht
   PreHeader: Email / Username ändern
   Subject: Domain wurde beansprucht
   Greeting: Hallo {{.DisplayName}},
   Text: Die Domain {{.Domain}} wurde von einer Organisation beansprucht. Dein derzeitiger User {{.Username}} ist nicht Teil dieser Organisation. Daher musst du beim nächsten Login eine neue Email hinterlegen. Für diesen Login haben wir dir einen temporären Usernamen ({{.TempUsername}}) erstellt.
-  ButtonText: Login
 PasswordlessRegistration:
   Title: ZITADEL - Passwortlosen Login hinzufügen
   PreHeader: Passwortlosen Login hinzufügen
