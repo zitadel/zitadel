@@ -1,3 +1,4 @@
+"use server";
 import { ReactNode } from "react";
 
 import {
@@ -7,12 +8,12 @@ import {
   IdentityProvider,
   IdentityProviderType,
 } from "@zitadel/server";
-import {
-  SignInWithGitlab,
-  SignInWithAzureAD,
-  SignInWithGoogle,
-  SignInWithGithub,
-} from "@zitadel/react";
+// import {
+//   SignInWithGitlab,
+//   SignInWithAzureAD,
+//   SignInWithGoogle,
+//   SignInWithGithub,
+// } from "@zitadel/react";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;
@@ -36,17 +37,18 @@ function getIdentityProviders(
     });
 }
 
-export async function SignInWithIDP(props: SignInWithIDPProps) {
-  const identityProviders = await getIdentityProviders(
-    props.server,
-    props.orgId
-  );
+export function SignInWithIDP(props: SignInWithIDPProps) {
+  console.log(props.server);
+  // const identityProviders = await getIdentityProviders(
+  //   props.server,
+  //   props.orgId
+  // );
 
-  console.log(identityProviders);
+  // console.log(identityProviders);
 
   return (
     <div className="ztdl-next-flex ztdl-next-flex-col ztdl-next-w-full ztdl-next-space-y-2 ztdl-next-text-sm">
-      {identityProviders &&
+      {/* {identityProviders &&
         identityProviders.map((idp, i) => {
           switch (idp.type) {
             case IdentityProviderType.IDENTITY_PROVIDER_TYPE_GITHUB:
@@ -94,7 +96,7 @@ export async function SignInWithIDP(props: SignInWithIDPProps) {
             default:
               return <div>{idp.name}</div>;
           }
-        })}
+        })} */}
       {props.children}
     </div>
   );
