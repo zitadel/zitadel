@@ -32,7 +32,9 @@ export function SignInWithGitlab(props: SignInWithGitlabProps) {
           />
         </svg>
       </div>
-      <span className="ztdl-ml-4">Sign in with Gitlab</span>
+      <span className="ztdl-ml-4">
+        {props.name ? props.name : "Sign in with Gitlab"}
+      </span>
     </div>
   );
 }

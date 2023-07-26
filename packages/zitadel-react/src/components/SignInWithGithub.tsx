@@ -1,4 +1,3 @@
-import * as React from "react";
 import { SignInWithIdentityProviderProps } from "./SignInWith";
 
 export interface SignInWithGithubProps
@@ -33,7 +32,9 @@ export function SignInWithGithub(props: SignInWithGithubProps) {
           />
         </svg>
       </div>
-      <span className="ztdl-ml-4">Sign in with Github</span>
+      <span className="ztdl-ml-4">
+        {props.name ? props.name : "Sign in with Github"}
+      </span>
     </div>
   );
 }

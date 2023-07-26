@@ -50,19 +50,49 @@ export async function SignInWithIDP(props: SignInWithIDPProps) {
         identityProviders.map((idp, i) => {
           switch (idp.type) {
             case IdentityProviderType.IDENTITY_PROVIDER_TYPE_GITHUB:
-              return <SignInWithGithub key={`idp-${i}`}></SignInWithGithub>;
+              return (
+                <SignInWithGithub
+                  key={`idp-${i}`}
+                  name={idp.name}
+                ></SignInWithGithub>
+              );
             case IdentityProviderType.IDENTITY_PROVIDER_TYPE_GITHUB_ES:
-              return <SignInWithGithub key={`idp-${i}`}></SignInWithGithub>;
+              return (
+                <SignInWithGithub
+                  key={`idp-${i}`}
+                  name={idp.name}
+                ></SignInWithGithub>
+              );
             case IdentityProviderType.IDENTITY_PROVIDER_TYPE_AZURE_AD:
-              return <SignInWithAzureAD key={`idp-${i}`}></SignInWithAzureAD>;
+              return (
+                <SignInWithAzureAD
+                  key={`idp-${i}`}
+                  name={idp.name}
+                ></SignInWithAzureAD>
+              );
             case IdentityProviderType.IDENTITY_PROVIDER_TYPE_GOOGLE:
-              return <SignInWithGoogle key={`idp-${i}`}></SignInWithGoogle>;
+              return (
+                <SignInWithGoogle
+                  key={`idp-${i}`}
+                  name={idp.name}
+                ></SignInWithGoogle>
+              );
             case IdentityProviderType.IDENTITY_PROVIDER_TYPE_GITLAB:
-              return <SignInWithGitlab key={`idp-${i}`}></SignInWithGitlab>;
+              return (
+                <SignInWithGitlab
+                  key={`idp-${i}`}
+                  name={idp.name}
+                ></SignInWithGitlab>
+              );
             case IdentityProviderType.IDENTITY_PROVIDER_TYPE_GITLAB_SELF_HOSTED:
-              return <SignInWithGitlab key={`idp-${i}`}></SignInWithGitlab>;
+              return (
+                <SignInWithGitlab
+                  key={`idp-${i}`}
+                  name={idp.name}
+                ></SignInWithGitlab>
+              );
             default:
-              return <div></div>;
+              return <div>{idp.name}</div>;
           }
         })}
       {props.children}

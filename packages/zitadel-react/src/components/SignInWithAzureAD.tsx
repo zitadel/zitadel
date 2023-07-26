@@ -32,7 +32,9 @@ export function SignInWithAzureAD(props: SignInWithAzureADProps) {
           />
         </svg>
       </div>
-      <span className="ztdl-ml-4">Sign in with AzureAD</span>
+      <span className="ztdl-ml-4">
+        {props.name ? props.name : "Sign in with AzureAD"}
+      </span>
     </div>
   );
 }

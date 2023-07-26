@@ -1,4 +1,3 @@
-import * as React from "react";
 import { SignInWithIdentityProviderProps } from "./SignInWith";
 
 export interface SignInWithGoogleProps
@@ -49,7 +48,9 @@ export function SignInWithGoogle(props: SignInWithGoogleProps) {
           />
         </svg>
       </div>
-      <span className="ztdl-ml-4">Sign in with Google</span>
+      <span className="ztdl-ml-4">
+        {props.name ? props.name : "Sign in with Google"}
+      </span>
     </div>
   );
 }
