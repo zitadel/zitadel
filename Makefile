@@ -80,6 +80,10 @@ console_build: console_dependencies console_client
 	cd console && \
 	yarn build
 
+.PHONY: console_container
+console_container:
+	docker build -f console/build/Dockerfile -t ghcr.io/zitadel/console:latest console
+
 .PHONY: clean
 clean:
 	$(RM) .artifacts/grpc
