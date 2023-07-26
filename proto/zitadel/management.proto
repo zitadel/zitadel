@@ -10868,9 +10868,9 @@ message GetDefaultVerifyPhoneMessageTextResponse {
 }
 
 message SetCustomVerifyPhoneMessageTextRequest {
+    // TODO: Why not: (google.api.field_behavior) = REQUIRED
     string language = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
-        // TODO: Why not: (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"de\""
         }
@@ -10987,11 +10987,23 @@ message SetCustomVerifySMSOTPMessageTextRequest {
     string text = 6 [
         (validate.rules).string = {max_len: 800},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Please use the following one-time password withing the next five minutes to authenticate to ZITADEL:\n{{.OTP}}.\""
+            example: "\"Please use the one-time password \\\"{{.OTP}}\\\" within the next five minutes to authenticate to ZITADEL.\""
             max_length: 800;
         }
     ];
     string footer_text = 7 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetCustomVerifySMSOTPMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomVerifySMSOTPMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomVerifySMSOTPMessageTextToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetCustomVerifyEmailOTPMessageTextRequest {
@@ -11048,7 +11060,7 @@ message SetCustomVerifyEmailOTPMessageTextRequest {
     string text = 6 [
         (validate.rules).string = {max_len: 800},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Please use the \"Authenticate\" button or copy and paste the one-time password {{.OTP}} to the authentication screen in order to authenticate at ZITADEL within the next five minutes.\""
+            example: "\"Please use the \\\"Authenticate\\\" button or copy and paste the one-time password {{.OTP}} to the authentication screen in order to authenticate at ZITADEL within the next five minutes.\""
             max_length: 800;
         }
     ];

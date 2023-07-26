@@ -299,7 +299,6 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 			if _, ok := err.(errors.InvalidArgument); !ok {
 				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
 			}
-
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
 			assertReduce(t, got, err, CustomTextTable, tt.want)

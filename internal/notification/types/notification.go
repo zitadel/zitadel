@@ -87,6 +87,7 @@ func SendSMSTwilio(
 		return generateSms(
 			ctx,
 			user,
+			// TODO: concat data.Title, data.PreHeader, data.Subject, data.Greeting, data.Text, data.FooterText? (remove ButtonText from Custom Texts API)
 			data.Text,
 			twilioConfig,
 			getFileSystemProvider,
