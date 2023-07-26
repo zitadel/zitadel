@@ -51,3 +51,19 @@ The object has the following fields and methods:
   Returns the body as JSON object, or throws an error if the body is not a json object.
 - `text()` *string*  
   Returns the body
+
+### Sample JS to make HTTP post Call with Action
+```
+let http = require('zitadel/http')
+let logger = require("zitadel/log")
+function log(ctx, api) {
+    var user = http.fetch('API_URL', {
+        method: 'POST',
+        body: {
+            "name": "user 1"
+        }
+    }).json();
+    logger.log(user.id);
+}
+```
+  
