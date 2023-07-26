@@ -217,7 +217,7 @@ service SystemService {
     };
   }
 
-  // Returns the domain of an instance
+  // Adds a domain to an instance
   rpc AddDomain(AddDomainRequest) returns (AddDomainResponse) {
     option (google.api.http) = {
       post: "/instances/{instance_id}/domains";
