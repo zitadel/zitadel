@@ -5804,6 +5804,202 @@ service ManagementService {
         };
     }
 
+    rpc GetCustomVerifySMSOTPMessageText(GetCustomVerifySMSOTPMessageTextRequest) returns (GetCustomVerifySMSOTPMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/verifysmsotp/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Custom Verify SMS OTP Message Text";
+            description: "Get the custom text of the verify SMS OTP message that is set on the organization. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc GetDefaultVerifySMSOTPMessageText(GetDefaultVerifySMSOTPMessageTextRequest) returns (GetDefaultVerifySMSOTPMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/default/message/verifysmsotp/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Default Verify SMS OTP Message Text";
+            description: "Get the default text of the verify SMS OTP message that is set on the instance or as translation files in ZITADEL itself. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc SetCustomVerifySMSOTPMessageText(SetCustomVerifySMSOTPMessageTextRequest) returns (SetCustomVerifySMSOTPMessageTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/verifysmsotp/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Set Custom Verify SMS OTP Reset Message Text";
+            description: "Set the custom text of the verify SMS OTP message for the organization. The message is sent when an SMS One-time password should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc ResetCustomVerifySMSOTPMessageTextToDefault(ResetCustomVerifySMSOTPMessageTextToDefaultRequest) returns (ResetCustomVerifySMSOTPMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/verifysmsotp/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            // TODO: not policy.write?
+            permission: "policy.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Reset Custom Verify SMS OTP Message Text to Default";
+            description: "Removes the custom text of the verify SMS OTP message from the organization and therefore the default texts will trigger for the users afterward."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc GetCustomVerifyEmailOTPMessageText(GetCustomVerifyEmailOTPMessageTextRequest) returns (GetCustomVerifyEmailOTPMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/verifyemailotp/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Custom Verify Email OTP Message Text";
+            description: "Get the custom text of the verify Email OTP message that is set on the organization. The message is sent when an Email One-time password should be verified and a notification provider is configured."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc GetDefaultVerifyEmailOTPMessageText(GetDefaultVerifyEmailOTPMessageTextRequest) returns (GetDefaultVerifyEmailOTPMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/default/message/verifyemailotp/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Default Verify Email OTP Message Text";
+            description: "Get the default text of the verify Email OTP message that is set on the instance or as translation files in ZITADEL itself. The message is sent when an Email One-time password should be verified and a notification provider is configured."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc SetCustomVerifyEmailOTPMessageText(SetCustomVerifyEmailOTPMessageTextRequest) returns (SetCustomVerifyEmailOTPMessageTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/verifyemailotp/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Set Custom Verify Email OTP Reset Message Text";
+            description: "Set the custom text of the verify Email OTP message for the organization. The message is sent when an Email One-time password should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc ResetCustomVerifyEmailOTPMessageTextToDefault(ResetCustomVerifyEmailOTPMessageTextToDefaultRequest) returns (ResetCustomVerifyEmailOTPMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/verifyemailotp/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            // TODO: not policy.write?
+            permission: "policy.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Reset Custom Verify Email OTP Message Text to Default";
+            description: "Removes the custom text of the verify Email OTP message from the organization and therefore the default texts will trigger for the users afterward."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
     rpc GetCustomDomainClaimedMessageText(GetCustomDomainClaimedMessageTextRequest) returns (GetCustomDomainClaimedMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/message/domainclaimed/{language}";
@@ -10674,6 +10870,7 @@ message GetDefaultVerifyPhoneMessageTextResponse {
 message SetCustomVerifyPhoneMessageTextRequest {
     string language = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        // TODO: Why not: (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"de\""
         }
@@ -10713,6 +10910,7 @@ message SetCustomVerifyPhoneMessageTextRequest {
             max_length: 800;
         }
     ];
+    // TODO: buttons can't be rendered in SMS, right?
     string button_text = 7 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -10732,6 +10930,147 @@ message ResetCustomVerifyPhoneMessageTextToDefaultRequest {
 }
 
 message ResetCustomVerifyPhoneMessageTextToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetCustomVerifySMSOTPMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomVerifySMSOTPMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message GetDefaultVerifySMSOTPMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultVerifySMSOTPMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetCustomVerifySMSOTPMessageTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL - One-time Password\""
+            max_length: 200;
+        }
+    ];
+    string pre_header = 3 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Verify One-time Password \""
+            max_length: 200;
+        }
+    ];
+    string subject = 4 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Verify One-time Password\""
+            max_length: 200;
+        }
+    ];
+    string greeting = 5  [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Hello {{.FirstName}} {{.LastName}},\""
+            max_length: 200;
+        }
+    ];
+    string text = 6 [
+        (validate.rules).string = {max_len: 800},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Please use the following one-time password withing the next five minutes to authenticate to ZITADEL:\n{{.OTP}}.\""
+            max_length: 800;
+        }
+    ];
+    string footer_text = 7 [(validate.rules).string = {max_len: 200}];
+}
+
+message GetCustomVerifyEmailOTPMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomVerifyEmailOTPMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message GetDefaultVerifyEmailOTPMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultVerifyEmailOTPMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetCustomVerifyEmailOTPMessageTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL - One-time Password\""
+            max_length: 200;
+        }
+    ];
+    string pre_header = 3 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Verify One-time Password \""
+            max_length: 200;
+        }
+    ];
+    string subject = 4 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Verify One-time Password\""
+            max_length: 200;
+        }
+    ];
+    string greeting = 5  [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Hello {{.FirstName}} {{.LastName}},\""
+            max_length: 200;
+        }
+    ];
+    string text = 6 [
+        (validate.rules).string = {max_len: 800},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Please use the \"Authenticate\" button or copy and paste the one-time password {{.OTP}} to the authentication screen in order to authenticate at ZITADEL within the next five minutes.\""
+            max_length: 800;
+        }
+    ];
+    string button_text = 7 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Authenticate\""
+            max_length: 200;
+        }
+    ];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetCustomVerifyEmailOTPMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomVerifyEmailOTPMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomVerifyEmailOTPMessageTextToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

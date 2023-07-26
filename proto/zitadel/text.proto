@@ -92,6 +92,8 @@ message LoginCustomText {
     PasswordlessRegistrationDoneScreenText passwordless_registration_done_text = 34;
     ExternalRegistrationUserOverviewScreenText external_registration_user_overview_text = 35;
     bool is_default = 36;
+    VerifyMFASMSOTPScreenText verify_mfa_sms_otp_text = 37;
+    VerifyMFAEmailOTPScreenText verify_mfa_email_otp_text = 38;
 }
 
 message SelectAccountScreenText {
