@@ -420,6 +420,9 @@ DefaultInstance:
   DefaultLanguage: en # ZITADEL_DEFAULTINSTANCE_DEFAULTLANGUAGE
   Org:
     Name: ZITADEL # ZITADEL_DEFAULTINSTANCE_ORG_NAME
+    # In the DefaultInstance.Org.Human section, the initial organizations admin user with role IAM_OWNER is defined.
+    # ZITADEL either creates a human user or a machine user.
+    # If DefaultInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role, not a human user.
     Human:
       # in case that UserLoginMustBeDomain is false (default) and if you don't overwrite the username with an email,
       # it will be suffixed by the org domain (org-name + domain from config).
@@ -438,14 +441,20 @@ DefaultInstance:
         Number: # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_PHONE_NUMBER
         Verified: # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_PHONE_VERIFIED
       Password: # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_PASSWORD
+    # In the DefaultInstance.Org.Machine section, the initial organizations admin user with role IAM_OWNER is defined.
+    # ZITADEL either creates a human user or a machine user.
+    # If DefaultInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role, not a human user.
     Machine:
       Machine:
         Username: # ZITADEL_DEFAULTINSTANCE_ORG_MACHINE_MACHINE_USERNAME
         Name: # ZITADEL_DEFAULTINSTANCE_ORG_MACHINE_MACHINE_NAME
       MachineKey:
+        # date format: 2023-01-01T00:00:00Z
         ExpirationDate: # ZITADEL_DEFAULTINSTANCE_ORG_MACHINE_MACHINEKEY_EXPIRATIONDATE
+        # Currently, the only supported value is 1 for JSON
         Type: # ZITADEL_DEFAULTINSTANCE_ORG_MACHINE_MACHINEKEY_TYPE
       Pat:
+        # date format: 2023-01-01T00:00:00Z
         ExpirationDate: # ZITADEL_DEFAULTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE
   SecretGenerators:
     PasswordSaltCost: 14 # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_PASSWORDSALTCOST
