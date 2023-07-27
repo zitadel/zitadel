@@ -274,6 +274,13 @@ module.exports = {
               groupPathsBy: "tag",
             },
           },
+          oidc: {
+            specPath: ".artifacts/openapi/zitadel/oidc/v2alpha/oidc_service.swagger.json",
+            outputDir: "docs/apis/resources/oidc_service",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
           settings: {
             specPath: ".artifacts/openapi/zitadel/settings/v2alpha/settings_service.swagger.json",
             outputDir: "docs/apis/resources/settings_service",

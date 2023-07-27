@@ -8,7 +8,6 @@ import (
 	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2alpha"
 )
 
-// TODO: ?
 func loginSettingsToPb(current *query.LoginPolicy) *settings.LoginSettings {
 	multi := make([]settings.MultiFactorType, len(current.MultiFactors))
 	for i, typ := range current.MultiFactors {
@@ -24,6 +23,7 @@ func loginSettingsToPb(current *query.LoginPolicy) *settings.LoginSettings {
 		AllowRegister:              current.AllowRegister,
 		AllowExternalIdp:           current.AllowExternalIDPs,
 		ForceMfa:                   current.ForceMFA,
+		ForceMfaLocalOnly:          current.ForceMFALocalOnly,
 		PasskeysType:               passkeysTypeToPb(current.PasswordlessType),
 		HidePasswordReset:          current.HidePasswordReset,
 		IgnoreUnknownUsernames:     current.IgnoreUnknownUsernames,

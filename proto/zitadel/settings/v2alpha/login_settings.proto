@@ -104,6 +104,11 @@ message LoginSettings {
       description: "resource_owner_type returns if the settings is managed on the organization or on the instance";
     }
   ];
+  bool force_mfa_local_only = 22 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login."
+    }
+  ];
 }
 
 enum SecondFactorType {

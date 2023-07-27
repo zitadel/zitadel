@@ -120,6 +120,8 @@ Errors:
       Empty: La password è vuota
       Invalid: La password non è valida
       NotSet: L'utente non ha impostato una password
+      NotChanged: Password non modificata
+      NotSupported: Codifica hash password non supportata
     PasswordComplexityPolicy:
       NotFound: Impostazioni di complessità password non trovati
       MinLength: La password è troppo corta
@@ -488,6 +490,16 @@ Errors:
     TokenCreationFailed: creazione del token fallita
     InvalidToken: Il token dell'intento non è valido
     OtherUser: Intento destinato a un altro utente
+  AuthRequest:
+    AlreadyExists: Auth Request esiste già
+    NotExisting: Auth Request non esiste
+    WrongLoginClient: Auth Request creato da un altro client di accesso
+  OIDCSession:
+    RefreshTokenInvalid: Refresh Token non è valido
+    Token:
+      Invalid: Token non è valido
+      Expired: Token è scaduto
+    InvalidClient: Il token non è stato emesso per questo cliente
 
 AggregateTypes:
   action: Azione

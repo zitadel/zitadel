@@ -14,6 +14,29 @@ Tracing:
   Fraction: 1.0 # ZITADEL_TRACING_FRACTION
   MetricPrefix: zitadel # ZITADEL_TRACING_METRICPREFIX
 
+Telemetry:
+  # As long as Enabled is true, ZITADEL tries to send usage data to the configured Telemetry.Endpoints.
+  # Data is projected by ZITADEL even if Enabled is false.
+  # This means that switching this to true makes ZITADEL try to send past data.
+  Enabled: false
+  # Push telemetry data to all these endpoints at least once using an HTTP POST request.
+  # If one endpoint returns an unsuccessful response code or times out,
+  # ZITADEL retries to push the data point to all configured endpoints until it succeeds.
+  # Configure delivery guarantees and intervals in the section Projections.Customizations.Telemetry
+  # The endpoints can be reconfigured at runtime.
+  # Ten redirects are followed.
+  # If you change this configuration at runtime, remaining data that is not successfully delivered to the old endpoints is sent to the new endpoints.
+  Endpoints:
+    - https://httpbin.org/post
+  # These headers are sent with every request to the configured endpoints.
+  Headers:
+  # single-value: "single-value"
+  # multi-value:
+  #   - "multi-value-1"
+  #   - "multi-value-2"
+  # The maximum number of data points that are queried before they are sent to the configured endpoints.
+  Limit: 100 # ZITADEL_TELEMETRY_LIMIT
+
 # Port ZITADEL will listen on
 Port: 8080 # ZITADEL_PORT
 # Port ZITADEL is exposed on, it can differ from port e.g. if you proxy the traffic
@@ -178,13 +201,26 @@ Projections:
       MaxFailureCount: 0 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONS_MAXFAILURECOUNT
     # The NotificationsQuotas projection is used for calling quota webhooks
     NotificationsQuotas:
-      # Delivery guarantee requirements are probably higher for quota webhooks
+      # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
+      # An instance is active, as long as there are projected events on the instance, that are not older than the HandleActiveInstances duration.
+      # Delivery guarantee requirements are higher for quota webhooks
       # Defaults to 45 days
       HandleActiveInstances: 1080h # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_HANDLEACTIVEINSTANCES
       # As quota notification projections don't result in database statements, retries don't have an effect
       MaxFailureCount: 0 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_MAXFAILURECOUNT
       # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the db too much.
       RequeueEvery: 300s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_REQUEUEEVERY
+    # The Telemetry projection is used for calling telemetry webhooks
+    Telemetry:
+      # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
+      # An instance is active, as long as there are projected events on the instance, that are not older than the HandleActiveInstances duration.
+      # Telemetry delivery guarantee requirements are a bit higher than normal data projections, as they are not interactively retryable.
+      # Defaults to 15 days
+      HandleActiveInstances: 360h # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_HANDLEACTIVEINSTANCES
+      # As sending telemetry data doesn't result in database statements, retries don't have any effects
+      MaxFailureCount: 0 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_MAXFAILURECOUNT
+      # Telemetry data synchronization is not time critical. Setting RequeueEvery to 55 minutes doesn't annoy the database too much.
+      RequeueEvery: 3300s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_REQUEUEEVERY
 
 Auth:
   SearchLimit: 1000 # ZITADEL_AUTH_SEARCHLIMIT
@@ -244,6 +280,8 @@ OIDC:
       Path: /oauth/v2/keys # ZITADEL_OIDC_CUSTOMENDPOINTS_KEYS_PATH
     DeviceAuth:
       Path: /oauth/v2/device_authorization # ZITADEL_OIDC_CUSTOMENDPOINTS_DEVICEAUTH_PATH
+  DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
+  DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
 
 SAML:
   ProviderConfig:
@@ -255,12 +293,12 @@ SAML:
       WantAuthRequestsSigned: true # ZITADEL_SAML_PROVIDERCONFIG_IDPCONFIG_WANTAUTHREQUESTSSIGNED
       Endpoints:
     #Organisation:
-    #  Name: ZITADEL
-    #  URL: https://zitadel.com
+    #  Name: ZITADEL # ZITADEL_SAML_PROVIDERCONFIG_ORGANISATION_NAME
+    #  URL: https://zitadel.com # ZITADEL_SAML_PROVIDERCONFIG_ORGANISATION_URL
     #ContactPerson:
-    #  ContactType: "technical"
-    #  Company: ZITADEL
-    #  EmailAddress: hi@zitadel.com
+    #  ContactType: "technical" # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_CONTACTTYPE
+    #  Company: ZITADEL # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_COMPANY
+    #  EmailAddress: hi@zitadel.com # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_EMAILADDRESS
 
 Login:
   LanguageCookieName: zitadel.login.lang # ZITADEL_LOGIN_LANGUAGECOOKIENAME
@@ -331,6 +369,51 @@ SystemDefaults:
     PasswordSaltCost: 14 # ZITADEL_SYSTEMDEFAULTS_SECRETGENERATORS_PASSWORDSALTCOST
     MachineKeySize: 2048 # ZITADEL_SYSTEMDEFAULTS_SECRETGENERATORS_MACHINEKEYSIZE
     ApplicationKeySize: 2048 # ZITADEL_SYSTEMDEFAULTS_SECRETGENERATORS_APPLICATIONKEYSIZE
+  PasswordHasher:
+  # Set hasher configuration for user passwords.
+  # Passwords previously hashed with a different algorithm
+  # or cost are automatically re-hashed using this config,
+  # upon password validation or update.
+    Hasher:
+      Algorithm: "bcrypt" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
+      Cost: 14 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_COST
+
+    # Other supported Hasher configs:
+
+    # Hasher:
+    #   Algorithm: "argon2i" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
+    #   Time: 3 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_TIME
+    #   Memory: 32768 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_MEMORY
+    #   Threads: 4 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_THREADS
+
+    # Hasher:
+    #   Algorithm: "argon2id" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
+    #   Time: 1 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_TIME
+    #   Memory: 65536 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_MEMORY
+    #   Threads: 4 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_THREADS
+
+    # Hasher:
+    #   Algorithm: "scrypt" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
+    #   Cost: 15 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_COST
+    
+    # Verifiers enable the possibility of verifying
+    # passwords that are previously hashed using another
+    # algorithm then the Hasher.
+    # This can be used when migrating from one algorithm to another,
+    # or when importing users with hashed passwords.
+    # There is no need to enable a Verifier of the same algorithm
+    # as the Hasher.
+    #
+    # The format of the encoded hash strings must comply
+    # with https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md
+    # https://passlib.readthedocs.io/en/stable/modular_crypt_format.html
+    #
+    # Supported verifiers: (uncomment to enable)
+    # Verifiers:
+    #   - "argon2" # verifier for both argon2i and argon2id.
+    #   - "bcrypt"
+    #   - "md5"
+    #   - "scrypt"
   Multifactors:
     OTP:
       # If this is empty, the issuer is the requested domain
@@ -505,6 +588,20 @@ DefaultInstance:
       IncludeUpperLetters: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_DOMAINVERIFICATION_INCLUDEUPPERLETTERS
       IncludeDigits: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_DOMAINVERIFICATION_INCLUDEDIGITS
       IncludeSymbols: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_DOMAINVERIFICATION_INCLUDESYMBOLS
+    OTPSMS:
+      Length: 8 # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPSMS_LENGTH
+      Expiry: "5m" # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPSMS_EXPIRY
+      IncludeLowerLetters: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPSMS_INCLUDELOWERLETTERS
+      IncludeUpperLetters: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPSMS_INCLUDEUPPERLETTERS
+      IncludeDigits: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPSMS_INCLUDEDIGITS
+      IncludeSymbols: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPSMS_INCLUDESYMBOLS
+    OTPEmail:
+      Length: 8 # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPEMAIL_LENGTH
+      Expiry: "5m" # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPEMAIL_EXPIRY
+      IncludeLowerLetters: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPEMAIL_INCLUDELOWERLETTERS
+      IncludeUpperLetters: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPEMAIL_INCLUDEUPPERLETTERS
+      IncludeDigits: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPEMAIL_INCLUDEDIGITS
+      IncludeSymbols: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPEMAIL_INCLUDESYMBOLS
   PasswordComplexityPolicy:
     MinLength: 8 # ZITADEL_DEFAULTINSTANCE_PASSWORDCOMPLEXITYPOLICY_MINLENGTH
     HasLowercase: true # ZITADEL_DEFAULTINSTANCE_PASSWORDCOMPLEXITYPOLICY_HASLOWERCASE
@@ -1065,6 +1162,10 @@ InternalAuthZ:
     - Role: "SELF_MANAGEMENT_GLOBAL"
       Permissions:
         - "org.create"
+        - "policy.read"
+        - "user.self.delete"
+    - Role: "ORG_USER_SELF_MANAGER"
+      Permissions:
         - "policy.read"
         - "user.self.delete"
     - Role: "PROJECT_OWNER_GLOBAL"

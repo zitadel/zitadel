@@ -1,0 +1,49 @@
+InitCode:
+  Title: ZITADEL - Inicializar Usuário
+  PreHeader: Inicializar Usuário
+  Subject: Inicializar Usuário
+  Greeting: Olá {{.DisplayName}},
+  Text: Este usuário foi criado no ZITADEL. Use o nome de usuário {{.PreferredLoginName}} para fazer login. Por favor, clique no botão abaixo para finalizar o processo de inicialização. (Código {{.Code}}) Se você não solicitou este e-mail, por favor, ignore-o.
+  ButtonText: Finalizar inicialização
+PasswordReset:
+  Title: ZITADEL - Redefinir senha
+  PreHeader: Redefinir senha
+  Subject: Redefinir senha
+  Greeting: Olá {{.DisplayName}},
+  Text: Recebemos uma solicitação de redefinição de senha. Por favor, use o botão abaixo para redefinir sua senha. (Código {{.Code}}) Se você não solicitou este e-mail, por favor, ignore-o.
+  ButtonText: Redefinir senha
+VerifyEmail:
+  Title: ZITADEL - Verificar e-mail
+  PreHeader: Verificar e-mail
+  Subject: Verificar e-mail
+  Greeting: Olá {{.DisplayName}},
+  Text: Um novo e-mail foi adicionado. Por favor, use o botão abaixo para verificar seu e-mail. (Código {{.Code}}) Se você não adicionou um novo e-mail, por favor, ignore este e-mail.
+  ButtonText: Verificar e-mail
+VerifyPhone:
+  Title: ZITADEL - Verificar telefone
+  PreHeader: Verificar telefone
+  Subject: Verificar telefone
+  Greeting: Olá {{.DisplayName}},
+  Text: Um novo número de telefone foi adicionado. Por favor, use o código a seguir para verificá-lo {{.Code}}
+  ButtonText: Verificar telefone
+DomainClaimed:
+  Title: ZITADEL - Domínio foi reivindicado
+  PreHeader: Alterar e-mail / nome de usuário
+  Subject: Domínio foi reivindicado
+  Greeting: Olá {{.DisplayName}},
+  Text: O domínio {{.Domain}} foi reivindicado por uma organização. Seu usuário atual, {{.Username}}, não faz parte dessa organização. Portanto, você terá que alterar seu e-mail quando fizer o login. Criamos um nome de usuário temporário ({{.TempUsername}}) para este login.
+  ButtonText: Fazer login
+PasswordlessRegistration:
+  Title: ZITADEL - Adicionar Login sem Senha
+  PreHeader: Adicionar Login sem Senha
+  Subject: Adicionar Login sem Senha
+  Greeting: Olá {{.DisplayName}},
+  Text: Recebemos uma solicitação para adicionar um token ou dispositivo para login sem senha. Por favor, use o botão abaixo para adicionar seu token ou dispositivo para login sem senha.
+  ButtonText: Adicionar Login sem Senha
+PasswordChange:
+  Title: ZITADEL - Senha do usuário foi alterada
+  PreHeader: Alterar senha
+  Subject: Senha do usuário foi alterada
+  Greeting: Olá {{.DisplayName}},
+  Text: A senha do seu usuário foi alterada. Se esta alteração não foi feita por você, recomendamos que você redefina sua senha imediatamente.
+  ButtonText: Fazer login

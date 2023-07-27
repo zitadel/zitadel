@@ -4,14 +4,15 @@ package session_test
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
@@ -20,11 +21,10 @@ import (
 )
 
 var (
-	CTX               context.Context
-	Tester            *integration.Tester
-	Client            session.SessionServiceClient
-	User              *user.AddHumanUserResponse
-	GenericOAuthIDPID string
+	CTX    context.Context
+	Tester *integration.Tester
+	Client session.SessionServiceClient
+	User   *user.AddHumanUserResponse
 )
 
 func TestMain(m *testing.M) {
@@ -36,38 +36,24 @@ func TestMain(m *testing.M) {
 		defer Tester.Done()
 		Client = Tester.Client.SessionV2
 
-		CTX, _ = Tester.WithSystemAuthorization(ctx, integration.OrgOwner), errCtx
+		CTX, _ = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
 		User = Tester.CreateHumanUser(CTX)
+		Tester.SetUserPassword(CTX, User.GetUserId(), integration.UserPassword)
 		Tester.RegisterUserPasskey(CTX, User.GetUserId())
 		return m.Run()
 	}())
 }
 
-func verifyCurrentSession(t testing.TB, id, token string, sequence uint64, window time.Duration, metadata map[string][]byte, factors ...wantFactor) (s *session.Session) {
+func verifyCurrentSession(t testing.TB, id, token string, sequence uint64, window time.Duration, metadata map[string][]byte, factors ...wantFactor) *session.Session {
 	require.NotEmpty(t, id)
 	require.NotEmpty(t, token)
 
-retry:
-	for {
-		resp, err := Client.GetSession(CTX, &session.GetSessionRequest{
-			SessionId:    id,
-			SessionToken: &token,
-		})
-		if err == nil {
-			s = resp.GetSession()
-			break retry
-		}
-		if code := status.Convert(err).Code(); code == codes.NotFound || code == codes.PermissionDenied {
-			select {
-			case <-CTX.Done():
-				t.Fatal(CTX.Err(), err)
-			case <-time.After(time.Second):
-				t.Log("retrying GetSession")
-				continue
-			}
-		}
-		require.NoError(t, err)
-	}
+	resp, err := Client.GetSession(CTX, &session.GetSessionRequest{
+		SessionId:    id,
+		SessionToken: &token,
+	})
+	require.NoError(t, err)
+	s := resp.GetSession()
 
 	assert.Equal(t, id, s.GetId())
 	assert.WithinRange(t, s.GetCreationDate().AsTime(), time.Now().Add(-window), time.Now().Add(window))
@@ -394,4 +380,52 @@ func TestServer_SetSession_flow(t *testing.T) {
 		require.NoError(t, err)
 		verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), time.Minute, nil, wantFactors...)
 	})
+}
+
+func Test_ZITADEL_API_missing_authentication(t *testing.T) {
+	// create new, empty session
+	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{Domain: Tester.Config.ExternalDomain})
+	require.NoError(t, err)
+
+	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("Bearer %s", createResp.GetSessionToken()))
+	sessionResp, err := Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: createResp.GetSessionId()})
+	require.Error(t, err)
+	require.Nil(t, sessionResp)
+}
+
+func Test_ZITADEL_API_missing_mfa(t *testing.T) {
+	id, token, _, _ := Tester.CreatePasswordSession(t, CTX, User.GetUserId(), integration.UserPassword)
+
+	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("Bearer %s", token))
+	sessionResp, err := Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+	require.Error(t, err)
+	require.Nil(t, sessionResp)
+}
+
+func Test_ZITADEL_API_success(t *testing.T) {
+	id, token, _, _ := Tester.CreatePasskeySession(t, CTX, User.GetUserId())
+
+	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("Bearer %s", token))
+	sessionResp, err := Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+	require.NoError(t, err)
+	require.NotNil(t, id, sessionResp.GetSession().GetFactors().GetPasskey().GetVerifiedAt().AsTime())
+}
+
+func Test_ZITADEL_API_session_not_found(t *testing.T) {
+	id, token, _, _ := Tester.CreatePasskeySession(t, CTX, User.GetUserId())
+
+	// test session token works
+	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("Bearer %s", token))
+	_, err := Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+	require.NoError(t, err)
+
+	//terminate the session and test it does not work anymore
+	_, err = Tester.Client.SessionV2.DeleteSession(CTX, &session.DeleteSessionRequest{
+		SessionId:    id,
+		SessionToken: gu.Ptr(token),
+	})
+	require.NoError(t, err)
+	ctx = metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("Bearer %s", token))
+	_, err = Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+	require.Error(t, err)
 }

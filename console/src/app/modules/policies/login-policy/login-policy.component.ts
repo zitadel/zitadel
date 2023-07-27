@@ -152,6 +152,7 @@ export class LoginPolicyComponent implements OnInit {
             mgmtreq.setAllowRegister(this.loginData.allowRegister);
             mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
             mgmtreq.setForceMfa(this.loginData.forceMfa);
+            mgmtreq.setForceMfaLocalOnly(this.loginData.forceMfaLocalOnly);
             mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
             mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
             mgmtreq.setMultiFactorsList(this.loginData.multiFactorsList);
@@ -185,6 +186,7 @@ export class LoginPolicyComponent implements OnInit {
             mgmtreq.setAllowRegister(this.loginData.allowRegister);
             mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
             mgmtreq.setForceMfa(this.loginData.forceMfa);
+            mgmtreq.setForceMfaLocalOnly(this.loginData.forceMfaLocalOnly);
             mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
             mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
             mgmtreq.setDisableLoginWithEmail(this.loginData.disableLoginWithEmail);
@@ -217,6 +219,7 @@ export class LoginPolicyComponent implements OnInit {
           adminreq.setAllowRegister(this.loginData.allowRegister);
           adminreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
           adminreq.setForceMfa(this.loginData.forceMfa);
+          adminreq.setForceMfaLocalOnly(this.loginData.forceMfaLocalOnly);
           adminreq.setPasswordlessType(this.loginData.passwordlessType);
           adminreq.setHidePasswordReset(this.loginData.hidePasswordReset);
           adminreq.setDisableLoginWithEmail(this.loginData.disableLoginWithEmail);

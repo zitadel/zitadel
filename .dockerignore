@@ -1,6 +1,6 @@
-/.git/
+# .git
 .codecov
-/.github/
+.github
 .gitignore
 .dockerignore
 **/Dockerfile
@@ -15,8 +15,14 @@ CONTRIBUTING.md
 LICENSE
 README.md
 SECURITY.md
+**/Dockerfile
+**/*.Dockerfile
 pkg/grpc/*/*.pb.*
 pkg/grpc/*/*.swagger.json
-.goreleaser.yaml
-.artifacts/
+**/.artifacts
+console/.angular
+console/node_modules
+console/src/app/proto/generated/
+console/tmp/
 .vscode
+build/*.Dockerfile

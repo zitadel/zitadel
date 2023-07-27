@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/dop251/goja"
 	"github.com/zitadel/logging"
@@ -17,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/actions/object"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -66,7 +68,7 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 		return nil, err
 	}
 
-	return ClientFromBusiness(client, o.defaultLoginURL, accessTokenLifetime, idTokenLifetime, allowedScopes)
+	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultLoginURLV2, accessTokenLifetime, idTokenLifetime, allowedScopes)
 }
 
 func (o *OPStorage) GetKeyByIDAndClientID(ctx context.Context, keyID, userID string) (_ *jose.JSONWebKey, err error) {
@@ -119,17 +121,25 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo *oidc.UserInfo, tokenID, subject, origin string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
+		token, err := o.query.ActiveAccessTokenByToken(ctx, tokenID)
+		if err != nil {
+			return err
+		}
+		if err = o.isOriginAllowed(ctx, token.ClientID, origin); err != nil {
+			return err
+		}
+		return o.setUserinfo(ctx, userInfo, token.UserID, token.ClientID, token.Scope, nil)
+	}
+
 	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
 	if token.ApplicationID != "" {
-		app, err := o.query.AppByOIDCClientID(ctx, token.ApplicationID, false)
-		if err != nil {
+		if err = o.isOriginAllowed(ctx, token.ApplicationID, origin); err != nil {
 			return err
-		}
-		if origin != "" && !api_http.IsOriginAllowed(app.OIDCConfig.AllowedOrigins, origin) {
-			return errors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
 		}
 	}
 	return o.setUserinfo(ctx, userInfo, token.UserID, token.ApplicationID, token.Scopes, nil)
@@ -153,7 +163,37 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo *oidc.Us
 	return o.setUserinfo(ctx, userInfo, userID, applicationID, scopes, nil)
 }
 
-func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection *oidc.IntrospectionResponse, tokenID, subject, clientID string) error {
+// SetUserinfoFromRequest extends the SetUserinfoFromScopes during the id_token generation.
+// This is required for V2 tokens to be able to set the sessionID (`sid`) claim.
+func (o *OPStorage) SetUserinfoFromRequest(ctx context.Context, userinfo *oidc.UserInfo, request op.IDTokenRequest, _ []string) error {
+	switch t := request.(type) {
+	case *AuthRequestV2:
+		userinfo.AppendClaims("sid", t.SessionID)
+	case *RefreshTokenRequestV2:
+		userinfo.AppendClaims("sid", t.SessionID)
+	}
+	return nil
+}
+
+func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection *oidc.IntrospectionResponse, tokenID, subject, clientID string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
+		token, err := o.query.ActiveAccessTokenByToken(ctx, tokenID)
+		if err != nil {
+			return err
+		}
+		projectID, err := o.query.ProjectIDFromClientID(ctx, clientID, false)
+		if err != nil {
+			return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
+		}
+		return o.introspect(ctx, introspection,
+			tokenID, token.UserID, token.ClientID, projectID,
+			token.Audience, token.Scope,
+			token.AccessTokenCreation, token.AccessTokenExpiration)
+	}
+
 	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
@@ -168,27 +208,10 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 			return errors.ThrowPreconditionFailed(err, "OIDC-AGefw", "Errors.Internal")
 		}
 	}
-	for _, aud := range token.Audience {
-		if aud == clientID || aud == projectID {
-			userInfo := new(oidc.UserInfo)
-			err := o.setUserinfo(ctx, userInfo, subject, clientID, token.Scopes, []string{projectID}) // always
-			if err != nil {
-				return err
-			}
-			introspection.SetUserInfo(userInfo)
-			introspection.Scope = token.Scopes
-			introspection.ClientID = token.ApplicationID
-			introspection.TokenType = oidc.BearerToken
-			introspection.Expiration = oidc.FromTime(token.Expiration)
-			introspection.IssuedAt = oidc.FromTime(token.CreationDate)
-			introspection.NotBefore = oidc.FromTime(token.CreationDate)
-			introspection.Audience = token.Audience
-			introspection.Issuer = op.IssuerFromContext(ctx)
-			introspection.JWTID = token.ID
-			return nil
-		}
-	}
-	return errors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
+	return o.introspect(ctx, introspection,
+		token.ID, token.UserID, token.ApplicationID, projectID,
+		token.Audience, token.Scopes,
+		token.CreationDate, token.Expiration)
 }
 
 func (o *OPStorage) ClientCredentialsTokenRequest(ctx context.Context, clientID string, scope []string) (op.TokenRequest, error) {
@@ -228,6 +251,55 @@ func (o *OPStorage) ClientCredentials(ctx context.Context, clientID, clientSecre
 		id:        clientID,
 		tokenType: accessTokenTypeToOIDC(user.Machine.AccessTokenType),
 	}, nil
+}
+
+// isOriginAllowed checks whether a call by the client to the endpoint is allowed from the provided origin
+// if no origin is provided, no error will be returned
+func (o *OPStorage) isOriginAllowed(ctx context.Context, clientID, origin string) error {
+	if origin == "" {
+		return nil
+	}
+	app, err := o.query.AppByOIDCClientID(ctx, clientID, false)
+	if err != nil {
+		return err
+	}
+	if api_http.IsOriginAllowed(app.OIDCConfig.AllowedOrigins, origin) {
+		return nil
+	}
+	return errors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
+}
+
+func (o *OPStorage) introspect(
+	ctx context.Context,
+	introspection *oidc.IntrospectionResponse,
+	tokenID, subject, clientID, projectID string,
+	audience, scope []string,
+	tokenCreation, tokenExpiration time.Time,
+) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	for _, aud := range audience {
+		if aud == clientID || aud == projectID {
+			userInfo := new(oidc.UserInfo)
+			err = o.setUserinfo(ctx, userInfo, subject, clientID, scope, []string{projectID}) // always
+			if err != nil {
+				return err
+			}
+			introspection.SetUserInfo(userInfo)
+			introspection.Scope = scope
+			introspection.ClientID = clientID
+			introspection.TokenType = oidc.BearerToken
+			introspection.Expiration = oidc.FromTime(tokenExpiration)
+			introspection.IssuedAt = oidc.FromTime(tokenCreation)
+			introspection.NotBefore = oidc.FromTime(tokenCreation)
+			introspection.Audience = audience
+			introspection.Issuer = op.IssuerFromContext(ctx)
+			introspection.JWTID = tokenID
+			return nil
+		}
+	}
+	return errors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
 }
 
 func (o *OPStorage) checkOrgScopes(ctx context.Context, user *query.User, scopes []string) ([]string, error) {

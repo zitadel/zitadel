@@ -15,6 +15,7 @@ const (
 	UserV1PasswordCodeSentType       = userV1PasswordEventTypePrefix + "code.sent"
 	UserV1PasswordCheckSucceededType = userV1PasswordEventTypePrefix + "check.succeeded"
 	UserV1PasswordCheckFailedType    = userV1PasswordEventTypePrefix + "check.failed"
+	UserV1PasswordHashUpdatedType    = userV1PasswordEventTypePrefix + "hash.updated"
 
 	userV1EmailEventTypePrefix        = userEventTypePrefix + "email."
 	UserV1EmailChangedType            = userV1EmailEventTypePrefix + "changed"

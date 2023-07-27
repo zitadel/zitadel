@@ -120,6 +120,8 @@ Errors:
       Empty: La contraseña está vacía
       Invalid: La contraseña no es válida
       NotSet: El usuario no ha establecido una contraseña
+      NotChanged: Contraseña no modificada
+      NotSupported: No se admite la codificación hash de contraseña
     PasswordComplexityPolicy:
       NotFound: Política de contraseñas no encontrada
       MinLength: La contraseña es demasiado corta
@@ -488,6 +490,16 @@ Errors:
     TokenCreationFailed: Fallo en la creación del token
     InvalidToken: El token de la intención no es válido
     OtherUser: Destinado a otro usuario
+  AuthRequest:
+    AlreadyExists: Auth Request ya existe
+    NotExisting: Auth Request no existe
+    WrongLoginClient: Auth Request creado por otro cliente de inicio de sesión
+  OIDCSession:
+    RefreshTokenInvalid: El token de refresco no es válido
+    Token:
+      Invalid: El token no es válido
+      Expired: El token ha caducado
+    InvalidClient: El token no ha sido emitido para este cliente
 
 AggregateTypes:
   action: Acción

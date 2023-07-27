@@ -338,8 +338,8 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.UserProjection.Trigger(ctx)
-		projection.LoginNameProjection.Trigger(ctx)
+		ctx = projection.UserProjection.Trigger(ctx)
+		ctx = projection.LoginNameProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareUserQuery(ctx, q.client)
@@ -367,8 +367,8 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwner
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.UserProjection.Trigger(ctx)
-		projection.LoginNameProjection.Trigger(ctx)
+		ctx = projection.UserProjection.Trigger(ctx)
+		ctx = projection.LoginNameProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareUserQuery(ctx, q.client)
@@ -467,8 +467,8 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		projection.UserProjection.Trigger(ctx)
-		projection.LoginNameProjection.Trigger(ctx)
+		ctx = projection.UserProjection.Trigger(ctx)
+		ctx = projection.LoginNameProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareNotifyUserQuery(ctx, q.client)
@@ -496,8 +496,8 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		projection.UserProjection.Trigger(ctx)
-		projection.LoginNameProjection.Trigger(ctx)
+		ctx = projection.UserProjection.Trigger(ctx)
+		ctx = projection.LoginNameProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareNotifyUserQuery(ctx, q.client)

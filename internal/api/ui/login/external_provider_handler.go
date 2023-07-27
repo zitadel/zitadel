@@ -897,6 +897,10 @@ func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserG
 }
 
 func (l *Login) externalAuthFailed(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, tokens *oidc.Tokens[*oidc.IDTokenClaims], user idp.User, err error) {
+	if authReq == nil {
+		l.renderLogin(w, r, authReq, err)
+		return
+	}
 	if _, _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, tokens, authReq, r, user, err); actionErr != nil {
 		logging.WithError(err).Error("both external user authentication and action post authentication failed")
 	}

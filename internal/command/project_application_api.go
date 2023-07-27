@@ -44,10 +44,11 @@ func (c *Commands) AddAPIAppCommand(app *addAPIApp, clientSecretAlg crypto.HashA
 			}
 
 			if app.AuthMethodType == domain.APIAuthMethodTypeBasic {
-				app.ClientSecret, app.ClientSecretPlain, err = newAppClientSecret(ctx, filter, clientSecretAlg)
+				code, err := c.newAppClientSecret(ctx, filter, clientSecretAlg)
 				if err != nil {
 					return nil, err
 				}
+				app.ClientSecret, app.ClientSecretPlain = code.Crypted, code.Plain
 			}
 
 			return []eventstore.Command{
@@ -243,7 +244,7 @@ func (c *Commands) VerifyAPIClientSecret(ctx context.Context, projectID, appID, 
 
 	projectAgg := ProjectAggregateFromWriteModel(&app.WriteModel)
 	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
-	err = crypto.CompareHash(app.ClientSecret, []byte(secret), c.userPasswordAlg)
+	err = crypto.CompareHash(app.ClientSecret, []byte(secret), c.codeAlg)
 	spanPasswordComparison.EndWithError(err)
 	if err == nil {
 		_, err = c.eventstore.Push(ctx, project_repo.NewAPIConfigSecretCheckSucceededEvent(ctx, projectAgg, app.AppID))
