@@ -23,7 +23,10 @@ const (
 type HumanPasswordChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
+	// New events only use EncodedHash. However, the secret field
+	// is preserved to handle events older than the switch to Passwap.
 	Secret         *crypto.CryptoValue `json:"secret,omitempty"`
+	EncodedHash    string              `json:"encodedHash,omitempty"`
 	ChangeRequired bool                `json:"changeRequired"`
 	UserAgentID    string              `json:"userAgentID,omitempty"`
 }
@@ -39,7 +42,7 @@ func (e *HumanPasswordChangedEvent) UniqueConstraints() []*eventstore.UniqueCons
 func NewHumanPasswordChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	secret *crypto.CryptoValue,
+	encodeHash string,
 	changeRequired bool,
 	userAgentID string,
 ) *HumanPasswordChangedEvent {
@@ -49,7 +52,7 @@ func NewHumanPasswordChangedEvent(
 			aggregate,
 			HumanPasswordChangedType,
 		),
-		Secret:         secret,
+		EncodedHash:    encodeHash,
 		ChangeRequired: changeRequired,
 		UserAgentID:    userAgentID,
 	}
@@ -264,4 +267,45 @@ func HumanPasswordCheckFailedEventMapper(event eventstore.Event) (eventstore.Eve
 	}
 
 	return humanAdded, nil
+}
+
+type HumanPasswordHashUpdatedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	EncodedHash          string `json:"encodedHash,omitempty"`
+}
+
+func (e *HumanPasswordHashUpdatedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *HumanPasswordHashUpdatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *HumanPasswordHashUpdatedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewHumanPasswordHashUpdatedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	encoded string,
+) *HumanPasswordHashUpdatedEvent {
+	return &HumanPasswordHashUpdatedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanPasswordCheckFailedType,
+		),
+		EncodedHash: encoded,
+	}
+}
+
+// SecretOrEncodedHash returns the legacy *crypto.CryptoValue if it is not nil.
+// orherwise it will returns the encoded hash string.
+func SecretOrEncodedHash(secret *crypto.CryptoValue, encoded string) string {
+	if secret != nil {
+		return string(secret.Crypted)
+	}
+	return encoded
 }

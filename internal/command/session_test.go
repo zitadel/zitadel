@@ -140,7 +140,6 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 
 func TestCommands_CreateSession(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
 		idGenerator  id.Generator
 		tokenCreator func(sessionID string) (string, string, error)
 	}
@@ -158,6 +157,7 @@ func TestCommands_CreateSession(t *testing.T) {
 		name   string
 		fields fields
 		args   args
+		expect []expect
 		res    res
 	}{
 		{
@@ -168,6 +168,7 @@ func TestCommands_CreateSession(t *testing.T) {
 			args{
 				ctx: context.Background(),
 			},
+			[]expect{},
 			res{
 				err: caos_errs.ThrowInternal(nil, "id", "generator failed"),
 			},
@@ -176,12 +177,12 @@ func TestCommands_CreateSession(t *testing.T) {
 			"eventstore failed",
 			fields{
 				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
-				eventstore: eventstoreExpect(t,
-					expectFilterError(caos_errs.ThrowInternal(nil, "id", "filter failed")),
-				),
 			},
 			args{
 				ctx: context.Background(),
+			},
+			[]expect{
+				expectFilterError(caos_errs.ThrowInternal(nil, "id", "filter failed")),
 			},
 			res{
 				err: caos_errs.ThrowInternal(nil, "id", "filter failed"),
@@ -191,15 +192,6 @@ func TestCommands_CreateSession(t *testing.T) {
 			"empty session",
 			fields{
 				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
-				eventstore: eventstoreExpect(t,
-					expectFilter(),
-					expectPush(
-						session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, ""),
-						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-							"tokenID",
-						),
-					),
-				),
 				tokenCreator: func(sessionID string) (string, string, error) {
 					return "tokenID",
 						"token",
@@ -208,6 +200,15 @@ func TestCommands_CreateSession(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("", "org1", ""),
+			},
+			[]expect{
+				expectFilter(),
+				expectPush(
+					session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, ""),
+					session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						"tokenID",
+					),
+				),
 			},
 			res{
 				want: &SessionChanged{
@@ -221,15 +222,6 @@ func TestCommands_CreateSession(t *testing.T) {
 			"empty session with domain",
 			fields{
 				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
-				eventstore: eventstoreExpect(t,
-					expectFilter(),
-					expectPush(
-						session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld"),
-						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-							"tokenID",
-						),
-					),
-				),
 				tokenCreator: func(sessionID string) (string, string, error) {
 					return "tokenID",
 						"token",
@@ -239,6 +231,15 @@ func TestCommands_CreateSession(t *testing.T) {
 			args{
 				ctx:    authz.NewMockContext("", "org1", ""),
 				domain: "domain.tld",
+			},
+			[]expect{
+				expectFilter(),
+				expectPush(
+					session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld"),
+					session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						"tokenID",
+					),
+				),
 			},
 			res{
 				want: &SessionChanged{
@@ -253,7 +254,7 @@ func TestCommands_CreateSession(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          eventstoreExpect(t, tt.expect...),
 				idGenerator:         tt.fields.idGenerator,
 				sessionTokenCreator: tt.fields.tokenCreator,
 			}
@@ -428,7 +429,7 @@ func TestCommands_updateSession(t *testing.T) {
 				ctx: context.Background(),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					cmds: []SessionCommand{
+					sessionCommands: []SessionCommand{
 						func(ctx context.Context, cmd *SessionCommands) error {
 							return caos_errs.ThrowInternal(nil, "id", "check failed")
 						},
@@ -448,7 +449,7 @@ func TestCommands_updateSession(t *testing.T) {
 				ctx: context.Background(),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					cmds:              []SessionCommand{},
+					sessionCommands:   []SessionCommand{},
 				},
 			},
 			res{
@@ -485,7 +486,7 @@ func TestCommands_updateSession(t *testing.T) {
 				ctx: context.Background(),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					cmds: []SessionCommand{
+					sessionCommands: []SessionCommand{
 						CheckUser("userID"),
 						CheckPassword("password"),
 					},
@@ -497,12 +498,7 @@ func TestCommands_updateSession(t *testing.T) {
 							),
 							eventFromEventPusher(
 								user.NewHumanPasswordChangedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeHash,
-										Algorithm:  "hash",
-										KeyID:      "",
-										Crypted:    []byte("password"),
-									}, false, ""),
+									"$plain$x$password", false, ""),
 							),
 						),
 					),
@@ -511,7 +507,7 @@ func TestCommands_updateSession(t *testing.T) {
 							"token",
 							nil
 					},
-					userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+					hasher: mockPasswordHasher("x"),
 					now: func() time.Time {
 						return testNow
 					},
@@ -539,7 +535,7 @@ func TestCommands_updateSession(t *testing.T) {
 				ctx: context.Background(),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					cmds: []SessionCommand{
+					sessionCommands: []SessionCommand{
 						CheckUser("userID"),
 						CheckIntent("intent", "aW50ZW50"),
 					},
@@ -578,7 +574,7 @@ func TestCommands_updateSession(t *testing.T) {
 				ctx: context.Background(),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					cmds: []SessionCommand{
+					sessionCommands: []SessionCommand{
 						CheckUser("userID"),
 						CheckIntent("intent", "aW50ZW50"),
 					},
@@ -627,7 +623,7 @@ func TestCommands_updateSession(t *testing.T) {
 				ctx: context.Background(),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					cmds: []SessionCommand{
+					sessionCommands: []SessionCommand{
 						CheckUser("userID"),
 						CheckIntent("intent2", "aW50ZW50"),
 					},
@@ -670,7 +666,7 @@ func TestCommands_updateSession(t *testing.T) {
 				ctx: context.Background(),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					cmds: []SessionCommand{
+					sessionCommands: []SessionCommand{
 						CheckUser("userID"),
 						CheckIntent("intent", "aW50ZW50"),
 					},

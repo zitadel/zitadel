@@ -1,6 +1,8 @@
 Log:
   Level: debug
 
+ExternalSecure: false
+
 TLS:
   Enabled: false
 

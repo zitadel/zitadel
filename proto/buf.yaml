@@ -10,3 +10,28 @@ breaking:
 lint:
   use:
     - MINIMAL
+  ignore:
+    - zitadel/action.proto
+    - zitadel/admin.proto
+    - zitadel/app.proto
+    - zitadel/auth_n_key.proto
+    - zitadel/auth.proto
+    - zitadel/change.proto
+    - zitadel/event.proto
+    - zitadel/idp.proto
+    - zitadel/instance.proto
+    - zitadel/management.proto
+    - zitadel/member.proto
+    - zitadel/message.proto
+    - zitadel/metadata.proto
+    - zitadel/object.proto
+    - zitadel/options.proto
+    - zitadel/org.proto
+    - zitadel/policy.proto
+    - zitadel/project.proto
+    - zitadel/quota.proto
+    - zitadel/settings.proto
+    - zitadel/system.proto
+    - zitadel/text.proto
+    - zitadel/user.proto
+    - zitadel/v1.proto

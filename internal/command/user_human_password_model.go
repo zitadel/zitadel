@@ -13,7 +13,7 @@ import (
 type HumanPasswordWriteModel struct {
 	eventstore.WriteModel
 
-	Secret               *crypto.CryptoValue
+	EncodedHash          string
 	SecretChangeRequired bool
 
 	Code                     *crypto.CryptoValue
@@ -37,11 +37,11 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
-			wm.Secret = e.Secret
+			wm.EncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			wm.SecretChangeRequired = e.ChangeRequired
 			wm.UserState = domain.UserStateActive
 		case *user.HumanRegisteredEvent:
-			wm.Secret = e.Secret
+			wm.EncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			wm.SecretChangeRequired = e.ChangeRequired
 			wm.UserState = domain.UserStateActive
 		case *user.HumanInitialCodeAddedEvent:
@@ -49,7 +49,7 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 		case *user.HumanInitializedCheckSucceededEvent:
 			wm.UserState = domain.UserStateActive
 		case *user.HumanPasswordChangedEvent:
-			wm.Secret = e.Secret
+			wm.EncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			wm.SecretChangeRequired = e.ChangeRequired
 			wm.Code = nil
 			wm.PasswordCheckFailedCount = 0
@@ -69,6 +69,8 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 			wm.PasswordCheckFailedCount = 0
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
+		case *user.HumanPasswordHashUpdatedEvent:
+			wm.EncodedHash = e.EncodedHash
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -98,7 +100,8 @@ func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserV1PasswordCodeAddedType,
 			user.UserV1EmailVerifiedType,
 			user.UserV1PasswordCheckFailedType,
-			user.UserV1PasswordCheckSucceededType).
+			user.UserV1PasswordCheckSucceededType,
+			user.UserV1PasswordHashUpdatedType).
 		Builder()
 
 	if wm.ResourceOwner != "" {

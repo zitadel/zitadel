@@ -180,6 +180,23 @@ func (t *TokenView) appendPATRemoved(event eventstore.Event) error {
 	return nil
 }
 
+func (t *TokenView) GetRelevantEventTypes() []eventstore.EventType {
+	return []eventstore.EventType{
+		user_repo.UserTokenAddedType,
+		user_repo.PersonalAccessTokenAddedType,
+		user_repo.UserTokenRemovedType,
+		user_repo.HumanRefreshTokenRemovedType,
+		user_repo.UserV1SignedOutType,
+		user_repo.HumanSignedOutType,
+		user_repo.UserRemovedType,
+		user_repo.UserDeactivatedType,
+		user_repo.UserLockedType,
+		user_repo.UserLockedType,
+		user_repo.UserReactivatedType,
+		user_repo.PersonalAccessTokenRemovedType,
+	}
+}
+
 func eventToMap(event eventstore.Event) (map[string]interface{}, error) {
 	m := make(map[string]interface{})
 	if err := event.Unmarshal(&m); err != nil {

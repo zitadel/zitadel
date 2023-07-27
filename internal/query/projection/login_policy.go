@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	LoginPolicyTable = "projections.login_policies4"
+	LoginPolicyTable = "projections.login_policies5"
 
 	LoginPolicyIDCol                    = "aggregate_id"
 	LoginPolicyInstanceIDCol            = "instance_id"
@@ -25,6 +25,7 @@ const (
 	LoginPolicyAllowUsernamePasswordCol = "allow_username_password"
 	LoginPolicyAllowExternalIDPsCol     = "allow_external_idps"
 	LoginPolicyForceMFACol              = "force_mfa"
+	LoginPolicyForceMFALocalOnlyCol     = "force_mfa_local_only"
 	LoginPolicy2FAsCol                  = "second_factors"
 	LoginPolicyMFAsCol                  = "multi_factors"
 	LoginPolicyPasswordlessTypeCol      = "passwordless_type"
@@ -65,6 +66,7 @@ func (*loginPolicyProjection) Init() *old_handler.Check {
 			handler.NewColumn(LoginPolicyAllowUsernamePasswordCol, handler.ColumnTypeBool),
 			handler.NewColumn(LoginPolicyAllowExternalIDPsCol, handler.ColumnTypeBool),
 			handler.NewColumn(LoginPolicyForceMFACol, handler.ColumnTypeBool),
+			handler.NewColumn(LoginPolicyForceMFALocalOnlyCol, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(LoginPolicy2FAsCol, handler.ColumnTypeEnumArray, handler.Nullable()),
 			handler.NewColumn(LoginPolicyMFAsCol, handler.ColumnTypeEnumArray, handler.Nullable()),
 			handler.NewColumn(LoginPolicyPasswordlessTypeCol, handler.ColumnTypeEnum),
@@ -186,6 +188,7 @@ func (p *loginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 		handler.NewCol(LoginPolicyAllowUsernamePasswordCol, policyEvent.AllowUserNamePassword),
 		handler.NewCol(LoginPolicyAllowExternalIDPsCol, policyEvent.AllowExternalIDP),
 		handler.NewCol(LoginPolicyForceMFACol, policyEvent.ForceMFA),
+		handler.NewCol(LoginPolicyForceMFALocalOnlyCol, policyEvent.ForceMFALocalOnly),
 		handler.NewCol(LoginPolicyPasswordlessTypeCol, policyEvent.PasswordlessType),
 		handler.NewCol(LoginPolicyIsDefaultCol, isDefault),
 		handler.NewCol(LoginPolicyHidePWResetCol, policyEvent.HidePasswordReset),
@@ -228,6 +231,9 @@ func (p *loginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 	}
 	if policyEvent.ForceMFA != nil {
 		cols = append(cols, handler.NewCol(LoginPolicyForceMFACol, *policyEvent.ForceMFA))
+	}
+	if policyEvent.ForceMFALocalOnly != nil {
+		cols = append(cols, handler.NewCol(LoginPolicyForceMFALocalOnlyCol, *policyEvent.ForceMFALocalOnly))
 	}
 	if policyEvent.PasswordlessType != nil {
 		cols = append(cols, handler.NewCol(LoginPolicyPasswordlessTypeCol, *policyEvent.PasswordlessType))

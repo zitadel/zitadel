@@ -120,6 +120,8 @@ Errors:
       Empty: 密码为空
       Invalid: 密码无效
       NotSet: 用户未设置密码
+      NotChanged: 密码未更改
+      NotSupported: 不支持密码哈希编码
     PasswordComplexityPolicy:
       NotFound: 未找到密码策略
       MinLength: 密码太短
@@ -488,6 +490,16 @@ Errors:
     TokenCreationFailed: 令牌创建失败
     InvalidToken: 意图令牌是无效的
     OtherUser: 意图是为另一个用户准备的
+  AuthRequest:
+    AlreadyExists: AuthRequest已经存在
+    NotExisting: AuthRequest不存在
+    WrongLoginClient: 其他登录客户端创建的AuthRequest
+  OIDCSession:
+    RefreshTokenInvalid: Refresh Token 无效
+    Token:
+      Invalid: 令牌无效
+      Expired: 令牌已过期
+    InvalidClient: 没有为该客户发放令牌
 
 AggregateTypes:
   action: 动作

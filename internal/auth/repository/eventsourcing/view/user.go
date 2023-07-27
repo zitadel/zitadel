@@ -98,7 +98,7 @@ func (v *View) userByID(ctx context.Context, instanceID string, queries ...query
 		user = new(model.UserView)
 	}
 
-	query, err := view.UserByIDQuery(queriedUser.ID, instanceID, user.ChangeDate)
+	query, err := view.UserByIDQuery(queriedUser.ID, instanceID, user.ChangeDate, user.EventTypes())
 	if err != nil {
 		return nil, err
 	}

@@ -379,7 +379,7 @@ func (u *UserView) setPasswordData(event eventstore.Event) error {
 		logging.Log("MODEL-sdw4r").WithError(err).Error("could not unmarshal event data")
 		return errors.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
-	u.PasswordSet = password.Secret != nil
+	u.PasswordSet = password.Secret != nil || password.EncodedHash != ""
 	u.PasswordInitRequired = !u.PasswordSet
 	u.PasswordChangeRequired = password.ChangeRequired
 	u.PasswordChanged = event.CreatedAt()
@@ -531,5 +531,61 @@ func (u *UserView) SetEmptyUserType() {
 		u.MachineView = nil
 	} else {
 		u.HumanView = nil
+	}
+}
+
+func (u *UserView) EventTypes() []eventstore.EventType {
+	return []eventstore.EventType{
+		user.MachineAddedEventType,
+		user.UserV1AddedType,
+		user.UserV1RegisteredType,
+		user.HumanRegisteredType,
+		user.HumanAddedType,
+		user.UserRemovedType,
+		user.UserV1PasswordChangedType,
+		user.HumanPasswordChangedType,
+		user.HumanPasswordlessTokenAddedType,
+		user.HumanPasswordlessTokenVerifiedType,
+		user.HumanPasswordlessTokenRemovedType,
+		user.UserV1ProfileChangedType,
+		user.HumanProfileChangedType,
+		user.UserV1AddressChangedType,
+		user.HumanAddressChangedType,
+		user.MachineChangedEventType,
+		user.UserDomainClaimedType,
+		user.UserUserNameChangedType,
+		user.UserV1EmailChangedType,
+		user.HumanEmailChangedType,
+		user.UserV1EmailVerifiedType,
+		user.HumanEmailVerifiedType,
+		user.UserV1PhoneChangedType,
+		user.HumanPhoneChangedType,
+		user.UserV1PhoneVerifiedType,
+		user.HumanPhoneVerifiedType,
+		user.UserV1PhoneRemovedType,
+		user.HumanPhoneRemovedType,
+		user.UserDeactivatedType,
+		user.UserReactivatedType,
+		user.UserUnlockedType,
+		user.UserLockedType,
+		user.UserV1MFAOTPAddedType,
+		user.HumanMFAOTPAddedType,
+		user.UserV1MFAOTPVerifiedType,
+		user.HumanMFAOTPVerifiedType,
+		user.UserV1MFAOTPRemovedType,
+		user.HumanMFAOTPRemovedType,
+		user.HumanU2FTokenAddedType,
+		user.HumanU2FTokenVerifiedType,
+		user.HumanU2FTokenRemovedType,
+		user.UserV1MFAInitSkippedType,
+		user.HumanMFAInitSkippedType,
+		user.UserV1InitialCodeAddedType,
+		user.HumanInitialCodeAddedType,
+		user.UserV1InitializedCheckSucceededType,
+		user.HumanInitializedCheckSucceededType,
+		user.HumanAvatarAddedType,
+		user.HumanAvatarRemovedType,
+		user.HumanPasswordlessInitCodeAddedType,
+		user.HumanPasswordlessInitCodeRequestedType,
 	}
 }

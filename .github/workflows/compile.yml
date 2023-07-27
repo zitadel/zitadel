@@ -1,0 +1,99 @@
+name: Compile
+
+on:
+  workflow_call:
+    inputs:
+      go_version:
+        required: true
+        type: string
+      core_cache_key:
+        required: true
+        type: string
+      core_cache_path:
+        required: true
+        type: string
+      console_cache_key:
+        required: true
+        type: string
+      console_cache_path:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+
+jobs:
+  executable:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        goos: [linux, darwin, windows]
+        goarch: [amd64, arm64]
+    
+    steps:
+    - 
+      uses: actions/checkout@v3
+    - 
+      uses: actions/cache/restore@v3
+      timeout-minutes: 1
+      name: restore console
+      with:
+        path: ${{ inputs.console_cache_path }}
+        key: ${{ inputs.console_cache_key }}
+        fail-on-cache-miss: true
+    - 
+      uses: actions/cache/restore@v3
+      timeout-minutes: 1
+      name: restore core
+      with:
+        path: ${{ inputs.core_cache_path }}
+        key: ${{ inputs.core_cache_key }}
+        fail-on-cache-miss: true
+    -
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ inputs.go_version }}
+    - 
+      name: compile
+      timeout-minutes: 5
+      run: |
+        GOOS="${{matrix.goos}}" \
+        GOARCH="${{matrix.goarch}}" \
+        VERSION="${{ inputs.version }}" \
+        COMMIT_SHA="${{ github.sha }}" \
+        make compile_pipeline
+    -
+      name: create folder
+      run: |
+        mkdir zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
+        mv zitadel zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
+        cp LICENSE zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
+        cp README.md zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
+        tar -cvf zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
+    - 
+      uses: actions/upload-artifact@v3
+      with:
+        name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
+        path: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar
+  
+  checksums:
+    runs-on: ubuntu-latest
+    needs: executable
+    steps:
+    - 
+      uses: actions/download-artifact@v3
+      with:
+        path: executables
+    - 
+      name: move files one folder up
+      run: mv */*.tar . && find . -type d -empty -delete
+      working-directory: executables
+    -
+      run: sha256sum * > checksums.txt
+      working-directory: executables
+    - 
+      uses: actions/upload-artifact@v3
+      with:
+        name: checksums.txt
+        path: executables/checksums.txt

@@ -39,12 +39,12 @@ func (repo *UserRepo) UserSessionUserIDsByAgentID(ctx context.Context, agentID s
 	return userIDs, nil
 }
 
-func (repo *UserRepo) UserEventsByID(ctx context.Context, id string, changeDate time.Time) ([]eventstore.Event, error) {
-	return repo.getUserEvents(ctx, id, changeDate)
+func (repo *UserRepo) UserEventsByID(ctx context.Context, id string, changeDate time.Time, eventTypes []eventstore.EventType) ([]eventstore.Event, error) {
+	return repo.getUserEvents(ctx, id, changeDate, eventTypes)
 }
 
-func (r *UserRepo) getUserEvents(ctx context.Context, userID string, changeDate time.Time) ([]eventstore.Event, error) {
-	query, err := usr_view.UserByIDQuery(userID, authz.GetInstance(ctx).InstanceID(), changeDate)
+func (r *UserRepo) getUserEvents(ctx context.Context, userID string, changeDate time.Time, eventTypes []eventstore.EventType) ([]eventstore.Event, error) {
+	query, err := usr_view.UserByIDQuery(userID, authz.GetInstance(ctx).InstanceID(), changeDate, eventTypes)
 	if err != nil {
 		return nil, err
 	}

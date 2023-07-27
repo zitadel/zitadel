@@ -79,10 +79,26 @@ func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, generatorTyp
 	if err != nil {
 		return nil, err
 	}
-	if generatorWriteModel.State == domain.SecretGeneratorStateUnspecified || generatorWriteModel.State == domain.SecretGeneratorStateRemoved {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-3n9ls", "Errors.SecretGenerator.NotFound")
-	}
 	instanceAgg := InstanceAggregateFromWriteModel(&generatorWriteModel.WriteModel)
+	if generatorWriteModel.State == domain.SecretGeneratorStateUnspecified || generatorWriteModel.State == domain.SecretGeneratorStateRemoved {
+		err = c.pushAppendAndReduce(ctx, generatorWriteModel,
+			instance.NewSecretGeneratorAddedEvent(
+				ctx,
+				instanceAgg,
+				generatorType,
+				config.Length,
+				config.Expiry,
+				config.IncludeLowerLetters,
+				config.IncludeUpperLetters,
+				config.IncludeDigits,
+				config.IncludeSymbols,
+			),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return writeModelToObjectDetails(&generatorWriteModel.WriteModel), nil
+	}
 
 	changedEvent, hasChanged, err := generatorWriteModel.NewChangedEvent(
 		ctx,
@@ -100,12 +116,7 @@ func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, generatorTyp
 	if !hasChanged {
 		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-m0o3f", "Errors.NoChangesFound")
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(generatorWriteModel, pushedEvents...)
-	if err != nil {
+	if err = c.pushAppendAndReduce(ctx, generatorWriteModel, changedEvent); err != nil {
 		return nil, err
 	}
 	return writeModelToObjectDetails(&generatorWriteModel.WriteModel), nil

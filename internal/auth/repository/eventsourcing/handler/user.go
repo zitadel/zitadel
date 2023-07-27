@@ -371,7 +371,7 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler2.Statement, err e
 			if !errors.IsNotFound(err) {
 				return nil, err
 			}
-			user, err = u.userFromEventstore(event.Aggregate())
+			user, err = u.userFromEventstore(event.Aggregate(), user.EventTypes())
 			if err != nil {
 				return nil, err
 			}
@@ -384,7 +384,7 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler2.Statement, err e
 			if !errors.IsNotFound(err) {
 				return nil, err
 			}
-			user, err = u.userFromEventstore(event.Aggregate())
+			user, err = u.userFromEventstore(event.Aggregate(), user.EventTypes())
 			if err != nil {
 				return nil, err
 			}
@@ -538,8 +538,8 @@ func (u *User) loginNameInformation(ctx context.Context, orgID string, instanceI
 	return policy.UserLoginMustBeDomain, org.GetPrimaryDomain().Domain, org.Domains, nil
 }
 
-func (u *User) userFromEventstore(agg *eventstore.Aggregate) (*view_model.UserView, error) {
-	query, err := usr_view.UserByIDQuery(agg.ID, agg.InstanceID, time.Time{})
+func (u *User) userFromEventstore(agg *eventstore.Aggregate, eventTypes []eventstore.EventType) (*view_model.UserView, error) {
+	query, err := usr_view.UserByIDQuery(agg.ID, agg.InstanceID, time.Time{}, eventTypes)
 	if err != nil {
 		return nil, err
 	}

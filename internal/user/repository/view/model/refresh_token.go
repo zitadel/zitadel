@@ -153,3 +153,14 @@ func (t *RefreshTokenView) appendRenewedEvent(event eventstore.Event) error {
 func (t *RefreshTokenView) appendRemovedEvent(event eventstore.Event) {
 	t.Expiration = event.CreatedAt()
 }
+
+func (t *RefreshTokenView) GetRelevantEventTypes() []eventstore.EventType {
+	return []eventstore.EventType{
+		user_repo.HumanRefreshTokenAddedType,
+		user_repo.HumanRefreshTokenRenewedType,
+		user_repo.HumanRefreshTokenRemovedType,
+		user_repo.UserRemovedType,
+		user_repo.UserDeactivatedType,
+		user_repo.UserLockedType,
+	}
+}

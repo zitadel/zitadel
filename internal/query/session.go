@@ -42,6 +42,7 @@ type Session struct {
 
 type SessionUserFactor struct {
 	UserID        string
+	ResourceOwner string
 	UserCheckedAt time.Time
 	LoginName     string
 	DisplayName   string
@@ -229,6 +230,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			SessionColumnUserCheckedAt.identifier(),
 			LoginNameNameCol.identifier(),
 			HumanDisplayNameCol.identifier(),
+			UserResourceOwnerCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
 			SessionColumnIntentCheckedAt.identifier(),
 			SessionColumnPasskeyCheckedAt.identifier(),
@@ -236,7 +238,8 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			SessionColumnToken.identifier(),
 		).From(sessionsTable.identifier()).
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
-			LeftJoin(join(HumanUserIDCol, SessionColumnUserID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(HumanUserIDCol, SessionColumnUserID)).
+			LeftJoin(join(UserIDCol, SessionColumnUserID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*Session, string, error) {
 			session := new(Session)
 
@@ -245,6 +248,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				userCheckedAt     sql.NullTime
 				loginName         sql.NullString
 				displayName       sql.NullString
+				userResourceOwner sql.NullString
 				passwordCheckedAt sql.NullTime
 				intentCheckedAt   sql.NullTime
 				passkeyCheckedAt  sql.NullTime
@@ -266,6 +270,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&userCheckedAt,
 				&loginName,
 				&displayName,
+				&userResourceOwner,
 				&passwordCheckedAt,
 				&intentCheckedAt,
 				&passkeyCheckedAt,
@@ -285,6 +290,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session.UserFactor.UserCheckedAt = userCheckedAt.Time
 			session.UserFactor.LoginName = loginName.String
 			session.UserFactor.DisplayName = displayName.String
+			session.UserFactor.ResourceOwner = userResourceOwner.String
 			session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
 			session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
 			session.PasskeyFactor.PasskeyCheckedAt = passkeyCheckedAt.Time
@@ -308,6 +314,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			SessionColumnUserCheckedAt.identifier(),
 			LoginNameNameCol.identifier(),
 			HumanDisplayNameCol.identifier(),
+			UserResourceOwnerCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
 			SessionColumnIntentCheckedAt.identifier(),
 			SessionColumnPasskeyCheckedAt.identifier(),
@@ -315,7 +322,8 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			countColumn.identifier(),
 		).From(sessionsTable.identifier()).
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
-			LeftJoin(join(HumanUserIDCol, SessionColumnUserID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(HumanUserIDCol, SessionColumnUserID)).
+			LeftJoin(join(UserIDCol, SessionColumnUserID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) (*Sessions, error) {
 			sessions := &Sessions{Sessions: []*Session{}}
 
@@ -327,6 +335,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					userCheckedAt     sql.NullTime
 					loginName         sql.NullString
 					displayName       sql.NullString
+					userResourceOwner sql.NullString
 					passwordCheckedAt sql.NullTime
 					intentCheckedAt   sql.NullTime
 					passkeyCheckedAt  sql.NullTime
@@ -347,6 +356,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&userCheckedAt,
 					&loginName,
 					&displayName,
+					&userResourceOwner,
 					&passwordCheckedAt,
 					&intentCheckedAt,
 					&passkeyCheckedAt,
@@ -362,6 +372,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session.UserFactor.UserCheckedAt = userCheckedAt.Time
 				session.UserFactor.LoginName = loginName.String
 				session.UserFactor.DisplayName = displayName.String
+				session.UserFactor.ResourceOwner = userResourceOwner.String
 				session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
 				session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
 				session.PasskeyFactor.PasskeyCheckedAt = passkeyCheckedAt.Time

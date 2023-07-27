@@ -1,0 +1,153 @@
+name: Integration test core
+
+on: 
+  workflow_call:
+    inputs:
+      go_version:
+        required: true
+        type: string
+      core_cache_key:
+        required: true
+        type: string
+      core_cache_path:
+        required: true
+        type: string
+
+jobs:
+  postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: zitadel
+          PGUSER: zitadel
+          POSTGRES_DB: zitadel
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --health-start-period 10s
+    steps:
+      - 
+        uses: actions/checkout@v3
+      -
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ inputs.go_version }}
+      - 
+        uses: actions/cache/restore@v3
+        timeout-minutes: 1
+        name: restore core
+        id: restore-core
+        with:
+          path: ${{ inputs.core_cache_path }}
+          key: ${{ inputs.core_cache_key }}
+          fail-on-cache-miss: true
+      -
+        id: go-cache-path
+        name: set cache path
+        run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
+      - 
+        uses: actions/cache/restore@v3
+        id: cache
+        timeout-minutes: 1
+        name: restore previous results
+        with:
+          key: integration-test-postgres-${{ inputs.core_cache_key }}
+          restore-keys: |
+            integration-test-postgres-core-
+          path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
+      - 
+        name: test
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        env:
+          ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
+          INTEGRATION_DB_FLAVOR: postgres
+        run: make core_integration_test
+      - 
+        name: publish coverage
+        uses: codecov/codecov-action@v3.1.4
+        with:
+          file: profile.cov
+          name: core-integration-tests-postgres
+          flags: core-integration-tests-postgres
+      - 
+        uses: actions/cache/save@v3
+        name: cache results
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        with:
+          key: integration-test-postgres-${{ inputs.core_cache_key }}
+          path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
+
+  # TODO: enable as soon as cockroach allows `COCKROACH_ARGS`
+  # cockroach:
+  #   runs-on: ubuntu-latest
+  #   services:
+  #     cockroach:
+  #       image: cockroachdb/cockroach:latest
+  #       ports:
+  #         - 26257:26257
+  #         - 9090:9090
+  #       env:
+  #         COCKROACH_ARGS: start-single-node --insecure --http-addr :9090
+  #       options: >-
+  #         --health-cmd "curl http://localhost:9090/health?ready=1 || exit 1"
+  #         --health-interval 10s
+  #         --health-timeout 5s
+  #         --health-retries 5
+  #         --health-start-period 10s
+  #   steps:
+  #     - 
+  #       uses: actions/checkout@v3
+  #     -
+  #       uses: actions/setup-go@v4
+  #       with:
+  #         go-version: ${{ inputs.go_version }}
+  #     - 
+  #       uses: actions/cache/restore@v3
+  #       timeout-minutes: 1
+  #       name: restore core
+  #       with:
+  #         path: ${{ inputs.core_cache_path }}
+  #         key: ${{ inputs.core_cache_key }}
+  #         fail-on-cache-miss: true
+  #     -
+  #       id: go-cache-path
+  #       name: set cache path
+  #       run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
+  #     - 
+  #       uses: actions/cache/restore@v3
+  #       timeout-minutes: 1
+  #       name: restore previous results
+  #       cache: id
+  #       with:
+  #         key: integration-test-crdb-${{ inputs.core_cache_key }}
+  #         restore-keys: |
+  #           integration-test-crdb-core-
+  #         path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
+  #     - 
+  #       name: test
+  #       if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+  #       env:
+  #         ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
+  #         INTEGRATION_DB_FLAVOR: cockroach
+  #       run: make core_integration_test
+  #     - 
+  #       name: publish coverage
+  #       uses: codecov/codecov-action@v3.1.4
+  #       with:
+  #         file: profile.cov
+  #         name: core-integration-tests-cockroach
+  #         flags: core-integration-tests-cockroach
+  #     - 
+  #       uses: actions/cache/save@v3
+  #       name: cache results
+  #       if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+  #       with:
+  #         key: integration-test-crdb-${{ inputs.core_cache_key }}
+  #         path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}

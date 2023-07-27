@@ -1,0 +1,23 @@
+package domain
+
+type OIDCErrorReason int32
+
+const (
+	OIDCErrorReasonUnspecified OIDCErrorReason = iota
+	OIDCErrorReasonInvalidRequest
+	OIDCErrorReasonUnauthorizedClient
+	OIDCErrorReasonAccessDenied
+	OIDCErrorReasonUnsupportedResponseType
+	OIDCErrorReasonInvalidScope
+	OIDCErrorReasonServerError
+	OIDCErrorReasonTemporaryUnavailable
+	OIDCErrorReasonInteractionRequired
+	OIDCErrorReasonLoginRequired
+	OIDCErrorReasonAccountSelectionRequired
+	OIDCErrorReasonConsentRequired
+	OIDCErrorReasonInvalidRequestURI
+	OIDCErrorReasonInvalidRequestObject
+	OIDCErrorReasonRequestNotSupported
+	OIDCErrorReasonRequestURINotSupported
+	OIDCErrorReasonRegistrationNotSupported
+)

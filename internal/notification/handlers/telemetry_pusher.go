@@ -125,14 +125,6 @@ func (t *telemetryPusher) pushMilestones(event eventstore.Event) (*handler.State
 
 func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.ScheduledEvent, ms *query.Milestone) error {
 	ctx = authz.WithInstanceID(ctx, ms.InstanceID)
-	alreadyHandled, err := t.queries.IsAlreadyHandled(ctx, event, map[string]interface{}{"type": ms.Type.String()}, milestone.AggregateType, milestone.PushedEventType)
-	if err != nil {
-		return err
-	}
-	if alreadyHandled {
-		return nil
-	}
-
 	for _, endpoint := range t.cfg.Endpoints {
 		if err := types.SendJSON(
 			ctx,

@@ -48,10 +48,6 @@ func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 			return nil, err
 		}
 	}
-	bcryptedPassword, err := hashedPasswordToCommand(req.GetHashedPassword())
-	if err != nil {
-		return nil, err
-	}
 	passwordChangeRequired := req.GetPassword().GetChangeRequired() || req.GetHashedPassword().GetChangeRequired()
 	metadata := make([]*command.AddMetadataEntry, len(req.Metadata))
 	for i, metadataEntry := range req.Metadata {
@@ -85,7 +81,7 @@ func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 		Gender:                 genderToDomain(req.GetProfile().GetGender()),
 		Phone:                  command.Phone{}, // TODO: add as soon as possible
 		Password:               req.GetPassword().GetPassword(),
-		BcryptedPassword:       bcryptedPassword,
+		EncodedPasswordHash:    req.GetHashedPassword().GetHash(),
 		PasswordChangeRequired: passwordChangeRequired,
 		Passwordless:           false,
 		Register:               false,
@@ -107,17 +103,6 @@ func genderToDomain(gender user.Gender) domain.Gender {
 	default:
 		return domain.GenderUnspecified
 	}
-}
-
-func hashedPasswordToCommand(hashed *user.HashedPassword) (string, error) {
-	if hashed == nil {
-		return "", nil
-	}
-	// we currently only handle bcrypt
-	if hashed.GetAlgorithm() != "bcrypt" {
-		return "", errors.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.InvalidArgument")
-	}
-	return hashed.GetHash(), nil
 }
 
 func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_ *user.AddIDPLinkResponse, err error) {

@@ -196,3 +196,37 @@ func avatarKeyFromEvent(event eventstore.Event) (string, error) {
 	}
 	return data["storeKey"], nil
 }
+
+func (v *UserSessionView) EventTypes() []eventstore.EventType {
+	return []eventstore.EventType{
+		user.UserV1PasswordCheckSucceededType,
+		user.HumanPasswordCheckSucceededType,
+		user.UserIDPLoginCheckSucceededType,
+		user.HumanPasswordlessTokenCheckSucceededType,
+		user.HumanPasswordlessTokenCheckFailedType,
+		user.HumanPasswordlessTokenRemovedType,
+		user.UserV1PasswordCheckFailedType,
+		user.HumanPasswordCheckFailedType,
+		user.UserV1PasswordChangedType,
+		user.HumanPasswordChangedType,
+		user.HumanMFAOTPVerifiedType,
+		user.UserV1MFAOTPCheckSucceededType,
+		user.HumanMFAOTPCheckSucceededType,
+		user.UserV1MFAOTPCheckFailedType,
+		user.UserV1MFAOTPRemovedType,
+		user.HumanMFAOTPCheckFailedType,
+		user.HumanMFAOTPRemovedType,
+		user.HumanU2FTokenCheckFailedType,
+		user.HumanU2FTokenRemovedType,
+		user.HumanU2FTokenVerifiedType,
+		user.HumanU2FTokenCheckSucceededType,
+		user.UserV1SignedOutType,
+		user.HumanSignedOutType,
+		user.UserLockedType,
+		user.UserDeactivatedType,
+		user.UserIDPLinkRemovedType,
+		user.UserIDPLinkCascadeRemovedType,
+		user.HumanAvatarAddedType,
+		user.HumanAvatarRemovedType,
+	}
+}

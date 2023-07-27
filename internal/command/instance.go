@@ -48,6 +48,8 @@ type InstanceSetup struct {
 		PasswordVerificationCode *crypto.GeneratorConfig
 		PasswordlessInitCode     *crypto.GeneratorConfig
 		DomainVerification       *crypto.GeneratorConfig
+		OTPSMS                   *crypto.GeneratorConfig
+		OTPEmail                 *crypto.GeneratorConfig
 	}
 	PasswordComplexityPolicy struct {
 		MinLength    uint64
@@ -70,6 +72,7 @@ type InstanceSetup struct {
 		AllowRegister              bool
 		AllowExternalIDP           bool
 		ForceMFA                   bool
+		ForceMFALocalOnly          bool
 		HidePasswordReset          bool
 		IgnoreUnknownUsername      bool
 		AllowDomainDiscovery       bool
@@ -198,6 +201,8 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordResetCode, setup.SecretGenerators.PasswordVerificationCode),
 		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordlessInitCode, setup.SecretGenerators.PasswordlessInitCode),
 		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyDomain, setup.SecretGenerators.DomainVerification),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeOTPSMS, setup.SecretGenerators.OTPSMS),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeOTPEmail, setup.SecretGenerators.OTPEmail),
 
 		prepareAddDefaultPasswordComplexityPolicy(
 			instanceAgg,
@@ -224,6 +229,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LoginPolicy.AllowRegister,
 			setup.LoginPolicy.AllowExternalIDP,
 			setup.LoginPolicy.ForceMFA,
+			setup.LoginPolicy.ForceMFALocalOnly,
 			setup.LoginPolicy.HidePasswordReset,
 			setup.LoginPolicy.IgnoreUnknownUsername,
 			setup.LoginPolicy.AllowDomainDiscovery,
@@ -333,7 +339,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	} else if setup.Org.Human != nil {
 		setup.Org.Human.ID = userID
 		validations = append(validations,
-			c.AddHumanCommand(setup.Org.Human, orgID, c.userPasswordAlg, c.userEncryption, true),
+			c.AddHumanCommand(setup.Org.Human, orgID, c.userPasswordHasher, c.userEncryption, true),
 		)
 	}
 

@@ -120,6 +120,8 @@ Errors:
       Empty: Passwort ist leer
       Invalid: Passwort ungültig
       NotSet: Benutzer hat kein Passwort gesetzt
+      NotChanged: Passwort nicht geändert
+      NotSupported: Passwort-Hash-Kodierung wird nicht unterstützt
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
       MinLength: Passwort ist zu kurz
@@ -488,6 +490,16 @@ Errors:
     TokenCreationFailed: Tokenerstellung schlug fehl
     InvalidToken: Intent Token ist ungültig
     OtherUser: Intent ist für anderen Benutzer gedacht
+  AuthRequest:
+    AlreadyExists: Auth Request existiert bereits
+    NotExisting: Auth Request existiert nicht
+    WrongLoginClient: Auth Request wurde von einem anderen Login-Client erstellt
+  OIDCSession:
+    RefreshTokenInvalid: Refresh Token ist ungültig
+    Token:
+      Invalid: Token ist ungültig
+      Expired: Token ist abgelaufen
+    InvalidClient: Token wurde nicht für diesen Client ausgestellt
 
 AggregateTypes:
   action: Action

@@ -2,8 +2,10 @@ package command
 
 import (
 	"context"
+	"errors"
 
 	"github.com/zitadel/logging"
+	"github.com/zitadel/passwap"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -13,80 +15,75 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) SetPassword(ctx context.Context, orgID, userID, passwordString string, oneTime bool) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password string, oneTime bool) (objectDetails *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.IDMissing")
 	}
-	existingPassword, err := c.passwordWriteModel(ctx, userID, orgID)
+	wm, err := c.passwordWriteModel(ctx, userID, orgID)
 	if err != nil {
 		return nil, err
 	}
-	if !existingPassword.UserState.Exists() {
+	if !wm.UserState.Exists() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M0fs", "Errors.User.NotFound")
 	}
-	if err = c.checkPermission(ctx, domain.PermissionUserWrite, existingPassword.ResourceOwner, userID); err != nil {
+	if err = c.checkPermission(ctx, domain.PermissionUserWrite, wm.ResourceOwner, userID); err != nil {
 		return nil, err
 	}
-	password := &domain.Password{
-		SecretString:   passwordString,
-		ChangeRequired: oneTime,
-	}
-	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
-	passwordEvent, err := c.changePassword(ctx, "", password, userAgg, existingPassword)
-	if err != nil {
-		return nil, err
-	}
-	pushedEvents, err := c.eventstore.Push(ctx, passwordEvent)
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(existingPassword, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-	return writeModelToObjectDetails(&existingPassword.WriteModel), nil
+	return c.setPassword(ctx, wm, password, oneTime)
 }
 
-func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID, code, passwordString, userAgentID string) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID, code, password, userAgentID string) (objectDetails *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M9fs", "Errors.IDMissing")
 	}
-	if passwordString == "" {
+	if password == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Mf0sd", "Errors.User.Password.Empty")
 	}
-	existingCode, err := c.passwordWriteModel(ctx, userID, orgID)
+	wm, err := c.passwordWriteModel(ctx, userID, orgID)
 	if err != nil {
 		return nil, err
 	}
 
-	if existingCode.Code == nil || existingCode.UserState == domain.UserStateUnspecified || existingCode.UserState == domain.UserStateDeleted {
+	if wm.Code == nil || wm.UserState == domain.UserStateUnspecified || wm.UserState == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.Code.NotFound")
 	}
 
-	err = crypto.VerifyCodeWithAlgorithm(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, c.userEncryption)
+	err = crypto.VerifyCodeWithAlgorithm(wm.CodeCreationDate, wm.CodeExpiry, wm.Code, code, c.userEncryption)
 	if err != nil {
 		return nil, err
 	}
 
-	password := &domain.Password{
-		SecretString:   passwordString,
-		ChangeRequired: false,
-	}
-	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
-	passwordEvent, err := c.changePassword(ctx, userAgentID, password, userAgg, existingCode)
+	return c.setPassword(ctx, wm, password, false)
+}
+
+func (c *Commands) setPassword(ctx context.Context, wm *HumanPasswordWriteModel, password string, changeRequired bool) (objectDetails *domain.ObjectDetails, err error) {
+	command, err := c.setPasswordCommand(ctx, wm, password, changeRequired)
 	if err != nil {
 		return nil, err
 	}
-	err = c.pushAppendAndReduce(ctx, existingCode, passwordEvent)
+	err = c.pushAppendAndReduce(ctx, wm, command)
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToObjectDetails(&existingCode.WriteModel), nil
+	return writeModelToObjectDetails(&wm.WriteModel), nil
+}
+
+func (c *Commands) setPasswordCommand(ctx context.Context, wm *HumanPasswordWriteModel, password string, changeRequired bool) (_ eventstore.Command, err error) {
+	if err = c.canUpdatePassword(ctx, password, wm); err != nil {
+		return nil, err
+	}
+	ctx, span := tracing.NewNamedSpan(ctx, "passwap.Hash")
+	encoded, err := c.userPasswordHasher.Hash(password)
+	span.EndWithError(err)
+	if err = convertPasswapErr(err); err != nil {
+		return nil, err
+	}
+	return user.NewHumanPasswordChangedEvent(ctx, UserAggregateFromWriteModel(&wm.WriteModel), encoded, changeRequired, ""), nil
 }
 
 func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword, userAgentID string) (objectDetails *domain.ObjectDetails, err error) {
@@ -99,59 +96,50 @@ func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPasswor
 	if oldPassword == "" || newPassword == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Empty")
 	}
-	existingPassword, err := c.passwordWriteModel(ctx, userID, orgID)
+	wm, err := c.passwordWriteModel(ctx, userID, orgID)
 	if err != nil {
 		return nil, err
 	}
-	if existingPassword.Secret == nil {
+	if wm.EncodedHash == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Fds3s", "Errors.User.Password.Empty")
 	}
-	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
-	err = crypto.CompareHash(existingPassword.Secret, []byte(oldPassword), c.userPasswordAlg)
-	spanPasswordComparison.EndWithError(err)
-
-	if err != nil {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Invalid")
-	}
-	password := &domain.Password{
-		SecretString:   newPassword,
-		ChangeRequired: false,
+	if err = c.canUpdatePassword(ctx, newPassword, wm); err != nil {
+		return nil, err
 	}
 
-	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
-	command, err := c.changePassword(ctx, userAgentID, password, userAgg, existingPassword)
+	ctx, spanPasswap := tracing.NewNamedSpan(ctx, "passwap.VerifyAndUpdate")
+	updated, err := c.userPasswordHasher.VerifyAndUpdate(wm.EncodedHash, oldPassword, newPassword)
+	spanPasswap.EndWithError(err)
+	if err = convertPasswapErr(err); err != nil {
+		return nil, err
+	}
+	err = c.pushAppendAndReduce(ctx, wm,
+		user.NewHumanPasswordChangedEvent(ctx, UserAggregateFromWriteModel(&wm.WriteModel), updated, false, userAgentID))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, command)
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(existingPassword, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-	return writeModelToObjectDetails(&existingPassword.WriteModel), nil
+	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
 
-func (c *Commands) changePassword(ctx context.Context, userAgentID string, password *domain.Password, userAgg *eventstore.Aggregate, existingPassword *HumanPasswordWriteModel) (event eventstore.Command, err error) {
+func (c *Commands) canUpdatePassword(ctx context.Context, newPassword string, wm *HumanPasswordWriteModel) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-G8dh3", "Errors.User.Password.NotFound")
+	if wm.UserState == domain.UserStateUnspecified || wm.UserState == domain.UserStateDeleted {
+		return caos_errs.ThrowNotFound(nil, "COMMAND-G8dh3", "Errors.User.Password.NotFound")
 	}
-	if existingPassword.UserState == domain.UserStateInitial {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-M9dse", "Errors.User.NotInitialised")
+	if wm.UserState == domain.UserStateInitial {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-M9dse", "Errors.User.NotInitialised")
 	}
-	pwPolicy, err := c.getOrgPasswordComplexityPolicy(ctx, userAgg.ResourceOwner)
+	policy, err := c.getOrgPasswordComplexityPolicy(ctx, wm.ResourceOwner)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	if err := password.HashPasswordIfExisting(pwPolicy, c.userPasswordAlg); err != nil {
-		return nil, err
+
+	if err := policy.Check(newPassword); err != nil {
+		return err
 	}
-	return user.NewHumanPasswordChangedEvent(ctx, userAgg, password.SecretCrypto, password.ChangeRequired, userAgentID), nil
+	return nil
 }
 
 func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner string, notifyType domain.NotificationType, passwordVerificationCode crypto.Generator) (objectDetails *domain.ObjectDetails, err error) {
@@ -238,37 +226,44 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-Dft32", "Errors.Org.LoginPolicy.UsernamePasswordNotAllowed")
 	}
 
-	existingPassword, err := c.passwordWriteModel(ctx, userID, orgID)
+	wm, err := c.passwordWriteModel(ctx, userID, orgID)
 	if err != nil {
 		return err
 	}
-	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
+	if wm.UserState == domain.UserStateUnspecified || wm.UserState == domain.UserStateDeleted {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.NotFound")
 	}
 
-	if existingPassword.Secret == nil {
+	if wm.EncodedHash == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.Password.NotSet")
 	}
 
-	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
-	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
-	err = crypto.CompareHash(existingPassword.Secret, []byte(password), c.userPasswordAlg)
+	userAgg := UserAggregateFromWriteModel(&wm.WriteModel)
+	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
+	updated, err := c.userPasswordHasher.Verify(wm.EncodedHash, password)
 	spanPasswordComparison.EndWithError(err)
+	err = convertPasswapErr(err)
+
+	commands := make([]eventstore.Command, 0, 2)
 	if err == nil {
-		_, err = c.eventstore.Push(ctx, user.NewHumanPasswordCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+		commands = append(commands, user.NewHumanPasswordCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+		if updated != "" {
+			commands = append(commands, user.NewHumanPasswordHashUpdatedEvent(ctx, userAgg, updated))
+		}
+		_, err = c.eventstore.Push(ctx, commands...)
 		return err
 	}
-	events := make([]eventstore.Command, 0)
-	events = append(events, user.NewHumanPasswordCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+
+	commands = append(commands, user.NewHumanPasswordCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 	if lockoutPolicy != nil && lockoutPolicy.MaxPasswordAttempts > 0 {
-		if existingPassword.PasswordCheckFailedCount+1 >= lockoutPolicy.MaxPasswordAttempts {
-			events = append(events, user.NewUserLockedEvent(ctx, userAgg))
+		if wm.PasswordCheckFailedCount+1 >= lockoutPolicy.MaxPasswordAttempts {
+			commands = append(commands, user.NewUserLockedEvent(ctx, userAgg))
 		}
 
 	}
-	_, err = c.eventstore.Push(ctx, events...)
-	logging.Log("COMMAND-9fj7s").OnError(err).Error("error create password check failed event")
-	return caos_errs.ThrowInvalidArgument(nil, "COMMAND-452ad", "Errors.User.Password.Invalid")
+	_, pushErr := c.eventstore.Push(ctx, commands...)
+	logging.OnError(pushErr).Error("error create password check failed event")
+	return err
 }
 
 func (c *Commands) passwordWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *HumanPasswordWriteModel, err error) {
@@ -281,4 +276,17 @@ func (c *Commands) passwordWriteModel(ctx context.Context, userID, resourceOwner
 		return nil, err
 	}
 	return writeModel, nil
+}
+
+func convertPasswapErr(err error) error {
+	if err == nil {
+		return nil
+	}
+	if errors.Is(err, passwap.ErrPasswordMismatch) {
+		return caos_errs.ThrowInvalidArgument(err, "COMMAND-3M0fs", "Errors.User.Password.Invalid")
+	}
+	if errors.Is(err, passwap.ErrPasswordNoChange) {
+		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-Aesh5", "Errors.User.Password.NotChanged")
+	}
+	return caos_errs.ThrowInternal(err, "COMMAND-CahN2", "Errors.Internal")
 }

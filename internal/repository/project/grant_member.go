@@ -106,7 +106,7 @@ func NewProjectGrantMemberChangedEvent(
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			GrantMemberAddedType,
+			GrantMemberChangedType,
 		),
 		UserID:  userID,
 		GrantID: grantID,

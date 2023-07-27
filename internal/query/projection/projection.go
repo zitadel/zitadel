@@ -66,6 +66,7 @@ var (
 	TelemetryPusherProjection           interface{}
 	DeviceAuthProjection                *handler.Handler
 	SessionProjection                   *handler.Handler
+	AuthRequestProjection               *handler.Handler
 	MilestoneProjection                 *handler.Handler
 )
 
@@ -135,6 +136,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	NotificationPolicyProjection = newNotificationPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["notification_policies"]))
 	DeviceAuthProjection = newDeviceAuthProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["device_auth"]))
 	SessionProjection = newSessionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["sessions"]))
+	AuthRequestProjection = newAuthRequestProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["auth_requests"]))
 	MilestoneProjection = newMilestoneProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["milestones"]), systemUsers)
 	newProjectionsList()
 	return nil
@@ -233,6 +235,7 @@ func newProjectionsList() {
 		NotificationPolicyProjection,
 		DeviceAuthProjection,
 		SessionProjection,
+		AuthRequestProjection,
 		MilestoneProjection,
 	}
 }

@@ -392,6 +392,79 @@ func TestServer_AddHumanUser(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "hashed password",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organisation: &object.Organisation{
+						Org: &object.Organisation_OrgId{
+							OrgId: Tester.Organisation.ID,
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						FirstName:         "Donald",
+						LastName:          "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_HashedPassword{
+						HashedPassword: &user.HashedPassword{
+							Hash: "$2y$12$hXUrnqdq1RIIYZ2HPytIIe5lXdIvbhqrTvdPsSF7o.jFh817Z6lwm",
+						},
+					},
+				},
+			},
+			want: &user.AddHumanUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+		{
+			name: "unsupported hashed password",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organisation: &object.Organisation{
+						Org: &object.Organisation_OrgId{
+							OrgId: Tester.Organisation.ID,
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						FirstName:         "Donald",
+						LastName:          "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_HashedPassword{
+						HashedPassword: &user.HashedPassword{
+							Hash: "$scrypt$ln=16,r=8,p=1$cmFuZG9tc2FsdGlzaGFyZA$Rh+NnJNo1I6nRwaNqbDm6kmADswD1+7FTKZ7Ln9D8nQ",
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for i, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -540,7 +613,7 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 					ResourceOwner: Tester.Organisation.ID,
 				},
 				NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{
-					AuthUrl: "https://example.com/oauth/v2/authorize?client_id=clientID&prompt=select_account&redirect_uri=https%3A%2F%2Flocalhost%3A8080%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=",
+					AuthUrl: "https://example.com/oauth/v2/authorize?client_id=clientID&prompt=select_account&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=",
 				},
 			},
 			wantErr: false,

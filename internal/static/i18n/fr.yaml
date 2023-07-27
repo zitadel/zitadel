@@ -120,6 +120,8 @@ Errors:
       Empty: Le mot de passe est vide
       Invalid: Le mot de passe n'est pas valide
       NotSet: L'utilisateur n'a pas défini de mot de passe
+      NotChanged: Mot de passe non modifié
+      NotSupported: Encodage de hachage de mot de passe non pris en charge
     PasswordComplexityPolicy:
       NotFound: Politique de mot de passe non trouvée
       MinLength: Le mot de passe est trop court
@@ -488,6 +490,16 @@ Errors:
     TokenCreationFailed: La création du token a échoué
     InvalidToken: Le jeton d'intention n'est pas valide
     OtherUser: Intention destinée à un autre utilisateur
+  AuthRequest:
+    AlreadyExists: Auth Request existe déjà
+    NotExisting: Auth Request n'existe pas
+    WrongLoginClient: Auth Request créé par un autre client de connexion
+  OIDCSession:
+    RefreshTokenInvalid: Le jeton de rafraîchissement n'est pas valide
+    Token:
+      Invalid: Le jeton n'est pas valide
+      Expired: Le jeton est expiré
+    InvalidClient: Le token n'a pas été émis pour ce client
 
 AggregateTypes:
   action: Action

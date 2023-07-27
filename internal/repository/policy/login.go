@@ -22,6 +22,7 @@ type LoginPolicyAddedEvent struct {
 	AllowRegister              bool                    `json:"allowRegister,omitempty"`
 	AllowExternalIDP           bool                    `json:"allowExternalIdp,omitempty"`
 	ForceMFA                   bool                    `json:"forceMFA,omitempty"`
+	ForceMFALocalOnly          bool                    `json:"forceMFALocalOnly,omitempty"`
 	HidePasswordReset          bool                    `json:"hidePasswordReset,omitempty"`
 	IgnoreUnknownUsernames     bool                    `json:"ignoreUnknownUsernames,omitempty"`
 	AllowDomainDiscovery       bool                    `json:"allowDomainDiscovery,omitempty"`
@@ -50,6 +51,7 @@ func NewLoginPolicyAddedEvent(
 	allowRegister,
 	allowExternalIDP,
 	forceMFA,
+	forceMFALocalOnly,
 	hidePasswordReset,
 	ignoreUnknownUsernames,
 	allowDomainDiscovery,
@@ -69,6 +71,7 @@ func NewLoginPolicyAddedEvent(
 		AllowRegister:              allowRegister,
 		AllowUserNamePassword:      allowUserNamePassword,
 		ForceMFA:                   forceMFA,
+		ForceMFALocalOnly:          forceMFALocalOnly,
 		PasswordlessType:           passwordlessType,
 		HidePasswordReset:          hidePasswordReset,
 		IgnoreUnknownUsernames:     ignoreUnknownUsernames,
@@ -104,6 +107,7 @@ type LoginPolicyChangedEvent struct {
 	AllowRegister              *bool                    `json:"allowRegister,omitempty"`
 	AllowExternalIDP           *bool                    `json:"allowExternalIdp,omitempty"`
 	ForceMFA                   *bool                    `json:"forceMFA,omitempty"`
+	ForceMFALocalOnly          *bool                    `json:"forceMFALocalOnly,omitempty"`
 	HidePasswordReset          *bool                    `json:"hidePasswordReset,omitempty"`
 	IgnoreUnknownUsernames     *bool                    `json:"ignoreUnknownUsernames,omitempty"`
 	AllowDomainDiscovery       *bool                    `json:"allowDomainDiscovery,omitempty"`
@@ -165,6 +169,12 @@ func ChangeAllowExternalIDP(allowExternalIDP bool) func(*LoginPolicyChangedEvent
 func ChangeForceMFA(forceMFA bool) func(*LoginPolicyChangedEvent) {
 	return func(e *LoginPolicyChangedEvent) {
 		e.ForceMFA = &forceMFA
+	}
+}
+
+func ChangeForceMFALocalOnly(forceMFALocalOnly bool) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.ForceMFALocalOnly = &forceMFALocalOnly
 	}
 }
 

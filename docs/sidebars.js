@@ -185,6 +185,14 @@ module.exports = {
         },
         {
           type: "category",
+          label: "Role management",
+          collapsed: true,
+          items: [
+            "guides/integrate/retrieve-user-roles"
+          ],
+        },
+        {
+          type: "category",
           label: "Build your own login UI",
           link: {
             type: "generated-index",
@@ -225,6 +233,7 @@ module.exports = {
             "guides/integrate/identity-providers/gitlab",
             "guides/integrate/identity-providers/ldap",
             "guides/integrate/identity-providers/openldap",
+            "guides/integrate/identity-providers/migrate",
             "guides/integrate/identity-providers/google-oidc",
             "guides/integrate/identity-providers/azuread-oidc",
           ],
@@ -483,6 +492,20 @@ module.exports = {
               "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
           },
           items: require("./docs/apis/resources/session_service/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "OIDC lifecycle (Alpha)",
+          link: {
+            type: "generated-index",
+            title: "OIDC service API (Alpha)",
+            slug: "/apis/resources/oidc_service",
+            description:
+              "Get OIDC Auth Request details and create callback URLs.\n"+
+              "\n"+
+              "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+          },
+          items: require("./docs/apis/resources/oidc_service/sidebar.js"),
         },
         {
           type: "category",
