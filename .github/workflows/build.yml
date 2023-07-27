@@ -74,18 +74,20 @@ jobs:
     uses: ./.github/workflows/container.yml
     with:
       image_name: 'ghcr.io/zitadel/zitadel'
+      build_image_name: 'ghcr.io/zitadel/test'
+      image_push: ${{ github.event_name == 'workflow_dispatch' }}
 
   e2e:
     uses: ./.github/workflows/e2e.yml
     needs: [container]
     with:
-      image: ${{ needs.container.outputs.image }}-debug
+      image: ${{ needs.container.outputs.build_image }}-debug
 
   release:
     uses: ./.github/workflows/release.yml
     needs: [version, core-unit-test, core-integration-test, lint, container, e2e]
     # TODO: trigger release on workflow_dispatch if: ${{ github.event_name == 'workflow_dispatch' }}
-    if: ${{ needs.version.outputs.published == 'true' }}
+    if: ${{ needs.version.outputs.published == 'true' && github.event_name == 'workflow_dispatch' }}
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
     with:
