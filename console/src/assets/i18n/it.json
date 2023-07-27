@@ -1311,7 +1311,9 @@
         "verifiedPhone": "Telefono verificato",
         "changedate": "Cambia data",
         "username": "Nome utente",
-        "tempUsername": "Nome utente temporaneo"
+        "tempUsername": "Nome utente temporaneo",
+        "otp": "Password monouso",
+        "verifyUrl": "URL per verificare la password monouso"
       },
       "TOAST": {
         "UPDATED": "Testi personalizzati salvati."

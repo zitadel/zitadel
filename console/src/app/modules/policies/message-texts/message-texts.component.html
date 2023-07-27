@@ -37,8 +37,8 @@
     [chips]="chips[currentType]"
     [disabled]="(canWrite$ | async) === false"
     label="one"
-    [default$]="getDefaultInitMessageTextMap$"
-    [current$]="getCustomInitMessageTextMap$"
+    [default$]="getDefaultMessageTextMap$"
+    [current$]="getCustomMessageTextMap$"
     (changedValues)="updateCurrentValues($event)"
   ></cnsl-edit-text>
 </div>
@@ -46,7 +46,7 @@
 <div class="message-text-actions">
   <button
     class="reset-button"
-    *ngIf="(getCustomInitMessageTextMap$ | async) && (getCustomInitMessageTextMap$ | async)?.['isDefault'] === false"
+    *ngIf="(getCustomMessageTextMap$ | async) && (getCustomMessageTextMap$ | async)?.['isDefault'] === false"
     [disabled]="(canWrite$ | async) === false"
     (click)="resetDefault()"
     color="message-text-warn"

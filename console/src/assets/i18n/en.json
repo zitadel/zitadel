@@ -1292,6 +1292,8 @@
         "INIT": "Initialization",
         "VE": "Verify Email",
         "VP": "Verify Phone",
+        "VSO": "Verify SMS OTP",
+        "VEO": "Verify Email OTP",
         "PR": "Password Reset",
         "DC": "Domain Claim",
         "PL": "Passwordless",
@@ -1312,7 +1314,9 @@
         "verifiedPhone": "Verified phone",
         "changedate": "Change date",
         "username": "Username",
-        "tempUsername": "Temp username"
+        "tempUsername": "Temp username",
+        "otp": "One-time password",
+        "verifyUrl": "Verify One-time-password URL"
       },
       "TOAST": {
         "UPDATED": "Custom Texts saved."

@@ -1312,7 +1312,9 @@
         "verifiedPhone": "Telefone verificado",
         "changedate": "Data de alteração",
         "username": "Nome de usuário",
-        "tempUsername": "Nome de usuário temporário"
+        "tempUsername": "Nome de usuário temporário",
+        "otp": "Senha de uso único",
+        "verifyUrl": "URL para verificar a senha de uso único"
       },
       "TOAST": {
         "UPDATED": "Textos personalizados salvos."

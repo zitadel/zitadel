@@ -1311,7 +1311,9 @@
         "verifiedPhone": "Zweryfikowany telefon",
         "changedate": "Data zmiany",
         "username": "Nazwa użytkownika",
-        "tempUsername": "Tymczasowa nazwa użytkownika"
+        "tempUsername": "Tymczasowa nazwa użytkownika",
+        "otp": "Hasło jednorazowe",
+        "verifyUrl": "URL do weryfikacji hasła jednorazowego"
       },
       "TOAST": {
         "UPDATED": "Teksty niestandardowe zapisane."

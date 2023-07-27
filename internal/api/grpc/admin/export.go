@@ -152,12 +152,12 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 			return nil, err
 		}
 
-		org.VerifySMSOTPMessages, err = s.getCustomVerifySMSOTPMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
+		org.VerifySmsOtpMessages, err = s.getCustomVerifySMSOTPMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
 		if err != nil {
 			return nil, err
 		}
 
-		org.VerifyEmailOTPMessages, err = s.getCustomVerifyEmailOTPMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
+		org.VerifyEmailOtpMessages, err = s.getCustomVerifyEmailOTPMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
 		if err != nil {
 			return nil, err
 		}

@@ -1307,7 +1307,9 @@
         "verifiedPhone": "認証済みの電話番号",
         "changedate": "変更日",
         "username": "ユーザー名",
-        "tempUsername": "一時ユーザー名"
+        "tempUsername": "一時ユーザー名",
+        "otp": "ワンタイムパスワード",
+        "verifyUrl": "ワンタイムパスワードを確認するURL"
       },
       "TOAST": {
         "UPDATED": "カスタムテキストが保存されました。"
