@@ -27,18 +27,18 @@ VerifyPhone:
   Text: Eine Telefonnummer wurde hinzugefügt. Bitte verifiziere diese in dem du folgenden Code eingibst&lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; 
   ButtonText: Telefon verifizieren
 VerifyEmailOTP:
-  Title: "ZITADEL - Einmalpasswort verifizieren"
-  PreHeader: "Einmalpasswort verifizieren"
-  Subject: "Einmalpasswort verifizieren"
-  Greeting: "Hallo {{.FirstName}} {{.LastName}},"
-  Text: "Bitte nutzen Sie den 'Authentifizieren'-Button oder kopieren Sie das Einmalpasswort {{.OTP}} und fügen Sie es in den Authentifizierungsbildschirm ein, um sich innerhalb der nächsten fünf Minuten bei ZITADEL zu authentifizieren."
-  ButtonText: "Authentifizieren"
+  Title: ZITADEL - Einmalpasswort verifizieren
+  PreHeader: Einmalpasswort verifizieren
+  Subject: Einmalpasswort verifizieren
+  Greeting: Hallo {{.FirstName}} {{.LastName}},
+  Text: Bitte nutze den 'Authentifizieren'-Button oder kopiere das Einmalpasswort {{.OTP}} und füge es in den Authentifizierungsbildschirm ein, um dich innerhalb der nächsten fünf Minuten bei ZITADEL zu authentifizieren.
+  ButtonText: Authentifizieren
 VerifySMSOTP:
-  Title: "ZITADEL - Einmalpasswort verifizieren"
-  PreHeader: "Einmalpasswort verifizieren"
-  Subject: "Einmalpasswort verifizieren"
-  Greeting: "Hallo {{.FirstName}} {{.LastName}},"
-  Text: "Bitte besuchen Sie {{ .VerifyURL }} oder kopieren Sie das Einmalpasswort {{.OTP}} und fügen Sie es in den Authentifizierungsbildschirm ein, um sich innerhalb der nächsten fünf Minuten bei ZITADEL zu authentifizieren."
+  Title: ZITADEL - Einmalpasswort verifizieren
+  PreHeader: Einmalpasswort verifizieren
+  Subject: Einmalpasswort verifizieren
+  Greeting: Hallo {{.FirstName}} {{.LastName}},
+  Text: Bitte besuche {{ .VerifyURL }} oder kopiere das Einmalpasswort {{.OTP}} und füge es in den Authentifizierungsbildschirm ein, um dich innerhalb der nächsten fünf Minuten bei ZITADEL zu authentifizieren.
 DomainClaimed:
   Title: ZITADEL - Domain wurde beansprucht
   PreHeader: Email / Username ändern

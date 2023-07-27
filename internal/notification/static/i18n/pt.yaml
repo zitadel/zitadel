@@ -27,18 +27,18 @@ VerifyPhone:
   Text: Um novo número de telefone foi adicionado. Por favor, use o código a seguir para verificá-lo {{.Code}}
   ButtonText: Verificar telefone
 VerifyEmailOTP:
-  Title: "ZITADEL - Verifique a senha de uso único"
-  PreHeader: "Verifique a senha de uso único"
-  Subject: "Verifique a senha de uso único"
-  Greeting: "Olá {{.FirstName}} {{.LastName}},"
-  Text: "Por favor, use o botão 'Autenticar' ou copie a senha de uso único {{.OTP}} e cole-a na tela de autenticação para se autenticar no ZITADEL nos próximos cinco minutos."
-  ButtonText: "Autenticar"
+  Title: ZITADEL - Verifica a senha de uso único
+  PreHeader: Verifica a senha de uso único
+  Subject: Verifica a senha de uso único
+  Greeting: Olá {{.FirstName}} {{.LastName}},
+  Text: Por favor, usa o botão 'Autenticar' ou copia a senha de uso único {{.OTP}} e cola-a na tela de autenticação para te autenticares no ZITADEL nos próximos cinco minutos.
+  ButtonText: Autenticar
 VerifySMSOTP:
-  Title: "ZITADEL - Verifique a senha de uso único"
-  PreHeader: "Verifique a senha de uso único"
-  Subject: "Verifique a senha de uso único"
-  Greeting: "Olá {{.FirstName}} {{.LastName}},"
-  Text: "Por favor, visite {{ .VerifyURL }} ou copie a senha de uso único {{.OTP}} e cole-a na tela de autenticação para se autenticar no ZITADEL nos próximos cinco minutos."
+  Title: ZITADEL - Verifica a senha de uso único
+  PreHeader: Verifica a senha de uso único
+  Subject: Verifica a senha de uso único
+  Greeting: Olá {{.FirstName}} {{.LastName}},
+  Text: Por favor, visita {{ .VerifyURL }} ou copia a senha de uso único {{.OTP}} e cola-a na tela de autenticação para te autenticares no ZITADEL nos próximos cinco minutos.
 DomainClaimed:
   Title: ZITADEL - Domínio foi reivindicado
   PreHeader: Alterar e-mail / nome de usuário

@@ -27,18 +27,18 @@ VerifyPhone:
   Text: 新しい電話番号が追加されました。次のコードを使用してを認証してください {{.Code}}
   ButtonText: 電話番号を認証
 VerifyEmailOTP:
-  Title: "ZITADEL - ワンタイムパスワードを確認する"
-  PreHeader: "ワンタイムパスワードを確認する"
-  Subject: "ワンタイムパスワードを確認する"
-  Greeting: "こんにちは、{{.FirstName}} {{.LastName}}さん、"
-  Text: "「認証」ボタンを使用するか、ワンタイムパスワード {{.OTP}} をコピーして認証画面に貼り付けて、次の5分間でZITADELで認証してください。"
-  ButtonText: "認証"
+  Title: ZITADEL - ワンタイムパスワードを確認する
+  PreHeader: ワンタイムパスワードを確認する
+  Subject: ワンタイムパスワードを確認する
+  Greeting: こんにちは、{{.FirstName}} {{.LastName}}さん
+  Text: '認証'ボタンを使用するか、ワンタイムパスワード {{.OTP}} をコピーして認証画面に貼り付け、次の5分以内にZITADELで認証してください。
+  ButtonText: 認証
 VerifySMSOTP:
-  Title: "ZITADEL - ワンタイムパスワードを確認する"
-  PreHeader: "ワンタイムパスワードを確認する"
-  Subject: "ワンタイムパスワードを確認する"
-  Greeting: "こんにちは、{{.FirstName}} {{.LastName}}さん、"
-  Text: "{{ .VerifyURL }} を訪問するか、ワンタイムパスワード {{.OTP}} をコピーして認証画面に貼り付けて、次の5分間でZITADELで認証してください。"
+  Title: ZITADEL - ワンタイムパスワードを確認する
+  PreHeader: ワンタイムパスワードを確認する
+  Subject: ワンタイムパスワードを確認する
+  Greeting: こんにちは、{{.FirstName}} {{.LastName}}さん
+  Text: {{ .VerifyURL }} を訪れるか、ワンタイムパスワード {{.OTP}} をコピーして認証画面に貼り付け、次の5分以内にZITADELで認証してください。
 DomainClaimed:
   Title: ZITADEL - ドメインの登録
   PreHeader: メールアドレス・ユーザー名の変更
