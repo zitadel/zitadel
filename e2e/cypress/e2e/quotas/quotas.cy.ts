@@ -273,7 +273,7 @@ describe('quotas', () => {
           });
         });
 
-        it.only('fires repeatedly with the expected payloads', () => {
+        it('fires repeatedly with the expected payloads', () => {
           cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
             cy.get<Context>('@ctx').then((ctx) => {
               for (let i = 0; i < usage; i++) {
