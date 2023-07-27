@@ -1496,7 +1496,7 @@ func Test_columnsToWhere(t *testing.T) {
 			},
 			want: want{
 				wheres: []string{"(col1 @> $1)"},
-				values: []interface{}{database.TextArray{"val1"}},
+				values: []interface{}{database.TextArray[string]{"val1"}},
 			},
 		},
 		{
