@@ -268,10 +268,6 @@ import {
   UpdateSMTPConfigResponse,
 } from '../proto/generated/zitadel/admin_pb';
 import { Event } from '../proto/generated/zitadel/event_pb';
-import { SearchQuery } from '../proto/generated/zitadel/member_pb';
-import { ListQuery } from '../proto/generated/zitadel/object_pb';
-import { GrpcService } from './grpc.service';
-import { StorageLocation, StorageService } from './storage.service';
 import {
   ResetCustomDomainClaimedMessageTextToDefaultRequest,
   ResetCustomDomainClaimedMessageTextToDefaultResponse,
@@ -290,8 +286,12 @@ import {
   ResetCustomVerifyPhoneMessageTextToDefaultRequest,
   ResetCustomVerifyPhoneMessageTextToDefaultResponse,
   ResetCustomVerifySMSOTPMessageTextToDefaultRequest,
-  ResetCustomVerifySMSOTPMessageTextToDefaultResponse
-} from "../proto/generated/zitadel/management_pb";
+  ResetCustomVerifySMSOTPMessageTextToDefaultResponse,
+} from '../proto/generated/zitadel/management_pb';
+import { SearchQuery } from '../proto/generated/zitadel/member_pb';
+import { ListQuery } from '../proto/generated/zitadel/object_pb';
+import { GrpcService } from './grpc.service';
+import { StorageLocation, StorageService } from './storage.service';
 
 export interface OnboardingActions {
   order: number;
