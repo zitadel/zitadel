@@ -1,9 +1,11 @@
 package settings
 
 import (
+	"reflect"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -82,6 +84,130 @@ func Test_loginSettingsToPb(t *testing.T) {
 	grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
 	if !proto.Equal(got, want) {
 		t.Errorf("loginSettingsToPb() =\n%v\nwant\n%v", got, want)
+	}
+}
+
+func Test_isDefaultToResourceOwnerTypePb(t *testing.T) {
+	type args struct {
+		isDefault bool
+	}
+	tests := []struct {
+		args args
+		want settings.ResourceOwnerType
+	}{
+		{
+			args: args{false},
+			want: settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_ORG,
+		},
+		{
+			args: args{true},
+			want: settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.want.String(), func(t *testing.T) {
+			got := isDefaultToResourceOwnerTypePb(tt.args.isDefault)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func Test_passkeysTypeToPb(t *testing.T) {
+	type args struct {
+		passwordlessType domain.PasswordlessType
+	}
+	tests := []struct {
+		args args
+		want settings.PasskeysType
+	}{
+		{
+			args: args{domain.PasswordlessTypeNotAllowed},
+			want: settings.PasskeysType_PASSKEYS_TYPE_NOT_ALLOWED,
+		},
+		{
+			args: args{domain.PasswordlessTypeAllowed},
+			want: settings.PasskeysType_PASSKEYS_TYPE_ALLOWED,
+		},
+		{
+			args: args{99},
+			want: settings.PasskeysType_PASSKEYS_TYPE_NOT_ALLOWED,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.want.String(), func(t *testing.T) {
+			got := passkeysTypeToPb(tt.args.passwordlessType)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func Test_secondFactorTypeToPb(t *testing.T) {
+	type args struct {
+		secondFactorType domain.SecondFactorType
+	}
+	tests := []struct {
+		args args
+		want settings.SecondFactorType
+	}{
+		{
+			args: args{domain.SecondFactorTypeTOTP},
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP,
+		},
+		{
+			args: args{domain.SecondFactorTypeU2F},
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_U2F,
+		},
+		{
+			args: args{domain.SecondFactorTypeOTPSMS},
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
+		},
+		{
+			args: args{domain.SecondFactorTypeOTPEmail},
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_EMAIL,
+		},
+		{
+			args: args{domain.SecondFactorTypeUnspecified},
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_UNSPECIFIED,
+		},
+		{
+			args: args{99},
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_UNSPECIFIED,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.want.String(), func(t *testing.T) {
+			got := secondFactorTypeToPb(tt.args.secondFactorType)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func Test_multiFactorTypeToPb(t *testing.T) {
+	type args struct {
+		typ domain.MultiFactorType
+	}
+	tests := []struct {
+		args args
+		want settings.MultiFactorType
+	}{
+		{
+			args: args{domain.MultiFactorTypeU2FWithPIN},
+			want: settings.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
+		},
+		{
+			args: args{domain.MultiFactorTypeUnspecified},
+			want: settings.MultiFactorType_MULTI_FACTOR_TYPE_UNSPECIFIED,
+		},
+		{
+			args: args{99},
+			want: settings.MultiFactorType_MULTI_FACTOR_TYPE_UNSPECIFIED,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.want.String(), func(t *testing.T) {
+			got := multiFactorTypeToPb(tt.args.typ)
+			assert.Equal(t, tt.want, got)
+		})
 	}
 }
 
@@ -254,5 +380,71 @@ func Test_identityProvidersToPb(t *testing.T) {
 		if !proto.Equal(v, want[i]) {
 			t.Errorf("identityProvidersToPb() =\n%v\nwant\n%v", got, want)
 		}
+	}
+}
+
+func Test_idpTypeToPb(t *testing.T) {
+	type args struct {
+		idpType domain.IDPType
+	}
+	tests := []struct {
+		args args
+		want settings.IdentityProviderType
+	}{
+		{
+			args: args{domain.IDPTypeUnspecified},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_UNSPECIFIED,
+		},
+		{
+			args: args{domain.IDPTypeOIDC},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_OIDC,
+		},
+		{
+			args: args{domain.IDPTypeJWT},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_JWT,
+		},
+		{
+			args: args{domain.IDPTypeOAuth},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_OAUTH,
+		},
+		{
+			args: args{domain.IDPTypeLDAP},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_LDAP,
+		},
+		{
+			args: args{domain.IDPTypeAzureAD},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_AZURE_AD,
+		},
+		{
+			args: args{domain.IDPTypeGitHub},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GITHUB,
+		},
+		{
+			args: args{domain.IDPTypeGitHubEnterprise},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GITHUB_ES,
+		},
+		{
+			args: args{domain.IDPTypeGitLab},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GITLAB,
+		},
+		{
+			args: args{domain.IDPTypeGitLabSelfHosted},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GITLAB_SELF_HOSTED,
+		},
+		{
+			args: args{domain.IDPTypeGoogle},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GOOGLE,
+		},
+		{
+			args: args{99},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_UNSPECIFIED,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.want.String(), func(t *testing.T) {
+			if got := idpTypeToPb(tt.args.idpType); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("idpTypeToPb() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
