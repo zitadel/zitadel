@@ -200,7 +200,7 @@ jobs:
         working-directory: /tmp/digests/${{ matrix.image }}
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< '${{ steps.meta.outputs.json }}') \
-            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< '${{ steps.build-meta.outputs.json }}')
+            $(jq -cr '.tags | map(" " + .) | join(" ")' <<< '${{ steps.build-meta.outputs.json }}')
       -
         name: Inspect image
         if: ${{ inputs.image_push }}
