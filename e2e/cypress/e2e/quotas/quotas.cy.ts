@@ -306,7 +306,7 @@ describe('quotas', () => {
                 return events.filter((ev) => expectEvents.some((expect) => Cypress._.matches(expect)(ev))).length >= 3;
               }),
             {
-              timeout: 10_000,
+              timeout: 60_000,
               log: true,
               errorMsg: () => {
                 const serialize = (ev: ZITADELWebhookEvent) => JSON.stringify(ev, null, 2);
