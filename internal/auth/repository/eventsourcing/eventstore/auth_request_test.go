@@ -105,7 +105,7 @@ type mockEventUser struct {
 	Event *es_models.Event
 }
 
-func (m *mockEventUser) UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error) {
+func (m *mockEventUser) UserEventsByID(ctx context.Context, id string, sequence uint64, types []es_models.EventType) ([]*es_models.Event, error) {
 	events := make([]*es_models.Event, 0)
 	if m.Event != nil {
 		events = append(events, m.Event)
@@ -119,7 +119,7 @@ func (m *mockEventUser) BulkAddExternalIDPs(ctx context.Context, userID string, 
 
 type mockEventErrUser struct{}
 
-func (m *mockEventErrUser) UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error) {
+func (m *mockEventErrUser) UserEventsByID(ctx context.Context, id string, sequence uint64, types []es_models.EventType) ([]*es_models.Event, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
 }
 
