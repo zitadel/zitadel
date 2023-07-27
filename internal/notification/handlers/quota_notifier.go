@@ -19,7 +19,6 @@ const (
 )
 
 type quotaNotifier struct {
-	// crdb.Handler
 	commands                       *command.Commands
 	queries                        *NotificationQueries
 	metricSuccessfulDeliveriesJSON string

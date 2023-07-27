@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/pseudo"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -32,6 +33,8 @@ type Config struct {
 	RetryFailedAfter      time.Duration
 	HandleActiveInstances time.Duration
 	MaxFailureCount       uint8
+
+	TriggerWithoutEvents Reduce
 }
 
 type Handler struct {
@@ -49,6 +52,8 @@ type Handler struct {
 	now                   nowFunc
 
 	triggeredInstancesSync sync.Map
+
+	triggerWithoutEvents Reduce
 }
 
 // nowFunc makes [time.Now] mockable
@@ -85,6 +90,7 @@ func NewHandler(
 		maxFailureCount:        config.MaxFailureCount,
 		retryFailedAfter:       config.RetryFailedAfter,
 		triggeredInstancesSync: sync.Map{},
+		triggerWithoutEvents:   config.TriggerWithoutEvents,
 	}
 
 	return handler
@@ -92,6 +98,9 @@ func NewHandler(
 
 func (h *Handler) Start(ctx context.Context) {
 	go h.schedule(ctx)
+	if h.triggerWithoutEvents != nil {
+		return
+	}
 	go h.subscribe(ctx)
 }
 
@@ -128,7 +137,6 @@ func (h *Handler) schedule(ctx context.Context) {
 					}
 					time.Sleep(h.retryFailedAfter)
 				}
-
 			}
 
 			if !didInitialize && !instanceFailed {
@@ -251,7 +259,6 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 	}()
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	start := time.Now()
 	defer cancel()
 
 	err = crdb.ExecuteTx(ctx, h.client.DB, nil, func(tx *sql.Tx) error {
@@ -260,26 +267,17 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 			return err
 		}
 
-		events, err := h.es.Filter(ctx, h.eventQuery(currentState))
-		if err != nil {
-			h.log().WithError(err).Debug("filter eventstore failed")
-			return err
-		}
-		eventAmount := len(events)
-		events = skipPreviouslyReduced(events, currentState)
-
-		if len(events) == 0 {
-			h.updateLastUpdated(ctx, tx, currentState)
-			return nil
+		if h.projection.Name() == "projections.notifications_quota" {
+			h.log().Debug("asdf")
 		}
 
-		statements, err := h.eventsToStatements(tx, events, currentState)
-		if len(statements) == 0 {
+		var statements []*Statement
+		statements, additionalIteration, err = h.generateStatements(ctx, tx, currentState)
+		if err != nil || len(statements) == 0 {
 			return err
 		}
 
-		err = h.execute(ctx, tx, currentState, statements)
-		if err != nil {
+		if err = h.execute(ctx, tx, currentState, statements); err != nil {
 			return err
 		}
 
@@ -288,23 +286,46 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 		currentState.eventSequence = statements[len(statements)-1].Sequence
 		currentState.eventTimestamp = statements[len(statements)-1].CreationDate
 
-		err = h.setState(ctx, tx, currentState)
-		if err != nil {
-			h.log().WithField("took", time.Since(start)).Debug("current state query")
-			return err
-		}
-
-		if len(statements) < len(events) {
-			// retry imediatly if statements failed
-			additionalIteration = true
-			return nil
-		}
-
-		additionalIteration = eventAmount == int(h.bulkLimit)
-		return nil
+		return h.setState(ctx, tx, currentState)
 	})
 
 	return additionalIteration, err
+}
+
+func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentState *state) (_ []*Statement, additionalIteration bool, err error) {
+	if h.triggerWithoutEvents != nil {
+		stmt, err := h.triggerWithoutEvents(pseudo.NewScheduledEvent(ctx, time.Now(), currentState.instanceID))
+		if err != nil {
+			return nil, false, err
+		}
+		return []*Statement{stmt}, false, nil
+	}
+
+	events, err := h.es.Filter(ctx, h.eventQuery(currentState))
+	if err != nil {
+		h.log().WithError(err).Debug("filter eventstore failed")
+		return nil, false, err
+	}
+	eventAmount := len(events)
+	events = skipPreviouslyReduced(events, currentState)
+
+	if len(events) == 0 {
+		h.updateLastUpdated(ctx, tx, currentState)
+		return nil, false, nil
+	}
+
+	statements, err := h.eventsToStatements(tx, events, currentState)
+	if len(statements) == 0 {
+		return nil, false, err
+	}
+
+	additionalIteration = eventAmount == int(h.bulkLimit)
+	if len(statements) < len(events) {
+		// retry imediatly if statements failed
+		additionalIteration = true
+	}
+
+	return statements, additionalIteration, nil
 }
 
 func skipPreviouslyReduced(events []eventstore.Event, currentState *state) []eventstore.Event {

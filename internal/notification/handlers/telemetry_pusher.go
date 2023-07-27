@@ -50,16 +50,18 @@ func NewTelemetryPusher(
 	metricSuccessfulDeliveriesJSON,
 	metricFailedDeliveriesJSON string,
 ) *handler.Handler {
+	pusher := &telemetryPusher{
+		cfg:                            telemetryCfg,
+		commands:                       commands,
+		queries:                        queries,
+		metricSuccessfulDeliveriesJSON: metricFailedDeliveriesJSON,
+		metricFailedDeliveriesJSON:     metricFailedDeliveriesJSON,
+	}
+	handlerCfg.TriggerWithoutEvents = pusher.pushMilestones
 	return handler.NewHandler(
 		ctx,
 		&handlerCfg,
-		&telemetryPusher{
-			cfg:                            telemetryCfg,
-			commands:                       commands,
-			queries:                        queries,
-			metricSuccessfulDeliveriesJSON: metricFailedDeliveriesJSON,
-			metricFailedDeliveriesJSON:     metricFailedDeliveriesJSON,
-		},
+		pusher,
 	)
 }
 

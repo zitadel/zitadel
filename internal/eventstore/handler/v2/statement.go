@@ -168,7 +168,7 @@ func getUpdateCols(cols, conflictTarget []string) (updateCols, updateVals []stri
 
 func NewUpdateStatement(event eventstore.Event, values []Column, conditions []Condition, opts ...execOption) *Statement {
 	cols, params, args := columnsToQuery(values)
-	wheres, whereArgs := conditionsToWhere(conditions, len(args))
+	wheres, whereArgs := conditionsToWhere(conditions, len(args)+1)
 	args = append(args, whereArgs...)
 
 	config := execConfig{
@@ -197,7 +197,7 @@ func NewUpdateStatement(event eventstore.Event, values []Column, conditions []Co
 }
 
 func NewDeleteStatement(event eventstore.Event, conditions []Condition, opts ...execOption) *Statement {
-	wheres, args := conditionsToWhere(conditions, 0)
+	wheres, args := conditionsToWhere(conditions, 1)
 
 	wheresPlaceholders := strings.Join(wheres, " AND ")
 
@@ -339,7 +339,7 @@ func NewCopyStatement(event eventstore.Event, conflictCols, from, to []Column, n
 	for i := range nsCond {
 		cond[i] = nsCond[i]("copy_table")
 	}
-	wheres, values := conditionsToWhere(cond, len(args))
+	wheres, values := conditionsToWhere(cond, len(args)+1)
 	args = append(args, values...)
 
 	conflictTargets := make([]string, len(conflictCols))
@@ -405,11 +405,13 @@ func columnsToQuery(cols []Column) (names []string, parameters []string, values 
 
 func conditionsToWhere(conds []Condition, paramOffset int) (wheres []string, values []interface{}) {
 	wheres = make([]string, len(conds))
-	values = make([]any, len(conds))
+	values = make([]any, 0, len(conds))
 
 	for i, cond := range conds {
-		paramOffset++
-		wheres[i], values[i] = cond("$" + strconv.Itoa(paramOffset))
+		var args []any
+		wheres[i], args = cond("$" + strconv.Itoa(paramOffset))
+		paramOffset += len(args)
+		values = append(values, args...)
 		wheres[i] = "(" + wheres[i] + ")"
 	}
 
@@ -438,13 +440,13 @@ func NewJSONCol(name string, value interface{}) Column {
 	return NewCol(name, marshalled)
 }
 
-type Condition func(param string) (string, interface{})
+type Condition func(param string) (string, []any)
 
 type NamespacedCondition func(namespace string) Condition
 
 func NewCond(name string, value interface{}) Condition {
-	return func(param string) (string, interface{}) {
-		return name + " = " + param, value
+	return func(param string) (string, []any) {
+		return name + " = " + param, []any{value}
 	}
 }
 
@@ -455,28 +457,30 @@ func NewNamespacedCondition(name string, value interface{}) NamespacedCondition 
 }
 
 func NewLessThanCond(column string, value interface{}) Condition {
-	return func(param string) (string, interface{}) {
-		return column + " < " + param, value
+	return func(param string) (string, []any) {
+		return column + " < " + param, []any{value}
 	}
 }
 
 func NewIsNullCond(column string) Condition {
-	return NewCond(column, nil)
+	return func(string) (string, []any) {
+		return column + " IS NULL", nil
+	}
 }
 
 // NewTextArrayContainsCond returns a Condition that checks if the column that stores an array of text contains the given value
 func NewTextArrayContainsCond(column string, value string) Condition {
-	return func(param string) (string, interface{}) {
-		return column + " @> " + param, database.TextArray[string]{value}
+	return func(param string) (string, []any) {
+		return column + " @> " + param, []any{database.TextArray[string]{value}}
 	}
 }
 
 // Not is a function and not a method, so that calling it is well readable
 // For example conditions := []Condition{ Not(NewTextArrayContainsCond())}
 func Not(condition Condition) Condition {
-	return func(param string) (string, interface{}) {
+	return func(param string) (string, []any) {
 		cond, value := condition(param)
-		return "NOT (" + cond + ")", value
+		return "NOT (" + cond + ")", []any{value}
 	}
 }
 
