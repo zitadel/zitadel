@@ -1,4 +1,8 @@
-export interface SignInWithIdentityProviderProps {
-  children?: React.ReactNode;
+import { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
+
+export type SignInWithIdentityProviderProps = DetailedHTMLProps<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  HTMLButtonElement
+> & {
   name?: string;
-}
+};

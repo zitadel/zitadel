@@ -1,57 +1,52 @@
-import { ReactNode } from "react";
+"use client";
+import { ReactNode, useState } from "react";
 
-import {
-  ZitadelServer,
-  settings,
-  GetActiveIdentityProvidersResponse,
-  IdentityProvider,
-  IdentityProviderType,
-} from "@zitadel/server";
+// import { IdentityProviderType } from "@zitadel/server";
+// import { IdentityProvider } from "@zitadel/client";
+
 import {
   SignInWithGitlab,
   SignInWithAzureAD,
   SignInWithGoogle,
   SignInWithGithub,
 } from "@zitadel/react";
-import { server, startIdentityProviderFlow } from "#/lib/zitadel";
+import { useRouter } from "next/navigation";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;
-  server: ZitadelServer;
-  orgId?: string;
+  identityProviders: any[];
 }
 
-function getIdentityProviders(
-  server: ZitadelServer,
-  orgId?: string
-): Promise<IdentityProvider[] | undefined> {
-  const settingsService = settings.getSettings(server);
-  console.log("req");
-  return settingsService
-    .getActiveIdentityProviders(
-      orgId ? { ctx: { orgId } } : { ctx: { instance: true } },
-      {}
-    )
-    .then((resp: GetActiveIdentityProvidersResponse) => {
-      return resp.identityProviders;
+export function SignInWithIDP({ identityProviders }: SignInWithIDPProps) {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const router = useRouter();
+
+  async function startFlow(idp: any) {
+    console.log("start flow");
+    const host = "http://localhost:3000";
+    setLoading(true);
+
+    const res = await fetch("/api/idp/start", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        idpId: idp.id,
+        successUrl: `${host}/api/idp/success`,
+        failureUrl: `${host}/api/idp/success`,
+      }),
     });
-}
 
-export async function SignInWithIDP(props: SignInWithIDPProps) {
-  console.log(props.server);
-  const identityProviders = await getIdentityProviders(
-    props.server,
-    props.orgId
-  );
+    const response = await res.json();
 
-  console.log(identityProviders);
-
-  function startFlow(idp: IdentityProvider) {
-    return startIdentityProviderFlow(server, {
-      idpId: idp.id,
-      successUrl: "",
-      failureUrl: "",
-    }).then(() => {});
+    setLoading(false);
+    if (!res.ok) {
+      setError(response.details);
+      return Promise.reject(response.details);
+    }
+    return response;
   }
 
   return (
@@ -59,43 +54,48 @@ export async function SignInWithIDP(props: SignInWithIDPProps) {
       {identityProviders &&
         identityProviders.map((idp, i) => {
           switch (idp.type) {
-            case IdentityProviderType.IDENTITY_PROVIDER_TYPE_GITHUB:
+            case 6: // IdentityProviderType.IDENTITY_PROVIDER_TYPE_GITHUB:
               return (
                 <SignInWithGithub
                   key={`idp-${i}`}
                   name={idp.name}
                 ></SignInWithGithub>
               );
-            case IdentityProviderType.IDENTITY_PROVIDER_TYPE_GITHUB_ES:
+            case 7: // IdentityProviderType.IDENTITY_PROVIDER_TYPE_GITHUB_ES:
               return (
                 <SignInWithGithub
                   key={`idp-${i}`}
                   name={idp.name}
                 ></SignInWithGithub>
               );
-            case IdentityProviderType.IDENTITY_PROVIDER_TYPE_AZURE_AD:
+            case 5: // IdentityProviderType.IDENTITY_PROVIDER_TYPE_AZURE_AD:
               return (
                 <SignInWithAzureAD
                   key={`idp-${i}`}
                   name={idp.name}
                 ></SignInWithAzureAD>
               );
-            case IdentityProviderType.IDENTITY_PROVIDER_TYPE_GOOGLE:
+            case 10: // IdentityProviderType.IDENTITY_PROVIDER_TYPE_GOOGLE:
               return (
                 <SignInWithGoogle
                   key={`idp-${i}`}
                   name={idp.name}
-                  onClick={() => startFlow(idp)}
+                  onClick={() =>
+                    startFlow(idp).then(({ authUrl }) => {
+                      console.log("done");
+                      router.push(authUrl);
+                    })
+                  }
                 ></SignInWithGoogle>
               );
-            case IdentityProviderType.IDENTITY_PROVIDER_TYPE_GITLAB:
+            case 8: // IdentityProviderType.IDENTITY_PROVIDER_TYPE_GITLAB:
               return (
                 <SignInWithGitlab
                   key={`idp-${i}`}
                   name={idp.name}
                 ></SignInWithGitlab>
               );
-            case IdentityProviderType.IDENTITY_PROVIDER_TYPE_GITLAB_SELF_HOSTED:
+            case 9: //IdentityProviderType.IDENTITY_PROVIDER_TYPE_GITLAB_SELF_HOSTED:
               return (
                 <SignInWithGitlab
                   key={`idp-${i}`}

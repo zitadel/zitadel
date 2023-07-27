@@ -11,12 +11,12 @@
   ],
   "scripts": {
     "generate": "buf generate https://github.com/zitadel/zitadel.git --path ./proto/zitadel",
-    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "build": "tsup --dts",
     "test": "pnpm test:unit",
     "test:watch": "pnpm test:unit:watch",
     "test:unit": "jest",
     "test:unit:watch": "jest --watch",
-    "dev": "tsup src/index.ts --format esm,cjs --watch --dts",
+    "dev": "tsup --watch --dts",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },

@@ -1,23 +1,9 @@
-"use client";
-
-import {
-  ButtonHTMLAttributes,
-  DetailedHTMLProps,
-  ReactNode,
-  forwardRef,
-} from "react";
+import { ReactNode, forwardRef } from "react";
 import { SignInWithIdentityProviderProps } from "./SignInWith";
-
-type SignInWithGoogleProps = DetailedHTMLProps<
-  ButtonHTMLAttributes<HTMLButtonElement>,
-  HTMLButtonElement
-> & {
-  name?: string;
-};
 
 export const SignInWithGoogle = forwardRef<
   HTMLButtonElement,
-  SignInWithGoogleProps
+  SignInWithIdentityProviderProps
 >(
   ({ children, className = "", name = "", ...props }, ref): ReactNode => (
     <button

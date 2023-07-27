@@ -2,20 +2,11 @@ import "./styles.css";
 
 export { SignInWithGoogle } from "./components/SignInWithGoogle";
 
-export {
-  SignInWithGitlab,
-  type SignInWithGitlabProps,
-} from "./components/SignInWithGitlab";
+export { SignInWithGitlab } from "./components/SignInWithGitlab";
 
-export {
-  SignInWithAzureAD,
-  type SignInWithAzureADProps,
-} from "./components/SignInWithAzureAD";
+export { SignInWithAzureAD } from "./components/SignInWithAzureAD";
 
-export {
-  SignInWithGithub,
-  type SignInWithGithubProps,
-} from "./components/SignInWithGithub";
+export { SignInWithGithub } from "./components/SignInWithGithub";
 
 export {
   ZitadelReactProvider,
