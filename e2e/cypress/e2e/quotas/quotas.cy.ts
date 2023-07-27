@@ -3,6 +3,7 @@ import { createHumanUser, ensureUserDoesntExist } from 'support/api/users';
 import { Context } from 'support/commands';
 import { ZITADELWebhookEvent } from 'support/types';
 import { textChangeRangeIsUnchanged } from 'typescript';
+import PrevSubject = Cypress.PrevSubject;
 
 beforeEach(() => {
   cy.context().as('ctx');
@@ -272,7 +273,7 @@ describe('quotas', () => {
           });
         });
 
-        it('fires repeatedly with the expected payloads', () => {
+        it.only('fires repeatedly with the expected payloads', () => {
           cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
             cy.get<Context>('@ctx').then((ctx) => {
               for (let i = 0; i < usage; i++) {
@@ -286,31 +287,34 @@ describe('quotas', () => {
               }
             });
           });
+          const expectEvents = [10, 20, 30].map((expectUsage) => {
+            return <ZITADELWebhookEvent>{
+              sentStatus: 200,
+              payload: {
+                callURL: callURL,
+                threshold: expectUsage,
+                unit: 1,
+                usage: expectUsage,
+              },
+            };
+          });
+          let mostRecentEvents: Array<ZITADELWebhookEvent> = [];
           cy.waitUntil(
             () =>
               cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
-                const expectEvents = [10, 20, 30].map((expectUsage) => {
-                  return <ZITADELWebhookEvent>{
-                    sentStatus: 200,
-                    payload: {
-                      callURL: callURL,
-                      threshold: expectUsage,
-                      unit: 1,
-                      usage: expectUsage,
-                    },
-                  }
-                })
-                const ok = events
-                    .filter((ev) => {
-                      return events.some((expect) => Cypress._.matches(expect)(ev))
-                    }).length >= 3
-                if (!ok) {
-                  const toSerializable = (ev: ZITADELWebhookEvent) => ({...ev, payload: JSON.stringify(ev.payload)})
-                  return cy.log("couldn't find all expected events", expectEvents.map(toSerializable), "in received events", events.map(toSerializable)).then(() => false);
-                }
-                return cy.wrap(true)
+                mostRecentEvents = events;
+                return events.filter((ev) => expectEvents.some((expect) => Cypress._.matches(expect)(ev))).length >= 3;
               }),
-            { timeout: 60_000 },
+            {
+              timeout: 10_000,
+              log: true,
+              errorMsg: () => {
+                const serialize = (ev: ZITADELWebhookEvent) => JSON.stringify(ev, null, 2);
+                return `couldn't find all expected events ${expectEvents.map(
+                  serialize,
+                )} in received events ${mostRecentEvents.map(serialize)}`;
+              },
+            },
           );
         });
       });
