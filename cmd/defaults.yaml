@@ -564,6 +564,20 @@ DefaultInstance:
       IncludeUpperLetters: true
       IncludeDigits: true
       IncludeSymbols: false
+    OTPSMS:
+      Length: 8
+      Expiry: "5m"
+      IncludeLowerLetters: false
+      IncludeUpperLetters: false
+      IncludeDigits: true
+      IncludeSymbols: false
+    OTPEmail:
+      Length: 8
+      Expiry: "5m"
+      IncludeLowerLetters: false
+      IncludeUpperLetters: false
+      IncludeDigits: true
+      IncludeSymbols: false
   PasswordComplexityPolicy:
     MinLength: 8
     HasLowercase: true
