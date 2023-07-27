@@ -10,13 +10,12 @@ func UserByIDQuery(id, instanceID string, latestSequence uint64, eventTypes []es
 	if id == "" {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d8isw", "Errors.User.UserIDMissing")
 	}
-	query := es_models.NewSearchQuery().
+	return es_models.NewSearchQuery().
 		AddQuery().
 		AggregateTypeFilter(user.AggregateType).
 		AggregateIDFilter(id).
 		EventTypesFilter(eventTypes...).
 		LatestSequenceFilter(latestSequence).
 		InstanceIDFilter(instanceID).
-		SearchQuery()
-	return query, nil
+		SearchQuery(), nil
 }
