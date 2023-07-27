@@ -1,21 +1,37 @@
+"use client";
+
+import {
+  ButtonHTMLAttributes,
+  DetailedHTMLProps,
+  ReactNode,
+  forwardRef,
+} from "react";
 import { SignInWithIdentityProviderProps } from "./SignInWith";
 
-export interface SignInWithGoogleProps
-  extends SignInWithIdentityProviderProps {}
+type SignInWithGoogleProps = DetailedHTMLProps<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  HTMLButtonElement
+> & {
+  name?: string;
+};
 
-export function SignInWithGoogle(props: SignInWithGoogleProps) {
-  return (
-    <div className="ztdl-w-full ztdl-cursor-pointer ztdl-flex ztdl-flex-row ztdl-items-center ztdl-bg-white ztdl-text-black dark:ztdl-bg-transparent dark:ztdl-text-white border ztdl-border-divider-light dark:ztdl-border-divider-dark rounded-md px-4 text-sm">
+export const SignInWithGoogle = forwardRef<
+  HTMLButtonElement,
+  SignInWithGoogleProps
+>(
+  ({ children, className = "", name = "", ...props }, ref): ReactNode => (
+    <button
+      type="button"
+      ref={ref}
+      className={`ztdl-w-full ztdl-cursor-pointer ztdl-flex ztdl-flex-row ztdl-items-center ztdl-bg-white ztdl-text-black dark:ztdl-bg-transparent dark:ztdl-text-white border ztdl-border-divider-light dark:ztdl-border-divider-dark rounded-md px-4 text-sm ${className}`}
+      {...props}
+    >
       <div className="ztdl-h-12 ztdl-w-12 ztdl-flex ztdl-items-center ztdl-justify-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           xmlSpace="preserve"
           id="Capa_1"
-          //   style={{
-          //     enableBackground: "new 0 0 150 150",
-          //   }}
           viewBox="0 0 150 150"
-          {...props}
         >
           <style>
             {
@@ -48,11 +64,13 @@ export function SignInWithGoogle(props: SignInWithGoogleProps) {
           />
         </svg>
       </div>
-      <span className="ztdl-ml-4">
-        {props.name ? props.name : "Sign in with Google"}
-      </span>
-    </div>
-  );
-}
+      {children ? (
+        children
+      ) : (
+        <span className="ztdl-ml-4">{name ? name : "Sign in with Google"}</span>
+      )}
+    </button>
+  )
+);
 
 SignInWithGoogle.displayName = "SignInWithGoogle";

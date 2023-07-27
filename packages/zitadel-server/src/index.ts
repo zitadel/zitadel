@@ -57,6 +57,8 @@ export {
   ListAuthenticationMethodTypesResponse,
   ListAuthenticationMethodTypesRequest,
   AuthenticationMethodType,
+  StartIdentityProviderFlowRequest,
+  StartIdentityProviderFlowResponse,
 } from "./proto/server/zitadel/user/v2alpha/user_service";
 export {
   SetHumanPasswordResponse,

@@ -25,6 +25,8 @@ import {
   LoginSettings,
   GetLoginSettingsResponse,
   ListAuthenticationMethodTypesResponse,
+  StartIdentityProviderFlowRequest,
+  StartIdentityProviderFlowResponse,
 } from "@zitadel/server";
 
 export const zitadelConfig: ZitadelServerOptions = {
@@ -193,6 +195,19 @@ export async function addHumanUser(
     .then((resp: AddHumanUserResponse) => {
       return resp.userId;
     });
+}
+
+export async function startIdentityProviderFlow(
+  server: ZitadelServer,
+  { idpId, successUrl, failureUrl }: StartIdentityProviderFlowRequest
+): Promise<StartIdentityProviderFlowResponse> {
+  const userService = user.getUser(server);
+
+  return userService.startIdentityProviderFlow({
+    idpId,
+    successUrl,
+    failureUrl,
+  });
 }
 
 export async function verifyEmail(

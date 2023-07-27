@@ -259,9 +259,6 @@ importers:
       '@zitadel/react':
         specifier: workspace:*
         version: link:../zitadel-react
-      '@zitadel/server':
-        specifier: workspace:*
-        version: link:../zitadel-server
       next:
         specifier: ^13.4.10
         version: 13.4.10(@babel/core@7.22.1)(react-dom@18.2.0)(react@18.2.0)
@@ -275,6 +272,9 @@ importers:
       '@types/react':
         specifier: ^17.0.13
         version: 17.0.52
+      '@zitadel/server':
+        specifier: workspace:*
+        version: link:../zitadel-server
       '@zitadel/tsconfig':
         specifier: workspace:*
         version: link:../zitadel-tsconfig

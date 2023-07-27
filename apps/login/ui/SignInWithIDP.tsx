@@ -1,4 +1,3 @@
-"use server";
 import { ReactNode } from "react";
 
 import {
@@ -8,12 +7,13 @@ import {
   IdentityProvider,
   IdentityProviderType,
 } from "@zitadel/server";
-// import {
-//   SignInWithGitlab,
-//   SignInWithAzureAD,
-//   SignInWithGoogle,
-//   SignInWithGithub,
-// } from "@zitadel/react";
+import {
+  SignInWithGitlab,
+  SignInWithAzureAD,
+  SignInWithGoogle,
+  SignInWithGithub,
+} from "@zitadel/react";
+import { server, startIdentityProviderFlow } from "#/lib/zitadel";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;
@@ -37,18 +37,26 @@ function getIdentityProviders(
     });
 }
 
-export function SignInWithIDP(props: SignInWithIDPProps) {
+export async function SignInWithIDP(props: SignInWithIDPProps) {
   console.log(props.server);
-  // const identityProviders = await getIdentityProviders(
-  //   props.server,
-  //   props.orgId
-  // );
+  const identityProviders = await getIdentityProviders(
+    props.server,
+    props.orgId
+  );
 
-  // console.log(identityProviders);
+  console.log(identityProviders);
+
+  function startFlow(idp: IdentityProvider) {
+    return startIdentityProviderFlow(server, {
+      idpId: idp.id,
+      successUrl: "",
+      failureUrl: "",
+    }).then(() => {});
+  }
 
   return (
-    <div className="ztdl-next-flex ztdl-next-flex-col ztdl-next-w-full ztdl-next-space-y-2 ztdl-next-text-sm">
-      {/* {identityProviders &&
+    <div className="flex flex-col w-full space-y-2 text-sm">
+      {identityProviders &&
         identityProviders.map((idp, i) => {
           switch (idp.type) {
             case IdentityProviderType.IDENTITY_PROVIDER_TYPE_GITHUB:
@@ -77,6 +85,7 @@ export function SignInWithIDP(props: SignInWithIDPProps) {
                 <SignInWithGoogle
                   key={`idp-${i}`}
                   name={idp.name}
+                  onClick={() => startFlow(idp)}
                 ></SignInWithGoogle>
               );
             case IdentityProviderType.IDENTITY_PROVIDER_TYPE_GITLAB:
@@ -96,8 +105,7 @@ export function SignInWithIDP(props: SignInWithIDPProps) {
             default:
               return <div>{idp.name}</div>;
           }
-        })} */}
-      {props.children}
+        })}
     </div>
   );
 }

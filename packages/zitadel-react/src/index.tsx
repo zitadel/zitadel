@@ -1,9 +1,6 @@
 import "./styles.css";
 
-export {
-  SignInWithGoogle,
-  type SignInWithGoogleProps,
-} from "./components/SignInWithGoogle";
+export { SignInWithGoogle } from "./components/SignInWithGoogle";
 
 export {
   SignInWithGitlab,

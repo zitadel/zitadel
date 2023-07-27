@@ -1,6 +1,5 @@
 import { getLegalAndSupportSettings, server } from "#/lib/zitadel";
-
-import { SignInWithIDP } from "@zitadel/next";
+import { SignInWithIDP } from "#/ui/SignInWithIDP";
 
 export default async function Page({
   searchParams,
@@ -8,6 +7,8 @@ export default async function Page({
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
   const legal = await getLegalAndSupportSettings(server);
+
+  console.log(server);
 
   return (
     <div className="flex flex-col items-center space-y-4">
