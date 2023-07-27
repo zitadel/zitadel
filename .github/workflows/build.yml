@@ -72,6 +72,7 @@ jobs:
   container:
     needs: [compile]
     uses: ./.github/workflows/container.yml
+    secrets: inherit
     with:
       image_name: 'ghcr.io/zitadel/zitadel'
       build_image_name: 'ghcr.io/zitadel/test'
