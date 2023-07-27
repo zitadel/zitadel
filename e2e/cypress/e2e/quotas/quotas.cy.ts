@@ -289,25 +289,26 @@ describe('quotas', () => {
           cy.waitUntil(
             () =>
               cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
-                let foundExpected = 0;
-                for (let i = 0; i < events.length; i++) {
-                  for (let expect = 10; expect <= 30; expect += 10) {
-                    if (
-                      Cypress._.matches(<ZITADELWebhookEvent>{
-                        sentStatus: 200,
-                        payload: {
-                          callURL: callURL,
-                          threshold: expect,
-                          unit: 1,
-                          usage: expect,
-                        },
-                      })(events[i])
-                    ) {
-                      foundExpected++;
-                    }
+                const expectEvents = [10, 20, 30].map((expectUsage) => {
+                  return <ZITADELWebhookEvent>{
+                    sentStatus: 200,
+                    payload: {
+                      callURL: callURL,
+                      threshold: expectUsage,
+                      unit: 1,
+                      usage: expectUsage,
+                    },
                   }
+                })
+                const ok = events
+                    .filter((ev) => {
+                      return events.some((expect) => Cypress._.matches(expect)(ev))
+                    }).length >= 3
+                if (!ok) {
+                  const toSerializable = (ev: ZITADELWebhookEvent) => ({...ev, payload: JSON.stringify(ev.payload)})
+                  return cy.log("couldn't find all expected events", expectEvents.map(toSerializable), "in received events", events.map(toSerializable)).then(() => false);
                 }
-                return foundExpected >= 3;
+                return cy.wrap(true)
               }),
             { timeout: 60_000 },
           );
