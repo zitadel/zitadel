@@ -72,6 +72,7 @@ func SecretGeneratorsToPb(generators []*query.SecretGenerator) []*settings_pb.Se
 
 func SecretGeneratorToPb(generator *query.SecretGenerator) *settings_pb.SecretGenerator {
 	mapped := &settings_pb.SecretGenerator{
+		GeneratorType:       SecretGeneratorTypeToPb(generator.GeneratorType),
 		Length:              uint32(generator.Length),
 		Expiry:              durationpb.New(generator.Expiry),
 		IncludeUpperLetters: generator.IncludeUpperLetters,
@@ -97,6 +98,10 @@ func SecretGeneratorTypeToPb(generatorType domain.SecretGeneratorType) settings_
 		return settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_PASSWORDLESS_INIT_CODE
 	case domain.SecretGeneratorTypeAppSecret:
 		return settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_APP_SECRET
+	case domain.SecretGeneratorTypeOTPSMS:
+		return settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_OTP_SMS
+	case domain.SecretGeneratorTypeOTPEmail:
+		return settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_OTP_EMAIL
 	default:
 		return settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_UNSPECIFIED
 	}
@@ -116,6 +121,10 @@ func SecretGeneratorTypeToDomain(generatorType settings_pb.SecretGeneratorType) 
 		return domain.SecretGeneratorTypePasswordlessInitCode
 	case settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_APP_SECRET:
 		return domain.SecretGeneratorTypeAppSecret
+	case settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_OTP_SMS:
+		return domain.SecretGeneratorTypeOTPSMS
+	case settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_OTP_EMAIL:
+		return domain.SecretGeneratorTypeOTPEmail
 	default:
 		return domain.SecretGeneratorTypeUnspecified
 	}

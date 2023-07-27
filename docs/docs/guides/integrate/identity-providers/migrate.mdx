@@ -28,8 +28,16 @@ Please note that you only have to perform this migration if you already have an 
 If that isn't your case please just add a new provider from scratch. 
 To migrate to a specific provider, you need to follow a few essential steps:
 1. Create a desired IDP as Terraform resource for example [Google](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs/resources/idp_google).
-2. Make the corresponding API call to [migrate the IDP](./migrate#google-configuration), save the ID of the IDP for the import
-3. Before applying the Terraform resources again, import the new IDP resource.
+2. Remove the old terraform resource from the state as to not destroy the migrated IDP accidentally.
+```bash
+# terraform state rm *address*
+terraform state rm zitadel_idp_oidc.oidc_idp
+```
+
+After this command you can also remove the resource from the terraform files, as it is not managed anymore but also not deleted.
+
+3. Make the corresponding API call to [migrate the IDP](./migrate#migrate-generic-oidc-provider), save the ID of the IDP for the import
+4. Before applying the Terraform resources again, import the new IDP resource.
 ```bash
 #resource "zitadel_idp_google" "google" {
 #  name                = "Google"
@@ -44,5 +52,6 @@ To migrate to a specific provider, you need to follow a few essential steps:
 
 # terraform import zitadel_idp_google.*resource_name* *id*:*client_secret*
 terraform import zitadel_idp_google.google 222302827723096428:GOCSPX-*****
+```
 
 You have now migrated your provider and you should be able to apply the resource again. There should be no changes and the IDP is maintained by Terraform again.

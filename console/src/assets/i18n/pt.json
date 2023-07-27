@@ -1102,7 +1102,9 @@
         "3": "Verificação de telefone",
         "4": "Redefinição de senha",
         "5": "Inicialização sem senha",
-        "6": "Segredo do aplicativo"
+        "6": "Segredo do aplicativo",
+        "7": "Senha única (OTP) - SMS",
+        "8": "Senha única (OTP) - e-mail"
       },
       "ADDGENERATOR": "Definir aparência de segredo",
       "GENERATORTYPE": "Tipo",

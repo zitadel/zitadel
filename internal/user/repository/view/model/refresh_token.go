@@ -155,3 +155,14 @@ func (t *RefreshTokenView) appendRenewedEvent(event *es_models.Event) error {
 func (t *RefreshTokenView) appendRemovedEvent(event *es_models.Event) {
 	t.Expiration = event.CreationDate
 }
+
+func (t *RefreshTokenView) GetRelevantEventTypes() []es_models.EventType {
+	return []es_models.EventType{
+		es_models.EventType(user_repo.HumanRefreshTokenAddedType),
+		es_models.EventType(user_repo.HumanRefreshTokenRenewedType),
+		es_models.EventType(user_repo.HumanRefreshTokenRemovedType),
+		es_models.EventType(user_repo.UserRemovedType),
+		es_models.EventType(user_repo.UserDeactivatedType),
+		es_models.EventType(user_repo.UserLockedType),
+	}
+}
