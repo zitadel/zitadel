@@ -34,8 +34,8 @@ export function SignInWithIDP({ identityProviders }: SignInWithIDPProps) {
       },
       body: JSON.stringify({
         idpId: idp.id,
-        successUrl: `${host}/api/idp/success`,
-        failureUrl: `${host}/api/idp/success`,
+        successUrl: `${host}`,
+        failureUrl: `${host}`,
       }),
     });
 
