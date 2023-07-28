@@ -583,6 +583,10 @@ EventTypes:
         check:
           succeeded: Comprobación exitosa de la contraseña
           failed: Fallo en la comprobación de la contraseña
+        change:
+          sent: Cambio de contraseña enviado
+        hash:
+          updated: Hash de contraseña actualizado
       externallogin:
         check:
           succeeded: Inicio de sesión externo con éxito
