@@ -620,15 +620,3 @@ This tutorial covered how to configure ZITADEL and how to use React to build an 
 
 We hope you enjoyed the tutorial and encourage you to check out the ZITADEL [documentation](https://zitadel.com/docs) for more information on how to use the ZITADEL platform to its full potential. Thanks for joining us!
 
-
-## Show Organization Login
-
-As you already learned at the [Terminologies](#zitadel-terminology-instances-organizations-projects-users-roles-authorizations-and-apps) ZITADEL knows the concept of Organizations.
-You can define [default settings](/docs/guides/manage/console/instance-settings) for your ZITADEL, or you can overwrite them for an [Organization](/docs/guides/manage/console/organizations#organization-settings).
-Per default the ZITADEL Login will always show what is defined per default. As soon as the Organization context is given, the settings defined on the specific organization can be triggered.
-This means when you want to trigger the settings of an organization directly, make sure to send the organization scope in the authentication request.
-``` bash
-urn:zitadel:iam:org:id:{id}
-```
-
-Read more about the [scopes](/docs/apis/openidoauth/scopes#reserved-scopes) or try it out in our [OIDC Playground](/docs/apis/openidoauth/authrequest).
