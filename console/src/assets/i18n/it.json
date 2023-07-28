@@ -1041,7 +1041,7 @@
       "pl": "Polski",
       "zh": "简体中文",
       "bg": "Български",
-			"pt": "Portuguese",
+      "pt": "Portuguese",
       "mk": "Македонски"
     },
     "SMTP": {
@@ -1101,7 +1101,9 @@
         "3": "Verificazione del numero di telefono",
         "4": "Ripristino Password",
         "5": "Inizializzazione Passwordless",
-        "6": "Segreto dell'applicazione"
+        "6": "Segreto dell'applicazione",
+        "7": "One Time Password (OTP) - SMS",
+        "8": "One Time Password (OTP) - email"
       },
       "ADDGENERATOR": "Definisci aspetto",
       "GENERATORTYPE": "Tipo",
@@ -1848,8 +1850,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Sconosciuto",
-      "1": "One Time Password (OTP)",
-      "2": "Impronta digitale, chiave di sicurezza, Face ID e altri"
+      "1": "One Time Password per Authenticator App (TOTP)",
+      "2": "Impronta digitale, chiave di sicurezza, Face ID e altri",
+      "3": "One Time Password per Email (Email OTP)",
+      "4": "One Time Password per SMS (SMS OTP)"
     }
   },
   "LOGINPOLICY": {

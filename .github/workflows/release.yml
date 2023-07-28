@@ -25,7 +25,7 @@ jobs:
     uses: ./.github/workflows/version.yml
     with:
       semantic_version: ${{ inputs.semantic_version }}
-      dry_run: true
+      dry_run: false
 
   docker:
     runs-on: ubuntu-22.04
@@ -65,7 +65,7 @@ jobs:
           ${{ inputs.image }}
     -
       name: Publish latest
-      if: ${{ github.ref_name == 'main' }}
+      if: ${{ github.ref_name == 'next' }}
       run: |
         docker buildx imagetools create \
           --tag ${{ inputs.image_name }}:latest \
