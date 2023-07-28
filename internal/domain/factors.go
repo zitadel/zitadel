@@ -4,19 +4,13 @@ type SecondFactorType int32
 
 const (
 	SecondFactorTypeUnspecified SecondFactorType = iota
-	SecondFactorTypeOTP
+	SecondFactorTypeTOTP
 	SecondFactorTypeU2F
+	SecondFactorTypeOTPEmail
+	SecondFactorTypeOTPSMS
 
 	secondFactorCount
 )
-
-func SecondFactorTypes() []SecondFactorType {
-	types := make([]SecondFactorType, 0, secondFactorCount-1)
-	for i := SecondFactorTypeUnspecified + 1; i < secondFactorCount; i++ {
-		types = append(types, i)
-	}
-	return types
-}
 
 type MultiFactorType int32
 
@@ -26,14 +20,6 @@ const (
 
 	multiFactorCount
 )
-
-func MultiFactorTypes() []MultiFactorType {
-	types := make([]MultiFactorType, 0, multiFactorCount-1)
-	for i := MultiFactorTypeUnspecified + 1; i < multiFactorCount; i++ {
-		types = append(types, i)
-	}
-	return types
-}
 
 type FactorState int32
 
