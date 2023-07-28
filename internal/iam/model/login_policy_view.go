@@ -106,8 +106,12 @@ func secondFactorsToDomain(types []domain.SecondFactorType) []domain.SecondFacto
 		switch secondfactorType {
 		case domain.SecondFactorTypeU2F:
 			secondfactors[i] = domain.SecondFactorTypeU2F
-		case domain.SecondFactorTypeOTP:
-			secondfactors[i] = domain.SecondFactorTypeOTP
+		case domain.SecondFactorTypeTOTP:
+			secondfactors[i] = domain.SecondFactorTypeTOTP
+		case domain.SecondFactorTypeOTPEmail:
+			secondfactors[i] = domain.SecondFactorTypeOTPEmail
+		case domain.SecondFactorTypeOTPSMS:
+			secondfactors[i] = domain.SecondFactorTypeOTPSMS
 		}
 	}
 	return secondfactors

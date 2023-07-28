@@ -89,7 +89,7 @@ type idpUserLinksProvider interface {
 }
 
 type userEventProvider interface {
-	UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error)
+	UserEventsByID(ctx context.Context, id string, sequence uint64, eventTypes []es_models.EventType) ([]*es_models.Event, error)
 }
 
 type userCommandProvider interface {
@@ -1326,6 +1326,29 @@ func userSessionsByUserAgentID(provider userSessionViewProvider, agentID, instan
 	return user_view_model.UserSessionsToModel(session), nil
 }
 
+var (
+	userSessionEventTypes = []es_models.EventType{
+		es_models.EventType(user_repo.UserV1PasswordCheckSucceededType),
+		es_models.EventType(user_repo.UserV1PasswordCheckFailedType),
+		es_models.EventType(user_repo.UserV1MFAOTPCheckSucceededType),
+		es_models.EventType(user_repo.UserV1MFAOTPCheckFailedType),
+		es_models.EventType(user_repo.UserV1SignedOutType),
+		es_models.EventType(user_repo.UserLockedType),
+		es_models.EventType(user_repo.UserDeactivatedType),
+		es_models.EventType(user_repo.HumanPasswordCheckSucceededType),
+		es_models.EventType(user_repo.HumanPasswordCheckFailedType),
+		es_models.EventType(user_repo.UserIDPLoginCheckSucceededType),
+		es_models.EventType(user_repo.HumanMFAOTPCheckSucceededType),
+		es_models.EventType(user_repo.HumanMFAOTPCheckFailedType),
+		es_models.EventType(user_repo.HumanSignedOutType),
+		es_models.EventType(user_repo.HumanPasswordlessTokenCheckSucceededType),
+		es_models.EventType(user_repo.HumanPasswordlessTokenCheckFailedType),
+		es_models.EventType(user_repo.HumanU2FTokenCheckSucceededType),
+		es_models.EventType(user_repo.HumanU2FTokenCheckFailedType),
+		es_models.EventType(user_repo.UserRemovedType),
+	}
+)
+
 func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eventProvider userEventProvider, agentID string, user *user_model.UserView) (*user_model.UserSessionView, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	session, err := provider.UserSessionByIDs(agentID, user.ID, instanceID)
@@ -1342,7 +1365,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			session.Sequence = sequence.CurrentSequence
 		}
 	}
-	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence)
+	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence, append(session.EventTypes(), userSessionEventTypes...))
 	if err != nil {
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserSessionToModel(session), nil
@@ -1423,7 +1446,7 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	} else if user == nil {
 		user = new(user_view_model.UserView)
 	}
-	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence)
+	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence, user.EventTypes())
 	if err != nil {
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserToModel(user), nil
