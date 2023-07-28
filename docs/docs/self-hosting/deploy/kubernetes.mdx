@@ -88,8 +88,6 @@ When Helm is done, you can print your service account key from a Kubernetes secr
 ```bash
 kubectl -n zitadel get secret zitadel-admin-sa -o jsonpath='{ .data.zitadel-admin-sa\.json }' | base64 -D
 ```
-## Examples
-* [Helmfile + PostgreSQL](/docs/self-hosting/manage/examples/helmfile-psql)
 
 <Next components={props.components} />
 <Disclaimer components={props.components} />

@@ -604,7 +604,7 @@ module.exports = {
     {
       type: "category",
       label: "Manage",
-      collapsed: true,
+      collapsed: false,
       items: [
         "self-hosting/manage/production",
         "self-hosting/manage/productionchecklist",
@@ -616,14 +616,6 @@ module.exports = {
         "self-hosting/manage/database/database",
         "self-hosting/manage/updating_scaling",
         "self-hosting/manage/quotas"
-      ],
-    },
-    {
-      type: "category",
-      label: "Examples",
-      collapsed: true,
-      items: [
-        "self-hosting/manage/examples/helmfile-psql",
       ],
     },
   ],
