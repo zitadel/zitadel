@@ -23,5 +23,6 @@ CREATE INDEX IF NOT EXISTS es_handler_idx ON eventstore.events (instance_id, agg
 CREATE INDEX IF NOT EXISTS es_agg_id_event_idx ON eventstore.events (aggregate_type, aggregate_id, event_type);
 CREATE INDEX IF NOT EXISTS es_active_instances ON eventstore.events (aggregate_type, event_type, created_at);
 CREATE INDEX IF NOT EXISTS es_global ON eventstore.events (aggregate_type, aggregate_id, created_at);
+CREATE INDEX IF NOT EXISTS es_inst_agg_type_agg_id_cd ON eventstore3.eventstore.events (instance_id, aggregate_type, aggregate_id, created_at);
 COMMIT;
 
