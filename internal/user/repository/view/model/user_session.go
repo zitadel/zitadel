@@ -198,3 +198,37 @@ func avatarKeyFromEvent(event *models.Event) (string, error) {
 	}
 	return data["storeKey"], nil
 }
+
+func (v *UserSessionView) EventTypes() []models.EventType {
+	return []models.EventType{
+		models.EventType(user.UserV1PasswordCheckSucceededType),
+		models.EventType(user.HumanPasswordCheckSucceededType),
+		models.EventType(user.UserIDPLoginCheckSucceededType),
+		models.EventType(user.HumanPasswordlessTokenCheckSucceededType),
+		models.EventType(user.HumanPasswordlessTokenCheckFailedType),
+		models.EventType(user.HumanPasswordlessTokenRemovedType),
+		models.EventType(user.UserV1PasswordCheckFailedType),
+		models.EventType(user.HumanPasswordCheckFailedType),
+		models.EventType(user.UserV1PasswordChangedType),
+		models.EventType(user.HumanPasswordChangedType),
+		models.EventType(user.HumanMFAOTPVerifiedType),
+		models.EventType(user.UserV1MFAOTPCheckSucceededType),
+		models.EventType(user.HumanMFAOTPCheckSucceededType),
+		models.EventType(user.UserV1MFAOTPCheckFailedType),
+		models.EventType(user.UserV1MFAOTPRemovedType),
+		models.EventType(user.HumanMFAOTPCheckFailedType),
+		models.EventType(user.HumanMFAOTPRemovedType),
+		models.EventType(user.HumanU2FTokenCheckFailedType),
+		models.EventType(user.HumanU2FTokenRemovedType),
+		models.EventType(user.HumanU2FTokenVerifiedType),
+		models.EventType(user.HumanU2FTokenCheckSucceededType),
+		models.EventType(user.UserV1SignedOutType),
+		models.EventType(user.HumanSignedOutType),
+		models.EventType(user.UserLockedType),
+		models.EventType(user.UserDeactivatedType),
+		models.EventType(user.UserIDPLinkRemovedType),
+		models.EventType(user.UserIDPLinkCascadeRemovedType),
+		models.EventType(user.HumanAvatarAddedType),
+		models.EventType(user.HumanAvatarRemovedType),
+	}
+}
