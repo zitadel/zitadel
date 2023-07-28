@@ -397,6 +397,7 @@ Errors:
       Empty: A senha está vazia
       Invalid: A senha é inválida
       InvalidAndLocked: A senha é inválida e o usuário está bloqueado, entre em contato com o administrador.
+      NotChanged: Senha não alterada
     UsernameOrPassword:
       Invalid: Nome de usuário ou senha inválidos
     PasswordComplexityPolicy:

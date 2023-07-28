@@ -399,6 +399,7 @@ Errors:
       Empty: Password is empty
       Invalid: Password is invalid
       InvalidAndLocked: Password is invalid and user is locked, contact your administrator.
+      NotChanged: Password not changed
     UsernameOrPassword:
       Invalid: Username or Password is invalid
     PasswordComplexityPolicy:
