@@ -210,15 +210,15 @@ RegistrationUser:
   FirstnameLabel: Nome próprio
   LastnameLabel: Sobrenome
   LanguageLabel: Idioma
-  German: Alemão
-  English: Inglês
+  German: Deutsch
+  English: English
   Italian: Italiano
-  French: Francês
-  Chinese: Chinês simplificado
-  Polish: Polonês
-  Japanese: Japonês
-  Spanish: Espanhol
-  Bulgarian: Búlgaro
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
   GenderLabel: Gênero
