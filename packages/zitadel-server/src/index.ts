@@ -29,6 +29,10 @@ export {
   Factors,
 } from "./proto/server/zitadel/session/v2alpha/session";
 export {
+  IDPInformation,
+  IDPLink,
+} from "./proto/server/zitadel/user/v2alpha/idp";
+export {
   ListSessionsResponse,
   GetSessionResponse,
   CreateSessionResponse,
@@ -47,6 +51,7 @@ export {
 } from "./proto/server/zitadel/settings/v2alpha/settings_service";
 export {
   AddHumanUserResponse,
+  AddHumanUserRequest,
   VerifyEmailResponse,
   VerifyPasskeyRegistrationRequest,
   VerifyPasskeyRegistrationResponse,
@@ -59,6 +64,8 @@ export {
   AuthenticationMethodType,
   StartIdentityProviderFlowRequest,
   StartIdentityProviderFlowResponse,
+  RetrieveIdentityProviderInformationRequest,
+  RetrieveIdentityProviderInformationResponse,
 } from "./proto/server/zitadel/user/v2alpha/user_service";
 export {
   SetHumanPasswordResponse,

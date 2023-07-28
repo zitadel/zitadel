@@ -11,6 +11,7 @@ import {
   SignInWithGithub,
 } from "@zitadel/react";
 import { useRouter } from "next/navigation";
+import { ProviderSlug } from "#/lib/demos";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;
@@ -22,7 +23,7 @@ export function SignInWithIDP({ identityProviders }: SignInWithIDPProps) {
   const [error, setError] = useState<string>("");
   const router = useRouter();
 
-  async function startFlow(idp: any) {
+  async function startFlow(idp: any, provider: ProviderSlug) {
     console.log("start flow");
     const host = "http://localhost:3000";
     setLoading(true);
@@ -34,8 +35,8 @@ export function SignInWithIDP({ identityProviders }: SignInWithIDPProps) {
       },
       body: JSON.stringify({
         idpId: idp.id,
-        successUrl: `${host}`,
-        failureUrl: `${host}`,
+        successUrl: `${host}/register/idp/${provider}/success`,
+        failureUrl: `${host}/register/idp/${provider}/failure`,
       }),
     });
 
@@ -58,14 +59,26 @@ export function SignInWithIDP({ identityProviders }: SignInWithIDPProps) {
               return (
                 <SignInWithGithub
                   key={`idp-${i}`}
-                  name={idp.name}
+                  onClick={() =>
+                    startFlow(idp, ProviderSlug.GITHUB).then(({ authUrl }) => {
+                      console.log("done");
+                      router.push(authUrl);
+                    })
+                  }
+                  // name={idp.name}
                 ></SignInWithGithub>
               );
             case 7: // IdentityProviderType.IDENTITY_PROVIDER_TYPE_GITHUB_ES:
               return (
                 <SignInWithGithub
                   key={`idp-${i}`}
-                  name={idp.name}
+                  // name={idp.name}
+                  // onClick={() =>
+                  //   startFlow(idp, ProviderSlug.GITHUB).then(({ authUrl }) => {
+                  //     console.log("done");
+                  //     router.push(authUrl);
+                  //   })
+                  // }
                 ></SignInWithGithub>
               );
             case 5: // IdentityProviderType.IDENTITY_PROVIDER_TYPE_AZURE_AD:
@@ -79,9 +92,9 @@ export function SignInWithIDP({ identityProviders }: SignInWithIDPProps) {
               return (
                 <SignInWithGoogle
                   key={`idp-${i}`}
-                  name={idp.name}
+                  // name={idp.name}
                   onClick={() =>
-                    startFlow(idp).then(({ authUrl }) => {
+                    startFlow(idp, ProviderSlug.GOOGLE).then(({ authUrl }) => {
                       console.log("done");
                       router.push(authUrl);
                     })
