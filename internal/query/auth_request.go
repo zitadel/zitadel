@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"

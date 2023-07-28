@@ -1429,7 +1429,7 @@ func Test_columnsToWhere(t *testing.T) {
 				conds: []Condition{
 					NewCond("col1", "val1"),
 				},
-				paramOffset: 0,
+				paramOffset: 1,
 			},
 			want: want{
 				wheres: []string{"(col1 = $1)"},
@@ -1443,7 +1443,7 @@ func Test_columnsToWhere(t *testing.T) {
 					NewCond("col1", "val1"),
 					NewCond("col2", "val2"),
 				},
-				paramOffset: 0,
+				paramOffset: 1,
 			},
 			want: want{
 				wheres: []string{"(col1 = $1)", "(col2 = $2)"},
@@ -1456,7 +1456,7 @@ func Test_columnsToWhere(t *testing.T) {
 				conds: []Condition{
 					NewCond("col1", "val1"),
 				},
-				paramOffset: 2,
+				paramOffset: 3,
 			},
 			want: want{
 				wheres: []string{"(col1 = $3)"},
@@ -1469,6 +1469,7 @@ func Test_columnsToWhere(t *testing.T) {
 				conds: []Condition{
 					NewLessThanCond("col1", "val1"),
 				},
+				paramOffset: 1,
 			},
 			want: want{
 				wheres: []string{"(col1 < $1)"},
@@ -1493,6 +1494,7 @@ func Test_columnsToWhere(t *testing.T) {
 				conds: []Condition{
 					NewTextArrayContainsCond("col1", "val1"),
 				},
+				paramOffset: 1,
 			},
 			want: want{
 				wheres: []string{"(col1 @> $1)"},
@@ -1505,6 +1507,7 @@ func Test_columnsToWhere(t *testing.T) {
 				conds: []Condition{
 					Not(NewCond("col1", "val1")),
 				},
+				paramOffset: 1,
 			},
 			want: want{
 				wheres: []string{"(NOT (col1 = $1))"},

@@ -129,7 +129,6 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						true,
 						true,
 						true,
-						true,
 						database.Array[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
 						database.Array[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 						domain.PasswordlessTypeAllowed,

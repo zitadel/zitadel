@@ -1398,7 +1398,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					),
 					expectFilter(),
 					expectPush(
-						newAddHumanEvent("", false, false, ""),
+						newAddHumanEvent("", false, true, ""),
 						user.NewHumanEmailVerifiedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate),
 						user.NewHumanPasswordlessInitCodeAddedEvent(context.Background(),
@@ -1821,7 +1821,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						newAddHumanEvent("", false, false, ""),
+						newAddHumanEvent("", false, true, ""),
 						user.NewUserIDPLinkAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							"idpID",

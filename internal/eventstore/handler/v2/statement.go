@@ -480,7 +480,7 @@ func NewTextArrayContainsCond(column string, value string) Condition {
 func Not(condition Condition) Condition {
 	return func(param string) (string, []any) {
 		cond, value := condition(param)
-		return "NOT (" + cond + ")", []any{value}
+		return "NOT (" + cond + ")", value
 	}
 }
 

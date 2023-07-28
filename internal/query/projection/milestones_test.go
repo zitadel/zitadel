@@ -104,11 +104,10 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.milestones SET primary_domain = $1 WHERE (instance_id = $2) AND (last_pushed_date = $3)",
+							expectedStmt: "UPDATE projections.milestones SET primary_domain = $1 WHERE (instance_id = $2) AND (last_pushed_date IS NULL)",
 							expectedArgs: []interface{}{
 								"my.domain",
 								"instance-id",
-								nil,
 							},
 						},
 					},
@@ -132,12 +131,11 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (reached_date = $4)",
+							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (reached_date IS NULL)",
 							expectedArgs: []interface{}{
 								now,
 								"instance-id",
 								milestone.ProjectCreated,
-								nil,
 							},
 						},
 					},
@@ -161,12 +159,11 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (reached_date = $4)",
+							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (reached_date IS NULL)",
 							expectedArgs: []interface{}{
 								now,
 								"instance-id",
 								milestone.ApplicationCreated,
-								nil,
 							},
 						},
 					},
@@ -205,12 +202,11 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.milestones SET ignore_client_ids = array_append(ignore_client_ids, $1) WHERE (instance_id = $2) AND (type = $3) AND (reached_date = $4)",
+							expectedStmt: "UPDATE projections.milestones SET ignore_client_ids = array_append(ignore_client_ids, $1) WHERE (instance_id = $2) AND (type = $3) AND (reached_date IS NULL)",
 							expectedArgs: []interface{}{
 								"client-id",
 								"instance-id",
 								milestone.AuthenticationSucceededOnApplication,
-								nil,
 							},
 						},
 					},
@@ -249,12 +245,11 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.milestones SET ignore_client_ids = array_append(ignore_client_ids, $1) WHERE (instance_id = $2) AND (type = $3) AND (reached_date = $4)",
+							expectedStmt: "UPDATE projections.milestones SET ignore_client_ids = array_append(ignore_client_ids, $1) WHERE (instance_id = $2) AND (type = $3) AND (reached_date IS NULL)",
 							expectedArgs: []interface{}{
 								"client-id",
 								"instance-id",
 								milestone.AuthenticationSucceededOnApplication,
-								nil,
 							},
 						},
 					},
@@ -279,22 +274,20 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 					// TODO: This can be optimized to only use one statement with OR
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (reached_date = $4)",
+							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (reached_date IS NULL)",
 							expectedArgs: []interface{}{
 								now,
 								"instance-id",
 								milestone.AuthenticationSucceededOnInstance,
-								nil,
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (NOT (ignore_client_ids @> $4)) AND (reached_date = $5)",
+							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (NOT (ignore_client_ids @> $4)) AND (reached_date IS NULL)",
 							expectedArgs: []interface{}{
 								now,
 								"instance-id",
 								milestone.AuthenticationSucceededOnApplication,
 								database.TextArray[string]{"client-id"},
-								nil,
 							},
 						},
 					},
@@ -318,12 +311,11 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (reached_date = $4)",
+							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (reached_date IS NULL)",
 							expectedArgs: []interface{}{
 								now,
 								"instance-id",
 								milestone.InstanceDeleted,
-								nil,
 							},
 						},
 					},
