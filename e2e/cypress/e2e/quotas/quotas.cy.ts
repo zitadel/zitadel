@@ -202,7 +202,7 @@ describe('quotas', () => {
                     },
                   })(events[0]);
                 }),
-              { timeout: 60_000 },
+              { timeout: 180_000 },
             );
           });
         });
@@ -251,7 +251,7 @@ describe('quotas', () => {
                         })(b);
                   }, true);
                 }),
-              { timeout: 60_000 },
+              { timeout: 180_000 },
             );
           });
         });
@@ -306,7 +306,7 @@ describe('quotas', () => {
                 return events.filter((ev) => expectEvents.some((expect) => Cypress._.matches(expect)(ev))).length >= 3;
               }),
             {
-              timeout: 60_000,
+              timeout: 180_000,
               log: true,
               errorMsg: () => {
                 const serialize = (ev: ZITADELWebhookEvent) => JSON.stringify(ev, null, 2);
