@@ -113,8 +113,11 @@ message LoginSettings {
 
 enum SecondFactorType {
   SECOND_FACTOR_TYPE_UNSPECIFIED = 0;
+  // This is the type for TOTP
   SECOND_FACTOR_TYPE_OTP = 1;
   SECOND_FACTOR_TYPE_U2F = 2;
+  SECOND_FACTOR_TYPE_OTP_EMAIL = 3;
+  SECOND_FACTOR_TYPE_OTP_SMS = 4;
 }
 
 enum MultiFactorType {

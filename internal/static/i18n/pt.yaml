@@ -120,6 +120,7 @@ Errors:
       Empty: Senha está vazia
       Invalid: Senha é inválida
       NotSet: O usuário não definiu uma senha
+      NotChanged: Senha não alterada
     PasswordComplexityPolicy:
       NotFound: Política de complexidade de senha não encontrada
       MinLength: A senha é muito curta
@@ -660,6 +661,10 @@ EventTypes:
       check:
         succeeded: Verificação de senha bem-sucedida
         failed: Verificação de senha falhou
+      change:
+        sent: Alteração de senha enviada
+      hash:
+        updated: Hash da senha atualizado
     phone:
       changed: Número de telefone alterado
       verified: Número de telefone verificado

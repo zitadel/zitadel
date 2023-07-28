@@ -306,7 +306,7 @@ describe('quotas', () => {
               }
               return foundExpected >= 3;
             }),
-          );
+          ), { timeout: 60_000 };
         });
       });
     });

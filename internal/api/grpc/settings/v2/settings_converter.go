@@ -62,10 +62,14 @@ func passkeysTypeToPb(passwordlessType domain.PasswordlessType) settings.Passkey
 
 func secondFactorTypeToPb(secondFactorType domain.SecondFactorType) settings.SecondFactorType {
 	switch secondFactorType {
-	case domain.SecondFactorTypeOTP:
+	case domain.SecondFactorTypeTOTP:
 		return settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP
 	case domain.SecondFactorTypeU2F:
 		return settings.SecondFactorType_SECOND_FACTOR_TYPE_U2F
+	case domain.SecondFactorTypeOTPEmail:
+		return settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_EMAIL
+	case domain.SecondFactorTypeOTPSMS:
+		return settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS
 	case domain.SecondFactorTypeUnspecified:
 		return settings.SecondFactorType_SECOND_FACTOR_TYPE_UNSPECIFIED
 	default:
