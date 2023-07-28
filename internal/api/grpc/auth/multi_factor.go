@@ -37,16 +37,16 @@ func (s *Server) ListMyAuthFactors(ctx context.Context, _ *auth_pb.ListMyAuthFac
 
 func (s *Server) AddMyAuthFactorOTP(ctx context.Context, _ *auth_pb.AddMyAuthFactorOTPRequest) (*auth_pb.AddMyAuthFactorOTPResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	otp, err := s.command.AddHumanOTP(ctx, ctxData.UserID, ctxData.ResourceOwner)
+	otp, err := s.command.AddHumanTOTP(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.AddMyAuthFactorOTPResponse{
-		Url:    otp.Url,
-		Secret: otp.SecretString,
+		Url:    otp.URI,
+		Secret: otp.Secret,
 		Details: object.AddToDetailsPb(
 			otp.Sequence,
-			otp.ChangeDate,
+			otp.EventDate,
 			otp.ResourceOwner,
 		),
 	}, nil
@@ -54,7 +54,7 @@ func (s *Server) AddMyAuthFactorOTP(ctx context.Context, _ *auth_pb.AddMyAuthFac
 
 func (s *Server) VerifyMyAuthFactorOTP(ctx context.Context, req *auth_pb.VerifyMyAuthFactorOTPRequest) (*auth_pb.VerifyMyAuthFactorOTPResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.HumanCheckMFAOTPSetup(ctx, ctxData.UserID, req.Code, "", ctxData.ResourceOwner)
+	objectDetails, err := s.command.HumanCheckMFATOTPSetup(ctx, ctxData.UserID, req.Code, "", ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (s *Server) VerifyMyAuthFactorOTP(ctx context.Context, req *auth_pb.VerifyM
 
 func (s *Server) RemoveMyAuthFactorOTP(ctx context.Context, _ *auth_pb.RemoveMyAuthFactorOTPRequest) (*auth_pb.RemoveMyAuthFactorOTPResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.HumanRemoveOTP(ctx, ctxData.UserID, ctxData.ResourceOwner)
+	objectDetails, err := s.command.HumanRemoveTOTP(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}

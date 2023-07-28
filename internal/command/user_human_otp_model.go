@@ -7,15 +7,15 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-type HumanOTPWriteModel struct {
+type HumanTOTPWriteModel struct {
 	eventstore.WriteModel
 
 	State  domain.MFAState
 	Secret *crypto.CryptoValue
 }
 
-func NewHumanOTPWriteModel(userID, resourceOwner string) *HumanOTPWriteModel {
-	return &HumanOTPWriteModel{
+func NewHumanTOTPWriteModel(userID, resourceOwner string) *HumanTOTPWriteModel {
+	return &HumanTOTPWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
@@ -23,7 +23,7 @@ func NewHumanOTPWriteModel(userID, resourceOwner string) *HumanOTPWriteModel {
 	}
 }
 
-func (wm *HumanOTPWriteModel) Reduce() error {
+func (wm *HumanTOTPWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanOTPAddedEvent:
@@ -40,7 +40,7 @@ func (wm *HumanOTPWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *HumanOTPWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *HumanTOTPWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
 		AggregateTypes(user.AggregateType).

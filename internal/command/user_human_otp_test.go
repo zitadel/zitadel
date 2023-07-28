@@ -22,7 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-func TestCommandSide_AddHumanOTP(t *testing.T) {
+func TestCommandSide_AddHumanTOTP(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -223,7 +223,7 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddHumanOTP(tt.args.ctx, tt.args.userID, tt.args.orgID)
+			got, err := r.AddHumanTOTP(tt.args.ctx, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -531,7 +531,7 @@ func TestCommands_HumanCheckMFAOTPSetup(t *testing.T) {
 	ctx := authz.NewMockContext("", "org1", "user1")
 
 	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
-	key, secret, err := domain.NewOTPKey("example.com", "user1", cryptoAlg)
+	key, secret, err := domain.NewTOTPKey("example.com", "user1", cryptoAlg)
 	require.NoError(t, err)
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 
@@ -697,7 +697,7 @@ func TestCommands_HumanCheckMFAOTPSetup(t *testing.T) {
 					},
 				},
 			}
-			got, err := c.HumanCheckMFAOTPSetup(ctx, tt.args.userID, tt.args.code, "agent1", tt.args.resourceOwner)
+			got, err := c.HumanCheckMFATOTPSetup(ctx, tt.args.userID, tt.args.code, "agent1", tt.args.resourceOwner)
 			require.ErrorIs(t, err, tt.wantErr)
 			if tt.want {
 				require.NotNil(t, got)
@@ -802,7 +802,7 @@ func TestCommandSide_RemoveHumanOTP(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.HumanRemoveOTP(tt.args.ctx, tt.args.userID, tt.args.orgID)
+			got, err := r.HumanRemoveTOTP(tt.args.ctx, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
