@@ -74,8 +74,7 @@ jobs:
     uses: ./.github/workflows/container.yml
     secrets: inherit
     with:
-      image_name: 'ghcr.io/zitadel/zitadel'
-      build_image_name: 'ghcr.io/zitadel/test'
+      build_image_name: 'ghcr.io/zitadel/build-cache'
       image_push: ${{ github.event_name == 'workflow_dispatch' }}
 
   e2e:
@@ -92,7 +91,7 @@ jobs:
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
     with:
-      image: ${{ needs.container.outputs.image }}
+      build_image_name: ${{ needs.container.outputs.build_image }}
       semantic_version: '19.0.2'
       image_name: 'ghcr.io/zitadel/zitadel'
       google_image_name: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
