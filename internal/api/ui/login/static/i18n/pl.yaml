@@ -403,6 +403,7 @@ Errors:
       Empty: Hasło jest puste
       Invalid: Hasło jest niepoprawne
       InvalidAndLocked: Hasło jest niepoprawne i użytkownik jest zablokowany, skontaktuj się z administratorem.
+      NotChanged: Hasło nie zostało zmienione
     UsernameOrPassword:
       Invalid: Nazwa użytkownika lub hasło jest niepoprawne
     PasswordComplexityPolicy:

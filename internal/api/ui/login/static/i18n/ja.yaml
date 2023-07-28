@@ -366,6 +366,7 @@ Errors:
       Empty: パスワードが空です
       Invalid: 無効なパスワードです
       InvalidAndLocked: パスワードが無効かつユーザーがロックされているため、管理者に連絡してください。
+      NotChanged: パスワードは変更されていません
     UsernameOrPassword:
       Invalid: ユーザー名またはパスワードは無効です
     PasswordComplexityPolicy:

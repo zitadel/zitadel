@@ -403,6 +403,7 @@ Errors:
       Empty: Лозинката е празна
       Invalid: Лозинката не е валидна
       InvalidAndLocked: Лозинката не е валидна и корисникот е заклучен, контактирајте со вашиот администратор.
+      NotChanged: Лозинката не е променета
     UsernameOrPassword:
       Invalid: Корисничкото име и/или лозинката не се валидни
     PasswordComplexityPolicy:

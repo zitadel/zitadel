@@ -403,6 +403,7 @@ Errors:
       Empty: La password è vuota
       Invalid: La password non è valida
       InvalidAndLocked: La password non è valida e l'utente è bloccato, contatta il tuo amministratore.
+      NotChanged: Password non modificata
     UsernameOrPassword:
       Invalid: Il nome utente o la password non sono validi
     PasswordComplexityPolicy:
