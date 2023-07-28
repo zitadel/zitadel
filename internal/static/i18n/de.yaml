@@ -583,6 +583,10 @@ EventTypes:
         check:
           succeeded: Passwortvalidierung erfolgreich
           failed: Passwortvalidierung fehlgeschlagen
+        change:
+          sent: Passwordänderung versendet
+        hash:
+          updated: Passwort Hash geändert
       externallogin:
         check:
           succeeded: Externer login erfolgreich durchgeführt

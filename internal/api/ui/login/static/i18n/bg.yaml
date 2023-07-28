@@ -391,6 +391,7 @@ Errors:
       InvalidAndLocked: >-
         Паролата е невалидна и потребителят е заключен, свържете се с вашия
         администратор.
+      NotChanged: Паролата не е променена
     UsernameOrPassword:
       Invalid: Потребителското име или паролата са невалидни
     PasswordComplexityPolicy:

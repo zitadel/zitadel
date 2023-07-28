@@ -399,6 +399,7 @@ Errors:
       Empty: Passwort ist leer
       Invalid: Passwort ungültig
       InvalidAndLocked: Password ist ungültig und Benutzer wurde gesperrt, melden Sie sich bei ihrem Administrator.
+      NotChanged: Passwort nicht geändert
     UsernameOrPassword:
       Invalid: Username oder Passwort ist ungültig
     PasswordComplexityPolicy:
