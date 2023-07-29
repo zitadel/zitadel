@@ -16,6 +16,7 @@ type LoginPolicy struct {
 	AllowExternalIDP           bool
 	IDPProviders               []*IDPProvider
 	ForceMFA                   bool
+	ForceMFALocalOnly          bool
 	SecondFactors              []SecondFactorType
 	MultiFactors               []MultiFactorType
 	PasswordlessType           PasswordlessType

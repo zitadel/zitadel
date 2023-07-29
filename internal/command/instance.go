@@ -48,6 +48,8 @@ type InstanceSetup struct {
 		PasswordVerificationCode *crypto.GeneratorConfig
 		PasswordlessInitCode     *crypto.GeneratorConfig
 		DomainVerification       *crypto.GeneratorConfig
+		OTPSMS                   *crypto.GeneratorConfig
+		OTPEmail                 *crypto.GeneratorConfig
 	}
 	PasswordComplexityPolicy struct {
 		MinLength    uint64
@@ -70,6 +72,7 @@ type InstanceSetup struct {
 		AllowRegister              bool
 		AllowExternalIDP           bool
 		ForceMFA                   bool
+		ForceMFALocalOnly          bool
 		HidePasswordReset          bool
 		IgnoreUnknownUsername      bool
 		AllowDomainDiscovery       bool
@@ -200,6 +203,8 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordResetCode, setup.SecretGenerators.PasswordVerificationCode),
 		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordlessInitCode, setup.SecretGenerators.PasswordlessInitCode),
 		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyDomain, setup.SecretGenerators.DomainVerification),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeOTPSMS, setup.SecretGenerators.OTPSMS),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeOTPEmail, setup.SecretGenerators.OTPEmail),
 
 		prepareAddDefaultPasswordComplexityPolicy(
 			instanceAgg,
@@ -226,6 +231,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LoginPolicy.AllowRegister,
 			setup.LoginPolicy.AllowExternalIDP,
 			setup.LoginPolicy.ForceMFA,
+			setup.LoginPolicy.ForceMFALocalOnly,
 			setup.LoginPolicy.HidePasswordReset,
 			setup.LoginPolicy.IgnoreUnknownUsername,
 			setup.LoginPolicy.AllowDomainDiscovery,
@@ -239,8 +245,12 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LoginPolicy.SecondFactorCheckLifetime,
 			setup.LoginPolicy.MultiFactorCheckLifetime,
 		),
-		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeOTP),
+		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeTOTP),
 		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeU2F),
+		/* TODO: incomment when usable
+		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeOTPEmail),
+		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeOTPSMS),
+		*/
 		prepareAddMultiFactorToDefaultLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
 
 		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink, setup.PrivacyPolicy.SupportEmail),

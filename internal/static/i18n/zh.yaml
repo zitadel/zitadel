@@ -664,6 +664,10 @@ EventTypes:
       check:
         succeeded: 密码检查成功
         failed: 密码检查失败
+      change:
+        sent: 密码更改已发送
+      hash:
+        updated: 密码哈希已更新
     phone:
       changed: 更改手机号码
       verified: 验证手机号码

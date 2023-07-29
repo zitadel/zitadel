@@ -85,6 +85,16 @@ func HasMFA(methods []UserAuthMethodType) bool {
 	return factors > 1
 }
 
+// RequiresMFA checks whether the user requires to authenticate with multiple auth factors based on the LoginPolicy and the authentication type.
+// Internal authentication will require MFA if either option is activated.
+// External authentication will only require MFA if it's forced generally and not local only.
+func RequiresMFA(forceMFA, forceMFALocalOnly, isInternalLogin bool) bool {
+	if isInternalLogin {
+		return forceMFA || forceMFALocalOnly
+	}
+	return forceMFA && !forceMFALocalOnly
+}
+
 type PersonalAccessTokenState int32
 
 const (

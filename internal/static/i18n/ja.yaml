@@ -655,6 +655,10 @@ EventTypes:
       check:
         succeeded: パスワードチェックの成功
         failed: パスワードチェックの失敗
+      change:
+        sent: パスワード変更を送信しました
+      hash:
+        updated: パスワードハッシュが更新されました
     phone:
       changed: 電話番号の変更
       verified: 電話番号の検証

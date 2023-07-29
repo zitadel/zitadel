@@ -89,7 +89,7 @@ type idpUserLinksProvider interface {
 }
 
 type userEventProvider interface {
-	UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error)
+	UserEventsByID(ctx context.Context, id string, sequence uint64, eventTypes []es_models.EventType) ([]*es_models.Event, error)
 }
 
 type userCommandProvider interface {
@@ -842,6 +842,7 @@ func queryLoginPolicyToDomain(policy *query.LoginPolicy) *domain.LoginPolicy {
 		AllowRegister:              policy.AllowRegister,
 		AllowExternalIDP:           policy.AllowExternalIDPs,
 		ForceMFA:                   policy.ForceMFA,
+		ForceMFALocalOnly:          policy.ForceMFALocalOnly,
 		SecondFactors:              policy.SecondFactors,
 		MultiFactors:               policy.MultiFactors,
 		PasswordlessType:           policy.PasswordlessType,
@@ -977,7 +978,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		}
 	}
 
-	step, ok, err := repo.mfaChecked(userSession, request, user)
+	step, ok, err := repo.mfaChecked(userSession, request, user, isInternalLogin && len(request.LinkingUsers) == 0)
 	if err != nil {
 		return nil, err
 	}
@@ -1096,9 +1097,9 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 	return &domain.PasswordStep{}
 }
 
-func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *domain.AuthRequest, user *user_model.UserView) (domain.NextStep, bool, error) {
+func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *domain.AuthRequest, user *user_model.UserView, isInternalAuthentication bool) (domain.NextStep, bool, error) {
 	mfaLevel := request.MFALevel()
-	allowedProviders, required := user.MFATypesAllowed(mfaLevel, request.LoginPolicy)
+	allowedProviders, required := user.MFATypesAllowed(mfaLevel, request.LoginPolicy, isInternalAuthentication)
 	promptRequired := (user.MFAMaxSetUp < mfaLevel) || (len(allowedProviders) == 0 && required)
 	if promptRequired || !repo.mfaSkippedOrSetUp(user, request) {
 		types := user.MFATypesSetupPossible(mfaLevel, request.LoginPolicy)
@@ -1315,6 +1316,29 @@ func userSessionsByUserAgentID(provider userSessionViewProvider, agentID, instan
 	return user_view_model.UserSessionsToModel(session), nil
 }
 
+var (
+	userSessionEventTypes = []es_models.EventType{
+		es_models.EventType(user_repo.UserV1PasswordCheckSucceededType),
+		es_models.EventType(user_repo.UserV1PasswordCheckFailedType),
+		es_models.EventType(user_repo.UserV1MFAOTPCheckSucceededType),
+		es_models.EventType(user_repo.UserV1MFAOTPCheckFailedType),
+		es_models.EventType(user_repo.UserV1SignedOutType),
+		es_models.EventType(user_repo.UserLockedType),
+		es_models.EventType(user_repo.UserDeactivatedType),
+		es_models.EventType(user_repo.HumanPasswordCheckSucceededType),
+		es_models.EventType(user_repo.HumanPasswordCheckFailedType),
+		es_models.EventType(user_repo.UserIDPLoginCheckSucceededType),
+		es_models.EventType(user_repo.HumanMFAOTPCheckSucceededType),
+		es_models.EventType(user_repo.HumanMFAOTPCheckFailedType),
+		es_models.EventType(user_repo.HumanSignedOutType),
+		es_models.EventType(user_repo.HumanPasswordlessTokenCheckSucceededType),
+		es_models.EventType(user_repo.HumanPasswordlessTokenCheckFailedType),
+		es_models.EventType(user_repo.HumanU2FTokenCheckSucceededType),
+		es_models.EventType(user_repo.HumanU2FTokenCheckFailedType),
+		es_models.EventType(user_repo.UserRemovedType),
+	}
+)
+
 func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eventProvider userEventProvider, agentID string, user *user_model.UserView) (*user_model.UserSessionView, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	session, err := provider.UserSessionByIDs(agentID, user.ID, instanceID)
@@ -1331,7 +1355,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			session.Sequence = sequence.CurrentSequence
 		}
 	}
-	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence)
+	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence, append(session.EventTypes(), userSessionEventTypes...))
 	if err != nil {
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserSessionToModel(session), nil
@@ -1412,7 +1436,7 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	} else if user == nil {
 		user = new(user_view_model.UserView)
 	}
-	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence)
+	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence, user.EventTypes())
 	if err != nil {
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserToModel(user), nil

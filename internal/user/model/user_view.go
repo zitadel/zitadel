@@ -156,7 +156,7 @@ func (u *UserView) MFATypesSetupPossible(level domain.MFALevel, policy *domain.L
 		if policy.HasSecondFactors() {
 			for _, mfaType := range policy.SecondFactors {
 				switch mfaType {
-				case domain.SecondFactorTypeOTP:
+				case domain.SecondFactorTypeTOTP:
 					if u.OTPState != MFAStateReady {
 						types = append(types, domain.MFATypeOTP)
 					}
@@ -170,18 +170,18 @@ func (u *UserView) MFATypesSetupPossible(level domain.MFALevel, policy *domain.L
 	return types
 }
 
-func (u *UserView) MFATypesAllowed(level domain.MFALevel, policy *domain.LoginPolicy) ([]domain.MFAType, bool) {
+func (u *UserView) MFATypesAllowed(level domain.MFALevel, policy *domain.LoginPolicy, isInternalAuthentication bool) ([]domain.MFAType, bool) {
 	types := make([]domain.MFAType, 0)
 	required := true
 	switch level {
 	default:
-		required = policy.ForceMFA
+		required = domain.RequiresMFA(policy.ForceMFA, policy.ForceMFALocalOnly, isInternalAuthentication)
 		fallthrough
 	case domain.MFALevelSecondFactor:
 		if policy.HasSecondFactors() {
 			for _, mfaType := range policy.SecondFactors {
 				switch mfaType {
-				case domain.SecondFactorTypeOTP:
+				case domain.SecondFactorTypeTOTP:
 					if u.OTPState == MFAStateReady {
 						types = append(types, domain.MFATypeOTP)
 					}
