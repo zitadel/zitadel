@@ -679,7 +679,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	}
 	// if there's an active (human) user, let's use it
 	if user != nil && !user.HumanView.IsZero() && domain.UserState(user.State).NotDisabled() {
-		request.SetUserInfo(user.ID, loginName, user.PreferredLoginName, user.DisplayName, user.AvatarKey, user.ResourceOwner)
+		request.SetUserInfo(user.ID, loginName, user.PreferredLoginName, "", "", user.ResourceOwner)
 		return nil
 	}
 	// the user was either not found or not active
@@ -952,6 +952,8 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	if err != nil {
 		return nil, err
 	}
+	request.DisplayName = userSession.DisplayName
+	request.AvatarKey = userSession.AvatarKey
 
 	isInternalLogin := request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == ""
 	idps, err := checkExternalIDPsOfUser(ctx, repo.IDPUserLinksProvider, user.ID)
