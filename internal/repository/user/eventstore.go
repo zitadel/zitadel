@@ -17,7 +17,6 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, UserV1PasswordCodeSentType, HumanPasswordCodeSentEventMapper).
 		RegisterFilterEventMapper(AggregateType, UserV1PasswordCheckSucceededType, HumanPasswordCheckSucceededEventMapper).
 		RegisterFilterEventMapper(AggregateType, UserV1PasswordCheckFailedType, HumanPasswordCheckFailedEventMapper).
-		RegisterFilterEventMapper(AggregateType, UserV1PasswordHashUpdatedType, eventstore.GenericEventMapper[HumanPasswordHashUpdatedEvent]).
 		RegisterFilterEventMapper(AggregateType, UserV1EmailChangedType, HumanEmailChangedEventMapper).
 		RegisterFilterEventMapper(AggregateType, UserV1EmailVerifiedType, HumanEmailVerifiedEventMapper).
 		RegisterFilterEventMapper(AggregateType, UserV1EmailVerificationFailedType, HumanEmailVerificationFailedEventMapper).
@@ -63,6 +62,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, HumanPasswordChangeSentType, HumanPasswordChangeSentEventMapper).
 		RegisterFilterEventMapper(AggregateType, HumanPasswordCheckSucceededType, HumanPasswordCheckSucceededEventMapper).
 		RegisterFilterEventMapper(AggregateType, HumanPasswordCheckFailedType, HumanPasswordCheckFailedEventMapper).
+		RegisterFilterEventMapper(AggregateType, HumanPasswordHashUpdatedType, eventstore.GenericEventMapper[HumanPasswordHashUpdatedEvent]).
 		RegisterFilterEventMapper(AggregateType, UserIDPLinkAddedType, UserIDPLinkAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, UserIDPLinkRemovedType, UserIDPLinkRemovedEventMapper).
 		RegisterFilterEventMapper(AggregateType, UserIDPLinkCascadeRemovedType, UserIDPLinkCascadeRemovedEventMapper).

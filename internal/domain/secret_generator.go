@@ -11,6 +11,8 @@ const (
 	SecretGeneratorTypePasswordResetCode
 	SecretGeneratorTypePasswordlessInitCode
 	SecretGeneratorTypeAppSecret
+	SecretGeneratorTypeOTPSMS
+	SecretGeneratorTypeOTPEmail
 
 	secretGeneratorTypeCount
 )
