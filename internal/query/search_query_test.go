@@ -1432,7 +1432,7 @@ func TestNewInTextQuery(t *testing.T) {
 			},
 			want: &InTextQuery{
 				Column: testCol,
-				Values: append([]string{"adler", "hurst"}),
+				Values: []string{"adler", "hurst"},
 			},
 		},
 	}
