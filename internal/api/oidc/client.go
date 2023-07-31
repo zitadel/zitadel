@@ -209,7 +209,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 		}
 	}
 	return o.introspect(ctx, introspection,
-		token.ID, token.UserID, token.ApplicationID, projectID,
+		token.ID, token.UserID, clientID, projectID,
 		token.Audience, token.Scopes,
 		token.CreationDate, token.Expiration)
 }
