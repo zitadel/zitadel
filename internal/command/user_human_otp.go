@@ -195,6 +195,9 @@ func (c *Commands) AddHumanOTPSMS(ctx context.Context, userID, resourceOwner str
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-QSF2s", "Errors.User.UserIDMissing")
 	}
+	if err := authz.UserIDInCTX(ctx, userID); err != nil {
+		return nil, err
+	}
 	otpWriteModel, err := c.otpSMSWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -220,6 +223,11 @@ func (c *Commands) RemoveHumanOTPSMS(ctx context.Context, userID, resourceOwner 
 	existingOTP, err := c.otpSMSWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
+	}
+	if userID != authz.GetCtxData(ctx).UserID {
+		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingOTP.ResourceOwner, userID); err != nil {
+			return nil, err
+		}
 	}
 	if !existingOTP.otpAdded {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Sr3h3", "Errors.User.MFA.OTP.NotExisting")
@@ -260,6 +268,11 @@ func (c *Commands) RemoveHumanOTPEmail(ctx context.Context, userID, resourceOwne
 	existingOTP, err := c.otpEmailWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
+	}
+	if userID != authz.GetCtxData(ctx).UserID {
+		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingOTP.ResourceOwner, userID); err != nil {
+			return nil, err
+		}
 	}
 	if !existingOTP.otpAdded {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-b312D", "Errors.User.MFA.OTP.NotExisting")

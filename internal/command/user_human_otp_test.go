@@ -817,6 +817,7 @@ func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 }
 
 func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
@@ -843,7 +844,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           ctx,
 				userID:        "",
 				resourceOwner: "org1",
 			},
@@ -852,12 +853,26 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 			},
 		},
 		{
+			name: "wrong user, permission denied error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "other",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			},
+		},
+		{
 			name: "otp sms already exists, already exists error",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanOTPSMSAddedEvent(context.Background(),
+							user.NewHumanOTPSMSAddedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 							),
 						),
@@ -865,7 +880,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           ctx,
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
@@ -881,7 +896,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           ctx,
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
@@ -895,18 +910,18 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanPhoneChangedEvent(context.Background(),
+							user.NewHumanPhoneChangedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"+4179654321",
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanPhoneVerifiedEvent(context.Background(),
+							user.NewHumanPhoneVerifiedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanPhoneRemovedEvent(context.Background(),
+							user.NewHumanPhoneRemovedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 							),
 						),
@@ -914,7 +929,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           ctx,
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
@@ -928,28 +943,30 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanPhoneChangedEvent(context.Background(),
+							user.NewHumanPhoneChangedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"+4179654321",
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanPhoneVerifiedEvent(context.Background(),
+							user.NewHumanPhoneVerifiedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 							),
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							user.NewHumanOTPSMSAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID("inst1",
+								user.NewHumanOTPSMSAddedEvent(ctx,
+									&user.NewAggregate("user1", "org1").Aggregate,
+								),
 							),
-						),
+						},
 					),
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           ctx,
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
@@ -973,8 +990,10 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 }
 
 func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	type fields struct {
-		eventstore func(*testing.T) *eventstore.Eventstore
+		eventstore      func(*testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type (
 		args struct {
@@ -999,7 +1018,7 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           ctx,
 				userID:        "",
 				resourceOwner: "org1",
 			},
@@ -1008,14 +1027,32 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 			},
 		},
 		{
+			name: "other user not permission, permission denied error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "other",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			},
+		},
+		{
 			name: "otp sms not added, not found error",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           ctx,
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
@@ -1029,22 +1066,25 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanOTPSMSAddedEvent(context.Background(),
+							user.NewHumanOTPSMSAddedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 							),
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							user.NewHumanOTPSMSRemovedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID("inst1",
+								user.NewHumanOTPSMSRemovedEvent(ctx,
+									&user.NewAggregate("user1", "org1").Aggregate,
+								),
 							),
-						),
+						},
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           ctx,
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
@@ -1058,7 +1098,8 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.RemoveHumanOTPSMS(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
@@ -1068,6 +1109,7 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 }
 
 func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
@@ -1094,7 +1136,7 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           ctx,
 				userID:        "",
 				resourceOwner: "org1",
 			},
@@ -1108,7 +1150,7 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanOTPEmailAddedEvent(context.Background(),
+							user.NewHumanOTPEmailAddedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 							),
 						),
@@ -1116,7 +1158,7 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           ctx,
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
@@ -1132,7 +1174,7 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           ctx,
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
@@ -1146,28 +1188,30 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanEmailChangedEvent(context.Background(),
+							user.NewHumanEmailChangedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"email@test.ch",
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailVerifiedEvent(context.Background(),
+							user.NewHumanEmailVerifiedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 							),
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							user.NewHumanOTPEmailAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID("inst1",
+								user.NewHumanOTPEmailAddedEvent(ctx,
+									&user.NewAggregate("user1", "org1").Aggregate,
+								),
 							),
-						),
+						},
 					),
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           ctx,
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
@@ -1191,8 +1235,10 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 }
 
 func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	type fields struct {
-		eventstore func(*testing.T) *eventstore.Eventstore
+		eventstore      func(*testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type (
 		args struct {
@@ -1217,7 +1263,7 @@ func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           ctx,
 				userID:        "",
 				resourceOwner: "org1",
 			},
@@ -1226,14 +1272,32 @@ func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
 			},
 		},
 		{
+			name: "other user not permission, permission denied error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "other",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			},
+		},
+		{
 			name: "otp email not added, not found error",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           ctx,
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
@@ -1247,22 +1311,25 @@ func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanOTPEmailAddedEvent(context.Background(),
+							user.NewHumanOTPEmailAddedEvent(ctx,
 								&user.NewAggregate("user1", "org1").Aggregate,
 							),
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							user.NewHumanOTPEmailRemovedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID("inst1",
+								user.NewHumanOTPEmailRemovedEvent(ctx,
+									&user.NewAggregate("user1", "org1").Aggregate,
+								),
 							),
-						),
+						},
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           ctx,
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
@@ -1276,7 +1343,8 @@ func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.RemoveHumanOTPEmail(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)

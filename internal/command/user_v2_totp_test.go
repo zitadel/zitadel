@@ -45,7 +45,7 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 				userID:        "foo",
 				resourceowner: "org1",
 			},
-			wantErr: caos_errs.ThrowUnauthenticated(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
 		},
 		{
 			name: "create otp error",
@@ -218,7 +218,7 @@ func TestCommands_CheckUserTOTP(t *testing.T) {
 			args: args{
 				userID: "foo",
 			},
-			wantErr: caos_errs.ThrowUnauthenticated(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
 		},
 		{
 			name: "success",
