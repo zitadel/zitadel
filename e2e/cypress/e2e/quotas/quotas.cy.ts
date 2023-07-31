@@ -173,86 +173,49 @@ describe('quotas', () => {
           });
         });
 
-        it('fires at least once with the expected payload', () => {
-          cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
-            cy.get<Context>('@ctx').then((ctx) => {
-              for (let i = 0; i < usage; i++) {
-                cy.request({
-                  url: urls[0],
-                  method: 'GET',
-                  auth: {
-                    bearer: ctx.api.token,
-                  },
-                });
-              }
-            });
-            cy.waitUntil(
-              () =>
-                cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
-                  if (events.length < 1) {
-                    return false;
-                  }
-                  return Cypress._.matches(<ZITADELWebhookEvent>{
-                    sentStatus: 200,
-                    payload: {
-                      callURL: callURL,
-                      threshold: percent,
-                      unit: 1,
-                      usage: percent,
+        [0, 8].forEach((fail) => {
+          it(`fires at least once with the expected payload when the endpoint fails ${fail} times`, () => {
+            cy.task('failWebhookEvents', fail);
+            cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
+              cy.get<Context>('@ctx').then((ctx) => {
+                for (let i = 0; i < usage; i++) {
+                  cy.request({
+                    url: urls[0],
+                    method: 'GET',
+                    auth: {
+                      bearer: ctx.api.token,
                     },
-                  })(events[0]);
-                }),
-              { timeout: 180_000 },
-            );
-          });
-        });
-
-        it('fires until the webhook returns a successful message', () => {
-          cy.task('failWebhookEvents', 8);
-          cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
-            cy.get<Context>('@ctx').then((ctx) => {
-              for (let i = 0; i < usage; i++) {
-                cy.request({
-                  url: urls[0],
-                  method: 'GET',
-                  auth: {
-                    bearer: ctx.api.token,
-                  },
-                });
-              }
+                  });
+                }
+              });
+              const expectEvent = <ZITADELWebhookEvent>{
+                sentStatus: 200,
+                payload: {
+                  callURL: callURL,
+                  threshold: percent,
+                  unit: 1,
+                  usage: percent,
+                },
+              };
+              let mostRecentEvents: Array<ZITADELWebhookEvent> = [];
+              cy.waitUntil(
+                () =>
+                  cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
+                    mostRecentEvents = events;
+                    if (events.length <= fail) {
+                      return false;
+                    }
+                    return events.filter((event) => Cypress._.matches(expectEvent)(event)).length < 1;
+                  }),
+                {
+                  timeout: 180_000,
+                  errorMsg: () =>
+                    `couldn't find expected event ${serialize(expectEvent)} in received events ${mostRecentEvents.map(
+                      serialize,
+                    )}`,
+                },
+              );
             });
-            cy.waitUntil(
-              () =>
-                cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
-                  if (events.length != 9) {
-                    return false;
-                  }
-                  return events.reduce<boolean>((a, b, i) => {
-                    return !a
-                      ? a
-                      : i < 8
-                      ? Cypress._.matches(<ZITADELWebhookEvent>{
-                          sentStatus: 500,
-                          payload: {
-                            callURL: callURL,
-                            threshold: percent,
-                            unit: 1,
-                            usage: percent,
-                          },
-                        })(b)
-                      : Cypress._.matches(<ZITADELWebhookEvent>{
-                          sentStatus: 200,
-                          payload: {
-                            callURL: callURL,
-                            threshold: percent,
-                            unit: 1,
-                            usage: percent,
-                          },
-                        })(b);
-                  }, true);
-                }),
-              { timeout: 180_000 },
-            );
           });
         });
       });
@@ -307,7 +270,6 @@ describe('quotas', () => {
               }),
             {
               timeout: 180_000,
-              log: true,
               errorMsg: () => {
                 const serialize = (ev: ZITADELWebhookEvent) => JSON.stringify(ev, null, 2);
                 return `couldn't find all expected events ${expectEvents.map(
@@ -326,4 +288,8 @@ function expectCookieDoesntExist() {
   cy.getCookie('zitadel.quota.limiting').then((cookie) => {
     expect(cookie).to.be.null;
   });
+}
+
+function serialize(ev: ZITADELWebhookEvent) {
+  return JSON.stringify(ev, null, 2);
 }
