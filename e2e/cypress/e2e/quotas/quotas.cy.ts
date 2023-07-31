@@ -159,84 +159,22 @@ describe('quotas', () => {
       const percent = 10;
       const usage = 35;
 
-      describe('without repetition', () => {
-        beforeEach(() => {
-          cy.get<Context>('@ctx').then((ctx) => {
-            ensureQuotaIsAdded(ctx, Unit.AuthenticatedRequests, false, amount, [
-              {
-                callUrl: callURL,
-                percent: percent,
-                repeat: false,
-              },
-            ]);
-            cy.task('runSQL', `TRUNCATE logstore.access;`);
-          });
-        });
-
-        [0, 8].forEach((fail) => {
-          it(`fires at least once with the expected payload when the endpoint fails ${fail} times`, () => {
-            cy.task('failWebhookEvents', fail);
-            cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
-              cy.get<Context>('@ctx').then((ctx) => {
-                for (let i = 0; i < usage; i++) {
-                  cy.request({
-                    url: urls[0],
-                    method: 'GET',
-                    auth: {
-                      bearer: ctx.api.token,
-                    },
-                  });
-                }
-              });
-              const expectEvent = <ZITADELWebhookEvent>{
-                sentStatus: 200,
-                payload: {
-                  callURL: callURL,
-                  threshold: percent,
-                  unit: 1,
-                  usage: percent,
-                },
-              };
-              let mostRecentEvents: Array<ZITADELWebhookEvent> = [];
-              cy.waitUntil(
-                () =>
-                  cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
-                    mostRecentEvents = events;
-                    if (events.length <= fail) {
-                      return false;
-                    }
-                    return events.filter((event) => Cypress._.matches(expectEvent)(event)).length >= 1;
-                  }),
-                {
-                  timeout: 180_000,
-                  errorMsg: () =>
-                    `couldn't find expected event ${serialize(expectEvent)} in received events ${mostRecentEvents.map(
-                      serialize,
-                    )}`,
-                },
-              );
-            });
-          });
+      beforeEach(() => {
+        cy.get<Context>('@ctx').then((ctx) => {
+          ensureQuotaIsAdded(ctx, Unit.AuthenticatedRequests, false, amount, [
+            {
+              callUrl: callURL,
+              percent: percent,
+              repeat: false,
+            },
+          ]);
+          cy.task('runSQL', `TRUNCATE logstore.access;`);
         });
       });
 
-      describe('with repetition', () => {
-        beforeEach(() => {
-          cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
-            cy.get<Context>('@ctx').then((ctx) => {
-              ensureQuotaIsAdded(ctx, Unit.AuthenticatedRequests, false, amount, [
-                {
-                  callUrl: callURL,
-                  percent: percent,
-                  repeat: true,
-                },
-              ]);
-              cy.task('runSQL', `TRUNCATE logstore.access;`);
-            });
-          });
-        });
-
-        it('fires repeatedly with the expected payloads', () => {
+      [0, 8].forEach((fail) => {
+        it(`fires at least once with the expected payload when the endpoint fails ${fail} times`, () => {
+          cy.task('failWebhookEvents', fail);
           cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
             cy.get<Context>('@ctx').then((ctx) => {
               for (let i = 0; i < usage; i++) {
@@ -249,36 +187,79 @@ describe('quotas', () => {
                 });
               }
             });
-          });
-          const expectEvents = [10, 20, 30].map((expectUsage) => {
-            return <ZITADELWebhookEvent>{
+            const expectEvent = <ZITADELWebhookEvent>{
               sentStatus: 200,
               payload: {
                 callURL: callURL,
-                threshold: expectUsage,
+                threshold: percent,
                 unit: 1,
-                usage: expectUsage,
+                usage: percent,
               },
             };
-          });
-          let mostRecentEvents: Array<ZITADELWebhookEvent> = [];
-          cy.waitUntil(
-            () =>
-              cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
-                mostRecentEvents = events;
-                return events.filter((ev) => expectEvents.some((expect) => Cypress._.matches(expect)(ev))).length >= 3;
-              }),
-            {
-              timeout: 180_000,
-              errorMsg: () => {
-                const serialize = (ev: ZITADELWebhookEvent) => JSON.stringify(ev, null, 2);
-                return `couldn't find all expected events ${expectEvents.map(
-                  serialize,
-                )} in received events ${mostRecentEvents.map(serialize)}`;
+            let mostRecentEvents: Array<ZITADELWebhookEvent> = [];
+            cy.waitUntil(
+              () =>
+                cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
+                  mostRecentEvents = events;
+                  if (events.length <= fail) {
+                    return false;
+                  }
+                  return events.filter((event) => Cypress._.matches(expectEvent)(event)).length >= 1;
+                }),
+              {
+                timeout: 180_000,
+                errorMsg: () =>
+                  `couldn't find expected event ${serialize(expectEvent)} in received events ${mostRecentEvents.map(
+                    serialize,
+                  )}`,
               },
-            },
-          );
+            );
+          });
         });
+      });
+
+      it('fires repeatedly with the expected payloads', () => {
+        cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
+          cy.get<Context>('@ctx').then((ctx) => {
+            for (let i = 0; i < usage; i++) {
+              cy.request({
+                url: urls[0],
+                method: 'GET',
+                auth: {
+                  bearer: ctx.api.token,
+                },
+              });
+            }
+          });
+        });
+        const expectEvents = [10, 20, 30].map((expectUsage) => {
+          return <ZITADELWebhookEvent>{
+            sentStatus: 200,
+            payload: {
+              callURL: callURL,
+              threshold: expectUsage,
+              unit: 1,
+              usage: expectUsage,
+            },
+          };
+        });
+        let mostRecentEvents: Array<ZITADELWebhookEvent> = [];
+        cy.waitUntil(
+          () =>
+            cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
+              mostRecentEvents = events;
+              return events.filter((ev) => expectEvents.some((expect) => Cypress._.matches(expect)(ev))).length >= 3;
+            }),
+          {
+            timeout: 180_000,
+            errorMsg: () => {
+              const serialize = (ev: ZITADELWebhookEvent) => JSON.stringify(ev, null, 2);
+              return `couldn't find all expected events ${expectEvents.map(
+                serialize,
+              )} in received events ${mostRecentEvents.map(serialize)}`;
+            },
+          },
+        );
       });
     });
   });
