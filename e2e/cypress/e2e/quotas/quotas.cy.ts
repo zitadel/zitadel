@@ -205,7 +205,7 @@ describe('quotas', () => {
                     if (events.length <= fail) {
                       return false;
                     }
-                    return events.filter((event) => Cypress._.matches(expectEvent)(event)).length < 1;
+                    return events.filter((event) => Cypress._.matches(expectEvent)(event)).length >= 1;
                   }),
                 {
                   timeout: 180_000,
