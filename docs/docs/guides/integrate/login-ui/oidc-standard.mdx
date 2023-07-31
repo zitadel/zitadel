@@ -92,11 +92,52 @@ This session token has to be sent to the following request:
 
 Read more about the [Finalize Auth Request Documentation](/docs/apis/resources/oidc_service/oidc-service-create-callback)
 
+Make sure that the authorization header is from the same account that you originally sent in the client id header ```x-zitadel-login-client: <userid>``` on the authorize endpoint.
 ```bash
-
+curl --request POST \
+  --url $ZITADEL_DOMAIN/v2alpha/oidc/auth_requests/V2_224908753244265546 \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Content-Type: application/json' \
+  --data '{
+  "session": {
+    "sessionId": "225307381909694508",
+    "sessionToken": "7N5kQCvC4jIf2OuBjwfyWSX2FUKbQqg4iG3uWT-TBngMhlS9miGUwpyUaN0HJ8OcbSzk4QHZy_Bvvv"
+  }
+}'
 ```
 
+In the response you will get a callback URL to which you have to redirect from your login UI.
+
+Example Response:
+```bash
+{
+	"details": {
+		"sequence": "686",
+		"changeDate": "2023-07-31T08:09:19.314537Z",
+		"resourceOwner": "163840776801878273"
+	},
+	"callbackUrl": "https://myapp.example.com/auth/callback?code=k98NBLrdjVbwQQI-oM_rR_cYHv0k3dqpkqlQX8UXTWVnYSQL9g&state=testd"
+}
+```
+
+### OIDC Endpoints
+
+All OIDC relevant endpoints are provided by ZITADEL. In you login UI you just have to proxy them through and send them directly to the backend.
+
+These are endpoints like:
+- Userinfo
+- Well-known
+- Introspection
+- Token
+- etc
 
 
-### Logout
-DefaultLogoutURLV2: "/logout?post_logout_redirect="
+### End Session / Logout
+
+Then end session endpoint has to be implemented as all to other OIDC endpoints. This means you have to proxy the request from you UI to the ZITADEL.
+To be able to redirect the user to the correct URLs after a successful logout, you need the following endpoint:
+
+```/logout?post_logout_redirect="```
+
+You will get the post logout redirect URLs in the parameter and can send the user to that URL.
