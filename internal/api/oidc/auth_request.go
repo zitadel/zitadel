@@ -463,7 +463,7 @@ func (o *OPStorage) assertProjectRoleScopesByProject(ctx context.Context, projec
 }
 
 func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.TokenView, clientID, projectID string) error {
-	token.Audience = append(token.Audience, clientID, projectID)
+	token.Audience = append(token.Audience, clientID)
 	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(projectID)
 	if err != nil {
 		return errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
