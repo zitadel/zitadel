@@ -22,25 +22,35 @@ const (
 // [RFC 8176, section 2]: https://datatracker.ietf.org/doc/html/rfc8176#section-2
 func AuthMethodTypesToAMR(methodTypes []domain.UserAuthMethodType) []string {
 	amr := make([]string, 0, 4)
-	var mfa bool
+	var factors, otp int
 	for _, methodType := range methodTypes {
 		switch methodType {
 		case domain.UserAuthMethodTypePassword:
 			amr = append(amr, PWD)
+			factors++
 		case domain.UserAuthMethodTypePasswordless:
-			mfa = true
 			amr = append(amr, UserPresence)
+			factors += 2
 		case domain.UserAuthMethodTypeU2F:
 			amr = append(amr, UserPresence)
-		case domain.UserAuthMethodTypeOTP:
-			amr = append(amr, OTP)
+			factors++
+		case domain.UserAuthMethodTypeTOTP,
+			domain.UserAuthMethodTypeOTPSMS,
+			domain.UserAuthMethodTypeOTPEmail:
+			// a user could use multiple (t)otp, which is a factor, but still will be returned as a single `otp` entry
+			otp++
+			factors++
 		case domain.UserAuthMethodTypeIDP:
 			// no AMR value according to specification
+			factors++
 		case domain.UserAuthMethodTypeUnspecified:
 			// ignore
 		}
 	}
-	if mfa || len(amr) >= 2 {
+	if otp > 0 {
+		amr = append(amr, OTP)
+	}
+	if factors >= 2 {
 		amr = append(amr, MFA)
 	}
 	return amr

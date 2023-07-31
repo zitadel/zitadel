@@ -191,11 +191,115 @@ func (c *Commands) HumanRemoveTOTP(ctx context.Context, userID, resourceOwner st
 	return writeModelToObjectDetails(&existingOTP.WriteModel), nil
 }
 
+func (c *Commands) AddHumanOTPSMS(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-QSF2s", "Errors.User.UserIDMissing")
+	}
+	otpWriteModel, err := c.otpSMSWriteModelByID(ctx, userID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if otpWriteModel.otpAdded {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-Ad3g2", "Errors.User.MFA.OTP.AlreadyReady")
+	}
+	if !otpWriteModel.phoneVerified {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Q54j2", "Errors.User.MFA.OTP.NotReady")
+	}
+	userAgg := UserAggregateFromWriteModel(&otpWriteModel.WriteModel)
+	if err = c.pushAppendAndReduce(ctx, otpWriteModel, user.NewHumanOTPSMSAddedEvent(ctx, userAgg)); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&otpWriteModel.WriteModel), nil
+}
+
+func (c *Commands) RemoveHumanOTPSMS(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-S3br2", "Errors.User.UserIDMissing")
+	}
+
+	existingOTP, err := c.otpSMSWriteModelByID(ctx, userID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if !existingOTP.otpAdded {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Sr3h3", "Errors.User.MFA.OTP.NotExisting")
+	}
+	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
+	if err = c.pushAppendAndReduce(ctx, existingOTP, user.NewHumanOTPSMSRemovedEvent(ctx, userAgg)); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingOTP.WriteModel), nil
+}
+
+func (c *Commands) AddHumanOTPEmail(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Sg1hz", "Errors.User.UserIDMissing")
+	}
+	otpWriteModel, err := c.otpEmailWriteModelByID(ctx, userID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if otpWriteModel.otpAdded {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-MKL2s", "Errors.User.MFA.OTP.AlreadyReady")
+	}
+	if !otpWriteModel.emailVerified {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-KLJ2d", "Errors.User.MFA.OTP.NotReady")
+	}
+	userAgg := UserAggregateFromWriteModel(&otpWriteModel.WriteModel)
+	if err = c.pushAppendAndReduce(ctx, otpWriteModel, user.NewHumanOTPEmailAddedEvent(ctx, userAgg)); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&otpWriteModel.WriteModel), nil
+}
+
+func (c *Commands) RemoveHumanOTPEmail(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-S2h11", "Errors.User.UserIDMissing")
+	}
+
+	existingOTP, err := c.otpEmailWriteModelByID(ctx, userID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if !existingOTP.otpAdded {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-b312D", "Errors.User.MFA.OTP.NotExisting")
+	}
+	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
+	if err = c.pushAppendAndReduce(ctx, existingOTP, user.NewHumanOTPEmailRemovedEvent(ctx, userAgg)); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingOTP.WriteModel), nil
+}
+
 func (c *Commands) totpWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *HumanTOTPWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewHumanTOTPWriteModel(userID, resourceOwner)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	if err != nil {
+		return nil, err
+	}
+	return writeModel, nil
+}
+
+func (c *Commands) otpSMSWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *HumanOTPSMSWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	writeModel = NewHumanOTPSMSWriteModel(userID, resourceOwner)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	if err != nil {
+		return nil, err
+	}
+	return writeModel, nil
+}
+
+func (c *Commands) otpEmailWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *HumanOTPEmailWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	writeModel = NewHumanOTPEmailWriteModel(userID, resourceOwner)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

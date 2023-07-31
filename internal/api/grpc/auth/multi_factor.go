@@ -18,7 +18,7 @@ func (s *Server) ListMyAuthFactors(ctx context.Context, _ *auth_pb.ListMyAuthFac
 	if err != nil {
 		return nil, err
 	}
-	err = query.AppendAuthMethodsQuery(domain.UserAuthMethodTypeU2F, domain.UserAuthMethodTypeOTP)
+	err = query.AppendAuthMethodsQuery(domain.UserAuthMethodTypeU2F, domain.UserAuthMethodTypeTOTP, domain.UserAuthMethodTypeOTPSMS, domain.UserAuthMethodTypeOTPEmail)
 	if err != nil {
 		return nil, err
 	}
@@ -71,6 +71,50 @@ func (s *Server) RemoveMyAuthFactorOTP(ctx context.Context, _ *auth_pb.RemoveMyA
 	}
 	return &auth_pb.RemoveMyAuthFactorOTPResponse{
 		Details: object.DomainToChangeDetailsPb(objectDetails),
+	}, nil
+}
+
+func (s *Server) AddMyAuthFactorOTPSMS(ctx context.Context, _ *auth_pb.AddMyAuthFactorOTPSMSRequest) (*auth_pb.AddMyAuthFactorOTPSMSResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	details, err := s.command.AddHumanOTPSMS(ctx, ctxData.UserID, ctxData.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return &auth_pb.AddMyAuthFactorOTPSMSResponse{
+		Details: object.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) RemoveMyAuthFactorOTPSMS(ctx context.Context, _ *auth_pb.RemoveMyAuthFactorOTPSMSRequest) (*auth_pb.RemoveMyAuthFactorOTPSMSResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	details, err := s.command.RemoveHumanOTPSMS(ctx, ctxData.UserID, ctxData.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return &auth_pb.RemoveMyAuthFactorOTPSMSResponse{
+		Details: object.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddMyAuthFactorOTPEmail(ctx context.Context, _ *auth_pb.AddMyAuthFactorOTPEmailRequest) (*auth_pb.AddMyAuthFactorOTPEmailResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	details, err := s.command.AddHumanOTPEmail(ctx, ctxData.UserID, ctxData.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return &auth_pb.AddMyAuthFactorOTPEmailResponse{
+		Details: object.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) RemoveMyAuthFactorOTPEmail(ctx context.Context, _ *auth_pb.RemoveMyAuthFactorOTPEmailRequest) (*auth_pb.RemoveMyAuthFactorOTPEmailResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	details, err := s.command.RemoveHumanOTPEmail(ctx, ctxData.UserID, ctxData.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return &auth_pb.RemoveMyAuthFactorOTPEmailResponse{
+		Details: object.DomainToChangeDetailsPb(details),
 	}, nil
 }
 

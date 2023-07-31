@@ -647,6 +647,70 @@ service AuthService {
         };
     }
 
+    rpc AddMyAuthFactorOTPSMS(AddMyAuthFactorOTPSMSRequest) returns (AddMyAuthFactorOTPSMSResponse) {
+        option (google.api.http) = {
+            post: "/users/me/auth_factors/otp_sms"
+            body: "*"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User Authentication Factor"
+            summary: "Add One-Time-Password (OTP) SMS";
+            description: "Add a new One-Time-Password (OTP) SMS factor to the authenticated user. OTP SMS will enable the user to verify a OTP via SMS. The phone number has to be already verified."
+        };
+    }
+
+    rpc RemoveMyAuthFactorOTPSMS(RemoveMyAuthFactorOTPSMSRequest) returns (RemoveMyAuthFactorOTPSMSResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/auth_factors/otp_sms"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User Authentication Factor"
+            summary: "Remove One-Time-Password (OTP) SMS";
+            description: "Remove the configured One-Time-Password (OTP) SMS factor of the authenticated user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward."
+        };
+    }
+
+    rpc AddMyAuthFactorOTPEmail(AddMyAuthFactorOTPEmailRequest) returns (AddMyAuthFactorOTPEmailResponse) {
+        option (google.api.http) = {
+            post: "/users/me/auth_factors/otp_email"
+            body: "*"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User Authentication Factor"
+            summary: "Add One-Time-Password (OTP) Email";
+            description: "Add a new One-Time-Password (OTP) Email factor to the authenticated user. OTP Email will enable the user to verify a OTP via email. The email has to be already verified."
+        };
+    }
+
+    rpc RemoveMyAuthFactorOTPEmail(RemoveMyAuthFactorOTPEmailRequest) returns (RemoveMyAuthFactorOTPEmailResponse) {
+        option (google.api.http) = {
+            delete: "/users/me/auth_factors/otp_email"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User Authentication Factor"
+            summary: "Remove One-Time-Password (OTP) Email";
+            description: "Remove the configured One-Time-Password (OTP) Email factor of the authenticated user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward."
+        };
+    }
+
     rpc AddMyAuthFactorU2F(AddMyAuthFactorU2FRequest) returns (AddMyAuthFactorU2FResponse) {
         option (google.api.http) = {
             post: "/users/me/auth_factors/u2f"
@@ -1337,6 +1401,34 @@ message VerifyMyAuthFactorU2FResponse {
 message RemoveMyAuthFactorOTPRequest {}
 
 message RemoveMyAuthFactorOTPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message AddMyAuthFactorOTPSMSRequest {}
+
+message AddMyAuthFactorOTPSMSResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveMyAuthFactorOTPSMSRequest {}
+
+message RemoveMyAuthFactorOTPSMSResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message AddMyAuthFactorOTPEmailRequest {}
+
+message AddMyAuthFactorOTPEmailResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveMyAuthFactorOTPEmailRequest {}
+
+message RemoveMyAuthFactorOTPEmailResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
