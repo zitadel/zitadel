@@ -41,9 +41,6 @@ importers:
       '@zitadel/client':
         specifier: workspace:*
         version: link:../../packages/zitadel-client
-      '@zitadel/next':
-        specifier: workspace:*
-        version: link:../../packages/zitadel-next
       '@zitadel/react':
         specifier: workspace:*
         version: link:../../packages/zitadel-react
@@ -5406,7 +5403,7 @@ packages:
       pretty-format: 29.5.0
       slash: 3.0.0
       strip-json-comments: 3.1.1
-      ts-node: 10.9.1(@types/node@18.11.9)(typescript@5.1.6)
+      ts-node: 10.9.1(@types/node@18.11.9)(typescript@5.0.4)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -6896,7 +6893,7 @@ packages:
     dependencies:
       lilconfig: 2.0.6
       postcss: 8.4.21
-      ts-node: 10.9.1(@types/node@18.11.9)(typescript@5.1.6)
+      ts-node: 10.9.1(@types/node@18.11.9)(typescript@5.0.4)
       yaml: 1.10.2
 
   /postcss-load-config@3.1.4(ts-node@10.9.1):
@@ -8236,7 +8233,6 @@ packages:
       typescript: 5.0.4
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
-    dev: true
 
   /ts-node@10.9.1(@types/node@18.11.9)(typescript@5.1.6):
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
@@ -8267,6 +8263,7 @@ packages:
       typescript: 5.1.6
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
+    dev: true
 
   /ts-poet@6.4.1:
     resolution: {integrity: sha512-AjZEs4h2w4sDfwpHMxQKHrTlNh2wRbM5NRXmLz0RiH+yPGtSQFbe9hBpNocU8vqVNgfh0BIOiXR80xDz3kKxUQ==}
@@ -8570,7 +8567,6 @@ packages:
     resolution: {integrity: sha512-cW9T5W9xY37cc+jfEnaUvX91foxtHkza3Nw3wkoF4sSlKn0MONdkdEndig/qPBWXNkmplh3NzayQzCiHM4/hqw==}
     engines: {node: '>=12.20'}
     hasBin: true
-    dev: true
 
   /typescript@5.1.6:
     resolution: {integrity: sha512-zaWCozRZ6DLEWAWFrVDz1H6FVXzUSfTy5FUMWsQlU8Ym5JP9eO4xkTIROFCQvhQf61z6O/G6ugw3SgAnvvm+HA==}

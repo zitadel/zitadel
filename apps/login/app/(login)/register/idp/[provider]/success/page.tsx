@@ -1,10 +1,9 @@
 import { ProviderSlug } from "#/lib/demos";
 import { addHumanUser, server } from "#/lib/zitadel";
+import Alert, { AlertType } from "#/ui/Alert";
 import {
   AddHumanUserRequest,
-  AddHumanUserResponse,
   IDPInformation,
-  Provider,
   RetrieveIdentityProviderInformationResponse,
   user,
   IDPLink,
@@ -79,9 +78,7 @@ function createUser(
   info: IDPInformation
 ): Promise<string> {
   const userData = (PROVIDER_MAPPING as any)[provider](info);
-  console.log(userData);
   const userService = user.getUser(server);
-  console.log(userData.profile);
   return userService.addHumanUser(userData, {}).then((resp) => resp.userId);
 }
 
@@ -96,23 +93,42 @@ export default async function Page({
   const { provider } = params;
 
   if (provider && id && token) {
-    const information = await retrieveIDP(id, token);
-    let user;
-    if (information) {
-      user = await createUser(provider, information);
-    }
-
-    return (
-      <div className="flex flex-col items-center space-y-4">
-        <h1>Register successful</h1>
-        <p className="ztdl-p">Your account has successfully been created.</p>
-        {user && <div>{JSON.stringify(user)}</div>}
-      </div>
-    );
+    return retrieveIDP(id, token)
+      .then((information) => {
+        if (information) {
+          return createUser(provider, information).catch((error) => {
+            throw new Error(error.details);
+          });
+        } else {
+          throw new Error("Could not get user information.");
+        }
+      })
+      .then((userId) => {
+        return (
+          <div className="flex flex-col items-center space-y-4">
+            <h1>Register successful</h1>
+            <div>You have successfully been registered!</div>
+          </div>
+        );
+      })
+      .catch((error: Error) => {
+        return (
+          <div className="flex flex-col items-center space-y-4">
+            <h1>Register failed</h1>
+            <div className="w-full">
+              {
+                <Alert type={AlertType.ALERT}>
+                  {JSON.stringify(error.message)}
+                </Alert>
+              }
+            </div>
+          </div>
+        );
+      });
   } else {
     return (
       <div className="flex flex-col items-center space-y-4">
-        <h1>Register successful</h1>
+        <h1>Register</h1>
         <p className="ztdl-p">No id and token received!</p>
       </div>
     );

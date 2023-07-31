@@ -66,7 +66,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ...props
     },
     ref
-  ): ReactNode => (
+  ) => (
     <button
       type="button"
       ref={ref}

@@ -32,15 +32,18 @@ export default async function Page({
 
   const identityProviders = await getIdentityProviders(server, "");
 
-  console.log(identityProviders);
-
   return (
     <div className="flex flex-col items-center space-y-4">
       <h1>Register</h1>
-      <p className="ztdl-p">Create your ZITADEL account.</p>
+      <p className="ztdl-p">
+        Select one of the following providers to register
+      </p>
 
-      {legal && identityProviders && (
-        <SignInWithIDP identityProviders={identityProviders}></SignInWithIDP>
+      {legal && identityProviders && process.env.ZITADEL_API_URL && (
+        <SignInWithIDP
+          instanceUrl={process.env.ZITADEL_API_URL}
+          identityProviders={identityProviders}
+        ></SignInWithIDP>
       )}
     </div>
   );
