@@ -375,6 +375,7 @@ ZITADEL loads translations from four files:
 - [Common texts](./internal/static/i18n) for success or error toasts
 
 You may edit the texts in these files or create a new file for additional language support. Make sure you set the locale (ISO 639-1 code) as the name of the new language file.
+Please make sure that the languages within the files remain in their own language, e.g. German must always be `Deutsch.
 
 ## Want to start ZITADEL?
 

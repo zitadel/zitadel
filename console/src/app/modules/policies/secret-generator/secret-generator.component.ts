@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { UpdateSecretGeneratorRequest, UpdateSecretGeneratorResponse } from 'src/app/proto/generated/zitadel/admin_pb';
+import { UpdateSecretGeneratorRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { OIDCSettings, SecretGenerator, SecretGeneratorType } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -25,7 +25,10 @@ export class SecretGeneratorComponent implements OnInit {
     SecretGeneratorType.SECRET_GENERATOR_TYPE_PASSWORD_RESET_CODE,
     SecretGeneratorType.SECRET_GENERATOR_TYPE_PASSWORDLESS_INIT_CODE,
     SecretGeneratorType.SECRET_GENERATOR_TYPE_APP_SECRET,
+    SecretGeneratorType.SECRET_GENERATOR_TYPE_OTP_SMS,
+    SecretGeneratorType.SECRET_GENERATOR_TYPE_OTP_EMAIL,
   ];
+
   constructor(private service: AdminService, private toast: ToastService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
@@ -48,25 +51,12 @@ export class SecretGeneratorComponent implements OnInit {
       });
   }
 
-  private updateData(): Promise<UpdateSecretGeneratorResponse.AsObject> | void {
-    const dialogRef = this.dialog.open(DialogAddSecretGeneratorComponent, {
-      data: {},
-      width: '400px',
-    });
-
-    dialogRef.afterClosed().subscribe((req: UpdateSecretGeneratorRequest) => {
-      if (req) {
-        return (this.service as AdminService).updateSecretGenerator(req);
-      } else {
-        return;
-      }
-    });
-  }
-
   public openGeneratorDialog(generatorType: SecretGeneratorType): void {
+    let config = this.generators.find((gen) => gen.generatorType === generatorType);
     const dialogRef = this.dialog.open(DialogAddSecretGeneratorComponent, {
       data: {
         type: generatorType,
+        config: config,
       },
       width: '400px',
     });
@@ -77,6 +67,9 @@ export class SecretGeneratorComponent implements OnInit {
           .updateSecretGenerator(req)
           .then(() => {
             this.toast.showInfo('SETTING.SECRETS.UPDATED', true);
+            setTimeout(() => {
+              this.fetchData();
+            }, 2000);
           })
           .catch((error) => {
             this.toast.showError(error);
@@ -85,22 +78,5 @@ export class SecretGeneratorComponent implements OnInit {
         return;
       }
     });
-  }
-
-  public savePolicy(): void {
-    const prom = this.updateData();
-    if (prom) {
-      prom
-        .then(() => {
-          this.toast.showInfo('SETTING.SMTP.SAVED', true);
-          this.loading = true;
-          setTimeout(() => {
-            this.fetchData();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    }
   }
 }
