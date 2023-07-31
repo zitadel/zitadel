@@ -74,7 +74,7 @@ jobs:
     uses: ./.github/workflows/container.yml
     secrets: inherit
     with:
-      build_image_name: 'ghcr.io/zitadel/build-cache'
+      build_image_name: 'ghcr.io/zitadel/zitadel-build'
       image_push: ${{ github.event_name == 'workflow_dispatch' }}
 
   e2e:
