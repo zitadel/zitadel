@@ -165,7 +165,7 @@ describe('quotas', () => {
             {
               callUrl: callURL,
               percent: percent,
-              repeat: false,
+              repeat: true,
             },
           ]);
           cy.task('runSQL', `TRUNCATE logstore.access;`);
