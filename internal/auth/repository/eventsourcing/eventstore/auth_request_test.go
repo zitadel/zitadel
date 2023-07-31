@@ -475,7 +475,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			args{&domain.AuthRequest{
 				Request: &domain.AuthRequestOIDC{},
 				LoginPolicy: &domain.LoginPolicy{
-					SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeTOTP},
 					PasswordCheckLifetime:     10 * 24 * time.Hour,
 					SecondFactorCheckLifetime: 18 * time.Hour,
 				},
@@ -520,7 +520,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			args{&domain.AuthRequest{
 				Request: &domain.AuthRequestOIDC{},
 				LoginPolicy: &domain.LoginPolicy{
-					SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeTOTP},
 					PasswordCheckLifetime:     10 * 24 * time.Hour,
 					SecondFactorCheckLifetime: 18 * time.Hour,
 				},
