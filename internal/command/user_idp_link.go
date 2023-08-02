@@ -3,20 +3,25 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner string, link *domain.UserIDPLink) (err error) {
+func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner string, link *domain.UserIDPLink) (_ *domain.ObjectDetails, err error) {
 	if userID == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-03j8f", "Errors.IDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-03j8f", "Errors.IDMissing")
 	}
 	if err := c.checkUserExists(ctx, userID, resourceOwner); err != nil {
-		return err
+		return nil, err
+	}
+	if userID != authz.GetCtxData(ctx).UserID {
+		if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, userID); err != nil {
+			return nil, err
+		}
 	}
 
 	linkWriteModel := NewUserIDPLinkWriteModel(userID, link.IDPConfigID, link.ExternalUserID, resourceOwner)
@@ -24,11 +29,18 @@ func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner str
 
 	event, err := c.addUserIDPLink(ctx, userAgg, link)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	_, err = c.eventstore.Push(ctx, event)
-	return err
+	events, err := c.eventstore.Push(ctx, event)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
+	}, nil
 }
 
 func (c *Commands) BulkAddedUserIDPLinks(ctx context.Context, userID, resourceOwner string, links []*domain.UserIDPLink) (err error) {

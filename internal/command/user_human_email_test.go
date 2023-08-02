@@ -220,6 +220,60 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 			},
 		},
 		{
+			name: "email verified, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewHumanEmailVerifiedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				email: &domain.Email{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "user1",
+					},
+					EmailAddress:    "email@test.ch",
+					IsEmailVerified: true,
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.Email{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					EmailAddress:    "email@test.ch",
+					IsEmailVerified: true,
+				},
+			},
+		},
+		{
 			name: "email changed with code, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(

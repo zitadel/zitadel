@@ -1,0 +1,3 @@
+BEGIN;
+ALTER TABLE eventstore.events ALTER COLUMN created_at SET NOT NULL;
+COMMIT;

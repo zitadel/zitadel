@@ -82,7 +82,7 @@ func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bo
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.UserMetadataProjection.Trigger(ctx)
+		ctx = projection.UserMetadataProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareUserMetadataQuery(ctx, q.client)
@@ -111,7 +111,7 @@ func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.UserMetadataProjection.Trigger(ctx)
+		ctx = projection.UserMetadataProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareUserMetadataListQuery(ctx, q.client)

@@ -89,7 +89,7 @@ type idpUserLinksProvider interface {
 }
 
 type userEventProvider interface {
-	UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error)
+	UserEventsByID(ctx context.Context, id string, sequence uint64, eventTypes []es_models.EventType) ([]*es_models.Event, error)
 }
 
 type userCommandProvider interface {
@@ -247,6 +247,8 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 	}
 	err = repo.checkExternalUserLogin(ctx, request, externalUser.IDPConfigID, externalUser.ExternalUserID)
 	if errors.IsNotFound(err) {
+		// clear potential user information (e.g. when username was entered but another external user was returned)
+		request.SetUserInfo("", "", "", "", "", request.UserOrgID)
 		if err := repo.setLinkingUser(ctx, request, externalUser); err != nil {
 			return err
 		}
@@ -276,6 +278,16 @@ func (repo *AuthRequestRepo) SetExternalUserLogin(ctx context.Context, authReqID
 		return err
 	}
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
+func (repo *AuthRequestRepo) SetLinkingUser(ctx context.Context, request *domain.AuthRequest, externalUser *domain.ExternalUser) error {
+	for i, user := range request.LinkingUsers {
+		if user.ExternalUserID == externalUser.ExternalUserID {
+			request.LinkingUsers[i] = externalUser
+			return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+		}
+	}
+	return nil
 }
 
 func (repo *AuthRequestRepo) setLinkingUser(ctx context.Context, request *domain.AuthRequest, externalUser *domain.ExternalUser) error {
@@ -707,6 +719,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 
 func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *domain.AuthRequest, loginName string) bool {
 	// check if there's a suffix in the loginname
+	loginName = strings.TrimSpace(strings.ToLower(loginName))
 	index := strings.LastIndex(loginName, "@")
 	if index < 0 {
 		return false
@@ -829,6 +842,7 @@ func queryLoginPolicyToDomain(policy *query.LoginPolicy) *domain.LoginPolicy {
 		AllowRegister:              policy.AllowRegister,
 		AllowExternalIDP:           policy.AllowExternalIDPs,
 		ForceMFA:                   policy.ForceMFA,
+		ForceMFALocalOnly:          policy.ForceMFALocalOnly,
 		SecondFactors:              policy.SecondFactors,
 		MultiFactors:               policy.MultiFactors,
 		PasswordlessType:           policy.PasswordlessType,
@@ -907,11 +921,15 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 			steps = append(steps, new(domain.ExternalNotFoundOptionStep))
 			return steps, nil
 		}
-		steps = append(steps, new(domain.LoginStep))
 		if domain.IsPrompt(request.Prompt, domain.PromptCreate) {
 			return append(steps, &domain.RegistrationStep{}), nil
 		}
-		if len(request.Prompt) == 0 || domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
+		// if there's a login or consent prompt, but not select account, just return the login step
+		if len(request.Prompt) > 0 && !domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
+			return append(steps, new(domain.LoginStep)), nil
+		} else {
+			// if no user was specified, no prompt or select_account was provided,
+			// then check the active user sessions (of the user agent)
 			users, err := repo.usersForUserSelection(request)
 			if err != nil {
 				return nil, err
@@ -922,11 +940,19 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 			if request.SelectedIDPConfigID != "" {
 				steps = append(steps, &domain.RedirectToExternalIDPStep{})
 			}
-			if len(request.Prompt) == 0 && len(users) > 0 {
+			if len(request.Prompt) == 0 && len(users) == 0 {
+				steps = append(steps, new(domain.LoginStep))
+			}
+			// if no prompt was provided, but there are multiple user sessions, then the user must decide which to use
+			if len(request.Prompt) == 0 && len(users) > 1 {
 				steps = append(steps, &domain.SelectUserStep{Users: users})
 			}
+			if len(steps) > 0 {
+				return steps, nil
+			}
+			// a single user session was found, use that automatically
+			request.UserID = users[0].UserID
 		}
-		return steps, nil
 	}
 	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID, request.LoginPolicy.IgnoreUnknownUsernames)
 	if err != nil {
@@ -962,7 +988,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		}
 	}
 
-	step, ok, err := repo.mfaChecked(userSession, request, user)
+	step, ok, err := repo.mfaChecked(userSession, request, user, isInternalLogin && len(request.LinkingUsers) == 0)
 	if err != nil {
 		return nil, err
 	}
@@ -1081,9 +1107,9 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 	return &domain.PasswordStep{}
 }
 
-func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *domain.AuthRequest, user *user_model.UserView) (domain.NextStep, bool, error) {
+func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *domain.AuthRequest, user *user_model.UserView, isInternalAuthentication bool) (domain.NextStep, bool, error) {
 	mfaLevel := request.MFALevel()
-	allowedProviders, required := user.MFATypesAllowed(mfaLevel, request.LoginPolicy)
+	allowedProviders, required := user.MFATypesAllowed(mfaLevel, request.LoginPolicy, isInternalAuthentication)
 	promptRequired := (user.MFAMaxSetUp < mfaLevel) || (len(allowedProviders) == 0 && required)
 	if promptRequired || !repo.mfaSkippedOrSetUp(user, request) {
 		types := user.MFATypesSetupPossible(mfaLevel, request.LoginPolicy)
@@ -1300,6 +1326,29 @@ func userSessionsByUserAgentID(provider userSessionViewProvider, agentID, instan
 	return user_view_model.UserSessionsToModel(session), nil
 }
 
+var (
+	userSessionEventTypes = []es_models.EventType{
+		es_models.EventType(user_repo.UserV1PasswordCheckSucceededType),
+		es_models.EventType(user_repo.UserV1PasswordCheckFailedType),
+		es_models.EventType(user_repo.UserV1MFAOTPCheckSucceededType),
+		es_models.EventType(user_repo.UserV1MFAOTPCheckFailedType),
+		es_models.EventType(user_repo.UserV1SignedOutType),
+		es_models.EventType(user_repo.UserLockedType),
+		es_models.EventType(user_repo.UserDeactivatedType),
+		es_models.EventType(user_repo.HumanPasswordCheckSucceededType),
+		es_models.EventType(user_repo.HumanPasswordCheckFailedType),
+		es_models.EventType(user_repo.UserIDPLoginCheckSucceededType),
+		es_models.EventType(user_repo.HumanMFAOTPCheckSucceededType),
+		es_models.EventType(user_repo.HumanMFAOTPCheckFailedType),
+		es_models.EventType(user_repo.HumanSignedOutType),
+		es_models.EventType(user_repo.HumanPasswordlessTokenCheckSucceededType),
+		es_models.EventType(user_repo.HumanPasswordlessTokenCheckFailedType),
+		es_models.EventType(user_repo.HumanU2FTokenCheckSucceededType),
+		es_models.EventType(user_repo.HumanU2FTokenCheckFailedType),
+		es_models.EventType(user_repo.UserRemovedType),
+	}
+)
+
 func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eventProvider userEventProvider, agentID string, user *user_model.UserView) (*user_model.UserSessionView, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	session, err := provider.UserSessionByIDs(agentID, user.ID, instanceID)
@@ -1316,7 +1365,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			session.Sequence = sequence.CurrentSequence
 		}
 	}
-	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence)
+	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence, append(session.EventTypes(), userSessionEventTypes...))
 	if err != nil {
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserSessionToModel(session), nil
@@ -1397,7 +1446,7 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	} else if user == nil {
 		user = new(user_view_model.UserView)
 	}
-	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence)
+	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence, user.EventTypes())
 	if err != nil {
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserToModel(user), nil

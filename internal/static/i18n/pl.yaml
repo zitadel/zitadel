@@ -53,6 +53,7 @@ Errors:
     NotFoundOnOrg: Użytkownik nie został znaleziony w wybranej organizacji
     NotAllowedOrg: Użytkownik nie jest członkiem wymaganej organizacji
     UserIDMissing: Brakuje ID użytkownika
+    UserIDWrong: "Żądanie użytkownika nie jest równe uwierzytelnionemu użytkownikowi"
     DomainPolicyNil: Polityka organizacji jest pusta
     EmailAsUsernameNotAllowed: Adres e-mail nie jest dozwolony jako nazwa użytkownika
     Invalid: Dane użytkownika są nieprawidłowe
@@ -67,6 +68,7 @@ Errors:
     NoChanges: Nie znaleziono zmian
     InitCodeNotFound: Kod inicjalizacji nie znaleziony
     UsernameNotChanged: Nazwa użytkownika nie została zmieniona
+    InvalidURLTemplate: Szablon URL jest nieprawidłowy
     Profile:
       NotFound: Profil nie znaleziony
       NotChanged: Profil nie zmieniony
@@ -81,7 +83,6 @@ Errors:
       NotChanged: Adres e-mail nie zmieniony
       Empty: Adres e-mail jest pusty
       IDMissing: Adres e-mail ID brakuje
-      InvalidURLTemplate: Szablon URL jest nieprawidłowy
     Phone:
       NotFound: Numer telefonu nie znaleziony
       Invalid: Numer telefonu jest nieprawidłowy
@@ -119,6 +120,8 @@ Errors:
       Empty: Hasło jest puste
       Invalid: Hasło jest nieprawidłowe
       NotSet: Użytkownik nie ustawił hasła
+      NotChanged: Hasło nie zostało zmienione
+      NotSupported: Kodowanie skrótu hasła nie jest obsługiwane
     PasswordComplexityPolicy:
       NotFound: Polityka hasła nie znaleziona
       MinLength: Hasło jest zbyt krótkie
@@ -475,6 +478,28 @@ Errors:
     Terminated: Sesja już zakończona
     Token:
       Invalid: Token sesji jest nieprawidłowy
+    Passkey:
+      NoChallenge: Sesja bez wyzwania klucza
+  Intent:
+    IDPMissing: Brak identyfikatora IDP w żądaniu
+    SuccessURLMissing: Brak adresu URL powodzenia w żądaniu
+    FailureURLMissing: Brak adresu URL niepowodzenia w żądaniu
+    StateMissing: Brak parametru stanu w żądaniu
+    NotStarted: Intencja nie została rozpoczęta lub już się zakończyła
+    NotSucceeded: intencja nie powiodła się
+    TokenCreationFailed: Tworzenie tokena nie powiodło się
+    InvalidToken: Token intencji jest nieprawidłowy
+    OtherUser: Intencja przeznaczona dla innego użytkownika
+  AuthRequest:
+    AlreadyExists: Auth Request już istnieje
+    NotExisting: Auth Request nie istnieje
+    WrongLoginClient: Auth Request utworzony przez innego klienta logowania
+  OIDCSession:
+    RefreshTokenInvalid: Refresh Token jest nieprawidłowy
+    Token:
+      Invalid: Token jest nieprawidłowy
+      Expired: Token wygasł
+    InvalidClient: Token nie został wydany dla tego klienta
 
 AggregateTypes:
   action: Działanie
@@ -558,6 +583,10 @@ EventTypes:
         check:
           succeeded: Sprawdzenie hasła zakończone powodzeniem
           failed: Sprawdzenie hasła nie powiodło się
+        change:
+          sent: Wysłano zmianę hasła
+        hash:
+          updated: Zaktualizowano skrót hasła
       externallogin:
         check:
           succeeded: Zewnętrzne logowanie zakończone powodzeniem

@@ -71,7 +71,7 @@ func TestVerifyCode(t *testing.T) {
 				expiry:           5 * time.Minute,
 				cryptoCode:       nil,
 				verificationCode: "",
-				g:                nil,
+				g:                createMockGenerator(t, createMockCrypto(t)),
 			},
 			true,
 		},

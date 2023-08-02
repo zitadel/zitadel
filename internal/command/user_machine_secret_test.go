@@ -137,7 +137,6 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 					ResourceOwner: "org1",
 				},
 				secret: &GenerateMachineSecret{
-					ClientID:     "user1",
 					ClientSecret: "a",
 				},
 			},
@@ -157,7 +156,6 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.want, got)
-				assert.Equal(t, tt.args.set.ClientID, tt.res.secret.ClientID)
 				assert.Equal(t, tt.args.set.ClientSecret, tt.res.secret.ClientSecret)
 			}
 		})
@@ -531,8 +529,8 @@ func TestCommandSide_VerifyMachineSecret(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore,
-				userPasswordAlg: crypto.NewBCrypt(14),
+				eventstore: tt.fields.eventstore,
+				codeAlg:    crypto.NewBCrypt(14),
 			}
 			got, err := r.VerifyMachineSecret(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.secret)
 			if tt.res.err == nil {

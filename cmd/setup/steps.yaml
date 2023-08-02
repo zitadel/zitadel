@@ -1,5 +1,6 @@
 FirstInstance:
   MachineKeyPath:
+  PatPath:
   InstanceName: ZITADEL
   DefaultLanguage: en
   Org:
@@ -30,5 +31,11 @@ FirstInstance:
       MachineKey:
         ExpirationDate:
         Type:
+      Pat:
+        ExpirationDate:
+
 CorrectCreationDate:
   FailAfter: 5m
+
+AddEventCreatedAt:
+  BulkAmount: 100

@@ -14,7 +14,6 @@ import (
 )
 
 type GenerateMachineSecret struct {
-	ClientID     string
 	ClientSecret string
 }
 
@@ -53,7 +52,6 @@ func prepareGenerateMachineSecret(a *user.Aggregate, generator crypto.Generator,
 			if !isUserStateExists(writeModel.UserState) {
 				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-x8910n", "Errors.User.NotExisting")
 			}
-			set.ClientID = writeModel.UserName
 
 			clientSecret, secretString, err := domain.NewMachineClientSecret(generator)
 			if err != nil {
@@ -115,7 +113,7 @@ func prepareRemoveMachineSecret(a *user.Aggregate) preparation.Validation {
 
 func (c *Commands) VerifyMachineSecret(ctx context.Context, userID string, resourceOwner string, secret string) (*domain.ObjectDetails, error) {
 	agg := user.NewAggregate(userID, resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareVerifyMachineSecret(agg, secret, c.userPasswordAlg))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareVerifyMachineSecret(agg, secret, c.codeAlg))
 	if err != nil {
 		return nil, err
 	}

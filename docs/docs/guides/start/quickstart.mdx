@@ -1,5 +1,5 @@
 ---
-title: Quick Start Guide 
+title: Quick start guide 
 ---
 
 import VSCodeFolderView from "../../../static/img/guides/quickstart/vscode1.png"; 
@@ -12,7 +12,7 @@ In this quick start guide, we will be learning some fundamentals on how to set u
 The sample application allows users to securely log in to ZITADEL using the OIDC Proof Key for Code Exchange (PKCE)  flow. This flow ensures that the authentication process is secure by using a code verifier and a code challenge, which are sent to ZITADEL to obtain an access token. The access token is then used by the app to access the userinfo endpoint to retrieve and display information about the logged-in user. The app also has a logout feature that allows users to end their session and clear their access token. Overall, the app provides a simple and secure way for users to authenticate and access protected resources within ZITADEL.
 
 
-## ZITADEL Terminology: Instances, Organizations, Projects, Users, Roles, Authorizations and Apps
+## ZITADEL terminology: instances, organizations, projects, users, roles, authorizations and apps
 
 In ZITADEL, instances, organizations, projects, users, roles, and apps are the main components that make up the platform.
 
@@ -31,9 +31,9 @@ The order of creation for the above components would typically be as follows:
 
 The order of creation for the above components may vary depending on the specific needs and requirements of the organization.
 
-## Set Up and Manage ZITADEL for your Identity Projects
+## Set up and manage ZITADEL for your identity projects
 
-### 1. Sign up for the ZITADEL Cloud Customer Portal and Register your Organization
+### 1. Sign up for the ZITADEL Cloud customer portal and register your organization
 
 1. Go to [zitadel.com](http://zitadel.com) and click on “Start for FREE”.
 
@@ -75,7 +75,7 @@ The order of creation for the above components may vary depending on the specifi
 
 ![Create Instance](/img/guides/quickstart/10.png)
 
-### 2. Create your First Instance
+### 2. Create your first instance
 
 As a user of the ZITADEL Cloud Customer Portal, you now can create multiple instances to suit your specific needs. This includes instances for development, production, or user acceptance testing, as well as instances for different clients or applications. For example, you might create an instance for each product in a B2C scenario, or an instance for each tenant or customer in a B2B scenario. The possibilities are endless. You can create a pay-as-you-go instance for production purposes. 
 
@@ -111,7 +111,7 @@ As a user of the ZITADEL Cloud Customer Portal, you now can create multiple inst
 
 ![Access Instance](/img/guides/quickstart/v2_7.png)
 
-### 3. Create your First Project
+### 3. Create your first project
 
 1. To create a project in the instance you just created, click on “Create Project”. 
 
@@ -125,7 +125,7 @@ As a user of the ZITADEL Cloud Customer Portal, you now can create multiple inst
 
 ![Project Created](/img/guides/quickstart/21.png)
 
-### 4. Add Users (optional)
+### 4. Add users (optional)
 
 [Skip optional steps](quickstart/#7-create-an-application-in-your-project) and jump directly to the create application step.
 
@@ -145,7 +145,7 @@ As a user of the ZITADEL Cloud Customer Portal, you now can create multiple inst
 
 ![User Info](/img/guides/quickstart/29.png)
 
-### 5. Add Roles to your Project (optional)
+### 5. Add roles to your project (optional)
 
 1. To add roles to your project, click on “Roles” on the left as shown below. Next, click on the “New” button.
 
@@ -163,7 +163,7 @@ As a user of the ZITADEL Cloud Customer Portal, you now can create multiple inst
 
 ![Add Role](/img/guides/quickstart/25.png)
 
-### 6. Add Authorizations to your Project
+### 6. Add authorizations to your project
 
 1. Click on “Authorizations” on the top menu.
 
@@ -193,7 +193,7 @@ As a user of the ZITADEL Cloud Customer Portal, you now can create multiple inst
 
 ![Add Authorization](/img/guides/quickstart/37.png)
 
-### 7. Create an Application in your Project
+### 7. Create an application in your project
 
 We will now create an application in the project, which will allow our React client application to access protected resources through the use of the OpenID Connect (OIDC) protocol. 
 
@@ -241,7 +241,7 @@ We will now create an application in the project, which will allow our React cli
 
 ![Add Application](/img/guides/quickstart/50.png)
 
-### 8. Obtaining ClientId and OIDC Endpoints for your Application {#referred1}
+### 8. Obtain ClientId and OIDC endpoints for your application {#referred1}
 You will need the ClientId and the OIDC endpoints (issuer and userinfo) when building your React application. The issuer URL is the base URL for the OIDC provider and includes the path to the OIDC discovery document, which contains information about the OIDC provider, including the authorization and token endpoints. By providing the issuer URL, you can use the OIDC library to automatically determine the endpoints for these requests. 
 
 The authorization endpoint is used to initiate the authorization process, the token endpoint is used to exchange authorization codes for access tokens, and the userinfo endpoint is used to retrieve information about the user. You need an access token to access the userinfo endpoint and other protected resources. 
@@ -256,9 +256,9 @@ The authorization endpoint is used to initiate the authorization process, the to
 
 And with that, configuring ZITADEL for our application is complete. Now we can move on to building our React application. Let's get coding!
 
-## Create Your React Application with ZITADEL OIDC PKCE Authentication
+## Create your React application with ZITADEL OIDC PKCE authentication
 
-### 1. Functional Requirements of the Application
+### 1. Functional requirements of the application
 
 1. The user navigates to the React app (client)  and clicks the "login" button.
 2. The app initiates the authorization process by redirecting the user’s browser to the authorization endpoint of the ZITADEL instance, along with the PKCE parameters (code challenge, and code challenge method).
@@ -276,29 +276,15 @@ And with that, configuring ZITADEL for our application is complete. Now we can m
 
 ### 2. Prerequisites
 
-To follow along with this tutorial, you will need to have both React and Visual Studio Code (VSCode) installed on your machine.
-
-<b> React </b>
+To follow along with this tutorial, you will need to have both Node.js and Visual Studio Code (VSCode) installed on your machine.
 
 To install React, you will need to have Node.js installed on your system. You can download and install Node.js from [here](https://nodejs.org/).
-
-Once you have Node.js installed, you can use the following command to install React:
-
-``` npm install -g react ```
-
-This will install the latest version of React globally on your system. You can then verify the installation by running the following command:
-
-``` react -v ```
-
-This should output the version of React that you have installed.
-
-<b> Visual Studio Code </b>
 
 To install Visual Studio Code, go to their [website](https://code.visualstudio.com/) and download and install the version for your operating system.
 
 
 ### 3. Development
-#### 1. Create Project
+#### 1. Create project
 1. Open a new terminal window in Visual Studio Code.
 2. Navigate to the folder where you want to create the React app. 
 3. Run the following command to create a new React app named "react-oidc-zitadel":
@@ -318,7 +304,7 @@ This will create the following files in your project:
    ``` npm install react-router-dom oidc-client-ts ```
 
 
-#### 2. Add Source Files 
+#### 2. Add source files 
 
 The code needed to run this project can be found [here](https://github.com/zitadel/react-user-authentication).
 
@@ -595,7 +581,7 @@ root.render(
 reportWebVitals();
 ```
 
-### 4. Running the Application
+### 4. Running the application
 
 1. Run ```npm start``` to start the development server.
 2. Open your browser and navigate to ```http://localhost:3000/``` to view the app.
@@ -633,25 +619,4 @@ And this brings us to the end of this quick start guide!
 This tutorial covered how to configure ZITADEL and how to use React to build an app that communicates with ZITADEL to access secured resources. 
 
 We hope you enjoyed the tutorial and encourage you to check out the ZITADEL [documentation](https://zitadel.com/docs) for more information on how to use the ZITADEL platform to its full potential. Thanks for joining us!
-
-
-
-
-
-                                                                                 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

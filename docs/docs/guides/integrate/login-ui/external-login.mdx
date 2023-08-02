@@ -1,0 +1,209 @@
+---
+title: Handle External Login
+sidebar_label: External Identity Provider
+---
+
+## Flow
+
+The prerequisite for adding an external login (social and enterprise) to your user account is a registered identity provider on your ZITADEL instance or the organization of the user.
+If you haven’t added a provider yet, have a look at the following guide first: [Identity Providers](/docs/guides/integrate/identity-providers)
+
+![Identity Provider Flow](/img/guides/login-ui/external-login-flow.png)
+
+## Start the Provider Flow
+
+ZITADEL will handle as much as possible from the authentication flow with the external provider.
+This requires you to initiate the flow with your desired provider.
+
+Send the following two URLs in the request body:
+1. SuccessURL: Page that should be shown when the login was successful
+2. ErrorURL: Page that should be shown when an error happens during the authentication
+
+In the response, you will get an authentication URL of the provider you like.
+[Start Identity Provider Flow Documentation](/docs/apis/resources/user_service/user-service-start-identity-provider-flow)
+
+### Request
+
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/users/idps/$IDP_ID/start \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Content-Type: application/json' \
+  --data '{
+  "successUrl": "https://custom.com/login/idp/success",
+  "failureUrl": "https://custom.com/login/idp/fail"
+}'
+```
+
+### Response
+
+```bash
+{
+	"details": {
+		"sequence": "592",
+		"changeDate": "2023-06-14T12:51:29.654819Z",
+		"resourceOwner": "163840776835432705"
+	},
+	"authUrl": "https://accounts.google.com/o/oauth2/v2/auth?client_id=Test&prompt=select_account&redirect_uri=https%3A%2F%2F$ZITADEL_DOMAIN%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=218525066445455617"
+}
+```
+
+## Call Provider
+
+The next step is to call the auth URL you got in the response from the previous step.
+This will open up the login page of the given provider. In this guide, it is Google Login.
+
+```bash
+https://accounts.google.com/o/oauth2/v2/auth?client_id=Test&prompt=select_account&redirect_uri=https%3A%2F%2F$ZITADEL_DOMAIN%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=218525066445455617
+```
+
+After the user has successfully authenticated, a redirect to the ZITADEL backend /idps/callback will automatically be performed.
+
+## Get Provider Information
+
+ZITADEL will take the information of the provider. After this, a redirect will be made to either the success page in case of a successful login or to the error page in case of a failure will be performed. In the parameters, you will provide the intentID, a token, and optionally, if a user could be found, a user ID.
+
+To get the information of the provider, make a request to ZITADEL.
+[Get Identity Provider Information Documentation](/docs/apis/resources/user_service/user-service-retrieve-identity-provider-information)
+
+### Request
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/users/intents/$INTENT_ID/information \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Content-Type: application/json' \
+  --data '{
+  "token": "k50WQmDaPIazQDJsyKaEPaQPwgsytxqgQ3K1ifQeQtAmeQ"
+}'
+```
+
+### Response
+
+```bash
+{
+	"details": {
+		"sequence": "599",
+		"changeDate": "2023-06-15T06:44:26.039444Z",
+		"resourceOwner": "163840776835432705"
+	},
+	"idpInformation": {
+		"oauth": {
+			"accessToken": "ya29...",
+			"idToken": "ey..."
+		},
+		"idpId": "218528353504723201",
+		"rawInformation": {
+			"User": {
+				"email": "minni@mouse.com",
+				"email_verified": true,
+				"family_name": "Mouse",
+				"given_name": "Minnie",
+				"hd": "mouse.com",
+				"locale": "de",
+				"name": "Minnie Mouse",
+				"picture": "https://lh3.googleusercontent.com/a/AAcKTtf973Q7NH8KzKTMEZELPU9lx45WpQ9FRBuxFdPb=s96-c",
+				"sub": "111392805975715856637"
+			}
+		}
+	}
+}
+```
+
+## Handle Provider Information
+After successfully authenticating using your identity provider, you have three possible options.
+1. Login
+2. Register user
+3. Add social login to existing user
+
+### Login
+
+If you did get a user ID in the parameters when calling your success page, you know that a user is already linked with the used identity provider and you are ready to perform the login.
+Create a new session and include the intent ID and the token in the checks.
+This check requires that the previous step ended on the successful page and didn't’t result in an error.
+
+#### Request
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/sessions \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+
+  --header 'Content-Type: application/json' \
+  --data '{
+  "checks": {
+	"user": {
+      		"userId": "218662596918640897"
+    	},
+	"intent": {
+      		"intentId": "219647325729980673",
+      		"token": "k86ihn-VLMMUGKy1q1b5i_foECspKYqei1l4mS8LT7Xzjw"
+    	}
+  }
+}'
+```
+
+### Register
+
+If you didn't get a user ID in the parameters of your success page, you know that there is no existing user in ZITADEL with that provider, and you can register a new user or link it to an existing account (read the next section).
+
+Fill the IdP links in the create user request to add a user with an external login provider.
+The idpId is the ID of the provider in ZITADEL, the idpExternalId is the ID of the user in the external identity provider; usually, this is sent in the “sub”.
+The display name is used to list the linkings on the users.
+
+[Create User API Documentation](/docs/apis/resources/user_service/user-service-add-human-user)
+
+#### Request
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/users/human \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Content-Type: application/json' \
+  --data '{
+  "username": "minni-mouse@mouse.com",
+  "profile": {
+    "firstName": "Minnie",
+    "lastName": "Mouse",
+    "nickName": "Mini",
+    "displayName": "Minnie Mouse",
+    "preferredLanguage": "en",
+    "gender": "GENDER_FEMALE"
+  },
+  "email": {
+    "email": "minni-mouse@mouse.com",
+		"isVerified": true
+  },
+  "idpLinks": [
+    {
+      "idpId": "218528353504723201",
+      "idpExternalId": "111392805975715856637",
+      "displayName": "Minnie Mouse"
+    }
+  ]
+}'
+```
+
+### Add External Login to Existing User
+
+If you didn't get a user ID in the parameters to your success page, you know that there is no existing user in ZITADEL with that provider and you can register a new user (read previous section), or link it to an existing account.
+
+If you want to link/connect to an existing account you can perform the add identity provider link request.
+[Add IDP Link to existing user documentation](/docs/apis/resources/user_service/user-service-add-idp-link)
+
+#### Request
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/users/users/218385419895570689/links \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Content-Type: application/json' \
+  --data '{
+	"idpLink": {
+    "idpId": "218528353504723201",
+    "idpExternalId": "1113928059757158566371",
+    "displayName": "Minnie Mouse"
+  }
+}'
+```

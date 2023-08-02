@@ -5,54 +5,70 @@ title: Kubernetes
 import Disclaimer from './_disclaimer.mdx'
 import DefaultUser from './_defaultuser.mdx'
 import Next from './_next.mdx'
+import NoteInstanceNotFound from './troubleshooting/_note_instance_not_found.mdx';
+
 
 Installation and configuration details are described in the [open source ZITADEL charts repo](https://github.com/zitadel/zitadel-charts).
 By default, the chart installs a secure and highly available ZITADEL instance.
 For running an easily testable, insecure, non-HA ZITADEL instance, run the following commands.
 
-## Helm
 
-### Add the helm repositories for CockroachDB and ZITADEL
+## Add the Helm Repositories for CockroachDB and ZITADEL
 
 ```bash
 helm repo add cockroachdb https://charts.cockroachdb.com/
 helm repo add zitadel https://charts.zitadel.com
 ```
 
-### Install zitadel
+After you have your repositories added,
+you can setup ZITADEL and either
+- initialize an [IAM owner who is a human user](#setup-zitadel-and-a-human-admin) or
+- initialize an [IAM owner who is a service account](#setup-zitadel-and-a-service-account-admin)
 
-#### Install an insecure cockroachdb and zitadel release that works with localhost
+## Setup ZITADEL and a Human Admin
 
 ```bash
-# CockroachDB
+# Install CockroachDB
 helm install crdb cockroachdb/cockroachdb \
   --set fullnameOverride=crdb \
   --set single-node=true \
   --set statefulset.replicas=1
 
-# ZITADEL
+# Install ZITADEL
 helm install my-zitadel zitadel/zitadel \
   --set zitadel.masterkey="MasterkeyNeedsToHave32Characters" \
   --set zitadel.configmapConfig.ExternalSecure=false \
   --set zitadel.configmapConfig.TLS.Enabled=false \
   --set zitadel.secretConfig.Database.cockroach.User.Password="a-zitadel-db-user-password" \
   --set replicaCount=1
+
+# Make ZITADEL locally accessible
+kubectl port-forward svc/my-zitadel 8080
 ```
 
 <DefaultUser components={props.components} />
 
-#### Install an insecure zitadel release that works with localhost with a service account
+<NoteInstanceNotFound/>
 
-!!!Caution!!! With this setup you only get a service account with a key and no admin account where you can login directly into ZITADEL.
+## Setup ZITADEL and a Service Account Admin
+
+With this setup, you don't create a human user that has the IAM_OWNER role.
+Instead, you create a service account that has the IAM_OWNER role.
+ZITADEL will also create a key for your, with which you can authenticate to the ZITADEL API.
+For example, you can install ZITADEL and seemlessly provision ZITADEL resources after installation using [Terraform](/docs/guides/manage/terraform/basics.md).
+
+:::caution
+With this setup you only get a key for a service account. Logging in at ZITADEL using the login screen is not possible until you create a user with the ZITADEL API. 
+:::
 
 ```bash
-# CockroachDB
+# Install CockroachDB
 helm install crdb cockroachdb/cockroachdb \
   --set fullnameOverride=crdb \
   --set single-node=true \
   --set statefulset.replicas=1
 
-# ZITADEL
+# Install ZITADEL
 helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
   --set zitadel.masterkey="MasterkeyNeedsToHave32Characters" \
   --set zitadel.configmapConfig.ExternalSecure=false \
@@ -63,19 +79,14 @@ helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
   --set zitadel.configmapConfig.FirstInstance.Org.Machine.Machine.Username="zitadel-admin-sa" \
   --set zitadel.configmapConfig.FirstInstance.Org.Machine.Machine.Name="Admin" \
   --set zitadel.configmapConfig.FirstInstance.Org.Machine.MachineKey.Type=1
+
+# Make ZITADEL locally accessible
+kubectl port-forward svc/my-zitadel 8080
 ```
 
-When helm is done, you get a command to retrieve your machine key, which is saved as a kubernetes secret, for example:
+When Helm is done, you can print your service account key from a Kubernetes secret:
 ```bash
 kubectl -n zitadel get secret zitadel-admin-sa -o jsonpath='{ .data.zitadel-admin-sa\.json }' | base64 -D
-```
-
-This key can be used to provision resources with for example [Terraform](/docs/guides/manage/terraform/basics.md).
-
-### Forward the ZITADEL service port to your local machine
-
-```bash
-kubectl port-forward svc/my-zitadel 8080:8080
 ```
 
 <Next components={props.components} />

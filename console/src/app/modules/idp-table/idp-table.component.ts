@@ -1,11 +1,11 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import {
   ListProvidersRequest as AdminListProvidersRequest,
   ListProvidersResponse as AdminListProvidersResponse,
@@ -31,6 +31,8 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { OverlayWorkflowService } from 'src/app/services/overlay/overlay-workflow.service';
+import { ContextChangedWorkflowOverlays } from 'src/app/services/overlay/workflows';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
@@ -40,7 +42,7 @@ import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
   templateUrl: './idp-table.component.html',
   styleUrls: ['./idp-table.component.scss'],
 })
-export class IdpTableComponent implements OnInit {
+export class IdpTableComponent implements OnInit, OnDestroy {
   @Input() public serviceType!: PolicyComponentServiceType;
   @Input() service!: AdminService | ManagementService;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
@@ -60,9 +62,27 @@ export class IdpTableComponent implements OnInit {
   public IDPStylingType: any = IDPStylingType;
   public loginPolicy!: LoginPolicy.AsObject;
 
-  constructor(public translate: TranslateService, private toast: ToastService, private dialog: MatDialog) {
+  private reloadIDPs$: Subject<void> = new Subject();
+
+  constructor(
+    private workflowService: OverlayWorkflowService,
+    public translate: TranslateService,
+    private toast: ToastService,
+    private dialog: MatDialog,
+    private router: Router,
+  ) {
     this.selection.changed.subscribe(() => {
       this.changedSelection.emit(this.selection.selected);
+    });
+
+    this.reloadIDPs$.subscribe(() => {
+      this.getIdps()
+        .then((resp) => {
+          this.idps = resp;
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     });
   }
 
@@ -75,6 +95,10 @@ export class IdpTableComponent implements OnInit {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
       this.displayedColumns = ['availability', 'name', 'type', 'owner', 'creationDate', 'changeDate', 'actions'];
     }
+  }
+
+  ngOnDestroy(): void {
+    this.reloadIDPs$.complete();
   }
 
   public isAllSelected(): boolean {
@@ -241,6 +265,16 @@ export class IdpTableComponent implements OnInit {
     }
   }
 
+  navigateToIDP(row: Provider.AsObject) {
+    this.router.navigate(this.routerLinkForRow(row)).then(() => {
+      if (this.serviceType === PolicyComponentServiceType.MGMT && row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM) {
+        setTimeout(() => {
+          this.workflowService.startWorkflow(ContextChangedWorkflowOverlays, null);
+        }, 1000);
+      }
+    });
+  }
+
   private async getIdps(): Promise<IDPLoginPolicyLink.AsObject[]> {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
@@ -314,13 +348,7 @@ export class IdpTableComponent implements OnInit {
                 this.toast.showInfo('IDP.TOAST.ADDED', true);
 
                 setTimeout(() => {
-                  this.getIdps()
-                    .then((resp) => {
-                      this.idps = resp;
-                    })
-                    .catch((error) => {
-                      this.toast.showError(error);
-                    });
+                  this.reloadIDPs$.next();
                 }, 2000);
               });
             })
@@ -333,13 +361,7 @@ export class IdpTableComponent implements OnInit {
             .then(() => {
               this.toast.showInfo('IDP.TOAST.ADDED', true);
               setTimeout(() => {
-                this.getIdps()
-                  .then((resp) => {
-                    this.idps = resp;
-                  })
-                  .catch((error) => {
-                    this.toast.showError(error);
-                  });
+                this.reloadIDPs$.next();
               }, 2000);
             })
             .catch((error) => {
@@ -352,13 +374,7 @@ export class IdpTableComponent implements OnInit {
           .then(() => {
             this.toast.showInfo('IDP.TOAST.ADDED', true);
             setTimeout(() => {
-              this.getIdps()
-                .then((resp) => {
-                  this.idps = resp;
-                })
-                .catch((error) => {
-                  this.toast.showError(error);
-                });
+              this.reloadIDPs$.next();
             }, 2000);
           })
           .catch((error) => {
@@ -367,72 +383,71 @@ export class IdpTableComponent implements OnInit {
     }
   }
 
-  public removeIdp(idp: Provider.AsObject): Promise<any> {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        if (this.isDefault) {
-          return this.addLoginPolicy()
-            .then(() => {
-              this.loginPolicy.isDefault = false;
-              return (this.service as ManagementService)
+  public removeIdp(idp: Provider.AsObject): void {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.CONTINUE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'IDP.REMOVE_WARN_TITLE',
+        descriptionKey: 'IDP.REMOVE_WARN_DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        switch (this.serviceType) {
+          case PolicyComponentServiceType.MGMT:
+            if (this.isDefault) {
+              this.addLoginPolicy()
+                .then(() => {
+                  this.loginPolicy.isDefault = false;
+                  return (this.service as ManagementService)
+                    .removeIDPFromLoginPolicy(idp.id)
+                    .then(() => {
+                      this.toast.showInfo('IDP.TOAST.REMOVED', true);
+                      setTimeout(() => {
+                        this.reloadIDPs$.next();
+                      }, 2000);
+                    })
+                    .catch((error) => {
+                      this.toast.showError(error);
+                    });
+                })
+                .catch((error) => {
+                  this.toast.showError(error);
+                });
+              break;
+            } else {
+              (this.service as ManagementService)
                 .removeIDPFromLoginPolicy(idp.id)
                 .then(() => {
                   this.toast.showInfo('IDP.TOAST.REMOVED', true);
                   setTimeout(() => {
-                    this.getIdps()
-                      .then((resp) => {
-                        this.idps = resp;
-                      })
-                      .catch((error) => {
-                        this.toast.showError(error);
-                      });
+                    this.reloadIDPs$.next();
                   }, 2000);
                 })
                 .catch((error) => {
                   this.toast.showError(error);
                 });
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
-        } else {
-          return (this.service as ManagementService)
-            .removeIDPFromLoginPolicy(idp.id)
-            .then(() => {
-              this.toast.showInfo('IDP.TOAST.REMOVED', true);
-              setTimeout(() => {
-                this.getIdps()
-                  .then((resp) => {
-                    this.idps = resp;
-                  })
-                  .catch((error) => {
-                    this.toast.showError(error);
-                  });
-              }, 2000);
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
+              break;
+            }
+          case PolicyComponentServiceType.ADMIN:
+            (this.service as AdminService)
+              .removeIDPFromLoginPolicy(idp.id)
+              .then(() => {
+                this.toast.showInfo('IDP.TOAST.REMOVED', true);
+                setTimeout(() => {
+                  this.reloadIDPs$.next();
+                }, 2000);
+              })
+              .catch((error) => {
+                this.toast.showError(error);
+              });
+            break;
         }
-      case PolicyComponentServiceType.ADMIN:
-        return (this.service as AdminService)
-          .removeIDPFromLoginPolicy(idp.id)
-          .then(() => {
-            this.toast.showInfo('IDP.TOAST.REMOVED', true);
-            setTimeout(() => {
-              this.getIdps()
-                .then((resp) => {
-                  this.idps = resp;
-                })
-                .catch((error) => {
-                  this.toast.showError(error);
-                });
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-    }
+      }
+    });
   }
 
   public isEnabled(idp: Provider.AsObject): boolean {

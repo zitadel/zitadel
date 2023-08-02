@@ -15,7 +15,7 @@ This is a guide on how to create service users in ZITADEL. You can read more abo
 
 In ZITADEL we use the `urn:ietf:params:oauth:grant-type:jwt-bearer` (**“JWT bearer token with private key”**, [RFC7523](https://tools.ietf.org/html/rfc7523)) authorization grant for this non-interactive authentication.
 
-You need to follow these steps to authenticate a service user and receive a access token:
+You need to follow these steps to authenticate a service user and receive an access token:
 
 1. Generate a private-public key pair in ZITADEL
 2. Create a JSON Web Token (JWT) and sign with private key
@@ -25,7 +25,7 @@ With this token you can make subsequent requests, just like a human user.
 
 ## Get an access token
 
-In this step we will authenticate a service user and receive an access_token to use against a API.
+In this step we will authenticate a service user and receive an access_token to use against the API.
 
 > **Information:** Are you stuck? Don't hesitate to reach out to us on [Github Discussions](https://github.com/zitadel/zitadel/discussions) or [contact us](https://zitadel.com/contact/) privately.
 
@@ -95,6 +95,8 @@ curl --request POST \
   --data scope='openid profile email' \
   --data assertion=eyJ0eXAiOiJKV1QiL...
 ```
+
+If you want to access the ZITADEL API with this access token, you have to add `urn:zitadel:iam:org:project:id:zitadel:aud` to the list of scopes.
 
 * `grant_type` should be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
 * `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile` and `email`

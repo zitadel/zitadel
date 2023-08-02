@@ -2,7 +2,6 @@
 title: Rate Limit Policy
 custom_edit_url: null
 ---
-## Introduction
 
 This policy is an annex to the [Terms of Service](terms-of-service) and clarifies your obligations while using our Services, specifically how we will use rate limiting to enforce certain aspects of our [Acceptable Use Policy](acceptable-use-policy).
 

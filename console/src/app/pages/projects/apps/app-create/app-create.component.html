@@ -2,14 +2,16 @@
   title="{{ 'APP.PAGES.CREATE' | translate }}"
   class="app-create-wrapper"
   [createSteps]="
-    appType?.value?.createType === AppCreateType.OIDC
-      ? appType?.value.oidcAppType !== OIDCAppType.OIDC_APP_TYPE_NATIVE
-        ? 4
-        : 3
-      : appType?.value?.createType === AppCreateType.API
-      ? 3
-      : appType?.value?.createType === AppCreateType.SAML
-      ? 3
+    !devmode
+      ? appType?.value?.createType === AppCreateType.OIDC
+        ? appType?.value.oidcAppType !== OIDCAppType.OIDC_APP_TYPE_NATIVE
+          ? 4
+          : 3
+        : appType?.value?.createType === AppCreateType.API
+        ? 3
+        : appType?.value?.createType === AppCreateType.SAML
+        ? 3
+        : 0
       : 0
   "
   [currentCreateStep]="currentCreateStep"

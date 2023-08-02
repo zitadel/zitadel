@@ -2,7 +2,6 @@
 title: Cloud Service
 custom_edit_url: null
 --- 
-## Introduction
 
 This annex of the [Framework Agreement](terms-of-service) describes the service levels offered by us for our Services.
 
@@ -28,4 +27,13 @@ The following regions will be available when using our cloud service. This list 
 - **Switzerland**: Exclusively on Swiss region
 - **GDPR safe countries**: Exclusively [Adequate Countries](https://ec.europa.eu/info/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en) as recognized by the European Commission under the GDPR
 
-Last revised: June 14, 2022
+## Backup
+
+Our backup strategy executes daily full backups and differential backups on much higher frequency.
+In a disaster recovery scenario, our goal is to guarantee a recovery point objective (RPO) of 1h, and a higher but similar recovery time objective (RTO).
+Under normal operations, RPO and RTO goals are below 1 minute.
+
+If you you have different requirements we provide you with a flexible approach to backup, restore, and transfer data (f.e. to a self-hosted setup) through our APIs.
+Please consult the [migration guides](../guides/migrate/introduction.md) for more information.
+
+Last revised: June 21, 2023

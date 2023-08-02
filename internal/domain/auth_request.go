@@ -42,7 +42,7 @@ type AuthRequest struct {
 	PrivateLabelingSetting   PrivateLabelingSetting
 	SelectedIDPConfigID      string
 	LinkingUsers             []*ExternalUser
-	PossibleSteps            []NextStep
+	PossibleSteps            []NextStep `json:"-"`
 	PasswordVerified         bool
 	MFAsVerified             []MFAType
 	Audience                 []string
@@ -114,6 +114,17 @@ const (
 	MFALevelSecondFactor
 	MFALevelMultiFactor
 	MFALevelMultiFactorCertified
+)
+
+type AuthRequestState int
+
+const (
+	AuthRequestStateUnspecified AuthRequestState = iota
+	AuthRequestStateAdded
+	AuthRequestStateCodeAdded
+	AuthRequestStateCodeExchanged
+	AuthRequestStateFailed
+	AuthRequestStateSucceeded
 )
 
 func NewAuthRequestFromType(requestType AuthRequestType) (*AuthRequest, error) {

@@ -94,7 +94,7 @@ Authentication
 - Single Sign On (SSO)
 - Passwordless with FIDO2 support (Including Passkeys)
 - Username / Password
-- Multifactor authentication with OTP, U2F, SMS
+- Multifactor authentication with OTP, U2F
 - LDAP
 - [OpenID Connect certified](https://openid.net/certification/#OPs) => [OIDC Endpoints](https://zitadel.com/docs/apis/openidoauth/endpoints)
 - [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html) => [SAML Endpoints](https://zitadel.com/docs/apis/saml/endpoints)
@@ -155,7 +155,9 @@ Use [Console](https://zitadel.com/docs/guides/manage/console/overview) or our [A
 
 ## Security
 
-See the policy [here](./SECURITY.md)
+See the policy [here](./SECURITY.md).
+
+[Technical Advisories](https://zitadel.com/docs/support/technical_advisory) are published regarding major issues with the ZITADEL platform that could potentially impact security or stability in production environments.
 
 ## License
 

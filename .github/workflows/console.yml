@@ -1,0 +1,61 @@
+name: Build console
+
+on: 
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+      buf_version:
+        required: true
+        type: string
+    outputs:
+      cache_key:
+        value: ${{ jobs.build.outputs.cache_key }}
+      cache_path:
+          value: ${{ jobs.build.outputs.cache_path }}
+
+env:
+  cache_path: console/dist/console
+
+jobs:
+  build:
+    outputs:
+      cache_key: ${{ steps.cache.outputs.cache-primary-key }}
+      cache_path: ${{ env.cache_path }}
+    runs-on: ubuntu-latest
+    steps:
+        - 
+          uses: actions/checkout@v3
+        - 
+          uses: actions/cache/restore@v3
+          timeout-minutes: 1
+          id: cache
+          with:
+            key: console-${{ hashFiles('console', 'proto') }}
+            restore-keys: |
+              console-
+            path: ${{ env.cache_path }}
+        - 
+          if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+          uses: bufbuild/buf-setup-action@v1
+          with:
+            github_token: ${{ github.token }}
+            version: ${{ inputs.buf_version }}
+        - 
+          if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+          uses: actions/setup-node@v3
+          with:
+            node-version: ${{ inputs.node_version }}
+            cache: 'yarn'
+            cache-dependency-path: console/yarn.lock
+        - 
+          if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+          run: make console_build
+        - 
+          if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+          uses: actions/cache/save@v3
+          with:
+            path: ${{ env.cache_path }}
+            key: ${{ steps.cache.outputs.cache-primary-key }}
+        

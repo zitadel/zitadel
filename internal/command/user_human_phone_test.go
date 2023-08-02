@@ -189,6 +189,66 @@ func TestCommandSide_ChangeHumanPhone(t *testing.T) {
 			},
 		},
 		{
+			name: "phone changed to verified, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPhoneChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"+41711234567",
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewHumanPhoneVerifiedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				email: &domain.Phone{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "user1",
+					},
+					PhoneNumber:     "+41711234567",
+					IsPhoneVerified: true,
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.Phone{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					PhoneNumber:     "+41711234567",
+					IsPhoneVerified: true,
+				},
+			},
+		},
+		{
 			name: "phone changed with code, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(

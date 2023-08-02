@@ -166,7 +166,13 @@
     "NEXT": "Avanti",
     "MORE": "azioni",
     "STEP": "Passo",
-    "COMINGSOON": "Coming soon",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Sei sicuro di voler eliminare questa nuova azione? La tua azione andrà persa",
+        "CANCEL": "Cancella",
+        "DISCARD": "Continua comunque"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Mostra utente {{value}}"
     }
@@ -204,6 +210,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "Attenzione! L'organizzazione è appena stata cambiata."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "La visualizzazione è appena stata modificata in istanza!"
     }
   },
   "FILTER": {
@@ -1030,7 +1039,10 @@
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български",
+      "pt": "Portuguese",
+      "mk": "Македонски"
     },
     "SMTP": {
       "TITLE": "Impostazioni SMTP",
@@ -1089,7 +1101,9 @@
         "3": "Verificazione del numero di telefono",
         "4": "Ripristino Password",
         "5": "Inizializzazione Passwordless",
-        "6": "Segreto dell'applicazione"
+        "6": "Segreto dell'applicazione",
+        "7": "One Time Password (OTP) - SMS",
+        "8": "One Time Password (OTP) - email"
       },
       "ADDGENERATOR": "Definisci aspetto",
       "GENERATORTYPE": "Tipo",
@@ -1229,7 +1243,10 @@
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -1328,6 +1345,8 @@
       "ALLOWREGISTER_DESC": "Se l'opzione \u00e8 selezionata, nel login apparirà un passo aggiuntivo per la registrazione di un utente.",
       "FORCEMFA": "Forza MFA",
       "FORCEMFA_DESC": "Se l'opzione \u00e8 selezionata, gli utenti devono configurare un secondo fattore per il login.",
+      "FORCEMFALOCALONLY": "Forza MFA per gli utenti locali",
+      "FORCEMFALOCALONLY_DESC": "Se l'opzione è selezionata, gli utenti locali autenticati devono configurare un secondo fattore per l'accesso.",
       "HIDEPASSWORDRESET": "Nascondi ripristino della password",
       "HIDEPASSWORDRESET_DESC": "Se l'opzione \u00e8 selezionata, l'utente non pu\u00f2 resettare la sua password nel interfaccia login.",
       "HIDELOGINNAMESUFFIX": "Nascondi il suffisso del nome utente",
@@ -1495,13 +1514,11 @@
         "SEL_PROJECT": "Cerca un progetto",
         "SEL_ROLES": "Seleziona i ruoli che vuoi aggiungere",
         "SEL_USER": "Seleziona utenti",
-        "SEL_ORG": "Impostare il dominio",
-        "SEL_ORG_DESC": "Inserisci il dominio completo per specificare l'organizzazione da concedere.",
-        "ORG_TITLE": "Organizzazione",
+        "SEL_ORG": "Cerca un'organizzazione",
+        "SEL_ORG_DESC": "Cerca l'organizzazione da concedere.",
         "ORG_DESCRIPTION": "Stai per concedere un utente per l'organizzazione {{name}}.",
         "ORG_DESCRIPTION_DESC": "Cambia il contesto nell'intestazione qui sopra per concedere un utente per un'altra organizzazione.",
-        "SEL_ORG_FORMFIELD": "Dominio completo",
-        "SEL_ORG_BUTTON": "Ricerca organizzazione",
+        "SEL_ORG_FORMFIELD": "Organizzazione",
         "FOR_ORG": "Org grant \u00e8 creato per:"
       },
       "DETAIL": {
@@ -1777,6 +1794,8 @@
     "DELETE": "Rimuovi IDP",
     "DELETE_TITLE": "Rimuovi IDP",
     "DELETE_DESCRIPTION": "Stai per rimuovere un fornitore di identit\u00e0. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
+    "REMOVE_WARN_TITLE": "Rimuovi IDP",
+    "REMOVE_WARN_DESCRIPTION": "Stai per rimuovere un provider di identità. Questo rimuoverà la selezione dell'IDP disponibile per i tuoi utenti e gli utenti già registrati non potranno accedere nuovamente. Sei sicuro di continuare?",
     "DELETE_SELECTION_TITLE": "Rimuovere IDP",
     "DELETE_SELECTION_DESCRIPTION": "Stai per rimuovere un fornitore di identit\u00e0. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
     "EMPTY": "Nessun IDP disponible",
@@ -1831,8 +1850,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Sconosciuto",
-      "1": "One Time Password (OTP)",
-      "2": "Impronta digitale, chiave di sicurezza, Face ID e altri"
+      "1": "One Time Password per Authenticator App (TOTP)",
+      "2": "Impronta digitale, chiave di sicurezza, Face ID e altri",
+      "3": "One Time Password per Email (Email OTP)",
+      "4": "One Time Password per SMS (SMS OTP)"
     }
   },
   "LOGINPOLICY": {
@@ -2098,7 +2119,10 @@
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

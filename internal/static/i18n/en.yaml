@@ -53,6 +53,7 @@ Errors:
     NotFoundOnOrg: User could not be found on chosen organization
     NotAllowedOrg: User is no member of the required organization
     UserIDMissing: User ID missing
+    UserIDWrong: "Request user not equal to authenticated user"
     DomainPolicyNil: Organisation Policy is empty
     EmailAsUsernameNotAllowed: Email is not allowed as username
     Invalid: Userdata is invalid
@@ -67,12 +68,13 @@ Errors:
     NoChanges: No changes found
     InitCodeNotFound: Initialization Code not found
     UsernameNotChanged: Username not changed
+    InvalidURLTemplate: URL Template is invalid
     Profile:
       NotFound: Profile not found
       NotChanged: Profile not changed
       Empty: Profile is empty
-      FirstNameEmpty: First name in profile is empty
-      LastNameEmpty: Last name in profile is empty
+      FirstNameEmpty: Given name in profile is empty
+      LastNameEmpty: Family name in profile is empty
       IDMissing: Profile ID is missing
     Email:
       NotFound: Email not found
@@ -81,7 +83,6 @@ Errors:
       NotChanged: Email not changed
       Empty: Email is empty
       IDMissing: Email ID is missing
-      InvalidURLTemplate: URL Template is invalid
     Phone:
       NotFound: Phone not found
       Invalid: Phone is invalid
@@ -119,6 +120,8 @@ Errors:
       Empty: Password is empty
       Invalid: Password is invalid
       NotSet: User has not set a password
+      NotChanged: Password not changed
+      NotSupported: Password hash encoding not supported
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is too short
@@ -475,6 +478,28 @@ Errors:
     Terminated: Session already terminated
     Token:
       Invalid: Session Token is invalid
+    Passkey:
+      NoChallenge: Session without passkey challenge
+  Intent:
+    IDPMissing: IDP ID is missing in the request
+    SuccessURLMissing: Success URL is missing in the request
+    FailureURLMissing: Failure URL is missing in the request
+    StateMissing: State parameter is missing in the request
+    NotStarted: Intent is not started or was already terminated
+    NotSucceeded: Intent has not succeeded
+    TokenCreationFailed: Token creation failed
+    InvalidToken: Intent Token is invalid
+    OtherUser: Intent meant for another user
+  AuthRequest:
+    AlreadyExists: Auth Request already exists
+    NotExisting: Auth Request does not exist
+    WrongLoginClient: Auth Request created by other login client
+  OIDCSession:
+    RefreshTokenInvalid: Refresh Token is invalid
+    Token:
+      Invalid: Token is invalid
+      Expired: Token is expired
+    InvalidClient: Token was not issued for this client
 
 AggregateTypes:
   action: Action
@@ -558,6 +583,10 @@ EventTypes:
         check:
           succeeded: Password check succeeded
           failed: Password check failed
+        change:
+          sent: Password change sent
+        hash:
+          updated: Password hash updated
       externallogin:
         check:
           succeeded: External login succeeded

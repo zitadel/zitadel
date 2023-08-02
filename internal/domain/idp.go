@@ -9,6 +9,7 @@ const (
 	IDPStateActive
 	IDPStateInactive
 	IDPStateRemoved
+	IDPStateMigrated
 
 	idpStateCount
 )
@@ -18,7 +19,7 @@ func (s IDPState) Valid() bool {
 }
 
 func (s IDPState) Exists() bool {
-	return s != IDPStateUnspecified && s != IDPStateRemoved
+	return s != IDPStateUnspecified && s != IDPStateRemoved && s != IDPStateMigrated
 }
 
 type IDPType int32
@@ -47,12 +48,13 @@ func (t IDPType) GetCSSClass() string {
 	case IDPTypeGitLab,
 		IDPTypeGitLabSelfHosted:
 		return "gitlab"
+	case IDPTypeAzureAD:
+		return "azure"
 	case IDPTypeUnspecified,
 		IDPTypeOIDC,
 		IDPTypeJWT,
 		IDPTypeOAuth,
-		IDPTypeLDAP,
-		IDPTypeAzureAD:
+		IDPTypeLDAP:
 		fallthrough
 	default:
 		return ""
@@ -90,4 +92,23 @@ func (t IDPType) DisplayName() string {
 		logging.Errorf("name of provider (type %d) is empty", t)
 		return ""
 	}
+}
+
+type IDPIntentState int32
+
+const (
+	IDPIntentStateUnspecified IDPIntentState = iota
+	IDPIntentStateStarted
+	IDPIntentStateSucceeded
+	IDPIntentStateFailed
+
+	idpIntentStateCount
+)
+
+func (s IDPIntentState) Valid() bool {
+	return s >= 0 && s < idpIntentStateCount
+}
+
+func (s IDPIntentState) Exists() bool {
+	return s != IDPIntentStateUnspecified && s != IDPIntentStateFailed //TODO: ?
 }

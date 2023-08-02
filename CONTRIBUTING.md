@@ -34,39 +34,44 @@ Follow [@zitadel](https://twitter.com/zitadel) on twitter
 
 We strongly recommend to [talk to us](https://zitadel.com/contact) before you start contributing to streamline our and your work.
 
-We accept contributions through pull requests. You need a github account for that. If you are unfamiliar with git have a look at Github's documentation on [creating forks](https://help.github.com/articles/fork-a-repo) and [creating pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork). Please draft the pull request as soon as possible. Go through the following checklist before you submit the final pull request:
+We accept contributions through pull requests.
+You need a github account for that.
+If you are unfamiliar with git have a look at Github's documentation on [creating forks](https://help.github.com/articles/fork-a-repo) and [creating pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork).
+Please draft the pull request as soon as possible.
+Go through the following checklist before you submit the final pull request:
 
-### Submit a Pull Request (PR)
+### Submit a pull request (PR)
 
 1. [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the [zitadel/zitadel](https://github.com/zitadel/zitadel) repository on GitHub
 2. On your fork, commit your changes to a new branch
 
-    `git checkout -b my-fix-branch main`
+   `git checkout -b my-fix-branch main`
 
 3. Make your changes following the [guidelines](#contribute) in this guide. Make sure that all tests pass.
 
 4. Commit the changes on the new branch
 
-    `git commit --all`
+   `git commit --all`
 
 5. [Merge](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) the latest commit of the `main`-branch
 
 6. Push the changes to your branch on Github
 
-    `git push origin my-fix-branch`
+   `git push origin my-fix-branch`
 
 7. Use [Semantic Release commit messages](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type) to simplify creation of release notes. In the title of the pull request [correct tagging](#commit-messages) is required and will be requested by the reviewers.
 
 8. On GitHub, [send a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) to `zitadel:main`. Request review from one of the maintainers.
 
-### Reviewing a Pull Request
+### Review a pull request
 
-The reviewers will provide you feedback and approve your changes as soon as they are satisfied. If we ask you for changes in the code, you can follow the [GitHub Guide](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/incorporating-feedback-in-your-pull-request) to incorporate feedback in your pull request.
+The reviewers will provide you feedback and approve your changes as soon as they are satisfied.
+If we ask you for changes in the code, you can follow the [GitHub Guide](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/incorporating-feedback-in-your-pull-request) to incorporate feedback in your pull request.
 
 <!-- TODO: how to do this via git -->
 <!-- TODO: change commit message via git -->
 
-### Commit Messages
+### Commit messages
 
 Make sure you use [semantic release messages format](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type).
 
@@ -84,9 +89,19 @@ Must be one of the following:
 
 This is optional to indicate which component is affected. In doubt, leave blank (`<type>: <short summary>`)
 
-#### Short Summary
+#### Short summary
 
 Provide a brief description of the change.
+
+### Quality assurance
+
+Please make sure you cover your changes with tests before marking a Pull Request as ready for review:
+
+- [ ] Integration tests against the gRPC server ensure that one or multiple API calls that belong together return the expected results.
+- [ ] Integration tests against the gRPC server ensure that probable good and bad read and write permissions are tested.
+- [ ] Integration tests against the gRPC server ensure that the API is easily usable despite eventual consistency.
+- [ ] Integration tests against the gRPC server ensure that all probable login and registration flows are covered."
+- [ ] Integration tests ensure that certain commands send expected notifications.
 
 ## Contribute
 
@@ -107,11 +122,11 @@ We add the label "good first issue" for problems we think are a good starting po
 - [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 - [All issues](https://github.com/zitadel/zitadel/issues)
 
-### Backend / Login
+### Backend/login
 
 By executing the commands from this section, you run everything you need to develop the ZITADEL backend locally.
 Using [Docker Compose](https://docs.docker.com/compose/), you run a [CockroachDB](https://www.cockroachlabs.com/docs/stable/start-a-local-cluster-in-docker-mac.html) on your local machine.
-With [goreleaser](https://opencollective.com/goreleaser), you build a debuggable ZITADEL binary and run it using [delve](https://github.com/go-delve/delve).
+With [make](https://www.gnu.org/software/make/), you build a debuggable ZITADEL binary and run it using [delve](https://github.com/go-delve/delve).
 Then, you test your changes via the console your binary is serving at http://<span because="breaks the link"></span>localhost:8080 and by verifying the database.
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
 
@@ -120,8 +135,7 @@ ZITADEL uses [golangci-lint](https://golangci-lint.run) for code quality checks.
 The commands in this section are tested against the following software versions:
 
 - [Docker version 20.10.17](https://docs.docker.com/engine/install/)
-- [Goreleaser version v1.8.3](https://goreleaser.com/install/)
-- [Go version 1.19](https://go.dev/doc/install)
+- [Go version 1.20](https://go.dev/doc/install)
 - [Delve 1.9.1](https://github.com/go-delve/delve/tree/v1.9.1/Documentation/installation)
 
 Make some changes to the source code, then run the database locally.
@@ -134,16 +148,15 @@ docker compose --file ./e2e/docker-compose.yaml up --detach db
 Build the binary. This takes some minutes, but you can speed up rebuilds.
 
 ```bash
-# You just need goreleasers build part (--snapshot) and you just need to target your current platform (--single-target)
-goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
+make compile
 ```
 
 > Note: With this command, several steps are executed.
 > For speeding up rebuilds, you can reexecute only specific steps you think are necessary based on your changes.  
-> Generating gRPC stubs: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-copy -o .`  
-> Running unit tests: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-codecov`  
-> Generating the console: `DOCKER_BUILDKIT=1 docker build -f build/console/Dockerfile . --target angular-export -o internal/api/ui/console/static/`  
-> Build the binary: `goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel --skip-before`
+> Generating gRPC stubs: `make core_api`  
+> Running unit tests: `make core_unit_test`  
+> Generating the console: `make console_build console_move`  
+> Build the binary: `make compile`
 
 You can now run and debug the binary in .artifacts/zitadel/zitadel using your favourite IDE, for example GoLand.
 You can test if ZITADEL does what you expect by using the UI at http://localhost:8080/ui/console.
@@ -151,19 +164,20 @@ Also, you can verify the data by running `cockroach sql --database zitadel --ins
 
 As soon as you are ready to battle test your changes, run the end-to-end tests.
 
-#### Running the tests with docker
+#### Running the tests
 
-Running the tests with docker doesn't require you to take care of other dependencies than docker and goreleaser.
+Running the tests with docker doesn't require you to take care of other dependencies than docker and make.
 
 ```bash
 # Build the production binary (unit tests are executed, too)
-goreleaser build --id prod --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
+make core_build console_build
+GOOS=linux make compile_pipeline
 
 # Pack the binary into a docker image
-DOCKER_BUILDKIT=1 docker build --file build/Dockerfile .artifacts/zitadel -t zitadel:local
+DOCKER_BUILDKIT=1 docker build --file build/Dockerfile . -t zitadel:local
 
 # If you made changes in the e2e directory, make sure you reformat the files
-(cd ./e2e && npm run lint:fix)
+make console_lint
 
 # Run the tests
 ZITADEL_IMAGE=zitadel:local docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml run --service-ports e2e
@@ -206,9 +220,7 @@ In order to run the integrations tests for the gRPC API, PostgreSQL and Cockroac
 ```bash
 export INTEGRATION_DB_FLAVOR="cockroach" ZITADEL_MASTERKEY="MasterkeyNeedsToHave32Characters"
 docker compose -f internal/integration/config/docker-compose.yaml up --wait ${INTEGRATION_DB_FLAVOR}
-go run main.go init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
-go run main.go setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
-go test -tags=integration -race -parallel 1 ./internal/integration ./internal/api/grpc/...
+make core_integration_test
 docker compose -f internal/integration/config/docker-compose.yaml down
 ```
 
@@ -221,7 +233,7 @@ Using [Docker Compose](https://docs.docker.com/compose/), you run [CockroachDB](
 You use the ZITADEL container as backend for your console.
 The console is run in your [Node](https://nodejs.org/en/about/) environment using [a local development server for Angular](https://angular.io/cli/serve#ng-serve), so you have fast feedback about your changes.
 
-We use angular-eslint/Prettier for linting/formatting, so please run `npm run lint:fix` before committing. (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
+We use angular-eslint/Prettier for linting/formatting, so please run `yarn lint:fix` before committing. (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
 
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
 
@@ -269,16 +281,16 @@ You can run the local console development server now.
 
 ```bash
 # Install npm dependencies
-npm install
+yarn install
 
 # Generate source files from Protos
-npm run generate
+yarn generate
 
 # Start the server
-npm start
+yarn start
 
 # If you don't want to develop against http://localhost:8080, you can use another environment
-ENVIRONMENT_JSON_URL=https://my-cloud-instance-abcdef.zitadel.cloud/ui/console/assets/environment.json npm start
+ENVIRONMENT_JSON_URL=https://my-cloud-instance-abcdef.zitadel.cloud/ui/console/assets/environment.json yarn start
 ```
 
 Navigate to http://localhost:4200/.
@@ -288,7 +300,7 @@ Open another shell.
 
 ```bash
 # Reformat your console code
-npm run lint:fix
+yarn lint:fix
 
 # Change to the e2e directory
 cd .. && cd e2e/
@@ -324,26 +336,36 @@ When you are happy with your changes, you can format your code and cleanup your 
 docker compose down
 ```
 
-## Contribute Docs
+## Contribute docs
 
 Project documentation is made with docusaurus and is located under [./docs](./docs).
 
-### Local Testing
+### Local testing
 
 Please refer to the [README](./docs/README.md) for more information and local testing.
 
-### Style Guide
+### Style guide
 
 - **Code with variables**: Make sure that code snippets can be used by setting environment variables, instead of manually replacing a placeholder.
-- **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
+- **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "\_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
 - **Don't repeat yourself**: When using the same content in multiple places, save and manage the content as separate file and make use of embedded files to import it into other docs pages.
 - **Embedded code**: You can embed code snippets from a repository. See the [plugin](https://github.com/saucelabs/docusaurus-theme-github-codeblock#usage) for usage.
 
-### Docs Pull Request
+Following the [Google style guide](https://developers.google.com/style) is highly recommended. Its clear and concise guidelines ensure consistency and effective communication within the wider developer community.
+
+The style guide covers a lot of material, so their [highlights](https://developers.google.com/style/highlights) page provides an overview of its most important points. Some of the points stated in the highlights that we care about most are given below:
+
+- Be conversational and friendly without being frivolous.
+- Use sentence case for document titles and section headings.
+- Use active voice: make clear who's performing the action.
+- Use descriptive link text.
+
+### Docs pull request
+
 When making a pull request use `docs(<scope>): <short summary>` as title for the semantic release.
 Scope can be left empty (omit the brackets) or refer to the top navigation sections.
 
-## Contribute Internationalization
+## Contribute internationalization
 
 ZITADEL loads translations from four files:
 
@@ -353,6 +375,7 @@ ZITADEL loads translations from four files:
 - [Common texts](./internal/static/i18n) for success or error toasts
 
 You may edit the texts in these files or create a new file for additional language support. Make sure you set the locale (ISO 639-1 code) as the name of the new language file.
+Please make sure that the languages within the files remain in their own language, e.g. German must always be `Deutsch.
 
 ## Want to start ZITADEL?
 
@@ -363,7 +386,7 @@ You can find an installation guide for all the different environments here:
 
 - Please read [Security Policy](./SECURITY.md).
 
-## Product Management
+## Product management
 
 The ZITADEL Team works with an agile product management methodology.
 You can find all the issues prioritized and ordered in the [product board](https://github.com/orgs/zitadel/projects/2/views/1).
@@ -387,10 +410,10 @@ The state should reflect the progress of the issue and what is going on right no
 
 - **No status**: Issue just got added and has to be looked at.
 - **🧐 Investigating**: We are currently investigating to find out what the problem is, which priority it should have and what has to be implemented. Or we need some more information from the author.
-- **📨 Product Backlog**: If an issue is in the backlog, it is not currently being worked on. These are recorded so that they can be worked on in the future. Issues with this state do not have to be completely defined yet.
-- **📝 Prioritized Product Backlog**: An issue with the state "Prioritized Backlog" is ready for the refinement from the perspective of the product owner (PO) to implement. This means the developer can find all the relevant information and acceptance criteria in the issue.
+- **📨 Product backlog**: If an issue is in the backlog, it is not currently being worked on. These are recorded so that they can be worked on in the future. Issues with this state do not have to be completely defined yet.
+- **📝 Prioritized product backlog**: An issue with the state "Prioritized Backlog" is ready for the refinement from the perspective of the product owner (PO) to implement. This means the developer can find all the relevant information and acceptance criteria in the issue.
 - **🔖 Ready**: The issue is ready to take into a sprint. Difference to "prioritized..." is that the complexity is defined by the team.
-- **📋 Sprint Backlog**: The issue is scheduled for the current sprint.
+- **📋 Sprint backlog**: The issue is scheduled for the current sprint.
 - **🏗 In progress**: Someone is working on this issue right now. The issue will get an assignee as soon as it is in progress.
 - **👀 In review**: The issue is in review. Please add someone to review your issue or let us know that it is ready to review with a comment on your pull request.
 - **✅ Done**: The issue is implemented and merged to main.
@@ -404,7 +427,6 @@ Priority shows you the priority the ZITADEL team has given this issue. In genera
 - **🏕 Medium**: After all the high issues are done these will be next.
 - **🏝 Low**: This is low in priority and will probably not be implemented in the next time or just if someone has some time in between.
 
-
 #### Complexity
 
 This should give you an indication how complex the issue is. It's not about the hours or effort it takes.
@@ -412,7 +434,7 @@ Everything that is higher than 8 should be split in smaller parts.
 
 **1**, **2**, **3**, **5**, **8**, **13**
 
-### About the Labels
+### About the labels
 
 There are a few general labels that don't belong to a specific category.
 
@@ -438,4 +460,3 @@ The language shows you in which programming language the affected part is writte
 - **lang: angular**
 - **lang: go**
 - **lang: javascript**
-

@@ -190,6 +190,10 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 			return
 		}
 		if err = GetAsset(w, r, resourceOwner, objectName, s.Storage()); err != nil {
+			if strings.Contains(err.Error(), "DATAB-pCP8P") {
+				s.ErrorHandler()(w, r, err, http.StatusNotFound)
+				return
+			}
 			s.ErrorHandler()(w, r, err, http.StatusInternalServerError)
 		}
 	}

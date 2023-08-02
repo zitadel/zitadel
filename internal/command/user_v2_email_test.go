@@ -199,7 +199,7 @@ func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 				email:         "email-changed@test.ch",
 				urlTmpl:       "{{",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "USERv2-ooD8p", "Errors.User.Email.InvalidURLTemplate"),
+			wantErr: caos_errs.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
 		},
 		{
 			name: "permission missing",

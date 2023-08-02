@@ -4,12 +4,10 @@ import (
 	"io"
 	"regexp"
 	"strings"
-	"text/template"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
@@ -73,19 +71,8 @@ type ConfirmURLData struct {
 	OrgID  string
 }
 
-// RenderConfirmURLTemplate parses and renders tmplStr.
+// RenderConfirmURLTemplate parses and renders tmpl.
 // userID, code and orgID are passed into the [ConfirmURLData].
-// "%s%s?userID=%s&code=%s&orgID=%s"
-func RenderConfirmURLTemplate(w io.Writer, tmplStr, userID, code, orgID string) error {
-	tmpl, err := template.New("").Parse(tmplStr)
-	if err != nil {
-		return caos_errs.ThrowInvalidArgument(err, "USERv2-ooD8p", "Errors.User.Email.InvalidURLTemplate")
-	}
-
-	data := &ConfirmURLData{userID, code, orgID}
-	if err = tmpl.Execute(w, data); err != nil {
-		return caos_errs.ThrowInvalidArgument(err, "USERv2-ohSi5", "Errors.User.Email.InvalidURLTemplate")
-	}
-
-	return nil
+func RenderConfirmURLTemplate(w io.Writer, tmpl, userID, code, orgID string) error {
+	return renderURLTemplate(w, tmpl, &ConfirmURLData{userID, code, orgID})
 }

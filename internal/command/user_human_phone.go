@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -27,11 +28,16 @@ func (c *Commands) ChangeHumanPhone(ctx context.Context, phone *domain.Phone, re
 
 	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
 	changedEvent, hasChanged := existingPhone.NewChangedEvent(ctx, userAgg, phone.PhoneNumber)
-	if !hasChanged {
+
+	// only continue if there were changes or there were no changes and the phone should be set to verified
+	if !hasChanged && !(phone.IsPhoneVerified && existingPhone.IsPhoneVerified != phone.IsPhoneVerified) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-wF94r", "Errors.User.Phone.NotChanged")
 	}
 
-	events := []eventstore.Command{changedEvent}
+	events := make([]eventstore.Command, 0)
+	if hasChanged {
+		events = append(events, changedEvent)
+	}
 	if phone.IsPhoneVerified {
 		events = append(events, user.NewHumanPhoneVerifiedEvent(ctx, userAgg))
 	} else {

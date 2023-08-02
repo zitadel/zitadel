@@ -49,14 +49,17 @@ type AddHuman struct {
 	Phone Phone
 	// Password is optional
 	Password string
-	// BcryptedPassword is optional
-	BcryptedPassword string
+	// EncodedPasswordHash is optional
+	EncodedPasswordHash string
 	// PasswordChangeRequired is used if the `Password`-field is set
 	PasswordChangeRequired bool
 	Passwordless           bool
 	ExternalIDP            bool
 	Register               bool
 	Metadata               []*AddMetadataEntry
+
+	// Links are optional
+	Links []*AddLink
 
 	// Details are set after a successful execution of the command
 	Details *domain.ObjectDetails
@@ -65,7 +68,13 @@ type AddHuman struct {
 	EmailCode *string
 }
 
-func (h *AddHuman) Validate() (err error) {
+type AddLink struct {
+	IDPID         string
+	DisplayName   string
+	IDPExternalID string
+}
+
+func (h *AddHuman) Validate(hasher *crypto.PasswordHasher) (err error) {
 	if err := h.Email.Validate(); err != nil {
 		return err
 	}
@@ -90,6 +99,11 @@ func (h *AddHuman) Validate() (err error) {
 	for _, metadataEntry := range h.Metadata {
 		if err := metadataEntry.Valid(); err != nil {
 			return err
+		}
+	}
+	if h.EncodedPasswordHash != "" {
+		if !hasher.EncodingSupported(h.EncodedPasswordHash) {
+			return errors.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.User.Password.NotSupported")
 		}
 	}
 	return nil
@@ -118,7 +132,7 @@ func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *Ad
 		c.AddHumanCommand(
 			human,
 			resourceOwner,
-			c.userPasswordAlg,
+			c.userPasswordHasher,
 			c.userEncryption,
 			allowInitMail,
 		))
@@ -142,12 +156,13 @@ func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *Ad
 type humanCreationCommand interface {
 	eventstore.Command
 	AddPhoneData(phoneNumber domain.PhoneNumber)
-	AddPasswordData(secret *crypto.CryptoValue, changeRequired bool)
+	AddPasswordData(encoded string, changeRequired bool)
 }
 
-func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, passwordAlg crypto.HashAlgorithm, codeAlg crypto.EncryptionAlgorithm, allowInitMail bool) preparation.Validation {
+//nolint:gocognit
+func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *crypto.PasswordHasher, codeAlg crypto.EncryptionAlgorithm, allowInitMail bool) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if err := human.Validate(); err != nil {
+		if err := human.Validate(hasher); err != nil {
 			return nil, err
 		}
 
@@ -201,7 +216,7 @@ func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, passwordAlg cr
 				createCmd.AddPhoneData(human.Phone.Number)
 			}
 
-			if err := addHumanCommandPassword(ctx, filter, createCmd, human, passwordAlg); err != nil {
+			if err := addHumanCommandPassword(ctx, filter, createCmd, human, hasher); err != nil {
 				return nil, err
 			}
 
@@ -226,6 +241,13 @@ func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, passwordAlg cr
 					metadataEntry.Value,
 				))
 			}
+			for _, link := range human.Links {
+				cmd, err := addLink(ctx, filter, a, link)
+				if err != nil {
+					return nil, err
+				}
+				cmds = append(cmds, cmd)
+			}
 
 			return cmds, nil
 		}, nil
@@ -242,7 +264,7 @@ func (c *Commands) addHumanCommandEmail(ctx context.Context, filter preparation.
 	// email not verified or
 	// user not registered and password set
 	if allowInitMail && human.shouldAddInitCode() {
-		initCode, err := newUserInitCode(ctx, filter, codeAlg)
+		initCode, err := c.newUserInitCode(ctx, filter, codeAlg)
 		if err != nil {
 			return nil, err
 		}
@@ -260,6 +282,15 @@ func (c *Commands) addHumanCommandEmail(ctx context.Context, filter preparation.
 	}
 	return cmds, nil
 }
+
+func addLink(ctx context.Context, filter preparation.FilterToQueryReducer, a *user.Aggregate, link *AddLink) (eventstore.Command, error) {
+	exists, err := ExistsIDP(ctx, filter, link.IDPID, a.ResourceOwner)
+	if !exists || err != nil {
+		return nil, errors.ThrowPreconditionFailed(err, "COMMAND-39nf2", "Errors.IDPConfig.NotExisting")
+	}
+	return user.NewUserIDPLinkAddedEvent(ctx, &a.Aggregate, link.IDPID, link.DisplayName, link.IDPExternalID), nil
+}
+
 func (c *Commands) addHumanCommandPhone(ctx context.Context, filter preparation.FilterToQueryReducer, cmds []eventstore.Command, a *user.Aggregate, human *AddHuman, codeAlg crypto.EncryptionAlgorithm) ([]eventstore.Command, error) {
 	if human.Phone.Number == "" {
 		return cmds, nil
@@ -267,7 +298,7 @@ func (c *Commands) addHumanCommandPhone(ctx context.Context, filter preparation.
 	if human.Phone.Verified {
 		return append(cmds, user.NewHumanPhoneVerifiedEvent(ctx, &a.Aggregate)), nil
 	}
-	phoneCode, err := newPhoneCode(ctx, filter, codeAlg)
+	phoneCode, err := c.newPhoneCode(ctx, filter, codeAlg)
 	if err != nil {
 		return nil, err
 	}
@@ -291,13 +322,13 @@ func (c *Commands) addHumanCommandCheckID(ctx context.Context, filter preparatio
 	return nil
 }
 
-func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQueryReducer, createCmd humanCreationCommand, human *AddHuman, passwordAlg crypto.HashAlgorithm) (err error) {
+func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQueryReducer, createCmd humanCreationCommand, human *AddHuman, hasher *crypto.PasswordHasher) (err error) {
 	if human.Password != "" {
 		if err = humanValidatePassword(ctx, filter, human.Password); err != nil {
 			return err
 		}
 
-		secret, err := crypto.Hash([]byte(human.Password), passwordAlg)
+		secret, err := hasher.Hash(human.Password)
 		if err != nil {
 			return err
 		}
@@ -305,8 +336,8 @@ func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQue
 		return nil
 	}
 
-	if human.BcryptedPassword != "" {
-		createCmd.AddPasswordData(crypto.FillHash([]byte(human.BcryptedPassword), passwordAlg), human.PasswordChangeRequired)
+	if human.EncodedPasswordHash != "" {
+		createCmd.AddPasswordData(human.EncodedPasswordHash, human.PasswordChangeRequired)
 	}
 	return nil
 }
@@ -553,7 +584,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 
 	human.EnsureDisplayName()
 	if human.Password != nil {
-		if err := human.HashPasswordIfExisting(pwPolicy, c.userPasswordAlg, human.Password.ChangeRequired); err != nil {
+		if err := human.HashPasswordIfExisting(pwPolicy, c.userPasswordHasher, human.Password.ChangeRequired); err != nil {
 			return nil, nil, err
 		}
 	}
@@ -652,10 +683,10 @@ func createAddHumanEvent(ctx context.Context, aggregate *eventstore.Aggregate, h
 			human.StreetAddress)
 	}
 	if human.Password != nil {
-		addEvent.AddPasswordData(human.Password.SecretCrypto, human.Password.ChangeRequired)
+		addEvent.AddPasswordData(human.Password.EncodedSecret, human.Password.ChangeRequired)
 	}
-	if human.HashedPassword != nil {
-		addEvent.AddPasswordData(human.HashedPassword.SecretCrypto, false)
+	if human.HashedPassword != "" {
+		addEvent.AddPasswordData(human.HashedPassword, false)
 	}
 	return addEvent
 }
@@ -686,10 +717,10 @@ func createRegisterHumanEvent(ctx context.Context, aggregate *eventstore.Aggrega
 			human.StreetAddress)
 	}
 	if human.Password != nil {
-		addEvent.AddPasswordData(human.Password.SecretCrypto, human.Password.ChangeRequired)
+		addEvent.AddPasswordData(human.Password.EncodedSecret, human.Password.ChangeRequired)
 	}
-	if human.HashedPassword != nil {
-		addEvent.AddPasswordData(human.HashedPassword.SecretCrypto, false)
+	if human.HashedPassword != "" {
+		addEvent.AddPasswordData(human.HashedPassword, false)
 	}
 	return addEvent
 }

@@ -2,6 +2,7 @@ package crypto
 
 import (
 	"database/sql/driver"
+	"encoding/base64"
 	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/errors"
@@ -9,7 +10,7 @@ import (
 
 const (
 	TypeEncryption CryptoType = iota
-	TypeHash
+	TypeHash                  // Depcrecated: use [passwap.Swapper] instead
 )
 
 type Crypto interface {
@@ -25,6 +26,7 @@ type EncryptionAlgorithm interface {
 	DecryptString(hashed []byte, keyID string) (string, error)
 }
 
+// Depcrecated: use [passwap.Swapper] instead
 type HashAlgorithm interface {
 	Crypto
 	Hash(value []byte) ([]byte, error)
@@ -131,4 +133,22 @@ func FillHash(value []byte, alg HashAlgorithm) *CryptoValue {
 		Algorithm:  alg.Algorithm(),
 		Crypted:    value,
 	}
+}
+
+func CheckToken(alg EncryptionAlgorithm, token string, content string) error {
+	if token == "" {
+		return errors.ThrowPermissionDenied(nil, "CRYPTO-Sfefs", "Errors.Intent.InvalidToken")
+	}
+	data, err := base64.RawURLEncoding.DecodeString(token)
+	if err != nil {
+		return errors.ThrowPermissionDenied(err, "CRYPTO-Swg31", "Errors.Intent.InvalidToken")
+	}
+	decryptedToken, err := alg.DecryptString(data, alg.EncryptionKeyID())
+	if err != nil {
+		return errors.ThrowPermissionDenied(err, "CRYPTO-Sf4gt", "Errors.Intent.InvalidToken")
+	}
+	if decryptedToken != content {
+		return errors.ThrowPermissionDenied(nil, "CRYPTO-CRYPTO", "Errors.Intent.InvalidToken")
+	}
+	return nil
 }

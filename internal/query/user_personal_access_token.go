@@ -90,7 +90,7 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.PersonalAccessTokenProjection.Trigger(ctx)
+		ctx = projection.PersonalAccessTokenProjection.Trigger(ctx)
 	}
 
 	query, scan := preparePersonalAccessTokenQuery(ctx, q.client)

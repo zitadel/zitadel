@@ -1,8 +1,8 @@
 ---
-title: Endpoints
+title: SAML endpoints
 ---
 
-## SAML 2.0 Metadata
+## SAML 2.0 metadata
 
 The SAML Metadata is located within the issuer domain. This would give us {your_domain}/saml/v2/metadata.
 
@@ -11,14 +11,14 @@ This metadata contains all the information defined in the spec.
 **Link to
 spec.** [Metadata for the OASIS Security Assertion Markup Language (SAML) V2.0 â€“ Errata Composite](https://www.oasis-open.org/committees/download.php/35391/sstc-saml-metadata-errata-2.0-wd-04-diff.pdf)
 
-## Certificate Endpoint
+## Certificate endpoint
 
 {your_domain}/saml/v2/certificate
 
 The certificate endpoint provides the certificate which is used to sign the responses for download, for easier use with
 different service providers which want the certificate separately instead of inside the metadata.
 
-## SSO Endpoint
+## SSO endpoint
 
 {your_domain}/saml/v2/SSO
 
@@ -40,7 +40,7 @@ spec.** [Bindings for the OASIS Security Assertion Markup Language (SAML) V2.0 â
 | SigAlg | Algorithm used to sign the request, only if binding is 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' as signature has to be provided es separate parameter. (base64 encoded) |
 | Signature | Signature of the request as parameter with 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' binding.  (base64 encoded)                                                                            |
 
-### Successful Response
+### Successful response
 
 Depending on the content of the request the response comes back in the requested binding, but the content is the same.
 
@@ -51,7 +51,7 @@ Depending on the content of the request the response comes back in the requested
 | SigAlg | Algorithm used to sign the response, only if binding is 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' as signature has to be provided es separate parameter.  (base64 encoded)  |
 | Signature | Signature of the response as parameter with 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' binding.  (base64 encoded)                                                            |
 
-### Error Response
+### Error response
 
 Regardless of the error, the used http error code will be '200', which represents a successful request. Whereas the
 response will contain a StatusCode include a message which provides more information if an error occurred.

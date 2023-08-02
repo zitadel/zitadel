@@ -33,7 +33,7 @@ export class ProjectCreateComponent {
       .addProject(this.project)
       .then((resp: AddProjectResponse.AsObject) => {
         this.toast.showInfo('PROJECT.TOAST.CREATED', true);
-        this.router.navigate(['projects', resp.id]);
+        this.router.navigate(['projects', resp.id], { queryParams: { new: true } });
       })
       .catch((error) => {
         this.toast.showError(error);

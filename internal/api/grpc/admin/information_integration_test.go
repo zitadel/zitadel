@@ -30,7 +30,6 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_Healthz(t *testing.T) {
-	client := admin.NewAdminServiceClient(Tester.GRPCClientConn)
-	_, err := client.Healthz(context.TODO(), &admin.HealthzRequest{})
+	_, err := Tester.Client.Admin.Healthz(context.TODO(), &admin.HealthzRequest{})
 	require.NoError(t, err)
 }

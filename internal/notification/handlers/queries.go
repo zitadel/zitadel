@@ -12,6 +12,7 @@ import (
 type NotificationQueries struct {
 	*query.Queries
 	es                 *eventstore.Eventstore
+	externalDomain     string
 	externalPort       uint16
 	externalSecure     bool
 	fileSystemPath     string
@@ -24,6 +25,7 @@ type NotificationQueries struct {
 func NewNotificationQueries(
 	baseQueries *query.Queries,
 	es *eventstore.Eventstore,
+	externalDomain string,
 	externalPort uint16,
 	externalSecure bool,
 	fileSystemPath string,
@@ -35,6 +37,7 @@ func NewNotificationQueries(
 	return &NotificationQueries{
 		Queries:            baseQueries,
 		es:                 es,
+		externalDomain:     externalDomain,
 		externalPort:       externalPort,
 		externalSecure:     externalSecure,
 		fileSystemPath:     fileSystemPath,

@@ -88,7 +88,7 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
       .bulkAddProjectRoles(this.projectId, rolesToAdd)
       .then(() => {
         this.toast.showInfo('PROJECT.TOAST.ROLESCREATED', true);
-        this.router.navigate(['projects', this.projectId], { queryParams: { id: 'roles' } });
+        this.router.navigate(['projects', this.projectId], { queryParams: { id: 'roles', new: true } });
       })
       .catch((error) => {
         this.toast.showError(error);

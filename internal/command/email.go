@@ -23,6 +23,6 @@ func (e *Email) Validate() error {
 	return e.Address.Validate()
 }
 
-func newEmailCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCodeWithExpiry, error) {
-	return newCryptoCodeWithExpiry(ctx, filter, domain.SecretGeneratorTypeVerifyEmailCode, alg)
+func (c *Commands) newEmailCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCode, error) {
+	return c.newCode(ctx, filter, domain.SecretGeneratorTypeVerifyEmailCode, alg)
 }

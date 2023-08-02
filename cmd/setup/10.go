@@ -19,6 +19,10 @@ var (
 	correctCreationDate10FillTable string
 	//go:embed 10/10_update.sql
 	correctCreationDate10Update string
+	//go:embed 10/10_count_wrong_events.sql
+	correctCreationDate10CountWrongEvents string
+	//go:embed 10/10_empty_table.sql
+	correctCreationDate10Truncate string
 )
 
 type CorrectCreationDate struct {
@@ -31,7 +35,7 @@ func (mig *CorrectCreationDate) Execute(ctx context.Context) (err error) {
 	defer cancel()
 
 	for {
-		var affected int64
+		affected := int64(0)
 		err = crdb.ExecuteTx(ctx, mig.dbClient.DB, nil, func(tx *sql.Tx) error {
 			if mig.dbClient.Type() == "cockroach" {
 				if _, err := tx.Exec("SET experimental_enable_temp_tables=on"); err != nil {
@@ -43,16 +47,24 @@ func (mig *CorrectCreationDate) Execute(ctx context.Context) (err error) {
 				return err
 			}
 
+			_, err = tx.ExecContext(ctx, correctCreationDate10Truncate)
+			if err != nil {
+				return err
+			}
 			_, err = tx.ExecContext(ctx, correctCreationDate10FillTable)
 			if err != nil {
 				return err
 			}
 
-			res, err := tx.ExecContext(ctx, correctCreationDate10Update)
+			res := tx.QueryRowContext(ctx, correctCreationDate10CountWrongEvents)
+			if err := res.Scan(&affected); err != nil || affected == 0 {
+				return err
+			}
+
+			_, err = tx.ExecContext(ctx, correctCreationDate10Update)
 			if err != nil {
 				return err
 			}
-			affected, _ = res.RowsAffected()
 			logging.WithFields("count", affected).Info("creation dates changed")
 			return nil
 		})

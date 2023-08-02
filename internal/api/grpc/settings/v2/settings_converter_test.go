@@ -11,38 +11,13 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/durationpb"
 
+	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2alpha"
 )
 
-var ignoreMessageTypes = map[protoreflect.FullName]bool{
-	"google.protobuf.Duration": true,
-}
-
-// allFieldsSet recusively checks if all values in a message
-// have a non-zero value.
-func allFieldsSet(t testing.TB, msg protoreflect.Message) {
-	md := msg.Descriptor()
-	name := md.FullName()
-	if ignoreMessageTypes[name] {
-		return
-	}
-
-	fields := md.Fields()
-
-	for i := 0; i < fields.Len(); i++ {
-		fd := fields.Get(i)
-		if !msg.Has(fd) {
-			t.Errorf("not all fields set in %q, missing %q", name, fd.Name())
-			continue
-		}
-
-		if fd.Kind() == protoreflect.MessageKind {
-			allFieldsSet(t, msg.Get(fd).Message())
-		}
-	}
-}
+var ignoreTypes = []protoreflect.FullName{"google.protobuf.Duration"}
 
 func Test_loginSettingsToPb(t *testing.T) {
 	arg := &query.LoginPolicy{
@@ -50,6 +25,7 @@ func Test_loginSettingsToPb(t *testing.T) {
 		AllowRegister:              true,
 		AllowExternalIDPs:          true,
 		ForceMFA:                   true,
+		ForceMFALocalOnly:          true,
 		PasswordlessType:           domain.PasswordlessTypeAllowed,
 		HidePasswordReset:          true,
 		IgnoreUnknownUsernames:     true,
@@ -63,8 +39,10 @@ func Test_loginSettingsToPb(t *testing.T) {
 		SecondFactorCheckLifetime:  time.Microsecond,
 		MultiFactorCheckLifetime:   time.Nanosecond,
 		SecondFactors: []domain.SecondFactorType{
-			domain.SecondFactorTypeOTP,
+			domain.SecondFactorTypeTOTP,
 			domain.SecondFactorTypeU2F,
+			domain.SecondFactorTypeOTPEmail,
+			domain.SecondFactorTypeOTPSMS,
 		},
 		MultiFactors: []domain.MultiFactorType{
 			domain.MultiFactorTypeU2FWithPIN,
@@ -77,6 +55,7 @@ func Test_loginSettingsToPb(t *testing.T) {
 		AllowRegister:              true,
 		AllowExternalIdp:           true,
 		ForceMfa:                   true,
+		ForceMfaLocalOnly:          true,
 		PasskeysType:               settings.PasskeysType_PASSKEYS_TYPE_ALLOWED,
 		HidePasswordReset:          true,
 		IgnoreUnknownUsernames:     true,
@@ -92,6 +71,8 @@ func Test_loginSettingsToPb(t *testing.T) {
 		SecondFactors: []settings.SecondFactorType{
 			settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP,
 			settings.SecondFactorType_SECOND_FACTOR_TYPE_U2F,
+			settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_EMAIL,
+			settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
 		},
 		MultiFactors: []settings.MultiFactorType{
 			settings.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
@@ -100,7 +81,7 @@ func Test_loginSettingsToPb(t *testing.T) {
 	}
 
 	got := loginSettingsToPb(arg)
-	allFieldsSet(t, got.ProtoReflect())
+	grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
 	if !proto.Equal(got, want) {
 		t.Errorf("loginSettingsToPb() =\n%v\nwant\n%v", got, want)
 	}
@@ -169,12 +150,20 @@ func Test_secondFactorTypeToPb(t *testing.T) {
 		want settings.SecondFactorType
 	}{
 		{
-			args: args{domain.SecondFactorTypeOTP},
+			args: args{domain.SecondFactorTypeTOTP},
 			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP,
 		},
 		{
 			args: args{domain.SecondFactorTypeU2F},
 			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_U2F,
+		},
+		{
+			args: args{domain.SecondFactorTypeOTPSMS},
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
+		},
+		{
+			args: args{domain.SecondFactorTypeOTPEmail},
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_EMAIL,
 		},
 		{
 			args: args{domain.SecondFactorTypeUnspecified},
@@ -241,7 +230,7 @@ func Test_passwordSettingsToPb(t *testing.T) {
 	}
 
 	got := passwordSettingsToPb(arg)
-	allFieldsSet(t, got.ProtoReflect())
+	grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
 	if !proto.Equal(got, want) {
 		t.Errorf("passwordSettingsToPb() =\n%v\nwant\n%v", got, want)
 	}
@@ -295,7 +284,7 @@ func Test_brandingSettingsToPb(t *testing.T) {
 	}
 
 	got := brandingSettingsToPb(arg, "http://example.com")
-	allFieldsSet(t, got.ProtoReflect())
+	grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
 	if !proto.Equal(got, want) {
 		t.Errorf("brandingSettingsToPb() =\n%v\nwant\n%v", got, want)
 	}
@@ -315,7 +304,7 @@ func Test_domainSettingsToPb(t *testing.T) {
 		ResourceOwnerType:                      settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
 	}
 	got := domainSettingsToPb(arg)
-	allFieldsSet(t, got.ProtoReflect())
+	grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
 	if !proto.Equal(got, want) {
 		t.Errorf("domainSettingsToPb() =\n%v\nwant\n%v", got, want)
 	}
@@ -337,7 +326,7 @@ func Test_legalSettingsToPb(t *testing.T) {
 		ResourceOwnerType: settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
 	}
 	got := legalAndSupportSettingsToPb(arg)
-	allFieldsSet(t, got.ProtoReflect())
+	grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
 	if !proto.Equal(got, want) {
 		t.Errorf("legalSettingsToPb() =\n%v\nwant\n%v", got, want)
 	}
@@ -353,7 +342,7 @@ func Test_lockoutSettingsToPb(t *testing.T) {
 		ResourceOwnerType:   settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
 	}
 	got := lockoutSettingsToPb(arg)
-	allFieldsSet(t, got.ProtoReflect())
+	grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
 	if !proto.Equal(got, want) {
 		t.Errorf("lockoutSettingsToPb() =\n%v\nwant\n%v", got, want)
 	}
@@ -387,7 +376,7 @@ func Test_identityProvidersToPb(t *testing.T) {
 	got := identityProvidersToPb(arg)
 	require.Len(t, got, len(got))
 	for i, v := range got {
-		allFieldsSet(t, v.ProtoReflect())
+		grpc.AllFieldsSet(t, v.ProtoReflect(), ignoreTypes...)
 		if !proto.Equal(v, want[i]) {
 			t.Errorf("identityProvidersToPb() =\n%v\nwant\n%v", got, want)
 		}

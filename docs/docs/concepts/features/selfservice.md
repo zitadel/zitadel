@@ -151,7 +151,7 @@ The current password must be entered first.
 Users can setup and delete a second factor and FIDO Passkeys (Passwordless).
 Available authenticators are:
 
-- Mobile one-time password (OTP) (Authenticator Apps, SMS)
+- Mobile one-time password (OTP) (Authenticator Apps)
 - FIDO Universal Second Factor (U2F) (Security Keys, Device, etc.)
 - FIDO2 WebAuthN (Passkeys)
 

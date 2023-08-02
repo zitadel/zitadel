@@ -53,6 +53,7 @@ Errors:
     NotFoundOnOrg: L'utilisateur n'a pas été trouvé dans l'organisation choisie
     NotAllowedOrg: L'utilisateur n'est pas membre de l'organisation requise
     UserIDMissing: L'ID de l'utilisateur est manquant
+    UserIDWrong: "L'utilisateur de la demande n'est pas égal à l'utilisateur authentifié"
     DomainPolicyNil: La politique de l'organisation est vide
     EmailAsUsernameNotAllowed: L'email n'est pas autorisé comme nom d'utilisateur
     Invalid: Les données de l'utilisateur ne sont pas valides
@@ -67,6 +68,7 @@ Errors:
     NoChanges: Aucun changement trouvé
     InitCodeNotFound: Code d'initialisation non trouvé
     UsernameNotChanged: Nom d'utilisateur non modifié
+    InvalidURLTemplate: Le modèle d'URL n'est pas valide
     Profile:
       NotFound: Profil non trouvé
       NotChanged: Le profil n'a pas changé
@@ -81,7 +83,6 @@ Errors:
       NotChanged: L'adresse électronique n'a pas changé
       Empty: Email est vide
       IDMissing: Email ID manquant
-      InvalidURLTemplate: Le modèle d'URL n'est pas valide
     Phone:
       Notfound: Téléphone non trouvé
       Invalid: Le téléphone n'est pas valide
@@ -119,6 +120,8 @@ Errors:
       Empty: Le mot de passe est vide
       Invalid: Le mot de passe n'est pas valide
       NotSet: L'utilisateur n'a pas défini de mot de passe
+      NotChanged: Mot de passe non modifié
+      NotSupported: Encodage de hachage de mot de passe non pris en charge
     PasswordComplexityPolicy:
       NotFound: Politique de mot de passe non trouvée
       MinLength: Le mot de passe est trop court
@@ -475,6 +478,28 @@ Errors:
     Terminated: La session est déjà terminée
     Token:
       Invalid: Le jeton de session n'est pas valide
+    Passkey:
+      NoChallenge: Session sans défi de clé d'accès
+  Intent:
+    IDPMissing: IDP manquant dans la requête
+    SuccessURLMissing: Success URL absent de la requête
+    FailureURLMissing: Failure URL absent de la requête
+    StateMissing: Paramètre d'état manquant dans la requête
+    NotStarted: Intent n'a pas démarré ou s'est déjà terminé
+    NotSucceeded: l'intention n'a pas abouti
+    TokenCreationFailed: La création du token a échoué
+    InvalidToken: Le jeton d'intention n'est pas valide
+    OtherUser: Intention destinée à un autre utilisateur
+  AuthRequest:
+    AlreadyExists: Auth Request existe déjà
+    NotExisting: Auth Request n'existe pas
+    WrongLoginClient: Auth Request créé par un autre client de connexion
+  OIDCSession:
+    RefreshTokenInvalid: Le jeton de rafraîchissement n'est pas valide
+    Token:
+      Invalid: Le jeton n'est pas valide
+      Expired: Le jeton est expiré
+    InvalidClient: Le token n'a pas été émis pour ce client
 
 AggregateTypes:
   action: Action
@@ -556,6 +581,10 @@ EventTypes:
         check:
           succeeded: Vérification du mot de passe réussie
           failed: La vérification du mot de passe a échoué
+        change:
+          sent: Changement de mot de passe envoyé
+        hash:
+          updated: Hachage du mot de passe mis à jour
       externallogin:
         check:
           succeeded: Connexion externe réussie

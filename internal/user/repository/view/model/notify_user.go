@@ -128,6 +128,6 @@ func (u *NotifyUser) setPasswordData(event *models.Event) error {
 		logging.Log("MODEL-dfhw6").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(nil, "MODEL-BHFD2", "could not unmarshal data")
 	}
-	u.PasswordSet = password.Secret != nil
+	u.PasswordSet = password.Secret != nil || password.EncodedHash != ""
 	return nil
 }

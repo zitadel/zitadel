@@ -222,6 +222,9 @@ RegistrationUser:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   GenderLabel: Genere
   Female: Femminile
   Male: Maschile
@@ -255,6 +258,9 @@ ExternalRegistrationUserOverview:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
   TosLinkText: Termini di servizio
@@ -316,6 +322,9 @@ ExternalNotFound:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
 
 DeviceAuth:
   Title: Autorizzazione del dispositivo
@@ -394,6 +403,7 @@ Errors:
       Empty: La password è vuota
       Invalid: La password non è valida
       InvalidAndLocked: La password non è valida e l'utente è bloccato, contatta il tuo amministratore.
+      NotChanged: Password non modificata
     UsernameOrPassword:
       Invalid: Il nome utente o la password non sono validi
     PasswordComplexityPolicy:

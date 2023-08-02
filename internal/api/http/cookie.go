@@ -111,7 +111,7 @@ func (c *CookieHandler) SetCookie(w http.ResponseWriter, name, domain, value str
 	c.httpSet(w, name, domain, value, c.maxAge)
 }
 
-func (c *CookieHandler) SetEncryptedCookie(w http.ResponseWriter, name, domain string, value interface{}) error {
+func (c *CookieHandler) SetEncryptedCookie(w http.ResponseWriter, name, domain string, value interface{}, sameSiteNone bool) error {
 	if c.securecookie == nil {
 		return errors.ThrowInternal(nil, "HTTP-s2HUtx", "securecookie not configured")
 	}
@@ -119,7 +119,11 @@ func (c *CookieHandler) SetEncryptedCookie(w http.ResponseWriter, name, domain s
 	if err != nil {
 		return err
 	}
-	c.httpSet(w, name, domain, encoded, c.maxAge)
+	sameSite := c.sameSite
+	if sameSiteNone {
+		sameSite = http.SameSiteNoneMode
+	}
+	c.httpSetWithSameSite(w, name, domain, encoded, c.maxAge, sameSite)
 	return nil
 }
 
@@ -128,6 +132,10 @@ func (c *CookieHandler) DeleteCookie(w http.ResponseWriter, name string) {
 }
 
 func (c *CookieHandler) httpSet(w http.ResponseWriter, name, domain, value string, maxage int) {
+	c.httpSetWithSameSite(w, name, domain, value, maxage, c.sameSite)
+}
+
+func (c *CookieHandler) httpSetWithSameSite(w http.ResponseWriter, name, domain, value string, maxage int, sameSite http.SameSite) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     SetCookiePrefix(name, domain, c.path, c.secureOnly),
 		Value:    value,
@@ -136,7 +144,7 @@ func (c *CookieHandler) httpSet(w http.ResponseWriter, name, domain, value strin
 		MaxAge:   maxage,
 		HttpOnly: c.httpOnly,
 		Secure:   c.secureOnly,
-		SameSite: c.sameSite,
+		SameSite: sameSite,
 	})
 	varyValues := w.Header().Values("vary")
 	for _, vary := range varyValues {

@@ -66,3 +66,17 @@ export const OrgContextChangedWorkflowOverlays: CnslOverlay[] = [
     },
   },
 ];
+
+export const ContextChangedWorkflowOverlays: CnslOverlay[] = [
+  {
+    id: 'contextswitcher',
+    origin: 'orgbutton',
+    toHighlight: ['orgbutton'],
+    content: {
+      i18nText: 'OVERLAYS.SWITCHEDTOINSTANCE.TEXT',
+    },
+    requirements: {
+      permission: ['iam.read'],
+    },
+  },
+];

@@ -60,7 +60,7 @@ InitPassword:
   CodeLabel: Code
   NewPasswordLabel: Nouveau mot de passe
   NewPasswordConfirmLabel: Confirmer le mot de passe
-  ResendButtonText: code de réexpédition
+  ResendButtonText: renvoyer le code
   NextButtonText: suivant
 
 InitPasswordDone:
@@ -76,7 +76,7 @@ InitUser:
   NewPasswordLabel: Nouveau mot de passe
   NewPasswordConfirm: Confirmer le mot de passe
   NextButtonText: Suivant
-  ResendButtonText: code de réexpédition
+  ResendButtonText: renvoyer le code
 
 InitUserDone:
   Title: User Utilisateur activé
@@ -189,7 +189,7 @@ EmailVerification:
   Description: Nous vous avons envoyé un e-mail pour vérifier votre adresse. Veuillez saisir le code dans le formulaire ci-dessous.
   CodeLabel: Code
   NextButtonText: suivant
-  ResendButtonText: code de réexpédition
+  ResendButtonText: renvoyer le code
 
 EmailVerificationDone:
   Title: E-Mail Verification
@@ -222,6 +222,9 @@ RegistrationUser:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   GenderLabel: Genre
   Female: Femme
   Male: Homme
@@ -255,6 +258,9 @@ ExternalRegistrationUserOverview:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
@@ -316,6 +322,9 @@ ExternalNotFound:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
 
 DeviceAuth:
   Title: Autorisation de l'appareil
@@ -394,6 +403,7 @@ Errors:
       Empty: Le mot de passe est vide
       Invalid: Le mot de passe n'est pas valide
       InvalidAndLocked: Le mot de passe n'est pas valide et l'utilisateur est verrouillé, contactez votre administrateur.
+      NotChanged: Mot de passe non modifié
     UsernameOrPassword:
       Invalid: Le nom d'utilisateur ou le mot de passe n'est pas valide
     PasswordComplexityPolicy:

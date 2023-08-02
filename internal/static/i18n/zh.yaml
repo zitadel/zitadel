@@ -53,6 +53,7 @@ Errors:
     NotFoundOnOrg: 在所选组织中找不到用户
     NotAllowedOrg: 用户不是所需组织的成员
     UserIDMissing: 缺少用户 ID
+    UserIDWrong: "请求用户不等于经过身份验证的用户"
     DomainPolicyNil: 组织策略为空
     EmailAsUsernameNotAllowed: 电子邮件不允许作为用户名
     Invalid: 用户数据无效
@@ -67,6 +68,7 @@ Errors:
     NoChanges: 未发现任何更改
     InitCodeNotFound: 未找到初始化验证码
     UsernameNotChanged: 用户名未更改
+    InvalidURLTemplate: URL模板无效
     Profile:
       NotFound: 未找到个人资料
       NotChanged: 个人资料未更改
@@ -81,7 +83,6 @@ Errors:
       NotChanged: 电子邮件未更改
       Empty: 电子邮件是空的
       IDMissing: 电子邮件ID丢失
-      InvalidURLTemplate: URL模板无效
     Phone:
       NotFound: 手机号码未找到
       Invalid: 手机号码无效
@@ -119,6 +120,8 @@ Errors:
       Empty: 密码为空
       Invalid: 密码无效
       NotSet: 用户未设置密码
+      NotChanged: 密码未更改
+      NotSupported: 不支持密码哈希编码
     PasswordComplexityPolicy:
       NotFound: 未找到密码策略
       MinLength: 密码太短
@@ -475,6 +478,28 @@ Errors:
     Terminated: 会话已经终止
     Token:
       Invalid: 会话令牌是无效的
+    Passkey:
+      NoChallenge: 没有密码挑战的会话
+  Intent:
+    IDPMissing: 请求中缺少IDP ID
+    SuccessURLMissing: 请求中缺少成功URL
+    FailureURLMissing: 请求中缺少失败的URL
+    StateMissing: 请求中缺少状态参数
+    NotStarted: 意图没有开始或已经结束
+    NotSucceeded: 意图不成功
+    TokenCreationFailed: 令牌创建失败
+    InvalidToken: 意图令牌是无效的
+    OtherUser: 意图是为另一个用户准备的
+  AuthRequest:
+    AlreadyExists: AuthRequest已经存在
+    NotExisting: AuthRequest不存在
+    WrongLoginClient: 其他登录客户端创建的AuthRequest
+  OIDCSession:
+    RefreshTokenInvalid: Refresh Token 无效
+    Token:
+      Invalid: 令牌无效
+      Expired: 令牌已过期
+    InvalidClient: 没有为该客户发放令牌
 
 AggregateTypes:
   action: 动作
@@ -639,6 +664,10 @@ EventTypes:
       check:
         succeeded: 密码检查成功
         failed: 密码检查失败
+      change:
+        sent: 密码更改已发送
+      hash:
+        updated: 密码哈希已更新
     phone:
       changed: 更改手机号码
       verified: 验证手机号码

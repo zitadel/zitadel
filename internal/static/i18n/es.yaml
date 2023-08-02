@@ -53,6 +53,7 @@ Errors:
     NotFoundOnOrg: El usuario no pudo encontrarse en la organización elegida
     NotAllowedOrg: El usuario no es miembro de la organización requerida
     UserIDMissing: Falta el ID de usuario
+    UserIDWrong: "Solicitud de usuario no igual al usuario autenticado"
     DomainPolicyNil: Falta la política de la organización
     EmailAsUsernameNotAllowed: La dirección de Email no se permite como nombre de usuario
     Invalid: Los datos de usuario no son válidos
@@ -67,6 +68,7 @@ Errors:
     NoChanges: No se encontraron cambios
     InitCodeNotFound: Código de inicialización no encontrado
     UsernameNotChanged: El nombre de usuario no cambió
+    InvalidURLTemplate: La plantilla URL no es válida
     Profile:
       NotFound: Perfil no encontrado
       NotChanged: El perfil no ha cambiado
@@ -81,7 +83,6 @@ Errors:
       NotChanged: El email no ha cambiado
       Empty: El email no está vacío
       IDMissing: Falta el ID del email
-      InvalidURLTemplate: La plantilla URL no es válida
     Phone:
       NotFound: Teléfono no encontrado
       Invalid: El teléfono no es válido
@@ -119,6 +120,8 @@ Errors:
       Empty: La contraseña está vacía
       Invalid: La contraseña no es válida
       NotSet: El usuario no ha establecido una contraseña
+      NotChanged: Contraseña no modificada
+      NotSupported: No se admite la codificación hash de contraseña
     PasswordComplexityPolicy:
       NotFound: Política de contraseñas no encontrada
       MinLength: La contraseña es demasiado corta
@@ -475,6 +478,28 @@ Errors:
     Terminated: Sesión ya terminada
     Token:
       Invalid: El identificador de sesión no es válido
+    Passkey:
+      NoChallenge: Sesión sin desafío de contraseña
+  Intent:
+    IDPMissing: Falta IDP en la solicitud
+    SuccessURLMissing: Falta la URL de éxito en la solicitud
+    FailureURLMissing: Falta la URL de error en la solicitud
+    StateMissing: Falta un parámetro de estado en la solicitud
+    NotStarted: La intención no se ha iniciado o ya ha finalizado
+    NotSucceeded: Intento fallido
+    TokenCreationFailed: Fallo en la creación del token
+    InvalidToken: El token de la intención no es válido
+    OtherUser: Destinado a otro usuario
+  AuthRequest:
+    AlreadyExists: Auth Request ya existe
+    NotExisting: Auth Request no existe
+    WrongLoginClient: Auth Request creado por otro cliente de inicio de sesión
+  OIDCSession:
+    RefreshTokenInvalid: El token de refresco no es válido
+    Token:
+      Invalid: El token no es válido
+      Expired: El token ha caducado
+    InvalidClient: El token no ha sido emitido para este cliente
 
 AggregateTypes:
   action: Acción
@@ -558,6 +583,10 @@ EventTypes:
         check:
           succeeded: Comprobación exitosa de la contraseña
           failed: Fallo en la comprobación de la contraseña
+        change:
+          sent: Cambio de contraseña enviado
+        hash:
+          updated: Hash de contraseña actualizado
       externallogin:
         check:
           succeeded: Inicio de sesión externo con éxito

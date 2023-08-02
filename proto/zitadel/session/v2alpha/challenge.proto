@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package zitadel.session.v2alpha;
+
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha;session";
+
+enum ChallengeKind {
+    CHALLENGE_KIND_UNSPECIFIED = 0;
+    CHALLENGE_KIND_PASSKEY = 1;
+}
+
+message Challenges {
+  message Passkey {
+    google.protobuf.Struct public_key_credential_request_options = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Options for Assertion Generaration (dictionary PublicKeyCredentialRequestOptions). Generated helper methods transform the field to JSON, for use in a WebauthN client. See also: https://www.w3.org/TR/webauthn/#dictdef-publickeycredentialrequestoptions"
+        example: "{\"publicKey\":{\"allowCredentials\":[{\"id\":\"ATmqBg-99qyOZk2zloPdJQyS2R7IkFT7v9Hoos_B_nM\",\"type\":\"public-key\"}],\"challenge\":\"GAOHYz2jE69kJMYo6Laij8yWw9-dKKgbViNhfuy0StA\",\"rpId\":\"localhost\",\"timeout\":300000,\"userVerification\":\"required\"}}"
+      }
+    ];
+  }
+
+  optional Passkey passkey = 1;
+}

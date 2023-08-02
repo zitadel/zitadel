@@ -1,7 +1,7 @@
 name: Bug Report
 description: "Create a bug report to help us improve ZITADEL. Click [here](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#product-management) to see how we process your issue."
 title: "[Bug]: "
-labels: ["type: bug", "state: triage"]
+labels: ["bug"]
 body:
 - type: markdown
   attributes:
@@ -27,11 +27,16 @@ body:
     - Self-hosted
   validations:
     required: true
-- type: textarea
-  id: description
+- type: input
+  id: version
   attributes:
-    label: Describe the bug
-    description: A clear and concise description of what the bug is.
+    label: Version
+    description: Which version of ZITADEL are you using.
+- type: textarea
+  id: impact
+  attributes:
+    label: Describe the problem caused by this bug
+    description: A clear and concise description of the problem you have and what the bug is.
   validations:
     required: true
 - type: textarea
@@ -57,11 +62,6 @@ body:
   attributes:
     label: Expected behavior
     description: A clear and concise description of what you expected to happen.
-- type: input
-  id: version
-  attributes:
-    label: Version
-    description: Which version of ZITADEL are you using.
 - type: textarea
   id: os
   attributes:

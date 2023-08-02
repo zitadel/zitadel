@@ -1,0 +1,192 @@
+---
+title: JSON Web Token profile
+---
+
+import IntrospectionResponse from './_introspection-response.mdx';
+
+This is a guide on how to secure your API using [JSON Web Token (JWT) profile (recommended)](https://zitadel.com/docs/apis/openidoauth/authn-methods#client-secret-basic).  
+
+## Register the API in ZITADEL and generate private and public keys 
+
+1. Go to your project and click on the **New** button as shown below. 
+
+<img
+    src="/docs/img/guides/integrate/token-introspection-jwt-profile-1.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+2.  Give a name to your application (Test API is the name given below) and select type **API**. 
+
+<img
+    src="/docs/img/guides/integrate/token-introspection-jwt-profile-2.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+3. Select **JWT** as the authentication method and click **Continue**.  
+
+<img
+    src="/docs/img/guides/integrate/token-introspection-jwt-profile-3.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+4. Now review your configuration and click **Create**.   
+
+<img
+    src="/docs/img/guides/integrate/token-introspection-jwt-profile-4.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+5. You will now see the API’s **Client ID**. You will not see a client secret because we are using a private JWT key.   
+
+<img
+    src="/docs/img/guides/integrate/token-introspection-jwt-profile-5.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+6. Next, we must create the key pairs. Click on **New**.   
+
+<img
+    src="/docs/img/guides/integrate/token-introspection-jwt-profile-6.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+7. Select **JSON** as the type of key. You can also set an expiration time for the key or leave it empty. Click on **Add**.   
+
+<img
+    src="/docs/img/guides/integrate/token-introspection-jwt-profile-7.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+8. Download the created key by clicking the **Download** button and then click **Close**.   
+
+<img
+    src="/docs/img/guides/integrate/token-introspection-jwt-profile-8.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+9. The key will be downloaded.   
+
+<img
+    src="/docs/img/guides/integrate/token-introspection-jwt-profile-9.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+10. When you click on URLs on the left, you will see the relevant OIDC URLs. Note down the **issuer** URL, **token_endpoint** and **introspection_endpoint**.  
+
+<img
+    src="/docs/img/guides/integrate/token-introspection-jwt-profile-10.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+11. The key that you downloaded will be of the following format. 
+```
+{
+  "type":"application",
+  "keyId":"<YOUR_KEY_ID>",
+  "key":"-----BEGIN RSA PRIVATE KEY-----\<YOUR_PRIVATE_KEY>\n-----END RSA PRIVATE KEY-----\n",
+  "appId":"<YOUR_APP_ID>",
+  "clientId":"<YOUR_CLIENT_ID>"
+}
+```
+12. Also note down the **Resource ID** of your project.   
+
+<img
+    src="/docs/img/guides/integrate/token-introspection-jwt-profile-11.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+## Token introspection 
+
+You must send a client_assertion as a JWT signed with the API’s private key for ZITADEL to validate the signature against the registered public key.
+
+Request parameters​:
+
+| **Parameter** | **Description** |
+---|---
+| `client_assertion` | When using JWT profile for token or introspection endpoints, you must provide a JWT as an assertion generated with the structure shown below and signed with the downloaded key. |
+| `client_assertion_type` | `urn:ietf:params:oauth:client-assertion-type:jwt-bearer` |
+
+
+You must create your client assertion JWT with the following format:
+
+Header:
+```json
+{
+   "alg": "RS256",
+   "kid": "81693565968962154" (keyId from your key file)
+}
+```
+
+
+Payload:
+```json
+{
+   "iss": "78366401571920522@acme", (clientId from your key file)
+   "sub": "78366401571920522@acme", (clientId from your key file)
+   "aud": "https://{your_domain}", (your ZITADEL domain/issuer URL)
+   "exp": 1605183582, (Unix timestamp of the expiry)
+   "iat": 1605179982   (Unix timestamp of the creation signing time of the JWT, MUST NOT be older than 1h)
+}
+```
+
+Create the JSON Web Token with the above header and payload, and sign it with the private key in your key file. You can do this programmatically or use tools like [https://github.com/zitadel/zitadel-tools](https://github.com/zitadel/zitadel-tools) and [https://dinochiesa.github.io/jwt/](https://dinochiesa.github.io/jwt/).
+
+The request from the API to the introspection endpoint should be in the following format:
+```bash
+curl --request POST \
+ --url {your_domain}/oauth/v2/introspect \
+ --header 'Content-Type: application/x-www-form-urlencoded' \
+ --data client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer \
+ --data client_assertion=eyJhbGciOiJSUzI1Ni... \
+ --data token=VjVxyCZmRmWYqd3_F5db9Pb9mHR
+ ```
+
+Here's an example of how this is done in Python code:
+
+```python
+def introspect_token(self, token_string):
+    #Create JWT for client assertion
+    payload = {
+        "iss": API_PRIVATE_KEY_FILE["client_id"],
+        "sub": API_PRIVATE_KEY_FILE["client_id"],
+        "aud": ZITADEL_DOMAIN,
+        "exp": int(time.time()) + 60 * 60,  # Expires in 1 hour
+        "iat": int(time.time())
+    }
+    headers = {
+        "alg": "RS256",
+        "kid": API_PRIVATE_KEY_FILE["key_id"]
+    }
+    jwt_token = jwt.encode(payload, API_PRIVATE_KEY_FILE["private_key"], algorithm="RS256", headers=headers)
+
+    #Send introspection request
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    data = {
+        "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+        "client_assertion": jwt_token,
+        "token": token_string
+    }
+    response = requests.post(ZITADEL_INTROSPECTION_URL, headers=headers, data=data)
+    response.raise_for_status()
+    token_data = response.json()
+    print(f"Token data from introspection: {token_data}")
+    return token_data
+
+```
+## Introspection response
+
+<IntrospectionResponse/>
+
+Follow this [tutorial](https://github.com/zitadel/examples-api-access-and-token-introspection/tree/main/api-jwt) to learn how to register an API application using JWT Profile with ZITADEL and test it. 
+

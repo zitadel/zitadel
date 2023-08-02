@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
 	object_pb "github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
@@ -217,6 +218,22 @@ func (s *Server) UpdateGenericOIDCProvider(ctx context.Context, req *admin_pb.Up
 	}
 	return &admin_pb.UpdateGenericOIDCProviderResponse{
 		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) MigrateGenericOIDCProvider(ctx context.Context, req *admin_pb.MigrateGenericOIDCProviderRequest) (*admin_pb.MigrateGenericOIDCProviderResponse, error) {
+	var details *domain.ObjectDetails
+	var err error
+	if req.GetAzure() != nil {
+		details, err = s.command.MigrateInstanceGenericOIDCToAzureADProvider(ctx, req.GetId(), addAzureADProviderToCommand(req.GetAzure()))
+	} else if req.GetGoogle() != nil {
+		details, err = s.command.MigrateInstanceGenericOIDCToGoogleProvider(ctx, req.GetId(), addGoogleProviderToCommand(req.GetGoogle()))
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.MigrateGenericOIDCProviderResponse{
+		Details: object_pb.DomainToAddDetailsPb(details),
 	}, nil
 }
 

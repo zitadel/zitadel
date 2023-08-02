@@ -23,10 +23,12 @@ type FirstInstance struct {
 	DefaultLanguage language.Tag
 	Org             command.OrgSetup
 	MachineKeyPath  string
+	PatPath         string
 
 	instanceSetup     command.InstanceSetup
 	userEncryptionKey *crypto.KeyConfig
 	smtpEncryptionKey *crypto.KeyConfig
+	oidcEncryptionKey *crypto.KeyConfig
 	masterKey         string
 	db                *sql.DB
 	es                *eventstore.Eventstore
@@ -59,6 +61,14 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 		return err
 	}
 
+	if err = verifyKey(mig.oidcEncryptionKey, keyStorage); err != nil {
+		return err
+	}
+	oidcEncryption, err := crypto.NewAESCrypto(mig.oidcEncryptionKey, keyStorage)
+	if err != nil {
+		return err
+	}
+
 	cmd, err := command.StartCommands(mig.es,
 		mig.defaults,
 		mig.zitadelRoles,
@@ -73,13 +83,15 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 		nil,
 		userAlg,
 		nil,
+		oidcEncryption,
 		nil,
 		nil,
 		nil,
 		nil,
-		nil,
+		0,
+		0,
+		0,
 	)
-
 	if err != nil {
 		return err
 	}
@@ -101,25 +113,43 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 		}
 	}
 
-	_, _, key, _, err := cmd.SetUpInstance(ctx, &mig.instanceSetup)
-	if key == nil {
+	_, token, key, _, err := cmd.SetUpInstance(ctx, &mig.instanceSetup)
+	if err != nil {
+		return err
+	}
+	if mig.instanceSetup.Org.Machine != nil &&
+		((mig.instanceSetup.Org.Machine.Pat != nil && token == "") ||
+			(mig.instanceSetup.Org.Machine.MachineKey != nil && key == nil)) {
 		return err
 	}
 
+	if key != nil {
+		keyDetails, err := key.Detail()
+		if err != nil {
+			return err
+		}
+		if err := outputStdoutOrPath(mig.MachineKeyPath, string(keyDetails)); err != nil {
+			return err
+		}
+	}
+	if token != "" {
+		if err := outputStdoutOrPath(mig.PatPath, token); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func outputStdoutOrPath(path string, content string) (err error) {
 	f := os.Stdout
-	if mig.MachineKeyPath != "" {
-		f, err = os.OpenFile(mig.MachineKeyPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if path != "" {
+		f, err = os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 		if err != nil {
 			return err
 		}
 		defer f.Close()
 	}
-
-	keyDetails, err := key.Detail()
-	if err != nil {
-		return err
-	}
-	_, err = fmt.Fprintln(f, string(keyDetails))
+	_, err = fmt.Fprintln(f, content)
 	return err
 }
 

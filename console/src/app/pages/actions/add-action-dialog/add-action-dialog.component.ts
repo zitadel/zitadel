@@ -1,9 +1,11 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import {
   MatLegacyDialog as MatDialog,
   MatLegacyDialogRef as MatDialogRef,
   MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
 } from '@angular/material/legacy-dialog';
+
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { mapTo } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
@@ -17,33 +19,74 @@ import { ToastService } from 'src/app/services/toast.service';
   templateUrl: './add-action-dialog.component.html',
   styleUrls: ['./add-action-dialog.component.scss'],
 })
-export class AddActionDialogComponent {
-  public name: string = '';
-  public script: string = '';
-  public durationInSec: number = 10;
-  public allowedToFail: boolean = false;
-
+export class AddActionDialogComponent implements OnInit {
   public id: string = '';
 
   public opened$ = this.dialogRef.afterOpened().pipe(mapTo(true));
-
+  public form: FormGroup = new FormGroup({
+    name: new FormControl<string>('', []),
+    script: new FormControl<string>('', []),
+    durationInSec: new FormControl<number>(10, []),
+    allowedToFail: new FormControl<boolean>(false, []),
+  });
   constructor(
     private toast: ToastService,
     private mgmtService: ManagementService,
     private dialog: MatDialog,
+    private unsavedChangesDialog: MatDialog,
     public dialogRef: MatDialogRef<AddActionDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
     if (data && data.action) {
       const action: Action.AsObject = data.action;
-      this.name = action.name;
-      this.script = action.script;
-      if (action.timeout?.seconds) {
-        this.durationInSec = action.timeout?.seconds;
-      }
-      this.allowedToFail = action.allowedToFail;
+      this.form.setValue({
+        name: action.name,
+        script: action.script,
+        durationInSec: action.timeout?.seconds ?? 10,
+        allowedToFail: action.allowedToFail,
+      });
       this.id = action.id;
     }
+  }
+
+  ngOnInit(): void {
+    // prevent unsaved changes get lost if backdrop is clicked
+    this.dialogRef.backdropClick().subscribe(() => {
+      if (this.form.dirty) {
+        this.showUnsavedDialog();
+      } else {
+        this.dialogRef.close(false);
+      }
+    });
+
+    // prevent unsaved changes get lost if escape key is pressed
+    this.dialogRef.keydownEvents().subscribe((event) => {
+      if (event.key === 'Escape') {
+        if (this.form.dirty) {
+          this.showUnsavedDialog();
+        } else {
+          this.dialogRef.close(false);
+        }
+      }
+    });
+  }
+
+  private showUnsavedDialog(): void {
+    const unsavedChangesDialogRef = this.unsavedChangesDialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.UNSAVED.DIALOG.DISCARD',
+        cancelKey: 'ACTIONS.UNSAVED.DIALOG.CANCEL',
+        titleKey: 'ACTIONS.UNSAVEDCHANGES',
+        descriptionKey: 'ACTIONS.UNSAVED.DIALOG.DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    unsavedChangesDialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.dialogRef.close(false);
+      }
+    });
   }
 
   public closeDialog(): void {
@@ -54,27 +97,27 @@ export class AddActionDialogComponent {
     if (this.id) {
       const req = new UpdateActionRequest();
       req.setId(this.id);
-      req.setName(this.name);
-      req.setScript(this.script);
+      req.setName(this.form.value.name);
+      req.setScript(this.form.value.script);
 
       const duration = new Duration();
       duration.setNanos(0);
-      duration.setSeconds(this.durationInSec);
+      duration.setSeconds(this.form.value.durationInSec);
 
-      req.setAllowedToFail(this.allowedToFail);
+      req.setAllowedToFail(this.form.value.allowedToFail);
 
       req.setTimeout(duration);
       this.dialogRef.close(req);
     } else {
       const req = new CreateActionRequest();
-      req.setName(this.name);
-      req.setScript(this.script);
+      req.setName(this.form.value.name);
+      req.setScript(this.form.value.script);
 
       const duration = new Duration();
       duration.setNanos(0);
-      duration.setSeconds(this.durationInSec);
+      duration.setSeconds(this.form.value.durationInSec);
 
-      req.setAllowedToFail(this.allowedToFail);
+      req.setAllowedToFail(this.form.value.allowedToFail);
 
       req.setTimeout(duration);
       this.dialogRef.close(req);

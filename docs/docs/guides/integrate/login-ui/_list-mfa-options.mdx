@@ -1,0 +1,46 @@
+Your user has successfully authenticated, and now you ask him if he wants to setup MFA to have a more secure account.
+When he starts the configuration, first you want him to show the possible methods.
+You can either list it implicitly or call the settings service from ZITADEL to get what is configured on the login settings.
+
+More detailed information about the API: [Get Login Settings Documentation](/apis/resources/settings_service/settings-service-get-login-settings)
+
+Request Example:
+
+```bash
+curl --request GET \
+  --url https://$ZITADEL_DOMAIN/v2alpha/settings/login \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''
+```
+
+Response Example:
+The relevant part for the list is the second factor and multi factor list.
+
+```bash
+{
+	"details": {
+		"sequence": "293",
+		"changeDate": "2023-03-29T14:16:55.570482Z",
+		"resourceOwner": "163840776835432705"
+	},
+	"settings": {
+		"allowUsernamePassword": true,
+		"allowRegister": true,
+		"allowExternalIdp": true,
+		"passkeysType": "PASSKEYS_TYPE_ALLOWED",
+		"passwordCheckLifetime": "864000s",
+		"externalLoginCheckLifetime": "864000s",
+		"mfaInitSkipLifetime": "2592000s",
+		"secondFactorCheckLifetime": "64800s",
+		"multiFactorCheckLifetime": "43200s",
+		"secondFactors": [
+			"SECOND_FACTOR_TYPE_OTP",
+			"SECOND_FACTOR_TYPE_U2F"
+		],
+		"multiFactors": [
+			"MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION"
+		],
+		"resourceOwnerType": "RESOURCE_OWNER_TYPE_ORG"
+	}
+}
+```
