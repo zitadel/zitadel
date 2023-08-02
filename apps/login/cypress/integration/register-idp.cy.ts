@@ -27,11 +27,10 @@ describe("register idps", () => {
     });
   });
 
-  it("should show a custom text on the idp button", () => {
+  it("should redirect the user to the correct url", () => {
     cy.visit("/register/idp");
     const button = cy.get('button[e2e="google"]');
-    // button.find("span").contains(CUSTOM_TEXT);
     button.click();
-    cy.location("pathname", { timeout: 10_000 }).should("eq", IDP_URL);
+    cy.location("href", { timeout: 10_000 }).should("eq", IDP_URL);
   });
 });
