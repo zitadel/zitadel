@@ -13,7 +13,6 @@ const PROVIDER_MAPPING: {
   [provider: string]: (rI: IDPInformation) => Partial<AddHumanUserRequest>;
 } = {
   [ProviderSlug.GOOGLE]: (idp: IDPInformation) => {
-    console.log("idp", idp);
     const idpLink: IDPLink = {
       idpId: idp.idpId,
       userId: idp.userId,
@@ -36,7 +35,6 @@ const PROVIDER_MAPPING: {
     return req;
   },
   [ProviderSlug.GITHUB]: (idp: IDPInformation) => {
-    console.log("idp", idp);
     const idpLink: IDPLink = {
       idpId: idp.idpId,
       userId: idp.userId,
@@ -65,7 +63,6 @@ function retrieveIDP(
   token: string
 ): Promise<IDPInformation | undefined> {
   const userService = user.getUser(server);
-  console.log("req");
   return userService
     .retrieveIdentityProviderInformation({ intentId: id, token: token }, {})
     .then((resp: RetrieveIdentityProviderInformationResponse) => {

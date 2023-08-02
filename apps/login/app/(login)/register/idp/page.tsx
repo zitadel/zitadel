@@ -12,7 +12,6 @@ function getIdentityProviders(
   orgId?: string
 ): Promise<IdentityProvider[] | undefined> {
   const settingsService = settings.getSettings(server);
-  console.log("req");
   return settingsService
     .getActiveIdentityProviders(
       orgId ? { ctx: { orgId } } : { ctx: { instance: true } },
