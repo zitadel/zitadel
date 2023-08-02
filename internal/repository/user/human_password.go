@@ -18,6 +18,7 @@ const (
 	HumanPasswordCodeSentType       = passwordEventPrefix + "code.sent"
 	HumanPasswordCheckSucceededType = passwordEventPrefix + "check.succeeded"
 	HumanPasswordCheckFailedType    = passwordEventPrefix + "check.failed"
+	HumanPasswordHashUpdatedType    = passwordEventPrefix + "hash.updated"
 )
 
 type HumanPasswordChangedEvent struct {
@@ -295,7 +296,7 @@ func NewHumanPasswordHashUpdatedEvent(
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			HumanPasswordCheckFailedType,
+			HumanPasswordHashUpdatedType,
 		),
 		EncodedHash: encoded,
 	}

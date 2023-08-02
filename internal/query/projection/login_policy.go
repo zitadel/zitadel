@@ -116,11 +116,11 @@ func (p *loginPolicyProjection) Reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  org.LoginPolicySecondFactorAddedEventType,
-					Reduce: p.reduce2FAAdded,
+					Reduce: p.reduceSecondFactorAdded,
 				},
 				{
 					Event:  org.LoginPolicySecondFactorRemovedEventType,
-					Reduce: p.reduce2FARemoved,
+					Reduce: p.reduceSecondFactorRemoved,
 				},
 				{
 					Event:  org.OrgRemovedEventType,
@@ -149,11 +149,11 @@ func (p *loginPolicyProjection) Reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  instance.LoginPolicySecondFactorAddedEventType,
-					Reduce: p.reduce2FAAdded,
+					Reduce: p.reduceSecondFactorAdded,
 				},
 				{
 					Event:  instance.LoginPolicySecondFactorRemovedEventType,
-					Reduce: p.reduce2FARemoved,
+					Reduce: p.reduceSecondFactorRemoved,
 				},
 				{
 					Event:  instance.InstanceRemovedEventType,
@@ -346,7 +346,7 @@ func (p *loginPolicyProjection) reduceLoginPolicyRemoved(event eventstore.Event)
 	), nil
 }
 
-func (p *loginPolicyProjection) reduce2FAAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginPolicyProjection) reduceSecondFactorAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.SecondFactorAddedEvent
 	switch e := event.(type) {
 	case *instance.LoginPolicySecondFactorAddedEvent:
@@ -371,7 +371,7 @@ func (p *loginPolicyProjection) reduce2FAAdded(event eventstore.Event) (*handler
 	), nil
 }
 
-func (p *loginPolicyProjection) reduce2FARemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginPolicyProjection) reduceSecondFactorRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.SecondFactorRemovedEvent
 	switch e := event.(type) {
 	case *instance.LoginPolicySecondFactorRemovedEvent:
