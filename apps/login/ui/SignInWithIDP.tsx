@@ -15,7 +15,7 @@ import { ProviderSlug } from "#/lib/demos";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;
-  instanceUrl: string;
+  host: string;
   identityProviders: any[];
   startIDPFlowPath?: (idpId: string) => string;
 }
@@ -24,7 +24,7 @@ const START_IDP_FLOW_PATH = (idpId: string) =>
   `/v2alpha/users/idps/${idpId}/start`;
 
 export function SignInWithIDP({
-  instanceUrl,
+  host,
   identityProviders,
   startIDPFlowPath = START_IDP_FLOW_PATH,
 }: SignInWithIDPProps) {
@@ -33,9 +33,6 @@ export function SignInWithIDP({
   const router = useRouter();
 
   async function startFlow(idpId: string, provider: ProviderSlug) {
-    const host = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000";
     setLoading(true);
 
     // const path = startIDPFlowPath(idpId);

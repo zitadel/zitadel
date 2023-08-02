@@ -32,6 +32,10 @@ export default async function Page({
 
   const identityProviders = await getIdentityProviders(server, "");
 
+  const host = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000";
+
   return (
     <div className="flex flex-col items-center space-y-4">
       <h1>Register</h1>
@@ -41,7 +45,7 @@ export default async function Page({
 
       {legal && identityProviders && process.env.ZITADEL_API_URL && (
         <SignInWithIDP
-          instanceUrl={process.env.ZITADEL_API_URL}
+          host={host}
           identityProviders={identityProviders}
         ></SignInWithIDP>
       )}
