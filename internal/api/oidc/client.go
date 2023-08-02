@@ -189,7 +189,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 			return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 		}
 		return o.introspect(ctx, introspection,
-			tokenID, token.UserID, token.ClientID, projectID,
+			tokenID, token.UserID, token.ClientID, clientID, projectID,
 			token.Audience, token.Scope,
 			token.AccessTokenCreation, token.AccessTokenExpiration)
 	}
@@ -209,7 +209,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 		}
 	}
 	return o.introspect(ctx, introspection,
-		token.ID, token.UserID, token.ApplicationID, projectID,
+		token.ID, token.UserID, token.ApplicationID, clientID, projectID,
 		token.Audience, token.Scopes,
 		token.CreationDate, token.Expiration)
 }
@@ -272,7 +272,7 @@ func (o *OPStorage) isOriginAllowed(ctx context.Context, clientID, origin string
 func (o *OPStorage) introspect(
 	ctx context.Context,
 	introspection *oidc.IntrospectionResponse,
-	tokenID, subject, clientID, projectID string,
+	tokenID, subject, tokenClientID, introspectionClientID, introspectionProjectID string,
 	audience, scope []string,
 	tokenCreation, tokenExpiration time.Time,
 ) (err error) {
@@ -280,15 +280,15 @@ func (o *OPStorage) introspect(
 	defer func() { span.EndWithError(err) }()
 
 	for _, aud := range audience {
-		if aud == clientID || aud == projectID {
+		if aud == introspectionClientID || aud == introspectionProjectID {
 			userInfo := new(oidc.UserInfo)
-			err = o.setUserinfo(ctx, userInfo, subject, clientID, scope, []string{projectID}) // always
+			err = o.setUserinfo(ctx, userInfo, subject, introspectionClientID, scope, []string{introspectionProjectID})
 			if err != nil {
 				return err
 			}
 			introspection.SetUserInfo(userInfo)
 			introspection.Scope = scope
-			introspection.ClientID = clientID
+			introspection.ClientID = tokenClientID
 			introspection.TokenType = oidc.BearerToken
 			introspection.Expiration = oidc.FromTime(tokenExpiration)
 			introspection.IssuedAt = oidc.FromTime(tokenCreation)
