@@ -158,6 +158,7 @@ func (h *Handler) subscribe(ctx context.Context) {
 		case <-ctx.Done():
 			subscription.Unsubscribe()
 			h.log().Debug("shutdown")
+			return
 		case event := <-queue:
 			events := checkAdditionalEvents(queue, event)
 			solvedInstances := make([]string, 0, len(events))
@@ -261,14 +262,12 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
+	var processErr error
+
 	err = crdb.ExecuteTx(ctx, h.client.DB, nil, func(tx *sql.Tx) error {
 		currentState, err := h.currentState(ctx, tx)
 		if err != nil {
 			return err
-		}
-
-		if h.projection.Name() == "projections.notifications_quota" {
-			h.log().Debug("asdf")
 		}
 
 		var statements []*Statement
@@ -277,17 +276,27 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 			return err
 		}
 
-		if err = h.execute(ctx, tx, currentState, statements); err != nil {
-			return err
+		lastProcessedIndex, err := h.execute(ctx, tx, currentState, statements)
+		if lastProcessedIndex < 0 {
+			processErr = err
+			return nil
 		}
 
-		currentState.aggregateID = statements[len(statements)-1].AggregateID
-		currentState.aggregateType = statements[len(statements)-1].AggregateType
-		currentState.eventSequence = statements[len(statements)-1].Sequence
-		currentState.eventTimestamp = statements[len(statements)-1].CreationDate
+		currentState.aggregateID = statements[lastProcessedIndex].AggregateID
+		currentState.aggregateType = statements[lastProcessedIndex].AggregateType
+		currentState.eventSequence = statements[lastProcessedIndex].Sequence
+		currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
 
 		return h.setState(ctx, tx, currentState)
 	})
+
+	if err != nil {
+		h.log().WithError(err).Debug("tuubel")
+	}
+
+	if processErr != nil {
+		return false, processErr
+	}
 
 	return additionalIteration, err
 }
@@ -339,36 +348,39 @@ func skipPreviouslyReduced(events []eventstore.Event, currentState *state) []eve
 	return events
 }
 
-func (h *Handler) execute(ctx context.Context, tx *sql.Tx, currentState *state, statements []*Statement) error {
-	for _, statement := range statements {
+func (h *Handler) execute(ctx context.Context, tx *sql.Tx, currentState *state, statements []*Statement) (lastProcessedIndex int, err error) {
+	lastProcessedIndex = -1
+
+	for i, statement := range statements {
 		if statement.Execute == nil {
 			continue
 		}
 		_, err := tx.Exec("SAVEPOINT exec")
 		if err != nil {
 			h.log().WithError(err).Debug("create savepoint failed")
-			return err
+			return lastProcessedIndex, err
 		}
-		if err := statement.Execute(tx, h.projection.Name()); err != nil {
+		if err = statement.Execute(tx, h.projection.Name()); err != nil {
 			h.log().WithError(err).Error("statement execution failed")
 
 			_, savepointErr := tx.Exec("ROLLBACK TO SAVEPOINT exec")
 			if savepointErr != nil {
 				h.log().WithError(savepointErr).Debug("rollback savepoint failed")
-				return savepointErr
+				return lastProcessedIndex, savepointErr
 			}
 
 			if h.handleFailedStmt(tx, currentState, failureFromStatement(statement, err)) {
 				continue
 			}
 
-			return err
+			return lastProcessedIndex, err
 		}
 		if _, err = tx.Exec("RELEASE SAVEPOINT exec"); err != nil {
-			return err
+			return lastProcessedIndex, err
 		}
+		lastProcessedIndex = i
 	}
-	return nil
+	return lastProcessedIndex, nil
 }
 
 func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder {
@@ -379,12 +391,16 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		InstanceID(currentState.instanceID)
 
 	for aggregateType, eventTypes := range h.eventTypes {
-		builder.
+		query := builder.
 			AddQuery().
 			AggregateTypes(aggregateType).
-			EventTypes(eventTypes...).
-			CreationDateAfter(currentState.eventTimestamp.Add(-1 * time.Microsecond)).
-			Builder()
+			EventTypes(eventTypes...)
+
+		if !currentState.eventTimestamp.IsZero() {
+			query = query.CreationDateAfter(currentState.eventTimestamp.Add(-1 * time.Microsecond))
+		}
+
+		builder = query.Builder()
 	}
 
 	return builder
