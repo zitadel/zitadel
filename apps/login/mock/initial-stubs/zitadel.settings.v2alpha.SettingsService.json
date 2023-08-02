@@ -19,6 +19,21 @@
   },
   {
     "service": "zitadel.settings.v2alpha.SettingsService",
+    "method": "GetActiveIdentityProviders",
+    "out": {
+      "data": {
+        "identityProviders": [
+          {
+            "id": "123",
+            "name": "Hubba bubba",
+            "type": 10
+          }
+        ]
+      }
+    }
+  },
+  {
+    "service": "zitadel.settings.v2alpha.SettingsService",
     "method": "GetPasswordComplexitySettings",
     "out": {
       "data": {

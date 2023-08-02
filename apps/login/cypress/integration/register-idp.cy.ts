@@ -5,11 +5,6 @@ const IDP_URL = "https://google.com";
 
 describe("register idps", () => {
   beforeEach(() => {
-    stub("zitadel.user.v2alpha.UserService", "StartIdentityProviderFlow", {
-      data: {
-        authUrl: IDP_URL,
-      },
-    });
     stub(
       "zitadel.settings.v2alpha.SettingsService",
       "GetActiveIdentityProviders",
@@ -25,6 +20,11 @@ describe("register idps", () => {
         },
       }
     );
+    stub("zitadel.user.v2alpha.UserService", "StartIdentityProviderFlow", {
+      data: {
+        authUrl: IDP_URL,
+      },
+    });
   });
 
   it("should show a custom text on the idp button", () => {
