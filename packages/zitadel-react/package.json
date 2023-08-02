@@ -12,7 +12,7 @@
     "./assets/*": "./dist/assets/*"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup src/index.tsx --format esm,cjs --dts --external react",
     "test": "pnpm test:unit",
     "test:watch": "pnpm test:unit:watch",
     "test:unit": "jest",

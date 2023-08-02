@@ -8,7 +8,7 @@ type Props = {
 
 export function LayoutProviders({ children }: Props) {
   const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme && resolvedTheme === "dark";
+  const isDark = resolvedTheme === "dark";
 
   return (
     <div className={`${isDark ? "ui-dark" : "ui-light"} `}>
