@@ -4,7 +4,7 @@ export default defineConfig((options: Options) => ({
   treeshake: true,
   splitting: true,
   publicDir: true,
-  entry: ["src/**/*.tsx"],
+  entry: ["src/index.tsx"],
   format: ["esm"],
   dts: true,
   minify: true,
