@@ -16,16 +16,16 @@ import (
 
 var (
 	membershipsStmt = regexp.QuoteMeta(
-		"SELECT memberships.user_id" +
-			", memberships.roles" +
-			", memberships.creation_date" +
-			", memberships.change_date" +
-			", memberships.sequence" +
-			", memberships.resource_owner" +
-			", memberships.org_id" +
-			", memberships.id" +
-			", memberships.project_id" +
-			", memberships.grant_id" +
+		"SELECT members.user_id" +
+			", members.roles" +
+			", members.creation_date" +
+			", members.change_date" +
+			", members.sequence" +
+			", members.resource_owner" +
+			", members.org_id" +
+			", members.id" +
+			", members.project_id" +
+			", members.grant_id" +
 			", projections.project_grants3.granted_org_id" +
 			", projections.projects3.name" +
 			", projections.orgs.name" +
@@ -86,10 +86,10 @@ var (
 			", members.grant_id" +
 			" FROM projections.project_grant_members3 AS members" +
 			" WHERE members.granted_org_removed = $7 AND members.owner_removed = $8 AND members.user_owner_removed = $9" +
-			") AS memberships" +
-			" LEFT JOIN projections.projects3 ON memberships.project_id = projections.projects3.id AND memberships.instance_id = projections.projects3.instance_id" +
-			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id AND memberships.instance_id = projections.orgs.instance_id" +
-			" LEFT JOIN projections.project_grants3 ON memberships.grant_id = projections.project_grants3.grant_id AND memberships.instance_id = projections.project_grants3.instance_id" +
+			") AS members" +
+			" LEFT JOIN projections.projects3 ON members.project_id = projections.projects3.id AND members.instance_id = projections.projects3.instance_id" +
+			" LEFT JOIN projections.orgs ON members.org_id = projections.orgs.id AND members.instance_id = projections.orgs.instance_id" +
+			" LEFT JOIN projections.project_grants3 ON members.grant_id = projections.project_grants3.grant_id AND members.instance_id = projections.project_grants3.instance_id" +
 			` AS OF SYSTEM TIME '-1 ms'`)
 	membershipCols = []string{
 		"user_id",
@@ -456,7 +456,7 @@ func Test_MembershipPrepares(t *testing.T) {
 
 func prepareMembershipWrapper(withOwnerRemoved bool) func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
 	return func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
-		builder, _, fun := prepareMembershipsQuery(ctx, db, withOwnerRemoved)
+		builder, _, fun := prepareMembershipsQuery(ctx, db, withOwnerRemoved, &MembershipSearchQuery{})
 		return builder, fun
 	}
 }

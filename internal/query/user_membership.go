@@ -109,7 +109,7 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, queryArgs, scan := prepareMembershipsQuery(ctx, q.client, withOwnerRemoved)
+	query, queryArgs, scan := prepareMembershipsQuery(ctx, q.client, withOwnerRemoved, queries)
 	eq := sq.Eq{membershipInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -136,7 +136,7 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 var (
 	//membershipAlias is a hack to satisfy checks in the queries
 	membershipAlias = table{
-		name:          "memberships",
+		name:          "members",
 		instanceIDCol: projection.MemberInstanceID,
 	}
 	membershipUserID = Column{
@@ -202,11 +202,11 @@ var (
 	}
 )
 
-func getMembershipFromQuery(withOwnerRemoved bool) (string, []interface{}) {
-	orgMembers, orgMembersArgs := prepareOrgMember(withOwnerRemoved)
-	iamMembers, iamMembersArgs := prepareIAMMember(withOwnerRemoved)
-	projectMembers, projectMembersArgs := prepareProjectMember(withOwnerRemoved)
-	projectGrantMembers, projectGrantMembersArgs := prepareProjectGrantMember(withOwnerRemoved)
+func getMembershipFromQuery(withOwnerRemoved bool, queries *MembershipSearchQuery) (string, []interface{}) {
+	orgMembers, orgMembersArgs := prepareOrgMember(withOwnerRemoved, queries)
+	iamMembers, iamMembersArgs := prepareIAMMember(withOwnerRemoved, queries)
+	projectMembers, projectMembersArgs := prepareProjectMember(withOwnerRemoved, queries)
+	projectGrantMembers, projectGrantMembersArgs := prepareProjectGrantMember(withOwnerRemoved, queries)
 	args := make([]interface{}, 0)
 	args = append(append(append(append(args, orgMembersArgs...), iamMembersArgs...), projectMembersArgs...), projectGrantMembersArgs...)
 
@@ -222,8 +222,8 @@ func getMembershipFromQuery(withOwnerRemoved bool) (string, []interface{}) {
 		args
 }
 
-func prepareMembershipsQuery(ctx context.Context, db prepareDatabase, withOwnerRemoved bool) (sq.SelectBuilder, []interface{}, func(*sql.Rows) (*Memberships, error)) {
-	query, args := getMembershipFromQuery(withOwnerRemoved)
+func prepareMembershipsQuery(ctx context.Context, db prepareDatabase, withOwnerRemoved bool, queries *MembershipSearchQuery) (sq.SelectBuilder, []interface{}, func(*sql.Rows) (*Memberships, error)) {
+	query, args := getMembershipFromQuery(withOwnerRemoved, queries)
 	return sq.Select(
 			membershipUserID.identifier(),
 			membershipRoles.identifier(),
@@ -322,7 +322,7 @@ func prepareMembershipsQuery(ctx context.Context, db prepareDatabase, withOwnerR
 		}
 }
 
-func prepareOrgMember(withOwnerRemoved bool) (string, []interface{}) {
+func prepareOrgMember(withOwnerRemoved bool, query *MembershipSearchQuery) (string, []interface{}) {
 	builder := sq.Select(
 		OrgMemberUserID.identifier(),
 		OrgMemberRoles.identifier(),
@@ -336,15 +336,23 @@ func prepareOrgMember(withOwnerRemoved bool) (string, []interface{}) {
 		"NULL::TEXT AS "+membershipProjectID.name,
 		"NULL::TEXT AS "+membershipGrantID.name,
 	).From(orgMemberTable.identifier())
+
+	for _, q := range query.Queries {
+		if q.Col().table.name == membershipAlias.name || q.Col().table.name == memberTableAlias.name {
+			builder = q.toQuery(builder)
+		}
+	}
+
 	if !withOwnerRemoved {
 		eq := sq.Eq{}
 		addOrgMemberWithoutOwnerRemoved(eq)
 		builder = builder.Where(eq)
 	}
+
 	return builder.MustSql()
 }
 
-func prepareIAMMember(withOwnerRemoved bool) (string, []interface{}) {
+func prepareIAMMember(withOwnerRemoved bool, query *MembershipSearchQuery) (string, []interface{}) {
 	builder := sq.Select(
 		InstanceMemberUserID.identifier(),
 		InstanceMemberRoles.identifier(),
@@ -358,6 +366,13 @@ func prepareIAMMember(withOwnerRemoved bool) (string, []interface{}) {
 		"NULL::TEXT AS "+membershipProjectID.name,
 		"NULL::TEXT AS "+membershipGrantID.name,
 	).From(instanceMemberTable.identifier())
+
+	for _, q := range query.Queries {
+		if q.Col().table.name == membershipAlias.name || q.Col().table.name == memberTableAlias.name {
+			builder = q.toQuery(builder)
+		}
+	}
+
 	if !withOwnerRemoved {
 		eq := sq.Eq{}
 		addIamMemberWithoutOwnerRemoved(eq)
@@ -366,7 +381,7 @@ func prepareIAMMember(withOwnerRemoved bool) (string, []interface{}) {
 	return builder.MustSql()
 }
 
-func prepareProjectMember(withOwnerRemoved bool) (string, []interface{}) {
+func prepareProjectMember(withOwnerRemoved bool, query *MembershipSearchQuery) (string, []interface{}) {
 	builder := sq.Select(
 		ProjectMemberUserID.identifier(),
 		ProjectMemberRoles.identifier(),
@@ -380,6 +395,13 @@ func prepareProjectMember(withOwnerRemoved bool) (string, []interface{}) {
 		ProjectMemberProjectID.identifier(),
 		"NULL::TEXT AS "+membershipGrantID.name,
 	).From(projectMemberTable.identifier())
+
+	for _, q := range query.Queries {
+		if q.Col().table.name == membershipAlias.name || q.Col().table.name == memberTableAlias.name {
+			builder = q.toQuery(builder)
+		}
+	}
+
 	if !withOwnerRemoved {
 		eq := sq.Eq{}
 		addProjectMemberWithoutOwnerRemoved(eq)
@@ -388,7 +410,7 @@ func prepareProjectMember(withOwnerRemoved bool) (string, []interface{}) {
 	return builder.MustSql()
 }
 
-func prepareProjectGrantMember(withOwnerRemoved bool) (string, []interface{}) {
+func prepareProjectGrantMember(withOwnerRemoved bool, query *MembershipSearchQuery) (string, []interface{}) {
 	builder := sq.Select(
 		ProjectGrantMemberUserID.identifier(),
 		ProjectGrantMemberRoles.identifier(),
@@ -402,6 +424,13 @@ func prepareProjectGrantMember(withOwnerRemoved bool) (string, []interface{}) {
 		ProjectGrantMemberProjectID.identifier(),
 		ProjectGrantMemberGrantID.identifier(),
 	).From(projectGrantMemberTable.identifier())
+
+	for _, q := range query.Queries {
+		if q.Col().table.name == membershipAlias.name || q.Col().table.name == memberTableAlias.name {
+			builder = q.toQuery(builder)
+		}
+	}
+
 	if !withOwnerRemoved {
 		eq := sq.Eq{}
 		addProjectGrantMemberWithoutOwnerRemoved(eq)
