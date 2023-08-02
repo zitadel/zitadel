@@ -1,7 +1,7 @@
 import { stub } from "../support/mock";
 
 const CUSTOM_TEXT = "Hubba Bubba";
-const IDP_URL = "https://google.com";
+const IDP_URL = "https://example.com/idp/url";
 
 describe("register idps", () => {
   beforeEach(() => {
@@ -29,8 +29,9 @@ describe("register idps", () => {
 
   it("should redirect the user to the correct url", () => {
     cy.visit("/register/idp");
-    const button = cy.get('button[e2e="google"]');
-    button.click();
-    cy.location("href", { timeout: 10_000 }).should("eq", IDP_URL);
+    cy.get('button[e2e="google"]').click();
+    cy.origin(IDP_URL, ()=> {
+      cy.location("href", { timeout: 10_000 }).should("eq", IDP_URL);
+    })
   });
 });
