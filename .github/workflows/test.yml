@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup pnpm 7
         uses: pnpm/action-setup@v2
