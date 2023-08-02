@@ -60,7 +60,7 @@ require (
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/zitadel/logging v0.3.4
 	github.com/zitadel/oidc/v2 v2.7.0
-	github.com/zitadel/passwap v0.2.0
+	github.com/zitadel/passwap v0.3.0
 	github.com/zitadel/saml v0.0.11
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.40.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.40.0
