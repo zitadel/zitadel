@@ -779,7 +779,7 @@ func (p *idpTemplateProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Ev
 	case *instance.OIDCIDPMigratedAzureADEvent:
 		idpEvent = e.OIDCIDPMigratedAzureADEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedGoogleEventType})
 	}
 
 	return crdb.NewMultiStatement(

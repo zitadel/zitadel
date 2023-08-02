@@ -30,6 +30,8 @@ type Phone struct {
 
 	PhoneNumber     PhoneNumber
 	IsPhoneVerified bool
+	// PlainCode is set by the command and can be used to return it to the caller (API)
+	PlainCode *string
 }
 
 type PhoneCode struct {
