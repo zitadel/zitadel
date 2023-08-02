@@ -222,7 +222,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			l.externalAuthFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &oauth.Session{Provider: provider.(*azuread.Provider).Provider, Code: data.Code}
+		session = &azuread.Session{Session: &oauth.Session{Provider: provider.(*azuread.Provider).Provider, Code: data.Code}}
 	case domain.IDPTypeGitHub:
 		provider, err = l.githubProvider(r.Context(), identityProvider)
 		if err != nil {
@@ -275,6 +275,45 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 	l.handleExternalUserAuthenticated(w, r, authReq, identityProvider, session, user, l.renderNextStep)
 }
 
+func (l *Login) tryMigrateExternalUserID(r *http.Request, session idp.Session, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) (oldIDMatched bool, err error) {
+	migration, ok := session.(idp.SessionSupportsMigration)
+	if !ok {
+		return false, nil
+	}
+	oldID, err := migration.RetrieveOldID()
+	if err != nil {
+		return false, err
+	}
+	return l.migrateExternalUserID(r, authReq, externalUser, oldID)
+}
+
+func (l *Login) migrateExternalUserID(r *http.Request, authReq *domain.AuthRequest, externalUser *domain.ExternalUser, oldID string) (oldIDMatched bool, err error) {
+	if oldID == "" {
+		return false, nil
+	}
+	// save the currentID, so we're able to reset to it later on if the user is not found with the old ID as well
+	externalUserID := externalUser.ExternalUserID
+	externalUser.ExternalUserID = oldID
+	if err = l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r), true); err != nil {
+		// always reset to the mapped ID
+		externalUser.ExternalUserID = externalUserID
+		// but ignore the error if the user was just not found with the oldID
+		if errors.IsNotFound(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	if err = l.authRepo.ResetLinkingUsers(r.Context(), authReq.ID, authReq.AgentID); err != nil {
+		return true, err
+	}
+	// read current auth request state (incl. authorized user)
+	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
+	if err != nil {
+		return true, err
+	}
+	return true, l.command.MigrateUserIDP(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, externalUser.IDPConfigID, oldID, externalUserID)
+}
+
 // handleExternalUserAuthenticated maps the IDP user, checks for a corresponding externalID
 func (l *Login) handleExternalUserAuthenticated(
 	w http.ResponseWriter,
@@ -287,10 +326,21 @@ func (l *Login) handleExternalUserAuthenticated(
 ) {
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
 	// check and fill in local linked user
-	externalErr := l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r))
+	externalErr := l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r), false)
 	if externalErr != nil && !errors.IsNotFound(externalErr) {
 		l.renderError(w, r, authReq, externalErr)
 		return
+	}
+	if externalErr != nil && errors.IsNotFound(externalErr) {
+		oldIDMatched, err := l.tryMigrateExternalUserID(r, session, authReq, externalUser)
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return
+		}
+		// if the old ID matched, ignore the not found error from the current ID
+		if oldIDMatched {
+			externalErr = nil
+		}
 	}
 	var err error
 	// read current auth request state (incl. authorized user)

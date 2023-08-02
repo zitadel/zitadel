@@ -247,12 +247,12 @@ func TestSession_FetchUser(t *testing.T) {
 			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.options...)
 			require.NoError(t, err)
 
-			session := &oauth.Session{
+			session := &Session{Session: &oauth.Session{
 				AuthURL:  tt.fields.authURL,
 				Code:     tt.fields.code,
 				Tokens:   tt.fields.tokens,
 				Provider: provider.Provider,
-			}
+			}}
 
 			user, err := session.FetchUser(context.Background())
 			if tt.want.err != nil && !tt.want.err(err) {

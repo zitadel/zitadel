@@ -9,3 +9,7 @@ type Session interface {
 	GetAuthURL() string
 	FetchUser(ctx context.Context) (User, error)
 }
+
+type SessionSupportsMigration interface {
+	RetrieveOldID() (oldID string, err error)
+}
