@@ -13,7 +13,7 @@
     "build": "tsup",
     "test": "pnpm test:unit",
     "test:watch": "pnpm test:unit:watch",
-    "test:unit": "jest",
+    "test:unit": "jest --passWithNoTests",
     "test:unit:watch": "jest --watch",
     "dev": "tsup --watch",
     "lint": "eslint \"src/**/*.ts*\"",
