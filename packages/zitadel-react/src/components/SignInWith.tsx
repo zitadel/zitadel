@@ -5,4 +5,5 @@ export type SignInWithIdentityProviderProps = DetailedHTMLProps<
   HTMLButtonElement
 > & {
   name?: string;
+  e2e?: string;
 };

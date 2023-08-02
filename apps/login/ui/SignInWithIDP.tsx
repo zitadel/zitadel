@@ -91,6 +91,8 @@ export function SignInWithIDP({
               return (
                 <SignInWithGoogle
                   key={`idp-${i}`}
+                  e2e="google"
+                  name={idp.name}
                   onClick={() =>
                     startFlow(idp.id, ProviderSlug.GOOGLE).then(
                       ({ authUrl }) => {
