@@ -75,6 +75,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
 					},
 					Email: &user.SetHumanEmail{},
+					Phone: &user.SetHumanPhone{},
 					Metadata: []*user.SetMetadataEntry{
 						{
 							Key:   "somekey",
@@ -97,7 +98,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 			},
 		},
 		{
-			name: "return verification code",
+			name: "return email verification code",
 			args: args{
 				CTX,
 				&user.AddHumanUserRequest{
@@ -185,6 +186,53 @@ func TestServer_AddHumanUser(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
+			},
+		},
+		{
+			name: "return phone verification code",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organisation: &object.Organisation{
+						Org: &object.Organisation_OrgId{
+							OrgId: Tester.Organisation.ID,
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						FirstName:         "Donald",
+						LastName:          "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Phone: &user.SetHumanPhone{
+						Phone: "+41791234567",
+						Verification: &user.SetHumanPhone_ReturnCode{
+							ReturnCode: &user.ReturnPhoneVerificationCode{},
+						},
+					},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_Password{
+						Password: &user.Password{
+							Password:       "DifficultPW666!",
+							ChangeRequired: true,
+						},
+					},
+				},
+			},
+			want: &user.AddHumanUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+				EmailCode: gu.Ptr("something"),
 			},
 		},
 		{

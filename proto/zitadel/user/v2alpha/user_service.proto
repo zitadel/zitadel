@@ -545,10 +545,7 @@ message AddHumanUserRequest{
     (validate.rules).message.required = true,
     (google.api.field_behavior) = REQUIRED
   ];
-  SetHumanPhone phone = 10 [
-    (validate.rules).message.required = true,
-    (google.api.field_behavior) = REQUIRED
-  ];
+  SetHumanPhone phone = 10;
   repeated SetMetadataEntry metadata = 6;
   oneof password_type {
     Password password = 7;
@@ -561,6 +558,7 @@ message AddHumanUserResponse {
   string user_id = 1;
   zitadel.object.v2alpha.Details details = 2;
   optional string email_code = 3;
+  optional string phone_code = 4;
 }
 
 message SetEmailRequest{
