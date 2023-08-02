@@ -9,6 +9,7 @@ import {
 } from "@zitadel/react";
 import { useRouter } from "next/navigation";
 import { ProviderSlug } from "#/lib/demos";
+import Alert from "./Alert";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;
@@ -117,6 +118,11 @@ export function SignInWithIDP({
               return null;
           }
         })}
+      {error && (
+        <div className="py-4">
+          <Alert>{error}</Alert>
+        </div>
+      )}
     </div>
   );
 }

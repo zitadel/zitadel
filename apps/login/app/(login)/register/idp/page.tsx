@@ -22,13 +22,10 @@ function getIdentityProviders(
     });
 }
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Record<string | number | symbol, string | undefined>;
-}) {
+export default async function Page() {
   const legal = await getLegalAndSupportSettings(server);
 
+  // TODO if org idps should be shown replace emptystring with the orgId.
   const identityProviders = await getIdentityProviders(server, "");
 
   const host = process.env.VERCEL_URL
