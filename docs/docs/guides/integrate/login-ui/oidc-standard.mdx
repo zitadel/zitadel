@@ -135,8 +135,8 @@ These are endpoints like:
 
 ### End Session / Logout
 
-Then end session endpoint has to be implemented as all to other OIDC endpoints. This means you have to proxy the request from you UI to the ZITADEL.
-To be able to redirect the user to the correct URLs after a successful logout, you need the following endpoint:
+The end session endpoint has to be implemented as all the other OIDC endpoints. This means you have to proxy the request from you UI to the ZITADEL.
+In case the ZITADEL backend is not able to determine which session to terminate directly or requires additional approval from the user, it will redirect the browser to the following endpoint:
 
 ```/logout?post_logout_redirect="```
 
