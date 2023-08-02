@@ -140,4 +140,4 @@ In case the ZITADEL backend is not able to determine which session to terminate 
 
 ```/logout?post_logout_redirect="```
 
-You will get the post logout redirect URLs in the parameter and can send the user to that URL.
+Prompt the user to select a session, terminate it using the [corresponding endpoint](/docs/apis/resources/session_service/session-service-terminate-session) and send the user to the `post_logout_redirect` URL.
