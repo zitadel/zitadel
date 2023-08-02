@@ -898,8 +898,8 @@ github.com/zitadel/logging v0.3.4 h1:9hZsTjMMTE3X2LUi0xcF9Q9EdLo+FAezeu52ireBbHM
 github.com/zitadel/logging v0.3.4/go.mod h1:aPpLQhE+v6ocNK0TWrBrd363hZ95KcI17Q1ixAQwZF0=
 github.com/zitadel/oidc/v2 v2.7.0 h1:IGX4EDk6tegTjUSsZDWeTfLseFU0BdJ/Glf1tgys2lU=
 github.com/zitadel/oidc/v2 v2.7.0/go.mod h1:zkUkVJS0sDVy9m0UA9RgO3f8i/C0rtjvXU36UJj7T+0=
-github.com/zitadel/passwap v0.2.0 h1:rkYrax9hfRIpVdXJ7pS8JHkQOhuQTdZQxEhsY0dFFrU=
-github.com/zitadel/passwap v0.2.0/go.mod h1:KRTL4LL8ugJIn2xLoQYZf5t4kDyr7w41uq3XqvUlO6w=
+github.com/zitadel/passwap v0.3.0 h1:kC/vzN9xQlEQjUAZs0z2P5nKrZs9AuTqprteSQ2S4Ag=
+github.com/zitadel/passwap v0.3.0/go.mod h1:sIpG6HfmnP28qwxu8kf+ot53ERbLwU9fOITstAwZSms=
 github.com/zitadel/saml v0.0.11 h1:kObucnBrcu1PHCO7RGT0iVeuJL/5I50gUgr40S41nMs=
 github.com/zitadel/saml v0.0.11/go.mod h1:YGWAvPZRv4DbEZ78Ht/2P0AWzGn+6WGhFf90PMXl0Po=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
