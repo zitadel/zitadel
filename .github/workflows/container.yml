@@ -56,21 +56,12 @@ jobs:
         with:
           driver-opts: 'image=moby/buildkit:v0.11.6'
       -
-        uses: tibdex/github-app-token@v1
-        id: generate-token
-        with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
-          repository: zitadel/zitadel
-          permissions: >-
-             {"packages": "write"}
-      -
         name: Login to Docker registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ secrets.APP_ID }}
-          password: ${{ steps.generate-token.outputs.token }}
+          username: ${{ secrets.PIPELINE_USERNAME }}
+          password: ${{ secrets.PIPELINE_TOKEN }}
       - 
         uses: actions/download-artifact@v3
         with:
@@ -158,21 +149,12 @@ jobs:
         with:
           driver-opts: 'image=moby/buildkit:v0.11.6'
       -
-        uses: tibdex/github-app-token@v1
-        id: generate-token
-        with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
-          repository: zitadel/zitadel
-          permissions: >-
-            {"packages": "write"}
-      -
         name: Login to Docker registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ secrets.APP_ID }}
-          password: ${{ steps.generate-token.outputs.token }}
+          username: ${{ secrets.PIPELINE_USERNAME }}
+          password: ${{ secrets.PIPELINE_TOKEN }}
       -
         name: Docker meta
         id: build-meta
