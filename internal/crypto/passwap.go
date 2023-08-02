@@ -45,7 +45,7 @@ const (
 type HashMode string
 
 // HashMode defines a underlying [hash.Hash] implementation
-// for alogrithms like pbkdf2
+// for algorithms like pbkdf2
 const (
 	HashModeSHA1   HashMode = "sha1"
 	HashModeSHA224 HashMode = "sha224"
