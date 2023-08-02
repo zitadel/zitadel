@@ -232,7 +232,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
-				EmailCode: gu.Ptr("something"),
+				PhoneCode: gu.Ptr("something"),
 			},
 		},
 		{
