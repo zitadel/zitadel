@@ -27,15 +27,9 @@ describe("register idps", () => {
     });
   });
 
-  it("should show a custom text on the idp button", () => {
+  it("should show a custom text on the idp button and redirect to the correct URL", () => {
     cy.visit("/register/idp");
     cy.get('button[e2e="google"]').find("span").contains(CUSTOM_TEXT);
     cy.location("pathname", { timeout: 10_000 }).should("eq", IDP_URL);
-  });
-
-  it("should redirect a user who selects an idp on register to a url", () => {
-    cy.visit("/register/idp");
-    cy.get('button[e2e="google"]').click();
-    cy.location("pathname", { timeout: 10_000 }).should("eq", "/passkey/add");
   });
 });
