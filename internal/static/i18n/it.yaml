@@ -581,6 +581,10 @@ EventTypes:
         check:
           succeeded: Controllo della password riuscito
           failed: Controllo della password fallito
+        change:
+          sent: Cambio password inviato
+        hash:
+          updated: Hash della password aggiornato
       externallogin:
         check:
           succeeded: Accesso esterno riuscito

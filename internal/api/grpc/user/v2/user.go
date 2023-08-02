@@ -213,7 +213,7 @@ func authMethodTypesToPb(methodTypes []domain.UserAuthMethodType) []user.Authent
 
 func authMethodTypeToPb(methodType domain.UserAuthMethodType) user.AuthenticationMethodType {
 	switch methodType {
-	case domain.UserAuthMethodTypeOTP:
+	case domain.UserAuthMethodTypeTOTP:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_TOTP
 	case domain.UserAuthMethodTypeU2F:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_U2F
@@ -223,6 +223,10 @@ func authMethodTypeToPb(methodType domain.UserAuthMethodType) user.Authenticatio
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSWORD
 	case domain.UserAuthMethodTypeIDP:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP
+	case domain.UserAuthMethodTypeOTPSMS:
+		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_SMS
+	case domain.UserAuthMethodTypeOTPEmail:
+		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_EMAIL
 	case domain.UserAuthMethodTypeUnspecified:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED
 	default:

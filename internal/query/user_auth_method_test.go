@@ -280,7 +280,7 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 						},
 						{
 							true,
-							domain.UserAuthMethodTypeOTP,
+							domain.UserAuthMethodTypeTOTP,
 							1,
 						},
 					},
@@ -292,7 +292,7 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 				},
 				AuthMethodTypes: []domain.UserAuthMethodType{
 					domain.UserAuthMethodTypePasswordless,
-					domain.UserAuthMethodTypeOTP,
+					domain.UserAuthMethodTypeTOTP,
 					domain.UserAuthMethodTypePassword,
 					domain.UserAuthMethodTypeIDP,
 				},
@@ -399,7 +399,7 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 						},
 						{
 							true,
-							domain.UserAuthMethodTypeOTP,
+							domain.UserAuthMethodTypeTOTP,
 							1,
 							true,
 							true,
@@ -411,7 +411,7 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			object: &testUserAuthMethodTypesRequired{
 				authMethods: []domain.UserAuthMethodType{
 					domain.UserAuthMethodTypePasswordless,
-					domain.UserAuthMethodTypeOTP,
+					domain.UserAuthMethodTypeTOTP,
 					domain.UserAuthMethodTypePassword,
 					domain.UserAuthMethodTypeIDP,
 				},

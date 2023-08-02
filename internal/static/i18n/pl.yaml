@@ -583,6 +583,10 @@ EventTypes:
         check:
           succeeded: Sprawdzenie hasła zakończone powodzeniem
           failed: Sprawdzenie hasła nie powiodło się
+        change:
+          sent: Wysłano zmianę hasła
+        hash:
+          updated: Zaktualizowano skrót hasła
       externallogin:
         check:
           succeeded: Zewnętrzne logowanie zakończone powodzeniem

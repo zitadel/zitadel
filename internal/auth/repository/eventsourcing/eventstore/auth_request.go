@@ -368,7 +368,7 @@ func (repo *AuthRequestRepo) VerifyMFAOTP(ctx context.Context, authRequestID, us
 	if err != nil {
 		return err
 	}
-	return repo.Command.HumanCheckMFAOTP(ctx, userID, code, resourceOwner, request.WithCurrentInfo(info))
+	return repo.Command.HumanCheckMFATOTP(ctx, userID, code, resourceOwner, request.WithCurrentInfo(info))
 }
 
 func (repo *AuthRequestRepo) BeginMFAU2FLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (login *domain.WebAuthNLogin, err error) {
@@ -921,11 +921,15 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 			steps = append(steps, new(domain.ExternalNotFoundOptionStep))
 			return steps, nil
 		}
-		steps = append(steps, new(domain.LoginStep))
 		if domain.IsPrompt(request.Prompt, domain.PromptCreate) {
 			return append(steps, &domain.RegistrationStep{}), nil
 		}
-		if len(request.Prompt) == 0 || domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
+		// if there's a login or consent prompt, but not select account, just return the login step
+		if len(request.Prompt) > 0 && !domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
+			return append(steps, new(domain.LoginStep)), nil
+		} else {
+			// if no user was specified, no prompt or select_account was provided,
+			// then check the active user sessions (of the user agent)
 			users, err := repo.usersForUserSelection(request)
 			if err != nil {
 				return nil, err
@@ -936,11 +940,19 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 			if request.SelectedIDPConfigID != "" {
 				steps = append(steps, &domain.RedirectToExternalIDPStep{})
 			}
-			if len(request.Prompt) == 0 && len(users) > 0 {
+			if len(request.Prompt) == 0 && len(users) == 0 {
+				steps = append(steps, new(domain.LoginStep))
+			}
+			// if no prompt was provided, but there are multiple user sessions, then the user must decide which to use
+			if len(request.Prompt) == 0 && len(users) > 1 {
 				steps = append(steps, &domain.SelectUserStep{Users: users})
 			}
+			if len(steps) > 0 {
+				return steps, nil
+			}
+			// a single user session was found, use that automatically
+			request.UserID = users[0].UserID
 		}
-		return steps, nil
 	}
 	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID, request.LoginPolicy.IgnoreUnknownUsernames)
 	if err != nil {
