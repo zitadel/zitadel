@@ -13,7 +13,7 @@ The following flow shows you the different components you need to enable OIDC fo
 3. The ZITADEL API parses the request and does what it needs to interpret certain parameters (e.g., organization scope, etc.)
 4. Redirect to a predefined, relative URL of the login UI that includes the authrequest ID ("/login?authRequest=")
 5. Request to ZITADEL API to get all the information from the auth request. This is optional and only needed if you like to get all the parsed information from the authrequest-
-6. Do the whole login and all the checks you like to do with create and update session, till your user did all the checks you need.
+6. Authenticate the user in your login UI by creating and updating a session with all the checks you need.
 7. Finalize the auth request by sending the session to the request, you will get the callback URL in the response
 8. Redirect to your application with the callback URL you got in the previous request
 9. All OIDC-specific endpoints have to be accepted in the Login UI and should be proxied and sent to the ZITADEL API
