@@ -157,7 +157,6 @@ describe('quotas', () => {
 
       const amount = 100;
       const percent = 10;
-      const usage = 35;
 
       beforeEach(() => {
         cy.get<Context>('@ctx').then((ctx) => {
@@ -173,6 +172,7 @@ describe('quotas', () => {
       });
 
       [0, 8].forEach((fail) => {
+        const usage = 11
         it(`fires at least once with the expected payload when the endpoint fails ${fail} times`, () => {
           cy.task('failWebhookEvents', fail);
           cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
@@ -209,9 +209,7 @@ describe('quotas', () => {
               {
                 timeout: 180_000,
                 errorMsg: () =>
-                  `couldn't find expected event ${serialize(expectEvent)} in received events ${mostRecentEvents.map(
-                    serialize,
-                  )}`,
+                  `couldn't find expected event ${serialize(expectEvent)} in received events ${serialize(mostRecentEvents)}`,
               },
             );
           });
@@ -219,6 +217,7 @@ describe('quotas', () => {
       });
 
       it('fires repeatedly with the expected payloads', () => {
+        const usage = 35;
         cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
           cy.get<Context>('@ctx').then((ctx) => {
             for (let i = 0; i < usage; i++) {
@@ -253,10 +252,7 @@ describe('quotas', () => {
           {
             timeout: 180_000,
             errorMsg: () => {
-              const serialize = (ev: ZITADELWebhookEvent) => JSON.stringify(ev, null, 2);
-              return `couldn't find all expected events ${expectEvents.map(
-                serialize,
-              )} in received events ${mostRecentEvents.map(serialize)}`;
+              return `couldn't find all expected events ${serialize(expectEvents)} in received events ${serialize(mostRecentEvents)}`;
             },
           },
         );
@@ -271,6 +267,6 @@ function expectCookieDoesntExist() {
   });
 }
 
-function serialize(ev: ZITADELWebhookEvent) {
+function serialize(ev: ZITADELWebhookEvent | Array<ZITADELWebhookEvent>) {
   return JSON.stringify(ev, null, 2);
 }

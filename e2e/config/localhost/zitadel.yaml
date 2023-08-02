@@ -22,8 +22,8 @@ LogStore:
     Database:
       Enabled: true
       Debounce:
-        MinFrequency: 0s
-        MaxBulkSize: 0
+        MinFrequency: 60s
+        MaxBulkSize: 1
   Execution:
     Database:
       Enabled: true
