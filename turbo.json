@@ -21,9 +21,7 @@
       "cache": false
     }
   },
-  "globalDependencies": [
-    "**/.env.*local"
-  ],
+  "globalDependencies": ["**/.env.*local"],
   "globalEnv": [
     "ZITADEL_API_URL",
     "ZITADEL_SERVICE_USER_TOKEN",
@@ -31,6 +29,7 @@
     "ZITADEL_SYSTEM_API_USERID",
     "ZITADEL_SYSTEM_API_KEY",
     "ZITADEL_ISSUER",
-    "ZITADEL_ADMIN_TOKEN"
+    "ZITADEL_ADMIN_TOKEN",
+    "VERCEL_URL"
   ]
 }
