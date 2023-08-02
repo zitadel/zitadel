@@ -1,6 +1,9 @@
 package crypto
 
 import (
+	"crypto/sha1"
+	"crypto/sha256"
+	"crypto/sha512"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -8,6 +11,7 @@ import (
 	"github.com/zitadel/passwap/argon2"
 	"github.com/zitadel/passwap/bcrypt"
 	"github.com/zitadel/passwap/md5"
+	"github.com/zitadel/passwap/pbkdf2"
 	"github.com/zitadel/passwap/scrypt"
 )
 
@@ -237,6 +241,101 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5},
 			},
 			wantPrefixes: []string{scrypt.Prefix, scrypt.Prefix_Linux, argon2.Prefix, bcrypt.Prefix, md5.Prefix},
+		},
+		{
+			name: "pbkdf2, parse error",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNamePBKDF2,
+					Params: map[string]any{
+						"cost": "bar",
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "pbkdf2, hash mode error",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNamePBKDF2,
+					Params: map[string]any{
+						"Rounds": 12,
+						"Hash":   "foo",
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "pbkdf2, sha1",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNamePBKDF2,
+					Params: map[string]any{
+						"Rounds": 12,
+						"Hash":   HashModeSHA1,
+					},
+				},
+				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5},
+			},
+			wantPrefixes: []string{pbkdf2.Prefix, argon2.Prefix, bcrypt.Prefix, md5.Prefix},
+		},
+		{
+			name: "pbkdf2, sha224",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNamePBKDF2,
+					Params: map[string]any{
+						"Rounds": 12,
+						"Hash":   HashModeSHA224,
+					},
+				},
+				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5},
+			},
+			wantPrefixes: []string{pbkdf2.Prefix, argon2.Prefix, bcrypt.Prefix, md5.Prefix},
+		},
+		{
+			name: "pbkdf2, sha256",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNamePBKDF2,
+					Params: map[string]any{
+						"Rounds": 12,
+						"Hash":   HashModeSHA256,
+					},
+				},
+				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5},
+			},
+			wantPrefixes: []string{pbkdf2.Prefix, argon2.Prefix, bcrypt.Prefix, md5.Prefix},
+		},
+		{
+			name: "pbkdf2, sha384",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNamePBKDF2,
+					Params: map[string]any{
+						"Rounds": 12,
+						"Hash":   HashModeSHA384,
+					},
+				},
+				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5},
+			},
+			wantPrefixes: []string{pbkdf2.Prefix, argon2.Prefix, bcrypt.Prefix, md5.Prefix},
+		},
+		{
+			name: "pbkdf2, sha512",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNamePBKDF2,
+					Params: map[string]any{
+						"Rounds": 12,
+						"Hash":   HashModeSHA512,
+					},
+				},
+				Verifiers: []HashName{HashNameArgon2, HashNameBcrypt, HashNameMd5},
+			},
+			wantPrefixes: []string{pbkdf2.Prefix, argon2.Prefix, bcrypt.Prefix, md5.Prefix},
 		},
 	}
 	for _, tt := range tests {
@@ -481,6 +580,119 @@ func TestHasherConfig_scryptParams(t *testing.T) {
 			}
 			require.NoError(t, err)
 			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestHasherConfig_pbkdf2Params(t *testing.T) {
+	type fields struct {
+		Params map[string]any
+	}
+	tests := []struct {
+		name     string
+		fields   fields
+		wantP    pbkdf2.Params
+		wantHash HashMode
+		wantErr  bool
+	}{
+		{
+			name: "decode error",
+			fields: fields{
+				Params: map[string]any{
+					"foo": "bar",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "sha1",
+			fields: fields{
+				Params: map[string]any{
+					"Rounds": 12,
+					"Hash":   "sha1",
+				},
+			},
+			wantP: pbkdf2.Params{
+				Rounds:  12,
+				KeyLen:  sha1.Size,
+				SaltLen: 16,
+			},
+			wantHash: HashModeSHA1,
+		},
+		{
+			name: "sha224",
+			fields: fields{
+				Params: map[string]any{
+					"Rounds": 12,
+					"Hash":   "sha224",
+				},
+			},
+			wantP: pbkdf2.Params{
+				Rounds:  12,
+				KeyLen:  sha256.Size224,
+				SaltLen: 16,
+			},
+			wantHash: HashModeSHA224,
+		},
+		{
+			name: "sha256",
+			fields: fields{
+				Params: map[string]any{
+					"Rounds": 12,
+					"Hash":   "sha256",
+				},
+			},
+			wantP: pbkdf2.Params{
+				Rounds:  12,
+				KeyLen:  sha256.Size,
+				SaltLen: 16,
+			},
+			wantHash: HashModeSHA256,
+		},
+		{
+			name: "sha384",
+			fields: fields{
+				Params: map[string]any{
+					"Rounds": 12,
+					"Hash":   "sha384",
+				},
+			},
+			wantP: pbkdf2.Params{
+				Rounds:  12,
+				KeyLen:  sha512.Size384,
+				SaltLen: 16,
+			},
+			wantHash: HashModeSHA384,
+		},
+		{
+			name: "sha512",
+			fields: fields{
+				Params: map[string]any{
+					"Rounds": 12,
+					"Hash":   "sha512",
+				},
+			},
+			wantP: pbkdf2.Params{
+				Rounds:  12,
+				KeyLen:  sha512.Size,
+				SaltLen: 16,
+			},
+			wantHash: HashModeSHA512,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &HasherConfig{
+				Params: tt.fields.Params,
+			}
+			gotP, gotHash, err := c.pbkdf2Params()
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.wantP, gotP)
+			assert.Equal(t, tt.wantHash, gotHash)
 		})
 	}
 }

@@ -155,6 +155,7 @@ func (wm *SessionWriteModel) AuthenticationTime() time.Time {
 		wm.PasskeyCheckedAt,
 		wm.IntentCheckedAt,
 		// TODO: add U2F and OTP check https://github.com/zitadel/zitadel/issues/5477
+		// TODO: add OTP (sms and email) check https://github.com/zitadel/zitadel/issues/6224
 	} {
 		if check.After(authTime) {
 			authTime = check
@@ -178,10 +179,19 @@ func (wm *SessionWriteModel) AuthMethodTypes() []domain.UserAuthMethodType {
 	// TODO: add checks with https://github.com/zitadel/zitadel/issues/5477
 	/*
 		if !wm.TOTPCheckedAt.IsZero() {
-			types = append(types, domain.UserAuthMethodTypeOTP)
+			types = append(types, domain.UserAuthMethodTypeTOTP)
 		}
 		if !wm.U2FCheckedAt.IsZero() {
 			types = append(types, domain.UserAuthMethodTypeU2F)
+		}
+	*/
+	// TODO: add checks with https://github.com/zitadel/zitadel/issues/6224
+	/*
+		if !wm.TOTPFactor.OTPSMSCheckedAt.IsZero() {
+			types = append(types, domain.UserAuthMethodTypeOTPSMS)
+		}
+		if !wm.TOTPFactor.OTPEmailCheckedAt.IsZero() {
+			types = append(types, domain.UserAuthMethodTypeOTPEmail)
 		}
 	*/
 	return types
