@@ -2,8 +2,6 @@ import { addQuota, ensureQuotaIsAdded, ensureQuotaIsRemoved, removeQuota, Unit }
 import { createHumanUser, ensureUserDoesntExist } from 'support/api/users';
 import { Context } from 'support/commands';
 import { ZITADELWebhookEvent } from 'support/types';
-import { textChangeRangeIsUnchanged } from 'typescript';
-import PrevSubject = Cypress.PrevSubject;
 
 beforeEach(() => {
   cy.context().as('ctx');
