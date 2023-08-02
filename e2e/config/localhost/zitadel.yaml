@@ -41,7 +41,7 @@ Console:
 Projections:
   Customizations:
     NotificationsQuotas:
-      RequeueEvery: 10s
+      RequeueEvery: 1s
 
 DefaultInstance:
   LoginPolicy:
