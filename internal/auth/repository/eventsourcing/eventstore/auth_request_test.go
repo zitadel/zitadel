@@ -1016,7 +1016,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					},
 				}, false},
 			[]domain.NextStep{&domain.MFAVerificationStep{
-				MFAProviders: []domain.MFAType{domain.MFATypeOTP},
+				MFAProviders: []domain.MFAType{domain.MFATypeTOTP},
 			}},
 			nil,
 		},
@@ -1050,7 +1050,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					},
 				}, false},
 			[]domain.NextStep{&domain.MFAVerificationStep{
-				MFAProviders: []domain.MFAType{domain.MFATypeOTP},
+				MFAProviders: []domain.MFAType{domain.MFATypeTOTP},
 			}},
 			nil,
 		},
@@ -1087,7 +1087,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					},
 				}, false},
 			[]domain.NextStep{&domain.MFAVerificationStep{
-				MFAProviders: []domain.MFAType{domain.MFATypeOTP},
+				MFAProviders: []domain.MFAType{domain.MFATypeTOTP},
 			}},
 			nil,
 		},
@@ -1637,7 +1637,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			&domain.MFAPromptStep{
 				MFAProviders: []domain.MFAType{
-					domain.MFATypeOTP,
+					domain.MFATypeTOTP,
 				},
 			},
 			false,
@@ -1663,7 +1663,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			&domain.MFAPromptStep{
 				Required: true,
 				MFAProviders: []domain.MFAType{
-					domain.MFATypeOTP,
+					domain.MFATypeTOTP,
 				},
 			},
 			false,
@@ -1731,7 +1731,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 
 			&domain.MFAVerificationStep{
-				MFAProviders: []domain.MFAType{domain.MFATypeOTP},
+				MFAProviders: []domain.MFAType{domain.MFATypeTOTP},
 			},
 			false,
 			nil,
@@ -1755,7 +1755,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				isInternal:  false,
 			},
 			&domain.MFAVerificationStep{
-				MFAProviders: []domain.MFAType{domain.MFATypeOTP},
+				MFAProviders: []domain.MFAType{domain.MFATypeTOTP},
 			},
 			false,
 			nil,
@@ -1803,7 +1803,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			&domain.MFAPromptStep{
 				Required: true,
 				MFAProviders: []domain.MFAType{
-					domain.MFATypeOTP,
+					domain.MFATypeTOTP,
 				},
 			},
 			false,
