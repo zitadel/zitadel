@@ -14,8 +14,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 )
 
 func Test_sessionsToPb(t *testing.T) {

@@ -1,14 +1,14 @@
 syntax = "proto3";
 
-package zitadel.user.v2alpha;
+package zitadel.user.v2beta;
 
-import "zitadel/object/v2alpha/object.proto";
+import "zitadel/object/v2beta/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
-import "zitadel/user/v2alpha/auth.proto";
-import "zitadel/user/v2alpha/email.proto";
-import "zitadel/user/v2alpha/idp.proto";
-import "zitadel/user/v2alpha/password.proto";
-import "zitadel/user/v2alpha/user.proto";
+import "zitadel/user/v2beta/auth.proto";
+import "zitadel/user/v2beta/email.proto";
+import "zitadel/user/v2beta/idp.proto";
+import "zitadel/user/v2beta/password.proto";
+import "zitadel/user/v2beta/user.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/duration.proto";
@@ -16,13 +16,13 @@ import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha;user";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2beta;user";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "User Service";
-    version: "2.0-alpha";
-    description: "This API is intended to manage users in a ZITADEL instance. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+    version: "2.0-beta";
+    description: "This API is intended to manage users in a ZITADEL instance. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -82,7 +82,7 @@ service UserService {
   // Create a new human user
   rpc AddHumanUser (AddHumanUserRequest) returns (AddHumanUserResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/human"
+      post: "/v2beta/users/human"
       body: "*"
     };
 
@@ -111,7 +111,7 @@ service UserService {
   // Change the email of a user
   rpc SetEmail (SetEmailRequest) returns (SetEmailResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/{user_id}/email"
+      post: "/v2beta/users/{user_id}/email"
       body: "*"
     };
 
@@ -136,7 +136,7 @@ service UserService {
   // Verify the email with the provided code
   rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/{user_id}/email/verify"
+      post: "/v2beta/users/{user_id}/email/verify"
       body: "*"
     };
 
@@ -160,7 +160,7 @@ service UserService {
 
   rpc RegisterPasskey (RegisterPasskeyRequest) returns (RegisterPasskeyResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/{user_id}/passkeys"
+      post: "/v2beta/users/{user_id}/passkeys"
       body: "*"
     };
 
@@ -182,7 +182,7 @@ service UserService {
   }
   rpc VerifyPasskeyRegistration (VerifyPasskeyRegistrationRequest) returns (VerifyPasskeyRegistrationResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/{user_id}/passkeys/{passkey_id}"
+      post: "/v2beta/users/{user_id}/passkeys/{passkey_id}"
       body: "*"
     };
 
@@ -204,7 +204,7 @@ service UserService {
   }
   rpc CreatePasskeyRegistrationLink (CreatePasskeyRegistrationLinkRequest) returns (CreatePasskeyRegistrationLinkResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/{user_id}/passkeys/registration_link"
+      post: "/v2beta/users/{user_id}/passkeys/registration_link"
       body: "*"
     };
 
@@ -227,7 +227,7 @@ service UserService {
 
   rpc RegisterU2F (RegisterU2FRequest) returns (RegisterU2FResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/{user_id}/u2f"
+      post: "/v2beta/users/{user_id}/u2f"
       body: "*"
     };
 
@@ -250,7 +250,7 @@ service UserService {
 
   rpc VerifyU2FRegistration (VerifyU2FRegistrationRequest) returns (VerifyU2FRegistrationResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/{user_id}/u2f/{u2f_id}"
+      post: "/v2beta/users/{user_id}/u2f/{u2f_id}"
       body: "*"
     };
 
@@ -273,7 +273,7 @@ service UserService {
 
   rpc RegisterTOTP (RegisterTOTPRequest) returns (RegisterTOTPResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/{user_id}/totp"
+      post: "/v2beta/users/{user_id}/totp"
       body: "*"
     };
 
@@ -296,7 +296,7 @@ service UserService {
 
   rpc VerifyTOTPRegistration (VerifyTOTPRegistrationRequest) returns (VerifyTOTPRegistrationResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/{user_id}/totp/verify"
+      post: "/v2beta/users/{user_id}/totp/verify"
       body: "*"
     };
 
@@ -320,7 +320,7 @@ service UserService {
   // Start an IDP authentication (for external login, registration or linking)
   rpc StartIdentityProviderIntent (StartIdentityProviderIntentRequest) returns (StartIdentityProviderIntentResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/idp_intents/start"
+      post: "/v2beta/idp_intents/start"
       body: "*"
     };
 
@@ -344,7 +344,7 @@ service UserService {
 
   rpc RetrieveIdentityProviderIntent (RetrieveIdentityProviderIntentRequest) returns (RetrieveIdentityProviderIntentResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/idp_intents/{idp_intent_id}"
+      post: "/v2beta/idp_intents/{idp_intent_id}"
       body: "*"
     };
 
@@ -369,7 +369,7 @@ service UserService {
   // Link an IDP to an existing user
   rpc AddIDPLink (AddIDPLinkRequest) returns (AddIDPLinkResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/{user_id}/links"
+      post: "/v2beta/users/{user_id}/links"
       body: "*"
     };
 
@@ -394,7 +394,7 @@ service UserService {
   // Request password reset
   rpc PasswordReset (PasswordResetRequest) returns (PasswordResetResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/{user_id}/password_reset"
+      post: "/v2beta/users/{user_id}/password_reset"
       body: "*"
     };
 
@@ -419,7 +419,7 @@ service UserService {
   // Change password
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/{user_id}/password"
+      post: "/v2beta/users/{user_id}/password"
       body: "*"
     };
 
@@ -444,7 +444,7 @@ service UserService {
   // List all possible authentication methods of a user
   rpc ListAuthenticationMethodTypes (ListAuthenticationMethodTypesRequest) returns (ListAuthenticationMethodTypesResponse) {
     option (google.api.http) = {
-      get: "/v2alpha/users/{user_id}/authentication_methods"
+      get: "/v2beta/users/{user_id}/authentication_methods"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -485,7 +485,7 @@ message AddHumanUserRequest{
       example: "\"minnie-mouse\"";
     }
   ];
-  zitadel.object.v2alpha.Organisation organisation = 3;
+  zitadel.object.v2beta.Organisation organisation = 3;
   SetHumanProfile profile = 4 [
     (validate.rules).message.required = true,
     (google.api.field_behavior) = REQUIRED
@@ -504,7 +504,7 @@ message AddHumanUserRequest{
 
 message AddHumanUserResponse {
   string user_id = 1;
-  zitadel.object.v2alpha.Details details = 2;
+  zitadel.object.v2beta.Details details = 2;
   optional string email_code = 3;
 }
 
@@ -536,7 +536,7 @@ message SetEmailRequest{
 }
 
 message SetEmailResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   // in case the verification was set to return_code, the code will be returned
   optional string verification_code = 2;
 }
@@ -564,7 +564,7 @@ message VerifyEmailRequest{
 }
 
 message VerifyEmailResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message RegisterPasskeyRequest{
@@ -595,7 +595,7 @@ message RegisterPasskeyRequest{
 }
 
 message RegisterPasskeyResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   string passkey_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"163840776835432705\""
@@ -650,7 +650,7 @@ message VerifyPasskeyRegistrationRequest{
 }
 
 message VerifyPasskeyRegistrationResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message RegisterU2FRequest{
@@ -671,7 +671,7 @@ message RegisterU2FRequest{
 }
 
 message RegisterU2FResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   string u2f_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"163840776835432705\""
@@ -726,7 +726,7 @@ message VerifyU2FRegistrationRequest{
 }
 
 message VerifyU2FRegistrationResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message RegisterTOTPRequest {
@@ -742,7 +742,7 @@ message RegisterTOTPRequest {
 }
 
 message RegisterTOTPResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   string uri = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"otpauth://totp/ZITADEL:gigi@acme.zitadel.cloud?algorithm=SHA1&digits=6&issuer=ZITADEL&period=30&secret=TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"";
@@ -776,7 +776,7 @@ message VerifyTOTPRegistrationRequest {
 }
 
 message VerifyTOTPRegistrationResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message CreatePasskeyRegistrationLinkRequest{
@@ -797,7 +797,7 @@ message CreatePasskeyRegistrationLinkRequest{
 }
 
 message CreatePasskeyRegistrationLinkResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   // in case the medium was set to return_code, the code will be returned
   optional PasskeyRegistrationCode code = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -837,7 +837,7 @@ message StartIdentityProviderIntentRequest{
 }
 
 message StartIdentityProviderIntentResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   oneof next_step {
     string auth_url = 2 [
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -870,7 +870,7 @@ message RetrieveIdentityProviderIntentRequest{
 }
 
 message RetrieveIdentityProviderIntentResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   IDPInformation idp_information = 2;
 }
 
@@ -888,7 +888,7 @@ message AddIDPLinkRequest{
 }
 
 message AddIDPLinkResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 
@@ -910,7 +910,7 @@ message PasswordResetRequest{
 }
 
 message PasswordResetResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   // in case the medium was set to return_code, the code will be returned
   optional string verification_code = 2;
 }
@@ -952,7 +952,7 @@ message SetPasswordRequest{
 }
 
 message SetPasswordResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message ListAuthenticationMethodTypesRequest{
@@ -968,7 +968,7 @@ message ListAuthenticationMethodTypesRequest{
 }
 
 message ListAuthenticationMethodTypesResponse{
-  zitadel.object.v2alpha.ListDetails details = 1;
+  zitadel.object.v2beta.ListDetails details = 1;
   repeated AuthenticationMethodType auth_method_types = 2;
 }
 

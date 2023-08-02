@@ -19,8 +19,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/integration"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 var (
@@ -657,8 +657,8 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			args: args{
 				CTX,
 				&user.RetrieveIdentityProviderIntentRequest{
-					IntentId: intentID,
-					Token:    "",
+					IdpIntentId:    intentID,
+					IdpIntentToken: "",
 				},
 			},
 			wantErr: true,
@@ -668,8 +668,8 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			args: args{
 				CTX,
 				&user.RetrieveIdentityProviderIntentRequest{
-					IntentId: successfulID,
-					Token:    "wrong token",
+					IdpIntentId:    successfulID,
+					IdpIntentToken: "wrong token",
 				},
 			},
 			wantErr: true,
@@ -679,8 +679,8 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			args: args{
 				CTX,
 				&user.RetrieveIdentityProviderIntentRequest{
-					IntentId: successfulID,
-					Token:    token,
+					IdpIntentId:    successfulID,
+					IdpIntentToken: token,
 				},
 			},
 			want: &user.RetrieveIdentityProviderIntentResponse{

@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-package zitadel.session.v2alpha;
+package zitadel.session.v2beta;
 
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha;session";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2beta;session";
 
 enum ChallengeKind {
     CHALLENGE_KIND_UNSPECIFIED = 0;

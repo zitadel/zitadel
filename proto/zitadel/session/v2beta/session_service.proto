@@ -1,25 +1,25 @@
 syntax = "proto3";
 
-package zitadel.session.v2alpha;
+package zitadel.session.v2beta;
 
 
-import "zitadel/object/v2alpha/object.proto";
+import "zitadel/object/v2beta/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
-import "zitadel/session/v2alpha/challenge.proto";
-import "zitadel/session/v2alpha/session.proto";
+import "zitadel/session/v2beta/challenge.proto";
+import "zitadel/session/v2beta/session.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha;session";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2beta;session";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Session Service";
-    version: "2.0-alpha";
-    description: "This API is intended to manage sessions in a ZITADEL instance. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+    version: "2.0-beta";
+    description: "This API is intended to manage sessions in a ZITADEL instance. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -79,7 +79,7 @@ service SessionService {
   // Search sessions
   rpc ListSessions (ListSessionsRequest) returns (ListSessionsResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/sessions/search"
+      post: "/v2beta/sessions/search"
       body: "*"
     };
 
@@ -115,7 +115,7 @@ service SessionService {
   // GetSession a session
   rpc GetSession (GetSessionRequest) returns (GetSessionResponse) {
     option (google.api.http) = {
-      get: "/v2alpha/sessions/{session_id}"
+      get: "/v2beta/sessions/{session_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -139,7 +139,7 @@ service SessionService {
   // Create a new session
   rpc CreateSession (CreateSessionRequest) returns (CreateSessionResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/sessions"
+      post: "/v2beta/sessions"
       body: "*"
     };
 
@@ -167,7 +167,7 @@ service SessionService {
   // Update a session
   rpc SetSession (SetSessionRequest) returns (SetSessionResponse) {
     option (google.api.http) = {
-      patch: "/v2alpha/sessions/{session_id}"
+      patch: "/v2beta/sessions/{session_id}"
       body: "*"
     };
 
@@ -192,7 +192,7 @@ service SessionService {
   // Terminate a session
   rpc DeleteSession (DeleteSessionRequest) returns (DeleteSessionResponse) {
     option (google.api.http) = {
-      delete: "/v2alpha/sessions/{session_id}"
+      delete: "/v2beta/sessions/{session_id}"
       body: "*"
     };
 
@@ -216,12 +216,12 @@ service SessionService {
 }
 
 message ListSessionsRequest{
-  zitadel.object.v2alpha.ListQuery query = 1;
+  zitadel.object.v2beta.ListQuery query = 1;
   repeated SearchQuery queries = 2;
 }
 
 message ListSessionsResponse{
-  zitadel.object.v2alpha.ListDetails details = 1;
+  zitadel.object.v2beta.ListDetails details = 1;
   repeated Session sessions = 2;
 }
 
@@ -253,7 +253,7 @@ message CreateSessionRequest{
 }
 
 message CreateSessionResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   string session_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"id of the session\"";
@@ -300,7 +300,7 @@ message SetSessionRequest{
 }
 
 message SetSessionResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   string session_token = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"token of the session, which is required for further updates of the session or the request other resources\"";
@@ -327,7 +327,7 @@ message DeleteSessionRequest{
 }
 
 message DeleteSessionResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message Checks {

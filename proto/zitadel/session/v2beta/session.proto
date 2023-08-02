@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package zitadel.session.v2alpha;
+package zitadel.session.v2beta;
 
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha;session";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2beta;session";
 
 message Session {
   string id = 1 [

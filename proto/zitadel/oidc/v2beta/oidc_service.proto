@@ -1,22 +1,22 @@
 syntax = "proto3";
 
-package zitadel.oidc.v2alpha;
+package zitadel.oidc.v2beta;
 
-import "zitadel/object/v2alpha/object.proto";
+import "zitadel/object/v2beta/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
-import "zitadel/oidc/v2alpha/authorization.proto";
+import "zitadel/oidc/v2beta/authorization.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha;oidc";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta;oidc";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "OIDC Service";
-    version: "2.0-alpha";
-    description: "Get OIDC Auth Request details and create callback URLs. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+    version: "2.0-beta";
+    description: "Get OIDC Auth Request details and create callback URLs. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -74,7 +74,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 service OIDCService {
   rpc GetAuthRequest (GetAuthRequestRequest) returns (GetAuthRequestResponse) {
     option (google.api.http) = {
-      get: "/v2alpha/oidc/auth_requests/{auth_request_id}"
+      get: "/v2beta/oidc/auth_requests/{auth_request_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -97,7 +97,7 @@ service OIDCService {
 
   rpc CreateCallback (CreateCallbackRequest) returns (CreateCallbackResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/oidc/auth_requests/{auth_request_id}"
+      post: "/v2beta/oidc/auth_requests/{auth_request_id}"
       body: "*"
     };
 
@@ -179,7 +179,7 @@ message Session {
 }
 
 message CreateCallbackResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   string callback_url = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Callback URL where the user should be redirected, using a \"302 FOUND\" status. Contains details for the application to obtain the tokens on success, or error details on failure. Note that this field must be treated as credentials, as the contained code can be used to obtain tokens on behalve of the user.";
