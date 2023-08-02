@@ -3,7 +3,7 @@ import { stub } from "../support/mock";
 const CUSTOM_TEXT = "Hubba Bubba";
 const IDP_URL = "https://google.com";
 
-describe("register", () => {
+describe("register idps", () => {
   beforeEach(() => {
     stub("zitadel.user.v2alpha.UserService", "StartIdentityProviderFlow", {
       data: {
