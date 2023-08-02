@@ -33,7 +33,9 @@ export function SignInWithIDP({
   const router = useRouter();
 
   async function startFlow(idpId: string, provider: ProviderSlug) {
-    const host = process.env.VERCEL_URL ?? "http://localhost:3000";
+    const host = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000";
     setLoading(true);
 
     // const path = startIDPFlowPath(idpId);
