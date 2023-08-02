@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/passwap/argon2"
 	"github.com/zitadel/passwap/bcrypt"
 	"github.com/zitadel/passwap/md5"
+	"github.com/zitadel/passwap/pbkdf2"
 	"github.com/zitadel/passwap/scrypt"
 	"github.com/zitadel/passwap/verifier"
 
@@ -38,6 +39,19 @@ const (
 	HashNameBcrypt   HashName = "bcrypt"   // hash and verify
 	HashNameMd5      HashName = "md5"      // verify only, as hashing with md5 is insecure and deprecated
 	HashNameScrypt   HashName = "scrypt"   // hash and verify
+	HashNamePBKDF2   HashName = "pbkdf2"   // hash and verify
+)
+
+type HashMode string
+
+// HashMode defines a underlying [hash.Hash] implementation
+// for alogrithms like pbkdf2
+const (
+	HashModeSHA1   HashMode = "sha1"
+	HashModeSHA224 HashMode = "sha224"
+	HashModeSHA256 HashMode = "sha256"
+	HashModeSHA384 HashMode = "sha384"
+	HashModeSHA512 HashMode = "sha512"
 )
 
 type PasswordHashConfig struct {
@@ -85,6 +99,10 @@ var knowVerifiers = map[HashName]prefixVerifier{
 		prefixes: []string{scrypt.Prefix, scrypt.Prefix_Linux},
 		verifier: scrypt.Verifier,
 	},
+	HashNamePBKDF2: {
+		prefixes: []string{pbkdf2.Prefix},
+		verifier: pbkdf2.Verifier,
+	},
 }
 
 func (c *PasswordHashConfig) buildVerifiers() (verifiers []verifier.Verifier, prefixes []string, err error) {
@@ -116,6 +134,8 @@ func (c *HasherConfig) buildHasher() (hasher passwap.Hasher, prefixes []string, 
 		return c.bcrypt()
 	case HashNameScrypt:
 		return c.scrypt()
+	case HashNamePBKDF2:
+		return c.pbkdf2()
 	case "":
 		return nil, nil, fmt.Errorf("missing hasher algorithm")
 	case HashNameArgon2, HashNameMd5:
@@ -206,4 +226,50 @@ func (c *HasherConfig) scrypt() (passwap.Hasher, []string, error) {
 		return nil, nil, err
 	}
 	return scrypt.New(p), []string{scrypt.Prefix, scrypt.Prefix_Linux}, nil
+}
+
+func (c *HasherConfig) pbkdf2Params() (p pbkdf2.Params, _ HashMode, _ error) {
+	var dst = struct {
+		Rounds uint32   `mapstructure:"Rounds"`
+		Hash   HashMode `mapstructure:"Hash"`
+	}{}
+	if err := c.decodeParams(&dst); err != nil {
+		return p, "", fmt.Errorf("decode pbkdf2 params: %w", err)
+	}
+	switch dst.Hash {
+	case HashModeSHA1:
+		p = pbkdf2.RecommendedSHA1Params
+	case HashModeSHA224:
+		p = pbkdf2.RecommendedSHA224Params
+	case HashModeSHA256:
+		p = pbkdf2.RecommendedSHA256Params
+	case HashModeSHA384:
+		p = pbkdf2.RecommendedSHA384Params
+	case HashModeSHA512:
+		p = pbkdf2.RecommendedSHA512Params
+	}
+	p.Rounds = dst.Rounds
+	return p, dst.Hash, nil
+}
+
+func (c *HasherConfig) pbkdf2() (passwap.Hasher, []string, error) {
+	p, hash, err := c.pbkdf2Params()
+	if err != nil {
+		return nil, nil, err
+	}
+	prefix := []string{pbkdf2.Prefix}
+	switch hash {
+	case HashModeSHA1:
+		return pbkdf2.NewSHA1(p), prefix, nil
+	case HashModeSHA224:
+		return pbkdf2.NewSHA224(p), prefix, nil
+	case HashModeSHA256:
+		return pbkdf2.NewSHA256(p), prefix, nil
+	case HashModeSHA384:
+		return pbkdf2.NewSHA384(p), prefix, nil
+	case HashModeSHA512:
+		return pbkdf2.NewSHA512(p), prefix, nil
+	default:
+		return nil, nil, fmt.Errorf("unsuppored pbkdf2 hash mode: %s", hash)
+	}
 }
