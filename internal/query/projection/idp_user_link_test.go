@@ -228,8 +228,10 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_user_links3 SET external_user_id = $1 WHERE (idp_id = $2) AND (user_id = $3) AND (external_user_id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idp_user_links3 SET (change_date, sequence, external_user_id) = ($1, $2, $3) WHERE (idp_id = $4) AND (user_id = $5) AND (external_user_id = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
 								"new-id",
 								"idp-config-id",
 								"agg-id",

@@ -207,6 +207,8 @@ func (p *idpUserLinkProjection) reduceExternalIDMigrated(event eventstore.Event)
 
 	return crdb.NewUpdateStatement(e,
 		[]handler.Column{
+			handler.NewCol(IDPUserLinkChangeDateCol, e.CreationDate()),
+			handler.NewCol(IDPUserLinkSequenceCol, e.Sequence()),
 			handler.NewCol(IDPUserLinkExternalUserIDCol, e.NewID),
 		},
 		[]handler.Condition{
