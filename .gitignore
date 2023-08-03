@@ -17,3 +17,5 @@ packages/zitadel-server/src/app/proto
 packages/zitadel-client/src/app/proto
 .vscode
 .idea
+.vercel
+.env*.local

@@ -12,7 +12,11 @@ export {
   Theme,
 } from "./proto/server/zitadel/settings/v2alpha/branding_settings";
 
-export { LoginSettings } from "./proto/server/zitadel/settings/v2alpha/login_settings";
+export {
+  LoginSettings,
+  IdentityProvider,
+  IdentityProviderType,
+} from "./proto/server/zitadel/settings/v2alpha/login_settings";
 
 export {
   ChallengeKind,
@@ -24,6 +28,10 @@ export {
   Session,
   Factors,
 } from "./proto/server/zitadel/session/v2alpha/session";
+export {
+  IDPInformation,
+  IDPLink,
+} from "./proto/server/zitadel/user/v2alpha/idp";
 export {
   ListSessionsResponse,
   GetSessionResponse,
@@ -38,9 +46,12 @@ export {
   GetGeneralSettingsResponse,
   GetLoginSettingsResponse,
   GetLoginSettingsRequest,
+  GetActiveIdentityProvidersResponse,
+  GetActiveIdentityProvidersRequest,
 } from "./proto/server/zitadel/settings/v2alpha/settings_service";
 export {
   AddHumanUserResponse,
+  AddHumanUserRequest,
   VerifyEmailResponse,
   VerifyPasskeyRegistrationRequest,
   VerifyPasskeyRegistrationResponse,
@@ -51,11 +62,16 @@ export {
   ListAuthenticationMethodTypesResponse,
   ListAuthenticationMethodTypesRequest,
   AuthenticationMethodType,
+  StartIdentityProviderFlowRequest,
+  StartIdentityProviderFlowResponse,
+  RetrieveIdentityProviderInformationRequest,
+  RetrieveIdentityProviderInformationResponse,
 } from "./proto/server/zitadel/user/v2alpha/user_service";
 export {
   SetHumanPasswordResponse,
   SetHumanPasswordRequest,
 } from "./proto/server/zitadel/management";
+export * from "./proto/server/zitadel/idp";
 export { type LegalAndSupportSettings } from "./proto/server/zitadel/settings/v2alpha/legal_settings";
 export { type PasswordComplexitySettings } from "./proto/server/zitadel/settings/v2alpha/password_settings";
 export { type ResourceOwnerType } from "./proto/server/zitadel/settings/v2alpha/settings";

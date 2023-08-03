@@ -12,7 +12,7 @@
     "./assets/*": "./dist/assets/*"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup src/index.tsx --format esm,cjs --dts --external react",
     "test": "pnpm test:unit",
     "test:watch": "pnpm test:unit:watch",
     "test:unit": "jest",
@@ -26,8 +26,8 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@types/jest": "^29.5.1",
-    "@types/react": "^17.0.13",
-    "@types/react-dom": "^17.0.8",
+    "@types/react": "^18.2.17",
+    "@types/react-dom": "^18.2.7",
     "@types/testing-library__jest-dom": "^5.14.6",
     "@zitadel/tsconfig": "workspace:*",
     "autoprefixer": "10.4.13",
@@ -40,8 +40,8 @@
     "tailwindcss": "3.2.4",
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.1",
-    "tsup": "^5.10.1",
-    "typescript": "^4.9.3",
+    "tsup": "^7.1.0",
+    "typescript": "^5.1.6",
     "zitadel-tailwind-config": "workspace:*"
   },
   "publishConfig": {

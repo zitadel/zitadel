@@ -1,15 +1,21 @@
-import { render, screen } from '@testing-library/react';
-import { SignInWithGoogle } from './SignInWithGoogle';
+import { render, screen } from "@testing-library/react";
+import { SignInWithGitlab } from "./SignInWithGitlab";
 
-describe('<SignInWithGoogle />', () => {
-    it('renders without crashing', () => {
-        const { container } = render(<SignInWithGoogle />);
-        expect(container.firstChild).toBeDefined();
-    });
+describe("<SignInWithGitlab />", () => {
+  it("renders without crashing", () => {
+    const { container } = render(<SignInWithGitlab />);
+    expect(container.firstChild).toBeDefined();
+  });
 
-    it('displays the correct text', () => {
-        render(<SignInWithGoogle />);
-        const signInText = screen.getByText(/Sign in with Google/i);
-        expect(signInText).toBeInTheDocument();
-    });
+  it("displays the default text", () => {
+    render(<SignInWithGitlab />);
+    const signInText = screen.getByText(/Sign in with Gitlab/i);
+    expect(signInText).toBeInTheDocument();
+  });
+
+  it("displays the given text", () => {
+    render(<SignInWithGitlab name={"Gitlab"} />);
+    const signInText = screen.getByText(/Gitlab/i);
+    expect(signInText).toBeInTheDocument();
+  });
 });

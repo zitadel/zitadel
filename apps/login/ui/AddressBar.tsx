@@ -11,7 +11,7 @@ export function AddressBar({ domain }: Props) {
   const pathname = usePathname();
 
   return (
-    <div className="flex items-center space-x-2 p-3.5 lg:px-5 lg:py-3">
+    <div className="flex items-center space-x-2 p-3.5 lg:px-5 lg:py-3 overflow-hidden">
       <div className="text-gray-600">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -27,8 +27,8 @@ export function AddressBar({ domain }: Props) {
         </svg>
       </div>
       <div className="flex space-x-1 text-sm font-medium">
-        <div>
-          <span className="px-2 text-gray-500">{domain}</span>
+        <div className="max-w-[150px] px-2 overflow-hidden text-gray-500  text-ellipsis">
+          <span className="whitespace-nowrap">{domain}</span>
         </div>
         {pathname ? (
           <>

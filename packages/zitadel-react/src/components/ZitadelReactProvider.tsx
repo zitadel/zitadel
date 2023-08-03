@@ -1,9 +1,9 @@
-export type ZitadelUIProps = {
+export type ZitadelReactProps = {
   dark: boolean;
   children: React.ReactNode;
 };
 
-export function ZitadelUIProvider({ dark, children }: ZitadelUIProps) {
+export function ZitadelReactProvider({ dark, children }: ZitadelReactProps) {
   return (
     <div className={`${dark ? "ztdl-dark" : "ztdl-light"} `}>{children}</div>
   );

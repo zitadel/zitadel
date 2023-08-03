@@ -4,6 +4,11 @@ export type Item = {
   description?: string;
 };
 
+export enum ProviderSlug {
+  GOOGLE = "google",
+  GITHUB = "github",
+}
+
 export const demos: { name: string; items: Item[] }[] = [
   {
     name: "Login",
@@ -37,6 +42,11 @@ export const demos: { name: string; items: Item[] }[] = [
         name: "Register",
         slug: "register",
         description: "Create your ZITADEL account",
+      },
+      {
+        name: "IDP Register",
+        slug: "register/idp",
+        description: "Register with an Identity Provider",
       },
       {
         name: "Verify email",
