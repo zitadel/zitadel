@@ -13,6 +13,9 @@ on:
       build_image:
         value: '${{ inputs.build_image_name }}:${{ github.sha }}'
 
+permissions:
+  packages: write
+
 env:
   default_labels: |
     org.opencontainers.image.documentation=https://zitadel.com/docs
