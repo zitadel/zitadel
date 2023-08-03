@@ -74,7 +74,7 @@ function createUser(
   provider: ProviderSlug,
   info: IDPInformation
 ): Promise<string> {
-  const userData = (PROVIDER_MAPPING as any)[provider](info);
+  const userData = PROVIDER_MAPPING[provider](info);
   const userService = user.getUser(server);
   return userService.addHumanUser(userData, {}).then((resp) => resp.userId);
 }
