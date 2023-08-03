@@ -729,7 +729,7 @@ message SetPhoneRequest{
       example: "\"+41791234567\"";
     }
   ];
-  // if no verification is specified, an email is sent with the default url
+  // if no verification is specified, an sms is sent
   oneof verification {
     SendPhoneVerificationCode send_code = 3;
     ReturnPhoneVerificationCode return_code = 4;
