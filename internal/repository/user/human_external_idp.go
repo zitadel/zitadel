@@ -18,7 +18,7 @@ const (
 	UserIDPLinkAddedType          = UserIDPLinkEventPrefix + "added"
 	UserIDPLinkRemovedType        = UserIDPLinkEventPrefix + "removed"
 	UserIDPLinkCascadeRemovedType = UserIDPLinkEventPrefix + "cascade.removed"
-	UserIDPExternalIDMigratedType = idpLoginEventPrefix + "id.migrated"
+	UserIDPExternalIDMigratedType = UserIDPLinkEventPrefix + "id.migrated"
 
 	UserIDPLoginCheckSucceededType = idpLoginEventPrefix + "check.succeeded"
 )
