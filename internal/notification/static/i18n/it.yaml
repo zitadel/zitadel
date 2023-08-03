@@ -30,14 +30,14 @@ VerifyEmailOTP:
   Title: ZITADEL - Verifica la password monouso
   PreHeader: Verifica la password monouso
   Subject: Verifica la password monouso
-  Greeting: Ciao {{.FirstName}} {{.LastName}},
+  Greeting: Ciao {{.DisplayName}},
   Text: Per favore, utilizza il pulsante 'Autentica' o copia la password monouso {{.OTP}} e incollala nella schermata di autenticazione per autenticarti a ZITADEL entro i prossimi cinque minuti.
   ButtonText: Autentica
 VerifySMSOTP:
   Title: ZITADEL - Verifica la password monouso
   PreHeader: Verifica la password monouso
   Subject: Verifica la password monouso
-  Greeting: Ciao {{.FirstName}} {{.LastName}},
+  Greeting: Ciao {{.DisplayName}},
   Text: Per favore, visita {{ .VerifyURL }} o copia la password monouso {{.OTP}} e incollala nella schermata di autenticazione per autenticarti a ZITADEL entro i prossimi cinque minuti.
 DomainClaimed:
   Title: ZITADEL - Il dominio è stato rivendicato

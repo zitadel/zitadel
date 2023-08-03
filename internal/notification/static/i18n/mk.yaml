@@ -30,14 +30,14 @@ VerifyEmailOTP:
   Title: ZITADEL - Потврди еднократна лозинка
   PreHeader: Потврди еднократна лозинка
   Subject: Потврди еднократна лозинка
-  Greeting: Здраво {{.FirstName}} {{.LastName}},
+  Greeting: Здраво {{.DisplayName}},
   Text: Ве молам, користи го копчето 'Автентицирај' или копирај ја еднократната лозинка {{.OTP}} и стави ја на екранот за автентикација за да се автентицираш на ZITADEL во следните пет минути.
   ButtonText: Автентицирај
 VerifySMSOTP:
   Title: ZITADEL - Потврди еднократна лозинка
   PreHeader: Потврди еднократна лозинка
   Subject: Потврди еднократна лозинка
-  Greeting: Здраво {{.FirstName}} {{.LastName}},
+  Greeting: Здраво {{.DisplayName}},
   Text: Ве молам, посети го {{ .VerifyURL }} или копирај ја еднократната лозинка {{.OTP}} и стави ја на екранот за автентикација за да се автентицираш на ZITADEL во следните пет минути.
 DomainClaimed:
   Title: ZITADEL - Доменот е преземен

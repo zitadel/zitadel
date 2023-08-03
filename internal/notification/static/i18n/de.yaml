@@ -30,14 +30,14 @@ VerifyEmailOTP:
   Title: ZITADEL - Einmalpasswort verifizieren
   PreHeader: Einmalpasswort verifizieren
   Subject: Einmalpasswort verifizieren
-  Greeting: Hallo {{.FirstName}} {{.LastName}},
+  Greeting: Hallo {{.DisplayName}},
   Text: Bitte nutze den 'Authentifizieren'-Button oder kopiere das Einmalpasswort {{.OTP}} und füge es in den Authentifizierungsbildschirm ein, um dich innerhalb der nächsten fünf Minuten bei ZITADEL zu authentifizieren.
   ButtonText: Authentifizieren
 VerifySMSOTP:
   Title: ZITADEL - Einmalpasswort verifizieren
   PreHeader: Einmalpasswort verifizieren
   Subject: Einmalpasswort verifizieren
-  Greeting: Hallo {{.FirstName}} {{.LastName}},
+  Greeting: Hallo {{.DisplayName}},
   Text: Bitte besuche {{ .VerifyURL }} oder kopiere das Einmalpasswort {{.OTP}} und füge es in den Authentifizierungsbildschirm ein, um dich innerhalb der nächsten fünf Minuten bei ZITADEL zu authentifizieren.
 DomainClaimed:
   Title: ZITADEL - Domain wurde beansprucht
@@ -45,6 +45,7 @@ DomainClaimed:
   Subject: Domain wurde beansprucht
   Greeting: Hallo {{.DisplayName}},
   Text: Die Domain {{.Domain}} wurde von einer Organisation beansprucht. Dein derzeitiger User {{.Username}} ist nicht Teil dieser Organisation. Daher musst du beim nächsten Login eine neue Email hinterlegen. Für diesen Login haben wir dir einen temporären Usernamen ({{.TempUsername}}) erstellt.
+  ButtonText: Login
 PasswordlessRegistration:
   Title: ZITADEL - Passwortlosen Login hinzufügen
   PreHeader: Passwortlosen Login hinzufügen
