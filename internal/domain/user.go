@@ -48,11 +48,13 @@ type UserAuthMethodType int32
 
 const (
 	UserAuthMethodTypeUnspecified UserAuthMethodType = iota
-	UserAuthMethodTypeOTP
+	UserAuthMethodTypeTOTP
 	UserAuthMethodTypeU2F
 	UserAuthMethodTypePasswordless
 	UserAuthMethodTypePassword
 	UserAuthMethodTypeIDP
+	UserAuthMethodTypeOTPSMS
+	UserAuthMethodTypeOTPEmail
 	userAuthMethodTypeCount
 )
 
@@ -67,15 +69,14 @@ func HasMFA(methods []UserAuthMethodType) bool {
 	var factors int
 	for _, method := range methods {
 		switch method {
-		case UserAuthMethodTypePassword:
-			factors++
 		case UserAuthMethodTypePasswordless:
 			return true
-		case UserAuthMethodTypeU2F:
-			factors++
-		case UserAuthMethodTypeOTP:
-			factors++
-		case UserAuthMethodTypeIDP:
+		case UserAuthMethodTypePassword,
+			UserAuthMethodTypeU2F,
+			UserAuthMethodTypeTOTP,
+			UserAuthMethodTypeOTPSMS,
+			UserAuthMethodTypeOTPEmail,
+			UserAuthMethodTypeIDP:
 			factors++
 		case UserAuthMethodTypeUnspecified,
 			userAuthMethodTypeCount:
