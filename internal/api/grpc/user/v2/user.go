@@ -32,6 +32,7 @@ func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest
 		UserId:    human.ID,
 		Details:   object.DomainToDetailsPb(human.Details),
 		EmailCode: human.EmailCode,
+		PhoneCode: human.PhoneCode,
 	}, nil
 }
 
@@ -77,9 +78,13 @@ func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 			ReturnCode:  req.GetEmail().GetReturnCode() != nil,
 			URLTemplate: urlTemplate,
 		},
+		Phone: command.Phone{
+			Number:     domain.PhoneNumber(req.GetPhone().GetPhone()),
+			Verified:   req.GetPhone().GetIsVerified(),
+			ReturnCode: req.GetPhone().GetReturnCode() != nil,
+		},
 		PreferredLanguage:      language.Make(req.GetProfile().GetPreferredLanguage()),
 		Gender:                 genderToDomain(req.GetProfile().GetGender()),
-		Phone:                  command.Phone{}, // TODO: add as soon as possible
 		Password:               req.GetPassword().GetPassword(),
 		EncodedPasswordHash:    req.GetHashedPassword().GetHash(),
 		PasswordChangeRequired: passwordChangeRequired,
