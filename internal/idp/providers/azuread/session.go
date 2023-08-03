@@ -1,28 +1,29 @@
 package azuread
 
 import (
-	"errors"
+	"net/http"
 
+	httphelper "github.com/zitadel/oidc/v2/pkg/http"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 )
 
-var ErrIDTokenMissing = errors.New("no id_token provided")
-
+// Session extends the [oauth.Session] to extend it with the [idp.SessionSupportsMigration] functionality
 type Session struct {
 	*oauth.Session
 }
 
-func (s *Session) RetrieveOldID() (string, error) {
-	idToken, ok := s.Tokens.Token.Extra("id_token").(string)
-	if !ok {
-		return "", ErrIDTokenMissing
-	}
-	claims := new(oidc.IDTokenClaims)
-	_, err := oidc.ParseToken(idToken, claims)
+// RetrievePreviousID implements the [idp.SessionSupportsMigration] interface by returning the `sub` from the userinfo endpoint
+func (s *Session) RetrievePreviousID() (string, error) {
+	req, err := http.NewRequest("GET", userinfoEndpoint, nil)
 	if err != nil {
 		return "", err
 	}
-	return claims.Subject, nil
+	req.Header.Set("authorization", s.Tokens.TokenType+" "+s.Tokens.AccessToken)
+	userinfo := new(oidc.UserInfo)
+	if err := httphelper.HttpRequest(s.Provider.HttpClient(), req, &userinfo); err != nil {
+		return "", err
+	}
+	return userinfo.Subject, nil
 }

@@ -212,7 +212,7 @@ func (p *idpUserLinkProjection) reduceExternalIDMigrated(event eventstore.Event)
 		[]handler.Condition{
 			handler.NewCond(IDPUserLinkIDPIDCol, e.IDPConfigID),
 			handler.NewCond(IDPUserLinkUserIDCol, e.Aggregate().ID),
-			handler.NewCond(IDPUserLinkExternalUserIDCol, e.OldID),
+			handler.NewCond(IDPUserLinkExternalUserIDCol, e.PreviousID),
 			handler.NewCond(IDPUserLinkInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil

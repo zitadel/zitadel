@@ -294,3 +294,116 @@ func userinfo() *User {
 		UserPrincipalName: "username",
 	}
 }
+
+func TestSession_RetrievePreviousID(t *testing.T) {
+	type fields struct {
+		name         string
+		clientID     string
+		clientSecret string
+		redirectURI  string
+		scopes       []string
+		httpMock     func()
+		tokens       *oidc.Tokens[*oidc.IDTokenClaims]
+	}
+	type res struct {
+		id  string
+		err bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		res    res
+	}{
+		{
+			name: "invalid token",
+			fields: fields{
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				httpMock: func() {
+					gock.New("https://graph.microsoft.com").
+						Get("/oidc/userinfo").
+						Reply(401)
+				},
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+					Token: &oauth2.Token{
+						AccessToken: "accessToken",
+						TokenType:   oidc.BearerToken,
+					},
+					IDTokenClaims: oidc.NewIDTokenClaims(
+						"https://login.microsoftonline.com/consumers/oauth2/v2.0",
+						"sub",
+						[]string{"clientID"},
+						time.Now().Add(1*time.Hour),
+						time.Now().Add(-1*time.Second),
+						"nonce",
+						"",
+						nil,
+						"clientID",
+						0,
+					),
+				},
+			},
+			res: res{
+				err: true,
+			},
+		},
+		{
+			name: "success",
+			fields: fields{
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				httpMock: func() {
+					gock.New("https://graph.microsoft.com").
+						Get("/oidc/userinfo").
+						Reply(200).
+						JSON(`{"sub":"sub"}`)
+				},
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+					Token: &oauth2.Token{
+						AccessToken: "accessToken",
+						TokenType:   oidc.BearerToken,
+					},
+					IDTokenClaims: oidc.NewIDTokenClaims(
+						"https://login.microsoftonline.com/consumers/oauth2/v2.0",
+						"sub",
+						[]string{"clientID"},
+						time.Now().Add(1*time.Hour),
+						time.Now().Add(-1*time.Second),
+						"nonce",
+						"",
+						nil,
+						"clientID",
+						0,
+					),
+				},
+			},
+			res: res{
+				id: "sub",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer gock.Off()
+			tt.fields.httpMock()
+			a := assert.New(t)
+
+			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes)
+			require.NoError(t, err)
+			session := &Session{Session: &oauth.Session{
+				Tokens:   tt.fields.tokens,
+				Provider: provider.Provider,
+			}}
+
+			id, err := session.RetrievePreviousID()
+			if tt.res.err {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+			a.Equal(tt.res.id, id)
+		})
+	}
+}

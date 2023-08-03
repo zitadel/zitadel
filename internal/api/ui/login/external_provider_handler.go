@@ -275,43 +275,44 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 	l.handleExternalUserAuthenticated(w, r, authReq, identityProvider, session, user, l.renderNextStep)
 }
 
-func (l *Login) tryMigrateExternalUserID(r *http.Request, session idp.Session, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) (oldIDMatched bool, err error) {
+func (l *Login) tryMigrateExternalUserID(r *http.Request, session idp.Session, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) (previousIDMatched bool, err error) {
 	migration, ok := session.(idp.SessionSupportsMigration)
 	if !ok {
 		return false, nil
 	}
-	oldID, err := migration.RetrieveOldID()
+	previousID, err := migration.RetrievePreviousID()
 	if err != nil {
 		return false, err
 	}
-	return l.migrateExternalUserID(r, authReq, externalUser, oldID)
+	return l.migrateExternalUserID(r, authReq, externalUser, previousID)
 }
 
-func (l *Login) migrateExternalUserID(r *http.Request, authReq *domain.AuthRequest, externalUser *domain.ExternalUser, oldID string) (oldIDMatched bool, err error) {
-	if oldID == "" {
+func (l *Login) migrateExternalUserID(r *http.Request, authReq *domain.AuthRequest, externalUser *domain.ExternalUser, previousID string) (previousIDMatched bool, err error) {
+	if previousID == "" {
 		return false, nil
 	}
 	// save the currentID, so we're able to reset to it later on if the user is not found with the old ID as well
 	externalUserID := externalUser.ExternalUserID
-	externalUser.ExternalUserID = oldID
+	externalUser.ExternalUserID = previousID
 	if err = l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r), true); err != nil {
 		// always reset to the mapped ID
 		externalUser.ExternalUserID = externalUserID
-		// but ignore the error if the user was just not found with the oldID
+		// but ignore the error if the user was just not found with the previousID
 		if errors.IsNotFound(err) {
 			return false, nil
 		}
 		return false, err
 	}
+	previousIDMatched = true
 	if err = l.authRepo.ResetLinkingUsers(r.Context(), authReq.ID, authReq.AgentID); err != nil {
-		return true, err
+		return previousIDMatched, err
 	}
 	// read current auth request state (incl. authorized user)
 	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
 	if err != nil {
-		return true, err
+		return previousIDMatched, err
 	}
-	return true, l.command.MigrateUserIDP(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, externalUser.IDPConfigID, oldID, externalUserID)
+	return previousIDMatched, l.command.MigrateUserIDP(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, externalUser.IDPConfigID, previousID, externalUserID)
 }
 
 // handleExternalUserAuthenticated maps the IDP user, checks for a corresponding externalID
@@ -332,13 +333,13 @@ func (l *Login) handleExternalUserAuthenticated(
 		return
 	}
 	if externalErr != nil && errors.IsNotFound(externalErr) {
-		oldIDMatched, err := l.tryMigrateExternalUserID(r, session, authReq, externalUser)
+		previousIDMatched, err := l.tryMigrateExternalUserID(r, session, authReq, externalUser)
 		if err != nil {
 			l.renderError(w, r, authReq, err)
 			return
 		}
 		// if the old ID matched, ignore the not found error from the current ID
-		if oldIDMatched {
+		if previousIDMatched {
 			externalErr = nil
 		}
 	}

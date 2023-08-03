@@ -218,7 +218,7 @@ type UserIDPExternalIDMigratedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	*AuthRequestInfo
 	IDPConfigID string `json:"idpConfigId"`
-	OldID       string `json:"oldId"`
+	PreviousID  string `json:"previousID"`
 	NewID       string `json:"newId"`
 }
 
@@ -238,7 +238,7 @@ func NewUserIDPExternalIDMigratedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	idpConfigID,
-	oldID,
+	previousID,
 	newID string,
 ) *UserIDPExternalIDMigratedEvent {
 	return &UserIDPExternalIDMigratedEvent{
@@ -248,7 +248,7 @@ func NewUserIDPExternalIDMigratedEvent(
 			UserIDPExternalIDMigratedType,
 		),
 		IDPConfigID: idpConfigID,
-		OldID:       oldID,
+		PreviousID:  previousID,
 		NewID:       newID,
 	}
 }

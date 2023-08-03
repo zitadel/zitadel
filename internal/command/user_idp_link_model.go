@@ -36,7 +36,7 @@ func (wm *UserIDPLinkWriteModel) AppendEvents(events ...eventstore.Event) {
 			}
 			wm.WriteModel.AppendEvents(e)
 		case *user.UserIDPExternalIDMigratedEvent:
-			if e.IDPConfigID != wm.IDPConfigID || e.OldID != wm.ExternalUserID {
+			if e.IDPConfigID != wm.IDPConfigID || e.PreviousID != wm.ExternalUserID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)

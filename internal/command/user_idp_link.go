@@ -139,12 +139,12 @@ func (c *Commands) UserIDPLoginChecked(ctx context.Context, orgID, userID string
 	return err
 }
 
-func (c *Commands) MigrateUserIDP(ctx context.Context, userID, orgID, idpConfigID, oldID, newID string) (err error) {
+func (c *Commands) MigrateUserIDP(ctx context.Context, userID, orgID, idpConfigID, previousID, newID string) (err error) {
 	if userID == "" {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Sn3l1", "Errors.IDMissing")
 	}
 
-	writeModel, err := c.userIDPLinkWriteModelByID(ctx, userID, idpConfigID, oldID, orgID)
+	writeModel, err := c.userIDPLinkWriteModelByID(ctx, userID, idpConfigID, previousID, orgID)
 	if err != nil {
 		return err
 	}
@@ -153,7 +153,7 @@ func (c *Commands) MigrateUserIDP(ctx context.Context, userID, orgID, idpConfigI
 	}
 
 	userAgg := UserAggregateFromWriteModel(&writeModel.WriteModel)
-	_, err = c.eventstore.Push(ctx, user.NewUserIDPExternalIDMigratedEvent(ctx, userAgg, idpConfigID, oldID, newID))
+	_, err = c.eventstore.Push(ctx, user.NewUserIDPExternalIDMigratedEvent(ctx, userAgg, idpConfigID, previousID, newID))
 	return err
 }
 
