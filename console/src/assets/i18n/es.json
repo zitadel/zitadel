@@ -1294,6 +1294,8 @@
         "INIT": "Inicialización",
         "VE": "Verificación de email",
         "VP": "Verificación de teléfono",
+        "VSO": "Verificar OTP de SMS",
+        "VEO": "Verificar OTP de correo electrónico",
         "PR": "Restablecimiento de contraseña",
         "DC": "Reclamar un dominio",
         "PL": "Acceso sin contraseña",

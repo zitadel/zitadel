@@ -1293,6 +1293,8 @@
         "INIT": "Inizializzazione",
         "VE": "Verificazione l'e-mail",
         "VP": "Verificazione del telefono",
+        "VSO": "Verifica OTP SMS",
+        "VEO": "Verifica OTP Email",
         "PR": "Ripristino della password",
         "DC": "Rivendicazione del dominio",
         "PL": "Autenticazione Passwordless",
