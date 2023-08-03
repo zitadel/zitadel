@@ -290,10 +290,6 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 		return h.setState(ctx, tx, currentState)
 	})
 
-	if err != nil {
-		h.log().WithError(err).Debug("tuubel")
-	}
-
 	if processErr != nil {
 		return false, processErr
 	}
@@ -353,6 +349,7 @@ func (h *Handler) execute(ctx context.Context, tx *sql.Tx, currentState *state, 
 
 	for i, statement := range statements {
 		if statement.Execute == nil {
+			lastProcessedIndex = i
 			continue
 		}
 		_, err := tx.Exec("SAVEPOINT exec")
@@ -370,6 +367,7 @@ func (h *Handler) execute(ctx context.Context, tx *sql.Tx, currentState *state, 
 			}
 
 			if h.handleFailedStmt(tx, currentState, failureFromStatement(statement, err)) {
+				lastProcessedIndex = i
 				continue
 			}
 
