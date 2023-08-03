@@ -176,9 +176,6 @@ module.exports = {
       apiKey: "124fe1c102a184bc6fc70c75dc84f96f",
       indexName: "zitadel",
       selector: "div#",
-      getMissingResultsUrl({ query }) {
-        return `https://github.com/zitadel/zitadel/discussions/new?category=ideas&title=Missing docs for ${query}`;
-      },
     },
     prism: {
       additionalLanguages: ["csharp", "dart", "groovy", "regex"],
