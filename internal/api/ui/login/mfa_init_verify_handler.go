@@ -33,7 +33,7 @@ func (l *Login) handleMFAInitVerify(w http.ResponseWriter, r *http.Request) {
 	}
 	var verifyData *mfaVerifyData
 	switch data.MFAType {
-	case domain.MFATypeOTP:
+	case domain.MFATypeTOTP:
 		verifyData = l.handleOTPVerify(w, r, authReq, data)
 	}
 
@@ -50,13 +50,13 @@ func (l *Login) handleMFAInitVerify(w http.ResponseWriter, r *http.Request) {
 
 func (l *Login) handleOTPVerify(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *mfaInitVerifyData) *mfaVerifyData {
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	_, err := l.command.HumanCheckMFAOTPSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.Code, userAgentID, authReq.UserOrgID)
+	_, err := l.command.HumanCheckMFATOTPSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.Code, userAgentID, authReq.UserOrgID)
 	if err == nil {
 		return nil
 	}
 	mfadata := &mfaVerifyData{
 		MFAType: data.MFAType,
-		otpData: otpData{
+		totpData: totpData{
 			Secret: data.Secret,
 			Url:    data.URL,
 		},
@@ -73,10 +73,10 @@ func (l *Login) renderMFAInitVerify(w http.ResponseWriter, r *http.Request, auth
 	translator := l.getTranslator(r.Context(), authReq)
 	data.baseData = l.getBaseData(r, authReq, "InitMFAOTP.Title", "InitMFAOTP.Description", errID, errMessage)
 	data.profileData = l.getProfileData(authReq)
-	if data.MFAType == domain.MFATypeOTP {
-		code, err := generateQrCode(data.otpData.Url)
+	if data.MFAType == domain.MFATypeTOTP {
+		code, err := generateQrCode(data.totpData.Url)
 		if err == nil {
-			data.otpData.QrCode = code
+			data.totpData.QrCode = code
 		}
 	}
 

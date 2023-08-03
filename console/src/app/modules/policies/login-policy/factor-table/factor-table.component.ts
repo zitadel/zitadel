@@ -146,7 +146,12 @@ export class FactorTableComponent {
       this.componentType === LoginMethodComponentType.MultiFactor
         ? [MultiFactorType.MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION]
         : this.componentType === LoginMethodComponentType.SecondFactor
-        ? [SecondFactorType.SECOND_FACTOR_TYPE_U2F, SecondFactorType.SECOND_FACTOR_TYPE_OTP]
+        ? [
+            SecondFactorType.SECOND_FACTOR_TYPE_U2F,
+            SecondFactorType.SECOND_FACTOR_TYPE_OTP,
+            SecondFactorType.SECOND_FACTOR_TYPE_OTP_SMS,
+            SecondFactorType.SECOND_FACTOR_TYPE_OTP_EMAIL,
+          ]
         : [];
 
     const filtered = (allTypes as Array<MultiFactorType | SecondFactorType>).filter((type) => !this.list.includes(type));

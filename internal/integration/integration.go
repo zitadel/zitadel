@@ -248,7 +248,11 @@ func (s *Tester) WithInstanceAuthorization(ctx context.Context, u UserType, inst
 	if u == SystemUser {
 		s.ensureSystemUser()
 	}
-	return metadata.AppendToOutgoingContext(ctx, "Authorization", fmt.Sprintf("Bearer %s", s.Users.Get(instanceID, u).Token))
+	return s.WithAuthorizationToken(ctx, s.Users.Get(instanceID, u).Token)
+}
+
+func (s *Tester) WithAuthorizationToken(ctx context.Context, token string) context.Context {
+	return metadata.AppendToOutgoingContext(ctx, "Authorization", fmt.Sprintf("Bearer %s", token))
 }
 
 func (s *Tester) ensureSystemUser() {

@@ -32,6 +32,7 @@ func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest
 		UserId:    human.ID,
 		Details:   object.DomainToDetailsPb(human.Details),
 		EmailCode: human.EmailCode,
+		PhoneCode: human.PhoneCode,
 	}, nil
 }
 
@@ -77,9 +78,13 @@ func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 			ReturnCode:  req.GetEmail().GetReturnCode() != nil,
 			URLTemplate: urlTemplate,
 		},
+		Phone: command.Phone{
+			Number:     domain.PhoneNumber(req.GetPhone().GetPhone()),
+			Verified:   req.GetPhone().GetIsVerified(),
+			ReturnCode: req.GetPhone().GetReturnCode() != nil,
+		},
 		PreferredLanguage:      language.Make(req.GetProfile().GetPreferredLanguage()),
 		Gender:                 genderToDomain(req.GetProfile().GetGender()),
-		Phone:                  command.Phone{}, // TODO: add as soon as possible
 		Password:               req.GetPassword().GetPassword(),
 		EncodedPasswordHash:    req.GetHashedPassword().GetHash(),
 		PasswordChangeRequired: passwordChangeRequired,
@@ -213,7 +218,7 @@ func authMethodTypesToPb(methodTypes []domain.UserAuthMethodType) []user.Authent
 
 func authMethodTypeToPb(methodType domain.UserAuthMethodType) user.AuthenticationMethodType {
 	switch methodType {
-	case domain.UserAuthMethodTypeOTP:
+	case domain.UserAuthMethodTypeTOTP:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_TOTP
 	case domain.UserAuthMethodTypeU2F:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_U2F
@@ -223,6 +228,10 @@ func authMethodTypeToPb(methodType domain.UserAuthMethodType) user.Authenticatio
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSWORD
 	case domain.UserAuthMethodTypeIDP:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP
+	case domain.UserAuthMethodTypeOTPSMS:
+		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_SMS
+	case domain.UserAuthMethodTypeOTPEmail:
+		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_EMAIL
 	case domain.UserAuthMethodTypeUnspecified:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED
 	default:
