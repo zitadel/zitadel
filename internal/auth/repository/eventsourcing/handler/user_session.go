@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	org_model "github.com/zitadel/zitadel/internal/org/model"
 	org_es_model "github.com/zitadel/zitadel/internal/org/repository/eventsourcing/model"
@@ -31,15 +30,15 @@ type UserSession struct {
 	es      handler.EventStore
 }
 
-var _ handler2.Projection = (*UserSession)(nil)
+var _ handler.Projection = (*UserSession)(nil)
 
 func newUserSession(
 	ctx context.Context,
-	config handler2.Config,
+	config handler.Config,
 	view *auth_view.View,
 	queries *query2.Queries,
-) *handler2.Handler {
-	return handler2.NewHandler(
+) *handler.Handler {
+	return handler.NewHandler(
 		ctx,
 		&config,
 		&UserSession{
@@ -56,11 +55,11 @@ func (*UserSession) Name() string {
 }
 
 // Reducers implements [handler.Projection]
-func (s *UserSession) Reducers() []handler2.AggregateReducer {
-	return []handler2.AggregateReducer{
+func (s *UserSession) Reducers() []handler.AggregateReducer {
+	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
-			EventRedusers: []handler2.EventReducer{
+			EventRedusers: []handler.EventReducer{
 				{
 					Event:  user.UserV1PasswordCheckSucceededType,
 					Reduce: s.Reduce,
@@ -193,7 +192,7 @@ func (s *UserSession) Reducers() []handler2.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler2.EventReducer{
+			EventRedusers: []handler.EventReducer{
 				{
 					Event:  org.OrgDomainPrimarySetEventType,
 					Reduce: s.Reduce,
@@ -206,7 +205,7 @@ func (s *UserSession) Reducers() []handler2.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler2.EventReducer{
+			EventRedusers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: s.Reduce,
@@ -216,112 +215,102 @@ func (s *UserSession) Reducers() []handler2.AggregateReducer {
 	}
 }
 
-func (u *UserSession) Reduce(event eventstore.Event) (_ *handler2.Statement, err error) {
-	var session *view_model.UserSessionView
-	switch event.Type() {
-	case user.UserV1PasswordCheckSucceededType,
-		user.UserV1PasswordCheckFailedType,
-		user.UserV1MFAOTPCheckSucceededType,
-		user.UserV1MFAOTPCheckFailedType,
-		user.UserV1SignedOutType,
-		user.HumanPasswordCheckSucceededType,
-		user.HumanPasswordCheckFailedType,
-		user.UserIDPLoginCheckSucceededType,
-		user.HumanMFAOTPCheckSucceededType,
-		user.HumanMFAOTPCheckFailedType,
-		user.HumanU2FTokenCheckSucceededType,
-		user.HumanU2FTokenCheckFailedType,
-		user.HumanPasswordlessTokenCheckSucceededType,
-		user.HumanPasswordlessTokenCheckFailedType,
-		user.HumanSignedOutType:
+func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err error) {
+	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+		var session *view_model.UserSessionView
+		switch event.Type() {
+		case user.UserV1PasswordCheckSucceededType,
+			user.UserV1PasswordCheckFailedType,
+			user.UserV1MFAOTPCheckSucceededType,
+			user.UserV1MFAOTPCheckFailedType,
+			user.UserV1SignedOutType,
+			user.HumanPasswordCheckSucceededType,
+			user.HumanPasswordCheckFailedType,
+			user.UserIDPLoginCheckSucceededType,
+			user.HumanMFAOTPCheckSucceededType,
+			user.HumanMFAOTPCheckFailedType,
+			user.HumanU2FTokenCheckSucceededType,
+			user.HumanU2FTokenCheckFailedType,
+			user.HumanPasswordlessTokenCheckSucceededType,
+			user.HumanPasswordlessTokenCheckFailedType,
+			user.HumanSignedOutType:
 
-		eventData, err := view_model.UserSessionFromEvent(event)
-		if err != nil {
-			return nil, err
-		}
-		session, err = u.view.UserSessionByIDs(eventData.UserAgentID, event.Aggregate().ID, event.Aggregate().InstanceID)
-		if err != nil {
-			if !errors.IsNotFound(err) {
-				return nil, err
+			eventData, err := view_model.UserSessionFromEvent(event)
+			if err != nil {
+				return err
 			}
-			session = &view_model.UserSessionView{
-				CreationDate:  event.CreatedAt(),
-				ResourceOwner: event.Aggregate().ResourceOwner,
-				UserAgentID:   eventData.UserAgentID,
-				UserID:        event.Aggregate().ID,
-				State:         int32(domain.UserSessionStateActive),
-				InstanceID:    event.Aggregate().InstanceID,
+			session, err = u.view.UserSessionByIDs(eventData.UserAgentID, event.Aggregate().ID, event.Aggregate().InstanceID)
+			if err != nil {
+				if !errors.IsNotFound(err) {
+					return err
+				}
+				session = &view_model.UserSessionView{
+					CreationDate:  event.CreatedAt(),
+					ResourceOwner: event.Aggregate().ResourceOwner,
+					UserAgentID:   eventData.UserAgentID,
+					UserID:        event.Aggregate().ID,
+					State:         int32(domain.UserSessionStateActive),
+					InstanceID:    event.Aggregate().InstanceID,
+				}
 			}
-		}
-		return u.updateSession(session, event)
-	case user.UserV1PasswordChangedType,
-		user.UserV1MFAOTPRemovedType,
-		user.UserV1ProfileChangedType,
-		user.UserLockedType,
-		user.UserDeactivatedType,
-		user.HumanPasswordChangedType,
-		user.HumanMFAOTPRemovedType,
-		user.HumanProfileChangedType,
-		user.HumanAvatarAddedType,
-		user.HumanAvatarRemovedType,
-		user.UserDomainClaimedType,
-		user.UserUserNameChangedType,
-		user.UserIDPLinkRemovedType,
-		user.UserIDPLinkCascadeRemovedType,
-		user.HumanPasswordlessTokenRemovedType,
-		user.HumanU2FTokenRemovedType:
-		sessions, err := u.view.UserSessionsByUserID(event.Aggregate().ID, event.Aggregate().InstanceID)
-		if err != nil {
-			return nil, err
-		}
-		if len(sessions) == 0 {
-			return handler2.NewNoOpStatement(event), nil
-		}
-		for _, session := range sessions {
-			if err := session.AppendEvent(event); err != nil {
-				return nil, err
+			return u.updateSession(session, event)
+		case user.UserV1PasswordChangedType,
+			user.UserV1MFAOTPRemovedType,
+			user.UserV1ProfileChangedType,
+			user.UserLockedType,
+			user.UserDeactivatedType,
+			user.HumanPasswordChangedType,
+			user.HumanMFAOTPRemovedType,
+			user.HumanProfileChangedType,
+			user.HumanAvatarAddedType,
+			user.HumanAvatarRemovedType,
+			user.UserDomainClaimedType,
+			user.UserUserNameChangedType,
+			user.UserIDPLinkRemovedType,
+			user.UserIDPLinkCascadeRemovedType,
+			user.HumanPasswordlessTokenRemovedType,
+			user.HumanU2FTokenRemovedType:
+			sessions, err := u.view.UserSessionsByUserID(event.Aggregate().ID, event.Aggregate().InstanceID)
+			if err != nil || len(sessions) == 0 {
+				return err
 			}
-			if err := u.fillUserInfo(session); err != nil {
-				return nil, err
+			for _, session := range sessions {
+				if err := session.AppendEvent(event); err != nil {
+					return err
+				}
+				if err := u.fillUserInfo(session); err != nil {
+					return err
+				}
 			}
+			if err = u.view.PutUserSessions(sessions); err != nil {
+				return err
+			}
+			return nil
+		case org.OrgDomainPrimarySetEventType:
+			return u.fillLoginNamesOnOrgUsers(event)
+		case user.UserRemovedType:
+			return u.view.DeleteUserSessions(event.Aggregate().ID, event.Aggregate().InstanceID)
+		case instance.InstanceRemovedEventType:
+			return u.view.DeleteInstanceUserSessions(event.Aggregate().InstanceID)
+		case org.OrgRemovedEventType:
+			return u.view.DeleteOrgUserSessions(event)
+		default:
+			return nil
 		}
-		if err = u.view.PutUserSessions(sessions); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	case org.OrgDomainPrimarySetEventType:
-		return u.fillLoginNamesOnOrgUsers(event)
-	case user.UserRemovedType:
-		if err = u.view.DeleteUserSessions(event.Aggregate().ID, event.Aggregate().InstanceID); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	case instance.InstanceRemovedEventType:
-		if err = u.view.DeleteInstanceUserSessions(event.Aggregate().InstanceID); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	case org.OrgRemovedEventType:
-		if err = u.view.DeleteOrgUserSessions(event); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	default:
-		return handler2.NewNoOpStatement(event), nil
-	}
+	}), nil
 }
 
-func (u *UserSession) updateSession(session *view_model.UserSessionView, event eventstore.Event) (*handler2.Statement, error) {
+func (u *UserSession) updateSession(session *view_model.UserSessionView, event eventstore.Event) error {
 	if err := session.AppendEvent(event); err != nil {
-		return nil, err
+		return err
 	}
 	if err := u.fillUserInfo(session); err != nil {
-		return nil, err
+		return err
 	}
 	if err := u.view.PutUserSession(session); err != nil {
-		return nil, err
+		return err
 	}
-	return handler2.NewNoOpStatement(event), nil
+	return nil
 }
 
 func (u *UserSession) fillUserInfo(session *view_model.UserSessionView) error {
@@ -336,28 +325,25 @@ func (u *UserSession) fillUserInfo(session *view_model.UserSessionView) error {
 	return nil
 }
 
-func (u *UserSession) fillLoginNamesOnOrgUsers(event eventstore.Event) (*handler2.Statement, error) {
+func (u *UserSession) fillLoginNamesOnOrgUsers(event eventstore.Event) error {
 	sessions, err := u.view.UserSessionsByOrgID(event.Aggregate().ResourceOwner, event.Aggregate().InstanceID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if len(sessions) == 0 {
-		return handler2.NewNoOpStatement(event), nil
+		return nil
 	}
 	userLoginMustBeDomain, primaryDomain, err := u.loginNameInformation(context.Background(), event.Aggregate().ResourceOwner, event.Aggregate().InstanceID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if !userLoginMustBeDomain {
-		return handler2.NewNoOpStatement(event), nil
+		return nil
 	}
 	for _, session := range sessions {
 		session.LoginName = session.UserName + "@" + primaryDomain
 	}
-	if err := u.view.PutUserSessions(sessions); err != nil {
-		return nil, err
-	}
-	return handler2.NewNoOpStatement(event), nil
+	return u.view.PutUserSessions(sessions)
 }
 
 func (u *UserSession) loginNameInformation(ctx context.Context, orgID string, instanceID string) (userLoginMustBeDomain bool, primaryDomain string, err error) {

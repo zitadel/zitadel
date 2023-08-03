@@ -86,41 +86,42 @@ func (t *telemetryPusher) pushMilestones(event eventstore.Event) (*handler.State
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-lDTs5", "reduce.wrong.event.type %s", event.Type())
 	}
 
-	isReached, err := query.NewNotNullQuery(query.MilestoneReachedDateColID)
-	if err != nil {
-		return nil, err
-	}
-	isNotPushed, err := query.NewIsNullQuery(query.MilestonePushedDateColID)
-	if err != nil {
-		return nil, err
-	}
-	hasPrimaryDomain, err := query.NewNotNullQuery(query.MilestonePrimaryDomainColID)
-	if err != nil {
-		return nil, err
-	}
-	unpushedMilestones, err := t.queries.Queries.SearchMilestones(ctx, scheduledEvent.InstanceIDs, &query.MilestonesSearchQueries{
-		SearchRequest: query.SearchRequest{
-			Limit:         t.cfg.Limit,
-			SortingColumn: query.MilestoneReachedDateColID,
-			Asc:           true,
-		},
-		Queries: []query.SearchQuery{isReached, isNotPushed, hasPrimaryDomain},
-	})
-	if err != nil {
-		return nil, err
-	}
-	var errs int
-	for _, ms := range unpushedMilestones.Milestones {
-		if err = t.pushMilestone(ctx, scheduledEvent, ms); err != nil {
-			errs++
-			logging.Warnf("pushing milestone %+v failed: %s", *ms, err.Error())
+	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+		isReached, err := query.NewNotNullQuery(query.MilestoneReachedDateColID)
+		if err != nil {
+			return err
 		}
-	}
-	if errs > 0 {
-		return nil, fmt.Errorf("pushing %d of %d milestones failed", errs, unpushedMilestones.Count)
-	}
-
-	return handler.NewNoOpStatement(scheduledEvent), nil
+		isNotPushed, err := query.NewIsNullQuery(query.MilestonePushedDateColID)
+		if err != nil {
+			return err
+		}
+		hasPrimaryDomain, err := query.NewNotNullQuery(query.MilestonePrimaryDomainColID)
+		if err != nil {
+			return err
+		}
+		unpushedMilestones, err := t.queries.Queries.SearchMilestones(ctx, scheduledEvent.InstanceIDs, &query.MilestonesSearchQueries{
+			SearchRequest: query.SearchRequest{
+				Limit:         t.cfg.Limit,
+				SortingColumn: query.MilestoneReachedDateColID,
+				Asc:           true,
+			},
+			Queries: []query.SearchQuery{isReached, isNotPushed, hasPrimaryDomain},
+		})
+		if err != nil {
+			return err
+		}
+		var errs int
+		for _, ms := range unpushedMilestones.Milestones {
+			if err = t.pushMilestone(ctx, scheduledEvent, ms); err != nil {
+				errs++
+				logging.Warnf("pushing milestone %+v failed: %s", *ms, err.Error())
+			}
+		}
+		if errs > 0 {
+			return fmt.Errorf("pushing %d of %d milestones failed", errs, unpushedMilestones.Count)
+		}
+		return nil
+	}), nil
 }
 
 func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.ScheduledEvent, ms *query.Milestone) error {

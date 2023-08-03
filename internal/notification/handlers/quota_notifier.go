@@ -64,33 +64,32 @@ func (u *quotaNotifier) reduceNotificationDue(event eventstore.Event) (*handler.
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DLxdE", "reduce.wrong.event.type %s", quota.NotificationDueEventType)
 	}
-	ctx := HandlerContext(event.Aggregate())
-	alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, map[string]interface{}{"dueEventID": e.ID}, quota.AggregateType, quota.NotifiedEventType)
-	if err != nil {
-		return nil, err
-	}
-	if alreadyHandled {
-		return handler.NewNoOpStatement(e), nil
-	}
-	err = types.SendJSON(
-		ctx,
-		webhook.Config{
-			CallURL: e.CallURL,
-			Method:  http.MethodPost,
-		},
-		u.queries.GetFileSystemProvider,
-		u.queries.GetLogProvider,
-		e,
-		e,
-		u.metricSuccessfulDeliveriesJSON,
-		u.metricFailedDeliveriesJSON,
-	).WithoutTemplate()
-	if err != nil {
-		return nil, err
-	}
-	err = u.commands.UsageNotificationSent(ctx, e)
-	if err != nil {
-		return nil, err
-	}
-	return handler.NewNoOpStatement(e), nil
+
+	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+		ctx := HandlerContext(event.Aggregate())
+		alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, map[string]interface{}{"dueEventID": e.ID}, quota.AggregateType, quota.NotifiedEventType)
+		if err != nil {
+			return err
+		}
+		if alreadyHandled {
+			return nil
+		}
+		err = types.SendJSON(
+			ctx,
+			webhook.Config{
+				CallURL: e.CallURL,
+				Method:  http.MethodPost,
+			},
+			u.queries.GetFileSystemProvider,
+			u.queries.GetLogProvider,
+			e,
+			e,
+			u.metricSuccessfulDeliveriesJSON,
+			u.metricFailedDeliveriesJSON,
+		).WithoutTemplate()
+		if err != nil {
+			return err
+		}
+		return u.commands.UsageNotificationSent(ctx, e)
+	}), nil
 }

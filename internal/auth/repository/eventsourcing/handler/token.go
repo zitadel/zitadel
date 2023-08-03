@@ -9,7 +9,6 @@ import (
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	proj_model "github.com/zitadel/zitadel/internal/project/model"
 	project_es_model "github.com/zitadel/zitadel/internal/project/repository/eventsourcing/model"
@@ -25,7 +24,7 @@ const (
 	tokenTable = "auth.tokens"
 )
 
-var _ handler2.Projection = (*Token)(nil)
+var _ handler.Projection = (*Token)(nil)
 
 type Token struct {
 	view *auth_view.View
@@ -34,10 +33,10 @@ type Token struct {
 
 func newToken(
 	ctx context.Context,
-	config handler2.Config,
+	config handler.Config,
 	view *auth_view.View,
-) *handler2.Handler {
-	return handler2.NewHandler(
+) *handler.Handler {
+	return handler.NewHandler(
 		ctx,
 		&config,
 		&Token{
@@ -53,11 +52,11 @@ func (*Token) Name() string {
 }
 
 // Reducers implements [handler.Projection]
-func (t *Token) Reducers() []handler2.AggregateReducer {
-	return []handler2.AggregateReducer{
+func (t *Token) Reducers() []handler.AggregateReducer {
+	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
-			EventRedusers: []handler2.EventReducer{
+			EventRedusers: []handler.EventReducer{
 				{
 					Event:  user.UserTokenAddedType,
 					Reduce: t.Reduce,
@@ -106,7 +105,7 @@ func (t *Token) Reducers() []handler2.AggregateReducer {
 		},
 		{
 			Aggregate: project.AggregateType,
-			EventRedusers: []handler2.EventReducer{
+			EventRedusers: []handler.EventReducer{
 				{
 					Event:  project.ApplicationDeactivatedType,
 					Reduce: t.Reduce,
@@ -127,7 +126,7 @@ func (t *Token) Reducers() []handler2.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler2.EventReducer{
+			EventRedusers: []handler.EventReducer{
 				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: t.Reduce,
@@ -136,7 +135,7 @@ func (t *Token) Reducers() []handler2.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler2.EventReducer{
+			EventRedusers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: t.Reduce,
@@ -146,121 +145,93 @@ func (t *Token) Reducers() []handler2.AggregateReducer {
 	}
 }
 
-func (t *Token) Reduce(event eventstore.Event) (_ *handler2.Statement, err error) { //nolint:gocognit
-	switch event.Type() {
-	case user.UserTokenAddedType,
-		user.PersonalAccessTokenAddedType:
-		token := new(view_model.TokenView)
-		err := token.AppendEvent(event)
-		if err != nil {
-			return nil, err
-		}
-		if err := t.view.PutToken(token); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	case user.UserV1ProfileChangedType,
-		user.HumanProfileChangedType:
-		user := new(view_model.UserView)
-		err := user.AppendEvent(event)
-		if err != nil {
-			return nil, err
-		}
-		tokens, err := t.view.TokensByUserID(event.Aggregate().ID, event.Aggregate().InstanceID)
-		if err != nil {
-			return nil, err
-		}
-		for _, token := range tokens {
-			token.PreferredLanguage = user.PreferredLanguage
-		}
-		if err := t.view.PutTokens(tokens); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	case user.UserV1SignedOutType,
-		user.HumanSignedOutType:
-		id, err := agentIDFromSession(event)
-		if err != nil {
-			return nil, err
-		}
-
-		if err := t.view.DeleteSessionTokens(id, event); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	case user.UserLockedType,
-		user.UserDeactivatedType,
-		user.UserRemovedType:
-
-		if err := t.view.DeleteUserTokens(event); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	case user.UserTokenRemovedType,
-		user.PersonalAccessTokenRemovedType:
-		id, err := tokenIDFromRemovedEvent(event)
-		if err != nil {
-			return nil, err
-		}
-
-		if err := t.view.DeleteToken(id, event.Aggregate().InstanceID); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	case user.HumanRefreshTokenRemovedType:
-		id, err := refreshTokenIDFromRemovedEvent(event)
-		if err != nil {
-			return nil, err
-		}
-
-		if err := t.view.DeleteTokensFromRefreshToken(id, event.Aggregate().InstanceID); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	case project.ApplicationDeactivatedType,
-		project.ApplicationRemovedType:
-		application, err := applicationFromSession(event)
-		if err != nil {
-			return nil, err
-		}
-
-		if err := t.view.DeleteApplicationTokens(event, application.AppID); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	case project.ProjectDeactivatedType,
-		project.ProjectRemovedType:
-		project, err := t.getProjectByID(context.Background(), event.Aggregate().ID, event.Aggregate().InstanceID)
-		if err != nil {
-			return nil, err
-		}
-		applicationIDs := make([]string, 0, len(project.Applications))
-		for _, app := range project.Applications {
-			if app.OIDCConfig != nil {
-				applicationIDs = append(applicationIDs, app.OIDCConfig.ClientID)
+func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error) { //nolint:gocognit
+	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+		switch event.Type() {
+		case user.UserTokenAddedType,
+			user.PersonalAccessTokenAddedType:
+			token := new(view_model.TokenView)
+			err := token.AppendEvent(event)
+			if err != nil {
+				return err
 			}
-		}
+			return t.view.PutToken(token)
+		case user.UserV1ProfileChangedType,
+			user.HumanProfileChangedType:
+			user := new(view_model.UserView)
+			err := user.AppendEvent(event)
+			if err != nil {
+				return err
+			}
+			tokens, err := t.view.TokensByUserID(event.Aggregate().ID, event.Aggregate().InstanceID)
+			if err != nil {
+				return err
+			}
+			for _, token := range tokens {
+				token.PreferredLanguage = user.PreferredLanguage
+			}
+			return t.view.PutTokens(tokens)
+		case user.UserV1SignedOutType,
+			user.HumanSignedOutType:
+			id, err := agentIDFromSession(event)
+			if err != nil {
+				return err
+			}
 
-		if err := t.view.DeleteApplicationTokens(event, applicationIDs...); err != nil {
-			return nil, err
+			return t.view.DeleteSessionTokens(id, event)
+		case user.UserLockedType,
+			user.UserDeactivatedType,
+			user.UserRemovedType:
+
+			return t.view.DeleteUserTokens(event)
+		case user.UserTokenRemovedType,
+			user.PersonalAccessTokenRemovedType:
+			id, err := tokenIDFromRemovedEvent(event)
+			if err != nil {
+				return err
+			}
+
+			return t.view.DeleteToken(id, event.Aggregate().InstanceID)
+		case user.HumanRefreshTokenRemovedType:
+			id, err := refreshTokenIDFromRemovedEvent(event)
+			if err != nil {
+				return err
+			}
+
+			return t.view.DeleteTokensFromRefreshToken(id, event.Aggregate().InstanceID)
+		case project.ApplicationDeactivatedType,
+			project.ApplicationRemovedType:
+			application, err := applicationFromSession(event)
+			if err != nil {
+				return err
+			}
+
+			return t.view.DeleteApplicationTokens(event, application.AppID)
+		case project.ProjectDeactivatedType,
+			project.ProjectRemovedType:
+			project, err := t.getProjectByID(context.Background(), event.Aggregate().ID, event.Aggregate().InstanceID)
+			if err != nil {
+				return err
+			}
+			applicationIDs := make([]string, 0, len(project.Applications))
+			for _, app := range project.Applications {
+				if app.OIDCConfig != nil {
+					applicationIDs = append(applicationIDs, app.OIDCConfig.ClientID)
+				}
+			}
+
+			return t.view.DeleteApplicationTokens(event, applicationIDs...)
+		case instance.InstanceRemovedEventType:
+			return t.view.DeleteInstanceTokens(event)
+		case org.OrgRemovedEventType:
+			// deletes all tokens including PATs, which is expected for now
+			// if there is an undo of the org deletion in the future,
+			// we will need to have a look on how to handle the deleted PATs
+			return t.view.DeleteOrgTokens(event)
+		default:
+			return nil
 		}
-		return handler2.NewNoOpStatement(event), nil
-	case instance.InstanceRemovedEventType:
-		if err := t.view.DeleteInstanceTokens(event); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	case org.OrgRemovedEventType:
-		// deletes all tokens including PATs, which is expected for now
-		// if there is an undo of the org deletion in the future,
-		// we will need to have a look on how to handle the deleted PATs
-		if err := t.view.DeleteOrgTokens(event); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	default:
-		return handler2.NewNoOpStatement(event), nil
-	}
+	}), nil
 }
 
 func agentIDFromSession(event eventstore.Event) (string, error) {

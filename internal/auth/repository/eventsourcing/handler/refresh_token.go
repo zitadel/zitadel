@@ -8,7 +8,7 @@ import (
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -19,7 +19,7 @@ const (
 	refreshTokenTable = "auth.refresh_tokens"
 )
 
-var _ handler2.Projection = (*RefreshToken)(nil)
+var _ handler.Projection = (*RefreshToken)(nil)
 
 type RefreshToken struct {
 	view *auth_view.View
@@ -27,10 +27,10 @@ type RefreshToken struct {
 
 func newRefreshToken(
 	ctx context.Context,
-	config handler2.Config,
+	config handler.Config,
 	view *auth_view.View,
-) *handler2.Handler {
-	return handler2.NewHandler(
+) *handler.Handler {
+	return handler.NewHandler(
 		ctx,
 		&config,
 		&RefreshToken{
@@ -45,11 +45,11 @@ func (*RefreshToken) Name() string {
 }
 
 // Reducers implements [handler.Projection]
-func (t *RefreshToken) Reducers() []handler2.AggregateReducer {
-	return []handler2.AggregateReducer{
+func (t *RefreshToken) Reducers() []handler.AggregateReducer {
+	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
-			EventRedusers: []handler2.EventReducer{
+			EventRedusers: []handler.EventReducer{
 				{
 					Event:  user.HumanRefreshTokenAddedType,
 					Reduce: t.Reduce,
@@ -78,7 +78,7 @@ func (t *RefreshToken) Reducers() []handler2.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler2.EventReducer{
+			EventRedusers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: t.Reduce,
@@ -87,7 +87,7 @@ func (t *RefreshToken) Reducers() []handler2.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler2.EventReducer{
+			EventRedusers: []handler.EventReducer{
 				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: t.Reduce,
@@ -97,68 +97,51 @@ func (t *RefreshToken) Reducers() []handler2.AggregateReducer {
 	}
 }
 
-func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler2.Statement, err error) {
-	switch event.Type() {
-	case user.HumanRefreshTokenAddedType:
-		token := new(view_model.RefreshTokenView)
-		err := token.AppendEvent(event)
-		if err != nil {
-			return nil, err
-		}
+func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler.Statement, err error) {
+	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+		switch event.Type() {
+		case user.HumanRefreshTokenAddedType:
+			token := new(view_model.RefreshTokenView)
+			err := token.AppendEvent(event)
+			if err != nil {
+				return err
+			}
 
-		if err := t.view.PutRefreshToken(token); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	case user.HumanRefreshTokenRenewedType:
-		e := new(user.HumanRefreshTokenRenewedEvent)
-		if err := event.Unmarshal(e); err != nil {
-			logging.WithError(err).Error("could not unmarshal event data")
-			return nil, caos_errs.ThrowInternal(nil, "MODEL-BHn75", "could not unmarshal data")
-		}
-		token, err := t.view.RefreshTokenByID(e.TokenID, event.Aggregate().InstanceID)
-		if err != nil {
-			return nil, err
-		}
-		err = token.AppendEvent(event)
-		if err != nil {
-			return nil, err
-		}
-		if err := t.view.PutRefreshToken(token); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	case user.HumanRefreshTokenRemovedType:
-		e := new(user.HumanRefreshTokenRemovedEvent)
-		if err := event.Unmarshal(e); err != nil {
-			logging.WithError(err).Error("could not unmarshal event data")
-			return nil, caos_errs.ThrowInternal(nil, "MODEL-Bz653", "could not unmarshal data")
-		}
-		if err := t.view.DeleteRefreshToken(e.TokenID, event.Aggregate().InstanceID); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	case user.UserLockedType,
-		user.UserDeactivatedType,
-		user.UserRemovedType:
+			return t.view.PutRefreshToken(token)
+		case user.HumanRefreshTokenRenewedType:
+			e := new(user.HumanRefreshTokenRenewedEvent)
+			if err := event.Unmarshal(e); err != nil {
+				logging.WithError(err).Error("could not unmarshal event data")
+				return caos_errs.ThrowInternal(nil, "MODEL-BHn75", "could not unmarshal data")
+			}
+			token, err := t.view.RefreshTokenByID(e.TokenID, event.Aggregate().InstanceID)
+			if err != nil {
+				return err
+			}
+			err = token.AppendEvent(event)
+			if err != nil {
+				return err
+			}
+			return t.view.PutRefreshToken(token)
+		case user.HumanRefreshTokenRemovedType:
+			e := new(user.HumanRefreshTokenRemovedEvent)
+			if err := event.Unmarshal(e); err != nil {
+				logging.WithError(err).Error("could not unmarshal event data")
+				return caos_errs.ThrowInternal(nil, "MODEL-Bz653", "could not unmarshal data")
+			}
+			return t.view.DeleteRefreshToken(e.TokenID, event.Aggregate().InstanceID)
+		case user.UserLockedType,
+			user.UserDeactivatedType,
+			user.UserRemovedType:
 
-		if err := t.view.DeleteUserRefreshTokens(event.Aggregate().ID, event.Aggregate().InstanceID); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	case instance.InstanceRemovedEventType:
+			return t.view.DeleteUserRefreshTokens(event.Aggregate().ID, event.Aggregate().InstanceID)
+		case instance.InstanceRemovedEventType:
 
-		if err := t.view.DeleteInstanceRefreshTokens(event.Aggregate().InstanceID); err != nil {
-			return nil, err
+			return t.view.DeleteInstanceRefreshTokens(event.Aggregate().InstanceID)
+		case org.OrgRemovedEventType:
+			return t.view.DeleteOrgRefreshTokens(event)
+		default:
+			return nil
 		}
-		return handler2.NewNoOpStatement(event), nil
-	case org.OrgRemovedEventType:
-
-		if err := t.view.DeleteOrgRefreshTokens(event); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	default:
-		return handler2.NewNoOpStatement(event), nil
-	}
+	}), nil
 }

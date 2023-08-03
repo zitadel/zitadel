@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	iam_model "github.com/zitadel/zitadel/internal/iam/repository/view/model"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -25,15 +25,15 @@ const (
 	stylingTable = "adminapi.styling2"
 )
 
-var _ handler2.Projection = (*Styling)(nil)
+var _ handler.Projection = (*Styling)(nil)
 
 type Styling struct {
 	static static.Storage
 	view   *admin_view.View
 }
 
-func newStyling(ctx context.Context, config handler2.Config, static static.Storage, view *admin_view.View) *handler2.Handler {
-	return handler2.NewHandler(
+func newStyling(ctx context.Context, config handler.Config, static static.Storage, view *admin_view.View) *handler.Handler {
+	return handler.NewHandler(
 		ctx,
 		&config,
 		&Styling{
@@ -49,11 +49,11 @@ func (*Styling) Name() string {
 }
 
 // Reducers implements [handler.Projection]
-func (s *Styling) Reducers() []handler2.AggregateReducer {
-	return []handler2.AggregateReducer{
+func (s *Styling) Reducers() []handler.AggregateReducer {
+	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler2.EventReducer{
+			EventRedusers: []handler.EventReducer{
 				{
 					Event:  org.LabelPolicyAddedEventType,
 					Reduce: s.processLabelPolicy,
@@ -118,7 +118,7 @@ func (s *Styling) Reducers() []handler2.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler2.EventReducer{
+			EventRedusers: []handler.EventReducer{
 				{
 					Event:  instance.LabelPolicyAddedEventType,
 					Reduce: s.processLabelPolicy,
@@ -184,80 +184,72 @@ func (s *Styling) Reducers() []handler2.AggregateReducer {
 	}
 }
 
-func (m *Styling) processLabelPolicy(event eventstore.Event) (_ *handler2.Statement, err error) {
-	policy := new(iam_model.LabelPolicyView)
-	switch event.Type() {
-	case instance.LabelPolicyAddedEventType,
-		org.LabelPolicyAddedEventType:
-		err = policy.AppendEvent(event)
-	case instance.LabelPolicyChangedEventType,
-		org.LabelPolicyChangedEventType,
-		instance.LabelPolicyLogoAddedEventType,
-		org.LabelPolicyLogoAddedEventType,
-		instance.LabelPolicyLogoRemovedEventType,
-		org.LabelPolicyLogoRemovedEventType,
-		instance.LabelPolicyIconAddedEventType,
-		org.LabelPolicyIconAddedEventType,
-		instance.LabelPolicyIconRemovedEventType,
-		org.LabelPolicyIconRemovedEventType,
-		instance.LabelPolicyLogoDarkAddedEventType,
-		org.LabelPolicyLogoDarkAddedEventType,
-		instance.LabelPolicyLogoDarkRemovedEventType,
-		org.LabelPolicyLogoDarkRemovedEventType,
-		instance.LabelPolicyIconDarkAddedEventType,
-		org.LabelPolicyIconDarkAddedEventType,
-		instance.LabelPolicyIconDarkRemovedEventType,
-		org.LabelPolicyIconDarkRemovedEventType,
-		instance.LabelPolicyFontAddedEventType,
-		org.LabelPolicyFontAddedEventType,
-		instance.LabelPolicyFontRemovedEventType,
-		org.LabelPolicyFontRemovedEventType,
-		instance.LabelPolicyAssetsRemovedEventType,
-		org.LabelPolicyAssetsRemovedEventType:
+func (m *Styling) processLabelPolicy(event eventstore.Event) (_ *handler.Statement, err error) {
+	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+		policy := new(iam_model.LabelPolicyView)
+		switch event.Type() {
+		case instance.LabelPolicyAddedEventType,
+			org.LabelPolicyAddedEventType:
+			err = policy.AppendEvent(event)
+		case instance.LabelPolicyChangedEventType,
+			org.LabelPolicyChangedEventType,
+			instance.LabelPolicyLogoAddedEventType,
+			org.LabelPolicyLogoAddedEventType,
+			instance.LabelPolicyLogoRemovedEventType,
+			org.LabelPolicyLogoRemovedEventType,
+			instance.LabelPolicyIconAddedEventType,
+			org.LabelPolicyIconAddedEventType,
+			instance.LabelPolicyIconRemovedEventType,
+			org.LabelPolicyIconRemovedEventType,
+			instance.LabelPolicyLogoDarkAddedEventType,
+			org.LabelPolicyLogoDarkAddedEventType,
+			instance.LabelPolicyLogoDarkRemovedEventType,
+			org.LabelPolicyLogoDarkRemovedEventType,
+			instance.LabelPolicyIconDarkAddedEventType,
+			org.LabelPolicyIconDarkAddedEventType,
+			instance.LabelPolicyIconDarkRemovedEventType,
+			org.LabelPolicyIconDarkRemovedEventType,
+			instance.LabelPolicyFontAddedEventType,
+			org.LabelPolicyFontAddedEventType,
+			instance.LabelPolicyFontRemovedEventType,
+			org.LabelPolicyFontRemovedEventType,
+			instance.LabelPolicyAssetsRemovedEventType,
+			org.LabelPolicyAssetsRemovedEventType:
 
-		policy, err = m.view.StylingByAggregateIDAndState(event.Aggregate().ID, event.Aggregate().InstanceID, int32(domain.LabelPolicyStatePreview))
-		if err != nil {
-			return nil, err
-		}
-		err = policy.AppendEvent(event)
-	case instance.LabelPolicyActivatedEventType,
-		org.LabelPolicyActivatedEventType:
+			policy, err = m.view.StylingByAggregateIDAndState(event.Aggregate().ID, event.Aggregate().InstanceID, int32(domain.LabelPolicyStatePreview))
+			if err != nil {
+				return err
+			}
+			err = policy.AppendEvent(event)
+		case instance.LabelPolicyActivatedEventType,
+			org.LabelPolicyActivatedEventType:
 
-		policy, err = m.view.StylingByAggregateIDAndState(event.Aggregate().ID, event.Aggregate().InstanceID, int32(domain.LabelPolicyStatePreview))
+			policy, err = m.view.StylingByAggregateIDAndState(event.Aggregate().ID, event.Aggregate().InstanceID, int32(domain.LabelPolicyStatePreview))
+			if err != nil {
+				return err
+			}
+			err = policy.AppendEvent(event)
+			if err != nil {
+				return err
+			}
+			err = m.generateStylingFile(policy)
+		case instance.InstanceRemovedEventType:
+			err = m.deleteInstanceFilesFromStorage(event.Aggregate().InstanceID)
+			if err != nil {
+				return err
+			}
+			return m.view.DeleteInstanceStyling(event)
+		case org.OrgRemovedEventType:
+			return m.view.UpdateOrgOwnerRemovedStyling(event)
+		default:
+			return nil
+		}
 		if err != nil {
-			return nil, err
+			return err
 		}
-		err = policy.AppendEvent(event)
-		if err != nil {
-			return nil, err
-		}
-		err = m.generateStylingFile(policy)
-	case instance.InstanceRemovedEventType:
-		err = m.deleteInstanceFilesFromStorage(event.Aggregate().InstanceID)
-		if err != nil {
-			return nil, err
-		}
-		if err := m.view.DeleteInstanceStyling(event); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	case org.OrgRemovedEventType:
 
-		if err := m.view.UpdateOrgOwnerRemovedStyling(event); err != nil {
-			return nil, err
-		}
-		return handler2.NewNoOpStatement(event), nil
-	default:
-		return handler2.NewNoOpStatement(event), nil
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	if err := m.view.PutStyling(policy, event); err != nil {
-		return nil, err
-	}
-	return handler2.NewNoOpStatement(event), nil
+		return m.view.PutStyling(policy, event)
+	}), nil
 }
 
 func (m *Styling) generateStylingFile(policy *iam_model.LabelPolicyView) error {
