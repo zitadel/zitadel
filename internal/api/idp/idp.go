@@ -120,12 +120,33 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 	userID, err := h.checkExternalUser(ctx, intent.IDPID, idpUser.GetID())
 	logging.WithFields("intent", intent.AggregateID).OnError(err).Error("could not check if idp user already exists")
 
+	if userID == "" {
+		userID, err = h.tryMigrateExternalUser(ctx, intent.IDPID, idpUser, idpSession)
+		logging.WithFields("intent", intent.AggregateID).OnError(err).Error("migration check failed")
+	}
+
 	token, err := h.commands.SucceedIDPIntent(ctx, intent, idpUser, idpSession, userID)
 	if err != nil {
 		redirectToFailureURLErr(w, r, intent, z_errs.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
 		return
 	}
 	redirectToSuccessURL(w, r, intent, token, userID)
+}
+
+func (h *Handler) tryMigrateExternalUser(ctx context.Context, idpID string, idpUser idp.User, idpSession idp.Session) (userID string, err error) {
+	migration, ok := idpSession.(idp.SessionSupportsMigration)
+	if !ok {
+		return "", nil
+	}
+	previousID, err := migration.RetrievePreviousID()
+	if err != nil || previousID == "" {
+		return "", err
+	}
+	userID, err = h.checkExternalUser(ctx, idpID, previousID)
+	if err != nil {
+		return "", err
+	}
+	return userID, h.commands.MigrateUserIDP(ctx, userID, "", idpID, previousID, idpUser.GetID())
 }
 
 func (h *Handler) parseCallbackRequest(r *http.Request) (*externalIDPCallbackData, error) {
