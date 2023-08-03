@@ -73,6 +73,8 @@ jobs:
     needs: [compile]
     uses: ./.github/workflows/container.yml
     secrets: inherit
+    permissions:
+      packages: write
     with:
       build_image_name: 'ghcr.io/zitadel/zitadel-build'
       image_push: ${{ github.event_name == 'workflow_dispatch' }}
@@ -85,8 +87,12 @@ jobs:
 
   release:
     uses: ./.github/workflows/release.yml
+    permissions:
+      packages: write
+      contents: write
+      issues: write
+      pull-requests: write
     needs: [version, core-unit-test, core-integration-test, lint, container, e2e]
-    # TODO: trigger release on workflow_dispatch if: ${{ github.event_name == 'workflow_dispatch' }}
     if: ${{ needs.version.outputs.published == 'true' && github.event_name == 'workflow_dispatch' }}
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
