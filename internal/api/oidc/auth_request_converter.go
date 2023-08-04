@@ -261,7 +261,7 @@ func CodeChallengeToOIDC(challenge *domain.OIDCCodeChallenge) *oidc.CodeChalleng
 
 func AMRFromMFAType(mfaType domain.MFAType) string {
 	switch mfaType {
-	case domain.MFATypeOTP:
+	case domain.MFATypeTOTP:
 		return OTP
 	case domain.MFATypeU2F,
 		domain.MFATypeU2FUserVerification:

@@ -583,6 +583,10 @@ EventTypes:
         check:
           succeeded: Password check succeeded
           failed: Password check failed
+        change:
+          sent: Password change sent
+        hash:
+          updated: Password hash updated
       externallogin:
         check:
           succeeded: External login succeeded

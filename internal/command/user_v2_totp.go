@@ -29,5 +29,5 @@ func (c *Commands) CheckUserTOTP(ctx context.Context, userID, code, resourceOwne
 	if err := authz.UserIDInCTX(ctx, userID); err != nil {
 		return nil, err
 	}
-	return c.HumanCheckMFAOTPSetup(ctx, userID, code, "", resourceOwner)
+	return c.HumanCheckMFATOTPSetup(ctx, userID, code, "", resourceOwner)
 }
