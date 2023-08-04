@@ -44,7 +44,7 @@
 
     <div *ngIf="http">
       <p>HTTP TOKEN</p>
-      <p class="entry">{{ http.url }}.txt</p>
+      <p class="entry">{{ http.url }}</p>
 
       <div class="btn-container">
         <button mat-stroked-button (click)="saveFile()" color="primary">{{ 'ORG.PAGES.DOWNLOAD_FILE' | translate }}</button>

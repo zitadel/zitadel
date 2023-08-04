@@ -1629,7 +1629,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Create Key for machine user";
+            summary: "Delete Key for machine user";
             description: "Delete a specific key from a user. The user will not be able to authenticate with that key afterward."
             tags: "Users";
             tags: "User Machine";
@@ -7406,8 +7406,14 @@ message ImportHumanUserRequest {
                 description: "Use this to import hashed passwords from another system."
             }
         };
-        string value = 1;
-        string algorithm = 2;
+        string value = 1 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"$2y$12$hXUrnqdq1RIIYZ2HPytIIe5lXdIvbhqrTvdPsSF7o.jFh817Z6lwm\"";
+                description: "Encoded hash of a password in Modular Crypt Format: https://passlib.readthedocs.io/en/stable/modular_crypt_format.html"
+            }
+        ];
+        reserved 2; // was algortithm, which is actually obtained from the encoded hash
+        reserved "algortithm";
     }
     message IDP {
         string config_id = 1 [
@@ -8935,8 +8941,8 @@ message AddOIDCAppRequest {
     ];
     repeated string additional_origins = 16 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"https://console.zitadel.ch/auth/callback\"]";
-            description: "Additional origins (other than the redirect_uris) from where the API can be used";
+            example: "[\"scheme://localhost:8080\"]";
+            description: "Additional origins (other than the redirect_uris) from where the API can be used, provided string has to be an origin (scheme://hostname[:port]) without path, query or fragment";
         }
     ];
     bool skip_native_app_success_page = 17 [
@@ -9110,8 +9116,8 @@ message UpdateOIDCAppConfigRequest {
     ];
     repeated string additional_origins = 15 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"https://console.zitadel.ch/auth/callback\"]";
-            description: "Additional origins (other than the redirect_uris) from where the API can be used";
+            example: "[\"scheme://localhost:8080\"]";
+            description: "Additional origins (other than the redirect_uris) from where the API can be used, provided string has to be an origin (scheme://hostname[:port]) without path, query or fragment";
         }
     ];
     bool skip_native_app_success_page = 16 [
@@ -9648,6 +9654,11 @@ message AddCustomLoginPolicyRequest {
             description: "defines if the user can additionally (to the login name) be identified by their verified phone number"
         }
     ];
+    bool force_mfa_local_only = 20 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login."
+        }
+    ];
 }
 
 message AddCustomLoginPolicyResponse {
@@ -9690,6 +9701,11 @@ message UpdateCustomLoginPolicyRequest {
     bool disable_login_with_phone = 16 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if the user can additionally (to the login name) be identified by their verified phone number"
+        }
+    ];
+    bool force_mfa_local_only = 17 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login."
         }
     ];
 }

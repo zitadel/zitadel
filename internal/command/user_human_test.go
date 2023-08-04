@@ -22,18 +22,17 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
-	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 func TestCommandSide_AddHuman(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		idGenerator     id.Generator
-		userPasswordAlg crypto.HashAlgorithm
-		codeAlg         crypto.EncryptionAlgorithm
-		newCode         cryptoCodeFunc
+		eventstore         func(t *testing.T) *eventstore.Eventstore
+		idGenerator        id.Generator
+		userPasswordHasher *crypto.PasswordHasher
+		codeAlg            crypto.EncryptionAlgorithm
+		newCode            cryptoCodeFunc
 	}
 	type args struct {
 		ctx             context.Context
@@ -50,7 +49,6 @@ func TestCommandSide_AddHuman(t *testing.T) {
 	}
 
 	userAgg := user.NewAggregate("user1", "org1")
-	instanceAgg := instance.NewAggregate("instance")
 
 	tests := []struct {
 		name   string
@@ -61,9 +59,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		{
 			name: "orgid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -87,9 +83,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		{
 			name: "user invalid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -109,11 +103,10 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		{
 			name: "with id, already exists, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newAddHumanEvent("password", true, ""),
+							newAddHumanEvent("$plain$x$password", true, ""),
 						),
 					),
 				),
@@ -143,8 +136,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			name: "domain policy not found, precondition error",
 			fields: fields{
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
@@ -174,8 +166,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			name: "password policy not found, precondition error",
 			fields: fields{
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -216,28 +207,12 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		{
 			name: "add human (with initial code), ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&userAgg.Aggregate,
-								true,
-								true,
-								true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(
-								context.Background(),
-								&instanceAgg.Aggregate,
-								domain.SecretGeneratorTypeInitCode,
-								0,
-								1*time.Hour,
-								true,
 								true,
 								true,
 								true,
@@ -267,7 +242,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
 										KeyID:      "id",
-										Crypted:    []byte(""),
+										Crypted:    []byte("userinit"),
 									},
 									time.Hour*1,
 								),
@@ -278,6 +253,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newCode:     mockCode("userinit", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -306,8 +282,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		{
 			name: "add human (with password and initial code), ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -331,25 +306,10 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(
-								context.Background(),
-								&instanceAgg.Aggregate,
-								domain.SecretGeneratorTypeInitCode,
-								0,
-								1*time.Hour,
-								true,
-								true,
-								true,
-								true,
-							),
-						),
-					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newAddHumanEvent("password", false, ""),
+								newAddHumanEvent("$plain$x$password", false, ""),
 							),
 							eventFromEventPusher(
 								user.NewHumanInitialCodeAddedEvent(context.Background(),
@@ -358,7 +318,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
 										KeyID:      "id",
-										Crypted:    []byte(""),
+										Crypted:    []byte("userinit"),
 									},
 									1*time.Hour,
 								),
@@ -367,9 +327,10 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
-				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newCode:            mockCode("userinit", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -397,8 +358,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		{
 			name: "add human (with password and email code custom template), ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -425,7 +385,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newAddHumanEvent("password", false, ""),
+								newAddHumanEvent("$plain$x$password", false, ""),
 							),
 							eventFromEventPusher(
 								user.NewHumanEmailCodeAddedEventV2(context.Background(),
@@ -445,10 +405,10 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
-				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:         mockCode("emailCode", time.Hour),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newCode:            mockCode("emailCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -477,8 +437,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		{
 			name: "add human (with password and return email code), ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -505,7 +464,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newAddHumanEvent("password", false, ""),
+								newAddHumanEvent("$plain$x$password", false, ""),
 							),
 							eventFromEventPusher(
 								user.NewHumanEmailCodeAddedEventV2(context.Background(),
@@ -525,10 +484,10 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
-				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:         mockCode("emailCode", time.Hour),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newCode:            mockCode("emailCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -558,8 +517,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		{
 			name: "add human email verified, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -586,7 +544,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newAddHumanEvent("password", true, ""),
+								newAddHumanEvent("$plain$x$password", true, ""),
 							),
 							eventFromEventPusher(
 								user.NewHumanEmailVerifiedEvent(context.Background(),
@@ -596,9 +554,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
-				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -628,8 +586,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		{
 			name: "add human email verified, trim spaces, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -656,7 +613,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newAddHumanEvent("password", true, ""),
+								newAddHumanEvent("$plain$x$password", true, ""),
 							),
 							eventFromEventPusher(
 								user.NewHumanEmailVerifiedEvent(context.Background(),
@@ -666,9 +623,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
-				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -698,8 +655,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		{
 			name: "add human, email verified, userLoginMustBeDomain false, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -726,7 +682,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newAddHumanEvent("password", true, ""),
+								newAddHumanEvent("$plain$x$password", true, ""),
 							),
 							eventFromEventPusher(
 								user.NewHumanEmailVerifiedEvent(context.Background(),
@@ -736,9 +692,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", false)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
-				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -768,8 +724,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		{
 			name: "add human claimed domain, userLoginMustBeDomain false, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -790,9 +745,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
-				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -821,8 +776,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		{
 			name: "add human domain, userLoginMustBeDomain false, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -870,12 +824,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 										"email@test.ch",
 										true,
 									)
-									event.AddPasswordData(&crypto.CryptoValue{
-										CryptoType: crypto.TypeHash,
-										Algorithm:  "hash",
-										KeyID:      "",
-										Crypted:    []byte("password"),
-									}, true)
+									event.AddPasswordData("$plain$x$password", true)
 									return event
 								}(),
 							),
@@ -887,9 +836,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username@test.ch", "org1", false)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
-				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -920,8 +869,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		{
 			name: "add human (with phone), ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -945,25 +893,10 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(
-								context.Background(),
-								&instanceAgg.Aggregate,
-								domain.SecretGeneratorTypeVerifyPhoneCode,
-								0,
-								1*time.Hour,
-								true,
-								true,
-								true,
-								true,
-							),
-						),
-					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newAddHumanEvent("password", false, "+41711234567"),
+								newAddHumanEvent("$plain$x$password", false, "+41711234567"),
 							),
 							eventFromEventPusher(
 								user.NewHumanEmailVerifiedEvent(
@@ -978,16 +911,17 @@ func TestCommandSide_AddHuman(t *testing.T) {
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
 										KeyID:      "id",
-										Crypted:    []byte(""),
+										Crypted:    []byte("phonecode"),
 									},
 									time.Hour*1)),
 						},
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
-				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newCode:            mockCode("phonecode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1019,28 +953,12 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		{
 			name: "add human (with verified phone), ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&userAgg.Aggregate,
-								true,
-								true,
-								true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(
-								context.Background(),
-								&instanceAgg.Aggregate,
-								domain.SecretGeneratorTypeInitCode,
-								0,
-								1*time.Hour,
-								true,
 								true,
 								true,
 								true,
@@ -1060,7 +978,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
 										KeyID:      "id",
-										Crypted:    []byte(""),
+										Crypted:    []byte("userinit"),
 									},
 									1*time.Hour,
 								),
@@ -1077,6 +995,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newCode:     mockCode("userinit", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1103,17 +1022,15 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				},
 				wantID: "user1",
 			},
-		},
-		{
-			name: "add human with metadata, ok",
+		}, {
+			name: "add human (with return code), ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 								true,
 								true,
@@ -1122,13 +1039,85 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(
-								context.Background(),
-								&instanceAgg.Aggregate,
-								domain.SecretGeneratorTypeInitCode,
-								0,
-								1*time.Hour,
-								true,
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								newAddHumanEvent("$plain$x$password", false, "+41711234567"),
+							),
+							eventFromEventPusher(
+								user.NewHumanEmailVerifiedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate),
+							),
+							eventFromEventPusher(
+								user.NewHumanPhoneCodeAddedEventV2(
+									context.Background(),
+									&userAgg.Aggregate,
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("phoneCode"),
+									},
+									1*time.Hour,
+									true,
+								),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+					),
+				),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newCode:            mockCode("phoneCode", time.Hour),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &AddHuman{
+					Username:  "username",
+					Password:  "password",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address:  "email@test.ch",
+						Verified: true,
+					},
+					Phone: Phone{
+						Number:     "+41711234567",
+						ReturnCode: true,
+					},
+					PreferredLanguage: language.English,
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+				wantID: "user1",
+			},
+		},
+		{
+			name: "add human with metadata, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
 								true,
 								true,
 								true,
@@ -1148,7 +1137,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
 										KeyID:      "id",
-										Crypted:    []byte(""),
+										Crypted:    []byte("userinit"),
 									},
 									1*time.Hour,
 								),
@@ -1167,6 +1156,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newCode:     mockCode("userinit", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1200,11 +1190,11 @@ func TestCommandSide_AddHuman(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore,
-				userPasswordAlg: tt.fields.userPasswordAlg,
-				userEncryption:  tt.fields.codeAlg,
-				idGenerator:     tt.fields.idGenerator,
-				newCode:         tt.fields.newCode,
+				eventstore:         tt.fields.eventstore(t),
+				userPasswordHasher: tt.fields.userPasswordHasher,
+				userEncryption:     tt.fields.codeAlg,
+				idGenerator:        tt.fields.idGenerator,
+				newCode:            tt.fields.newCode,
 			}
 			err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail)
 			if tt.res.err == nil {
@@ -1226,9 +1216,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 
 func TestCommandSide_ImportHuman(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		idGenerator     id.Generator
-		userPasswordAlg crypto.HashAlgorithm
+		eventstore         *eventstore.Eventstore
+		idGenerator        id.Generator
+		userPasswordHasher *crypto.PasswordHasher
 	}
 	type args struct {
 		ctx                  context.Context
@@ -1412,7 +1402,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newAddHumanEvent("password", true, ""),
+								newAddHumanEvent("$plain$x$password", true, ""),
 							),
 							eventFromEventPusher(
 								user.NewHumanInitialCodeAddedEvent(context.Background(),
@@ -1430,8 +1420,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1503,7 +1493,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newAddHumanEvent("password", false, ""),
+								newAddHumanEvent("$plain$x$password", false, ""),
 							),
 							eventFromEventPusher(
 								user.NewHumanEmailVerifiedEvent(context.Background(),
@@ -1513,8 +1503,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1612,8 +1602,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1", "code1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1", "code1"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1696,7 +1686,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newAddHumanEvent("password", false, ""),
+								newAddHumanEvent("$plain$x$password", false, ""),
 							),
 							eventFromEventPusher(
 								user.NewHumanEmailVerifiedEvent(context.Background(),
@@ -1719,8 +1709,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1", "code1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1", "code1"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1806,7 +1796,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newAddHumanEvent("password", false, "+41711234567"),
+								newAddHumanEvent("$plain$x$password", false, "+41711234567"),
 							),
 							eventFromEventPusher(
 								user.NewHumanInitialCodeAddedEvent(context.Background(),
@@ -1834,8 +1824,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1913,7 +1903,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newAddHumanEvent("password", false, "+41711234567"),
+								newAddHumanEvent("$plain$x$password", false, "+41711234567"),
 							),
 							eventFromEventPusher(
 								user.NewHumanInitialCodeAddedEvent(context.Background(),
@@ -1935,8 +1925,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2066,8 +2056,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUserIDPLinkUniqueConstraint("idpID", "externalID")),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2118,9 +2108,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore,
-				idGenerator:     tt.fields.idGenerator,
-				userPasswordAlg: tt.fields.userPasswordAlg,
+				eventstore:         tt.fields.eventstore,
+				idGenerator:        tt.fields.idGenerator,
+				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
 			gotHuman, gotCode, err := r.ImportHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.passwordless, tt.args.links, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator)
 			if tt.res.err == nil {
@@ -2139,9 +2129,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 
 func TestCommandSide_RegisterHuman(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		idGenerator     id.Generator
-		userPasswordAlg crypto.HashAlgorithm
+		eventstore         *eventstore.Eventstore
+		idGenerator        id.Generator
+		userPasswordHasher *crypto.PasswordHasher
 	}
 	type args struct {
 		ctx             context.Context
@@ -2344,6 +2334,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -2413,6 +2404,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -2475,6 +2467,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								false,
 								true,
+								false,
 								false,
 								false,
 								false,
@@ -2568,6 +2561,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -2614,7 +2608,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newRegisterHumanEvent("email@test.ch", "password", false, ""),
+								newRegisterHumanEvent("email@test.ch", "$plain$x$password", false, ""),
 							),
 							eventFromEventPusher(
 								user.NewHumanInitialCodeAddedEvent(context.Background(),
@@ -2632,8 +2626,8 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("email@test.ch", "org1", false)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2712,6 +2706,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -2725,7 +2720,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newRegisterHumanEvent("username", "password", false, ""),
+								newRegisterHumanEvent("username", "$plain$x$password", false, ""),
 							),
 							eventFromEventPusher(
 								user.NewHumanInitialCodeAddedEvent(context.Background(),
@@ -2743,8 +2738,8 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", false)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2824,6 +2819,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -2837,7 +2833,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newRegisterHumanEvent("username", "password", false, ""),
+								newRegisterHumanEvent("username", "$plain$x$password", false, ""),
 							),
 							eventFromEventPusher(
 								user.NewHumanInitialCodeAddedEvent(context.Background(),
@@ -2855,8 +2851,8 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2936,6 +2932,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -2949,7 +2946,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newRegisterHumanEvent("username", "password", false, ""),
+								newRegisterHumanEvent("username", "$plain$x$password", false, ""),
 							),
 							eventFromEventPusher(
 								user.NewHumanEmailVerifiedEvent(context.Background(),
@@ -2959,8 +2956,8 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3042,6 +3039,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -3055,7 +3053,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newRegisterHumanEvent("username", "password", false, "+41711234567"),
+								newRegisterHumanEvent("username", "$plain$x$password", false, "+41711234567"),
 							),
 							eventFromEventPusher(
 								user.NewHumanInitialCodeAddedEvent(context.Background(),
@@ -3083,8 +3081,8 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3170,6 +3168,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -3183,7 +3182,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newRegisterHumanEvent("username", "password", false, "+41711234567"),
+								newRegisterHumanEvent("username", "$plain$x$password", false, "+41711234567"),
 							),
 							eventFromEventPusher(
 								user.NewHumanInitialCodeAddedEvent(context.Background(),
@@ -3205,8 +3204,8 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3293,6 +3292,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -3338,7 +3338,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newRegisterHumanEvent("username", "password", false, ""),
+								newRegisterHumanEvent("username", "$plain$x$password", false, ""),
 							),
 							eventFromEventPusher(
 								user.NewUserIDPLinkAddedEvent(context.Background(),
@@ -3357,8 +3357,8 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUserIDPLinkUniqueConstraint("idpID", "externalID")),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -3409,9 +3409,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore,
-				idGenerator:     tt.fields.idGenerator,
-				userPasswordAlg: tt.fields.userPasswordAlg,
+				eventstore:         tt.fields.eventstore,
+				idGenerator:        tt.fields.idGenerator,
+				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
 			got, err := r.RegisterHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.link, tt.args.orgMemberRoles, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator)
 			if tt.res.err == nil {
@@ -3750,13 +3750,7 @@ func newAddHumanEvent(password string, changeRequired bool, phone string) *user.
 		true,
 	)
 	if password != "" {
-		event.AddPasswordData(&crypto.CryptoValue{
-			CryptoType: crypto.TypeHash,
-			Algorithm:  "hash",
-			KeyID:      "",
-			Crypted:    []byte(password),
-		},
-			changeRequired)
+		event.AddPasswordData(password, changeRequired)
 	}
 	if phone != "" {
 		event.AddPhoneData(domain.PhoneNumber(phone))
@@ -3778,13 +3772,7 @@ func newRegisterHumanEvent(username, password string, changeRequired bool, phone
 		true,
 	)
 	if password != "" {
-		event.AddPasswordData(&crypto.CryptoValue{
-			CryptoType: crypto.TypeHash,
-			Algorithm:  "hash",
-			KeyID:      "",
-			Crypted:    []byte(password),
-		},
-			changeRequired)
+		event.AddPasswordData(password, changeRequired)
 	}
 	if phone != "" {
 		event.AddPhoneData(domain.PhoneNumber(phone))
@@ -3799,7 +3787,7 @@ func TestAddHumanCommand(t *testing.T) {
 	type args struct {
 		human         *AddHuman
 		orgID         string
-		passwordAlg   crypto.HashAlgorithm
+		hasher        *crypto.PasswordHasher
 		filter        preparation.FilterToQueryReducer
 		codeAlg       crypto.EncryptionAlgorithm
 		allowInitMail bool
@@ -3854,6 +3842,24 @@ func TestAddHumanCommand(t *testing.T) {
 			},
 			want: Want{
 				ValidationErr: caos_errs.ThrowInvalidArgument(nil, "USER-4hB7d", "Errors.User.Profile.LastNameEmpty"),
+			},
+		},
+		{
+			name: "unsupported password hash encoding",
+			args: args{
+				human: &AddHuman{
+					Email:               Email{Address: "support@zitadel.com", Verified: true},
+					PreferredLanguage:   language.English,
+					FirstName:           "gigi",
+					LastName:            "giraffe",
+					EncodedPasswordHash: "$foo$x$password",
+					Username:            "username",
+				},
+				orgID:  "ro",
+				hasher: mockPasswordHasher("x"),
+			},
+			want: Want{
+				ValidationErr: caos_errs.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.User.Password.NotSupported"),
 			},
 		},
 		{
@@ -3921,9 +3927,9 @@ func TestAddHumanCommand(t *testing.T) {
 					Password:          "password",
 					Username:          "username",
 				},
-				orgID:       "ro",
-				passwordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
-				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				orgID:   "ro",
+				hasher:  mockPasswordHasher("x"),
+				codeAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				filter: NewMultiFilter().Append(
 					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return []eventstore.Event{}, nil
@@ -3972,12 +3978,79 @@ func TestAddHumanCommand(t *testing.T) {
 							"support@zitadel.com",
 							true,
 						)
-						event.AddPasswordData(&crypto.CryptoValue{
-							CryptoType: crypto.TypeHash,
-							Algorithm:  "hash",
-							KeyID:      "",
-							Crypted:    []byte("password"),
-						}, false)
+						event.AddPasswordData("$plain$x$password", false)
+						return event
+					}(),
+					user.NewHumanEmailVerifiedEvent(context.Background(), &agg.Aggregate),
+				},
+			},
+		},
+		{
+			name: "hashed password",
+			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id"),
+			},
+			args: args{
+				human: &AddHuman{
+					Email:               Email{Address: "support@zitadel.com", Verified: true},
+					PreferredLanguage:   language.English,
+					FirstName:           "gigi",
+					LastName:            "giraffe",
+					EncodedPasswordHash: "$plain$x$password",
+					Username:            "username",
+				},
+				orgID:   "ro",
+				hasher:  mockPasswordHasher("x"),
+				codeAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				filter: NewMultiFilter().Append(
+					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{}, nil
+					}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return []eventstore.Event{
+								org.NewDomainPolicyAddedEvent(
+									ctx,
+									&org.NewAggregate("id").Aggregate,
+									true,
+									true,
+									true,
+								),
+							}, nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return []eventstore.Event{
+								org.NewPasswordComplexityPolicyAddedEvent(
+									ctx,
+									&org.NewAggregate("id").Aggregate,
+									2,
+									false,
+									false,
+									false,
+									false,
+								),
+							}, nil
+						}).
+					Filter(),
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					func() *user.HumanAddedEvent {
+						event := user.NewHumanAddedEvent(
+							context.Background(),
+							&agg.Aggregate,
+							"username",
+							"gigi",
+							"giraffe",
+							"",
+							"gigi giraffe",
+							language.English,
+							0,
+							"support@zitadel.com",
+							true,
+						)
+						event.AddPasswordData("$plain$x$password", false)
 						return event
 					}(),
 					user.NewHumanEmailVerifiedEvent(context.Background(), &agg.Aggregate),
@@ -3990,7 +4063,7 @@ func TestAddHumanCommand(t *testing.T) {
 			c := &Commands{
 				idGenerator: tt.fields.idGenerator,
 			}
-			AssertValidation(t, context.Background(), c.AddHumanCommand(tt.args.human, tt.args.orgID, tt.args.passwordAlg, tt.args.codeAlg, tt.args.allowInitMail), tt.args.filter, tt.want)
+			AssertValidation(t, context.Background(), c.AddHumanCommand(tt.args.human, tt.args.orgID, tt.args.hasher, tt.args.codeAlg, tt.args.allowInitMail), tt.args.filter, tt.want)
 		})
 	}
 }

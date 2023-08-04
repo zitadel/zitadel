@@ -51,7 +51,7 @@ func (c *Commands) CreatePasskeyChallenge(userVerification domain.UserVerificati
 			return caos_errs.ThrowInternal(err, "COMMAND-Yah6A", "Errors.Internal")
 		}
 
-		cmd.sessionWriteModel.PasskeyChallenged(ctx, webAuthNLogin.Challenge, webAuthNLogin.AllowedCredentialIDs, webAuthNLogin.UserVerification)
+		cmd.PasskeyChallenged(ctx, webAuthNLogin.Challenge, webAuthNLogin.AllowedCredentialIDs, webAuthNLogin.UserVerification)
 		return nil
 	}
 }
@@ -78,7 +78,7 @@ func (c *Commands) CheckPasskey(credentialAssertionData json.Marshaler) SessionC
 		if token == nil {
 			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Aej7i", "Errors.User.WebAuthN.NotFound")
 		}
-		cmd.sessionWriteModel.PasskeyChecked(ctx, cmd.now(), token.WebAuthNTokenID, signCount)
+		cmd.PasskeyChecked(ctx, cmd.now(), token.WebAuthNTokenID, signCount)
 		return nil
 	}
 }

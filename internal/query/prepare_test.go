@@ -16,6 +16,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -76,9 +77,9 @@ type checkErr func(error) (err error, ok bool)
 
 type sqlExpectation func(sqlmock.Sqlmock) sqlmock.Sqlmock
 
-func mockQuery(stmt string, cols []string, row []driver.Value) func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
+func mockQuery(stmt string, cols []string, row []driver.Value, args ...driver.Value) func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
 	return func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
-		q := m.ExpectQuery(stmt)
+		q := m.ExpectQuery(stmt).WithArgs(args...)
 		result := sqlmock.NewRows(cols)
 		if len(row) > 0 {
 			result.AddRow(row...)
@@ -111,6 +112,15 @@ func mockQueryErr(stmt string, err error, args ...driver.Value) func(m sqlmock.S
 		q.WillReturnError(err)
 		return m
 	}
+}
+
+func execMock(t testing.TB, exp sqlExpectation, run func(db *sql.DB)) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+	defer db.Close()
+	mock = exp(mock)
+	run(db)
+	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
 var (
@@ -319,7 +329,9 @@ func TestValidatePrepare(t *testing.T) {
 
 type prepareDB struct{}
 
-func (_ *prepareDB) Timetravel(time.Duration) string { return " AS OF SYSTEM TIME '-1 ms' " }
+const asOfSystemTime = " AS OF SYSTEM TIME '-1 ms' "
+
+func (*prepareDB) Timetravel(time.Duration) string { return asOfSystemTime }
 
 var defaultPrepareArgs = []reflect.Value{reflect.ValueOf(context.Background()), reflect.ValueOf(new(prepareDB))}
 

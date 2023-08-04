@@ -36,9 +36,9 @@ The first parameter contains the following fields
       - `appendMetadata(string, Any)`  
         The first parameter represents the key and the second a value which will be stored
   - `setFirstName(string)`  
-    Sets the first name
+    Sets the given name
   - `setLastName(string)`  
-    Sets the last name
+    Sets the family name
   - `setNickName(string)`  
     Sets the nickname
   - `setDisplayName(string)`  
@@ -75,9 +75,9 @@ A user selected **Register** on the overview page after external authentication.
   - `metadata`  
     Array of [*metadata*](./objects#metadata-with-value-as-bytes). This function is deprecated, please use `api.v1.user.appendMetadata`
   - `setFirstName(string)`  
-    Sets the first name
+    Sets the given name
   - `setLastName(string)`  
-    Sets the last name
+    Sets the family name
   - `setNickName(string)`  
     Sets the nick name
   - `setDisplayName(string)`  

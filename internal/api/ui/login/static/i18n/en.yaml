@@ -211,8 +211,8 @@ RegistrationUser:
   DescriptionOrgRegister: Enter your Userdata.
   EmailLabel: E-Mail
   UsernameLabel: Username
-  FirstnameLabel: First name
-  LastnameLabel: Surname
+  FirstnameLabel: Given name
+  LastnameLabel: Family name
   LanguageLabel: Language
   German: Deutsch
   English: English
@@ -222,6 +222,9 @@ RegistrationUser:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   GenderLabel: Gender
   Female: Female
   Male: Male
@@ -242,8 +245,8 @@ ExternalRegistrationUserOverview:
   Description: We have taken your user details from the selected provider. You can now change or complete them.
   EmailLabel: E-Mail
   UsernameLabel: Username
-  FirstnameLabel: First name
-  LastnameLabel: Surname
+  FirstnameLabel: Given name
+  LastnameLabel: Family name
   NicknameLabel: Nickname
   PhoneLabel: Phonenumber
   LanguageLabel: Language
@@ -252,9 +255,12 @@ ExternalRegistrationUserOverview:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
-  Japanese: 日本語
   Polish: Polski
+  Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
@@ -270,8 +276,8 @@ RegistrationOrg:
   OrgNameLabel: Organization name
   EmailLabel: E-Mail
   UsernameLabel: Username
-  FirstnameLabel: First name
-  LastnameLabel: Surname
+  FirstnameLabel: Given name
+  LastnameLabel: Family name
   PasswordLabel: Password
   PasswordConfirmLabel: Password confirmation
   TosAndPrivacyLabel: Terms and conditions
@@ -317,6 +323,9 @@ ExternalNotFound:
   Japanese: 日本語
   Spanish: Español
   Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  
 DeviceAuth:
   Title: Device Authorization
   UserCode:
@@ -366,8 +375,8 @@ Errors:
       NotFound: Profile not found
       NotChanged: Profile not changed
       Empty: Profile is empty
-      FirstNameEmpty: First name in profile is empty
-      LastNameEmpty: Last name in profile is empty
+      FirstNameEmpty: Given name in profile is empty
+      LastNameEmpty: Family name in profile is empty
       IDMissing: Profile ID is missing
     Email:
       NotFound: Email not found
@@ -394,6 +403,7 @@ Errors:
       Empty: Password is empty
       Invalid: Password is invalid
       InvalidAndLocked: Password is invalid and user is locked, contact your administrator.
+      NotChanged: Password not changed
     UsernameOrPassword:
       Invalid: Username or Password is invalid
     PasswordComplexityPolicy:

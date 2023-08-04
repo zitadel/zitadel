@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	es_repo_mock "github.com/zitadel/zitadel/internal/eventstore/repository/mock"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/repository/pseudo"
 )
 
 var (
@@ -62,7 +63,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 	type fields struct {
 		sequenceTable  string
 		projectionName string
-		aggregates     []eventstore.AggregateType
+		reducers       []handler.AggregateReducer
 		bulkLimit      uint64
 	}
 	type args struct {
@@ -79,7 +80,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 			fields: fields{
 				sequenceTable:  "my_sequences",
 				projectionName: "my_projection",
-				aggregates:     []eventstore.AggregateType{"testAgg"},
+				reducers:       failingAggregateReducers("testAgg"),
 				bulkLimit:      5,
 			},
 			args: args{
@@ -101,7 +102,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 			fields: fields{
 				sequenceTable:  "my_sequences",
 				projectionName: "my_projection",
-				aggregates:     []eventstore.AggregateType{"testAgg"},
+				reducers:       failingAggregateReducers("testAgg"),
 				bulkLimit:      5,
 			},
 			args: args{
@@ -131,7 +132,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 			fields: fields{
 				sequenceTable:  "my_sequences",
 				projectionName: "my_projection",
-				aggregates:     []eventstore.AggregateType{"testAgg"},
+				reducers:       failingAggregateReducers("testAgg"),
 				bulkLimit:      5,
 			},
 			args: args{
@@ -160,6 +161,32 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 					Limit(5),
 			},
 		},
+		{
+			name: "scheduled pseudo event",
+			fields: fields{
+				sequenceTable:  "my_sequences",
+				projectionName: "my_projection",
+				reducers: []handler.AggregateReducer{{
+					Aggregate: pseudo.AggregateType,
+					EventRedusers: []handler.EventReducer{
+						{
+							Event:  pseudo.ScheduledEventType,
+							Reduce: testReduceErr(errors.New("should not be called")),
+						},
+					},
+				}},
+				bulkLimit: 5,
+			},
+			args: args{
+				instanceIDs: []string{"instanceID1", "instanceID2"},
+			},
+			want: want{
+				limit: 1,
+				isErr: func(err error) bool {
+					return err == nil
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -179,15 +206,14 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				Client: &database.DB{
 					DB: client,
 				},
+				Reducers: tt.fields.reducers,
 			})
-
-			h.aggregates = tt.fields.aggregates
 
 			for _, expectation := range tt.want.expectations {
 				expectation(mock)
 			}
 
-			query, limit, err := h.SearchQuery(context.Background(), tt.args.instanceIDs)
+			query, limit, err := h.searchQuery(context.Background(), tt.args.instanceIDs)
 			if !tt.want.isErr(err) {
 				t.Errorf("ProjectionHandler.prepareBulkStmts() error = %v", err)
 				return
@@ -1769,4 +1795,18 @@ func testReduceErr(err error) handler.Reduce {
 	return func(event eventstore.Event) (*handler.Statement, error) {
 		return nil, err
 	}
+}
+
+func failingAggregateReducers(aggregates ...eventstore.AggregateType) []handler.AggregateReducer {
+	reducers := make([]handler.AggregateReducer, len(aggregates))
+	for idx := range aggregates {
+		reducers[idx] = handler.AggregateReducer{
+			Aggregate: aggregates[idx],
+			EventRedusers: []handler.EventReducer{{
+				Event:  "any.event",
+				Reduce: testReduceErr(errors.New("should not be called")),
+			}},
+		}
+	}
+	return reducers
 }

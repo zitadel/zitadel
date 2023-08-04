@@ -17,9 +17,12 @@ import (
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
+	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
@@ -27,8 +30,11 @@ type Client struct {
 	CC        *grpc.ClientConn
 	Admin     admin.AdminServiceClient
 	Mgmt      mgmt.ManagementServiceClient
+	Auth      auth.AuthServiceClient
 	UserV2    user.UserServiceClient
 	SessionV2 session.SessionServiceClient
+	OIDCv2    oidc_pb.OIDCServiceClient
+	System    system.SystemServiceClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
@@ -36,9 +42,36 @@ func newClient(cc *grpc.ClientConn) Client {
 		CC:        cc,
 		Admin:     admin.NewAdminServiceClient(cc),
 		Mgmt:      mgmt.NewManagementServiceClient(cc),
+		Auth:      auth.NewAuthServiceClient(cc),
 		UserV2:    user.NewUserServiceClient(cc),
 		SessionV2: session.NewSessionServiceClient(cc),
+		OIDCv2:    oidc_pb.NewOIDCServiceClient(cc),
+		System:    system.NewSystemServiceClient(cc),
 	}
+}
+
+func (t *Tester) UseIsolatedInstance(iamOwnerCtx, systemCtx context.Context) (primaryDomain, instanceId string, authenticatedIamOwnerCtx context.Context) {
+	primaryDomain = randString(5) + ".integration"
+	instance, err := t.Client.System.CreateInstance(systemCtx, &system.CreateInstanceRequest{
+		InstanceName: "testinstance",
+		CustomDomain: primaryDomain,
+		Owner: &system.CreateInstanceRequest_Machine_{
+			Machine: &system.CreateInstanceRequest_Machine{
+				UserName:            "owner",
+				Name:                "owner",
+				PersonalAccessToken: &system.CreateInstanceRequest_PersonalAccessToken{},
+			},
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
+	t.createClientConn(iamOwnerCtx, grpc.WithAuthority(primaryDomain))
+	instanceId = instance.GetInstanceId()
+	t.Users.Set(instanceId, IAMOwner, &User{
+		Token: instance.GetPat(),
+	})
+	return primaryDomain, instanceId, t.WithInstanceAuthorization(iamOwnerCtx, IAMOwner, instanceId)
 }
 
 func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse {
@@ -56,6 +89,12 @@ func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse
 			Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
 			Verification: &user.SetHumanEmail_ReturnCode{
 				ReturnCode: &user.ReturnEmailVerificationCode{},
+			},
+		},
+		Phone: &user.SetHumanPhone{
+			Phone: "+41791234567",
+			Verification: &user.SetHumanPhone_ReturnCode{
+				ReturnCode: &user.ReturnPhoneVerificationCode{},
 			},
 		},
 	})
@@ -102,6 +141,14 @@ func (s *Tester) RegisterUserPasskey(ctx context.Context, userID string) {
 		PasskeyName:         "nice name",
 	})
 	logging.OnError(err).Fatal("create user passkey")
+}
+
+func (s *Tester) SetUserPassword(ctx context.Context, userID, password string) {
+	_, err := s.Client.UserV2.SetPassword(ctx, &user.SetPasswordRequest{
+		UserId:      userID,
+		NewPassword: &user.Password{Password: password},
+	})
+	logging.OnError(err).Fatal("set user password")
 }
 
 func (s *Tester) AddGenericOAuthProvider(t *testing.T) string {
@@ -157,4 +204,52 @@ func (s *Tester) CreateSuccessfulIntent(t *testing.T, idpID, userID, idpUserID s
 	token, err := s.Commands.SucceedIDPIntent(ctx, writeModel, idpUser, idpSession, userID)
 	require.NoError(t, err)
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
+}
+
+func (s *Tester) CreatePasskeySession(t *testing.T, ctx context.Context, userID string) (id, token string, start, change time.Time) {
+	createResp, err := s.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{UserId: userID},
+			},
+		},
+		Challenges: []session.ChallengeKind{
+			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
+		},
+		Domain: s.Config.ExternalDomain,
+	})
+	require.NoError(t, err)
+
+	assertion, err := s.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetPasskey().GetPublicKeyCredentialRequestOptions())
+	require.NoError(t, err)
+
+	updateResp, err := s.Client.SessionV2.SetSession(ctx, &session.SetSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: createResp.GetSessionToken(),
+		Checks: &session.Checks{
+			Passkey: &session.CheckPasskey{
+				CredentialAssertionData: assertion,
+			},
+		},
+	})
+	require.NoError(t, err)
+	return createResp.GetSessionId(), updateResp.GetSessionToken(),
+		createResp.GetDetails().GetChangeDate().AsTime(), updateResp.GetDetails().GetChangeDate().AsTime()
+}
+
+func (s *Tester) CreatePasswordSession(t *testing.T, ctx context.Context, userID, password string) (id, token string, start, change time.Time) {
+	createResp, err := s.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{UserId: userID},
+			},
+			Password: &session.CheckPassword{
+				Password: password,
+			},
+		},
+		Domain: s.Config.ExternalDomain,
+	})
+	require.NoError(t, err)
+	return createResp.GetSessionId(), createResp.GetSessionToken(),
+		createResp.GetDetails().GetChangeDate().AsTime(), createResp.GetDetails().GetChangeDate().AsTime()
 }

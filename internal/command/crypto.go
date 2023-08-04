@@ -10,15 +10,15 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 )
 
-type cryptoCodeFunc func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (*CryptoCodeWithExpiry, error)
+type cryptoCodeFunc func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (*CryptoCode, error)
 
-type CryptoCodeWithExpiry struct {
+type CryptoCode struct {
 	Crypted *crypto.CryptoValue
 	Plain   string
 	Expiry  time.Duration
 }
 
-func newCryptoCodeWithExpiry(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (*CryptoCodeWithExpiry, error) {
+func newCryptoCode(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (*CryptoCode, error) {
 	gen, config, err := secretGenerator(ctx, filter, typ, alg)
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func newCryptoCodeWithExpiry(ctx context.Context, filter preparation.FilterToQue
 	if err != nil {
 		return nil, err
 	}
-	return &CryptoCodeWithExpiry{
+	return &CryptoCode{
 		Crypted: crypted,
 		Plain:   plain,
 		Expiry:  config.Expiry,
@@ -40,14 +40,6 @@ func verifyCryptoCode(ctx context.Context, filter preparation.FilterToQueryReduc
 		return err
 	}
 	return crypto.VerifyCode(creation, expiry, crypted, plain, gen)
-}
-
-func newCryptoCodeWithPlain(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (value *crypto.CryptoValue, plain string, err error) {
-	gen, _, err := secretGenerator(ctx, filter, typ, alg)
-	if err != nil {
-		return nil, "", err
-	}
-	return crypto.NewCode(gen)
 }
 
 func secretGenerator(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (crypto.Generator, *crypto.GeneratorConfig, error) {

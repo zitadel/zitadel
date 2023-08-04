@@ -213,14 +213,16 @@ RegistrationUser:
   LastnameLabel: Фамилия
   LanguageLabel: език
   German: Deutsch
-  English: Английски
-  Italian: Италиано
+  English: English
+  Italian: Italiano
   French: Français
   Chinese: 简体中文
-  Polish: Полски
+  Polish: Polski
   Japanese: 日本語
   Spanish: Español
   Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   GenderLabel: Пол
   Female: Женски пол
   Male: Мъжки
@@ -246,13 +248,16 @@ ExternalRegistrationUserOverview:
   PhoneLabel: Телефонен номер
   LanguageLabel: език
   German: Deutsch
-  English: Английски
-  Italian: Италиано
+  English: English
+  Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
   Japanese: 日本語
-  Polish: Полски
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   TosAndPrivacyLabel: Правила и условия
   TosConfirm: Приемам
   TosLinkText: TOS
@@ -302,13 +307,17 @@ ExternalNotFound:
   PrivacyConfirm: Приемам
   PrivacyLinkText: политика за поверителност
   German: Deutsch
-  English: Английски
-  Italian: Италиано
+  English: English
+  Italian: Italiano
   French: Français
   Chinese: 简体中文
-  Polish: Полски
+  Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  
 DeviceAuth:
   Title: Упълномощаване на устройството
   UserCode:
@@ -386,6 +395,7 @@ Errors:
       InvalidAndLocked: >-
         Паролата е невалидна и потребителят е заключен, свържете се с вашия
         администратор.
+      NotChanged: Паролата не е променена
     UsernameOrPassword:
       Invalid: Потребителското име или паролата са невалидни
     PasswordComplexityPolicy:

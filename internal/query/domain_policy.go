@@ -91,7 +91,7 @@ func (q *Queries) DomainPolicyByOrg(ctx context.Context, shouldTriggerBulk bool,
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.DomainPolicyProjection.Trigger(ctx)
+		ctx = projection.DomainPolicyProjection.Trigger(ctx)
 	}
 	eq := sq.And{
 		sq.Eq{DomainPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},

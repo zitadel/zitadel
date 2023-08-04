@@ -1,6 +1,8 @@
 package start
 
 import (
+	"encoding/json"
+	"reflect"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -25,6 +27,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
@@ -58,13 +61,14 @@ type Config struct {
 	EncryptionKeys    *encryptionKeyConfig
 	DefaultInstance   command.InstanceSetup
 	AuditLogRetention time.Duration
-	SystemAPIUsers    map[string]*internal_authz.SystemAPIUser
+	SystemAPIUsers    SystemAPIUsers
 	CustomerPortal    string
 	Machine           *id.Config
 	Actions           *actions.Config
 	Eventstore        *eventstore.Config
 	LogStore          *logstore.Configs
 	Quotas            *QuotasConfig
+	Telemetry         *handlers.TelemetryPusherConfig
 }
 
 type QuotasConfig struct {
@@ -83,6 +87,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
 			actions.HTTPConfigDecodeHook,
+			systemAPIUsersDecodeHook,
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read config")
@@ -113,4 +118,23 @@ type encryptionKeyConfig struct {
 	User                 *crypto.KeyConfig
 	CSRFCookieKeyID      string
 	UserAgentCookieKeyID string
+}
+
+type SystemAPIUsers map[string]*internal_authz.SystemAPIUser
+
+func systemAPIUsersDecodeHook(from, to reflect.Value) (any, error) {
+	if to.Type() != reflect.TypeOf(SystemAPIUsers{}) {
+		return from.Interface(), nil
+	}
+
+	data, ok := from.Interface().(string)
+	if !ok {
+		return from.Interface(), nil
+	}
+	users := make(SystemAPIUsers)
+	err := json.Unmarshal([]byte(data), &users)
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
 }

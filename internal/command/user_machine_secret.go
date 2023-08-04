@@ -113,7 +113,7 @@ func prepareRemoveMachineSecret(a *user.Aggregate) preparation.Validation {
 
 func (c *Commands) VerifyMachineSecret(ctx context.Context, userID string, resourceOwner string, secret string) (*domain.ObjectDetails, error) {
 	agg := user.NewAggregate(userID, resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareVerifyMachineSecret(agg, secret, c.userPasswordAlg))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareVerifyMachineSecret(agg, secret, c.codeAlg))
 	if err != nil {
 		return nil, err
 	}
