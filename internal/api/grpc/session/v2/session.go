@@ -20,8 +20,7 @@ func (s *Server) GetSession(ctx context.Context, req *session.GetSessionRequest)
 	res, err := s.query.SessionByID(ctx, true, req.GetSessionId(), req.GetSessionToken())
 	if err != nil {
 		sessionWriteModel := command.NewSessionWriteModel(req.GetSessionId(), authz.GetCtxData(ctx).OrgID)
-		err = s.command.Eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
-		if err != nil {
+		if err := s.command.Eventstore.FilterToQueryReducer(ctx, sessionWriteModel); err != nil {
 			return nil, err
 		}
 		logging.New().WithField("session_seq", sessionWriteModel.ProcessedSequence).Debug("get session from command")
