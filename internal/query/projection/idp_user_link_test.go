@@ -215,8 +215,8 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 					user.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
-    "previousID": "previous-id",
-	"newID": "new-id"
+    "previousId": "previous-id",
+	"newId": "new-id"
 }`),
 				), eventstore.GenericEventMapper[user.UserIDPExternalIDMigratedEvent]),
 			},

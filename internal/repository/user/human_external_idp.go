@@ -217,7 +217,7 @@ func UserIDPCheckSucceededEventMapper(event *repository.Event) (eventstore.Event
 type UserIDPExternalIDMigratedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	IDPConfigID          string `json:"idpConfigId"`
-	PreviousID           string `json:"previousID"`
+	PreviousID           string `json:"previousId"`
 	NewID                string `json:"newId"`
 }
 
