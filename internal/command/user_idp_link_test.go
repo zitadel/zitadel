@@ -731,16 +731,12 @@ func TestCommandSide_MigrateUserIDP(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewUserIDPExternalIDMigratedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"idpConfig1",
-									"previousID",
-									"newID",
-								),
-							),
-						},
+						user.NewUserIDPExternalIDMigratedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"idpConfig1",
+							"previousID",
+							"newID",
+						),
 					),
 				),
 			},

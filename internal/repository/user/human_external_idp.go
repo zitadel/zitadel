@@ -218,11 +218,11 @@ type UserIDPExternalIDMigratedEvent struct {
 	NewID                string `json:"newId"`
 }
 
-func (e *UserIDPExternalIDMigratedEvent) Data() interface{} {
+func (e *UserIDPExternalIDMigratedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *UserIDPExternalIDMigratedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserIDPExternalIDMigratedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
