@@ -173,6 +173,18 @@ func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Ev
 		if err != nil {
 			return index, err
 		}
+
+		logging.New().WithFields(logrus.Fields{
+			"EditorService":                 event.EditorService(),
+			"EditorUser":                    event.EditorUser(),
+			"Type":                          event.Type(),
+			"Aggregate":                     event.Aggregate(),
+			"Sequence":                      event.Sequence(),
+			"CreationDate":                  event.CreationDate(),
+			"PreviousAggregateSequence":     event.PreviousAggregateSequence(),
+			"PreviousAggregateTypeSequence": event.PreviousAggregateTypeSequence(),
+			"DataAsBytes":                   event.DataAsBytes(),
+		}).Debug("processing event")
 	}
 	for retry := 0; retry <= h.retries; retry++ {
 		index, err = h.update(ctx, statements[index+1:], h.reduce)
