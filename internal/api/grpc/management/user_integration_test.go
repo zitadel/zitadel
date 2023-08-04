@@ -16,8 +16,6 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/user"
 	"golang.org/x/text/language"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 var (
@@ -75,16 +73,18 @@ func TestImport_and_Get(t *testing.T) {
 
 			_, err = Client.GetUserByID(CTX, &management.GetUserByIDRequest{Id: res.GetUserId()})
 
-			if s, ok := status.FromError(err); ok {
-				if s == nil {
-					return
+			/*
+				if s, ok := status.FromError(err); ok {
+					if s == nil {
+						return
+					}
+					if s.Code() == codes.NotFound {
+						t.Log(s)
+						misses++
+						return
+					}
 				}
-				if s.Code() == codes.NotFound {
-					t.Log(s)
-					misses++
-					return
-				}
-			}
+			*/
 			require.NoError(t, err) // catch and fail on any other error
 		})
 	}
