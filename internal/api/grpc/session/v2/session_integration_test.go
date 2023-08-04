@@ -396,7 +396,7 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 func Test_ZITADEL_API_missing_mfa(t *testing.T) {
 	id, token, _, _ := Tester.CreatePasswordSession(t, CTX, User.GetUserId(), integration.UserPassword)
 
-	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("Bearer %s", token))
+	ctx := Tester.WithAuthorizationToken(context.Background(), token)
 	sessionResp, err := Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
 	require.Error(t, err)
 	require.Nil(t, sessionResp)
@@ -405,7 +405,7 @@ func Test_ZITADEL_API_missing_mfa(t *testing.T) {
 func Test_ZITADEL_API_success(t *testing.T) {
 	id, token, _, _ := Tester.CreatePasskeySession(t, CTX, User.GetUserId())
 
-	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("Bearer %s", token))
+	ctx := Tester.WithAuthorizationToken(context.Background(), token)
 	sessionResp, err := Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
 	require.NoError(t, err)
 	require.NotNil(t, id, sessionResp.GetSession().GetFactors().GetPasskey().GetVerifiedAt().AsTime())
@@ -415,7 +415,7 @@ func Test_ZITADEL_API_session_not_found(t *testing.T) {
 	id, token, _, _ := Tester.CreatePasskeySession(t, CTX, User.GetUserId())
 
 	// test session token works
-	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("Bearer %s", token))
+	ctx := Tester.WithAuthorizationToken(context.Background(), token)
 	_, err := Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
 	require.NoError(t, err)
 
@@ -425,7 +425,7 @@ func Test_ZITADEL_API_session_not_found(t *testing.T) {
 		SessionToken: gu.Ptr(token),
 	})
 	require.NoError(t, err)
-	ctx = metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("Bearer %s", token))
+	ctx = Tester.WithAuthorizationToken(context.Background(), token)
 	_, err = Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
 	require.Error(t, err)
 }

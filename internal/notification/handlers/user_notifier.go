@@ -182,6 +182,7 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SWf3g", "reduce.wrong.event.type %s", user.HumanEmailCodeAddedType)
 	}
+
 	if e.CodeReturned {
 		return crdb.NewNoOpStatement(e), nil
 	}
@@ -534,6 +535,9 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 	e, ok := event.(*user.HumanPhoneCodeAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-He83g", "reduce.wrong.event.type %s", user.HumanPhoneCodeAddedType)
+	}
+	if e.CodeReturned {
+		return crdb.NewNoOpStatement(e), nil
 	}
 	ctx := HandlerContext(event.Aggregate())
 	alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,

@@ -6,6 +6,7 @@ import "zitadel/object/v2beta/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/user/v2beta/auth.proto";
 import "zitadel/user/v2beta/email.proto";
+import "zitadel/user/v2beta/phone.proto";
 import "zitadel/user/v2beta/idp.proto";
 import "zitadel/user/v2beta/password.proto";
 import "zitadel/user/v2beta/user.proto";
@@ -149,6 +150,56 @@ service UserService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Verify the email";
       description: "Verify the email with the generated code."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Change the phone of a user
+  rpc SetPhone(SetPhoneRequest) returns (SetPhoneResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/users/{user_id}/phone"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Change the user phone";
+      description: "Change the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Verify the phone with the provided code
+  rpc VerifyPhone (VerifyPhoneRequest) returns (VerifyPhoneResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/users/{user_id}/phone/_verify"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Verify the phone";
+      description: "Verify the phone with the generated code."
       responses: {
         key: "200"
         value: {
@@ -308,6 +359,96 @@ service UserService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Verify a TOTP generator for a user";
       description: "Verify the TOTP registration with a generated code."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc AddOTPSMS (AddOTPSMSRequest) returns (AddOTPSMSResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/users/{user_id}/otp_sms"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Add OTP SMS for a user";
+      description: "Add a new One-Time-Password (OTP) SMS factor to the authenticated user. OTP SMS will enable the user to verify a OTP with the latest verified phone number. The phone number has to be verified to add the second factor."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc RemoveOTPSMS (RemoveOTPSMSRequest) returns (RemoveOTPSMSResponse) {
+    option (google.api.http) = {
+      delete: "/v2beta/users/{user_id}/otp_sms"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Remove One-Time-Password (OTP) SMS from a user";
+      description: "Remove the configured One-Time-Password (OTP) SMS factor of the authenticated user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc AddOTPEmail (AddOTPEmailRequest) returns (AddOTPEmailResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/users/{user_id}/otp_email"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Add OTP Email for a user";
+      description: "Add a new One-Time-Password (OTP) Email factor to the authenticated user. OTP Email will enable the user to verify a OTP with the latest verified email. The email has to be verified to add the second factor."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc RemoveOTPEmail (RemoveOTPEmailRequest) returns (RemoveOTPEmailResponse) {
+    option (google.api.http) = {
+      delete: "/v2beta/users/{user_id}/otp_email"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Remove One-Time-Password (OTP) Email from a user";
+      description: "Remove the configured One-Time-Password (OTP) Email factor of the authenticated user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward."
       responses: {
         key: "200"
         value: {
@@ -494,6 +635,7 @@ message AddHumanUserRequest{
     (validate.rules).message.required = true,
     (google.api.field_behavior) = REQUIRED
   ];
+  SetHumanPhone phone = 10;
   repeated SetMetadataEntry metadata = 6;
   oneof password_type {
     Password password = 7;
@@ -506,6 +648,7 @@ message AddHumanUserResponse {
   string user_id = 1;
   zitadel.object.v2beta.Details details = 2;
   optional string email_code = 3;
+  optional string phone_code = 4;
 }
 
 message SetEmailRequest{
@@ -564,6 +707,65 @@ message VerifyEmailRequest{
 }
 
 message VerifyEmailResponse{
+  zitadel.object.v2beta.Details details = 1;
+}
+
+message SetPhoneRequest{
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  string phone = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"+41791234567\"";
+    }
+  ];
+  // if no verification is specified, an sms is sent
+  oneof verification {
+    SendPhoneVerificationCode send_code = 3;
+    ReturnPhoneVerificationCode return_code = 4;
+    bool is_verified = 5 [(validate.rules).bool.const = true];
+  }
+}
+
+message SetPhoneResponse{
+  zitadel.object.v2beta.Details details = 1;
+  // in case the verification was set to return_code, the code will be returned
+  optional string verification_code = 2;
+}
+
+message VerifyPhoneRequest{
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  string verification_code = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 20},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 20;
+      example: "\"SKJd342k\"";
+      description: "\"the verification code generated during the set phone request\"";
+    }
+  ];
+}
+
+message VerifyPhoneResponse{
   zitadel.object.v2beta.Details details = 1;
 }
 
@@ -779,6 +981,70 @@ message VerifyTOTPRegistrationResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
+message AddOTPSMSRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432705\"";
+    }
+  ];
+}
+
+message AddOTPSMSResponse {
+  zitadel.object.v2beta.Details details = 1;
+}
+
+message RemoveOTPSMSRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432705\"";
+    }
+  ];
+}
+
+message RemoveOTPSMSResponse {
+  zitadel.object.v2beta.Details details = 1;
+}
+
+message AddOTPEmailRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432705\"";
+    }
+  ];
+}
+
+message AddOTPEmailResponse {
+  zitadel.object.v2beta.Details details = 1;
+}
+
+message RemoveOTPEmailRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432705\"";
+    }
+  ];
+}
+
+message RemoveOTPEmailResponse {
+  zitadel.object.v2beta.Details details = 1;
+}
+
 message CreatePasskeyRegistrationLinkRequest{
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -979,4 +1245,6 @@ enum AuthenticationMethodType {
   AUTHENTICATION_METHOD_TYPE_IDP = 3;
   AUTHENTICATION_METHOD_TYPE_TOTP = 4;
   AUTHENTICATION_METHOD_TYPE_U2F = 5;
+  AUTHENTICATION_METHOD_TYPE_OTP_SMS = 6;
+  AUTHENTICATION_METHOD_TYPE_OTP_EMAIL = 7;
 }

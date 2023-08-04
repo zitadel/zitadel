@@ -91,6 +91,12 @@ func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse
 				ReturnCode: &user.ReturnEmailVerificationCode{},
 			},
 		},
+		Phone: &user.SetHumanPhone{
+			Phone: "+41791234567",
+			Verification: &user.SetHumanPhone_ReturnCode{
+				ReturnCode: &user.ReturnPhoneVerificationCode{},
+			},
+		},
 	})
 	logging.OnError(err).Fatal("create human user")
 	return resp
