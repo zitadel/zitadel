@@ -103,8 +103,10 @@ console_lint:
 	cd console && \
 	yarn lint
 
+missingBuildTags := $(shell grep -LEr --include '*_test.go' 'go:build\ unit|go:build\ integration' .)
 .PHONE: core_lint
 core_lint:
+	if [ -n "$(missingBuildTags)" ]; then echo "The following _test.go files neither have a unit nor an integration build tag"; echo $(missingBuildTags); exit 1; fi && \
 	golangci-lint run \
 		--timeout 10m \
 		--config ./.golangci.yaml \
