@@ -74,8 +74,8 @@ jobs:
       name: lint
       run: make console_lint
 
-  core:
-    name: core
+  core-standard:
+    name: core standard
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' }}
     steps:
@@ -102,3 +102,14 @@ jobs:
         only-new-issues: true
         skip-pkg-cache: true
         skip-build-cache: true
+
+  core-custom:
+    name: core custom
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        run: make core_lint_custom

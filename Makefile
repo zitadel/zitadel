@@ -103,12 +103,18 @@ console_lint:
 	cd console && \
 	yarn lint
 
+.PHONY: core_lint_custom
 missingBuildTags := $(shell grep -LEr --include '*_test.go' 'go:build\ unit|go:build\ integration' .)
-.PHONE: core_lint
-core_lint:
-	if [ -n "$(missingBuildTags)" ]; then echo "The following _test.go files neither have a unit nor an integration build tag"; echo $(missingBuildTags); exit 1; fi && \
-	golangci-lint run \
+core_lint_custom:
+	if [ -n "$(missingBuildTags)" ]; then echo "The following _test.go files neither have a unit nor an integration build tag"; echo $(missingBuildTags); exit 1; fi
+
+.PHONY: core_lint_standard
+core_lint_standard:
+	go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.2 run \
 		--timeout 10m \
 		--config ./.golangci.yaml \
 		--out-format=github-actions \
 		--concurrency=$$(getconf _NPROCESSORS_ONLN)
+
+.PHONY: core_lint
+core_lint: core_lint_standard core_lint_custom

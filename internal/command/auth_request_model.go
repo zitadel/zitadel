@@ -2,14 +2,19 @@ package command
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
+
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 )
+
+var anErrXY = errors.New("Blubb")
 
 type AuthRequestWriteModel struct {
 	eventstore.WriteModel
