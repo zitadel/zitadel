@@ -140,8 +140,11 @@ func (h *ProjectionHandler) Trigger(ctx context.Context, instances ...string) co
 // by calling FetchEvents and Process until the amount of events is smaller than the BulkLimit.
 // If a bulk action was executed, the call timestamp in context will be reset for subsequent queries.
 // The returned context is never nil. It is either the original context or an updated context.
-func (h *ProjectionHandler) TriggerErr(ctx context.Context, instances ...string) (context.Context, error) {
+func (h *ProjectionHandler) TriggerErr(ctx context.Context, instances ...string) (outCtx context.Context, err error) {
 	instances = triggerInstances(ctx, instances)
+	defer func() {
+		outCtx = call.ResetTimestamp(ctx)
+	}()
 	for {
 		events, hasLimitExceeded, err := h.FetchEvents(ctx, instances...)
 		if err != nil {
@@ -169,7 +172,6 @@ func (h *ProjectionHandler) TriggerErr(ctx context.Context, instances ...string)
 		*/
 
 		_, err = h.Process(ctx, events...)
-		ctx = call.ResetTimestamp(ctx)
 		if err != nil {
 			return ctx, err
 		}
