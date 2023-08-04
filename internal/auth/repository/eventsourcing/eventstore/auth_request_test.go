@@ -2167,9 +2167,6 @@ func Test_userByID(t *testing.T) {
 				t.Errorf("nextSteps() wrong error = %v", err)
 				return
 			}
-			if tt.name == "new user events but error, old view model state" {
-				assert.Nil(t, nil)
-			}
 			assert.Equal(t, tt.want, got)
 		})
 	}
