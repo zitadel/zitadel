@@ -206,7 +206,7 @@ func (p *idpUserLinkProjection) reduceExternalIDMigrated(event eventstore.Event)
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AS3th", "reduce.wrong.event.type %s", user.UserIDPExternalIDMigratedType)
 	}
 
-	return crdb.NewUpdateStatement(e,
+	return handler.NewUpdateStatement(e,
 		[]handler.Column{
 			handler.NewCol(IDPUserLinkChangeDateCol, e.CreationDate()),
 			handler.NewCol(IDPUserLinkSequenceCol, e.Sequence()),
