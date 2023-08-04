@@ -234,7 +234,7 @@ func (repo *AuthRequestRepo) SelectExternalIDP(ctx context.Context, authReqID, i
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID string, externalUser *domain.ExternalUser, info *domain.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID string, externalUser *domain.ExternalUser, info *domain.BrowserInfo, migrationCheck bool) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
@@ -245,6 +245,11 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 	if errors.IsNotFound(err) {
 		// clear potential user information (e.g. when username was entered but another external user was returned)
 		request.SetUserInfo("", "", "", "", "", request.UserOrgID)
+		// in case the check was done with an ID, that was retrieved by a session that allows migration,
+		// we do not need to set the linking user and return early
+		if migrationCheck {
+			return err
+		}
 		if err := repo.setLinkingUser(ctx, request, externalUser); err != nil {
 			return err
 		}
