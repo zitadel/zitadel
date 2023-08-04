@@ -342,12 +342,22 @@ message AuthFactor {
     oneof type {
         AuthFactorOTP otp = 2 [
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "one type use OTP or U2F"
+                description: "one type use OTP, OTPSMS, OTPEmail or U2F"
             }
         ];
         AuthFactorU2F u2f = 3 [
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "one type use OTP or U2F"
+                description: "one type use OTP, OTPSMS, OTPEmail or U2F"
+            }
+        ];
+        AuthFactorOTPSMS otp_sms = 4 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "one type use OTP, OTPSMS, OTPEmail or U2F"
+            }
+        ];
+        AuthFactorOTPEmail otp_email = 5 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "one type use OTP, OTPSMS, OTPEmail or U2F"
             }
         ];
     }
@@ -361,6 +371,8 @@ enum AuthFactorState {
 }
 
 message AuthFactorOTP {}
+message AuthFactorOTPSMS {}
+message AuthFactorOTPEmail {}
 
 message AuthFactorU2F {
     string id = 1 [

@@ -310,8 +310,8 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "org reduce2FAAdded",
-			reduce: (&loginPolicyProjection{}).reduce2FAAdded,
+			name:   "org reduceSecondFactorAdded",
+			reduce: (&loginPolicyProjection{}).reduceSecondFactorAdded,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LoginPolicySecondFactorAddedEventType),
@@ -342,8 +342,8 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "org reduce2FARemoved",
-			reduce: (&loginPolicyProjection{}).reduce2FARemoved,
+			name:   "org reduceSecondFactorRemoved",
+			reduce: (&loginPolicyProjection{}).reduceSecondFactorRemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LoginPolicySecondFactorRemovedEventType),
@@ -558,8 +558,8 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance reduce2FAAdded",
-			reduce: (&loginPolicyProjection{}).reduce2FAAdded,
+			name:   "instance reduceSecondFactorAdded u2f",
+			reduce: (&loginPolicyProjection{}).reduceSecondFactorAdded,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LoginPolicySecondFactorAddedEventType),
@@ -590,8 +590,8 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance reduce2FARemoved",
-			reduce: (&loginPolicyProjection{}).reduce2FARemoved,
+			name:   "instance reduceSecondFactorRemoved  u2f",
+			reduce: (&loginPolicyProjection{}).reduceSecondFactorRemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LoginPolicySecondFactorRemovedEventType),
@@ -613,6 +613,70 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 								anyArg{},
 								uint64(15),
 								domain.SecondFactorTypeU2F,
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:   "instance reduceSecondFactorAdded otp email",
+			reduce: (&loginPolicyProjection{}).reduceSecondFactorAdded,
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.LoginPolicySecondFactorAddedEventType),
+					instance.AggregateType,
+					[]byte(`{
+			"mfaType": 3
+			}`),
+				), instance.SecondFactorAddedEventMapper),
+			},
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.login_policies5 SET (change_date, sequence, second_factors) = ($1, $2, array_append(second_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								domain.SecondFactorTypeOTPEmail,
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:   "instance reduceSecondFactorRemoved otp email",
+			reduce: (&loginPolicyProjection{}).reduceSecondFactorRemoved,
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.LoginPolicySecondFactorRemovedEventType),
+					instance.AggregateType,
+					[]byte(`{
+			"mfaType": 3
+			}`),
+				), instance.SecondFactorRemovedEventMapper),
+			},
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.login_policies5 SET (change_date, sequence, second_factors) = ($1, $2, array_remove(second_factors, $3)) WHERE (aggregate_id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								domain.SecondFactorTypeOTPEmail,
 								"agg-id",
 								"instance-id",
 							},

@@ -383,7 +383,12 @@ SystemDefaults:
     # Hasher:
     #   Algorithm: "scrypt"
     #   Cost: 15
-    
+
+    # Hasher:
+    #   Algorithm: "pbkdf2"
+    #   Rounds: 290000
+    #   Hash: "sha256" # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
+
     # Verifiers enable the possibility of verifying
     # passwords that are previously hashed using another
     # algorithm then the Hasher.
@@ -402,6 +407,7 @@ SystemDefaults:
     #   - "bcrypt"
     #   - "md5"
     #   - "scrypt"
+    #   - "pbkdf2" # verifier for all pbkdf2 hash modes.
   Multifactors:
     OTP:
       # If this is empty, the issuer is the requested domain
@@ -562,6 +568,20 @@ DefaultInstance:
       Length: 32
       IncludeLowerLetters: true
       IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
+    OTPSMS:
+      Length: 8
+      Expiry: "5m"
+      IncludeLowerLetters: false
+      IncludeUpperLetters: false
+      IncludeDigits: true
+      IncludeSymbols: false
+    OTPEmail:
+      Length: 8
+      Expiry: "5m"
+      IncludeLowerLetters: false
+      IncludeUpperLetters: false
       IncludeDigits: true
       IncludeSymbols: false
   PasswordComplexityPolicy:

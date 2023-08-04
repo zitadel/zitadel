@@ -1101,7 +1101,9 @@
         "3": "Telefonnummer Verificationscode",
         "4": "Passwort Zurücksetzen Code",
         "5": "Passwordless Initialisierungscode",
-        "6": "Applicationssecret"
+        "6": "Applicationssecret",
+        "7": "One Time Password (OTP) - SMS",
+        "8": "One Time Password (OTP) - Email"
       },
       "ADDGENERATOR": "Secret Erscheinungsbild definieren",
       "GENERATORTYPE": "Typ",
@@ -1847,8 +1849,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
-      "1": "One Time Password (OTP)",
-      "2": "Fingerabdruck, Security Keys, Face ID und andere"
+      "1": "One Time Password per Authenticator App (TOTP)",
+      "2": "Fingerabdruck, Security Keys, Face ID und andere",
+      "3": "One Time Password per Email (Email OTP)",
+      "4": "One Time Password per SMS (SMS OTP)"
     }
   },
   "LOGINPOLICY": {
