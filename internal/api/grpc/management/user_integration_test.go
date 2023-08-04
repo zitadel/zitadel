@@ -50,43 +50,43 @@ func TestImport_and_Get(t *testing.T) {
 
 	for i := 0; i < N; i++ {
 		firstName := strconv.Itoa(i)
-		t.Run(firstName, func(t *testing.T) {
-			// create unique names.
-			lastName := strconv.FormatInt(time.Now().Unix(), 10)
-			userName := strings.Join([]string{firstName, lastName}, "_")
-			email := strings.Join([]string{userName, "zitadel.com"}, "@")
+		//t.Run(firstName, func(t *testing.T) {
+		// create unique names.
+		lastName := strconv.FormatInt(time.Now().Unix(), 10)
+		userName := strings.Join([]string{firstName, lastName}, "_")
+		email := strings.Join([]string{userName, "zitadel.com"}, "@")
 
-			res, err := Client.ImportHumanUser(CTX, &management.ImportHumanUserRequest{
-				UserName: userName,
-				Profile: &management.ImportHumanUserRequest_Profile{
-					FirstName:         firstName,
-					LastName:          lastName,
-					PreferredLanguage: language.Afrikaans.String(),
-					Gender:            user.Gender_GENDER_DIVERSE,
-				},
-				Email: &management.ImportHumanUserRequest_Email{
-					Email:           email,
-					IsEmailVerified: true,
-				},
-			})
-			require.NoError(t, err)
-
-			_, err = Client.GetUserByID(CTX, &management.GetUserByIDRequest{Id: res.GetUserId()})
-
-			/*
-				if s, ok := status.FromError(err); ok {
-					if s == nil {
-						return
-					}
-					if s.Code() == codes.NotFound {
-						t.Log(s)
-						misses++
-						return
-					}
-				}
-			*/
-			require.NoError(t, err) // catch and fail on any other error
+		res, err := Client.ImportHumanUser(CTX, &management.ImportHumanUserRequest{
+			UserName: userName,
+			Profile: &management.ImportHumanUserRequest_Profile{
+				FirstName:         firstName,
+				LastName:          lastName,
+				PreferredLanguage: language.Afrikaans.String(),
+				Gender:            user.Gender_GENDER_DIVERSE,
+			},
+			Email: &management.ImportHumanUserRequest_Email{
+				Email:           email,
+				IsEmailVerified: true,
+			},
 		})
+		require.NoError(t, err)
+
+		_, err = Client.GetUserByID(CTX, &management.GetUserByIDRequest{Id: res.GetUserId()})
+
+		/*
+			if s, ok := status.FromError(err); ok {
+				if s == nil {
+					return
+				}
+				if s.Code() == codes.NotFound {
+					t.Log(s)
+					misses++
+					return
+				}
+			}
+		*/
+		require.NoError(t, err) // catch and fail on any other error
+		//})
 	}
 	assert.Zerof(t, misses, "Not Found errors %d out of %d", misses, N)
 }
