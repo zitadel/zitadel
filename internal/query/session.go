@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
@@ -169,6 +170,9 @@ func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, s
 	if sessionToken == "" {
 		return session, nil
 	}
+
+	logging.New().WithField("session_seq", session.Sequence).Debug("get session")
+
 	if err := q.sessionTokenVerifier(ctx, sessionToken, session.ID, tokenID); err != nil {
 		return nil, errors.ThrowPermissionDenied(nil, "QUERY-dsfr3", "Errors.PermissionDenied")
 	}
