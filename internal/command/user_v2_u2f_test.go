@@ -51,7 +51,7 @@ func TestCommands_RegisterUserU2F(t *testing.T) {
 				userID:        "foo",
 				resourceOwner: "org1",
 			},
-			wantErr: caos_errs.ThrowUnauthenticated(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
 		},
 		{
 			name: "get human passwordless error",

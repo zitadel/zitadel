@@ -21,7 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-func TestCommandSide_AddHumanOTP(t *testing.T) {
+func TestCommandSide_AddHumanTOTP(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -209,7 +209,7 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddHumanOTP(tt.args.ctx, tt.args.userID, tt.args.orgID)
+			got, err := r.AddHumanTOTP(tt.args.ctx, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -223,7 +223,7 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 	}
 }
 
-func TestCommands_createHumanOTP(t *testing.T) {
+func TestCommands_createHumanTOTP(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -513,11 +513,11 @@ func TestCommands_createHumanOTP(t *testing.T) {
 	}
 }
 
-func TestCommands_HumanCheckMFAOTPSetup(t *testing.T) {
+func TestCommands_HumanCheckMFATOTPSetup(t *testing.T) {
 	ctx := authz.NewMockContext("", "org1", "user1")
 
 	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
-	key, secret, err := domain.NewOTPKey("example.com", "user1", cryptoAlg)
+	key, secret, err := domain.NewTOTPKey("example.com", "user1", cryptoAlg)
 	require.NoError(t, err)
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 
@@ -681,7 +681,7 @@ func TestCommands_HumanCheckMFAOTPSetup(t *testing.T) {
 					},
 				},
 			}
-			got, err := c.HumanCheckMFAOTPSetup(ctx, tt.args.userID, tt.args.code, "agent1", tt.args.resourceOwner)
+			got, err := c.HumanCheckMFATOTPSetup(ctx, tt.args.userID, tt.args.code, "agent1", tt.args.resourceOwner)
 			require.ErrorIs(t, err, tt.wantErr)
 			if tt.want {
 				require.NotNil(t, got)
@@ -691,7 +691,7 @@ func TestCommands_HumanCheckMFAOTPSetup(t *testing.T) {
 	}
 }
 
-func TestCommandSide_RemoveHumanOTP(t *testing.T) {
+func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -782,7 +782,7 @@ func TestCommandSide_RemoveHumanOTP(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.HumanRemoveOTP(tt.args.ctx, tt.args.userID, tt.args.orgID)
+			got, err := r.HumanRemoveTOTP(tt.args.ctx, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -792,6 +792,527 @@ func TestCommandSide_RemoveHumanOTP(t *testing.T) {
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.want, got)
 			}
+		})
+	}
+}
+
+func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
+	type fields struct {
+		eventstore func(*testing.T) *eventstore.Eventstore
+	}
+	type (
+		args struct {
+			ctx           context.Context
+			userID        string
+			resourceOwner string
+		}
+	)
+	type res struct {
+		want *domain.ObjectDetails
+		err  error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-QSF2s", "Errors.User.UserIDMissing"),
+			},
+		},
+		{
+			name: "wrong user, permission denied error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "other",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			},
+		},
+		{
+			name: "otp sms already exists, already exists error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPSMSAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.ThrowAlreadyExists(nil, "COMMAND-Ad3g2", "Errors.User.MFA.OTP.AlreadyReady"),
+			},
+		},
+		{
+			name: "phone not verified, precondition failed error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Q54j2", "Errors.User.MFA.OTP.NotReady"),
+			},
+		},
+		{
+			name: "phone removed, precondition failed error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanPhoneChangedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"+4179654321",
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPhoneVerifiedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPhoneRemovedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Q54j2", "Errors.User.MFA.OTP.NotReady"),
+			},
+		},
+		{
+			name: "successful add",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanPhoneChangedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"+4179654321",
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPhoneVerifiedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPSMSAddedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			got, err := r.AddHumanOTPSMS(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
+			assert.ErrorIs(t, err, tt.res.err)
+			assert.Equal(t, tt.res.want, got)
+		})
+	}
+}
+
+func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
+	type fields struct {
+		eventstore      func(*testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
+	}
+	type (
+		args struct {
+			ctx           context.Context
+			userID        string
+			resourceOwner string
+		}
+	)
+	type res struct {
+		want *domain.ObjectDetails
+		err  error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-S3br2", "Errors.User.UserIDMissing"),
+			},
+		},
+		{
+			name: "other user not permission, permission denied error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "other",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			},
+		},
+		{
+			name: "otp sms not added, not found error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.ThrowNotFound(nil, "COMMAND-Sr3h3", "Errors.User.MFA.OTP.NotExisting"),
+			},
+		},
+		{
+			name: "successful remove",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPSMSAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPSMSRemovedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
+			}
+			got, err := r.RemoveHumanOTPSMS(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
+			assert.ErrorIs(t, err, tt.res.err)
+			assert.Equal(t, tt.res.want, got)
+		})
+	}
+}
+
+func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
+	type fields struct {
+		eventstore func(*testing.T) *eventstore.Eventstore
+	}
+	type (
+		args struct {
+			ctx           context.Context
+			userID        string
+			resourceOwner string
+		}
+	)
+	type res struct {
+		want *domain.ObjectDetails
+		err  error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-Sg1hz", "Errors.User.UserIDMissing"),
+			},
+		},
+		{
+			name: "otp email already exists, already exists error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPEmailAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.ThrowAlreadyExists(nil, "COMMAND-MKL2s", "Errors.User.MFA.OTP.AlreadyReady"),
+			},
+		},
+		{
+			name: "email not verified, precondition failed error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-KLJ2d", "Errors.User.MFA.OTP.NotReady"),
+			},
+		},
+		{
+			name: "successful add",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanEmailChangedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"email@test.ch",
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPEmailAddedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			got, err := r.AddHumanOTPEmail(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
+			assert.ErrorIs(t, err, tt.res.err)
+			assert.Equal(t, tt.res.want, got)
+		})
+	}
+}
+
+func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
+	type fields struct {
+		eventstore      func(*testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
+	}
+	type (
+		args struct {
+			ctx           context.Context
+			userID        string
+			resourceOwner string
+		}
+	)
+	type res struct {
+		want *domain.ObjectDetails
+		err  error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-S2h11", "Errors.User.UserIDMissing"),
+			},
+		},
+		{
+			name: "other user not permission, permission denied error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "other",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			},
+		},
+		{
+			name: "otp email not added, not found error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: caos_errs.ThrowNotFound(nil, "COMMAND-b312D", "Errors.User.MFA.OTP.NotExisting"),
+			},
+		},
+		{
+			name: "successful remove",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPEmailAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPEmailRemovedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
+			}
+			got, err := r.RemoveHumanOTPEmail(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
+			assert.ErrorIs(t, err, tt.res.err)
+			assert.Equal(t, tt.res.want, got)
 		})
 	}
 }

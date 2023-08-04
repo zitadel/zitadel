@@ -673,7 +673,7 @@ type mfaVerifyData struct {
 	baseData
 	profileData
 	MFAType domain.MFAType
-	otpData
+	totpData
 }
 
 type mfaDoneData struct {
@@ -682,7 +682,7 @@ type mfaDoneData struct {
 	MFAType domain.MFAType
 }
 
-type otpData struct {
+type totpData struct {
 	Url    string
 	Secret string
 	QrCode string

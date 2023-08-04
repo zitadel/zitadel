@@ -104,6 +104,9 @@ func (e *Event) CreatedAt() time.Time {
 
 // Unmarshal implements [eventstore.Event]
 func (e *Event) Unmarshal(ptr any) error {
+	if len(e.Data) == 0 {
+		return nil
+	}
 	return json.Unmarshal(e.Data, ptr)
 }
 

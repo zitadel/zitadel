@@ -44,7 +44,7 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 				userID:        "foo",
 				resourceowner: "org1",
 			},
-			wantErr: caos_errs.ThrowUnauthenticated(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
 		},
 		{
 			name: "create otp error",
@@ -190,7 +190,7 @@ func TestCommands_CheckUserTOTP(t *testing.T) {
 	ctx := authz.NewMockContext("", "org1", "user1")
 
 	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
-	key, secret, err := domain.NewOTPKey("example.com", "user1", cryptoAlg)
+	key, secret, err := domain.NewTOTPKey("example.com", "user1", cryptoAlg)
 	require.NoError(t, err)
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 
@@ -217,7 +217,7 @@ func TestCommands_CheckUserTOTP(t *testing.T) {
 			args: args{
 				userID: "foo",
 			},
-			wantErr: caos_errs.ThrowUnauthenticated(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
 		},
 		{
 			name: "success",

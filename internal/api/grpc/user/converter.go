@@ -197,7 +197,7 @@ func AuthMethodToPb(mfa *query.AuthMethod) *user_pb.AuthFactor {
 		State: MFAStateToPb(mfa.State),
 	}
 	switch mfa.Type {
-	case domain.UserAuthMethodTypeOTP:
+	case domain.UserAuthMethodTypeTOTP:
 		factor.Type = &user_pb.AuthFactor_Otp{
 			Otp: &user_pb.AuthFactorOTP{},
 		}
@@ -207,6 +207,14 @@ func AuthMethodToPb(mfa *query.AuthMethod) *user_pb.AuthFactor {
 				Id:   mfa.TokenID,
 				Name: mfa.Name,
 			},
+		}
+	case domain.UserAuthMethodTypeOTPSMS:
+		factor.Type = &user_pb.AuthFactor_OtpSms{
+			OtpSms: &user_pb.AuthFactorOTPSMS{},
+		}
+	case domain.UserAuthMethodTypeOTPEmail:
+		factor.Type = &user_pb.AuthFactor_OtpEmail{
+			OtpEmail: &user_pb.AuthFactorOTPEmail{},
 		}
 	}
 	return factor

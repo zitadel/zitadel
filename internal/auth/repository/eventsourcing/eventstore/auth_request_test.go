@@ -1003,7 +1003,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					},
 				}, false},
 			[]domain.NextStep{&domain.MFAVerificationStep{
-				MFAProviders: []domain.MFAType{domain.MFATypeOTP},
+				MFAProviders: []domain.MFAType{domain.MFATypeTOTP},
 			}},
 			nil,
 		},
@@ -1037,7 +1037,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					},
 				}, false},
 			[]domain.NextStep{&domain.MFAVerificationStep{
-				MFAProviders: []domain.MFAType{domain.MFATypeOTP},
+				MFAProviders: []domain.MFAType{domain.MFATypeTOTP},
 			}},
 			nil,
 		},
@@ -1074,7 +1074,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					},
 				}, false},
 			[]domain.NextStep{&domain.MFAVerificationStep{
-				MFAProviders: []domain.MFAType{domain.MFATypeOTP},
+				MFAProviders: []domain.MFAType{domain.MFATypeTOTP},
 			}},
 			nil,
 		},
@@ -1624,7 +1624,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			&domain.MFAPromptStep{
 				MFAProviders: []domain.MFAType{
-					domain.MFATypeOTP,
+					domain.MFATypeTOTP,
 				},
 			},
 			false,
@@ -1650,7 +1650,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			&domain.MFAPromptStep{
 				Required: true,
 				MFAProviders: []domain.MFAType{
-					domain.MFATypeOTP,
+					domain.MFATypeTOTP,
 				},
 			},
 			false,
@@ -1718,7 +1718,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 
 			&domain.MFAVerificationStep{
-				MFAProviders: []domain.MFAType{domain.MFATypeOTP},
+				MFAProviders: []domain.MFAType{domain.MFATypeTOTP},
 			},
 			false,
 			nil,
@@ -1742,7 +1742,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				isInternal:  false,
 			},
 			&domain.MFAVerificationStep{
-				MFAProviders: []domain.MFAType{domain.MFATypeOTP},
+				MFAProviders: []domain.MFAType{domain.MFATypeTOTP},
 			},
 			false,
 			nil,
@@ -1790,7 +1790,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			&domain.MFAPromptStep{
 				Required: true,
 				MFAProviders: []domain.MFAType{
-					domain.MFATypeOTP,
+					domain.MFATypeTOTP,
 				},
 			},
 			false,
@@ -2115,14 +2115,7 @@ func Test_userByID(t *testing.T) {
 				viewProvider: &mockViewUser{
 					PasswordChangeRequired: true,
 				},
-				eventProvider: &mockEventUser{
-					&es_models.Event{
-						AggregateType: user_repo.AggregateType,
-						Typ:           user_repo.UserV1PasswordChangedType,
-						CreationDate:  testNow,
-						Data:          nil,
-					},
-				},
+				eventProvider: &mockEventErrUser{},
 			},
 			&user_model.UserView{
 				State:    user_model.UserStateActive,
@@ -2173,6 +2166,9 @@ func Test_userByID(t *testing.T) {
 			if (err != nil && tt.wantErr == nil) || (tt.wantErr != nil && !tt.wantErr(err)) {
 				t.Errorf("nextSteps() wrong error = %v", err)
 				return
+			}
+			if tt.name == "new user events but error, old view model state" {
+				assert.Nil(t, nil)
 			}
 			assert.Equal(t, tt.want, got)
 		})

@@ -81,6 +81,9 @@ func (e *event) Sequence() uint64 {
 
 // Unmarshal implements [eventstore.Event]
 func (e *event) Unmarshal(ptr any) error {
+	if len(e.payload) == 0 {
+		return nil
+	}
 	return json.Unmarshal(e.payload, ptr)
 }
 
