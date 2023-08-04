@@ -152,19 +152,21 @@ func (h *ProjectionHandler) TriggerErr(ctx context.Context, instances ...string)
 			return ctx, nil
 		}
 
-		// troubleshoot logging
-		for _, event := range events {
-			logging.New().WithFields(logrus.Fields{
-				"EditorService":                 event.EditorService(),
-				"EditorUser":                    event.EditorUser(),
-				"Type":                          event.Type(),
-				"Sequence":                      event.Sequence(),
-				"CreationDate":                  event.CreationDate(),
-				"PreviousAggregateSequence":     event.PreviousAggregateSequence(),
-				"PreviousAggregateTypeSequence": event.PreviousAggregateTypeSequence(),
-			}).Debug("events for trigger")
-		}
-		// end troubleshoot
+		/*
+			// troubleshoot logging
+			for _, event := range events {
+				logging.New().WithFields(logrus.Fields{
+					"EditorService":                 event.EditorService(),
+					"EditorUser":                    event.EditorUser(),
+					"Type":                          event.Type(),
+					"Sequence":                      event.Sequence(),
+					"CreationDate":                  event.CreationDate(),
+					"PreviousAggregateSequence":     event.PreviousAggregateSequence(),
+					"PreviousAggregateTypeSequence": event.PreviousAggregateTypeSequence(),
+				}).Debug("events for trigger")
+			}
+			// end troubleshoot
+		*/
 
 		_, err = h.Process(ctx, events...)
 		ctx = call.ResetTimestamp(ctx)
@@ -185,6 +187,18 @@ func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Ev
 	index = -1
 	statements := make([]*Statement, len(events))
 	for i, event := range events {
+		if h.ProjectionName == "projections.sessions3" {
+			logging.New().WithFields(logrus.Fields{
+				"EditorService":                 event.EditorService(),
+				"EditorUser":                    event.EditorUser(),
+				"Type":                          event.Type(),
+				"Sequence":                      event.Sequence(),
+				"CreationDate":                  event.CreationDate(),
+				"PreviousAggregateSequence":     event.PreviousAggregateSequence(),
+				"PreviousAggregateTypeSequence": event.PreviousAggregateTypeSequence(),
+			}).Debug("events for trigger")
+		}
+
 		statements[i], err = h.reduce(event)
 		if err != nil {
 			return index, err
