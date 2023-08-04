@@ -803,6 +803,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionLoginButtonText, "LoginButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								org.NewCustomTextSetEvent(context.Background(),
 									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTitle, "Title", language.English,
 								),
 							),
@@ -1372,6 +1377,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						Description:                        "Description",
 						RegisterUsernamePasswordButtonText: "RegisterUsernamePasswordButtonText",
 						ExternalLoginDescription:           "ExternalLoginDescription",
+						LoginButtonText:                    "LoginButtonText",
 					},
 					RegistrationUser: domain.RegistrationUserScreenText{
 						Title:                  "Title",
