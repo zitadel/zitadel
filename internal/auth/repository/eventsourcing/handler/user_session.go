@@ -215,6 +215,7 @@ func (s *UserSession) Reducers() []handler.AggregateReducer {
 	}
 }
 
+//nolint:gocognit
 func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err error) {
 	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
 		var session *view_model.UserSessionView

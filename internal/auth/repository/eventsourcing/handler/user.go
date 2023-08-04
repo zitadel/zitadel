@@ -309,6 +309,7 @@ func (u *User) Reducers() []handler.AggregateReducer {
 	}
 }
 
+//nolint:gocognit
 func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err error) {
 	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
 		user := new(view_model.UserView)
@@ -395,22 +396,14 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err er
 			}
 			err = u.fillLoginNames(user)
 		case user_repo.UserRemovedType:
-			err = u.view.DeleteUser(event.Aggregate().ID, event.Aggregate().InstanceID, event)
-			if err != nil {
-				return err
-			}
-			return nil
+			return u.view.DeleteUser(event.Aggregate().ID, event.Aggregate().InstanceID, event)
 		default:
 			return nil
 		}
 		if err != nil {
 			return err
 		}
-		err = u.view.PutUser(user, event)
-		if err != nil {
-			return err
-		}
-		return nil
+		return u.view.PutUser(user, event)
 	}), nil
 }
 
