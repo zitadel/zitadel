@@ -126,7 +126,7 @@ func (c *Commands) UserIDPLoginChecked(ctx context.Context, orgID, userID string
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-5n8sM", "Errors.IDMissing")
 	}
 
-	existingHuman, err := c.getHumanWriteModelByID(ctx, userID, orgID)
+	existingHuman, err := c.GetHumanWriteModelByID(ctx, userID, orgID)
 	if err != nil {
 		return err
 	}

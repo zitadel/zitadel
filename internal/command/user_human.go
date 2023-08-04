@@ -16,7 +16,7 @@ import (
 )
 
 func (c *Commands) getHuman(ctx context.Context, userID, resourceowner string) (*domain.Human, error) {
-	human, err := c.getHumanWriteModelByID(ctx, userID, resourceowner)
+	human, err := c.GetHumanWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {
 		return nil, err
 	}
@@ -425,7 +425,7 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 	}
 
 	if human.AggregateID != "" {
-		existing, err := c.getHumanWriteModelByID(ctx, human.AggregateID, human.ResourceOwner)
+		existing, err := c.GetHumanWriteModelByID(ctx, human.AggregateID, human.ResourceOwner)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -648,7 +648,7 @@ func (c *Commands) HumanSkipMFAInit(ctx context.Context, userID, resourceowner s
 		return errors.ThrowInvalidArgument(nil, "COMMAND-2xpX9", "Errors.User.UserIDMissing")
 	}
 
-	existingHuman, err := c.getHumanWriteModelByID(ctx, userID, resourceowner)
+	existingHuman, err := c.GetHumanWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {
 		return err
 	}
@@ -739,7 +739,7 @@ func (c *Commands) HumansSignOut(ctx context.Context, agentID string, userIDs []
 	}
 	events := make([]eventstore.Command, 0)
 	for _, userID := range userIDs {
-		existingUser, err := c.getHumanWriteModelByID(ctx, userID, "")
+		existingUser, err := c.GetHumanWriteModelByID(ctx, userID, "")
 		if err != nil {
 			return err
 		}
@@ -758,7 +758,7 @@ func (c *Commands) HumansSignOut(ctx context.Context, agentID string, userIDs []
 	return err
 }
 
-func (c *Commands) getHumanWriteModelByID(ctx context.Context, userID, resourceowner string) (*HumanWriteModel, error) {
+func (c *Commands) GetHumanWriteModelByID(ctx context.Context, userID, resourceowner string) (*HumanWriteModel, error) {
 	humanWriteModel := NewHumanWriteModel(userID, resourceowner)
 	err := c.Eventstore.FilterToQueryReducer(ctx, humanWriteModel)
 	if err != nil {

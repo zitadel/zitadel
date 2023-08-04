@@ -40,7 +40,7 @@ func (c *Commands) requestPasswordReset(ctx context.Context, userID string, retu
 	if userID == "" {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-SAFdda", "Errors.User.IDMissing")
 	}
-	model, err := c.getHumanWriteModelByID(ctx, userID, "")
+	model, err := c.GetHumanWriteModelByID(ctx, userID, "")
 	if err != nil {
 		return nil, nil, err
 	}

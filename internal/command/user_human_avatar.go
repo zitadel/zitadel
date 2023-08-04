@@ -40,7 +40,7 @@ func (c *Commands) RemoveHumanAvatar(ctx context.Context, orgID, userID string) 
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "USER-1B8sd", "Errors.IDMissing")
 	}
-	existingUser, err := c.getHumanWriteModelByID(ctx, userID, orgID)
+	existingUser, err := c.GetHumanWriteModelByID(ctx, userID, orgID)
 	if err != nil {
 		return nil, err
 	}

@@ -268,7 +268,7 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 	audience = domain.AddAudScopeToAudience(ctx, audience, scopes)
 
 	preferredLanguage := ""
-	existingHuman, err := c.getHumanWriteModelByID(ctx, userWriteModel.AggregateID, userWriteModel.ResourceOwner)
+	existingHuman, err := c.GetHumanWriteModelByID(ctx, userWriteModel.AggregateID, userWriteModel.ResourceOwner)
 	if existingHuman != nil {
 		preferredLanguage = existingHuman.PreferredLanguage.String()
 	}

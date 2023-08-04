@@ -187,7 +187,7 @@ func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Ev
 	index = -1
 	statements := make([]*Statement, len(events))
 	for i, event := range events {
-		if h.ProjectionName == "projections.sessions3" {
+		if h.ProjectionName == "projections.users8" {
 			logging.New().WithFields(logrus.Fields{
 				"EditorService":                 event.EditorService(),
 				"EditorUser":                    event.EditorUser(),
@@ -196,7 +196,7 @@ func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Ev
 				"CreationDate":                  event.CreationDate(),
 				"PreviousAggregateSequence":     event.PreviousAggregateSequence(),
 				"PreviousAggregateTypeSequence": event.PreviousAggregateTypeSequence(),
-			}).Debug("events for trigger")
+			}).Debug("events for Process")
 		}
 
 		statements[i], err = h.reduce(event)

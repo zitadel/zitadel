@@ -41,6 +41,9 @@ func (s *Server) getUserByID(ctx context.Context, id string) (*query.User, error
 func (s *Server) GetUserByID(ctx context.Context, req *mgmt_pb.GetUserByIDRequest) (*mgmt_pb.GetUserByIDResponse, error) {
 	user, err := s.getUserByID(ctx, req.GetId())
 	if err != nil {
+		if wm, err := s.command.GetHumanWriteModelByID(ctx, req.GetId(), authz.GetCtxData(ctx).OrgID); err == nil {
+			logging.New().WithField("user_seq", wm.ProcessedSequence)
+		}
 		return nil, err
 	}
 	return &mgmt_pb.GetUserByIDResponse{
