@@ -1180,13 +1180,8 @@ func (s *Server) getCustomVerifySMSOTPMessageTexts(ctx context.Context, org stri
 
 		if !text.IsDefault {
 			customTexts = append(customTexts, &management_pb.SetCustomVerifySMSOTPMessageTextRequest{
-				Language:   lang,
-				Title:      text.Title,
-				PreHeader:  text.PreHeader,
-				Subject:    text.Subject,
-				Greeting:   text.Greeting,
-				Text:       text.Text,
-				FooterText: text.Footer,
+				Language: lang,
+				Text:     text.Text,
 			})
 		}
 	}

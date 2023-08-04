@@ -13,7 +13,7 @@ import (
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
-	"sigs.k8s.io/yaml" // TODO: not gopkg.in/yaml.v3?
+	"sigs.k8s.io/yaml"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"

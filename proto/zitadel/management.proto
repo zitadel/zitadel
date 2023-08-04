@@ -5883,7 +5883,6 @@ service ManagementService {
         };
 
         option (zitadel.v1.auth_option) = {
-            // TODO: not policy.write?
             permission: "policy.delete"
         };
 
@@ -5981,7 +5980,6 @@ service ManagementService {
         };
 
         option (zitadel.v1.auth_option) = {
-            // TODO: not policy.write?
             permission: "policy.delete"
         };
 
@@ -10868,7 +10866,6 @@ message GetDefaultVerifyPhoneMessageTextResponse {
 }
 
 message SetCustomVerifyPhoneMessageTextRequest {
-    // TODO: Why not: (google.api.field_behavior) = REQUIRED
     string language = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -10910,7 +10907,6 @@ message SetCustomVerifyPhoneMessageTextRequest {
             max_length: 800;
         }
     ];
-    // TODO: buttons can't be rendered in SMS, right?
     string button_text = 7 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -10956,42 +10952,13 @@ message SetCustomVerifySMSOTPMessageTextRequest {
             example: "\"de\""
         }
     ];
-    string title = 2 [
-        (validate.rules).string = {max_len: 200},
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"ZITADEL - One-time Password\""
-            max_length: 200;
-        }
-    ];
-    string pre_header = 3 [
-        (validate.rules).string = {max_len: 200},
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Verify One-time Password \""
-            max_length: 200;
-        }
-    ];
-    string subject = 4 [
-        (validate.rules).string = {max_len: 200},
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Verify One-time Password\""
-            max_length: 200;
-        }
-    ];
-    string greeting = 5  [
-        (validate.rules).string = {max_len: 200},
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Hello {{.FirstName}} {{.LastName}},\""
-            max_length: 200;
-        }
-    ];
-    string text = 6 [
+    string text = 2 [
         (validate.rules).string = {max_len: 800},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Please visit {{ .VerifyURL }} or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at ZITADEL within the next five minutes.\""
             max_length: 800;
         }
     ];
-    string footer_text = 7 [(validate.rules).string = {max_len: 200}];
 }
 
 message SetCustomVerifySMSOTPMessageTextResponse {

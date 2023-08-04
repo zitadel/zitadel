@@ -34,10 +34,6 @@ VerifyEmailOTP:
   Text: Please use the "Authenticate" button or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at ZITADEL within the next five minutes.
   ButtonText: Authenticate
 VerifySMSOTP:
-  Title: ZITADEL - Verify One-Time Password
-  PreHeader: Verify One-Time Password
-  Subject: Verify One-Time Password
-  Greeting: Hello {{.DisplayName}},
   Text: Please visit {{ .VerifyURL }} or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at ZITADEL within the next five minutes.
 DomainClaimed:
   Title: ZITADEL - Domain has been claimed

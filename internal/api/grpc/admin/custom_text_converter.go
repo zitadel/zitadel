@@ -73,12 +73,7 @@ func SetVerifySMSOTPCustomTextToDomain(msg *admin_pb.SetDefaultVerifySMSOTPMessa
 	return &domain.CustomMessageText{
 		MessageTextType: domain.VerifySMSOTPMessageType,
 		Language:        langTag,
-		Title:           msg.Title,
-		PreHeader:       msg.PreHeader,
-		Subject:         msg.Subject,
-		Greeting:        msg.Greeting,
 		Text:            msg.Text,
-		FooterText:      msg.FooterText,
 	}
 }
 

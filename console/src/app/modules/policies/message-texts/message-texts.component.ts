@@ -148,14 +148,9 @@ const REQUESTMAP = {
       get: new GetCustomVerifySMSOTPMessageTextRequest(),
       set: new SetCustomVerifySMSOTPMessageTextRequest(),
       getDefault: new GetDefaultVerifySMSOTPMessageTextRequest(),
-      setFcn: (map: Partial<Omit<MessageCustomText.AsObject, 'buttonText'>>): SetCustomVerifySMSOTPMessageTextRequest => {
+      setFcn: (map: Partial<MessageCustomText.AsObject>): SetCustomVerifySMSOTPMessageTextRequest => {
         const req = new SetCustomVerifySMSOTPMessageTextRequest();
-        req.setFooterText(map.footerText ?? '');
-        req.setGreeting(map.greeting ?? '');
-        req.setPreHeader(map.preHeader ?? '');
-        req.setSubject(map.subject ?? '');
         req.setText(map.text ?? '');
-        req.setTitle(map.title ?? '');
 
         return req;
       },
@@ -302,14 +297,9 @@ const REQUESTMAP = {
     [MESSAGETYPES.VERIFYSMSOTP]: {
       get: new AdminGetDefaultVerifySMSOTPMessageTextRequest(),
       set: new SetDefaultVerifySMSOTPMessageTextRequest(),
-      setFcn: (map: Partial<Omit<MessageCustomText.AsObject, 'buttonText'>>): SetDefaultVerifySMSOTPMessageTextRequest => {
+      setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultVerifySMSOTPMessageTextRequest => {
         const req = new SetDefaultVerifySMSOTPMessageTextRequest();
-        req.setFooterText(map.footerText ?? '');
-        req.setGreeting(map.greeting ?? '');
-        req.setPreHeader(map.preHeader ?? '');
-        req.setSubject(map.subject ?? '');
         req.setText(map.text ?? '');
-        req.setTitle(map.title ?? '');
 
         return req;
       },
@@ -792,7 +782,7 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
   }
 
   private stripSMS(prom: Promise<any>): Promise<any> {
-    return this.strip(prom, ['details, buttonText']);
+    return this.strip(prom, ['details', 'buttonText', 'footerText', 'greeting', 'preHeader', 'subject', 'title']);
   }
 
   public ngOnDestroy(): void {
