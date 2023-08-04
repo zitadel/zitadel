@@ -42,7 +42,7 @@ func (s *Server) GetUserByID(ctx context.Context, req *mgmt_pb.GetUserByIDReques
 	user, err := s.getUserByID(ctx, req.GetId())
 	if err != nil {
 		if wm, err := s.command.GetHumanWriteModelByID(ctx, req.GetId(), authz.GetCtxData(ctx).OrgID); err == nil {
-			logging.New().WithField("user_seq", wm.ProcessedSequence)
+			logging.New().WithField("user_seq", wm.ProcessedSequence).Debug("human from command")
 		}
 		return nil, err
 	}
