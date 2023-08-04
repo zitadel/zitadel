@@ -175,15 +175,15 @@ func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Ev
 		}
 
 		logging.New().WithFields(logrus.Fields{
-			"EditorService":                 event.EditorService(),
-			"EditorUser":                    event.EditorUser(),
-			"Type":                          event.Type(),
-			"Aggregate":                     event.Aggregate(),
+			"EditorService": event.EditorService(),
+			"EditorUser":    event.EditorUser(),
+			"Type":          event.Type(),
+			// "Aggregate":                     event.Aggregate(),
 			"Sequence":                      event.Sequence(),
 			"CreationDate":                  event.CreationDate(),
 			"PreviousAggregateSequence":     event.PreviousAggregateSequence(),
 			"PreviousAggregateTypeSequence": event.PreviousAggregateTypeSequence(),
-			"DataAsBytes":                   event.DataAsBytes(),
+			// "DataAsBytes":                   event.DataAsBytes(),
 		}).Debug("processing event")
 	}
 	for retry := 0; retry <= h.retries; retry++ {
