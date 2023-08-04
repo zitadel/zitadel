@@ -210,7 +210,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			name: "reduceExternalIDMigrated",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(user.UserIDPExternalIDMigratedType),
+					user.UserIDPExternalIDMigratedType,
 					user.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
@@ -221,9 +221,8 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpUserLinkProjection{}).reduceExternalIDMigrated,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
