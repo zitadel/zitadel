@@ -148,6 +148,7 @@ func (h *ProjectionHandler) TriggerErr(ctx context.Context, instances ...string)
 			return ctx, err
 		}
 		if len(events) == 0 {
+			logging.Debug("no events to process")
 			return ctx, nil
 		}
 
