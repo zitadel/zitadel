@@ -915,6 +915,7 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request
 	return nil
 }
 
+//nolint:gocognit
 func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.AuthRequest, checkLoggedIn bool) (steps []domain.NextStep, err error) {
 	if request == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-ds27a", "Errors.Internal")
