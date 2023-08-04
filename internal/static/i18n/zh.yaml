@@ -589,6 +589,8 @@ EventTypes:
         removed: 移除了外部 IDP
         cascade:
           removed: 移除了外部 IDP
+        id:
+          migrated: IDP 的外部用户 ID 已迁移
       phone:
         changed: 修改手机号码
         verified: 已验证手机号码
