@@ -225,7 +225,7 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -388,7 +388,7 @@ func TestCommandSide_ChangeIDPConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeIDPConfig(tt.args.ctx, tt.args.config, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -588,7 +588,7 @@ func TestCommands_RemoveIDPConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := c.RemoveIDPConfig(tt.args.ctx, tt.args.idpID, tt.args.orgID, tt.args.cascadeRemoveProvider, tt.args.cascadeExternalIDPs...)
 			if tt.res.err == nil {

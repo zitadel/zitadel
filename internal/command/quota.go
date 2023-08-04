@@ -53,11 +53,11 @@ func (c *Commands) AddQuota(
 	}
 	aggregate := quota.NewAggregate(aggregateId, instanceId, instanceId)
 
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddQuotaCommand(aggregate, q))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.AddQuotaCommand(aggregate, q))
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (c *Commands) RemoveQuota(ctx context.Context, unit QuotaUnit) (*domain.Obj
 	events := []eventstore.Command{
 		quota.NewRemovedEvent(ctx, &aggregate.Aggregate, unit.Enum()),
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (c *Commands) RemoveQuota(ctx context.Context, unit QuotaUnit) (*domain.Obj
 
 func (c *Commands) getQuotaWriteModel(ctx context.Context, instanceId, resourceOwner string, unit quota.Unit) (*quotaWriteModel, error) {
 	wm := newQuotaWriteModel(instanceId, resourceOwner, unit)
-	return wm, c.eventstore.FilterToQueryReducer(ctx, wm)
+	return wm, c.Eventstore.FilterToQueryReducer(ctx, wm)
 }
 
 type QuotaNotification struct {

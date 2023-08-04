@@ -21,7 +21,7 @@ func (c *Commands) getOrgPasswordComplexityPolicy(ctx context.Context, orgID str
 
 func (c *Commands) orgPasswordComplexityPolicyWriteModelByID(ctx context.Context, orgID string) (*OrgPasswordComplexityPolicyWriteModel, error) {
 	policy := NewOrgPasswordComplexityPolicyWriteModel(orgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, policy)
+	err := c.Eventstore.FilterToQueryReducer(ctx, policy)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (c *Commands) AddPasswordComplexityPolicy(ctx context.Context, resourceOwne
 		return nil, err
 	}
 	addedPolicy := NewOrgPasswordComplexityPolicyWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	err := c.Eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (c *Commands) AddPasswordComplexityPolicy(ctx context.Context, resourceOwne
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
-	pushedEvents, err := c.eventstore.Push(
+	pushedEvents, err := c.Eventstore.Push(
 		ctx,
 		org.NewPasswordComplexityPolicyAddedEvent(
 			ctx,
@@ -74,7 +74,7 @@ func (c *Commands) ChangePasswordComplexityPolicy(ctx context.Context, resourceO
 	}
 
 	existingPolicy := NewOrgPasswordComplexityPolicyWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.Eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (c *Commands) ChangePasswordComplexityPolicy(ctx context.Context, resourceO
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-DAs21", "Errors.Org.PasswordComplexityPolicy.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (c *Commands) RemovePasswordComplexityPolicy(ctx context.Context, orgID str
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	pushedEvents, err := c.Eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (c *Commands) RemovePasswordComplexityPolicy(ctx context.Context, orgID str
 }
 
 func (c *Commands) removePasswordComplexityPolicy(ctx context.Context, existingPolicy *OrgPasswordComplexityPolicyWriteModel) (*org.PasswordComplexityPolicyRemovedEvent, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.Eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
 	}

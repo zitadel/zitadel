@@ -14,11 +14,11 @@ import (
 
 func (c *Commands) AddDefaultDomainPolicy(ctx context.Context, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain bool) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultDomainPolicy(instanceAgg, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareAddDefaultDomainPolicy(instanceAgg, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -27,11 +27,11 @@ func (c *Commands) AddDefaultDomainPolicy(ctx context.Context, userLoginMustBeDo
 
 func (c *Commands) ChangeDefaultDomainPolicy(ctx context.Context, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain bool) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareChangeDefaultDomainPolicy(instanceAgg, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareChangeDefaultDomainPolicy(instanceAgg, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (c *Commands) defaultDomainPolicyWriteModelByID(ctx context.Context) (polic
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewInstanceDomainPolicyWriteModel(ctx)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

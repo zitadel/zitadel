@@ -33,7 +33,7 @@ func (c *Commands) ImportHumanTOTP(ctx context.Context, userID, userAgentID, res
 	}
 	userAgg := UserAggregateFromWriteModel(&otpWriteModel.WriteModel)
 
-	_, err = c.eventstore.Push(ctx,
+	_, err = c.Eventstore.Push(ctx,
 		user.NewHumanOTPAddedEvent(ctx, userAgg, encryptedSecret),
 		user.NewHumanOTPVerifiedEvent(ctx, userAgg, userAgentID),
 	)
@@ -134,7 +134,7 @@ func (c *Commands) HumanCheckMFATOTPSetup(ctx context.Context, userID, code, use
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
 
-	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanOTPVerifiedEvent(ctx, userAgg, userAgentID))
+	pushedEvents, err := c.Eventstore.Push(ctx, user.NewHumanOTPVerifiedEvent(ctx, userAgg, userAgentID))
 	if err != nil {
 		return nil, err
 	}
@@ -159,10 +159,10 @@ func (c *Commands) HumanCheckMFATOTP(ctx context.Context, userID, code, resource
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
 	err = domain.VerifyTOTP(code, existingOTP.Secret, c.multifactors.OTP.CryptoMFA)
 	if err == nil {
-		_, err = c.eventstore.Push(ctx, user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+		_, err = c.Eventstore.Push(ctx, user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 		return err
 	}
-	_, pushErr := c.eventstore.Push(ctx, user.NewHumanOTPCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+	_, pushErr := c.Eventstore.Push(ctx, user.NewHumanOTPCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 	logging.OnError(pushErr).Error("error create password check failed event")
 	return err
 }
@@ -180,7 +180,7 @@ func (c *Commands) HumanRemoveTOTP(ctx context.Context, userID, resourceOwner st
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Hd9sd", "Errors.User.MFA.OTP.NotExisting")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanOTPRemovedEvent(ctx, userAgg))
+	pushedEvents, err := c.Eventstore.Push(ctx, user.NewHumanOTPRemovedEvent(ctx, userAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -289,7 +289,7 @@ func (c *Commands) totpWriteModelByID(ctx context.Context, userID, resourceOwner
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewHumanTOTPWriteModel(userID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}
@@ -301,7 +301,7 @@ func (c *Commands) otpSMSWriteModelByID(ctx context.Context, userID, resourceOwn
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewHumanOTPSMSWriteModel(userID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}
@@ -313,7 +313,7 @@ func (c *Commands) otpEmailWriteModelByID(ctx context.Context, userID, resourceO
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewHumanOTPEmailWriteModel(userID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

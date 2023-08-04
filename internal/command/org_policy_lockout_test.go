@@ -122,7 +122,7 @@ func TestCommandSide_AddPasswordLockoutPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddLockoutPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
@@ -269,7 +269,7 @@ func TestCommandSide_ChangePasswordLockoutPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeLockoutPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
@@ -371,7 +371,7 @@ func TestCommandSide_RemovePasswordLockoutPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			_, err := r.RemoveLockoutPolicy(tt.args.ctx, tt.args.orgID)
 			if tt.res.err == nil {

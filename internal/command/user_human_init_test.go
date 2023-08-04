@@ -286,7 +286,7 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ResendInitialMail(tt.args.ctx, tt.args.userID, domain.EmailAddress(tt.args.email), tt.args.resourceOwner, tt.args.secretGenerator)
 			if tt.res.err == nil {
@@ -609,7 +609,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore,
+				Eventstore:         tt.fields.eventstore,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
 			err := r.HumanVerifyInitCode(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.code, tt.args.password, tt.args.secretGenerator)
@@ -716,7 +716,7 @@ func TestCommandSide_InitCodeSent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			err := r.HumanInitCodeSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID)
 			if tt.res.err == nil {

@@ -29,7 +29,7 @@ func (c *Commands) AddSMSConfigTwilio(ctx context.Context, instanceID string, co
 	}
 
 	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigTwilioAddedEvent(
+	pushedEvents, err := c.Eventstore.Push(ctx, instance.NewSMSConfigTwilioAddedEvent(
 		ctx,
 		iamAgg,
 		id,
@@ -71,7 +71,7 @@ func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, instanceID, id str
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-jf9wk", "Errors.NoChangesFound")
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (c *Commands) ChangeSMSConfigTwilioToken(ctx context.Context, instanceID, i
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigTokenChangedEvent(
+	pushedEvents, err := c.Eventstore.Push(ctx, instance.NewSMSConfigTokenChangedEvent(
 		ctx,
 		iamAgg,
 		id,
@@ -126,7 +126,7 @@ func (c *Commands) ActivateSMSConfig(ctx context.Context, instanceID, id string)
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-sn9we", "Errors.SMSConfig.AlreadyActive")
 	}
 	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigTwilioActivatedEvent(
+	pushedEvents, err := c.Eventstore.Push(ctx, instance.NewSMSConfigTwilioActivatedEvent(
 		ctx,
 		iamAgg,
 		id))
@@ -156,7 +156,7 @@ func (c *Commands) DeactivateSMSConfig(ctx context.Context, instanceID, id strin
 	}
 
 	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigDeactivatedEvent(
+	pushedEvents, err := c.Eventstore.Push(ctx, instance.NewSMSConfigDeactivatedEvent(
 		ctx,
 		iamAgg,
 		id))
@@ -183,7 +183,7 @@ func (c *Commands) RemoveSMSConfig(ctx context.Context, instanceID, id string) (
 	}
 
 	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigRemovedEvent(
+	pushedEvents, err := c.Eventstore.Push(ctx, instance.NewSMSConfigRemovedEvent(
 		ctx,
 		iamAgg,
 		id))
@@ -198,7 +198,7 @@ func (c *Commands) RemoveSMSConfig(ctx context.Context, instanceID, id string) (
 }
 func (c *Commands) getSMSConfig(ctx context.Context, instanceID, id string) (_ *IAMSMSConfigWriteModel, err error) {
 	writeModel := NewIAMSMSConfigWriteModel(instanceID, id)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

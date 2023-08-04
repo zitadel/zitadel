@@ -14,12 +14,12 @@ import (
 
 func (c *Commands) AddSecretGeneratorConfig(ctx context.Context, typ domain.SecretGeneratorType, config *crypto.GeneratorConfig) (*domain.ObjectDetails, error) {
 	agg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddSecretGeneratorConfig(agg, typ, config))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareAddSecretGeneratorConfig(agg, typ, config))
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (c *Commands) RemoveSecretGeneratorConfig(ctx context.Context, generatorTyp
 		return nil, errors.ThrowNotFound(nil, "COMMAND-b8les", "Errors.SecretGenerator.NotFound")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&generatorWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSecretGeneratorRemovedEvent(ctx, instanceAgg, generatorType))
+	pushedEvents, err := c.Eventstore.Push(ctx, instance.NewSecretGeneratorRemovedEvent(ctx, instanceAgg, generatorType))
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func (c *Commands) RemoveSecretGeneratorConfig(ctx context.Context, generatorTyp
 
 func (c *Commands) getSecretConfig(ctx context.Context, generatorType domain.SecretGeneratorType) (_ *InstanceSecretGeneratorConfigWriteModel, err error) {
 	writeModel := NewInstanceSecretGeneratorConfigWriteModel(ctx, generatorType)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

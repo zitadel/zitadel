@@ -21,7 +21,7 @@ func (c *Commands) getOrgPrivacyPolicy(ctx context.Context, orgID string) (*doma
 
 func (c *Commands) orgPrivacyPolicyWriteModelByID(ctx context.Context, orgID string) (*OrgPrivacyPolicyWriteModel, error) {
 	policy := NewOrgPrivacyPolicyWriteModel(orgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, policy)
+	err := c.Eventstore.FilterToQueryReducer(ctx, policy)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (c *Commands) AddPrivacyPolicy(ctx context.Context, resourceOwner string, p
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-MMk9fs", "Errors.ResourceOwnerMissing")
 	}
 	addedPolicy := NewOrgPrivacyPolicyWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	err := c.Eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (c *Commands) AddPrivacyPolicy(ctx context.Context, resourceOwner string, p
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
-	pushedEvents, err := c.eventstore.Push(
+	pushedEvents, err := c.Eventstore.Push(
 		ctx,
 		org.NewPrivacyPolicyAddedEvent(
 			ctx,
@@ -96,7 +96,7 @@ func (c *Commands) ChangePrivacyPolicy(ctx context.Context, resourceOwner string
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4N9fs", "Errors.Org.PrivacyPolicy.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (c *Commands) RemovePrivacyPolicy(ctx context.Context, orgID string) (*doma
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	pushedEvents, err := c.Eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func (c *Commands) RemovePrivacyPolicy(ctx context.Context, orgID string) (*doma
 }
 
 func (c *Commands) removePrivacyPolicy(ctx context.Context, existingPolicy *OrgPrivacyPolicyWriteModel) (*org.PrivacyPolicyRemovedEvent, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.Eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
 	}

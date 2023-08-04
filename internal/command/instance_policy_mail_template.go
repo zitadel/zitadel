@@ -19,7 +19,7 @@ func (c *Commands) AddDefaultMailTemplate(ctx context.Context, policy *domain.Ma
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	pushedEvents, err := c.Eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (c *Commands) addDefaultMailTemplate(ctx context.Context, instanceAgg *even
 	if !policy.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-fm9sd", "Errors.IAM.MailTemplate.Invalid")
 	}
-	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	err := c.Eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (c *Commands) ChangeDefaultMailTemplate(ctx context.Context, policy *domain
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (c *Commands) defaultMailTemplateWriteModelByID(ctx context.Context) (polic
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewInstanceMailTemplateWriteModel(ctx)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

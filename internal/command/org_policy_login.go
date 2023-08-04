@@ -65,11 +65,11 @@ type ChangeLoginPolicy struct {
 
 func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, policy *AddLoginPolicy) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddLoginPolicy(orgAgg, policy))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareAddLoginPolicy(orgAgg, policy))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, pol
 
 func (c *Commands) orgLoginPolicyWriteModelByID(ctx context.Context, orgID string) (*OrgLoginPolicyWriteModel, error) {
 	policyWriteModel := NewOrgLoginPolicyWriteModel(orgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, policyWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -98,11 +98,11 @@ func (c *Commands) getOrgLoginPolicy(ctx context.Context, orgID string) (*domain
 
 func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, policy *ChangeLoginPolicy) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareChangeLoginPolicy(orgAgg, policy))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareChangeLoginPolicy(orgAgg, policy))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) (*domain
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-55Mg9", "Errors.ResourceOwnerMissing")
 	}
 	existingPolicy := NewOrgLoginPolicyWriteModel(orgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.Eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) (*domain
 		return nil, caos_errs.ThrowNotFound(nil, "Org-GHB37", "Errors.Org.LoginPolicy.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, org.NewLoginPolicyRemovedEvent(ctx, orgAgg))
+	pushedEvents, err := c.Eventstore.Push(ctx, org.NewLoginPolicyRemovedEvent(ctx, orgAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -150,15 +150,15 @@ func (c *Commands) AddIDPToLoginPolicy(ctx context.Context, resourceOwner string
 
 	var exists bool
 	if idpProvider.Type == domain.IdentityProviderTypeOrg {
-		exists, err = ExistsOrgIDP(ctx, c.eventstore.Filter, idpProvider.IDPConfigID, resourceOwner)
+		exists, err = ExistsOrgIDP(ctx, c.Eventstore.Filter, idpProvider.IDPConfigID, resourceOwner)
 	} else {
-		exists, err = ExistsInstanceIDP(ctx, c.eventstore.Filter, idpProvider.IDPConfigID)
+		exists, err = ExistsInstanceIDP(ctx, c.Eventstore.Filter, idpProvider.IDPConfigID)
 	}
 	if !exists || err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "Org-3N9fs", "Errors.IDPConfig.NotExisting")
 	}
 	idpModel := NewOrgIdentityProviderWriteModel(resourceOwner, idpProvider.IDPConfigID)
-	err = c.eventstore.FilterToQueryReducer(ctx, idpModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ func (c *Commands) AddIDPToLoginPolicy(ctx context.Context, resourceOwner string
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&idpModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, org.NewIdentityProviderAddedEvent(ctx, orgAgg, idpProvider.IDPConfigID, idpProvider.Type))
+	pushedEvents, err := c.Eventstore.Push(ctx, org.NewIdentityProviderAddedEvent(ctx, orgAgg, idpProvider.IDPConfigID, idpProvider.Type))
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +194,7 @@ func (c *Commands) RemoveIDPFromLoginPolicy(ctx context.Context, resourceOwner s
 	}
 
 	idpModel := NewOrgIdentityProviderWriteModel(resourceOwner, idpProvider.IDPConfigID)
-	err = c.eventstore.FilterToQueryReducer(ctx, idpModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +205,7 @@ func (c *Commands) RemoveIDPFromLoginPolicy(ctx context.Context, resourceOwner s
 	orgAgg := OrgAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
 	events := c.removeIDPFromLoginPolicy(ctx, orgAgg, idpProvider.IDPConfigID, false, cascadeExternalIDPs...)
 
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -248,7 +248,7 @@ func (c *Commands) AddSecondFactorToLoginPolicy(ctx context.Context, secondFacto
 		return domain.SecondFactorTypeUnspecified, nil, err
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, addedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, addedEvent)
 	if err != nil {
 		return domain.SecondFactorTypeUnspecified, nil, err
 	}
@@ -261,7 +261,7 @@ func (c *Commands) AddSecondFactorToLoginPolicy(ctx context.Context, secondFacto
 }
 
 func (c *Commands) addSecondFactorToLoginPolicy(ctx context.Context, secondFactorModel *OrgSecondFactorWriteModel, secondFactor domain.SecondFactorType) (*org.LoginPolicySecondFactorAddedEvent, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, secondFactorModel)
 	if err != nil {
 		return nil, err
 	}
@@ -287,7 +287,7 @@ func (c *Commands) RemoveSecondFactorFromLoginPolicy(ctx context.Context, second
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, removedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, removedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -299,7 +299,7 @@ func (c *Commands) RemoveSecondFactorFromLoginPolicy(ctx context.Context, second
 }
 
 func (c *Commands) removeSecondFactorFromLoginPolicy(ctx context.Context, secondFactorModel *OrgSecondFactorWriteModel, secondFactor domain.SecondFactorType) (*org.LoginPolicySecondFactorRemovedEvent, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, secondFactorModel)
 	if err != nil {
 		return nil, err
 	}
@@ -323,7 +323,7 @@ func (c *Commands) AddMultiFactorToLoginPolicy(ctx context.Context, multiFactor 
 		return domain.MultiFactorTypeUnspecified, nil, err
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, addedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, addedEvent)
 	if err != nil {
 		return domain.MultiFactorTypeUnspecified, nil, err
 	}
@@ -335,7 +335,7 @@ func (c *Commands) AddMultiFactorToLoginPolicy(ctx context.Context, multiFactor 
 }
 
 func (c *Commands) addMultiFactorToLoginPolicy(ctx context.Context, multiFactorModel *OrgMultiFactorWriteModel, multiFactor domain.MultiFactorType) (*org.LoginPolicyMultiFactorAddedEvent, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, multiFactorModel)
 	if err != nil {
 		return nil, err
 	}
@@ -360,7 +360,7 @@ func (c *Commands) RemoveMultiFactorFromLoginPolicy(ctx context.Context, multiFa
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, removedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, removedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -372,7 +372,7 @@ func (c *Commands) RemoveMultiFactorFromLoginPolicy(ctx context.Context, multiFa
 }
 
 func (c *Commands) removeMultiFactorFromLoginPolicy(ctx context.Context, multiFactorModel *OrgMultiFactorWriteModel, multiFactor domain.MultiFactorType) (*org.LoginPolicyMultiFactorRemovedEvent, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, multiFactorModel)
 	if err != nil {
 		return nil, err
 	}
@@ -389,7 +389,7 @@ func (c *Commands) orgLoginPolicyAuthFactorsWriteModel(ctx context.Context, orgI
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewOrgAuthFactorsAllowedWriteModel(ctx, orgID)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

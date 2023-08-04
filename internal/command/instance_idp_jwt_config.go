@@ -12,7 +12,7 @@ func (c *Commands) ChangeDefaultIDPJWTConfig(ctx context.Context, config *domain
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-m9322", "Errors.IDMissing")
 	}
 	existingConfig := NewInstanceIDPJWTConfigWriteModel(ctx, config.IDPConfigID)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingConfig)
+	err := c.Eventstore.FilterToQueryReducer(ctx, existingConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (c *Commands) ChangeDefaultIDPJWTConfig(ctx context.Context, config *domain
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-3n9gg", "Errors.IAM.IDPConfig.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}

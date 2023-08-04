@@ -105,7 +105,7 @@ func TestCommands_RequestPasswordReset(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				checkPermission: tt.fields.checkPermission,
-				eventstore:      tt.fields.eventstore(t),
+				Eventstore:      tt.fields.eventstore(t),
 				userEncryption:  tt.fields.userEncryption,
 			}
 			_, _, err := c.RequestPasswordReset(tt.args.ctx, tt.args.userID)
@@ -203,7 +203,7 @@ func TestCommands_RequestPasswordResetReturnCode(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				checkPermission: tt.fields.checkPermission,
-				eventstore:      tt.fields.eventstore(t),
+				Eventstore:      tt.fields.eventstore(t),
 				userEncryption:  tt.fields.userEncryption,
 			}
 			_, _, err := c.RequestPasswordResetReturnCode(tt.args.ctx, tt.args.userID)
@@ -315,7 +315,7 @@ func TestCommands_RequestPasswordResetURLTemplate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				checkPermission: tt.fields.checkPermission,
-				eventstore:      tt.fields.eventstore(t),
+				Eventstore:      tt.fields.eventstore(t),
 				userEncryption:  tt.fields.userEncryption,
 			}
 			_, _, err := c.RequestPasswordResetURLTemplate(tt.args.ctx, tt.args.userID, tt.args.urlTmpl, tt.args.notificationType)
@@ -598,7 +598,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				checkPermission: tt.fields.checkPermission,
-				eventstore:      tt.fields.eventstore(t),
+				Eventstore:      tt.fields.eventstore(t),
 				userEncryption:  tt.fields.userEncryption,
 				newCode:         tt.fields.newCode,
 			}

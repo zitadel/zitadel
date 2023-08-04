@@ -202,7 +202,7 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddProjectRole(tt.args.ctx, tt.args.role, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -434,7 +434,7 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.BulkAddProjectRole(tt.args.ctx, tt.args.projectID, tt.args.resourceOwner, tt.args.roles)
 			if tt.res.err == nil {
@@ -677,7 +677,7 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeProjectRole(tt.args.ctx, tt.args.role, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -1041,7 +1041,7 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveProjectRole(tt.args.ctx, tt.args.projectID, tt.args.key, tt.args.resourceOwner, tt.args.cascadingProjectGrantIDs, tt.args.cascadingUserGrantIDs...)
 			if tt.res.err == nil {

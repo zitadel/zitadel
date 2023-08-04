@@ -159,7 +159,7 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddDefaultPrivacyPolicy(tt.args.ctx, tt.args.tosLink, tt.args.privacyLink, tt.args.helpLink, tt.args.supportEmail)
 			if tt.res.err == nil {
@@ -321,7 +321,7 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeDefaultPrivacyPolicy(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {

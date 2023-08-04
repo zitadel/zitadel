@@ -162,7 +162,7 @@ func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanPasswordCodeAddedEvent(ctx, userAgg, passwordCode.Code, passwordCode.Expiry, notifyType))
+	pushedEvents, err := c.Eventstore.Push(ctx, user.NewHumanPasswordCodeAddedEvent(ctx, userAgg, passwordCode.Code, passwordCode.Expiry, notifyType))
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func (c *Commands) PasswordCodeSent(ctx context.Context, orgID, userID string) (
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
-	_, err = c.eventstore.Push(ctx, user.NewHumanPasswordCodeSentEvent(ctx, userAgg))
+	_, err = c.Eventstore.Push(ctx, user.NewHumanPasswordCodeSentEvent(ctx, userAgg))
 	return err
 }
 
@@ -203,7 +203,7 @@ func (c *Commands) PasswordChangeSent(ctx context.Context, orgID, userID string)
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-x902b2v", "Errors.User.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
-	_, err = c.eventstore.Push(ctx, user.NewHumanPasswordChangeSentEvent(ctx, userAgg))
+	_, err = c.Eventstore.Push(ctx, user.NewHumanPasswordChangeSentEvent(ctx, userAgg))
 	return err
 }
 
@@ -250,7 +250,7 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 		if updated != "" {
 			commands = append(commands, user.NewHumanPasswordHashUpdatedEvent(ctx, userAgg, updated))
 		}
-		_, err = c.eventstore.Push(ctx, commands...)
+		_, err = c.Eventstore.Push(ctx, commands...)
 		return err
 	}
 
@@ -261,7 +261,7 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 		}
 
 	}
-	_, pushErr := c.eventstore.Push(ctx, commands...)
+	_, pushErr := c.Eventstore.Push(ctx, commands...)
 	logging.OnError(pushErr).Error("error create password check failed event")
 	return err
 }
@@ -271,7 +271,7 @@ func (c *Commands) passwordWriteModel(ctx context.Context, userID, resourceOwner
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewHumanPasswordWriteModel(userID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

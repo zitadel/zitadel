@@ -118,7 +118,7 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:     tt.fields.eventstore,
+				Eventstore:     tt.fields.eventstore,
 				idGenerator:    tt.fields.idGenerator,
 				webauthnConfig: webauthnConfig,
 			}
@@ -220,7 +220,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:     tt.fields.eventstore,
+				Eventstore:     tt.fields.eventstore,
 				idGenerator:    tt.fields.idGenerator,
 				webauthnConfig: webauthnConfig,
 			}
@@ -328,7 +328,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := c.verifyUserPasskeyCode(ctx, tt.args.userID, tt.args.resourceOwner, tt.args.codeID, tt.args.code, alg)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -438,14 +438,14 @@ func TestCommands_pushUserPasskey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:     eventstoreExpect(t, prep...),
+				Eventstore:     eventstoreExpect(t, prep...),
 				webauthnConfig: webauthnConfig,
 				idGenerator:    id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			}
 			wm, userAgg, webAuthN, err := c.createUserPasskey(ctx, "user1", "org1", "rpID", domain.AuthenticatorAttachmentCrossPlattform)
 			require.NoError(t, err)
 
-			c.eventstore = eventstoreExpect(t, tt.expectPush(webAuthN.Challenge))
+			c.Eventstore = eventstoreExpect(t, tt.expectPush(webAuthN.Challenge))
 
 			got, err := c.pushUserPasskey(ctx, wm, userAgg, webAuthN, tt.args.events...)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -538,7 +538,7 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				newCode:     tt.fields.newCode,
-				eventstore:  tt.fields.eventstore(t),
+				Eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
 			got, err := c.AddUserPasskeyCode(context.Background(), tt.args.userID, tt.args.resourceOwner, alg)
@@ -648,7 +648,7 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				newCode:     tt.fields.newCode,
-				eventstore:  tt.fields.eventstore,
+				Eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
 			got, err := c.AddUserPasskeyCodeURLTemplate(context.Background(), tt.args.userID, tt.args.resourceOwner, alg, tt.args.urlTmpl)
@@ -742,7 +742,7 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				newCode:     tt.fields.newCode,
-				eventstore:  tt.fields.eventstore,
+				Eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
 			got, err := c.AddUserPasskeyCodeReturn(context.Background(), tt.args.userID, tt.args.resourceOwner, alg)
@@ -906,7 +906,7 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				newCode:     tt.fields.newCode,
-				eventstore:  tt.fields.eventstore,
+				Eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
 			got, err := c.addUserPasskeyCode(context.Background(), tt.args.userID, tt.args.resourceOwner, alg, "", false)

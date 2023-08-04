@@ -277,7 +277,7 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore,
+				Eventstore:   tt.fields.eventstore,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
 			got, err := r.AddProjectMember(tt.args.ctx, tt.args.member, tt.args.resourceOwner)
@@ -479,7 +479,7 @@ func TestCommandSide_ChangeProjectMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore,
+				Eventstore:   tt.fields.eventstore,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
 			got, err := r.ChangeProjectMember(tt.args.ctx, tt.args.member, tt.args.resourceOwner)
@@ -609,7 +609,7 @@ func TestCommandSide_RemoveProjectMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveProjectMember(tt.args.ctx, tt.args.projectID, tt.args.userID, tt.args.resourceOwner)
 			if tt.res.err == nil {

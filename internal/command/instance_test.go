@@ -159,7 +159,7 @@ func TestCommandSide_UpdateInstance(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.UpdateInstance(tt.args.ctx, tt.args.name)
 			if tt.res.err == nil {
@@ -304,7 +304,7 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveInstance(tt.args.ctx, tt.args.instanceID)
 			if tt.res.err == nil {

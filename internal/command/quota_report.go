@@ -13,7 +13,7 @@ func (c *Commands) ReportQuotaUsage(ctx context.Context, dueNotifications []*quo
 	for idx, notification := range dueNotifications {
 		cmds[idx] = notification
 	}
-	_, err := c.eventstore.Push(ctx, cmds...)
+	_, err := c.Eventstore.Push(ctx, cmds...)
 	return err
 }
 
@@ -23,7 +23,7 @@ func (c *Commands) UsageNotificationSent(ctx context.Context, dueEvent *quota.No
 		return err
 	}
 
-	_, err = c.eventstore.Push(
+	_, err = c.Eventstore.Push(
 		ctx,
 		quota.NewNotifiedEvent(ctx, id, dueEvent),
 	)

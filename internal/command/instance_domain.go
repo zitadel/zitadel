@@ -22,11 +22,11 @@ var (
 func (c *Commands) AddInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.addInstanceDomain(instanceAgg, instanceDomain, false)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -40,11 +40,11 @@ func (c *Commands) AddInstanceDomain(ctx context.Context, instanceDomain string)
 func (c *Commands) SetPrimaryInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := setPrimaryInstanceDomain(instanceAgg, instanceDomain)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -58,11 +58,11 @@ func (c *Commands) SetPrimaryInstanceDomain(ctx context.Context, instanceDomain 
 func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := removeInstanceDomain(instanceAgg, instanceDomain)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -227,7 +227,7 @@ func containsURI(uris []string, uri string) bool {
 
 func (c *Commands) getInstanceDomainsWriteModel(ctx context.Context, instanceID string) (*InstanceDomainsWriteModel, error) {
 	domainsWriteModel := NewInstanceDomainsWriteModel(instanceID)
-	err := c.eventstore.FilterToQueryReducer(ctx, domainsWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, domainsWriteModel)
 	if err != nil {
 		return nil, err
 	}

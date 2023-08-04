@@ -171,7 +171,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
@@ -377,7 +377,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
@@ -483,7 +483,7 @@ func TestCommandSide_ActivateLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			_, err := r.ActivateLabelPolicy(tt.args.ctx, tt.args.orgID)
 			if tt.res.err == nil {
@@ -588,7 +588,7 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.static,
 			}
 			_, err := r.RemoveLabelPolicy(tt.args.ctx, tt.args.orgID)
@@ -769,7 +769,7 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.AddLogoLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.upload)
@@ -895,7 +895,7 @@ func TestCommandSide_RemoveLogoLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.RemoveLogoLabelPolicy(tt.args.ctx, tt.args.orgID)
@@ -1079,7 +1079,7 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.AddIconLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.upload)
@@ -1202,7 +1202,7 @@ func TestCommandSide_RemoveIconLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.RemoveIconLabelPolicy(tt.args.ctx, tt.args.orgID)
@@ -1386,7 +1386,7 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.AddLogoDarkLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.upload)
@@ -1512,7 +1512,7 @@ func TestCommandSide_RemoveLogoDarkLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.RemoveLogoDarkLabelPolicy(tt.args.ctx, tt.args.orgID)
@@ -1696,7 +1696,7 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.AddIconDarkLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.upload)
@@ -1817,7 +1817,7 @@ func TestCommandSide_RemoveIconDarkLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.RemoveIconDarkLabelPolicy(tt.args.ctx, tt.args.orgID)
@@ -1993,7 +1993,7 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.AddFontLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.upload)
@@ -2114,7 +2114,7 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.RemoveFontLabelPolicy(tt.args.ctx, tt.args.orgID)

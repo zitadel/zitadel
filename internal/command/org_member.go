@@ -75,11 +75,11 @@ func IsOrgMember(ctx context.Context, filter preparation.FilterToQueryReducer, o
 
 func (c *Commands) AddOrgMember(ctx context.Context, orgID, userID string, roles ...string) (*domain.Member, error) {
 	orgAgg := org.NewAggregate(orgID)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddOrgMemberCommand(orgAgg, userID, roles...))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.AddOrgMemberCommand(orgAgg, userID, roles...))
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (c *Commands) addOrgMember(ctx context.Context, orgAgg *eventstore.Aggregat
 	if len(domain.CheckForInvalidRoles(member.Roles, domain.OrgRolePrefix, c.zitadelRoles)) > 0 && len(domain.CheckForInvalidRoles(member.Roles, domain.RoleSelfManagementGlobal, c.zitadelRoles)) > 0 {
 		return nil, errors.ThrowInvalidArgument(nil, "Org-4N8es", "Errors.Org.MemberInvalid")
 	}
-	err := c.eventstore.FilterToQueryReducer(ctx, addedMember)
+	err := c.Eventstore.FilterToQueryReducer(ctx, addedMember)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +127,7 @@ func (c *Commands) ChangeOrgMember(ctx context.Context, member *domain.Member) (
 		return nil, errors.ThrowPreconditionFailed(nil, "Org-LiaZi", "Errors.Org.Member.RolesNotChanged")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, org.NewMemberChangedEvent(ctx, orgAgg, member.UserID, member.Roles...))
+	pushedEvents, err := c.Eventstore.Push(ctx, org.NewMemberChangedEvent(ctx, orgAgg, member.UserID, member.Roles...))
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func (c *Commands) RemoveOrgMember(ctx context.Context, orgID, userID string) (*
 
 	orgAgg := OrgAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
 	removeEvent := c.removeOrgMember(ctx, orgAgg, userID, false)
-	pushedEvents, err := c.eventstore.Push(ctx, removeEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +178,7 @@ func (c *Commands) orgMemberWriteModelByID(ctx context.Context, orgID, userID st
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewOrgMemberWriteModel(orgID, userID)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

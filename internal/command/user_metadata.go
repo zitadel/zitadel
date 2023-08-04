@@ -20,7 +20,7 @@ func (c *Commands) SetUserMetadata(ctx context.Context, metadata *domain.Metadat
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	pushedEvents, err := c.Eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwne
 		events[i] = event
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (c *Commands) RemoveUserMetadata(ctx context.Context, metadataKey, userID, 
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	pushedEvents, err := c.Eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +137,7 @@ func (c *Commands) BulkRemoveUserMetadata(ctx context.Context, userID, resourceO
 		events[i] = event
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +178,7 @@ func (c *Commands) removeUserMetadata(ctx context.Context, userAgg *eventstore.A
 
 func (c *Commands) getUserMetadataModelByID(ctx context.Context, userID, resourceOwner, key string) (*UserMetadataWriteModel, error) {
 	userMetadataWriteModel := NewUserMetadataWriteModel(userID, resourceOwner, key)
-	err := c.eventstore.FilterToQueryReducer(ctx, userMetadataWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, userMetadataWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +187,7 @@ func (c *Commands) getUserMetadataModelByID(ctx context.Context, userID, resourc
 
 func (c *Commands) getUserMetadataListModelByID(ctx context.Context, userID, resourceOwner string) (*UserMetadataListWriteModel, error) {
 	userMetadataWriteModel := NewUserMetadataListWriteModel(userID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, userMetadataWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, userMetadataWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +196,7 @@ func (c *Commands) getUserMetadataListModelByID(ctx context.Context, userID, res
 
 func (c *Commands) getUserMetadataByOrgListModelByID(ctx context.Context, resourceOwner string) (*UserMetadataByOrgListWriteModel, error) {
 	userMetadataWriteModel := NewUserMetadataByOrgListWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, userMetadataWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, userMetadataWriteModel)
 	if err != nil {
 		return nil, err
 	}

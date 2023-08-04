@@ -17,7 +17,7 @@ func (c *Commands) AddUserGrant(ctx context.Context, usergrant *domain.UserGrant
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	pushedEvents, err := c.Eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	pushedEvents, err := c.Eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +160,7 @@ func (c *Commands) DeactivateUserGrant(ctx context.Context, grantID, resourceOwn
 
 	deactivateUserGrant := NewUserGrantWriteModel(grantID, resourceOwner)
 	userGrantAgg := UserGrantAggregateFromWriteModel(&deactivateUserGrant.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, usergrant.NewUserGrantDeactivatedEvent(ctx, userGrantAgg))
+	pushedEvents, err := c.Eventstore.Push(ctx, usergrant.NewUserGrantDeactivatedEvent(ctx, userGrantAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +192,7 @@ func (c *Commands) ReactivateUserGrant(ctx context.Context, grantID, resourceOwn
 	}
 	deactivateUserGrant := NewUserGrantWriteModel(grantID, resourceOwner)
 	userGrantAgg := UserGrantAggregateFromWriteModel(&deactivateUserGrant.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, usergrant.NewUserGrantReactivatedEvent(ctx, userGrantAgg))
+	pushedEvents, err := c.Eventstore.Push(ctx, usergrant.NewUserGrantReactivatedEvent(ctx, userGrantAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +209,7 @@ func (c *Commands) RemoveUserGrant(ctx context.Context, grantID, resourceOwner s
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	pushedEvents, err := c.Eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -232,7 +232,7 @@ func (c *Commands) BulkRemoveUserGrant(ctx context.Context, grantIDs []string, r
 		}
 		events[i] = event
 	}
-	_, err = c.eventstore.Push(ctx, events...)
+	_, err = c.Eventstore.Push(ctx, events...)
 	return err
 }
 
@@ -278,7 +278,7 @@ func (c *Commands) userGrantWriteModelByID(ctx context.Context, userGrantID, res
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewUserGrantWriteModel(userGrantID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}
@@ -287,7 +287,7 @@ func (c *Commands) userGrantWriteModelByID(ctx context.Context, userGrantID, res
 
 func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string) error {
 	preConditions := NewUserGrantPreConditionReadModel(usergrant.UserID, usergrant.ProjectID, usergrant.ProjectGrantID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, preConditions)
+	err := c.Eventstore.FilterToQueryReducer(ctx, preConditions)
 	if err != nil {
 		return err
 	}

@@ -20,7 +20,7 @@ func (c *Commands) SetOrgMetadata(ctx context.Context, orgID string, metadata *d
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	pushedEvents, err := c.Eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (c *Commands) BulkSetOrgMetadata(ctx context.Context, orgID string, metadat
 		events[i] = event
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (c *Commands) RemoveOrgMetadata(ctx context.Context, orgID, metadataKey str
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	pushedEvents, err := c.Eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +137,7 @@ func (c *Commands) BulkRemoveOrgMetadata(ctx context.Context, orgID string, meta
 		events[i] = event
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +160,7 @@ func (c *Commands) removeOrgMetadata(ctx context.Context, orgAgg *eventstore.Agg
 
 func (c *Commands) getOrgMetadataModelByID(ctx context.Context, orgID, key string) (*OrgMetadataWriteModel, error) {
 	orgMetadataWriteModel := NewOrgMetadataWriteModel(orgID, key)
-	err := c.eventstore.FilterToQueryReducer(ctx, orgMetadataWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, orgMetadataWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +169,7 @@ func (c *Commands) getOrgMetadataModelByID(ctx context.Context, orgID, key strin
 
 func (c *Commands) getOrgMetadataListModelByID(ctx context.Context, orgID string) (*OrgMetadataListWriteModel, error) {
 	orgMetadataWriteModel := NewOrgMetadataListWriteModel(orgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, orgMetadataWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, orgMetadataWriteModel)
 	if err != nil {
 		return nil, err
 	}

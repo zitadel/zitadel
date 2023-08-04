@@ -186,7 +186,7 @@ func TestCommandSide_AddHumanAvatar(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.AddHumanAvatar(tt.args.ctx, tt.args.orgID, tt.args.userID, tt.args.upload)
@@ -353,7 +353,7 @@ func TestCommandSide_RemoveHumanAvatar(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.RemoveHumanAvatar(tt.args.ctx, tt.args.orgID, tt.args.userID)

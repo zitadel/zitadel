@@ -175,7 +175,7 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeHumanProfile(tt.args.ctx, tt.args.address)
 			if tt.res.err == nil {

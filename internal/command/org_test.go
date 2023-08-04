@@ -460,7 +460,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore,
+				Eventstore:   tt.fields.eventstore,
 				idGenerator:  tt.fields.idGenerator,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
@@ -719,7 +719,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			_, err := r.ChangeOrg(tt.args.ctx, tt.args.orgID, tt.args.name)
 			if tt.res.err == nil {
@@ -854,7 +854,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
+				Eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
 			_, err := r.DeactivateOrg(tt.args.ctx, tt.args.orgID)
@@ -994,7 +994,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
+				Eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
 			_, err := r.ReactivateOrg(tt.args.ctx, tt.args.orgID)
@@ -1312,7 +1312,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
+				Eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
 			_, err := r.RemoveOrg(tt.args.ctx, tt.args.orgID)

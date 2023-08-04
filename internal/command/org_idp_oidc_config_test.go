@@ -302,7 +302,7 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := r.ChangeIDPOIDCConfig(tt.args.ctx, tt.args.config, tt.args.resourceOwner)

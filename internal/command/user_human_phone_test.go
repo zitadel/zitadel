@@ -318,7 +318,7 @@ func TestCommandSide_ChangeHumanPhone(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeHumanPhone(tt.args.ctx, tt.args.email, tt.args.resourceOwner, tt.args.secretGenerator)
 			if tt.res.err == nil {
@@ -566,7 +566,7 @@ func TestCommandSide_VerifyHumanPhone(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.VerifyHumanPhone(tt.args.ctx, tt.args.userID, tt.args.code, tt.args.resourceOwner, tt.args.secretGenerator)
 			if tt.res.err == nil {
@@ -738,7 +738,7 @@ func TestCommandSide_CreateVerificationCodeHumanPhone(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.CreateHumanPhoneVerificationCode(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.secretGenerator)
 			if tt.res.err == nil {
@@ -853,7 +853,7 @@ func TestCommandSide_PhoneVerificationCodeSent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			err := r.HumanPhoneVerificationCodeSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID)
 			if tt.res.err == nil {
@@ -1002,7 +1002,7 @@ func TestCommandSide_RemoveHumanPhone(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveHumanPhone(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			if tt.res.err == nil {

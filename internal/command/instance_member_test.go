@@ -247,7 +247,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore,
+				Eventstore:   tt.fields.eventstore,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
 			got, err := r.AddInstanceMember(tt.args.ctx, tt.args.userID, tt.args.roles...)
@@ -428,7 +428,7 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore,
+				Eventstore:   tt.fields.eventstore,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
 			got, err := r.ChangeInstanceMember(tt.args.ctx, tt.args.member)
@@ -534,7 +534,7 @@ func TestCommandSide_RemoveIAMMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveInstanceMember(tt.args.ctx, tt.args.userID)
 			if tt.res.err == nil {

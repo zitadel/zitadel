@@ -12,11 +12,11 @@ import (
 
 func (c *Commands) AddDefaultNotificationPolicy(ctx context.Context, resourceOwner string, passwordChange bool) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultNotificationPolicy(instanceAgg, passwordChange))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareAddDefaultNotificationPolicy(instanceAgg, passwordChange))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -25,11 +25,11 @@ func (c *Commands) AddDefaultNotificationPolicy(ctx context.Context, resourceOwn
 
 func (c *Commands) ChangeDefaultNotificationPolicy(ctx context.Context, resourceOwner string, passwordChange bool) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareChangeDefaultNotificationPolicy(instanceAgg, passwordChange))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareChangeDefaultNotificationPolicy(instanceAgg, passwordChange))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}

@@ -17,6 +17,6 @@ func (c *Commands) MilestonePushed(
 	if err != nil {
 		return err
 	}
-	_, err = c.eventstore.Push(ctx, milestone.NewPushedEvent(ctx, milestone.NewAggregate(ctx, id), msType, endpoints, primaryDomain, c.externalDomain))
+	_, err = c.Eventstore.Push(ctx, milestone.NewPushedEvent(ctx, milestone.NewAggregate(ctx, id), msType, endpoints, primaryDomain, c.externalDomain))
 	return err
 }

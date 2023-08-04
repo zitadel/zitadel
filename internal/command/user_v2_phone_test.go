@@ -173,7 +173,7 @@ func TestCommands_ChangeUserPhone(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:      tt.fields.eventstore,
+				Eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
 			}
 			_, err := c.ChangeUserPhone(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.phone, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
@@ -291,7 +291,7 @@ func TestCommands_ChangeUserPhoneReturnCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:      tt.fields.eventstore,
+				Eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
 			}
 			_, err := c.ChangeUserPhoneReturnCode(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.phone, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
@@ -462,7 +462,7 @@ func TestCommands_ChangeUserPhoneVerified(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:      tt.fields.eventstore,
+				Eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := c.ChangeUserPhoneVerified(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.phone)
@@ -748,7 +748,7 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:      tt.fields.eventstore,
+				Eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := c.changeUserPhoneWithGenerator(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.phone, GetMockSecretGenerator(t), tt.args.returnCode)

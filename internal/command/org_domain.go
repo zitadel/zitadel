@@ -103,11 +103,11 @@ func orgDomain(ctx context.Context, filter preparation.FilterToQueryReducer, org
 
 func (c *Commands) VerifyOrgDomain(ctx context.Context, orgID, domain string) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(orgID)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, verifyOrgDomain(orgAgg, domain))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, verifyOrgDomain(orgAgg, domain))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -116,11 +116,11 @@ func (c *Commands) VerifyOrgDomain(ctx context.Context, orgID, domain string) (*
 
 func (c *Commands) AddOrgDomain(ctx context.Context, orgID, domain string, claimedUserIDs []string) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(orgID)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgDomain(orgAgg, domain, claimedUserIDs))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareAddOrgDomain(orgAgg, domain, claimedUserIDs))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +156,7 @@ func (c *Commands) GenerateOrgDomainValidation(ctx context.Context, orgDomain *d
 
 	orgAgg := OrgAggregateFromWriteModel(&domainWriteModel.WriteModel)
 
-	_, err = c.eventstore.Push(
+	_, err = c.Eventstore.Push(
 		ctx,
 		org.NewDomainVerificationAddedEvent(ctx, orgAgg, orgDomain.Domain, orgDomain.ValidationType, orgDomain.ValidationCode))
 	if err != nil {
@@ -202,7 +202,7 @@ func (c *Commands) ValidateOrgDomain(ctx context.Context, orgDomain *domain.OrgD
 			}
 			events = append(events, userEvents...)
 		}
-		pushedEvents, err := c.eventstore.Push(ctx, events...)
+		pushedEvents, err := c.Eventstore.Push(ctx, events...)
 		if err != nil {
 			return nil, err
 		}
@@ -213,7 +213,7 @@ func (c *Commands) ValidateOrgDomain(ctx context.Context, orgDomain *domain.OrgD
 		return writeModelToObjectDetails(&domainWriteModel.WriteModel), nil
 	}
 	events = append(events, org.NewDomainVerificationFailedEvent(ctx, orgAgg, orgDomain.Domain))
-	_, err = c.eventstore.Push(ctx, events...)
+	_, err = c.Eventstore.Push(ctx, events...)
 	logging.LogWithFields("ORG-dhTE", "orgID", orgAgg.ID, "domain", orgDomain.Domain).OnError(err).Error("NewDomainVerificationFailedEvent push failed")
 	return nil, errors.ThrowInvalidArgument(err, "ORG-GH3s", "Errors.Org.DomainVerificationFailed")
 }
@@ -233,7 +233,7 @@ func (c *Commands) SetPrimaryOrgDomain(ctx context.Context, orgDomain *domain.Or
 		return nil, errors.ThrowPreconditionFailed(nil, "ORG-Ggd32", "Errors.Org.DomainNotVerified")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&domainWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, org.NewDomainPrimarySetEvent(ctx, orgAgg, orgDomain.Domain))
+	pushedEvents, err := c.Eventstore.Push(ctx, org.NewDomainPrimarySetEvent(ctx, orgAgg, orgDomain.Domain))
 	if err != nil {
 		return nil, err
 	}
@@ -259,7 +259,7 @@ func (c *Commands) RemoveOrgDomain(ctx context.Context, orgDomain *domain.OrgDom
 		return nil, errors.ThrowPreconditionFailed(nil, "ORG-Sjdi3", "Errors.Org.PrimaryDomainNotDeletable")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&domainWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, org.NewDomainRemovedEvent(ctx, orgAgg, orgDomain.Domain, domainWriteModel.Verified))
+	pushedEvents, err := c.Eventstore.Push(ctx, org.NewDomainRemovedEvent(ctx, orgAgg, orgDomain.Domain, domainWriteModel.Verified))
 	if err != nil {
 		return nil, err
 	}
@@ -271,7 +271,7 @@ func (c *Commands) RemoveOrgDomain(ctx context.Context, orgDomain *domain.OrgDom
 }
 
 func (c *Commands) addOrgDomain(ctx context.Context, orgAgg *eventstore.Aggregate, addedDomain *OrgDomainWriteModel, orgDomain *domain.OrgDomain, claimedUserIDs []string) ([]eventstore.Command, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, addedDomain)
+	err := c.Eventstore.FilterToQueryReducer(ctx, addedDomain)
 	if err != nil {
 		return nil, err
 	}
@@ -302,7 +302,7 @@ func (c *Commands) addOrgDomain(ctx context.Context, orgAgg *eventstore.Aggregat
 
 func (c *Commands) changeDefaultDomain(ctx context.Context, orgID, newName string) ([]eventstore.Command, error) {
 	orgDomains := NewOrgDomainsWriteModel(orgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, orgDomains)
+	err := c.Eventstore.FilterToQueryReducer(ctx, orgDomains)
 	if err != nil {
 		return nil, err
 	}
@@ -331,7 +331,7 @@ func (c *Commands) changeDefaultDomain(ctx context.Context, orgID, newName strin
 
 func (c *Commands) removeCustomDomains(ctx context.Context, orgID string) ([]eventstore.Command, error) {
 	orgDomains := NewOrgDomainsWriteModel(orgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, orgDomains)
+	err := c.Eventstore.FilterToQueryReducer(ctx, orgDomains)
 	if err != nil {
 		return nil, err
 	}
@@ -363,7 +363,7 @@ func (c *Commands) removeCustomDomains(ctx context.Context, orgID string) ([]eve
 
 func (c *Commands) getOrgDomainWriteModel(ctx context.Context, orgID, domain string) (*OrgDomainWriteModel, error) {
 	domainWriteModel := NewOrgDomainWriteModel(orgID, domain)
-	err := c.eventstore.FilterToQueryReducer(ctx, domainWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, domainWriteModel)
 	if err != nil {
 		return nil, err
 	}

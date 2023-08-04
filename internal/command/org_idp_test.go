@@ -299,7 +299,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -632,7 +632,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgGenericOAuthProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -849,7 +849,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -1102,7 +1102,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgGenericOIDCProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -1352,7 +1352,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.MigrateOrgGenericOIDCToAzureADProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -1570,7 +1570,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.MigrateOrgGenericOIDCToGoogleProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -1765,7 +1765,7 @@ func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -1996,7 +1996,7 @@ func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgAzureADProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -2164,7 +2164,7 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -2366,7 +2366,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgGitHubProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -2633,7 +2633,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -2937,7 +2937,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgGitHubEnterpriseProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -3108,7 +3108,7 @@ func TestCommandSide_AddOrgGitLabIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -3310,7 +3310,7 @@ func TestCommandSide_UpdateOrgGitLabIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgGitLabProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -3528,7 +3528,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -3779,7 +3779,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgGitLabSelfHostedProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -3946,7 +3946,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -4146,7 +4146,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgGoogleProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -4506,7 +4506,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -4909,7 +4909,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgLDAPProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)

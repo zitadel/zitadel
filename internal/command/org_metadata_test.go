@@ -131,7 +131,7 @@ func TestCommandSide_SetOrgMetadata(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.SetOrgMetadata(tt.args.ctx, tt.args.orgID, tt.args.metadata)
 			if tt.res.err == nil {
@@ -281,7 +281,7 @@ func TestCommandSide_BulkSetOrgMetadata(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.BulkSetOrgMetadata(tt.args.ctx, tt.args.orgID, tt.args.metadataList...)
 			if tt.res.err == nil {
@@ -425,7 +425,7 @@ func TestCommandSide_OrgRemoveMetadata(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveOrgMetadata(tt.args.ctx, tt.args.orgID, tt.args.metadataKey)
 			if tt.res.err == nil {
@@ -629,7 +629,7 @@ func TestCommandSide_BulkRemoveOrgMetadata(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.BulkRemoveOrgMetadata(tt.args.ctx, tt.args.orgID, tt.args.metadataList...)
 			if tt.res.err == nil {

@@ -29,7 +29,7 @@ func (c *Commands) GenerateSigningKeyPair(ctx context.Context, algorithm string)
 
 	keyPairWriteModel := NewKeyPairWriteModel(keyID, authz.GetInstance(ctx).InstanceID())
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
-	_, err = c.eventstore.Push(ctx, keypair.NewAddedEvent(
+	_, err = c.Eventstore.Push(ctx, keypair.NewAddedEvent(
 		ctx,
 		keyAgg,
 		domain.KeyUsageSigning,
@@ -65,7 +65,7 @@ func (c *Commands) GenerateSAMLCACertificate(ctx context.Context, algorithm stri
 
 	keyPairWriteModel := NewKeyPairWriteModel(keyID, authz.GetInstance(ctx).InstanceID())
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
-	_, err = c.eventstore.Push(ctx,
+	_, err = c.Eventstore.Push(ctx,
 		keypair.NewAddedEvent(
 			ctx,
 			keyAgg,
@@ -111,7 +111,7 @@ func (c *Commands) GenerateSAMLResponseCertificate(ctx context.Context, algorith
 
 	keyPairWriteModel := NewKeyPairWriteModel(keyID, authz.GetInstance(ctx).InstanceID())
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
-	_, err = c.eventstore.Push(ctx,
+	_, err = c.Eventstore.Push(ctx,
 		keypair.NewAddedEvent(
 			ctx,
 			keyAgg,
@@ -156,7 +156,7 @@ func (c *Commands) GenerateSAMLMetadataCertificate(ctx context.Context, algorith
 
 	keyPairWriteModel := NewKeyPairWriteModel(keyID, authz.GetInstance(ctx).InstanceID())
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
-	_, err = c.eventstore.Push(ctx,
+	_, err = c.Eventstore.Push(ctx,
 		keypair.NewAddedEvent(
 			ctx,
 			keyAgg,

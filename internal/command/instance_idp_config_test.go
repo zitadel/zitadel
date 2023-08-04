@@ -199,7 +199,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -342,7 +342,7 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeDefaultIDPConfig(tt.args.ctx, tt.args.config)
 			if tt.res.err == nil {

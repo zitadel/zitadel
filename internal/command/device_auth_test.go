@@ -130,7 +130,7 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:  tt.fields.eventstore,
+				Eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
 			gotID, gotDetails, err := c.AddDeviceAuth(tt.args.ctx, tt.args.clientID, tt.args.deviceCode, tt.args.userCode, tt.args.expires, tt.args.scopes)
@@ -241,7 +241,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			gotDetails, err := c.ApproveDeviceAuth(tt.args.ctx, tt.args.id, tt.args.subject)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -378,7 +378,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			gotDetails, err := c.CancelDeviceAuth(tt.args.ctx, tt.args.id, tt.args.reason)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -471,7 +471,7 @@ func TestCommands_RemoveDeviceAuth(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			gotDetails, err := c.RemoveDeviceAuth(tt.args.ctx, tt.args.id)
 			require.ErrorIs(t, err, tt.wantErr)

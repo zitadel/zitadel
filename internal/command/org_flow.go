@@ -21,7 +21,7 @@ func (c *Commands) ClearFlow(ctx context.Context, flowType domain.FlowType, reso
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-DgGh3", "Errors.Flow.Empty")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingFlow.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, org.NewFlowClearedEvent(ctx, orgAgg, flowType))
+	pushedEvents, err := c.Eventstore.Push(ctx, org.NewFlowClearedEvent(ctx, orgAgg, flowType))
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (c *Commands) SetTriggerActions(ctx context.Context, flowType domain.FlowTy
 		}
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingFlow.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, org.NewTriggerActionsSetEvent(ctx, orgAgg, flowType, triggerType, actionIDs))
+	pushedEvents, err := c.Eventstore.Push(ctx, org.NewTriggerActionsSetEvent(ctx, orgAgg, flowType, triggerType, actionIDs))
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (c *Commands) SetTriggerActions(ctx context.Context, flowType domain.FlowTy
 
 func (c *Commands) getOrgFlowWriteModelByType(ctx context.Context, flowType domain.FlowType, resourceOwner string) (*OrgFlowWriteModel, error) {
 	flowWriteModel := NewOrgFlowWriteModel(flowType, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, flowWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, flowWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -78,6 +78,6 @@ func (c *Commands) getOrgFlowWriteModelByType(ctx context.Context, flowType doma
 
 func (c *Commands) actionsIDsExist(ctx context.Context, ids []string, resourceOwner string) (bool, error) {
 	actionIDsModel := NewActionsExistModel(ids, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, actionIDsModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, actionIDsModel)
 	return len(actionIDsModel.actionIDs) == len(actionIDsModel.checkedIDs), err
 }

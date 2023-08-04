@@ -70,12 +70,12 @@ func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID strin
 		validations = append(validations, c.prepareAddOrgDomain(orgAgg, o.CustomDomain, userIDs))
 	}
 
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validations...)
 	if err != nil {
 		return "", "", nil, nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return "", "", nil, nil, err
 	}
@@ -182,7 +182,7 @@ func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, reso
 		return nil, err
 	}
 	events = append(events, orgMemberEvent)
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -219,7 +219,7 @@ func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.O
 	if len(changeDomainEvents) > 0 {
 		events = append(events, changeDomainEvents...)
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -242,7 +242,7 @@ func (c *Commands) DeactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Dbs2g", "Errors.Org.AlreadyDeactivated")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, org.NewOrgDeactivatedEvent(ctx, orgAgg))
+	pushedEvents, err := c.Eventstore.Push(ctx, org.NewOrgDeactivatedEvent(ctx, orgAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -265,7 +265,7 @@ func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-bfnrh", "Errors.Org.AlreadyActive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, org.NewOrgReactivatedEvent(ctx, orgAgg))
+	pushedEvents, err := c.Eventstore.Push(ctx, org.NewOrgReactivatedEvent(ctx, orgAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -279,12 +279,12 @@ func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 func (c *Commands) RemoveOrg(ctx context.Context, id string) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(id)
 
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveOrg(orgAgg))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareRemoveOrg(orgAgg))
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -586,7 +586,7 @@ func (c *Commands) addOrgWithID(ctx context.Context, organisation *domain.Org, o
 
 func (c *Commands) getOrgWriteModelByID(ctx context.Context, orgID string) (*OrgWriteModel, error) {
 	orgWriteModel := NewOrgWriteModel(orgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, orgWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, orgWriteModel)
 	if err != nil {
 		return nil, err
 	}

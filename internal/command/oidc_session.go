@@ -87,7 +87,7 @@ func (c *Commands) OIDCSessionByRefreshToken(ctx context.Context, refreshToken s
 		return nil, err
 	}
 	writeModel := NewOIDCSessionWriteModel(oidcSessionID, "")
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "OIDCS-SAF31", "Errors.OIDCSession.RefreshTokenInvalid")
 	}
@@ -123,7 +123,7 @@ func (c *Commands) RevokeOIDCSessionToken(ctx context.Context, token, clientID s
 		return nil
 	}
 	writeModel := NewOIDCSessionWriteModel(oidcSessionID, "")
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "OIDCS-NB3t2", "Errors.Internal")
 	}
@@ -155,7 +155,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, authRequestID st
 		return nil, err
 	}
 	sessionWriteModel := NewSessionWriteModel(authRequestWriteModel.SessionID, authz.GetCtxData(ctx).OrgID)
-	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, authRequestID st
 	}
 	sessionID = IDPrefixV2 + sessionID
 	return &OIDCSessionEvents{
-		eventstore:               c.eventstore,
+		eventstore:               c.Eventstore,
 		idGenerator:              c.idGenerator,
 		encryptionAlg:            c.keyAlgorithm,
 		oidcSessionWriteModel:    NewOIDCSessionWriteModel(sessionID, resourceOwner),
@@ -189,7 +189,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, authRequestID st
 }
 
 func (c *Commands) getResourceOwnerOfSessionUser(ctx context.Context, userID, instanceID string) (string, error) {
-	events, err := c.eventstore.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+	events, err := c.Eventstore.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		InstanceID(instanceID).
 		AllowTimeTravel().
 		OrderAsc().
@@ -233,7 +233,7 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, oidcSessionID
 		return nil, err
 	}
 	sessionWriteModel := NewOIDCSessionWriteModel(oidcSessionID, "")
-	if err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel); err != nil {
+	if err = c.Eventstore.FilterToQueryReducer(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}
 	if err = sessionWriteModel.CheckRefreshToken(refreshTokenID); err != nil {
@@ -244,7 +244,7 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, oidcSessionID
 		return nil, err
 	}
 	return &OIDCSessionEvents{
-		eventstore:               c.eventstore,
+		eventstore:               c.Eventstore,
 		idGenerator:              c.idGenerator,
 		encryptionAlg:            c.keyAlgorithm,
 		oidcSessionWriteModel:    sessionWriteModel,
@@ -350,7 +350,7 @@ func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (accessTokenID strin
 
 func (c *Commands) tokenTokenLifetimes(ctx context.Context) (accessTokenLifetime time.Duration, refreshTokenLifetime time.Duration, refreshTokenIdleLifetime time.Duration, err error) {
 	oidcSettings := NewInstanceOIDCSettingsWriteModel(ctx)
-	err = c.eventstore.FilterToQueryReducer(ctx, oidcSettings)
+	err = c.Eventstore.FilterToQueryReducer(ctx, oidcSettings)
 	if err != nil {
 		return 0, 0, 0, err
 	}

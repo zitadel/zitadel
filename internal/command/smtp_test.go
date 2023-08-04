@@ -296,7 +296,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:     tt.fields.eventstore,
+				Eventstore:     tt.fields.eventstore,
 				smtpEncryption: tt.fields.alg,
 			}
 			got, err := r.AddSMTPConfig(tt.args.ctx, tt.args.smtp)
@@ -652,7 +652,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeSMTPConfig(tt.args.ctx, tt.args.smtp)
 			if tt.res.err == nil {
@@ -756,7 +756,7 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:     tt.fields.eventstore,
+				Eventstore:     tt.fields.eventstore,
 				smtpEncryption: tt.fields.alg,
 			}
 			got, err := r.ChangeSMTPConfigPassword(tt.args.ctx, tt.args.password)
@@ -851,7 +851,7 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:     tt.fields.eventstore,
+				Eventstore:     tt.fields.eventstore,
 				smtpEncryption: tt.fields.alg,
 			}
 			got, err := r.RemoveSMTPConfig(tt.args.ctx)

@@ -145,7 +145,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.GenerateMachineSecret(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.generator, tt.args.set)
 			if tt.res.err == nil {
@@ -312,7 +312,7 @@ func TestCommandSide_RemoveMachineSecret(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveMachineSecret(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -529,7 +529,7 @@ func TestCommandSide_VerifyMachineSecret(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				codeAlg:    crypto.NewBCrypt(14),
 			}
 			got, err := r.VerifyMachineSecret(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.secret)

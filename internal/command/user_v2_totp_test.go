@@ -167,7 +167,7 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				multifactors: domain.MultifactorConfigs{
 					OTP: domain.OTPConfig{
 						Issuer:    "zitadel.com",
@@ -245,7 +245,7 @@ func TestCommands_CheckUserTOTP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				multifactors: domain.MultifactorConfigs{
 					OTP: domain.OTPConfig{
 						CryptoMFA: cryptoAlg,

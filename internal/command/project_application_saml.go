@@ -28,7 +28,7 @@ func (c *Commands) AddSAMLApplication(ctx context.Context, application *domain.S
 		return nil, err
 	}
 	addedApplication.AppID = application.AppID
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (c *Commands) ChangeSAMLApplication(ctx context.Context, samlApp *domain.SA
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1m88i", "Errors.NoChangesFound")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ func (c *Commands) ChangeSAMLApplication(ctx context.Context, samlApp *domain.SA
 
 func (c *Commands) getSAMLAppWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (*SAMLApplicationWriteModel, error) {
 	appWriteModel := NewSAMLApplicationWriteModelWithAppID(projectID, appID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, appWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, appWriteModel)
 	if err != nil {
 		return nil, err
 	}

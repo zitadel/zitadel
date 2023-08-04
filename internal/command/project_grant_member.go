@@ -23,7 +23,7 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *domain.Pro
 		return nil, err
 	}
 	addedMember := NewProjectGrantMemberWriteModel(member.AggregateID, member.UserID, member.GrantID)
-	err = c.eventstore.FilterToQueryReducer(ctx, addedMember)
+	err = c.Eventstore.FilterToQueryReducer(ctx, addedMember)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *domain.Pro
 		return nil, errors.ThrowAlreadyExists(nil, "PROJECT-16dVN", "Errors.Project.Member.AlreadyExists")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&addedMember.WriteModel)
-	pushedEvents, err := c.eventstore.Push(
+	pushedEvents, err := c.Eventstore.Push(
 		ctx,
 		project.NewProjectGrantMemberAddedEvent(ctx, projectAgg, member.UserID, member.GrantID, member.Roles...))
 	if err != nil {
@@ -63,7 +63,7 @@ func (c *Commands) ChangeProjectGrantMember(ctx context.Context, member *domain.
 		return nil, errors.ThrowPreconditionFailed(nil, "PROJECT-2n8vx", "Errors.Project.Member.RolesNotChanged")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingMember.WriteModel)
-	pushedEvents, err := c.eventstore.Push(
+	pushedEvents, err := c.Eventstore.Push(
 		ctx,
 		project.NewProjectGrantMemberChangedEvent(ctx, projectAgg, member.UserID, member.GrantID, member.Roles...))
 	if err != nil {
@@ -88,7 +88,7 @@ func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, user
 
 	projectAgg := ProjectAggregateFromWriteModel(&m.WriteModel)
 	removeEvent := c.removeProjectGrantMember(ctx, projectAgg, userID, grantID, false)
-	pushedEvents, err := c.eventstore.Push(ctx, removeEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (c *Commands) projectGrantMemberWriteModelByID(ctx context.Context, project
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewProjectGrantMemberWriteModel(projectID, userID, grantID)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

@@ -61,7 +61,7 @@ func (c *Commands) AddNewRefreshTokenAndAccessToken(
 	if err != nil {
 		return nil, "", err
 	}
-	_, err = c.eventstore.Push(ctx, accessTokenEvent, refreshTokenEvent)
+	_, err = c.Eventstore.Push(ctx, accessTokenEvent, refreshTokenEvent)
 	if err != nil {
 		return nil, "", err
 	}
@@ -89,7 +89,7 @@ func (c *Commands) RenewRefreshTokenAndAccessToken(
 	if err != nil {
 		return nil, "", err
 	}
-	_, err = c.eventstore.Push(ctx, accessTokenEvent, refreshTokenEvent)
+	_, err = c.Eventstore.Push(ctx, accessTokenEvent, refreshTokenEvent)
 	if err != nil {
 		return nil, "", err
 	}
@@ -101,7 +101,7 @@ func (c *Commands) RevokeRefreshToken(ctx context.Context, userID, orgID, tokenI
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, removeEvent)
+	events, err := c.Eventstore.Push(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (c *Commands) RevokeRefreshTokens(ctx context.Context, userID, orgID string
 		}
 		events[i] = event
 	}
-	_, err = c.eventstore.Push(ctx, events...)
+	_, err = c.Eventstore.Push(ctx, events...)
 	return err
 }
 
@@ -153,7 +153,7 @@ func (c *Commands) renewRefreshToken(ctx context.Context, userID, orgID, refresh
 		return nil, "", "", caos_errs.ThrowInvalidArgument(nil, "COMMAND-Ht2g2", "Errors.User.RefreshToken.Invalid")
 	}
 	refreshTokenWriteModel := NewHumanRefreshTokenWriteModel(userID, orgID, tokenID)
-	err = c.eventstore.FilterToQueryReducer(ctx, refreshTokenWriteModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, refreshTokenWriteModel)
 	if err != nil {
 		return nil, "", "", err
 	}
@@ -183,7 +183,7 @@ func (c *Commands) removeRefreshToken(ctx context.Context, userID, orgID, tokenI
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-GVDgf", "Errors.IDMissing")
 	}
 	refreshTokenWriteModel := NewHumanRefreshTokenWriteModel(userID, orgID, tokenID)
-	err := c.eventstore.FilterToQueryReducer(ctx, refreshTokenWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, refreshTokenWriteModel)
 	if err != nil {
 		return nil, nil, err
 	}

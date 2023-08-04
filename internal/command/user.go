@@ -48,7 +48,7 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 
-	pushedEvents, err := c.eventstore.Push(ctx,
+	pushedEvents, err := c.Eventstore.Push(ctx,
 		user.NewUsernameChangedEvent(ctx, userAgg, existingUser.UserName, userName, domainPolicy.UserLoginMustBeDomain))
 	if err != nil {
 		return nil, err
@@ -79,7 +79,7 @@ func (c *Commands) DeactivateUser(ctx context.Context, userID, resourceOwner str
 		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-5M0sf", "Errors.User.AlreadyInactive")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx,
+	pushedEvents, err := c.Eventstore.Push(ctx,
 		user.NewUserDeactivatedEvent(ctx, UserAggregateFromWriteModel(&existingUser.WriteModel)))
 	if err != nil {
 		return nil, err
@@ -107,7 +107,7 @@ func (c *Commands) ReactivateUser(ctx context.Context, userID, resourceOwner str
 		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-6M0sf", "Errors.User.NotInactive")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx,
+	pushedEvents, err := c.Eventstore.Push(ctx,
 		user.NewUserReactivatedEvent(ctx, UserAggregateFromWriteModel(&existingUser.WriteModel)))
 	if err != nil {
 		return nil, err
@@ -135,7 +135,7 @@ func (c *Commands) LockUser(ctx context.Context, userID, resourceOwner string) (
 		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-3NN8v", "Errors.User.ShouldBeActiveOrInitial")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx,
+	pushedEvents, err := c.Eventstore.Push(ctx,
 		user.NewUserLockedEvent(ctx, UserAggregateFromWriteModel(&existingUser.WriteModel)))
 	if err != nil {
 		return nil, err
@@ -163,7 +163,7 @@ func (c *Commands) UnlockUser(ctx context.Context, userID, resourceOwner string)
 		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.NotLocked")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx,
+	pushedEvents, err := c.Eventstore.Push(ctx,
 		user.NewUserUnlockedEvent(ctx, UserAggregateFromWriteModel(&existingUser.WriteModel)))
 	if err != nil {
 		return nil, err
@@ -213,7 +213,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 		events = append(events, membershipEvents...)
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -233,7 +233,7 @@ func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, u
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.eventstore.Push(ctx, event)
+	_, err = c.Eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -245,7 +245,7 @@ func (c *Commands) RevokeAccessToken(ctx context.Context, userID, orgID, tokenID
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, removeEvent)
+	events, err := c.Eventstore.Push(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -257,7 +257,7 @@ func (c *Commands) RevokeAccessToken(ctx context.Context, userID, orgID, tokenID
 }
 
 func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteModel, agentID, clientID, refreshTokenID string, audience, scopes []string, lifetime time.Duration) (*user.UserTokenAddedEvent, *domain.Token, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, userWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, userWriteModel)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -300,7 +300,7 @@ func (c *Commands) removeAccessToken(ctx context.Context, userID, orgID, tokenID
 		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-Dng42", "Errors.IDMissing")
 	}
 	refreshTokenWriteModel := NewUserAccessTokenWriteModel(userID, orgID, tokenID)
-	err := c.eventstore.FilterToQueryReducer(ctx, refreshTokenWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, refreshTokenWriteModel)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -380,7 +380,7 @@ func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID stri
 		return errors.ThrowNotFound(nil, "COMMAND-5m9gK", "Errors.User.NotFound")
 	}
 
-	_, err = c.eventstore.Push(ctx,
+	_, err = c.Eventstore.Push(ctx,
 		user.NewDomainClaimedSentEvent(ctx, UserAggregateFromWriteModel(&existingUser.WriteModel)))
 	return err
 }
@@ -401,7 +401,7 @@ func (c *Commands) userWriteModelByID(ctx context.Context, userID, resourceOwner
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewUserWriteModel(userID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

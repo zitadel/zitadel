@@ -409,7 +409,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddLoginPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
@@ -619,7 +619,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeLoginPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
@@ -736,7 +736,7 @@ func TestCommandSide_RemoveLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveLoginPolicy(tt.args.ctx, tt.args.orgID)
 			if tt.res.err == nil {
@@ -1015,7 +1015,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddIDPToLoginPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
@@ -1430,7 +1430,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveIDPFromLoginPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.provider, tt.args.cascadeExternalIDPs...)
 			if tt.res.err == nil {
@@ -1634,7 +1634,7 @@ func TestCommandSide_AddSecondFactorLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, _, err := r.AddSecondFactorToLoginPolicy(tt.args.ctx, tt.args.factor, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -1915,7 +1915,7 @@ func TestCommandSide_RemoveSecondFactoroginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			_, err := r.RemoveSecondFactorFromLoginPolicy(tt.args.ctx, tt.args.factor, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -2031,7 +2031,7 @@ func TestCommandSide_AddMultiFactorLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, _, err := r.AddMultiFactorToLoginPolicy(tt.args.ctx, tt.args.factor, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -2182,7 +2182,7 @@ func TestCommandSide_RemoveMultiFactorLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			_, err := r.RemoveMultiFactorFromLoginPolicy(tt.args.ctx, tt.args.factor, tt.args.resourceOwner)
 			if tt.res.err == nil {

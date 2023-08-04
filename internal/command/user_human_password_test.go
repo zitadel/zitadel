@@ -257,7 +257,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore,
+				Eventstore:         tt.fields.eventstore,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				checkPermission:    tt.fields.checkPermission,
 			}
@@ -514,7 +514,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore,
+				Eventstore:         tt.fields.eventstore,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				userEncryption:     tt.fields.userEncryption,
 			}
@@ -780,7 +780,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         eventstoreExpect(t, tt.expect...),
+				Eventstore:         eventstoreExpect(t, tt.expect...),
 				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
 			got, err := r.ChangePassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.oldPassword, tt.args.newPassword, tt.args.agentID)
@@ -963,7 +963,7 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RequestSetPassword(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.notifyType, tt.args.secretGenerator)
 			if tt.res.err == nil {
@@ -1078,7 +1078,7 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			err := r.PasswordCodeSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID)
 			if tt.res.err == nil {
@@ -1764,7 +1764,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore,
+				Eventstore:         tt.fields.eventstore,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
 			err := r.HumanCheckPassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.password, tt.args.authReq, tt.args.lockoutPolicy)

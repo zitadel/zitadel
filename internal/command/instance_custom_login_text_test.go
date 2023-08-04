@@ -8658,7 +8658,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.SetCustomInstanceLoginText(tt.args.ctx, tt.args.config)
 			if tt.res.err == nil {

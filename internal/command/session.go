@@ -40,7 +40,7 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 	return &SessionCommands{
 		sessionCommands:   cmds,
 		sessionWriteModel: session,
-		eventstore:        c.eventstore,
+		eventstore:        c.Eventstore,
 		hasher:            c.userPasswordHasher,
 		intentAlg:         c.idpConfigEncryption,
 		createToken:       c.sessionTokenCreator,
@@ -232,7 +232,7 @@ func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, ses
 		return nil, err
 	}
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetCtxData(ctx).OrgID)
-	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -243,7 +243,7 @@ func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, ses
 
 func (c *Commands) UpdateSession(ctx context.Context, sessionID, sessionToken string, cmds []SessionCommand, metadata map[string][]byte) (set *SessionChanged, err error) {
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetCtxData(ctx).OrgID)
-	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -264,7 +264,7 @@ func (c *Commands) TerminateSessionWithoutTokenCheck(ctx context.Context, sessio
 
 func (c *Commands) terminateSession(ctx context.Context, sessionID, sessionToken string, mustCheckToken bool) (*domain.ObjectDetails, error) {
 	sessionWriteModel := NewSessionWriteModel(sessionID, "")
-	if err := c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel); err != nil {
+	if err := c.Eventstore.FilterToQueryReducer(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}
 	if mustCheckToken {
@@ -276,7 +276,7 @@ func (c *Commands) terminateSession(ctx context.Context, sessionID, sessionToken
 		return writeModelToObjectDetails(&sessionWriteModel.WriteModel), nil
 	}
 	terminate := session.NewTerminateEvent(ctx, &session.NewAggregate(sessionWriteModel.AggregateID, sessionWriteModel.ResourceOwner).Aggregate)
-	pushedEvents, err := c.eventstore.Push(ctx, terminate)
+	pushedEvents, err := c.Eventstore.Push(ctx, terminate)
 	if err != nil {
 		return nil, err
 	}
@@ -304,7 +304,7 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, m
 	if len(cmds) == 0 {
 		return sessionWriteModelToSessionChanged(checks.sessionWriteModel), nil
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}

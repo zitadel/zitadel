@@ -18,7 +18,7 @@ func (c *Commands) SetCustomInstanceLoginText(ctx context.Context, loginText *do
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (c *Commands) RemoveCustomInstanceLoginTexts(ctx context.Context, lang lang
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-fru44", "Errors.CustomText.NotFound")
 	}
 	iamAgg := InstanceAggregateFromWriteModel(&customText.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewCustomTextTemplateRemovedEvent(ctx, iamAgg, domain.LoginCustomText, lang))
+	pushedEvents, err := c.Eventstore.Push(ctx, instance.NewCustomTextTemplateRemovedEvent(ctx, iamAgg, domain.LoginCustomText, lang))
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (c *Commands) setCustomInstanceLoginText(ctx context.Context, instanceAgg *
 
 func (c *Commands) defaultLoginTextWriteModelByID(ctx context.Context, lang language.Tag) (*InstanceCustomLoginTextReadModel, error) {
 	writeModel := NewInstanceCustomLoginTextReadModel(ctx, lang)
-	err := c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

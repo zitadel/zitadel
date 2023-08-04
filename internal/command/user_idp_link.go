@@ -32,7 +32,7 @@ func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner str
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, event)
+	events, err := c.Eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (c *Commands) BulkAddedUserIDPLinks(ctx context.Context, userID, resourceOw
 		}
 	}
 
-	_, err = c.eventstore.Push(ctx, events...)
+	_, err = c.Eventstore.Push(ctx, events...)
 	return err
 }
 
@@ -78,7 +78,7 @@ func (c *Commands) addUserIDPLink(ctx context.Context, human *eventstore.Aggrega
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-6m9Kd", "Errors.User.ExternalIDP.Invalid")
 	}
 
-	exists, err := ExistsIDP(ctx, c.eventstore.Filter, link.IDPConfigID, human.ResourceOwner)
+	exists, err := ExistsIDP(ctx, c.Eventstore.Filter, link.IDPConfigID, human.ResourceOwner)
 	if !exists || err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-39nfs", "Errors.IDPConfig.NotExisting")
 	}
@@ -91,7 +91,7 @@ func (c *Commands) RemoveUserIDPLink(ctx context.Context, link *domain.UserIDPLi
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	pushedEvents, err := c.Eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (c *Commands) UserIDPLoginChecked(ctx context.Context, orgID, userID string
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingHuman.WriteModel)
-	_, err = c.eventstore.Push(ctx, user.NewUserIDPCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+	_, err = c.Eventstore.Push(ctx, user.NewUserIDPCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 	return err
 }
 
@@ -144,7 +144,7 @@ func (c *Commands) userIDPLinkWriteModelByID(ctx context.Context, userID, idpCon
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewUserIDPLinkWriteModel(userID, idpConfigID, externalUserID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

@@ -277,7 +277,7 @@ func TestCommandSide_AddProjectGrantMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore,
+				Eventstore:   tt.fields.eventstore,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
 			got, err := r.AddProjectGrantMember(tt.args.ctx, tt.args.member)
@@ -481,7 +481,7 @@ func TestCommandSide_ChangeProjectGrantMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore,
+				Eventstore:   tt.fields.eventstore,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
 			got, err := r.ChangeProjectGrantMember(tt.args.ctx, tt.args.member)
@@ -630,7 +630,7 @@ func TestCommandSide_RemoveProjectGrantMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveProjectGrantMember(tt.args.ctx, tt.args.projectID, tt.args.userID, tt.args.grantID)
 			if tt.res.err == nil {

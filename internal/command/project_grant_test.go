@@ -217,7 +217,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
+				Eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
 			got, err := r.AddProjectGrant(tt.args.ctx, tt.args.projectGrant, tt.args.resourceOwner)
@@ -729,7 +729,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeProjectGrant(tt.args.ctx, tt.args.projectGrant, tt.args.resourceOwner, tt.args.cascadeUserGrantIDs...)
 			if tt.res.err == nil {
@@ -928,7 +928,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.DeactivateProjectGrant(tt.args.ctx, tt.args.projectID, tt.args.grantID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -1127,7 +1127,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ReactivateProjectGrant(tt.args.ctx, tt.args.projectID, tt.args.grantID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -1400,7 +1400,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveProjectGrant(tt.args.ctx, tt.args.projectID, tt.args.grantID, tt.args.resourceOwner, tt.args.cascadeUserGrantIDs...)
 			if tt.res.err == nil {

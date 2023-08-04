@@ -16,7 +16,7 @@ func (c *Commands) AddMailTemplate(ctx context.Context, resourceOwner string, po
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-3m9fs", "Errors.Org.MailTemplate.Invalid")
 	}
 	addedPolicy := NewOrgMailTemplateWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	err := c.Eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +25,7 @@ func (c *Commands) AddMailTemplate(ctx context.Context, resourceOwner string, po
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.MailTemplateWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, org.NewMailTemplateAddedEvent(ctx, orgAgg, policy.Template))
+	pushedEvents, err := c.Eventstore.Push(ctx, org.NewMailTemplateAddedEvent(ctx, orgAgg, policy.Template))
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (c *Commands) ChangeMailTemplate(ctx context.Context, resourceOwner string,
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-9f9ds", "Errors.Org.MailTemplate.Invalid")
 	}
 	existingPolicy := NewOrgMailTemplateWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.Eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (c *Commands) ChangeMailTemplate(ctx context.Context, resourceOwner string,
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-49hfj", "Errors.Org.MailTemplate.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (c *Commands) RemoveMailTemplate(ctx context.Context, orgID string) error {
 		return caos_errs.ThrowInvalidArgument(nil, "Org-5Jgis", "Errors.ResourceOwnerMissing")
 	}
 	existingPolicy := NewOrgMailTemplateWriteModel(orgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.Eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return err
 	}
@@ -83,6 +83,6 @@ func (c *Commands) RemoveMailTemplate(ctx context.Context, orgID string) error {
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
 
-	_, err = c.eventstore.Push(ctx, org.NewMailTemplateRemovedEvent(ctx, orgAgg))
+	_, err = c.Eventstore.Push(ctx, org.NewMailTemplateRemovedEvent(ctx, orgAgg))
 	return err
 }

@@ -187,7 +187,7 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddOIDCSettings(tt.args.ctx, tt.args.oidcConfig)
 			if tt.res.err == nil {
@@ -404,7 +404,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeOIDCSettings(tt.args.ctx, tt.args.oidcConfig)
 			if tt.res.err == nil {

@@ -135,7 +135,7 @@ func TestCommandSide_AddNotificationPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddNotificationPolicy(tt.args.ctx, tt.args.orgID, tt.args.passwordChange)
 			if tt.res.err == nil {
@@ -263,7 +263,7 @@ func TestCommandSide_ChangeNotificationPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeNotificationPolicy(tt.args.ctx, tt.args.orgID, tt.args.passwordChange)
 			if tt.res.err == nil {
@@ -364,7 +364,7 @@ func TestCommandSide_RemoveNotificationPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveNotificationPolicy(tt.args.ctx, tt.args.orgID)
 			if tt.res.err == nil {

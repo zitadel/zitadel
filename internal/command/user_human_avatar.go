@@ -25,7 +25,7 @@ func (c *Commands) AddHumanAvatar(ctx context.Context, orgID, userID string, upl
 		return nil, caos_errs.ThrowInternal(err, "USER-1Xyud", "Errors.Assets.Object.PutFailed")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanAvatarAddedEvent(ctx, userAgg, asset.VersionedName()))
+	pushedEvents, err := c.Eventstore.Push(ctx, user.NewHumanAvatarAddedEvent(ctx, userAgg, asset.VersionedName()))
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (c *Commands) RemoveHumanAvatar(ctx context.Context, orgID, userID string) 
 		return nil, err
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanAvatarRemovedEvent(ctx, userAgg, existingUser.Avatar))
+	pushedEvents, err := c.Eventstore.Push(ctx, user.NewHumanAvatarRemovedEvent(ctx, userAgg, existingUser.Avatar))
 	if err != nil {
 		return nil, err
 	}

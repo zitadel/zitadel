@@ -16,11 +16,11 @@ func (c *Commands) AddOrgDomainPolicy(ctx context.Context, resourceOwner string,
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-4Jfsf", "Errors.ResourceOwnerMissing")
 	}
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddOrgDomainPolicy(orgAgg, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareAddOrgDomainPolicy(orgAgg, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -32,11 +32,11 @@ func (c *Commands) ChangeOrgDomainPolicy(ctx context.Context, resourceOwner stri
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-5H8fs", "Errors.ResourceOwnerMissing")
 	}
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareChangeOrgDomainPolicy(orgAgg, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareChangeOrgDomainPolicy(orgAgg, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -48,11 +48,11 @@ func (c *Commands) RemoveOrgDomainPolicy(ctx context.Context, orgID string) (*do
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-3H8fs", "Errors.ResourceOwnerMissing")
 	}
 	orgAgg := org.NewAggregate(orgID)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareRemoveOrgDomainPolicy(orgAgg))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareRemoveOrgDomainPolicy(orgAgg))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (c *Commands) orgDomainPolicyWriteModelByID(ctx context.Context, orgID stri
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewOrgDomainPolicyWriteModel(orgID)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

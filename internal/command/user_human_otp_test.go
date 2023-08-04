@@ -221,7 +221,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddHumanTOTP(tt.args.ctx, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
@@ -505,7 +505,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				multifactors: domain.MultifactorConfigs{
 					OTP: domain.OTPConfig{
 						CryptoMFA: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -690,7 +690,7 @@ func TestCommands_HumanCheckMFATOTPSetup(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				multifactors: domain.MultifactorConfigs{
 					OTP: domain.OTPConfig{
 						CryptoMFA: cryptoAlg,
@@ -800,7 +800,7 @@ func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.HumanRemoveTOTP(tt.args.ctx, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
@@ -980,7 +980,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				Eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.AddHumanOTPSMS(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
@@ -1098,7 +1098,7 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore(t),
+				Eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.RemoveHumanOTPSMS(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
@@ -1225,7 +1225,7 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				Eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.AddHumanOTPEmail(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
@@ -1343,7 +1343,7 @@ func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore(t),
+				Eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.RemoveHumanOTPEmail(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)

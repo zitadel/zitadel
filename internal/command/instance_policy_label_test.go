@@ -144,7 +144,7 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddDefaultLabelPolicy(
 				tt.args.ctx,
@@ -340,7 +340,7 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeDefaultLabelPolicy(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {
@@ -436,7 +436,7 @@ func TestCommandSide_ActivateDefaultLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ActivateDefaultLabelPolicy(tt.args.ctx)
 			if tt.res.err == nil {
@@ -592,7 +592,7 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.AddLogoDefaultLabelPolicy(tt.args.ctx, tt.args.upload)
@@ -736,7 +736,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.RemoveLogoDefaultLabelPolicy(tt.args.ctx)
@@ -893,7 +893,7 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.AddIconDefaultLabelPolicy(tt.args.ctx, tt.args.upload)
@@ -998,7 +998,7 @@ func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.RemoveIconDefaultLabelPolicy(tt.args.ctx)
@@ -1158,7 +1158,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.AddLogoDarkDefaultLabelPolicy(tt.args.ctx, tt.args.upload)
@@ -1302,7 +1302,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.RemoveLogoDarkDefaultLabelPolicy(tt.args.ctx)
@@ -1459,7 +1459,7 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.AddIconDarkDefaultLabelPolicy(tt.args.ctx, tt.args.upload)
@@ -1603,7 +1603,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.RemoveIconDarkDefaultLabelPolicy(tt.args.ctx)
@@ -1760,7 +1760,7 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.AddFontDefaultLabelPolicy(tt.args.ctx, tt.args.upload)
@@ -1904,7 +1904,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
 			got, err := r.RemoveFontDefaultLabelPolicy(tt.args.ctx)

@@ -104,7 +104,7 @@ func TestCommands_ClearFlow(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			details, err := c.ClearFlow(tt.args.ctx, tt.args.flowType, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -270,7 +270,7 @@ func TestCommands_SetTriggerActions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			details, err := c.SetTriggerActions(tt.args.ctx, tt.args.flowType, tt.args.triggerType, tt.args.actionIDs, tt.args.resourceOwner)
 			if tt.res.err == nil {

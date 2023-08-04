@@ -153,7 +153,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:  tt.fields.eventstore,
+				Eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
 			got, err := c.AddAuthRequest(tt.args.ctx, tt.args.request)
@@ -581,7 +581,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:           tt.fields.eventstore,
+				Eventstore:           tt.fields.eventstore,
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 				checkPermission:      tt.fields.checkPermission,
 			}
@@ -692,7 +692,7 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			details, got, err := c.FailAuthRequest(tt.args.ctx, tt.args.id, tt.args.reason)
 			require.ErrorIs(t, err, tt.res.wantErr)
@@ -821,7 +821,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			err := c.AddAuthRequestCode(tt.args.ctx, tt.args.id, tt.args.code)
 			assert.ErrorIs(t, tt.wantErr, err)
@@ -981,7 +981,7 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := c.ExchangeAuthCode(tt.args.ctx, tt.args.code)
 			assert.ErrorIs(t, tt.res.err, err)

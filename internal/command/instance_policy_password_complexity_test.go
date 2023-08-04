@@ -123,7 +123,7 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddDefaultPasswordComplexityPolicy(tt.args.ctx, tt.args.minLength, tt.args.hasLowercase, tt.args.hasUppercase, tt.args.hasNumber, tt.args.hasSymbol)
 			if tt.res.err == nil {
@@ -281,7 +281,7 @@ func TestCommandSide_ChangeDefaultPasswordComplexityPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeDefaultPasswordComplexityPolicy(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {

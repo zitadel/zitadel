@@ -85,11 +85,11 @@ func (c *Commands) AddPersonalAccessToken(ctx context.Context, pat *PersonalAcce
 		}
 	}
 	validation := prepareAddPersonalAccessToken(pat, c.keyAlgorithm)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -134,11 +134,11 @@ func prepareAddPersonalAccessToken(pat *PersonalAccessToken, algorithm crypto.En
 
 func (c *Commands) RemovePersonalAccessToken(ctx context.Context, pat *PersonalAccessToken) (*domain.ObjectDetails, error) {
 	validation := prepareRemovePersonalAccessToken(pat)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}

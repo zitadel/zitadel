@@ -119,7 +119,7 @@ func TestCommandSide_AddDefaultNotificationPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddDefaultNotificationPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.passwordChange)
 			if tt.res.err == nil {
@@ -233,7 +233,7 @@ func TestCommandSide_ChangeDefaultNotificationPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeDefaultNotificationPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.passwordChange)
 			if tt.res.err == nil {

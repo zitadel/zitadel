@@ -199,7 +199,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:     tt.fields.eventstore,
+				Eventstore:     tt.fields.eventstore,
 				externalSecure: tt.fields.externalSecure,
 			}
 			got, err := r.AddInstanceDomain(tt.args.ctx, tt.args.domain)
@@ -306,7 +306,7 @@ func TestCommandSide_SetPrimaryInstanceDomain(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.SetPrimaryInstanceDomain(tt.args.ctx, tt.args.domain)
 			if tt.res.err == nil {
@@ -437,7 +437,7 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveInstanceDomain(tt.args.ctx, tt.args.domain)
 			if tt.res.err == nil {

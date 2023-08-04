@@ -128,7 +128,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddDebugNotificationProviderLog(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {
@@ -286,7 +286,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeDefaultNotificationLog(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {
@@ -372,7 +372,7 @@ func TestCommandSide_RemoveDebugNotificationProviderLog(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveDefaultNotificationLog(tt.args.ctx)
 			if tt.res.err == nil {

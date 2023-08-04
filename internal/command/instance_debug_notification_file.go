@@ -18,7 +18,7 @@ func (c *Commands) AddDebugNotificationProviderFile(ctx context.Context, fileSys
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func (c *Commands) AddDebugNotificationProviderFile(ctx context.Context, fileSys
 }
 
 func (c *Commands) addDefaultDebugNotificationFile(ctx context.Context, instanceAgg *eventstore.Aggregate, addedWriteModel *InstanceDebugNotificationFileWriteModel, fileSystemProvider *fs.Config) ([]eventstore.Command, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, addedWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, addedWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (c *Commands) ChangeDefaultNotificationFile(ctx context.Context, fileSystem
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func (c *Commands) RemoveDefaultNotificationFile(ctx context.Context) (*domain.O
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-dj9ew", "Errors.IAM.DebugNotificationProvider.NotFound")
 	}
 
-	events, err := c.eventstore.Push(ctx, iam_repo.NewDebugNotificationProviderFileRemovedEvent(ctx, instanceAgg))
+	events, err := c.Eventstore.Push(ctx, iam_repo.NewDebugNotificationProviderFileRemovedEvent(ctx, instanceAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (c *Commands) defaultDebugNotificationProviderFileWriteModelByID(ctx contex
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return err
 	}

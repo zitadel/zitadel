@@ -54,7 +54,7 @@ func (c *Commands) ChangeUserEmailVerified(ctx context.Context, userID, resource
 }
 
 func (c *Commands) changeUserEmailWithCode(ctx context.Context, userID, resourceOwner, email string, alg crypto.EncryptionAlgorithm, returnCode bool, urlTmpl string) (*domain.Email, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode)
+	config, err := secretGeneratorConfig(ctx, c.Eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (c *Commands) changeUserEmailWithGenerator(ctx context.Context, userID, res
 }
 
 func (c *Commands) VerifyUserEmail(ctx context.Context, userID, resourceOwner, code string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode)
+	config, err := secretGeneratorConfig(ctx, c.Eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +139,7 @@ func (c *Commands) NewUserEmailEvents(ctx context.Context, userID, resourceOwner
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-uz0Uu", "Errors.User.NotInitialised")
 	}
 	return &UserEmailEvents{
-		eventstore: c.eventstore,
+		eventstore: c.Eventstore,
 		aggregate:  UserAggregateFromWriteModel(&model.WriteModel),
 		model:      model,
 	}, nil

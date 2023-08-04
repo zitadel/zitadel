@@ -41,7 +41,7 @@ func (c *Commands) addActionWithID(ctx context.Context, addAction *domain.Action
 	actionModel := NewActionWriteModel(addAction.AggregateID, resourceOwner)
 	actionAgg := ActionAggregateFromWriteModel(&actionModel.WriteModel)
 
-	pushedEvents, err := c.eventstore.Push(ctx, action.NewAddedEvent(
+	pushedEvents, err := c.Eventstore.Push(ctx, action.NewAddedEvent(
 		ctx,
 		actionAgg,
 		addAction.Name,
@@ -83,7 +83,7 @@ func (c *Commands) ChangeAction(ctx context.Context, actionChange *domain.Action
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (c *Commands) DeactivateAction(ctx context.Context, actionID string, resour
 	events := []eventstore.Command{
 		action.NewDeactivatedEvent(ctx, actionAgg),
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +144,7 @@ func (c *Commands) ReactivateAction(ctx context.Context, actionID string, resour
 	events := []eventstore.Command{
 		action.NewReactivatedEvent(ctx, actionAgg),
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +175,7 @@ func (c *Commands) DeleteAction(ctx context.Context, actionID, resourceOwner str
 	for _, flowType := range flowTypes {
 		events = append(events, org.NewTriggerActionsCascadeRemovedEvent(ctx, &orgAgg, flowType, actionID))
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -229,7 +229,7 @@ func (c *Commands) deactivateNotAllowedActionsFromOrg(ctx context.Context, resou
 
 func (c *Commands) getActionWriteModelByID(ctx context.Context, actionID string, resourceOwner string) (*ActionWriteModel, error) {
 	actionWriteModel := NewActionWriteModel(actionID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, actionWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, actionWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -238,7 +238,7 @@ func (c *Commands) getActionWriteModelByID(ctx context.Context, actionID string,
 
 func (c *Commands) getActionsByOrgWriteModelByID(ctx context.Context, resourceOwner string) (*ActionsListByOrgModel, error) {
 	actionWriteModel := NewActionsListByOrgModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, actionWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, actionWriteModel)
 	if err != nil {
 		return nil, err
 	}

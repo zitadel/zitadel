@@ -43,7 +43,7 @@ func (c *Commands) ChangeUserPhoneVerified(ctx context.Context, userID, resource
 }
 
 func (c *Commands) changeUserPhoneWithCode(ctx context.Context, userID, resourceOwner, phone string, alg crypto.EncryptionAlgorithm, returnCode bool) (*domain.Phone, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode)
+	config, err := secretGeneratorConfig(ctx, c.Eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (c *Commands) changeUserPhoneWithGenerator(ctx context.Context, userID, res
 }
 
 func (c *Commands) VerifyUserPhone(ctx context.Context, userID, resourceOwner, code string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode)
+	config, err := secretGeneratorConfig(ctx, c.Eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +127,7 @@ func (c *Commands) NewUserPhoneEvents(ctx context.Context, userID, resourceOwner
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-uz0Uu", "Errors.User.NotInitialised")
 	}
 	return &UserPhoneEvents{
-		eventstore: c.eventstore,
+		eventstore: c.Eventstore,
 		aggregate:  UserAggregateFromWriteModel(&model.WriteModel),
 		model:      model,
 	}, nil

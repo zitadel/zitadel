@@ -18,7 +18,7 @@ func (c *Commands) SetDefaultMessageText(ctx context.Context, instanceID string,
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func (c *Commands) RemoveInstanceMessageTexts(ctx context.Context, messageTextTy
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-fju90", "Errors.CustomMessageText.NotFound")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&customText.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewCustomTextTemplateRemovedEvent(ctx, instanceAgg, messageTextType, lang))
+	pushedEvents, err := c.Eventstore.Push(ctx, instance.NewCustomTextTemplateRemovedEvent(ctx, instanceAgg, messageTextType, lang))
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (c *Commands) RemoveInstanceMessageTexts(ctx context.Context, messageTextTy
 
 func (c *Commands) defaultCustomMessageTextWriteModelByID(ctx context.Context, messageType string, lang language.Tag) (*InstanceCustomMessageTextWriteModel, error) {
 	writeModel := NewInstanceCustomMessageTextWriteModel(ctx, messageType, lang)
-	err := c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

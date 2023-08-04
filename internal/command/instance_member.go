@@ -71,11 +71,11 @@ func IsInstanceMember(ctx context.Context, filter preparation.FilterToQueryReduc
 
 func (c *Commands) AddInstanceMember(ctx context.Context, userID string, roles ...string) (*domain.Member, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddInstanceMemberCommand(instanceAgg, userID, roles...))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.AddInstanceMemberCommand(instanceAgg, userID, roles...))
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func (c *Commands) ChangeInstanceMember(ctx context.Context, member *domain.Memb
 		return nil, errors.ThrowPreconditionFailed(nil, "INSTANCE-LiaZi", "Errors.IAM.Member.RolesNotChanged")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewMemberChangedEvent(ctx, instanceAgg, member.UserID, member.Roles...))
+	pushedEvents, err := c.Eventstore.Push(ctx, instance.NewMemberChangedEvent(ctx, instanceAgg, member.UserID, member.Roles...))
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func (c *Commands) RemoveInstanceMember(ctx context.Context, userID string) (*do
 
 	instanceAgg := InstanceAggregateFromWriteModel(&memberWriteModel.MemberWriteModel.WriteModel)
 	removeEvent := c.removeInstanceMember(ctx, instanceAgg, userID, false)
-	pushedEvents, err := c.eventstore.Push(ctx, removeEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +160,7 @@ func (c *Commands) instanceMemberWriteModelByID(ctx context.Context, userID stri
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewInstanceMemberWriteModel(ctx, userID)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

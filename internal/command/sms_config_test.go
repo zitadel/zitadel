@@ -86,7 +86,7 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:    tt.fields.eventstore,
+				Eventstore:    tt.fields.eventstore,
 				idGenerator:   tt.fields.idGenerator,
 				smsEncryption: tt.fields.alg,
 			}
@@ -251,7 +251,7 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeSMSConfigTwilio(tt.args.ctx, tt.args.instanceID, tt.args.id, tt.args.sms)
 			if tt.res.err == nil {
@@ -362,7 +362,7 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ActivateSMSConfig(tt.args.ctx, tt.args.instanceID, tt.args.id)
 			if tt.res.err == nil {
@@ -480,7 +480,7 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.DeactivateSMSConfig(tt.args.ctx, tt.args.instanceID, tt.args.id)
 			if tt.res.err == nil {
@@ -591,7 +591,7 @@ func TestCommandSide_RemoveSMSConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveSMSConfig(tt.args.ctx, tt.args.instanceID, tt.args.id)
 			if tt.res.err == nil {

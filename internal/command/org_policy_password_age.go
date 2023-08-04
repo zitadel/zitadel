@@ -13,7 +13,7 @@ func (c *Commands) AddPasswordAgePolicy(ctx context.Context, resourceOwner strin
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M9fsd", "Errors.ResourceOwnerMissing")
 	}
 	addedPolicy := NewOrgPasswordAgePolicyWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	err := c.Eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +22,7 @@ func (c *Commands) AddPasswordAgePolicy(ctx context.Context, resourceOwner strin
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, org.NewPasswordAgePolicyAddedEvent(ctx, orgAgg, policy.ExpireWarnDays, policy.MaxAgeDays))
+	pushedEvents, err := c.Eventstore.Push(ctx, org.NewPasswordAgePolicyAddedEvent(ctx, orgAgg, policy.ExpireWarnDays, policy.MaxAgeDays))
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (c *Commands) ChangePasswordAgePolicy(ctx context.Context, resourceOwner st
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-57tGs", "Errors.ResourceOwnerMissing")
 	}
 	existingPolicy := NewOrgPasswordAgePolicyWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.Eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (c *Commands) ChangePasswordAgePolicy(ctx context.Context, resourceOwner st
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-dsgjR", "Errors.ORg.LabelPolicy.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (c *Commands) RemovePasswordAgePolicy(ctx context.Context, orgID string) (*
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M58wd", "Errors.ResourceOwnerMissing")
 	}
 	existingPolicy := NewOrgPasswordAgePolicyWriteModel(orgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	err := c.Eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (c *Commands) RemovePasswordAgePolicy(ctx context.Context, orgID string) (*
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-Dgs1g", "Errors.Org.PasswordAgePolicy.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, org.NewPasswordAgePolicyRemovedEvent(ctx, orgAgg))
+	pushedEvents, err := c.Eventstore.Push(ctx, org.NewPasswordAgePolicyRemovedEvent(ctx, orgAgg))
 	if err != nil {
 		return nil, err
 	}

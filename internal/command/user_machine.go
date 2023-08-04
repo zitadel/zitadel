@@ -73,12 +73,12 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine) (*domain.Ob
 	}
 
 	agg := user.NewAggregate(machine.AggregateID, machine.ResourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddMachineCommand(agg, machine))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, AddMachineCommand(agg, machine))
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,12 +92,12 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine) (*domain.Ob
 
 func (c *Commands) ChangeMachine(ctx context.Context, machine *Machine) (*domain.ObjectDetails, error) {
 	agg := user.NewAggregate(machine.AggregateID, machine.ResourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, changeMachineCommand(agg, machine))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, changeMachineCommand(agg, machine))
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}

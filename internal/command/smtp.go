@@ -18,11 +18,11 @@ import (
 func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.Config) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.prepareAddSMTPConfig(instanceAgg, config.From, config.FromName, config.SMTP.Host, config.SMTP.User, []byte(config.SMTP.Password), config.Tls)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -36,11 +36,11 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.Config) (*dom
 func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *smtp.Config) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.prepareChangeSMTPConfig(instanceAgg, config.From, config.FromName, config.SMTP.Host, config.SMTP.User, config.Tls)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *smtp.Config) (*
 
 func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	smtpConfigWriteModel, err := getSMTPConfigWriteModel(ctx, c.eventstore.Filter, "")
+	smtpConfigWriteModel, err := getSMTPConfigWriteModel(ctx, c.Eventstore.Filter, "")
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string
 			return nil, err
 		}
 	}
-	events, err := c.eventstore.Push(ctx, instance.NewSMTPConfigPasswordChangedEvent(
+	events, err := c.Eventstore.Push(ctx, instance.NewSMTPConfigPasswordChangedEvent(
 		ctx,
 		&instanceAgg.Aggregate,
 		smtpPassword))
@@ -84,11 +84,11 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string
 func (c *Commands) RemoveSMTPConfig(ctx context.Context) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.prepareRemoveSMTPConfig(instanceAgg)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}

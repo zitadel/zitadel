@@ -91,7 +91,7 @@ func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, 
 		return nil, nil, errors.ThrowPermissionDenied(nil, "COMMAND-rai9Y", "Errors.AuthRequest.WrongLoginClient")
 	}
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetCtxData(ctx).OrgID)
-	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -206,7 +206,7 @@ func (c *Commands) getAuthRequestWriteModel(ctx context.Context, id string) (wri
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewAuthRequestWriteModel(ctx, id)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

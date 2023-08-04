@@ -518,7 +518,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore,
+				Eventstore:   tt.fields.eventstore,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
 			got, err := r.AddOrgMember(tt.args.ctx, tt.args.orgID, tt.args.userID, tt.args.roles...)
@@ -714,7 +714,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore,
+				Eventstore:   tt.fields.eventstore,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
 			got, err := r.ChangeOrgMember(tt.args.ctx, tt.args.member)
@@ -844,7 +844,7 @@ func TestCommandSide_RemoveOrgMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveProjectMember(tt.args.ctx, tt.args.projectID, tt.args.userID, tt.args.resourceOwner)
 			if tt.res.err == nil {

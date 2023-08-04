@@ -53,7 +53,7 @@ func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email, em
 		events = append(events, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry))
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceo
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
 	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, emailCodeGenerator)
 	if err == nil {
-		pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
+		pushedEvents, err := c.Eventstore.Push(ctx, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
 		if err != nil {
 			return nil, err
 		}
@@ -94,7 +94,7 @@ func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceo
 		return writeModelToObjectDetails(&existingCode.WriteModel), nil
 	}
 
-	_, err = c.eventstore.Push(ctx, user.NewHumanEmailVerificationFailedEvent(ctx, userAgg))
+	_, err = c.Eventstore.Push(ctx, user.NewHumanEmailVerificationFailedEvent(ctx, userAgg))
 	logging.LogWithFields("COMMAND-Dg2z5", "userID", userAgg.ID).OnError(err).Error("NewHumanEmailVerificationFailedEvent push failed")
 	return nil, caos_errs.ThrowInvalidArgument(err, "COMMAND-Gdsgs", "Errors.User.Code.Invalid")
 }
@@ -122,7 +122,7 @@ func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID,
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry))
+	pushedEvents, err := c.Eventstore.Push(ctx, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry))
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func (c *Commands) HumanEmailVerificationCodeSent(ctx context.Context, orgID, us
 		return caos_errs.ThrowNotFound(nil, "COMMAND-6n8uH", "Errors.User.Email.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
-	_, err = c.eventstore.Push(ctx, user.NewHumanEmailCodeSentEvent(ctx, userAgg))
+	_, err = c.Eventstore.Push(ctx, user.NewHumanEmailCodeSentEvent(ctx, userAgg))
 	return err
 }
 
@@ -154,7 +154,7 @@ func (c *Commands) emailWriteModel(ctx context.Context, userID, resourceOwner st
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewHumanEmailWriteModel(userID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

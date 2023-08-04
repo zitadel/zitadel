@@ -14,11 +14,11 @@ import (
 
 func (c *Commands) AddDefaultPasswordComplexityPolicy(ctx context.Context, minLength uint64, hasLowercase, hasUppercase, hasNumber, hasSymbol bool) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultPasswordComplexityPolicy(instanceAgg, minLength, hasLowercase, hasUppercase, hasNumber, hasSymbol))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareAddDefaultPasswordComplexityPolicy(instanceAgg, minLength, hasLowercase, hasUppercase, hasNumber, hasSymbol))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (c *Commands) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, po
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-9jlsf", "Errors.IAM.PasswordComplexityPolicy.NotChanged")
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func prepareAddDefaultPasswordComplexityPolicy(
 
 func (c *Commands) getDefaultPasswordComplexityPolicy(ctx context.Context) (*domain.PasswordComplexityPolicy, error) {
 	policyWriteModel := NewInstancePasswordComplexityPolicyWriteModel(ctx)
-	err := c.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, policyWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (c *Commands) defaultPasswordComplexityPolicyWriteModelByID(ctx context.Con
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewInstancePasswordComplexityPolicyWriteModel(ctx)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

@@ -13,11 +13,11 @@ import (
 func (c *Commands) SetSecurityPolicy(ctx context.Context, enabled bool, allowedOrigins []string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.prepareSetSecurityPolicy(instanceAgg, enabled, allowedOrigins)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}

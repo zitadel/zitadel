@@ -47,7 +47,7 @@ func (c *Commands) addProjectGrantWithID(ctx context.Context, grant *domain.Proj
 
 	addedGrant := NewProjectGrantWriteModel(grant.GrantID, grant.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedGrant.WriteModel)
-	pushedEvents, err := c.eventstore.Push(
+	pushedEvents, err := c.Eventstore.Push(
 		ctx,
 		project.NewGrantAddedEvent(ctx, projectAgg, grant.GrantID, grant.GrantedOrgID, grant.RoleKeys))
 	if err != nil {
@@ -85,7 +85,7 @@ func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *domain.Project
 
 	removedRoles := domain.GetRemovedRoles(existingGrant.RoleKeys, grant.RoleKeys)
 	if len(removedRoles) == 0 {
-		pushedEvents, err := c.eventstore.Push(ctx, events...)
+		pushedEvents, err := c.Eventstore.Push(ctx, events...)
 		if err != nil {
 			return nil, err
 		}
@@ -103,7 +103,7 @@ func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *domain.Project
 		}
 		events = append(events, event)
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +161,7 @@ func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantI
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingGrant.WriteModel)
 
-	pushedEvents, err := c.eventstore.Push(ctx, project.NewGrantDeactivateEvent(ctx, projectAgg, grantID))
+	pushedEvents, err := c.Eventstore.Push(ctx, project.NewGrantDeactivateEvent(ctx, projectAgg, grantID))
 	if err != nil {
 		return nil, err
 	}
@@ -188,7 +188,7 @@ func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantI
 		return details, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-47fu8", "Errors.Project.Grant.NotInactive")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingGrant.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, project.NewGrantReactivatedEvent(ctx, projectAgg, grantID))
+	pushedEvents, err := c.Eventstore.Push(ctx, project.NewGrantReactivatedEvent(ctx, projectAgg, grantID))
 	if err != nil {
 		return nil, err
 	}
@@ -223,7 +223,7 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 		}
 		events = append(events, event)
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +239,7 @@ func (c *Commands) projectGrantWriteModelByID(ctx context.Context, grantID, proj
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewProjectGrantWriteModel(grantID, projectID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}
@@ -253,7 +253,7 @@ func (c *Commands) projectGrantWriteModelByID(ctx context.Context, grantID, proj
 
 func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectGrant *domain.ProjectGrant) error {
 	preConditions := NewProjectGrantPreConditionReadModel(projectGrant.AggregateID, projectGrant.GrantedOrgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, preConditions)
+	err := c.Eventstore.FilterToQueryReducer(ctx, preConditions)
 	if err != nil {
 		return err
 	}

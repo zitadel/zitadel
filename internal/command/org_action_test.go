@@ -128,7 +128,7 @@ func TestCommands_AddAction(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:  tt.fields.eventstore,
+				Eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
 			id, details, err := c.AddAction(tt.args.ctx, tt.args.addAction, tt.args.resourceOwner)
@@ -343,7 +343,7 @@ func TestCommands_ChangeAction(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			details, err := c.ChangeAction(tt.args.ctx, tt.args.changeAction, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -480,7 +480,7 @@ func TestCommands_DeactivateAction(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			details, err := c.DeactivateAction(tt.args.ctx, tt.args.actionID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -617,7 +617,7 @@ func TestCommands_ReactivateAction(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			details, err := c.ReactivateAction(tt.args.ctx, tt.args.actionID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -775,7 +775,7 @@ func TestCommands_DeleteAction(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			details, err := c.DeleteAction(tt.args.ctx, tt.args.id, tt.args.resourceOwner, tt.args.flowTypes...)
 			if tt.res.err == nil {

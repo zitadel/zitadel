@@ -95,7 +95,7 @@ func TestCommandSide_AddDefaultLockoutPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddDefaultLockoutPolicy(tt.args.ctx, tt.args.maxPasswordAttempts, tt.args.showLockOutFailures)
 			if tt.res.err == nil {
@@ -220,7 +220,7 @@ func TestCommandSide_ChangeDefaultLockoutPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeDefaultLockoutPolicy(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {

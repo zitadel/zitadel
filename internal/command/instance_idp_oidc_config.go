@@ -12,7 +12,7 @@ func (c *Commands) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *domai
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-9djf8", "Errors.IDMissing")
 	}
 	existingConfig := NewInstanceIDPOIDCConfigWriteModel(ctx, config.IDPConfigID)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingConfig)
+	err := c.Eventstore.FilterToQueryReducer(ctx, existingConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (c *Commands) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *domai
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-d8kwF", "Errors.IAM.IDPConfig.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}

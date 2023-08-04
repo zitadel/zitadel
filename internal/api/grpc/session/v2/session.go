@@ -6,6 +6,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
@@ -18,6 +19,12 @@ import (
 func (s *Server) GetSession(ctx context.Context, req *session.GetSessionRequest) (*session.GetSessionResponse, error) {
 	res, err := s.query.SessionByID(ctx, true, req.GetSessionId(), req.GetSessionToken())
 	if err != nil {
+		sessionWriteModel := command.NewSessionWriteModel(req.GetSessionId(), authz.GetCtxData(ctx).OrgID)
+		err = s.command.Eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
+		if err != nil {
+			return nil, err
+		}
+		logging.New().WithField("session_seq", sessionWriteModel.ProcessedSequence).Debug("get session from command")
 		return nil, err
 	}
 	return &session.GetSessionResponse{

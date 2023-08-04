@@ -1188,7 +1188,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore(t),
+				Eventstore:         tt.fields.eventstore(t),
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				userEncryption:     tt.fields.codeAlg,
 				idGenerator:        tt.fields.idGenerator,
@@ -2106,7 +2106,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore,
+				Eventstore:         tt.fields.eventstore,
 				idGenerator:        tt.fields.idGenerator,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
@@ -3407,7 +3407,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore,
+				Eventstore:         tt.fields.eventstore,
 				idGenerator:        tt.fields.idGenerator,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
@@ -3526,7 +3526,7 @@ func TestCommandSide_HumanMFASkip(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			err := r.HumanSkipMFAInit(tt.args.ctx, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
@@ -3721,7 +3721,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			err := r.HumansSignOut(tt.args.ctx, tt.args.agentID, tt.args.userIDs)
 			if tt.res.err == nil {

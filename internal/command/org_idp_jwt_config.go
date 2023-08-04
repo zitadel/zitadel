@@ -15,7 +15,7 @@ func (c *Commands) ChangeIDPJWTConfig(ctx context.Context, config *domain.JWTIDP
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-2n99f", "Errors.IDMissing")
 	}
 	existingConfig := NewOrgIDPJWTConfigWriteModel(config.IDPConfigID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingConfig)
+	err := c.Eventstore.FilterToQueryReducer(ctx, existingConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (c *Commands) ChangeIDPJWTConfig(ctx context.Context, config *domain.JWTIDP
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-2k9fs", "Errors.Org.IDPConfig.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}

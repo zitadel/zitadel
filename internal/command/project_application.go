@@ -36,7 +36,7 @@ func (c *Commands) ChangeApplication(ctx context.Context, projectID string, appC
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2m8vx", "Errors.NoChangesFound")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
-	pushedEvents, err := c.eventstore.Push(
+	pushedEvents, err := c.Eventstore.Push(
 		ctx,
 		project.NewApplicationChangedEvent(ctx, projectAgg, appChange.GetAppID(), existingApp.Name, appChange.GetApplicationName()))
 	if err != nil {
@@ -65,7 +65,7 @@ func (c *Commands) DeactivateApplication(ctx context.Context, projectID, appID, 
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-dsh35", "Errors.Project.App.NotActive")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationDeactivatedEvent(ctx, projectAgg, appID))
+	pushedEvents, err := c.Eventstore.Push(ctx, project.NewApplicationDeactivatedEvent(ctx, projectAgg, appID))
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (c *Commands) ReactivateApplication(ctx context.Context, projectID, appID, 
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 
-	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationReactivatedEvent(ctx, projectAgg, appID))
+	pushedEvents, err := c.Eventstore.Push(ctx, project.NewApplicationReactivatedEvent(ctx, projectAgg, appID))
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (c *Commands) RemoveApplication(ctx context.Context, projectID, appID, reso
 		entityID = samlWriteModel.EntityID
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationRemovedEvent(ctx, projectAgg, appID, existingApp.Name, entityID))
+	pushedEvents, err := c.Eventstore.Push(ctx, project.NewApplicationRemovedEvent(ctx, projectAgg, appID, existingApp.Name, entityID))
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +137,7 @@ func (c *Commands) RemoveApplication(ctx context.Context, projectID, appID, reso
 
 func (c *Commands) getApplicationWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (*ApplicationWriteModel, error) {
 	appWriteModel := NewApplicationWriteModelWithAppIDC(projectID, appID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, appWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, appWriteModel)
 	if err != nil {
 		return nil, err
 	}

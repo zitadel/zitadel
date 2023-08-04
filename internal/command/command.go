@@ -37,7 +37,7 @@ type Commands struct {
 	checkPermission domain.PermissionCheck
 	newCode         cryptoCodeFunc
 
-	eventstore     *eventstore.Eventstore
+	Eventstore     *eventstore.Eventstore
 	static         static.Storage
 	idGenerator    id.Generator
 	zitadelRoles   []authz.RoleMapping
@@ -97,7 +97,7 @@ func StartCommands(
 	// reuse the oidcEncryption to be able to handle both tokens in the interceptor later on
 	sessionAlg := oidcEncryption
 	repo = &Commands{
-		eventstore:                      es,
+		Eventstore:                      es,
 		static:                          staticStore,
 		idGenerator:                     idGenerator,
 		zitadelRoles:                    zitadelRoles,
@@ -127,19 +127,19 @@ func StartCommands(
 		defaultRefreshTokenIdleLifetime: defaultRefreshTokenIdleLifetime,
 	}
 
-	instance_repo.RegisterEventMappers(repo.eventstore)
-	org.RegisterEventMappers(repo.eventstore)
-	usr_repo.RegisterEventMappers(repo.eventstore)
-	usr_grant_repo.RegisterEventMappers(repo.eventstore)
-	proj_repo.RegisterEventMappers(repo.eventstore)
-	keypair.RegisterEventMappers(repo.eventstore)
-	action.RegisterEventMappers(repo.eventstore)
-	quota.RegisterEventMappers(repo.eventstore)
-	session.RegisterEventMappers(repo.eventstore)
-	idpintent.RegisterEventMappers(repo.eventstore)
-	authrequest.RegisterEventMappers(repo.eventstore)
-	oidcsession.RegisterEventMappers(repo.eventstore)
-	milestone.RegisterEventMappers(repo.eventstore)
+	instance_repo.RegisterEventMappers(repo.Eventstore)
+	org.RegisterEventMappers(repo.Eventstore)
+	usr_repo.RegisterEventMappers(repo.Eventstore)
+	usr_grant_repo.RegisterEventMappers(repo.Eventstore)
+	proj_repo.RegisterEventMappers(repo.Eventstore)
+	keypair.RegisterEventMappers(repo.Eventstore)
+	action.RegisterEventMappers(repo.Eventstore)
+	quota.RegisterEventMappers(repo.Eventstore)
+	session.RegisterEventMappers(repo.Eventstore)
+	idpintent.RegisterEventMappers(repo.Eventstore)
+	authrequest.RegisterEventMappers(repo.Eventstore)
+	oidcsession.RegisterEventMappers(repo.Eventstore)
+	milestone.RegisterEventMappers(repo.Eventstore)
 
 	repo.codeAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.userPasswordHasher, err = defaults.PasswordHasher.PasswordHasher()
@@ -168,7 +168,7 @@ type AppendReducer interface {
 }
 
 func (c *Commands) pushAppendAndReduce(ctx context.Context, object AppendReducer, cmds ...eventstore.Command) error {
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return err
 	}

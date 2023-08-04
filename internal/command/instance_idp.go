@@ -21,11 +21,11 @@ func (c *Commands) AddInstanceGenericOAuthProvider(ctx context.Context, provider
 		return "", nil, err
 	}
 	writeModel := NewOAuthInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceOAuthProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareAddInstanceOAuthProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -36,7 +36,7 @@ func (c *Commands) UpdateInstanceGenericOAuthProvider(ctx context.Context, id st
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
 	writeModel := NewOAuthInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceOAuthProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareUpdateInstanceOAuthProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (c *Commands) UpdateInstanceGenericOAuthProvider(ctx context.Context, id st
 			ResourceOwner: writeModel.ResourceOwner,
 		}, nil
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,11 +63,11 @@ func (c *Commands) AddInstanceGenericOIDCProvider(ctx context.Context, provider 
 		return "", nil, err
 	}
 	writeModel := NewOIDCInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceOIDCProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareAddInstanceOIDCProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -78,7 +78,7 @@ func (c *Commands) UpdateInstanceGenericOIDCProvider(ctx context.Context, id str
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
 	writeModel := NewOIDCInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceOIDCProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareUpdateInstanceOIDCProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (c *Commands) UpdateInstanceGenericOIDCProvider(ctx context.Context, id str
 			ResourceOwner: writeModel.ResourceOwner,
 		}, nil
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -120,11 +120,11 @@ func (c *Commands) migrateInstanceGenericOIDC(ctx context.Context, id string, pr
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-s9219", "Errors.IDPConfig.NotExisting")
 	}
 
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -139,11 +139,11 @@ func (c *Commands) AddInstanceJWTProvider(ctx context.Context, provider JWTProvi
 		return "", nil, err
 	}
 	writeModel := NewJWTInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceJWTProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareAddInstanceJWTProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -154,7 +154,7 @@ func (c *Commands) UpdateInstanceJWTProvider(ctx context.Context, id string, pro
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
 	writeModel := NewJWTInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceJWTProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareUpdateInstanceJWTProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +166,7 @@ func (c *Commands) UpdateInstanceJWTProvider(ctx context.Context, id string, pro
 			ResourceOwner: writeModel.ResourceOwner,
 		}, nil
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -181,11 +181,11 @@ func (c *Commands) AddInstanceAzureADProvider(ctx context.Context, provider Azur
 		return "", nil, err
 	}
 	writeModel := NewAzureADInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceAzureADProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareAddInstanceAzureADProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -196,7 +196,7 @@ func (c *Commands) UpdateInstanceAzureADProvider(ctx context.Context, id string,
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
 	writeModel := NewAzureADInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceAzureADProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareUpdateInstanceAzureADProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -208,7 +208,7 @@ func (c *Commands) UpdateInstanceAzureADProvider(ctx context.Context, id string,
 			ResourceOwner: writeModel.ResourceOwner,
 		}, nil
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -223,11 +223,11 @@ func (c *Commands) AddInstanceGitHubProvider(ctx context.Context, provider GitHu
 		return "", nil, err
 	}
 	writeModel := NewGitHubInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceGitHubProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareAddInstanceGitHubProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -238,7 +238,7 @@ func (c *Commands) UpdateInstanceGitHubProvider(ctx context.Context, id string, 
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
 	writeModel := NewGitHubInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceGitHubProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareUpdateInstanceGitHubProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -250,7 +250,7 @@ func (c *Commands) UpdateInstanceGitHubProvider(ctx context.Context, id string, 
 			ResourceOwner: writeModel.ResourceOwner,
 		}, nil
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -265,11 +265,11 @@ func (c *Commands) AddInstanceGitHubEnterpriseProvider(ctx context.Context, prov
 		return "", nil, err
 	}
 	writeModel := NewGitHubEnterpriseInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceGitHubEnterpriseProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareAddInstanceGitHubEnterpriseProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -280,7 +280,7 @@ func (c *Commands) UpdateInstanceGitHubEnterpriseProvider(ctx context.Context, i
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
 	writeModel := NewGitHubEnterpriseInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceGitHubEnterpriseProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareUpdateInstanceGitHubEnterpriseProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -292,7 +292,7 @@ func (c *Commands) UpdateInstanceGitHubEnterpriseProvider(ctx context.Context, i
 			ResourceOwner: writeModel.ResourceOwner,
 		}, nil
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -307,11 +307,11 @@ func (c *Commands) AddInstanceGitLabProvider(ctx context.Context, provider GitLa
 		return "", nil, err
 	}
 	writeModel := NewGitLabInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceGitLabProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareAddInstanceGitLabProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -322,7 +322,7 @@ func (c *Commands) UpdateInstanceGitLabProvider(ctx context.Context, id string, 
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
 	writeModel := NewGitLabInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceGitLabProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareUpdateInstanceGitLabProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -334,7 +334,7 @@ func (c *Commands) UpdateInstanceGitLabProvider(ctx context.Context, id string, 
 			ResourceOwner: writeModel.ResourceOwner,
 		}, nil
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -349,11 +349,11 @@ func (c *Commands) AddInstanceGitLabSelfHostedProvider(ctx context.Context, prov
 		return "", nil, err
 	}
 	writeModel := NewGitLabSelfHostedInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceGitLabSelfHostedProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareAddInstanceGitLabSelfHostedProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -364,7 +364,7 @@ func (c *Commands) UpdateInstanceGitLabSelfHostedProvider(ctx context.Context, i
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
 	writeModel := NewGitLabSelfHostedInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceGitLabSelfHostedProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareUpdateInstanceGitLabSelfHostedProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -376,7 +376,7 @@ func (c *Commands) UpdateInstanceGitLabSelfHostedProvider(ctx context.Context, i
 			ResourceOwner: writeModel.ResourceOwner,
 		}, nil
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -391,11 +391,11 @@ func (c *Commands) AddInstanceGoogleProvider(ctx context.Context, provider Googl
 		return "", nil, err
 	}
 	writeModel := NewGoogleInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceGoogleProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareAddInstanceGoogleProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -406,7 +406,7 @@ func (c *Commands) UpdateInstanceGoogleProvider(ctx context.Context, id string, 
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
 	writeModel := NewGoogleInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceGoogleProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareUpdateInstanceGoogleProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -418,7 +418,7 @@ func (c *Commands) UpdateInstanceGoogleProvider(ctx context.Context, id string, 
 			ResourceOwner: writeModel.ResourceOwner,
 		}, nil
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -433,11 +433,11 @@ func (c *Commands) AddInstanceLDAPProvider(ctx context.Context, provider LDAPPro
 		return "", nil, err
 	}
 	writeModel := NewLDAPInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceLDAPProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareAddInstanceLDAPProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -448,7 +448,7 @@ func (c *Commands) UpdateInstanceLDAPProvider(ctx context.Context, id string, pr
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
 	writeModel := NewLDAPInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceLDAPProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareUpdateInstanceLDAPProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -460,7 +460,7 @@ func (c *Commands) UpdateInstanceLDAPProvider(ctx context.Context, id string, pr
 			ResourceOwner: writeModel.ResourceOwner,
 		}, nil
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -469,11 +469,11 @@ func (c *Commands) UpdateInstanceLDAPProvider(ctx context.Context, id string, pr
 
 func (c *Commands) DeleteInstanceProvider(ctx context.Context, id string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareDeleteInstanceProvider(instanceAgg, id))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareDeleteInstanceProvider(instanceAgg, id))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}

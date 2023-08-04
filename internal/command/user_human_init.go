@@ -39,7 +39,7 @@ func (c *Commands) ResendInitialMail(ctx context.Context, userID string, email d
 		return nil, err
 	}
 	events = append(events, user.NewHumanInitialCodeAddedEvent(ctx, userAgg, initCode.Code, initCode.Expiry))
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
 	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, initCodeGenerator)
 	if err != nil {
-		_, err = c.eventstore.Push(ctx, user.NewHumanInitializedCheckFailedEvent(ctx, userAgg))
+		_, err = c.Eventstore.Push(ctx, user.NewHumanInitializedCheckFailedEvent(ctx, userAgg))
 		logging.WithFields("userID", userAgg.ID).OnError(err).Error("NewHumanInitializedCheckFailedEvent push failed")
 		return caos_errs.ThrowInvalidArgument(err, "COMMAND-11v6G", "Errors.User.Code.Invalid")
 	}
@@ -88,7 +88,7 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 		}
 		commands = append(commands, passwordCommand)
 	}
-	_, err = c.eventstore.Push(ctx, commands...)
+	_, err = c.Eventstore.Push(ctx, commands...)
 	return err
 }
 
@@ -104,13 +104,13 @@ func (c *Commands) HumanInitCodeSent(ctx context.Context, orgID, userID string) 
 		return caos_errs.ThrowNotFound(nil, "COMMAND-556zg", "Errors.User.Code.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingInitCode.WriteModel)
-	_, err = c.eventstore.Push(ctx, user.NewHumanInitialCodeSentEvent(ctx, userAgg))
+	_, err = c.Eventstore.Push(ctx, user.NewHumanInitialCodeSentEvent(ctx, userAgg))
 	return err
 }
 
 func (c *Commands) getHumanInitWriteModelByID(ctx context.Context, userID, resourceowner string) (*HumanInitCodeWriteModel, error) {
 	initWriteModel := NewHumanInitCodeWriteModel(userID, resourceowner)
-	err := c.eventstore.FilterToQueryReducer(ctx, initWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, initWriteModel)
 	if err != nil {
 		return nil, err
 	}

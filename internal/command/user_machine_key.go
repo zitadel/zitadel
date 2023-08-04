@@ -99,11 +99,11 @@ func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *MachineKey
 	}
 
 	validation := prepareAddUserMachineKey(machineKey, c.machineKeySize)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -151,11 +151,11 @@ func prepareAddUserMachineKey(machineKey *MachineKey, keySize int) preparation.V
 
 func (c *Commands) RemoveUserMachineKey(ctx context.Context, machineKey *MachineKey) (*domain.ObjectDetails, error) {
 	validation := prepareRemoveUserMachineKey(machineKey)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}

@@ -137,7 +137,7 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddSecretGeneratorConfig(tt.args.ctx, tt.args.generatorType, tt.args.generator)
 			if tt.res.err == nil {
@@ -389,7 +389,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				Eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.ChangeSecretGeneratorConfig(tt.args.ctx, tt.args.generatorType, tt.args.generator)
 			if tt.res.err == nil {
@@ -536,7 +536,7 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveSecretGeneratorConfig(tt.args.ctx, tt.args.generatorType)
 			if tt.res.err == nil {

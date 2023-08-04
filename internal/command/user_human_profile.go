@@ -31,7 +31,7 @@ func (c *Commands) ChangeHumanProfile(ctx context.Context, profile *domain.Profi
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0fs", "Errors.User.Profile.NotChanged")
 	}
 
-	events, err := c.eventstore.Push(ctx, changedEvent)
+	events, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (c *Commands) profileWriteModelByID(ctx context.Context, userID, resourceOw
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewHumanProfileWriteModel(userID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

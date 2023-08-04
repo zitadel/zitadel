@@ -48,7 +48,7 @@ func (c *Commands) ChangeHumanPhone(ctx context.Context, phone *domain.Phone, re
 		events = append(events, user.NewHumanPhoneCodeAddedEvent(ctx, userAgg, phoneCode.Code, phoneCode.Expiry))
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func (c *Commands) VerifyHumanPhone(ctx context.Context, userID, code, resourceo
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
 	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, phoneCodeGenerator)
 	if err == nil {
-		pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanPhoneVerifiedEvent(ctx, userAgg))
+		pushedEvents, err := c.Eventstore.Push(ctx, user.NewHumanPhoneVerifiedEvent(ctx, userAgg))
 		if err != nil {
 			return nil, err
 		}
@@ -92,7 +92,7 @@ func (c *Commands) VerifyHumanPhone(ctx context.Context, userID, code, resourceo
 		}
 		return writeModelToObjectDetails(&existingCode.WriteModel), nil
 	}
-	_, err = c.eventstore.Push(ctx, user.NewHumanPhoneVerificationFailedEvent(ctx, userAgg))
+	_, err = c.Eventstore.Push(ctx, user.NewHumanPhoneVerificationFailedEvent(ctx, userAgg))
 	logging.LogWithFields("COMMAND-5M9ds", "userID", userAgg.ID).OnError(err).Error("NewHumanPhoneVerificationFailedEvent push failed")
 	return nil, caos_errs.ThrowInvalidArgument(err, "COMMAND-sM0cs", "Errors.User.Code.Invalid")
 }
@@ -123,7 +123,7 @@ func (c *Commands) CreateHumanPhoneVerificationCode(ctx context.Context, userID,
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanPhoneCodeAddedEvent(ctx, userAgg, phoneCode.Code, phoneCode.Expiry))
+	pushedEvents, err := c.Eventstore.Push(ctx, user.NewHumanPhoneCodeAddedEvent(ctx, userAgg, phoneCode.Code, phoneCode.Expiry))
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func (c *Commands) HumanPhoneVerificationCodeSent(ctx context.Context, orgID, us
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
-	_, err = c.eventstore.Push(ctx, user.NewHumanPhoneCodeSentEvent(ctx, userAgg))
+	_, err = c.Eventstore.Push(ctx, user.NewHumanPhoneCodeSentEvent(ctx, userAgg))
 	return err
 }
 
@@ -172,7 +172,7 @@ func (c *Commands) RemoveHumanPhone(ctx context.Context, userID, resourceOwner s
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanPhoneRemovedEvent(ctx, userAgg))
+	pushedEvents, err := c.Eventstore.Push(ctx, user.NewHumanPhoneRemovedEvent(ctx, userAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -188,7 +188,7 @@ func (c *Commands) phoneWriteModelByID(ctx context.Context, userID, resourceOwne
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewHumanPhoneWriteModel(userID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

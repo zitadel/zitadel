@@ -59,11 +59,11 @@ func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureU
 		return "", nil, err
 	}
 
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareCreateIntent(writeModel, idpID, successURL, failureURL))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareCreateIntent(writeModel, idpID, successURL, failureURL))
 	if err != nil {
 		return "", nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -75,7 +75,7 @@ func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureU
 }
 
 func (c *Commands) GetProvider(ctx context.Context, idpID, callbackURL string) (idp.Provider, error) {
-	writeModel, err := IDPProviderWriteModel(ctx, c.eventstore.Filter, idpID)
+	writeModel, err := IDPProviderWriteModel(ctx, c.Eventstore.Filter, idpID)
 	if err != nil {
 		return nil, err
 	}
@@ -142,13 +142,13 @@ func (c *Commands) FailIDPIntent(ctx context.Context, writeModel *IDPIntentWrite
 		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
 		reason,
 	)
-	_, err := c.eventstore.Push(ctx, cmd)
+	_, err := c.Eventstore.Push(ctx, cmd)
 	return err
 }
 
 func (c *Commands) GetIntentWriteModel(ctx context.Context, id, resourceOwner string) (*IDPIntentWriteModel, error) {
 	writeModel := NewIDPIntentWriteModel(id, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

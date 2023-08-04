@@ -113,7 +113,7 @@ func TestCommandSide_AddDefaultMailTemplatePolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddDefaultMailTemplate(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {
@@ -247,7 +247,7 @@ func TestCommandSide_ChangeDefaultMailTemplatePolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeDefaultMailTemplate(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {

@@ -15,7 +15,7 @@ func (c *Commands) ChangeIDPOIDCConfig(ctx context.Context, config *domain.OIDCI
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-66Qwj", "Errors.IDMissing")
 	}
 	existingConfig := NewOrgIDPOIDCConfigWriteModel(config.IDPConfigID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingConfig)
+	err := c.Eventstore.FilterToQueryReducer(ctx, existingConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (c *Commands) ChangeIDPOIDCConfig(ctx context.Context, config *domain.OIDCI
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-10ods", "Errors.Org.IDPConfig.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}

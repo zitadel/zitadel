@@ -14,11 +14,11 @@ import (
 
 func (c *Commands) AddDefaultLockoutPolicy(ctx context.Context, maxAttempts uint64, showLockoutFailure bool) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultLockoutPolicy(instanceAgg, maxAttempts, showLockoutFailure))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareAddDefaultLockoutPolicy(instanceAgg, maxAttempts, showLockoutFailure))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (c *Commands) ChangeDefaultLockoutPolicy(ctx context.Context, policy *domai
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-0psjF", "Errors.IAM.LockoutPolicy.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (c *Commands) defaultLockoutPolicyWriteModelByID(ctx context.Context) (poli
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewInstanceLockoutPolicyWriteModel(ctx)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

@@ -168,7 +168,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		return "", "", nil, nil, err
 	}
 
-	if err = c.eventstore.NewInstance(ctx, instanceID); err != nil {
+	if err = c.Eventstore.NewInstance(ctx, instanceID); err != nil {
 		return "", "", nil, nil, err
 	}
 
@@ -433,12 +433,12 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		)
 	}
 
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validations...)
 	if err != nil {
 		return "", "", nil, nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return "", "", nil, nil, err
 	}
@@ -458,11 +458,11 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 func (c *Commands) UpdateInstance(ctx context.Context, name string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.prepareUpdateInstance(instanceAgg, name)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -472,11 +472,11 @@ func (c *Commands) UpdateInstance(ctx context.Context, name string) (*domain.Obj
 func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.prepareSetDefaultLanguage(instanceAgg, defaultLanguage)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -486,11 +486,11 @@ func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage langu
 func (c *Commands) SetDefaultOrg(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.prepareSetDefaultOrg(instanceAgg, orgID)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -498,7 +498,7 @@ func (c *Commands) SetDefaultOrg(ctx context.Context, orgID string) (*domain.Obj
 }
 
 func (c *Commands) ChangeSystemConfig(ctx context.Context, externalDomain string, externalPort uint16, externalSecure bool) error {
-	validations, err := c.prepareChangeSystemConfig(externalDomain, externalPort, externalSecure)(ctx, c.eventstore.Filter)
+	validations, err := c.prepareChangeSystemConfig(externalDomain, externalPort, externalSecure)(ctx, c.Eventstore.Filter)
 	if err != nil {
 		return err
 	}
@@ -507,14 +507,14 @@ func (c *Commands) ChangeSystemConfig(ctx context.Context, externalDomain string
 			continue
 		}
 		ctx := authz.WithConsole(authz.WithInstanceID(ctx, instanceID), instanceValidations.ProjectID, instanceValidations.ConsoleAppID)
-		cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, instanceValidations.Validations...)
+		cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, instanceValidations.Validations...)
 		if err != nil {
 			return err
 		}
 		if len(cmds) == 0 {
 			continue
 		}
-		_, err = c.eventstore.Push(ctx, cmds...)
+		_, err = c.Eventstore.Push(ctx, cmds...)
 		if err != nil {
 			return err
 		}
@@ -590,7 +590,7 @@ func (c *Commands) prepareSetDefaultOrg(a *instance.Aggregate, orgID string) pre
 }
 
 func (c *Commands) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *InstanceWriteModel, projectID string) (eventstore.Command, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, iamWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -669,12 +669,12 @@ func getSystemConfigWriteModel(ctx context.Context, filter preparation.FilterToQ
 
 func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveInstance(instanceAgg))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, c.prepareRemoveInstance(instanceAgg))
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -707,7 +707,7 @@ func (c *Commands) prepareRemoveInstance(a *instance.Aggregate) preparation.Vali
 
 func (c *Commands) getInstanceWriteModelByID(ctx context.Context, orgID string) (*InstanceWriteModel, error) {
 	instanceWriteModel := NewInstanceWriteModel(orgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, instanceWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, instanceWriteModel)
 	if err != nil {
 		return nil, err
 	}

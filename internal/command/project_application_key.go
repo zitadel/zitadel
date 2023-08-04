@@ -49,7 +49,7 @@ func (c *Commands) AddApplicationKey(ctx context.Context, key *domain.Applicatio
 func (c *Commands) addApplicationKey(ctx context.Context, key *domain.ApplicationKey, resourceOwner string) (_ *domain.ApplicationKey, err error) {
 
 	keyWriteModel := NewApplicationKeyWriteModel(key.AggregateID, key.ApplicationID, key.KeyID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, keyWriteModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, keyWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (c *Commands) addApplicationKey(ctx context.Context, key *domain.Applicatio
 		key.ClientID = keyWriteModel.ClientID
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx,
+	pushedEvents, err := c.Eventstore.Push(ctx,
 		project.NewApplicationKeyAddedEvent(
 			ctx,
 			ProjectAggregateFromWriteModel(&keyWriteModel.WriteModel),
@@ -97,7 +97,7 @@ func (c *Commands) addApplicationKey(ctx context.Context, key *domain.Applicatio
 
 func (c *Commands) RemoveApplicationKey(ctx context.Context, projectID, applicationID, keyID, resourceOwner string) (*domain.ObjectDetails, error) {
 	keyWriteModel := NewApplicationKeyWriteModel(projectID, applicationID, keyID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, keyWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, keyWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func (c *Commands) RemoveApplicationKey(ctx context.Context, projectID, applicat
 		return nil, errors.ThrowNotFound(nil, "COMMAND-4m77G", "Errors.Project.App.Key.NotFound")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationKeyRemovedEvent(ctx, ProjectAggregateFromWriteModel(&keyWriteModel.WriteModel), keyID))
+	pushedEvents, err := c.Eventstore.Push(ctx, project.NewApplicationKeyRemovedEvent(ctx, ProjectAggregateFromWriteModel(&keyWriteModel.WriteModel), keyID))
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (c *Commands) applicationKeyWriteModelByID(ctx context.Context, projectID, 
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewApplicationKeyWriteModel(projectID, appID, keyID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

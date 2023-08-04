@@ -19,7 +19,7 @@ func (c *Commands) AddProjectMember(ctx context.Context, member *domain.Member, 
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	pushedEvents, err := c.Eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (c *Commands) addProjectMember(ctx context.Context, projectAgg *eventstore.
 	if err != nil {
 		return nil, err
 	}
-	err = c.eventstore.FilterToQueryReducer(ctx, addedMember)
+	err = c.Eventstore.FilterToQueryReducer(ctx, addedMember)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (c *Commands) ChangeProjectMember(ctx context.Context, member *domain.Membe
 		return nil, errors.ThrowPreconditionFailed(nil, "PROJECT-LiaZi", "Errors.Project.Member.RolesNotChanged")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, project.NewProjectMemberChangedEvent(ctx, projectAgg, member.UserID, member.Roles...))
+	pushedEvents, err := c.Eventstore.Push(ctx, project.NewProjectMemberChangedEvent(ctx, projectAgg, member.UserID, member.Roles...))
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (c *Commands) RemoveProjectMember(ctx context.Context, projectID, userID, r
 
 	projectAgg := ProjectAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
 	removeEvent := c.removeProjectMember(ctx, projectAgg, userID, false)
-	pushedEvents, err := c.eventstore.Push(ctx, removeEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +127,7 @@ func (c *Commands) projectMemberWriteModelByID(ctx context.Context, projectID, u
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewProjectMemberWriteModel(projectID, userID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

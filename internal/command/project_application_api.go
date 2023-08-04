@@ -135,7 +135,7 @@ func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 		apiApp.AuthMethodType))
 
 	addedApplication.AppID = apiApp.AppID
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (c *Commands) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIA
 		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-1m88i", "Errors.NoChangesFound")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -210,7 +210,7 @@ func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, ap
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingAPI.WriteModel)
 
-	pushedEvents, err := c.eventstore.Push(ctx, project_repo.NewAPIConfigSecretChangedEvent(ctx, projectAgg, appID, cryptoSecret))
+	pushedEvents, err := c.Eventstore.Push(ctx, project_repo.NewAPIConfigSecretChangedEvent(ctx, projectAgg, appID, cryptoSecret))
 	if err != nil {
 		return nil, err
 	}
@@ -247,17 +247,17 @@ func (c *Commands) VerifyAPIClientSecret(ctx context.Context, projectID, appID, 
 	err = crypto.CompareHash(app.ClientSecret, []byte(secret), c.codeAlg)
 	spanPasswordComparison.EndWithError(err)
 	if err == nil {
-		_, err = c.eventstore.Push(ctx, project_repo.NewAPIConfigSecretCheckSucceededEvent(ctx, projectAgg, app.AppID))
+		_, err = c.Eventstore.Push(ctx, project_repo.NewAPIConfigSecretCheckSucceededEvent(ctx, projectAgg, app.AppID))
 		return err
 	}
-	_, err = c.eventstore.Push(ctx, project_repo.NewAPIConfigSecretCheckFailedEvent(ctx, projectAgg, app.AppID))
+	_, err = c.Eventstore.Push(ctx, project_repo.NewAPIConfigSecretCheckFailedEvent(ctx, projectAgg, app.AppID))
 	logging.Log("COMMAND-g3f12").OnError(err).Error("could not push event APIClientSecretCheckFailed")
 	return errors.ThrowInvalidArgument(nil, "COMMAND-SADfg", "Errors.Project.App.ClientSecretInvalid")
 }
 
 func (c *Commands) getAPIAppWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (*APIApplicationWriteModel, error) {
 	appWriteModel := NewAPIApplicationWriteModelWithAppID(projectID, appID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, appWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, appWriteModel)
 	if err != nil {
 		return nil, err
 	}

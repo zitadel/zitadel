@@ -111,7 +111,7 @@ func TestCommands_RegisterUserU2F(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:     tt.fields.eventstore,
+				Eventstore:     tt.fields.eventstore,
 				idGenerator:    tt.fields.idGenerator,
 				webauthnConfig: webauthnConfig,
 			}
@@ -195,14 +195,14 @@ func TestCommands_pushUserU2F(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:     eventstoreExpect(t, prep...),
+				Eventstore:     eventstoreExpect(t, prep...),
 				webauthnConfig: webauthnConfig,
 				idGenerator:    id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			}
 			wm, userAgg, webAuthN, err := c.createUserPasskey(ctx, "user1", "org1", "rpID", domain.AuthenticatorAttachmentCrossPlattform)
 			require.NoError(t, err)
 
-			c.eventstore = eventstoreExpect(t, tt.expectPush(webAuthN.Challenge))
+			c.Eventstore = eventstoreExpect(t, tt.expectPush(webAuthN.Challenge))
 
 			got, err := c.pushUserU2F(ctx, wm, userAgg, webAuthN)
 			require.ErrorIs(t, err, tt.wantErr)

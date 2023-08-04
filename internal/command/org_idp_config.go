@@ -81,7 +81,7 @@ func (c *Commands) addIDPConfig(ctx context.Context, config *domain.IDPConfig, i
 			config.JWTConfig.HeaderName,
 		))
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (c *Commands) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig
 	if !hasChanged {
 		return nil, errors.ThrowPreconditionFailed(nil, "Org-jf9w", "Errors.Org.IDPConfig.NotChanged")
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +136,7 @@ func (c *Commands) DeactivateIDPConfig(ctx context.Context, idpID, orgID string)
 		return nil, errors.ThrowPreconditionFailed(nil, "Org-BBmd0", "Errors.Org.IDPConfig.NotActive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, org_repo.NewIDPConfigDeactivatedEvent(ctx, orgAgg, idpID))
+	pushedEvents, err := c.Eventstore.Push(ctx, org_repo.NewIDPConfigDeactivatedEvent(ctx, orgAgg, idpID))
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +156,7 @@ func (c *Commands) ReactivateIDPConfig(ctx context.Context, idpID, orgID string)
 		return nil, errors.ThrowPreconditionFailed(nil, "Org-5Mo0d", "Errors.Org.IDPConfig.NotInactive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, org_repo.NewIDPConfigReactivatedEvent(ctx, orgAgg, idpID))
+	pushedEvents, err := c.Eventstore.Push(ctx, org_repo.NewIDPConfigReactivatedEvent(ctx, orgAgg, idpID))
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (c *Commands) RemoveIDPConfig(ctx context.Context, idpID, orgID string, cas
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -220,7 +220,7 @@ func (c *Commands) orgIDPConfigWriteModelByID(ctx context.Context, idpID, orgID 
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewOrgIDPConfigWriteModel(idpID, orgID)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

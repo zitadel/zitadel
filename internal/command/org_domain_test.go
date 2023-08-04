@@ -390,7 +390,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddOrgDomain(tt.args.ctx, tt.args.orgID, tt.args.domain, tt.args.claimedUserIDs)
 			if tt.res.err == nil {
@@ -660,7 +660,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:                  tt.fields.eventstore,
+				Eventstore:                  tt.fields.eventstore,
 				domainVerificationGenerator: tt.fields.secretGenerator,
 			}
 			token, url, err := r.GenerateOrgDomainValidation(tt.args.ctx, tt.args.domain)
@@ -1120,7 +1120,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:                  tt.fields.eventstore,
+				Eventstore:                  tt.fields.eventstore,
 				domainVerificationGenerator: tt.fields.secretGenerator,
 				domainVerificationAlg:       tt.fields.alg,
 				domainVerificationValidator: tt.fields.domainValidationFunc,
@@ -1311,7 +1311,7 @@ func TestCommandSide_SetPrimaryDomain(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.SetPrimaryOrgDomain(tt.args.ctx, tt.args.domain)
 			if tt.res.err == nil {
@@ -1555,7 +1555,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveOrgDomain(tt.args.ctx, tt.args.domain)
 			if tt.res.err == nil {

@@ -84,11 +84,11 @@ func (c *Commands) prepareUpdateOIDCSettings(a *instance.Aggregate, accessTokenL
 func (c *Commands) AddOIDCSettings(ctx context.Context, settings *domain.OIDCSettings) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.prepareAddOIDCSettings(instanceAgg, settings.AccessTokenLifetime, settings.IdTokenLifetime, settings.RefreshTokenIdleExpiration, settings.RefreshTokenExpiration)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -102,11 +102,11 @@ func (c *Commands) AddOIDCSettings(ctx context.Context, settings *domain.OIDCSet
 func (c *Commands) ChangeOIDCSettings(ctx context.Context, settings *domain.OIDCSettings) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.prepareUpdateOIDCSettings(instanceAgg, settings.AccessTokenLifetime, settings.IdTokenLifetime, settings.RefreshTokenIdleExpiration, settings.RefreshTokenExpiration)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}

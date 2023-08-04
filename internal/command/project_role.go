@@ -22,7 +22,7 @@ func (c *Commands) AddProjectRole(ctx context.Context, projectRole *domain.Proje
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (c *Commands) BulkAddProjectRole(ctx context.Context, projectID, resourceOw
 		return details, err
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func (c *Commands) ChangeProjectRole(ctx context.Context, projectRole *domain.Pr
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0cs", "Errors.NoChangesFound")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, changeEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func (c *Commands) RemoveProjectRole(ctx context.Context, projectID, key, resour
 		events = append(events, event)
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +161,7 @@ func (c *Commands) RemoveProjectRole(ctx context.Context, projectID, key, resour
 
 func (c *Commands) getProjectRoleWriteModelByID(ctx context.Context, key, projectID, resourceOwner string) (*ProjectRoleWriteModel, error) {
 	projectRoleWriteModel := NewProjectRoleWriteModelWithKey(key, projectID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, projectRoleWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, projectRoleWriteModel)
 	if err != nil {
 		return nil, err
 	}

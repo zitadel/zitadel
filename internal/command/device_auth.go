@@ -20,7 +20,7 @@ func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, user
 	aggr := deviceauth.NewAggregate(aggrID, authz.GetInstance(ctx).InstanceID())
 	model := NewDeviceAuthWriteModel(aggrID, aggr.ResourceOwner)
 
-	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewAddedEvent(
+	pushedEvents, err := c.Eventstore.Push(ctx, deviceauth.NewAddedEvent(
 		ctx,
 		aggr,
 		clientID,
@@ -50,7 +50,7 @@ func (c *Commands) ApproveDeviceAuth(ctx context.Context, id, subject string) (*
 	}
 	aggr := deviceauth.NewAggregate(model.AggregateID, model.InstanceID)
 
-	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewApprovedEvent(ctx, aggr, subject))
+	pushedEvents, err := c.Eventstore.Push(ctx, deviceauth.NewApprovedEvent(ctx, aggr, subject))
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (c *Commands) CancelDeviceAuth(ctx context.Context, id string, reason domai
 	}
 	aggr := deviceauth.NewAggregate(model.AggregateID, model.InstanceID)
 
-	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewCanceledEvent(ctx, aggr, reason))
+	pushedEvents, err := c.Eventstore.Push(ctx, deviceauth.NewCanceledEvent(ctx, aggr, reason))
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (c *Commands) RemoveDeviceAuth(ctx context.Context, id string) (*domain.Obj
 	}
 	aggr := deviceauth.NewAggregate(model.AggregateID, model.InstanceID)
 
-	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewRemovedEvent(ctx, aggr, model.ClientID, model.DeviceCode, model.UserCode))
+	pushedEvents, err := c.Eventstore.Push(ctx, deviceauth.NewRemovedEvent(ctx, aggr, model.ClientID, model.DeviceCode, model.UserCode))
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func (c *Commands) RemoveDeviceAuth(ctx context.Context, id string) (*domain.Obj
 
 func (c *Commands) getDeviceAuthWriteModelByID(ctx context.Context, id string) (*DeviceAuthWriteModel, error) {
 	model := &DeviceAuthWriteModel{WriteModel: eventstore.WriteModel{AggregateID: id}}
-	err := c.eventstore.FilterToQueryReducer(ctx, model)
+	err := c.Eventstore.FilterToQueryReducer(ctx, model)
 	if err != nil {
 		return nil, err
 	}

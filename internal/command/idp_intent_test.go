@@ -195,7 +195,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:  tt.fields.eventstore,
+				Eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
 			intentID, details, err := c.CreateIntent(tt.args.ctx, tt.args.idpID, tt.args.successURL, tt.args.failureURL, tt.args.resourceOwner)
@@ -352,7 +352,7 @@ func TestCommands_AuthURLFromProvider(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			authURL, err := c.AuthURLFromProvider(tt.args.ctx, tt.args.idpID, tt.args.state, tt.args.callbackURL)
@@ -480,7 +480,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				Eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.idpConfigEncryption,
 			}
 			got, err := c.SucceedIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.idpSession, tt.args.userID)
@@ -536,7 +536,7 @@ func TestCommands_FailIDPIntent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			err := c.FailIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.reason)
 			require.ErrorIs(t, err, tt.res.err)

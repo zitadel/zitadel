@@ -20,7 +20,7 @@ func (c *Commands) SetInstanceCustomText(ctx context.Context, customText *domain
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	pushedEvents, err := c.Eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func (c *Commands) setDefaultCustomText(ctx context.Context, instanceAgg *events
 	if !text.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-3MN0s", "Errors.CustomText.Invalid")
 	}
-	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	err := c.Eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (c *Commands) defaultCustomTextWriteModelByID(ctx context.Context, key stri
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewInstanceCustomTextWriteModel(ctx, key, language)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

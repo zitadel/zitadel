@@ -215,7 +215,7 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:                      tt.fields.eventstore,
+				Eventstore:                      tt.fields.eventstore,
 				idGenerator:                     tt.fields.idGenerator,
 				defaultAccessTokenLifetime:      tt.fields.defaultAccessTokenLifetime,
 				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
@@ -424,7 +424,7 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:                      tt.fields.eventstore,
+				Eventstore:                      tt.fields.eventstore,
 				idGenerator:                     tt.fields.idGenerator,
 				defaultAccessTokenLifetime:      tt.fields.defaultAccessTokenLifetime,
 				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
@@ -609,7 +609,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:                      tt.fields.eventstore,
+				Eventstore:                      tt.fields.eventstore,
 				idGenerator:                     tt.fields.idGenerator,
 				defaultAccessTokenLifetime:      tt.fields.defaultAccessTokenLifetime,
 				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
@@ -781,7 +781,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:                      tt.fields.eventstore,
+				Eventstore:                      tt.fields.eventstore,
 				idGenerator:                     tt.fields.idGenerator,
 				defaultAccessTokenLifetime:      tt.fields.defaultAccessTokenLifetime,
 				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
@@ -1004,7 +1004,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:   tt.fields.eventstore,
+				Eventstore:   tt.fields.eventstore,
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
 			err := c.RevokeOIDCSessionToken(tt.args.ctx, tt.args.token, tt.args.clientID)

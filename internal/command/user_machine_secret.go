@@ -19,12 +19,12 @@ type GenerateMachineSecret struct {
 
 func (c *Commands) GenerateMachineSecret(ctx context.Context, userID string, resourceOwner string, generator crypto.Generator, set *GenerateMachineSecret) (*domain.ObjectDetails, error) {
 	agg := user.NewAggregate(userID, resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareGenerateMachineSecret(agg, generator, set))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareGenerateMachineSecret(agg, generator, set))
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -68,12 +68,12 @@ func prepareGenerateMachineSecret(a *user.Aggregate, generator crypto.Generator,
 
 func (c *Commands) RemoveMachineSecret(ctx context.Context, userID string, resourceOwner string) (*domain.ObjectDetails, error) {
 	agg := user.NewAggregate(userID, resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareRemoveMachineSecret(agg))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareRemoveMachineSecret(agg))
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -113,12 +113,12 @@ func prepareRemoveMachineSecret(a *user.Aggregate) preparation.Validation {
 
 func (c *Commands) VerifyMachineSecret(ctx context.Context, userID string, resourceOwner string, secret string) (*domain.ObjectDetails, error) {
 	agg := user.NewAggregate(userID, resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareVerifyMachineSecret(agg, secret, c.codeAlg))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareVerifyMachineSecret(agg, secret, c.codeAlg))
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	for _, cmd := range cmds {
 		if cmd.Type() == user.MachineSecretCheckFailedType {
 			logging.OnError(err).Error("could not push event MachineSecretCheckFailed")

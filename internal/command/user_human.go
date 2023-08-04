@@ -131,7 +131,7 @@ func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *Ad
 	if resourceOwner == "" {
 		return errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter,
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter,
 		c.AddHumanCommand(
 			human,
 			resourceOwner,
@@ -143,7 +143,7 @@ func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *Ad
 		return err
 	}
 
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return err
 	}
@@ -439,7 +439,7 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 	if err != nil {
 		return nil, nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -500,7 +500,7 @@ func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domai
 		userEvents = append(userEvents, memberEvent)
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, userEvents...)
+	pushedEvents, err := c.Eventstore.Push(ctx, userEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -570,7 +570,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 		index := strings.LastIndex(human.Username, "@")
 		if index > 1 {
 			domainCheck := NewOrgDomainVerifiedWriteModel(human.Username[index+1:])
-			if err := c.eventstore.FilterToQueryReducer(ctx, domainCheck); err != nil {
+			if err := c.Eventstore.FilterToQueryReducer(ctx, domainCheck); err != nil {
 				return nil, nil, err
 			}
 			if domainCheck.Verified && domainCheck.ResourceOwner != orgID {
@@ -656,7 +656,7 @@ func (c *Commands) HumanSkipMFAInit(ctx context.Context, userID, resourceowner s
 		return errors.ThrowNotFound(nil, "COMMAND-m9cV8", "Errors.User.NotFound")
 	}
 
-	_, err = c.eventstore.Push(ctx,
+	_, err = c.Eventstore.Push(ctx,
 		user.NewHumanMFAInitSkippedEvent(ctx, UserAggregateFromWriteModel(&existingHuman.WriteModel)))
 	return err
 }
@@ -754,13 +754,13 @@ func (c *Commands) HumansSignOut(ctx context.Context, agentID string, userIDs []
 	if len(events) == 0 {
 		return nil
 	}
-	_, err := c.eventstore.Push(ctx, events...)
+	_, err := c.Eventstore.Push(ctx, events...)
 	return err
 }
 
 func (c *Commands) getHumanWriteModelByID(ctx context.Context, userID, resourceowner string) (*HumanWriteModel, error) {
 	humanWriteModel := NewHumanWriteModel(userID, resourceowner)
-	err := c.eventstore.FilterToQueryReducer(ctx, humanWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, humanWriteModel)
 	if err != nil {
 		return nil, err
 	}

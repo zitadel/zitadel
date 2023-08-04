@@ -17,7 +17,7 @@ import (
 
 func (c *Commands) getHumanU2FTokens(ctx context.Context, userID, resourceowner string) ([]*domain.WebAuthNToken, error) {
 	tokenReadModel := NewHumanU2FTokensReadModel(userID, resourceowner)
-	err := c.eventstore.FilterToQueryReducer(ctx, tokenReadModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, tokenReadModel)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (c *Commands) getHumanU2FTokens(ctx context.Context, userID, resourceowner 
 
 func (c *Commands) getHumanPasswordlessTokens(ctx context.Context, userID, resourceOwner string) ([]*domain.WebAuthNToken, error) {
 	tokenReadModel := NewHumanPasswordlessTokensReadModel(userID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, tokenReadModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, tokenReadModel)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (c *Commands) getHumanPasswordlessTokens(ctx context.Context, userID, resou
 
 func (c *Commands) getHumanU2FLogin(ctx context.Context, userID, authReqID, resourceowner string) (*domain.WebAuthNLogin, error) {
 	tokenReadModel := NewHumanU2FLoginReadModel(userID, authReqID, resourceowner)
-	err := c.eventstore.FilterToQueryReducer(ctx, tokenReadModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, tokenReadModel)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (c *Commands) getHumanU2FLogin(ctx context.Context, userID, authReqID, reso
 
 func (c *Commands) getHumanPasswordlessLogin(ctx context.Context, userID, authReqID, resourceowner string) (*domain.WebAuthNLogin, error) {
 	tokenReadModel := NewHumanPasswordlessLoginReadModel(userID, authReqID, resourceowner)
-	err := c.eventstore.FilterToQueryReducer(ctx, tokenReadModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, tokenReadModel)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (c *Commands) HumanAddU2FSetup(ctx context.Context, userID, resourceowner s
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, usr_repo.NewHumanU2FAddedEvent(ctx, userAgg, addWebAuthN.WebauthNTokenID, webAuthN.Challenge, ""))
+	events, err := c.Eventstore.Push(ctx, usr_repo.NewHumanU2FAddedEvent(ctx, userAgg, addWebAuthN.WebauthNTokenID, webAuthN.Challenge, ""))
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (c *Commands) HumanAddPasswordlessSetup(ctx context.Context, userID, resour
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, usr_repo.NewHumanPasswordlessAddedEvent(ctx, userAgg, addWebAuthN.WebauthNTokenID, webAuthN.Challenge, ""))
+	events, err := c.Eventstore.Push(ctx, usr_repo.NewHumanPasswordlessAddedEvent(ctx, userAgg, addWebAuthN.WebauthNTokenID, webAuthN.Challenge, ""))
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +184,7 @@ func (c *Commands) HumanVerifyU2FSetup(ctx context.Context, userID, resourceowne
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx,
+	pushedEvents, err := c.Eventstore.Push(ctx,
 		usr_repo.NewHumanU2FVerifiedEvent(
 			ctx,
 			userAgg,
@@ -252,7 +252,7 @@ func (c *Commands) humanHumanPasswordlessSetup(ctx context.Context, userID, reso
 	if codeCheckEvent != nil {
 		events = append(events, codeCheckEvent(userAgg))
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -297,7 +297,7 @@ func (c *Commands) HumanBeginU2FLogin(ctx context.Context, userID, resourceOwner
 		return nil, err
 	}
 
-	_, err = c.eventstore.Push(ctx,
+	_, err = c.Eventstore.Push(ctx,
 		usr_repo.NewHumanU2FBeginLoginEvent(
 			ctx,
 			userAgg,
@@ -321,7 +321,7 @@ func (c *Commands) HumanBeginPasswordlessLogin(ctx context.Context, userID, reso
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.eventstore.Push(ctx,
+	_, err = c.Eventstore.Push(ctx,
 		usr_repo.NewHumanPasswordlessBeginLoginEvent(
 			ctx,
 			userAgg,
@@ -373,7 +373,7 @@ func (c *Commands) HumanFinishU2FLogin(ctx context.Context, userID, resourceOwne
 			logging.WithFields("userID", userID, "resourceOwner", resourceOwner).WithError(err).Warn("missing userAggregate for pushing failed u2f check event")
 			return err
 		}
-		_, pushErr := c.eventstore.Push(ctx,
+		_, pushErr := c.Eventstore.Push(ctx,
 			usr_repo.NewHumanU2FCheckFailedEvent(
 				ctx,
 				userAgg,
@@ -384,7 +384,7 @@ func (c *Commands) HumanFinishU2FLogin(ctx context.Context, userID, resourceOwne
 		return err
 	}
 
-	_, err = c.eventstore.Push(ctx,
+	_, err = c.Eventstore.Push(ctx,
 		usr_repo.NewHumanU2FCheckSucceededEvent(
 			ctx,
 			userAgg,
@@ -418,7 +418,7 @@ func (c *Commands) HumanFinishPasswordlessLogin(ctx context.Context, userID, res
 			logging.WithFields("userID", userID, "resourceOwner", resourceOwner).WithError(err).Warn("missing userAggregate for pushing failed passwordless check event")
 			return err
 		}
-		_, pushErr := c.eventstore.Push(ctx,
+		_, pushErr := c.Eventstore.Push(ctx,
 			usr_repo.NewHumanPasswordlessCheckFailedEvent(
 				ctx,
 				userAgg,
@@ -429,7 +429,7 @@ func (c *Commands) HumanFinishPasswordlessLogin(ctx context.Context, userID, res
 		return err
 	}
 
-	_, err = c.eventstore.Push(ctx,
+	_, err = c.Eventstore.Push(ctx,
 		usr_repo.NewHumanPasswordlessCheckSucceededEvent(
 			ctx,
 			userAgg,
@@ -488,7 +488,7 @@ func (c *Commands) HumanAddPasswordlessInitCode(ctx context.Context, userID, res
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, codeEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, codeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -504,7 +504,7 @@ func (c *Commands) HumanSendPasswordlessInitCode(ctx context.Context, userID, re
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, codeEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, codeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -525,7 +525,7 @@ func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, res
 		return nil, nil, "", err
 	}
 	initCode := NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, initCode)
+	err = c.Eventstore.FilterToQueryReducer(ctx, initCode)
 	if err != nil {
 		return nil, nil, "", err
 	}
@@ -551,7 +551,7 @@ func (c *Commands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, re
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-ADggh", "Errors.IDMissing")
 	}
 	initCode := NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, initCode)
+	err := c.Eventstore.FilterToQueryReducer(ctx, initCode)
 	if err != nil {
 		return err
 	}
@@ -560,7 +560,7 @@ func (c *Commands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, re
 		return caos_errs.ThrowNotFound(nil, "COMMAND-Gdfg3", "Errors.User.Code.NotFound")
 	}
 
-	_, err = c.eventstore.Push(ctx,
+	_, err = c.Eventstore.Push(ctx,
 		usr_repo.NewHumanPasswordlessInitCodeSentEvent(ctx, UserAggregateFromWriteModel(&initCode.WriteModel), codeID),
 	)
 	return err
@@ -571,14 +571,14 @@ func (c *Commands) humanVerifyPasswordlessInitCode(ctx context.Context, userID, 
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-GVfg3", "Errors.IDMissing")
 	}
 	initCode := NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, initCode)
+	err := c.Eventstore.FilterToQueryReducer(ctx, initCode)
 	if err != nil {
 		return err
 	}
 	err = crypto.VerifyCode(initCode.ChangeDate, initCode.Expiration, initCode.CryptoCode, verificationCode, passwordlessCodeGenerator)
 	if err != nil || initCode.State != domain.PasswordlessInitCodeStateActive {
 		userAgg := UserAggregateFromWriteModel(&initCode.WriteModel)
-		_, err = c.eventstore.Push(ctx, usr_repo.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, codeID))
+		_, err = c.Eventstore.Push(ctx, usr_repo.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, codeID))
 		logging.WithFields("userID", userAgg.ID).OnError(err).Error("NewHumanPasswordlessInitCodeCheckFailedEvent push failed")
 		return caos_errs.ThrowInvalidArgument(err, "COMMAND-Dhz8i", "Errors.User.Code.Invalid")
 	}
@@ -599,7 +599,7 @@ func (c *Commands) removeHumanWebAuthN(ctx context.Context, userID, webAuthNID, 
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingWebAuthN.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, preparedEvent(userAgg))
+	pushedEvents, err := c.Eventstore.Push(ctx, preparedEvent(userAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -615,7 +615,7 @@ func (c *Commands) webauthNWriteModelByID(ctx context.Context, userID, webAuthNI
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewHumanWebAuthNWriteModel(userID, webAuthNID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

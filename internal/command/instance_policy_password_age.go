@@ -14,11 +14,11 @@ import (
 
 func (c *Commands) AddDefaultPasswordAgePolicy(ctx context.Context, expireWarnDays, maxAgeDays uint64) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultPasswordAgePolicy(instanceAgg, expireWarnDays, maxAgeDays))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareAddDefaultPasswordAgePolicy(instanceAgg, expireWarnDays, maxAgeDays))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (c *Commands) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy *d
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-180sf", "Errors.IAM.PasswordAgePolicy.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *Commands) defaultPasswordAgePolicyWriteModelByID(ctx context.Context) (
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewInstancePasswordAgePolicyWriteModel(ctx)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

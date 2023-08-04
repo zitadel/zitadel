@@ -24,7 +24,7 @@ func (c *Commands) ChangeHumanAddress(ctx context.Context, address *domain.Addre
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M0cs", "Errors.User.Address.NotChanged")
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (c *Commands) addressWriteModel(ctx context.Context, userID, resourceOwner 
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewHumanAddressWriteModel(userID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = c.Eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

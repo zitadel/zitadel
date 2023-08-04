@@ -339,7 +339,7 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			err := r.BulkAddedUserIDPLinks(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.links)
 			if tt.res.err == nil {
@@ -519,7 +519,7 @@ func TestCommandSide_RemoveUserIDPLink(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			got, err := r.RemoveUserIDPLink(tt.args.ctx, tt.args.link)
 			if tt.res.err == nil {
@@ -657,7 +657,7 @@ func TestCommandSide_ExternalLoginCheck(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				Eventstore: tt.fields.eventstore,
 			}
 			err := r.UserIDPLoginChecked(tt.args.ctx, tt.args.orgID, tt.args.userID, tt.args.authRequest)
 			if tt.res.err == nil {

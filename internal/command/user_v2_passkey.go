@@ -44,11 +44,11 @@ type eventCallback func(context.Context, *eventstore.Aggregate) eventstore.Comma
 // This prevents consuming a code when another error occurred after verification.
 func (c *Commands) verifyUserPasskeyCode(ctx context.Context, userID, resourceOwner, codeID, code string, alg crypto.EncryptionAlgorithm) (eventCallback, error) {
 	wm := NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, wm)
+	err := c.Eventstore.FilterToQueryReducer(ctx, wm)
 	if err != nil {
 		return nil, err
 	}
-	err = verifyCryptoCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg, wm.ChangeDate, wm.Expiration, wm.CryptoCode, code)
+	err = verifyCryptoCode(ctx, c.Eventstore.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg, wm.ChangeDate, wm.Expiration, wm.CryptoCode, code)
 	if err != nil || wm.State != domain.PasswordlessInitCodeStateActive {
 		c.verifyUserPasskeyCodeFailed(ctx, wm)
 		return nil, caos_errs.ThrowInvalidArgument(err, "COMMAND-Eeb2a", "Errors.User.Code.Invalid")
@@ -60,7 +60,7 @@ func (c *Commands) verifyUserPasskeyCode(ctx context.Context, userID, resourceOw
 
 func (c *Commands) verifyUserPasskeyCodeFailed(ctx context.Context, wm *HumanPasswordlessInitCodeWriteModel) {
 	userAgg := UserAggregateFromWriteModel(&wm.WriteModel)
-	_, err := c.eventstore.Push(ctx, user.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, wm.CodeID))
+	_, err := c.Eventstore.Push(ctx, user.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, wm.CodeID))
 	logging.WithFields("userID", userAgg.ID).OnError(err).Error("RegisterUserPasskeyWithCode push failed")
 }
 
@@ -133,12 +133,12 @@ func (c *Commands) addUserPasskeyCode(ctx context.Context, userID, resourceOwner
 	if err != nil {
 		return nil, err
 	}
-	code, err := c.newPasskeyCode(ctx, c.eventstore.Filter, alg)
+	code, err := c.newPasskeyCode(ctx, c.Eventstore.Filter, alg)
 	if err != nil {
 		return nil, err
 	}
 	wm := NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, wm)
+	err = c.Eventstore.FilterToQueryReducer(ctx, wm)
 	if err != nil {
 		return nil, err
 	}

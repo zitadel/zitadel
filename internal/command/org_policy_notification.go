@@ -15,11 +15,11 @@ func (c *Commands) AddNotificationPolicy(ctx context.Context, resourceOwner stri
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-x801sk2i", "Errors.ResourceOwnerMissing")
 	}
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddNotificationPolicy(orgAgg, passwordChange))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareAddNotificationPolicy(orgAgg, passwordChange))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,11 +56,11 @@ func (c *Commands) ChangeNotificationPolicy(ctx context.Context, resourceOwner s
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-x091n1g", "Errors.ResourceOwnerMissing")
 	}
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareChangeNotificationPolicy(orgAgg, passwordChange))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareChangeNotificationPolicy(orgAgg, passwordChange))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -102,11 +102,11 @@ func (c *Commands) RemoveNotificationPolicy(ctx context.Context, resourceOwner s
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-x89ns2", "Errors.ResourceOwnerMissing")
 	}
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareRemoveNotificationPolicy(orgAgg))
+	cmds, err := preparation.PrepareCommands(ctx, c.Eventstore.Filter, prepareRemoveNotificationPolicy(orgAgg))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	pushedEvents, err := c.Eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}

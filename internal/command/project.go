@@ -53,7 +53,7 @@ func (c *Commands) addProjectWithID(ctx context.Context, projectAdd *domain.Proj
 			projectAdd.PrivateLabelingSetting),
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (c *Commands) addProjectWithIDWithOwner(ctx context.Context, projectAdd *do
 		project.NewProjectMemberAddedEvent(ctx, projectAgg, ownerUserID, projectRole),
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +197,7 @@ func (c *Commands) ChangeProject(ctx context.Context, projectChange *domain.Proj
 	if !hasChanged {
 		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-2M0fs", "Errors.NoChangesFound")
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	pushedEvents, err := c.Eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +225,7 @@ func (c *Commands) DeactivateProject(ctx context.Context, projectID string, reso
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, project.NewProjectDeactivatedEvent(ctx, projectAgg))
+	pushedEvents, err := c.Eventstore.Push(ctx, project.NewProjectDeactivatedEvent(ctx, projectAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -253,7 +253,7 @@ func (c *Commands) ReactivateProject(ctx context.Context, projectID string, reso
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, project.NewProjectReactivatedEvent(ctx, projectAgg))
+	pushedEvents, err := c.Eventstore.Push(ctx, project.NewProjectReactivatedEvent(ctx, projectAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -301,7 +301,7 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 		events = append(events, event)
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.Eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -314,7 +314,7 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 
 func (c *Commands) getProjectWriteModelByID(ctx context.Context, projectID, resourceOwner string) (*ProjectWriteModel, error) {
 	projectWriteModel := NewProjectWriteModel(projectID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, projectWriteModel)
+	err := c.Eventstore.FilterToQueryReducer(ctx, projectWriteModel)
 	if err != nil {
 		return nil, err
 	}
@@ -323,7 +323,7 @@ func (c *Commands) getProjectWriteModelByID(ctx context.Context, projectID, reso
 
 func (c *Commands) getSAMLEntityIdsWriteModelByProjectID(ctx context.Context, projectID, resourceOwner string) (*SAMLEntityIDsWriteModel, error) {
 	samlEntityIDsAgg := NewSAMLEntityIDsWriteModel(projectID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, samlEntityIDsAgg)
+	err := c.Eventstore.FilterToQueryReducer(ctx, samlEntityIDsAgg)
 	if err != nil {
 		return nil, err
 	}
