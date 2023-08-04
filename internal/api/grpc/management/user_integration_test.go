@@ -4,6 +4,7 @@ package management_test
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -50,6 +51,7 @@ func TestImport_and_Get(t *testing.T) {
 
 	for i := 0; i < N; i++ {
 		firstName := strconv.Itoa(i)
+		fmt.Println(">>>> Begin Test", firstName)
 		//t.Run(firstName, func(t *testing.T) {
 		// create unique names.
 		lastName := strconv.FormatInt(time.Now().Unix(), 10)
@@ -86,6 +88,7 @@ func TestImport_and_Get(t *testing.T) {
 			}
 		*/
 		require.NoError(t, err) // catch and fail on any other error
+		fmt.Println(">>>> End Test", firstName)
 		//})
 	}
 	assert.Zerof(t, misses, "Not Found errors %d out of %d", misses, N)
