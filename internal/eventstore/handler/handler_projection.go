@@ -150,6 +150,21 @@ func (h *ProjectionHandler) TriggerErr(ctx context.Context, instances ...string)
 		if len(events) == 0 {
 			return ctx, nil
 		}
+
+		// troubleshoot logging
+		for _, event := range events {
+			logging.New().WithFields(logrus.Fields{
+				"EditorService":                 event.EditorService(),
+				"EditorUser":                    event.EditorUser(),
+				"Type":                          event.Type(),
+				"Sequence":                      event.Sequence(),
+				"CreationDate":                  event.CreationDate(),
+				"PreviousAggregateSequence":     event.PreviousAggregateSequence(),
+				"PreviousAggregateTypeSequence": event.PreviousAggregateTypeSequence(),
+			}).Debug("events for trigger")
+		}
+		// end troubleshoot
+
 		_, err = h.Process(ctx, events...)
 		ctx = call.ResetTimestamp(ctx)
 		if err != nil {
@@ -173,18 +188,6 @@ func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Ev
 		if err != nil {
 			return index, err
 		}
-
-		logging.New().WithFields(logrus.Fields{
-			"EditorService": event.EditorService(),
-			"EditorUser":    event.EditorUser(),
-			"Type":          event.Type(),
-			// "Aggregate":                     event.Aggregate(),
-			"Sequence":                      event.Sequence(),
-			"CreationDate":                  event.CreationDate(),
-			"PreviousAggregateSequence":     event.PreviousAggregateSequence(),
-			"PreviousAggregateTypeSequence": event.PreviousAggregateTypeSequence(),
-			// "DataAsBytes":                   event.DataAsBytes(),
-		}).Debug("processing event")
 	}
 	for retry := 0; retry <= h.retries; retry++ {
 		index, err = h.update(ctx, statements[index+1:], h.reduce)
