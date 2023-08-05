@@ -110,8 +110,10 @@ core_lint_custom:
 
 .PHONY: core_lint_standard
 core_lint_standard:
+	# golangci-lint doesn't work if git config diff.noprefix is true https://github.com/golangci/golangci-lint/issues/948
+	if [ "$$(git config diff.noprefix)" = "true" ]; then echo "git config diff.noprefix must not be true"; exit 1; fi
 	go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.3 run \
-		--out-format=github-actions \
+		--new-from-rev=main \
 		--concurrency=$$(getconf _NPROCESSORS_ONLN)
 
 .PHONY: core_lint

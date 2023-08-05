@@ -112,4 +112,4 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        run: make core_lint_custom
+        run: make --silent core_lint_custom
