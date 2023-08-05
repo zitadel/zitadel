@@ -110,9 +110,7 @@ core_lint_custom:
 
 .PHONY: core_lint_standard
 core_lint_standard:
-	go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.2 run \
-		--timeout 10m \
-		--config ./.golangci.yaml \
+	go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.3 run \
 		--out-format=github-actions \
 		--concurrency=$$(getconf _NPROCESSORS_ONLN)
 
