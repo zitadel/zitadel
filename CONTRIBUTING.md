@@ -130,13 +130,30 @@ With [make](https://www.gnu.org/software/make/), you build a debuggable ZITADEL 
 Then, you test your changes via the console your binary is serving at http://<span because="breaks the link"></span>localhost:8080 and by verifying the database.
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
 
-ZITADEL uses [golangci-lint](https://golangci-lint.run) for code quality checks. Please use [this configuration](.golangci.yaml) when running `golangci-lint`. We recommend to set golangci-lint as linter in your IDE.
-
 The commands in this section are tested against the following software versions:
 
 - [Docker version 20.10.17](https://docs.docker.com/engine/install/)
 - [Go version 1.20](https://go.dev/doc/install)
 - [Delve 1.9.1](https://github.com/go-delve/delve/tree/v1.9.1/Documentation/installation)
+
+#### configuring build tags
+
+Configure your IDE to use the build tags `unit` and `integration`.
+In Visual Studio Code, you can configure them at `go.buildTags` in your `settings.json`.
+In GoLand, you can do so at *Settings > Go > Build Tags & Vendoring > Custom tags*.
+
+#### linting your changes
+
+ZITADEL uses [golangci-lint](https://golangci-lint.run) for code quality checks.
+Please use [this configuration](.golangci.yaml) when running `golangci-lint`.
+We recommend to set golangci-lint as linter in your IDE.
+For an overview of all backend linting issues, run the following command:
+
+```bash
+make core_lint
+```
+
+#### building and running the binary
 
 Make some changes to the source code, then run the database locally.
 
