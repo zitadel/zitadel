@@ -14,7 +14,10 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-type OrgSetup struct {
+// InstanceOrgSetup is used for the first organisation in the instance setup.
+// It used to be called OrgSetup, which now allows multiple Users, but it's used in the config.yaml and therefore
+// a breaking change was not possible.
+type InstanceOrgSetup struct {
 	Name         string
 	CustomDomain string
 	Human        *AddHuman
@@ -22,83 +25,156 @@ type OrgSetup struct {
 	Roles        []string
 }
 
-func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID string, userIDs ...string) (userID string, token string, machineKey *MachineKey, details *domain.ObjectDetails, err error) {
-	userID, err = c.idGenerator.Next()
-	if err != nil {
-		return "", "", nil, nil, err
+type OrgSetup struct {
+	Name         string
+	CustomDomain string
+	Admins       []*OrgSetupAdmin
+}
+
+// OrgSetupAdmin describes a user to be created (Human / Machine) or an existing (ID) to be used for an org setup.
+type OrgSetupAdmin struct {
+	ID      string
+	Human   *AddHuman
+	Machine *AddMachine
+	Roles   []string
+}
+
+type orgSetupCommands struct {
+	validations []preparation.Validation
+	aggregate   *org.Aggregate
+	commands    *Commands
+
+	users []*CreatedOrgAdmin
+}
+
+type CreatedOrg struct {
+	ObjectDetails *domain.ObjectDetails
+	Users         []*CreatedOrgAdmin
+}
+
+type CreatedOrgAdmin struct {
+	ID         string
+	PAT        *PersonalAccessToken
+	MachineKey *MachineKey
+}
+
+func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID string, allowInitialMail bool, userIDs ...string) (_ *CreatedOrg, err error) {
+	cmds := c.newOrgSetupCommands(ctx, orgID, o, userIDs)
+	for _, admin := range o.Admins {
+		if err = cmds.setupOrgAdmin(admin, allowInitialMail); err != nil {
+			return nil, err
+		}
 	}
+	if err = cmds.addCustomDomain(o.CustomDomain, userIDs); err != nil {
+		return nil, err
+	}
+
+	return cmds.push(ctx)
+}
+
+func (c *Commands) newOrgSetupCommands(ctx context.Context, orgID string, orgSetup *OrgSetup, userIDs []string) *orgSetupCommands {
 	orgAgg := org.NewAggregate(orgID)
-	userAgg := user.NewAggregate(userID, orgID)
-
-	roles := []string{domain.RoleOrgOwner}
-	if len(o.Roles) > 0 {
-		roles = o.Roles
-	}
-
 	validations := []preparation.Validation{
-		AddOrgCommand(ctx, orgAgg, o.Name, userIDs...),
+		AddOrgCommand(ctx, orgAgg, orgSetup.Name, userIDs...),
 	}
+	return &orgSetupCommands{
+		validations: validations,
+		aggregate:   orgAgg,
+		commands:    c,
+	}
+}
 
+func (c *orgSetupCommands) setupOrgAdmin(admin *OrgSetupAdmin, allowInitialMail bool) error {
+	if admin.ID != "" {
+		c.validations = append(c.validations, c.commands.AddOrgMemberCommand(c.aggregate, admin.ID, orgAdminRoles(admin.Roles)...))
+		return nil
+	}
+	userID, err := c.commands.idGenerator.Next()
+	if err != nil {
+		return err
+	}
+	if admin.Human != nil {
+		admin.Human.ID = userID
+		c.validations = append(c.validations, c.commands.AddHumanCommand(admin.Human, c.aggregate.ID, c.commands.userPasswordHasher, c.commands.userEncryption, allowInitialMail))
+		c.users = append(c.users, &CreatedOrgAdmin{ID: userID})
+	} else if admin.Machine != nil {
+		if err = c.setupOrgAdminMachine(c.aggregate, userID, admin.Machine); err != nil {
+			return err
+		}
+	}
+	c.validations = append(c.validations, c.commands.AddOrgMemberCommand(c.aggregate, userID, orgAdminRoles(admin.Roles)...))
+	return nil
+}
+
+func (c *orgSetupCommands) setupOrgAdminMachine(orgAgg *org.Aggregate, userID string, machine *AddMachine) error {
+	userAgg := user.NewAggregate(userID, orgAgg.ID)
+	c.validations = append(c.validations, AddMachineCommand(userAgg, machine.Machine))
 	var pat *PersonalAccessToken
-	if o.Human != nil {
-		o.Human.ID = userID
-		validations = append(validations, c.AddHumanCommand(o.Human, orgID, c.userPasswordHasher, c.userEncryption, true))
-	} else if o.Machine != nil {
-		validations = append(validations, AddMachineCommand(userAgg, o.Machine.Machine))
-		if o.Machine.Pat != nil {
-			pat = NewPersonalAccessToken(orgID, userID, o.Machine.Pat.ExpirationDate, o.Machine.Pat.Scopes, domain.UserTypeMachine)
-			tokenID, err := c.idGenerator.Next()
-			if err != nil {
-				return "", "", nil, nil, err
-			}
-			pat.TokenID = tokenID
-			validations = append(validations, prepareAddPersonalAccessToken(pat, c.keyAlgorithm))
+	var machineKey *MachineKey
+	if machine.Pat != nil {
+		pat = NewPersonalAccessToken(orgAgg.ID, userID, machine.Pat.ExpirationDate, machine.Pat.Scopes, domain.UserTypeMachine)
+		tokenID, err := c.commands.idGenerator.Next()
+		if err != nil {
+			return err
 		}
-		if o.Machine.MachineKey != nil {
-			machineKey = NewMachineKey(orgID, userID, o.Machine.MachineKey.ExpirationDate, o.Machine.MachineKey.Type)
-			keyID, err := c.idGenerator.Next()
-			if err != nil {
-				return "", "", nil, nil, err
-			}
-			machineKey.KeyID = keyID
-			validations = append(validations, prepareAddUserMachineKey(machineKey, c.keySize))
+		pat.TokenID = tokenID
+		c.validations = append(c.validations, prepareAddPersonalAccessToken(pat, c.commands.keyAlgorithm))
+	}
+	if machine.MachineKey != nil {
+		machineKey = NewMachineKey(orgAgg.ID, userID, machine.MachineKey.ExpirationDate, machine.MachineKey.Type)
+		keyID, err := c.commands.idGenerator.Next()
+		if err != nil {
+			return err
 		}
+		machineKey.KeyID = keyID
+		c.validations = append(c.validations, prepareAddUserMachineKey(machineKey, c.commands.keySize))
 	}
-	validations = append(validations, c.AddOrgMemberCommand(orgAgg, userID, roles...))
+	c.users = append(c.users, &CreatedOrgAdmin{ID: userID, PAT: pat, MachineKey: machineKey})
+	return nil
+}
 
-	if o.CustomDomain != "" {
-		validations = append(validations, c.prepareAddOrgDomain(orgAgg, o.CustomDomain, userIDs))
+func (c *orgSetupCommands) addCustomDomain(domain string, userIDs []string) error {
+	if domain != "" {
+		c.validations = append(c.validations, c.commands.prepareAddOrgDomain(c.aggregate, domain, userIDs))
 	}
+	return nil
+}
 
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
+func orgAdminRoles(roles []string) []string {
+	if len(roles) > 0 {
+		return roles
+	}
+	return []string{domain.RoleOrgOwner}
+}
+
+func (c *orgSetupCommands) push(ctx context.Context) (_ *CreatedOrg, err error) {
+	cmds, err := preparation.PrepareCommands(ctx, c.commands.eventstore.Filter, c.validations...)
 	if err != nil {
-		return "", "", nil, nil, err
+		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.commands.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return "", "", nil, nil, err
+		return nil, err
 	}
 
-	if pat != nil {
-		token = pat.Token
-	}
-
-	return userID, token, machineKey, &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: orgID,
+	return &CreatedOrg{
+		ObjectDetails: &domain.ObjectDetails{
+			Sequence:      events[len(events)-1].Sequence(),
+			EventDate:     events[len(events)-1].CreationDate(),
+			ResourceOwner: c.aggregate.ID,
+		},
+		Users: c.users,
 	}, nil
 }
 
-func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, userIDs ...string) (string, *domain.ObjectDetails, error) {
+func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail bool, userIDs ...string) (*CreatedOrg, error) {
 	orgID, err := c.idGenerator.Next()
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
 
-	userID, _, _, details, err := c.setUpOrgWithIDs(ctx, o, orgID, userIDs...)
-	return userID, details, err
+	return c.setUpOrgWithIDs(ctx, o, orgID, allowInitialMail, userIDs...)
 }
 
 // AddOrgCommand defines the commands to create a new org,
