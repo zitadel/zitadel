@@ -25,10 +25,32 @@ jobs:
           tar -xvf .artifacts/zitadel-linux-amd64.tar
           mv zitadel-linux-amd64/zitadel ./zitadel
       -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          driver-opts: 'image=moby/buildkit:v0.11.6'
+      -
+        name: Debug
+        id: build-debug
+        uses: docker/build-push-action@v4
+        timeout-minutes: 3
+        with:
+          context: .
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          file: build/Dockerfile
+          target: artifact
+          platforms: linux/amd64
+          push: false
+          outputs: type=image,name=zitadel:local
+      -
         name: Start DB and ZITADEL
         run: |
-          mv ./build/docker-compose-e2e.yaml ./docker-compose.yaml
-          docker compose up
+          cd ./e2e
+          docker compose up --detach --wait
       - 
         name: Cypress run
         uses: cypress-io/github-action@v5
