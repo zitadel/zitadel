@@ -393,9 +393,14 @@ SystemDefaults:
     #   Threads: 4 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_THREADS
 
     # Hasher:
-    #   Algorithm: "scrypt" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
-    #   Cost: 15 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_COST
-    
+    #   Algorithm: "scrypt"
+    #   Cost: 15
+
+    # Hasher:
+    #   Algorithm: "pbkdf2"
+    #   Rounds: 290000
+    #   Hash: "sha256" # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
+
     # Verifiers enable the possibility of verifying
     # passwords that are previously hashed using another
     # algorithm then the Hasher.
@@ -414,6 +419,7 @@ SystemDefaults:
     #   - "bcrypt"
     #   - "md5"
     #   - "scrypt"
+    #   - "pbkdf2" # verifier for all pbkdf2 hash modes.
   Multifactors:
     OTP:
       # If this is empty, the issuer is the requested domain

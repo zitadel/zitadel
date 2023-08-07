@@ -583,6 +583,10 @@ EventTypes:
         check:
           succeeded: Password check succeeded
           failed: Password check failed
+        change:
+          sent: Password change sent
+        hash:
+          updated: Password hash updated
       externallogin:
         check:
           succeeded: External login succeeded
@@ -591,6 +595,8 @@ EventTypes:
         removed: External IDP removed
         cascade:
           removed: External IDP cascade removed
+        id:
+          migrated: External UserID of IDP was migrated
       phone:
         changed: Phone number changed
         verified: Phone number verified

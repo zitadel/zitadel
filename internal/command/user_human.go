@@ -66,6 +66,9 @@ type AddHuman struct {
 
 	// EmailCode is set by the command
 	EmailCode *string
+
+	// PhoneCode is set by the command
+	PhoneCode *string
 }
 
 type AddLink struct {
@@ -258,7 +261,6 @@ func (c *Commands) addHumanCommandEmail(ctx context.Context, filter preparation.
 	if human.Email.Verified {
 		cmds = append(cmds, user.NewHumanEmailVerifiedEvent(ctx, &a.Aggregate))
 	}
-
 	// if allowInitMail, used for v1 api (system, admin, mgmt, auth):
 	// add init code if
 	// email not verified or
@@ -302,7 +304,10 @@ func (c *Commands) addHumanCommandPhone(ctx context.Context, filter preparation.
 	if err != nil {
 		return nil, err
 	}
-	return append(cmds, user.NewHumanPhoneCodeAddedEvent(ctx, &a.Aggregate, phoneCode.Crypted, phoneCode.Expiry)), nil
+	if human.Phone.ReturnCode {
+		human.PhoneCode = &phoneCode.Plain
+	}
+	return append(cmds, user.NewHumanPhoneCodeAddedEventV2(ctx, &a.Aggregate, phoneCode.Crypted, phoneCode.Expiry, human.Phone.ReturnCode)), nil
 }
 
 func (c *Commands) addHumanCommandCheckID(ctx context.Context, filter preparation.FilterToQueryReducer, human *AddHuman, orgID string) (err error) {
