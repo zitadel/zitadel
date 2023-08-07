@@ -6,9 +6,6 @@ on:
       build_image_name:
         required: true
         type: string
-      image_push:
-        required: true
-        type: boolean
     outputs:
       build_image:
         value: '${{ inputs.build_image_name }}:${{ github.sha }}'

@@ -32,6 +32,11 @@ jobs:
     needs: [ version ]
     steps:
     -
+      name: Download release assets
+      uses: actions/download-artifact@v3
+      with:
+        path: .artifacts
+    -
       name: Set up QEMU
       uses: docker/setup-qemu-action@v2
     -

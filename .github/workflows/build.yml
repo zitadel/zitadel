@@ -2,6 +2,10 @@ name: ZITADEL CI/CD
 
 on:
   pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - 'guides/**'
+      - '**.md'
   workflow_dispatch:
 
 permissions:
@@ -75,13 +79,13 @@ jobs:
     secrets: inherit
     permissions:
       packages: write
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     with:
       build_image_name: 'ghcr.io/zitadel/zitadel-build'
-      image_push: ${{ github.event_name == 'workflow_dispatch' }}
 
   e2e:
     uses: ./.github/workflows/e2e.yml
-    needs: [container]
+    needs: [compile]
 
   release:
     uses: ./.github/workflows/release.yml
