@@ -50,7 +50,7 @@ jobs:
         name: Start DB and ZITADEL
         run: |
           cd ./e2e
-          docker compose up --detach --wait
+          ZITADEL_IMAGE=zitadel:local docker compose up --detach --wait
       - 
         name: Cypress run
         uses: cypress-io/github-action@v5
