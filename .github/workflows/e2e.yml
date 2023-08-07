@@ -15,6 +15,16 @@ jobs:
         name: Checkout Repository
         uses: actions/checkout@v3
       -
+        uses: actions/download-artifact@v3
+        with:
+          path: .artifacts
+          name: zitadel-linux-amd64
+      -
+        name: Unpack executable
+        run: |
+          tar -xvf .artifacts/zitadel-linux-amd64.tar
+          mv zitadel-linux-amd64/zitadel ./zitadel
+      -
         name: Start DB and ZITADEL
         run: |
           mv ./build/docker-compose-e2e.yaml ./docker-compose.yaml
