@@ -28,7 +28,7 @@ jobs:
         name: Start DB and ZITADEL
         run: |
           mv ./build/docker-compose-e2e.yaml ./docker-compose.yaml
-          docker compose up --detach --wait  --wait-timeout '180'
+          docker compose up --detach --wait
       - 
         name: Cypress run
         uses: cypress-io/github-action@v5
