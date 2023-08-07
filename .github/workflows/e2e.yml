@@ -33,21 +33,6 @@ jobs:
         with:
           driver-opts: 'image=moby/buildkit:v0.11.6'
       -
-        name: Debug
-        id: build-debug
-        uses: docker/build-push-action@v4
-        timeout-minutes: 3
-        with:
-          context: .
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          file: build/Dockerfile
-          target: artifact
-          platforms: linux/amd64
-          push: false
-          load: true
-          outputs: type=image,name=zitadel:local
-      -
         name: Start DB and ZITADEL
         run: |
           cd ./e2e
