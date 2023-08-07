@@ -239,6 +239,8 @@ func (h *Handler) lockInstance(ctx context.Context) func() {
 
 	instanceMu, _ := h.triggeredInstancesSync.LoadOrStore(instanceID, new(sync.Mutex))
 	if !instanceMu.(*sync.Mutex).TryLock() {
+		instanceMu.(*sync.Mutex).Lock()
+		defer instanceMu.(*sync.Mutex).Unlock()
 		return nil
 	}
 	return func() {
