@@ -82,8 +82,6 @@ jobs:
   e2e:
     uses: ./.github/workflows/e2e.yml
     needs: [container]
-    with:
-      image: ${{ needs.container.outputs.build_image }}-debug
 
   release:
     uses: ./.github/workflows/release.yml
