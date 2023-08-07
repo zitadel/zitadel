@@ -57,7 +57,7 @@ jobs:
         env:
           CYPRESS_BASE_URL: http://localhost:8080/ui/console
           CYPRESS_WEBHOOK_HANDLER_HOST: host.docker.internal
-          CYPRESS_DATABASE_CONNECTION_URL: 'postgresql://zitadel@localhost:5432/zitadel'
+          CYPRESS_DATABASE_CONNECTION_URL: 'postgresql://root@localhost:26257/zitadel'
           CYPRESS_BACKEND_URL: http://localhost:8080
         with:
           working-directory: e2e
