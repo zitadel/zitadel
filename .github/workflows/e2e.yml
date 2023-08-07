@@ -45,12 +45,12 @@ jobs:
           target: artifact
           platforms: linux/amd64
           push: false
-          outputs: type=image,name=zitadel:local
+          outputs: type=image,name=localhost:5000/zitadel:local
       -
         name: Start DB and ZITADEL
         run: |
           cd ./e2e
-          ZITADEL_IMAGE=zitadel:local docker compose up --detach --wait
+          ZITADEL_IMAGE=localhost:5000/zitadel:local docker compose up --detach --wait
       - 
         name: Cypress run
         uses: cypress-io/github-action@v5
