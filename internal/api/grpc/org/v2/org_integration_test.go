@@ -14,7 +14,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	org "github.com/zitadel/zitadel/pkg/grpc/organisation/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
@@ -103,25 +102,18 @@ func TestServer_AddOrganisation(t *testing.T) {
 				},
 			},
 			want: &org.AddOrganisationResponse{
-				Details: &object.Details{
-					Sequence:      0,
-					ChangeDate:    nil,
-					ResourceOwner: "orgID",
-				},
-				OrganisationId: "",
+				OrganisationId: integration.NotEmpty,
 				CreatedAdmins: []*org.AddOrganisationResponse_CreatedAdmin{
 					{
-						UserId:     "userID",
-						EmailCode:  gu.Ptr("code"),
-						PhoneCode:  nil,
-						Pat:        nil,
-						MachineKey: nil,
+						UserId:    integration.NotEmpty,
+						EmailCode: gu.Ptr(integration.NotEmpty),
+						PhoneCode: nil,
 					},
 				},
 			},
 		},
 		{
-			name: "existing user, new human and machine with pat and key",
+			name: "existing user and new human",
 			ctx:  CTX,
 			req: &org.AddOrganisationRequest{
 				Name: fmt.Sprintf("%d", time.Now().UnixNano()),
@@ -145,29 +137,14 @@ func TestServer_AddOrganisation(t *testing.T) {
 							},
 						},
 					},
-					{
-						UserType: &org.AddOrganisationRequest_Admin_Machine{
-							Machine: &org.AddMachineUserRequest{
-								Username:   fmt.Sprintf("%d", time.Now().UnixNano()),
-								Name:       "name",
-								Pat:        true,
-								MachineKey: true,
-							},
-						},
-					},
 				},
 			},
 			want: &org.AddOrganisationResponse{
 				CreatedAdmins: []*org.AddOrganisationResponse_CreatedAdmin{
+					// a single admin is expected, because the first provided already exists
 					{
-						UserId:     integration.NotEmpty,
-						Pat:        nil,
-						MachineKey: nil,
-					},
-					{
-						UserId:     integration.NotEmpty,
-						Pat:        gu.Ptr(integration.NotEmpty),
-						MachineKey: []byte(integration.NotEmpty),
+						UserId:    integration.NotEmpty,
+						EmailCode: gu.Ptr(integration.NotEmpty),
 					},
 				},
 			},
@@ -217,15 +194,5 @@ func assertCreatedAdmin(t *testing.T, expected, got *org.AddOrganisationResponse
 		assert.NotEmpty(t, got.GetPhoneCode())
 	} else {
 		assert.Empty(t, got.GetPhoneCode())
-	}
-	if expected.GetPat() != "" {
-		assert.NotEmpty(t, got.GetPat())
-	} else {
-		assert.Empty(t, got.GetPat())
-	}
-	if expected.GetMachineKey() != nil {
-		assert.NotEmpty(t, got.GetMachineKey())
-	} else {
-		assert.Empty(t, got.GetMachineKey())
 	}
 }

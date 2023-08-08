@@ -2,7 +2,6 @@ package org
 
 import (
 	"context"
-	"time"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/user/v2"
@@ -62,33 +61,6 @@ func addOrganisationRequestAdminToCommand(admin *org.AddOrganisationRequest_Admi
 			Human: human,
 			Roles: admin.GetRoles(),
 		}, nil
-	case *org.AddOrganisationRequest_Admin_Machine:
-		var pat *command.AddPat
-		if a.Machine.Pat {
-			pat = &command.AddPat{
-				ExpirationDate: time.Time{},
-			}
-		}
-		var machineKey *command.AddMachineKey
-		if a.Machine.MachineKey {
-			machineKey = &command.AddMachineKey{
-				Type:           1,
-				ExpirationDate: time.Time{},
-			}
-		}
-		return &command.OrgSetupAdmin{
-			Machine: &command.AddMachine{
-				Machine: &command.Machine{
-					Username:        a.Machine.Username,
-					Name:            a.Machine.Name,
-					Description:     "",
-					AccessTokenType: 0,
-				},
-				Pat:        pat,
-				MachineKey: machineKey,
-			},
-			Roles: admin.GetRoles(),
-		}, nil
 	default:
 		return nil, caos_errs.ThrowUnimplementedf(nil, "ORGv2-SD2r1", "userType oneOf %T in method AddOrganisation not implemented", a)
 	}
@@ -97,23 +69,10 @@ func addOrganisationRequestAdminToCommand(admin *org.AddOrganisationRequest_Admi
 func createdOrganisationToPb(createdOrg *command.CreatedOrg) (_ *org.AddOrganisationResponse, err error) {
 	admins := make([]*org.AddOrganisationResponse_CreatedAdmin, len(createdOrg.CreatedAdmins))
 	for i, admin := range createdOrg.CreatedAdmins {
-		var pat *string
-		if admin.PAT != nil {
-			pat = &admin.PAT.Token
-		}
-		var machineKey []byte
-		if admin.MachineKey != nil {
-			machineKey, err = admin.MachineKey.Detail()
-			if err != nil {
-				return nil, err
-			}
-		}
 		admins[i] = &org.AddOrganisationResponse_CreatedAdmin{
-			UserId:     admin.ID,
-			EmailCode:  admin.EmailCode,
-			PhoneCode:  admin.PhoneCode,
-			Pat:        pat,
-			MachineKey: machineKey,
+			UserId:    admin.ID,
+			EmailCode: admin.EmailCode,
+			PhoneCode: admin.PhoneCode,
 		}
 	}
 	return &org.AddOrganisationResponse{
