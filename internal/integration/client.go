@@ -156,7 +156,7 @@ func (s *Tester) SetUserPassword(ctx context.Context, userID, password string) {
 
 func (s *Tester) AddGenericOAuthProvider(t *testing.T) string {
 	ctx := authz.WithInstance(context.Background(), s.Instance)
-	id, _, err := s.Commands.AddOrgGenericOAuthProvider(ctx, s.Organisation.ID, command.GenericOAuthProvider{
+	id, _, err := s.Commands.AddInstanceGenericOAuthProvider(ctx, command.GenericOAuthProvider{
 		Name:                  "idp",
 		ClientID:              "clientID",
 		ClientSecret:          "clientSecret",

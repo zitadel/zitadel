@@ -41,6 +41,8 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_AddOrganisation(t *testing.T) {
+	idpID := Tester.AddGenericOAuthProvider(t)
+
 	tests := []struct {
 		name    string
 		ctx     context.Context
@@ -113,7 +115,7 @@ func TestServer_AddOrganisation(t *testing.T) {
 			},
 		},
 		{
-			name: "existing user and new human",
+			name: "existing user and new human with idp",
 			ctx:  CTX,
 			req: &org.AddOrganisationRequest{
 				Name: fmt.Sprintf("%d", time.Now().UnixNano()),
@@ -130,8 +132,15 @@ func TestServer_AddOrganisation(t *testing.T) {
 								},
 								Email: &user.SetHumanEmail{
 									Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
-									Verification: &user.SetHumanEmail_ReturnCode{
-										ReturnCode: &user.ReturnEmailVerificationCode{},
+									Verification: &user.SetHumanEmail_IsVerified{
+										IsVerified: true,
+									},
+								},
+								IdpLinks: []*user.IDPLink{
+									{
+										IdpId:    idpID,
+										UserId:   "userID",
+										UserName: "username",
 									},
 								},
 							},
@@ -143,8 +152,7 @@ func TestServer_AddOrganisation(t *testing.T) {
 				CreatedAdmins: []*org.AddOrganisationResponse_CreatedAdmin{
 					// a single admin is expected, because the first provided already exists
 					{
-						UserId:    integration.NotEmpty,
-						EmailCode: gu.Ptr(integration.NotEmpty),
+						UserId: integration.NotEmpty,
 					},
 				},
 			},
