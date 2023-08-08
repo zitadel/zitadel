@@ -44,16 +44,20 @@ type orgSetupCommands struct {
 	aggregate   *org.Aggregate
 	commands    *Commands
 
-	users []*CreatedOrgAdmin
+	admins      []*OrgSetupAdmin
+	pats        []*PersonalAccessToken
+	machineKeys []*MachineKey
 }
 
 type CreatedOrg struct {
 	ObjectDetails *domain.ObjectDetails
-	Users         []*CreatedOrgAdmin
+	CreatedAdmins []*CreatedOrgAdmin
 }
 
 type CreatedOrgAdmin struct {
 	ID         string
+	EmailCode  *string
+	PhoneCode  *string
 	PAT        *PersonalAccessToken
 	MachineKey *MachineKey
 }
@@ -81,6 +85,7 @@ func (c *Commands) newOrgSetupCommands(ctx context.Context, orgID string, orgSet
 		validations: validations,
 		aggregate:   orgAgg,
 		commands:    c,
+		admins:      orgSetup.Admins,
 	}
 }
 
@@ -96,9 +101,9 @@ func (c *orgSetupCommands) setupOrgAdmin(admin *OrgSetupAdmin, allowInitialMail 
 	if admin.Human != nil {
 		admin.Human.ID = userID
 		c.validations = append(c.validations, c.commands.AddHumanCommand(admin.Human, c.aggregate.ID, c.commands.userPasswordHasher, c.commands.userEncryption, allowInitialMail))
-		c.users = append(c.users, &CreatedOrgAdmin{ID: userID})
 	} else if admin.Machine != nil {
-		if err = c.setupOrgAdminMachine(c.aggregate, userID, admin.Machine); err != nil {
+		admin.Machine.Machine.AggregateID = userID
+		if err = c.setupOrgAdminMachine(c.aggregate, admin.Machine); err != nil {
 			return err
 		}
 	}
@@ -106,30 +111,31 @@ func (c *orgSetupCommands) setupOrgAdmin(admin *OrgSetupAdmin, allowInitialMail 
 	return nil
 }
 
-func (c *orgSetupCommands) setupOrgAdminMachine(orgAgg *org.Aggregate, userID string, machine *AddMachine) error {
-	userAgg := user.NewAggregate(userID, orgAgg.ID)
+func (c *orgSetupCommands) setupOrgAdminMachine(orgAgg *org.Aggregate, machine *AddMachine) error {
+	userAgg := user.NewAggregate(machine.Machine.AggregateID, orgAgg.ID)
 	c.validations = append(c.validations, AddMachineCommand(userAgg, machine.Machine))
 	var pat *PersonalAccessToken
 	var machineKey *MachineKey
 	if machine.Pat != nil {
-		pat = NewPersonalAccessToken(orgAgg.ID, userID, machine.Pat.ExpirationDate, machine.Pat.Scopes, domain.UserTypeMachine)
+		pat = NewPersonalAccessToken(orgAgg.ID, machine.Machine.AggregateID, machine.Pat.ExpirationDate, machine.Pat.Scopes, domain.UserTypeMachine)
 		tokenID, err := c.commands.idGenerator.Next()
 		if err != nil {
 			return err
 		}
 		pat.TokenID = tokenID
+		c.pats = append(c.pats, pat)
 		c.validations = append(c.validations, prepareAddPersonalAccessToken(pat, c.commands.keyAlgorithm))
 	}
 	if machine.MachineKey != nil {
-		machineKey = NewMachineKey(orgAgg.ID, userID, machine.MachineKey.ExpirationDate, machine.MachineKey.Type)
+		machineKey = NewMachineKey(orgAgg.ID, machine.Machine.AggregateID, machine.MachineKey.ExpirationDate, machine.MachineKey.Type)
 		keyID, err := c.commands.idGenerator.Next()
 		if err != nil {
 			return err
 		}
 		machineKey.KeyID = keyID
+		c.machineKeys = append(c.machineKeys, machineKey)
 		c.validations = append(c.validations, prepareAddUserMachineKey(machineKey, c.commands.keySize))
 	}
-	c.users = append(c.users, &CreatedOrgAdmin{ID: userID, PAT: pat, MachineKey: machineKey})
 	return nil
 }
 
@@ -164,8 +170,56 @@ func (c *orgSetupCommands) push(ctx context.Context) (_ *CreatedOrg, err error) 
 			EventDate:     events[len(events)-1].CreationDate(),
 			ResourceOwner: c.aggregate.ID,
 		},
-		Users: c.users,
+		CreatedAdmins: c.createdAdmins(),
 	}, nil
+}
+
+func (c *orgSetupCommands) createdAdmins() []*CreatedOrgAdmin {
+	users := make([]*CreatedOrgAdmin, 0, len(c.admins))
+	for _, admin := range c.admins {
+		if admin.ID != "" {
+			continue
+		}
+		if admin.Human != nil {
+			users = append(users, c.createdHumanAdmin(admin))
+			continue
+		}
+		if admin.Machine != nil {
+			users = append(users, c.createdMachineAdmin(admin))
+		}
+	}
+	return users
+}
+
+func (c *orgSetupCommands) createdHumanAdmin(admin *OrgSetupAdmin) *CreatedOrgAdmin {
+	createdAdmin := &CreatedOrgAdmin{
+		ID: admin.Human.ID,
+	}
+	if admin.Human.EmailCode != nil {
+		createdAdmin.EmailCode = admin.Human.EmailCode
+	}
+	return createdAdmin
+}
+
+func (c *orgSetupCommands) createdMachineAdmin(admin *OrgSetupAdmin) *CreatedOrgAdmin {
+	createdAdmin := &CreatedOrgAdmin{
+		ID: admin.Machine.Machine.AggregateID,
+	}
+	if admin.Machine.Pat != nil {
+		for _, pat := range c.pats {
+			if pat.AggregateID == createdAdmin.ID {
+				createdAdmin.PAT = pat
+			}
+		}
+	}
+	if admin.Machine.MachineKey != nil {
+		for _, key := range c.machineKeys {
+			if key.AggregateID == createdAdmin.ID {
+				createdAdmin.MachineKey = key
+			}
+		}
+	}
+	return createdAdmin
 }
 
 func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail bool, userIDs ...string) (*CreatedOrg, error) {

@@ -95,8 +95,8 @@ func addOrganisationRequestAdminToCommand(admin *org.AddOrganisationRequest_Admi
 }
 
 func createdOrganisationToPb(createdOrg *command.CreatedOrg) (_ *org.AddOrganisationResponse, err error) {
-	admins := make([]*org.AddOrganisationResponse_CreatedAdmin, len(createdOrg.Users))
-	for i, admin := range createdOrg.Users {
+	admins := make([]*org.AddOrganisationResponse_CreatedAdmin, len(createdOrg.CreatedAdmins))
+	for i, admin := range createdOrg.CreatedAdmins {
 		var pat *string
 		if admin.PAT != nil {
 			pat = &admin.PAT.Token
@@ -110,6 +110,8 @@ func createdOrganisationToPb(createdOrg *command.CreatedOrg) (_ *org.AddOrganisa
 		}
 		admins[i] = &org.AddOrganisationResponse_CreatedAdmin{
 			UserId:     admin.ID,
+			EmailCode:  admin.EmailCode,
+			PhoneCode:  admin.PhoneCode,
 			Pat:        pat,
 			MachineKey: machineKey,
 		}

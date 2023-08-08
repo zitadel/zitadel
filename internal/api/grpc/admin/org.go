@@ -86,8 +86,8 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 		return nil, err
 	}
 	var userID string
-	if len(createdOrg.Users) == 1 {
-		userID = createdOrg.Users[0].ID
+	if len(createdOrg.CreatedAdmins) == 1 {
+		userID = createdOrg.CreatedAdmins[0].ID
 	}
 	return &admin_pb.SetUpOrgResponse{
 		Details: object.DomainToAddDetailsPb(createdOrg.ObjectDetails),
