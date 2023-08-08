@@ -173,3 +173,4 @@ jobs:
         name: Inspect build image
         run: |
           docker buildx imagetools inspect ${{ inputs.build_image_name }}:${{ github.sha }}${{ matrix.suffix }}
+
