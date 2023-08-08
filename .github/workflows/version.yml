@@ -24,6 +24,11 @@ jobs:
       version: ${{ steps.output.outputs.VERSION }}
       published: ${{ steps.semantic.outputs.new_release_published }}
     steps:
+    -
+      name: Download release assets
+      uses: actions/download-artifact@v3
+      with:
+        path: .artifacts
     - 
       name: Source checkout
       uses: actions/checkout@v3
