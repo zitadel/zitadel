@@ -1,7 +1,7 @@
 Log:
   Level: info # ZITADEL_LOG_LEVEL
   Formatter:
-    Format: text # ZITADEL_LOG_LEVEL
+    Format: text # ZITADEL_LOG_FORMATTER_FORMAT
 
 # Exposes metrics on /debug/metrics
 Metrics:
@@ -18,7 +18,7 @@ Telemetry:
   # As long as Enabled is true, ZITADEL tries to send usage data to the configured Telemetry.Endpoints.
   # Data is projected by ZITADEL even if Enabled is false.
   # This means that switching this to true makes ZITADEL try to send past data.
-  Enabled: false
+  Enabled: false # ZITADEL_TELEMETRY_ENABLED
   # Push telemetry data to all these endpoints at least once using an HTTP POST request.
   # If one endpoint returns an unsuccessful response code or times out,
   # ZITADEL retries to push the data point to all configured endpoints until it succeeds.
@@ -41,10 +41,10 @@ Telemetry:
 Port: 8080 # ZITADEL_PORT
 # Port ZITADEL is exposed on, it can differ from port e.g. if you proxy the traffic
 # !!! Changing this after the initial setup breaks your system !!!
-ExternalPort: 8080 # ZITADEL_EXTERNAL_PORT
+ExternalPort: 8080 # ZITADEL_EXTERNALPORT
 # Domain/hostname ZITADEL is exposed externally
 # !!! Changing this after the initial setup breaks your system !!!
-ExternalDomain: localhost # ZITADEL_EXTERNAL_DOMAIN
+ExternalDomain: localhost # ZITADEL_EXTERNALDOMAIN
 # specifies if ZITADEL is exposed externally through TLS
 # this must be set to true even if TLS is not enabled on ZITADEL itself
 # but TLS traffic is terminated on a reverse proxy
@@ -75,7 +75,7 @@ HTTP2HostHeader: ":authority" # ZITADEL_HTTP2HOSTHEADER
 # Header name of HTTP1 calls from which the instance will be matched
 HTTP1HostHeader: "host" # ZITADEL_HTTP1HOSTHEADER
 
-WebAuthNName: ZITADEL # ZITADEL_WEBAUTHN_NAME
+WebAuthNName: ZITADEL # ZITADEL_WEBAUTHNNAME
 
 Database:
   # CockroachDB is the default database of ZITADEL
@@ -148,8 +148,8 @@ Machine:
     Webhook:
       Enabled: true # ZITADEL_MACHINE_IDENTIFICATION_WEBHOOK_ENABLED
       Url: "http://metadata.google.internal/computeMetadata/v1/instance/id" # ZITADEL_MACHINE_IDENTIFICATION_WEBHOOK_URL
-      Headers:
-        "Metadata-Flavor": "Google" # ZITADEL_MACHINE_IDENTIFICATION_WEBHOOK_HEADERS
+      Headers: # ZITADEL_MACHINE_IDENTIFICATION_WEBHOOK_HEADERS
+        "Metadata-Flavor": "Google"
     #
     # AWS EC2 IMDSv1 Configuration: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-data-retrieval.html
     # Webhook:
@@ -180,7 +180,7 @@ Projections:
   # Time interval between scheduled projections
   RequeueEvery: 60s # ZITADEL_PROJECTIONS_REQUEUEEVERY
   # Time between retried database statements resulting from projected events
-  RetryFailedAfter: 1s # ZITADEL_PROJECTIONS_RETRYFAILED
+  RetryFailedAfter: 1s # ZITADEL_PROJECTIONS_RETRYFAILEDAFTER
   # Retried execution number of database statements resulting from projected events
   MaxFailureCount: 5 # ZITADEL_PROJECTIONS_MAXFAILURECOUNT
   # Number of concurrent projection routines. Values of 0 and below are overwritten to 1
@@ -393,13 +393,13 @@ SystemDefaults:
     #   Threads: 4 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_THREADS
 
     # Hasher:
-    #   Algorithm: "scrypt"
-    #   Cost: 15
+    #   Algorithm: "scrypt" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
+    #   Cost: 15 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_COST
 
     # Hasher:
-    #   Algorithm: "pbkdf2"
-    #   Rounds: 290000
-    #   Hash: "sha256" # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
+    #   Algorithm: "pbkdf2" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
+    #   Rounds: 290000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ROUNDS
+    #   Hash: "sha256" # Can be "sha1", "sha224", "sha256", "sha384" or "sha512" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_HASH
 
     # Verifiers enable the possibility of verifying
     # passwords that are previously hashed using another
