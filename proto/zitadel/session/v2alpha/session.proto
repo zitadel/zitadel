@@ -51,6 +51,8 @@ message Factors {
   PasswordFactor password = 2;
   PasskeyFactor passkey = 3;
   IntentFactor intent = 4;
+  TotpFactor totp  = 5;
+  U2Factor u2f = 6;
 }
 
 message UserFactor {
@@ -101,6 +103,22 @@ message PasskeyFactor {
   google.protobuf.Timestamp verified_at = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"time when the passkey challenge was last checked\"";
+    }
+  ];
+}
+
+message TotpFactor {
+  google.protobuf.Timestamp verified_at = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the tOTP challenge was last checked\"";
+    }
+  ];
+}
+
+message U2Factor {
+  google.protobuf.Timestamp verified_at = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the U2F challenge was last checked\"";
     }
   ];
 }

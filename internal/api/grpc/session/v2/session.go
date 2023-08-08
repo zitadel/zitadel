@@ -269,8 +269,8 @@ func (s *Server) challengesToCommand(challenges []session.ChallengeKind, cmds []
 	return resp, cmds
 }
 
-func (s *Server) createPasskeyChallengeCommand() (*session.Challenges_Passkey, command.SessionCommand) {
-	challenge := &session.Challenges_Passkey{
+func (s *Server) createPasskeyChallengeCommand() (*session.Challenges_WebauthN, command.SessionCommand) {
+	challenge := &session.Challenges_WebauthN{
 		PublicKeyCredentialRequestOptions: new(structpb.Struct),
 	}
 	return challenge, s.command.CreatePasskeyChallenge(domain.UserVerificationRequirementRequired, challenge.PublicKeyCredentialRequestOptions)

@@ -10,10 +10,11 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha;session
 enum ChallengeKind {
     CHALLENGE_KIND_UNSPECIFIED = 0;
     CHALLENGE_KIND_PASSKEY = 1;
+    CHALLENGE_KIND_U2F = 2;
 }
 
 message Challenges {
-  message Passkey {
+  message WebauthN {
     google.protobuf.Struct public_key_credential_request_options = 1 [
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         description: "Options for Assertion Generaration (dictionary PublicKeyCredentialRequestOptions). Generated helper methods transform the field to JSON, for use in a WebauthN client. See also: https://www.w3.org/TR/webauthn/#dictdef-publickeycredentialrequestoptions"
@@ -22,5 +23,6 @@ message Challenges {
     ];
   }
 
-  optional Passkey passkey = 1;
+  optional WebauthN passkey = 1;
+  optional WebauthN u2f = 2;
 }
