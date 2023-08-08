@@ -10,7 +10,7 @@ import (
 
 func main() {
 	args := os.Args[1:]
+	
 	rootCmd := cmd.New(os.Stdout, os.Stdin, args, nil)
-	fmt.Printf("change")
 	cobra.CheckErr(rootCmd.Execute())
 }
