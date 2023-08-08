@@ -170,6 +170,17 @@ func (s *SessionCommands) PasskeyChecked(ctx context.Context, checkedAt time.Tim
 	)
 }
 
+func (s *SessionCommands) U2FChallenged(ctx context.Context, challenge string, allowedCrentialIDs [][]byte, userVerification domain.UserVerificationRequirement) {
+	s.eventCommands = append(s.eventCommands, session.NewU2FChallengedEvent(ctx, s.sessionWriteModel.aggregate, challenge, allowedCrentialIDs, userVerification))
+}
+
+func (s *SessionCommands) U2FChecked(ctx context.Context, checkedAt time.Time, tokenID string, signCount uint32) {
+	s.eventCommands = append(s.eventCommands,
+		session.NewU2FCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt),
+		usr_repo.NewHumanU2FSignCountChangedEvent(ctx, s.sessionWriteModel.aggregate, tokenID, signCount),
+	)
+}
+
 func (s *SessionCommands) SetToken(ctx context.Context, tokenID string) {
 	s.eventCommands = append(s.eventCommands, session.NewTokenSetEvent(ctx, s.sessionWriteModel.aggregate, tokenID))
 }

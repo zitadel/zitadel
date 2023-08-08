@@ -19,6 +19,8 @@ const (
 	IntentCheckedType     = sessionEventPrefix + "intent.checked"
 	PasskeyChallengedType = sessionEventPrefix + "passkey.challenged"
 	PasskeyCheckedType    = sessionEventPrefix + "passkey.checked"
+	U2FChallengedType     = sessionEventPrefix + "u2f.challenged"
+	U2FCheckedType        = sessionEventPrefix + "u2f.checked"
 	TokenSetType          = sessionEventPrefix + "token.set"
 	MetadataSetType       = sessionEventPrefix + "metadata.set"
 	TerminateType         = sessionEventPrefix + "terminated"
@@ -248,6 +250,78 @@ func (e *PasskeyCheckedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
 }
 
 func NewPasskeyCheckedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	checkedAt time.Time,
+) *PasswordCheckedEvent {
+	return &PasswordCheckedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			PasskeyCheckedType,
+		),
+		CheckedAt: checkedAt,
+	}
+}
+
+type U2FChallengedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Challenge          string                             `json:"challenge,omitempty"`
+	AllowedCrentialIDs [][]byte                           `json:"allowedCrentialIDs,omitempty"`
+	UserVerification   domain.UserVerificationRequirement `json:"userVerification,omitempty"`
+}
+
+func (e *U2FChallengedEvent) Data() interface{} {
+	return e
+}
+
+func (e *U2FChallengedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *U2FChallengedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewU2FChallengedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	challenge string,
+	allowedCrentialIDs [][]byte,
+	userVerification domain.UserVerificationRequirement,
+) *U2FChallengedEvent {
+	return &U2FChallengedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			PasskeyChallengedType,
+		),
+		Challenge:          challenge,
+		AllowedCrentialIDs: allowedCrentialIDs,
+		UserVerification:   userVerification,
+	}
+}
+
+type U2FCheckedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	CheckedAt time.Time `json:"checkedAt"`
+}
+
+func (e *U2FCheckedEvent) Data() interface{} {
+	return e
+}
+
+func (e *U2FCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *U2FCheckedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewU2FCheckedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	checkedAt time.Time,
