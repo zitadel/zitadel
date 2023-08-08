@@ -341,7 +341,7 @@ message Checks {
       description: "\"Checks the password and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
     }
   ];
-  optional CheckPasskey passkey = 3 [
+  optional CheckWebAuthN passkey = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"Checks the public key credential issued by the passkey client. Requires that the user is already checked and a passkey challenge to be requested, in any previous request.\"";
     }
@@ -349,6 +349,11 @@ message Checks {
   optional CheckIntent intent = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"Checks the intent. Requires that the userlink is already checked and a successful intent.\"";
+    }
+  ];
+  optional CheckWebAuthN u2f = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Checks the public key credential issued by the u2f client. Requires that the user is already checked and a u2f challenge to be requested, in any previous request.\"";
     }
   ];
 }
@@ -385,12 +390,12 @@ message CheckPassword {
   ];
 }
 
-message CheckPasskey {
+message CheckWebAuthN {
   google.protobuf.Struct credential_assertion_data = 1 [
     (validate.rules).message.required = true,
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "JSON representation of public key credential issued by the passkey client";
+      description: "JSON representation of public key credential issued by the webAuthN client";
       min_length: 55;
       max_length: 1048576; //1 MB
     }
