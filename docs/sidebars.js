@@ -185,6 +185,14 @@ module.exports = {
         },
         {
           type: "category",
+          label: "Role management",
+          collapsed: true,
+          items: [
+            "guides/integrate/retrieve-user-roles"
+          ],
+        },
+        {
+          type: "category",
           label: "Build your own login UI",
           link: {
             type: "generated-index",

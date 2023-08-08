@@ -32,6 +32,7 @@ func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest
 		UserId:    human.ID,
 		Details:   object.DomainToDetailsPb(human.Details),
 		EmailCode: human.EmailCode,
+		PhoneCode: human.PhoneCode,
 	}, nil
 }
 
@@ -47,10 +48,6 @@ func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 		if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, req.GetUserId(), "code", "orgID"); err != nil {
 			return nil, err
 		}
-	}
-	bcryptedPassword, err := hashedPasswordToCommand(req.GetHashedPassword())
-	if err != nil {
-		return nil, err
 	}
 	passwordChangeRequired := req.GetPassword().GetChangeRequired() || req.GetHashedPassword().GetChangeRequired()
 	metadata := make([]*command.AddMetadataEntry, len(req.Metadata))
@@ -81,11 +78,15 @@ func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 			ReturnCode:  req.GetEmail().GetReturnCode() != nil,
 			URLTemplate: urlTemplate,
 		},
+		Phone: command.Phone{
+			Number:     domain.PhoneNumber(req.GetPhone().GetPhone()),
+			Verified:   req.GetPhone().GetIsVerified(),
+			ReturnCode: req.GetPhone().GetReturnCode() != nil,
+		},
 		PreferredLanguage:      language.Make(req.GetProfile().GetPreferredLanguage()),
 		Gender:                 genderToDomain(req.GetProfile().GetGender()),
-		Phone:                  command.Phone{}, // TODO: add as soon as possible
 		Password:               req.GetPassword().GetPassword(),
-		BcryptedPassword:       bcryptedPassword,
+		EncodedPasswordHash:    req.GetHashedPassword().GetHash(),
 		PasswordChangeRequired: passwordChangeRequired,
 		Passwordless:           false,
 		Register:               false,
@@ -107,17 +108,6 @@ func genderToDomain(gender user.Gender) domain.Gender {
 	default:
 		return domain.GenderUnspecified
 	}
-}
-
-func hashedPasswordToCommand(hashed *user.HashedPassword) (string, error) {
-	if hashed == nil {
-		return "", nil
-	}
-	// we currently only handle bcrypt
-	if hashed.GetAlgorithm() != "bcrypt" {
-		return "", errors.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.InvalidArgument")
-	}
-	return hashed.GetHash(), nil
 }
 
 func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_ *user.AddIDPLinkResponse, err error) {
@@ -228,7 +218,7 @@ func authMethodTypesToPb(methodTypes []domain.UserAuthMethodType) []user.Authent
 
 func authMethodTypeToPb(methodType domain.UserAuthMethodType) user.AuthenticationMethodType {
 	switch methodType {
-	case domain.UserAuthMethodTypeOTP:
+	case domain.UserAuthMethodTypeTOTP:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_TOTP
 	case domain.UserAuthMethodTypeU2F:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_U2F
@@ -238,6 +228,10 @@ func authMethodTypeToPb(methodType domain.UserAuthMethodType) user.Authenticatio
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSWORD
 	case domain.UserAuthMethodTypeIDP:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP
+	case domain.UserAuthMethodTypeOTPSMS:
+		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_SMS
+	case domain.UserAuthMethodTypeOTPEmail:
+		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_EMAIL
 	case domain.UserAuthMethodTypeUnspecified:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED
 	default:

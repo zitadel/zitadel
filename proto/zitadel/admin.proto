@@ -5866,6 +5866,11 @@ message UpdateLoginPolicyRequest {
             description: "defines if the user can additionally (to the login name) be identified by their verified phone number"
         }
     ];
+    bool force_mfa_local_only = 17 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login."
+        }
+    ];
 }
 
 message UpdateLoginPolicyResponse {

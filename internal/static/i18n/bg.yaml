@@ -122,6 +122,8 @@ Errors:
       Empty: Паролата е празна
       Invalid: Паролата е невалидна
       NotSet: Потребителят не е задал парола
+      NotChanged: Паролата не е променена
+      NotSupported: Хеш кодирането на паролата не се поддържа
     PasswordComplexityPolicy:
       NotFound: Политиката за парола не е намерена
       MinLength: Паролата е твърде кратка
@@ -512,6 +514,9 @@ Errors:
     WrongLoginClient: Auth Request, създаден от друг клиент за влизане
   OIDCSession:
     RefreshTokenInvalid: Токенът за опресняване е невалиден
+    Token:
+      Invalid: Токенът е невалиден
+      Expired: Токенът е изтекъл
 
 AggregateTypes:
   action: Действие
@@ -602,6 +607,8 @@ EventTypes:
         removed: Външният IDP е премахнат
         cascade:
           removed: Външната IDP каскада е премахната
+        id:
+          migrated: Външният потребителски идентификатор на IDP беше мигриран
       phone:
         changed: Телефонният номер е променен
         verified: Телефонният номер е потвърден
@@ -677,6 +684,10 @@ EventTypes:
       check:
         succeeded: Проверката на паролата е успешна
         failed: Проверката на паролата е неуспешна
+      change:
+        sent: Промяната на паролата е изпратена
+      hash:
+        updated: Хешът на паролата е актуализиран
     phone:
       changed: Телефонният номер е променен
       verified: Телефонният номер е потвърден

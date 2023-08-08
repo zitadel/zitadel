@@ -120,6 +120,8 @@ Errors:
       Empty: Le mot de passe est vide
       Invalid: Le mot de passe n'est pas valide
       NotSet: L'utilisateur n'a pas défini de mot de passe
+      NotChanged: Mot de passe non modifié
+      NotSupported: Encodage de hachage de mot de passe non pris en charge
     PasswordComplexityPolicy:
       NotFound: Politique de mot de passe non trouvée
       MinLength: Le mot de passe est trop court
@@ -494,6 +496,10 @@ Errors:
     WrongLoginClient: Auth Request créé par un autre client de connexion
   OIDCSession:
     RefreshTokenInvalid: Le jeton de rafraîchissement n'est pas valide
+    Token:
+      Invalid: Le jeton n'est pas valide
+      Expired: Le jeton est expiré
+    InvalidClient: Le token n'a pas été émis pour ce client
 
 AggregateTypes:
   action: Action
@@ -575,6 +581,10 @@ EventTypes:
         check:
           succeeded: Vérification du mot de passe réussie
           failed: La vérification du mot de passe a échoué
+        change:
+          sent: Changement de mot de passe envoyé
+        hash:
+          updated: Hachage du mot de passe mis à jour
       externallogin:
         check:
           succeeded: Connexion externe réussie
@@ -583,6 +593,8 @@ EventTypes:
         removed: Externer IDP supprimé
         cascade:
           removed: Externer IDP cascade supprimé
+        îd:
+          migrated: L'ID utilisateur externe de l'IDP a été migré
       phone:
         changed: Le numéro de téléphone a changé
         verified: Numéro de téléphone vérifié

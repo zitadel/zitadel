@@ -112,6 +112,8 @@ Errors:
       Empty: パスワードは空です
       Invalid: 無効なパスワードです
       NotSet: パスワードが未設置です
+      NotChanged: パスワードは変更されていません
+      NotSupported: パスワードハッシュエンコードはサポートされていません
     PasswordComplexityPolicy:
       NotFound: パスワードポリシーが見つかりません
       MinLength: パスワードが短すぎます
@@ -483,6 +485,10 @@ Errors:
     WrongLoginClient: 他のログインクライアントによって作成された AuthRequest
   OIDCSession:
     RefreshTokenInvalid: 無効なリフレッシュトークンです
+    Token:
+      Invalid: トークンが無効です
+      Expired: トークンの有効期限が切れている
+    InvalidClient: トークンが発行されていません
 
 AggregateTypes:
   action: アクション
@@ -574,6 +580,8 @@ EventTypes:
         removed: 外部IDPの削除
         cascade:
           removed: 外部IDPカスケードの削除
+        id:
+          migrated: IDP の外部ユーザー ID が移行されました
       phone:
         changed: 電話番号の変更
         verified: 電話番号の検証
@@ -649,6 +657,10 @@ EventTypes:
       check:
         succeeded: パスワードチェックの成功
         failed: パスワードチェックの失敗
+      change:
+        sent: パスワード変更を送信しました
+      hash:
+        updated: パスワードハッシュが更新されました
     phone:
       changed: 電話番号の変更
       verified: 電話番号の検証

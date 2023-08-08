@@ -88,6 +88,10 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
     }
   }
 
+  public selectOrg(org: Org.AsObject): void {
+    this.org = org;
+  }
+
   public selectRoles(roles: string[]): void {
     this.rolesKeyList = roles;
   }

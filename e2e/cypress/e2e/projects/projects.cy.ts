@@ -1,19 +1,23 @@
 import { Context } from 'support/commands';
 import { ensureProjectDoesntExist, ensureProjectExists } from '../../support/api/projects';
+import { ensureOrgExists } from 'support/api/orgs';
 
 describe('projects', () => {
   beforeEach(() => {
     cy.context().as('ctx');
   });
 
+  const defaultOrg = 'e2eorgnewdefault';
   const testProjectNameCreate = 'e2eprojectcreate';
   const testProjectNameDelete = 'e2eprojectdelete';
 
   describe('add project', () => {
     beforeEach(`ensure it doesn't exist already`, () => {
       cy.get<Context>('@ctx').then((ctx) => {
-        ensureProjectDoesntExist(ctx.api, testProjectNameCreate);
-        cy.visit(`/projects`);
+        ensureOrgExists(ctx, defaultOrg).then(() => {
+          ensureProjectDoesntExist(ctx.api, testProjectNameCreate);
+          cy.visit(`/projects`);
+        });
       });
     });
 
@@ -27,10 +31,49 @@ describe('projects', () => {
     it('should configure a project to assert roles on authentication');
   });
 
+  describe('create project grant', () => {
+    const testRoleName = 'e2eroleundertestname';
+
+    beforeEach('ensure it exists', () => {
+      cy.get<Context>('@ctx').then((ctx) => {
+        ensureProjectExists(ctx.api, testProjectNameCreate).as('projectId');
+        cy.get<number>('@projectId').then((projectId) => {
+          cy.visit(`/projects/${projectId}`);
+        });
+      });
+    });
+
+    it('should add a role', () => {
+      cy.get('[data-e2e="sidenav-element-roles"]').click();
+      cy.get('[data-e2e="add-new-role"]').click();
+      cy.get('[formcontrolname="key"]').type(testRoleName);
+      cy.get('[formcontrolname="displayName"]').type('e2eroleundertestdisplay');
+      cy.get('[formcontrolname="group"]').type('e2eroleundertestgroup');
+      cy.get('[data-e2e="save-button"]').click();
+      cy.shouldConfirmSuccess();
+      cy.contains('tr', testRoleName);
+    });
+
+    it('should add a project grant', () => {
+      const rowSelector = `tr:contains(${testRoleName})`;
+
+      cy.get('[data-e2e="sidenav-element-projectgrants"]').click();
+      cy.get('[data-e2e="create-project-grant-button"]').click();
+      cy.get('[data-e2e="add-org-input"]').type(defaultOrg);
+      cy.get('mat-option').contains(defaultOrg).click();
+      cy.get('button').should('be.enabled');
+      cy.get('[data-e2e="project-grant-continue"]').first().click();
+      cy.get(rowSelector).find('input').click({ force: true });
+      cy.get('[data-e2e="save-project-grant-button"]').click();
+      cy.contains('tr', defaultOrg);
+      cy.contains('tr', testRoleName);
+    });
+  });
+
   describe('edit project', () => {
     beforeEach('ensure it exists', () => {
       cy.get<Context>('@ctx').then((ctx) => {
-        ensureProjectExists(ctx.api, testProjectNameDelete);
+        ensureProjectExists(ctx.api, testProjectNameDelete).as('projectId');
         cy.visit(`/projects`);
       });
     });

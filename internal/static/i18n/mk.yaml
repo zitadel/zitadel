@@ -120,6 +120,8 @@ Errors:
       Empty: Лозинката е празна
       Invalid: Невалидна лозинка
       NotSet: Корисникот нема поставено лозинка
+      NotChanged: Лозинката не е променета
+      NotSupported: Не е поддржано хаш-кодирањето на лозинката
     PasswordComplexityPolicy:
       NotFound: Политиката за комплексност на лозинката не е пронајдена
       MinLength: Лозинката е прекратка
@@ -488,6 +490,16 @@ Errors:
     TokenCreationFailed: Неуспешно креирање на токен
     InvalidToken: Токенот за намера е невалиден
     OtherUser: Намерата е за друг корисник
+  AuthRequest:
+    AlreadyExists: Барањето за автентикација веќе постои
+    NotExisting: Барањето за автентикација не постои
+    WrongLoginClient: Барањето за автификација беше креирано од друг клиент за најавување
+  OIDCSession:
+    RefreshTokenInvalid: Токенот за освежување е неважечки
+    Token:
+      Invalid: токенот е неважечки
+      Expired: токенот е истечен
+    InvalidClient: Токен не беше издаден на овој клиент
 
 AggregateTypes:
   action: Акција
@@ -579,6 +591,8 @@ EventTypes:
         removed: Отстранет надворешен IDP
         cascade:
           removed: Отстранета каскадата на надворешни IDP
+        id:
+          migrated: Надворешниот кориснички ID на IDP е мигриран
       phone:
         changed: Променет број на телефон
         verified: Верифициран број на телефон
@@ -654,6 +668,10 @@ EventTypes:
       check:
         succeeded: Проверката на лозинката е успешна
         failed: Проверката на лозинката е неуспешна
+      change:
+        sent: Промената на лозинката е испратена
+      hash:
+        updated: Хашот на лозинката е ажуриран
     phone:
       changed: Бројот на телефонот е променет
       verified: Бројот на телефонот е верифициран

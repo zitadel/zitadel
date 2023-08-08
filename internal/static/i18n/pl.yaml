@@ -120,6 +120,8 @@ Errors:
       Empty: Hasło jest puste
       Invalid: Hasło jest nieprawidłowe
       NotSet: Użytkownik nie ustawił hasła
+      NotChanged: Hasło nie zostało zmienione
+      NotSupported: Kodowanie skrótu hasła nie jest obsługiwane
     PasswordComplexityPolicy:
       NotFound: Polityka hasła nie znaleziona
       MinLength: Hasło jest zbyt krótkie
@@ -494,6 +496,10 @@ Errors:
     WrongLoginClient: Auth Request utworzony przez innego klienta logowania
   OIDCSession:
     RefreshTokenInvalid: Refresh Token jest nieprawidłowy
+    Token:
+      Invalid: Token jest nieprawidłowy
+      Expired: Token wygasł
+    InvalidClient: Token nie został wydany dla tego klienta
 
 AggregateTypes:
   action: Działanie
@@ -577,6 +583,10 @@ EventTypes:
         check:
           succeeded: Sprawdzenie hasła zakończone powodzeniem
           failed: Sprawdzenie hasła nie powiodło się
+        change:
+          sent: Wysłano zmianę hasła
+        hash:
+          updated: Zaktualizowano skrót hasła
       externallogin:
         check:
           succeeded: Zewnętrzne logowanie zakończone powodzeniem
@@ -585,6 +595,8 @@ EventTypes:
         removed: Usunięto zewnętrzne IDP
         cascade:
           removed: Usunięto kaskadę zewnętrznego IDP
+        id:
+          migrated: Identyfikator użytkownika zewnętrznego dostawcy tożsamości został przeniesiony
       phone:
         changed: Numer telefonu zmieniony
         verified: Numer telefonu zweryfikowany

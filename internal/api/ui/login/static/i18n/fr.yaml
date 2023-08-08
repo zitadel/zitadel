@@ -223,6 +223,7 @@ RegistrationUser:
   Japanese: 日本語
   Spanish: Español
   Bulgarian: Български
+  Portuguese: Português
   Macedonian: Македонски
   GenderLabel: Genre
   Female: Femme
@@ -257,6 +258,8 @@ ExternalRegistrationUserOverview:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
   Macedonian: Македонски
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
@@ -319,6 +322,8 @@ ExternalNotFound:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
   Macedonian: Македонски
 
 DeviceAuth:
@@ -398,6 +403,7 @@ Errors:
       Empty: Le mot de passe est vide
       Invalid: Le mot de passe n'est pas valide
       InvalidAndLocked: Le mot de passe n'est pas valide et l'utilisateur est verrouillé, contactez votre administrateur.
+      NotChanged: Mot de passe non modifié
     UsernameOrPassword:
       Invalid: Le nom d'utilisateur ou le mot de passe n'est pas valide
     PasswordComplexityPolicy:

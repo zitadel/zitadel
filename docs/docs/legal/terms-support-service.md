@@ -6,7 +6,7 @@ custom_edit_url: null
 
 ### Introduction
 
-CAOS Ltd. (**"We"**, **CAOS AG**, or simply **CAOS**), with head office located at Teufener Strasse 19, 9000 St. Gallen, Switzerland, offers amongst other services and websites (**Services**) as well commercial support services (**Support Services**) for units of CAOS software products (**Unit**), if not otherwise defined a Unit refers to a is a single, dedicated setup of an application or service.
+CAOS Ltd. (**"We"**, **CAOS AG**, or simply **CAOS**), with head office located at Lerchenfeldstrasse 3, 9014 St. Gallen, Switzerland, offers amongst other services and websites (**Services**) as well commercial support services (**Support Services**) for units of CAOS software products (**Unit**), if not otherwise defined a Unit refers to a is a single, dedicated setup of an application or service.
 
 The customer relationship (**Framework Agreement** or **The Agreement**) is created by the **Customer** (**"you"**) by accepting a **Purchase Order** (**"PO"**) for the specified Support Services (**Booking**). Jointly you and CAOS will be referred to as **the Parties**. The terms of service (**"TOS"**) outlined in this document establish the most important points of this Framework Agreement – independently of the use of any other services. 
 

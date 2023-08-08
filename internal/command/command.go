@@ -49,7 +49,8 @@ type Commands struct {
 	smtpEncryption                  crypto.EncryptionAlgorithm
 	smsEncryption                   crypto.EncryptionAlgorithm
 	userEncryption                  crypto.EncryptionAlgorithm
-	userPasswordAlg                 crypto.HashAlgorithm
+	userPasswordHasher              *crypto.PasswordHasher
+	codeAlg                         crypto.HashAlgorithm
 	machineKeySize                  int
 	applicationKeySize              int
 	domainVerificationAlg           crypto.EncryptionAlgorithm
@@ -140,7 +141,11 @@ func StartCommands(
 	oidcsession.RegisterEventMappers(repo.eventstore)
 	milestone.RegisterEventMappers(repo.eventstore)
 
-	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
+	repo.codeAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
+	repo.userPasswordHasher, err = defaults.PasswordHasher.PasswordHasher()
+	if err != nil {
+		return nil, err
+	}
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
 	repo.applicationKeySize = int(defaults.SecretGenerators.ApplicationKeySize)
 

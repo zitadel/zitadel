@@ -156,10 +156,11 @@ func userFactorToPb(factor query.SessionUserFactor) *session.UserFactor {
 		return nil
 	}
 	return &session.UserFactor{
-		VerifiedAt:  timestamppb.New(factor.UserCheckedAt),
-		Id:          factor.UserID,
-		LoginName:   factor.LoginName,
-		DisplayName: factor.DisplayName,
+		VerifiedAt:     timestamppb.New(factor.UserCheckedAt),
+		Id:             factor.UserID,
+		LoginName:      factor.LoginName,
+		DisplayName:    factor.DisplayName,
+		OrganisationId: factor.ResourceOwner,
 	}
 }
 

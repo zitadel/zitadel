@@ -20,7 +20,8 @@ import (
 
 const (
 	BearerPrefix       = "Bearer "
-	SessionTokenFormat = "sess_%s:%s"
+	SessionTokenPrefix = "sess_"
+	SessionTokenFormat = SessionTokenPrefix + "%s:%s"
 )
 
 type TokenVerifier struct {

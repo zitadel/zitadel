@@ -120,6 +120,8 @@ Errors:
       Empty: Password is empty
       Invalid: Password is invalid
       NotSet: User has not set a password
+      NotChanged: Password not changed
+      NotSupported: Password hash encoding not supported
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is too short
@@ -494,6 +496,10 @@ Errors:
     WrongLoginClient: Auth Request created by other login client
   OIDCSession:
     RefreshTokenInvalid: Refresh Token is invalid
+    Token:
+      Invalid: Token is invalid
+      Expired: Token is expired
+    InvalidClient: Token was not issued for this client
 
 AggregateTypes:
   action: Action
@@ -577,6 +583,10 @@ EventTypes:
         check:
           succeeded: Password check succeeded
           failed: Password check failed
+        change:
+          sent: Password change sent
+        hash:
+          updated: Password hash updated
       externallogin:
         check:
           succeeded: External login succeeded
@@ -585,6 +595,8 @@ EventTypes:
         removed: External IDP removed
         cascade:
           removed: External IDP cascade removed
+        id:
+          migrated: External UserID of IDP was migrated
       phone:
         changed: Phone number changed
         verified: Phone number verified

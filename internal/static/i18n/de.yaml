@@ -120,6 +120,8 @@ Errors:
       Empty: Passwort ist leer
       Invalid: Passwort ungültig
       NotSet: Benutzer hat kein Passwort gesetzt
+      NotChanged: Passwort nicht geändert
+      NotSupported: Passwort-Hash-Kodierung wird nicht unterstützt
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
       MinLength: Passwort ist zu kurz
@@ -494,6 +496,11 @@ Errors:
     WrongLoginClient: Auth Request wurde von einem anderen Login-Client erstellt
   OIDCSession:
     RefreshTokenInvalid: Refresh Token ist ungültig
+    Token:
+      Invalid: Token ist ungültig
+      Expired: Token ist abgelaufen
+    InvalidClient: Token wurde nicht für diesen Client ausgestellt
+
 AggregateTypes:
   action: Action
   instance: Instanz
@@ -576,6 +583,10 @@ EventTypes:
         check:
           succeeded: Passwortvalidierung erfolgreich
           failed: Passwortvalidierung fehlgeschlagen
+        change:
+          sent: Passwordänderung versendet
+        hash:
+          updated: Passwort Hash geändert
       externallogin:
         check:
           succeeded: Externer login erfolgreich durchgeführt
@@ -584,6 +595,8 @@ EventTypes:
         removed: Externer IDP wurde gelöscht
         cascade:
           removed: Externer IDP wurde kaskadiert gelöscht
+        id:
+          migrated: Externe UserID des IDP wurde migriert
       phone:
         changed: Telefonnummer geändert
         verified: Telefonnummer verifiziert

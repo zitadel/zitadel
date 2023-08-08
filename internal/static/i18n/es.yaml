@@ -120,6 +120,8 @@ Errors:
       Empty: La contraseña está vacía
       Invalid: La contraseña no es válida
       NotSet: El usuario no ha establecido una contraseña
+      NotChanged: Contraseña no modificada
+      NotSupported: No se admite la codificación hash de contraseña
     PasswordComplexityPolicy:
       NotFound: Política de contraseñas no encontrada
       MinLength: La contraseña es demasiado corta
@@ -494,6 +496,10 @@ Errors:
     WrongLoginClient: Auth Request creado por otro cliente de inicio de sesión
   OIDCSession:
     RefreshTokenInvalid: El token de refresco no es válido
+    Token:
+      Invalid: El token no es válido
+      Expired: El token ha caducado
+    InvalidClient: El token no ha sido emitido para este cliente
 
 AggregateTypes:
   action: Acción
@@ -577,6 +583,10 @@ EventTypes:
         check:
           succeeded: Comprobación exitosa de la contraseña
           failed: Fallo en la comprobación de la contraseña
+        change:
+          sent: Cambio de contraseña enviado
+        hash:
+          updated: Hash de contraseña actualizado
       externallogin:
         check:
           succeeded: Inicio de sesión externo con éxito
@@ -585,6 +595,8 @@ EventTypes:
         removed: IDP externo eliminado
         cascade:
           removed: IDP externo eliminado en cascada
+        id:
+          migrated: Se migró el ID de usuario externo del IDP
       phone:
         changed: Número de teléfono modificado
         verified: Número de teléfono verificado

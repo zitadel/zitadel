@@ -2,21 +2,20 @@ package oidcsession
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
 	oidcSessionEventPrefix  = "oidc_session."
 	AddedType               = oidcSessionEventPrefix + "added"
 	AccessTokenAddedType    = oidcSessionEventPrefix + "access_token.added"
+	AccessTokenRevokedType  = oidcSessionEventPrefix + "access_token.revoked"
 	RefreshTokenAddedType   = oidcSessionEventPrefix + "refresh_token.added"
 	RefreshTokenRenewedType = oidcSessionEventPrefix + "refresh_token.renewed"
+	RefreshTokenRevokedType = oidcSessionEventPrefix + "refresh_token.revoked"
 )
 
 type AddedEvent struct {
@@ -37,6 +36,10 @@ func (e *AddedEvent) Data() interface{} {
 
 func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
+}
+
+func (e *AddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
 }
 
 func NewAddedEvent(ctx context.Context,
@@ -65,18 +68,6 @@ func NewAddedEvent(ctx context.Context,
 	}
 }
 
-func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	added := &AddedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, added)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDCS-DG4gn", "unable to unmarshal oidc session added")
-	}
-
-	return added, nil
-}
-
 type AccessTokenAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
@@ -91,6 +82,10 @@ func (e *AccessTokenAddedEvent) Data() interface{} {
 
 func (e *AccessTokenAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
+}
+
+func (e *AccessTokenAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
 }
 
 func NewAccessTokenAddedEvent(
@@ -112,16 +107,33 @@ func NewAccessTokenAddedEvent(
 	}
 }
 
-func AccessTokenAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	added := &AccessTokenAddedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, added)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDCS-DSGn5", "unable to unmarshal access token added")
-	}
+type AccessTokenRevokedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
 
-	return added, nil
+func (e *AccessTokenRevokedEvent) Data() interface{} {
+	return e
+}
+
+func (e *AccessTokenRevokedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *AccessTokenRevokedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewAccessTokenRevokedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *AccessTokenAddedEvent {
+	return &AccessTokenAddedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			AccessTokenRevokedType,
+		),
+	}
 }
 
 type RefreshTokenAddedEvent struct {
@@ -138,6 +150,10 @@ func (e *RefreshTokenAddedEvent) Data() interface{} {
 
 func (e *RefreshTokenAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
+}
+
+func (e *RefreshTokenAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
 }
 
 func NewRefreshTokenAddedEvent(
@@ -159,18 +175,6 @@ func NewRefreshTokenAddedEvent(
 	}
 }
 
-func RefreshTokenAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	added := &RefreshTokenAddedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, added)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDCS-aW3gqq", "unable to unmarshal refresh token added")
-	}
-
-	return added, nil
-}
-
 type RefreshTokenRenewedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
@@ -184,6 +188,10 @@ func (e *RefreshTokenRenewedEvent) Data() interface{} {
 
 func (e *RefreshTokenRenewedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
+}
+
+func (e *RefreshTokenRenewedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
 }
 
 func NewRefreshTokenRenewedEvent(
@@ -203,14 +211,31 @@ func NewRefreshTokenRenewedEvent(
 	}
 }
 
-func RefreshTokenRenewedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	added := &RefreshTokenRenewedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, added)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDCS-SF3fc", "unable to unmarshal refresh token renewed")
-	}
+type RefreshTokenRevokedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
 
-	return added, nil
+func (e *RefreshTokenRevokedEvent) Data() interface{} {
+	return e
+}
+
+func (e *RefreshTokenRevokedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *RefreshTokenRevokedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewRefreshTokenRevokedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *RefreshTokenRevokedEvent {
+	return &RefreshTokenRevokedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			RefreshTokenRevokedType,
+		),
+	}
 }

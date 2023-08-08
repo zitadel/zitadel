@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Server) GetUserGrantByID(ctx context.Context, req *mgmt_pb.GetUserGrantByIDRequest) (*mgmt_pb.GetUserGrantByIDResponse, error) {
-	idQuery, err := query.NewUserGrantGrantIDSearchQuery(req.GrantId)
+	idQuery, err := query.NewUserGrantIDSearchQuery(req.GrantId)
 	if err != nil {
 		return nil, err
 	}

@@ -5,74 +5,26 @@ package oidc_test
 import (
 	"context"
 	"net/url"
-	"os"
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
-	"golang.org/x/oauth2"
 
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/integration"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
 )
 
 var (
-	CTX      context.Context
-	CTXLOGIN context.Context
-	Tester   *integration.Tester
-	User     *user.AddHumanUserResponse
+	armPasskey  = []string{oidc_api.UserPresence, oidc_api.MFA}
+	armPassword = []string{oidc_api.PWD}
 )
-
-const (
-	redirectURI         = "oidcIntegrationTest://callback"
-	redirectURIImplicit = "http://localhost:9999/callback"
-)
-
-func TestMain(m *testing.M) {
-	os.Exit(func() int {
-		ctx, errCtx, cancel := integration.Contexts(5 * time.Minute)
-		defer cancel()
-
-		Tester = integration.NewTester(ctx)
-		defer Tester.Done()
-
-		CTX, _ = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
-		User = Tester.CreateHumanUser(CTX)
-		Tester.RegisterUserPasskey(CTX, User.GetUserId())
-		CTXLOGIN, _ = Tester.WithAuthorization(ctx, integration.Login), errCtx
-		return m.Run()
-	}())
-}
-
-func createClient(t testing.TB) string {
-	app, err := Tester.CreateOIDCNativeClient(CTX, redirectURI)
-	require.NoError(t, err)
-	return app.GetClientId()
-}
-
-func createImplicitClient(t testing.TB) string {
-	app, err := Tester.CreateOIDCImplicitFlowClient(CTX, redirectURIImplicit)
-	require.NoError(t, err)
-	return app.GetClientId()
-}
-
-func createAuthRequest(t testing.TB, clientID, redirectURI string, scope ...string) string {
-	redURL, err := Tester.CreateOIDCAuthRequest(clientID, Tester.Users[integration.FirstInstanceUsersKey][integration.Login].ID, redirectURI, scope...)
-	require.NoError(t, err)
-	return redURL
-}
-
-func createAuthRequestImplicit(t testing.TB, clientID, redirectURI string, scope ...string) string {
-	redURL, err := Tester.CreateOIDCAuthRequestImplicit(clientID, Tester.Users[integration.FirstInstanceUsersKey][integration.Login].ID, redirectURI, scope...)
-	require.NoError(t, err)
-	return redURL
-}
 
 func TestOPStorage_CreateAuthRequest(t *testing.T) {
 	clientID := createClient(t)
@@ -101,7 +53,7 @@ func TestOPStorage_CreateAccessToken_code(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
-	assertTokenClaims(t, tokens.IDTokenClaims, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
 
 	// callback on a succeeded request must fail
 	linkResp, err = Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -155,7 +107,7 @@ func TestOPStorage_CreateAccessToken_implicit(t *testing.T) {
 	require.NoError(t, err)
 	claims, err := rp.VerifyTokens[*oidc.IDTokenClaims](context.Background(), accessToken, idToken, provider.IDTokenVerifier())
 	require.NoError(t, err)
-	assertTokenClaims(t, claims, startTime, changeTime)
+	assertIDTokenClaims(t, claims, armPasskey, startTime, changeTime)
 
 	// callback on a succeeded request must fail
 	linkResp, err = Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -190,7 +142,7 @@ func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertTokenClaims(t, tokens.IDTokenClaims, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
 }
 
 func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
@@ -215,22 +167,332 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertTokenClaims(t, tokens.IDTokenClaims, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
 
 	// test actual refresh grant
 	newTokens, err := refreshTokens(t, clientID, tokens.RefreshToken)
 	require.NoError(t, err)
-	idToken, _ := newTokens.Extra("id_token").(string)
-	assert.NotEmpty(t, idToken)
-	assert.NotEmpty(t, newTokens.AccessToken)
-	assert.NotEmpty(t, newTokens.RefreshToken)
-	claims, err := rp.VerifyTokens[*oidc.IDTokenClaims](context.Background(), newTokens.AccessToken, idToken, provider.IDTokenVerifier())
-	require.NoError(t, err)
+	assertTokens(t, newTokens, true)
 	// auth time must still be the initial
-	assertTokenClaims(t, claims, startTime, changeTime)
+	assertIDTokenClaims(t, newTokens.IDTokenClaims, armPasskey, startTime, changeTime)
 
 	// refresh with an old refresh_token must fail
 	_, err = rp.RefreshAccessToken(provider, tokens.RefreshToken, "", "")
+	require.Error(t, err)
+}
+
+func TestOPStorage_RevokeToken_access_token(t *testing.T) {
+	clientID := createClient(t)
+	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
+	require.NoError(t, err)
+	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+		AuthRequestId: authRequestID,
+		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// code exchange
+	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+	tokens, err := exchangeTokens(t, clientID, code)
+	require.NoError(t, err)
+	assertTokens(t, tokens, true)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+
+	// revoke access token
+	err = rp.RevokeToken(provider, tokens.AccessToken, "access_token")
+	require.NoError(t, err)
+
+	// userinfo must fail
+	_, err = rp.Userinfo(tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
+	require.Error(t, err)
+
+	// refresh grant must still work
+	_, err = refreshTokens(t, clientID, tokens.RefreshToken)
+	require.NoError(t, err)
+
+	// revocation with the same access token must not fail (with or without hint)
+	err = rp.RevokeToken(provider, tokens.AccessToken, "access_token")
+	require.NoError(t, err)
+	err = rp.RevokeToken(provider, tokens.AccessToken, "")
+	require.NoError(t, err)
+}
+
+func TestOPStorage_RevokeToken_access_token_invalid_token_hint_type(t *testing.T) {
+	clientID := createClient(t)
+	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
+	require.NoError(t, err)
+	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+		AuthRequestId: authRequestID,
+		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// code exchange
+	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+	tokens, err := exchangeTokens(t, clientID, code)
+	require.NoError(t, err)
+	assertTokens(t, tokens, true)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+
+	// revoke access token
+	err = rp.RevokeToken(provider, tokens.AccessToken, "refresh_token")
+	require.NoError(t, err)
+
+	// userinfo must fail
+	_, err = rp.Userinfo(tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
+	require.Error(t, err)
+
+	// refresh grant must still work
+	_, err = refreshTokens(t, clientID, tokens.RefreshToken)
+	require.NoError(t, err)
+}
+
+func TestOPStorage_RevokeToken_refresh_token(t *testing.T) {
+	clientID := createClient(t)
+	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
+	require.NoError(t, err)
+	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+		AuthRequestId: authRequestID,
+		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// code exchange
+	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+	tokens, err := exchangeTokens(t, clientID, code)
+	require.NoError(t, err)
+	assertTokens(t, tokens, true)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+
+	// revoke refresh token -> invalidates also access token
+	err = rp.RevokeToken(provider, tokens.RefreshToken, "refresh_token")
+	require.NoError(t, err)
+
+	// userinfo must fail
+	_, err = rp.Userinfo(tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
+	require.Error(t, err)
+
+	// refresh must fail
+	_, err = refreshTokens(t, clientID, tokens.RefreshToken)
+	require.Error(t, err)
+
+	// revocation with the same refresh token must not fail (with or without hint)
+	err = rp.RevokeToken(provider, tokens.RefreshToken, "refresh_token")
+	require.NoError(t, err)
+	err = rp.RevokeToken(provider, tokens.RefreshToken, "")
+	require.NoError(t, err)
+}
+
+func TestOPStorage_RevokeToken_refresh_token_invalid_token_type_hint(t *testing.T) {
+	clientID := createClient(t)
+	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
+	require.NoError(t, err)
+	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+		AuthRequestId: authRequestID,
+		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// code exchange
+	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+	tokens, err := exchangeTokens(t, clientID, code)
+	require.NoError(t, err)
+	assertTokens(t, tokens, true)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+
+	// revoke refresh token even with a wrong hint
+	err = rp.RevokeToken(provider, tokens.RefreshToken, "access_token")
+	require.NoError(t, err)
+
+	// userinfo must fail
+	_, err = rp.Userinfo(tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
+	require.Error(t, err)
+
+	// refresh must fail
+	_, err = refreshTokens(t, clientID, tokens.RefreshToken)
+	require.Error(t, err)
+}
+
+func TestOPStorage_RevokeToken_invalid_client(t *testing.T) {
+	clientID := createClient(t)
+	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+		AuthRequestId: authRequestID,
+		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// code exchange
+	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+	tokens, err := exchangeTokens(t, clientID, code)
+	require.NoError(t, err)
+	assertTokens(t, tokens, true)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+
+	// simulate second client (not part of the audience) trying to revoke the token
+	otherClientID := createClient(t)
+	provider, err := Tester.CreateRelyingParty(otherClientID, redirectURI)
+	require.NoError(t, err)
+	err = rp.RevokeToken(provider, tokens.AccessToken, "")
+	require.Error(t, err)
+}
+
+func TestOPStorage_TerminateSession(t *testing.T) {
+	clientID := createClient(t)
+	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
+	require.NoError(t, err)
+	authRequestID := createAuthRequest(t, clientID, redirectURI)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+		AuthRequestId: authRequestID,
+		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// test code exchange
+	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+	tokens, err := exchangeTokens(t, clientID, code)
+	require.NoError(t, err)
+	assertTokens(t, tokens, false)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+
+	// userinfo must not fail
+	_, err = rp.Userinfo(tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
+	require.NoError(t, err)
+
+	postLogoutRedirect, err := rp.EndSession(provider, tokens.IDToken, logoutRedirectURI, "state")
+	require.NoError(t, err)
+	assert.Equal(t, logoutRedirectURI+"?state=state", postLogoutRedirect.String())
+
+	// userinfo must fail
+	_, err = rp.Userinfo(tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
+	require.Error(t, err)
+}
+
+func TestOPStorage_TerminateSession_refresh_grant(t *testing.T) {
+	clientID := createClient(t)
+	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
+	require.NoError(t, err)
+	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+		AuthRequestId: authRequestID,
+		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// test code exchange
+	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+	tokens, err := exchangeTokens(t, clientID, code)
+	require.NoError(t, err)
+	assertTokens(t, tokens, true)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+
+	// userinfo must not fail
+	_, err = rp.Userinfo(tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
+	require.NoError(t, err)
+
+	postLogoutRedirect, err := rp.EndSession(provider, tokens.IDToken, logoutRedirectURI, "state")
+	require.NoError(t, err)
+	assert.Equal(t, logoutRedirectURI+"?state=state", postLogoutRedirect.String())
+
+	// userinfo must fail
+	_, err = rp.Userinfo(tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
+	require.Error(t, err)
+
+	refreshedTokens, err := refreshTokens(t, clientID, tokens.RefreshToken)
+	require.NoError(t, err)
+
+	// userinfo must not fail
+	_, err = rp.Userinfo(refreshedTokens.AccessToken, refreshedTokens.TokenType, refreshedTokens.IDTokenClaims.Subject, provider)
+	require.NoError(t, err)
+}
+
+func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
+	clientID := createClient(t)
+	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
+	require.NoError(t, err)
+	authRequestID := createAuthRequest(t, clientID, redirectURI)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+		AuthRequestId: authRequestID,
+		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// test code exchange
+	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+	tokens, err := exchangeTokens(t, clientID, code)
+	require.NoError(t, err)
+	assertTokens(t, tokens, false)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+
+	postLogoutRedirect, err := rp.EndSession(provider, "", logoutRedirectURI, "state")
+	require.NoError(t, err)
+	assert.Equal(t, http_utils.BuildOrigin(Tester.Host(), Tester.Config.ExternalSecure)+Tester.Config.OIDC.DefaultLogoutURLV2+logoutRedirectURI+"?state=state", postLogoutRedirect.String())
+
+	// userinfo must not fail until login UI terminated session
+	_, err = rp.Userinfo(tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
+	require.NoError(t, err)
+
+	// simulate termination by login UI
+	_, err = Tester.Client.SessionV2.DeleteSession(CTXLOGIN, &session.DeleteSessionRequest{
+		SessionId:    sessionID,
+		SessionToken: gu.Ptr(sessionToken),
+	})
+	require.NoError(t, err)
+
+	// userinfo must fail
+	_, err = rp.Userinfo(tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
 	require.Error(t, err)
 }
 
@@ -242,11 +504,24 @@ func exchangeTokens(t testing.TB, clientID, code string) (*oidc.Tokens[*oidc.IDT
 	return rp.CodeExchange[*oidc.IDTokenClaims](context.Background(), code, provider, rp.WithCodeVerifier(codeVerifier))
 }
 
-func refreshTokens(t testing.TB, clientID, refreshToken string) (*oauth2.Token, error) {
+func refreshTokens(t testing.TB, clientID, refreshToken string) (*oidc.Tokens[*oidc.IDTokenClaims], error) {
 	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
 	require.NoError(t, err)
 
-	return rp.RefreshAccessToken(provider, refreshToken, "", "")
+	tokens, err := rp.RefreshAccessToken(provider, refreshToken, "", "")
+	if err != nil {
+		return nil, err
+	}
+	idToken, _ := tokens.Extra("id_token").(string)
+	claims, err := rp.VerifyTokens[*oidc.IDTokenClaims](context.Background(), tokens.AccessToken, idToken, provider.IDTokenVerifier())
+	if err != nil {
+		return nil, err
+	}
+	return &oidc.Tokens[*oidc.IDTokenClaims]{
+		Token:         tokens,
+		IDToken:       idToken,
+		IDTokenClaims: claims,
+	}, nil
 }
 
 func assertCodeResponse(t *testing.T, callback string) string {
@@ -268,8 +543,8 @@ func assertTokens(t *testing.T, tokens *oidc.Tokens[*oidc.IDTokenClaims], requir
 	}
 }
 
-func assertTokenClaims(t *testing.T, claims *oidc.IDTokenClaims, sessionStart, sessionChange time.Time) {
+func assertIDTokenClaims(t *testing.T, claims *oidc.IDTokenClaims, arm []string, sessionStart, sessionChange time.Time) {
 	assert.Equal(t, User.GetUserId(), claims.Subject)
-	assert.Equal(t, []string{oidc_api.UserPresence, oidc_api.MFA}, claims.AuthenticationMethodsReferences)
-	assert.WithinRange(t, claims.AuthTime.AsTime().UTC(), sessionStart.Add(-1*time.Second), sessionChange.Add(1*time.Second))
+	assert.Equal(t, arm, claims.AuthenticationMethodsReferences)
+	assertOIDCTimeRange(t, claims.AuthTime, sessionStart, sessionChange)
 }

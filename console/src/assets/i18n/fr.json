@@ -1041,6 +1041,7 @@
       "pl": "Polski",
       "zh": "简体中文",
       "bg": "Български",
+      "pt": "Portuguese",
       "mk": "Македонски"
     },
     "SMTP": {
@@ -1100,7 +1101,9 @@
         "3": "Vérification par téléphone",
         "4": "Réinitialisation du mot de passe",
         "5": "Initialisation sans mot de passe",
-        "6": "Secret de l'application"
+        "6": "Secret de l'application",
+        "7": "Mot de passe à usage unique (OTP) - SMS",
+        "8": "Mot de passe à usage unique (OTP) - e-mail"
       },
       "ADDGENERATOR": "Définir l'apparence du secret",
       "GENERATORTYPE": "Type",
@@ -1242,6 +1245,7 @@
         "pl": "Polski",
         "zh": "简体中文",
         "bg": "Български",
+        "pt": "Portuguese",
         "mk": "Македонски"
       },
       "KEYS": {
@@ -1341,6 +1345,8 @@
       "ALLOWREGISTER_DESC": "Si l'option est sélectionnée, une étape supplémentaire pour l'enregistrement d'un utilisateur apparaît dans la connexion.",
       "FORCEMFA": "Forcer MFA",
       "FORCEMFA_DESC": "Si l'option est sélectionnée, les utilisateurs doivent configurer un deuxième facteur pour la connexion.",
+      "FORCEMFALOCALONLY": "Forcer MFA pour les utilisateurs locaux",
+      "FORCEMFALOCALONLY_DESC": "Si l'option est sélectionnée, les utilisateurs locaux authentifiés doivent configurer un deuxième facteur pour la connexion.",
       "HIDEPASSWORDRESET": "Masquer la réinitialisation du mot de passe",
       "HIDEPASSWORDRESET_DESC": "Si l'option est sélectionnée, l'utilisateur ne peut pas réinitialiser son mot de passe lors du processus de connexion.",
       "HIDELOGINNAMESUFFIX": "Masquer le suffixe du nom de connexion",
@@ -1508,13 +1514,11 @@
         "SEL_PROJECT": "Rechercher un projet",
         "SEL_ROLES": "Sélectionnez les rôles que vous souhaitez ajouter à l'autorisation.",
         "SEL_USER": "Sélectionnez les utilisateurs",
-        "SEL_ORG": "Définir le domaine",
-        "SEL_ORG_DESC": "Entrez le domaine complet pour spécifier l'organisation à accorder.",
-        "ORG_TITLE": "Organisation",
+        "SEL_ORG": "Rechercher une organisation",
+        "SEL_ORG_DESC": "Rechercher l'organisme à accorder",
         "ORG_DESCRIPTION": "Vous êtes sur le point d'accorder un utilisateur pour l'organisation{{name}}.",
         "ORG_DESCRIPTION_DESC": "Changez le contexte dans l'en-tête ci-dessus pour accorder un utilisateur pour une autre organisation.",
-        "SEL_ORG_FORMFIELD": "Domaine complet",
-        "SEL_ORG_BUTTON": "Rechercher une organisation",
+        "SEL_ORG_FORMFIELD": "Organisation",
         "FOR_ORG": "L'autorisation est créée pour"
       },
       "DETAIL": {
@@ -1846,8 +1850,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Inconnu",
-      "1": "Mot de passe à usage unique (OTP)",
-      "2": "Empreinte digitale, clés de sécurité, Face ID et autres"
+      "1": "One Time Password par authenticator app (TOTP)",
+      "2": "Empreinte digitale, clés de sécurité, Face ID et autres",
+      "3": "One Time Password par email (Email OTP)",
+      "4": "One Time Password par SMS (SMS OTP)"
     }
   },
   "LOGINPOLICY": {
@@ -2103,6 +2109,7 @@
     "pl": "Polski",
     "zh": "简体中文",
     "bg": "Български",
+    "pt": "Portuguese",
     "mk": "Македонски"
   },
   "MEMBER": {

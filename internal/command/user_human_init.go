@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -49,7 +50,7 @@ func (c *Commands) ResendInitialMail(ctx context.Context, userID string, email d
 	return writeModelToObjectDetails(&existingCode.WriteModel), nil
 }
 
-func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwner, code, passwordString string, initCodeGenerator crypto.Generator) error {
+func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwner, code, password string, initCodeGenerator crypto.Generator) error {
 	if userID == "" {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-mkM9f", "Errors.User.UserIDMissing")
 	}
@@ -72,26 +73,22 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 		logging.WithFields("userID", userAgg.ID).OnError(err).Error("NewHumanInitializedCheckFailedEvent push failed")
 		return caos_errs.ThrowInvalidArgument(err, "COMMAND-11v6G", "Errors.User.Code.Invalid")
 	}
-	events := []eventstore.Command{
+	commands := []eventstore.Command{
 		user.NewHumanInitializedCheckSucceededEvent(ctx, userAgg),
 	}
 	if !existingCode.IsEmailVerified {
-		events = append(events, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
+		commands = append(commands, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
 	}
-	if passwordString != "" {
+	if password != "" {
 		passwordWriteModel := NewHumanPasswordWriteModel(userID, existingCode.ResourceOwner)
 		passwordWriteModel.UserState = domain.UserStateActive
-		password := &domain.Password{
-			SecretString:   passwordString,
-			ChangeRequired: false,
-		}
-		passwordEvent, err := c.changePassword(ctx, "", password, userAgg, passwordWriteModel)
+		passwordCommand, err := c.setPasswordCommand(ctx, passwordWriteModel, password, false)
 		if err != nil {
 			return err
 		}
-		events = append(events, passwordEvent)
+		commands = append(commands, passwordCommand)
 	}
-	_, err = c.eventstore.Push(ctx, events...)
+	_, err = c.eventstore.Push(ctx, commands...)
 	return err
 }
 

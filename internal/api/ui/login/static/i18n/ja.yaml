@@ -215,6 +215,7 @@ RegistrationUser:
   Japanese: 日本語
   Spanish: Español
   Bulgarian: Български
+  Portuguese: Português
   Macedonian: Македонски
   GenderLabel: 性別
   Female: 女性
@@ -249,6 +250,8 @@ ExternalRegistrationUserOverview:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
   Macedonian: Македонски
   TosAndPrivacyLabel: 利用規約
   TosConfirm: 私は利用規約を承諾します。
@@ -311,6 +314,8 @@ ExternalNotFound:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
   Macedonian: Македонски
 
 DeviceAuth:
@@ -361,6 +366,7 @@ Errors:
       Empty: パスワードが空です
       Invalid: 無効なパスワードです
       InvalidAndLocked: パスワードが無効かつユーザーがロックされているため、管理者に連絡してください。
+      NotChanged: パスワードは変更されていません
     UsernameOrPassword:
       Invalid: ユーザー名またはパスワードは無効です
     PasswordComplexityPolicy:
