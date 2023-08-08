@@ -35,6 +35,11 @@ func (wm *UserIDPLinkWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
+		case *user.UserIDPExternalIDMigratedEvent:
+			if e.IDPConfigID != wm.IDPConfigID || e.PreviousID != wm.ExternalUserID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
 		case *user.UserIDPLinkRemovedEvent:
 			if e.IDPConfigID != wm.IDPConfigID || e.ExternalUserID != wm.ExternalUserID {
 				continue
@@ -59,6 +64,8 @@ func (wm *UserIDPLinkWriteModel) Reduce() error {
 			wm.DisplayName = e.DisplayName
 			wm.ExternalUserID = e.ExternalUserID
 			wm.State = domain.UserIDPLinkStateActive
+		case *user.UserIDPExternalIDMigratedEvent:
+			wm.ExternalUserID = e.NewID
 		case *user.UserIDPLinkRemovedEvent:
 			wm.State = domain.UserIDPLinkStateRemoved
 		case *user.UserIDPLinkCascadeRemovedEvent:
@@ -77,6 +84,7 @@ func (wm *UserIDPLinkWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(user.UserIDPLinkAddedType,
+			user.UserIDPExternalIDMigratedType,
 			user.UserIDPLinkRemovedType,
 			user.UserIDPLinkCascadeRemovedType,
 			user.UserRemovedType).
