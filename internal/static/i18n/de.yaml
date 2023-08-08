@@ -583,6 +583,10 @@ EventTypes:
         check:
           succeeded: Passwortvalidierung erfolgreich
           failed: Passwortvalidierung fehlgeschlagen
+        change:
+          sent: Passwordänderung versendet
+        hash:
+          updated: Passwort Hash geändert
       externallogin:
         check:
           succeeded: Externer login erfolgreich durchgeführt
@@ -591,6 +595,8 @@ EventTypes:
         removed: Externer IDP wurde gelöscht
         cascade:
           removed: Externer IDP wurde kaskadiert gelöscht
+        id:
+          migrated: Externe UserID des IDP wurde migriert
       phone:
         changed: Telefonnummer geändert
         verified: Telefonnummer verifiziert

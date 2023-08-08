@@ -1020,6 +1020,92 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				},
 				wantID: "user1",
 			},
+		}, {
+			name: "add human (with return code), ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								newAddHumanEvent("$plain$x$password", false, "+41711234567"),
+							),
+							eventFromEventPusher(
+								user.NewHumanEmailVerifiedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate),
+							),
+							eventFromEventPusher(
+								user.NewHumanPhoneCodeAddedEventV2(
+									context.Background(),
+									&userAgg.Aggregate,
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("phoneCode"),
+									},
+									1*time.Hour,
+									true,
+								),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+					),
+				),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newCode:            mockCode("phoneCode", time.Hour),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &AddHuman{
+					Username:  "username",
+					Password:  "password",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address:  "email@test.ch",
+						Verified: true,
+					},
+					Phone: Phone{
+						Number:     "+41711234567",
+						ReturnCode: true,
+					},
+					PreferredLanguage: language.English,
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+				wantID: "user1",
+			},
 		},
 		{
 			name: "add human with metadata, ok",

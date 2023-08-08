@@ -98,7 +98,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceAddedOTP",
+			name: "reduceAddedTOTP",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(user.HumanMFAOTPAddedType),
@@ -125,7 +125,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 								"agg-id",
 								uint64(15),
 								domain.MFAStateNotReady,
-								domain.UserAuthMethodTypeOTP,
+								domain.UserAuthMethodTypeTOTP,
 								"",
 							},
 						},
@@ -208,7 +208,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceVerifiedOTP",
+			name: "reduceVerifiedTOTP",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(user.HumanMFAOTPVerifiedType),
@@ -232,9 +232,259 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 								"",
 								domain.MFAStateReady,
 								"agg-id",
-								domain.UserAuthMethodTypeOTP,
+								domain.UserAuthMethodTypeTOTP,
 								"ro-id",
 								"",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceAddedOTPSMS",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.HumanOTPSMSAddedType),
+					user.AggregateType,
+					nil,
+				), eventstore.GenericEventMapper[user.HumanOTPSMSAddedEvent]),
+			},
+			reduce: (&userAuthMethodProjection{}).reduceAddAuthMethod,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.user_auth_methods4 (token_id, creation_date, change_date, resource_owner, instance_id, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedArgs: []interface{}{
+								"",
+								anyArg{},
+								anyArg{},
+								"ro-id",
+								"instance-id",
+								"agg-id",
+								uint64(15),
+								domain.MFAStateReady,
+								domain.UserAuthMethodTypeOTPSMS,
+								"",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceAddedOTPEmail",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.HumanOTPEmailAddedType),
+					user.AggregateType,
+					nil,
+				), eventstore.GenericEventMapper[user.HumanOTPEmailAddedEvent]),
+			},
+			reduce: (&userAuthMethodProjection{}).reduceAddAuthMethod,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.user_auth_methods4 (token_id, creation_date, change_date, resource_owner, instance_id, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedArgs: []interface{}{
+								"",
+								anyArg{},
+								anyArg{},
+								"ro-id",
+								"instance-id",
+								"agg-id",
+								uint64(15),
+								domain.MFAStateReady,
+								domain.UserAuthMethodTypeOTPEmail,
+								"",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceRemoveOTPPasswordless",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.HumanPasswordlessTokenRemovedType),
+					user.AggregateType,
+					[]byte(`{
+						"webAuthNTokenId": "token-id"
+					}`),
+				), user.HumanPasswordlessRemovedEventMapper),
+			},
+			reduce: (&userAuthMethodProjection{}).reduceRemoveAuthMethod,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.user_auth_methods4 WHERE (user_id = $1) AND (method_type = $2) AND (resource_owner = $3) AND (instance_id = $4) AND (token_id = $5)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								domain.UserAuthMethodTypePasswordless,
+								"ro-id",
+								"instance-id",
+								"token-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceRemoveOTPU2F",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.HumanU2FTokenRemovedType),
+					user.AggregateType,
+					[]byte(`{
+						"webAuthNTokenId": "token-id"
+					}`),
+				), user.HumanU2FRemovedEventMapper),
+			},
+			reduce: (&userAuthMethodProjection{}).reduceRemoveAuthMethod,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.user_auth_methods4 WHERE (user_id = $1) AND (method_type = $2) AND (resource_owner = $3) AND (instance_id = $4) AND (token_id = $5)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								domain.UserAuthMethodTypeU2F,
+								"ro-id",
+								"instance-id",
+								"token-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceRemoveTOTP",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.HumanMFAOTPRemovedType),
+					user.AggregateType,
+					nil,
+				), user.HumanOTPRemovedEventMapper),
+			},
+			reduce: (&userAuthMethodProjection{}).reduceRemoveAuthMethod,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.user_auth_methods4 WHERE (user_id = $1) AND (method_type = $2) AND (resource_owner = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								domain.UserAuthMethodTypeTOTP,
+								"ro-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceRemoveOTPSMS",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.HumanOTPSMSRemovedType),
+					user.AggregateType,
+					nil,
+				), eventstore.GenericEventMapper[user.HumanOTPSMSRemovedEvent]),
+			},
+			reduce: (&userAuthMethodProjection{}).reduceRemoveAuthMethod,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.user_auth_methods4 WHERE (user_id = $1) AND (method_type = $2) AND (resource_owner = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								domain.UserAuthMethodTypeOTPSMS,
+								"ro-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceRemovePhone",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.HumanPhoneRemovedType),
+					user.AggregateType,
+					nil,
+				), user.HumanPhoneRemovedEventMapper),
+			},
+			reduce: (&userAuthMethodProjection{}).reduceRemoveAuthMethod,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.user_auth_methods4 WHERE (user_id = $1) AND (method_type = $2) AND (resource_owner = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								domain.UserAuthMethodTypeOTPSMS,
+								"ro-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceRemoveOTPEmail",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.HumanOTPEmailRemovedType),
+					user.AggregateType,
+					nil,
+				), eventstore.GenericEventMapper[user.HumanOTPEmailRemovedEvent]),
+			},
+			reduce: (&userAuthMethodProjection{}).reduceRemoveAuthMethod,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.user_auth_methods4 WHERE (user_id = $1) AND (method_type = $2) AND (resource_owner = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								domain.UserAuthMethodTypeOTPEmail,
+								"ro-id",
 								"instance-id",
 							},
 						},

@@ -1101,7 +1101,9 @@
         "3": "Weryfikacja telefonu",
         "4": "Resetowanie hasła",
         "5": "Inicjalizacja bez hasła",
-        "6": "Sekret aplikacji"
+        "6": "Sekret aplikacji",
+        "7": "Hasło jednorazowe (OTP) - SMS",
+        "8": "Hasło jednorazowe (OTP) — e-mail"
       },
       "ADDGENERATOR": "Zdefiniuj wygląd sekretu",
       "GENERATORTYPE": "Typ",
@@ -1848,8 +1850,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Nieznany",
-      "1": "Jednorazowe hasło (OTP)",
-      "2": "Odcisk palca, klucze bezpieczeństwa, Face ID i inne"
+      "1": "Hasło jednorazowe dla aplikacji uwierzytelniającej (TOTP)",
+      "2": "Odcisk palca, Klucze Bezpieczeństwa, Face ID i inne",
+      "3": "Hasło jednorazowe dla wiadomości e-mail (Email OTP)",
+      "4": "Hasło jednorazowe dla wiadomości SMS (SMS OTP)"
     }
   },
   "LOGINPOLICY": {

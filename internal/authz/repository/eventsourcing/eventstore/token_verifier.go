@@ -63,7 +63,7 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 		}
 	}
 
-	events, esErr := repo.getUserEvents(ctx, userID, instanceID, token.Sequence)
+	events, esErr := repo.getUserEvents(ctx, userID, instanceID, token.Sequence, token.GetRelevantEventTypes())
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
 	}
@@ -147,7 +147,7 @@ func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	session, err := repo.Query.SessionByID(ctx, false, sessionID, token)
+	session, err := repo.Query.SessionByID(ctx, true, sessionID, token)
 	if err != nil {
 		return "", "", "", err
 	}
@@ -199,10 +199,19 @@ func authMethodsFromSession(session *query.Session) []domain.UserAuthMethodType 
 	// TODO: add checks with https://github.com/zitadel/zitadel/issues/5477
 	/*
 		if !session.TOTPFactor.TOTPCheckedAt.IsZero() {
-			types = append(types, domain.UserAuthMethodTypeOTP)
+			types = append(types, domain.UserAuthMethodTypeTOTP)
 		}
 		if !session.U2FFactor.U2FCheckedAt.IsZero() {
 			types = append(types, domain.UserAuthMethodTypeU2F)
+		}
+	*/
+	// TODO: add checks with https://github.com/zitadel/zitadel/issues/6224
+	/*
+		if !session.TOTPFactor.OTPSMSCheckedAt.IsZero() {
+			types = append(types, domain.UserAuthMethodTypeOTPSMS)
+		}
+		if !session.TOTPFactor.OTPEmailCheckedAt.IsZero() {
+			types = append(types, domain.UserAuthMethodTypeOTPEmail)
 		}
 	*/
 	return types
@@ -238,10 +247,10 @@ func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName str
 	return clientID, app.ProjectID, nil
 }
 
-func (repo *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64) (_ []*models.Event, err error) {
+func (repo *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64, eventTypes []models.EventType) (_ []*models.Event, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence)
+	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence, eventTypes)
 	if err != nil {
 		return nil, err
 	}
