@@ -1248,6 +1248,7 @@ Action:
       ExternalAuthentication: Външно удостоверяване
       CustomiseToken: Токен за допълнение
       InternalAuthentication: Вътрешно удостоверяване
+      CustomizeSAMLResponse: Допълнение на SAMLResponse
   TriggerType:
     Unspecified: Неуточнено
     PostAuthentication: Публикуване на автентификация
@@ -1255,3 +1256,4 @@ Action:
     PostCreation: Създаване на публикации
     PreUserinfoCreation: Предварително създаване на потребителска информация
     PreAccessTokenCreation: Създаване на маркер за предварителен достъп
+    PreSAMLResponseCreation: Предварително създаване на SAMLResponse

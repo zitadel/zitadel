@@ -1027,6 +1027,7 @@ Action:
       ExternalAuthentication: 外部认证
       CustomiseToken: 自定义令牌
       InternalAuthentication: 内部认证
+      CustomizeSAMLResponse: 补充 SAMLResponse
   TriggerType:
     Unspecified: 未指定的
     PostAuthentication: 后期认证
@@ -1034,3 +1035,4 @@ Action:
     PostCreation: 创建后
     PreUserinfoCreation: 用户信息创建前
     PreAccessTokenCreation: access 令牌创建前
+    PreSAMLResponseCreation: 创建 SAMLResponse 前

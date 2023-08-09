@@ -1197,6 +1197,7 @@ Action:
       ExternalAuthentication: Надворешна автентикација
       CustomiseToken: Комплемент на токенот
       InternalAuthentication: Внатрешна автентикација
+      CustomizeSAMLResponse: Дополнете го SAMLResponse
   TriggerType:
     Unspecified: Неодредено
     PostAuthentication: По автентикација
@@ -1204,3 +1205,4 @@ Action:
     PostCreation: По креирање
     PreUserinfoCreation: Пред креирање на кориснички информации
     PreAccessTokenCreation: Пред креирање на токен за пристап
+    PreSAMLResponseCreation: Пред создавање на SAMLResponse

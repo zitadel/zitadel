@@ -61,7 +61,7 @@ require (
 	github.com/zitadel/logging v0.3.4
 	github.com/zitadel/oidc/v2 v2.7.0
 	github.com/zitadel/passwap v0.3.0
-	github.com/zitadel/saml v0.0.11
+	github.com/zitadel/saml v0.0.12-0.20230809152136-3bdfd7ad13fe
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.40.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.40.0
 	go.opentelemetry.io/otel v1.14.0
@@ -115,7 +115,7 @@ require (
 	cloud.google.com/go/trace v1.9.0 // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
 	github.com/amdonov/xmlsig v0.1.0 // indirect
-	github.com/beevik/etree v1.1.0 // indirect
+	github.com/beevik/etree v1.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
@@ -181,7 +181,7 @@ require (
 	github.com/prometheus/common v0.42.0 // indirect
 	github.com/prometheus/procfs v0.9.0 // indirect
 	github.com/rs/xid v1.4.0 // indirect
-	github.com/russellhaering/goxmldsig v1.3.0 // indirect
+	github.com/russellhaering/goxmldsig v1.4.0 // indirect
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/afero v1.9.5 // indirect
 	github.com/spf13/cast v1.5.0 // indirect

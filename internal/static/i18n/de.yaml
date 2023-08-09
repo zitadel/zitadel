@@ -1198,6 +1198,7 @@ Action:
       ExternalAuthentication:  Externe Authentifizierung
       CustomiseToken: Token ergänzen
       InternalAuthentication:  Interne Authentifizierung
+      CustomizeSAMLResponse: SAMLResponse ergänzen
   TriggerType:
     Unspecified: Unspezifiziert
     PostAuthentication: Nach Authentifizierung
@@ -1205,3 +1206,4 @@ Action:
     PostCreation: Nach Erstellung
     PreUserinfoCreation: Vor Userinfo Erstellung
     PreAccessTokenCreation: Vor Access Token Erstellung
+    PreSAMLResponseCreation: Vor SAMLResponse Erstellung
