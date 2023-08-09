@@ -29,6 +29,26 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         path: .artifacts
+    -
+      name: Unpack executable
+      run: |
+        tar -xvf .artifacts/zitadel-linux-amd64.tar
+        tar -czvf zitadel-linux-amd64.tar.gz zitadel-linux-amd64
+        
+        tar -xvf .artifacts/zitadel-linux-arm64.tar
+        tar -czvf zitadel-linux-arm64.tar.gz zitadel-linux-arm64
+        
+        tar -xvf .artifacts/zitadel-windows-amd64.tar
+        tar -czvf zitadel-windows-amd64.tar.gz zitadel-windows-amd64
+        
+        tar -xvf .artifacts/zitadel-windows-arm64.tar
+        tar -czvf zitadel-windows-arm64.tar.gz zitadel-windows-arm64
+        
+        tar -xvf .artifacts/zitadel-darwin-amd64.tar
+        tar -czvf zitadel-darwin-amd64.tar.gz zitadel-darwin-amd64
+        
+        tar -xvf .artifacts/zitadel-darwin-arm64.tar
+        tar -czvf zitadel-darwin-arm64.tar.gz zitadel-darwin-arm64
     - 
       name: Source checkout
       uses: actions/checkout@v3
