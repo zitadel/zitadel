@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/user/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	org "github.com/zitadel/zitadel/pkg/grpc/organisation/v2beta"
+	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
 func (s *Server) AddOrganisation(ctx context.Context, request *org.AddOrganisationRequest) (*org.AddOrganisationResponse, error) {

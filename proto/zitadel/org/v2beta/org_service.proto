@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 
-package zitadel.organisation.v2beta;
+package zitadel.org.v2beta;
 
 import "zitadel/object/v2alpha/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
@@ -19,7 +19,7 @@ import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/organisation/v2beta;organisation";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/org/v2beta;org";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {

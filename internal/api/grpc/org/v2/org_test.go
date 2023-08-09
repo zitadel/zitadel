@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	org "github.com/zitadel/zitadel/pkg/grpc/organisation/v2beta"
+	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 

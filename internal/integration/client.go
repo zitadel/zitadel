@@ -21,7 +21,7 @@ import (
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
-	organisation "github.com/zitadel/zitadel/pkg/grpc/organisation/v2beta"
+	organisation "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
