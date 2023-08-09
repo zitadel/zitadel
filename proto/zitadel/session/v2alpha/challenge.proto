@@ -9,11 +9,11 @@ import "validate/validate.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha;session";
 
-enum UserInteraction {
-  USER_INTERACTION_UNSPECIFIED = 0;
-  USER_INTERACTION_REQUIRED = 1;
-  USER_INTERACTION_PREFERRED = 2;
-  USER_INTERACTION_DISCOURAGED = 3;
+enum UserVerificationRequirement {
+  USER_VERIFICATION_REQUIREMENT_UNSPECIFIED = 0;
+  USER_VERIFICATION_REQUIREMENT_REQUIRED = 1;
+  USER_VERIFICATION_REQUIREMENT_PREFERRED = 2;
+  USER_VERIFICATION_REQUIREMENT_DISCOURAGED = 3;
 }
 
 message RequestChallenges {
@@ -25,14 +25,14 @@ message RequestChallenges {
         description: "\"Domain on which the session was created. Will be used in the WebAuthN challenge.\"";
       }
     ];
-    UserInteraction user_interacion = 2 [
+    UserVerificationRequirement user_verification_requirement = 2 [
       (validate.rules).enum = {
         defined_only: true,
         not_in: [0]
       },
       (google.api.field_behavior) = REQUIRED,
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "\"User interaction that is required during validation. When set to `USER_INTERACTION_REQUIRED` the behaviour is for passkey authentication. Other values will mean U2F\"";
+        description: "\"User verification that is required during validation. When set to `USER_VERIFICATION_REQUIREMENT_REQUIRED` the behaviour is for passkey authentication. Other values will mean U2F\"";
         ref: "https://www.w3.org/TR/webauthn/#enum-userVerificationRequirement";
       }
     ];

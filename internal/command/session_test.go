@@ -219,38 +219,6 @@ func TestCommands_CreateSession(t *testing.T) {
 				},
 			},
 		},
-		{
-			"empty session with domain",
-			fields{
-				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
-				tokenCreator: func(sessionID string) (string, string, error) {
-					return "tokenID",
-						"token",
-						nil
-				},
-			},
-			args{
-				ctx: authz.NewMockContext("", "org1", ""),
-			},
-			[]expect{
-				expectFilter(),
-				expectPush(
-					eventPusherToEvents(
-						session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate),
-						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-							"tokenID",
-						),
-					),
-				),
-			},
-			res{
-				want: &SessionChanged{
-					ObjectDetails: &domain.ObjectDetails{ResourceOwner: "org1"},
-					ID:            "sessionID",
-					NewToken:      "token",
-				},
-			},
-		},
 		// the rest is tested in the Test_updateSession
 	}
 	for _, tt := range tests {

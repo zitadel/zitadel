@@ -8,38 +8,41 @@ import (
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
-type humanPasskeys struct {
+type humanWebAuthNTokens struct {
 	human  *domain.Human
 	tokens []*domain.WebAuthNToken
 }
 
-func (s *SessionCommands) getHumanPasskeys(ctx context.Context) (*humanPasskeys, error) {
+func (s *SessionCommands) getHumanWebAuthNTokens(ctx context.Context, userVerification domain.UserVerificationRequirement) (*humanWebAuthNTokens, error) {
 	humanWritemodel, err := s.gethumanWriteModel(ctx)
 	if err != nil {
 		return nil, err
 	}
-	tokenReadModel, err := s.getHumanPasswordlessTokenReadModel(ctx)
+	tokenReadModel, err := s.getHumanWebAuthNTokenReadModel(ctx, userVerification)
 	if err != nil {
 		return nil, err
 	}
-	return &humanPasskeys{
+	return &humanWebAuthNTokens{
 		human:  writeModelToHuman(humanWritemodel),
-		tokens: readModelToPasswordlessTokens(tokenReadModel),
+		tokens: readModelToWebAuthNTokens(tokenReadModel),
 	}, nil
 }
 
-func (s *SessionCommands) getHumanPasswordlessTokenReadModel(ctx context.Context) (*HumanPasswordlessTokensReadModel, error) {
-	tokenReadModel := NewHumanPasswordlessTokensReadModel(s.sessionWriteModel.UserID, s.sessionWriteModel.ResourceOwner)
-	err := s.eventstore.FilterToQueryReducer(ctx, tokenReadModel)
+func (s *SessionCommands) getHumanWebAuthNTokenReadModel(ctx context.Context, userVerification domain.UserVerificationRequirement) (readModel HumanWebAuthNTokensReadModel, err error) {
+	readModel = NewHumanU2FTokensReadModel(s.sessionWriteModel.UserID, s.sessionWriteModel.ResourceOwner)
+	if userVerification == domain.UserVerificationRequirementRequired {
+		readModel = NewHumanPasswordlessTokensReadModel(s.sessionWriteModel.UserID, s.sessionWriteModel.ResourceOwner)
+	}
+	err = s.eventstore.FilterToQueryReducer(ctx, readModel)
 	if err != nil {
 		return nil, err
 	}
-	return tokenReadModel, nil
+	return readModel, nil
 }
 
-func (c *Commands) CreatePasskeyChallenge(userVerification domain.UserVerificationRequirement, rpid string, dst json.Unmarshaler) SessionCommand {
+func (c *Commands) CreateWebAuthNChallenge(userVerification domain.UserVerificationRequirement, rpid string, dst json.Unmarshaler) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) error {
-		humanPasskeys, err := cmd.getHumanPasskeys(ctx)
+		humanPasskeys, err := cmd.getHumanWebAuthNTokens(ctx, userVerification)
 		if err != nil {
 			return err
 		}
@@ -51,34 +54,36 @@ func (c *Commands) CreatePasskeyChallenge(userVerification domain.UserVerificati
 			return caos_errs.ThrowInternal(err, "COMMAND-Yah6A", "Errors.Internal")
 		}
 
-		cmd.PasskeyChallenged(ctx, webAuthNLogin.Challenge, webAuthNLogin.AllowedCredentialIDs, webAuthNLogin.UserVerification, rpid)
+		cmd.WebAuthNChallenged(ctx, webAuthNLogin.Challenge, webAuthNLogin.AllowedCredentialIDs, webAuthNLogin.UserVerification, rpid)
 		return nil
 	}
 }
 
-func (c *Commands) CheckPasskey(credentialAssertionData json.Marshaler) SessionCommand {
+func (c *Commands) CheckWebAuthN(credentialAssertionData json.Marshaler) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) error {
 		credentialAssertionData, err := json.Marshal(credentialAssertionData)
 		if err != nil {
-			return caos_errs.ThrowInvalidArgument(err, "COMMAND-ohG2o", "todo")
+			return caos_errs.ThrowInternal(err, "COMMAND-ohG2o", "Errors.Internal")
 		}
-		humanPasskeys, err := cmd.getHumanPasskeys(ctx)
+		challenge := cmd.sessionWriteModel.WebAuthNChallenge
+		if challenge == nil {
+			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Ioqu5", "Errors.Session.Passkey.NoChallenge") // TODO i18N
+		}
+		webAuthNTokens, err := cmd.getHumanWebAuthNTokens(ctx, challenge.UserVerification)
 		if err != nil {
 			return err
 		}
-		webAuthN, err := cmd.sessionWriteModel.PasskeyChallenge.WebAuthNLogin(humanPasskeys.human, credentialAssertionData)
-		if err != nil {
-			return err
-		}
-		keyID, signCount, err := c.webauthnConfig.FinishLogin(ctx, humanPasskeys.human, webAuthN, credentialAssertionData, humanPasskeys.tokens...)
+		webAuthN := challenge.WebAuthNLogin(webAuthNTokens.human, credentialAssertionData)
+
+		keyID, signCount, err := c.webauthnConfig.FinishLogin(ctx, webAuthNTokens.human, webAuthN, credentialAssertionData, webAuthNTokens.tokens...)
 		if err != nil && keyID == nil {
 			return err
 		}
-		_, token := domain.GetTokenByKeyID(humanPasskeys.tokens, keyID)
+		_, token := domain.GetTokenByKeyID(webAuthNTokens.tokens, keyID)
 		if token == nil {
 			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Aej7i", "Errors.User.WebAuthN.NotFound")
 		}
-		cmd.PasskeyChecked(ctx, cmd.now(), token.WebAuthNTokenID, signCount)
+		cmd.WebAuthNChecked(ctx, cmd.now(), token.WebAuthNTokenID, signCount)
 		return nil
 	}
 }

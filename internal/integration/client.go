@@ -143,6 +143,24 @@ func (s *Tester) RegisterUserPasskey(ctx context.Context, userID string) {
 	logging.OnError(err).Fatal("create user passkey")
 }
 
+func (s *Tester) RegisterUserU2F(ctx context.Context, userID string) {
+	pkr, err := s.Client.UserV2.RegisterU2F(ctx, &user.RegisterU2FRequest{
+		UserId: userID,
+		Domain: s.Config.ExternalDomain,
+	})
+	logging.OnError(err).Fatal("create user u2f")
+	attestationResponse, err := s.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
+	logging.OnError(err).Fatal("create user u2f")
+
+	_, err = s.Client.UserV2.VerifyU2FRegistration(ctx, &user.VerifyU2FRegistrationRequest{
+		UserId:              userID,
+		U2FId:               pkr.GetU2FId(),
+		PublicKeyCredential: attestationResponse,
+		TokenName:           "nice name",
+	})
+	logging.OnError(err).Fatal("create user u2f")
+}
+
 func (s *Tester) SetUserPassword(ctx context.Context, userID, password string) {
 	_, err := s.Client.UserV2.SetPassword(ctx, &user.SetPasswordRequest{
 		UserId:      userID,
@@ -215,8 +233,8 @@ func (s *Tester) CreatePasskeySession(t *testing.T, ctx context.Context, userID 
 		},
 		Challenges: &session.RequestChallenges{
 			WebAuthN: &session.RequestChallenges_WebAuthN{
-				Domain:         s.Config.ExternalDomain,
-				UserInteracion: session.UserInteraction_USER_INTERACTION_REQUIRED,
+				Domain:                      s.Config.ExternalDomain,
+				UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 			},
 		},
 	})

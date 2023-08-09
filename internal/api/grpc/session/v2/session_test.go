@@ -432,3 +432,40 @@ func Test_userCheck(t *testing.T) {
 		})
 	}
 }
+
+func Test_userVerificationRequirementToDomain(t *testing.T) {
+	type args struct {
+		req session.UserVerificationRequirement
+	}
+	tests := []struct {
+		args args
+		want domain.UserVerificationRequirement
+	}{
+		{
+			args: args{session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_UNSPECIFIED},
+			want: domain.UserVerificationRequirementUnspecified,
+		},
+		{
+			args: args{session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED},
+			want: domain.UserVerificationRequirementRequired,
+		},
+		{
+			args: args{session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_PREFERRED},
+			want: domain.UserVerificationRequirementPreferred,
+		},
+		{
+			args: args{session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_DISCOURAGED},
+			want: domain.UserVerificationRequirementDiscouraged,
+		},
+		{
+			args: args{999},
+			want: domain.UserVerificationRequirementUnspecified,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.args.req.String(), func(t *testing.T) {
+			got := userVerificationRequirementToDomain(tt.args.req)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}

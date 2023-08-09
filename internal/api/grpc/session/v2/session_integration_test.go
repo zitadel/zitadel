@@ -70,6 +70,7 @@ const (
 	wantUserFactor wantFactor = iota
 	wantPasswordFactor
 	wantPasskeyFactor
+	wantU2Factor
 	wantIntentFactor
 )
 
@@ -87,6 +88,10 @@ func verifyFactors(t testing.TB, factors *session.Factors, window time.Duration,
 			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
 		case wantPasskeyFactor:
 			pf := factors.GetPasskey()
+			assert.NotNil(t, pf)
+			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
+		case wantU2Factor:
+			pf := factors.GetU2F()
 			assert.NotNil(t, pf)
 			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
 		case wantIntentFactor:
@@ -151,8 +156,8 @@ func TestServer_CreateSession(t *testing.T) {
 			req: &session.CreateSessionRequest{
 				Challenges: &session.RequestChallenges{
 					WebAuthN: &session.RequestChallenges_WebAuthN{
-						Domain:         Tester.Config.ExternalDomain,
-						UserInteracion: session.UserInteraction_USER_INTERACTION_REQUIRED,
+						Domain:                      Tester.Config.ExternalDomain,
+						UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 					},
 				},
 			},
@@ -170,7 +175,7 @@ func TestServer_CreateSession(t *testing.T) {
 				},
 				Challenges: &session.RequestChallenges{
 					WebAuthN: &session.RequestChallenges_WebAuthN{
-						UserInteracion: session.UserInteraction_USER_INTERACTION_REQUIRED,
+						UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 					},
 				},
 			},
@@ -204,8 +209,8 @@ func TestServer_CreateSession_passkey(t *testing.T) {
 		},
 		Challenges: &session.RequestChallenges{
 			WebAuthN: &session.RequestChallenges_WebAuthN{
-				Domain:         Tester.Config.ExternalDomain,
-				UserInteracion: session.UserInteraction_USER_INTERACTION_REQUIRED,
+				Domain:                      Tester.Config.ExternalDomain,
+				UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 			},
 		},
 	})
@@ -337,8 +342,8 @@ func TestServer_SetSession_flow(t *testing.T) {
 	// create new, empty session
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{})
 	require.NoError(t, err)
-	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, wantFactors...)
 	sessionToken := createResp.GetSessionToken()
+	verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, createResp.GetDetails().GetSequence(), time.Minute, nil, wantFactors...)
 
 	t.Run("check user", func(t *testing.T) {
 		wantFactors = append(wantFactors, wantUserFactor)
@@ -354,8 +359,8 @@ func TestServer_SetSession_flow(t *testing.T) {
 			},
 		})
 		require.NoError(t, err)
-		verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), time.Minute, nil, wantFactors...)
 		sessionToken = resp.GetSessionToken()
+		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, wantFactors...)
 	})
 
 	t.Run("check passkey", func(t *testing.T) {
@@ -364,8 +369,8 @@ func TestServer_SetSession_flow(t *testing.T) {
 			SessionToken: sessionToken,
 			Challenges: &session.RequestChallenges{
 				WebAuthN: &session.RequestChallenges_WebAuthN{
-					Domain:         Tester.Config.ExternalDomain,
-					UserInteracion: session.UserInteraction_USER_INTERACTION_REQUIRED,
+					Domain:                      Tester.Config.ExternalDomain,
+					UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 				},
 			},
 		})
@@ -387,7 +392,53 @@ func TestServer_SetSession_flow(t *testing.T) {
 			},
 		})
 		require.NoError(t, err)
-		verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), time.Minute, nil, wantFactors...)
+		sessionToken = resp.GetSessionToken()
+		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, wantFactors...)
+	})
+
+	t.Run("check u2f", func(t *testing.T) {
+		Tester.RegisterUserU2F(
+			Tester.WithAuthorizationToken(context.Background(), sessionToken),
+			User.GetUserId(),
+		)
+
+		for _, userVerificationRequirement := range []session.UserVerificationRequirement{
+			session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_PREFERRED,
+			session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_DISCOURAGED,
+		} {
+			t.Run(userVerificationRequirement.String(), func(t *testing.T) {
+				resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
+					SessionId:    createResp.GetSessionId(),
+					SessionToken: sessionToken,
+					Challenges: &session.RequestChallenges{
+						WebAuthN: &session.RequestChallenges_WebAuthN{
+							Domain:                      Tester.Config.ExternalDomain,
+							UserVerificationRequirement: userVerificationRequirement,
+						},
+					},
+				})
+				require.NoError(t, err)
+				verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), time.Minute, nil, wantFactors...)
+				sessionToken = resp.GetSessionToken()
+
+				wantFactors := append(wantFactors, wantU2Factor)
+				assertionData, err := Tester.WebAuthN.CreateAssertionResponse(resp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions())
+				require.NoError(t, err)
+
+				resp, err = Client.SetSession(CTX, &session.SetSessionRequest{
+					SessionId:    createResp.GetSessionId(),
+					SessionToken: sessionToken,
+					Checks: &session.Checks{
+						WebAuthN: &session.CheckWebAuthN{
+							CredentialAssertionData: assertionData,
+						},
+					},
+				})
+				require.NoError(t, err)
+				sessionToken = resp.GetSessionToken()
+				verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, wantFactors...)
+			})
+		}
 	})
 }
 

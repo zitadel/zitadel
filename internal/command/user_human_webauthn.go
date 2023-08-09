@@ -24,7 +24,7 @@ func (c *Commands) getHumanU2FTokens(ctx context.Context, userID, resourceowner 
 	if tokenReadModel.UserState == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-4M0ds", "Errors.User.NotFound")
 	}
-	return readModelToU2FTokens(tokenReadModel), nil
+	return readModelToWebAuthNTokens(tokenReadModel), nil
 }
 
 func (c *Commands) getHumanPasswordlessTokens(ctx context.Context, userID, resourceOwner string) ([]*domain.WebAuthNToken, error) {
@@ -36,7 +36,7 @@ func (c *Commands) getHumanPasswordlessTokens(ctx context.Context, userID, resou
 	if tokenReadModel.UserState == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Mv9sd", "Errors.User.NotFound")
 	}
-	return readModelToPasswordlessTokens(tokenReadModel), nil
+	return readModelToWebAuthNTokens(tokenReadModel), nil
 }
 
 func (c *Commands) getHumanU2FLogin(ctx context.Context, userID, authReqID, resourceowner string) (*domain.WebAuthNLogin, error) {

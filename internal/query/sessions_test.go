@@ -32,6 +32,7 @@ var (
 		` projections.sessions4.password_checked_at,` +
 		` projections.sessions4.intent_checked_at,` +
 		` projections.sessions4.passkey_checked_at,` +
+		` projections.sessions4.u2f_checked_at,` +
 		` projections.sessions4.metadata,` +
 		` projections.sessions4.token_id` +
 		` FROM projections.sessions4` +
@@ -54,6 +55,7 @@ var (
 		` projections.sessions4.password_checked_at,` +
 		` projections.sessions4.intent_checked_at,` +
 		` projections.sessions4.passkey_checked_at,` +
+		` projections.sessions4.u2f_checked_at,` +
 		` projections.sessions4.metadata,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.sessions4` +
@@ -78,6 +80,7 @@ var (
 		"password_checked_at",
 		"intent_checked_at",
 		"passkey_checked_at",
+		"u2f_checked_at",
 		"metadata",
 		"token",
 	}
@@ -98,6 +101,7 @@ var (
 		"password_checked_at",
 		"intent_checked_at",
 		"passkey_checked_at",
+		"u2f_checked_at",
 		"metadata",
 		"count",
 	}
@@ -150,6 +154,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							testNow,
+							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
 						},
 					},
@@ -184,6 +189,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						PasskeyFactor: SessionPasskeyFactor{
 							PasskeyCheckedAt: testNow,
 						},
+						U2Factor: SessionU2Factor{
+							U2FCheckedAt: testNow,
+						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
 						},
@@ -215,6 +223,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							testNow,
+							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
 						},
 						{
@@ -230,6 +239,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							"login-name2",
 							"display-name2",
 							"resourceOwner",
+							testNow,
 							testNow,
 							testNow,
 							testNow,
@@ -267,6 +277,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						PasskeyFactor: SessionPasskeyFactor{
 							PasskeyCheckedAt: testNow,
 						},
+						U2Factor: SessionU2Factor{
+							U2FCheckedAt: testNow,
+						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
 						},
@@ -294,6 +307,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						},
 						PasskeyFactor: SessionPasskeyFactor{
 							PasskeyCheckedAt: testNow,
+						},
+						U2Factor: SessionU2Factor{
+							U2FCheckedAt: testNow,
 						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
@@ -379,6 +395,7 @@ func Test_SessionPrepare(t *testing.T) {
 						testNow,
 						testNow,
 						testNow,
+						testNow,
 						[]byte(`{"key": "dmFsdWU="}`),
 						"tokenID",
 					},
@@ -407,6 +424,9 @@ func Test_SessionPrepare(t *testing.T) {
 				},
 				PasskeyFactor: SessionPasskeyFactor{
 					PasskeyCheckedAt: testNow,
+				},
+				U2Factor: SessionU2Factor{
+					U2FCheckedAt: testNow,
 				},
 				Metadata: map[string][]byte{
 					"key": []byte("value"),

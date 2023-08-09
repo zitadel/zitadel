@@ -29,6 +29,7 @@ const (
 	SessionColumnPasswordCheckedAt = "password_checked_at"
 	SessionColumnIntentCheckedAt   = "intent_checked_at"
 	SessionColumnPasskeyCheckedAt  = "passkey_checked_at"
+	SessionColumnU2FCheckedAt      = "u2f_checked_at"
 	SessionColumnMetadata          = "metadata"
 	SessionColumnTokenID           = "token_id"
 )
@@ -56,6 +57,7 @@ func newSessionProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(SessionColumnPasswordCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnIntentCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnPasskeyCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
+			crdb.NewColumn(SessionColumnU2FCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnMetadata, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnTokenID, crdb.ColumnTypeText, crdb.Nullable()),
 		},
@@ -88,8 +90,8 @@ func (p *sessionProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceIntentChecked,
 				},
 				{
-					Event:  session.PasskeyCheckedType,
-					Reduce: p.reducePasskeyChecked,
+					Event:  session.WebAuthNCheckedType,
+					Reduce: p.reduceWebAuthNChecked,
 				},
 				{
 					Event:  session.TokenSetType,
@@ -207,10 +209,15 @@ func (p *sessionProjection) reduceIntentChecked(event eventstore.Event) (*handle
 	), nil
 }
 
-func (p *sessionProjection) reducePasskeyChecked(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*session.PasskeyCheckedEvent)
+func (p *sessionProjection) reduceWebAuthNChecked(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*session.WebAuthNCheckedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-WieM4", "reduce.wrong.event.type %s", session.PasskeyCheckedType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-WieM4", "reduce.wrong.event.type %s", session.WebAuthNCheckedType)
+	}
+
+	checkedAtCol := SessionColumnU2FCheckedAt
+	if e.UserVerification == domain.UserVerificationRequirementRequired {
+		checkedAtCol = SessionColumnPasskeyCheckedAt
 	}
 
 	return crdb.NewUpdateStatement(
@@ -218,7 +225,7 @@ func (p *sessionProjection) reducePasskeyChecked(event eventstore.Event) (*handl
 		[]handler.Column{
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
-			handler.NewCol(SessionColumnPasskeyCheckedAt, e.CheckedAt),
+			handler.NewCol(checkedAtCol, e.CheckedAt),
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnID, e.Aggregate().ID),

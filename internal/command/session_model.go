@@ -4,22 +4,18 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/session"
 )
 
-type PasskeyChallengeModel struct {
+type WebAuthNChallengeModel struct {
 	Challenge          string
 	AllowedCrentialIDs [][]byte
 	UserVerification   domain.UserVerificationRequirement
 	RPID               string
 }
 
-func (p *PasskeyChallengeModel) WebAuthNLogin(human *domain.Human, credentialAssertionData []byte) (*domain.WebAuthNLogin, error) {
-	if p == nil {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Ioqu5", "Errors.Session.Passkey.NoChallenge")
-	}
+func (p *WebAuthNChallengeModel) WebAuthNLogin(human *domain.Human, credentialAssertionData []byte) *domain.WebAuthNLogin {
 	return &domain.WebAuthNLogin{
 		ObjectRoot:              human.ObjectRoot,
 		CredentialAssertionData: credentialAssertionData,
@@ -27,7 +23,7 @@ func (p *PasskeyChallengeModel) WebAuthNLogin(human *domain.Human, credentialAss
 		AllowedCredentialIDs:    p.AllowedCrentialIDs,
 		UserVerification:        p.UserVerification,
 		RPID:                    p.RPID,
-	}, nil
+	}
 }
 
 type SessionWriteModel struct {
@@ -39,10 +35,11 @@ type SessionWriteModel struct {
 	PasswordCheckedAt time.Time
 	IntentCheckedAt   time.Time
 	PasskeyCheckedAt  time.Time
+	U2FCheckedAt      time.Time
 	Metadata          map[string][]byte
 	State             domain.SessionState
 
-	PasskeyChallenge *PasskeyChallengeModel
+	WebAuthNChallenge *WebAuthNChallengeModel
 
 	aggregate *eventstore.Aggregate
 }
@@ -69,10 +66,10 @@ func (wm *SessionWriteModel) Reduce() error {
 			wm.reducePasswordChecked(e)
 		case *session.IntentCheckedEvent:
 			wm.reduceIntentChecked(e)
-		case *session.PasskeyChallengedEvent:
-			wm.reducePasskeyChallenged(e)
-		case *session.PasskeyCheckedEvent:
-			wm.reducePasskeyChecked(e)
+		case *session.WebAuthNChallengedEvent:
+			wm.reduceWebAuthNChallenged(e)
+		case *session.WebAuthNCheckedEvent:
+			wm.reduceWebAuthNChecked(e)
 		case *session.TokenSetEvent:
 			wm.reduceTokenSet(e)
 		case *session.TerminateEvent:
@@ -92,8 +89,8 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 			session.UserCheckedType,
 			session.PasswordCheckedType,
 			session.IntentCheckedType,
-			session.PasskeyChallengedType,
-			session.PasskeyCheckedType,
+			session.WebAuthNChallengedType,
+			session.WebAuthNCheckedType,
 			session.TokenSetType,
 			session.MetadataSetType,
 			session.TerminateType,
@@ -123,8 +120,8 @@ func (wm *SessionWriteModel) reduceIntentChecked(e *session.IntentCheckedEvent) 
 	wm.IntentCheckedAt = e.CheckedAt
 }
 
-func (wm *SessionWriteModel) reducePasskeyChallenged(e *session.PasskeyChallengedEvent) {
-	wm.PasskeyChallenge = &PasskeyChallengeModel{
+func (wm *SessionWriteModel) reduceWebAuthNChallenged(e *session.WebAuthNChallengedEvent) {
+	wm.WebAuthNChallenge = &WebAuthNChallengeModel{
 		Challenge:          e.Challenge,
 		AllowedCrentialIDs: e.AllowedCrentialIDs,
 		UserVerification:   e.UserVerification,
@@ -132,9 +129,13 @@ func (wm *SessionWriteModel) reducePasskeyChallenged(e *session.PasskeyChallenge
 	}
 }
 
-func (wm *SessionWriteModel) reducePasskeyChecked(e *session.PasskeyCheckedEvent) {
-	wm.PasskeyChallenge = nil
-	wm.PasskeyCheckedAt = e.CheckedAt
+func (wm *SessionWriteModel) reduceWebAuthNChecked(e *session.WebAuthNCheckedEvent) {
+	if wm.WebAuthNChallenge.UserVerification == domain.UserVerificationRequirementRequired {
+		wm.PasskeyCheckedAt = e.CheckedAt
+	} else {
+		wm.U2FCheckedAt = e.CheckedAt
+	}
+	wm.WebAuthNChallenge = nil
 }
 
 func (wm *SessionWriteModel) reduceTokenSet(e *session.TokenSetEvent) {
@@ -151,8 +152,9 @@ func (wm *SessionWriteModel) AuthenticationTime() time.Time {
 	for _, check := range []time.Time{
 		wm.PasswordCheckedAt,
 		wm.PasskeyCheckedAt,
+		wm.U2FCheckedAt,
 		wm.IntentCheckedAt,
-		// TODO: add U2F and OTP check https://github.com/zitadel/zitadel/issues/5477
+		// TODO: add OTP check https://github.com/zitadel/zitadel/issues/5477
 		// TODO: add OTP (sms and email) check https://github.com/zitadel/zitadel/issues/6224
 	} {
 		if check.After(authTime) {
@@ -171,6 +173,9 @@ func (wm *SessionWriteModel) AuthMethodTypes() []domain.UserAuthMethodType {
 	if !wm.PasskeyCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypePasswordless)
 	}
+	if !wm.U2FCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypeU2F)
+	}
 	if !wm.IntentCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypeIDP)
 	}
@@ -178,9 +183,6 @@ func (wm *SessionWriteModel) AuthMethodTypes() []domain.UserAuthMethodType {
 	/*
 		if !wm.TOTPCheckedAt.IsZero() {
 			types = append(types, domain.UserAuthMethodTypeTOTP)
-		}
-		if !wm.U2FCheckedAt.IsZero() {
-			types = append(types, domain.UserAuthMethodTypeU2F)
 		}
 	*/
 	// TODO: add checks with https://github.com/zitadel/zitadel/issues/6224

@@ -34,6 +34,7 @@ type Session struct {
 	PasswordFactor SessionPasswordFactor
 	IntentFactor   SessionIntentFactor
 	PasskeyFactor  SessionPasskeyFactor
+	U2Factor       SessionU2Factor
 	Metadata       map[string][]byte
 }
 
@@ -55,6 +56,10 @@ type SessionIntentFactor struct {
 
 type SessionPasskeyFactor struct {
 	PasskeyCheckedAt time.Time
+}
+
+type SessionU2Factor struct {
+	U2FCheckedAt time.Time
 }
 
 type SessionsSearchQueries struct {
@@ -125,6 +130,10 @@ var (
 	}
 	SessionColumnPasskeyCheckedAt = Column{
 		name:  projection.SessionColumnPasskeyCheckedAt,
+		table: sessionsTable,
+	}
+	SessionColumnU2FCheckedAt = Column{
+		name:  projection.SessionColumnU2FCheckedAt,
 		table: sessionsTable,
 	}
 	SessionColumnMetadata = Column{
@@ -224,6 +233,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			SessionColumnPasswordCheckedAt.identifier(),
 			SessionColumnIntentCheckedAt.identifier(),
 			SessionColumnPasskeyCheckedAt.identifier(),
+			SessionColumnU2FCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			SessionColumnToken.identifier(),
 		).From(sessionsTable.identifier()).
@@ -242,6 +252,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				passwordCheckedAt sql.NullTime
 				intentCheckedAt   sql.NullTime
 				passkeyCheckedAt  sql.NullTime
+				u2fCheckedAt      sql.NullTime
 				metadata          database.Map[[]byte]
 				token             sql.NullString
 			)
@@ -262,6 +273,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&passwordCheckedAt,
 				&intentCheckedAt,
 				&passkeyCheckedAt,
+				&u2fCheckedAt,
 				&metadata,
 				&token,
 			)
@@ -281,6 +293,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
 			session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
 			session.PasskeyFactor.PasskeyCheckedAt = passkeyCheckedAt.Time
+			session.U2Factor.U2FCheckedAt = u2fCheckedAt.Time
 			session.Metadata = metadata
 
 			return session, token.String, nil
@@ -304,6 +317,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			SessionColumnPasswordCheckedAt.identifier(),
 			SessionColumnIntentCheckedAt.identifier(),
 			SessionColumnPasskeyCheckedAt.identifier(),
+			SessionColumnU2FCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			countColumn.identifier(),
 		).From(sessionsTable.identifier()).
@@ -325,6 +339,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					passwordCheckedAt sql.NullTime
 					intentCheckedAt   sql.NullTime
 					passkeyCheckedAt  sql.NullTime
+					u2fCheckedAt      sql.NullTime
 					metadata          database.Map[[]byte]
 				)
 
@@ -344,6 +359,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&passwordCheckedAt,
 					&intentCheckedAt,
 					&passkeyCheckedAt,
+					&u2fCheckedAt,
 					&metadata,
 					&sessions.Count,
 				)
@@ -359,6 +375,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
 				session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
 				session.PasskeyFactor.PasskeyCheckedAt = passkeyCheckedAt.Time
+				session.U2Factor.U2FCheckedAt = u2fCheckedAt.Time
 				session.Metadata = metadata
 
 				sessions.Sessions = append(sessions.Sessions, session)
