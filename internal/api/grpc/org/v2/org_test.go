@@ -17,9 +17,9 @@ import (
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
-func Test_addOrganisationRequestToCommand(t *testing.T) {
+func Test_addOrganizationRequestToCommand(t *testing.T) {
 	type args struct {
-		request *org.AddOrganisationRequest
+		request *org.AddOrganizationRequest
 	}
 	tests := []struct {
 		name    string
@@ -30,23 +30,23 @@ func Test_addOrganisationRequestToCommand(t *testing.T) {
 		{
 			name: "nil user",
 			args: args{
-				request: &org.AddOrganisationRequest{
+				request: &org.AddOrganizationRequest{
 					Name: "name",
-					Admins: []*org.AddOrganisationRequest_Admin{
+					Admins: []*org.AddOrganizationRequest_Admin{
 						{},
 					},
 				},
 			},
-			wantErr: caos_errs.ThrowUnimplementedf(nil, "ORGv2-SD2r1", "userType oneOf %T in method AddOrganisation not implemented", nil),
+			wantErr: caos_errs.ThrowUnimplementedf(nil, "ORGv2-SD2r1", "userType oneOf %T in method AddOrganization not implemented", nil),
 		},
 		{
 			name: "user ID",
 			args: args{
-				request: &org.AddOrganisationRequest{
+				request: &org.AddOrganizationRequest{
 					Name: "name",
-					Admins: []*org.AddOrganisationRequest_Admin{
+					Admins: []*org.AddOrganizationRequest_Admin{
 						{
-							UserType: &org.AddOrganisationRequest_Admin_UserId{
+							UserType: &org.AddOrganizationRequest_Admin_UserId{
 								UserId: "userID",
 							},
 							Roles: nil,
@@ -67,11 +67,11 @@ func Test_addOrganisationRequestToCommand(t *testing.T) {
 		{
 			name: "human user",
 			args: args{
-				request: &org.AddOrganisationRequest{
+				request: &org.AddOrganizationRequest{
 					Name: "name",
-					Admins: []*org.AddOrganisationRequest_Admin{
+					Admins: []*org.AddOrganizationRequest_Admin{
 						{
-							UserType: &org.AddOrganisationRequest_Admin_Human{
+							UserType: &org.AddOrganizationRequest_Admin_Human{
 								Human: &user.AddHumanUserRequest{
 									Profile: &user.SetHumanProfile{
 										FirstName: "firstname",
@@ -109,14 +109,14 @@ func Test_addOrganisationRequestToCommand(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := addOrganisationRequestToCommand(tt.args.request)
+			got, err := addOrganizationRequestToCommand(tt.args.request)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})
 	}
 }
 
-func Test_createdOrganisationToPb(t *testing.T) {
+func Test_createdOrganizationToPb(t *testing.T) {
 	now := time.Now()
 	type args struct {
 		createdOrg *command.CreatedOrg
@@ -124,7 +124,7 @@ func Test_createdOrganisationToPb(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *org.AddOrganisationResponse
+		want    *org.AddOrganizationResponse
 		wantErr error
 	}{
 		{
@@ -145,14 +145,14 @@ func Test_createdOrganisationToPb(t *testing.T) {
 					},
 				},
 			},
-			want: &org.AddOrganisationResponse{
+			want: &org.AddOrganizationResponse{
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.New(now),
 					ResourceOwner: "orgID",
 				},
-				OrganisationId: "orgID",
-				CreatedAdmins: []*org.AddOrganisationResponse_CreatedAdmin{
+				OrganizationId: "orgID",
+				CreatedAdmins: []*org.AddOrganizationResponse_CreatedAdmin{
 					{
 						UserId:    "id",
 						EmailCode: gu.Ptr("emailCode"),
@@ -164,7 +164,7 @@ func Test_createdOrganisationToPb(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := createdOrganisationToPb(tt.args.createdOrg)
+			got, err := createdOrganizationToPb(tt.args.createdOrg)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})

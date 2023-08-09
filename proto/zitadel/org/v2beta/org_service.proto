@@ -25,7 +25,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "User Service";
     version: "2.0-alpha";
-    description: "This API is intended to manage organisations in a ZITADEL instance. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+    description: "This API is intended to manage organizations in a ZITADEL instance. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -80,18 +80,18 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
-service OrganisationService {
+service OrganizationService {
 
-  // Create a new organisation and grant the user(s) permission to manage it
-  rpc AddOrganisation(AddOrganisationRequest) returns (AddOrganisationResponse) {
+  // Create a new organization and grant the user(s) permission to manage it
+  rpc AddOrganization(AddOrganizationRequest) returns (AddOrganizationResponse) {
     option (google.api.http) = {
-      post: "/v2beta/organisation"
+      post: "/v2beta/organizations"
       body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.create" // TODO: "iam.write"?
+        permission: "org.create"
       }
       http_response: {
         success_code: 201
@@ -99,7 +99,7 @@ service OrganisationService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Create an Organisation";
+      summary: "Create an Organization";
       description: "Create a new organization with an administrative user. If no specific roles are sent for the users, they will be granted the role ORG_OWNER."
       responses: {
         key: "200"
@@ -111,7 +111,7 @@ service OrganisationService {
   }
 }
 
-message AddOrganisationRequest{
+message AddOrganizationRequest{
   message Admin {
     oneof user_type{
       string user_id = 1;
@@ -133,13 +133,13 @@ message AddOrganisationRequest{
   repeated Admin admins = 2;
 }
 
-message AddOrganisationResponse{
+message AddOrganizationResponse{
   message CreatedAdmin {
     string user_id = 1;
     optional string email_code = 2;
     optional string phone_code = 3;
   }
   zitadel.object.v2alpha.Details details = 1;
-  string organisation_id = 2;
+  string organization_id = 2;
   repeated CreatedAdmin created_admins = 3;
 }

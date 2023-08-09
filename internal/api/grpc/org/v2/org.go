@@ -10,8 +10,8 @@ import (
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
-func (s *Server) AddOrganisation(ctx context.Context, request *org.AddOrganisationRequest) (*org.AddOrganisationResponse, error) {
-	orgSetup, err := addOrganisationRequestToCommand(request)
+func (s *Server) AddOrganization(ctx context.Context, request *org.AddOrganizationRequest) (*org.AddOrganizationResponse, error) {
+	orgSetup, err := addOrganizationRequestToCommand(request)
 	if err != nil {
 		return nil, err
 	}
@@ -19,11 +19,11 @@ func (s *Server) AddOrganisation(ctx context.Context, request *org.AddOrganisati
 	if err != nil {
 		return nil, err
 	}
-	return createdOrganisationToPb(createdOrg)
+	return createdOrganizationToPb(createdOrg)
 }
 
-func addOrganisationRequestToCommand(request *org.AddOrganisationRequest) (*command.OrgSetup, error) {
-	admins, err := addOrganisationRequestAdminsToCommand(request.GetAdmins())
+func addOrganizationRequestToCommand(request *org.AddOrganizationRequest) (*command.OrgSetup, error) {
+	admins, err := addOrganizationRequestAdminsToCommand(request.GetAdmins())
 	if err != nil {
 		return nil, err
 	}
@@ -34,10 +34,10 @@ func addOrganisationRequestToCommand(request *org.AddOrganisationRequest) (*comm
 	}, nil
 }
 
-func addOrganisationRequestAdminsToCommand(requestAdmins []*org.AddOrganisationRequest_Admin) (admins []*command.OrgSetupAdmin, err error) {
+func addOrganizationRequestAdminsToCommand(requestAdmins []*org.AddOrganizationRequest_Admin) (admins []*command.OrgSetupAdmin, err error) {
 	admins = make([]*command.OrgSetupAdmin, len(requestAdmins))
 	for i, admin := range requestAdmins {
-		admins[i], err = addOrganisationRequestAdminToCommand(admin)
+		admins[i], err = addOrganizationRequestAdminToCommand(admin)
 		if err != nil {
 			return nil, err
 		}
@@ -45,14 +45,14 @@ func addOrganisationRequestAdminsToCommand(requestAdmins []*org.AddOrganisationR
 	return admins, nil
 }
 
-func addOrganisationRequestAdminToCommand(admin *org.AddOrganisationRequest_Admin) (*command.OrgSetupAdmin, error) {
+func addOrganizationRequestAdminToCommand(admin *org.AddOrganizationRequest_Admin) (*command.OrgSetupAdmin, error) {
 	switch a := admin.GetUserType().(type) {
-	case *org.AddOrganisationRequest_Admin_UserId:
+	case *org.AddOrganizationRequest_Admin_UserId:
 		return &command.OrgSetupAdmin{
 			ID:    a.UserId,
 			Roles: admin.GetRoles(),
 		}, nil
-	case *org.AddOrganisationRequest_Admin_Human:
+	case *org.AddOrganizationRequest_Admin_Human:
 		human, err := user.AddUserRequestToAddHuman(a.Human)
 		if err != nil {
 			return nil, err
@@ -62,22 +62,22 @@ func addOrganisationRequestAdminToCommand(admin *org.AddOrganisationRequest_Admi
 			Roles: admin.GetRoles(),
 		}, nil
 	default:
-		return nil, caos_errs.ThrowUnimplementedf(nil, "ORGv2-SD2r1", "userType oneOf %T in method AddOrganisation not implemented", a)
+		return nil, caos_errs.ThrowUnimplementedf(nil, "ORGv2-SD2r1", "userType oneOf %T in method AddOrganization not implemented", a)
 	}
 }
 
-func createdOrganisationToPb(createdOrg *command.CreatedOrg) (_ *org.AddOrganisationResponse, err error) {
-	admins := make([]*org.AddOrganisationResponse_CreatedAdmin, len(createdOrg.CreatedAdmins))
+func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.AddOrganizationResponse, err error) {
+	admins := make([]*org.AddOrganizationResponse_CreatedAdmin, len(createdOrg.CreatedAdmins))
 	for i, admin := range createdOrg.CreatedAdmins {
-		admins[i] = &org.AddOrganisationResponse_CreatedAdmin{
+		admins[i] = &org.AddOrganizationResponse_CreatedAdmin{
 			UserId:    admin.ID,
 			EmailCode: admin.EmailCode,
 			PhoneCode: admin.PhoneCode,
 		}
 	}
-	return &org.AddOrganisationResponse{
+	return &org.AddOrganizationResponse{
 		Details:        object.DomainToDetailsPb(createdOrg.ObjectDetails),
-		OrganisationId: createdOrg.ObjectDetails.ResourceOwner,
+		OrganizationId: createdOrg.ObjectDetails.ResourceOwner,
 		CreatedAdmins:  admins,
 	}, nil
 }

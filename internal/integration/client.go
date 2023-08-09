@@ -35,7 +35,7 @@ type Client struct {
 	UserV2    user.UserServiceClient
 	SessionV2 session.SessionServiceClient
 	OIDCv2    oidc_pb.OIDCServiceClient
-	Orgv2     organisation.OrganisationServiceClient
+	OrgV2     organisation.OrganizationServiceClient
 	System    system.SystemServiceClient
 }
 
@@ -48,7 +48,7 @@ func newClient(cc *grpc.ClientConn) Client {
 		UserV2:    user.NewUserServiceClient(cc),
 		SessionV2: session.NewSessionServiceClient(cc),
 		OIDCv2:    oidc_pb.NewOIDCServiceClient(cc),
-		Orgv2:     organisation.NewOrganisationServiceClient(cc),
+		OrgV2:     organisation.NewOrganizationServiceClient(cc),
 		System:    system.NewSystemServiceClient(cc),
 	}
 }

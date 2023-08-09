@@ -21,7 +21,7 @@ import (
 var (
 	CTX    context.Context
 	Tester *integration.Tester
-	Client org.OrganisationServiceClient
+	Client org.OrganizationServiceClient
 	User   *user.AddHumanUserResponse
 )
 
@@ -32,7 +32,7 @@ func TestMain(m *testing.M) {
 
 		Tester = integration.NewTester(ctx)
 		defer Tester.Done()
-		Client = Tester.Client.Orgv2
+		Client = Tester.Client.OrgV2
 
 		CTX, _ = Tester.WithAuthorization(ctx, integration.IAMOwner), errCtx
 		User = Tester.CreateHumanUser(CTX)
@@ -40,20 +40,20 @@ func TestMain(m *testing.M) {
 	}())
 }
 
-func TestServer_AddOrganisation(t *testing.T) {
+func TestServer_AddOrganization(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t)
 
 	tests := []struct {
 		name    string
 		ctx     context.Context
-		req     *org.AddOrganisationRequest
-		want    *org.AddOrganisationResponse
+		req     *org.AddOrganizationRequest
+		want    *org.AddOrganizationResponse
 		wantErr bool
 	}{
 		{
 			name: "missing permission",
 			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
-			req: &org.AddOrganisationRequest{
+			req: &org.AddOrganizationRequest{
 				Name:   "name",
 				Admins: nil,
 			},
@@ -62,7 +62,7 @@ func TestServer_AddOrganisation(t *testing.T) {
 		{
 			name: "empty name",
 			ctx:  CTX,
-			req: &org.AddOrganisationRequest{
+			req: &org.AddOrganizationRequest{
 				Name:   "",
 				Admins: nil,
 			},
@@ -71,9 +71,9 @@ func TestServer_AddOrganisation(t *testing.T) {
 		{
 			name: "invalid admin type",
 			ctx:  CTX,
-			req: &org.AddOrganisationRequest{
+			req: &org.AddOrganizationRequest{
 				Name: fmt.Sprintf("%d", time.Now().UnixNano()),
-				Admins: []*org.AddOrganisationRequest_Admin{
+				Admins: []*org.AddOrganizationRequest_Admin{
 					{},
 				},
 			},
@@ -82,11 +82,11 @@ func TestServer_AddOrganisation(t *testing.T) {
 		{
 			name: "admin with init",
 			ctx:  CTX,
-			req: &org.AddOrganisationRequest{
+			req: &org.AddOrganizationRequest{
 				Name: fmt.Sprintf("%d", time.Now().UnixNano()),
-				Admins: []*org.AddOrganisationRequest_Admin{
+				Admins: []*org.AddOrganizationRequest_Admin{
 					{
-						UserType: &org.AddOrganisationRequest_Admin_Human{
+						UserType: &org.AddOrganizationRequest_Admin_Human{
 							Human: &user.AddHumanUserRequest{
 								Profile: &user.SetHumanProfile{
 									FirstName: "firstname",
@@ -103,9 +103,9 @@ func TestServer_AddOrganisation(t *testing.T) {
 					},
 				},
 			},
-			want: &org.AddOrganisationResponse{
-				OrganisationId: integration.NotEmpty,
-				CreatedAdmins: []*org.AddOrganisationResponse_CreatedAdmin{
+			want: &org.AddOrganizationResponse{
+				OrganizationId: integration.NotEmpty,
+				CreatedAdmins: []*org.AddOrganizationResponse_CreatedAdmin{
 					{
 						UserId:    integration.NotEmpty,
 						EmailCode: gu.Ptr(integration.NotEmpty),
@@ -117,14 +117,14 @@ func TestServer_AddOrganisation(t *testing.T) {
 		{
 			name: "existing user and new human with idp",
 			ctx:  CTX,
-			req: &org.AddOrganisationRequest{
+			req: &org.AddOrganizationRequest{
 				Name: fmt.Sprintf("%d", time.Now().UnixNano()),
-				Admins: []*org.AddOrganisationRequest_Admin{
+				Admins: []*org.AddOrganizationRequest_Admin{
 					{
-						UserType: &org.AddOrganisationRequest_Admin_UserId{UserId: User.GetUserId()},
+						UserType: &org.AddOrganizationRequest_Admin_UserId{UserId: User.GetUserId()},
 					},
 					{
-						UserType: &org.AddOrganisationRequest_Admin_Human{
+						UserType: &org.AddOrganizationRequest_Admin_Human{
 							Human: &user.AddHumanUserRequest{
 								Profile: &user.SetHumanProfile{
 									FirstName: "firstname",
@@ -148,8 +148,8 @@ func TestServer_AddOrganisation(t *testing.T) {
 					},
 				},
 			},
-			want: &org.AddOrganisationResponse{
-				CreatedAdmins: []*org.AddOrganisationResponse_CreatedAdmin{
+			want: &org.AddOrganizationResponse{
+				CreatedAdmins: []*org.AddOrganizationResponse_CreatedAdmin{
 					// a single admin is expected, because the first provided already exists
 					{
 						UserId: integration.NotEmpty,
@@ -160,7 +160,7 @@ func TestServer_AddOrganisation(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.AddOrganisation(tt.ctx, tt.req)
+			got, err := Client.AddOrganization(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -174,8 +174,8 @@ func TestServer_AddOrganisation(t *testing.T) {
 			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 			assert.NotEmpty(t, got.GetDetails().GetResourceOwner())
 
-			// organisation id must be the same as the resourceOwner
-			assert.Equal(t, got.GetDetails().GetResourceOwner(), got.GetOrganisationId())
+			// organization id must be the same as the resourceOwner
+			assert.Equal(t, got.GetDetails().GetResourceOwner(), got.GetOrganizationId())
 
 			// check the admins
 			require.Len(t, got.GetCreatedAdmins(), len(tt.want.GetCreatedAdmins()))
@@ -187,7 +187,7 @@ func TestServer_AddOrganisation(t *testing.T) {
 	}
 }
 
-func assertCreatedAdmin(t *testing.T, expected, got *org.AddOrganisationResponse_CreatedAdmin) {
+func assertCreatedAdmin(t *testing.T, expected, got *org.AddOrganizationResponse_CreatedAdmin) {
 	if expected.GetUserId() != "" {
 		assert.NotEmpty(t, got.GetUserId())
 	} else {

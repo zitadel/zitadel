@@ -11,10 +11,10 @@ import (
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
-var _ org.OrganisationServiceServer = (*Server)(nil)
+var _ org.OrganizationServiceServer = (*Server)(nil)
 
 type Server struct {
-	org.UnimplementedOrganisationServiceServer
+	org.UnimplementedOrganizationServiceServer
 	command         *command.Commands
 	query           *query.Queries
 	checkPermission domain.PermissionCheck
@@ -35,21 +35,21 @@ func CreateServer(
 }
 
 func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	org.RegisterOrganisationServiceServer(grpcServer, s)
+	org.RegisterOrganizationServiceServer(grpcServer, s)
 }
 
 func (s *Server) AppName() string {
-	return org.OrganisationService_ServiceDesc.ServiceName
+	return org.OrganizationService_ServiceDesc.ServiceName
 }
 
 func (s *Server) MethodPrefix() string {
-	return org.OrganisationService_ServiceDesc.ServiceName
+	return org.OrganizationService_ServiceDesc.ServiceName
 }
 
 func (s *Server) AuthMethods() authz.MethodMapping {
-	return org.OrganisationService_AuthMethods
+	return org.OrganizationService_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
-	return org.RegisterOrganisationServiceHandler
+	return org.RegisterOrganizationServiceHandler
 }
