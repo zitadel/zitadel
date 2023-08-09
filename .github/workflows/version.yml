@@ -29,6 +29,11 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         path: .artifacts
+    -
+      name: test
+      run: |
+        ls -la 
+        ls -la .artifacts
     - 
       name: Source checkout
       uses: actions/checkout@v3
