@@ -591,6 +591,8 @@ EventTypes:
         removed: Отстранет надворешен IDP
         cascade:
           removed: Отстранета каскадата на надворешни IDP
+        id:
+          migrated: Надворешниот кориснички ID на IDP е мигриран
       phone:
         changed: Променет број на телефон
         verified: Верифициран број на телефон
