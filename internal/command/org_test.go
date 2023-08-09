@@ -1621,6 +1621,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 					ObjectDetails: &domain.ObjectDetails{
 						ResourceOwner: "orgID",
 					},
+					CreatedAdmins: []*CreatedOrgAdmin{},
 				},
 			},
 		},
