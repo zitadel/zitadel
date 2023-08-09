@@ -37,13 +37,13 @@ func (s *SessionCommands) getHumanPasswordlessTokenReadModel(ctx context.Context
 	return tokenReadModel, nil
 }
 
-func (c *Commands) CreatePasskeyChallenge(userVerification domain.UserVerificationRequirement, dst json.Unmarshaler) SessionCommand {
+func (c *Commands) CreatePasskeyChallenge(userVerification domain.UserVerificationRequirement, rpid string, dst json.Unmarshaler) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) error {
 		humanPasskeys, err := cmd.getHumanPasskeys(ctx)
 		if err != nil {
 			return err
 		}
-		webAuthNLogin, err := c.webauthnConfig.BeginLogin(ctx, humanPasskeys.human, userVerification, cmd.sessionWriteModel.Domain, humanPasskeys.tokens...)
+		webAuthNLogin, err := c.webauthnConfig.BeginLogin(ctx, humanPasskeys.human, userVerification, rpid, humanPasskeys.tokens...)
 		if err != nil {
 			return err
 		}
@@ -51,7 +51,7 @@ func (c *Commands) CreatePasskeyChallenge(userVerification domain.UserVerificati
 			return caos_errs.ThrowInternal(err, "COMMAND-Yah6A", "Errors.Internal")
 		}
 
-		cmd.PasskeyChallenged(ctx, webAuthNLogin.Challenge, webAuthNLogin.AllowedCredentialIDs, webAuthNLogin.UserVerification)
+		cmd.PasskeyChallenged(ctx, webAuthNLogin.Challenge, webAuthNLogin.AllowedCredentialIDs, webAuthNLogin.UserVerification, rpid)
 		return nil
 	}
 }

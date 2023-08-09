@@ -127,7 +127,6 @@ func TestServer_CreateSession(t *testing.T) {
 					},
 				},
 				Metadata: map[string][]byte{"foo": []byte("bar")},
-				Domain:   "domain",
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
@@ -150,8 +149,11 @@ func TestServer_CreateSession(t *testing.T) {
 		{
 			name: "passkey without user error",
 			req: &session.CreateSessionRequest{
-				Challenges: []session.ChallengeKind{
-					session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
+				Challenges: &session.RequestChallenges{
+					WebAuthN: &session.RequestChallenges_WebAuthN{
+						Domain:         Tester.Config.ExternalDomain,
+						UserInteracion: session.UserInteraction_USER_INTERACTION_REQUIRED,
+					},
 				},
 			},
 			wantErr: true,
@@ -166,8 +168,10 @@ func TestServer_CreateSession(t *testing.T) {
 						},
 					},
 				},
-				Challenges: []session.ChallengeKind{
-					session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
+				Challenges: &session.RequestChallenges{
+					WebAuthN: &session.RequestChallenges_WebAuthN{
+						UserInteracion: session.UserInteraction_USER_INTERACTION_REQUIRED,
+					},
 				},
 			},
 			wantErr: true,
@@ -198,15 +202,17 @@ func TestServer_CreateSession_passkey(t *testing.T) {
 				},
 			},
 		},
-		Challenges: []session.ChallengeKind{
-			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
+		Challenges: &session.RequestChallenges{
+			WebAuthN: &session.RequestChallenges_WebAuthN{
+				Domain:         Tester.Config.ExternalDomain,
+				UserInteracion: session.UserInteraction_USER_INTERACTION_REQUIRED,
+			},
 		},
-		Domain: Tester.Config.ExternalDomain,
 	})
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil)
 
-	assertionData, err := Tester.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetPasskey().GetPublicKeyCredentialRequestOptions())
+	assertionData, err := Tester.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions())
 	require.NoError(t, err)
 
 	// update the session with passkey assertion data
@@ -214,7 +220,7 @@ func TestServer_CreateSession_passkey(t *testing.T) {
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),
 		Checks: &session.Checks{
-			Passkey: &session.CheckPasskey{
+			WebAuthN: &session.CheckWebAuthN{
 				CredentialAssertionData: assertionData,
 			},
 		},
@@ -329,7 +335,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 	var wantFactors []wantFactor
 
 	// create new, empty session
-	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{Domain: Tester.Config.ExternalDomain})
+	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{})
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, wantFactors...)
 	sessionToken := createResp.GetSessionToken()
@@ -356,8 +362,11 @@ func TestServer_SetSession_flow(t *testing.T) {
 		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
 			SessionId:    createResp.GetSessionId(),
 			SessionToken: sessionToken,
-			Challenges: []session.ChallengeKind{
-				session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
+			Challenges: &session.RequestChallenges{
+				WebAuthN: &session.RequestChallenges_WebAuthN{
+					Domain:         Tester.Config.ExternalDomain,
+					UserInteracion: session.UserInteraction_USER_INTERACTION_REQUIRED,
+				},
 			},
 		})
 		require.NoError(t, err)
@@ -365,14 +374,14 @@ func TestServer_SetSession_flow(t *testing.T) {
 		sessionToken = resp.GetSessionToken()
 
 		wantFactors = append(wantFactors, wantPasskeyFactor)
-		assertionData, err := Tester.WebAuthN.CreateAssertionResponse(resp.GetChallenges().GetPasskey().GetPublicKeyCredentialRequestOptions())
+		assertionData, err := Tester.WebAuthN.CreateAssertionResponse(resp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions())
 		require.NoError(t, err)
 
 		resp, err = Client.SetSession(CTX, &session.SetSessionRequest{
 			SessionId:    createResp.GetSessionId(),
 			SessionToken: sessionToken,
 			Checks: &session.Checks{
-				Passkey: &session.CheckPasskey{
+				WebAuthN: &session.CheckWebAuthN{
 					CredentialAssertionData: assertionData,
 				},
 			},
@@ -384,7 +393,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 
 func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 	// create new, empty session
-	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{Domain: Tester.Config.ExternalDomain})
+	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{})
 	require.NoError(t, err)
 
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("Bearer %s", createResp.GetSessionToken()))

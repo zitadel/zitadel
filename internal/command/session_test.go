@@ -146,7 +146,6 @@ func TestCommands_CreateSession(t *testing.T) {
 	type args struct {
 		ctx      context.Context
 		checks   []SessionCommand
-		domain   string
 		metadata map[string][]byte
 	}
 	type res struct {
@@ -205,7 +204,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				expectFilter(),
 				expectPush(
 					eventPusherToEvents(
-						session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, ""),
+						session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate),
 						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 							"tokenID",
 						),
@@ -231,14 +230,13 @@ func TestCommands_CreateSession(t *testing.T) {
 				},
 			},
 			args{
-				ctx:    authz.NewMockContext("", "org1", ""),
-				domain: "domain.tld",
+				ctx: authz.NewMockContext("", "org1", ""),
 			},
 			[]expect{
 				expectFilter(),
 				expectPush(
 					eventPusherToEvents(
-						session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld"),
+						session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate),
 						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 							"tokenID",
 						),
@@ -262,7 +260,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				idGenerator:         tt.fields.idGenerator,
 				sessionTokenCreator: tt.fields.tokenCreator,
 			}
-			got, err := c.CreateSession(tt.args.ctx, tt.args.checks, tt.args.domain, tt.args.metadata)
+			got, err := c.CreateSession(tt.args.ctx, tt.args.checks, tt.args.metadata)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})
@@ -311,7 +309,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld")),
+							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID")),
@@ -336,7 +334,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld")),
+							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID")),
@@ -769,7 +767,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld")),
+							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID")),
@@ -794,7 +792,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld")),
+							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID")),
@@ -823,7 +821,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld")),
+							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID"),
@@ -854,7 +852,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld")),
+							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID"),

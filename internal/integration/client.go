@@ -213,21 +213,23 @@ func (s *Tester) CreatePasskeySession(t *testing.T, ctx context.Context, userID 
 				Search: &session.CheckUser_UserId{UserId: userID},
 			},
 		},
-		Challenges: []session.ChallengeKind{
-			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
+		Challenges: &session.RequestChallenges{
+			WebAuthN: &session.RequestChallenges_WebAuthN{
+				Domain:         s.Config.ExternalDomain,
+				UserInteracion: session.UserInteraction_USER_INTERACTION_REQUIRED,
+			},
 		},
-		Domain: s.Config.ExternalDomain,
 	})
 	require.NoError(t, err)
 
-	assertion, err := s.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetPasskey().GetPublicKeyCredentialRequestOptions())
+	assertion, err := s.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions())
 	require.NoError(t, err)
 
 	updateResp, err := s.Client.SessionV2.SetSession(ctx, &session.SetSessionRequest{
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),
 		Checks: &session.Checks{
-			Passkey: &session.CheckPasskey{
+			WebAuthN: &session.CheckWebAuthN{
 				CredentialAssertionData: assertion,
 			},
 		},
@@ -247,7 +249,6 @@ func (s *Tester) CreatePasswordSession(t *testing.T, ctx context.Context, userID
 				Password: password,
 			},
 		},
-		Domain: s.Config.ExternalDomain,
 	})
 	require.NoError(t, err)
 	return createResp.GetSessionId(), createResp.GetSessionToken(),

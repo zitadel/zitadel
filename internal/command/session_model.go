@@ -40,7 +40,6 @@ type SessionWriteModel struct {
 	IntentCheckedAt   time.Time
 	PasskeyCheckedAt  time.Time
 	Metadata          map[string][]byte
-	Domain            string
 	State             domain.SessionState
 
 	PasskeyChallenge *PasskeyChallengeModel
@@ -108,7 +107,6 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 func (wm *SessionWriteModel) reduceAdded(e *session.AddedEvent) {
-	wm.Domain = e.Domain
 	wm.State = domain.SessionStateActive
 }
 
@@ -130,7 +128,7 @@ func (wm *SessionWriteModel) reducePasskeyChallenged(e *session.PasskeyChallenge
 		Challenge:          e.Challenge,
 		AllowedCrentialIDs: e.AllowedCrentialIDs,
 		UserVerification:   e.UserVerification,
-		RPID:               wm.Domain,
+		RPID:               e.RPID,
 	}
 }
 

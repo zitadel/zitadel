@@ -39,11 +39,6 @@ message Session {
       description: "\"custom key value list\"";
     }
   ];
-  string domain = 7 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"domain on which the session was created\"";
-    }
-  ];
 }
 
 message Factors {

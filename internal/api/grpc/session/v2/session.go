@@ -47,7 +47,7 @@ func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRe
 	}
 	challengeResponse, cmds := s.challengesToCommand(req.GetChallenges(), checks)
 
-	set, err := s.command.CreateSession(ctx, cmds, req.GetDomain(), metadata)
+	set, err := s.command.CreateSession(ctx, cmds, metadata)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,6 @@ func sessionToPb(s *query.Session) *session.Session {
 		Sequence:     s.Sequence,
 		Factors:      factorsToPb(s),
 		Metadata:     s.Metadata,
-		Domain:       s.Domain,
 	}
 }
 
@@ -244,36 +243,31 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	if intent := checks.GetIntent(); intent != nil {
 		sessionChecks = append(sessionChecks, command.CheckIntent(intent.GetIntentId(), intent.GetToken()))
 	}
-	if passkey := checks.GetPasskey(); passkey != nil {
+	if passkey := checks.GetWebAuthN(); passkey != nil {
 		sessionChecks = append(sessionChecks, s.command.CheckPasskey(passkey.GetCredentialAssertionData()))
 	}
 
 	return sessionChecks, nil
 }
 
-func (s *Server) challengesToCommand(challenges []session.ChallengeKind, cmds []command.SessionCommand) (*session.Challenges, []command.SessionCommand) {
-	if len(challenges) == 0 {
+func (s *Server) challengesToCommand(challenges *session.RequestChallenges, cmds []command.SessionCommand) (*session.Challenges, []command.SessionCommand) {
+	if challenges == nil {
 		return nil, cmds
 	}
 	resp := new(session.Challenges)
-	for _, c := range challenges {
-		switch c {
-		case session.ChallengeKind_CHALLENGE_KIND_UNSPECIFIED:
-			continue
-		case session.ChallengeKind_CHALLENGE_KIND_PASSKEY:
-			passkeyChallenge, cmd := s.createPasskeyChallengeCommand()
-			resp.Passkey = passkeyChallenge
-			cmds = append(cmds, cmd)
-		}
+	if req := challenges.GetWebAuthN(); req != nil {
+		challenge, cmd := s.createPasskeyChallengeCommand(req.GetDomain())
+		resp.WebAuthN = challenge
+		cmds = append(cmds, cmd)
 	}
 	return resp, cmds
 }
 
-func (s *Server) createPasskeyChallengeCommand() (*session.Challenges_WebauthN, command.SessionCommand) {
-	challenge := &session.Challenges_WebauthN{
+func (s *Server) createPasskeyChallengeCommand(rpid string) (*session.Challenges_WebAuthN, command.SessionCommand) {
+	challenge := &session.Challenges_WebAuthN{
 		PublicKeyCredentialRequestOptions: new(structpb.Struct),
 	}
-	return challenge, s.command.CreatePasskeyChallenge(domain.UserVerificationRequirementRequired, challenge.PublicKeyCredentialRequestOptions)
+	return challenge, s.command.CreatePasskeyChallenge(domain.UserVerificationRequirementRequired, rpid, challenge.PublicKeyCredentialRequestOptions)
 }
 
 func userCheck(user *session.CheckUser) (userSearch, error) {

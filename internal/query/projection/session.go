@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	SessionsProjectionTable = "projections.sessions3"
+	SessionsProjectionTable = "projections.sessions4"
 
 	SessionColumnID                = "id"
 	SessionColumnCreationDate      = "creation_date"
@@ -22,7 +22,6 @@ const (
 	SessionColumnSequence          = "sequence"
 	SessionColumnState             = "state"
 	SessionColumnResourceOwner     = "resource_owner"
-	SessionColumnDomain            = "domain"
 	SessionColumnInstanceID        = "instance_id"
 	SessionColumnCreator           = "creator"
 	SessionColumnUserID            = "user_id"
@@ -50,7 +49,6 @@ func newSessionProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(SessionColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(SessionColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(SessionColumnResourceOwner, crdb.ColumnTypeText),
-			crdb.NewColumn(SessionColumnDomain, crdb.ColumnTypeText),
 			crdb.NewColumn(SessionColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(SessionColumnCreator, crdb.ColumnTypeText),
 			crdb.NewColumn(SessionColumnUserID, crdb.ColumnTypeText, crdb.Nullable()),
@@ -142,7 +140,6 @@ func (p *sessionProjection) reduceSessionAdded(event eventstore.Event) (*handler
 			handler.NewCol(SessionColumnCreationDate, e.CreationDate()),
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnResourceOwner, e.Aggregate().ResourceOwner),
-			handler.NewCol(SessionColumnDomain, e.Domain),
 			handler.NewCol(SessionColumnState, domain.SessionStateActive),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
 			handler.NewCol(SessionColumnCreator, e.User),

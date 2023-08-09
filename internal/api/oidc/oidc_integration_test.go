@@ -92,7 +92,6 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 				Search: &session.CheckUser_UserId{UserId: User.GetUserId()},
 			},
 		},
-		Domain: Tester.Config.ExternalDomain,
 	})
 	require.NoError(t, err)
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
