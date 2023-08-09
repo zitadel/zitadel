@@ -31,7 +31,7 @@ jobs:
         path: .artifacts
     -
       name: test
-      if: !${{ inputs.dry_run }}
+      if: ${{ inputs.dry_run }} == false
       run: |
         ls -la 
         ls -la .artifacts
