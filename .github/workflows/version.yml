@@ -31,10 +31,8 @@ jobs:
         path: .artifacts
     -
       name: test
-      if: ${{ inputs.dry_run }} == false
       run: |
-        ls -la 
-        ls -la .artifacts
+        find .
     - 
       name: Source checkout
       uses: actions/checkout@v3
