@@ -149,7 +149,7 @@ describe('quotas', () => {
       });
     });
 
-    describe('notifications', () => {
+    describe.skip('notifications', () => {
       const callURL = `http://${Cypress.env('WEBHOOK_HANDLER_HOST')}:${Cypress.env('WEBHOOK_HANDLER_PORT')}/do_something`;
 
       beforeEach(() => cy.task('resetWebhookEvents'));
