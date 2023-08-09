@@ -247,9 +247,6 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	if passkey := checks.GetPasskey(); passkey != nil {
 		sessionChecks = append(sessionChecks, s.command.CheckPasskey(passkey.GetCredentialAssertionData()))
 	}
-	if u2f := checks.GetU2F(); u2f != nil {
-		sessionChecks = append(sessionChecks, s.command.CheckU2F(u2f.GetCredentialAssertionData()))
-	}
 
 	return sessionChecks, nil
 }
@@ -267,10 +264,6 @@ func (s *Server) challengesToCommand(challenges []session.ChallengeKind, cmds []
 			passkeyChallenge, cmd := s.createPasskeyChallengeCommand()
 			resp.Passkey = passkeyChallenge
 			cmds = append(cmds, cmd)
-		case session.ChallengeKind_CHALLENGE_KIND_U2F:
-			u2fChallange, cmd := s.createU2FChallengeCommand()
-			resp.U2F = u2fChallange
-			cmds = append(cmds, cmd)
 		}
 	}
 	return resp, cmds
@@ -281,13 +274,6 @@ func (s *Server) createPasskeyChallengeCommand() (*session.Challenges_WebauthN, 
 		PublicKeyCredentialRequestOptions: new(structpb.Struct),
 	}
 	return challenge, s.command.CreatePasskeyChallenge(domain.UserVerificationRequirementRequired, challenge.PublicKeyCredentialRequestOptions)
-}
-
-func (s *Server) createU2FChallengeCommand() (*session.Challenges_WebauthN, command.SessionCommand) {
-	challenge := &session.Challenges_WebauthN{
-		PublicKeyCredentialRequestOptions: new(structpb.Struct),
-	}
-	return challenge, s.command.CreateU2FChallenge(domain.UserVerificationRequirementRequired, challenge.PublicKeyCredentialRequestOptions)
 }
 
 func userCheck(user *session.CheckUser) (userSearch, error) {

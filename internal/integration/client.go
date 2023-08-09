@@ -227,7 +227,7 @@ func (s *Tester) CreatePasskeySession(t *testing.T, ctx context.Context, userID 
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),
 		Checks: &session.Checks{
-			Passkey: &session.CheckWebAuthN{
+			Passkey: &session.CheckPasskey{
 				CredentialAssertionData: assertion,
 			},
 		},

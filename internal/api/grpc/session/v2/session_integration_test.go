@@ -214,7 +214,7 @@ func TestServer_CreateSession_passkey(t *testing.T) {
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),
 		Checks: &session.Checks{
-			Passkey: &session.CheckWebAuthN{
+			Passkey: &session.CheckPasskey{
 				CredentialAssertionData: assertionData,
 			},
 		},
@@ -372,7 +372,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 			SessionId:    createResp.GetSessionId(),
 			SessionToken: sessionToken,
 			Checks: &session.Checks{
-				Passkey: &session.CheckWebAuthN{
+				Passkey: &session.CheckPasskey{
 					CredentialAssertionData: assertionData,
 				},
 			},

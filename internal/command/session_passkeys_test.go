@@ -25,7 +25,7 @@ func TestSessionCommands_getHumanPasskeys(t *testing.T) {
 		sessionWriteModel *SessionWriteModel
 	}
 	type res struct {
-		want *humanWebAuthN
+		want *humanPasskeys
 		err  error
 	}
 	tests := []struct {
@@ -92,7 +92,7 @@ func TestSessionCommands_getHumanPasskeys(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &humanWebAuthN{
+				want: &humanPasskeys{
 					human: &domain.Human{
 						ObjectRoot: models.ObjectRoot{
 							AggregateID:   "user1",
