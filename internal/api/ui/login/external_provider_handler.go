@@ -967,6 +967,8 @@ func tokens(session idp.Session) *oidc.Tokens[*oidc.IDTokenClaims] {
 		return s.Tokens
 	case *oauth.Session:
 		return s.Tokens
+	case *azuread.Session:
+		return s.Tokens
 	}
 	return nil
 }

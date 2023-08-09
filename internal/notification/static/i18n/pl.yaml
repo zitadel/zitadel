@@ -26,6 +26,15 @@ VerifyPhone:
   Greeting: Witaj {{.DisplayName}},
   Text: Został dodany nowy numer telefonu. Użyj następującego kodu, aby go zweryfikować {{.Code}}
   ButtonText: Zweryfikuj numer telefonu
+VerifyEmailOTP:
+  Title: ZITADEL - Zatwierdź hasło jednorazowe
+  PreHeader: Zatwierdź hasło jednorazowe
+  Subject: Zatwierdź hasło jednorazowe
+  Greeting: Witaj {{.DisplayName}},
+  Text: Proszę, użyj przycisku 'Uwierzytelnij' lub skopiuj hasło jednorazowe {{.OTP}} i wklej go na ekran uwierzytelniania, aby uwierzytelnić się w ZITADEL w ciągu najbliższych pięciu minut.
+  ButtonText: Uwierzytelnij
+VerifySMSOTP:
+  Text: Proszę, odwiedź {{ .VerifyURL }} lub skopiuj hasło jednorazowe {{.OTP}} i wklej go na ekran uwierzytelniania, aby uwierzytelnić się w ZITADEL w ciągu najbliższych pięciu minut.
 DomainClaimed:
   Title: ZITADEL - Domena została zarejestrowana
   PreHeader: Zmiana adresu e-mail / nazwy użytkownika
