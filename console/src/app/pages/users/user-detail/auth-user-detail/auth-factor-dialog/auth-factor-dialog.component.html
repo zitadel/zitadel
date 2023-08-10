@@ -7,18 +7,56 @@
 
     <div class="type-selection">
       <button
-        mat-raised-button
-        color="primary"
+        mat-stroked-button
         [disabled]="data.otpDisabled$ | async"
         (click)="selectType(AuthFactorType.OTP)"
         data-e2e="add-factor-otp"
       >
         <div class="otp-btn">
-          <mat-icon class="icon" svgIcon="mdi_radar"></mat-icon>
+          <div class="icon-row">
+            <svg
+              class="authenticator-logo"
+              version="1.1"
+              baseProfile="basic"
+              id="Layer_1"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              x="0px"
+              y="0px"
+              viewBox="0 0 512 512"
+              xml:space="preserve"
+            >
+              <path
+                fill="#1A73E8"
+                d="M440,255.99997v0.00006C440,273.12085,426.12085,287,409.00003,287H302l-46-93.01001l49.6507-85.9951
+	c8.56021-14.82629,27.51834-19.9065,42.34518-11.34724l0.00586,0.0034c14.82776,8.55979,19.90875,27.51928,11.34857,42.34682
+	L309.70001,225h99.30002C426.12085,225,440,238.87917,440,255.99997z"
+              />
+              <path
+                fill="#EA4335"
+                d="M348.00174,415.34897l-0.00586,0.00339c-14.82684,8.55927-33.78497,3.47903-42.34518-11.34723L256,318.01001
+	l-49.65065,85.99509c-8.5602,14.82629-27.51834,19.90652-42.34517,11.34729l-0.00591-0.00342
+	c-14.82777-8.55978-19.90875-27.51929-11.34859-42.34683L202.29999,287L256,285l53.70001,2l49.6503,86.00214
+	C367.91049,387.82968,362.8295,406.78918,348.00174,415.34897z"
+              />
+              <path
+                fill="#FBBC04"
+                d="M256,193.98999L242,232l-39.70001-7l-49.6503-86.00212
+	c-8.56017-14.82755-3.47919-33.78705,11.34859-42.34684l0.00591-0.00341c14.82683-8.55925,33.78497-3.47903,42.34517,11.34726
+	L256,193.98999z"
+              />
+              <path
+                fill="#34A853"
+                d="M248,225l-36,62H102.99997C85.87916,287,72,273.12085,72,256.00003v-0.00006
+	C72,238.87917,85.87916,225,102.99997,225H248z"
+              />
+              <polygon fill="#185DB7" points="309.70001,287 202.29999,287 256,193.98999 " />
+            </svg>
+          </div>
           <span>{{ 'USER.MFA.OTP' | translate }}</span>
         </div>
       </button>
-      <button mat-raised-button color="primary" (click)="selectType(AuthFactorType.U2F)">
+      <button mat-stroked-button (click)="selectType(AuthFactorType.U2F)">
         <div class="u2f-btn">
           <div class="icon-row">
             <i matTooltip="Fingerprint" class="las la-fingerprint"></i>
@@ -26,6 +64,18 @@
             <mat-icon matTooltip="NFC">nfc</mat-icon>
           </div>
           <span>{{ 'USER.MFA.U2F' | translate }}</span>
+        </div>
+      </button>
+      <button [disabled]="!phoneVerified" mat-stroked-button (click)="selectType(AuthFactorType.OTPSMS)">
+        <div class="otp-btn">
+          <div class="icon-row">
+            <i class="las la-sms"></i>
+          </div>
+          <span>{{ 'USER.MFA.OTPSMS' | translate }}</span>
+
+          <cnsl-info-section [type]="InfoSectionType.ALERT" *ngIf="!phoneVerified"
+            ><span>You have to verify your phone to use this method</span></cnsl-info-section
+          >
         </div>
       </button>
     </div>

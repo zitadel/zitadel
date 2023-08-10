@@ -420,6 +420,7 @@
       "U2F_SUCCESS": "Czynnik został pomyślnie dodany!",
       "U2F_ERROR": "Wystąpił błąd podczas konfiguracji!",
       "U2F_NAME": "Nazwa uwierzytelniacza",
+      "OTPSMS": "OTP (hasło jednorazowe) z SMS-em",
       "TYPE": {
         "0": "Nie zdefiniowano MFA",
         "1": "Jednorazowe hasło (OTP)",

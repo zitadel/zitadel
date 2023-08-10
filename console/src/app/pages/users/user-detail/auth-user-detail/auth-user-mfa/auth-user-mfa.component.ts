@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { MatLegacyTable as MatTable, MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
 import { MatSort } from '@angular/material/sort';
@@ -32,6 +32,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
   @ViewChild(MatTable) public table!: MatTable<AuthFactor.AsObject>;
   @ViewChild(MatSort) public sort!: MatSort;
+  @Input() public phoneVerified: boolean = false;
   public dataSource: MatTableDataSource<AuthFactor.AsObject> = new MatTableDataSource<AuthFactor.AsObject>([]);
 
   public AuthFactorState: any = AuthFactorState;
@@ -53,6 +54,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(AuthFactorDialogComponent, {
       data: {
         otpDisabled$: this.otpDisabled$,
+        phoneVerified: this.phoneVerified,
       },
     });
 

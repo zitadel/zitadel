@@ -419,6 +419,7 @@
       "U2F_SUCCESS": "Fattore aggiunto con successo!",
       "U2F_ERROR": "Si \u00e8 verificato un errore durante la configurazione!",
       "U2F_NAME": "Nome dell'autenticatore",
+      "OTPSMS": "OTP (One-Time Password) con SMS",
       "TYPE": {
         "0": "Nessun altro fattore definito",
         "1": "One Time Password (OTP)",

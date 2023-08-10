@@ -420,6 +420,7 @@
       "U2F_SUCCESS": "Facteur ajouté avec succès !",
       "U2F_ERROR": "Une erreur s'est produite pendant l'installation !",
       "U2F_NAME": "Nom de l'authentificateur",
+      "OTPSMS": "OTP (One-Time Password) avec SMS",
       "TYPE": {
         "0": "Pas de MFA défini",
         "1": "Mot de passe à usage unique (OTP)",

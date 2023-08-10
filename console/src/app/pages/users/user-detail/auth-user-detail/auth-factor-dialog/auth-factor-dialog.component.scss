@@ -1,3 +1,7 @@
+.desc {
+  margin-top: 0;
+}
+
 .type-selection {
   display: flex;
   margin: 0 -0.5rem;
@@ -11,11 +15,26 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin: 1rem;
+    margin: 1rem 0;
     box-sizing: border-box;
+    max-width: 180px;
+    white-space: normal;
+    line-height: 1.5rem;
+
+    .authenticator-logo {
+      height: 40px;
+      width: 40px;
+    }
+
+    * {
+      white-space: normal;
+    }
 
     .icon-row {
+      height: 40px;
       display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
     }
   }
 

@@ -8,12 +8,15 @@ import { take } from 'rxjs/operators';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { _base64ToArrayBuffer } from '../../u2f-util';
 import { _arrayBufferToBase64 } from '../u2f_util';
 
 export enum AuthFactorType {
   OTP,
   U2F,
+  OTPSMS,
+  // OTPEMAIL,
 }
 
 @Component({
@@ -32,17 +35,22 @@ export class AuthFactorDialogComponent {
   public u2fLoading: boolean = false;
   public u2fError: string = '';
 
+  public phoneVerified: boolean = false;
+
   AuthFactorType: any = AuthFactorType;
   selectedType!: AuthFactorType;
 
   public copied: string = '';
+  public InfoSectionType: any = InfoSectionType;
   constructor(
     private authService: GrpcAuthService,
     private toast: ToastService,
     private translate: TranslateService,
     public dialogRef: MatDialogRef<AuthFactorDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-  ) {}
+  ) {
+    this.phoneVerified = data.phoneVerified;
+  }
 
   closeDialog(code: string = ''): void {
     this.dialogRef.close(code);
@@ -52,18 +60,19 @@ export class AuthFactorDialogComponent {
     this.selectedType = type;
 
     if (type === AuthFactorType.OTP) {
-      this.authService.addMyMultiFactorOTP().then(
-        (otpresp) => {
+      this.authService
+        .addMyMultiFactorOTP()
+        .then((otpresp) => {
           this.otpurl = otpresp.url;
           this.otpsecret = otpresp.secret;
-        },
-        (error) => {
+        })
+        .catch((error) => {
           this.toast.showError(error);
-        },
-      );
+        });
     } else if (type === AuthFactorType.U2F) {
-      this.authService.addMyMultiFactorU2F().then(
-        (u2fresp) => {
+      this.authService
+        .addMyMultiFactorU2F()
+        .then((u2fresp) => {
           if (u2fresp.key) {
             const credOptions: CredentialCreationOptions = JSON.parse(atob(u2fresp.key?.publicKey as string));
 
@@ -79,11 +88,20 @@ export class AuthFactorDialogComponent {
               this.u2fCredentialOptions = credOptions;
             }
           }
-        },
-        (error) => {
+        })
+        .catch((error) => {
           this.toast.showError(error);
-        },
-      );
+        });
+    } else if (type === AuthFactorType.OTPSMS) {
+      this.authService
+        .addMyAuthFactorOTPSMS()
+        .then(() => {
+          this.dialogRef.close(true);
+        })
+        .catch((error) => {
+          this.dialogRef.close(false);
+          this.toast.showError(error);
+        });
     }
   }
 

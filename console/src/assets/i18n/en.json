@@ -421,6 +421,7 @@
       "U2F_SUCCESS": "Factor added successfully!",
       "U2F_ERROR": "An error during setup occurred!",
       "U2F_NAME": "Authenticator Name",
+      "OTPSMS": "OTP (One-Time Password) with SMS",
       "TYPE": {
         "0": "No MFA defined",
         "1": "One Time Password (OTP)",

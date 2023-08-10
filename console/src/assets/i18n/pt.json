@@ -421,6 +421,7 @@
       "U2F_SUCCESS": "Fator adicionado com sucesso!",
       "U2F_ERROR": "Ocorreu um erro durante a configuração!",
       "U2F_NAME": "Nome do Autenticador",
+      "OTPSMS": "OTP (senha de uso único) com SMS",
       "TYPE": {
         "0": "Nenhum MFA definido",
         "1": "One Time Password (OTP)",

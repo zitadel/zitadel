@@ -16,8 +16,12 @@ import {
 } from 'rxjs/operators';
 
 import {
+  AddMyAuthFactorOTPEmailRequest,
+  AddMyAuthFactorOTPEmailResponse,
   AddMyAuthFactorOTPRequest,
   AddMyAuthFactorOTPResponse,
+  AddMyAuthFactorOTPSMSRequest,
+  AddMyAuthFactorOTPSMSResponse,
   AddMyAuthFactorU2FRequest,
   AddMyAuthFactorU2FResponse,
   AddMyPasswordlessLinkRequest,
@@ -555,6 +559,18 @@ export class GrpcAuthService {
 
   public addMyMultiFactorOTP(): Promise<AddMyAuthFactorOTPResponse.AsObject> {
     return this.grpcService.auth.addMyAuthFactorOTP(new AddMyAuthFactorOTPRequest(), null).then((resp) => resp.toObject());
+  }
+
+  public addMyAuthFactorOTPSMS(): Promise<AddMyAuthFactorOTPSMSResponse.AsObject> {
+    return this.grpcService.auth
+      .addMyAuthFactorOTPSMS(new AddMyAuthFactorOTPSMSRequest(), null)
+      .then((resp) => resp.toObject());
+  }
+
+  public addMyAuthFactorOTPEmail(): Promise<AddMyAuthFactorOTPEmailResponse.AsObject> {
+    return this.grpcService.auth
+      .addMyAuthFactorOTPEmail(new AddMyAuthFactorOTPEmailRequest(), null)
+      .then((resp) => resp.toObject());
   }
 
   public addMyMultiFactorU2F(): Promise<AddMyAuthFactorU2FResponse.AsObject> {

@@ -420,6 +420,7 @@
       "U2F_SUCCESS": "Faktor erfolgreich hinzugefügt!",
       "U2F_ERROR": "Ein Fehler ist aufgetreten!",
       "U2F_NAME": "Authenticator Name",
+      "OTPSMS": "OTP (One-Time Password) mit SMS",
       "TYPE": {
         "0": "Keine MFA definiert",
         "1": "OTP",
