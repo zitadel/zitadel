@@ -33,7 +33,6 @@ jobs:
       - name: Display structure of downloaded files
         if: ${{ !inputs.dry_run }}
         run: |
-          ls -R
           tar -xvf zitadel-linux-amd64/zitadel-linux-amd64.tar
           ls -R
         working-directory: .artifacts
