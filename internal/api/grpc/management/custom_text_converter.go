@@ -68,6 +68,30 @@ func SetVerifyPhoneCustomTextToDomain(msg *mgmt_pb.SetCustomVerifyPhoneMessageTe
 	}
 }
 
+func SetVerifySMSOTPCustomTextToDomain(msg *mgmt_pb.SetCustomVerifySMSOTPMessageTextRequest) *domain.CustomMessageText {
+	langTag := language.Make(msg.Language)
+	return &domain.CustomMessageText{
+		MessageTextType: domain.VerifySMSOTPMessageType,
+		Language:        langTag,
+		Text:            msg.Text,
+	}
+}
+
+func SetVerifyEmailOTPCustomTextToDomain(msg *mgmt_pb.SetCustomVerifyEmailOTPMessageTextRequest) *domain.CustomMessageText {
+	langTag := language.Make(msg.Language)
+	return &domain.CustomMessageText{
+		MessageTextType: domain.VerifyEmailOTPMessageType,
+		Language:        langTag,
+		Title:           msg.Title,
+		PreHeader:       msg.PreHeader,
+		Subject:         msg.Subject,
+		Greeting:        msg.Greeting,
+		Text:            msg.Text,
+		ButtonText:      msg.ButtonText,
+		FooterText:      msg.FooterText,
+	}
+}
+
 func SetDomainClaimedCustomTextToDomain(msg *mgmt_pb.SetCustomDomainClaimedMessageTextRequest) *domain.CustomMessageText {
 	langTag := language.Make(msg.Language)
 	return &domain.CustomMessageText{

@@ -1293,6 +1293,8 @@
         "INIT": "Initialisierung",
         "VE": "Emailverifikation",
         "VP": "Telefonnummerverifikation",
+        "VSO": "SMS-OTP überprüfen",
+        "VEO": "E-Mail-OTP überprüfen",
         "PR": "Passwort Wiederherstellung",
         "DC": "Domainbeanspruchung",
         "PL": "Passwortlos",
@@ -1313,7 +1315,9 @@
         "verifiedPhone": "Verifizierte Telefonnummer",
         "changedate": "Änderungsdatum",
         "username": "Username",
-        "tempUsername": "Temp. Username"
+        "tempUsername": "Temp. Username",
+        "otp": "Einmalpasswort",
+        "verifyUrl": "URL zur Überprüfung des Einmalpassworts"
       },
       "TOAST": {
         "UPDATED": "Benutzerdefinierte Texte gespeichert."

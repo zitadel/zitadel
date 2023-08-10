@@ -204,6 +204,102 @@ func (s *Server) ResetCustomVerifyPhoneMessageTextToDefault(ctx context.Context,
 	}, nil
 }
 
+func (s *Server) GetDefaultVerifySMSOTPMessageText(ctx context.Context, req *admin_pb.GetDefaultVerifySMSOTPMessageTextRequest) (*admin_pb.GetDefaultVerifySMSOTPMessageTextResponse, error) {
+	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx, domain.VerifySMSOTPMessageType, req.Language)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetDefaultVerifySMSOTPMessageTextResponse{
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
+	}, nil
+}
+
+func (s *Server) GetCustomVerifySMSOTPMessageText(ctx context.Context, req *admin_pb.GetCustomVerifySMSOTPMessageTextRequest) (*admin_pb.GetCustomVerifySMSOTPMessageTextResponse, error) {
+	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetInstance(ctx).InstanceID(), domain.VerifySMSOTPMessageType, req.Language, false)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetCustomVerifySMSOTPMessageTextResponse{
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
+	}, nil
+}
+
+func (s *Server) SetDefaultVerifySMSOTPMessageText(ctx context.Context, req *admin_pb.SetDefaultVerifySMSOTPMessageTextRequest) (*admin_pb.SetDefaultVerifySMSOTPMessageTextResponse, error) {
+	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).InstanceID(), SetVerifySMSOTPCustomTextToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.SetDefaultVerifySMSOTPMessageTextResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) ResetCustomVerifySMSOTPMessageTextToDefault(ctx context.Context, req *admin_pb.ResetCustomVerifySMSOTPMessageTextToDefaultRequest) (*admin_pb.ResetCustomVerifySMSOTPMessageTextToDefaultResponse, error) {
+	result, err := s.command.RemoveInstanceMessageTexts(ctx, domain.VerifySMSOTPMessageType, language.Make(req.Language))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.ResetCustomVerifySMSOTPMessageTextToDefaultResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) GetDefaultVerifyEmailOTPMessageText(ctx context.Context, req *admin_pb.GetDefaultVerifyEmailOTPMessageTextRequest) (*admin_pb.GetDefaultVerifyEmailOTPMessageTextResponse, error) {
+	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx, domain.VerifyEmailOTPMessageType, req.Language)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetDefaultVerifyEmailOTPMessageTextResponse{
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
+	}, nil
+}
+
+func (s *Server) GetCustomVerifyEmailOTPMessageText(ctx context.Context, req *admin_pb.GetCustomVerifyEmailOTPMessageTextRequest) (*admin_pb.GetCustomVerifyEmailOTPMessageTextResponse, error) {
+	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetInstance(ctx).InstanceID(), domain.VerifyEmailOTPMessageType, req.Language, false)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetCustomVerifyEmailOTPMessageTextResponse{
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
+	}, nil
+}
+
+func (s *Server) SetDefaultVerifyEmailOTPMessageText(ctx context.Context, req *admin_pb.SetDefaultVerifyEmailOTPMessageTextRequest) (*admin_pb.SetDefaultVerifyEmailOTPMessageTextResponse, error) {
+	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).InstanceID(), SetVerifyEmailOTPCustomTextToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.SetDefaultVerifyEmailOTPMessageTextResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) ResetCustomVerifyEmailOTPMessageTextToDefault(ctx context.Context, req *admin_pb.ResetCustomVerifyEmailOTPMessageTextToDefaultRequest) (*admin_pb.ResetCustomVerifyEmailOTPMessageTextToDefaultResponse, error) {
+	result, err := s.command.RemoveInstanceMessageTexts(ctx, domain.VerifyEmailOTPMessageType, language.Make(req.Language))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.ResetCustomVerifyEmailOTPMessageTextToDefaultResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
 func (s *Server) GetDefaultDomainClaimedMessageText(ctx context.Context, req *admin_pb.GetDefaultDomainClaimedMessageTextRequest) (*admin_pb.GetDefaultDomainClaimedMessageTextResponse, error) {
 	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx, domain.DomainClaimedMessageType, req.Language)
 	if err != nil {
