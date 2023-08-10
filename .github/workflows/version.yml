@@ -10,9 +10,9 @@ on:
         required: true
         type: boolean
     outputs:
-        version: 
+        version:
             value: ${{ jobs.generate.outputs.version }}
-        published: 
+        published:
             value: ${{jobs.generate.outputs.published }}
 
 jobs:
@@ -24,10 +24,10 @@ jobs:
       version: ${{ steps.output.outputs.VERSION }}
       published: ${{ steps.semantic.outputs.new_release_published }}
     steps:
-    - 
+    -
       name: Source checkout
       uses: actions/checkout@v3
-    - 
+    -
       name: Semantic Release
       uses: cycjimmy/semantic-release-action@v3
       id: semantic
@@ -46,7 +46,7 @@ jobs:
 
   build:
     needs: generate
-    if: ${{ jobs.generate.outputs.published }}
+    if: ${{ needs.generate.outputs.published }}
     name: upload assets
     runs-on: ubuntu-22.04
     strategy:
