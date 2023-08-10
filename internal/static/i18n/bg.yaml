@@ -496,8 +496,8 @@ Errors:
     Terminated: Сесията вече е прекратена
     Token:
       Invalid: Токенът на сесията е невалиден
-    Passkey:
-      NoChallenge: Сесия без предизвикателство за парола
+    WebAuthN:
+      NoChallenge: Сесия без WebAuthN предизвикателство
   Intent:
     IDPMissing: IDP липсва в заявката
     SuccessURLMissing: В заявката липсва URL адрес за успех

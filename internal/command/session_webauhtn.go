@@ -67,7 +67,7 @@ func (c *Commands) CheckWebAuthN(credentialAssertionData json.Marshaler) Session
 		}
 		challenge := cmd.sessionWriteModel.WebAuthNChallenge
 		if challenge == nil {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Ioqu5", "Errors.Session.Passkey.NoChallenge") // TODO i18N
+			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Ioqu5", "Errors.Session.WebAuthN.NoChallenge")
 		}
 		webAuthNTokens, err := cmd.getHumanWebAuthNTokens(ctx, challenge.UserVerification)
 		if err != nil {
