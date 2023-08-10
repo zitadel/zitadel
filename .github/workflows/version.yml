@@ -27,9 +27,11 @@ jobs:
       - name: Source checkout
         uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
+        if: ${{ inputs.dry_run }} == false
         with:
           path: .artifacts
       - name: Display structure of downloaded files
+        if: ${{ inputs.dry_run }} == false
         run: ls -R
         working-directory: .artifacts
       - name: Semantic Release
