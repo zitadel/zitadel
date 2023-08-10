@@ -26,6 +26,15 @@ VerifyPhone:
   Greeting: Bonjour {{.DisplayName}},
   Text: Un nouveau numéro de téléphone a été ajouté. Veuillez utiliser le code suivant pour le vérifier {{.Code}}
   ButtonText: Vérifier le téléphone
+VerifyEmailOTP:
+  Title: ZITADEL - Vérifie le mot de passe à usage unique
+  PreHeader: Vérifie le mot de passe à usage unique
+  Subject: Vérifie le mot de passe à usage unique
+  Greeting: Bonjour {{.DisplayName}},
+  Text: Utilise le bouton 'Authentifier' ou copie le mot de passe à usage unique {{.OTP}} et colle-le à l'écran d'authentification pour t'authentifier sur ZITADEL dans les cinq prochaines minutes.
+  ButtonText: Authentifier
+VerifySMSOTP:
+  Text: Visite {{ .VerifyURL }} ou copie le mot de passe à usage unique {{.OTP}} et colle-le à l'écran d'authentification pour t'authentifier sur ZITADEL dans les cinq prochaines minutes.
 DomainClaimed:
   Title: ZITADEL - Le domaine a été réclamé
   PreHeader: Modifier l'email / le nom d'utilisateur

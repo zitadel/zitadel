@@ -57,7 +57,7 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 				resourceOwner: "org1",
 				authenticator: domain.AuthenticatorAttachmentCrossPlattform,
 			},
-			wantErr: caos_errs.ThrowUnauthenticated(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
 		},
 		{
 			name: "get human passwordless error",

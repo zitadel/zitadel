@@ -158,7 +158,7 @@ func (u *UserView) MFATypesSetupPossible(level domain.MFALevel, policy *domain.L
 				switch mfaType {
 				case domain.SecondFactorTypeTOTP:
 					if u.OTPState != MFAStateReady {
-						types = append(types, domain.MFATypeOTP)
+						types = append(types, domain.MFATypeTOTP)
 					}
 				case domain.SecondFactorTypeU2F:
 					types = append(types, domain.MFATypeU2F)
@@ -183,7 +183,7 @@ func (u *UserView) MFATypesAllowed(level domain.MFALevel, policy *domain.LoginPo
 				switch mfaType {
 				case domain.SecondFactorTypeTOTP:
 					if u.OTPState == MFAStateReady {
-						types = append(types, domain.MFATypeOTP)
+						types = append(types, domain.MFATypeTOTP)
 					}
 				case domain.SecondFactorTypeU2F:
 					if u.IsU2FReady() {

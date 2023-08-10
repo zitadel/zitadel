@@ -1294,6 +1294,8 @@
         "INIT": "Inicialización",
         "VE": "Verificación de email",
         "VP": "Verificación de teléfono",
+        "VSO": "Verificar OTP de SMS",
+        "VEO": "Verificar OTP de correo electrónico",
         "PR": "Restablecimiento de contraseña",
         "DC": "Reclamar un dominio",
         "PL": "Acceso sin contraseña",
@@ -1314,7 +1316,9 @@
         "verifiedPhone": "Teléfono verificado",
         "changedate": "Cambiar fecha",
         "username": "Nombre de usuario",
-        "tempUsername": "Nombre de usuario temporal"
+        "tempUsername": "Nombre de usuario temporal",
+        "otp": "Contraseña de un solo uso",
+        "verifyUrl": "URL para verificar la contraseña de un solo uso"
       },
       "TOAST": {
         "UPDATED": "Textos personalizados guardados."

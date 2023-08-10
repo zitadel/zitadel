@@ -208,6 +208,42 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "reduceExternalIDMigrated",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserIDPExternalIDMigratedType),
+					user.AggregateType,
+					[]byte(`{
+	"idpConfigId": "idp-config-id",
+    "previousId": "previous-id",
+	"newId": "new-id"
+}`),
+				), eventstore.GenericEventMapper[user.UserIDPExternalIDMigratedEvent]),
+			},
+			reduce: (&idpUserLinkProjection{}).reduceExternalIDMigrated,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_user_links3 SET (change_date, sequence, external_user_id) = ($1, $2, $3) WHERE (idp_id = $4) AND (user_id = $5) AND (external_user_id = $6) AND (instance_id = $7)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"new-id",
+								"idp-config-id",
+								"agg-id",
+								"previous-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "org IDPConfigRemovedEvent",
 			args: args{
 				event: getEvent(testEvent(
