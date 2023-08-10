@@ -32,23 +32,23 @@ jobs:
     -
       name: Unpack executable
       run: |
-        [ -f .artifacts/zitadel-linux-amd64.tar ] && tar -xvf .artifacts/zitadel-linux-amd64.tar
-        [ -d zitadel-linux-amd64 ] && tar -czvf zitadel-linux-amd64.tar.gz zitadel-linux-amd64
+        [ -f .artifacts/zitadel-linux-amd64.tar ] && tar -xvf .artifacts/zitadel-linux-amd64.tar || true
+        [ -d zitadel-linux-amd64 ] && tar -czvf zitadel-linux-amd64.tar.gz zitadel-linux-amd64 || true
         
-        [ -f .artifacts/zitadel-linux-arm64.tar ] && tar -xvf .artifacts/zitadel-linux-arm64.tar
-        [ -d zitadel-linux-arm64 ] && tar -czvf zitadel-linux-arm64.tar.gz zitadel-linux-arm64
+        [ -f .artifacts/zitadel-linux-arm64.tar ] && tar -xvf .artifacts/zitadel-linux-arm64.tar || true
+        [ -d zitadel-linux-arm64 ] && tar -czvf zitadel-linux-arm64.tar.gz zitadel-linux-arm64 || true
         
-        [ -f .artifacts/zitadel-windows-amd64.tar ] && tar -xvf .artifacts/zitadel-windows-amd64.tar
-        [ -d zitadel-windows-amd64 ] && tar -czvf zitadel-windows-amd64.tar.gz zitadel-windows-amd64
+        [ -f .artifacts/zitadel-windows-amd64.tar ] && tar -xvf .artifacts/zitadel-windows-amd64.tar || true
+        [ -d zitadel-windows-amd64 ] && tar -czvf zitadel-windows-amd64.tar.gz zitadel-windows-amd64 || true
         
-        [ -f .artifacts/zitadel-windows-arm64.tar ] && tar -xvf .artifacts/zitadel-windows-arm64.tar
-        [ -d zitadel-windows-arm64 ] && tar -czvf zitadel-windows-arm64.tar.gz zitadel-windows-arm64
+        [ -f .artifacts/zitadel-windows-arm64.tar ] && tar -xvf .artifacts/zitadel-windows-arm64.tar || true
+        [ -d zitadel-windows-arm64 ] && tar -czvf zitadel-windows-arm64.tar.gz zitadel-windows-arm64 || true
         
-        [ -f .artifacts/zitadel-darwin-amd64.tar ] && tar -xvf .artifacts/zitadel-darwin-amd64.tar
-        [ -d zitadel-darwin-amd64 ] && tar -czvf zitadel-darwin-amd64.tar.gz zitadel-darwin-amd64
+        [ -f .artifacts/zitadel-darwin-amd64.tar ] && tar -xvf .artifacts/zitadel-darwin-amd64.tar || true
+        [ -d zitadel-darwin-amd64 ] && tar -czvf zitadel-darwin-amd64.tar.gz zitadel-darwin-amd64 || true
         
-        [ -f .artifacts/zitadel-darwin-arm64.tar ] && tar -xvf .artifacts/zitadel-darwin-arm64.tar
-        [ -d zitadel-darwin-arm64 ] && tar -czvf zitadel-darwin-arm64.tar.gz zitadel-darwin-arm64
+        [ -f .artifacts/zitadel-darwin-arm64.tar ] && tar -xvf .artifacts/zitadel-darwin-arm64.tar || true
+        [ -d zitadel-darwin-arm64 ] && tar -czvf zitadel-darwin-arm64.tar.gz zitadel-darwin-arm64 || true
     - 
       name: Source checkout
       uses: actions/checkout@v3
