@@ -74,7 +74,7 @@
           <span>{{ 'USER.MFA.OTPSMS' | translate }}</span>
 
           <cnsl-info-section [type]="InfoSectionType.ALERT" *ngIf="!phoneVerified"
-            ><span>You have to verify your phone to use this method</span></cnsl-info-section
+            ><span>{{ 'USER.MFA.OTPSMSPHONEMUSTBEVERIFIED' }}</span></cnsl-info-section
           >
         </div>
       </button>

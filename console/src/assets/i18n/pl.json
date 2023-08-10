@@ -421,6 +421,9 @@
       "U2F_ERROR": "Wystąpił błąd podczas konfiguracji!",
       "U2F_NAME": "Nazwa uwierzytelniacza",
       "OTPSMS": "OTP (hasło jednorazowe) z SMS-em",
+      "SETUPOTPSMSDESCRIPTION": "Czy chcesz ustawić ten numer telefonu jako drugi czynnik OTP (hasło jednorazowe)?",
+      "OTPSMSSUCCESS": "Pomyślnie skonfigurowano współczynnik OTP.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Aby skorzystać z tej metody, Twój telefon musi zostać zweryfikowany.",
       "TYPE": {
         "0": "Nie zdefiniowano MFA",
         "1": "Jednorazowe hasło (OTP)",
@@ -587,7 +590,8 @@
         "EDITVALUE": "Numer telefonu",
         "EDITDESC": "Wprowadź nowy numer telefonu poniżej.",
         "DELETETITLE": "Usuń numer telefonu",
-        "DELETEDESC": "Czy na pewno chcesz usunąć numer telefonu"
+        "DELETEDESC": "Czy na pewno chcesz usunąć numer telefonu",
+        "OTPSMSREMOVALWARNING": "To konto używa tego numeru telefonu jako drugiego czynnika. Po przejściu dalej nie będziesz mógł z niego korzystać."
       },
       "RESENDCODE": "Wyślij kod ponownie",
       "ENTERCODE": "Zweryfikuj",

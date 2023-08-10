@@ -422,6 +422,9 @@
       "U2F_ERROR": "An error during setup occurred!",
       "U2F_NAME": "Authenticator Name",
       "OTPSMS": "OTP (One-Time Password) with SMS",
+      "SETUPOTPSMSDESCRIPTION": "Do you want to setup this phonenumber as OTP (One-Time password) second factor?",
+      "OTPSMSSUCCESS": "OTP factor set up with success.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Your phone must be verified in order to use this method.",
       "TYPE": {
         "0": "No MFA defined",
         "1": "One Time Password (OTP)",
@@ -588,7 +591,8 @@
         "EDITVALUE": "Phone number",
         "EDITDESC": "Enter the new phone number in the field below.",
         "DELETETITLE": "Delete phone number",
-        "DELETEDESC": "Do you really want to delete the phone number"
+        "DELETEDESC": "Do you really want to delete the phone number",
+        "OTPSMSREMOVALWARNING": "This account uses this phone number as second factor. You won't be able to use it after you proceed."
       },
       "RESENDCODE": "Resend Code",
       "ENTERCODE": "Verify",

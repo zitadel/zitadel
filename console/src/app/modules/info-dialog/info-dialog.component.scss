@@ -1,0 +1,36 @@
+.title {
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+.icon-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+  margin: 1rem;
+  align-items: center;
+
+  .icon {
+    font-size: 3rem;
+  }
+}
+
+.desc {
+  font-size: 0.9rem;
+}
+
+.action {
+  display: flex;
+
+  button {
+    border-radius: 0.5rem;
+  }
+
+  .ok-button {
+    margin-left: 0.5rem;
+  }
+
+  .fill-space {
+    flex: 1;
+  }
+}

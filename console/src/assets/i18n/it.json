@@ -420,6 +420,9 @@
       "U2F_ERROR": "Si \u00e8 verificato un errore durante la configurazione!",
       "U2F_NAME": "Nome dell'autenticatore",
       "OTPSMS": "OTP (One-Time Password) con SMS",
+      "SETUPOTPSMSDESCRIPTION": "Vuoi impostare questo numero di telefono come secondo fattore OTP (One-Time password)?",
+      "OTPSMSSUCCESS": "Fattore OTP impostato con successo.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Il tuo telefono deve essere verificato per utilizzare questo metodo.",
       "TYPE": {
         "0": "Nessun altro fattore definito",
         "1": "One Time Password (OTP)",
@@ -586,7 +589,8 @@
         "EDITVALUE": "Numero di telefono",
         "EDITDESC": "Inserisci il nuovo numero di telefono nel campo sottostante.",
         "DELETETITLE": "Rimuovi il numero di telefono",
-        "DELETEDESC": "Vuoi davvero rimuovere il numero di telefono"
+        "DELETEDESC": "Vuoi davvero rimuovere il numero di telefono",
+        "OTPSMSREMOVALWARNING": "Questo account utilizza questo numero di telefono come secondo fattore. Non sarai in grado di usarlo dopo aver proceduto."
       },
       "RESENDCODE": "Reinvia il codice",
       "ENTERCODE": "Verifica",

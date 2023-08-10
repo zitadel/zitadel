@@ -97,6 +97,12 @@ export class AuthFactorDialogComponent {
         .addMyAuthFactorOTPSMS()
         .then(() => {
           this.dialogRef.close(true);
+          this.translate
+            .get('USER.MFA.OTPSMSSUCCESS')
+            .pipe(take(1))
+            .subscribe((msg) => {
+              this.toast.showInfo(msg);
+            });
         })
         .catch((error) => {
           this.dialogRef.close(false);

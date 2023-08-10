@@ -422,6 +422,9 @@
       "U2F_ERROR": "Ocorreu um erro durante a configuração!",
       "U2F_NAME": "Nome do Autenticador",
       "OTPSMS": "OTP (senha de uso único) com SMS",
+      "SETUPOTPSMSDESCRIPTION": "Deseja configurar este número de telefone como segundo fator OTP (senha de uso único)?",
+      "OTPSMSSUCCESS": "Fator OTP configurado com sucesso.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Seu telefone deve ser verificado para usar este método.",
       "TYPE": {
         "0": "Nenhum MFA definido",
         "1": "One Time Password (OTP)",
@@ -588,7 +591,8 @@
         "EDITVALUE": "Número de Telefone",
         "EDITDESC": "Digite o novo número de telefone no campo abaixo.",
         "DELETETITLE": "Excluir número de telefone",
-        "DELETEDESC": "Você realmente deseja excluir o número de telefone?"
+        "DELETEDESC": "Você realmente deseja excluir o número de telefone?",
+        "OTPSMSREMOVALWARNING": "Esta conta usa este número de telefone como segundo fator. Você não poderá usá-lo depois de continuar."
       },
       "RESENDCODE": "Reenviar Código",
       "ENTERCODE": "Verificar",
