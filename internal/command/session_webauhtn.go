@@ -75,15 +75,15 @@ func (c *Commands) CheckWebAuthN(credentialAssertionData json.Marshaler) Session
 		}
 		webAuthN := challenge.WebAuthNLogin(webAuthNTokens.human, credentialAssertionData)
 
-		keyID, signCount, err := c.webauthnConfig.FinishLogin(ctx, webAuthNTokens.human, webAuthN, credentialAssertionData, webAuthNTokens.tokens...)
-		if err != nil && keyID == nil {
+		credential, err := c.webauthnConfig.FinishLogin(ctx, webAuthNTokens.human, webAuthN, credentialAssertionData, webAuthNTokens.tokens...)
+		if err != nil && (credential == nil || credential.ID == nil) {
 			return err
 		}
-		_, token := domain.GetTokenByKeyID(webAuthNTokens.tokens, keyID)
+		_, token := domain.GetTokenByKeyID(webAuthNTokens.tokens, credential.ID)
 		if token == nil {
 			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Aej7i", "Errors.User.WebAuthN.NotFound")
 		}
-		cmd.WebAuthNChecked(ctx, cmd.now(), token.WebAuthNTokenID, signCount)
+		cmd.WebAuthNChecked(ctx, cmd.now(), token.WebAuthNTokenID, credential.Authenticator.SignCount, credential.Flags.UserVerified)
 		return nil
 	}
 }

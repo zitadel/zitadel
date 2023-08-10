@@ -70,7 +70,7 @@ func Test_sessionsToPb(t *testing.T) {
 			},
 			Metadata: map[string][]byte{"hello": []byte("world")},
 		},
-		{ // passkey factor
+		{ // webAuthN factor
 			ID:            "999",
 			CreationDate:  now,
 			ChangeDate:    now,
@@ -85,8 +85,9 @@ func Test_sessionsToPb(t *testing.T) {
 				DisplayName:   "donald duck",
 				ResourceOwner: "org1",
 			},
-			PasskeyFactor: query.SessionPasskeyFactor{
-				PasskeyCheckedAt: past,
+			WebAuthNFactor: query.SessionWebAuthNFactor{
+				WebAuthNCheckedAt: past,
+				UserVerified:      true,
 			},
 			Metadata: map[string][]byte{"hello": []byte("world")},
 		},
@@ -136,7 +137,7 @@ func Test_sessionsToPb(t *testing.T) {
 			},
 			Metadata: map[string][]byte{"hello": []byte("world")},
 		},
-		{ // passkey factor
+		{ // webAuthN factor
 			Id:           "999",
 			CreationDate: timestamppb.New(now),
 			ChangeDate:   timestamppb.New(now),
@@ -149,8 +150,9 @@ func Test_sessionsToPb(t *testing.T) {
 					DisplayName:    "donald duck",
 					OrganisationId: "org1",
 				},
-				Passkey: &session.PasskeyFactor{
-					VerifiedAt: timestamppb.New(past),
+				WebAuthN: &session.WebAuthNFactor{
+					VerifiedAt:   timestamppb.New(past),
+					UserVerified: true,
 				},
 			},
 			Metadata: map[string][]byte{"hello": []byte("world")},

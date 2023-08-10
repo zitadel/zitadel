@@ -118,9 +118,8 @@ func factorsToPb(s *query.Session) *session.Factors {
 	return &session.Factors{
 		User:     user,
 		Password: passwordFactorToPb(s.PasswordFactor),
-		Passkey:  passkeyFactorToPb(s.PasskeyFactor),
+		WebAuthN: webAuthNFactorToPb(s.WebAuthNFactor),
 		Intent:   intentFactorToPb(s.IntentFactor),
-		U2F:      u2FactorToPb(s.U2Factor),
 	}
 }
 
@@ -142,21 +141,13 @@ func intentFactorToPb(factor query.SessionIntentFactor) *session.IntentFactor {
 	}
 }
 
-func passkeyFactorToPb(factor query.SessionPasskeyFactor) *session.PasskeyFactor {
-	if factor.PasskeyCheckedAt.IsZero() {
+func webAuthNFactorToPb(factor query.SessionWebAuthNFactor) *session.WebAuthNFactor {
+	if factor.WebAuthNCheckedAt.IsZero() {
 		return nil
 	}
-	return &session.PasskeyFactor{
-		VerifiedAt: timestamppb.New(factor.PasskeyCheckedAt),
-	}
-}
-
-func u2FactorToPb(factor query.SessionU2Factor) *session.U2Factor {
-	if factor.U2FCheckedAt.IsZero() {
-		return nil
-	}
-	return &session.U2Factor{
-		VerifiedAt: timestamppb.New(factor.U2FCheckedAt),
+	return &session.WebAuthNFactor{
+		VerifiedAt:   timestamppb.New(factor.WebAuthNCheckedAt),
+		UserVerified: factor.UserVerified,
 	}
 }
 

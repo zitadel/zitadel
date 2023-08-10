@@ -160,9 +160,9 @@ func (s *SessionCommands) WebAuthNChallenged(ctx context.Context, challenge stri
 	s.eventCommands = append(s.eventCommands, session.NewWebAuthNChallengedEvent(ctx, s.sessionWriteModel.aggregate, challenge, allowedCrentialIDs, userVerification, rpid))
 }
 
-func (s *SessionCommands) WebAuthNChecked(ctx context.Context, checkedAt time.Time, tokenID string, signCount uint32) {
+func (s *SessionCommands) WebAuthNChecked(ctx context.Context, checkedAt time.Time, tokenID string, signCount uint32, userVerified bool) {
 	s.eventCommands = append(s.eventCommands,
-		session.NewWebAuthNCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt, s.sessionWriteModel.WebAuthNChallenge.UserVerification),
+		session.NewWebAuthNCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt, userVerified),
 	)
 	if s.sessionWriteModel.WebAuthNChallenge.UserVerification == domain.UserVerificationRequirementRequired {
 		s.eventCommands = append(s.eventCommands,

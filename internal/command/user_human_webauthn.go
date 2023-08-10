@@ -454,12 +454,12 @@ func (c *Commands) finishWebAuthNLogin(ctx context.Context, userID, resourceOwne
 	if err != nil {
 		return nil, nil, 0, err
 	}
-	keyID, signCount, err := c.webauthnConfig.FinishLogin(ctx, human, webAuthN, credentialData, tokens...)
-	if err != nil && keyID == nil {
+	credential, err := c.webauthnConfig.FinishLogin(ctx, human, webAuthN, credentialData, tokens...)
+	if err != nil && (credential == nil || credential.ID == nil) {
 		return nil, nil, 0, err
 	}
 
-	_, token := domain.GetTokenByKeyID(tokens, keyID)
+	_, token := domain.GetTokenByKeyID(tokens, credential.ID)
 	if token == nil {
 		return nil, nil, 0, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3b7zs", "Errors.User.WebAuthN.NotFound")
 	}
@@ -470,7 +470,7 @@ func (c *Commands) finishWebAuthNLogin(ctx context.Context, userID, resourceOwne
 	}
 	userAgg := UserAggregateFromWriteModel(&writeModel.WriteModel)
 
-	return userAgg, token, signCount, nil
+	return userAgg, token, credential.Authenticator.SignCount, nil
 }
 
 func (c *Commands) HumanRemoveU2F(ctx context.Context, userID, webAuthNID, resourceOwner string) (*domain.ObjectDetails, error) {

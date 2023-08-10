@@ -29,15 +29,15 @@ func (p *WebAuthNChallengeModel) WebAuthNLogin(human *domain.Human, credentialAs
 type SessionWriteModel struct {
 	eventstore.WriteModel
 
-	TokenID           string
-	UserID            string
-	UserCheckedAt     time.Time
-	PasswordCheckedAt time.Time
-	IntentCheckedAt   time.Time
-	PasskeyCheckedAt  time.Time
-	U2FCheckedAt      time.Time
-	Metadata          map[string][]byte
-	State             domain.SessionState
+	TokenID              string
+	UserID               string
+	UserCheckedAt        time.Time
+	PasswordCheckedAt    time.Time
+	IntentCheckedAt      time.Time
+	WebAuthNCheckedAt    time.Time
+	WebAuthNUserVerified bool
+	Metadata             map[string][]byte
+	State                domain.SessionState
 
 	WebAuthNChallenge *WebAuthNChallengeModel
 
@@ -130,12 +130,9 @@ func (wm *SessionWriteModel) reduceWebAuthNChallenged(e *session.WebAuthNChallen
 }
 
 func (wm *SessionWriteModel) reduceWebAuthNChecked(e *session.WebAuthNCheckedEvent) {
-	if wm.WebAuthNChallenge.UserVerification == domain.UserVerificationRequirementRequired {
-		wm.PasskeyCheckedAt = e.CheckedAt
-	} else {
-		wm.U2FCheckedAt = e.CheckedAt
-	}
 	wm.WebAuthNChallenge = nil
+	wm.WebAuthNCheckedAt = e.CheckedAt
+	wm.WebAuthNUserVerified = e.UserVerified
 }
 
 func (wm *SessionWriteModel) reduceTokenSet(e *session.TokenSetEvent) {
@@ -151,8 +148,7 @@ func (wm *SessionWriteModel) AuthenticationTime() time.Time {
 	var authTime time.Time
 	for _, check := range []time.Time{
 		wm.PasswordCheckedAt,
-		wm.PasskeyCheckedAt,
-		wm.U2FCheckedAt,
+		wm.WebAuthNCheckedAt,
 		wm.IntentCheckedAt,
 		// TODO: add OTP check https://github.com/zitadel/zitadel/issues/5477
 		// TODO: add OTP (sms and email) check https://github.com/zitadel/zitadel/issues/6224
@@ -170,11 +166,12 @@ func (wm *SessionWriteModel) AuthMethodTypes() []domain.UserAuthMethodType {
 	if !wm.PasswordCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypePassword)
 	}
-	if !wm.PasskeyCheckedAt.IsZero() {
-		types = append(types, domain.UserAuthMethodTypePasswordless)
-	}
-	if !wm.U2FCheckedAt.IsZero() {
-		types = append(types, domain.UserAuthMethodTypeU2F)
+	if !wm.WebAuthNCheckedAt.IsZero() && wm.WebAuthNUserVerified {
+		if wm.WebAuthNUserVerified {
+			types = append(types, domain.UserAuthMethodTypePasswordless)
+		} else {
+			types = append(types, domain.UserAuthMethodTypeU2F)
+		}
 	}
 	if !wm.IntentCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypeIDP)

@@ -126,14 +126,14 @@ func TestSessionProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance reduceWebAuthNChecked passkey",
+			name: "instance reduceWebAuthNChecked",
 			args: args{
 				event: getEvent(testEvent(
 					session.WebAuthNCheckedType,
 					session.AggregateType,
 					[]byte(`{
 						"checkedAt": "2023-05-04T00:00:00Z",
-						"userVerification": 1
+						"userVerified": true
 					}`),
 				), eventstore.GenericEventMapper[session.WebAuthNCheckedEvent]),
 			},
@@ -145,44 +145,12 @@ func TestSessionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.sessions4 SET (change_date, sequence, passkey_checked_at) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.sessions4 SET (change_date, sequence, webauthn_checked_at, webauthn_user_verified) = ($1, $2, $3, $4) WHERE (id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
 								time.Date(2023, time.May, 4, 0, 0, 0, 0, time.UTC),
-								"agg-id",
-								"instance-id",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "instance reduceWebAuthNChecked u2f",
-			args: args{
-				event: getEvent(testEvent(
-					session.WebAuthNCheckedType,
-					session.AggregateType,
-					[]byte(`{
-						"checkedAt": "2023-05-04T00:00:00Z",
-						"userVerification": 3
-					}`),
-				), eventstore.GenericEventMapper[session.WebAuthNCheckedEvent]),
-			},
-			reduce: (&sessionProjection{}).reduceWebAuthNChecked,
-			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("session"),
-				sequence:         15,
-				previousSequence: 10,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE projections.sessions4 SET (change_date, sequence, u2f_checked_at) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
-								anyArg{},
-								anyArg{},
-								time.Date(2023, time.May, 4, 0, 0, 0, 0, time.UTC),
+								true,
 								"agg-id",
 								"instance-id",
 							},

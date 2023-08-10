@@ -16,22 +16,22 @@ import (
 const (
 	SessionsProjectionTable = "projections.sessions4"
 
-	SessionColumnID                = "id"
-	SessionColumnCreationDate      = "creation_date"
-	SessionColumnChangeDate        = "change_date"
-	SessionColumnSequence          = "sequence"
-	SessionColumnState             = "state"
-	SessionColumnResourceOwner     = "resource_owner"
-	SessionColumnInstanceID        = "instance_id"
-	SessionColumnCreator           = "creator"
-	SessionColumnUserID            = "user_id"
-	SessionColumnUserCheckedAt     = "user_checked_at"
-	SessionColumnPasswordCheckedAt = "password_checked_at"
-	SessionColumnIntentCheckedAt   = "intent_checked_at"
-	SessionColumnPasskeyCheckedAt  = "passkey_checked_at"
-	SessionColumnU2FCheckedAt      = "u2f_checked_at"
-	SessionColumnMetadata          = "metadata"
-	SessionColumnTokenID           = "token_id"
+	SessionColumnID                   = "id"
+	SessionColumnCreationDate         = "creation_date"
+	SessionColumnChangeDate           = "change_date"
+	SessionColumnSequence             = "sequence"
+	SessionColumnState                = "state"
+	SessionColumnResourceOwner        = "resource_owner"
+	SessionColumnInstanceID           = "instance_id"
+	SessionColumnCreator              = "creator"
+	SessionColumnUserID               = "user_id"
+	SessionColumnUserCheckedAt        = "user_checked_at"
+	SessionColumnPasswordCheckedAt    = "password_checked_at"
+	SessionColumnIntentCheckedAt      = "intent_checked_at"
+	SessionColumnWebAuthNCheckedAt    = "webauthn_checked_at"
+	SessionColumnWebAuthNUserVerified = "webauthn_user_verified"
+	SessionColumnMetadata             = "metadata"
+	SessionColumnTokenID              = "token_id"
 )
 
 type sessionProjection struct {
@@ -56,8 +56,8 @@ func newSessionProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(SessionColumnUserCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnPasswordCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnIntentCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
-			crdb.NewColumn(SessionColumnPasskeyCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
-			crdb.NewColumn(SessionColumnU2FCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
+			crdb.NewColumn(SessionColumnWebAuthNCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
+			crdb.NewColumn(SessionColumnWebAuthNUserVerified, crdb.ColumnTypeBool, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnMetadata, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnTokenID, crdb.ColumnTypeText, crdb.Nullable()),
 		},
@@ -214,18 +214,13 @@ func (p *sessionProjection) reduceWebAuthNChecked(event eventstore.Event) (*hand
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-WieM4", "reduce.wrong.event.type %s", session.WebAuthNCheckedType)
 	}
-
-	checkedAtCol := SessionColumnU2FCheckedAt
-	if e.UserVerification == domain.UserVerificationRequirementRequired {
-		checkedAtCol = SessionColumnPasskeyCheckedAt
-	}
-
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
-			handler.NewCol(checkedAtCol, e.CheckedAt),
+			handler.NewCol(SessionColumnWebAuthNCheckedAt, e.CheckedAt),
+			handler.NewCol(SessionColumnWebAuthNUserVerified, e.UserVerified),
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnID, e.Aggregate().ID),

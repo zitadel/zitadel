@@ -33,8 +33,7 @@ type Session struct {
 	UserFactor     SessionUserFactor
 	PasswordFactor SessionPasswordFactor
 	IntentFactor   SessionIntentFactor
-	PasskeyFactor  SessionPasskeyFactor
-	U2Factor       SessionU2Factor
+	WebAuthNFactor SessionWebAuthNFactor
 	Metadata       map[string][]byte
 }
 
@@ -54,12 +53,9 @@ type SessionIntentFactor struct {
 	IntentCheckedAt time.Time
 }
 
-type SessionPasskeyFactor struct {
-	PasskeyCheckedAt time.Time
-}
-
-type SessionU2Factor struct {
-	U2FCheckedAt time.Time
+type SessionWebAuthNFactor struct {
+	WebAuthNCheckedAt time.Time
+	UserVerified      bool
 }
 
 type SessionsSearchQueries struct {
@@ -128,12 +124,12 @@ var (
 		name:  projection.SessionColumnIntentCheckedAt,
 		table: sessionsTable,
 	}
-	SessionColumnPasskeyCheckedAt = Column{
-		name:  projection.SessionColumnPasskeyCheckedAt,
+	SessionColumnWebAuthNCheckedAt = Column{
+		name:  projection.SessionColumnWebAuthNCheckedAt,
 		table: sessionsTable,
 	}
-	SessionColumnU2FCheckedAt = Column{
-		name:  projection.SessionColumnU2FCheckedAt,
+	SessionColumnWebAuthNUserVerified = Column{
+		name:  projection.SessionColumnWebAuthNUserVerified,
 		table: sessionsTable,
 	}
 	SessionColumnMetadata = Column{
@@ -232,8 +228,8 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			UserResourceOwnerCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
 			SessionColumnIntentCheckedAt.identifier(),
-			SessionColumnPasskeyCheckedAt.identifier(),
-			SessionColumnU2FCheckedAt.identifier(),
+			SessionColumnWebAuthNCheckedAt.identifier(),
+			SessionColumnWebAuthNUserVerified.identifier(),
 			SessionColumnMetadata.identifier(),
 			SessionColumnToken.identifier(),
 		).From(sessionsTable.identifier()).
@@ -244,17 +240,17 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session := new(Session)
 
 			var (
-				userID            sql.NullString
-				userCheckedAt     sql.NullTime
-				loginName         sql.NullString
-				displayName       sql.NullString
-				userResourceOwner sql.NullString
-				passwordCheckedAt sql.NullTime
-				intentCheckedAt   sql.NullTime
-				passkeyCheckedAt  sql.NullTime
-				u2fCheckedAt      sql.NullTime
-				metadata          database.Map[[]byte]
-				token             sql.NullString
+				userID              sql.NullString
+				userCheckedAt       sql.NullTime
+				loginName           sql.NullString
+				displayName         sql.NullString
+				userResourceOwner   sql.NullString
+				passwordCheckedAt   sql.NullTime
+				intentCheckedAt     sql.NullTime
+				webAuthNCheckedAt   sql.NullTime
+				webAuthNUserPresent sql.NullBool
+				metadata            database.Map[[]byte]
+				token               sql.NullString
 			)
 
 			err := row.Scan(
@@ -272,8 +268,8 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&userResourceOwner,
 				&passwordCheckedAt,
 				&intentCheckedAt,
-				&passkeyCheckedAt,
-				&u2fCheckedAt,
+				&webAuthNCheckedAt,
+				&webAuthNUserPresent,
 				&metadata,
 				&token,
 			)
@@ -292,8 +288,8 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session.UserFactor.ResourceOwner = userResourceOwner.String
 			session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
 			session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
-			session.PasskeyFactor.PasskeyCheckedAt = passkeyCheckedAt.Time
-			session.U2Factor.U2FCheckedAt = u2fCheckedAt.Time
+			session.WebAuthNFactor.WebAuthNCheckedAt = webAuthNCheckedAt.Time
+			session.WebAuthNFactor.UserVerified = webAuthNUserPresent.Bool
 			session.Metadata = metadata
 
 			return session, token.String, nil
@@ -316,8 +312,8 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			UserResourceOwnerCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
 			SessionColumnIntentCheckedAt.identifier(),
-			SessionColumnPasskeyCheckedAt.identifier(),
-			SessionColumnU2FCheckedAt.identifier(),
+			SessionColumnWebAuthNCheckedAt.identifier(),
+			SessionColumnWebAuthNUserVerified.identifier(),
 			SessionColumnMetadata.identifier(),
 			countColumn.identifier(),
 		).From(sessionsTable.identifier()).
@@ -331,16 +327,16 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session := new(Session)
 
 				var (
-					userID            sql.NullString
-					userCheckedAt     sql.NullTime
-					loginName         sql.NullString
-					displayName       sql.NullString
-					userResourceOwner sql.NullString
-					passwordCheckedAt sql.NullTime
-					intentCheckedAt   sql.NullTime
-					passkeyCheckedAt  sql.NullTime
-					u2fCheckedAt      sql.NullTime
-					metadata          database.Map[[]byte]
+					userID              sql.NullString
+					userCheckedAt       sql.NullTime
+					loginName           sql.NullString
+					displayName         sql.NullString
+					userResourceOwner   sql.NullString
+					passwordCheckedAt   sql.NullTime
+					intentCheckedAt     sql.NullTime
+					webAuthNCheckedAt   sql.NullTime
+					webAuthNUserPresent sql.NullBool
+					metadata            database.Map[[]byte]
 				)
 
 				err := rows.Scan(
@@ -358,8 +354,8 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&userResourceOwner,
 					&passwordCheckedAt,
 					&intentCheckedAt,
-					&passkeyCheckedAt,
-					&u2fCheckedAt,
+					&webAuthNCheckedAt,
+					&webAuthNUserPresent,
 					&metadata,
 					&sessions.Count,
 				)
@@ -374,8 +370,8 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session.UserFactor.ResourceOwner = userResourceOwner.String
 				session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
 				session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
-				session.PasskeyFactor.PasskeyCheckedAt = passkeyCheckedAt.Time
-				session.U2Factor.U2FCheckedAt = u2fCheckedAt.Time
+				session.WebAuthNFactor.WebAuthNCheckedAt = webAuthNCheckedAt.Time
+				session.WebAuthNFactor.UserVerified = webAuthNUserPresent.Bool
 				session.Metadata = metadata
 
 				sessions.Sessions = append(sessions.Sessions, session)

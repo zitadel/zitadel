@@ -231,8 +231,8 @@ func NewWebAuthNChallengedEvent(
 type WebAuthNCheckedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	CheckedAt        time.Time                          `json:"checkedAt"`
-	UserVerification domain.UserVerificationRequirement `json:"userVerification,omitempty"`
+	CheckedAt    time.Time `json:"checkedAt"`
+	UserVerified bool      `json:"userVerified,omitempty"`
 }
 
 func (e *WebAuthNCheckedEvent) Data() interface{} {
@@ -251,7 +251,7 @@ func NewWebAuthNCheckedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	checkedAt time.Time,
-	userVerification domain.UserVerificationRequirement,
+	userVerified bool,
 ) *WebAuthNCheckedEvent {
 	return &WebAuthNCheckedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -259,8 +259,8 @@ func NewWebAuthNCheckedEvent(
 			aggregate,
 			WebAuthNCheckedType,
 		),
-		CheckedAt:        checkedAt,
-		UserVerification: userVerification,
+		CheckedAt:    checkedAt,
+		UserVerified: userVerified,
 	}
 }
 

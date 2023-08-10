@@ -224,7 +224,7 @@ func (s *Tester) CreateSuccessfulIntent(t *testing.T, idpID, userID, idpUserID s
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
 }
 
-func (s *Tester) CreatePasskeySession(t *testing.T, ctx context.Context, userID string) (id, token string, start, change time.Time) {
+func (s *Tester) CreateVerfiedWebAuthNSession(t *testing.T, ctx context.Context, userID string) (id, token string, start, change time.Time) {
 	createResp, err := s.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -240,7 +240,7 @@ func (s *Tester) CreatePasskeySession(t *testing.T, ctx context.Context, userID 
 	})
 	require.NoError(t, err)
 
-	assertion, err := s.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions())
+	assertion, err := s.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions(), true)
 	require.NoError(t, err)
 
 	updateResp, err := s.Client.SessionV2.SetSession(ctx, &session.SetSessionRequest{

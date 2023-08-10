@@ -31,8 +31,8 @@ var (
 		` projections.users8.resource_owner,` +
 		` projections.sessions4.password_checked_at,` +
 		` projections.sessions4.intent_checked_at,` +
-		` projections.sessions4.passkey_checked_at,` +
-		` projections.sessions4.u2f_checked_at,` +
+		` projections.sessions4.webauthn_checked_at,` +
+		` projections.sessions4.webauthn_user_verified,` +
 		` projections.sessions4.metadata,` +
 		` projections.sessions4.token_id` +
 		` FROM projections.sessions4` +
@@ -54,8 +54,8 @@ var (
 		` projections.users8.resource_owner,` +
 		` projections.sessions4.password_checked_at,` +
 		` projections.sessions4.intent_checked_at,` +
-		` projections.sessions4.passkey_checked_at,` +
-		` projections.sessions4.u2f_checked_at,` +
+		` projections.sessions4.webauthn_checked_at,` +
+		` projections.sessions4.webauthn_user_verified,` +
 		` projections.sessions4.metadata,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.sessions4` +
@@ -154,7 +154,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							testNow,
-							testNow,
+							true,
 							[]byte(`{"key": "dmFsdWU="}`),
 						},
 					},
@@ -186,11 +186,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						IntentFactor: SessionIntentFactor{
 							IntentCheckedAt: testNow,
 						},
-						PasskeyFactor: SessionPasskeyFactor{
-							PasskeyCheckedAt: testNow,
-						},
-						U2Factor: SessionU2Factor{
-							U2FCheckedAt: testNow,
+						WebAuthNFactor: SessionWebAuthNFactor{
+							WebAuthNCheckedAt: testNow,
+							UserVerified:      true,
 						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
@@ -223,7 +221,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							testNow,
-							testNow,
+							true,
 							[]byte(`{"key": "dmFsdWU="}`),
 						},
 						{
@@ -242,7 +240,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							testNow,
-							testNow,
+							false,
 							[]byte(`{"key": "dmFsdWU="}`),
 						},
 					},
@@ -274,11 +272,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						IntentFactor: SessionIntentFactor{
 							IntentCheckedAt: testNow,
 						},
-						PasskeyFactor: SessionPasskeyFactor{
-							PasskeyCheckedAt: testNow,
-						},
-						U2Factor: SessionU2Factor{
-							U2FCheckedAt: testNow,
+						WebAuthNFactor: SessionWebAuthNFactor{
+							WebAuthNCheckedAt: testNow,
+							UserVerified:      true,
 						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
@@ -305,11 +301,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						IntentFactor: SessionIntentFactor{
 							IntentCheckedAt: testNow,
 						},
-						PasskeyFactor: SessionPasskeyFactor{
-							PasskeyCheckedAt: testNow,
-						},
-						U2Factor: SessionU2Factor{
-							U2FCheckedAt: testNow,
+						WebAuthNFactor: SessionWebAuthNFactor{
+							WebAuthNCheckedAt: testNow,
+							UserVerified:      false,
 						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
@@ -395,7 +389,7 @@ func Test_SessionPrepare(t *testing.T) {
 						testNow,
 						testNow,
 						testNow,
-						testNow,
+						true,
 						[]byte(`{"key": "dmFsdWU="}`),
 						"tokenID",
 					},
@@ -422,11 +416,9 @@ func Test_SessionPrepare(t *testing.T) {
 				IntentFactor: SessionIntentFactor{
 					IntentCheckedAt: testNow,
 				},
-				PasskeyFactor: SessionPasskeyFactor{
-					PasskeyCheckedAt: testNow,
-				},
-				U2Factor: SessionU2Factor{
-					U2FCheckedAt: testNow,
+				WebAuthNFactor: SessionWebAuthNFactor{
+					WebAuthNCheckedAt: testNow,
+					UserVerified:      true,
 				},
 				Metadata: map[string][]byte{
 					"key": []byte("value"),
