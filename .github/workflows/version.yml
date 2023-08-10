@@ -24,31 +24,6 @@ jobs:
       version: ${{ steps.output.outputs.VERSION }}
       published: ${{ steps.semantic.outputs.new_release_published }}
     steps:
-    -
-      name: Download release assets
-      uses: actions/download-artifact@v3
-      with:
-        path: .artifacts
-    -
-      name: Unpack executable
-      run: |
-        [ -f .artifacts/zitadel-linux-amd64.tar ] && tar -xvf .artifacts/zitadel-linux-amd64.tar || true
-        [ -d zitadel-linux-amd64 ] && tar -czvf zitadel-linux-amd64.tar.gz zitadel-linux-amd64 || true
-        
-        [ -f .artifacts/zitadel-linux-arm64.tar ] && tar -xvf .artifacts/zitadel-linux-arm64.tar || true
-        [ -d zitadel-linux-arm64 ] && tar -czvf zitadel-linux-arm64.tar.gz zitadel-linux-arm64 || true
-        
-        [ -f .artifacts/zitadel-windows-amd64.tar ] && tar -xvf .artifacts/zitadel-windows-amd64.tar || true
-        [ -d zitadel-windows-amd64 ] && tar -czvf zitadel-windows-amd64.tar.gz zitadel-windows-amd64 || true
-        
-        [ -f .artifacts/zitadel-windows-arm64.tar ] && tar -xvf .artifacts/zitadel-windows-arm64.tar || true
-        [ -d zitadel-windows-arm64 ] && tar -czvf zitadel-windows-arm64.tar.gz zitadel-windows-arm64 || true
-        
-        [ -f .artifacts/zitadel-darwin-amd64.tar ] && tar -xvf .artifacts/zitadel-darwin-amd64.tar || true
-        [ -d zitadel-darwin-amd64 ] && tar -czvf zitadel-darwin-amd64.tar.gz zitadel-darwin-amd64 || true
-        
-        [ -f .artifacts/zitadel-darwin-arm64.tar ] && tar -xvf .artifacts/zitadel-darwin-arm64.tar || true
-        [ -d zitadel-darwin-arm64 ] && tar -czvf zitadel-darwin-arm64.tar.gz zitadel-darwin-arm64 || true
     - 
       name: Source checkout
       uses: actions/checkout@v3
@@ -68,3 +43,30 @@ jobs:
       id: output
       run:
         if [[ ! -z "${{ steps.semantic.outputs.new_release_version }}" ]]; then echo "VERSION=v${{ steps.semantic.outputs.new_release_version }}" >> "$GITHUB_OUTPUT"; else echo "VERSION=" >> "$GITHUB_OUTPUT";fi
+
+  build:
+    needs: generate
+    if: ${{ jobs.generate.outputs.published }}
+    name: upload assets
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows, darwin, linux]
+        arch: [amd64, arm64]
+    steps:
+      -
+        name: Download release assets
+        uses: actions/download-artifact@v3
+        with:
+          path: .artifacts
+          name: zitadel-linux-${{ matrix.arch }}
+      -
+        name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: zitadel-${{ matrix.os }}-${{ matrix.arch }}.tar
+          asset_name: zitadel-${{ matrix.os }}-${{ matrix.arch }}.tar
+          tag: ${{ jobs.generate.outputs.version }}
+
