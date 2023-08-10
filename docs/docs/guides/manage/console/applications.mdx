@@ -41,6 +41,7 @@ At the moment ZITADEL offers four client types:
 - [**Native**](#native) (native, mobile or desktop applications)
 - [**User Agent**](#user-agent) (single page applications / SPA, generally JavaScript executed in the browser)
 - [**API**](#api) (OAuth Resource Server)
+- [**SAML**](#saml)
 
 The first three options (Web, Native and User Agent) require user interaction, the fourth option (API) has no direct user-interaction.
 Depending on the app type, there are small differences in the possible settings.
@@ -83,6 +84,17 @@ Following authentication types can be used:
 <AuthType appType="api" />
 
 After selecting your Apps Type and Authentication Method, you may need to specify redirect URIs.
+
+### SAML
+
+If your application doesn't support the OIDC standard, but SAML this is the right application type to choose. SAML is an open standard used for authentication based on XML.
+
+After entering a name and choosing the application type "SAML", you will get to the SAML configuration screen.
+
+You can either add a link to a SAML metadata file or upload it directly.
+SAML metadata is an XML document which contains information necessary for interaction with SAML-enabled identity or service providers.
+
+You can find some example configurations for SAML 2.0 in our [integrate services](/docs/guides/integrate/services) guides
 
 ## Redirect URIs
 

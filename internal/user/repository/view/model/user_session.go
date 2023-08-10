@@ -134,11 +134,11 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 			return err
 		}
 		if v.UserAgentID == data.UserAgentID {
-			v.setSecondFactorVerification(event.CreationDate, domain.MFATypeOTP)
+			v.setSecondFactorVerification(event.CreationDate, domain.MFATypeTOTP)
 		}
 	case user.UserV1MFAOTPCheckSucceededType,
 		user.HumanMFAOTPCheckSucceededType:
-		v.setSecondFactorVerification(event.CreationDate, domain.MFATypeOTP)
+		v.setSecondFactorVerification(event.CreationDate, domain.MFATypeTOTP)
 	case user.UserV1MFAOTPCheckFailedType,
 		user.UserV1MFAOTPRemovedType,
 		user.HumanMFAOTPCheckFailedType,

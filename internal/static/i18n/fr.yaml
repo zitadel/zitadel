@@ -593,6 +593,8 @@ EventTypes:
         removed: Externer IDP supprimé
         cascade:
           removed: Externer IDP cascade supprimé
+        îd:
+          migrated: L'ID utilisateur externe de l'IDP a été migré
       phone:
         changed: Le numéro de téléphone a changé
         verified: Numéro de téléphone vérifié

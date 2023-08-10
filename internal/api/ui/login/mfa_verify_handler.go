@@ -33,7 +33,7 @@ func (l *Login) handleMFAVerify(w http.ResponseWriter, r *http.Request) {
 		l.renderMFAVerifySelected(w, r, authReq, step, data.SelectedProvider, nil)
 		return
 	}
-	if data.MFAType == domain.MFATypeOTP {
+	if data.MFAType == domain.MFATypeTOTP {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 		err = l.authRepo.VerifyMFAOTP(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Code, userAgentID, domain.BrowserInfoFromRequest(r))
 
@@ -45,7 +45,7 @@ func (l *Login) handleMFAVerify(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err != nil {
-			l.renderMFAVerifySelected(w, r, authReq, step, domain.MFATypeOTP, err)
+			l.renderMFAVerifySelected(w, r, authReq, step, domain.MFATypeTOTP, err)
 			return
 		}
 	}
@@ -79,9 +79,9 @@ func (l *Login) renderMFAVerifySelected(w http.ResponseWriter, r *http.Request, 
 		data.Description = translator.LocalizeWithoutArgs("VerifyMFAU2F.Description")
 		l.renderU2FVerification(w, r, authReq, removeSelectedProviderFromList(verificationStep.MFAProviders, domain.MFATypeU2F), nil)
 		return
-	case domain.MFATypeOTP:
-		data.MFAProviders = removeSelectedProviderFromList(verificationStep.MFAProviders, domain.MFATypeOTP)
-		data.SelectedMFAProvider = domain.MFATypeOTP
+	case domain.MFATypeTOTP:
+		data.MFAProviders = removeSelectedProviderFromList(verificationStep.MFAProviders, domain.MFATypeTOTP)
+		data.SelectedMFAProvider = domain.MFATypeTOTP
 		data.Title = translator.LocalizeWithoutArgs("VerifyMFAOTP.Title")
 		data.Description = translator.LocalizeWithoutArgs("VerifyMFAOTP.Description")
 	default:

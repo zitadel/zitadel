@@ -18,6 +18,7 @@ const (
 	UserIDPLinkAddedType          = UserIDPLinkEventPrefix + "added"
 	UserIDPLinkRemovedType        = UserIDPLinkEventPrefix + "removed"
 	UserIDPLinkCascadeRemovedType = UserIDPLinkEventPrefix + "cascade.removed"
+	UserIDPExternalIDMigratedType = UserIDPLinkEventPrefix + "id.migrated"
 
 	UserIDPLoginCheckSucceededType = idpLoginEventPrefix + "check.succeeded"
 )
@@ -211,4 +212,42 @@ func UserIDPCheckSucceededEventMapper(event *repository.Event) (eventstore.Event
 	}
 
 	return e, nil
+}
+
+type UserIDPExternalIDMigratedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	IDPConfigID          string `json:"idpConfigId"`
+	PreviousID           string `json:"previousId"`
+	NewID                string `json:"newId"`
+}
+
+func (e *UserIDPExternalIDMigratedEvent) Data() interface{} {
+	return e
+}
+
+func (e *UserIDPExternalIDMigratedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *UserIDPExternalIDMigratedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewUserIDPExternalIDMigratedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	idpConfigID,
+	previousID,
+	newID string,
+) *UserIDPExternalIDMigratedEvent {
+	return &UserIDPExternalIDMigratedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			UserIDPExternalIDMigratedType,
+		),
+		IDPConfigID: idpConfigID,
+		PreviousID:  previousID,
+		NewID:       newID,
+	}
 }
