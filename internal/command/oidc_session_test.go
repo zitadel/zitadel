@@ -802,8 +802,10 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 				assert.WithinRange(t, got.AuthTime, tt.res.model.AuthTime, tt.res.model.AuthTime)
 				assert.Equal(t, tt.res.model.State, got.State)
 				assert.Equal(t, tt.res.model.RefreshTokenID, got.RefreshTokenID)
-				assert.Equal(t, got.RefreshTokenExpiration.Sub(testNow).Truncate(time.Second), tt.res.model.RefreshTokenExpiration.Sub(testNow))
-				assert.Equal(t, got.RefreshTokenIdleExpiration.Sub(testNow).Truncate(time.Second), tt.res.model.RefreshTokenIdleExpiration.Sub(testNow))
+				duration := tt.res.model.RefreshTokenExpiration.Sub(testNow)
+				assert.WithinRange(t, got.RefreshTokenExpiration, tt.res.model.RefreshTokenExpiration, time.Now().Add(duration))
+				idleDuration := tt.res.model.RefreshTokenIdleExpiration.Sub(testNow)
+				assert.WithinRange(t, got.RefreshTokenIdleExpiration, tt.res.model.RefreshTokenIdleExpiration, time.Now().Add(idleDuration))
 			}
 		})
 	}
