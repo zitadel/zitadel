@@ -46,7 +46,7 @@ jobs:
 
   build:
     needs: generate
-    if: ${{ needs.generate.outputs.published }}
+    if: ${{ needs.generate.outputs.published && inputs.dry_run == 'false'}}
     name: upload assets
     runs-on: ubuntu-22.04
     strategy:
