@@ -68,5 +68,5 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: zitadel-${{ matrix.os }}-${{ matrix.arch }}.tar
           asset_name: zitadel-${{ matrix.os }}-${{ matrix.arch }}.tar
-          tag: ${{ jobs.generate.outputs.version }}
+          tag: ${{ needs.generate.outputs.version }}
 
