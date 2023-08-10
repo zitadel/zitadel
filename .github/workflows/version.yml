@@ -44,9 +44,9 @@ jobs:
       run:
         if [[ ! -z "${{ steps.semantic.outputs.new_release_version }}" ]]; then echo "VERSION=v${{ steps.semantic.outputs.new_release_version }}" >> "$GITHUB_OUTPUT"; else echo "VERSION=" >> "$GITHUB_OUTPUT";fi
 
-  build:
+  assets:
     needs: generate
-    if: ${{ inputs.dry_run == 'false'}}
+    if: ${{ github.event.inputs.dry_run == 'false'}}
     name: upload assets
     runs-on: ubuntu-22.04
     strategy:
