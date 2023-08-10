@@ -135,8 +135,12 @@ import {
   GetCustomPasswordResetMessageTextResponse,
   GetCustomVerifyEmailMessageTextRequest,
   GetCustomVerifyEmailMessageTextResponse,
+  GetCustomVerifyEmailOTPMessageTextRequest,
+  GetCustomVerifyEmailOTPMessageTextResponse,
   GetCustomVerifyPhoneMessageTextRequest,
   GetCustomVerifyPhoneMessageTextResponse,
+  GetCustomVerifySMSOTPMessageTextRequest,
+  GetCustomVerifySMSOTPMessageTextResponse,
   GetDefaultDomainClaimedMessageTextRequest,
   GetDefaultDomainClaimedMessageTextResponse,
   GetDefaultInitMessageTextRequest,
@@ -155,8 +159,12 @@ import {
   GetDefaultPasswordResetMessageTextResponse,
   GetDefaultVerifyEmailMessageTextRequest,
   GetDefaultVerifyEmailMessageTextResponse,
+  GetDefaultVerifyEmailOTPMessageTextRequest,
+  GetDefaultVerifyEmailOTPMessageTextResponse,
   GetDefaultVerifyPhoneMessageTextRequest,
   GetDefaultVerifyPhoneMessageTextResponse,
+  GetDefaultVerifySMSOTPMessageTextRequest,
+  GetDefaultVerifySMSOTPMessageTextResponse,
   GetDomainPolicyRequest,
   GetDomainPolicyResponse,
   GetFlowRequest,
@@ -375,8 +383,12 @@ import {
   ResetCustomPasswordResetMessageTextToDefaultResponse,
   ResetCustomVerifyEmailMessageTextToDefaultRequest,
   ResetCustomVerifyEmailMessageTextToDefaultResponse,
+  ResetCustomVerifyEmailOTPMessageTextToDefaultRequest,
+  ResetCustomVerifyEmailOTPMessageTextToDefaultResponse,
   ResetCustomVerifyPhoneMessageTextToDefaultRequest,
   ResetCustomVerifyPhoneMessageTextToDefaultResponse,
+  ResetCustomVerifySMSOTPMessageTextToDefaultRequest,
+  ResetCustomVerifySMSOTPMessageTextToDefaultResponse,
   ResetLabelPolicyToDefaultRequest,
   ResetLabelPolicyToDefaultResponse,
   ResetLockoutPolicyToDefaultRequest,
@@ -408,8 +420,12 @@ import {
   SetCustomPasswordResetMessageTextResponse,
   SetCustomVerifyEmailMessageTextRequest,
   SetCustomVerifyEmailMessageTextResponse,
+  SetCustomVerifyEmailOTPMessageTextRequest,
+  SetCustomVerifyEmailOTPMessageTextResponse,
   SetCustomVerifyPhoneMessageTextRequest,
   SetCustomVerifyPhoneMessageTextResponse,
+  SetCustomVerifySMSOTPMessageTextRequest,
+  SetCustomVerifySMSOTPMessageTextResponse,
   SetHumanInitialPasswordRequest,
   SetOrgMetadataRequest,
   SetOrgMetadataResponse,
@@ -620,6 +636,58 @@ export class ManagementService {
     return this.grpcService.mgmt.resetCustomVerifyPhoneMessageTextToDefault(req, null).then((resp) => resp.toObject());
   }
 
+  public getDefaultVerifySMSOTPMessageText(
+    req: GetDefaultVerifySMSOTPMessageTextRequest,
+  ): Promise<GetDefaultVerifySMSOTPMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultVerifySMSOTPMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public getCustomVerifySMSOTPMessageText(
+    req: GetCustomVerifySMSOTPMessageTextRequest,
+  ): Promise<GetCustomVerifySMSOTPMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomVerifySMSOTPMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public setCustomVerifySMSOTPMessageText(
+    req: SetCustomVerifySMSOTPMessageTextRequest,
+  ): Promise<SetCustomVerifySMSOTPMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomVerifySMSOTPMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public resetCustomVerifySMSOTPMessageTextToDefault(
+    lang: string,
+  ): Promise<ResetCustomVerifySMSOTPMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomVerifySMSOTPMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomVerifySMSOTPMessageTextToDefault(req, null).then((resp) => resp.toObject());
+  }
+
+  public getDefaultVerifyEmailOTPMessageText(
+    req: GetDefaultVerifyEmailOTPMessageTextRequest,
+  ): Promise<GetDefaultVerifyEmailOTPMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultVerifyEmailOTPMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public getCustomVerifyEmailOTPMessageText(
+    req: GetCustomVerifyEmailOTPMessageTextRequest,
+  ): Promise<GetCustomVerifyEmailOTPMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomVerifyEmailOTPMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public setCustomVerifyEmailOTPMessageText(
+    req: SetCustomVerifyEmailOTPMessageTextRequest,
+  ): Promise<SetCustomVerifyEmailOTPMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomVerifyEmailOTPMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public resetCustomVerifyEmailOTPMessageTextToDefault(
+    lang: string,
+  ): Promise<ResetCustomVerifyEmailOTPMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomVerifyEmailOTPMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomVerifyEmailOTPMessageTextToDefault(req, null).then((resp) => resp.toObject());
+  }
+
   public getDefaultPasswordResetMessageText(
     req: GetDefaultPasswordResetMessageTextRequest,
   ): Promise<GetDefaultPasswordResetMessageTextResponse.AsObject> {
@@ -678,6 +746,30 @@ export class ManagementService {
     return this.grpcService.mgmt.getDefaultPasswordlessRegistrationMessageText(req, null).then((resp) => resp.toObject());
   }
 
+  public getCustomPasswordlessRegistrationMessageText(
+    req: GetCustomPasswordlessRegistrationMessageTextRequest,
+  ): Promise<GetCustomPasswordlessRegistrationMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomPasswordlessRegistrationMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public setCustomPasswordlessRegistrationMessageCustomText(
+    req: SetCustomPasswordlessRegistrationMessageTextRequest,
+  ): Promise<SetCustomPasswordlessRegistrationMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt
+      .setCustomPasswordlessRegistrationMessageCustomText(req, null)
+      .then((resp) => resp.toObject());
+  }
+
+  public resetCustomPasswordlessRegistrationMessageTextToDefault(
+    lang: string,
+  ): Promise<ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt
+      .resetCustomPasswordlessRegistrationMessageTextToDefault(req, null)
+      .then((resp) => resp.toObject());
+  }
+
   public getDefaultPasswordChangeMessageText(
     req: GetDefaultPasswordChangeMessageTextRequest,
   ): Promise<GetDefaultPasswordChangeMessageTextResponse.AsObject> {
@@ -702,30 +794,6 @@ export class ManagementService {
     const req = new ResetCustomPasswordChangeMessageTextToDefaultRequest();
     req.setLanguage(lang);
     return this.grpcService.mgmt.resetCustomPasswordChangeMessageTextToDefault(req, null).then((resp) => resp.toObject());
-  }
-
-  public getCustomPasswordlessRegistrationMessageText(
-    req: GetCustomPasswordlessRegistrationMessageTextRequest,
-  ): Promise<GetCustomPasswordlessRegistrationMessageTextResponse.AsObject> {
-    return this.grpcService.mgmt.getCustomPasswordlessRegistrationMessageText(req, null).then((resp) => resp.toObject());
-  }
-
-  public setCustomPasswordlessRegistrationMessageCustomText(
-    req: SetCustomPasswordlessRegistrationMessageTextRequest,
-  ): Promise<SetCustomPasswordlessRegistrationMessageTextResponse.AsObject> {
-    return this.grpcService.mgmt
-      .setCustomPasswordlessRegistrationMessageCustomText(req, null)
-      .then((resp) => resp.toObject());
-  }
-
-  public resetCustomPasswordlessRegistrationMessageTextToDefault(
-    lang: string,
-  ): Promise<ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse.AsObject> {
-    const req = new ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest();
-    req.setLanguage(lang);
-    return this.grpcService.mgmt
-      .resetCustomPasswordlessRegistrationMessageTextToDefault(req, null)
-      .then((resp) => resp.toObject());
   }
 
   public updateUserName(userId: string, username: string): Promise<UpdateUserNameResponse.AsObject> {
