@@ -70,7 +70,7 @@ jobs:
       -
         name: Unpack executable
         run: |
-          tar -xvf .artifacts/zitadel-linux-${{ matrix.arch }}.tar
+          tar -xvf .artifacts/zitadel-linux-${{ matrix.arch }}.tar.gz
           mv zitadel-linux-${{ matrix.arch }}/zitadel ./zitadel
       - 
         name: Debug

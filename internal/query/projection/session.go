@@ -14,24 +14,24 @@ import (
 )
 
 const (
-	SessionsProjectionTable = "projections.sessions3"
+	SessionsProjectionTable = "projections.sessions4"
 
-	SessionColumnID                = "id"
-	SessionColumnCreationDate      = "creation_date"
-	SessionColumnChangeDate        = "change_date"
-	SessionColumnSequence          = "sequence"
-	SessionColumnState             = "state"
-	SessionColumnResourceOwner     = "resource_owner"
-	SessionColumnDomain            = "domain"
-	SessionColumnInstanceID        = "instance_id"
-	SessionColumnCreator           = "creator"
-	SessionColumnUserID            = "user_id"
-	SessionColumnUserCheckedAt     = "user_checked_at"
-	SessionColumnPasswordCheckedAt = "password_checked_at"
-	SessionColumnIntentCheckedAt   = "intent_checked_at"
-	SessionColumnPasskeyCheckedAt  = "passkey_checked_at"
-	SessionColumnMetadata          = "metadata"
-	SessionColumnTokenID           = "token_id"
+	SessionColumnID                   = "id"
+	SessionColumnCreationDate         = "creation_date"
+	SessionColumnChangeDate           = "change_date"
+	SessionColumnSequence             = "sequence"
+	SessionColumnState                = "state"
+	SessionColumnResourceOwner        = "resource_owner"
+	SessionColumnInstanceID           = "instance_id"
+	SessionColumnCreator              = "creator"
+	SessionColumnUserID               = "user_id"
+	SessionColumnUserCheckedAt        = "user_checked_at"
+	SessionColumnPasswordCheckedAt    = "password_checked_at"
+	SessionColumnIntentCheckedAt      = "intent_checked_at"
+	SessionColumnWebAuthNCheckedAt    = "webauthn_checked_at"
+	SessionColumnWebAuthNUserVerified = "webauthn_user_verified"
+	SessionColumnMetadata             = "metadata"
+	SessionColumnTokenID              = "token_id"
 )
 
 type sessionProjection struct {
@@ -50,14 +50,14 @@ func newSessionProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(SessionColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(SessionColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(SessionColumnResourceOwner, crdb.ColumnTypeText),
-			crdb.NewColumn(SessionColumnDomain, crdb.ColumnTypeText),
 			crdb.NewColumn(SessionColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(SessionColumnCreator, crdb.ColumnTypeText),
 			crdb.NewColumn(SessionColumnUserID, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnUserCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnPasswordCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnIntentCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
-			crdb.NewColumn(SessionColumnPasskeyCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
+			crdb.NewColumn(SessionColumnWebAuthNCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
+			crdb.NewColumn(SessionColumnWebAuthNUserVerified, crdb.ColumnTypeBool, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnMetadata, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnTokenID, crdb.ColumnTypeText, crdb.Nullable()),
 		},
@@ -90,8 +90,8 @@ func (p *sessionProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceIntentChecked,
 				},
 				{
-					Event:  session.PasskeyCheckedType,
-					Reduce: p.reducePasskeyChecked,
+					Event:  session.WebAuthNCheckedType,
+					Reduce: p.reduceWebAuthNChecked,
 				},
 				{
 					Event:  session.TokenSetType,
@@ -142,7 +142,6 @@ func (p *sessionProjection) reduceSessionAdded(event eventstore.Event) (*handler
 			handler.NewCol(SessionColumnCreationDate, e.CreationDate()),
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnResourceOwner, e.Aggregate().ResourceOwner),
-			handler.NewCol(SessionColumnDomain, e.Domain),
 			handler.NewCol(SessionColumnState, domain.SessionStateActive),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
 			handler.NewCol(SessionColumnCreator, e.User),
@@ -210,18 +209,18 @@ func (p *sessionProjection) reduceIntentChecked(event eventstore.Event) (*handle
 	), nil
 }
 
-func (p *sessionProjection) reducePasskeyChecked(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*session.PasskeyCheckedEvent)
+func (p *sessionProjection) reduceWebAuthNChecked(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*session.WebAuthNCheckedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-WieM4", "reduce.wrong.event.type %s", session.PasskeyCheckedType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-WieM4", "reduce.wrong.event.type %s", session.WebAuthNCheckedType)
 	}
-
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
-			handler.NewCol(SessionColumnPasskeyCheckedAt, e.CheckedAt),
+			handler.NewCol(SessionColumnWebAuthNCheckedAt, e.CheckedAt),
+			handler.NewCol(SessionColumnWebAuthNUserVerified, e.UserVerified),
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnID, e.Aggregate().ID),

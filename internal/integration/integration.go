@@ -46,6 +46,10 @@ var (
 	systemUserKey []byte
 )
 
+// NotEmpty can be used as placeholder, when the returned values is unknown.
+// It can be used in tests to assert whether a value should be empty or not.
+const NotEmpty = "not empty"
+
 // UserType provides constants that give
 // a short explinanation with the purpose
 // a serverice user.
@@ -153,11 +157,38 @@ func (s *Tester) pollHealth(ctx context.Context) (err error) {
 }
 
 const (
-	LoginUser   = "loginClient"
-	MachineUser = "integration"
+	LoginUser                = "loginClient"
+	MachineUserOrgOwner      = "integrationOrgOwner"
+	MachineUserInstanceOwner = "integrationInstanceOwner"
 )
 
-func (s *Tester) createMachineUser(ctx context.Context, instanceId string) {
+func (s *Tester) createMachineUserOrgOwner(ctx context.Context) {
+	var err error
+
+	ctx, user := s.createMachineUser(ctx, MachineUserOrgOwner, OrgOwner)
+	_, err = s.Commands.AddOrgMember(ctx, user.ResourceOwner, user.ID, "ORG_OWNER")
+	target := new(caos_errs.AlreadyExistsError)
+	if !errors.As(err, &target) {
+		logging.OnError(err).Fatal("add org member")
+	}
+}
+
+func (s *Tester) createMachineUserInstanceOwner(ctx context.Context) {
+	var err error
+
+	ctx, user := s.createMachineUser(ctx, MachineUserInstanceOwner, IAMOwner)
+	_, err = s.Commands.AddInstanceMember(ctx, user.ID, "IAM_OWNER")
+	target := new(caos_errs.AlreadyExistsError)
+	if !errors.As(err, &target) {
+		logging.OnError(err).Fatal("add instance member")
+	}
+}
+
+func (s *Tester) createLoginClient(ctx context.Context) {
+	s.createMachineUser(ctx, LoginUser, Login)
+}
+
+func (s *Tester) createMachineUser(ctx context.Context, username string, userType UserType) (context.Context, *query.User) {
 	var err error
 
 	s.Instance, err = s.Queries.InstanceByHost(ctx, s.Host())
@@ -167,7 +198,7 @@ func (s *Tester) createMachineUser(ctx context.Context, instanceId string) {
 	s.Organisation, err = s.Queries.OrgByID(ctx, true, s.Instance.DefaultOrganisationID())
 	logging.OnError(err).Fatal("query organisation")
 
-	usernameQuery, err := query.NewUserUsernameSearchQuery(MachineUser, query.TextEquals)
+	usernameQuery, err := query.NewUserUsernameSearchQuery(username, query.TextEquals)
 	logging.OnError(err).Fatal("user query")
 	user, err := s.Queries.GetUser(ctx, true, true, usernameQuery)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -175,69 +206,25 @@ func (s *Tester) createMachineUser(ctx context.Context, instanceId string) {
 			ObjectRoot: models.ObjectRoot{
 				ResourceOwner: s.Organisation.ID,
 			},
-			Username:        MachineUser,
-			Name:            MachineUser,
+			Username:        username,
+			Name:            username,
 			Description:     "who cares?",
 			AccessTokenType: domain.OIDCTokenTypeJWT,
 		})
-		logging.WithFields("username", SystemUser).OnError(err).Fatal("add machine user")
+		logging.WithFields("username", username).OnError(err).Fatal("add machine user")
 		user, err = s.Queries.GetUser(ctx, true, true, usernameQuery)
 	}
-	logging.WithFields("username", SystemUser).OnError(err).Fatal("get user")
-
-	_, err = s.Commands.AddOrgMember(ctx, s.Organisation.ID, user.ID, "ORG_OWNER")
-	target := new(caos_errs.AlreadyExistsError)
-	if !errors.As(err, &target) {
-		logging.OnError(err).Fatal("add org member")
-	}
+	logging.WithFields("username", username).OnError(err).Fatal("get user")
 
 	scopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner}
 	pat := command.NewPersonalAccessToken(user.ResourceOwner, user.ID, time.Now().Add(time.Hour), scopes, domain.UserTypeMachine)
 	_, err = s.Commands.AddPersonalAccessToken(ctx, pat)
 	logging.WithFields("username", SystemUser).OnError(err).Fatal("add pat")
-	s.Users.Set(instanceId, OrgOwner, &User{
+	s.Users.Set(FirstInstanceUsersKey, userType, &User{
 		User:  user,
 		Token: pat.Token,
 	})
-}
-
-func (s *Tester) createLoginClient(ctx context.Context) {
-	var err error
-
-	s.Instance, err = s.Queries.InstanceByHost(ctx, s.Host())
-	logging.OnError(err).Fatal("query instance")
-	ctx = authz.WithInstance(ctx, s.Instance)
-
-	s.Organisation, err = s.Queries.OrgByID(ctx, true, s.Instance.DefaultOrganisationID())
-	logging.OnError(err).Fatal("query organisation")
-
-	usernameQuery, err := query.NewUserUsernameSearchQuery(LoginUser, query.TextEquals)
-	logging.WithFields("username", LoginUser).OnError(err).Fatal("user query")
-	user, err := s.Queries.GetUser(ctx, true, true, usernameQuery)
-	if errors.Is(err, sql.ErrNoRows) {
-		_, err = s.Commands.AddMachine(ctx, &command.Machine{
-			ObjectRoot: models.ObjectRoot{
-				ResourceOwner: s.Organisation.ID,
-			},
-			Username:        LoginUser,
-			Name:            LoginUser,
-			Description:     "who cares?",
-			AccessTokenType: domain.OIDCTokenTypeJWT,
-		})
-		logging.WithFields("username", LoginUser).OnError(err).Fatal("add machine user")
-		user, err = s.Queries.GetUser(ctx, true, true, usernameQuery)
-	}
-	logging.WithFields("username", LoginUser).OnError(err).Fatal("get user")
-
-	scopes := []string{oidc.ScopeOpenID, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner}
-	pat := command.NewPersonalAccessToken(user.ResourceOwner, user.ID, time.Now().Add(time.Hour), scopes, domain.UserTypeMachine)
-	_, err = s.Commands.AddPersonalAccessToken(ctx, pat)
-	logging.OnError(err).Fatal("add pat")
-
-	s.Users.Set(FirstInstanceUsersKey, Login, &User{
-		User:  user,
-		Token: pat.Token,
-	})
+	return ctx, user
 }
 
 func (s *Tester) WithAuthorization(ctx context.Context, u UserType) context.Context {
@@ -333,7 +320,8 @@ func NewTester(ctx context.Context) *Tester {
 	tester.createClientConn(ctx)
 	tester.createLoginClient(ctx)
 	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, http_util.BuildOrigin(tester.Host(), tester.Config.ExternalSecure))
-	tester.createMachineUser(ctx, FirstInstanceUsersKey)
+	tester.createMachineUserOrgOwner(ctx)
+	tester.createMachineUserInstanceOwner(ctx)
 	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, "https://"+tester.Host())
 
 	return &tester
