@@ -25,6 +25,8 @@ type mfaOTPFormData struct {
 	Provider         domain.MFAType `schema:"provider"`
 }
 
+// renderOTPVerification renders the OTP verification for SMS and Email based on the passed MFAType.
+// It will send a new code to either phone or email first.
 func (l *Login) renderOTPVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, providers []domain.MFAType, selectedProvider domain.MFAType, err error) {
 	var errID, errMessage string
 	if err == nil {
@@ -46,6 +48,9 @@ func (l *Login) renderOTPVerification(w http.ResponseWriter, r *http.Request, au
 	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplOTPVerification], data, nil)
 }
 
+// handleRegisterSMSCheck handles form submissions of the OTP verification.
+// On successful code verification, the check will be added to the auth request.
+// A user is also able to request a code resend or choose another provider.
 func (l *Login) handleOTPVerification(w http.ResponseWriter, r *http.Request) {
 	formData := new(mfaOTPFormData)
 	authReq, err := l.getAuthRequestAndParseData(r, formData)
