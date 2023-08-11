@@ -116,6 +116,7 @@ type SSL struct {
 func (s *Config) checkSSL(user User) {
 	if user.SSL.Mode == sslDisabledMode || user.SSL.Mode == "" {
 		user.SSL = SSL{Mode: sslDisabledMode}
+		return
 	}
 
 	if user.SSL.Mode == sslRequireMode || user.SSL.Mode == sslAllowMode || user.SSL.Mode == sslPreferMode {
