@@ -16,16 +16,16 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) ImportHumanTOTP(ctx context.Context, userID, userAgentID, resourceowner string, key string) error {
+func (c *Commands) ImportHumanTOTP(ctx context.Context, userID, userAgentID, resourceOwner string, key string) error {
 	encryptedSecret, err := crypto.Encrypt([]byte(key), c.multifactors.OTP.CryptoMFA)
 	if err != nil {
 		return err
 	}
-	if err = c.checkUserExists(ctx, userID, resourceowner); err != nil {
+	if err = c.checkUserExists(ctx, userID, resourceOwner); err != nil {
 		return err
 	}
 
-	otpWriteModel, err := c.totpWriteModelByID(ctx, userID, resourceowner)
+	otpWriteModel, err := c.totpWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -41,11 +41,11 @@ func (c *Commands) ImportHumanTOTP(ctx context.Context, userID, userAgentID, res
 	return err
 }
 
-func (c *Commands) AddHumanTOTP(ctx context.Context, userID, resourceowner string) (*domain.TOTP, error) {
+func (c *Commands) AddHumanTOTP(ctx context.Context, userID, resourceOwner string) (*domain.TOTP, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
 	}
-	prep, err := c.createHumanTOTP(ctx, userID, resourceowner)
+	prep, err := c.createHumanTOTP(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -115,12 +115,12 @@ func (c *Commands) createHumanTOTP(ctx context.Context, userID, resourceOwner st
 	}, nil
 }
 
-func (c *Commands) HumanCheckMFATOTPSetup(ctx context.Context, userID, code, userAgentID, resourceowner string) (*domain.ObjectDetails, error) {
+func (c *Commands) HumanCheckMFATOTPSetup(ctx context.Context, userID, code, userAgentID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing")
 	}
 
-	existingOTP, err := c.totpWriteModelByID(ctx, userID, resourceowner)
+	existingOTP, err := c.totpWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -146,11 +146,11 @@ func (c *Commands) HumanCheckMFATOTPSetup(ctx context.Context, userID, code, use
 	return writeModelToObjectDetails(&existingOTP.WriteModel), nil
 }
 
-func (c *Commands) HumanCheckMFATOTP(ctx context.Context, userID, code, resourceowner string, authRequest *domain.AuthRequest) error {
+func (c *Commands) HumanCheckMFATOTP(ctx context.Context, userID, code, resourceOwner string, authRequest *domain.AuthRequest) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing")
 	}
-	existingOTP, err := c.totpWriteModelByID(ctx, userID, resourceowner)
+	existingOTP, err := c.totpWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -244,7 +244,7 @@ func (c *Commands) RemoveHumanOTPSMS(ctx context.Context, userID, resourceOwner 
 	return writeModelToObjectDetails(&existingOTP.WriteModel), nil
 }
 
-func (c *Commands) HumanSendOTPSMS(ctx context.Context, userID, resourceowner string, authRequest *domain.AuthRequest) error {
+func (c *Commands) HumanSendOTPSMS(ctx context.Context, userID, resourceOwner string, authRequest *domain.AuthRequest) error {
 	smsWriteModel := func(ctx context.Context, userID string, resourceOwner string) (OTPWriteModel, error) {
 		return c.otpSMSWriteModelByID(ctx, userID, resourceOwner)
 	}
@@ -254,7 +254,7 @@ func (c *Commands) HumanSendOTPSMS(ctx context.Context, userID, resourceowner st
 	return c.sendHumanOTP(
 		ctx,
 		userID,
-		resourceowner,
+		resourceOwner,
 		authRequest,
 		smsWriteModel,
 		domain.SecretGeneratorTypeOTPSMS,
@@ -344,7 +344,7 @@ func (c *Commands) RemoveHumanOTPEmail(ctx context.Context, userID, resourceOwne
 	return writeModelToObjectDetails(&existingOTP.WriteModel), nil
 }
 
-func (c *Commands) HumanSendOTPEmail(ctx context.Context, userID, resourceowner string, authRequest *domain.AuthRequest) error {
+func (c *Commands) HumanSendOTPEmail(ctx context.Context, userID, resourceOwner string, authRequest *domain.AuthRequest) error {
 	smsWriteModel := func(ctx context.Context, userID string, resourceOwner string) (OTPWriteModel, error) {
 		return c.otpEmailWriteModelByID(ctx, userID, resourceOwner)
 	}
@@ -354,7 +354,7 @@ func (c *Commands) HumanSendOTPEmail(ctx context.Context, userID, resourceowner 
 	return c.sendHumanOTP(
 		ctx,
 		userID,
-		resourceowner,
+		resourceOwner,
 		authRequest,
 		smsWriteModel,
 		domain.SecretGeneratorTypeOTPEmail,
