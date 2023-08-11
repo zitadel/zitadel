@@ -147,7 +147,7 @@ func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	session, err := repo.Query.SessionByID(ctx, false, sessionID, token)
+	session, err := repo.Query.SessionByID(ctx, true, sessionID, token)
 	if err != nil {
 		return "", "", "", err
 	}
@@ -199,10 +199,19 @@ func authMethodsFromSession(session *query.Session) []domain.UserAuthMethodType 
 	// TODO: add checks with https://github.com/zitadel/zitadel/issues/5477
 	/*
 		if !session.TOTPFactor.TOTPCheckedAt.IsZero() {
-			types = append(types, domain.UserAuthMethodTypeOTP)
+			types = append(types, domain.UserAuthMethodTypeTOTP)
 		}
 		if !session.U2FFactor.U2FCheckedAt.IsZero() {
 			types = append(types, domain.UserAuthMethodTypeU2F)
+		}
+	*/
+	// TODO: add checks with https://github.com/zitadel/zitadel/issues/6224
+	/*
+		if !session.TOTPFactor.OTPSMSCheckedAt.IsZero() {
+			types = append(types, domain.UserAuthMethodTypeOTPSMS)
+		}
+		if !session.TOTPFactor.OTPEmailCheckedAt.IsZero() {
+			types = append(types, domain.UserAuthMethodTypeOTPEmail)
 		}
 	*/
 	return types
