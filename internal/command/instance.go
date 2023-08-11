@@ -38,7 +38,7 @@ type InstanceSetup struct {
 	InstanceName     string
 	CustomDomain     string
 	DefaultLanguage  language.Tag
-	Org              OrgSetup
+	Org              InstanceOrgSetup
 	SecretGenerators struct {
 		PasswordSaltCost         uint
 		ClientSecret             *crypto.GeneratorConfig
