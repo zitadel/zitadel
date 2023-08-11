@@ -83,6 +83,12 @@ func (l *Login) handleMFACreation(w http.ResponseWriter, r *http.Request, authRe
 	case domain.MFATypeTOTP:
 		l.handleTOTPCreation(w, r, authReq, data)
 		return
+	case domain.MFATypeOTPSMS:
+		l.handleRegisterOTPSMS(w, r, authReq)
+		return
+	case domain.MFATypeOTPEmail:
+		l.handleRegisterOTPEmail(w, r, authReq)
+		return
 	case domain.MFATypeU2F:
 		l.renderRegisterU2F(w, r, authReq, nil)
 		return
@@ -102,4 +108,18 @@ func (l *Login) handleTOTPCreation(w http.ResponseWriter, r *http.Request, authR
 		Url:    otp.URI,
 	}
 	l.renderMFAInitVerify(w, r, authReq, data, nil)
+}
+
+// handleRegisterOTPEmail will directly add OTP Email as 2FA.
+// It will also add a successful OTP Email check to the auth request.
+func (l *Login) handleRegisterOTPEmail(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
+	_, err := l.command.AddHumanOTPEmail(setUserContext(r.Context(), authReq.UserID, authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	done := &mfaDoneData{
+		MFAType: domain.MFATypeOTPEmail,
+	}
+	l.renderMFAInitDone(w, r, authReq, done)
 }

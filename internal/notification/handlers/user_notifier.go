@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -105,6 +106,14 @@ func (u *userNotifier) reducers() []handler.AggregateReducer {
 				{
 					Event:  user.HumanPasswordChangedType,
 					Reduce: u.reducePasswordChanged,
+				},
+				{
+					Event:  user.HumanOTPSMSCodeAddedType,
+					Reduce: u.reduceOTPSMSCodeAdded,
+				},
+				{
+					Event:  user.HumanOTPEmailCodeAddedType,
+					Reduce: u.reduceOTPEmailCodeAdded,
 				},
 			},
 		},
@@ -326,6 +335,132 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		return nil, err
 	}
 	err = u.commands.PasswordCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+	if err != nil {
+		return nil, err
+	}
+	return crdb.NewNoOpStatement(e), nil
+}
+
+func (u *userNotifier) reduceOTPSMSCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPSMSCodeAddedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ASF3g", "reduce.wrong.event.type %s", user.HumanOTPSMSCodeAddedType)
+	}
+	ctx := HandlerContext(event.Aggregate())
+	alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
+		user.HumanOTPSMSCodeAddedType, user.HumanOTPSMSCodeSentType)
+	if err != nil {
+		return nil, err
+	}
+	if alreadyHandled {
+		return crdb.NewNoOpStatement(e), nil
+	}
+	code, err := crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
+	if err != nil {
+		return nil, err
+	}
+	colors, err := u.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
+	if err != nil {
+		return nil, err
+	}
+
+	notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
+	if err != nil {
+		return nil, err
+	}
+	translator, err := u.queries.GetTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.VerifySMSOTPMessageType)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, origin, err := u.queries.Origin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	notify := types.SendSMSTwilio(
+		ctx,
+		translator,
+		notifyUser,
+		u.queries.GetTwilioConfig,
+		u.queries.GetFileSystemProvider,
+		u.queries.GetLogProvider,
+		colors,
+		u.assetsPrefix(ctx),
+		e,
+		u.metricSuccessfulDeliveriesSMS,
+		u.metricFailedDeliveriesSMS,
+	)
+	err = notify.SendOTPSMSCode(notifyUser, authz.GetInstance(ctx).RequestedDomain(), origin, code, e.Expiry)
+	if err != nil {
+		return nil, err
+	}
+	err = u.commands.HumanMFAOTPSMSCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+	if err != nil {
+		return nil, err
+	}
+	return crdb.NewNoOpStatement(e), nil
+}
+
+func (u *userNotifier) reduceOTPEmailCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanOTPEmailCodeAddedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-JL3hw", "reduce.wrong.event.type %s", user.HumanOTPEmailCodeAddedType)
+	}
+	ctx := HandlerContext(event.Aggregate())
+	alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
+		user.HumanOTPEmailCodeAddedType, user.HumanOTPEmailCodeSentType)
+	if err != nil {
+		return nil, err
+	}
+	if alreadyHandled {
+		return crdb.NewNoOpStatement(e), nil
+	}
+	code, err := crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
+	if err != nil {
+		return nil, err
+	}
+	colors, err := u.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
+	if err != nil {
+		return nil, err
+	}
+
+	template, err := u.queries.MailTemplateByOrg(ctx, e.Aggregate().ResourceOwner, false)
+	if err != nil {
+		return nil, err
+	}
+
+	notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
+	if err != nil {
+		return nil, err
+	}
+	translator, err := u.queries.GetTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.VerifyEmailOTPMessageType)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, origin, err := u.queries.Origin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	notify := types.SendEmail(
+		ctx,
+		string(template.Template),
+		translator,
+		notifyUser,
+		u.queries.GetSMTPConfig,
+		u.queries.GetFileSystemProvider,
+		u.queries.GetLogProvider,
+		colors,
+		u.assetsPrefix(ctx),
+		e,
+		u.metricSuccessfulDeliveriesEmail,
+		u.metricFailedDeliveriesEmail,
+	)
+	err = notify.SendOTPEmailCode(notifyUser, authz.GetInstance(ctx).RequestedDomain(), origin, code, e.Expiry)
+	if err != nil {
+		return nil, err
+	}
+	err = u.commands.HumanMFAOTPEmailCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
 	if err != nil {
 		return nil, err
 	}

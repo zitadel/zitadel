@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 
@@ -21,11 +22,15 @@ const (
 	otpSMSEventPrefix               = otpEventPrefix + "sms."
 	HumanOTPSMSAddedType            = otpSMSEventPrefix + "added"
 	HumanOTPSMSRemovedType          = otpSMSEventPrefix + "removed"
+	HumanOTPSMSCodeAddedType        = otpSMSEventPrefix + "code.added"
+	HumanOTPSMSCodeSentType         = otpSMSEventPrefix + "code.sent"
 	HumanOTPSMSCheckSucceededType   = otpSMSEventPrefix + "check.succeeded"
 	HumanOTPSMSCheckFailedType      = otpSMSEventPrefix + "check.failed"
 	otpEmailEventPrefix             = otpEventPrefix + "email."
 	HumanOTPEmailAddedType          = otpEmailEventPrefix + "added"
 	HumanOTPEmailRemovedType        = otpEmailEventPrefix + "removed"
+	HumanOTPEmailCodeAddedType      = otpEmailEventPrefix + "code.added"
+	HumanOTPEmailCodeSentType       = otpEmailEventPrefix + "code.sent"
 	HumanOTPEmailCheckSucceededType = otpEmailEventPrefix + "check.succeeded"
 	HumanOTPEmailCheckFailedType    = otpEmailEventPrefix + "check.failed"
 )
@@ -271,6 +276,78 @@ func NewHumanOTPSMSRemovedEvent(
 	}
 }
 
+type HumanOTPSMSCodeAddedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Code   *crypto.CryptoValue `json:"code,omitempty"`
+	Expiry time.Duration       `json:"expiry,omitempty"`
+	*AuthRequestInfo
+}
+
+func (e *HumanOTPSMSCodeAddedEvent) Data() interface{} {
+	return e
+}
+
+func (e *HumanOTPSMSCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanOTPSMSCodeAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewHumanOTPSMSCodeAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	code *crypto.CryptoValue,
+	expiry time.Duration,
+	info *AuthRequestInfo,
+) *HumanOTPSMSCodeAddedEvent {
+	return &HumanOTPSMSCodeAddedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanOTPSMSCodeAddedType,
+		),
+		Code:            code,
+		Expiry:          expiry,
+		AuthRequestInfo: info,
+	}
+}
+
+type HumanOTPSMSCodeSentEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Code   *crypto.CryptoValue `json:"code,omitempty"`
+	Expiry time.Duration       `json:"expiry,omitempty"`
+	*AuthRequestInfo
+}
+
+func (e *HumanOTPSMSCodeSentEvent) Data() interface{} {
+	return e
+}
+
+func (e *HumanOTPSMSCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanOTPSMSCodeSentEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewHumanOTPSMSCodeSentEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *HumanOTPSMSCodeSentEvent {
+	return &HumanOTPSMSCodeSentEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanOTPSMSCodeSentType,
+		),
+	}
+}
+
 type HumanOTPSMSCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	*AuthRequestInfo
@@ -389,6 +466,78 @@ func NewHumanOTPEmailRemovedEvent(
 			ctx,
 			aggregate,
 			HumanOTPEmailRemovedType,
+		),
+	}
+}
+
+type HumanOTPEmailCodeAddedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Code   *crypto.CryptoValue `json:"code,omitempty"`
+	Expiry time.Duration       `json:"expiry,omitempty"`
+	*AuthRequestInfo
+}
+
+func (e *HumanOTPEmailCodeAddedEvent) Data() interface{} {
+	return e
+}
+
+func (e *HumanOTPEmailCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanOTPEmailCodeAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewHumanOTPEmailCodeAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	code *crypto.CryptoValue,
+	expiry time.Duration,
+	info *AuthRequestInfo,
+) *HumanOTPEmailCodeAddedEvent {
+	return &HumanOTPEmailCodeAddedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanOTPEmailCodeAddedType,
+		),
+		Code:            code,
+		Expiry:          expiry,
+		AuthRequestInfo: info,
+	}
+}
+
+type HumanOTPEmailCodeSentEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Code   *crypto.CryptoValue `json:"code,omitempty"`
+	Expiry time.Duration       `json:"expiry,omitempty"`
+	*AuthRequestInfo
+}
+
+func (e *HumanOTPEmailCodeSentEvent) Data() interface{} {
+	return e
+}
+
+func (e *HumanOTPEmailCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanOTPEmailCodeSentEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewHumanOTPEmailCodeSentEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *HumanOTPEmailCodeSentEvent {
+	return &HumanOTPEmailCodeSentEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanOTPEmailCodeSentType,
 		),
 	}
 }

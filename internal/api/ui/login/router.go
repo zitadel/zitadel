@@ -31,6 +31,8 @@ const (
 	EndpointMFAVerify                = "/mfa/verify"
 	EndpointMFAPrompt                = "/mfa/prompt"
 	EndpointMFAInitVerify            = "/mfa/init/verify"
+	EndpointMFASMSInitVerify         = "/mfa/init/sms/verify"
+	EndpointMFAOTPVerify             = "/mfa/otp/verify"
 	EndpointMFAInitU2FVerify         = "/mfa/init/u2f/verify"
 	EndpointU2FVerification          = "/mfa/u2f/verify"
 	EndpointMailVerification         = "/mail/verification"
@@ -89,6 +91,8 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointMFAPrompt, login.handleMFAPromptSelection).Methods(http.MethodGet)
 	router.HandleFunc(EndpointMFAPrompt, login.handleMFAPrompt).Methods(http.MethodPost)
 	router.HandleFunc(EndpointMFAInitVerify, login.handleMFAInitVerify).Methods(http.MethodPost)
+	router.HandleFunc(EndpointMFASMSInitVerify, login.handleRegisterSMSCheck).Methods(http.MethodPost)
+	router.HandleFunc(EndpointMFAOTPVerify, login.handleOTPVerification).Methods(http.MethodPost)
 	router.HandleFunc(EndpointMFAInitU2FVerify, login.handleRegisterU2F).Methods(http.MethodPost)
 	router.HandleFunc(EndpointU2FVerification, login.handleU2FVerification).Methods(http.MethodPost)
 	router.HandleFunc(EndpointMailVerification, login.handleMailVerification).Methods(http.MethodGet)

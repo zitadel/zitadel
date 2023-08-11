@@ -89,6 +89,8 @@ InitMFAPrompt:
   Description: 2-factor authentication gives you an additional security for your user account. This ensures that only you have access to your account.
   Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
   Provider1: Device dependent (e.g FaceID, Windows Hello, Fingerprint)
+  Provider3: OTP SMS
+  Provider4: OTP Email
   NextButtonText: next
   SkipButtonText: skip
 
@@ -100,6 +102,16 @@ InitMFAOTP:
   CodeLabel: Code
   NextButtonText: next
   CancelButtonText: cancel
+
+InitMFAOTPSMS:
+  Title: 2-Factor Verification
+  DescriptionPhone: Create your 2-factor. Enter your phone number to verify it.
+  DescriptionCode: Create your 2-factor. Enter the received code to verify your phone number.
+  PhoneLabel: Phone
+  CodeLabel: Code
+  EditButtonText: edit
+  ResendButtonText: resend code
+  NextButtonText: next
 
 InitMFAU2F:
   Title: Add security key
@@ -118,12 +130,21 @@ InitMFADone:
 MFAProvider:
   Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
   Provider1: Device dependent (e.g FaceID, Windows Hello, Fingerprint)
+  Provider3: OTP SMS
+  Provider4: OTP Email
   ChooseOther: or choose another option
 
 VerifyMFAOTP:
   Title: Verify 2-Factor
   Description: Verify your second factor
   CodeLabel: Code
+  NextButtonText: next
+
+VerifyOTP:
+  Title: Verify 2-Factor
+  Description: Verify your second factor
+  CodeLabel: Code
+  ResendButtonText: resend code
   NextButtonText: next
 
 VerifyMFAU2F:

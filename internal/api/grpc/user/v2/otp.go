@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) AddOTPSMS(ctx context.Context, req *user.AddOTPSMSRequest) (*user.AddOTPSMSResponse, error) {
-	details, err := s.command.AddHumanOTPSMS(ctx, req.GetUserId(), authz.GetCtxData(ctx).ResourceOwner)
+	details, err := s.command.AddHumanOTPSMS(ctx, req.GetUserId(), authz.GetCtxData(ctx).ResourceOwner, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func (s *Server) RemoveOTPSMS(ctx context.Context, req *user.RemoveOTPSMSRequest
 }
 
 func (s *Server) AddOTPEmail(ctx context.Context, req *user.AddOTPEmailRequest) (*user.AddOTPEmailResponse, error) {
-	details, err := s.command.AddHumanOTPEmail(ctx, req.GetUserId(), authz.GetCtxData(ctx).ResourceOwner)
+	details, err := s.command.AddHumanOTPEmail(ctx, req.GetUserId(), authz.GetCtxData(ctx).ResourceOwner, nil)
 	if err != nil {
 		return nil, err
 	}
