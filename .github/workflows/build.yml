@@ -2,10 +2,6 @@ name: ZITADEL CI/CD
 
 on:
   pull_request:
-    paths-ignore:
-      - 'docs/**'
-      - 'guides/**'
-      - '**.md'
   workflow_dispatch:
 
 permissions:

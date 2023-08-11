@@ -21,6 +21,7 @@ import (
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
+	organisation "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
@@ -34,6 +35,7 @@ type Client struct {
 	UserV2    user.UserServiceClient
 	SessionV2 session.SessionServiceClient
 	OIDCv2    oidc_pb.OIDCServiceClient
+	OrgV2     organisation.OrganizationServiceClient
 	System    system.SystemServiceClient
 }
 
@@ -46,6 +48,7 @@ func newClient(cc *grpc.ClientConn) Client {
 		UserV2:    user.NewUserServiceClient(cc),
 		SessionV2: session.NewSessionServiceClient(cc),
 		OIDCv2:    oidc_pb.NewOIDCServiceClient(cc),
+		OrgV2:     organisation.NewOrganizationServiceClient(cc),
 		System:    system.NewSystemServiceClient(cc),
 	}
 }
@@ -171,7 +174,7 @@ func (s *Tester) SetUserPassword(ctx context.Context, userID, password string) {
 
 func (s *Tester) AddGenericOAuthProvider(t *testing.T) string {
 	ctx := authz.WithInstance(context.Background(), s.Instance)
-	id, _, err := s.Commands.AddOrgGenericOAuthProvider(ctx, s.Organisation.ID, command.GenericOAuthProvider{
+	id, _, err := s.Commands.AddInstanceGenericOAuthProvider(ctx, command.GenericOAuthProvider{
 		Name:                  "idp",
 		ClientID:              "clientID",
 		ClientSecret:          "clientSecret",
