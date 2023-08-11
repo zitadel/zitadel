@@ -28,6 +28,11 @@ jobs:
       name: Source checkout
       uses: actions/checkout@v3
     -
+      uses: actions/download-artifact@v3
+      if: ${{ !inputs.dry_run }}
+      with:
+        path: .artifacts
+    -
       name: Semantic Release
       uses: cycjimmy/semantic-release-action@v3
       id: semantic
