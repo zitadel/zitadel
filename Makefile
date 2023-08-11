@@ -90,12 +90,15 @@ clean:
 core_unit_test:
 	go test -race -coverprofile=profile.cov ./...
 
-.PHONY: core_integration_test
-core_integration_test:
+.PHONY: core_integration_setup
+core_integration_setup:
 	go build -o zitadel main.go
 	./zitadel init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 	./zitadel setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 	$(RM) zitadel
+
+.PHONY: core_integration_test
+core_integration_test: core_integration_setup
 	go test -tags=integration -race -p 1 -v -coverprofile=profile.cov -coverpkg=./internal/...,./cmd/... ./internal/integration ./internal/api/grpc/...  ./internal/notification/handlers/... ./internal/api/oidc/...
 
 .PHONY: console_lint
