@@ -791,7 +791,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 			got, err := c.OIDCSessionByRefreshToken(tt.args.ctx, tt.args.refreshToken)
 			require.ErrorIs(t, err, tt.res.err)
 			if tt.res.err == nil {
-				assert.WithinRange(t, got.ChangeDate, tt.res.model.ChangeDate.Add(-2*time.Second), tt.res.model.ChangeDate.Add(2*time.Second))
+				assert.WithinRange(t, got.ChangeDate, tt.res.model.ChangeDate, time.Now())
 				assert.Equal(t, tt.res.model.AggregateID, got.AggregateID)
 				assert.Equal(t, tt.res.model.UserID, got.UserID)
 				assert.Equal(t, tt.res.model.SessionID, got.SessionID)
@@ -799,11 +799,13 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 				assert.Equal(t, tt.res.model.Audience, got.Audience)
 				assert.Equal(t, tt.res.model.Scope, got.Scope)
 				assert.Equal(t, tt.res.model.AuthMethods, got.AuthMethods)
-				assert.WithinRange(t, got.AuthTime, tt.res.model.AuthTime.Add(-2*time.Second), tt.res.model.AuthTime.Add(2*time.Second))
+				assert.WithinRange(t, got.AuthTime, tt.res.model.AuthTime, tt.res.model.AuthTime)
 				assert.Equal(t, tt.res.model.State, got.State)
 				assert.Equal(t, tt.res.model.RefreshTokenID, got.RefreshTokenID)
-				assert.WithinRange(t, got.RefreshTokenExpiration, tt.res.model.RefreshTokenExpiration.Add(-2*time.Second), tt.res.model.RefreshTokenExpiration.Add(2*time.Second))
-				assert.WithinRange(t, got.RefreshTokenIdleExpiration, tt.res.model.RefreshTokenIdleExpiration.Add(-2*time.Second), tt.res.model.RefreshTokenIdleExpiration.Add(2*time.Second))
+				duration := tt.res.model.RefreshTokenExpiration.Sub(testNow)
+				assert.WithinRange(t, got.RefreshTokenExpiration, tt.res.model.RefreshTokenExpiration, time.Now().Add(duration))
+				idleDuration := tt.res.model.RefreshTokenIdleExpiration.Sub(testNow)
+				assert.WithinRange(t, got.RefreshTokenIdleExpiration, tt.res.model.RefreshTokenIdleExpiration, time.Now().Add(idleDuration))
 			}
 		})
 	}
