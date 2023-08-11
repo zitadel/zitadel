@@ -394,7 +394,7 @@ func (u *userNotifier) reduceOTPSMSCodeAdded(event eventstore.Event) (*handler.S
 	if err != nil {
 		return nil, err
 	}
-	err = u.commands.HumanMFAOTPSMSCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+	err = u.commands.HumanOTPSMSCodeSent(ctx, e.Aggregate().ID, e.Aggregate().ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -460,7 +460,7 @@ func (u *userNotifier) reduceOTPEmailCodeAdded(event eventstore.Event) (*handler
 	if err != nil {
 		return nil, err
 	}
-	err = u.commands.HumanMFAOTPEmailCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+	err = u.commands.HumanOTPEmailCodeSent(ctx, e.Aggregate().ID, e.Aggregate().ResourceOwner)
 	if err != nil {
 		return nil, err
 	}

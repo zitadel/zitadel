@@ -384,7 +384,7 @@ func (repo *AuthRequestRepo) SendMFAOTPSMS(ctx context.Context, userID, resource
 	if err != nil {
 		return err
 	}
-	return repo.Command.HumanSendMFAOTPSMS(ctx, userID, resourceOwner, request)
+	return repo.Command.HumanSendOTPSMS(ctx, userID, resourceOwner, request)
 }
 
 func (repo *AuthRequestRepo) VerifyMFAOTPSMS(ctx context.Context, userID, resourceOwner, code, authRequestID, userAgentID string, info *domain.BrowserInfo) (err error) {
@@ -394,7 +394,7 @@ func (repo *AuthRequestRepo) VerifyMFAOTPSMS(ctx context.Context, userID, resour
 	if err != nil {
 		return err
 	}
-	return repo.Command.HumanCheckMFAOTPSMS(ctx, userID, code, resourceOwner, request.WithCurrentInfo(info))
+	return repo.Command.HumanCheckOTPSMS(ctx, userID, code, resourceOwner, request.WithCurrentInfo(info))
 }
 
 func (repo *AuthRequestRepo) SendMFAOTPEmail(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (err error) {
@@ -405,7 +405,7 @@ func (repo *AuthRequestRepo) SendMFAOTPEmail(ctx context.Context, userID, resour
 	if err != nil {
 		return err
 	}
-	return repo.Command.HumanSendMFAOTPEmail(ctx, userID, resourceOwner, request)
+	return repo.Command.HumanSendOTPEmail(ctx, userID, resourceOwner, request)
 }
 
 func (repo *AuthRequestRepo) VerifyMFAOTPEmail(ctx context.Context, userID, resourceOwner, code, authRequestID, userAgentID string, info *domain.BrowserInfo) (err error) {
@@ -415,7 +415,7 @@ func (repo *AuthRequestRepo) VerifyMFAOTPEmail(ctx context.Context, userID, reso
 	if err != nil {
 		return err
 	}
-	return repo.Command.HumanCheckMFAOTPEmail(ctx, userID, code, resourceOwner, request.WithCurrentInfo(info))
+	return repo.Command.HumanCheckOTPEmail(ctx, userID, code, resourceOwner, request.WithCurrentInfo(info))
 }
 
 func (repo *AuthRequestRepo) BeginMFAU2FLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (login *domain.WebAuthNLogin, err error) {

@@ -244,7 +244,7 @@ func (c *Commands) RemoveHumanOTPSMS(ctx context.Context, userID, resourceOwner 
 	return writeModelToObjectDetails(&existingOTP.WriteModel), nil
 }
 
-func (c *Commands) HumanSendMFAOTPSMS(ctx context.Context, userID, resourceowner string, authRequest *domain.AuthRequest) error {
+func (c *Commands) HumanSendOTPSMS(ctx context.Context, userID, resourceowner string, authRequest *domain.AuthRequest) error {
 	smsWriteModel := func(ctx context.Context, userID string, resourceOwner string) (OTPWriteModel, error) {
 		return c.otpSMSWriteModelByID(ctx, userID, resourceOwner)
 	}
@@ -262,17 +262,17 @@ func (c *Commands) HumanSendMFAOTPSMS(ctx context.Context, userID, resourceowner
 	)
 }
 
-func (c *Commands) HumanMFAOTPSMSCodeSent(ctx context.Context, orgID, userID string) (err error) {
+func (c *Commands) HumanOTPSMSCodeSent(ctx context.Context, userID, resourceOwner string) (err error) {
 	smsWriteModel := func(ctx context.Context, userID string, resourceOwner string) (OTPWriteModel, error) {
 		return c.otpSMSWriteModelByID(ctx, userID, resourceOwner)
 	}
 	codeSentEvent := func(ctx context.Context, aggregate *eventstore.Aggregate) eventstore.Command {
 		return user.NewHumanOTPSMSCodeSentEvent(ctx, aggregate)
 	}
-	return c.humanOTPSent(ctx, userID, orgID, smsWriteModel, codeSentEvent)
+	return c.humanOTPSent(ctx, userID, resourceOwner, smsWriteModel, codeSentEvent)
 }
 
-func (c *Commands) HumanCheckMFAOTPSMS(ctx context.Context, userID, code, resourceOwner string, authRequest *domain.AuthRequest) error {
+func (c *Commands) HumanCheckOTPSMS(ctx context.Context, userID, code, resourceOwner string, authRequest *domain.AuthRequest) error {
 	writeModel := func(ctx context.Context, userID string, resourceOwner string) (OTPCodeWriteModel, error) {
 		return c.otpSMSCodeWriteModelByID(ctx, userID, resourceOwner)
 	}
@@ -344,7 +344,7 @@ func (c *Commands) RemoveHumanOTPEmail(ctx context.Context, userID, resourceOwne
 	return writeModelToObjectDetails(&existingOTP.WriteModel), nil
 }
 
-func (c *Commands) HumanSendMFAOTPEmail(ctx context.Context, userID, resourceowner string, authRequest *domain.AuthRequest) error {
+func (c *Commands) HumanSendOTPEmail(ctx context.Context, userID, resourceowner string, authRequest *domain.AuthRequest) error {
 	smsWriteModel := func(ctx context.Context, userID string, resourceOwner string) (OTPWriteModel, error) {
 		return c.otpEmailWriteModelByID(ctx, userID, resourceOwner)
 	}
@@ -362,17 +362,17 @@ func (c *Commands) HumanSendMFAOTPEmail(ctx context.Context, userID, resourceown
 	)
 }
 
-func (c *Commands) HumanMFAOTPEmailCodeSent(ctx context.Context, orgID, userID string) (err error) {
+func (c *Commands) HumanOTPEmailCodeSent(ctx context.Context, userID, resourceOwner string) (err error) {
 	smsWriteModel := func(ctx context.Context, userID string, resourceOwner string) (OTPWriteModel, error) {
 		return c.otpEmailWriteModelByID(ctx, userID, resourceOwner)
 	}
 	codeSentEvent := func(ctx context.Context, aggregate *eventstore.Aggregate) eventstore.Command {
 		return user.NewHumanOTPEmailCodeSentEvent(ctx, aggregate)
 	}
-	return c.humanOTPSent(ctx, userID, orgID, smsWriteModel, codeSentEvent)
+	return c.humanOTPSent(ctx, userID, resourceOwner, smsWriteModel, codeSentEvent)
 }
 
-func (c *Commands) HumanCheckMFAOTPEmail(ctx context.Context, userID, code, resourceOwner string, authRequest *domain.AuthRequest) error {
+func (c *Commands) HumanCheckOTPEmail(ctx context.Context, userID, code, resourceOwner string, authRequest *domain.AuthRequest) error {
 	writeModel := func(ctx context.Context, userID string, resourceOwner string) (OTPCodeWriteModel, error) {
 		return c.otpEmailCodeWriteModelByID(ctx, userID, resourceOwner)
 	}
@@ -404,7 +404,7 @@ func (c *Commands) sendHumanOTP(
 	codeAddedEvent func(ctx context.Context, aggregate *eventstore.Aggregate, code *crypto.CryptoValue, expiry time.Duration, info *user.AuthRequestInfo) eventstore.Command,
 ) (err error) {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-S3SF1", "Errors.User.UserIDMissing")
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-S3SF1", "Errors.User.UserIDMissing")
 	}
 	existingOTP, err := writeModelByID(ctx, userID, resourceOwner)
 	if err != nil {
@@ -458,7 +458,10 @@ func (c *Commands) humanCheckOTP(
 	checkFailedEvent func(ctx context.Context, aggregate *eventstore.Aggregate, info *user.AuthRequestInfo) eventstore.Command,
 ) error {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-S453v", "Errors.User.UserIDMissing")
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-S453v", "Errors.User.UserIDMissing")
+	}
+	if code == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-SJl2g", "Errors.User.Code.Empty")
 	}
 	existingOTP, err := writeModelByID(ctx, userID, resourceOwner)
 	if err != nil {
@@ -467,17 +470,14 @@ func (c *Commands) humanCheckOTP(
 	if !existingOTP.OTPAdded() {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-d2r52", "Errors.User.MFA.OTP.NotReady")
 	}
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, secretGeneratorType)
-	if err != nil {
-		return err
+	if existingOTP.Code() == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-S34gh", "Errors.User.Code.NotFound")
 	}
-	gen := crypto.NewEncryptionGenerator(*config, c.userEncryption)
 	if code == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty")
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty")
 	}
-
 	userAgg := &user.NewAggregate(userID, existingOTP.ResourceOwner()).Aggregate
-	err = crypto.VerifyCode(existingOTP.CodeCreationDate(), existingOTP.CodeExpiry(), existingOTP.Code(), code, gen)
+	err = crypto.VerifyCodeWithAlgorithm(existingOTP.CodeCreationDate(), existingOTP.CodeExpiry(), existingOTP.Code(), code, c.userEncryption)
 	if err == nil {
 		_, err = c.eventstore.Push(ctx, checkSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 		return err
