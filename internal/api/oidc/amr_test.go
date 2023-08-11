@@ -46,11 +46,32 @@ func TestAMR(t *testing.T) {
 			[]string{UserPresence},
 		},
 		{
-			"otp checked",
+			"totp checked",
 			args{
-				[]domain.UserAuthMethodType{domain.UserAuthMethodTypeOTP},
+				[]domain.UserAuthMethodType{domain.UserAuthMethodTypeTOTP},
 			},
 			[]string{OTP},
+		},
+		{
+			"otp sms checked",
+			args{
+				[]domain.UserAuthMethodType{domain.UserAuthMethodTypeOTPSMS},
+			},
+			[]string{OTP},
+		},
+		{
+			"otp email checked",
+			args{
+				[]domain.UserAuthMethodType{domain.UserAuthMethodTypeOTPEmail},
+			},
+			[]string{OTP},
+		},
+		{
+			"multiple (t)otp checked",
+			args{
+				[]domain.UserAuthMethodType{domain.UserAuthMethodTypeTOTP, domain.UserAuthMethodTypeOTPEmail},
+			},
+			[]string{OTP, MFA},
 		},
 		{
 			"multiple checked",

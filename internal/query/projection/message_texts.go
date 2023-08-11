@@ -272,6 +272,8 @@ func isMessageTemplate(template string) bool {
 		template == domain.PasswordResetMessageType ||
 		template == domain.VerifyEmailMessageType ||
 		template == domain.VerifyPhoneMessageType ||
+		template == domain.VerifySMSOTPMessageType ||
+		template == domain.VerifyEmailOTPMessageType ||
 		template == domain.DomainClaimedMessageType ||
 		template == domain.PasswordlessRegistrationMessageType ||
 		template == domain.PasswordChangeMessageType

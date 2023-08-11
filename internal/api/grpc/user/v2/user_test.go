@@ -194,8 +194,8 @@ func Test_authMethodTypeToPb(t *testing.T) {
 			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED,
 		},
 		{
-			"(t)otp",
-			domain.UserAuthMethodTypeOTP,
+			"totp",
+			domain.UserAuthMethodTypeTOTP,
 			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_TOTP,
 		},
 		{
@@ -217,6 +217,16 @@ func Test_authMethodTypeToPb(t *testing.T) {
 			"idp",
 			domain.UserAuthMethodTypeIDP,
 			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP,
+		},
+		{
+			"otp sms",
+			domain.UserAuthMethodTypeOTPSMS,
+			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_SMS,
+		},
+		{
+			"otp email",
+			domain.UserAuthMethodTypeOTPEmail,
+			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_EMAIL,
 		},
 	}
 	for _, tt := range tests {

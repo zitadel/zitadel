@@ -1293,6 +1293,8 @@
         "INIT": "Inizializzazione",
         "VE": "Verificazione l'e-mail",
         "VP": "Verificazione del telefono",
+        "VSO": "Verifica OTP SMS",
+        "VEO": "Verifica OTP Email",
         "PR": "Ripristino della password",
         "DC": "Rivendicazione del dominio",
         "PL": "Autenticazione Passwordless",
@@ -1313,7 +1315,9 @@
         "verifiedPhone": "Telefono verificato",
         "changedate": "Cambia data",
         "username": "Nome utente",
-        "tempUsername": "Nome utente temporaneo"
+        "tempUsername": "Nome utente temporaneo",
+        "otp": "Password monouso",
+        "verifyUrl": "URL per verificare la password monouso"
       },
       "TOAST": {
         "UPDATED": "Testi personalizzati salvati."
@@ -1850,8 +1854,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Sconosciuto",
-      "1": "One Time Password (OTP)",
-      "2": "Impronta digitale, chiave di sicurezza, Face ID e altri"
+      "1": "One Time Password per Authenticator App (TOTP)",
+      "2": "Impronta digitale, chiave di sicurezza, Face ID e altri",
+      "3": "One Time Password per Email (Email OTP)",
+      "4": "One Time Password per SMS (SMS OTP)"
     }
   },
   "LOGINPOLICY": {

@@ -583,6 +583,10 @@ EventTypes:
         check:
           succeeded: Sprawdzenie hasła zakończone powodzeniem
           failed: Sprawdzenie hasła nie powiodło się
+        change:
+          sent: Wysłano zmianę hasła
+        hash:
+          updated: Zaktualizowano skrót hasła
       externallogin:
         check:
           succeeded: Zewnętrzne logowanie zakończone powodzeniem
@@ -591,6 +595,8 @@ EventTypes:
         removed: Usunięto zewnętrzne IDP
         cascade:
           removed: Usunięto kaskadę zewnętrznego IDP
+        id:
+          migrated: Identyfikator użytkownika zewnętrznego dostawcy tożsamości został przeniesiony
       phone:
         changed: Numer telefonu zmieniony
         verified: Numer telefonu zweryfikowany

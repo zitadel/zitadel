@@ -1293,6 +1293,8 @@
         "INIT": "Inicjalizacja",
         "VE": "Weryfikacja e-mail",
         "VP": "Weryfikacja telefonu",
+        "VSO": "Zweryfikuj SMS OTP",
+        "VEO": "Zweryfikuj Email OTP",
         "PR": "Resetowanie hasła",
         "DC": "Rejestracja domeny",
         "PL": "Bez hasła",
@@ -1313,7 +1315,9 @@
         "verifiedPhone": "Zweryfikowany telefon",
         "changedate": "Data zmiany",
         "username": "Nazwa użytkownika",
-        "tempUsername": "Tymczasowa nazwa użytkownika"
+        "tempUsername": "Tymczasowa nazwa użytkownika",
+        "otp": "Hasło jednorazowe",
+        "verifyUrl": "URL do weryfikacji hasła jednorazowego"
       },
       "TOAST": {
         "UPDATED": "Teksty niestandardowe zapisane."
@@ -1850,8 +1854,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Nieznany",
-      "1": "Jednorazowe hasło (OTP)",
-      "2": "Odcisk palca, klucze bezpieczeństwa, Face ID i inne"
+      "1": "Hasło jednorazowe dla aplikacji uwierzytelniającej (TOTP)",
+      "2": "Odcisk palca, Klucze Bezpieczeństwa, Face ID i inne",
+      "3": "Hasło jednorazowe dla wiadomości e-mail (Email OTP)",
+      "4": "Hasło jednorazowe dla wiadomości SMS (SMS OTP)"
     }
   },
   "LOGINPOLICY": {
