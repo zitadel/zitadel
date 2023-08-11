@@ -2,7 +2,6 @@ module.exports = {
   branches: [
     { name: "next" },
     { name: "next-rc", prerelease: "rc" },
-    { name: "pipeline-upload-assets", prerelease: "ignore-me2" }
   ],
   plugins: [
     "@semantic-release/commit-analyzer",
@@ -36,13 +35,6 @@ module.exports = {
             label: "zitadel-darwin-arm64.tar",
           },
         ],
-        draftRelease: true,
-        successComment: false,
-        failComment: false,
-        labels: false,
-        releasedLabels: false,
-        addReleases: false,
-        failTitle: false,
       },
     ],
   ],
