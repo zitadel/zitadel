@@ -79,8 +79,8 @@ var (
 		"user_resource_owner",
 		"password_checked_at",
 		"intent_checked_at",
-		"passkey_checked_at",
-		"u2f_checked_at",
+		"webauthn_checked_at",
+		"webauthn_user_verified",
 		"metadata",
 		"token",
 	}
@@ -100,8 +100,8 @@ var (
 		"user_resource_owner",
 		"password_checked_at",
 		"intent_checked_at",
-		"passkey_checked_at",
-		"u2f_checked_at",
+		"webauthn_checked_at",
+		"webauthn_user_verified",
 		"metadata",
 		"count",
 	}

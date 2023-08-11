@@ -166,7 +166,7 @@ func (wm *SessionWriteModel) AuthMethodTypes() []domain.UserAuthMethodType {
 	if !wm.PasswordCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypePassword)
 	}
-	if !wm.WebAuthNCheckedAt.IsZero() && wm.WebAuthNUserVerified {
+	if !wm.WebAuthNCheckedAt.IsZero() {
 		if wm.WebAuthNUserVerified {
 			types = append(types, domain.UserAuthMethodTypePasswordless)
 		} else {
