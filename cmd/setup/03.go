@@ -21,7 +21,7 @@ import (
 type FirstInstance struct {
 	InstanceName    string
 	DefaultLanguage language.Tag
-	Org             command.OrgSetup
+	Org             command.InstanceOrgSetup
 	MachineKeyPath  string
 	PatPath         string
 
