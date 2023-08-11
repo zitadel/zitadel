@@ -24,7 +24,6 @@ jobs:
   version:
     uses: ./.github/workflows/version.yml
     with:
-      upload_assets: true
       semantic_version: ${{ inputs.semantic_version }}
       dry_run: false
 

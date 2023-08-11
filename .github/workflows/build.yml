@@ -32,7 +32,6 @@ jobs:
   version:
     uses: ./.github/workflows/version.yml
     with:
-      upload_assets: false
       semantic_version: '19.0.2'
       dry_run: true
 

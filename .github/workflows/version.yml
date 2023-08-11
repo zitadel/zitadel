@@ -9,9 +9,6 @@ on:
       dry_run:
         required: true
         type: boolean
-      upload_assets:
-        required: true
-        type: boolean
     outputs:
         version:
             value: ${{ jobs.generate.outputs.version }}
