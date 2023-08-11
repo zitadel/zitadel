@@ -146,6 +146,24 @@ func (s *Tester) RegisterUserPasskey(ctx context.Context, userID string) {
 	logging.OnError(err).Fatal("create user passkey")
 }
 
+func (s *Tester) RegisterUserU2F(ctx context.Context, userID string) {
+	pkr, err := s.Client.UserV2.RegisterU2F(ctx, &user.RegisterU2FRequest{
+		UserId: userID,
+		Domain: s.Config.ExternalDomain,
+	})
+	logging.OnError(err).Fatal("create user u2f")
+	attestationResponse, err := s.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
+	logging.OnError(err).Fatal("create user u2f")
+
+	_, err = s.Client.UserV2.VerifyU2FRegistration(ctx, &user.VerifyU2FRegistrationRequest{
+		UserId:              userID,
+		U2FId:               pkr.GetU2FId(),
+		PublicKeyCredential: attestationResponse,
+		TokenName:           "nice name",
+	})
+	logging.OnError(err).Fatal("create user u2f")
+}
+
 func (s *Tester) SetUserPassword(ctx context.Context, userID, password string) {
 	_, err := s.Client.UserV2.SetPassword(ctx, &user.SetPasswordRequest{
 		UserId:      userID,
@@ -209,28 +227,30 @@ func (s *Tester) CreateSuccessfulIntent(t *testing.T, idpID, userID, idpUserID s
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
 }
 
-func (s *Tester) CreatePasskeySession(t *testing.T, ctx context.Context, userID string) (id, token string, start, change time.Time) {
+func (s *Tester) CreateVerfiedWebAuthNSession(t *testing.T, ctx context.Context, userID string) (id, token string, start, change time.Time) {
 	createResp, err := s.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
 				Search: &session.CheckUser_UserId{UserId: userID},
 			},
 		},
-		Challenges: []session.ChallengeKind{
-			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
+		Challenges: &session.RequestChallenges{
+			WebAuthN: &session.RequestChallenges_WebAuthN{
+				Domain:                      s.Config.ExternalDomain,
+				UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
+			},
 		},
-		Domain: s.Config.ExternalDomain,
 	})
 	require.NoError(t, err)
 
-	assertion, err := s.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetPasskey().GetPublicKeyCredentialRequestOptions())
+	assertion, err := s.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions(), true)
 	require.NoError(t, err)
 
 	updateResp, err := s.Client.SessionV2.SetSession(ctx, &session.SetSessionRequest{
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),
 		Checks: &session.Checks{
-			Passkey: &session.CheckPasskey{
+			WebAuthN: &session.CheckWebAuthN{
 				CredentialAssertionData: assertion,
 			},
 		},
@@ -250,7 +270,6 @@ func (s *Tester) CreatePasswordSession(t *testing.T, ctx context.Context, userID
 				Password: password,
 			},
 		},
-		Domain: s.Config.ExternalDomain,
 	})
 	require.NoError(t, err)
 	return createResp.GetSessionId(), createResp.GetSessionToken(),
