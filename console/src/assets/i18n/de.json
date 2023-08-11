@@ -421,9 +421,11 @@
       "U2F_ERROR": "Ein Fehler ist aufgetreten!",
       "U2F_NAME": "Authenticator Name",
       "OTPSMS": "OTP (One-Time Password) mit SMS",
+      "OTPEMAIL": "OTP (One-Time Password) mit E-Mail",
       "SETUPOTPSMSDESCRIPTION": "Möchten Sie diese Telefonnummer als zweiten OTP-Faktor (Einmalpasswort) einrichten?",
       "OTPSMSSUCCESS": "OTP Faktor erfolgrech hinzugefügt.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Um diese Methode nutzen zu können, muss Ihr Telefon verifiziert werden.",
+      "OTPEMAILSUCCESS": "OTP Faktor erfolgrech hinzugefügt.",
       "TYPE": {
         "0": "Keine MFA definiert",
         "1": "OTP",

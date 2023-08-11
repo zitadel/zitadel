@@ -421,9 +421,11 @@
       "U2F_ERROR": "Wystąpił błąd podczas konfiguracji!",
       "U2F_NAME": "Nazwa uwierzytelniacza",
       "OTPSMS": "OTP (hasło jednorazowe) z SMS-em",
+      "OTPEMAIL": "OTP (hasło jednorazowe) z e-mailem",
       "SETUPOTPSMSDESCRIPTION": "Czy chcesz ustawić ten numer telefonu jako drugi czynnik OTP (hasło jednorazowe)?",
       "OTPSMSSUCCESS": "Pomyślnie skonfigurowano współczynnik OTP.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Aby skorzystać z tej metody, Twój telefon musi zostać zweryfikowany.",
+      "OTPEMAILSUCCESS": "Pomyślnie skonfigurowano współczynnik OTP.",
       "TYPE": {
         "0": "Nie zdefiniowano MFA",
         "1": "Jednorazowe hasło (OTP)",

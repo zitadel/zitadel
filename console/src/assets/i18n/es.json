@@ -422,9 +422,11 @@
       "U2F_ERROR": "¡Se produjo un error durante la configuración!",
       "U2F_NAME": "Nombre del autenticador",
       "OTPSMS": "OTP (One-Time Password) con SMS",
+      "OTPEMAIL": "OTP (contraseña de un solo uso) con correo electrónico",
       "SETUPOTPSMSDESCRIPTION": "¿Desea configurar este número de teléfono como segundo factor OTP (contraseña de un solo uso)?",
       "OTPSMSSUCCESS": "Factor OTP establecido con éxito.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Su teléfono debe estar verificado para usar este método.",
+      "OTPEMAILSUCCESS": "Factor OTP establecido con éxito.",
       "TYPE": {
         "0": "No se ha definido MFA",
         "1": "One Time Password (OTP)",

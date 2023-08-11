@@ -421,9 +421,11 @@
       "U2F_ERROR": "安装过程中发生错误！",
       "U2F_NAME": "身份验证器名称",
       "OTPSMS": "带短信的 OTP（一次性密码）",
+      "OTPEMAIL": "带电子邮件的 OTP（一次性密码）",
       "SETUPOTPSMSDESCRIPTION": "您想将此电话号码设置为 OTP（一次性密码）第二因素吗？",
       "OTPSMSSUCCESS": "OTP 因子设置成功。",
       "OTPSMSPHONEMUSTBEVERIFIED": "您的手机必须经过验证才能使用此方法。",
+      "OTPEMAILSUCCESS": "OTP 因子设置成功。",
       "TYPE": {
         "0": "未定义 MFA",
         "1": "一次性密码 (OTP)",

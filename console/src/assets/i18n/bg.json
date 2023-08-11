@@ -415,9 +415,11 @@
       "U2F_ERROR": "Възникна грешка по време на настройката!",
       "U2F_NAME": "Име на автентификатора",
       "OTPSMS": "OTP (One-Time password) c SMS",
+      "OTPEMAIL": "OTP (еднократна парола) с имейл",
       "SETUPOTPSMSDESCRIPTION": "Искате ли да настроите този телефонен номер като OTP (еднократна парола) втори фактор?",
       "OTPSMSSUCCESS": "OTP Factor е настроен успешно.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Вашият телефон трябва да бъде потвърден, за да използвате този метод.",
+      "OTPEMAILSUCCESS": "OTP Factor е настроен успешно.",
       "TYPE": {
         "0": "Няма дефинирани MFA",
         "1": "Еднократна парола (OTP)",

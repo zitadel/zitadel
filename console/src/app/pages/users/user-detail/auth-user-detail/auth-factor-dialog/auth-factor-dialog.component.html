@@ -74,8 +74,16 @@
           <span>{{ 'USER.MFA.OTPSMS' | translate }}</span>
 
           <cnsl-info-section [type]="InfoSectionType.ALERT" *ngIf="!phoneVerified"
-            ><span>{{ 'USER.MFA.OTPSMSPHONEMUSTBEVERIFIED' }}</span></cnsl-info-section
+            ><span>{{ 'USER.MFA.OTPSMSPHONEMUSTBEVERIFIED' | translate }}</span></cnsl-info-section
           >
+        </div>
+      </button>
+      <button mat-stroked-button (click)="selectType(AuthFactorType.OTPEMAIL)">
+        <div class="otp-btn">
+          <div class="icon-row">
+            <i class="las la-at"></i>
+          </div>
+          <span>{{ 'USER.MFA.OTPEMAIL' | translate }}</span>
         </div>
       </button>
     </div>

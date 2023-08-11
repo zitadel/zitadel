@@ -422,9 +422,11 @@
       "U2F_ERROR": "セットアップ中にエラーが発生しました！",
       "U2F_NAME": "認証者名",
       "OTPSMS": "OTP（ワンタイムパスワード）とSMS",
+      "OTPEMAIL": "電子メールによる OTP (ワンタイム パスワード)",
       "SETUPOTPSMSDESCRIPTION": "この電話番号を OTP (ワンタイム パスワード) の第 2 要素として設定しますか?",
       "OTPSMSSUCCESS": "OTP 係数の設定が成功しました。",
       "OTPSMSPHONEMUSTBEVERIFIED": "この方法を使用するには、電話を認証する必要があります。",
+      "OTPEMAILSUCCESS": "OTP 係数の設定が成功しました。",
       "TYPE": {
         "0": "MFAは定義されていません",
         "1": "ワンタイムパスワード（OTP）",

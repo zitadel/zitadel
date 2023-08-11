@@ -16,7 +16,7 @@ export enum AuthFactorType {
   OTP,
   U2F,
   OTPSMS,
-  // OTPEMAIL,
+  OTPEMAIL,
 }
 
 @Component({
@@ -92,13 +92,13 @@ export class AuthFactorDialogComponent {
         .catch((error) => {
           this.toast.showError(error);
         });
-    } else if (type === AuthFactorType.OTPSMS) {
+    } else if (type === AuthFactorType.OTPEMAIL) {
       this.authService
-        .addMyAuthFactorOTPSMS()
+        .addMyAuthFactorOTPEmail()
         .then(() => {
           this.dialogRef.close(true);
           this.translate
-            .get('USER.MFA.OTPSMSSUCCESS')
+            .get('USER.MFA.OTPEMAILSUCCESS')
             .pipe(take(1))
             .subscribe((msg) => {
               this.toast.showInfo(msg);

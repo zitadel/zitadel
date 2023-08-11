@@ -422,9 +422,11 @@
       "U2F_ERROR": "An error during setup occurred!",
       "U2F_NAME": "Authenticator Name",
       "OTPSMS": "OTP (One-Time Password) with SMS",
+      "OTPEMAIL": "OTP (One-Time Password) with Email",
       "SETUPOTPSMSDESCRIPTION": "Do you want to setup this phonenumber as OTP (One-Time password) second factor?",
       "OTPSMSSUCCESS": "OTP factor set up with success.",
       "OTPSMSPHONEMUSTBEVERIFIED": "Your phone must be verified in order to use this method.",
+      "OTPEMAILSUCCESS": "OTP factor set up with success.",
       "TYPE": {
         "0": "No MFA defined",
         "1": "One Time Password (OTP)",
