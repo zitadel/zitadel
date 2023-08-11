@@ -22,6 +22,7 @@ type mfaOTPFormData struct {
 	Resend           bool           `schema:"resend"`
 	Code             string         `schema:"code"`
 	SelectedProvider domain.MFAType `schema:"selectedProvider"`
+	Provider         domain.MFAType `schema:"provider"`
 }
 
 func (l *Login) renderOTPVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, providers []domain.MFAType, selectedProvider domain.MFAType, err error) {
@@ -62,7 +63,7 @@ func (l *Login) handleOTPVerification(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if formData.Code == "" {
-		l.renderMFAVerifySelected(w, r, authReq, step, formData.SelectedProvider, nil)
+		l.renderMFAVerifySelected(w, r, authReq, step, formData.Provider, nil)
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
