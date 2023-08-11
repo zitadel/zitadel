@@ -586,6 +586,8 @@ EventTypes:
         removed: IDP externo removido
         cascade:
           removed: Cascade de IDP externo removido
+        id:
+          migrated: O ID de usuário externo do IDP foi migrado
       phone:
         changed: Número de telefone alterado
         verified: Número de telefone verificado

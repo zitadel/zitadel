@@ -1293,6 +1293,8 @@
         "INIT": "Inizializzazione",
         "VE": "Verificazione l'e-mail",
         "VP": "Verificazione del telefono",
+        "VSO": "Verifica OTP SMS",
+        "VEO": "Verifica OTP Email",
         "PR": "Ripristino della password",
         "DC": "Rivendicazione del dominio",
         "PL": "Autenticazione Passwordless",
@@ -1313,7 +1315,9 @@
         "verifiedPhone": "Telefono verificato",
         "changedate": "Cambia data",
         "username": "Nome utente",
-        "tempUsername": "Nome utente temporaneo"
+        "tempUsername": "Nome utente temporaneo",
+        "otp": "Password monouso",
+        "verifyUrl": "URL per verificare la password monouso"
       },
       "TOAST": {
         "UPDATED": "Testi personalizzati salvati."
