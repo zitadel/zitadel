@@ -33,6 +33,9 @@
     {{template "error-message" .}}
 
     <div class="lgn-actions lgn-reverse-order">
+        <a class="lgn-icon-button lgn-left-action" id="back-button" href="#">
+            <i class="lgn-icon-arrow-left-solid"></i>
+        </a>
         <button class="lgn-raised-button lgn-primary lgn-initial-focus" id="submit-button" type="submit">{{t "Login.NextButtonText"}}</button>
         <span class="fill-space"></span>
         {{if hasRegistration}}
@@ -59,5 +62,6 @@
 <script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
 <script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
 <script src="{{ resourceUrl "scripts/input_suffix_offset.js" }}"></script>
+<script src="{{ resourceUrl "scripts/go_back.js" }}"></script>
 
 {{template "main-bottom" .}}
