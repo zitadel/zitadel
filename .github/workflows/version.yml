@@ -31,6 +31,11 @@ jobs:
       name: Source checkout
       uses: actions/checkout@v3
     -
+      uses: actions/download-artifact@v3
+      if: ${{ !inputs.dry_run }}
+      with:
+        path: .artifacts
+    -
       name: Semantic Release
       uses: cycjimmy/semantic-release-action@v3
       id: semantic
@@ -46,29 +51,3 @@ jobs:
       id: output
       run:
         if [[ ! -z "${{ steps.semantic.outputs.new_release_version }}" ]]; then echo "VERSION=v${{ steps.semantic.outputs.new_release_version }}" >> "$GITHUB_OUTPUT"; else echo "VERSION=" >> "$GITHUB_OUTPUT";fi
-
-  assets:
-    needs: generate
-    if: ${{ github.event.inputs.upload_assets == 'true'}}
-    name: upload assets
-    runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows, darwin, linux]
-        arch: [amd64, arm64]
-    steps:
-      -
-        name: Download release assets
-        uses: actions/download-artifact@v3
-        with:
-          path: .artifacts
-          name: zitadel-linux-${{ matrix.arch }}
-      -
-        name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: zitadel-${{ matrix.os }}-${{ matrix.arch }}.tar
-          asset_name: zitadel-${{ matrix.os }}-${{ matrix.arch }}.tar
-          tag: ${{ needs.generate.outputs.version }}
