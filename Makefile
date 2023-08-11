@@ -52,7 +52,7 @@ core_grpc_dependencies:
 
 .PHONY: core_api
 core_api: core_api_generator core_grpc_dependencies
-	buf generate
+	npx buf generate
 	mkdir -p pkg/grpc
 	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/
 	mkdir -p openapi/v2/zitadel
