@@ -22,7 +22,7 @@ jobs:
       -
         name: Unpack executable
         run: |
-          tar -xvf .artifacts/zitadel-linux-amd64.tar
+          tar -xvf .artifacts/zitadel-linux-amd64.tar.gz
           mv zitadel-linux-amd64/zitadel ./zitadel
       -
         name: Set up QEMU
