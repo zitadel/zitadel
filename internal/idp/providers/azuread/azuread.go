@@ -15,7 +15,8 @@ import (
 const (
 	authURLTemplate  string = "https://login.microsoftonline.com/%s/oauth2/v2.0/authorize"
 	tokenURLTemplate string = "https://login.microsoftonline.com/%s/oauth2/v2.0/token"
-	userinfoURL      string = "https://graph.microsoft.com/v1.0/me"
+	userURL          string = "https://graph.microsoft.com/v1.0/me"
+	userinfoEndpoint string = "https://graph.microsoft.com/oidc/userinfo"
 
 	ScopeUserRead string = "User.Read"
 )
@@ -87,7 +88,7 @@ func New(name, clientID, clientSecret, redirectURI string, scopes []string, opts
 	rp, err := oauth.New(
 		config,
 		name,
-		userinfoURL,
+		userURL,
 		func() idp.User {
 			return &User{isEmailVerified: provider.emailVerified}
 		},

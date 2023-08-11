@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"math"
 	"net/http"
 	"time"
 
@@ -57,6 +58,7 @@ func NewTelemetryPusher(
 	handlerCfg.ProjectionName = TelemetryProjectionTable
 	handlerCfg.Reducers = p.reducers()
 	p.cfg = telemetryCfg
+	handlerCfg.ConcurrentInstances = math.MaxInt
 	p.StatementHandler = crdb.NewStatementHandler(ctx, handlerCfg)
 	p.commands = commands
 	p.queries = queries
