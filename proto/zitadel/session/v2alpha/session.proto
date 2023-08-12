@@ -39,17 +39,12 @@ message Session {
       description: "\"custom key value list\"";
     }
   ];
-  string domain = 7 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"domain on which the session was created\"";
-    }
-  ];
 }
 
 message Factors {
   UserFactor user = 1;
   PasswordFactor password = 2;
-  PasskeyFactor passkey = 3;
+  WebAuthNFactor web_auth_n = 3;
   IntentFactor intent = 4;
 }
 
@@ -97,12 +92,13 @@ message IntentFactor {
   ];
 }
 
-message PasskeyFactor {
+message WebAuthNFactor {
   google.protobuf.Timestamp verified_at = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"time when the passkey challenge was last checked\"";
     }
   ];
+  bool user_verified = 2;
 }
 
 message SearchQuery {

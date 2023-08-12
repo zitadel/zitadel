@@ -5,6 +5,14 @@ services:
     user: '$UID'
     restart: 'always'
     image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}'
+    build:
+      context: ../../..
+      dockerfile: ./build/Dockerfile
+      target: artifact
+      cache_from:
+      - type=gha
+      cache_to:
+      - type=gha,mode=max
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
     depends_on:
       db:
@@ -13,6 +21,12 @@ services:
       - ./zitadel.yaml:/zitadel.yaml
     ports:
     - "8080:8080"
+    healthcheck:
+      test: ["CMD", "zitadel", "ready"]
+      interval: '10s'
+      timeout: '5s'
+      retries: 5
+      start_period: '10s'
     extra_hosts:
     - "host.docker.internal:host-gateway"
 

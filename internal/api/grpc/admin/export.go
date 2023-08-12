@@ -152,6 +152,16 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 			return nil, err
 		}
 
+		org.VerifySmsOtpMessages, err = s.getCustomVerifySMSOTPMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
+		if err != nil {
+			return nil, err
+		}
+
+		org.VerifyEmailOtpMessages, err = s.getCustomVerifyEmailOTPMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
+		if err != nil {
+			return nil, err
+		}
+
 		org.DomainClaimedMessages, err = s.getCustomDomainClaimedMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
 		if err != nil {
 			return nil, err
@@ -1145,6 +1155,50 @@ func (s *Server) getCustomVerifyPhoneMessageTexts(ctx context.Context, org strin
 
 		if !text.IsDefault {
 			customTexts = append(customTexts, &management_pb.SetCustomVerifyPhoneMessageTextRequest{
+				Language:   lang,
+				Title:      text.Title,
+				PreHeader:  text.PreHeader,
+				Subject:    text.Subject,
+				Greeting:   text.Greeting,
+				Text:       text.Text,
+				ButtonText: text.ButtonText,
+				FooterText: text.Footer,
+			})
+		}
+	}
+
+	return customTexts, nil
+}
+
+func (s *Server) getCustomVerifySMSOTPMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomVerifySMSOTPMessageTextRequest, error) {
+	customTexts := make([]*management_pb.SetCustomVerifySMSOTPMessageTextRequest, 0, len(languages))
+	for _, lang := range languages {
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.VerifySMSOTPMessageType, lang, false)
+		if err != nil {
+			return nil, err
+		}
+
+		if !text.IsDefault {
+			customTexts = append(customTexts, &management_pb.SetCustomVerifySMSOTPMessageTextRequest{
+				Language: lang,
+				Text:     text.Text,
+			})
+		}
+	}
+
+	return customTexts, nil
+}
+
+func (s *Server) getCustomVerifyEmailOTPMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomVerifyEmailOTPMessageTextRequest, error) {
+	customTexts := make([]*management_pb.SetCustomVerifyEmailOTPMessageTextRequest, 0, len(languages))
+	for _, lang := range languages {
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.VerifyEmailOTPMessageType, lang, false)
+		if err != nil {
+			return nil, err
+		}
+
+		if !text.IsDefault {
+			customTexts = append(customTexts, &management_pb.SetCustomVerifyEmailOTPMessageTextRequest{
 				Language:   lang,
 				Title:      text.Title,
 				PreHeader:  text.PreHeader,

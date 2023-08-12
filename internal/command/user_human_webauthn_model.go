@@ -146,6 +146,12 @@ func (wm *HumanWebAuthNWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
+type HumanWebAuthNTokensReadModel interface {
+	eventstore.QueryReducer
+	GetWebAuthNTokens() []*HumanWebAuthNWriteModel
+	WebAuthNTokenByID(id string) (int, *HumanWebAuthNWriteModel)
+}
+
 type HumanU2FTokensReadModel struct {
 	eventstore.WriteModel
 
@@ -218,6 +224,10 @@ func (rm *HumanU2FTokensReadModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanU2FTokenRemovedType).
 		Builder()
 
+}
+
+func (wm *HumanU2FTokensReadModel) GetWebAuthNTokens() []*HumanWebAuthNWriteModel {
+	return wm.WebAuthNTokens
 }
 
 func (wm *HumanU2FTokensReadModel) WebAuthNTokenByID(id string) (idx int, token *HumanWebAuthNWriteModel) {
@@ -301,6 +311,10 @@ func (rm *HumanPasswordlessTokensReadModel) Query() *eventstore.SearchQueryBuild
 			user.HumanPasswordlessTokenRemovedType).
 		Builder()
 
+}
+
+func (wm *HumanPasswordlessTokensReadModel) GetWebAuthNTokens() []*HumanWebAuthNWriteModel {
+	return wm.WebAuthNTokens
 }
 
 func (wm *HumanPasswordlessTokensReadModel) WebAuthNTokenByID(id string) (idx int, token *HumanWebAuthNWriteModel) {
