@@ -15,7 +15,6 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
-	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -138,10 +137,8 @@ func (s *SessionCommands) Exec(ctx context.Context) error {
 	return nil
 }
 
-func (s *SessionCommands) Start(ctx context.Context, domain string) {
-	s.eventCommands = append(s.eventCommands, session.NewAddedEvent(ctx, s.sessionWriteModel.aggregate, domain))
-	// set the domain so checks can use it
-	s.sessionWriteModel.Domain = domain
+func (s *SessionCommands) Start(ctx context.Context) {
+	s.eventCommands = append(s.eventCommands, session.NewAddedEvent(ctx, s.sessionWriteModel.aggregate))
 }
 
 func (s *SessionCommands) UserChecked(ctx context.Context, userID string, checkedAt time.Time) error {
@@ -159,15 +156,23 @@ func (s *SessionCommands) IntentChecked(ctx context.Context, checkedAt time.Time
 	s.eventCommands = append(s.eventCommands, session.NewIntentCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
 }
 
-func (s *SessionCommands) PasskeyChallenged(ctx context.Context, challenge string, allowedCrentialIDs [][]byte, userVerification domain.UserVerificationRequirement) {
-	s.eventCommands = append(s.eventCommands, session.NewPasskeyChallengedEvent(ctx, s.sessionWriteModel.aggregate, challenge, allowedCrentialIDs, userVerification))
+func (s *SessionCommands) WebAuthNChallenged(ctx context.Context, challenge string, allowedCrentialIDs [][]byte, userVerification domain.UserVerificationRequirement, rpid string) {
+	s.eventCommands = append(s.eventCommands, session.NewWebAuthNChallengedEvent(ctx, s.sessionWriteModel.aggregate, challenge, allowedCrentialIDs, userVerification, rpid))
 }
 
-func (s *SessionCommands) PasskeyChecked(ctx context.Context, checkedAt time.Time, tokenID string, signCount uint32) {
+func (s *SessionCommands) WebAuthNChecked(ctx context.Context, checkedAt time.Time, tokenID string, signCount uint32, userVerified bool) {
 	s.eventCommands = append(s.eventCommands,
-		session.NewPasskeyCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt),
-		usr_repo.NewHumanPasswordlessSignCountChangedEvent(ctx, s.sessionWriteModel.aggregate, tokenID, signCount),
+		session.NewWebAuthNCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt, userVerified),
 	)
+	if s.sessionWriteModel.WebAuthNChallenge.UserVerification == domain.UserVerificationRequirementRequired {
+		s.eventCommands = append(s.eventCommands,
+			user.NewHumanPasswordlessSignCountChangedEvent(ctx, s.sessionWriteModel.aggregate, tokenID, signCount),
+		)
+	} else {
+		s.eventCommands = append(s.eventCommands,
+			user.NewHumanU2FSignCountChangedEvent(ctx, s.sessionWriteModel.aggregate, tokenID, signCount),
+		)
+	}
 }
 
 func (s *SessionCommands) SetToken(ctx context.Context, tokenID string) {
@@ -226,7 +231,7 @@ func (s *SessionCommands) commands(ctx context.Context) (string, []eventstore.Co
 	return token, s.eventCommands, nil
 }
 
-func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, sessionDomain string, metadata map[string][]byte) (set *SessionChanged, err error) {
+func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, metadata map[string][]byte) (set *SessionChanged, err error) {
 	sessionID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -237,7 +242,7 @@ func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, ses
 		return nil, err
 	}
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
-	cmd.Start(ctx, sessionDomain)
+	cmd.Start(ctx)
 	return c.updateSession(ctx, cmd, metadata)
 }
 

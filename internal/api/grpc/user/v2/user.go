@@ -19,7 +19,7 @@ import (
 )
 
 func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest) (_ *user.AddHumanUserResponse, err error) {
-	human, err := addUserRequestToAddHuman(req)
+	human, err := AddUserRequestToAddHuman(req)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest
 	}, nil
 }
 
-func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman, error) {
+func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman, error) {
 	username := req.GetUsername()
 	if username == "" {
 		username = req.GetEmail().GetEmail()
