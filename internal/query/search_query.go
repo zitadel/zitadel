@@ -175,7 +175,7 @@ var (
 )
 
 func NewInTextQuery(col Column, values []string) (*InTextQuery, error) {
-	if len(values) <= 0 {
+	if len(values) == 0 {
 		return nil, ErrEmptyValues
 	}
 	if col.isZero() {
@@ -206,7 +206,7 @@ func (q *InTextQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (s *InTextQuery) comp() sq.Sqlizer {
-	//This translates to an IN query
+	// This translates to an IN query
 	return sq.Eq{s.Column.identifier(): s.Values}
 }
 
@@ -296,7 +296,7 @@ func NewNumberQuery(c Column, value interface{}, compare NumberComparison) (*Num
 	}
 	switch reflect.TypeOf(value).Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Float32, reflect.Float64:
-		//everything fine
+		// everything fine
 	default:
 		return nil, ErrInvalidNumber
 	}
