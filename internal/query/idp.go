@@ -193,7 +193,7 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.IDPProjection.Trigger(ctx)
+		ctx = projection.IDPProjection.Trigger(ctx)
 	}
 
 	eq := sq.Eq{

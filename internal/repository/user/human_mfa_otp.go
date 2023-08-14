@@ -12,12 +12,22 @@ import (
 )
 
 const (
-	otpEventPrefix                = mfaEventPrefix + "otp."
-	HumanMFAOTPAddedType          = otpEventPrefix + "added"
-	HumanMFAOTPVerifiedType       = otpEventPrefix + "verified"
-	HumanMFAOTPRemovedType        = otpEventPrefix + "removed"
-	HumanMFAOTPCheckSucceededType = otpEventPrefix + "check.succeeded"
-	HumanMFAOTPCheckFailedType    = otpEventPrefix + "check.failed"
+	otpEventPrefix                  = mfaEventPrefix + "otp."
+	HumanMFAOTPAddedType            = otpEventPrefix + "added"
+	HumanMFAOTPVerifiedType         = otpEventPrefix + "verified"
+	HumanMFAOTPRemovedType          = otpEventPrefix + "removed"
+	HumanMFAOTPCheckSucceededType   = otpEventPrefix + "check.succeeded"
+	HumanMFAOTPCheckFailedType      = otpEventPrefix + "check.failed"
+	otpSMSEventPrefix               = otpEventPrefix + "sms."
+	HumanOTPSMSAddedType            = otpSMSEventPrefix + "added"
+	HumanOTPSMSRemovedType          = otpSMSEventPrefix + "removed"
+	HumanOTPSMSCheckSucceededType   = otpSMSEventPrefix + "check.succeeded"
+	HumanOTPSMSCheckFailedType      = otpSMSEventPrefix + "check.failed"
+	otpEmailEventPrefix             = otpEventPrefix + "email."
+	HumanOTPEmailAddedType          = otpEmailEventPrefix + "added"
+	HumanOTPEmailRemovedType        = otpEmailEventPrefix + "removed"
+	HumanOTPEmailCheckSucceededType = otpEmailEventPrefix + "check.succeeded"
+	HumanOTPEmailCheckFailedType    = otpEmailEventPrefix + "check.failed"
 )
 
 type HumanOTPAddedEvent struct {
@@ -201,4 +211,248 @@ func HumanOTPCheckFailedEventMapper(event *repository.Event) (eventstore.Event, 
 		return nil, errors.ThrowInternal(err, "USER-Ns9df", "unable to unmarshal human otp check failed")
 	}
 	return otpAdded, nil
+}
+
+type HumanOTPSMSAddedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanOTPSMSAddedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *HumanOTPSMSAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanOTPSMSAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewHumanOTPSMSAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *HumanOTPSMSAddedEvent {
+	return &HumanOTPSMSAddedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanOTPSMSAddedType,
+		),
+	}
+}
+
+type HumanOTPSMSRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanOTPSMSRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *HumanOTPSMSRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanOTPSMSRemovedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewHumanOTPSMSRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *HumanOTPSMSRemovedEvent {
+	return &HumanOTPSMSRemovedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanOTPSMSRemovedType,
+		),
+	}
+}
+
+type HumanOTPSMSCheckSucceededEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	*AuthRequestInfo
+}
+
+func (e *HumanOTPSMSCheckSucceededEvent) Data() interface{} {
+	return e
+}
+
+func (e *HumanOTPSMSCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanOTPSMSCheckSucceededEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewHumanOTPSMSCheckSucceededEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	info *AuthRequestInfo,
+) *HumanOTPSMSCheckSucceededEvent {
+	return &HumanOTPSMSCheckSucceededEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanOTPSMSCheckSucceededType,
+		),
+		AuthRequestInfo: info,
+	}
+}
+
+type HumanOTPSMSCheckFailedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	*AuthRequestInfo
+}
+
+func (e *HumanOTPSMSCheckFailedEvent) Data() interface{} {
+	return e
+}
+
+func (e *HumanOTPSMSCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanOTPSMSCheckFailedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewHumanOTPSMSCheckFailedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	info *AuthRequestInfo,
+) *HumanOTPSMSCheckFailedEvent {
+	return &HumanOTPSMSCheckFailedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanOTPSMSCheckFailedType,
+		),
+		AuthRequestInfo: info,
+	}
+}
+
+type HumanOTPEmailAddedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanOTPEmailAddedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *HumanOTPEmailAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanOTPEmailAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewHumanOTPEmailAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *HumanOTPEmailAddedEvent {
+	return &HumanOTPEmailAddedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanOTPEmailAddedType,
+		),
+	}
+}
+
+type HumanOTPEmailRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanOTPEmailRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *HumanOTPEmailRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanOTPEmailRemovedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewHumanOTPEmailRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *HumanOTPEmailRemovedEvent {
+	return &HumanOTPEmailRemovedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanOTPEmailRemovedType,
+		),
+	}
+}
+
+type HumanOTPEmailCheckSucceededEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	*AuthRequestInfo
+}
+
+func (e *HumanOTPEmailCheckSucceededEvent) Data() interface{} {
+	return e
+}
+
+func (e *HumanOTPEmailCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanOTPEmailCheckSucceededEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewHumanOTPEmailCheckSucceededEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	info *AuthRequestInfo,
+) *HumanOTPEmailCheckSucceededEvent {
+	return &HumanOTPEmailCheckSucceededEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanOTPEmailCheckSucceededType,
+		),
+		AuthRequestInfo: info,
+	}
+}
+
+type HumanOTPEmailCheckFailedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	*AuthRequestInfo
+}
+
+func (e *HumanOTPEmailCheckFailedEvent) Data() interface{} {
+	return e
+}
+
+func (e *HumanOTPEmailCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *HumanOTPEmailCheckFailedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewHumanOTPEmailCheckFailedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	info *AuthRequestInfo,
+) *HumanOTPEmailCheckFailedEvent {
+	return &HumanOTPEmailCheckFailedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanOTPEmailCheckFailedType,
+		),
+		AuthRequestInfo: info,
+	}
 }

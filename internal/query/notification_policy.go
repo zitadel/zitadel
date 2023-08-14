@@ -81,7 +81,8 @@ func (q *Queries) NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		if err := projection.NotificationPolicyProjection.Trigger(ctx); err != nil {
+		ctx, err = projection.NotificationPolicyProjection.TriggerErr(ctx)
+		if err != nil {
 			return nil, err
 		}
 	}
@@ -112,7 +113,8 @@ func (q *Queries) DefaultNotificationPolicy(ctx context.Context, shouldTriggerBu
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		if err := projection.NotificationPolicyProjection.Trigger(ctx); err != nil {
+		ctx, err = projection.NotificationPolicyProjection.TriggerErr(ctx)
+		if err != nil {
 			return nil, err
 		}
 	}

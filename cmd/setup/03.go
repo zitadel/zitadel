@@ -21,7 +21,7 @@ import (
 type FirstInstance struct {
 	InstanceName    string
 	DefaultLanguage language.Tag
-	Org             command.OrgSetup
+	Org             command.InstanceOrgSetup
 	MachineKeyPath  string
 	PatPath         string
 
@@ -88,6 +88,9 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 		nil,
 		nil,
 		nil,
+		0,
+		0,
+		0,
 	)
 	if err != nil {
 		return err

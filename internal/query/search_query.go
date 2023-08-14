@@ -66,6 +66,27 @@ func (q *NotNullQuery) comp() sq.Sqlizer {
 	return sq.NotEq{q.Column.identifier(): nil}
 }
 
+type IsNullQuery struct {
+	Column Column
+}
+
+func NewIsNullQuery(col Column) (*IsNullQuery, error) {
+	if col.isZero() {
+		return nil, ErrMissingColumn
+	}
+	return &IsNullQuery{
+		Column: col,
+	}, nil
+}
+
+func (q *IsNullQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (q *IsNullQuery) comp() sq.Sqlizer {
+	return sq.Eq{q.Column.identifier(): nil}
+}
+
 type orQuery struct {
 	queries []SearchQuery
 }
@@ -135,6 +156,10 @@ const (
 	columnCompareMax
 )
 
+type InTextQuery struct {
+	Column Column
+	Values []string
+}
 type TextQuery struct {
 	Column  Column
 	Text    string
@@ -146,7 +171,21 @@ var (
 	ErrInvalidCompare  = errors.New("invalid compare")
 	ErrMissingColumn   = errors.New("missing column")
 	ErrInvalidNumber   = errors.New("value is no number")
+	ErrEmptyValues     = errors.New("values array must not be empty")
 )
+
+func NewInTextQuery(col Column, values []string) (*InTextQuery, error) {
+	if len(values) == 0 {
+		return nil, ErrEmptyValues
+	}
+	if col.isZero() {
+		return nil, ErrMissingColumn
+	}
+	return &InTextQuery{
+		Column: col,
+		Values: values,
+	}, nil
+}
 
 func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery, error) {
 	if compare < 0 || compare >= textCompareMax {
@@ -160,6 +199,15 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery,
 		Text:    value,
 		Compare: compare,
 	}, nil
+}
+
+func (q *InTextQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (s *InTextQuery) comp() sq.Sqlizer {
+	// This translates to an IN query
+	return sq.Eq{s.Column.identifier(): s.Values}
 }
 
 func (q *TextQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -248,7 +296,7 @@ func NewNumberQuery(c Column, value interface{}, compare NumberComparison) (*Num
 	}
 	switch reflect.TypeOf(value).Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Float32, reflect.Float64:
-		//everything fine
+		// everything fine
 	default:
 		return nil, ErrInvalidNumber
 	}

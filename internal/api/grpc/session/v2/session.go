@@ -16,7 +16,7 @@ import (
 )
 
 func (s *Server) GetSession(ctx context.Context, req *session.GetSessionRequest) (*session.GetSessionResponse, error) {
-	res, err := s.query.SessionByID(ctx, req.GetSessionId(), req.GetSessionToken())
+	res, err := s.query.SessionByID(ctx, true, req.GetSessionId(), req.GetSessionToken())
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func factorsToPb(s *query.Session) *session.Factors {
 	return &session.Factors{
 		User:     user,
 		Password: passwordFactorToPb(s.PasswordFactor),
-		Passkey:  passkeyFactorToPb(s.PasskeyFactor),
+		WebAuthN: webAuthNFactorToPb(s.WebAuthNFactor),
 		Intent:   intentFactorToPb(s.IntentFactor),
 	}
 }
@@ -141,12 +141,13 @@ func intentFactorToPb(factor query.SessionIntentFactor) *session.IntentFactor {
 	}
 }
 
-func passkeyFactorToPb(factor query.SessionPasskeyFactor) *session.PasskeyFactor {
-	if factor.PasskeyCheckedAt.IsZero() {
+func webAuthNFactorToPb(factor query.SessionWebAuthNFactor) *session.WebAuthNFactor {
+	if factor.WebAuthNCheckedAt.IsZero() {
 		return nil
 	}
-	return &session.PasskeyFactor{
-		VerifiedAt: timestamppb.New(factor.PasskeyCheckedAt),
+	return &session.WebAuthNFactor{
+		VerifiedAt:   timestamppb.New(factor.WebAuthNCheckedAt),
+		UserVerified: factor.UserVerified,
 	}
 }
 
@@ -155,10 +156,11 @@ func userFactorToPb(factor query.SessionUserFactor) *session.UserFactor {
 		return nil
 	}
 	return &session.UserFactor{
-		VerifiedAt:  timestamppb.New(factor.UserCheckedAt),
-		Id:          factor.UserID,
-		LoginName:   factor.LoginName,
-		DisplayName: factor.DisplayName,
+		VerifiedAt:     timestamppb.New(factor.UserCheckedAt),
+		Id:             factor.UserID,
+		LoginName:      factor.LoginName,
+		DisplayName:    factor.DisplayName,
+		OrganisationId: factor.ResourceOwner,
 	}
 }
 
@@ -242,36 +244,47 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	if intent := checks.GetIntent(); intent != nil {
 		sessionChecks = append(sessionChecks, command.CheckIntent(intent.GetIntentId(), intent.GetToken()))
 	}
-	if passkey := checks.GetPasskey(); passkey != nil {
-		sessionChecks = append(sessionChecks, s.command.CheckPasskey(passkey.GetCredentialAssertionData()))
+	if passkey := checks.GetWebAuthN(); passkey != nil {
+		sessionChecks = append(sessionChecks, s.command.CheckWebAuthN(passkey.GetCredentialAssertionData()))
 	}
 
 	return sessionChecks, nil
 }
 
-func (s *Server) challengesToCommand(challenges []session.ChallengeKind, cmds []command.SessionCommand) (*session.Challenges, []command.SessionCommand) {
-	if len(challenges) == 0 {
+func (s *Server) challengesToCommand(challenges *session.RequestChallenges, cmds []command.SessionCommand) (*session.Challenges, []command.SessionCommand) {
+	if challenges == nil {
 		return nil, cmds
 	}
 	resp := new(session.Challenges)
-	for _, c := range challenges {
-		switch c {
-		case session.ChallengeKind_CHALLENGE_KIND_UNSPECIFIED:
-			continue
-		case session.ChallengeKind_CHALLENGE_KIND_PASSKEY:
-			passkeyChallenge, cmd := s.createPasskeyChallengeCommand()
-			resp.Passkey = passkeyChallenge
-			cmds = append(cmds, cmd)
-		}
+	if req := challenges.GetWebAuthN(); req != nil {
+		challenge, cmd := s.createWebAuthNChallengeCommand(req)
+		resp.WebAuthN = challenge
+		cmds = append(cmds, cmd)
 	}
 	return resp, cmds
 }
 
-func (s *Server) createPasskeyChallengeCommand() (*session.Challenges_Passkey, command.SessionCommand) {
-	challenge := &session.Challenges_Passkey{
+func (s *Server) createWebAuthNChallengeCommand(req *session.RequestChallenges_WebAuthN) (*session.Challenges_WebAuthN, command.SessionCommand) {
+	challenge := &session.Challenges_WebAuthN{
 		PublicKeyCredentialRequestOptions: new(structpb.Struct),
 	}
-	return challenge, s.command.CreatePasskeyChallenge(domain.UserVerificationRequirementRequired, challenge.PublicKeyCredentialRequestOptions)
+	userVerification := userVerificationRequirementToDomain(req.GetUserVerificationRequirement())
+	return challenge, s.command.CreateWebAuthNChallenge(userVerification, req.GetDomain(), challenge.PublicKeyCredentialRequestOptions)
+}
+
+func userVerificationRequirementToDomain(req session.UserVerificationRequirement) domain.UserVerificationRequirement {
+	switch req {
+	case session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_UNSPECIFIED:
+		return domain.UserVerificationRequirementUnspecified
+	case session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED:
+		return domain.UserVerificationRequirementRequired
+	case session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_PREFERRED:
+		return domain.UserVerificationRequirementPreferred
+	case session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_DISCOURAGED:
+		return domain.UserVerificationRequirementDiscouraged
+	default:
+		return domain.UserVerificationRequirementUnspecified
+	}
 }
 
 func userCheck(user *session.CheckUser) (userSearch, error) {

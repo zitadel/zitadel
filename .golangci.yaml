@@ -6,7 +6,7 @@ issues:
   max-same-issues: 0
 
 run:
-  concurrency: 2
+  concurrency: 4
   timeout: 10m
   go: '1.19'
   skip-dirs:

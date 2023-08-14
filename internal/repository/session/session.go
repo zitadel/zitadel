@@ -12,16 +12,16 @@ import (
 )
 
 const (
-	sessionEventPrefix    = "session."
-	AddedType             = sessionEventPrefix + "added"
-	UserCheckedType       = sessionEventPrefix + "user.checked"
-	PasswordCheckedType   = sessionEventPrefix + "password.checked"
-	IntentCheckedType     = sessionEventPrefix + "intent.checked"
-	PasskeyChallengedType = sessionEventPrefix + "passkey.challenged"
-	PasskeyCheckedType    = sessionEventPrefix + "passkey.checked"
-	TokenSetType          = sessionEventPrefix + "token.set"
-	MetadataSetType       = sessionEventPrefix + "metadata.set"
-	TerminateType         = sessionEventPrefix + "terminated"
+	sessionEventPrefix     = "session."
+	AddedType              = sessionEventPrefix + "added"
+	UserCheckedType        = sessionEventPrefix + "user.checked"
+	PasswordCheckedType    = sessionEventPrefix + "password.checked"
+	IntentCheckedType      = sessionEventPrefix + "intent.checked"
+	WebAuthNChallengedType = sessionEventPrefix + "webAuthN.challenged"
+	WebAuthNCheckedType    = sessionEventPrefix + "webAuthN.checked"
+	TokenSetType           = sessionEventPrefix + "token.set"
+	MetadataSetType        = sessionEventPrefix + "metadata.set"
+	TerminateType          = sessionEventPrefix + "terminated"
 )
 
 type AddedEvent struct {
@@ -186,75 +186,81 @@ func IntentCheckedEventMapper(event *repository.Event) (eventstore.Event, error)
 	return added, nil
 }
 
-type PasskeyChallengedEvent struct {
+type WebAuthNChallengedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Challenge          string                             `json:"challenge,omitempty"`
 	AllowedCrentialIDs [][]byte                           `json:"allowedCrentialIDs,omitempty"`
 	UserVerification   domain.UserVerificationRequirement `json:"userVerification,omitempty"`
+	RPID               string                             `json:"rpid,omitempty"`
 }
 
-func (e *PasskeyChallengedEvent) Data() interface{} {
+func (e *WebAuthNChallengedEvent) Data() interface{} {
 	return e
 }
 
-func (e *PasskeyChallengedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *WebAuthNChallengedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func (e *PasskeyChallengedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+func (e *WebAuthNChallengedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
 	e.BaseEvent = *base
 }
 
-func NewPasskeyChallengedEvent(
+func NewWebAuthNChallengedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	challenge string,
 	allowedCrentialIDs [][]byte,
 	userVerification domain.UserVerificationRequirement,
-) *PasskeyChallengedEvent {
-	return &PasskeyChallengedEvent{
+	rpid string,
+) *WebAuthNChallengedEvent {
+	return &WebAuthNChallengedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			PasskeyChallengedType,
+			WebAuthNChallengedType,
 		),
 		Challenge:          challenge,
 		AllowedCrentialIDs: allowedCrentialIDs,
 		UserVerification:   userVerification,
+		RPID:               rpid,
 	}
 }
 
-type PasskeyCheckedEvent struct {
+type WebAuthNCheckedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	CheckedAt time.Time `json:"checkedAt"`
+	CheckedAt    time.Time `json:"checkedAt"`
+	UserVerified bool      `json:"userVerified,omitempty"`
 }
 
-func (e *PasskeyCheckedEvent) Data() interface{} {
+func (e *WebAuthNCheckedEvent) Data() interface{} {
 	return e
 }
 
-func (e *PasskeyCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *WebAuthNCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func (e *PasskeyCheckedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+func (e *WebAuthNCheckedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
 	e.BaseEvent = *base
 }
 
-func NewPasskeyCheckedEvent(
+func NewWebAuthNCheckedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	checkedAt time.Time,
-) *PasswordCheckedEvent {
-	return &PasswordCheckedEvent{
+	userVerified bool,
+) *WebAuthNCheckedEvent {
+	return &WebAuthNCheckedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			PasskeyCheckedType,
+			WebAuthNCheckedType,
 		),
-		CheckedAt: checkedAt,
+		CheckedAt:    checkedAt,
+		UserVerified: userVerified,
 	}
 }
 

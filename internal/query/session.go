@@ -33,12 +33,13 @@ type Session struct {
 	UserFactor     SessionUserFactor
 	PasswordFactor SessionPasswordFactor
 	IntentFactor   SessionIntentFactor
-	PasskeyFactor  SessionPasskeyFactor
+	WebAuthNFactor SessionWebAuthNFactor
 	Metadata       map[string][]byte
 }
 
 type SessionUserFactor struct {
 	UserID        string
+	ResourceOwner string
 	UserCheckedAt time.Time
 	LoginName     string
 	DisplayName   string
@@ -52,8 +53,9 @@ type SessionIntentFactor struct {
 	IntentCheckedAt time.Time
 }
 
-type SessionPasskeyFactor struct {
-	PasskeyCheckedAt time.Time
+type SessionWebAuthNFactor struct {
+	WebAuthNCheckedAt time.Time
+	UserVerified      bool
 }
 
 type SessionsSearchQueries struct {
@@ -122,8 +124,12 @@ var (
 		name:  projection.SessionColumnIntentCheckedAt,
 		table: sessionsTable,
 	}
-	SessionColumnPasskeyCheckedAt = Column{
-		name:  projection.SessionColumnPasskeyCheckedAt,
+	SessionColumnWebAuthNCheckedAt = Column{
+		name:  projection.SessionColumnWebAuthNCheckedAt,
+		table: sessionsTable,
+	}
+	SessionColumnWebAuthNUserVerified = Column{
+		name:  projection.SessionColumnWebAuthNUserVerified,
 		table: sessionsTable,
 	}
 	SessionColumnMetadata = Column{
@@ -136,9 +142,13 @@ var (
 	}
 )
 
-func (q *Queries) SessionByID(ctx context.Context, id, sessionToken string) (_ *Session, err error) {
+func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string) (_ *Session, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	if shouldTriggerBulk {
+		ctx = projection.SessionProjection.Trigger(ctx)
+	}
 
 	query, scan := prepareSessionQuery(ctx, q.client)
 	stmt, args, err := query.Where(
@@ -215,27 +225,32 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			SessionColumnUserCheckedAt.identifier(),
 			LoginNameNameCol.identifier(),
 			HumanDisplayNameCol.identifier(),
+			UserResourceOwnerCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
 			SessionColumnIntentCheckedAt.identifier(),
-			SessionColumnPasskeyCheckedAt.identifier(),
+			SessionColumnWebAuthNCheckedAt.identifier(),
+			SessionColumnWebAuthNUserVerified.identifier(),
 			SessionColumnMetadata.identifier(),
 			SessionColumnToken.identifier(),
 		).From(sessionsTable.identifier()).
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
-			LeftJoin(join(HumanUserIDCol, SessionColumnUserID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(HumanUserIDCol, SessionColumnUserID)).
+			LeftJoin(join(UserIDCol, SessionColumnUserID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*Session, string, error) {
 			session := new(Session)
 
 			var (
-				userID            sql.NullString
-				userCheckedAt     sql.NullTime
-				loginName         sql.NullString
-				displayName       sql.NullString
-				passwordCheckedAt sql.NullTime
-				intentCheckedAt   sql.NullTime
-				passkeyCheckedAt  sql.NullTime
-				metadata          database.Map[[]byte]
-				token             sql.NullString
+				userID              sql.NullString
+				userCheckedAt       sql.NullTime
+				loginName           sql.NullString
+				displayName         sql.NullString
+				userResourceOwner   sql.NullString
+				passwordCheckedAt   sql.NullTime
+				intentCheckedAt     sql.NullTime
+				webAuthNCheckedAt   sql.NullTime
+				webAuthNUserPresent sql.NullBool
+				metadata            database.Map[[]byte]
+				token               sql.NullString
 			)
 
 			err := row.Scan(
@@ -250,9 +265,11 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&userCheckedAt,
 				&loginName,
 				&displayName,
+				&userResourceOwner,
 				&passwordCheckedAt,
 				&intentCheckedAt,
-				&passkeyCheckedAt,
+				&webAuthNCheckedAt,
+				&webAuthNUserPresent,
 				&metadata,
 				&token,
 			)
@@ -268,9 +285,11 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session.UserFactor.UserCheckedAt = userCheckedAt.Time
 			session.UserFactor.LoginName = loginName.String
 			session.UserFactor.DisplayName = displayName.String
+			session.UserFactor.ResourceOwner = userResourceOwner.String
 			session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
 			session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
-			session.PasskeyFactor.PasskeyCheckedAt = passkeyCheckedAt.Time
+			session.WebAuthNFactor.WebAuthNCheckedAt = webAuthNCheckedAt.Time
+			session.WebAuthNFactor.UserVerified = webAuthNUserPresent.Bool
 			session.Metadata = metadata
 
 			return session, token.String, nil
@@ -290,14 +309,17 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			SessionColumnUserCheckedAt.identifier(),
 			LoginNameNameCol.identifier(),
 			HumanDisplayNameCol.identifier(),
+			UserResourceOwnerCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
 			SessionColumnIntentCheckedAt.identifier(),
-			SessionColumnPasskeyCheckedAt.identifier(),
+			SessionColumnWebAuthNCheckedAt.identifier(),
+			SessionColumnWebAuthNUserVerified.identifier(),
 			SessionColumnMetadata.identifier(),
 			countColumn.identifier(),
 		).From(sessionsTable.identifier()).
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
-			LeftJoin(join(HumanUserIDCol, SessionColumnUserID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(HumanUserIDCol, SessionColumnUserID)).
+			LeftJoin(join(UserIDCol, SessionColumnUserID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) (*Sessions, error) {
 			sessions := &Sessions{Sessions: []*Session{}}
 
@@ -305,14 +327,16 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session := new(Session)
 
 				var (
-					userID            sql.NullString
-					userCheckedAt     sql.NullTime
-					loginName         sql.NullString
-					displayName       sql.NullString
-					passwordCheckedAt sql.NullTime
-					intentCheckedAt   sql.NullTime
-					passkeyCheckedAt  sql.NullTime
-					metadata          database.Map[[]byte]
+					userID              sql.NullString
+					userCheckedAt       sql.NullTime
+					loginName           sql.NullString
+					displayName         sql.NullString
+					userResourceOwner   sql.NullString
+					passwordCheckedAt   sql.NullTime
+					intentCheckedAt     sql.NullTime
+					webAuthNCheckedAt   sql.NullTime
+					webAuthNUserPresent sql.NullBool
+					metadata            database.Map[[]byte]
 				)
 
 				err := rows.Scan(
@@ -327,9 +351,11 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&userCheckedAt,
 					&loginName,
 					&displayName,
+					&userResourceOwner,
 					&passwordCheckedAt,
 					&intentCheckedAt,
-					&passkeyCheckedAt,
+					&webAuthNCheckedAt,
+					&webAuthNUserPresent,
 					&metadata,
 					&sessions.Count,
 				)
@@ -341,9 +367,11 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session.UserFactor.UserCheckedAt = userCheckedAt.Time
 				session.UserFactor.LoginName = loginName.String
 				session.UserFactor.DisplayName = displayName.String
+				session.UserFactor.ResourceOwner = userResourceOwner.String
 				session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
 				session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
-				session.PasskeyFactor.PasskeyCheckedAt = passkeyCheckedAt.Time
+				session.WebAuthNFactor.WebAuthNCheckedAt = webAuthNCheckedAt.Time
+				session.WebAuthNFactor.UserVerified = webAuthNUserPresent.Bool
 				session.Metadata = metadata
 
 				sessions.Sessions = append(sessions.Sessions, session)

@@ -15,7 +15,7 @@ const (
 	CheckTypeHTTP CheckType = iota
 	CheckTypeDNS
 
-	HTTPPattern = "https://%s/.well-known/zitadel-challenge/%s"
+	HTTPPattern = "https://%s/.well-known/zitadel-challenge/%s.txt"
 	DNSPattern  = "_zitadel-challenge.%s"
 )
 

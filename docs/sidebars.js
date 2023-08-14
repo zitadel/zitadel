@@ -152,6 +152,22 @@ module.exports = {
         },
         {
           type: "category",
+          label: "Token introspection",
+          link: {
+            type: "generated-index",
+            title: "Token introspection",
+            slug: "/guides/integrate/token-introspection",
+            description:
+              "Token introspection is the process of checking whether an access token is valid and can be used to access protected resources. You have an API that acts as an OAuth resource server and can be accessed by user-facing applications. To validate an access token by calling the ZITADEL introspection API, you can use the JSON Web Token (JWT) Profile (recommended) or Basic Authentication for token introspection. It's crucial to understand that the API is entirely separate from the front end. The API shouldn’t concern itself with the token type received. Instead, it's about how the API chooses to call the introspection endpoint, either through JWT Profile or Basic Authentication. Many APIs assume they might receive a JWT and attempt to verify it based on signature or expiration. However, with ZITADEL, you can send either a JWT or an opaque Bearer token from the client end to the API. This flexibility is one of ZITADEL's standout features.",
+          },
+          collapsed: true,
+          items: [
+            "guides/integrate/token-introspection/private-key-jwt",
+            "guides/integrate/token-introspection/basic-auth",
+          ],
+        },
+        {
+          type: "category",
           label: "Authenticate service users",
           link: {
             type: "generated-index",
@@ -169,20 +185,31 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Build your own Login-UI",
+          label: "Role management",
+          collapsed: true,
+          items: [
+            "guides/integrate/retrieve-user-roles"
+          ],
+        },
+        {
+          type: "category",
+          label: "Build your own login UI",
           link: {
             type: "generated-index",
-            title: "Build your own Login-UI",
+            title: "Build your own login UI",
             slug: "/guides/integrate/login-ui",
             description:
-                "In the following guides you will learn how to create your own login ui with our APIs. The different scenarios like username/password, external identity provider, etc will be shown.",
+                "In the following guides you will learn how to create your own login UI with our APIs. The different scenarios like username/password, external identity provider, etc. will be shown."
 
           },
           collapsed: true,
           items: [
             "guides/integrate/login-ui/username-password",
             "guides/integrate/login-ui/external-login",
+            "guides/integrate/login-ui/passkey",
+            "guides/integrate/login-ui/mfa",
             "guides/integrate/login-ui/select-account",
+            "guides/integrate/login-ui/password-reset",
             "guides/integrate/login-ui/logout",
             "guides/integrate/login-ui/oidc-standard"
           ],
@@ -206,6 +233,7 @@ module.exports = {
             "guides/integrate/identity-providers/gitlab",
             "guides/integrate/identity-providers/ldap",
             "guides/integrate/identity-providers/openldap",
+            "guides/integrate/identity-providers/migrate",
             "guides/integrate/identity-providers/google-oidc",
             "guides/integrate/identity-providers/azuread-oidc",
           ],
@@ -248,6 +276,7 @@ module.exports = {
           collapsed: true,
           items: [
             "guides/integrate/services/gitlab-self-hosted",
+            "guides/integrate/services/cloudflare-oidc",
             "guides/integrate/services/aws-saml",
             "guides/integrate/services/google-cloud",
             "guides/integrate/services/atlassian-saml",
@@ -293,6 +322,7 @@ module.exports = {
         "guides/solution-scenarios/saas",
         "guides/solution-scenarios/domain-discovery",
         "guides/solution-scenarios/configurations",
+        "guides/solution-scenarios/frontend-calling-backend-API",
       ],
     },
     {
@@ -466,6 +496,20 @@ module.exports = {
         },
         {
           type: "category",
+          label: "OIDC lifecycle (Alpha)",
+          link: {
+            type: "generated-index",
+            title: "OIDC service API (Alpha)",
+            slug: "/apis/resources/oidc_service",
+            description:
+              "Get OIDC Auth Request details and create callback URLs.\n"+
+              "\n"+
+              "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+          },
+          items: require("./docs/apis/resources/oidc_service/sidebar.js"),
+        },
+        {
+          type: "category",
           label: "Settings lifecycle (alpha)",
           link: {
             type: "generated-index",
@@ -554,7 +598,8 @@ module.exports = {
         "self-hosting/deploy/compose",
         "self-hosting/deploy/knative",
         "self-hosting/deploy/kubernetes",
-        "self-hosting/deploy/loadbalancing-example/loadbalancing-example"
+        "self-hosting/deploy/loadbalancing-example/loadbalancing-example",
+        "self-hosting/deploy/troubleshooting/troubleshooting"
       ],
     },
     {

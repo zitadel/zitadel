@@ -223,6 +223,8 @@ RegistrationUser:
   Japanese: 日本語
   Spanish: Español
   Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -256,6 +258,9 @@ ExternalRegistrationUserOverview:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
@@ -317,7 +322,10 @@ ExternalNotFound:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
-
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  
 DeviceAuth:
   Title: Geräteautorisierung
   UserCode:
@@ -395,6 +403,7 @@ Errors:
       Empty: Passwort ist leer
       Invalid: Passwort ungültig
       InvalidAndLocked: Password ist ungültig und Benutzer wurde gesperrt, melden Sie sich bei ihrem Administrator.
+      NotChanged: Passwort nicht geändert
     UsernameOrPassword:
       Invalid: Username oder Passwort ist ungültig
     PasswordComplexityPolicy:

@@ -21,7 +21,6 @@ providers:
     filename: /etc/traefik/traefik.yaml
 
 http:
-
   middlewares:
     zitadel:
       headers:
@@ -29,7 +28,7 @@ http:
         allowedHosts:
         - 'my.domain'
         customRequestHeaders:
-          :authority: 'my.domain'
+          authority: 'my.domain'
     redirect-to-https:
       redirectScheme:
         scheme: https

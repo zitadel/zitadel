@@ -3,7 +3,7 @@
     "rewrites": [
         {
             "source": "/docs/proxy/js/script.js",
-            "destination": "https://plausible.io/js/script.tagged-events.outbound-links.js"
+            "destination": "https://plausible.io/js/script.tagged-events.pageview-props.outbound-links.js"
         },
         {
             "source": "/docs/proxy/api/event",
@@ -15,6 +15,10 @@
         }
     ],
     "redirects": [
-        { "source": "/", "destination": "/docs" }
+        { "source": "/", "destination": "/docs" },
+        { "source": "/docs/apis/mgmt/:slug*", "destination": "/docs/apis/resources/mgmt/:slug*", "permanent": true },
+        { "source": "/docs/apis/auth/:slug*", "destination": "/docs/apis/resources/auth/:slug*", "permanent": true },
+        { "source": "/docs/apis/system/:slug*", "destination": "/docs/apis/resources/system/:slug*", "permanent": true },
+        { "source": "/docs/apis/admin/:slug*", "destination": "/docs/apis/resources/admin/:slug*", "permanent": true }
     ]
 }

@@ -1,0 +1,191 @@
+---
+title: Multi-Factor (MFA)
+sidebar_label: Multi-Factor (MFA)
+---
+
+import MfaOptions from './_list-mfa-options.mdx';
+import BrowserRegisterWebAuthN from './_browser_register_webauthn.mdx';
+
+
+Multi-factor authentication (MFA) is a multi-step account authentication which requires to user to enter more than only the password.
+It is highly recommended to use MFA or [Passkeys](./passkey) to make your user accounts more secure.
+
+ZITADEL supports two different Methods:
+- Time-based one time password (TOTP), which are Authenticator apps like Google/Microsoft Authenticator, Authy, etc
+- Universal Second Factor (U2F), which is authentication with your device like Windows Hello, Apple FaceID, Fingerprint, FIDO2 keys, Yubikey, etc.
+
+## TOTP Registration
+
+### Flow
+
+![Register TOTP](/img/guides/login-ui/register-totp-flow.png)
+
+### List the Possible Methods
+
+<MfaOptions/>
+
+### Start TOTP Registration
+
+The user has selected to setup Time-based One-Time-Password (TOTP).
+To show the user the QR to register TOTP with his Authenticator App like Google/Microsoft Authenticator or Authy you have to start the registration on the ZITADEL API.
+Generate the QR Code with the URI from the response.
+For users that do not have a QR Code reader make sure to also show the secret, to enable manual configuration.
+
+More detailed information about the API: [Start TOTP Registration Documentation](/apis/resources/user_service/user-service-register-totp)
+
+Request Example:
+
+```bash
+curl --request POST \
+    --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER_ID/totp \
+    --header 'Accept: application/json' \
+    --header 'Authorization: Bearer '"$TOKEN"''
+    --header 'Content-Type: application/json' \
+    --data '{}'
+```
+
+Response Example:
+
+```bash
+{
+  "details": {
+    "sequence": "2",
+    "changeDate": "2023-06-28",
+    "resourceOwner": "69629023906488334"
+  },
+  "uri": "otpauth://totp/ZITADEL:minni-mouse@mouse.com?algorithm=SHA1&digits=6&issuer=ZITADEL&period=30&secret=TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK",
+  "secret": "TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK"
+}
+```
+
+### Verify TOTP Registration
+
+When the user has added the account to his authenticator app, he has to enter the code from the App to finish the registration.
+This code has to be sent to the verify endpoint in ZITADEL.
+
+More detailed information about the API: [Verify TOTP Documentation](/apis/resources/user_service/user-service-verify-totp-registration)
+
+Request Example:
+
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER_ID/totp/_verify \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''
+  --header 'Content-Type: application/json' \
+  --data '{
+  "code": "123456"
+}'
+```
+
+## U2F Registration
+
+### Flow
+
+![Register U2F](/img/guides/login-ui/register-u2f-flow.png)
+
+### List the Possible Methods
+
+<MfaOptions/>
+
+### Start U2F Registration
+
+The user has selected to setup Universal Second Factor (U2F).
+To be able to authenticate in the browser you have to start the u2f registration within ZITADEL.
+
+More detailed information about the API: [Start U2F Registration Documentation](/apis/resources/user_service/user-service-register-u-2-f)
+
+Request Example:
+
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER_ID/u2f \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''
+  --header 'Content-Type: application/json' \
+  --data '{
+    "domain": "acme.com"
+  }'
+```
+
+Response Example:
+
+```bash
+{
+  "details": {
+    "sequence": "2",
+    "changeDate": "2023-07-03",
+    "resourceOwner": "69629023906488334"
+  },
+  "u2fId": "163840776835432705",
+  "publicKeyCredentialCreationOptions": {
+    "publicKey": {
+      "attestation": "none",
+      "authenticatorSelection": {
+        "userVerification": "required"
+      },
+      "challenge": "XaMYwWOZ5hj6pwtwJJlpcI-ExkO5TxevBMG4R8DoKQQ",
+      "excludeCredentials": [
+        {
+          "id": "tVp1QfYhT8DkyEHVrv7blnpAo2YJzbZgZNBf7zPs6CI",
+          "type": "public-key"
+        }
+      ],
+      "pubKeyCredParams": [
+        {
+          "alg": -7,
+          "type": "public-key"
+        }
+      ],
+      "rp": {
+        "id": "localhost",
+        "name": "ZITADEL"
+      },
+      "timeout": 300000,
+      "user": {
+        "displayName": "Minie Mouse",
+        "id": "MjE1NTk4MDAwNDY0OTk4OTQw",
+        "name": "minie-mouse"
+      }
+    }
+  }
+}
+```
+
+### Register new U2F on current device
+
+<BrowserRegisterWebAuthN/>
+
+### Verify U2F Registration
+
+In the next request you have to verify the U2F within ZITADEL.
+Include the public key credential you got from the browser in your request.
+You can give the U2F a name, which makes it easier for the user to identify the registered authentication methods.
+Example: Google Pixel, iCloud Keychain, Yubikey, etc
+
+More detailed information about the API: [Verify U2F Documentation](/apis/resources/user_service/user-service-verify-u-2-f-registration)
+
+Example Request:
+
+```bash
+
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER_ID/u2f/$PASSKEY_ID \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Content-Type: application/json' \
+  --data '{
+  "publicKeyCredential": {
+    "type": "public-key",
+    "id": "pawVarF4xPxLFmfCnRkwXWeTrKGzabcAi92LEI1WC00",
+    "rawId": "pawVarF4xPxLFmfCnRkwXWeTrKGzabcAi92LEI1WC00",
+    "response": {
+      "attestationObject": "o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIgRKS3VpeE9tfExXRzkoUKnG4rQWPvtSSt4YtDGgTx32oCIQDPey-2YJ4uIg-QCM4jj6aE2U3tgMFM_RP7Efx6xRu3JGhhdXRoRGF0YVikSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFAAAAADju76085Yhmlt1CEOHkwLQAIKWsFWqxeMT8SxZnwp0ZMF1nk6yhs2m3AIvdixCNVgtNpQECAyYgASFYIMGUDSP2FAQn2MIfPMy7cyB_Y30VqixVgGULTBtFjfRiIlggjUGfQo3_-CrMmH3S-ZQkFKWKnNBQEAMkFtG-9A4zqW0",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQlhXdHh0WGxJeFZZa0pHT1dVaUVmM25zby02aXZKdWw2YmNmWHdMVlFIayIsIm9yaWdpbiI6Imh0dHBzOi8vbG9jYWxob3N0OjgwODAifQ"
+    }
+  },
+  "tokenName": "Google Pixel"
+}'
+```
+
+You have successfully registered a new U2F to the user.

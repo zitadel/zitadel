@@ -12,7 +12,7 @@ type Password struct {
 	es_models.ObjectRoot
 
 	SecretString   string
-	SecretCrypto   *crypto.CryptoValue
+	EncodedSecret  string
 	ChangeRequired bool
 }
 
@@ -30,7 +30,7 @@ type PasswordCode struct {
 	NotificationType NotificationType
 }
 
-func (p *Password) HashPasswordIfExisting(policy *PasswordComplexityPolicy, passwordAlg crypto.HashAlgorithm) error {
+func (p *Password) HashPasswordIfExisting(policy *PasswordComplexityPolicy, hasher *crypto.PasswordHasher) error {
 	if p.SecretString == "" {
 		return nil
 	}
@@ -40,11 +40,11 @@ func (p *Password) HashPasswordIfExisting(policy *PasswordComplexityPolicy, pass
 	if err := policy.Check(p.SecretString); err != nil {
 		return err
 	}
-	secret, err := crypto.Hash([]byte(p.SecretString), passwordAlg)
+	encoded, err := hasher.Hash(p.SecretString)
 	if err != nil {
 		return err
 	}
-	p.SecretCrypto = secret
+	p.EncodedSecret = encoded
 	return nil
 }
 

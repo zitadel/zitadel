@@ -1,0 +1,21 @@
+Upon successful introspection, regardless of the token type or introspection method, a response with the boolean `active` is returned, indicating if the provided token is active and if the requesting client is part of the token audience. If `active` is true, further information will be provided:
+
+| **Property** | **Description** |
+| --- | --- |
+| `aud` | The audience of the token |
+| `client_id` | The client_id of the application the token was issued to |
+| `exp` | Time the token expires (as unix time) |
+| `iat` | Time the token was issued at (as unix time) |
+| `iss` | Issuer of the token |
+| `jti` | Unique id of the token |
+| `nbf` | Time the token must not be used before (as unix time) |
+| `scope` | Space delimited list of scopes granted to the token |
+| `token_type` | Type of the inspected token. Value is always Bearer |
+| `username` | ZITADEL's login name of the user. Consists of username@primarydomain |
+
+
+Depending on the granted scopes, additional information about the authorized user is provided. 
+
+If the authorization fails, an HTTP 401 with invalid_client will be returned.
+
+In summary, the introspection endpoint plays a crucial role in validating access tokens, either opaque or JWT, ensuring that they are not revoked. 

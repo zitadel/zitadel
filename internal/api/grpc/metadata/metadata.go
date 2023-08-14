@@ -70,5 +70,5 @@ func MetadataQueryToQuery(query *meta_pb.MetadataQuery) (query.SearchQuery, erro
 }
 
 func MetadataKeyQueryToQuery(q *meta_pb.MetadataKeyQuery) (query.SearchQuery, error) {
-	return query.NewUserMetadataKeySearchQuery(q.Key, object.TextMethodToQuery(q.Method))
+	return query.NewOrgMetadataKeySearchQuery(q.Key, object.TextMethodToQuery(q.Method))
 }

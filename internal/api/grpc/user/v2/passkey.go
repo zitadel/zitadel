@@ -20,11 +20,11 @@ func (s *Server) RegisterPasskey(ctx context.Context, req *user.RegisterPasskeyR
 	)
 	if code := req.GetCode(); code != nil {
 		return passkeyRegistrationDetailsToPb(
-			s.command.RegisterUserPasskeyWithCode(ctx, req.GetUserId(), resourceOwner, authenticator, code.Id, code.Code, s.userCodeAlg),
+			s.command.RegisterUserPasskeyWithCode(ctx, req.GetUserId(), resourceOwner, authenticator, code.Id, code.Code, req.GetDomain(), s.userCodeAlg),
 		)
 	}
 	return passkeyRegistrationDetailsToPb(
-		s.command.RegisterUserPasskey(ctx, req.GetUserId(), resourceOwner, authenticator),
+		s.command.RegisterUserPasskey(ctx, req.GetUserId(), resourceOwner, req.GetDomain(), authenticator),
 	)
 }
 

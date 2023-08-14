@@ -40,6 +40,7 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 	type args struct {
 		userID        string
 		resourceOwner string
+		rpID          string
 		authenticator domain.AuthenticatorAttachment
 	}
 	tests := []struct {
@@ -56,7 +57,7 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 				resourceOwner: "org1",
 				authenticator: domain.AuthenticatorAttachmentCrossPlattform,
 			},
-			wantErr: caos_errs.ThrowUnauthenticated(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
 		},
 		{
 			name: "get human passwordless error",
@@ -121,7 +122,7 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 				idGenerator:    tt.fields.idGenerator,
 				webauthnConfig: webauthnConfig,
 			}
-			_, err := c.RegisterUserPasskey(ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authenticator)
+			_, err := c.RegisterUserPasskey(ctx, tt.args.userID, tt.args.resourceOwner, tt.args.rpID, tt.args.authenticator)
 			require.ErrorIs(t, err, tt.wantErr)
 			// successful case can't be tested due to random challenge.
 		})
@@ -138,7 +139,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 	es := eventstoreExpect(t,
 		expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
 	)
-	code, err := newCryptoCodeWithExpiry(ctx, es.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg)
+	code, err := newCryptoCode(ctx, es.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg)
 	require.NoError(t, err)
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
@@ -148,6 +149,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 	type args struct {
 		userID        string
 		resourceOwner string
+		rpID          string
 		authenticator domain.AuthenticatorAttachment
 		codeID        string
 		code          string
@@ -222,7 +224,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 				idGenerator:    tt.fields.idGenerator,
 				webauthnConfig: webauthnConfig,
 			}
-			_, err := c.RegisterUserPasskeyWithCode(ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authenticator, tt.args.codeID, tt.args.code, alg)
+			_, err := c.RegisterUserPasskeyWithCode(ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authenticator, tt.args.codeID, tt.args.code, tt.args.rpID, alg)
 			require.ErrorIs(t, err, tt.wantErr)
 			// successful case can't be tested due to random challenge.
 		})
@@ -235,7 +237,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 	es := eventstoreExpect(t,
 		expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
 	)
-	code, err := newCryptoCodeWithExpiry(ctx, es.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg)
+	code, err := newCryptoCode(ctx, es.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg)
 	require.NoError(t, err)
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 
@@ -376,7 +378,7 @@ func TestCommands_pushUserPasskey(t *testing.T) {
 		expectFilter(eventFromEventPusher(
 			user.NewHumanWebAuthNAddedEvent(eventstore.NewBaseEventForPush(
 				ctx, &org.NewAggregate("org1").Aggregate, user.HumanPasswordlessTokenAddedType,
-			), "111", "challenge"),
+			), "111", "challenge", "rpID"),
 		)),
 	}
 
@@ -394,7 +396,7 @@ func TestCommands_pushUserPasskey(t *testing.T) {
 			expectPush: func(challenge string) expect {
 				return expectPushFailed(io.ErrClosedPipe, []*repository.Event{eventFromEventPusher(
 					user.NewHumanPasswordlessAddedEvent(ctx,
-						userAgg, "123", challenge,
+						userAgg, "123", challenge, "rpID",
 					),
 				)})
 			},
@@ -406,7 +408,7 @@ func TestCommands_pushUserPasskey(t *testing.T) {
 			expectPush: func(challenge string) expect {
 				return expectPush([]*repository.Event{eventFromEventPusher(
 					user.NewHumanPasswordlessAddedEvent(ctx,
-						userAgg, "123", challenge,
+						userAgg, "123", challenge, "rpID",
 					),
 				)})
 			},
@@ -418,7 +420,7 @@ func TestCommands_pushUserPasskey(t *testing.T) {
 				return expectPush([]*repository.Event{
 					eventFromEventPusher(
 						user.NewHumanPasswordlessAddedEvent(ctx,
-							userAgg, "123", challenge,
+							userAgg, "123", challenge, "rpID",
 						),
 					),
 					eventFromEventPusher(
@@ -440,7 +442,7 @@ func TestCommands_pushUserPasskey(t *testing.T) {
 				webauthnConfig: webauthnConfig,
 				idGenerator:    id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			}
-			wm, userAgg, webAuthN, err := c.createUserPasskey(ctx, "user1", "org1", domain.AuthenticatorAttachmentCrossPlattform)
+			wm, userAgg, webAuthN, err := c.createUserPasskey(ctx, "user1", "org1", "rpID", domain.AuthenticatorAttachmentCrossPlattform)
 			require.NoError(t, err)
 
 			c.eventstore = eventstoreExpect(t, tt.expectPush(webAuthN.Challenge))
@@ -461,7 +463,7 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
 		newCode     cryptoCodeFunc
-		eventstore  *eventstore.Eventstore
+		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 	}
 	type args struct {
@@ -478,8 +480,8 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 		{
 			name: "id generator error",
 			fields: fields{
-				newCode:     newCryptoCodeWithExpiry,
-				eventstore:  eventstoreExpect(t),
+				newCode:     mockCode("passkey1", time.Hour),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectError(t, io.ErrClosedPipe),
 			},
 			args: args{
@@ -492,7 +494,7 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 			name: "success",
 			fields: fields{
 				newCode: mockCode("passkey1", time.Minute),
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(eventFromEventPusher(
 						user.NewHumanAddedEvent(context.Background(),
 							userAgg,
@@ -536,7 +538,7 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				newCode:     tt.fields.newCode,
-				eventstore:  tt.fields.eventstore,
+				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
 			got, err := c.AddUserPasskeyCode(context.Background(), tt.args.userID, tt.args.resourceOwner, alg)
@@ -570,7 +572,7 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 		{
 			name: "template error",
 			fields: fields{
-				newCode:    newCryptoCodeWithExpiry,
+				newCode:    newCryptoCode,
 				eventstore: eventstoreExpect(t),
 			},
 			args: args{
@@ -583,7 +585,7 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 		{
 			name: "id generator error",
 			fields: fields{
-				newCode:     newCryptoCodeWithExpiry,
+				newCode:     newCryptoCode,
 				eventstore:  eventstoreExpect(t),
 				idGenerator: id_mock.NewIDGeneratorExpectError(t, io.ErrClosedPipe),
 			},
@@ -678,7 +680,7 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 		{
 			name: "id generator error",
 			fields: fields{
-				newCode:     newCryptoCodeWithExpiry,
+				newCode:     newCryptoCode,
 				eventstore:  eventstoreExpect(t),
 				idGenerator: id_mock.NewIDGeneratorExpectError(t, io.ErrClosedPipe),
 			},
@@ -772,7 +774,7 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 		{
 			name: "id generator error",
 			fields: fields{
-				newCode:     newCryptoCodeWithExpiry,
+				newCode:     newCryptoCode,
 				eventstore:  eventstoreExpect(t),
 				idGenerator: id_mock.NewIDGeneratorExpectError(t, io.ErrClosedPipe),
 			},
@@ -785,7 +787,7 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 		{
 			name: "crypto error",
 			fields: fields{
-				newCode:     newCryptoCodeWithExpiry,
+				newCode:     newCryptoCode,
 				eventstore:  eventstoreExpect(t, expectFilterError(io.ErrClosedPipe)),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			},
@@ -798,7 +800,7 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 		{
 			name: "filter query error",
 			fields: fields{
-				newCode: newCryptoCodeWithExpiry,
+				newCode: newCryptoCode,
 				eventstore: eventstoreExpect(t,
 					expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
 					expectFilterError(io.ErrClosedPipe),

@@ -1039,7 +1039,9 @@
       "ja": "日本語",
       "pl": "Polski",
       "zh": "简体中文",
-      "bg": "Български"
+      "bg": "Български",
+      "pt": "Portuguese",
+      "mk": "Македонски"
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -1098,7 +1100,9 @@
         "3": "Telefonnummer Verificationscode",
         "4": "Passwort Zurücksetzen Code",
         "5": "Passwordless Initialisierungscode",
-        "6": "Applicationssecret"
+        "6": "Applicationssecret",
+        "7": "One Time Password (OTP) - SMS",
+        "8": "One Time Password (OTP) - Email"
       },
       "ADDGENERATOR": "Secret Erscheinungsbild definieren",
       "GENERATORTYPE": "Typ",
@@ -1239,7 +1243,9 @@
         "ja": "日本語",
         "pl": "Polski",
         "zh": "简体中文",
-        "bg": "Български"
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1286,6 +1292,8 @@
         "INIT": "Initialisierung",
         "VE": "Emailverifikation",
         "VP": "Telefonnummerverifikation",
+        "VSO": "SMS-OTP überprüfen",
+        "VEO": "E-Mail-OTP überprüfen",
         "PR": "Passwort Wiederherstellung",
         "DC": "Domainbeanspruchung",
         "PL": "Passwortlos",
@@ -1306,7 +1314,9 @@
         "verifiedPhone": "Verifizierte Telefonnummer",
         "changedate": "Änderungsdatum",
         "username": "Username",
-        "tempUsername": "Temp. Username"
+        "tempUsername": "Temp. Username",
+        "otp": "Einmalpasswort",
+        "verifyUrl": "URL zur Überprüfung des Einmalpassworts"
       },
       "TOAST": {
         "UPDATED": "Benutzerdefinierte Texte gespeichert."
@@ -1336,8 +1346,10 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
       "ALLOWEXTERNALIDP_DESC": "Der Login wird für die darunter liegenden Identitätsanbieter erlaubt.",
       "ALLOWREGISTER_DESC": "Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",
-      "FORCEMFA": "Mfa erzwingen",
+      "FORCEMFA": "MFA erzwingen",
       "FORCEMFA_DESC": "Ist die Option gewählt, müssen Benutzer einen zweiten Faktor für den Login verwenden.",
+      "FORCEMFALOCALONLY": "MFA für lokale Users erzwingen",
+      "FORCEMFALOCALONLY_DESC": "Ist die Option gewählt, müssen lokal authentifizierte Benutzer einen zweiten Faktor für den Login verwenden.",
       "HIDEPASSWORDRESET": "Passwort vergessen ausblenden",
       "HIDEPASSWORDRESET_DESC": "Ist die Option gewählt, ist es nicht möglich im Login das Passwort zurück zusetzen via Passwort vergessen Link.",
       "HIDELOGINNAMESUFFIX": "Loginname Suffix ausblenden",
@@ -1505,13 +1517,11 @@
         "SEL_ROLES": "Selektiere die gewünschten Rollen für das Erstellen der Berechtigung.",
         "SEL_PROJECT": "Suchen nach Projekt",
         "SEL_USER": "Benutzer auswählen",
-        "SEL_ORG": "Suchen nach Domain",
-        "SEL_ORG_DESC": "Gebe die vollständige Domain ein, um Resultate zu erhalten.",
-        "ORG_TITLE": "Organisation",
+        "SEL_ORG": "Durchsuchen Sie eine Organisation",
+        "SEL_ORG_DESC": "Suchen Sie nach der zu gewährenden Organisation.",
         "ORG_DESCRIPTION": "Du bist im Begriff, einen Benutzer für die Organisation {{name}} zu berechtigen.",
         "ORG_DESCRIPTION_DESC": "Wechsle den Kontext, um die Organisation zu wechseln.",
-        "SEL_ORG_FORMFIELD": "Vollständige Domain",
-        "SEL_ORG_BUTTON": "Suche Organisation",
+        "SEL_ORG_FORMFIELD": "Organisation",
         "FOR_ORG": "Die Berechtigung wird erstellt für:"
       },
       "DETAIL": {
@@ -1783,6 +1793,8 @@
     "DELETE": "Löschen",
     "DELETE_TITLE": "IDP löschen",
     "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identitätsanbieter zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
+    "REMOVE_WARN_TITLE": "IDP entfernen?",
+    "REMOVE_WARN_DESCRIPTION": "Sie sind dabei, einen Identitätsanbieter zu entfernen. Dadurch wird die Auswahl des verfügbaren IDP für Ihre Benutzer entfernt und bereits registrierte Benutzer können sich nicht erneut anmelden. Wollen Sie wirklich fortfahren?",
     "DELETE_SELECTION_TITLE": "Identitätsanbieter löschen",
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identitätsanbieter zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
     "EMPTY": "Kein IDP vorhanden",
@@ -1840,8 +1852,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
-      "1": "One Time Password (OTP)",
-      "2": "Fingerabdruck, Security Keys, Face ID und andere"
+      "1": "One Time Password per Authenticator App (TOTP)",
+      "2": "Fingerabdruck, Security Keys, Face ID und andere",
+      "3": "One Time Password per Email (Email OTP)",
+      "4": "One Time Password per SMS (SMS OTP)"
     }
   },
   "LOGINPOLICY": {
@@ -2108,7 +2122,9 @@
     "ja": "日本語",
     "pl": "Polski",
     "zh": "简体中文",
-    "bg": "Български"
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",
