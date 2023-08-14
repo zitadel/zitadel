@@ -478,8 +478,8 @@ Errors:
     Terminated: Session bereits beendet
     Token:
       Invalid: Session Token ist ungültig
-    Passkey:
-      NoChallenge: Sitzung ohne Passkey-Herausforderung
+    WebAuthN:
+      NoChallenge: Sitzung ohne WebAuthN-Challenge
   Intent:
     IDPMissing: IDP ID fehlt im Request
     SuccessURLMissing: Success URL fehlt im Request

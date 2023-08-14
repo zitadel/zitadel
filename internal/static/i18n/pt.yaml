@@ -477,8 +477,8 @@ Errors:
     Terminated: A sessão já foi encerrada
     Token:
       Invalid: O token da sessão é inválido
-    Passkey:
-      NoChallenge: Sessão sem desafio de senha
+    WebAuthN:
+      NoChallenge: Sessão sem desafio WebAuthN
   Intent:
     IDPMissing: O ID do IDP está faltando na solicitação
     SuccessURLMissing: A URL de sucesso está faltando na solicitação

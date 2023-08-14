@@ -467,8 +467,8 @@ Errors:
     Terminated: セッションはすでに終了しています
     Token:
       Invalid: セッショントークンが無効です
-    Passkey:
-      NoChallenge: パスキーチャレンジなしのセッション
+    WebAuthN:
+      NoChallenge: WebAuthN チャレンジを使用しないセッション
   Intent:
     IDPMissing: リクエストにIDP IDが含まれていません
     SuccessURLMissing: リクエストに成功時の URL がありません
