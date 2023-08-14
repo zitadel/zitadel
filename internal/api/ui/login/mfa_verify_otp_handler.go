@@ -1,6 +1,7 @@
 package login
 
 import (
+	"fmt"
 	"net/http"
 
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -8,7 +9,8 @@ import (
 )
 
 const (
-	tmplOTPVerification = "otpverification"
+	tmplOTPVerification   = "otpverification"
+	querySelectedProvider = "selectedProvider"
 )
 
 type mfaOTPData struct {
@@ -24,18 +26,28 @@ type mfaOTPFormData struct {
 	Provider         domain.MFAType `schema:"provider"`
 }
 
+func OTPLink(origin, authRequestID, code string, provider domain.MFAType) string {
+	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%d", externalLink(origin), EndpointMFAOTPVerify, QueryAuthRequestID, authRequestID, queryCode, code, querySelectedProvider, provider)
+}
+
 // renderOTPVerification renders the OTP verification for SMS and Email based on the passed MFAType.
 // It will send a new code to either phone or email first.
+func (l *Login) handleOTPVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, providers []domain.MFAType, selectedProvider domain.MFAType, err error) {
+	if err != nil {
+		l.renderOTPVerification(w, r, authReq, providers, selectedProvider, err)
+		return
+	}
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	sendCode := l.authRepo.SendMFAOTPSMS
+	if selectedProvider == domain.MFATypeOTPEmail {
+		sendCode = l.authRepo.SendMFAOTPEmail
+	}
+	err = sendCode(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, userAgentID)
+	l.renderOTPVerification(w, r, authReq, providers, selectedProvider, err)
+}
+
 func (l *Login) renderOTPVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, providers []domain.MFAType, selectedProvider domain.MFAType, err error) {
 	var errID, errMessage string
-	if err == nil {
-		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-		sendCode := l.authRepo.SendMFAOTPSMS
-		if selectedProvider == domain.MFATypeOTPEmail {
-			sendCode = l.authRepo.SendMFAOTPEmail
-		}
-		err = sendCode(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, userAgentID)
-	}
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
@@ -47,10 +59,10 @@ func (l *Login) renderOTPVerification(w http.ResponseWriter, r *http.Request, au
 	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplOTPVerification], data, nil)
 }
 
-// handleRegisterSMSCheck handles form submissions of the OTP verification.
+// handleOTPVerificationCheck handles form submissions of the OTP verification.
 // On successful code verification, the check will be added to the auth request.
 // A user is also able to request a code resend or choose another provider.
-func (l *Login) handleOTPVerification(w http.ResponseWriter, r *http.Request) {
+func (l *Login) handleOTPVerificationCheck(w http.ResponseWriter, r *http.Request) {
 	formData := new(mfaOTPFormData)
 	authReq, err := l.getAuthRequestAndParseData(r, formData)
 	if err != nil {

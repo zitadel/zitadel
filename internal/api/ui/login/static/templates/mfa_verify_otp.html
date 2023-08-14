@@ -17,7 +17,7 @@
 
     <div class="fields">
         <label class="lgn-label" for="code">{{t "VerifyOTP.CodeLabel"}}</label>
-        <input class="lgn-input" type="text" id="code" name="code" autocomplete="off" autofocus required>
+        <input class="lgn-input" type="text" id="code" name="code" autocomplete="one-time-code" autofocus required>
     </div>
 
     {{ template "error-message" .}}

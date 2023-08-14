@@ -36,7 +36,7 @@
         {{if and .Phone (not .Edit) }}
         <div class="field">
             <label class="lgn-label" for="code">{{t "InitMFAOTPSMS.CodeLabel"}}</label>
-            <input class="lgn-input" type="text" id="code" name="code" autocomplete="off" required>
+            <input class="lgn-input" type="text" id="code" name="code" autocomplete="one-time-code" autofocus required>
         </div>
         {{end}}
     </div>

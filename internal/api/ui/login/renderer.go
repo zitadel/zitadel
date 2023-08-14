@@ -58,7 +58,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplMFAPrompt:                    "mfa_prompt.html",
 		tmplMFAInitVerify:                "mfa_init_otp.html",
 		tmplMFASMSInit:                   "mfa_init_otp_sms.html",
-		tmplOTPVerification:              "mfa_verify_otp_code.html",
+		tmplOTPVerification:              "mfa_verify_otp.html",
 		tmplMFAU2FInit:                   "mfa_init_u2f.html",
 		tmplU2FVerification:              "mfa_verification_u2f.html",
 		tmplMFAInitDone:                  "mfa_init_done.html",

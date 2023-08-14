@@ -390,7 +390,7 @@ func (u *userNotifier) reduceOTPSMSCodeAdded(event eventstore.Event) (*handler.S
 		u.metricSuccessfulDeliveriesSMS,
 		u.metricFailedDeliveriesSMS,
 	)
-	err = notify.SendOTPSMSCode(notifyUser, authz.GetInstance(ctx).RequestedDomain(), origin, code, e.Expiry)
+	err = notify.SendOTPSMSCode(authz.GetInstance(ctx).RequestedDomain(), origin, code, e.Expiry)
 	if err != nil {
 		return nil, err
 	}
@@ -442,6 +442,10 @@ func (u *userNotifier) reduceOTPEmailCodeAdded(event eventstore.Event) (*handler
 	if err != nil {
 		return nil, err
 	}
+	var authRequestID string
+	if e.AuthRequestInfo != nil {
+		authRequestID = e.AuthRequestInfo.ID
+	}
 	notify := types.SendEmail(
 		ctx,
 		string(template.Template),
@@ -456,7 +460,7 @@ func (u *userNotifier) reduceOTPEmailCodeAdded(event eventstore.Event) (*handler
 		u.metricSuccessfulDeliveriesEmail,
 		u.metricFailedDeliveriesEmail,
 	)
-	err = notify.SendOTPEmailCode(notifyUser, authz.GetInstance(ctx).RequestedDomain(), origin, code, e.Expiry)
+	err = notify.SendOTPEmailCode(notifyUser, authz.GetInstance(ctx).RequestedDomain(), origin, code, authRequestID, e.Expiry)
 	if err != nil {
 		return nil, err
 	}

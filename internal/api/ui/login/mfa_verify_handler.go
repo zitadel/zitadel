@@ -85,10 +85,10 @@ func (l *Login) renderMFAVerifySelected(w http.ResponseWriter, r *http.Request, 
 		data.Title = translator.LocalizeWithoutArgs("VerifyMFAOTP.Title")
 		data.Description = translator.LocalizeWithoutArgs("VerifyMFAOTP.Description")
 	case domain.MFATypeOTPSMS:
-		l.renderOTPVerification(w, r, authReq, verificationStep.MFAProviders, domain.MFATypeOTPSMS, nil)
+		l.handleOTPVerification(w, r, authReq, verificationStep.MFAProviders, domain.MFATypeOTPSMS, nil)
 		return
 	case domain.MFATypeOTPEmail:
-		l.renderOTPVerification(w, r, authReq, verificationStep.MFAProviders, domain.MFATypeOTPEmail, nil)
+		l.handleOTPVerification(w, r, authReq, verificationStep.MFAProviders, domain.MFATypeOTPEmail, nil)
 		return
 	default:
 		l.renderError(w, r, authReq, err)
