@@ -478,8 +478,8 @@ Errors:
     Terminated: Сесијата е веќе завршена
     Token:
       Invalid: Токенот за сесија е невалиден
-    Passkey:
-      NoChallenge: Сесија без предизвик за passkey
+    WebAuthN:
+      NoChallenge: Сесија без предизвик WebAuthN
   Intent:
     IDPMissing: ID на IDP недостасува во барањето
     SuccessURLMissing: URL за успех недостасува во барањето
