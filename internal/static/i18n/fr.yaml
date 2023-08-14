@@ -616,6 +616,24 @@ EventTypes:
           check:
             succeeded: Vérification de l'OTP multifactorielle réussie
             failed: La vérification de l'OTP multifactorielle a échoué
+          sms:
+            added: Ajout de SMS OTP multifactoriels
+            removed: Suppression des SMS OTP multifactoriels
+            code:
+              added: Ajout du code SMS OTP multifactoriel
+              sent: Code SMS OTP multifacteur envoyé
+            check:
+              succeeded: Vérification par SMS OTP multifacteur réussie
+              failed: Échec de la vérification par SMS OTP multifacteur
+          email:
+            added: Ajout d'un e-mail OTP multifactoriel
+            removed: Suppression de l'e-mail OTP multifacteur
+            code:
+              added: Ajout d'un code de messagerie OTP multifactoriel
+              sent: Code de messagerie OTP multifacteur envoyé
+            check:
+              succeeded: Vérification de l'e-mail OTP multifacteur réussie
+              failed: Échec de la vérification de l'e-mail OTP multifacteur
         u2f:
           token:
             added: Ajout d'un jeton U2F multifacteur

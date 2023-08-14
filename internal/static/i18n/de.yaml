@@ -618,6 +618,24 @@ EventTypes:
           check:
             succeeded: Multifaktor OTP Verifikation erfolgreich
             failed: Multifaktor OTP Verifikation fehlgeschlagen
+          sms:
+            added: Multifaktor OTP SMS hinzugefügt
+            removed: Multifaktor OTP SMS entfernt
+            code:
+              added: Multifaktor OTP SMS Code hinzugefügt
+              sent: Multifaktor OTP SMS Code versendet
+            check:
+              succeeded: Multifaktor OTP SMS Verifikation erfolgreich
+              failed: Multifaktor OTP SMS Verifikation fehlgeschlagen
+          email:
+            added: Multifaktor OTP Email hinzugefügt
+            removed: Multifaktor OTP Email entfernt
+            code:
+              added: Multifaktor OTP Email Code hinzugefügt
+              sent: Multifaktor OTP Email Code versendet
+            check:
+              succeeded: Multifaktor OTP Email Verifikation erfolgreich
+              failed: Multifaktor OTP Email Verifikation fehlgeschlagen
         u2f:
           token:
             added: Multifaktor U2F Token hinzugefügt
