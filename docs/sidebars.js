@@ -276,6 +276,7 @@ module.exports = {
           collapsed: true,
           items: [
             "guides/integrate/services/gitlab-self-hosted",
+            "guides/integrate/services/cloudflare-oidc",
             "guides/integrate/services/aws-saml",
             "guides/integrate/services/google-cloud",
             "guides/integrate/services/atlassian-saml",
