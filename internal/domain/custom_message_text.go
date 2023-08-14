@@ -11,6 +11,8 @@ const (
 	PasswordResetMessageType            = "PasswordReset"
 	VerifyEmailMessageType              = "VerifyEmail"
 	VerifyPhoneMessageType              = "VerifyPhone"
+	VerifySMSOTPMessageType             = "VerifySMSOTP"
+	VerifyEmailOTPMessageType           = "VerifyEmailOTP"
 	DomainClaimedMessageType            = "DomainClaimed"
 	PasswordlessRegistrationMessageType = "PasswordlessRegistration"
 	PasswordChangeMessageType           = "PasswordChange"
@@ -53,31 +55,13 @@ func (m *CustomMessageText) IsValid() bool {
 	return m.MessageTextType != "" && m.Language != language.Und
 }
 
-func (m *MessageTexts) GetMessageTextByType(msgType string) *CustomMessageText {
-	switch msgType {
-	case InitCodeMessageType:
-		return &m.InitCode
-	case PasswordResetMessageType:
-		return &m.PasswordReset
-	case VerifyEmailMessageType:
-		return &m.VerifyEmail
-	case VerifyPhoneMessageType:
-		return &m.VerifyPhone
-	case DomainClaimedMessageType:
-		return &m.DomainClaimed
-	case PasswordlessRegistrationMessageType:
-		return &m.PasswordlessRegistration
-	case PasswordChangeMessageType:
-		return &m.PasswordChange
-	}
-	return nil
-}
-
 func IsMessageTextType(textType string) bool {
 	return textType == InitCodeMessageType ||
 		textType == PasswordResetMessageType ||
 		textType == VerifyEmailMessageType ||
 		textType == VerifyPhoneMessageType ||
+		textType == VerifySMSOTPMessageType ||
+		textType == VerifyEmailOTPMessageType ||
 		textType == DomainClaimedMessageType ||
 		textType == PasswordlessRegistrationMessageType ||
 		textType == PasswordChangeMessageType

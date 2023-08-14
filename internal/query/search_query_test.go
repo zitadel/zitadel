@@ -1382,3 +1382,118 @@ func TestNumberComparisonFromMethod(t *testing.T) {
 		})
 	}
 }
+
+func TestNewInTextQuery(t *testing.T) {
+	type args struct {
+		column Column
+		value  []string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *InTextQuery
+		wantErr func(error) bool
+	}{
+		{
+			name: "empty values",
+			args: args{
+				column: testCol,
+				value:  []string{},
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, ErrEmptyValues)
+			},
+		},
+		{
+			name: "no column",
+			args: args{
+				column: Column{},
+				value:  []string{"adler", "hurst"},
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, ErrMissingColumn)
+			},
+		},
+		{
+			name: "no column name",
+			args: args{
+				column: testNoCol,
+				value:  []string{"adler", "hurst"},
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, ErrMissingColumn)
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				column: testCol,
+				value:  []string{"adler", "hurst"},
+			},
+			want: &InTextQuery{
+				Column: testCol,
+				Values: []string{"adler", "hurst"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewInTextQuery(tt.args.column, tt.args.value)
+			if err != nil && tt.wantErr == nil {
+				t.Errorf("NewTextQuery() no error expected got %v", err)
+				return
+			} else if tt.wantErr != nil && !tt.wantErr(err) {
+				t.Errorf("NewTextQuery() unexpeted error = %v", err)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewTextQuery() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInTextQuery_comp(t *testing.T) {
+	type fields struct {
+		Column Column
+		Values []string
+	}
+	type want struct {
+		query interface{}
+		isNil bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   want
+	}{
+		{
+			name: "equals",
+			fields: fields{
+				Column: testCol,
+				Values: []string{"Adler", "Hurst"},
+			},
+			want: want{
+				query: sq.Eq{"test_table.test_col": []string{"Adler", "Hurst"}},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &InTextQuery{
+				Column: tt.fields.Column,
+				Values: tt.fields.Values,
+			}
+			query := s.comp()
+			if query == nil && tt.want.isNil {
+				return
+			} else if tt.want.isNil && query != nil {
+				t.Error("query should not be nil")
+			}
+
+			if !reflect.DeepEqual(query, tt.want.query) {
+				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, query, query)
+			}
+		})
+	}
+}

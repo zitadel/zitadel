@@ -478,8 +478,8 @@ Errors:
     Terminated: Sesja już zakończona
     Token:
       Invalid: Token sesji jest nieprawidłowy
-    Passkey:
-      NoChallenge: Sesja bez wyzwania klucza
+    WebAuthN:
+      NoChallenge: Sesja bez wyzwania WebAuthN
   Intent:
     IDPMissing: Brak identyfikatora IDP w żądaniu
     SuccessURLMissing: Brak adresu URL powodzenia w żądaniu
@@ -595,6 +595,8 @@ EventTypes:
         removed: Usunięto zewnętrzne IDP
         cascade:
           removed: Usunięto kaskadę zewnętrznego IDP
+        id:
+          migrated: Identyfikator użytkownika zewnętrznego dostawcy tożsamości został przeniesiony
       phone:
         changed: Numer telefonu zmieniony
         verified: Numer telefonu zweryfikowany

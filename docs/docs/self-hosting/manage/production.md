@@ -21,6 +21,9 @@ Read more about separating the init and setup phases on the [Updating and Scalin
 ## Configuration
 
 Read [on the configure page](/docs/self-hosting/manage/configure) about the available options you have to configure ZITADEL.
+Prefer passing .yaml files to the ZITADEL binary instead of environment variables.
+Restricting access to these files to avoid leaking sensitive information is easier than restricting access to environment variables.
+Also, not all configuration options are available as environment variables.
 
 ## Networking
 

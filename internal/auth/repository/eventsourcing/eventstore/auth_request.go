@@ -238,7 +238,7 @@ func (repo *AuthRequestRepo) SelectExternalIDP(ctx context.Context, authReqID, i
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID string, externalUser *domain.ExternalUser, info *domain.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID string, externalUser *domain.ExternalUser, info *domain.BrowserInfo, migrationCheck bool) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
@@ -249,6 +249,11 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 	if errors.IsNotFound(err) {
 		// clear potential user information (e.g. when username was entered but another external user was returned)
 		request.SetUserInfo("", "", "", "", "", request.UserOrgID)
+		// in case the check was done with an ID, that was retrieved by a session that allows migration,
+		// we do not need to set the linking user and return early
+		if migrationCheck {
+			return err
+		}
 		if err := repo.setLinkingUser(ctx, request, externalUser); err != nil {
 			return err
 		}
@@ -541,6 +546,13 @@ func (repo *AuthRequestRepo) getAuthRequestEnsureUser(ctx context.Context, authR
 	request, err := repo.getAuthRequest(ctx, authRequestID, userAgentID)
 	if err != nil {
 		return nil, err
+	}
+	// If there's no user, checks if the user could be reused (from the session).
+	// (the nextStepsUser will update the userID in the request in that case)
+	if request.UserID == "" {
+		if _, err = repo.nextStepsUser(request); err != nil {
+			return nil, err
+		}
 	}
 	if request.UserID != userID {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-GBH32", "Errors.User.NotMatchingUserID")
@@ -908,50 +920,19 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request
 	return nil
 }
 
-func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.AuthRequest, checkLoggedIn bool) ([]domain.NextStep, error) {
+//nolint:gocognit
+func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.AuthRequest, checkLoggedIn bool) (steps []domain.NextStep, err error) {
 	if request == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-ds27a", "Errors.Internal")
 	}
-	steps := make([]domain.NextStep, 0)
+	steps = make([]domain.NextStep, 0)
 	if !checkLoggedIn && domain.IsPrompt(request.Prompt, domain.PromptNone) {
 		return append(steps, &domain.RedirectToCallbackStep{}), nil
 	}
 	if request.UserID == "" {
-		if request.LinkingUsers != nil && len(request.LinkingUsers) > 0 {
-			steps = append(steps, new(domain.ExternalNotFoundOptionStep))
-			return steps, nil
-		}
-		if domain.IsPrompt(request.Prompt, domain.PromptCreate) {
-			return append(steps, &domain.RegistrationStep{}), nil
-		}
-		// if there's a login or consent prompt, but not select account, just return the login step
-		if len(request.Prompt) > 0 && !domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
-			return append(steps, new(domain.LoginStep)), nil
-		} else {
-			// if no user was specified, no prompt or select_account was provided,
-			// then check the active user sessions (of the user agent)
-			users, err := repo.usersForUserSelection(request)
-			if err != nil {
-				return nil, err
-			}
-			if domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
-				steps = append(steps, &domain.SelectUserStep{Users: users})
-			}
-			if request.SelectedIDPConfigID != "" {
-				steps = append(steps, &domain.RedirectToExternalIDPStep{})
-			}
-			if len(request.Prompt) == 0 && len(users) == 0 {
-				steps = append(steps, new(domain.LoginStep))
-			}
-			// if no prompt was provided, but there are multiple user sessions, then the user must decide which to use
-			if len(request.Prompt) == 0 && len(users) > 1 {
-				steps = append(steps, &domain.SelectUserStep{Users: users})
-			}
-			if len(steps) > 0 {
-				return steps, nil
-			}
-			// a single user session was found, use that automatically
-			request.UserID = users[0].UserID
+		steps, err = repo.nextStepsUser(request)
+		if err != nil || len(steps) > 0 {
+			return steps, err
 		}
 	}
 	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID, request.LoginPolicy.IgnoreUnknownUsernames)
@@ -965,6 +946,8 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	if err != nil {
 		return nil, err
 	}
+	request.DisplayName = userSession.DisplayName
+	request.AvatarKey = userSession.AvatarKey
 
 	isInternalLogin := request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == ""
 	idps, err := checkExternalIDPsOfUser(ctx, repo.IDPUserLinksProvider, user.ID)
@@ -1039,6 +1022,47 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		steps = append(steps, &domain.LoginSucceededStep{})
 	}
 	return append(steps, &domain.RedirectToCallbackStep{}), nil
+}
+
+func (repo *AuthRequestRepo) nextStepsUser(request *domain.AuthRequest) ([]domain.NextStep, error) {
+	steps := make([]domain.NextStep, 0)
+	if request.LinkingUsers != nil && len(request.LinkingUsers) > 0 {
+		steps = append(steps, new(domain.ExternalNotFoundOptionStep))
+		return steps, nil
+	}
+	if domain.IsPrompt(request.Prompt, domain.PromptCreate) {
+		return append(steps, &domain.RegistrationStep{}), nil
+	}
+	// if there's a login or consent prompt, but not select account, just return the login step
+	if len(request.Prompt) > 0 && !domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
+		return append(steps, new(domain.LoginStep)), nil
+	} else {
+		// if no user was specified, no prompt or select_account was provided,
+		// then check the active user sessions (of the user agent)
+		users, err := repo.usersForUserSelection(request)
+		if err != nil {
+			return nil, err
+		}
+		if domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
+			steps = append(steps, &domain.SelectUserStep{Users: users})
+		}
+		if request.SelectedIDPConfigID != "" {
+			steps = append(steps, &domain.RedirectToExternalIDPStep{})
+		}
+		if len(request.Prompt) == 0 && len(users) == 0 {
+			steps = append(steps, new(domain.LoginStep))
+		}
+		// if no prompt was provided, but there are multiple user sessions, then the user must decide which to use
+		if len(request.Prompt) == 0 && len(users) > 1 {
+			steps = append(steps, &domain.SelectUserStep{Users: users})
+		}
+		if len(steps) > 0 {
+			return steps, nil
+		}
+		// a single user session was found, use that automatically
+		request.SetUserInfo(users[0].UserID, users[0].UserName, users[0].LoginName, users[0].DisplayName, users[0].AvatarKey, users[0].ResourceOwner)
+	}
+	return steps, nil
 }
 
 func checkExternalIDPsOfUser(ctx context.Context, idpUserLinksProvider idpUserLinksProvider, userID string) (*query.IDPUserLinks, error) {

@@ -3,11 +3,15 @@ package command
 import (
 	"context"
 	"testing"
+	"time"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	openid "github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -1322,6 +1326,453 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 			if tt.res.err != nil && !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
 			}
+		})
+	}
+}
+
+func TestCommandSide_SetUpOrg(t *testing.T) {
+	type fields struct {
+		eventstore   func(t *testing.T) *eventstore.Eventstore
+		idGenerator  id.Generator
+		newCode      cryptoCodeFunc
+		keyAlgorithm crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx              context.Context
+		setupOrg         *OrgSetup
+		allowInitialMail bool
+		userIDs          []string
+	}
+	type res struct {
+		createdOrg *CreatedOrg
+		err        error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "org name empty, error",
+			fields: fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID"),
+			},
+			args: args{
+				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name: "",
+				},
+			},
+			res: res{
+				err: errors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "userID not existing, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID"),
+			},
+			args: args{
+				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name: "Org",
+					Admins: []*OrgSetupAdmin{
+						{
+							ID: "userID",
+						},
+					},
+				},
+			},
+			res: res{
+				err: errors.ThrowPreconditionFailed(nil, "ORG-GoXOn", "Errors.User.NotFound"),
+			},
+		},
+		{
+			name: "human invalid, error",
+			fields: fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID", "userID"),
+			},
+			args: args{
+				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name: "Org",
+					Admins: []*OrgSetupAdmin{
+						{
+							Human: &AddHuman{
+								Username:  "",
+								FirstName: "firstname",
+								LastName:  "lastname",
+								Email: Email{
+									Address:  "email@test.ch",
+									Verified: true,
+								},
+								PreferredLanguage: language.English,
+							},
+						},
+					},
+				},
+				allowInitialMail: true,
+			},
+			res: res{
+				err: errors.ThrowInvalidArgument(nil, "V2-zzad3", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "human added with initial mail",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(), // add human exists check
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "orgID").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(), // org member check
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "orgID").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"",
+								"firstname lastname",
+								language.English,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("orgID").Aggregate,
+								"Org",
+							)),
+							eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
+								&org.NewAggregate("orgID").Aggregate, "org.iam-domain",
+							)),
+							eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),
+								&org.NewAggregate("orgID").Aggregate,
+								"org.iam-domain",
+							)),
+							eventFromEventPusher(org.NewDomainPrimarySetEvent(context.Background(),
+								&org.NewAggregate("orgID").Aggregate,
+								"org.iam-domain",
+							)),
+							eventFromEventPusher(
+								user.NewHumanAddedEvent(context.Background(),
+									&user.NewAggregate("userID", "orgID").Aggregate,
+									"username",
+									"firstname",
+									"lastname",
+									"",
+									"firstname lastname",
+									language.English,
+									domain.GenderUnspecified,
+									"email@test.ch",
+									true,
+								),
+							),
+							eventFromEventPusher(
+								user.NewHumanEmailVerifiedEvent(context.Background(),
+									&user.NewAggregate("userID", "orgID").Aggregate,
+								),
+							),
+							eventFromEventPusher(
+								user.NewHumanInitialCodeAddedEvent(
+									context.Background(),
+									&user.NewAggregate("userID", "orgID").Aggregate,
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("userinit"),
+									},
+									1*time.Hour,
+								),
+							),
+							eventFromEventPusher(org.NewMemberAddedEvent(context.Background(),
+								&org.NewAggregate("orgID").Aggregate,
+								"userID",
+								domain.RoleOrgOwner,
+							)),
+						},
+						uniqueConstraintsFromEventConstraint(org.NewAddOrgNameUniqueConstraint("Org")),
+						uniqueConstraintsFromEventConstraint(org.NewAddOrgDomainUniqueConstraint("org.iam-domain")),
+						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "orgID", true)),
+						uniqueConstraintsFromEventConstraint(member.NewAddMemberUniqueConstraint("orgID", "userID")),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID", "userID"),
+				newCode:     mockCode("userinit", time.Hour),
+			},
+			args: args{
+				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name: "Org",
+					Admins: []*OrgSetupAdmin{
+						{
+							Human: &AddHuman{
+								Username:  "username",
+								FirstName: "firstname",
+								LastName:  "lastname",
+								Email: Email{
+									Address:  "email@test.ch",
+									Verified: true,
+								},
+								PreferredLanguage: language.English,
+							},
+						},
+					},
+				},
+				allowInitialMail: true,
+			},
+			res: res{
+				createdOrg: &CreatedOrg{
+					ObjectDetails: &domain.ObjectDetails{
+						ResourceOwner: "orgID",
+					},
+					CreatedAdmins: []*CreatedOrgAdmin{
+						{
+							ID: "userID",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "existing human added",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "orgID").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"",
+								"firstname lastname",
+								language.English,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(), // org member check
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("orgID").Aggregate,
+								"Org",
+							)),
+							eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
+								&org.NewAggregate("orgID").Aggregate, "org.iam-domain",
+							)),
+							eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),
+								&org.NewAggregate("orgID").Aggregate,
+								"org.iam-domain",
+							)),
+							eventFromEventPusher(org.NewDomainPrimarySetEvent(context.Background(),
+								&org.NewAggregate("orgID").Aggregate,
+								"org.iam-domain",
+							)),
+							eventFromEventPusher(org.NewMemberAddedEvent(context.Background(),
+								&org.NewAggregate("orgID").Aggregate,
+								"userID",
+								domain.RoleOrgOwner,
+							)),
+						},
+						uniqueConstraintsFromEventConstraint(org.NewAddOrgNameUniqueConstraint("Org")),
+						uniqueConstraintsFromEventConstraint(org.NewAddOrgDomainUniqueConstraint("org.iam-domain")),
+						uniqueConstraintsFromEventConstraint(member.NewAddMemberUniqueConstraint("orgID", "userID")),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID"),
+			},
+			args: args{
+				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name: "Org",
+					Admins: []*OrgSetupAdmin{
+						{
+							ID: "userID",
+						},
+					},
+				},
+				allowInitialMail: true,
+			},
+			res: res{
+				createdOrg: &CreatedOrg{
+					ObjectDetails: &domain.ObjectDetails{
+						ResourceOwner: "orgID",
+					},
+					CreatedAdmins: []*CreatedOrgAdmin{},
+				},
+			},
+		},
+		{
+			name: "machine added with pat",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(), // add machine exists check
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "orgID").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(),
+					expectFilter(),
+					expectFilter(), // org member check
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "orgID").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"",
+								"firstname lastname",
+								language.English,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("orgID").Aggregate,
+								"Org",
+							)),
+							eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
+								&org.NewAggregate("orgID").Aggregate, "org.iam-domain",
+							)),
+							eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),
+								&org.NewAggregate("orgID").Aggregate,
+								"org.iam-domain",
+							)),
+							eventFromEventPusher(org.NewDomainPrimarySetEvent(context.Background(),
+								&org.NewAggregate("orgID").Aggregate,
+								"org.iam-domain",
+							)),
+							eventFromEventPusher(
+								user.NewMachineAddedEvent(context.Background(),
+									&user.NewAggregate("userID", "orgID").Aggregate,
+									"username",
+									"name",
+									"description",
+									true,
+									domain.OIDCTokenTypeBearer,
+								),
+							),
+							eventFromEventPusher(
+								user.NewPersonalAccessTokenAddedEvent(context.Background(),
+									&user.NewAggregate("userID", "orgID").Aggregate,
+									"tokenID",
+									testNow.Add(time.Hour),
+									[]string{openid.ScopeOpenID},
+								),
+							),
+							eventFromEventPusher(org.NewMemberAddedEvent(context.Background(),
+								&org.NewAggregate("orgID").Aggregate,
+								"userID",
+								domain.RoleOrgOwner,
+							)),
+						},
+						uniqueConstraintsFromEventConstraint(org.NewAddOrgNameUniqueConstraint("Org")),
+						uniqueConstraintsFromEventConstraint(org.NewAddOrgDomainUniqueConstraint("org.iam-domain")),
+						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "orgID", true)),
+						uniqueConstraintsFromEventConstraint(member.NewAddMemberUniqueConstraint("orgID", "userID")),
+					),
+				),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "orgID", "userID", "tokenID"),
+				newCode:      mockCode("userinit", time.Hour),
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name: "Org",
+					Admins: []*OrgSetupAdmin{
+						{
+							Machine: &AddMachine{
+								Machine: &Machine{
+									Username:        "username",
+									Name:            "name",
+									Description:     "description",
+									AccessTokenType: domain.OIDCTokenTypeBearer,
+								},
+								Pat: &AddPat{
+									ExpirationDate: testNow.Add(time.Hour),
+									Scopes:         []string{openid.ScopeOpenID},
+								},
+							},
+						},
+					},
+				},
+			},
+			res: res{
+				createdOrg: &CreatedOrg{
+					ObjectDetails: &domain.ObjectDetails{
+						ResourceOwner: "orgID",
+					},
+					CreatedAdmins: []*CreatedOrgAdmin{
+						{
+							ID: "userID",
+							PAT: &PersonalAccessToken{
+								ObjectRoot: models.ObjectRoot{
+									AggregateID:   "userID",
+									ResourceOwner: "orgID",
+								},
+								ExpirationDate:  testNow.Add(time.Hour),
+								Scopes:          []string{openid.ScopeOpenID},
+								AllowedUserType: domain.UserTypeMachine,
+								TokenID:         "tokenID",
+								Token:           "dG9rZW5JRDp1c2VySUQ", // token
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:   tt.fields.eventstore(t),
+				idGenerator:  tt.fields.idGenerator,
+				newCode:      tt.fields.newCode,
+				keyAlgorithm: tt.fields.keyAlgorithm,
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: domain.RoleOrgOwner,
+					},
+				},
+			}
+			got, err := r.SetUpOrg(tt.args.ctx, tt.args.setupOrg, tt.args.allowInitialMail, tt.args.userIDs...)
+			assert.ErrorIs(t, err, tt.res.err)
+			assert.Equal(t, tt.res.createdOrg, got)
 		})
 	}
 }

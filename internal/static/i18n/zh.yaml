@@ -478,8 +478,8 @@ Errors:
     Terminated: 会话已经终止
     Token:
       Invalid: 会话令牌是无效的
-    Passkey:
-      NoChallenge: 没有密码挑战的会话
+    WebAuthN:
+      NoChallenge: 没有 WebAuthN 质询的会话
   Intent:
     IDPMissing: 请求中缺少IDP ID
     SuccessURLMissing: 请求中缺少成功URL
@@ -589,6 +589,8 @@ EventTypes:
         removed: 移除了外部 IDP
         cascade:
           removed: 移除了外部 IDP
+        id:
+          migrated: IDP 的外部用户 ID 已迁移
       phone:
         changed: 修改手机号码
         verified: 已验证手机号码

@@ -478,8 +478,8 @@ Errors:
     Terminated: La session est déjà terminée
     Token:
       Invalid: Le jeton de session n'est pas valide
-    Passkey:
-      NoChallenge: Session sans défi de clé d'accès
+    WebAuthN:
+      NoChallenge: Session sans challenge WebAuthN
   Intent:
     IDPMissing: IDP manquant dans la requête
     SuccessURLMissing: Success URL absent de la requête
@@ -593,6 +593,8 @@ EventTypes:
         removed: Externer IDP supprimé
         cascade:
           removed: Externer IDP cascade supprimé
+        îd:
+          migrated: L'ID utilisateur externe de l'IDP a été migré
       phone:
         changed: Le numéro de téléphone a changé
         verified: Numéro de téléphone vérifié

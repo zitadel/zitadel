@@ -29,7 +29,7 @@ Errors:
   Limit:
     ExceedsDefault: Limit überschreitet default Limit
   Language:
-    NotParsed: Sprache konnte nicht gemapped werde
+    NotParsed: Sprache konnte nicht gemapped werden
   OIDCSettings:
     NotFound: OIDC Konfiguration konnte nicht gefunden werden
     AlreadyExists: OIDC Konfiguration existiert bereits
@@ -478,8 +478,8 @@ Errors:
     Terminated: Session bereits beendet
     Token:
       Invalid: Session Token ist ungültig
-    Passkey:
-      NoChallenge: Sitzung ohne Passkey-Herausforderung
+    WebAuthN:
+      NoChallenge: Sitzung ohne WebAuthN-Challenge
   Intent:
     IDPMissing: IDP ID fehlt im Request
     SuccessURLMissing: Success URL fehlt im Request
@@ -595,6 +595,8 @@ EventTypes:
         removed: Externer IDP wurde gelöscht
         cascade:
           removed: Externer IDP wurde kaskadiert gelöscht
+        id:
+          migrated: Externe UserID des IDP wurde migriert
       phone:
         changed: Telefonnummer geändert
         verified: Telefonnummer verifiziert

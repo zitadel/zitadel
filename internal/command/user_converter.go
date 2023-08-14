@@ -112,17 +112,9 @@ func personalTokenWriteModelToToken(wm *PersonalAccessTokenWriteModel, algorithm
 	}, base64.RawURLEncoding.EncodeToString(encrypted), nil
 }
 
-func readModelToU2FTokens(wm *HumanU2FTokensReadModel) []*domain.WebAuthNToken {
-	tokens := make([]*domain.WebAuthNToken, len(wm.WebAuthNTokens))
-	for i, token := range wm.WebAuthNTokens {
-		tokens[i] = writeModelToWebAuthN(token)
-	}
-	return tokens
-}
-
-func readModelToPasswordlessTokens(wm *HumanPasswordlessTokensReadModel) []*domain.WebAuthNToken {
-	tokens := make([]*domain.WebAuthNToken, len(wm.WebAuthNTokens))
-	for i, token := range wm.WebAuthNTokens {
+func readModelToWebAuthNTokens(readModel HumanWebAuthNTokensReadModel) []*domain.WebAuthNToken {
+	tokens := make([]*domain.WebAuthNToken, len(readModel.GetWebAuthNTokens()))
+	for i, token := range readModel.GetWebAuthNTokens() {
 		tokens[i] = writeModelToWebAuthN(token)
 	}
 	return tokens
