@@ -722,7 +722,7 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 		e,
 		u.metricSuccessfulDeliveriesSMS,
 		u.metricFailedDeliveriesSMS,
-	).SendPhoneVerificationCode(notifyUser, origin, code)
+	).SendPhoneVerificationCode(notifyUser, origin, code, authz.GetInstance(ctx).RequestedDomain())
 	if err != nil {
 		return nil, err
 	}

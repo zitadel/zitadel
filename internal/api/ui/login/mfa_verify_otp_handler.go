@@ -75,7 +75,7 @@ func (l *Login) handleOTPVerificationCheck(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	if formData.Resend {
-		l.renderOTPVerification(w, r, authReq, step.MFAProviders, formData.SelectedProvider, nil)
+		l.handleOTPVerification(w, r, authReq, step.MFAProviders, formData.SelectedProvider, nil)
 		return
 	}
 	if formData.Code == "" {
