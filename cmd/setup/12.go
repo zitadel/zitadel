@@ -22,5 +22,5 @@ func (mig *AddOTPColumns) Execute(ctx context.Context) error {
 }
 
 func (mig *AddOTPColumns) String() string {
-	return "12_otp_columns"
+	return "12_auth_users_otp_columns"
 }
