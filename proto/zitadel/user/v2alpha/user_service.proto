@@ -342,6 +342,32 @@ service UserService {
     };
   }
 
+
+  // Set credentials of an already existing intent
+  rpc SetIntentCredentials (SetIntentCredentialsRequest) returns (SetIntentCredentialsResponse) {
+    option (google.api.http) = {
+      patch: "/v2alpha/users/intents/{intent_id}/credentials"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Set credentials for already existing intent";
+      description: "Set credentials for already existing intent";
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
   rpc RetrieveIdentityProviderInformation (RetrieveIdentityProviderInformationRequest) returns (RetrieveIdentityProviderInformationResponse) {
     option (google.api.http) = {
       post: "/v2alpha/users/intents/{intent_id}/information"
@@ -875,6 +901,42 @@ message StartIdentityProviderFlowResponse{
       }
     ];
   }
+}
+
+message SetIntentCredentialsRequest {
+  string intent_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the intent, previously returned on the success response of the IDP callback"
+      min_length: 1;
+      max_length: 200;
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  string token = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "token of the intent, previously returned on the success response of the IDP callback"
+      min_length: 1;
+      max_length: 200;
+      example: "\"SJKL3ioIDpo342ioqw98fjp3sdf32wahb=\"";
+    }
+  ];
+  oneof credentials {
+    LDAPCredentials ldap = 3;
+  }
+}
+
+message SetIntentCredentialsResponse{
+  zitadel.object.v2alpha.Details details = 1;
+  string token = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "token of the intent"
+      min_length: 1;
+      max_length: 200;
+      example: "\"SJKL3ioIDpo342ioqw98fjp3sdf32wahb=\"";
+    }
+  ];
 }
 
 message Intent {

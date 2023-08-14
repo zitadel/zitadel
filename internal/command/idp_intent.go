@@ -50,53 +50,38 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID st
 	}
 }
 
-func (c *Commands) LoginWithLDAP(ctx context.Context, intentID string, username string, password string) (*IDPIntentWriteModel, idp.User, *ldap.Session, error) {
-	intent, err := c.GetActiveIntent(ctx, intentID)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	provider, err := c.GetProvider(ctx, intent.IDPID, "")
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	ldapProvider, ok := provider.(*ldap.Provider)
-	if !ok {
-		return nil, nil, nil, errors.ThrowInvalidArgument(nil, "IDP-9a02j2n2bh", "Errors.ExternalIDP.IDPTypeNotImplemented")
-	}
-
-	session := &ldap.Session{Provider: ldapProvider, User: username, Password: password}
+func (c *Commands) LoginWithLDAP(ctx context.Context, provider ldap.ProviderInterface, username string, password string) (idp.User, idp.Session, error) {
+	session := provider.GetSession(username, password)
 	user, err := session.FetchUser(ctx)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
-	return intent, user, session, nil
+	return user, session, nil
 }
 
-func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureURL, resourceOwner string) (string, *domain.ObjectDetails, error) {
+func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureURL, resourceOwner string) (*IDPIntentWriteModel, *domain.ObjectDetails, error) {
 	id, err := c.idGenerator.Next()
 	if err != nil {
-		return "", nil, err
+		return nil, nil, err
 	}
 	writeModel := NewIDPIntentWriteModel(id, resourceOwner)
 	if err != nil {
-		return "", nil, err
+		return nil, nil, err
 	}
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareCreateIntent(writeModel, idpID, successURL, failureURL))
 	if err != nil {
-		return "", nil, err
+		return nil, nil, err
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return "", nil, err
+		return nil, nil, err
 	}
 	err = AppendAndReduce(writeModel, pushedEvents...)
 	if err != nil {
-		return "", nil, err
+		return nil, nil, err
 	}
-	return id, writeModelToObjectDetails(&writeModel.WriteModel), nil
+	return writeModel, writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
 func (c *Commands) GetProvider(ctx context.Context, idpID string, callbackURL string) (idp.Provider, error) {
@@ -145,8 +130,8 @@ func getIDPIntentWriteModel(ctx context.Context, writeModel *IDPIntentWriteModel
 	return writeModel.Reduce()
 }
 
-func (c *Commands) SucceedOAuthIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, idpSession idp.Session, userID string) (string, error) {
-	token, err := c.idpConfigEncryption.Encrypt([]byte(writeModel.AggregateID))
+func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, idpSession idp.Session, userID string) (string, error) {
+	token, err := c.generateIntentToken(writeModel.AggregateID)
 	if err != nil {
 		return "", err
 	}
@@ -158,7 +143,7 @@ func (c *Commands) SucceedOAuthIDPIntent(ctx context.Context, writeModel *IDPInt
 	if err != nil {
 		return "", err
 	}
-	cmd := idpintent.NewOAuthSucceededEvent(
+	cmd := idpintent.NewSucceededEvent(
 		ctx,
 		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
 		idpInfo,
@@ -172,11 +157,19 @@ func (c *Commands) SucceedOAuthIDPIntent(ctx context.Context, writeModel *IDPInt
 	if err != nil {
 		return "", err
 	}
+	return token, nil
+}
+
+func (c *Commands) generateIntentToken(intentID string) (string, error) {
+	token, err := c.idpConfigEncryption.Encrypt([]byte(intentID))
+	if err != nil {
+		return "", err
+	}
 	return base64.RawURLEncoding.EncodeToString(token), nil
 }
 
 func (c *Commands) SucceedLDAPIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, userID string, attributes map[string][]string) (string, error) {
-	token, err := c.idpConfigEncryption.Encrypt([]byte(writeModel.AggregateID))
+	token, err := c.generateIntentToken(writeModel.AggregateID)
 	if err != nil {
 		return "", err
 	}
@@ -197,7 +190,7 @@ func (c *Commands) SucceedLDAPIDPIntent(ctx context.Context, writeModel *IDPInte
 	if err != nil {
 		return "", err
 	}
-	return base64.RawURLEncoding.EncodeToString(token), nil
+	return token, nil
 }
 
 func (c *Commands) FailIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, reason string) error {

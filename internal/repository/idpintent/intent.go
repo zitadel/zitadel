@@ -12,10 +12,10 @@ import (
 )
 
 const (
-	StartedEventType        = instanceEventTypePrefix + "started"
-	OAuthSucceededEventType = instanceEventTypePrefix + "oauth.succeeded"
-	LDAPSucceededEventType  = instanceEventTypePrefix + "ldap.succeeded"
-	FailedEventType         = instanceEventTypePrefix + "failed"
+	StartedEventType       = instanceEventTypePrefix + "started"
+	SucceededEventType     = instanceEventTypePrefix + "succeeded"
+	LDAPSucceededEventType = instanceEventTypePrefix + "ldap.succeeded"
+	FailedEventType        = instanceEventTypePrefix + "failed"
 )
 
 type StartedEvent struct {
@@ -66,7 +66,7 @@ func StartedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return e, nil
 }
 
-type OAuthSucceededEvent struct {
+type SucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	IDPUser     []byte `json:"idpUser"`
@@ -78,7 +78,7 @@ type OAuthSucceededEvent struct {
 	IDPIDToken     string              `json:"idpIdToken,omitempty"`
 }
 
-func NewOAuthSucceededEvent(
+func NewSucceededEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	idpUser []byte,
@@ -87,12 +87,12 @@ func NewOAuthSucceededEvent(
 	userID string,
 	idpAccessToken *crypto.CryptoValue,
 	idpIDToken string,
-) *OAuthSucceededEvent {
-	return &OAuthSucceededEvent{
+) *SucceededEvent {
+	return &SucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			OAuthSucceededEventType,
+			SucceededEventType,
 		),
 		IDPUser:        idpUser,
 		IDPUserID:      idpUserID,
@@ -103,16 +103,16 @@ func NewOAuthSucceededEvent(
 	}
 }
 
-func (e *OAuthSucceededEvent) Data() interface{} {
+func (e *SucceededEvent) Data() interface{} {
 	return e
 }
 
-func (e *OAuthSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func OAuthSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
-	e := &OAuthSucceededEvent{
+func SucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e := &SucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 

@@ -44,7 +44,7 @@ func (wm *IDPIntentWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *idpintent.StartedEvent:
 			wm.reduceStartedEvent(e)
-		case *idpintent.OAuthSucceededEvent:
+		case *idpintent.SucceededEvent:
 			wm.reduceOAuthSucceededEvent(e)
 		case *idpintent.LDAPSucceededEvent:
 			wm.reduceLDAPSucceededEvent(e)
@@ -63,7 +63,7 @@ func (wm *IDPIntentWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			idpintent.StartedEventType,
-			idpintent.OAuthSucceededEventType,
+			idpintent.SucceededEventType,
 			idpintent.LDAPSucceededEventType,
 			idpintent.FailedEventType,
 		).
@@ -86,7 +86,7 @@ func (wm *IDPIntentWriteModel) reduceLDAPSucceededEvent(e *idpintent.LDAPSucceed
 	wm.State = domain.IDPIntentStateSucceeded
 }
 
-func (wm *IDPIntentWriteModel) reduceOAuthSucceededEvent(e *idpintent.OAuthSucceededEvent) {
+func (wm *IDPIntentWriteModel) reduceOAuthSucceededEvent(e *idpintent.SucceededEvent) {
 	wm.UserID = e.UserID
 	wm.IDPUser = e.IDPUser
 	wm.IDPUserID = e.IDPUserID

@@ -6,7 +6,7 @@ import (
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
 	es.RegisterFilterEventMapper(AggregateType, StartedEventType, StartedEventMapper).
-		RegisterFilterEventMapper(AggregateType, OAuthSucceededEventType, OAuthSucceededEventMapper).
+		RegisterFilterEventMapper(AggregateType, SucceededEventType, SucceededEventMapper).
 		RegisterFilterEventMapper(AggregateType, LDAPSucceededEventType, LDAPSucceededEventMapper).
 		RegisterFilterEventMapper(AggregateType, FailedEventType, FailedEventMapper)
 }

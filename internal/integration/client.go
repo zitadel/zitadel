@@ -171,9 +171,9 @@ func (s *Tester) AddGenericOAuthProvider(t *testing.T) string {
 
 func (s *Tester) CreateIntent(t *testing.T, idpID string) string {
 	ctx := authz.WithInstance(context.Background(), s.Instance)
-	id, _, err := s.Commands.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", s.Organisation.ID)
+	writeModel, _, err := s.Commands.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", s.Organisation.ID)
 	require.NoError(t, err)
-	return id
+	return writeModel.AggregateID
 }
 
 func (s *Tester) CreateSuccessfulOAuthIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
@@ -197,7 +197,7 @@ func (s *Tester) CreateSuccessfulOAuthIntent(t *testing.T, idpID, userID, idpUse
 			IDToken: "idToken",
 		},
 	}
-	token, err := s.Commands.SucceedOAuthIDPIntent(ctx, writeModel, idpUser, idpSession, userID)
+	token, err := s.Commands.SucceedIDPIntent(ctx, writeModel, idpUser, idpSession, userID)
 	require.NoError(t, err)
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
 }

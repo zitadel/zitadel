@@ -94,10 +94,9 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 		if z_errs.IsNotFound(err) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
-		} else {
-			redirectToFailureURLErr(w, r, intent, err)
-			return
 		}
+		redirectToFailureURLErr(w, r, intent, err)
+		return
 	}
 
 	// the provider might have returned an error
@@ -126,7 +125,7 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 	userID, err := h.checkExternalUser(ctx, intent.IDPID, idpUser.GetID())
 	logging.WithFields("intent", intent.AggregateID).OnError(err).Error("could not check if idp user already exists")
 
-	token, err := h.commands.SucceedOAuthIDPIntent(ctx, intent, idpUser, idpSession, userID)
+	token, err := h.commands.SucceedIDPIntent(ctx, intent, idpUser, idpSession, userID)
 	if err != nil {
 		redirectToFailureURLErr(w, r, intent, z_errs.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
 		return

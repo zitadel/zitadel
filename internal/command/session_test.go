@@ -587,7 +587,7 @@ func TestCommands_updateSession(t *testing.T) {
 									"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
 							),
 							eventFromEventPusher(
-								idpintent.NewOAuthSucceededEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate,
+								idpintent.NewSucceededEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate,
 									nil,
 									"idpUserID",
 									"idpUserName",
@@ -681,7 +681,7 @@ func TestCommands_updateSession(t *testing.T) {
 									"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
 							),
 							eventFromEventPusher(
-								idpintent.NewOAuthSucceededEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate,
+								idpintent.NewSucceededEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate,
 									nil,
 									"idpUserID",
 									"idpUsername",

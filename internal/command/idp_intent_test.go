@@ -22,6 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
+	mock_ldap "github.com/zitadel/zitadel/internal/idp/providers/ldap/mock"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	rep_idp "github.com/zitadel/zitadel/internal/repository/idp"
@@ -199,9 +200,9 @@ func TestCommands_CreateIntent(t *testing.T) {
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			intentID, details, err := c.CreateIntent(tt.args.ctx, tt.args.idpID, tt.args.successURL, tt.args.failureURL, tt.args.resourceOwner)
+			intentWriteModel, details, err := c.CreateIntent(tt.args.ctx, tt.args.idpID, tt.args.successURL, tt.args.failureURL, tt.args.resourceOwner)
 			require.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.intentID, intentID)
+			assert.Equal(t, tt.res.intentID, intentWriteModel.AggregateID)
 			assert.Equal(t, tt.res.details, details)
 		})
 	}
@@ -363,7 +364,7 @@ func TestCommands_AuthURLFromProvider(t *testing.T) {
 	}
 }
 
-func TestCommands_SucceedOAuthIDPIntent(t *testing.T) {
+func TestCommands_SucceedIDPIntent(t *testing.T) {
 	type fields struct {
 		eventstore          *eventstore.Eventstore
 		idpConfigEncryption crypto.EncryptionAlgorithm
@@ -436,7 +437,7 @@ func TestCommands_SucceedOAuthIDPIntent(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectPush(
 						eventPusherToEvents(
-							idpintent.NewOAuthSucceededEvent(
+							idpintent.NewSucceededEvent(
 								context.Background(),
 								&idpintent.NewAggregate("id", "ro").Aggregate,
 								[]byte(`{"sub":"id","preferred_username":"username"}`),
@@ -484,11 +485,98 @@ func TestCommands_SucceedOAuthIDPIntent(t *testing.T) {
 				eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.idpConfigEncryption,
 			}
-			got, err := c.SucceedOAuthIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.idpSession, tt.args.userID)
+			got, err := c.SucceedIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.idpSession, tt.args.userID)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.token, got)
 		})
 	}
+}
+
+func TestCommands_LoginWithLDAP(t *testing.T) {
+	type args struct {
+		ctx      context.Context
+		provider ldap.ProviderInterface
+		username string
+		password string
+		user     idp.User
+	}
+	type res struct {
+		user idp.User
+		err  error
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{{
+		"failed login",
+		args{
+			ctx:      context.Background(),
+			provider: getLdapProviderMockWithUser(t, nil, z_errors.ThrowInternal(nil, "id", "failed")),
+			username: "username",
+			password: "password",
+		},
+		res{
+			err: z_errors.ThrowInternal(nil, "id", "failed"),
+		},
+	},
+		{
+			"successful",
+			args{
+				ctx: context.Background(),
+				provider: getLdapProviderMockWithUser(t, ldap.NewUser(
+					"id",
+					"",
+					"",
+					"",
+					"",
+					"username",
+					"",
+					false,
+					"",
+					false,
+					language.Tag{},
+					"",
+					"",
+				), nil),
+				username: "username",
+				password: "password",
+			},
+			res{
+				user: ldap.NewUser(
+					"id",
+					"",
+					"",
+					"",
+					"",
+					"username",
+					"",
+					false,
+					"",
+					false,
+					language.Tag{},
+					"",
+					"",
+				),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{}
+			got, _, err := c.LoginWithLDAP(tt.args.ctx, tt.args.provider, tt.args.username, tt.args.password)
+			require.ErrorIs(t, err, tt.res.err)
+			assert.Equal(t, tt.res.user, got)
+		})
+	}
+}
+
+func getLdapProviderMockWithUser(t *testing.T, user idp.User, err error) ldap.ProviderInterface {
+	provider := mock_ldap.NewMockProviderInterface(gomock.NewController(t))
+	ldapSession := mock_ldap.NewMockSession(gomock.NewController(t))
+	ldapSession.EXPECT().FetchUser(gomock.Any()).Return(user, err)
+	provider.EXPECT().GetSession(gomock.Any(), gomock.Any()).Return(ldapSession)
+	return provider
 }
 
 func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
