@@ -49,6 +49,7 @@ core_grpc_dependencies:
 	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.15.2 
 	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.15.2 
 	go install github.com/envoyproxy/protoc-gen-validate@v0.10.1
+	go install github.com/bufbuild/buf/cmd/buf@v1.25.1
 
 .PHONY: core_api
 core_api: core_api_generator core_grpc_dependencies
