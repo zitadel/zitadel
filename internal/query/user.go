@@ -605,6 +605,15 @@ func (r *UserSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
 	return nil
 }
 
+func NewUserOrSearchQuery(values []SearchQuery) (SearchQuery, error) {
+	return NewOrQuery(values...)
+}
+func NewUserAndSearchQuery(values []SearchQuery) (SearchQuery, error) {
+	return NewAndQuery(values...)
+}
+func NewUserNotSearchQuery(value SearchQuery) (SearchQuery, error) {
+	return NewNotQuery(value)
+}
 func NewUserInUserIdsSearchQuery(values []string) (SearchQuery, error) {
 	return NewInTextQuery(UserIDCol, values)
 }

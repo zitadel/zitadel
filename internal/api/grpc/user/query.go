@@ -42,6 +42,12 @@ func UserQueryToQuery(query *user_pb.SearchQuery) (query.SearchQuery, error) {
 		return ResourceOwnerQueryToQuery(q.ResourceOwner)
 	case *user_pb.SearchQuery_InUserIdsQuery:
 		return InUserIdsQueryToQuery(q.InUserIdsQuery)
+	case *user_pb.SearchQuery_OrQuery:
+		return OrQueryToQuery(q.OrQuery)
+	case *user_pb.SearchQuery_AndQuery:
+		return AndQueryToQuery(q.AndQuery)
+	case *user_pb.SearchQuery_NotQuery:
+		return NotQueryToQuery(q.NotQuery)
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}
@@ -89,4 +95,25 @@ func ResourceOwnerQueryToQuery(q *user_pb.ResourceOwnerQuery) (query.SearchQuery
 
 func InUserIdsQueryToQuery(q *user_pb.InUserIDQuery) (query.SearchQuery, error) {
 	return query.NewUserInUserIdsSearchQuery(q.UserIds)
+}
+func OrQueryToQuery(q *user_pb.OrQuery) (query.SearchQuery, error) {
+	mappedQueries, err := UserQueriesToQuery(q.Queries)
+	if err != nil {
+		return nil, err
+	}
+	return query.NewUserOrSearchQuery(mappedQueries)
+}
+func AndQueryToQuery(q *user_pb.AndQuery) (query.SearchQuery, error) {
+	mappedQueries, err := UserQueriesToQuery(q.Queries)
+	if err != nil {
+		return nil, err
+	}
+	return query.NewUserAndSearchQuery(mappedQueries)
+}
+func NotQueryToQuery(q *user_pb.NotQuery) (query.SearchQuery, error) {
+	mappedQuery, err := UserQueryToQuery(q.Query)
+	if err != nil {
+		return nil, err
+	}
+	return query.NewUserNotSearchQuery(mappedQuery)
 }

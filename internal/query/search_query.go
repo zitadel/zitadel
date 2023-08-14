@@ -2,6 +2,7 @@ package query
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 
 	sq "github.com/Masterminds/squirrel"
@@ -87,27 +88,75 @@ func (q *IsNullQuery) comp() sq.Sqlizer {
 	return sq.Eq{q.Column.identifier(): nil}
 }
 
-type orQuery struct {
+type OrQuery struct {
 	queries []SearchQuery
 }
 
-func newOrQuery(queries ...SearchQuery) (*orQuery, error) {
+func NewOrQuery(queries ...SearchQuery) (*OrQuery, error) {
 	if len(queries) == 0 {
 		return nil, ErrMissingColumn
 	}
-	return &orQuery{queries: queries}, nil
+	return &OrQuery{queries: queries}, nil
 }
 
-func (q *orQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *OrQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
 }
 
-func (q *orQuery) comp() sq.Sqlizer {
+func (q *OrQuery) comp() sq.Sqlizer {
 	or := make(sq.Or, len(q.queries))
 	for i, query := range q.queries {
 		or[i] = query.comp()
 	}
 	return or
+}
+
+type AndQuery struct {
+	queries []SearchQuery
+}
+
+func NewAndQuery(queries ...SearchQuery) (*AndQuery, error) {
+	if len(queries) == 0 {
+		return nil, ErrMissingColumn
+	}
+	return &AndQuery{queries: queries}, nil
+}
+
+func (q *AndQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (q *AndQuery) comp() sq.Sqlizer {
+	and := make(sq.And, len(q.queries))
+	for i, query := range q.queries {
+		and[i] = query.comp()
+	}
+	return and
+}
+
+type NotQuery struct {
+	query SearchQuery
+}
+
+func NewNotQuery(query SearchQuery) (*NotQuery, error) {
+	if query == nil {
+		return nil, ErrMissingColumn
+	}
+	return &NotQuery{query: query}, nil
+}
+
+func (q *NotQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (notQ NotQuery) ToSql() (sql string, args []interface{}, err error) {
+	querySql, args, err := notQ.query.comp().ToSql()
+	sql = fmt.Sprintf("NOT (%s)", querySql)
+	return
+}
+
+func (q *NotQuery) comp() sq.Sqlizer {
+	return q
 }
 
 type ColumnComparisonQuery struct {
