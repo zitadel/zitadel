@@ -163,8 +163,7 @@ func NewHumanOTPSMSCodeWriteModel(userID, resourceOwner string) *HumanOTPSMSCode
 
 func (wm *HumanOTPSMSCodeWriteModel) Reduce() error {
 	for _, event := range wm.Events {
-		switch e := event.(type) {
-		case *user.HumanOTPSMSCodeAddedEvent:
+		if e, ok := event.(*user.HumanOTPSMSCodeAddedEvent); ok {
 			wm.code = e.Code
 			wm.codeCreationDate = e.CreationDate()
 			wm.codeExpiry = e.Expiry
@@ -282,8 +281,7 @@ func NewHumanOTPEmailCodeWriteModel(userID, resourceOwner string) *HumanOTPEmail
 
 func (wm *HumanOTPEmailCodeWriteModel) Reduce() error {
 	for _, event := range wm.Events {
-		switch e := event.(type) {
-		case *user.HumanOTPEmailCodeAddedEvent:
+		if e, ok := event.(*user.HumanOTPEmailCodeAddedEvent); ok {
 			wm.code = e.Code
 			wm.codeCreationDate = e.CreationDate()
 			wm.codeExpiry = e.Expiry
