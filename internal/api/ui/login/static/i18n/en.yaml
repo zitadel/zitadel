@@ -122,7 +122,7 @@ InitMFAU2F:
   ErrorRetry: Retry, create a new challenge or choose a different method.
 
 InitMFADone:
-  Title: Security key verified
+  Title: 2-factor verified
   Description: Awesome! You just successfully set up your 2-factor and made your account way more secure. The Factor has to be entered on each login.
   NextButtonText: next
   CancelButtonText: cancel

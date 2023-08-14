@@ -34,7 +34,10 @@ VerifyEmailOTP:
   Text: 認証ボタンを使用するか、ワンタイムパスワード {{.OTP}} をコピーして認証画面に貼り付け、次の5分以内にZITADELで認証してください。
   ButtonText: 認証
 VerifySMSOTP:
-  Text: '{{ .VerifyURL }} を訪れるか、ワンタイムパスワード {{.OTP}} をコピーして認証画面に貼り付け、次の5分以内にZITADELで認証してください。'
+  Text: >-
+    {{.OTP}} は、{{ .Domain }} のワンタイムパスワードです。次の {{.Expiry}} 以内に使用してください。
+    
+    @{{.ドメイン}} #{{.OTP}}
 DomainClaimed:
   Title: ZITADEL - ドメインの登録
   PreHeader: メールアドレス・ユーザー名の変更
