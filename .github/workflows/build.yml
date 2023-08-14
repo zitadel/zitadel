@@ -72,24 +72,30 @@ jobs:
   container:
     needs: [compile]
     uses: ./.github/workflows/container.yml
+    secrets: inherit
+    permissions:
+      packages: write
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     with:
-      image_name: 'ghcr.io/zitadel/zitadel'
+      build_image_name: 'ghcr.io/zitadel/zitadel-build'
 
   e2e:
     uses: ./.github/workflows/e2e.yml
-    needs: [container]
-    with:
-      image: ${{ needs.container.outputs.image }}-debug
+    needs: [compile]
 
   release:
     uses: ./.github/workflows/release.yml
+    permissions:
+      packages: write
+      contents: write
+      issues: write
+      pull-requests: write
     needs: [version, core-unit-test, core-integration-test, lint, container, e2e]
-    # TODO: trigger release on workflow_dispatch if: ${{ github.event_name == 'workflow_dispatch' }}
-    if: ${{ needs.version.outputs.published == 'true' }}
+    if: ${{ needs.version.outputs.published == 'true' && github.event_name == 'workflow_dispatch' }}
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
     with:
-      image: ${{ needs.container.outputs.image }}
+      build_image_name: ${{ needs.container.outputs.build_image }}
       semantic_version: '19.0.2'
       image_name: 'ghcr.io/zitadel/zitadel'
       google_image_name: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"

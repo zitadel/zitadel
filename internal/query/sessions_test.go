@@ -19,51 +19,51 @@ import (
 )
 
 var (
-	expectedSessionQuery = regexp.QuoteMeta(`SELECT projections.sessions3.id,` +
-		` projections.sessions3.creation_date,` +
-		` projections.sessions3.change_date,` +
-		` projections.sessions3.sequence,` +
-		` projections.sessions3.state,` +
-		` projections.sessions3.resource_owner,` +
-		` projections.sessions3.creator,` +
-		` projections.sessions3.domain,` +
-		` projections.sessions3.user_id,` +
-		` projections.sessions3.user_checked_at,` +
+	expectedSessionQuery = regexp.QuoteMeta(`SELECT projections.sessions4.id,` +
+		` projections.sessions4.creation_date,` +
+		` projections.sessions4.change_date,` +
+		` projections.sessions4.sequence,` +
+		` projections.sessions4.state,` +
+		` projections.sessions4.resource_owner,` +
+		` projections.sessions4.creator,` +
+		` projections.sessions4.user_id,` +
+		` projections.sessions4.user_checked_at,` +
 		` projections.login_names2.login_name,` +
 		` projections.users8_humans.display_name,` +
 		` projections.users8.resource_owner,` +
-		` projections.sessions3.password_checked_at,` +
-		` projections.sessions3.intent_checked_at,` +
-		` projections.sessions3.passkey_checked_at,` +
-		` projections.sessions3.metadata,` +
-		` projections.sessions3.token_id` +
-		` FROM projections.sessions3` +
-		` LEFT JOIN projections.login_names2 ON projections.sessions3.user_id = projections.login_names2.user_id AND projections.sessions3.instance_id = projections.login_names2.instance_id` +
-		` LEFT JOIN projections.users8_humans ON projections.sessions3.user_id = projections.users8_humans.user_id AND projections.sessions3.instance_id = projections.users8_humans.instance_id` +
-		` LEFT JOIN projections.users8 ON projections.sessions3.user_id = projections.users8.id AND projections.sessions3.instance_id = projections.users8.instance_id` +
+		` projections.sessions4.password_checked_at,` +
+		` projections.sessions4.intent_checked_at,` +
+		` projections.sessions4.webauthn_checked_at,` +
+		` projections.sessions4.webauthn_user_verified,` +
+		` projections.sessions4.metadata,` +
+		` projections.sessions4.token_id` +
+		` FROM projections.sessions4` +
+		` LEFT JOIN projections.login_names2 ON projections.sessions4.user_id = projections.login_names2.user_id AND projections.sessions4.instance_id = projections.login_names2.instance_id` +
+		` LEFT JOIN projections.users8_humans ON projections.sessions4.user_id = projections.users8_humans.user_id AND projections.sessions4.instance_id = projections.users8_humans.instance_id` +
+		` LEFT JOIN projections.users8 ON projections.sessions4.user_id = projections.users8.id AND projections.sessions4.instance_id = projections.users8.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
-	expectedSessionsQuery = regexp.QuoteMeta(`SELECT projections.sessions3.id,` +
-		` projections.sessions3.creation_date,` +
-		` projections.sessions3.change_date,` +
-		` projections.sessions3.sequence,` +
-		` projections.sessions3.state,` +
-		` projections.sessions3.resource_owner,` +
-		` projections.sessions3.creator,` +
-		` projections.sessions3.domain,` +
-		` projections.sessions3.user_id,` +
-		` projections.sessions3.user_checked_at,` +
+	expectedSessionsQuery = regexp.QuoteMeta(`SELECT projections.sessions4.id,` +
+		` projections.sessions4.creation_date,` +
+		` projections.sessions4.change_date,` +
+		` projections.sessions4.sequence,` +
+		` projections.sessions4.state,` +
+		` projections.sessions4.resource_owner,` +
+		` projections.sessions4.creator,` +
+		` projections.sessions4.user_id,` +
+		` projections.sessions4.user_checked_at,` +
 		` projections.login_names2.login_name,` +
 		` projections.users8_humans.display_name,` +
 		` projections.users8.resource_owner,` +
-		` projections.sessions3.password_checked_at,` +
-		` projections.sessions3.intent_checked_at,` +
-		` projections.sessions3.passkey_checked_at,` +
-		` projections.sessions3.metadata,` +
+		` projections.sessions4.password_checked_at,` +
+		` projections.sessions4.intent_checked_at,` +
+		` projections.sessions4.webauthn_checked_at,` +
+		` projections.sessions4.webauthn_user_verified,` +
+		` projections.sessions4.metadata,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.sessions3` +
-		` LEFT JOIN projections.login_names2 ON projections.sessions3.user_id = projections.login_names2.user_id AND projections.sessions3.instance_id = projections.login_names2.instance_id` +
-		` LEFT JOIN projections.users8_humans ON projections.sessions3.user_id = projections.users8_humans.user_id AND projections.sessions3.instance_id = projections.users8_humans.instance_id` +
-		` LEFT JOIN projections.users8 ON projections.sessions3.user_id = projections.users8.id AND projections.sessions3.instance_id = projections.users8.instance_id` +
+		` FROM projections.sessions4` +
+		` LEFT JOIN projections.login_names2 ON projections.sessions4.user_id = projections.login_names2.user_id AND projections.sessions4.instance_id = projections.login_names2.instance_id` +
+		` LEFT JOIN projections.users8_humans ON projections.sessions4.user_id = projections.users8_humans.user_id AND projections.sessions4.instance_id = projections.users8_humans.instance_id` +
+		` LEFT JOIN projections.users8 ON projections.sessions4.user_id = projections.users8.id AND projections.sessions4.instance_id = projections.users8.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
 
 	sessionCols = []string{
@@ -74,7 +74,6 @@ var (
 		"state",
 		"resource_owner",
 		"creator",
-		"domain",
 		"user_id",
 		"user_checked_at",
 		"login_name",
@@ -82,7 +81,8 @@ var (
 		"user_resource_owner",
 		"password_checked_at",
 		"intent_checked_at",
-		"passkey_checked_at",
+		"webauthn_checked_at",
+		"webauthn_user_verified",
 		"metadata",
 		"token",
 	}
@@ -95,7 +95,6 @@ var (
 		"state",
 		"resource_owner",
 		"creator",
-		"domain",
 		"user_id",
 		"user_checked_at",
 		"login_name",
@@ -103,7 +102,8 @@ var (
 		"user_resource_owner",
 		"password_checked_at",
 		"intent_checked_at",
-		"passkey_checked_at",
+		"webauthn_checked_at",
+		"webauthn_user_verified",
 		"metadata",
 		"count",
 	}
@@ -148,7 +148,6 @@ func Test_SessionsPrepare(t *testing.T) {
 							domain.SessionStateActive,
 							"ro",
 							"creator",
-							"domain",
 							"user-id",
 							testNow,
 							"login-name",
@@ -157,6 +156,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							testNow,
+							true,
 							[]byte(`{"key": "dmFsdWU="}`),
 						},
 					},
@@ -175,7 +175,6 @@ func Test_SessionsPrepare(t *testing.T) {
 						State:         domain.SessionStateActive,
 						ResourceOwner: "ro",
 						Creator:       "creator",
-						Domain:        "domain",
 						UserFactor: SessionUserFactor{
 							UserID:        "user-id",
 							UserCheckedAt: testNow,
@@ -189,8 +188,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						IntentFactor: SessionIntentFactor{
 							IntentCheckedAt: testNow,
 						},
-						PasskeyFactor: SessionPasskeyFactor{
-							PasskeyCheckedAt: testNow,
+						WebAuthNFactor: SessionWebAuthNFactor{
+							WebAuthNCheckedAt: testNow,
+							UserVerified:      true,
 						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
@@ -215,7 +215,6 @@ func Test_SessionsPrepare(t *testing.T) {
 							domain.SessionStateActive,
 							"ro",
 							"creator",
-							"domain",
 							"user-id",
 							testNow,
 							"login-name",
@@ -224,6 +223,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							testNow,
+							true,
 							[]byte(`{"key": "dmFsdWU="}`),
 						},
 						{
@@ -234,7 +234,6 @@ func Test_SessionsPrepare(t *testing.T) {
 							domain.SessionStateActive,
 							"ro",
 							"creator2",
-							"domain",
 							"user-id2",
 							testNow,
 							"login-name2",
@@ -243,6 +242,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							testNow,
+							false,
 							[]byte(`{"key": "dmFsdWU="}`),
 						},
 					},
@@ -261,7 +261,6 @@ func Test_SessionsPrepare(t *testing.T) {
 						State:         domain.SessionStateActive,
 						ResourceOwner: "ro",
 						Creator:       "creator",
-						Domain:        "domain",
 						UserFactor: SessionUserFactor{
 							UserID:        "user-id",
 							UserCheckedAt: testNow,
@@ -275,8 +274,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						IntentFactor: SessionIntentFactor{
 							IntentCheckedAt: testNow,
 						},
-						PasskeyFactor: SessionPasskeyFactor{
-							PasskeyCheckedAt: testNow,
+						WebAuthNFactor: SessionWebAuthNFactor{
+							WebAuthNCheckedAt: testNow,
+							UserVerified:      true,
 						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
@@ -290,7 +290,6 @@ func Test_SessionsPrepare(t *testing.T) {
 						State:         domain.SessionStateActive,
 						ResourceOwner: "ro",
 						Creator:       "creator2",
-						Domain:        "domain",
 						UserFactor: SessionUserFactor{
 							UserID:        "user-id2",
 							UserCheckedAt: testNow,
@@ -304,8 +303,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						IntentFactor: SessionIntentFactor{
 							IntentCheckedAt: testNow,
 						},
-						PasskeyFactor: SessionPasskeyFactor{
-							PasskeyCheckedAt: testNow,
+						WebAuthNFactor: SessionWebAuthNFactor{
+							WebAuthNCheckedAt: testNow,
+							UserVerified:      false,
 						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
@@ -383,7 +383,6 @@ func Test_SessionPrepare(t *testing.T) {
 						domain.SessionStateActive,
 						"ro",
 						"creator",
-						"domain",
 						"user-id",
 						testNow,
 						"login-name",
@@ -392,6 +391,7 @@ func Test_SessionPrepare(t *testing.T) {
 						testNow,
 						testNow,
 						testNow,
+						true,
 						[]byte(`{"key": "dmFsdWU="}`),
 						"tokenID",
 					},
@@ -405,7 +405,6 @@ func Test_SessionPrepare(t *testing.T) {
 				State:         domain.SessionStateActive,
 				ResourceOwner: "ro",
 				Creator:       "creator",
-				Domain:        "domain",
 				UserFactor: SessionUserFactor{
 					UserID:        "user-id",
 					UserCheckedAt: testNow,
@@ -419,8 +418,9 @@ func Test_SessionPrepare(t *testing.T) {
 				IntentFactor: SessionIntentFactor{
 					IntentCheckedAt: testNow,
 				},
-				PasskeyFactor: SessionPasskeyFactor{
-					PasskeyCheckedAt: testNow,
+				WebAuthNFactor: SessionWebAuthNFactor{
+					WebAuthNCheckedAt: testNow,
+					UserVerified:      true,
 				},
 				Metadata: map[string][]byte{
 					"key": []byte("value"),
