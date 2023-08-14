@@ -25,7 +25,7 @@ SelectAccount:
   DescriptionLinking: Selecciona tu cuenta para vincular con tu usuario externo.
   OtherUser: Otro Usuario
   SessionState0: activo
-  SessionState1: inactivo
+  SessionState1: Se ha cerrado la sesión
   MustBeMemberOfOrg: El usuario debe ser miembro de la organización {{.OrgName}}.
 
 Password:
