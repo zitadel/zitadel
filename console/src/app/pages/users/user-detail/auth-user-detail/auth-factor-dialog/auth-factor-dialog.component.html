@@ -66,7 +66,11 @@
           <span>{{ 'USER.MFA.U2F' | translate }}</span>
         </div>
       </button>
-      <button [disabled]="!phoneVerified" mat-stroked-button (click)="selectType(AuthFactorType.OTPSMS)">
+      <button
+        [disabled]="!phoneVerified || data.otpSmsDisabled$ | async"
+        mat-stroked-button
+        (click)="selectType(AuthFactorType.OTPSMS)"
+      >
         <div class="otp-btn">
           <div class="icon-row">
             <i class="las la-sms"></i>
@@ -78,7 +82,7 @@
           >
         </div>
       </button>
-      <button mat-stroked-button (click)="selectType(AuthFactorType.OTPEMAIL)">
+      <button [disabled]="data.otpEmailDisabled$ | async" mat-stroked-button (click)="selectType(AuthFactorType.OTPEMAIL)">
         <div class="otp-btn">
           <div class="icon-row">
             <i class="las la-at"></i>
