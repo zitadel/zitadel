@@ -21,8 +21,8 @@ This trigger is called before attributes are set in the SAMLResponse.
   The second parameter contains the following fields:
   - `v1`
     - `attributes`
-      - `setCustomAttribute(string, string, Array of string)`  
-        Sets any value as attribute in addition to the default attributes, if the key is not already present. The parameters represent the key, nameFormat and the attributeValue.
+      - `setCustomAttribute(string, string, ...string)`  
+        Sets any value as attribute in addition to the default attributes, if the key is not already present. The parameters represent the key, nameFormat and the attributeValue(s).
     - `user`
       - `setMetadata(string, Any)`  
         Key of the metadata and any value
