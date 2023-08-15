@@ -292,7 +292,7 @@ func NewTOTPCheckedEvent(
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			PasswordCheckedType,
+			TOTPCheckedType,
 		),
 		CheckedAt: checkedAt,
 	}

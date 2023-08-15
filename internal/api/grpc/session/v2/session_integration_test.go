@@ -100,7 +100,7 @@ func verifyFactors(t testing.TB, factors *session.Factors, window time.Duration,
 			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
 			assert.True(t, pf.GetUserVerified())
 		case wantTOTPFactor:
-			pf := factors.GetWebAuthN()
+			pf := factors.GetTotp()
 			assert.NotNil(t, pf)
 			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
 		case wantIntentFactor:
