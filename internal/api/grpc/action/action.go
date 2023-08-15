@@ -19,6 +19,8 @@ func FlowTypeToDomain(flowType string) domain.FlowType {
 		return domain.FlowTypeCustomiseToken
 	case domain.FlowTypeInternalAuthentication.ID():
 		return domain.FlowTypeInternalAuthentication
+	case domain.FlowTypeCustomizeSAMLResponse.ID():
+		return domain.FlowTypeCustomizeSAMLResponse
 	default:
 		return domain.FlowTypeUnspecified
 	}
@@ -47,6 +49,8 @@ func TriggerTypeToDomain(triggerType string) domain.TriggerType {
 		return domain.TriggerTypePreAccessTokenCreation
 	case domain.TriggerTypePreUserinfoCreation.ID():
 		return domain.TriggerTypePreUserinfoCreation
+	case domain.TriggerTypePreSAMLResponseCreation.ID():
+		return domain.TriggerTypePreSAMLResponseCreation
 	default:
 		return domain.TriggerTypeUnspecified
 	}

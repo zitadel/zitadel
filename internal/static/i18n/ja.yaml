@@ -1205,6 +1205,7 @@ Action:
       ExternalAuthentication: 外部認証
       CustomiseToken: トークンを補完
       InternalAuthentication: 内部認証
+      CustomizeSAMLResponse: SAMLResponse の補完
   TriggerType:
     Unspecified: 未定義
     PostAuthentication: 認証後
@@ -1212,3 +1213,4 @@ Action:
     PostCreation: 作成後
     PreUserinfoCreation: ユーザー情報作成前
     PreAccessTokenCreation: アクセストークン作成前
+    PreSAMLResponseCreation: SAMLResponse の作成前
