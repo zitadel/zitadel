@@ -376,6 +376,48 @@ func (repo *AuthRequestRepo) VerifyMFAOTP(ctx context.Context, authRequestID, us
 	return repo.Command.HumanCheckMFATOTP(ctx, userID, code, resourceOwner, request.WithCurrentInfo(info))
 }
 
+func (repo *AuthRequestRepo) SendMFAOTPSMS(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
+	if err != nil {
+		return err
+	}
+	return repo.Command.HumanSendOTPSMS(ctx, userID, resourceOwner, request)
+}
+
+func (repo *AuthRequestRepo) VerifyMFAOTPSMS(ctx context.Context, userID, resourceOwner, code, authRequestID, userAgentID string, info *domain.BrowserInfo) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
+	if err != nil {
+		return err
+	}
+	return repo.Command.HumanCheckOTPSMS(ctx, userID, code, resourceOwner, request.WithCurrentInfo(info))
+}
+
+func (repo *AuthRequestRepo) SendMFAOTPEmail(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
+	if err != nil {
+		return err
+	}
+	return repo.Command.HumanSendOTPEmail(ctx, userID, resourceOwner, request)
+}
+
+func (repo *AuthRequestRepo) VerifyMFAOTPEmail(ctx context.Context, userID, resourceOwner, code, authRequestID, userAgentID string, info *domain.BrowserInfo) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
+	if err != nil {
+		return err
+	}
+	return repo.Command.HumanCheckOTPEmail(ctx, userID, code, resourceOwner, request.WithCurrentInfo(info))
+}
+
 func (repo *AuthRequestRepo) BeginMFAU2FLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (login *domain.WebAuthNLogin, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -946,6 +988,8 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	if err != nil {
 		return nil, err
 	}
+	request.DisplayName = userSession.DisplayName
+	request.AvatarKey = userSession.AvatarKey
 
 	isInternalLogin := request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == ""
 	idps, err := checkExternalIDPsOfUser(ctx, repo.IDPUserLinksProvider, user.ID)

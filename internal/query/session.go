@@ -29,12 +29,12 @@ type Session struct {
 	Sequence       uint64
 	State          domain.SessionState
 	ResourceOwner  string
-	Domain         string
 	Creator        string
 	UserFactor     SessionUserFactor
 	PasswordFactor SessionPasswordFactor
 	IntentFactor   SessionIntentFactor
-	PasskeyFactor  SessionPasskeyFactor
+	WebAuthNFactor SessionWebAuthNFactor
+	TOTPFactor     SessionTOTPFactor
 	Metadata       map[string][]byte
 }
 
@@ -54,8 +54,13 @@ type SessionIntentFactor struct {
 	IntentCheckedAt time.Time
 }
 
-type SessionPasskeyFactor struct {
-	PasskeyCheckedAt time.Time
+type SessionWebAuthNFactor struct {
+	WebAuthNCheckedAt time.Time
+	UserVerified      bool
+}
+
+type SessionTOTPFactor struct {
+	TOTPCheckedAt time.Time
 }
 
 type SessionsSearchQueries struct {
@@ -100,10 +105,6 @@ var (
 		name:  projection.SessionColumnResourceOwner,
 		table: sessionsTable,
 	}
-	SessionColumnDomain = Column{
-		name:  projection.SessionColumnDomain,
-		table: sessionsTable,
-	}
 	SessionColumnInstanceID = Column{
 		name:  projection.SessionColumnInstanceID,
 		table: sessionsTable,
@@ -128,8 +129,16 @@ var (
 		name:  projection.SessionColumnIntentCheckedAt,
 		table: sessionsTable,
 	}
-	SessionColumnPasskeyCheckedAt = Column{
-		name:  projection.SessionColumnPasskeyCheckedAt,
+	SessionColumnWebAuthNCheckedAt = Column{
+		name:  projection.SessionColumnWebAuthNCheckedAt,
+		table: sessionsTable,
+	}
+	SessionColumnWebAuthNUserVerified = Column{
+		name:  projection.SessionColumnWebAuthNUserVerified,
+		table: sessionsTable,
+	}
+	SessionColumnTOTPCheckedAt = Column{
+		name:  projection.SessionColumnTOTPCheckedAt,
 		table: sessionsTable,
 	}
 	SessionColumnMetadata = Column{
@@ -221,7 +230,6 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			SessionColumnState.identifier(),
 			SessionColumnResourceOwner.identifier(),
 			SessionColumnCreator.identifier(),
-			SessionColumnDomain.identifier(),
 			SessionColumnUserID.identifier(),
 			SessionColumnUserCheckedAt.identifier(),
 			LoginNameNameCol.identifier(),
@@ -229,7 +237,9 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			UserResourceOwnerCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
 			SessionColumnIntentCheckedAt.identifier(),
-			SessionColumnPasskeyCheckedAt.identifier(),
+			SessionColumnWebAuthNCheckedAt.identifier(),
+			SessionColumnWebAuthNUserVerified.identifier(),
+			SessionColumnTOTPCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			SessionColumnToken.identifier(),
 		).From(sessionsTable.identifier()).
@@ -240,17 +250,18 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session := new(Session)
 
 			var (
-				userID            sql.NullString
-				userCheckedAt     sql.NullTime
-				loginName         sql.NullString
-				displayName       sql.NullString
-				userResourceOwner sql.NullString
-				passwordCheckedAt sql.NullTime
-				intentCheckedAt   sql.NullTime
-				passkeyCheckedAt  sql.NullTime
-				metadata          database.Map[[]byte]
-				token             sql.NullString
-				sessionDomain     sql.NullString
+				userID              sql.NullString
+				userCheckedAt       sql.NullTime
+				loginName           sql.NullString
+				displayName         sql.NullString
+				userResourceOwner   sql.NullString
+				passwordCheckedAt   sql.NullTime
+				intentCheckedAt     sql.NullTime
+				webAuthNCheckedAt   sql.NullTime
+				webAuthNUserPresent sql.NullBool
+				totpCheckedAt       sql.NullTime
+				metadata            database.Map[[]byte]
+				token               sql.NullString
 			)
 
 			err := row.Scan(
@@ -261,7 +272,6 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&session.State,
 				&session.ResourceOwner,
 				&session.Creator,
-				&sessionDomain,
 				&userID,
 				&userCheckedAt,
 				&loginName,
@@ -269,7 +279,9 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&userResourceOwner,
 				&passwordCheckedAt,
 				&intentCheckedAt,
-				&passkeyCheckedAt,
+				&webAuthNCheckedAt,
+				&webAuthNUserPresent,
+				&totpCheckedAt,
 				&metadata,
 				&token,
 			)
@@ -281,7 +293,6 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				return nil, "", errors.ThrowInternal(err, "QUERY-SAder", "Errors.Internal")
 			}
 
-			session.Domain = sessionDomain.String
 			session.UserFactor.UserID = userID.String
 			session.UserFactor.UserCheckedAt = userCheckedAt.Time
 			session.UserFactor.LoginName = loginName.String
@@ -289,7 +300,9 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session.UserFactor.ResourceOwner = userResourceOwner.String
 			session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
 			session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
-			session.PasskeyFactor.PasskeyCheckedAt = passkeyCheckedAt.Time
+			session.WebAuthNFactor.WebAuthNCheckedAt = webAuthNCheckedAt.Time
+			session.WebAuthNFactor.UserVerified = webAuthNUserPresent.Bool
+			session.TOTPFactor.TOTPCheckedAt = totpCheckedAt.Time
 			session.Metadata = metadata
 
 			return session, token.String, nil
@@ -305,7 +318,6 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			SessionColumnState.identifier(),
 			SessionColumnResourceOwner.identifier(),
 			SessionColumnCreator.identifier(),
-			SessionColumnDomain.identifier(),
 			SessionColumnUserID.identifier(),
 			SessionColumnUserCheckedAt.identifier(),
 			LoginNameNameCol.identifier(),
@@ -313,7 +325,9 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			UserResourceOwnerCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
 			SessionColumnIntentCheckedAt.identifier(),
-			SessionColumnPasskeyCheckedAt.identifier(),
+			SessionColumnWebAuthNCheckedAt.identifier(),
+			SessionColumnWebAuthNUserVerified.identifier(),
+			SessionColumnTOTPCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			countColumn.identifier(),
 		).From(sessionsTable.identifier()).
@@ -327,16 +341,17 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session := new(Session)
 
 				var (
-					userID            sql.NullString
-					userCheckedAt     sql.NullTime
-					loginName         sql.NullString
-					displayName       sql.NullString
-					userResourceOwner sql.NullString
-					passwordCheckedAt sql.NullTime
-					intentCheckedAt   sql.NullTime
-					passkeyCheckedAt  sql.NullTime
-					metadata          database.Map[[]byte]
-					sessionDomain     sql.NullString
+					userID              sql.NullString
+					userCheckedAt       sql.NullTime
+					loginName           sql.NullString
+					displayName         sql.NullString
+					userResourceOwner   sql.NullString
+					passwordCheckedAt   sql.NullTime
+					intentCheckedAt     sql.NullTime
+					webAuthNCheckedAt   sql.NullTime
+					webAuthNUserPresent sql.NullBool
+					totpCheckedAt       sql.NullTime
+					metadata            database.Map[[]byte]
 				)
 
 				err := rows.Scan(
@@ -347,7 +362,6 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&session.State,
 					&session.ResourceOwner,
 					&session.Creator,
-					&sessionDomain,
 					&userID,
 					&userCheckedAt,
 					&loginName,
@@ -355,7 +369,9 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&userResourceOwner,
 					&passwordCheckedAt,
 					&intentCheckedAt,
-					&passkeyCheckedAt,
+					&webAuthNCheckedAt,
+					&webAuthNUserPresent,
+					&totpCheckedAt,
 					&metadata,
 					&sessions.Count,
 				)
@@ -363,7 +379,6 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				if err != nil {
 					return nil, errors.ThrowInternal(err, "QUERY-SAfeg", "Errors.Internal")
 				}
-				session.Domain = sessionDomain.String
 				session.UserFactor.UserID = userID.String
 				session.UserFactor.UserCheckedAt = userCheckedAt.Time
 				session.UserFactor.LoginName = loginName.String
@@ -371,7 +386,9 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session.UserFactor.ResourceOwner = userResourceOwner.String
 				session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
 				session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
-				session.PasskeyFactor.PasskeyCheckedAt = passkeyCheckedAt.Time
+				session.WebAuthNFactor.WebAuthNCheckedAt = webAuthNCheckedAt.Time
+				session.WebAuthNFactor.UserVerified = webAuthNUserPresent.Bool
+				session.TOTPFactor.TOTPCheckedAt = totpCheckedAt.Time
 				session.Metadata = metadata
 
 				sessions.Sessions = append(sessions.Sessions, session)

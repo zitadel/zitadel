@@ -168,7 +168,7 @@ func ChangeSecretGeneratorIncludeDigits(includeDigits bool) func(event *SecretGe
 
 func ChangeSecretGeneratorIncludeSymbols(includeSymbols bool) func(event *SecretGeneratorChangedEvent) {
 	return func(e *SecretGeneratorChangedEvent) {
-		e.IncludeDigits = &includeSymbols
+		e.IncludeSymbols = &includeSymbols
 	}
 }
 

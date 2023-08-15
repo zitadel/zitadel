@@ -64,7 +64,6 @@ docs/docs/apis/proto
 **/.sass-cache
 /internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css
 /internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css.map
-zitadel
 zitadel-*-*
 
 # local
@@ -74,6 +73,7 @@ migrations/cockroach/migrate_cloud.go
 /.artifacts/*
 !/.artifacts/zitadel
 /zitadel
+node_modules/
 
 go.work
 go.work.sum
