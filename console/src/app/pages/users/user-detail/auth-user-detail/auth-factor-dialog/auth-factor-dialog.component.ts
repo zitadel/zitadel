@@ -48,9 +48,7 @@ export class AuthFactorDialogComponent {
     private translate: TranslateService,
     public dialogRef: MatDialogRef<AuthFactorDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-  ) {
-    this.phoneVerified = data.phoneVerified;
-  }
+  ) {}
 
   closeDialog(code: string = ''): void {
     this.dialogRef.close(code);
