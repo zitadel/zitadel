@@ -565,6 +565,7 @@ module.exports = {
         "apis/actions/internal-authentication",
         "apis/actions/external-authentication",
         "apis/actions/complement-token",
+        "apis/actions/customize-samlresponse",
         "apis/actions/objects",
       ]
     },
