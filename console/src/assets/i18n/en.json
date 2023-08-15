@@ -412,7 +412,7 @@
       "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
       "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
       "ADD": "Add Factor",
-      "OTP": "Authenticator App for OTP (One-Time Password)",
+      "OTP": "Authenticator App for TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "Add OTP",
       "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
       "U2F": "Fingerprint, Security Keys, Face ID and other",
