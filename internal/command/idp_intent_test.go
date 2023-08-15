@@ -202,7 +202,11 @@ func TestCommands_CreateIntent(t *testing.T) {
 			}
 			intentWriteModel, details, err := c.CreateIntent(tt.args.ctx, tt.args.idpID, tt.args.successURL, tt.args.failureURL, tt.args.resourceOwner)
 			require.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.intentID, intentWriteModel.AggregateID)
+			if intentWriteModel != nil {
+				assert.Equal(t, tt.res.intentID, intentWriteModel.AggregateID)
+			} else {
+				assert.Equal(t, tt.res.intentID, "")
+			}
 			assert.Equal(t, tt.res.details, details)
 		})
 	}

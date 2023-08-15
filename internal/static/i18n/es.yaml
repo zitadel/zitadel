@@ -137,6 +137,7 @@ Errors:
       MinimumExternalIDPNeeded: Al menos de añadirse un IDP
       AlreadyExists: IDP externo ya cogido
       NotFound: IDP no encontrado
+      LoginFailed: Error de inicio de sesión en IDP externo
     MFA:
       OTP:
         AlreadyReady: Multifactor OTP (OneTimePassword) ya está configurado

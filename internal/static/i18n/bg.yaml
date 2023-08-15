@@ -139,6 +139,7 @@ Errors:
       MinimumExternalIDPNeeded: Трябва да се добави поне един IDP
       AlreadyExists: Външен IDP вече е зает
       NotFound: Външен IDP не е намерен
+      LoginFailed: Влизането във Външен IDP е неуспешно
     MFA:
       OTP:
         AlreadyReady: Многофакторният OTP (OneTimePassword) вече е настроен
