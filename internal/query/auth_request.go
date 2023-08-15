@@ -60,7 +60,7 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 	)
 
 	dst := new(AuthRequest)
-	err = q.client.DB.QueryRowContext(
+	err = q.client.QueryRowContext(
 		ctx, q.authRequestByIDQuery(ctx),
 		id, authz.GetInstance(ctx).InstanceID(),
 	).Scan(
