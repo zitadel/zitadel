@@ -1,5 +1,5 @@
 ---
-title: Customize SAMLResponse Flow
+title: Complement SAMLResponse
 ---
 
 This flow is executed before the return of the SAMLResponse.
