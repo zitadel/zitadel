@@ -2,7 +2,6 @@ package cockroach
 
 import (
 	"database/sql"
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
