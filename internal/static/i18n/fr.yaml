@@ -1035,4 +1035,4 @@ Action:
     PostCreation: Post-création
     PreUserinfoCreation: Pré Userinfo création
     PreAccessTokenCreation: Pré access token création
-    PreSAMLResponseCreation: Création préalable de la réponse SAMLR
+    PreSAMLResponseCreation: Création préalable de la réponse SAMLResponse
