@@ -33,6 +33,7 @@ var (
 		` projections.sessions4.intent_checked_at,` +
 		` projections.sessions4.webauthn_checked_at,` +
 		` projections.sessions4.webauthn_user_verified,` +
+		` projections.sessions4.totp_checked_at,` +
 		` projections.sessions4.metadata,` +
 		` projections.sessions4.token_id` +
 		` FROM projections.sessions4` +
@@ -56,6 +57,7 @@ var (
 		` projections.sessions4.intent_checked_at,` +
 		` projections.sessions4.webauthn_checked_at,` +
 		` projections.sessions4.webauthn_user_verified,` +
+		` projections.sessions4.totp_checked_at,` +
 		` projections.sessions4.metadata,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.sessions4` +
@@ -81,6 +83,7 @@ var (
 		"intent_checked_at",
 		"webauthn_checked_at",
 		"webauthn_user_verified",
+		"totp_checked_at",
 		"metadata",
 		"token",
 	}
@@ -102,6 +105,7 @@ var (
 		"intent_checked_at",
 		"webauthn_checked_at",
 		"webauthn_user_verified",
+		"totp_checked_at",
 		"metadata",
 		"count",
 	}
@@ -155,6 +159,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							true,
+							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
 						},
 					},
@@ -190,6 +195,9 @@ func Test_SessionsPrepare(t *testing.T) {
 							WebAuthNCheckedAt: testNow,
 							UserVerified:      true,
 						},
+						TOTPFactor: SessionTOTPFactor{
+							TOTPCheckedAt: testNow,
+						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
 						},
@@ -222,6 +230,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							true,
+							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
 						},
 						{
@@ -241,6 +250,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							false,
+							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
 						},
 					},
@@ -276,6 +286,9 @@ func Test_SessionsPrepare(t *testing.T) {
 							WebAuthNCheckedAt: testNow,
 							UserVerified:      true,
 						},
+						TOTPFactor: SessionTOTPFactor{
+							TOTPCheckedAt: testNow,
+						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
 						},
@@ -304,6 +317,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						WebAuthNFactor: SessionWebAuthNFactor{
 							WebAuthNCheckedAt: testNow,
 							UserVerified:      false,
+						},
+						TOTPFactor: SessionTOTPFactor{
+							TOTPCheckedAt: testNow,
 						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
@@ -390,6 +406,7 @@ func Test_SessionPrepare(t *testing.T) {
 						testNow,
 						testNow,
 						true,
+						testNow,
 						[]byte(`{"key": "dmFsdWU="}`),
 						"tokenID",
 					},
@@ -419,6 +436,9 @@ func Test_SessionPrepare(t *testing.T) {
 				WebAuthNFactor: SessionWebAuthNFactor{
 					WebAuthNCheckedAt: testNow,
 					UserVerified:      true,
+				},
+				TOTPFactor: SessionTOTPFactor{
+					TOTPCheckedAt: testNow,
 				},
 				Metadata: map[string][]byte{
 					"key": []byte("value"),

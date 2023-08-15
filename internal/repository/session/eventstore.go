@@ -9,6 +9,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, IntentCheckedType, IntentCheckedEventMapper).
 		RegisterFilterEventMapper(AggregateType, WebAuthNChallengedType, eventstore.GenericEventMapper[WebAuthNChallengedEvent]).
 		RegisterFilterEventMapper(AggregateType, WebAuthNCheckedType, eventstore.GenericEventMapper[WebAuthNCheckedEvent]).
+		RegisterFilterEventMapper(AggregateType, TOTPCheckedType, eventstore.GenericEventMapper[TOTPCheckedEvent]).
 		RegisterFilterEventMapper(AggregateType, TokenSetType, TokenSetEventMapper).
 		RegisterFilterEventMapper(AggregateType, MetadataSetType, MetadataSetEventMapper).
 		RegisterFilterEventMapper(AggregateType, TerminateType, TerminateEventMapper)
