@@ -124,13 +124,16 @@ func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_
 }
 
 func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartIdentityProviderFlowRequest) (_ *user.StartIdentityProviderFlowResponse, err error) {
-	intentWriteModel, details, err := s.command.CreateIntent(ctx, req.GetIdpId(), req.GetSuccessUrl(), req.GetFailureUrl(), authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
 	if req.GetLdap() != nil {
+		intentWriteModel, details, err := s.command.CreateIntent(ctx, req.GetIdpId(), "", "", authz.GetCtxData(ctx).OrgID)
+		if err != nil {
+			return nil, err
+		}
 		externalUser, userID, attributes, err := s.ldapLogin(ctx, intentWriteModel.IDPID, req.GetLdap().GetUsername(), req.GetLdap().GetPassword())
 		if err != nil {
+			if err := s.command.FailIDPIntent(ctx, intentWriteModel, err.Error()); err != nil {
+				return nil, err
+			}
 			return nil, err
 		}
 		token, err := s.command.SucceedLDAPIDPIntent(ctx, intentWriteModel, externalUser, userID, attributes)
@@ -142,6 +145,10 @@ func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartI
 			NextStep: &user.StartIdentityProviderFlowResponse_Intent{Intent: &user.Intent{IntentId: intentWriteModel.AggregateID, Token: token}},
 		}, nil
 	} else {
+		intentWriteModel, details, err := s.command.CreateIntent(ctx, req.GetIdpId(), req.GetUrls().GetSuccessUrl(), req.GetUrls().GetFailureUrl(), authz.GetCtxData(ctx).OrgID)
+		if err != nil {
+			return nil, err
+		}
 		authURL, err := s.command.AuthURLFromProvider(ctx, req.GetIdpId(), intentWriteModel.AggregateID, s.idpCallback(ctx))
 		if err != nil {
 			return nil, err
@@ -201,34 +208,6 @@ func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string
 		attributes[item.Name] = item.Values
 	}
 	return externalUser, userID, attributes, nil
-}
-
-func (s *Server) SetIntentCredentials(ctx context.Context, req *user.SetIntentCredentialsRequest) (_ *user.SetIntentCredentialsResponse, err error) {
-	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIntentId(), authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	if err := s.checkIntentToken(req.GetToken(), intent.AggregateID); err != nil {
-		return nil, err
-	}
-	if intent.State != domain.IDPIntentStateStarted {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDP-Hs38e", "Errors.Intent.NotStarted")
-	}
-	if req.GetLdap() != nil {
-		externalUser, userID, attributes, err := s.ldapLogin(ctx, intent.IDPID, req.GetLdap().GetUsername(), req.GetLdap().GetPassword())
-		if err != nil {
-			return nil, err
-		}
-		token, err := s.command.SucceedLDAPIDPIntent(ctx, intent, externalUser, userID, attributes)
-		if err != nil {
-			return nil, err
-		}
-		return &user.SetIntentCredentialsResponse{
-			Details: intentToDetailsPb(intent),
-			Token:   token,
-		}, nil
-	}
-	return nil, errors.ThrowPreconditionFailed(nil, "IDP-Hk3s8e", "Errors.Intent.NotSucceeded")
 }
 
 func (s *Server) RetrieveIdentityProviderInformation(ctx context.Context, req *user.RetrieveIdentityProviderInformationRequest) (_ *user.RetrieveIdentityProviderInformationResponse, err error) {

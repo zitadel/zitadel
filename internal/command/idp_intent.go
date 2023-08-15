@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	errs "errors"
 	"net/url"
 
 	"github.com/zitadel/oidc/v2/pkg/oidc"
@@ -53,6 +54,9 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID st
 func (c *Commands) LoginWithLDAP(ctx context.Context, provider ldap.ProviderInterface, username string, password string) (idp.User, idp.Session, error) {
 	session := provider.GetSession(username, password)
 	user, err := session.FetchUser(ctx)
+	if errs.Is(err, ldap.ErrFailedLogin) || errs.Is(err, ldap.ErrNoSingleUser) {
+		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-nzun2i", "Errors.User.ExternalIDP.LoginFailed")
+	}
 	if err != nil {
 		return nil, nil, err
 	}
