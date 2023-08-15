@@ -1,0 +1,63 @@
+{{template "main-top" .}}
+
+<div class="lgn-head">
+    <h1>{{t "InitMFAOTPSMS.Title"}}</h1>
+
+    {{ template "user-profile" . }}
+
+    {{if .Edit}}
+    <p>{{t "InitMFAOTPSMS.DescriptionPhone"}}</p>
+    {{else}}
+    <p>{{t "InitMFAOTPSMS.DescriptionCode"}}</p>
+    {{end}}
+</div>
+
+<form action="{{ mfaInitSMSVerifyUrl }}" method="POST">
+
+    {{ .CSRF }}
+
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="mfaType" value="{{ .MFAType }}" />
+    <input type="hidden" name="phone" value="{{ .Phone }}" />
+
+    <div class="fields">
+        {{if .Edit}}
+        <div class="field">
+            <label class="lgn-label" for="newPhone">{{t "InitMFAOTPSMS.PhoneLabel"}}</label>
+            <input class="lgn-input" type="tel" id="newPhone" name="newPhone" autocomplete="off" value="{{.Phone}}" autofocus required>
+        </div>
+        {{else}}
+        <div class="field lgn-actions">
+            <p>{{.Phone}}</p>
+            <span class="fill-space"></span>
+            <button type="button" id="edit" name="edit" value="true" class="lgn-stroked-button" formnovalidate>{{t "InitMFAOTPSMS.EditButtonText"}}</button>
+        </div>
+        {{end}}
+        {{if and .Phone (not .Edit) }}
+        <div class="field">
+            <label class="lgn-label" for="code">{{t "InitMFAOTPSMS.CodeLabel"}}</label>
+            <input class="lgn-input" type="text" id="code" name="code" autocomplete="one-time-code" autofocus required>
+        </div>
+        {{end}}
+    </div>
+
+    {{ template "error-message" .}}
+
+    <div class="lgn-actions lgn-reverse-order">
+        <!-- position element in header -->
+        <a class="lgn-icon-button lgn-left-action" href="{{ mfaPromptChangeUrl .AuthReqID .MFAType }}">
+            <i class="lgn-icon-arrow-left-solid"></i>
+        </a>
+        <button class="lgn-raised-button lgn-primary" id="submit-button" type="submit">{{t "InitMFAOTPSMS.NextButtonText"}}</button>
+        {{if and .Phone (not .Edit) }}
+        <span class="fill-space"></span>
+        <button type="submit" name="resend" value="true" class="lgn-stroked-button" formnovalidate>{{t "InitMFAOTPSMS.ResendButtonText"}}</button>
+        {{end}}
+    </div>
+</form>
+
+<script src="{{ resourceUrl "scripts/edit.js" }}"></script>
+<script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
+<script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
+
+{{template "main-bottom" .}}
