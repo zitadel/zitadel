@@ -35,6 +35,7 @@ type SessionWriteModel struct {
 	PasswordCheckedAt    time.Time
 	IntentCheckedAt      time.Time
 	WebAuthNCheckedAt    time.Time
+	TOTPCheckedAt        time.Time
 	WebAuthNUserVerified bool
 	Metadata             map[string][]byte
 	State                domain.SessionState
@@ -70,6 +71,8 @@ func (wm *SessionWriteModel) Reduce() error {
 			wm.reduceWebAuthNChallenged(e)
 		case *session.WebAuthNCheckedEvent:
 			wm.reduceWebAuthNChecked(e)
+		case *session.TOTPCheckedEvent:
+			wm.reduceTOTPChecked(e)
 		case *session.TokenSetEvent:
 			wm.reduceTokenSet(e)
 		case *session.TerminateEvent:
@@ -91,6 +94,7 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 			session.IntentCheckedType,
 			session.WebAuthNChallengedType,
 			session.WebAuthNCheckedType,
+			session.TOTPCheckedType,
 			session.TokenSetType,
 			session.MetadataSetType,
 			session.TerminateType,
@@ -135,6 +139,10 @@ func (wm *SessionWriteModel) reduceWebAuthNChecked(e *session.WebAuthNCheckedEve
 	wm.WebAuthNUserVerified = e.UserVerified
 }
 
+func (wm *SessionWriteModel) reduceTOTPChecked(e *session.TOTPCheckedEvent) {
+	wm.TOTPCheckedAt = e.CheckedAt
+}
+
 func (wm *SessionWriteModel) reduceTokenSet(e *session.TokenSetEvent) {
 	wm.TokenID = e.TokenID
 }
@@ -149,8 +157,8 @@ func (wm *SessionWriteModel) AuthenticationTime() time.Time {
 	for _, check := range []time.Time{
 		wm.PasswordCheckedAt,
 		wm.WebAuthNCheckedAt,
+		wm.TOTPCheckedAt,
 		wm.IntentCheckedAt,
-		// TODO: add OTP check https://github.com/zitadel/zitadel/issues/5477
 		// TODO: add OTP (sms and email) check https://github.com/zitadel/zitadel/issues/6224
 	} {
 		if check.After(authTime) {
@@ -176,12 +184,9 @@ func (wm *SessionWriteModel) AuthMethodTypes() []domain.UserAuthMethodType {
 	if !wm.IntentCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypeIDP)
 	}
-	// TODO: add checks with https://github.com/zitadel/zitadel/issues/5477
-	/*
-		if !wm.TOTPCheckedAt.IsZero() {
-			types = append(types, domain.UserAuthMethodTypeTOTP)
-		}
-	*/
+	if !wm.TOTPCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypeTOTP)
+	}
 	// TODO: add checks with https://github.com/zitadel/zitadel/issues/6224
 	/*
 		if !wm.TOTPFactor.OTPSMSCheckedAt.IsZero() {

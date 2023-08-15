@@ -34,6 +34,7 @@ type Session struct {
 	PasswordFactor SessionPasswordFactor
 	IntentFactor   SessionIntentFactor
 	WebAuthNFactor SessionWebAuthNFactor
+	TOTPFactor     SessionTOTPFactor
 	Metadata       map[string][]byte
 }
 
@@ -56,6 +57,10 @@ type SessionIntentFactor struct {
 type SessionWebAuthNFactor struct {
 	WebAuthNCheckedAt time.Time
 	UserVerified      bool
+}
+
+type SessionTOTPFactor struct {
+	TOTPCheckedAt time.Time
 }
 
 type SessionsSearchQueries struct {
@@ -130,6 +135,10 @@ var (
 	}
 	SessionColumnWebAuthNUserVerified = Column{
 		name:  projection.SessionColumnWebAuthNUserVerified,
+		table: sessionsTable,
+	}
+	SessionColumnTOTPCheckedAt = Column{
+		name:  projection.SessionColumnTOTPCheckedAt,
 		table: sessionsTable,
 	}
 	SessionColumnMetadata = Column{
@@ -230,6 +239,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			SessionColumnIntentCheckedAt.identifier(),
 			SessionColumnWebAuthNCheckedAt.identifier(),
 			SessionColumnWebAuthNUserVerified.identifier(),
+			SessionColumnTOTPCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			SessionColumnToken.identifier(),
 		).From(sessionsTable.identifier()).
@@ -249,6 +259,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				intentCheckedAt     sql.NullTime
 				webAuthNCheckedAt   sql.NullTime
 				webAuthNUserPresent sql.NullBool
+				totpCheckedAt       sql.NullTime
 				metadata            database.Map[[]byte]
 				token               sql.NullString
 			)
@@ -270,6 +281,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&intentCheckedAt,
 				&webAuthNCheckedAt,
 				&webAuthNUserPresent,
+				&totpCheckedAt,
 				&metadata,
 				&token,
 			)
@@ -290,6 +302,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
 			session.WebAuthNFactor.WebAuthNCheckedAt = webAuthNCheckedAt.Time
 			session.WebAuthNFactor.UserVerified = webAuthNUserPresent.Bool
+			session.TOTPFactor.TOTPCheckedAt = totpCheckedAt.Time
 			session.Metadata = metadata
 
 			return session, token.String, nil
@@ -314,6 +327,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			SessionColumnIntentCheckedAt.identifier(),
 			SessionColumnWebAuthNCheckedAt.identifier(),
 			SessionColumnWebAuthNUserVerified.identifier(),
+			SessionColumnTOTPCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			countColumn.identifier(),
 		).From(sessionsTable.identifier()).
@@ -336,6 +350,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					intentCheckedAt     sql.NullTime
 					webAuthNCheckedAt   sql.NullTime
 					webAuthNUserPresent sql.NullBool
+					totpCheckedAt       sql.NullTime
 					metadata            database.Map[[]byte]
 				)
 
@@ -356,6 +371,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&intentCheckedAt,
 					&webAuthNCheckedAt,
 					&webAuthNUserPresent,
+					&totpCheckedAt,
 					&metadata,
 					&sessions.Count,
 				)
@@ -372,6 +388,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
 				session.WebAuthNFactor.WebAuthNCheckedAt = webAuthNCheckedAt.Time
 				session.WebAuthNFactor.UserVerified = webAuthNUserPresent.Bool
+				session.TOTPFactor.TOTPCheckedAt = totpCheckedAt.Time
 				session.Metadata = metadata
 
 				sessions.Sessions = append(sessions.Sessions, session)
