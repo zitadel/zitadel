@@ -171,6 +171,14 @@ func setContext(ctx context.Context, resourceOwner string) context.Context {
 	return authz.SetCtxData(ctx, data)
 }
 
+func setUserContext(ctx context.Context, userID, resourceOwner string) context.Context {
+	data := authz.CtxData{
+		UserID: userID,
+		OrgID:  resourceOwner,
+	}
+	return authz.SetCtxData(ctx, data)
+}
+
 func (l *Login) baseURL(ctx context.Context) string {
 	return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), l.externalSecure) + HandlerPrefix
 }

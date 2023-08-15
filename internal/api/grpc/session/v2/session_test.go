@@ -70,7 +70,7 @@ func Test_sessionsToPb(t *testing.T) {
 			},
 			Metadata: map[string][]byte{"hello": []byte("world")},
 		},
-		{ // passkey factor
+		{ // webAuthN factor
 			ID:            "999",
 			CreationDate:  now,
 			ChangeDate:    now,
@@ -85,8 +85,29 @@ func Test_sessionsToPb(t *testing.T) {
 				DisplayName:   "donald duck",
 				ResourceOwner: "org1",
 			},
-			PasskeyFactor: query.SessionPasskeyFactor{
-				PasskeyCheckedAt: past,
+			WebAuthNFactor: query.SessionWebAuthNFactor{
+				WebAuthNCheckedAt: past,
+				UserVerified:      true,
+			},
+			Metadata: map[string][]byte{"hello": []byte("world")},
+		},
+		{ // totp factor
+			ID:            "999",
+			CreationDate:  now,
+			ChangeDate:    now,
+			Sequence:      123,
+			State:         domain.SessionStateActive,
+			ResourceOwner: "me",
+			Creator:       "he",
+			UserFactor: query.SessionUserFactor{
+				UserID:        "345",
+				UserCheckedAt: past,
+				LoginName:     "donald",
+				DisplayName:   "donald duck",
+				ResourceOwner: "org1",
+			},
+			TOTPFactor: query.SessionTOTPFactor{
+				TOTPCheckedAt: past,
 			},
 			Metadata: map[string][]byte{"hello": []byte("world")},
 		},
@@ -136,7 +157,7 @@ func Test_sessionsToPb(t *testing.T) {
 			},
 			Metadata: map[string][]byte{"hello": []byte("world")},
 		},
-		{ // passkey factor
+		{ // webAuthN factor
 			Id:           "999",
 			CreationDate: timestamppb.New(now),
 			ChangeDate:   timestamppb.New(now),
@@ -149,7 +170,27 @@ func Test_sessionsToPb(t *testing.T) {
 					DisplayName:    "donald duck",
 					OrganisationId: "org1",
 				},
-				Passkey: &session.PasskeyFactor{
+				WebAuthN: &session.WebAuthNFactor{
+					VerifiedAt:   timestamppb.New(past),
+					UserVerified: true,
+				},
+			},
+			Metadata: map[string][]byte{"hello": []byte("world")},
+		},
+		{ // totp factor
+			Id:           "999",
+			CreationDate: timestamppb.New(now),
+			ChangeDate:   timestamppb.New(now),
+			Sequence:     123,
+			Factors: &session.Factors{
+				User: &session.UserFactor{
+					VerifiedAt:     timestamppb.New(past),
+					Id:             "345",
+					LoginName:      "donald",
+					DisplayName:    "donald duck",
+					OrganisationId: "org1",
+				},
+				Totp: &session.TOTPFactor{
 					VerifiedAt: timestamppb.New(past),
 				},
 			},
@@ -428,6 +469,43 @@ func Test_userCheck(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := userCheck(tt.args.user)
 			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func Test_userVerificationRequirementToDomain(t *testing.T) {
+	type args struct {
+		req session.UserVerificationRequirement
+	}
+	tests := []struct {
+		args args
+		want domain.UserVerificationRequirement
+	}{
+		{
+			args: args{session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_UNSPECIFIED},
+			want: domain.UserVerificationRequirementUnspecified,
+		},
+		{
+			args: args{session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED},
+			want: domain.UserVerificationRequirementRequired,
+		},
+		{
+			args: args{session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_PREFERRED},
+			want: domain.UserVerificationRequirementPreferred,
+		},
+		{
+			args: args{session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_DISCOURAGED},
+			want: domain.UserVerificationRequirementDiscouraged,
+		},
+		{
+			args: args{999},
+			want: domain.UserVerificationRequirementUnspecified,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.args.req.String(), func(t *testing.T) {
+			got := userVerificationRequirementToDomain(tt.args.req)
 			assert.Equal(t, tt.want, got)
 		})
 	}

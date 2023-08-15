@@ -89,6 +89,8 @@ type HumanView struct {
 	Region                   string         `json:"region" gorm:"column:region"`
 	StreetAddress            string         `json:"streetAddress" gorm:"column:street_address"`
 	OTPState                 int32          `json:"-" gorm:"column:otp_state"`
+	OTPSMSAdded              bool           `json:"-" gorm:"column:otp_sms_added"`
+	OTPEmailAdded            bool           `json:"-" gorm:"column:otp_email_added"`
 	U2FTokens                WebAuthNTokens `json:"-" gorm:"column:u2f_tokens"`
 	MFAMaxSetUp              int32          `json:"-" gorm:"column:mfa_max_set_up"`
 	MFAInitSkipped           time.Time      `json:"-" gorm:"column:mfa_init_skipped"`
@@ -178,6 +180,8 @@ func UserToModel(user *UserView) *model.UserView {
 			Region:                   user.Region,
 			StreetAddress:            user.StreetAddress,
 			OTPState:                 model.MFAState(user.OTPState),
+			OTPSMSAdded:              user.OTPSMSAdded,
+			OTPEmailAdded:            user.OTPEmailAdded,
 			MFAMaxSetUp:              domain.MFALevel(user.MFAMaxSetUp),
 			MFAInitSkipped:           user.MFAInitSkipped,
 			InitRequired:             user.InitRequired,
@@ -301,6 +305,8 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		user.HumanPhoneRemovedType:
 		u.Phone = ""
 		u.IsPhoneVerified = false
+		u.OTPSMSAdded = false
+		u.MFAInitSkipped = time.Time{}
 	case user.UserDeactivatedType:
 		u.State = int32(model.UserStateInactive)
 	case user.UserReactivatedType,
@@ -326,6 +332,16 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case user.UserV1MFAOTPRemovedType,
 		user.HumanMFAOTPRemovedType:
 		u.OTPState = int32(model.MFAStateUnspecified)
+	case user.HumanOTPSMSAddedType:
+		u.OTPSMSAdded = true
+	case user.HumanOTPSMSRemovedType:
+		u.OTPSMSAdded = false
+		u.MFAInitSkipped = time.Time{}
+	case user.HumanOTPEmailAddedType:
+		u.OTPEmailAdded = true
+	case user.HumanOTPEmailRemovedType:
+		u.OTPEmailAdded = false
+		u.MFAInitSkipped = time.Time{}
 	case user.HumanU2FTokenAddedType:
 		err = u.addU2FToken(event)
 	case user.HumanU2FTokenVerifiedType:
@@ -520,7 +536,8 @@ func (u *UserView) ComputeMFAMaxSetUp() {
 			return
 		}
 	}
-	if u.OTPState == int32(model.MFAStateReady) {
+	if u.OTPState == int32(model.MFAStateReady) ||
+		u.OTPSMSAdded || u.OTPEmailAdded {
 		u.MFAMaxSetUp = int32(domain.MFALevelSecondFactor)
 		return
 	}
@@ -575,6 +592,10 @@ func (u *UserView) EventTypes() []models.EventType {
 		models.EventType(user.HumanMFAOTPVerifiedType),
 		models.EventType(user.UserV1MFAOTPRemovedType),
 		models.EventType(user.HumanMFAOTPRemovedType),
+		models.EventType(user.HumanOTPSMSAddedType),
+		models.EventType(user.HumanOTPSMSRemovedType),
+		models.EventType(user.HumanOTPEmailAddedType),
+		models.EventType(user.HumanOTPEmailRemovedType),
 		models.EventType(user.HumanU2FTokenAddedType),
 		models.EventType(user.HumanU2FTokenVerifiedType),
 		models.EventType(user.HumanU2FTokenRemovedType),

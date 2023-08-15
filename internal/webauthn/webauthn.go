@@ -154,10 +154,10 @@ func (w *Config) BeginLogin(ctx context.Context, user *domain.Human, userVerific
 	}, nil
 }
 
-func (w *Config) FinishLogin(ctx context.Context, user *domain.Human, webAuthN *domain.WebAuthNLogin, credData []byte, webAuthNs ...*domain.WebAuthNToken) ([]byte, uint32, error) {
+func (w *Config) FinishLogin(ctx context.Context, user *domain.Human, webAuthN *domain.WebAuthNLogin, credData []byte, webAuthNs ...*domain.WebAuthNToken) (*webauthn.Credential, error) {
 	assertionData, err := protocol.ParseCredentialRequestResponseBody(bytes.NewReader(credData))
 	if err != nil {
-		return nil, 0, caos_errs.ThrowInternal(err, "WEBAU-ADgv4", "Errors.User.WebAuthN.ValidateLoginFailed")
+		return nil, caos_errs.ThrowInternal(err, "WEBAU-ADgv4", "Errors.User.WebAuthN.ValidateLoginFailed")
 	}
 	webUser := &webUser{
 		Human:       user,
@@ -165,17 +165,17 @@ func (w *Config) FinishLogin(ctx context.Context, user *domain.Human, webAuthN *
 	}
 	webAuthNServer, err := w.serverFromContext(ctx, webAuthN.RPID, assertionData.Response.CollectedClientData.Origin)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 	credential, err := webAuthNServer.ValidateLogin(webUser, WebAuthNLoginToSessionData(webAuthN), assertionData)
 	if err != nil {
-		return nil, 0, caos_errs.ThrowInternal(err, "WEBAU-3M9si", "Errors.User.WebAuthN.ValidateLoginFailed")
+		return nil, caos_errs.ThrowInternal(err, "WEBAU-3M9si", "Errors.User.WebAuthN.ValidateLoginFailed")
 	}
 
 	if credential.Authenticator.CloneWarning {
-		return credential.ID, credential.Authenticator.SignCount, caos_errs.ThrowInternal(err, "WEBAU-4M90s", "Errors.User.WebAuthN.CloneWarning")
+		return credential, caos_errs.ThrowInternal(err, "WEBAU-4M90s", "Errors.User.WebAuthN.CloneWarning")
 	}
-	return credential.ID, credential.Authenticator.SignCount, nil
+	return credential, nil
 }
 
 func (w *Config) serverFromContext(ctx context.Context, id, origin string) (*webauthn.WebAuthn, error) {

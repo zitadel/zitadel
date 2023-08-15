@@ -89,6 +89,8 @@ InitMFAPrompt:
   Description: A autenticação de 2 fatores fornece uma segurança adicional para sua conta de usuário. Isso garante que apenas você tenha acesso à sua conta.
   Provider0: Aplicativo de autenticação (por exemplo, Google/Microsoft Authenticator, Authy)
   Provider1: Dependente do dispositivo (por exemplo, FaceID, Windows Hello, Impressão digital)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   NextButtonText: próximo
   SkipButtonText: pular
 
@@ -100,6 +102,16 @@ InitMFAOTP:
   CodeLabel: Código
   NextButtonText: próximo
   CancelButtonText: cancelar
+
+InitMFASMS:
+  Title: Verificação de 2 fatores
+  DescriptionPhone: Crie sua verificação de 2 fatores. Digite seu número de telefone para verificá-lo.
+  DescriptionCode: Crie sua verificação de 2 fatores. Digite o código recebido para verificar seu número de telefone.
+  PhoneLabel: Número de telefone
+  CodeLabel: Código
+  EditButtonText: editar
+  ResendButtonText: reenviar código
+  NextButtonText: próximo
 
 InitMFAU2F:
   Title: Adicionar chave de segurança
@@ -118,6 +130,8 @@ InitMFADone:
 MFAProvider:
   Provider0: Aplicativo de autenticação (por exemplo, Google/Microsoft Authenticator, Authy)
   Provider1: Dependente do dispositivo (por exemplo, FaceID, Windows Hello, Impressão digital)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   ChooseOther: ou escolha outra opção
 
 VerifyMFAOTP:
