@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"reflect"
+	"time"
 
 	_ "github.com/zitadel/zitadel/internal/database/cockroach"
 	"github.com/zitadel/zitadel/internal/database/dialect"
@@ -34,7 +35,10 @@ func (db *DB) QueryContext(ctx context.Context, query string, args ...any) (*sql
 		return nil, err
 	}
 	defer func() {
-		_ = tx.Commit()
+		go func() {
+			time.Sleep(10 * time.Millisecond)
+			_ = tx.Commit()
+		}()
 	}()
 	return tx.Query(query, args...)
 }
@@ -48,7 +52,10 @@ func (db *DB) QueryRowContext(ctx context.Context, query string, args ...any) *s
 		return db.DB.QueryRowContext(ctx, query, args...)
 	}
 	defer func() {
-		_ = tx.Commit()
+		go func() {
+			time.Sleep(10 * time.Millisecond)
+			_ = tx.Commit()
+		}()
 	}()
 	return tx.QueryRowContext(ctx, query, args...)
 }

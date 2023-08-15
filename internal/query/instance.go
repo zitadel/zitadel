@@ -447,7 +447,7 @@ func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase, host st
 				})
 			}
 			if instance.ID == "" {
-				return nil, errors.ThrowNotFound(nil, "QUERY-n0wng", "Errors.IAM.NotFound")
+				return nil, errors.ThrowNotFound(nil, "QUERY-lSO0U", "Errors.IAM.NotFound")
 			}
 			instance.DefaultLang = language.Make(lang)
 			if err := rows.Close(); err != nil {
