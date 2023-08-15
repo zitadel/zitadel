@@ -90,6 +90,22 @@ export class AuthFactorDialogComponent {
         .catch((error) => {
           this.toast.showError(error);
         });
+    } else if (type === AuthFactorType.OTPSMS) {
+      this.authService
+        .addMyAuthFactorOTPSMS()
+        .then(() => {
+          this.dialogRef.close(true);
+          this.translate
+            .get('USER.MFA.OTPSMSSUCCESS')
+            .pipe(take(1))
+            .subscribe((msg) => {
+              this.toast.showInfo(msg);
+            });
+        })
+        .catch((error) => {
+          this.dialogRef.close(false);
+          this.toast.showError(error);
+        });
     } else if (type === AuthFactorType.OTPEMAIL) {
       this.authService
         .addMyAuthFactorOTPEmail()
