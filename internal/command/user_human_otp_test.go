@@ -828,7 +828,6 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 			ctx           context.Context
 			userID        string
 			resourceOwner string
-			authRequest   *domain.AuthRequest
 		}
 	)
 	type res struct {
@@ -979,75 +978,13 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "successful add with auth request",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanPhoneChangedEvent(ctx,
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"+4179654321",
-							),
-						),
-						eventFromEventPusher(
-							user.NewHumanPhoneVerifiedEvent(ctx,
-								&user.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("inst1",
-								user.NewHumanOTPSMSAddedEvent(ctx,
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-							eventFromEventPusherWithInstanceID("inst1",
-								user.NewHumanOTPSMSCheckSucceededEvent(ctx,
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&user.AuthRequestInfo{
-										ID:          "authRequestID",
-										UserAgentID: "userAgentID",
-										BrowserInfo: &user.BrowserInfo{
-											UserAgent:      "user-agent",
-											AcceptLanguage: "en",
-											RemoteIP:       net.IP{192, 0, 2, 1},
-										},
-									},
-								),
-							),
-						},
-					),
-				),
-			},
-			args: args{
-				ctx:           ctx,
-				userID:        "user1",
-				resourceOwner: "org1",
-				authRequest: &domain.AuthRequest{
-					ID:      "authRequestID",
-					AgentID: "userAgentID",
-					BrowserInfo: &domain.BrowserInfo{
-						UserAgent:      "user-agent",
-						AcceptLanguage: "en",
-						RemoteIP:       net.IP{192, 0, 2, 1},
-					},
-				},
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.AddHumanOTPSMS(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authRequest)
+			got, err := r.AddHumanOTPSMS(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})
@@ -1974,7 +1911,7 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.AddHumanOTPEmail(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, nil)
+			got, err := r.AddHumanOTPEmail(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})
