@@ -34,7 +34,10 @@ VerifyEmailOTP:
   Text: Por favor, utiliza el botón 'Autenticar' o copia la contraseña de un solo uso {{.OTP}} y pégala en la pantalla de autenticación para autenticarte en ZITADEL en los próximos cinco minutos.
   ButtonText: Autenticar
 VerifySMSOTP:
-  Text: Por favor, visita {{ .VerifyURL }} o copia la contraseña de un solo uso {{.OTP}} y pégala en la pantalla de autenticación para autenticarte en ZITADEL en los próximos cinco minutos.
+  Text: >-
+    {{.OTP}} es su contraseña de un solo uso para {{ .Domain }}. Úselo dentro de los próximos {{.Expiry}}.
+    
+    @{{.Dominio}} #{{.OTP}}
 DomainClaimed:
   Title: ZITADEL - Se ha reclamado un dominio
   PreHeader: Cambiar dirección de correo electrónico / nombre de usuario

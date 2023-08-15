@@ -49,6 +49,8 @@ type HumanView struct {
 	Region                   string
 	StreetAddress            string
 	OTPState                 MFAState
+	OTPSMSAdded              bool
+	OTPEmailAdded            bool
 	U2FTokens                []*WebAuthNView
 	PasswordlessTokens       []*WebAuthNView
 	MFAMaxSetUp              domain.MFALevel
@@ -162,10 +164,17 @@ func (u *UserView) MFATypesSetupPossible(level domain.MFALevel, policy *domain.L
 					}
 				case domain.SecondFactorTypeU2F:
 					types = append(types, domain.MFATypeU2F)
+				case domain.SecondFactorTypeOTPSMS:
+					if !u.OTPSMSAdded {
+						types = append(types, domain.MFATypeOTPSMS)
+					}
+				case domain.SecondFactorTypeOTPEmail:
+					if !u.OTPEmailAdded {
+						types = append(types, domain.MFATypeOTPEmail)
+					}
 				}
 			}
 		}
-		//PLANNED: add sms
 	}
 	return types
 }
@@ -189,10 +198,17 @@ func (u *UserView) MFATypesAllowed(level domain.MFALevel, policy *domain.LoginPo
 					if u.IsU2FReady() {
 						types = append(types, domain.MFATypeU2F)
 					}
+				case domain.SecondFactorTypeOTPSMS:
+					if u.OTPSMSAdded {
+						types = append(types, domain.MFATypeOTPSMS)
+					}
+				case domain.SecondFactorTypeOTPEmail:
+					if u.OTPEmailAdded {
+						types = append(types, domain.MFATypeOTPEmail)
+					}
 				}
 			}
 		}
-		//PLANNED: add sms
 	}
 	return types, required
 }

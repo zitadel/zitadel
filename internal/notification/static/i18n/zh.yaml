@@ -34,7 +34,10 @@ VerifyEmailOTP:
   Text: 请使用 '验证' 按钮，或复制一次性密码 {{.OTP}} 并将其粘贴到验证屏幕中，以在接下来的五分钟内在 ZITADEL 中进行验证。
   ButtonText: 验证
 VerifySMSOTP:
-  Text: 请访问 {{ .VerifyURL }} 或复制一次性密码 {{.OTP}} 并将其粘贴到身份验证屏幕，以在接下来的五分钟内在ZITADEL进行身份验证。
+  Text: >-
+    {{.OTP}} 是您的 {{ .Domain }} 的一次性密码。在下一个 {{.Expiry}} 内使用它。
+    
+    @{{.Domain}} #{{.OTP}}
 DomainClaimed:
   Title: ZITADEL - 域名所有权验证
   PreHeader: 更改电子邮件/用户名

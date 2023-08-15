@@ -612,6 +612,24 @@ EventTypes:
           check:
             succeeded: 验证 MFA OTP 成功
             failed:  验证 MFA OTP 失败
+          sms:
+            added: 添加了多因素 OTP 短信
+            removed: 删除了多因素 OTP 短信
+            code:
+              added: 添加了多因素 OTP 短信代码
+              sent: 已发送多因素 OTP 短信代码
+            check:
+              succeeded: 多因素 OTP 短信验证成功
+              failed: 多因素 OTP 短信验证失败
+          email:
+            added: 添加了多因素 OTP 电子邮件
+            removed: 删除了多因素 OTP 电子邮件
+            code:
+              added: 添加了多因素 OTP 电子邮件代码
+              sent: 已发送多因素 OTP 电子邮件代码
+            check:
+              succeeded: 多因素 OTP 电子邮件验证成功
+              failed: 多因素 OTP 电子邮件验证失败
         u2f:
           token:
             added: 添加 MFA U2F 令牌

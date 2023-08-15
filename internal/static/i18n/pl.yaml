@@ -618,6 +618,24 @@ EventTypes:
           check:
             succeeded: Sprawdzenie wielofaktorowego OTP zakończone powodzeniem
             failed: Sprawdzenie wielofaktorowego OTP nie powiodło się
+          sms:
+            added: Dodano wieloskładnikowy SMS OTP
+            removed: Usunięto wieloskładnikowy SMS OTP
+            code:
+              added: Dodano wieloczynnikowy kod SMS OTP
+              sent: Wysłano kod SMS Multifactor OTP
+            check:
+              succeeded: Pomyślna weryfikacja wieloczynnikowego SMS-a OTP
+              failed: Wieloskładnikowa weryfikacja wiadomości SMS OTP nie powiodła się
+          email:
+            added: Dodano wieloskładnikowy e-mail OTP
+            removed: Usunięto wieloskładnikowy e-mail OTP
+            code:
+              added: Dodano wieloskładnikowy kod e-mail OTP
+              sent: Wysłano kod e-mail Multifactor OTP
+            check:
+              succeeded: Pomyślna wieloczynnikowa weryfikacja adresu e-mail OTP
+              failed: Wieloczynnikowa weryfikacja adresu e-mail OTP nie powiodła się
         u2f:
           token:
             added: Dodano token wielofaktorowego U2F
