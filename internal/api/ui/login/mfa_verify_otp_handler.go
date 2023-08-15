@@ -1,6 +1,7 @@
 package login
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -38,9 +39,18 @@ func (l *Login) handleOTPVerification(w http.ResponseWriter, r *http.Request, au
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	sendCode := l.authRepo.SendMFAOTPSMS
-	if selectedProvider == domain.MFATypeOTPEmail {
+	var sendCode func(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) error
+	switch selectedProvider {
+	case domain.MFATypeOTPSMS:
+		sendCode = l.authRepo.SendMFAOTPSMS
+	case domain.MFATypeOTPEmail:
 		sendCode = l.authRepo.SendMFAOTPEmail
+		// another type should never be passed, but just making sure
+	case domain.MFATypeU2F,
+		domain.MFATypeTOTP,
+		domain.MFATypeU2FUserVerification:
+		l.renderError(w, r, authReq, err)
+		return
 	}
 	err = sendCode(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, userAgentID)
 	l.renderOTPVerification(w, r, authReq, providers, selectedProvider, err)
@@ -83,11 +93,21 @@ func (l *Login) handleOTPVerificationCheck(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	verifyCode := l.authRepo.VerifyMFAOTPSMS
-	actionType := authMethodOTPSMS
-	if formData.SelectedProvider == domain.MFATypeOTPEmail {
-		verifyCode = l.authRepo.VerifyMFAOTPEmail
+	var actionType authMethod
+	var verifyCode func(ctx context.Context, userID, resourceOwner, code, authRequestID, userAgentID string, info *domain.BrowserInfo) error
+	switch formData.SelectedProvider {
+	case domain.MFATypeOTPSMS:
+		actionType = authMethodOTPSMS
+		verifyCode = l.authRepo.VerifyMFAOTPSMS
+	case domain.MFATypeOTPEmail:
 		actionType = authMethodOTPEmail
+		verifyCode = l.authRepo.VerifyMFAOTPEmail
+		// another type should never be passed, but just making sure
+	case domain.MFATypeU2F,
+		domain.MFATypeTOTP,
+		domain.MFATypeU2FUserVerification:
+		l.renderOTPVerification(w, r, authReq, step.MFAProviders, formData.SelectedProvider, err)
+		return
 	}
 	err = verifyCode(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, formData.Code, authReq.ID, userAgentID, domain.BrowserInfoFromRequest(r))
 
