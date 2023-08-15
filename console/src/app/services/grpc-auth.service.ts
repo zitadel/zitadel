@@ -65,8 +65,12 @@ import {
   ListMyUserSessionsResponse,
   ListMyZitadelPermissionsRequest,
   ListMyZitadelPermissionsResponse,
+  RemoveMyAuthFactorOTPEmailRequest,
+  RemoveMyAuthFactorOTPEmailResponse,
   RemoveMyAuthFactorOTPRequest,
   RemoveMyAuthFactorOTPResponse,
+  RemoveMyAuthFactorOTPSMSRequest,
+  RemoveMyAuthFactorOTPSMSResponse,
   RemoveMyAuthFactorU2FRequest,
   RemoveMyAuthFactorU2FResponse,
   RemoveMyAvatarRequest,
@@ -630,6 +634,18 @@ export class GrpcAuthService {
   public removeMyMultiFactorOTP(): Promise<RemoveMyAuthFactorOTPResponse.AsObject> {
     return this.grpcService.auth
       .removeMyAuthFactorOTP(new RemoveMyAuthFactorOTPRequest(), null)
+      .then((resp) => resp.toObject());
+  }
+
+  public removeMyAuthFactorOTPSMS(): Promise<RemoveMyAuthFactorOTPSMSResponse.AsObject> {
+    return this.grpcService.auth
+      .removeMyAuthFactorOTPSMS(new RemoveMyAuthFactorOTPSMSRequest(), null)
+      .then((resp) => resp.toObject());
+  }
+
+  public removeMyAuthFactorOTPEmail(): Promise<RemoveMyAuthFactorOTPEmailResponse.AsObject> {
+    return this.grpcService.auth
+      .removeMyAuthFactorOTPEmail(new RemoveMyAuthFactorOTPEmailRequest(), null)
       .then((resp) => resp.toObject());
   }
 

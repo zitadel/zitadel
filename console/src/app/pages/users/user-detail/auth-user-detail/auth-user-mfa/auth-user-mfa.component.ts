@@ -149,6 +149,30 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
             .catch((error) => {
               this.toast.showError(error);
             });
+        } else if (factor.otpEmail) {
+          this.service
+            .removeMyAuthFactorOTPEmail()
+            .then(() => {
+              this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
+
+              this.cleanupList();
+              this.getMFAs();
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        } else if (factor.otpSms) {
+          this.service
+            .removeMyAuthFactorOTPSMS()
+            .then(() => {
+              this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
+
+              this.cleanupList();
+              this.getMFAs();
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
         }
       }
     });
