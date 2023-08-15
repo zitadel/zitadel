@@ -91,12 +91,7 @@ func (c *Config) Type() string {
 }
 
 func (c *Config) Timetravel(d time.Duration) string {
-	// verify that it is at least 1 micro second
-	if d < time.Microsecond {
-		d = time.Microsecond
-	}
-
-	return fmt.Sprintf(" AS OF SYSTEM TIME '-%d µs' ", d.Microseconds())
+	return ""
 }
 
 type User struct {
