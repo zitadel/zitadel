@@ -258,7 +258,7 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 		apiFields := actions.WithAPIFields(
 			actions.SetFields("v1",
 				actions.SetFields("attributes",
-					actions.SetFields("setCustomAttribute", func(name string, nameFormat string, attributeValue []string) {
+					actions.SetFields("setCustomAttribute", func(name string, nameFormat string, attributeValue ...string) {
 						if _, ok := customAttributes[name]; !ok {
 							customAttributes = appendCustomAttribute(customAttributes, name, nameFormat, attributeValue)
 							return
