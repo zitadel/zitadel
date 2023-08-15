@@ -113,7 +113,7 @@ func (l *Login) handleTOTPCreation(w http.ResponseWriter, r *http.Request, authR
 // handleRegisterOTPEmail will directly add OTP Email as 2FA.
 // It will also add a successful OTP Email check to the auth request.
 func (l *Login) handleRegisterOTPEmail(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
-	_, err := l.command.AddHumanOTPEmail(setUserContext(r.Context(), authReq.UserID, authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq)
+	_, err := l.command.AddHumanOTPEmailWithCheckSucceeded(setUserContext(r.Context(), authReq.UserID, authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

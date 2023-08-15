@@ -192,7 +192,26 @@ func (c *Commands) HumanRemoveTOTP(ctx context.Context, userID, resourceOwner st
 	return writeModelToObjectDetails(&existingOTP.WriteModel), nil
 }
 
-func (c *Commands) AddHumanOTPSMS(ctx context.Context, userID, resourceOwner string, authRequest *domain.AuthRequest) (*domain.ObjectDetails, error) {
+// AddHumanOTPSMS adds the OTP SMS factor to a user.
+// It can only be added if it not already is and the phone has to be verified.
+func (c *Commands) AddHumanOTPSMS(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
+	return c.addHumanOTPSMS(ctx, userID, resourceOwner)
+}
+
+// AddHumanOTPSMSWithCheckSucceeded adds the OTP SMS factor to a user.
+// It can only be added if it's not already and the phone has to be verified.
+// An OTPSMSCheckSucceededEvent will be added to the passed AuthRequest, if not nil.
+func (c *Commands) AddHumanOTPSMSWithCheckSucceeded(ctx context.Context, userID, resourceOwner string, authRequest *domain.AuthRequest) (*domain.ObjectDetails, error) {
+	if authRequest == nil {
+		return c.addHumanOTPSMS(ctx, userID, resourceOwner)
+	}
+	event := func(ctx context.Context, userAgg *eventstore.Aggregate) eventstore.Command {
+		return user.NewHumanOTPSMSCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest))
+	}
+	return c.addHumanOTPSMS(ctx, userID, resourceOwner, event)
+}
+
+func (c *Commands) addHumanOTPSMS(ctx context.Context, userID, resourceOwner string, events ...eventCallback) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-QSF2s", "Errors.User.UserIDMissing")
 	}
@@ -210,9 +229,10 @@ func (c *Commands) AddHumanOTPSMS(ctx context.Context, userID, resourceOwner str
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Q54j2", "Errors.User.MFA.OTP.NotReady")
 	}
 	userAgg := UserAggregateFromWriteModel(&otpWriteModel.WriteModel)
-	cmds := []eventstore.Command{user.NewHumanOTPSMSAddedEvent(ctx, userAgg)}
-	if authRequest != nil {
-		cmds = append(cmds, user.NewHumanOTPSMSCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+	cmds := make([]eventstore.Command, len(events)+1)
+	cmds[0] = user.NewHumanOTPSMSAddedEvent(ctx, userAgg)
+	for i, event := range events {
+		cmds[i+1] = event(ctx, userAgg)
 	}
 	if err = c.pushAppendAndReduce(ctx, otpWriteModel, cmds...); err != nil {
 		return nil, err
@@ -295,7 +315,26 @@ func (c *Commands) HumanCheckOTPSMS(ctx context.Context, userID, code, resourceO
 	)
 }
 
-func (c *Commands) AddHumanOTPEmail(ctx context.Context, userID, resourceOwner string, authRequest *domain.AuthRequest) (*domain.ObjectDetails, error) {
+// AddHumanOTPEmail adds the OTP Email factor to a user.
+// It can only be added if it not already is and the phone has to be verified.
+func (c *Commands) AddHumanOTPEmail(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
+	return c.addHumanOTPEmail(ctx, userID, resourceOwner)
+}
+
+// AddHumanOTPEmailWithCheckSucceeded adds the OTP Email factor to a user.
+// It can only be added if it's not already and the email has to be verified.
+// An OTPEmailCheckSucceededEvent will be added to the passed AuthRequest, if not nil.
+func (c *Commands) AddHumanOTPEmailWithCheckSucceeded(ctx context.Context, userID, resourceOwner string, authRequest *domain.AuthRequest) (*domain.ObjectDetails, error) {
+	if authRequest == nil {
+		return c.addHumanOTPEmail(ctx, userID, resourceOwner)
+	}
+	event := func(ctx context.Context, userAgg *eventstore.Aggregate) eventstore.Command {
+		return user.NewHumanOTPEmailCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest))
+	}
+	return c.addHumanOTPEmail(ctx, userID, resourceOwner, event)
+}
+
+func (c *Commands) addHumanOTPEmail(ctx context.Context, userID, resourceOwner string, events ...eventCallback) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Sg1hz", "Errors.User.UserIDMissing")
 	}
@@ -310,9 +349,10 @@ func (c *Commands) AddHumanOTPEmail(ctx context.Context, userID, resourceOwner s
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-KLJ2d", "Errors.User.MFA.OTP.NotReady")
 	}
 	userAgg := UserAggregateFromWriteModel(&otpWriteModel.WriteModel)
-	cmds := []eventstore.Command{user.NewHumanOTPEmailAddedEvent(ctx, userAgg)}
-	if authRequest != nil {
-		cmds = append(cmds, user.NewHumanOTPEmailCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+	cmds := make([]eventstore.Command, len(events)+1)
+	cmds[0] = user.NewHumanOTPEmailAddedEvent(ctx, userAgg)
+	for i, event := range events {
+		cmds[i+1] = event(ctx, userAgg)
 	}
 	if err = c.pushAppendAndReduce(ctx, otpWriteModel, cmds...); err != nil {
 		return nil, err
@@ -395,6 +435,7 @@ func (c *Commands) HumanCheckOTPEmail(ctx context.Context, userID, code, resourc
 	)
 }
 
+// sendHumanOTP creates a code for a registered mechanism (sms / email), which is used for a check (during login)
 func (c *Commands) sendHumanOTP(
 	ctx context.Context,
 	userID, resourceOwner string,
@@ -472,9 +513,6 @@ func (c *Commands) humanCheckOTP(
 	}
 	if existingOTP.Code() == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-S34gh", "Errors.User.Code.NotFound")
-	}
-	if code == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty")
 	}
 	userAgg := &user.NewAggregate(userID, existingOTP.ResourceOwner()).Aggregate
 	err = crypto.VerifyCodeWithAlgorithm(existingOTP.CodeCreationDate(), existingOTP.CodeExpiry(), existingOTP.Code(), code, c.userEncryption)

@@ -41,7 +41,7 @@ func (l *Login) handleRegisterOTPSMS(w http.ResponseWriter, r *http.Request, aut
 		l.renderRegisterSMS(w, r, authReq, data, nil)
 		return
 	}
-	_, err = l.command.AddHumanOTPSMS(setUserContext(r.Context(), authReq.UserID, authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq)
+	_, err = l.command.AddHumanOTPSMSWithCheckSucceeded(setUserContext(r.Context(), authReq.UserID, authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -113,7 +113,7 @@ func (l *Login) handleRegisterSMSCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegisterSMS(w, r, authReq, data, err)
 		return
 	}
-	_, err = l.command.AddHumanOTPSMS(ctx, authReq.UserID, authReq.UserOrgID, authReq)
+	_, err = l.command.AddHumanOTPSMSWithCheckSucceeded(ctx, authReq.UserID, authReq.UserOrgID, authReq)
 	if err != nil {
 		l.renderRegisterSMS(w, r, authReq, data, err)
 		return

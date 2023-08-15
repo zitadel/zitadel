@@ -117,6 +117,16 @@
             />
           </svg>
         </div>
+        {{ end }} {{ if eq $provider 3 }}
+        <div class="mfa-img">
+          <img width="100px" height="100px" alt="OTP SMS" src="{{ resourceUrl
+          "images/mfa/mfa-u2f.svg" }}" /> // TODO: image
+        </div>
+        {{ end }}{{ if eq $provider 4 }}
+        <div class="mfa-img">
+          <img width="100px" height="100px" alt="OTP Email" src="{{ resourceUrl
+          "images/mfa/mfa-u2f.svg" }}" /> // TODO: image
+        </div>
         {{ end }}
         <span>{{ $providerName }} </span>
       </label>
