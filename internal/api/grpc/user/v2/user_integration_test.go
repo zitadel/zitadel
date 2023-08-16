@@ -768,12 +768,12 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			name: "retrieve successful ldap intent",
 			args: args{
 				CTX,
-				&user.RetrieveIdentityProviderInformationRequest{
-					IntentId: ldapSuccessfulID,
-					Token:    ldapToken,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    ldapSuccessfulID,
+					IdpIntentToken: ldapToken,
 				},
 			},
-			want: &user.RetrieveIdentityProviderInformationResponse{
+			want: &user.RetrieveIdentityProviderIntentResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.New(ldapChangeDate),
 					ResourceOwner: Tester.Organisation.ID,

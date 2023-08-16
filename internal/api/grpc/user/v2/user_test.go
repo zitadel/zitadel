@@ -166,7 +166,7 @@ func Test_idpIntentToIDPIntentPb(t *testing.T) {
 				},
 			},
 			res{
-				resp: &user.RetrieveIdentityProviderInformationResponse{
+				resp: &user.RetrieveIdentityProviderIntentResponse{
 					Details: &object_pb.Details{
 						Sequence:      123,
 						ChangeDate:    timestamppb.New(time.Date(2019, 4, 1, 1, 1, 1, 1, time.Local)),

@@ -131,16 +131,16 @@ func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_
 
 func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *user.StartIdentityProviderIntentRequest) (_ *user.StartIdentityProviderIntentResponse, err error) {
 	switch t := req.GetContent().(type) {
-	case *user.StartIdentityProviderFlowRequest_Urls:
+	case *user.StartIdentityProviderIntentRequest_Urls:
 		return s.startIDPIntent(ctx, req.GetIdpId(), t.Urls)
-	case *user.StartIdentityProviderFlowRequest_Ldap:
+	case *user.StartIdentityProviderIntentRequest_Ldap:
 		return s.startLDAPIntent(ctx, req.GetIdpId(), t.Ldap)
 	default:
-		return nil, errors.ThrowUnimplementedf(nil, "USERv2-S2g21", "type oneOf %T in method StartIdentityProviderFlow not implemented", t)
+		return nil, errors.ThrowUnimplementedf(nil, "USERv2-S2g21", "type oneOf %T in method StartIdentityProviderIntent not implemented", t)
 	}
 }
 
-func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*user.StartIdentityProviderFlowResponse, error) {
+func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*user.StartIdentityProviderIntentResponse, error) {
 	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
@@ -155,7 +155,7 @@ func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.Re
 	}, nil
 }
 
-func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderFlowResponse, error) {
+func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderIntentResponse, error) {
 	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, "", "", authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
@@ -171,9 +171,9 @@ func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredenti
 	if err != nil {
 		return nil, err
 	}
-	return &user.StartIdentityProviderFlowResponse{
+	return &user.StartIdentityProviderIntentResponse{
 		Details:  object.DomainToDetailsPb(details),
-		NextStep: &user.StartIdentityProviderFlowResponse_Intent{Intent: &user.Intent{IntentId: intentWriteModel.AggregateID, Token: token}},
+		NextStep: &user.StartIdentityProviderIntentResponse_Intent{Intent: &user.Intent{IntentId: intentWriteModel.AggregateID, Token: token}},
 	}, nil
 }
 
