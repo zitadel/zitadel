@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/jinzhu/gorm"
@@ -47,6 +49,9 @@ func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, r
 				return count, caos_errs.ThrowInvalidArgument(err, "VIEW-KaGue", "query is invalid")
 			}
 		}
+
+		query = query.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: true})
+		defer query.Commit()
 
 		query = query.Count(&count)
 		if res == nil {
