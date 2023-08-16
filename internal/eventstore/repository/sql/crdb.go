@@ -250,8 +250,8 @@ func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *repository.SearchQ
 	return ids, nil
 }
 
-func (db *CRDB) db() *sql.DB {
-	return db.DB.DB
+func (db *CRDB) db() *database.DB {
+	return db.DB
 }
 
 func (db *CRDB) orderByEventSequence(desc bool) string {

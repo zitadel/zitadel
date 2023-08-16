@@ -2,7 +2,6 @@ package sql
 
 import (
 	"context"
-	"database/sql"
 	"runtime/debug"
 
 	"github.com/zitadel/logging"
@@ -12,10 +11,6 @@ import (
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
-
-type Querier interface {
-	Query(query string, args ...interface{}) (*sql.Rows, error)
-}
 
 func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQueryFactory) (events []*es_models.Event, err error) {
 	if !searchQuery.InstanceFiltered {
