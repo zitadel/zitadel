@@ -827,6 +827,7 @@ func Test_query_events_mocked(t *testing.T) {
 				},
 				AllowOrderByCreationDate: true,
 			}
+			crdb.SetQueryCommitDelay(10 * time.Millisecond)
 			if tt.fields.mock != nil {
 				crdb.DB.DB = tt.fields.mock.client
 			}
@@ -835,6 +836,7 @@ func Test_query_events_mocked(t *testing.T) {
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("query() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
+			time.Sleep(20 * time.Millisecond)
 
 			if tt.fields.mock == nil {
 				return
@@ -853,7 +855,9 @@ type dbMock struct {
 }
 
 func (m *dbMock) expectQuery(t *testing.T, expectedQuery string, args []driver.Value, events ...*repository.Event) *dbMock {
+	m.mock.ExpectBegin()
 	query := m.mock.ExpectQuery(expectedQuery).WithArgs(args...)
+	m.mock.ExpectCommit()
 	rows := sqlmock.NewRows([]string{"event_sequence"})
 	for _, event := range events {
 		rows = rows.AddRow(event.Sequence)
@@ -863,6 +867,7 @@ func (m *dbMock) expectQuery(t *testing.T, expectedQuery string, args []driver.V
 }
 
 func (m *dbMock) expectQueryErr(t *testing.T, expectedQuery string, args []driver.Value, err error) *dbMock {
+	m.mock.ExpectBegin()
 	m.mock.ExpectQuery(expectedQuery).WithArgs(args...).WillReturnError(err)
 	return m
 }

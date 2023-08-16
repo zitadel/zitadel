@@ -1,8 +1,10 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"reflect"
+	"time"
 
 	_ "github.com/zitadel/zitadel/internal/database/cockroach"
 	"github.com/zitadel/zitadel/internal/database/dialect"
@@ -22,6 +24,56 @@ func (c *Config) SetConnector(connector dialect.Connector) {
 type DB struct {
 	*sql.DB
 	dialect.Database
+	queryCommitDelay time.Duration
+}
+
+func (db *DB) SetQueryCommitDelay(d time.Duration) {
+	db.queryCommitDelay = d
+}
+
+func (db *DB) Query(query string, args ...any) (*sql.Rows, error) {
+	return db.QueryContext(context.Background(), query, args...)
+}
+
+func (db *DB) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if db.queryCommitDelay == 0 {
+			_ = tx.Commit()
+			return
+		}
+		go func() {
+			time.Sleep(db.queryCommitDelay)
+			_ = tx.Commit()
+		}()
+	}()
+	return tx.Query(query, args...)
+}
+
+func (db *DB) QueryRow(query string, args ...any) *sql.Row {
+	return db.QueryRowContext(context.Background(), query, args...)
+}
+
+func (db *DB) QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row {
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	if err != nil {
+		// because we need to return [*sql.Row] we have to call the function
+		return db.DB.QueryRowContext(ctx, query, args...)
+	}
+	defer func() {
+		if db.queryCommitDelay == 0 {
+			_ = tx.Commit()
+			return
+		}
+		go func() {
+			time.Sleep(db.queryCommitDelay)
+			_ = tx.Commit()
+		}()
+	}()
+	return tx.QueryRowContext(ctx, query, args...)
 }
 
 func Connect(config Config, useAdmin bool) (*DB, error) {
@@ -35,8 +87,9 @@ func Connect(config Config, useAdmin bool) (*DB, error) {
 	}
 
 	return &DB{
-		DB:       client,
-		Database: config.connector,
+		DB:               client,
+		Database:         config.connector,
+		queryCommitDelay: 10 * time.Millisecond,
 	}, nil
 }
 
