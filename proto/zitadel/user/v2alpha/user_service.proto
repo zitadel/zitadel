@@ -1098,9 +1098,9 @@ message StartIdentityProviderIntentResponse{
         example: "\"https://accounts.google.com/o/oauth2/v2/auth?client_id=clientID&callback=https%3A%2F%2Fzitadel.cloud%2Fidps%2Fcallback\"";
       }
     ];
-    Intent intent = 3 [
+    IDPIntent idp_intent = 3 [
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Intent information"
+        description: "IDP Intent information"
       }
     ];
   }

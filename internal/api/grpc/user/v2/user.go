@@ -173,7 +173,7 @@ func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredenti
 	}
 	return &user.StartIdentityProviderIntentResponse{
 		Details:  object.DomainToDetailsPb(details),
-		NextStep: &user.StartIdentityProviderIntentResponse_Intent{Intent: &user.Intent{IntentId: intentWriteModel.AggregateID, Token: token}},
+		NextStep: &user.StartIdentityProviderIntentResponse_IdpIntent{IdpIntent: &user.IDPIntent{IdpIntentId: intentWriteModel.AggregateID, IdpIntentToken: token}},
 	}, nil
 }
 
