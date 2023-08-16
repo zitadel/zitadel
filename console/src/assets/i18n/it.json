@@ -410,8 +410,8 @@
       "DESCRIPTION": "Aggiungi un secondo fattore per garantire la sicurezza ottimale del tuo account.",
       "MANAGE_DESCRIPTION": "Gestite i metodi del secondo fattore dei vostri utenti.",
       "ADD": "Aggiungi fattore",
-      "OTP": "App di autenticazione per OTP (One-Time Password)",
-      "OTP_DIALOG_TITLE": "Aggiungi OTP",
+      "OTP": "App di autenticazione per TOTP (Time-based One-Time Password)",
+      "OTP_DIALOG_TITLE": "Aggiungi TOTP",
       "OTP_DIALOG_DESCRIPTION": "Scansiona il codice QR con un'app di autenticazione e inserisci il codice nel campo sottostante per verificare e attivare il metodo OTP.",
       "U2F": "Impronta digitale, chiave di sicurezza, Face ID e altri",
       "U2F_DIALOG_TITLE": "Verifica Fattore",
@@ -419,6 +419,12 @@
       "U2F_SUCCESS": "Fattore aggiunto con successo!",
       "U2F_ERROR": "Si \u00e8 verificato un errore durante la configurazione!",
       "U2F_NAME": "Nome dell'autenticatore",
+      "OTPSMS": "OTP (One-Time Password) con SMS",
+      "OTPEMAIL": "OTP (One-Time Password) with Email",
+      "SETUPOTPSMSDESCRIPTION": "Vuoi impostare questo numero di telefono come secondo fattore OTP (One-Time password)?",
+      "OTPSMSSUCCESS": "Fattore OTP impostato con successo.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Il tuo telefono deve essere verificato per utilizzare questo metodo.",
+      "OTPEMAILSUCCESS": "Fattore OTP impostato con successo.",
       "TYPE": {
         "0": "Nessun altro fattore definito",
         "1": "One Time Password (OTP)",
@@ -585,7 +591,8 @@
         "EDITVALUE": "Numero di telefono",
         "EDITDESC": "Inserisci il nuovo numero di telefono nel campo sottostante.",
         "DELETETITLE": "Rimuovi il numero di telefono",
-        "DELETEDESC": "Vuoi davvero rimuovere il numero di telefono"
+        "DELETEDESC": "Vuoi davvero rimuovere il numero di telefono",
+        "OTPSMSREMOVALWARNING": "Questo account utilizza questo numero di telefono come secondo fattore. Non sarai in grado di usarlo dopo aver proceduto."
       },
       "RESENDCODE": "Reinvia il codice",
       "ENTERCODE": "Verifica",
@@ -1293,6 +1300,8 @@
         "INIT": "Inizializzazione",
         "VE": "Verificazione l'e-mail",
         "VP": "Verificazione del telefono",
+        "VSO": "Verifica OTP SMS",
+        "VEO": "Verifica OTP Email",
         "PR": "Ripristino della password",
         "DC": "Rivendicazione del dominio",
         "PL": "Autenticazione Passwordless",
@@ -1313,7 +1322,9 @@
         "verifiedPhone": "Telefono verificato",
         "changedate": "Cambia data",
         "username": "Nome utente",
-        "tempUsername": "Nome utente temporaneo"
+        "tempUsername": "Nome utente temporaneo",
+        "otp": "Password monouso",
+        "verifyUrl": "URL per verificare la password monouso"
       },
       "TOAST": {
         "UPDATED": "Testi personalizzati salvati."

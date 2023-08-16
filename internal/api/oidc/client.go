@@ -386,7 +386,7 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 	}
 	o.setUserInfoRoleClaims(userInfo, projectRoles)
 
-	return o.userinfoFlows(ctx, user.ResourceOwner, userGrants, userInfo)
+	return o.userinfoFlows(ctx, user, userGrants, userInfo)
 }
 
 func (o *OPStorage) setUserInfoProfile(ctx context.Context, userInfo *oidc.UserInfo, user *query.User) {
@@ -457,8 +457,8 @@ func (o *OPStorage) setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projec
 	}
 }
 
-func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, userGrants *query.UserGrants, userInfo *oidc.UserInfo) error {
-	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, resourceOwner, false)
+func (o *OPStorage) userinfoFlows(ctx context.Context, user *query.User, userGrants *query.UserGrants, userInfo *oidc.UserInfo) error {
+	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, user.ResourceOwner, false)
 	if err != nil {
 		return err
 	}
@@ -468,17 +468,13 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 			actions.SetFields("claims", userinfoClaims(userInfo)),
 			actions.SetFields("getUser", func(c *actions.FieldConfig) interface{} {
 				return func(call goja.FunctionCall) goja.Value {
-					user, err := o.query.GetUserByID(ctx, true, userInfo.Subject, false)
-					if err != nil {
-						panic(err)
-					}
 					return object.UserFromQuery(c, user)
 				}
 			}),
 			actions.SetFields("user",
 				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
 					return func(goja.FunctionCall) goja.Value {
-						resourceOwnerQuery, err := query.NewUserMetadataResourceOwnerSearchQuery(resourceOwner)
+						resourceOwnerQuery, err := query.NewUserMetadataResourceOwnerSearchQuery(user.ResourceOwner)
 						if err != nil {
 							logging.WithError(err).Debug("unable to create search query")
 							panic(err)
@@ -552,7 +548,7 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 							Key:   key,
 							Value: value,
 						}
-						if _, err = o.command.SetUserMetadata(ctx, metadata, userInfo.Subject, resourceOwner); err != nil {
+						if _, err = o.command.SetUserMetadata(ctx, metadata, userInfo.Subject, user.ResourceOwner); err != nil {
 							logging.WithError(err).Info("unable to set md in action")
 							panic(err)
 						}
@@ -665,10 +661,6 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userG
 			}),
 			actions.SetFields("getUser", func(c *actions.FieldConfig) interface{} {
 				return func(call goja.FunctionCall) goja.Value {
-					user, err := o.query.GetUserByID(ctx, true, userID, false)
-					if err != nil {
-						panic(err)
-					}
 					return object.UserFromQuery(c, user)
 				}
 			}),
@@ -807,7 +799,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 		}
 		return grants, roles, nil
 	}
-	// now specific roles were requested, so convert any grants into roles
+	// no specific roles were requested, so convert any grants into roles
 	for _, grant := range grants.UserGrants {
 		for _, role := range grant.Roles {
 			roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID)

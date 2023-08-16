@@ -411,7 +411,7 @@
       "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",
       "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
       "ADD": "Faktor hinzufügen",
-      "OTP": "Authentikator App für OTP (One-Time Password)",
+      "OTP": "Authentikator App für TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "OTP hinzufügen",
       "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
       "U2F": "Fingerabdruck, Security Key, Face ID oder andere",
@@ -420,6 +420,12 @@
       "U2F_SUCCESS": "Faktor erfolgreich hinzugefügt!",
       "U2F_ERROR": "Ein Fehler ist aufgetreten!",
       "U2F_NAME": "Authenticator Name",
+      "OTPSMS": "OTP (One-Time Password) mit SMS",
+      "OTPEMAIL": "OTP (One-Time Password) mit E-Mail",
+      "SETUPOTPSMSDESCRIPTION": "Möchten Sie diese Telefonnummer als zweiten OTP-Faktor (Einmalpasswort) einrichten?",
+      "OTPSMSSUCCESS": "OTP Faktor erfolgrech hinzugefügt.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Um diese Methode nutzen zu können, muss Ihr Telefon verifiziert werden.",
+      "OTPEMAILSUCCESS": "OTP Faktor erfolgrech hinzugefügt.",
       "TYPE": {
         "0": "Keine MFA definiert",
         "1": "OTP",
@@ -586,7 +592,8 @@
         "EDITVALUE": "Telefonnummer",
         "EDITDESC": "Geben Sie die neue Nummer in dem darunterliegenden Feld ein!",
         "DELETETITLE": "Telefonnummer löschen",
-        "DELETEDESC": "Wollen Sie die Telefonnummer wirklich löschen?"
+        "DELETEDESC": "Wollen Sie die Telefonnummer wirklich löschen?",
+        "OTPSMSREMOVALWARNING": "Dieses Konto verwendet diese Telefonnummer als zweiten Faktor. Wenn Sie fortfahren können Sie nicht mehr darauf zugreifen."
       },
       "RESENDCODE": "Code erneut senden",
       "ENTERCODE": "Verifizieren",
@@ -1293,6 +1300,8 @@
         "INIT": "Initialisierung",
         "VE": "Emailverifikation",
         "VP": "Telefonnummerverifikation",
+        "VSO": "SMS-OTP überprüfen",
+        "VEO": "E-Mail-OTP überprüfen",
         "PR": "Passwort Wiederherstellung",
         "DC": "Domainbeanspruchung",
         "PL": "Passwortlos",
@@ -1313,7 +1322,9 @@
         "verifiedPhone": "Verifizierte Telefonnummer",
         "changedate": "Änderungsdatum",
         "username": "Username",
-        "tempUsername": "Temp. Username"
+        "tempUsername": "Temp. Username",
+        "otp": "Einmalpasswort",
+        "verifyUrl": "URL zur Überprüfung des Einmalpassworts"
       },
       "TOAST": {
         "UPDATED": "Benutzerdefinierte Texte gespeichert."

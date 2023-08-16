@@ -137,6 +137,7 @@ Errors:
       MinimumExternalIDPNeeded: Almeno un IDP deve essere aggiunto
       AlreadyExists: IDP esterno già preso
       NotFound: IDP esterno non trovato
+      LoginFailed: Accesso all'IDP esterno non riuscito
     MFA:
       OTP:
         AlreadyReady: Multifattore OTP (OneTimePassword) è già impostato
@@ -478,8 +479,8 @@ Errors:
     Terminated: Sessione già terminata
     Token:
       Invalid: Il token della sessione non è valido
-    Passkey:
-      NoChallenge: Sessione senza sfida passkey
+    WebAuthN:
+      NoChallenge: Sessione senza sfida WebAuthN
   Intent:
     IDPMissing: IDP mancante nella richiesta
     SuccessURLMissing: URL di successo mancante nella richiesta
@@ -616,6 +617,24 @@ EventTypes:
           check:
             succeeded: Controllo OTP riuscito
             failed: Controllo OTP fallito
+          sms:
+            added: Aggiunto SMS OTP
+            removed: OTP SMS rimosso
+            code:
+              added: Aggiunto codice OTP SMS
+              sent: Codice OTP SMS inviato
+            check:
+              succeeded: Controllo OTP SMS riuscito
+              failed: Controllo OTP SMS fallito
+          email:
+            added: Aggiunto OTP e-mail
+            removed: OTP e-mail rimosso
+            code:
+              added: Aggiunto codice OTP e-mail
+              sent: Codice OTP e-mail inviato
+            check:
+              succeeded: OTP Controllo e-mail riuscito
+              failed: OTP Controllo e-mail fallito
         u2f:
           token:
             added: Aggiunto il U2F Token
@@ -1027,6 +1046,7 @@ Action:
       ExternalAuthentication: Autenticazione esterna
       CustomiseToken: Completare Token
       InternalAuthentication: Autenticazione interna
+      CustomizeSAMLResponse: Completare SAMLResponse
   TriggerType:
     Unspecified: Non specificato
     PostAuthentication: Post-autenticazione
@@ -1034,3 +1054,4 @@ Action:
     PostCreation: Creazione successiva
     PreUserinfoCreation: Pre userinfo creazione
     PreAccessTokenCreation: Pre access token creazione
+    PreSAMLResponseCreation: Pre SAMLResponse creazione

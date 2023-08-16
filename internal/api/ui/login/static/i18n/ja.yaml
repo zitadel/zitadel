@@ -82,6 +82,8 @@ InitMFAPrompt:
   Description: 二要素認証でアカウントのセキュリティを強化します。
   Provider0: 認証アプリ（Google/Microsoft Authenticator、Authyなど）
   Provider1: デバイス依存（例：FaceID、Windows Hello、指紋など）
+  Provider3: OTP SMS
+  Provider4: OTPメール
   NextButtonText: 次へ
   SkipButtonText: スキップ
 
@@ -93,6 +95,16 @@ InitMFAOTP:
   CodeLabel: コード
   NextButtonText: 次へ
   CancelButtonText: キャンセル
+
+InitMFASMS:
+  Title: 二要素認証
+  DescriptionPhone: 二要素認証を作成します。確認するには電話番号を入力してください。
+  DescriptionCode: 二要素認証を作成します。受信したコードを入力して電話番号を確認します。
+  PhoneLabel: 電話番号
+  CodeLabel: コード
+  EditButtonText: 編集
+  ResendButtonText: コードを再送信
+  NextButtonText: 次へ
 
 InitMFAU2F:
   Title: セキュリティキーの追加
@@ -111,6 +123,8 @@ InitMFADone:
 MFAProvider:
   Provider0: Authenticatorアプリ（Google/Microsoft Authenticator、Authyなど）
   Provider1: デバイス依存（FaceID、Windows Hello、指紋など）
+  Provider3: OTP SMS
+  Provider4: OTPメール
   ChooseOther: または、他のオプションを選択
 
 VerifyMFAOTP:
