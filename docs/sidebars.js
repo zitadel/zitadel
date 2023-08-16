@@ -185,6 +185,14 @@ module.exports = {
         },
         {
           type: "category",
+          label: "Role management",
+          collapsed: true,
+          items: [
+            "guides/integrate/retrieve-user-roles"
+          ],
+        },
+        {
+          type: "category",
           label: "Build your own login UI",
           link: {
             type: "generated-index",
@@ -268,6 +276,7 @@ module.exports = {
           collapsed: true,
           items: [
             "guides/integrate/services/gitlab-self-hosted",
+            "guides/integrate/services/cloudflare-oidc",
             "guides/integrate/services/aws-saml",
             "guides/integrate/services/google-cloud",
             "guides/integrate/services/atlassian-saml",
@@ -557,6 +566,7 @@ module.exports = {
         "apis/actions/internal-authentication",
         "apis/actions/external-authentication",
         "apis/actions/complement-token",
+        "apis/actions/customize-samlresponse",
         "apis/actions/objects",
       ]
     },

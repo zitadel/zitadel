@@ -89,6 +89,8 @@ InitMFAPrompt:
   Description: L'authentification à deux facteurs vous offre une sécurité supplémentaire pour votre compte d'utilisateur. Vous êtes ainsi assuré d'être le seul à avoir accès à votre compte.
   Provider0: Application d'authentification (par exemple, Google/Microsoft Authenticator, Authy)
   Provider1: Dépend de l'appareil (par ex. FaceID, Windows Hello, empreinte digitale)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   NextButtonText: Suivant
   SkipButtonText: Passer
 
@@ -100,6 +102,16 @@ InitMFAOTP:
   CodeLabel: Code
   NextButtonText: Suivant
   CancelButtonText: Annuler
+
+InitMFASMS:
+  Title: Vérification à deux facteurs
+  DescriptionPhone: Créez votre 2-facteurs. Entrez votre numéro de téléphone pour le vérifier.
+  DescriptionCode: Créez votre 2-facteurs. Entrez le code reçu pour vérifier votre numéro de téléphone.
+  PhoneLabel: Numéro de téléphone
+  CodeLabel: Code
+  EditButtonText: Modifier
+  ResendButtonText: Renvoyer le code
+  NextButtonText: Suivant
 
 InitMFAU2F:
   Title: Ajouter une clé de sécurité
@@ -118,6 +130,8 @@ InitMFADone:
 MFAProvider:
   Provider0: Application d'authentification (par exemple, Google/Microsoft Authenticator, Authy)
   Provider1: Dépend de l'appareil (par ex. FaceID, Windows Hello, empreinte digitale)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   ChooseOther: ou choisissez une autre option
 
 VerifyMFAOTP:
@@ -223,6 +237,7 @@ RegistrationUser:
   Japanese: 日本語
   Spanish: Español
   Bulgarian: Български
+  Portuguese: Português
   Macedonian: Македонски
   GenderLabel: Genre
   Female: Femme
@@ -257,6 +272,8 @@ ExternalRegistrationUserOverview:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
   Macedonian: Македонски
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
@@ -319,6 +336,8 @@ ExternalNotFound:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
   Macedonian: Македонски
 
 DeviceAuth:
@@ -398,6 +417,7 @@ Errors:
       Empty: Le mot de passe est vide
       Invalid: Le mot de passe n'est pas valide
       InvalidAndLocked: Le mot de passe n'est pas valide et l'utilisateur est verrouillé, contactez votre administrateur.
+      NotChanged: Mot de passe non modifié
     UsernameOrPassword:
       Invalid: Le nom d'utilisateur ou le mot de passe n'est pas valide
     PasswordComplexityPolicy:

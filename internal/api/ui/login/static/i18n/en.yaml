@@ -89,6 +89,8 @@ InitMFAPrompt:
   Description: 2-factor authentication gives you an additional security for your user account. This ensures that only you have access to your account.
   Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
   Provider1: Device dependent (e.g FaceID, Windows Hello, Fingerprint)
+  Provider3: OTP SMS
+  Provider4: OTP Email
   NextButtonText: next
   SkipButtonText: skip
 
@@ -101,6 +103,16 @@ InitMFAOTP:
   NextButtonText: next
   CancelButtonText: cancel
 
+InitMFAOTPSMS:
+  Title: 2-Factor Verification
+  DescriptionPhone: Create your 2-factor. Enter your phone number to verify it.
+  DescriptionCode: Create your 2-factor. Enter the received code to verify your phone number.
+  PhoneLabel: Phone
+  CodeLabel: Code
+  EditButtonText: edit
+  ResendButtonText: resend code
+  NextButtonText: next
+
 InitMFAU2F:
   Title: Add security key
   Description: A security key is a verification method that can be built into your phone, use Bluetooth, or plug directly into your computer's USB port.
@@ -110,7 +122,7 @@ InitMFAU2F:
   ErrorRetry: Retry, create a new challenge or choose a different method.
 
 InitMFADone:
-  Title: Security key verified
+  Title: 2-factor verified
   Description: Awesome! You just successfully set up your 2-factor and made your account way more secure. The Factor has to be entered on each login.
   NextButtonText: next
   CancelButtonText: cancel
@@ -118,12 +130,21 @@ InitMFADone:
 MFAProvider:
   Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
   Provider1: Device dependent (e.g FaceID, Windows Hello, Fingerprint)
+  Provider3: OTP SMS
+  Provider4: OTP Email
   ChooseOther: or choose another option
 
 VerifyMFAOTP:
   Title: Verify 2-Factor
   Description: Verify your second factor
   CodeLabel: Code
+  NextButtonText: next
+
+VerifyOTP:
+  Title: Verify 2-Factor
+  Description: Verify your second factor
+  CodeLabel: Code
+  ResendButtonText: resend code
   NextButtonText: next
 
 VerifyMFAU2F:
@@ -222,6 +243,8 @@ RegistrationUser:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
   Macedonian: Македонски
   GenderLabel: Gender
   Female: Female
@@ -253,9 +276,11 @@ ExternalRegistrationUserOverview:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
-  Japanese: 日本語
   Polish: Polski
+  Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
   Macedonian: Македонски
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
@@ -319,6 +344,7 @@ ExternalNotFound:
   Japanese: 日本語
   Spanish: Español
   Bulgarian: Български
+  Portuguese: Português
   Macedonian: Македонски
   
 DeviceAuth:
@@ -398,6 +424,7 @@ Errors:
       Empty: Password is empty
       Invalid: Password is invalid
       InvalidAndLocked: Password is invalid and user is locked, contact your administrator.
+      NotChanged: Password not changed
     UsernameOrPassword:
       Invalid: Username or Password is invalid
     PasswordComplexityPolicy:

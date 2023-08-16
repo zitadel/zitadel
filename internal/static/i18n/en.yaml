@@ -479,8 +479,8 @@ Errors:
     Terminated: Session already terminated
     Token:
       Invalid: Session Token is invalid
-    Passkey:
-      NoChallenge: Session without passkey challenge
+    WebAuthN:
+      NoChallenge: Session without WebAuthN challenge
   Intent:
     IDPMissing: IDP ID is missing in the request
     SuccessURLMissing: Success URL is missing in the request
@@ -584,6 +584,10 @@ EventTypes:
         check:
           succeeded: Password check succeeded
           failed: Password check failed
+        change:
+          sent: Password change sent
+        hash:
+          updated: Password hash updated
       externallogin:
         check:
           succeeded: External login succeeded
@@ -592,6 +596,8 @@ EventTypes:
         removed: External IDP removed
         cascade:
           removed: External IDP cascade removed
+        id:
+          migrated: External UserID of IDP was migrated
       phone:
         changed: Phone number changed
         verified: Phone number verified
@@ -613,6 +619,24 @@ EventTypes:
           check:
             succeeded: Multifactor OTP check succeeded
             failed: Multifactor OTP check failed
+          sms:
+            added: Multifactor OTP SMS added
+            removed: Multifactor OTP SMS removed
+            code:
+              added: Multifactor OTP SMS code added
+              sent: Multifactor OTP SMS code sent
+            check:
+              succeeded: Multifactor OTP SMS check succeeded
+              failed: Multifactor OTP SMS check failed
+          email:
+            added: Multifactor OTP Email added
+            removed: Multifactor OTP Email removed
+            code:
+              added: Multifactor OTP Email code added
+              sent: Multifactor OTP Email code sent
+            check:
+              succeeded: Multifactor OTP Email check succeeded
+              failed: Multifactor OTP Email check failed
         u2f:
           token:
             added: Multifactor U2F Token added
@@ -1193,6 +1217,7 @@ Action:
       ExternalAuthentication: External Authentication
       CustomiseToken: Complement Token
       InternalAuthentication: Internal Authentication
+      CustomizeSAMLResponse: Complement SAMLResponse
   TriggerType:
     Unspecified: Unspecified
     PostAuthentication: Post Authentication
@@ -1200,3 +1225,4 @@ Action:
     PostCreation: Post Creation
     PreUserinfoCreation: Pre Userinfo creation
     PreAccessTokenCreation: Pre access token creation
+    PreSAMLResponseCreation: Pre SAMLResponse creation

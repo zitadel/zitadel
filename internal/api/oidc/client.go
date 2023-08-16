@@ -163,6 +163,18 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo *oidc.Us
 	return o.setUserinfo(ctx, userInfo, userID, applicationID, scopes, nil)
 }
 
+// SetUserinfoFromRequest extends the SetUserinfoFromScopes during the id_token generation.
+// This is required for V2 tokens to be able to set the sessionID (`sid`) claim.
+func (o *OPStorage) SetUserinfoFromRequest(ctx context.Context, userinfo *oidc.UserInfo, request op.IDTokenRequest, _ []string) error {
+	switch t := request.(type) {
+	case *AuthRequestV2:
+		userinfo.AppendClaims("sid", t.SessionID)
+	case *RefreshTokenRequestV2:
+		userinfo.AppendClaims("sid", t.SessionID)
+	}
+	return nil
+}
+
 func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection *oidc.IntrospectionResponse, tokenID, subject, clientID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -177,7 +189,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 			return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 		}
 		return o.introspect(ctx, introspection,
-			tokenID, token.UserID, token.ClientID, projectID,
+			tokenID, token.UserID, token.ClientID, clientID, projectID,
 			token.Audience, token.Scope,
 			token.AccessTokenCreation, token.AccessTokenExpiration)
 	}
@@ -197,7 +209,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 		}
 	}
 	return o.introspect(ctx, introspection,
-		token.ID, token.UserID, token.ApplicationID, projectID,
+		token.ID, token.UserID, token.ApplicationID, clientID, projectID,
 		token.Audience, token.Scopes,
 		token.CreationDate, token.Expiration)
 }
@@ -260,7 +272,7 @@ func (o *OPStorage) isOriginAllowed(ctx context.Context, clientID, origin string
 func (o *OPStorage) introspect(
 	ctx context.Context,
 	introspection *oidc.IntrospectionResponse,
-	tokenID, subject, clientID, projectID string,
+	tokenID, subject, tokenClientID, introspectionClientID, introspectionProjectID string,
 	audience, scope []string,
 	tokenCreation, tokenExpiration time.Time,
 ) (err error) {
@@ -268,15 +280,15 @@ func (o *OPStorage) introspect(
 	defer func() { span.EndWithError(err) }()
 
 	for _, aud := range audience {
-		if aud == clientID || aud == projectID {
+		if aud == introspectionClientID || aud == introspectionProjectID {
 			userInfo := new(oidc.UserInfo)
-			err = o.setUserinfo(ctx, userInfo, subject, clientID, scope, []string{projectID}) // always
+			err = o.setUserinfo(ctx, userInfo, subject, introspectionClientID, scope, []string{introspectionProjectID})
 			if err != nil {
 				return err
 			}
 			introspection.SetUserInfo(userInfo)
 			introspection.Scope = scope
-			introspection.ClientID = clientID
+			introspection.ClientID = tokenClientID
 			introspection.TokenType = oidc.BearerToken
 			introspection.Expiration = oidc.FromTime(tokenExpiration)
 			introspection.IssuedAt = oidc.FromTime(tokenCreation)
@@ -374,7 +386,7 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 	}
 	o.setUserInfoRoleClaims(userInfo, projectRoles)
 
-	return o.userinfoFlows(ctx, user.ResourceOwner, userGrants, userInfo)
+	return o.userinfoFlows(ctx, user, userGrants, userInfo)
 }
 
 func (o *OPStorage) setUserInfoProfile(ctx context.Context, userInfo *oidc.UserInfo, user *query.User) {
@@ -445,8 +457,8 @@ func (o *OPStorage) setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projec
 	}
 }
 
-func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, userGrants *query.UserGrants, userInfo *oidc.UserInfo) error {
-	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, resourceOwner, false)
+func (o *OPStorage) userinfoFlows(ctx context.Context, user *query.User, userGrants *query.UserGrants, userInfo *oidc.UserInfo) error {
+	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, user.ResourceOwner, false)
 	if err != nil {
 		return err
 	}
@@ -456,17 +468,13 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 			actions.SetFields("claims", userinfoClaims(userInfo)),
 			actions.SetFields("getUser", func(c *actions.FieldConfig) interface{} {
 				return func(call goja.FunctionCall) goja.Value {
-					user, err := o.query.GetUserByID(ctx, true, userInfo.Subject, false)
-					if err != nil {
-						panic(err)
-					}
 					return object.UserFromQuery(c, user)
 				}
 			}),
 			actions.SetFields("user",
 				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
 					return func(goja.FunctionCall) goja.Value {
-						resourceOwnerQuery, err := query.NewUserMetadataResourceOwnerSearchQuery(resourceOwner)
+						resourceOwnerQuery, err := query.NewUserMetadataResourceOwnerSearchQuery(user.ResourceOwner)
 						if err != nil {
 							logging.WithError(err).Debug("unable to create search query")
 							panic(err)
@@ -540,7 +548,7 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 							Key:   key,
 							Value: value,
 						}
-						if _, err = o.command.SetUserMetadata(ctx, metadata, userInfo.Subject, resourceOwner); err != nil {
+						if _, err = o.command.SetUserMetadata(ctx, metadata, userInfo.Subject, user.ResourceOwner); err != nil {
 							logging.WithError(err).Info("unable to set md in action")
 							panic(err)
 						}
@@ -653,10 +661,6 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userG
 			}),
 			actions.SetFields("getUser", func(c *actions.FieldConfig) interface{} {
 				return func(call goja.FunctionCall) goja.Value {
-					user, err := o.query.GetUserByID(ctx, true, userID, false)
-					if err != nil {
-						panic(err)
-					}
 					return object.UserFromQuery(c, user)
 				}
 			}),
@@ -795,7 +799,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 		}
 		return grants, roles, nil
 	}
-	// now specific roles were requested, so convert any grants into roles
+	// no specific roles were requested, so convert any grants into roles
 	for _, grant := range grants.UserGrants {
 		for _, role := range grant.Roles {
 			roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID)

@@ -102,9 +102,11 @@ const (
 type MFAType int
 
 const (
-	MFATypeOTP MFAType = iota
+	MFATypeTOTP MFAType = iota
 	MFATypeU2F
 	MFATypeU2FUserVerification
+	MFATypeOTPSMS
+	MFATypeOTPEmail
 )
 
 type MFALevel int

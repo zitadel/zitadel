@@ -411,8 +411,8 @@
       "DESCRIPTION": "Dodaj drugi czynnik, aby zapewnić optymalne bezpieczeństwo twojego konta.",
       "MANAGE_DESCRIPTION": "Zarządzaj metodami drugiego czynnika swoich użytkowników.",
       "ADD": "Dodaj czynnik",
-      "OTP": "Aplikacja uwierzytelniająca OTP (jednorazowe hasło)",
-      "OTP_DIALOG_TITLE": "Dodaj OTP",
+      "OTP": "Aplikacja uwierzytelniająca TOTP (jednorazowe hasło)",
+      "OTP_DIALOG_TITLE": "Dodaj TOTP",
       "OTP_DIALOG_DESCRIPTION": "Zeskanuj kod QR za pomocą aplikacji uwierzytelniającej i wprowadź poniższy kod, aby zweryfikować i aktywować metodę OTP.",
       "U2F": "Odcisk palca, klucze bezpieczeństwa, Face ID i inne",
       "U2F_DIALOG_TITLE": "Zweryfikuj czynnik",
@@ -420,6 +420,12 @@
       "U2F_SUCCESS": "Czynnik został pomyślnie dodany!",
       "U2F_ERROR": "Wystąpił błąd podczas konfiguracji!",
       "U2F_NAME": "Nazwa uwierzytelniacza",
+      "OTPSMS": "OTP (hasło jednorazowe) z SMS-em",
+      "OTPEMAIL": "OTP (hasło jednorazowe) z e-mailem",
+      "SETUPOTPSMSDESCRIPTION": "Czy chcesz ustawić ten numer telefonu jako drugi czynnik OTP (hasło jednorazowe)?",
+      "OTPSMSSUCCESS": "Pomyślnie skonfigurowano współczynnik OTP.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Aby skorzystać z tej metody, Twój telefon musi zostać zweryfikowany.",
+      "OTPEMAILSUCCESS": "Pomyślnie skonfigurowano współczynnik OTP.",
       "TYPE": {
         "0": "Nie zdefiniowano MFA",
         "1": "Jednorazowe hasło (OTP)",
@@ -586,7 +592,8 @@
         "EDITVALUE": "Numer telefonu",
         "EDITDESC": "Wprowadź nowy numer telefonu poniżej.",
         "DELETETITLE": "Usuń numer telefonu",
-        "DELETEDESC": "Czy na pewno chcesz usunąć numer telefonu"
+        "DELETEDESC": "Czy na pewno chcesz usunąć numer telefonu",
+        "OTPSMSREMOVALWARNING": "To konto używa tego numeru telefonu jako drugiego czynnika. Po przejściu dalej nie będziesz mógł z niego korzystać."
       },
       "RESENDCODE": "Wyślij kod ponownie",
       "ENTERCODE": "Zweryfikuj",
@@ -1041,6 +1048,7 @@
       "pl": "Polski",
       "zh": "简体中文",
       "bg": "Български",
+      "pt": "Portuguese",
       "mk": "Македонски"
     },
     "SMTP": {
@@ -1100,7 +1108,9 @@
         "3": "Weryfikacja telefonu",
         "4": "Resetowanie hasła",
         "5": "Inicjalizacja bez hasła",
-        "6": "Sekret aplikacji"
+        "6": "Sekret aplikacji",
+        "7": "Hasło jednorazowe (OTP) - SMS",
+        "8": "Hasło jednorazowe (OTP) — e-mail"
       },
       "ADDGENERATOR": "Zdefiniuj wygląd sekretu",
       "GENERATORTYPE": "Typ",
@@ -1242,6 +1252,7 @@
         "pl": "Polski",
         "zh": "简体中文",
         "bg": "Български",
+        "pt": "Portuguese",
         "mk": "Македонски"
       },
       "KEYS": {
@@ -1289,6 +1300,8 @@
         "INIT": "Inicjalizacja",
         "VE": "Weryfikacja e-mail",
         "VP": "Weryfikacja telefonu",
+        "VSO": "Zweryfikuj SMS OTP",
+        "VEO": "Zweryfikuj Email OTP",
         "PR": "Resetowanie hasła",
         "DC": "Rejestracja domeny",
         "PL": "Bez hasła",
@@ -1309,7 +1322,9 @@
         "verifiedPhone": "Zweryfikowany telefon",
         "changedate": "Data zmiany",
         "username": "Nazwa użytkownika",
-        "tempUsername": "Tymczasowa nazwa użytkownika"
+        "tempUsername": "Tymczasowa nazwa użytkownika",
+        "otp": "Hasło jednorazowe",
+        "verifyUrl": "URL do weryfikacji hasła jednorazowego"
       },
       "TOAST": {
         "UPDATED": "Teksty niestandardowe zapisane."
@@ -1341,6 +1356,8 @@
       "ALLOWREGISTER_DESC": "Jeśli ta opcja jest zaznaczona, pojawi się dodatkowy krok rejestracji użytkownika w procesie logowania.",
       "FORCEMFA": "Wymuś MFA",
       "FORCEMFA_DESC": "Jeśli ta opcja jest zaznaczona, użytkownicy muszą skonfigurować drugi czynnik logowania.",
+      "FORCEMFALOCALONLY": "Wymuś MFA dla lokalnych użytkowników",
+      "FORCEMFALOCALONLY_DESC": "Jeśli ta opcja jest zaznaczona, lokalni uwierzytelnieni użytkownicy muszą skonfigurować drugi czynnik logowania.",
       "HIDEPASSWORDRESET": "Ukryj reset hasła",
       "HIDEPASSWORDRESET_DESC": "Jeśli ta opcja jest zaznaczona, użytkownik nie może zresetować swojego hasła w procesie logowania.",
       "HIDELOGINNAMESUFFIX": "Ukryj sufiks nazwy użytkownika",
@@ -1844,8 +1861,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Nieznany",
-      "1": "Jednorazowe hasło (OTP)",
-      "2": "Odcisk palca, klucze bezpieczeństwa, Face ID i inne"
+      "1": "Hasło jednorazowe dla aplikacji uwierzytelniającej (TOTP)",
+      "2": "Odcisk palca, Klucze Bezpieczeństwa, Face ID i inne",
+      "3": "Hasło jednorazowe dla wiadomości e-mail (Email OTP)",
+      "4": "Hasło jednorazowe dla wiadomości SMS (SMS OTP)"
     }
   },
   "LOGINPOLICY": {
@@ -2113,6 +2132,7 @@
     "pl": "Polski",
     "zh": "简体中文",
     "bg": "Български",
+    "pt": "Portuguese",
     "mk": "Македонски"
   },
   "MEMBER": {

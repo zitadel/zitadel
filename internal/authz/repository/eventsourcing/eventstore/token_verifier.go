@@ -63,7 +63,7 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 		}
 	}
 
-	events, esErr := repo.getUserEvents(ctx, userID, instanceID, token.Sequence)
+	events, esErr := repo.getUserEvents(ctx, userID, instanceID, token.Sequence, token.GetRelevantEventTypes())
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
 	}
@@ -147,7 +147,7 @@ func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	session, err := repo.Query.SessionByID(ctx, false, sessionID, token)
+	session, err := repo.Query.SessionByID(ctx, true, sessionID, token)
 	if err != nil {
 		return "", "", "", err
 	}
@@ -166,14 +166,23 @@ func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMeth
 	if domain.HasMFA(authMethods) {
 		return nil
 	}
-	availableAuthMethods, forceMFA, err := repo.Query.ListUserAuthMethodTypesRequired(setCallerCtx(ctx, userID), userID, false)
+	availableAuthMethods, forceMFA, forceMFALocalOnly, err := repo.Query.ListUserAuthMethodTypesRequired(setCallerCtx(ctx, userID), userID, false)
 	if err != nil {
 		return err
 	}
-	if forceMFA || domain.HasMFA(availableAuthMethods) {
+	if domain.RequiresMFA(forceMFA, forceMFALocalOnly, hasIDPAuthentication(authMethods)) || domain.HasMFA(availableAuthMethods) {
 		return caos_errs.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "mfa required")
 	}
 	return nil
+}
+
+func hasIDPAuthentication(authMethods []domain.UserAuthMethodType) bool {
+	for _, method := range authMethods {
+		if method == domain.UserAuthMethodTypeIDP {
+			return true
+		}
+	}
+	return false
 }
 
 func authMethodsFromSession(session *query.Session) []domain.UserAuthMethodType {
@@ -181,8 +190,12 @@ func authMethodsFromSession(session *query.Session) []domain.UserAuthMethodType 
 	if !session.PasswordFactor.PasswordCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypePassword)
 	}
-	if !session.PasskeyFactor.PasskeyCheckedAt.IsZero() {
-		types = append(types, domain.UserAuthMethodTypePasswordless)
+	if !session.WebAuthNFactor.WebAuthNCheckedAt.IsZero() {
+		if session.WebAuthNFactor.UserVerified {
+			types = append(types, domain.UserAuthMethodTypePasswordless)
+		} else {
+			types = append(types, domain.UserAuthMethodTypeU2F)
+		}
 	}
 	if !session.IntentFactor.IntentCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypeIDP)
@@ -190,10 +203,16 @@ func authMethodsFromSession(session *query.Session) []domain.UserAuthMethodType 
 	// TODO: add checks with https://github.com/zitadel/zitadel/issues/5477
 	/*
 		if !session.TOTPFactor.TOTPCheckedAt.IsZero() {
-			types = append(types, domain.UserAuthMethodTypeOTP)
+			types = append(types, domain.UserAuthMethodTypeTOTP)
 		}
-		if !session.U2FFactor.U2FCheckedAt.IsZero() {
-			types = append(types, domain.UserAuthMethodTypeU2F)
+	*/
+	// TODO: add checks with https://github.com/zitadel/zitadel/issues/6224
+	/*
+		if !session.TOTPFactor.OTPSMSCheckedAt.IsZero() {
+			types = append(types, domain.UserAuthMethodTypeOTPSMS)
+		}
+		if !session.TOTPFactor.OTPEmailCheckedAt.IsZero() {
+			types = append(types, domain.UserAuthMethodTypeOTPEmail)
 		}
 	*/
 	return types
@@ -229,10 +248,10 @@ func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName str
 	return clientID, app.ProjectID, nil
 }
 
-func (repo *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64) (_ []*models.Event, err error) {
+func (repo *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64, eventTypes []models.EventType) (_ []*models.Event, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence)
+	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence, eventTypes)
 	if err != nil {
 		return nil, err
 	}

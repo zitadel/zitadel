@@ -411,7 +411,7 @@
       "DESCRIPTION": "添加第二个因素以确保您帐户的最佳安全性。",
       "MANAGE_DESCRIPTION": "管理用户的第二因素身份认证方式。",
       "ADD": "添加因子",
-      "OTP": "用于 OTP 的身份验证器应用程序",
+      "OTP": "用于 TOTP 的身份验证器应用程序",
       "OTP_DIALOG_TITLE": "添加 OTP",
       "OTP_DIALOG_DESCRIPTION": "使用验证器应用程序扫描二维码并输入下面的代码以验证并激活 OTP 方法。",
       "U2F": "指纹、安全密钥、Face ID 等",
@@ -420,6 +420,12 @@
       "U2F_SUCCESS": "身份验证因子添加成功！",
       "U2F_ERROR": "安装过程中发生错误！",
       "U2F_NAME": "身份验证器名称",
+      "OTPSMS": "带短信的 OTP（一次性密码）",
+      "OTPEMAIL": "带电子邮件的 OTP（一次性密码）",
+      "SETUPOTPSMSDESCRIPTION": "您想将此电话号码设置为 OTP（一次性密码）第二因素吗？",
+      "OTPSMSSUCCESS": "OTP 因子设置成功。",
+      "OTPSMSPHONEMUSTBEVERIFIED": "您的手机必须经过验证才能使用此方法。",
+      "OTPEMAILSUCCESS": "OTP 因子设置成功。",
       "TYPE": {
         "0": "未定义 MFA",
         "1": "一次性密码 (OTP)",
@@ -586,7 +592,8 @@
         "EDITVALUE": "手机号码",
         "EDITDESC": "在下面的字段中输入新的手机号码。",
         "DELETETITLE": "删除手机号码",
-        "DELETEDESC": "你真的要删除手机号码吗"
+        "DELETEDESC": "你真的要删除手机号码吗",
+        "OTPSMSREMOVALWARNING": "此帐户使用此电话号码作为第二因素。继续后您将无法使用它。"
       },
       "RESENDCODE": "重新发送验证码",
       "ENTERCODE": "验证",
@@ -1041,6 +1048,7 @@
       "pl": "Polski",
       "zh": "简体中文",
       "bg": "Български",
+      "pt": "Portuguese",
       "mk": "Македонски"
     },
     "SMTP": {
@@ -1100,7 +1108,9 @@
         "3": "电话号码验证",
         "4": "重置密码",
         "5": "无密码认证初始化",
-        "6": "App 验证"
+        "6": "App 验证",
+        "7": "一次性密码 (OTP) - SMS",
+        "8": "一次性密码 (OTP) - 电子邮件"
       },
       "ADDGENERATOR": "定义验证码外观",
       "GENERATORTYPE": "类型",
@@ -1241,6 +1251,7 @@
         "pl": "Polski",
         "zh": "简体中文",
         "bg": "Български",
+        "pt": "Portuguese",
         "mk": "Македонски"
       },
       "KEYS": {
@@ -1288,6 +1299,8 @@
         "INIT": "初始化",
         "VE": "验证电子邮箱",
         "VP": "验证手机号码",
+        "VSO": "验证短信一次性密码",
+        "VEO": "验证电子邮件一次性密码",
         "PR": "重置密码",
         "DC": "域名声明",
         "PL": "无密码身份验证",
@@ -1308,7 +1321,9 @@
         "verifiedPhone": "已验证的手机号码",
         "changedate": "修改于",
         "username": "用户名",
-        "tempUsername": "临时用户名"
+        "tempUsername": "临时用户名",
+        "otp": "一次性密码",
+        "verifyUrl": "验证一次性密码的URL"
       },
       "TOAST": {
         "UPDATED": "自定义文本已保存。"
@@ -1340,6 +1355,8 @@
       "ALLOWREGISTER_DESC": "如果选择了该选项，登录中会出现一个用于注册用户的附加步骤。",
       "FORCEMFA": "强制使用 MFA",
       "FORCEMFA_DESC": "如果选择该选项，用户必须配置第二身份认证登录因素。",
+      "FORCEMFALOCALONLY": "对本地用户强制执行 MFA",
+      "FORCEMFALOCALONLY_DESC": "如果选择该选项，本地经过身份验证的用户必须配置第二个登录因素。",
       "HIDEPASSWORDRESET": "隐藏密码重置按钮",
       "HIDEPASSWORDRESET_DESC": "如果选择该选项，则用户无法在登录过程中重置其密码。",
       "HIDELOGINNAMESUFFIX": "隐藏登录名后缀",
@@ -1843,8 +1860,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "未知",
-      "1": "一次性密码 (OTP)",
-      "2": "指纹、安全密钥、Face ID 等"
+      "1": "身份验证应用程序的一次性密码（TOTP）",
+      "2": "指纹、安全密钥、Face ID 等",
+      "3": "电子邮件一次性密码（email OTP）",
+      "4": "短信一次性密码（SMS OTP）"
     }
   },
   "LOGINPOLICY": {
@@ -2100,6 +2119,7 @@
     "pl": "Polski",
     "zh": "简体中文",
     "bg": "Български",
+    "pt": "Portuguese",
     "mk": "Македонски"
   },
   "MEMBER": {

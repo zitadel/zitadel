@@ -90,6 +90,14 @@ func (p *userAuthMethodProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceActivateEvent,
 				},
 				{
+					Event:  user.HumanOTPSMSAddedType,
+					Reduce: p.reduceAddAuthMethod,
+				},
+				{
+					Event:  user.HumanOTPEmailAddedType,
+					Reduce: p.reduceAddAuthMethod,
+				},
+				{
 					Event:  user.HumanPasswordlessTokenRemovedType,
 					Reduce: p.reduceRemoveAuthMethod,
 				},
@@ -99,6 +107,22 @@ func (p *userAuthMethodProjection) reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  user.HumanMFAOTPRemovedType,
+					Reduce: p.reduceRemoveAuthMethod,
+				},
+				{
+					Event:  user.HumanOTPSMSRemovedType,
+					Reduce: p.reduceRemoveAuthMethod,
+				},
+				{
+					Event:  user.HumanPhoneRemovedType,
+					Reduce: p.reduceRemoveAuthMethod,
+				},
+				{
+					Event:  user.UserV1PhoneRemovedType,
+					Reduce: p.reduceRemoveAuthMethod,
+				},
+				{
+					Event:  user.HumanOTPEmailRemovedType,
 					Reduce: p.reduceRemoveAuthMethod,
 				},
 			},
@@ -135,7 +159,7 @@ func (p *userAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) 
 		methodType = domain.UserAuthMethodTypeU2F
 		tokenID = e.WebAuthNTokenID
 	case *user.HumanOTPAddedEvent:
-		methodType = domain.UserAuthMethodTypeOTP
+		methodType = domain.UserAuthMethodTypeTOTP
 	default:
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType})
 	}
@@ -178,7 +202,7 @@ func (p *userAuthMethodProjection) reduceActivateEvent(event eventstore.Event) (
 		tokenID = e.WebAuthNTokenID
 		name = e.WebAuthNTokenName
 	case *user.HumanOTPVerifiedEvent:
-		methodType = domain.UserAuthMethodTypeOTP
+		methodType = domain.UserAuthMethodTypeTOTP
 
 	default:
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType})
@@ -202,6 +226,34 @@ func (p *userAuthMethodProjection) reduceActivateEvent(event eventstore.Event) (
 	), nil
 }
 
+func (p *userAuthMethodProjection) reduceAddAuthMethod(event eventstore.Event) (*handler.Statement, error) {
+	var methodType domain.UserAuthMethodType
+	switch event.(type) {
+	case *user.HumanOTPSMSAddedEvent:
+		methodType = domain.UserAuthMethodTypeOTPSMS
+	case *user.HumanOTPEmailAddedEvent:
+		methodType = domain.UserAuthMethodTypeOTPEmail
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-DS4g3", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanOTPSMSAddedType, user.HumanOTPEmailAddedType})
+	}
+
+	return crdb.NewCreateStatement(
+		event,
+		[]handler.Column{
+			handler.NewCol(UserAuthMethodTokenIDCol, ""),
+			handler.NewCol(UserAuthMethodCreationDateCol, event.CreationDate()),
+			handler.NewCol(UserAuthMethodChangeDateCol, event.CreationDate()),
+			handler.NewCol(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
+			handler.NewCol(UserAuthMethodInstanceIDCol, event.Aggregate().InstanceID),
+			handler.NewCol(UserAuthMethodUserIDCol, event.Aggregate().ID),
+			handler.NewCol(UserAuthMethodSequenceCol, event.Sequence()),
+			handler.NewCol(UserAuthMethodStateCol, domain.MFAStateReady),
+			handler.NewCol(UserAuthMethodTypeCol, methodType),
+			handler.NewCol(UserAuthMethodNameCol, ""),
+		},
+	), nil
+}
+
 func (p *userAuthMethodProjection) reduceRemoveAuthMethod(event eventstore.Event) (*handler.Statement, error) {
 	var tokenID string
 	var methodType domain.UserAuthMethodType
@@ -213,10 +265,17 @@ func (p *userAuthMethodProjection) reduceRemoveAuthMethod(event eventstore.Event
 		methodType = domain.UserAuthMethodTypeU2F
 		tokenID = e.WebAuthNTokenID
 	case *user.HumanOTPRemovedEvent:
-		methodType = domain.UserAuthMethodTypeOTP
+		methodType = domain.UserAuthMethodTypeTOTP
+	case *user.HumanOTPSMSRemovedEvent,
+		*user.HumanPhoneRemovedEvent:
+		methodType = domain.UserAuthMethodTypeOTPSMS
+	case *user.HumanOTPEmailRemovedEvent:
+		methodType = domain.UserAuthMethodTypeOTPEmail
 
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v",
+			[]eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType, user.HumanMFAOTPRemovedType,
+				user.HumanOTPSMSRemovedType, user.HumanPhoneRemovedType, user.HumanOTPEmailRemovedType})
 	}
 	conditions := []handler.Condition{
 		handler.NewCond(UserAuthMethodUserIDCol, event.Aggregate().ID),

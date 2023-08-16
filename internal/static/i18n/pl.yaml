@@ -479,8 +479,8 @@ Errors:
     Terminated: Sesja już zakończona
     Token:
       Invalid: Token sesji jest nieprawidłowy
-    Passkey:
-      NoChallenge: Sesja bez wyzwania klucza
+    WebAuthN:
+      NoChallenge: Sesja bez wyzwania WebAuthN
   Intent:
     IDPMissing: Brak identyfikatora IDP w żądaniu
     SuccessURLMissing: Brak adresu URL powodzenia w żądaniu
@@ -584,6 +584,10 @@ EventTypes:
         check:
           succeeded: Sprawdzenie hasła zakończone powodzeniem
           failed: Sprawdzenie hasła nie powiodło się
+        change:
+          sent: Wysłano zmianę hasła
+        hash:
+          updated: Zaktualizowano skrót hasła
       externallogin:
         check:
           succeeded: Zewnętrzne logowanie zakończone powodzeniem
@@ -592,6 +596,8 @@ EventTypes:
         removed: Usunięto zewnętrzne IDP
         cascade:
           removed: Usunięto kaskadę zewnętrznego IDP
+        id:
+          migrated: Identyfikator użytkownika zewnętrznego dostawcy tożsamości został przeniesiony
       phone:
         changed: Numer telefonu zmieniony
         verified: Numer telefonu zweryfikowany
@@ -613,6 +619,24 @@ EventTypes:
           check:
             succeeded: Sprawdzenie wielofaktorowego OTP zakończone powodzeniem
             failed: Sprawdzenie wielofaktorowego OTP nie powiodło się
+          sms:
+            added: Dodano wieloskładnikowy SMS OTP
+            removed: Usunięto wieloskładnikowy SMS OTP
+            code:
+              added: Dodano wieloczynnikowy kod SMS OTP
+              sent: Wysłano kod SMS Multifactor OTP
+            check:
+              succeeded: Pomyślna weryfikacja wieloczynnikowego SMS-a OTP
+              failed: Wieloskładnikowa weryfikacja wiadomości SMS OTP nie powiodła się
+          email:
+            added: Dodano wieloskładnikowy e-mail OTP
+            removed: Usunięto wieloskładnikowy e-mail OTP
+            code:
+              added: Dodano wieloskładnikowy kod e-mail OTP
+              sent: Wysłano kod e-mail Multifactor OTP
+            check:
+              succeeded: Pomyślna wieloczynnikowa weryfikacja adresu e-mail OTP
+              failed: Wieloczynnikowa weryfikacja adresu e-mail OTP nie powiodła się
         u2f:
           token:
             added: Dodano token wielofaktorowego U2F
@@ -1193,6 +1217,7 @@ Action:
       ExternalAuthentication: Autentykacja zewnętrzna
       CustomiseToken: Uzupełnienie tokenu
       InternalAuthentication: Autentykacja wewnętrzna
+      CustomizeSAMLResponse: Uzupełnienie SAMLResponse
   TriggerType:
     Unspecified: Nieokreślony
     PostAuthentication: Po autentykacji
@@ -1200,3 +1225,4 @@ Action:
     PostCreation: Po utworzeniu
     PreUserinfoCreation: Przed tworzeniem informacji o użytkowniku
     PreAccessTokenCreation: Przed tworzeniem tokenu dostępu
+    PreSAMLResponseCreation: Wstępne tworzenie odpowiedzi SAMLResponse

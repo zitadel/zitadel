@@ -59,7 +59,8 @@ var (
 	prepareAuthMethodTypesRequiredStmt = `SELECT projections.users8_notifications.password_set,` +
 		` auth_method_types.method_type,` +
 		` user_idps_count.count,` +
-		` auth_methods_force_mfa.force_mfa` +
+		` auth_methods_force_mfa.force_mfa,` +
+		` auth_methods_force_mfa.force_mfa_local_only` +
 		` FROM projections.users8` +
 		` LEFT JOIN projections.users8_notifications ON projections.users8.id = projections.users8_notifications.user_id AND projections.users8.instance_id = projections.users8_notifications.instance_id` +
 		` LEFT JOIN (SELECT DISTINCT(auth_method_types.method_type), auth_method_types.user_id, auth_method_types.instance_id FROM projections.user_auth_methods4 AS auth_method_types` +
@@ -68,7 +69,7 @@ var (
 		` LEFT JOIN (SELECT user_idps_count.user_id, user_idps_count.instance_id, COUNT(user_idps_count.user_id) AS count FROM projections.idp_user_links3 AS user_idps_count` +
 		` GROUP BY user_idps_count.user_id, user_idps_count.instance_id) AS user_idps_count` +
 		` ON user_idps_count.user_id = projections.users8.id AND user_idps_count.instance_id = projections.users8.instance_id` +
-		` LEFT JOIN (SELECT auth_methods_force_mfa.force_mfa, auth_methods_force_mfa.instance_id, auth_methods_force_mfa.aggregate_id FROM projections.login_policies4 AS auth_methods_force_mfa ORDER BY auth_methods_force_mfa.is_default) AS auth_methods_force_mfa` +
+		` LEFT JOIN (SELECT auth_methods_force_mfa.force_mfa, auth_methods_force_mfa.force_mfa_local_only, auth_methods_force_mfa.instance_id, auth_methods_force_mfa.aggregate_id FROM projections.login_policies5 AS auth_methods_force_mfa ORDER BY auth_methods_force_mfa.is_default) AS auth_methods_force_mfa` +
 		` ON (auth_methods_force_mfa.aggregate_id = projections.users8.instance_id OR auth_methods_force_mfa.aggregate_id = projections.users8.resource_owner) AND auth_methods_force_mfa.instance_id = projections.users8.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms
 `
@@ -77,6 +78,7 @@ var (
 		"method_type",
 		"idps_count",
 		"force_mfa",
+		"force_mfa_local_only",
 	}
 )
 
@@ -278,7 +280,7 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 						},
 						{
 							true,
-							domain.UserAuthMethodTypeOTP,
+							domain.UserAuthMethodTypeTOTP,
 							1,
 						},
 					},
@@ -290,7 +292,7 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 				},
 				AuthMethodTypes: []domain.UserAuthMethodType{
 					domain.UserAuthMethodTypePasswordless,
-					domain.UserAuthMethodTypeOTP,
+					domain.UserAuthMethodTypeTOTP,
 					domain.UserAuthMethodTypePassword,
 					domain.UserAuthMethodTypeIDP,
 				},
@@ -318,11 +320,11 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*testUserAuthMethodTypesRequired, error)) {
 				builder, scan := prepareUserAuthMethodTypesRequiredQuery(ctx, db)
 				return builder, func(rows *sql.Rows) (*testUserAuthMethodTypesRequired, error) {
-					authMethods, forceMFA, err := scan(rows)
+					authMethods, forceMFA, forceMFALocalOnly, err := scan(rows)
 					if err != nil {
 						return nil, err
 					}
-					return &testUserAuthMethodTypesRequired{authMethods: authMethods, forceMFA: forceMFA}, nil
+					return &testUserAuthMethodTypesRequired{authMethods: authMethods, forceMFA: forceMFA, forceMFALocalOnly: forceMFALocalOnly}, nil
 				}
 			},
 			want: want{
@@ -339,11 +341,11 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*testUserAuthMethodTypesRequired, error)) {
 				builder, scan := prepareUserAuthMethodTypesRequiredQuery(ctx, db)
 				return builder, func(rows *sql.Rows) (*testUserAuthMethodTypesRequired, error) {
-					authMethods, forceMFA, err := scan(rows)
+					authMethods, forceMFA, forceMFALocalOnly, err := scan(rows)
 					if err != nil {
 						return nil, err
 					}
-					return &testUserAuthMethodTypesRequired{authMethods: authMethods, forceMFA: forceMFA}, nil
+					return &testUserAuthMethodTypesRequired{authMethods: authMethods, forceMFA: forceMFA, forceMFALocalOnly: forceMFALocalOnly}, nil
 				}
 			},
 			want: want{
@@ -355,6 +357,7 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 							true,
 							domain.UserAuthMethodTypePasswordless,
 							1,
+							true,
 							true,
 						},
 					},
@@ -366,7 +369,8 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 					domain.UserAuthMethodTypePassword,
 					domain.UserAuthMethodTypeIDP,
 				},
-				forceMFA: true,
+				forceMFA:          true,
+				forceMFALocalOnly: true,
 			},
 		},
 		{
@@ -374,11 +378,11 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*testUserAuthMethodTypesRequired, error)) {
 				builder, scan := prepareUserAuthMethodTypesRequiredQuery(ctx, db)
 				return builder, func(rows *sql.Rows) (*testUserAuthMethodTypesRequired, error) {
-					authMethods, forceMFA, err := scan(rows)
+					authMethods, forceMFA, forceMFALocalOnly, err := scan(rows)
 					if err != nil {
 						return nil, err
 					}
-					return &testUserAuthMethodTypesRequired{authMethods: authMethods, forceMFA: forceMFA}, nil
+					return &testUserAuthMethodTypesRequired{authMethods: authMethods, forceMFA: forceMFA, forceMFALocalOnly: forceMFALocalOnly}, nil
 				}
 			},
 			want: want{
@@ -391,11 +395,13 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 							domain.UserAuthMethodTypePasswordless,
 							1,
 							true,
+							true,
 						},
 						{
 							true,
-							domain.UserAuthMethodTypeOTP,
+							domain.UserAuthMethodTypeTOTP,
 							1,
+							true,
 							true,
 						},
 					},
@@ -405,11 +411,12 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			object: &testUserAuthMethodTypesRequired{
 				authMethods: []domain.UserAuthMethodType{
 					domain.UserAuthMethodTypePasswordless,
-					domain.UserAuthMethodTypeOTP,
+					domain.UserAuthMethodTypeTOTP,
 					domain.UserAuthMethodTypePassword,
 					domain.UserAuthMethodTypeIDP,
 				},
-				forceMFA: true,
+				forceMFA:          true,
+				forceMFALocalOnly: true,
 			},
 		},
 		{
@@ -417,11 +424,11 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*testUserAuthMethodTypesRequired, error)) {
 				builder, scan := prepareUserAuthMethodTypesRequiredQuery(ctx, db)
 				return builder, func(rows *sql.Rows) (*testUserAuthMethodTypesRequired, error) {
-					authMethods, forceMFA, err := scan(rows)
+					authMethods, forceMFA, forceMFALocalOnly, err := scan(rows)
 					if err != nil {
 						return nil, err
 					}
-					return &testUserAuthMethodTypesRequired{authMethods: authMethods, forceMFA: forceMFA}, nil
+					return &testUserAuthMethodTypesRequired{authMethods: authMethods, forceMFA: forceMFA, forceMFALocalOnly: forceMFALocalOnly}, nil
 				}
 			},
 			want: want{
@@ -448,6 +455,7 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 
 // testUserAuthMethodTypesRequired is required as assetPrepare is only able to return a single object from scan
 type testUserAuthMethodTypesRequired struct {
-	authMethods []domain.UserAuthMethodType
-	forceMFA    bool
+	authMethods       []domain.UserAuthMethodType
+	forceMFA          bool
+	forceMFALocalOnly bool
 }

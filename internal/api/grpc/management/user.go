@@ -421,7 +421,7 @@ func (s *Server) GetHumanProfile(ctx context.Context, req *mgmt_pb.GetHumanProfi
 }
 
 func (s *Server) UpdateHumanProfile(ctx context.Context, req *mgmt_pb.UpdateHumanProfileRequest) (*mgmt_pb.UpdateHumanProfileResponse, error) {
-	profile, err := s.command.ChangeHumanProfile(ctx, UpdateHumanProfileRequestToDomain(req))
+	profile, err := s.command.ChangeHumanProfile(ctx, UpdateHumanProfileRequestToDomain(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
@@ -549,11 +549,7 @@ func (s *Server) RemoveHumanPhone(ctx context.Context, req *mgmt_pb.RemoveHumanP
 }
 
 func (s *Server) ResendHumanPhoneVerification(ctx context.Context, req *mgmt_pb.ResendHumanPhoneVerificationRequest) (*mgmt_pb.ResendHumanPhoneVerificationResponse, error) {
-	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, s.userCodeAlg)
-	if err != nil {
-		return nil, err
-	}
-	objectDetails, err := s.command.CreateHumanPhoneVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, phoneCodeGenerator)
+	objectDetails, err := s.command.CreateHumanPhoneVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -613,7 +609,7 @@ func (s *Server) ListHumanAuthFactors(ctx context.Context, req *mgmt_pb.ListHuma
 	if err != nil {
 		return nil, err
 	}
-	err = query.AppendAuthMethodsQuery(domain.UserAuthMethodTypeU2F, domain.UserAuthMethodTypeOTP)
+	err = query.AppendAuthMethodsQuery(domain.UserAuthMethodTypeU2F, domain.UserAuthMethodTypeTOTP, domain.UserAuthMethodTypeOTPSMS, domain.UserAuthMethodTypeOTPEmail)
 	if err != nil {
 		return nil, err
 	}
@@ -631,7 +627,7 @@ func (s *Server) ListHumanAuthFactors(ctx context.Context, req *mgmt_pb.ListHuma
 }
 
 func (s *Server) RemoveHumanAuthFactorOTP(ctx context.Context, req *mgmt_pb.RemoveHumanAuthFactorOTPRequest) (*mgmt_pb.RemoveHumanAuthFactorOTPResponse, error) {
-	objectDetails, err := s.command.HumanRemoveOTP(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.HumanRemoveTOTP(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

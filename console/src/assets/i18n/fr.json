@@ -411,8 +411,8 @@
       "DESCRIPTION": "Ajoutez un second facteur pour garantir une sécurité optimale de votre compte.",
       "MANAGE_DESCRIPTION": "Gérez les méthodes de second facteur de vos utilisateurs.",
       "ADD": "Ajouter un facteur",
-      "OTP": "Application d'authentification pour OTP (One-time password)",
-      "OTP_DIALOG_TITLE": "Ajouter un OTP",
+      "OTP": "Application d'authentification pour TOTP (Time-based One-time password)",
+      "OTP_DIALOG_TITLE": "Ajouter un TOTP",
       "OTP_DIALOG_DESCRIPTION": "Scannez le code QR avec une application d'authentification et saisissez le code ci-dessous pour vérifier et activer la méthode OTP.",
       "U2F": "Empreinte digitale, clés de sécurité, Face ID et autres",
       "U2F_DIALOG_TITLE": "Vérifier le facteur",
@@ -420,6 +420,12 @@
       "U2F_SUCCESS": "Facteur ajouté avec succès !",
       "U2F_ERROR": "Une erreur s'est produite pendant l'installation !",
       "U2F_NAME": "Nom de l'authentificateur",
+      "OTPSMS": "OTP (One-Time Password) avec SMS",
+      "OTPEMAIL": "OTP (password monouso) con e-mail",
+      "SETUPOTPSMSDESCRIPTION": "Voulez-vous configurer ce numéro de téléphone comme deuxième facteur OTP (mot de passe à usage unique) ?",
+      "OTPSMSSUCCESS": "OTP Factor mis en place avec succès.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Votre téléphone doit être vérifié pour pouvoir utiliser cette méthode.",
+      "OTPEMAILSUCCESS": "OTP Factor mis en place avec succès.",
       "TYPE": {
         "0": "Pas de MFA défini",
         "1": "Mot de passe à usage unique (OTP)",
@@ -586,7 +592,8 @@
         "EDITVALUE": "Numéro de téléphone",
         "EDITDESC": "Entrez le nouveau numéro de téléphone dans le champ ci-dessous.",
         "DELETETITLE": "Supprimer le numéro de téléphone",
-        "DELETEDESC": "Voulez-vous vraiment supprimer le numéro de téléphone ?"
+        "DELETEDESC": "Voulez-vous vraiment supprimer le numéro de téléphone ?",
+        "OTPSMSREMOVALWARNING": "Ce compte utilise ce numéro de téléphone comme deuxième facteur. Vous ne pourrez plus l'utiliser après avoir continué."
       },
       "RESENDCODE": "Renvoyer le code",
       "ENTERCODE": "Vérifier",
@@ -1041,6 +1048,7 @@
       "pl": "Polski",
       "zh": "简体中文",
       "bg": "Български",
+      "pt": "Portuguese",
       "mk": "Македонски"
     },
     "SMTP": {
@@ -1100,7 +1108,9 @@
         "3": "Vérification par téléphone",
         "4": "Réinitialisation du mot de passe",
         "5": "Initialisation sans mot de passe",
-        "6": "Secret de l'application"
+        "6": "Secret de l'application",
+        "7": "Mot de passe à usage unique (OTP) - SMS",
+        "8": "Mot de passe à usage unique (OTP) - e-mail"
       },
       "ADDGENERATOR": "Définir l'apparence du secret",
       "GENERATORTYPE": "Type",
@@ -1242,6 +1252,7 @@
         "pl": "Polski",
         "zh": "简体中文",
         "bg": "Български",
+        "pt": "Portuguese",
         "mk": "Македонски"
       },
       "KEYS": {
@@ -1289,6 +1300,8 @@
         "INIT": "Initialisation",
         "VE": "Vérifier l'email",
         "VP": "Vérifier le téléphone",
+        "VSO": "Vérifier SMS OTP",
+        "VEO": "Vérifier l'OTP par courrier électronique",
         "PR": "Réinitialisation du mot de passe",
         "DC": "Réclamation de domaine",
         "PL": "Sans mot de passe",
@@ -1309,7 +1322,9 @@
         "verifiedPhone": "Téléphone vérifié",
         "changedate": "Date de changement",
         "username": "Nom d'utilisateur",
-        "tempUsername": "Nom d'utilisateur temporaire"
+        "tempUsername": "Nom d'utilisateur temporaire",
+        "otp": "Mot de passe à usage unique",
+        "verifyUrl": "URL pour vérifier le mot de passe à usage unique"
       },
       "TOAST": {
         "UPDATED": "Textes personnalisés enregistrés."
@@ -1341,6 +1356,8 @@
       "ALLOWREGISTER_DESC": "Si l'option est sélectionnée, une étape supplémentaire pour l'enregistrement d'un utilisateur apparaît dans la connexion.",
       "FORCEMFA": "Forcer MFA",
       "FORCEMFA_DESC": "Si l'option est sélectionnée, les utilisateurs doivent configurer un deuxième facteur pour la connexion.",
+      "FORCEMFALOCALONLY": "Forcer MFA pour les utilisateurs locaux",
+      "FORCEMFALOCALONLY_DESC": "Si l'option est sélectionnée, les utilisateurs locaux authentifiés doivent configurer un deuxième facteur pour la connexion.",
       "HIDEPASSWORDRESET": "Masquer la réinitialisation du mot de passe",
       "HIDEPASSWORDRESET_DESC": "Si l'option est sélectionnée, l'utilisateur ne peut pas réinitialiser son mot de passe lors du processus de connexion.",
       "HIDELOGINNAMESUFFIX": "Masquer le suffixe du nom de connexion",
@@ -1844,8 +1861,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Inconnu",
-      "1": "Mot de passe à usage unique (OTP)",
-      "2": "Empreinte digitale, clés de sécurité, Face ID et autres"
+      "1": "One Time Password par authenticator app (TOTP)",
+      "2": "Empreinte digitale, clés de sécurité, Face ID et autres",
+      "3": "One Time Password par email (Email OTP)",
+      "4": "One Time Password par SMS (SMS OTP)"
     }
   },
   "LOGINPOLICY": {
@@ -2101,6 +2120,7 @@
     "pl": "Polski",
     "zh": "简体中文",
     "bg": "Български",
+    "pt": "Portuguese",
     "mk": "Македонски"
   },
   "MEMBER": {

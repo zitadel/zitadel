@@ -479,8 +479,8 @@ Errors:
     Terminated: La session est déjà terminée
     Token:
       Invalid: Le jeton de session n'est pas valide
-    Passkey:
-      NoChallenge: Session sans défi de clé d'accès
+    WebAuthN:
+      NoChallenge: Session sans challenge WebAuthN
   Intent:
     IDPMissing: IDP manquant dans la requête
     SuccessURLMissing: Success URL absent de la requête
@@ -582,6 +582,10 @@ EventTypes:
         check:
           succeeded: Vérification du mot de passe réussie
           failed: La vérification du mot de passe a échoué
+        change:
+          sent: Changement de mot de passe envoyé
+        hash:
+          updated: Hachage du mot de passe mis à jour
       externallogin:
         check:
           succeeded: Connexion externe réussie
@@ -590,6 +594,8 @@ EventTypes:
         removed: Externer IDP supprimé
         cascade:
           removed: Externer IDP cascade supprimé
+        îd:
+          migrated: L'ID utilisateur externe de l'IDP a été migré
       phone:
         changed: Le numéro de téléphone a changé
         verified: Numéro de téléphone vérifié
@@ -611,6 +617,24 @@ EventTypes:
           check:
             succeeded: Vérification de l'OTP multifactorielle réussie
             failed: La vérification de l'OTP multifactorielle a échoué
+          sms:
+            added: Ajout de SMS OTP multifactoriels
+            removed: Suppression des SMS OTP multifactoriels
+            code:
+              added: Ajout du code SMS OTP multifactoriel
+              sent: Code SMS OTP multifacteur envoyé
+            check:
+              succeeded: Vérification par SMS OTP multifacteur réussie
+              failed: Échec de la vérification par SMS OTP multifacteur
+          email:
+            added: Ajout d'un e-mail OTP multifactoriel
+            removed: Suppression de l'e-mail OTP multifacteur
+            code:
+              added: Ajout d'un code de messagerie OTP multifactoriel
+              sent: Code de messagerie OTP multifacteur envoyé
+            check:
+              succeeded: Vérification de l'e-mail OTP multifacteur réussie
+              failed: Échec de la vérification de l'e-mail OTP multifacteur
         u2f:
           token:
             added: Ajout d'un jeton U2F multifacteur
@@ -1022,6 +1046,7 @@ Action:
       ExternalAuthentication: Authentification externe
       CustomiseToken: Compléter Token
       InternalAuthentication: Authentification interne
+      CustomizeSAMLResponse: Compléter SAMLResponse
   TriggerType:
     Unspecified: Non spécifié
     PostAuthentication: Authentification postérieure
@@ -1029,3 +1054,4 @@ Action:
     PostCreation: Post-création
     PreUserinfoCreation: Pré Userinfo création
     PreAccessTokenCreation: Pré access token création
+    PreSAMLResponseCreation: Création préalable de la réponse SAMLResponse

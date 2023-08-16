@@ -21,7 +21,7 @@ import (
 func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
 	clientID := createClient(t)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -51,7 +51,7 @@ func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
 func TestOPStorage_SetIntrospectionFromToken(t *testing.T) {
 	project, err := Tester.CreateProject(CTX)
 	require.NoError(t, err)
-	app, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, project.GetId())
+	app, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
 	require.NoError(t, err)
 	api, err := Tester.CreateAPIClient(CTX, project.GetId())
 	require.NoError(t, err)
@@ -67,7 +67,7 @@ func TestOPStorage_SetIntrospectionFromToken(t *testing.T) {
 
 	scope := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess}
 	authRequestID := createAuthRequest(t, app.GetClientId(), redirectURI, scope...)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{

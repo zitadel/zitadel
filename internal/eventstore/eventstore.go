@@ -315,6 +315,9 @@ func GenericEventMapper[T any, PT BaseEventSetter[T]](event *repository.Event) (
 	e := PT(new(T))
 	e.SetBaseEvent(BaseEventFromRepo(event))
 
+	if len(event.Data) == 0 {
+		return e, nil
+	}
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "V2-Thai6", "unable to unmarshal event")

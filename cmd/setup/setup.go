@@ -94,6 +94,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.CorrectCreationDate.dbClient = dbClient
 	steps.AddEventCreatedAt.dbClient = dbClient
 	steps.AddEventCreatedAt.step10 = steps.CorrectCreationDate
+	steps.s12AddOTPColumns = &AddOTPColumns{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -134,6 +135,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.OnError(err).Fatal("unable to migrate step 10")
 	err = migration.Migrate(ctx, eventstoreClient, steps.AddEventCreatedAt)
 	logging.OnError(err).Fatal("unable to migrate step 11")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s12AddOTPColumns)
+	logging.OnError(err).Fatal("unable to migrate step 12")
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)

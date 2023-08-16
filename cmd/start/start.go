@@ -36,6 +36,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	oidc_v2 "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2"
+	"github.com/zitadel/zitadel/internal/api/grpc/org/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/session/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/settings/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/system"
@@ -218,9 +219,6 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 
 	usageReporter := logstore.UsageReporterFunc(commands.ReportQuotaUsage)
 	actionsLogstoreSvc := logstore.New(queries, usageReporter, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
-	if actionsLogstoreSvc.Enabled() {
-		logging.Warn("execution logs are currently in beta")
-	}
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
 	notification.Start(ctx, config.Projections.Customizations["notifications"], config.Projections.Customizations["notificationsquotas"], config.Projections.Customizations["telemetry"], *config.Telemetry, config.ExternalDomain, config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
@@ -314,9 +312,6 @@ func startAPIs(
 	}
 
 	accessSvc := logstore.New(quotaQuerier, usageReporter, accessDBEmitter, accessStdoutEmitter)
-	if accessSvc.Enabled() {
-		logging.Warn("access logs are currently in beta")
-	}
 	exhaustedCookieHandler := http_util.NewCookieHandler(
 		http_util.WithUnsecure(),
 		http_util.WithNonHttpOnly(),
@@ -355,6 +350,9 @@ func startAPIs(
 	}
 
 	if err := apis.RegisterService(ctx, settings.CreateServer(commands, queries, config.ExternalSecure)); err != nil {
+		return err
+	}
+	if err := apis.RegisterService(ctx, org.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return err
 	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)
@@ -461,7 +459,7 @@ func shutdownServer(ctx context.Context, server *http.Server) error {
 }
 
 func showBasicInformation(startConfig *Config) {
-	fmt.Println(color.MagentaString(figure.NewFigure("Zitadel", "", true).String()))
+	fmt.Println(color.MagentaString(figure.NewFigure("ZITADEL", "", true).String()))
 	http := "http"
 	if startConfig.TLS.Enabled || startConfig.ExternalSecure {
 		http = "https"

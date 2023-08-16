@@ -40,6 +40,8 @@ func UserQueryToQuery(query *user_pb.SearchQuery) (query.SearchQuery, error) {
 		return LoginNameQueryToQuery(q.LoginNameQuery)
 	case *user_pb.SearchQuery_ResourceOwner:
 		return ResourceOwnerQueryToQuery(q.ResourceOwner)
+	case *user_pb.SearchQuery_InUserIdsQuery:
+		return InUserIdsQueryToQuery(q.InUserIdsQuery)
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}
@@ -83,4 +85,8 @@ func LoginNameQueryToQuery(q *user_pb.LoginNameQuery) (query.SearchQuery, error)
 
 func ResourceOwnerQueryToQuery(q *user_pb.ResourceOwnerQuery) (query.SearchQuery, error) {
 	return query.NewUserResourceOwnerSearchQuery(q.OrgID, query.TextEquals)
+}
+
+func InUserIdsQueryToQuery(q *user_pb.InUserIDQuery) (query.SearchQuery, error) {
+	return query.NewUserInUserIdsSearchQuery(q.UserIds)
 }

@@ -479,8 +479,8 @@ Errors:
     Terminated: Сесијата е веќе завршена
     Token:
       Invalid: Токенот за сесија е невалиден
-    Passkey:
-      NoChallenge: Сесија без предизвик за passkey
+    WebAuthN:
+      NoChallenge: Сесија без предизвик WebAuthN
   Intent:
     IDPMissing: ID на IDP недостасува во барањето
     SuccessURLMissing: URL за успех недостасува во барањето
@@ -592,6 +592,8 @@ EventTypes:
         removed: Отстранет надворешен IDP
         cascade:
           removed: Отстранета каскадата на надворешни IDP
+        id:
+          migrated: Надворешниот кориснички ID на IDP е мигриран
       phone:
         changed: Променет број на телефон
         verified: Верифициран број на телефон
@@ -613,6 +615,24 @@ EventTypes:
           check:
             succeeded: Проверката на мултифактор OTP е успешна
             failed: Проверката на мултифактор OTP е неуспешна
+          sms:
+            added: Додадена е мултифакторна OTP SMS
+            removed: Отстранета мултифакторна OTP SMS
+            code:
+              added: Додаден мултифакторски OTP SMS код
+              sent: Мултифакторен OTP СМС-код е испратен
+            check:
+              succeeded: Мултифакторна OTP СМС-верификација е успешна
+              failed: Мултифакторна OTP СМС-верификација не успеа
+          email:
+            added: Додадена е повеќефакторна OTP е-пошта
+            removed: Отстранета мултифакторна OTP е-пошта
+            code:
+              added: Додаден мултифакторски OTP код за е-пошта
+              sent: Испратен е-пошта OTP-код со повеќе фактори
+            check:
+              succeeded: Успешна е-пошта OTP-верификација на мултифактор
+              failed: Неуспешна потврда на е-пошта OTP со повеќе фактори
         u2f:
           token:
             added: Додаден мултифактор U2F токен
@@ -667,6 +687,10 @@ EventTypes:
       check:
         succeeded: Проверката на лозинката е успешна
         failed: Проверката на лозинката е неуспешна
+      change:
+        sent: Промената на лозинката е испратена
+      hash:
+        updated: Хашот на лозинката е ажуриран
     phone:
       changed: Бројот на телефонот е променет
       verified: Бројот на телефонот е верифициран
@@ -1192,6 +1216,7 @@ Action:
       ExternalAuthentication: Надворешна автентикација
       CustomiseToken: Комплемент на токенот
       InternalAuthentication: Внатрешна автентикација
+      CustomizeSAMLResponse: Дополнете го SAMLResponse
   TriggerType:
     Unspecified: Неодредено
     PostAuthentication: По автентикација
@@ -1199,3 +1224,4 @@ Action:
     PostCreation: По креирање
     PreUserinfoCreation: Пред креирање на кориснички информации
     PreAccessTokenCreation: Пред креирање на токен за пристап
+    PreSAMLResponseCreation: Пред создавање на SAMLResponse

@@ -18,6 +18,7 @@ func ModelLoginPolicyToPb(policy *query.LoginPolicy) *policy_pb.LoginPolicy {
 		AllowRegister:              policy.AllowRegister,
 		AllowExternalIdp:           policy.AllowExternalIDPs,
 		ForceMfa:                   policy.ForceMFA,
+		ForceMfaLocalOnly:          policy.ForceMFALocalOnly,
 		PasswordlessType:           ModelPasswordlessTypeToPb(policy.PasswordlessType),
 		HidePasswordReset:          policy.HidePasswordReset,
 		IgnoreUnknownUsernames:     policy.IgnoreUnknownUsernames,

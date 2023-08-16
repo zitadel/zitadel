@@ -97,7 +97,7 @@ func (c *Commands) VerifyHumanPhone(ctx context.Context, userID, code, resourceo
 	return nil, caos_errs.ThrowInvalidArgument(err, "COMMAND-sM0cs", "Errors.User.Code.Invalid")
 }
 
-func (c *Commands) CreateHumanPhoneVerificationCode(ctx context.Context, userID, resourceowner string, phoneCodeGenerator crypto.Generator) (*domain.ObjectDetails, error) {
+func (c *Commands) CreateHumanPhoneVerificationCode(ctx context.Context, userID, resourceowner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
@@ -116,19 +116,17 @@ func (c *Commands) CreateHumanPhoneVerificationCode(ctx context.Context, userID,
 	if existingPhone.IsPhoneVerified {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9sf", "Errors.User.Phone.AlreadyVerified")
 	}
-
-	phoneCode, err := domain.NewPhoneCode(phoneCodeGenerator)
+	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode)
+	if err != nil {
+		return nil, err
+	}
+	phoneCode, err := domain.NewPhoneCode(crypto.NewEncryptionGenerator(*config, c.userEncryption))
 	if err != nil {
 		return nil, err
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanPhoneCodeAddedEvent(ctx, userAgg, phoneCode.Code, phoneCode.Expiry))
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(existingPhone, pushedEvents...)
-	if err != nil {
+	if err = c.pushAppendAndReduce(ctx, existingPhone, user.NewHumanPhoneCodeAddedEvent(ctx, userAgg, phoneCode.Code, phoneCode.Expiry)); err != nil {
 		return nil, err
 	}
 	return writeModelToObjectDetails(&existingPhone.WriteModel), nil

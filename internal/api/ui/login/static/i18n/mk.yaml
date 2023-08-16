@@ -89,6 +89,8 @@ InitMFAPrompt:
   Description: 2-факторската автентикација ви дава дополнителна безбедност за вашата корисничка сметка. Ова обезбедува само вие да имате пристап до вашата сметка.
   Provider0: Апликација за автентикација (на пример Google/Microsoft Authenticator, Authy)
   Provider1: Во зависност од вашиот уред (на пример FaceID, Windows Hello, отпечаток од прст)
+  Provider3: ОТП СМС
+  Provider4: ОТП е-пошта
   NextButtonText: следно
   SkipButtonText: прескокни
 
@@ -100,6 +102,16 @@ InitMFAOTP:
   CodeLabel: Код
   NextButtonText: следно
   CancelButtonText: откажи
+
+InitMFASMS:
+  Title: Потврда на 2-факторска автентикација
+  DescriptionPhone: Направете двофакторна автентикација. Внесете го вашиот телефонски број за да го потврдите.
+  DescriptionCode: Направете двофакторна автентикација. Внесете го примениот код за да го потврдите вашиот телефонски број.
+  PhoneLabel: Телефонски број
+  CodeLabel: Код
+  EditButtonText: Уредување
+  ResendButtonText: повторно испрати код
+  NextButtonText: следно
 
 InitMFAU2F:
   Title: Додајте безбедносен клуч
@@ -118,6 +130,8 @@ InitMFADone:
 MFAProvider:
   Provider0: Апликација за автентикација (на пример Google/Microsoft Authenticator, Authy)
   Provider1: Во зависност од вашиот уред (на пример FaceID, Windows Hello, отпечаток од прст)
+  Provider3: ОТП СМС
+  Provider4: ОТП е-пошта
   ChooseOther: или изберете друга опција
 
 VerifyMFAOTP:
@@ -222,6 +236,8 @@ RegistrationUser:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
   Macedonian: Македонски
   GenderLabel: Пол
   Female: Женски
@@ -253,9 +269,11 @@ ExternalRegistrationUserOverview:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
-  Japanese: 日本語
   Polish: Polski
+  Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
   Macedonian: Македонски
   TosAndPrivacyLabel: Правила и услови
   TosConfirm: Се согласувам со
@@ -319,6 +337,7 @@ ExternalNotFound:
   Japanese: 日本語
   Spanish: Español
   Bulgarian: Български
+  Portuguese: Português
   Macedonian: Македонски
 
 DeviceAuth:
@@ -398,6 +417,7 @@ Errors:
       Empty: Лозинката е празна
       Invalid: Лозинката не е валидна
       InvalidAndLocked: Лозинката не е валидна и корисникот е заклучен, контактирајте со вашиот администратор.
+      NotChanged: Лозинката не е променета
     UsernameOrPassword:
       Invalid: Корисничкото име и/или лозинката не се валидни
     PasswordComplexityPolicy:

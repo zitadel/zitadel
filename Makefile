@@ -21,8 +21,8 @@ core_dependencies:
 .PHONY: core_static
 core_static:
 	go install github.com/rakyll/statik@v0.1.7
-	go generate internal/api/ui/login/statik/generate.go
 	go generate internal/api/ui/login/static/resources/generate.go
+	go generate internal/api/ui/login/statik/generate.go
 	go generate internal/notification/statik/generate.go
 	go generate internal/statik/generate.go
 
@@ -49,6 +49,7 @@ core_grpc_dependencies:
 	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.15.2 
 	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.15.2 
 	go install github.com/envoyproxy/protoc-gen-validate@v0.10.1
+	go install github.com/bufbuild/buf/cmd/buf@v1.25.1
 
 .PHONY: core_api
 core_api: core_api_generator core_grpc_dependencies
@@ -90,12 +91,15 @@ clean:
 core_unit_test:
 	go test -race -coverprofile=profile.cov ./...
 
-.PHONY: core_integration_test
-core_integration_test:
+.PHONY: core_integration_setup
+core_integration_setup:
 	go build -o zitadel main.go
 	./zitadel init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 	./zitadel setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 	$(RM) zitadel
+
+.PHONY: core_integration_test
+core_integration_test: core_integration_setup
 	go test -tags=integration -race -p 1 -v -coverprofile=profile.cov -coverpkg=./internal/...,./cmd/... ./internal/integration ./internal/api/grpc/...  ./internal/notification/handlers/... ./internal/api/oidc/...
 
 .PHONY: console_lint

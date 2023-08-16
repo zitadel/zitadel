@@ -468,8 +468,8 @@ Errors:
     Terminated: セッションはすでに終了しています
     Token:
       Invalid: セッショントークンが無効です
-    Passkey:
-      NoChallenge: パスキーチャレンジなしのセッション
+    WebAuthN:
+      NoChallenge: WebAuthN チャレンジを使用しないセッション
   Intent:
     IDPMissing: リクエストにIDP IDが含まれていません
     SuccessURLMissing: リクエストに成功時の URL がありません
@@ -581,6 +581,8 @@ EventTypes:
         removed: 外部IDPの削除
         cascade:
           removed: 外部IDPカスケードの削除
+        id:
+          migrated: IDP の外部ユーザー ID が移行されました
       phone:
         changed: 電話番号の変更
         verified: 電話番号の検証
@@ -602,6 +604,24 @@ EventTypes:
           check:
             succeeded: MFA OTPチェックの成功
             failed: MFA OTPチェックの失敗
+          sms:
+            added: 多要素 OTP SMS を追加しました
+            removed: 多要素 OTP SMS を削除しました
+            code:
+              added: 多要素 OTP SMS コードを追加しました
+              sent: 多要素 OTP SMS コードが送信されました
+            check:
+              succeeded: 多要素 OTP SMS 検証が成功しました
+              failed: 多要素 OTP SMS 検証が失敗しました
+          email:
+            added: 多要素 OTP 電子メールを追加しました
+            removed: 多要素 OTP 電子メールを削除しました
+            code:
+              added: 多要素 OTP 電子メール コードを追加しました
+              sent: 多要素 OTP 電子メール コードが送信されました
+            check:
+              succeeded: 多要素 OTP 電子メール検証が成功しました
+              failed: 多要素 OTP 電子メール検証が失敗しました
         u2f:
           token:
             added: MFA U2Fトークンの追加
@@ -656,6 +676,10 @@ EventTypes:
       check:
         succeeded: パスワードチェックの成功
         failed: パスワードチェックの失敗
+      change:
+        sent: パスワード変更を送信しました
+      hash:
+        updated: パスワードハッシュが更新されました
     phone:
       changed: 電話番号の変更
       verified: 電話番号の検証
@@ -1182,6 +1206,7 @@ Action:
       ExternalAuthentication: 外部認証
       CustomiseToken: トークンを補完
       InternalAuthentication: 内部認証
+      CustomizeSAMLResponse: SAMLResponse の補完
   TriggerType:
     Unspecified: 未定義
     PostAuthentication: 認証後
@@ -1189,3 +1214,4 @@ Action:
     PostCreation: 作成後
     PreUserinfoCreation: ユーザー情報作成前
     PreAccessTokenCreation: アクセストークン作成前
+    PreSAMLResponseCreation: SAMLResponse の作成前

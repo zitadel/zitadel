@@ -48,11 +48,13 @@ type UserAuthMethodType int32
 
 const (
 	UserAuthMethodTypeUnspecified UserAuthMethodType = iota
-	UserAuthMethodTypeOTP
+	UserAuthMethodTypeTOTP
 	UserAuthMethodTypeU2F
 	UserAuthMethodTypePasswordless
 	UserAuthMethodTypePassword
 	UserAuthMethodTypeIDP
+	UserAuthMethodTypeOTPSMS
+	UserAuthMethodTypeOTPEmail
 	userAuthMethodTypeCount
 )
 
@@ -67,15 +69,14 @@ func HasMFA(methods []UserAuthMethodType) bool {
 	var factors int
 	for _, method := range methods {
 		switch method {
-		case UserAuthMethodTypePassword:
-			factors++
 		case UserAuthMethodTypePasswordless:
 			return true
-		case UserAuthMethodTypeU2F:
-			factors++
-		case UserAuthMethodTypeOTP:
-			factors++
-		case UserAuthMethodTypeIDP:
+		case UserAuthMethodTypePassword,
+			UserAuthMethodTypeU2F,
+			UserAuthMethodTypeTOTP,
+			UserAuthMethodTypeOTPSMS,
+			UserAuthMethodTypeOTPEmail,
+			UserAuthMethodTypeIDP:
 			factors++
 		case UserAuthMethodTypeUnspecified,
 			userAuthMethodTypeCount:
@@ -83,6 +84,16 @@ func HasMFA(methods []UserAuthMethodType) bool {
 		}
 	}
 	return factors > 1
+}
+
+// RequiresMFA checks whether the user requires to authenticate with multiple auth factors based on the LoginPolicy and the authentication type.
+// Internal authentication will require MFA if either option is activated.
+// External authentication will only require MFA if it's forced generally and not local only.
+func RequiresMFA(forceMFA, forceMFALocalOnly, isInternalLogin bool) bool {
+	if isInternalLogin {
+		return forceMFA || forceMFALocalOnly
+	}
+	return forceMFA && !forceMFALocalOnly
 }
 
 type PersonalAccessTokenState int32

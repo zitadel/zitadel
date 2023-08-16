@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	mock_ldap "github.com/zitadel/zitadel/internal/idp/providers/ldap/mock"
@@ -352,6 +353,95 @@ func TestCommands_AuthURLFromProvider(t *testing.T) {
 			},
 			res{
 				authURL: "auth?client_id=clientID&prompt=select_account&redirect_uri=url&response_type=code&state=state",
+			},
+		},
+		{
+			"migrated and push",
+			fields{
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"instance",
+							instance.NewOIDCIDPAddedEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
+								"idp",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{"openid", "profile", "User.Read"},
+								false,
+								rep_idp.Options{},
+							)),
+						eventFromEventPusherWithInstanceID(
+							"instance",
+							instance.NewOIDCIDPMigratedAzureADEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
+								"idp",
+								"name",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{"openid", "profile", "User.Read"},
+								"tenant",
+								true,
+								rep_idp.Options{},
+							)),
+					),
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"instance",
+							instance.NewOIDCIDPAddedEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
+								"idp",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{"openid", "profile", "User.Read"},
+								false,
+								rep_idp.Options{},
+							)),
+						eventFromEventPusherWithInstanceID(
+							"instance",
+							instance.NewOIDCIDPMigratedAzureADEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
+								"idp",
+								"name",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{"openid", "profile", "User.Read"},
+								"tenant",
+								true,
+								rep_idp.Options{},
+							)),
+					),
+				),
+			},
+			args{
+				ctx:         authz.SetCtxData(context.Background(), authz.CtxData{OrgID: "ro"}),
+				idpID:       "idp",
+				state:       "state",
+				callbackURL: "url",
+			},
+			res{
+				authURL: "https://login.microsoftonline.com/tenant/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=url&response_type=code&scope=openid+profile+User.Read&state=state",
 			},
 		},
 	}
@@ -844,6 +934,31 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 				accessToken: nil,
 				idToken:     "idToken",
 				err:         nil,
+			},
+		},
+		{
+			"azure tokens",
+			args{
+				&azuread.Session{
+					Session: &oauth.Session{
+						Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+							Token: &oauth2.Token{
+								AccessToken: "accessToken",
+							},
+						},
+					},
+				},
+				crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			res{
+				accessToken: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("accessToken"),
+				},
+				idToken: "",
+				err:     nil,
 			},
 		},
 	}

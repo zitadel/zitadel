@@ -73,6 +73,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 								"https://example.com/redirect",
 								time.Hour*1,
@@ -92,6 +93,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 					AllowUsernamePassword:      true,
 					AllowExternalIDP:           true,
 					ForceMFA:                   true,
+					ForceMFALocalOnly:          true,
 					HidePasswordReset:          true,
 					IgnoreUnknownUsernames:     true,
 					AllowDomainDiscovery:       true,
@@ -129,6 +131,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 								"https://example.com/redirect",
 								time.Hour*1,
@@ -144,6 +147,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								newDefaultLoginPolicyChangedEvent(context.Background(),
+									false,
 									false,
 									false,
 									false,
@@ -172,6 +176,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 					AllowUsernamePassword:      false,
 					AllowExternalIDP:           false,
 					ForceMFA:                   false,
+					ForceMFALocalOnly:          false,
 					HidePasswordReset:          false,
 					IgnoreUnknownUsernames:     false,
 					AllowDomainDiscovery:       false,
@@ -281,6 +286,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 								"",
 								time.Hour*1,
@@ -313,6 +319,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
+								true,
 								true,
 								true,
 								true,
@@ -374,6 +381,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 							"INSTANCE",
 							instance.NewLoginPolicyAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
+								true,
 								true,
 								true,
 								true,
@@ -526,6 +534,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 								"",
 								time.Hour*1,
@@ -558,6 +567,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
+								true,
 								true,
 								true,
 								true,
@@ -612,6 +622,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
+								true,
 								true,
 								true,
 								true,
@@ -680,6 +691,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 								"",
 								time.Hour*1,
@@ -738,6 +750,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
+								true,
 								true,
 								true,
 								true,
@@ -871,7 +884,7 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
-								domain.SecondFactorTypeOTP,
+								domain.SecondFactorTypeTOTP,
 							),
 						),
 					),
@@ -879,14 +892,14 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				factor: domain.SecondFactorTypeOTP,
+				factor: domain.SecondFactorTypeTOTP,
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
 			},
 		},
 		{
-			name: "add factor, ok",
+			name: "add factor totp, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -897,7 +910,7 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 								"INSTANCE",
 								instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
-									domain.SecondFactorTypeOTP),
+									domain.SecondFactorTypeTOTP),
 							),
 						},
 					),
@@ -905,7 +918,98 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
-				factor: domain.SecondFactorTypeOTP,
+				factor: domain.SecondFactorTypeTOTP,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "add factor otp email, ok ",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									domain.SecondFactorTypeOTPEmail),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				factor: domain.SecondFactorTypeOTPEmail,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "add factor otp sms, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									domain.SecondFactorTypeOTPSMS),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				factor: domain.SecondFactorTypeOTPSMS,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "add factor totp, add otp sms, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								domain.SecondFactorTypeTOTP,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									domain.SecondFactorTypeOTPSMS),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				factor: domain.SecondFactorTypeOTPSMS,
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -976,14 +1080,14 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				factor: domain.SecondFactorTypeOTP,
+				factor: domain.SecondFactorTypeTOTP,
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
 			},
 		},
 		{
-			name: "factor removed, not found error",
+			name: "factor removed totp, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -991,13 +1095,13 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
-								domain.SecondFactorTypeOTP,
+								domain.SecondFactorTypeTOTP,
 							),
 						),
 						eventFromEventPusher(
 							instance.NewLoginPolicySecondFactorRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
-								domain.SecondFactorTypeOTP,
+								domain.SecondFactorTypeTOTP,
 							),
 						),
 					),
@@ -1005,14 +1109,14 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				factor: domain.SecondFactorTypeOTP,
+				factor: domain.SecondFactorTypeTOTP,
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
 			},
 		},
 		{
-			name: "add factor, ok",
+			name: "factor removed otp email, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -1020,7 +1124,65 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
-								domain.SecondFactorTypeOTP,
+								domain.SecondFactorTypeOTPEmail,
+							),
+						),
+						eventFromEventPusher(
+							instance.NewLoginPolicySecondFactorRemovedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								domain.SecondFactorTypeOTPEmail,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				factor: domain.SecondFactorTypeOTPEmail,
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "factor removed otp sms, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								domain.SecondFactorTypeOTPSMS,
+							),
+						),
+						eventFromEventPusher(
+							instance.NewLoginPolicySecondFactorRemovedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								domain.SecondFactorTypeOTPSMS,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				factor: domain.SecondFactorTypeOTPSMS,
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "remove factor totp, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								domain.SecondFactorTypeTOTP,
 							),
 						),
 					),
@@ -1029,7 +1191,7 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 							eventFromEventPusher(
 								instance.NewLoginPolicySecondFactorRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
-									domain.SecondFactorTypeOTP),
+									domain.SecondFactorTypeTOTP),
 							),
 						},
 					),
@@ -1037,12 +1199,103 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				factor: domain.SecondFactorTypeOTP,
+				factor: domain.SecondFactorTypeTOTP,
 			},
 			res: res{
 				want: &domain.ObjectDetails{
 					ResourceOwner: "INSTANCE",
 				},
+			},
+		},
+		{
+			name: "remove factor email, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								domain.SecondFactorTypeOTPEmail,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								instance.NewLoginPolicySecondFactorRemovedEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									domain.SecondFactorTypeOTPEmail),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				factor: domain.SecondFactorTypeOTPEmail,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "remove factor sms, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								domain.SecondFactorTypeOTPSMS,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								instance.NewLoginPolicySecondFactorRemovedEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									domain.SecondFactorTypeOTPSMS),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				factor: domain.SecondFactorTypeOTPSMS,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "factor added totp, removed otp sms, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								domain.SecondFactorTypeTOTP,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				factor: domain.SecondFactorTypeOTPSMS,
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
 			},
 		},
 	}
@@ -1301,7 +1554,7 @@ func TestCommandSide_RemoveMultiFactorDefaultLoginPolicy(t *testing.T) {
 	}
 }
 
-func newDefaultLoginPolicyChangedEvent(ctx context.Context, allowRegister, allowUsernamePassword, allowExternalIDP, forceMFA,
+func newDefaultLoginPolicyChangedEvent(ctx context.Context, allowRegister, allowUsernamePassword, allowExternalIDP, forceMFA, forceMFALocalOnly,
 	hidePasswordReset, ignoreUnknownUsernames, allowDomainDiscovery, disableLoginWithEmail, disableLoginWithPhone bool,
 	passwordlessType domain.PasswordlessType,
 	redirectURI string,
@@ -1312,6 +1565,7 @@ func newDefaultLoginPolicyChangedEvent(ctx context.Context, allowRegister, allow
 			policy.ChangeAllowRegister(allowRegister),
 			policy.ChangeAllowExternalIDP(allowExternalIDP),
 			policy.ChangeForceMFA(forceMFA),
+			policy.ChangeForceMFALocalOnly(forceMFALocalOnly),
 			policy.ChangeAllowUserNamePassword(allowUsernamePassword),
 			policy.ChangeHidePasswordReset(hidePasswordReset),
 			policy.ChangeIgnoreUnknownUsernames(ignoreUnknownUsernames),

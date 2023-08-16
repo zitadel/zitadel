@@ -479,8 +479,8 @@ Errors:
     Terminated: 会话已经终止
     Token:
       Invalid: 会话令牌是无效的
-    Passkey:
-      NoChallenge: 没有密码挑战的会话
+    WebAuthN:
+      NoChallenge: 没有 WebAuthN 质询的会话
   Intent:
     IDPMissing: 请求中缺少IDP ID
     SuccessURLMissing: 请求中缺少成功URL
@@ -590,6 +590,8 @@ EventTypes:
         removed: 移除了外部 IDP
         cascade:
           removed: 移除了外部 IDP
+        id:
+          migrated: IDP 的外部用户 ID 已迁移
       phone:
         changed: 修改手机号码
         verified: 已验证手机号码
@@ -611,6 +613,24 @@ EventTypes:
           check:
             succeeded: 验证 MFA OTP 成功
             failed:  验证 MFA OTP 失败
+          sms:
+            added: 添加了多因素 OTP 短信
+            removed: 删除了多因素 OTP 短信
+            code:
+              added: 添加了多因素 OTP 短信代码
+              sent: 已发送多因素 OTP 短信代码
+            check:
+              succeeded: 多因素 OTP 短信验证成功
+              failed: 多因素 OTP 短信验证失败
+          email:
+            added: 添加了多因素 OTP 电子邮件
+            removed: 删除了多因素 OTP 电子邮件
+            code:
+              added: 添加了多因素 OTP 电子邮件代码
+              sent: 已发送多因素 OTP 电子邮件代码
+            check:
+              succeeded: 多因素 OTP 电子邮件验证成功
+              failed: 多因素 OTP 电子邮件验证失败
         u2f:
           token:
             added: 添加 MFA U2F 令牌
@@ -665,6 +685,10 @@ EventTypes:
       check:
         succeeded: 密码检查成功
         failed: 密码检查失败
+      change:
+        sent: 密码更改已发送
+      hash:
+        updated: 密码哈希已更新
     phone:
       changed: 更改手机号码
       verified: 验证手机号码
@@ -1022,6 +1046,7 @@ Action:
       ExternalAuthentication: 外部认证
       CustomiseToken: 自定义令牌
       InternalAuthentication: 内部认证
+      CustomizeSAMLResponse: 补充 SAMLResponse
   TriggerType:
     Unspecified: 未指定的
     PostAuthentication: 后期认证
@@ -1029,3 +1054,4 @@ Action:
     PostCreation: 创建后
     PreUserinfoCreation: 用户信息创建前
     PreAccessTokenCreation: access 令牌创建前
+    PreSAMLResponseCreation: 创建 SAMLResponse 前

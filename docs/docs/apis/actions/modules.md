@@ -39,7 +39,7 @@ This function allows to call HTTP servers. The function does NOT fulfil the [Fet
 
 #### Response
 
-If the request was valid, an error will be thrown, otherwise a Response object will be returned.
+If the request was invalid, an error will be thrown, otherwise a Response object will be returned.
 
 The object has the following fields and methods:
 

@@ -19,7 +19,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func (s *Tester) CreateOIDCNativeClient(ctx context.Context, redirectURI, projectID string) (*management.AddOIDCAppResponse, error) {
+func (s *Tester) CreateOIDCNativeClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string) (*management.AddOIDCAppResponse, error) {
 	return s.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
 		ProjectId:                projectID,
 		Name:                     fmt.Sprintf("app-%d", time.Now().UnixNano()),
@@ -28,7 +28,7 @@ func (s *Tester) CreateOIDCNativeClient(ctx context.Context, redirectURI, projec
 		GrantTypes:               []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN},
 		AppType:                  app.OIDCAppType_OIDC_APP_TYPE_NATIVE,
 		AuthMethodType:           app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE,
-		PostLogoutRedirectUris:   nil,
+		PostLogoutRedirectUris:   []string{logoutRedirectURI},
 		Version:                  app.OIDCVersion_OIDC_VERSION_1_0,
 		DevMode:                  false,
 		AccessTokenType:          app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT,
@@ -140,7 +140,17 @@ func (s *Tester) CreateRelyingParty(clientID, redirectURI string, scope ...strin
 	if len(scope) == 0 {
 		scope = []string{oidc.ScopeOpenID}
 	}
-	return rp.NewRelyingPartyOIDC(s.OIDCIssuer(), clientID, "", redirectURI, scope)
+	loginClient := &http.Client{Transport: &loginRoundTripper{http.DefaultTransport}}
+	return rp.NewRelyingPartyOIDC(s.OIDCIssuer(), clientID, "", redirectURI, scope, rp.WithHTTPClient(loginClient))
+}
+
+type loginRoundTripper struct {
+	http.RoundTripper
+}
+
+func (c *loginRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	req.Header.Set(oidc_internal.LoginClientHeader, LoginUser)
+	return c.RoundTripper.RoundTrip(req)
 }
 
 func (s *Tester) CreateResourceServer(keyFileData []byte) (rs.ResourceServer, error) {

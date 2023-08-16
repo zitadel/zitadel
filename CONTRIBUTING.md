@@ -1,4 +1,3 @@
-
 # Contributing to ZITADEL
 
 ## Introduction
@@ -46,19 +45,19 @@ Go through the following checklist before you submit the final pull request:
 1. [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the [zitadel/zitadel](https://github.com/zitadel/zitadel) repository on GitHub
 2. On your fork, commit your changes to a new branch
 
-    `git checkout -b my-fix-branch main`
+   `git checkout -b my-fix-branch main`
 
 3. Make your changes following the [guidelines](#contribute) in this guide. Make sure that all tests pass.
 
 4. Commit the changes on the new branch
 
-    `git commit --all`
+   `git commit --all`
 
 5. [Merge](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) the latest commit of the `main`-branch
 
 6. Push the changes to your branch on Github
 
-    `git push origin my-fix-branch`
+   `git push origin my-fix-branch`
 
 7. Use [Semantic Release commit messages](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type) to simplify creation of release notes. In the title of the pull request [correct tagging](#commit-messages) is required and will be requested by the reviewers.
 
@@ -234,7 +233,7 @@ Using [Docker Compose](https://docs.docker.com/compose/), you run [CockroachDB](
 You use the ZITADEL container as backend for your console.
 The console is run in your [Node](https://nodejs.org/en/about/) environment using [a local development server for Angular](https://angular.io/cli/serve#ng-serve), so you have fast feedback about your changes.
 
-We use angular-eslint/Prettier for linting/formatting, so please run `npm run lint:fix` before committing. (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
+We use angular-eslint/Prettier for linting/formatting, so please run `yarn lint:fix` before committing. (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
 
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
 
@@ -282,16 +281,16 @@ You can run the local console development server now.
 
 ```bash
 # Install npm dependencies
-npm install
+yarn install
 
 # Generate source files from Protos
-npm run generate
+yarn generate
 
 # Start the server
-npm start
+yarn start
 
 # If you don't want to develop against http://localhost:8080, you can use another environment
-ENVIRONMENT_JSON_URL=https://my-cloud-instance-abcdef.zitadel.cloud/ui/console/assets/environment.json npm start
+ENVIRONMENT_JSON_URL=https://my-cloud-instance-abcdef.zitadel.cloud/ui/console/assets/environment.json yarn start
 ```
 
 Navigate to http://localhost:4200/.
@@ -301,7 +300,7 @@ Open another shell.
 
 ```bash
 # Reformat your console code
-npm run lint:fix
+yarn lint:fix
 
 # Change to the e2e directory
 cd .. && cd e2e/
@@ -348,13 +347,13 @@ Please refer to the [README](./docs/README.md) for more information and local te
 ### Style guide
 
 - **Code with variables**: Make sure that code snippets can be used by setting environment variables, instead of manually replacing a placeholder.
-- **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
+- **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "\_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
 - **Don't repeat yourself**: When using the same content in multiple places, save and manage the content as separate file and make use of embedded files to import it into other docs pages.
 - **Embedded code**: You can embed code snippets from a repository. See the [plugin](https://github.com/saucelabs/docusaurus-theme-github-codeblock#usage) for usage.
 
 Following the [Google style guide](https://developers.google.com/style) is highly recommended. Its clear and concise guidelines ensure consistency and effective communication within the wider developer community.
 
-The style guide covers a lot of material, so their [highlights](https://developers.google.com/style/highlights) page provides an overview of its most important points. Some of the points stated in the highlights that we care about most are given below: 
+The style guide covers a lot of material, so their [highlights](https://developers.google.com/style/highlights) page provides an overview of its most important points. Some of the points stated in the highlights that we care about most are given below:
 
 - Be conversational and friendly without being frivolous.
 - Use sentence case for document titles and section headings.
@@ -376,6 +375,7 @@ ZITADEL loads translations from four files:
 - [Common texts](./internal/static/i18n) for success or error toasts
 
 You may edit the texts in these files or create a new file for additional language support. Make sure you set the locale (ISO 639-1 code) as the name of the new language file.
+Please make sure that the languages within the files remain in their own language, e.g. German must always be `Deutsch.
 
 ## Want to start ZITADEL?
 
@@ -427,7 +427,6 @@ Priority shows you the priority the ZITADEL team has given this issue. In genera
 - **🏕 Medium**: After all the high issues are done these will be next.
 - **🏝 Low**: This is low in priority and will probably not be implemented in the next time or just if someone has some time in between.
 
-
 #### Complexity
 
 This should give you an indication how complex the issue is. It's not about the hours or effort it takes.
@@ -461,4 +460,3 @@ The language shows you in which programming language the affected part is writte
 - **lang: angular**
 - **lang: go**
 - **lang: javascript**
-

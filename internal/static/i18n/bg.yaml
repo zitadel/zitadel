@@ -497,8 +497,8 @@ Errors:
     Terminated: Сесията вече е прекратена
     Token:
       Invalid: Токенът на сесията е невалиден
-    Passkey:
-      NoChallenge: Сесия без предизвикателство за парола
+    WebAuthN:
+      NoChallenge: Сесия без WebAuthN предизвикателство
   Intent:
     IDPMissing: IDP липсва в заявката
     SuccessURLMissing: В заявката липсва URL адрес за успех
@@ -608,6 +608,8 @@ EventTypes:
         removed: Външният IDP е премахнат
         cascade:
           removed: Външната IDP каскада е премахната
+        id:
+          migrated: Външният потребителски идентификатор на IDP беше мигриран
       phone:
         changed: Телефонният номер е променен
         verified: Телефонният номер е потвърден
@@ -629,6 +631,24 @@ EventTypes:
           check:
             succeeded: Многофакторната OTP проверка е успешна
             failed: Многофакторната OTP проверка е неуспешна
+          sms:
+            added: Добавен Многофакторната OTP SMS
+            removed: Премахнато многофакторно OTP SMS
+            code:
+              added: Добавен многофакторен OTP SMS код
+              sent: Многофакторната OTP SMS код е изпратен
+            check:
+              succeeded: Успешна многофакторна OTP SMS проверка
+              failed: Многофакторната OTP проверка на SMS не бе успешна
+          email:
+            added: Добавен Многофакторната OTP имейл
+            removed: Премахнат многофакторен OTP имейл
+            code:
+              added: Добавен многофакторен OTP имейл код
+              sent: Многофакторният OTP имейл код е изпратен
+            check:
+              succeeded: Многофакторната еднократна имейл потвърждение е успешна
+              failed: Многофакторната OTP проверка на имейл не бе успешна
         u2f:
           token:
             added: Добавен е многофакторен U2F токен
@@ -683,6 +703,10 @@ EventTypes:
       check:
         succeeded: Проверката на паролата е успешна
         failed: Проверката на паролата е неуспешна
+      change:
+        sent: Промяната на паролата е изпратена
+      hash:
+        updated: Хешът на паролата е актуализиран
     phone:
       changed: Телефонният номер е променен
       verified: Телефонният номер е потвърден
@@ -1243,6 +1267,7 @@ Action:
       ExternalAuthentication: Външно удостоверяване
       CustomiseToken: Токен за допълнение
       InternalAuthentication: Вътрешно удостоверяване
+      CustomizeSAMLResponse: Допълнение на SAMLResponse
   TriggerType:
     Unspecified: Неуточнено
     PostAuthentication: Публикуване на автентификация
@@ -1250,3 +1275,4 @@ Action:
     PostCreation: Създаване на публикации
     PreUserinfoCreation: Предварително създаване на потребителска информация
     PreAccessTokenCreation: Създаване на маркер за предварителен достъп
+    PreSAMLResponseCreation: Предварително създаване на SAMLResponse

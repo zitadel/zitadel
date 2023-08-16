@@ -61,8 +61,8 @@ $lgn-radio-label-padding: 0 0 0 ($lgn-radio-size + 10px);
     }
 
     &::after {
-      top: $lgn-radio-size / 2 - $lgn-radio-checked-size / 2;
-      left: $lgn-radio-size / 2 - $lgn-radio-checked-size / 2;
+      top: calc($lgn-radio-size / 2) - calc($lgn-radio-checked-size / 2);
+      left: calc($lgn-radio-size / 2) - calc($lgn-radio-checked-size / 2);
       width: $lgn-radio-checked-size;
       height: $lgn-radio-checked-size;
       transform: scale(0);
