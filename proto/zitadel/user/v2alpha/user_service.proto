@@ -1082,24 +1082,11 @@ message StartIdentityProviderIntentRequest{
       example: "\"163840776835432705\"";
     }
   ];
-  string success_url = 2 [
-    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "URL on which the user will be redirected after a successful login"
-      min_length: 1;
-      max_length: 200;
-      example: "\"https://custom.com/login/idp/success\"";
-    }
-  ];
-  string failure_url = 3 [
-    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "URL on which the user will be redirected after a failed login"
-      min_length: 1;
-      max_length: 200;
-      example: "\"https://custom.com/login/idp/fail\"";
-    }
-  ];
+
+  oneof content {
+    RedirectURLs urls = 2;
+    LDAPCredentials ldap = 3;
+  }
 }
 
 message StartIdentityProviderIntentResponse{
@@ -1109,6 +1096,11 @@ message StartIdentityProviderIntentResponse{
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         description: "URL to which the client should redirect"
         example: "\"https://accounts.google.com/o/oauth2/v2/auth?client_id=clientID&callback=https%3A%2F%2Fzitadel.cloud%2Fidps%2Fcallback\"";
+      }
+    ];
+    Intent intent = 3 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Intent information"
       }
     ];
   }

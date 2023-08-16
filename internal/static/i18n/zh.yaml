@@ -137,6 +137,7 @@ Errors:
       MinimumExternalIDPNeeded: 必须添加至少一个 IDP
       AlreadyExists: 外部 IDP 已存在
       NotFound: 未找到外部 IDP
+      LoginFailed: 外部 IDP 登录失败
     MFA:
       OTP:
         AlreadyReady: OTP (一次性密码) 已经设置好了

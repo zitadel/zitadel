@@ -28,8 +28,9 @@ import (
 )
 
 const (
-	HandlerPrefix = "/idps"
-	callbackPath  = "/callback"
+	HandlerPrefix    = "/idps"
+	callbackPath     = "/callback"
+	ldapCallbackPath = callbackPath + "/ldap"
 
 	paramIntentID         = "id"
 	paramToken            = "token"
@@ -82,18 +83,22 @@ func NewHandler(
 }
 
 func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	data, err := h.parseCallbackRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	intent := h.getActiveIntent(w, r, data.State)
-	if intent == nil {
-		// if we didn't get an active intent the error was already handled (either redirected or display directly)
+	intent, err := h.commands.GetActiveIntent(ctx, data.State)
+	if err != nil {
+		if z_errs.IsNotFound(err) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		redirectToFailureURLErr(w, r, intent, err)
 		return
 	}
 
-	ctx := r.Context()
 	// the provider might have returned an error
 	if data.Error != "" {
 		cmdErr := h.commands.FailIDPIntent(ctx, intent, reason(data.Error, data.ErrorDescription))

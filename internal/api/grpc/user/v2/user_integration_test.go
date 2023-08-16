@@ -650,9 +650,13 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			args: args{
 				CTX,
 				&user.StartIdentityProviderIntentRequest{
-					IdpId:      idpID,
-					SuccessUrl: "https://example.com/success",
-					FailureUrl: "https://example.com/failure",
+					IdpId: idpID,
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
+						Urls: &user.RedirectURLs{
+							SuccessUrl: "https://example.com/success",
+							FailureUrl: "https://example.com/failure",
+						},
+					},
 				},
 			},
 			want: &user.StartIdentityProviderIntentResponse{
@@ -689,7 +693,8 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t)
 	intentID := Tester.CreateIntent(t, idpID)
-	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulIntent(t, idpID, "", "id")
+	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulOAuthIntent(t, idpID, "", "id")
+	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Tester.CreateSuccessfulLDAPIntent(t, idpID, "", "id")
 	type args struct {
 		ctx context.Context
 		req *user.RetrieveIdentityProviderIntentRequest
@@ -759,6 +764,51 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "retrieve successful ldap intent",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderInformationRequest{
+					IntentId: ldapSuccessfulID,
+					Token:    ldapToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderInformationResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(ldapChangeDate),
+					ResourceOwner: Tester.Organisation.ID,
+					Sequence:      ldapSequence,
+				},
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Ldap{
+						Ldap: &user.IDPLDAPAccessInformation{
+							Attributes: func() *structpb.Struct {
+								s, err := structpb.NewStruct(map[string]interface{}{
+									"id":       []interface{}{"id"},
+									"username": []interface{}{"username"},
+									"language": []interface{}{"en"},
+								})
+								require.NoError(t, err)
+								return s
+							}(),
+						},
+					},
+					IdpId:    idpID,
+					UserId:   "id",
+					UserName: "username",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"id":                "id",
+							"preferredUsername": "username",
+							"preferredLanguage": "en",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -769,7 +819,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			grpc.AllFieldsEqual(t, got.ProtoReflect(), tt.want.ProtoReflect(), grpc.CustomMappers)
+			grpc.AllFieldsEqual(t, tt.want.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
 		})
 	}
 }

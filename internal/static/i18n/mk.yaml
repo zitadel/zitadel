@@ -137,6 +137,7 @@ Errors:
       MinimumExternalIDPNeeded: Мора да се додаде најмалку еден надворешен IDP
       AlreadyExists: Надворешниот IDP е веќе зафатен
       NotFound: Надворешниот IDP не е пронајден
+      LoginFailed: Пријавувањето на Надворешниот ВРЛ не успеа
     MFA:
       OTP:
         AlreadyReady: Мултифактор OTP (Еднократна Лозинка) e веќе поставен
