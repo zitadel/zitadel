@@ -91,7 +91,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				},
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequenceErr("my_sequences", "my_projection", []string{"instanceID1"}, sql.ErrTxDone),
+					expectCurrentSequenceErr(false, "my_sequences", "my_projection", []string{"instanceID1"}, sql.ErrTxDone),
 					expectCommit(),
 				},
 				SearchQueryBuilder: nil,
@@ -115,7 +115,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				},
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", []string{"instanceID1"}),
+					expectCurrentSequence(false, "my_sequences", "my_projection", 5, "testAgg", []string{"instanceID1"}),
 					expectCommit(),
 				},
 				SearchQueryBuilder: eventstore.
@@ -147,7 +147,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				},
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", []string{"instanceID1", "instanceID2"}),
+					expectCurrentSequence(false, "my_sequences", "my_projection", 5, "testAgg", []string{"instanceID1", "instanceID2"}),
 					expectCommit(),
 				},
 				SearchQueryBuilder: eventstore.
@@ -298,7 +298,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequenceErr("my_sequences", "my_projection", []string{"instanceID"}, sql.ErrTxDone),
+					expectCurrentSequenceErr(false, "my_sequences", "my_projection", []string{"instanceID"}, sql.ErrTxDone),
 					expectRollback(),
 				},
 				isErr: func(err error) bool {
@@ -330,7 +330,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", []string{"instanceID"}),
+					expectCurrentSequence(false, "my_sequences", "my_projection", 5, "testAgg", []string{"instanceID"}),
 					expectRollback(),
 				},
 				isErr: func(err error) bool {
@@ -369,7 +369,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", []string{"instanceID"}),
+					expectCurrentSequence(false, "my_sequences", "my_projection", 5, "testAgg", []string{"instanceID"}),
 					expectCommit(),
 				},
 				isErr: func(err error) bool {
@@ -408,7 +408,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "agg", []string{"instanceID"}),
+					expectCurrentSequence(false, "my_sequences", "my_projection", 5, "agg", []string{"instanceID"}),
 					expectSavePoint(),
 					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
 					expectSavePointRelease(),
@@ -451,7 +451,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "agg", []string{"instanceID"}),
+					expectCurrentSequence(false, "my_sequences", "my_projection", 5, "agg", []string{"instanceID"}),
 					expectSavePoint(),
 					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
 					expectSavePointRelease(),
@@ -487,7 +487,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", []string{"instanceID"}),
+					expectCurrentSequence(false, "my_sequences", "my_projection", 5, "testAgg", []string{"instanceID"}),
 					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "testAgg", "instanceID"),
 					expectCommit(),
 				},
@@ -520,7 +520,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", []string{"instanceID"}),
+					expectCurrentSequence(false, "my_sequences", "my_projection", 5, "testAgg", []string{"instanceID"}),
 					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "testAgg", "instanceID"),
 					expectCommit(),
 				},
@@ -560,7 +560,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", []string{"instanceID"}),
+					expectCurrentSequence(false, "my_sequences", "my_projection", 5, "testAgg", []string{"instanceID"}),
 					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "testAgg", "instanceID"),
 					expectCommit(),
 				},
@@ -1434,7 +1434,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 					return errors.Is(err, sql.ErrConnDone)
 				},
 				expectations: []mockExpectation{
-					expectCurrentSequenceErr("my_table", "my_projection", nil, sql.ErrConnDone),
+					expectCurrentSequenceErr(true, "my_table", "my_projection", nil, sql.ErrConnDone),
 				},
 			},
 		},
@@ -1496,7 +1496,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 					return errors.Is(err, nil)
 				},
 				expectations: []mockExpectation{
-					expectCurrentSequence("my_table", "my_projection", 5, "agg", []string{"instanceID"}),
+					expectCurrentSequence(true, "my_table", "my_projection", 5, "agg", []string{"instanceID"}),
 				},
 				sequences: currentSequences{
 					"agg": []*instanceSequence{
@@ -1524,7 +1524,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 					return errors.Is(err, nil)
 				},
 				expectations: []mockExpectation{
-					expectCurrentSequence("my_table", "my_projection", 5, "agg", []string{"instanceID1", "instanceID2"}),
+					expectCurrentSequence(true, "my_table", "my_projection", 5, "agg", []string{"instanceID1", "instanceID2"}),
 				},
 				sequences: currentSequences{
 					"agg": []*instanceSequence{
@@ -1572,7 +1572,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 				t.Fatalf("unexpected err in begin: %v", err)
 			}
 
-			seq, err := h.currentSequences(context.Background(), tx.QueryContext, tt.args.instanceIDs)
+			seq, err := h.currentSequences(context.Background(), true, tx.QueryContext, tt.args.instanceIDs)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
