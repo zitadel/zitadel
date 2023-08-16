@@ -127,9 +127,11 @@ func (db *dbMock) expectFilterEventsLimit(aggregateType string, limit uint64, ev
 	for i := 0; i < eventCount; i++ {
 		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "instanceID", "aggType", "aggID", "v1.0.0")
 	}
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(expectedFilterEventsLimitFormat).
 		WithArgs(aggregateType, limit).
 		WillReturnRows(rows)
+	db.mock.ExpectCommit()
 	return db
 }
 
@@ -138,8 +140,10 @@ func (db *dbMock) expectFilterEventsDesc(aggregateType string, eventCount int) *
 	for i := eventCount; i > 0; i-- {
 		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "instanceID", "aggType", "aggID", "v1.0.0")
 	}
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(expectedFilterEventsDescFormat).
 		WillReturnRows(rows)
+	db.mock.ExpectCommit()
 	return db
 }
 
@@ -148,9 +152,11 @@ func (db *dbMock) expectFilterEventsAggregateIDLimit(aggregateType, aggregateID 
 	for i := limit; i > 0; i-- {
 		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "instanceID", "aggType", "aggID", "v1.0.0")
 	}
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(expectedFilterEventsAggregateIDLimit).
 		WithArgs(aggregateType, aggregateID, limit).
 		WillReturnRows(rows)
+	db.mock.ExpectCommit()
 	return db
 }
 
@@ -159,28 +165,36 @@ func (db *dbMock) expectFilterEventsAggregateIDTypeLimit(aggregateType, aggregat
 	for i := limit; i > 0; i-- {
 		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "instanceID", "aggType", "aggID", "v1.0.0")
 	}
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(expectedFilterEventsAggregateIDTypeLimit).
 		WithArgs(aggregateType, aggregateID, limit).
 		WillReturnRows(rows)
+	db.mock.ExpectCommit()
 	return db
 }
 
 func (db *dbMock) expectFilterEventsError(returnedErr error) *dbMock {
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(expectedGetAllEvents).
 		WillReturnError(returnedErr)
+	db.mock.ExpectCommit()
 	return db
 }
 
 func (db *dbMock) expectLatestSequenceFilter(aggregateType string, sequence Sequence) *dbMock {
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(`SELECT MAX\(event_sequence\) FROM eventstore\.events AS OF SYSTEM TIME '-1 ms' WHERE \( aggregate_type = \$1 \)`).
 		WithArgs(aggregateType).
 		WillReturnRows(sqlmock.NewRows([]string{"max_sequence"}).AddRow(sequence))
+	db.mock.ExpectCommit()
 	return db
 }
 
 func (db *dbMock) expectLatestSequenceFilterError(aggregateType string, err error) *dbMock {
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(`SELECT MAX\(event_sequence\) FROM eventstore\.events AS OF SYSTEM TIME '-1 ms' WHERE \( aggregate_type = \$1 \)`).
 		WithArgs(aggregateType).WillReturnError(err)
+	db.mock.ExpectCommit()
 	return db
 }
 
