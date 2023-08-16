@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	errs "errors"
 	"io"
 
 	"golang.org/x/text/language"
@@ -14,6 +15,9 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
+	"github.com/zitadel/zitadel/internal/query"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
@@ -126,11 +130,22 @@ func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_
 }
 
 func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartIdentityProviderFlowRequest) (_ *user.StartIdentityProviderFlowResponse, err error) {
-	id, details, err := s.command.CreateIntent(ctx, req.GetIdpId(), req.GetSuccessUrl(), req.GetFailureUrl(), authz.GetCtxData(ctx).OrgID)
+	switch t := req.GetContent().(type) {
+	case *user.StartIdentityProviderFlowRequest_Urls:
+		return s.startIDPIntent(ctx, req.GetIdpId(), t.Urls)
+	case *user.StartIdentityProviderFlowRequest_Ldap:
+		return s.startLDAPIntent(ctx, req.GetIdpId(), t.Ldap)
+	default:
+		return nil, errors.ThrowUnimplementedf(nil, "USERv2-S2g21", "type oneOf %T in method StartIdentityProviderFlow not implemented", t)
+	}
+}
+
+func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*user.StartIdentityProviderFlowResponse, error) {
+	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	authURL, err := s.command.AuthURLFromProvider(ctx, req.GetIdpId(), id, s.idpCallback(ctx))
+	authURL, err := s.command.AuthURLFromProvider(ctx, idpID, intentWriteModel.AggregateID, s.idpCallback(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -138,6 +153,79 @@ func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartI
 		Details:  object.DomainToDetailsPb(details),
 		NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: authURL},
 	}, nil
+}
+
+func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderFlowResponse, error) {
+	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, "", "", authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	externalUser, userID, attributes, err := s.ldapLogin(ctx, intentWriteModel.IDPID, ldapCredentials.GetUsername(), ldapCredentials.GetPassword())
+	if err != nil {
+		if err := s.command.FailIDPIntent(ctx, intentWriteModel, err.Error()); err != nil {
+			return nil, err
+		}
+		return nil, err
+	}
+	token, err := s.command.SucceedLDAPIDPIntent(ctx, intentWriteModel, externalUser, userID, attributes)
+	if err != nil {
+		return nil, err
+	}
+	return &user.StartIdentityProviderFlowResponse{
+		Details:  object.DomainToDetailsPb(details),
+		NextStep: &user.StartIdentityProviderFlowResponse_Intent{Intent: &user.Intent{IntentId: intentWriteModel.AggregateID, Token: token}},
+	}, nil
+}
+
+func (s *Server) checkLinkedExternalUser(ctx context.Context, idpID, externalUserID string) (string, error) {
+	idQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(idpID)
+	if err != nil {
+		return "", err
+	}
+	externalIDQuery, err := query.NewIDPUserLinksExternalIDSearchQuery(externalUserID)
+	if err != nil {
+		return "", err
+	}
+	queries := []query.SearchQuery{
+		idQuery, externalIDQuery,
+	}
+	links, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
+	if err != nil {
+		return "", err
+	}
+	if len(links.Links) == 1 {
+		return links.Links[0].UserID, nil
+	}
+	return "", nil
+}
+
+func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string) (idp.User, string, map[string][]string, error) {
+	provider, err := s.command.GetProvider(ctx, idpID, "")
+	if err != nil {
+		return nil, "", nil, err
+	}
+	ldapProvider, ok := provider.(*ldap.Provider)
+	if !ok {
+		return nil, "", nil, errors.ThrowInvalidArgument(nil, "IDP-9a02j2n2bh", "Errors.ExternalIDP.IDPTypeNotImplemented")
+	}
+	session := ldapProvider.GetSession(username, password)
+	externalUser, err := session.FetchUser(ctx)
+	if errs.Is(err, ldap.ErrFailedLogin) || errs.Is(err, ldap.ErrNoSingleUser) {
+		return nil, "", nil, errors.ThrowInvalidArgument(nil, "COMMAND-nzun2i", "Errors.User.ExternalIDP.LoginFailed")
+	}
+	if err != nil {
+		return nil, "", nil, err
+	}
+	userID, err := s.checkLinkedExternalUser(ctx, idpID, externalUser.GetID())
+	if err != nil {
+		return nil, "", nil, err
+	}
+
+	attributes := make(map[string][]string, 0)
+	for _, item := range session.Entry.Attributes {
+		attributes[item.Name] = item.Values
+	}
+	return externalUser, userID, attributes, nil
 }
 
 func (s *Server) RetrieveIdentityProviderInformation(ctx context.Context, req *user.RetrieveIdentityProviderInformationRequest) (_ *user.RetrieveIdentityProviderInformationResponse, err error) {
@@ -155,40 +243,82 @@ func (s *Server) RetrieveIdentityProviderInformation(ctx context.Context, req *u
 }
 
 func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.EncryptionAlgorithm) (_ *user.RetrieveIdentityProviderInformationResponse, err error) {
-	var idToken *string
-	if intent.IDPIDToken != "" {
-		idToken = &intent.IDPIDToken
-	}
-	var accessToken string
-	if intent.IDPAccessToken != nil {
-		accessToken, err = crypto.DecryptString(intent.IDPAccessToken, alg)
-		if err != nil {
-			return nil, err
-		}
-	}
 	rawInformation := new(structpb.Struct)
 	err = rawInformation.UnmarshalJSON(intent.IDPUser)
 	if err != nil {
 		return nil, err
 	}
-
-	return &user.RetrieveIdentityProviderInformationResponse{
-		Details: &object_pb.Details{
-			Sequence:      intent.ProcessedSequence,
-			ChangeDate:    timestamppb.New(intent.ChangeDate),
-			ResourceOwner: intent.ResourceOwner,
-		},
+	information := &user.RetrieveIdentityProviderInformationResponse{
+		Details: intentToDetailsPb(intent),
 		IdpInformation: &user.IDPInformation{
-			Access: &user.IDPInformation_Oauth{
-				Oauth: &user.IDPOAuthAccessInformation{
-					AccessToken: accessToken,
-					IdToken:     idToken,
-				},
-			},
 			IdpId:          intent.IDPID,
 			UserId:         intent.IDPUserID,
 			UserName:       intent.IDPUserName,
 			RawInformation: rawInformation,
+		},
+	}
+	if intent.IDPIDToken != "" || intent.IDPAccessToken != nil {
+		information.IdpInformation.Access, err = idpOAuthTokensToPb(intent.IDPIDToken, intent.IDPAccessToken, alg)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if intent.IDPEntryAttributes != nil {
+		access, err := IDPEntryAttributesToPb(intent.IDPEntryAttributes)
+		if err != nil {
+			return nil, err
+		}
+		information.IdpInformation.Access = access
+	}
+
+	return information, nil
+}
+
+func idpOAuthTokensToPb(idpIDToken string, idpAccessToken *crypto.CryptoValue, alg crypto.EncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
+	var idToken *string
+	if idpIDToken != "" {
+		idToken = &idpIDToken
+	}
+	var accessToken string
+	if idpAccessToken != nil {
+		accessToken, err = crypto.DecryptString(idpAccessToken, alg)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &user.IDPInformation_Oauth{
+		Oauth: &user.IDPOAuthAccessInformation{
+			AccessToken: accessToken,
+			IdToken:     idToken,
+		},
+	}, nil
+}
+
+func intentToDetailsPb(intent *command.IDPIntentWriteModel) *object_pb.Details {
+	return &object_pb.Details{
+		Sequence:      intent.ProcessedSequence,
+		ChangeDate:    timestamppb.New(intent.ChangeDate),
+		ResourceOwner: intent.ResourceOwner,
+	}
+}
+
+func IDPEntryAttributesToPb(entryAttributes map[string][]string) (*user.IDPInformation_Ldap, error) {
+	values := make(map[string]interface{}, 0)
+	for k, v := range entryAttributes {
+		intValues := make([]interface{}, len(v))
+		for i, value := range v {
+			intValues[i] = value
+		}
+		values[k] = intValues
+	}
+	attributes, err := structpb.NewStruct(values)
+	if err != nil {
+		return nil, err
+	}
+	return &user.IDPInformation_Ldap{
+		Ldap: &user.IDPLDAPAccessInformation{
+			Attributes: attributes,
 		},
 	}, nil
 }

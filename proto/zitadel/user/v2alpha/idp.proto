@@ -9,11 +9,77 @@ import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
+message LDAPCredentials {
+  string username = 1[
+    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Username used to login through LDAP"
+      min_length: 1;
+      max_length: 200;
+      example: "\"username\"";
+    }
+  ];
+  string password = 2[
+    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Password used to login through LDAP"
+      min_length: 1;
+      max_length: 200;
+      example: "\"Password1!\"";
+    }
+  ];
+}
+
+message RedirectURLs {
+  string success_url = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "URL on which the user will be redirected after a successful login"
+      min_length: 1;
+      max_length: 200;
+      example: "\"https://custom.com/login/idp/success\"";
+    }
+  ];
+  string failure_url = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "URL on which the user will be redirected after a failed login"
+      min_length: 1;
+      max_length: 200;
+      example: "\"https://custom.com/login/idp/fail\"";
+    }
+  ];
+}
+
+message Intent {
+  string intent_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the intent"
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432705=\"";
+    }
+  ];
+  string token = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "token of the intent"
+      min_length: 1;
+      max_length: 200;
+      example: "\"SJKL3ioIDpo342ioqw98fjp3sdf32wahb=\"";
+    }
+  ];
+}
+
 message IDPInformation{
   oneof access{
     IDPOAuthAccessInformation oauth = 1 [
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         description: "OAuth/OIDC access (and id_token) returned by the identity provider"
+      }
+    ];
+    IDPLDAPAccessInformation ldap = 6 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "LDAP entity attributes returned by the identity provider"
       }
     ];
   }
@@ -45,6 +111,10 @@ message IDPInformation{
 message IDPOAuthAccessInformation{
   string access_token = 1;
   optional string id_token = 2;
+}
+
+message IDPLDAPAccessInformation{
+  google.protobuf.Struct attributes = 1;
 }
 
 message IDPLink {

@@ -7,19 +7,19 @@ import (
 )
 
 type User struct {
-	id                string
-	firstName         string
-	lastName          string
-	displayName       string
-	nickName          string
-	preferredUsername string
-	email             domain.EmailAddress
-	emailVerified     bool
-	phone             domain.PhoneNumber
-	phoneVerified     bool
-	preferredLanguage language.Tag
-	avatarURL         string
-	profile           string
+	ID                string              `json:"id,omitempty"`
+	FirstName         string              `json:"firstName,omitempty"`
+	LastName          string              `json:"lastName,omitempty"`
+	DisplayName       string              `json:"displayName,omitempty"`
+	NickName          string              `json:"nickName,omitempty"`
+	PreferredUsername string              `json:"preferredUsername,omitempty"`
+	Email             domain.EmailAddress `json:"email,omitempty"`
+	EmailVerified     bool                `json:"emailVerified,omitempty"`
+	Phone             domain.PhoneNumber  `json:"phone,omitempty"`
+	PhoneVerified     bool                `json:"phoneVerified,omitempty"`
+	PreferredLanguage language.Tag        `json:"preferredLanguage,omitempty"`
+	AvatarURL         string              `json:"avatarURL,omitempty"`
+	Profile           string              `json:"profile,omitempty"`
 }
 
 func NewUser(
@@ -55,41 +55,41 @@ func NewUser(
 }
 
 func (u *User) GetID() string {
-	return u.id
+	return u.ID
 }
 func (u *User) GetFirstName() string {
-	return u.firstName
+	return u.FirstName
 }
 func (u *User) GetLastName() string {
-	return u.lastName
+	return u.LastName
 }
 func (u *User) GetDisplayName() string {
-	return u.displayName
+	return u.DisplayName
 }
 func (u *User) GetNickname() string {
-	return u.nickName
+	return u.NickName
 }
 func (u *User) GetPreferredUsername() string {
-	return u.preferredUsername
+	return u.PreferredUsername
 }
 func (u *User) GetEmail() domain.EmailAddress {
-	return u.email
+	return u.Email
 }
 func (u *User) IsEmailVerified() bool {
-	return u.emailVerified
+	return u.EmailVerified
 }
 func (u *User) GetPhone() domain.PhoneNumber {
-	return u.phone
+	return u.Phone
 }
 func (u *User) IsPhoneVerified() bool {
-	return u.phoneVerified
+	return u.PhoneVerified
 }
 func (u *User) GetPreferredLanguage() language.Tag {
-	return u.preferredLanguage
+	return u.PreferredLanguage
 }
 func (u *User) GetAvatarURL() string {
-	return u.avatarURL
+	return u.AvatarURL
 }
 func (u *User) GetProfile() string {
-	return u.profile
+	return u.Profile
 }
