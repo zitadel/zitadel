@@ -6,7 +6,7 @@
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
     "start:api": "yarn generate && docusaurus start",
-    "build": "yarn generate && docusaurus build --no-minify",
+    "build": "yarn generate && docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
