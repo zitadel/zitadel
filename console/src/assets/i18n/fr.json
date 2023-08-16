@@ -411,8 +411,8 @@
       "DESCRIPTION": "Ajoutez un second facteur pour garantir une sécurité optimale de votre compte.",
       "MANAGE_DESCRIPTION": "Gérez les méthodes de second facteur de vos utilisateurs.",
       "ADD": "Ajouter un facteur",
-      "OTP": "Application d'authentification pour OTP (One-time password)",
-      "OTP_DIALOG_TITLE": "Ajouter un OTP",
+      "OTP": "Application d'authentification pour TOTP (Time-based One-time password)",
+      "OTP_DIALOG_TITLE": "Ajouter un TOTP",
       "OTP_DIALOG_DESCRIPTION": "Scannez le code QR avec une application d'authentification et saisissez le code ci-dessous pour vérifier et activer la méthode OTP.",
       "U2F": "Empreinte digitale, clés de sécurité, Face ID et autres",
       "U2F_DIALOG_TITLE": "Vérifier le facteur",
@@ -420,6 +420,12 @@
       "U2F_SUCCESS": "Facteur ajouté avec succès !",
       "U2F_ERROR": "Une erreur s'est produite pendant l'installation !",
       "U2F_NAME": "Nom de l'authentificateur",
+      "OTPSMS": "OTP (One-Time Password) avec SMS",
+      "OTPEMAIL": "OTP (password monouso) con e-mail",
+      "SETUPOTPSMSDESCRIPTION": "Voulez-vous configurer ce numéro de téléphone comme deuxième facteur OTP (mot de passe à usage unique) ?",
+      "OTPSMSSUCCESS": "OTP Factor mis en place avec succès.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Votre téléphone doit être vérifié pour pouvoir utiliser cette méthode.",
+      "OTPEMAILSUCCESS": "OTP Factor mis en place avec succès.",
       "TYPE": {
         "0": "Pas de MFA défini",
         "1": "Mot de passe à usage unique (OTP)",
@@ -586,7 +592,8 @@
         "EDITVALUE": "Numéro de téléphone",
         "EDITDESC": "Entrez le nouveau numéro de téléphone dans le champ ci-dessous.",
         "DELETETITLE": "Supprimer le numéro de téléphone",
-        "DELETEDESC": "Voulez-vous vraiment supprimer le numéro de téléphone ?"
+        "DELETEDESC": "Voulez-vous vraiment supprimer le numéro de téléphone ?",
+        "OTPSMSREMOVALWARNING": "Ce compte utilise ce numéro de téléphone comme deuxième facteur. Vous ne pourrez plus l'utiliser après avoir continué."
       },
       "RESENDCODE": "Renvoyer le code",
       "ENTERCODE": "Vérifier",

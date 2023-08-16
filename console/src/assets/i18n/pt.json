@@ -412,7 +412,7 @@
       "DESCRIPTION": "Adicione um segundo fator para garantir a segurança ideal da sua conta.",
       "MANAGE_DESCRIPTION": "Gerencie os métodos de segundo fator dos seus usuários.",
       "ADD": "Adicionar Fator",
-      "OTP": "Aplicativo de Autenticação para OTP (One-Time Password)",
+      "OTP": "Aplicativo de Autenticação para TOTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "Adicionar OTP",
       "OTP_DIALOG_DESCRIPTION": "Digitalize o código QR com um aplicativo autenticador e insira o código abaixo para verificar e ativar o método OTP.",
       "U2F": "Impressão digital, Chaves de Segurança, Face ID e outros",
@@ -421,6 +421,12 @@
       "U2F_SUCCESS": "Fator adicionado com sucesso!",
       "U2F_ERROR": "Ocorreu um erro durante a configuração!",
       "U2F_NAME": "Nome do Autenticador",
+      "OTPSMS": "OTP (senha de uso único) com SMS",
+      "OTPEMAIL": "OTP (senha de uso único) com e-mail",
+      "SETUPOTPSMSDESCRIPTION": "Deseja configurar este número de telefone como segundo fator OTP (senha de uso único)?",
+      "OTPSMSSUCCESS": "Fator OTP configurado com sucesso.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Seu telefone deve ser verificado para usar este método.",
+      "OTPEMAILSUCCESS": "Fator OTP configurado com sucesso.",
       "TYPE": {
         "0": "Nenhum MFA definido",
         "1": "One Time Password (OTP)",
@@ -587,7 +593,8 @@
         "EDITVALUE": "Número de Telefone",
         "EDITDESC": "Digite o novo número de telefone no campo abaixo.",
         "DELETETITLE": "Excluir número de telefone",
-        "DELETEDESC": "Você realmente deseja excluir o número de telefone?"
+        "DELETEDESC": "Você realmente deseja excluir o número de telefone?",
+        "OTPSMSREMOVALWARNING": "Esta conta usa este número de telefone como segundo fator. Você não poderá usá-lo depois de continuar."
       },
       "RESENDCODE": "Reenviar Código",
       "ENTERCODE": "Verificar",
