@@ -650,9 +650,13 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 			args: args{
 				CTX,
 				&user.StartIdentityProviderFlowRequest{
-					IdpId:      idpID,
-					SuccessUrl: "https://example.com/success",
-					FailureUrl: "https://example.com/failure",
+					IdpId: idpID,
+					Content: &user.StartIdentityProviderFlowRequest_Urls{
+						Urls: &user.RedirectURLs{
+							SuccessUrl: "https://example.com/success",
+							FailureUrl: "https://example.com/failure",
+						},
+					},
 				},
 			},
 			want: &user.StartIdentityProviderFlowResponse{

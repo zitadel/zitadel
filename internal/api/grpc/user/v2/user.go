@@ -129,40 +129,51 @@ func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_
 }
 
 func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartIdentityProviderFlowRequest) (_ *user.StartIdentityProviderFlowResponse, err error) {
-	if req.GetLdap() != nil {
-		intentWriteModel, details, err := s.command.CreateIntent(ctx, req.GetIdpId(), "", "", authz.GetCtxData(ctx).OrgID)
-		if err != nil {
-			return nil, err
-		}
-		externalUser, userID, attributes, err := s.ldapLogin(ctx, intentWriteModel.IDPID, req.GetLdap().GetUsername(), req.GetLdap().GetPassword())
-		if err != nil {
-			if err := s.command.FailIDPIntent(ctx, intentWriteModel, err.Error()); err != nil {
-				return nil, err
-			}
-			return nil, err
-		}
-		token, err := s.command.SucceedLDAPIDPIntent(ctx, intentWriteModel, externalUser, userID, attributes)
-		if err != nil {
-			return nil, err
-		}
-		return &user.StartIdentityProviderFlowResponse{
-			Details:  object.DomainToDetailsPb(details),
-			NextStep: &user.StartIdentityProviderFlowResponse_Intent{Intent: &user.Intent{IntentId: intentWriteModel.AggregateID, Token: token}},
-		}, nil
-	} else {
-		intentWriteModel, details, err := s.command.CreateIntent(ctx, req.GetIdpId(), req.GetUrls().GetSuccessUrl(), req.GetUrls().GetFailureUrl(), authz.GetCtxData(ctx).OrgID)
-		if err != nil {
-			return nil, err
-		}
-		authURL, err := s.command.AuthURLFromProvider(ctx, req.GetIdpId(), intentWriteModel.AggregateID, s.idpCallback(ctx))
-		if err != nil {
-			return nil, err
-		}
-		return &user.StartIdentityProviderFlowResponse{
-			Details:  object.DomainToDetailsPb(details),
-			NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: authURL},
-		}, nil
+	switch t := req.GetContent().(type) {
+	case *user.StartIdentityProviderFlowRequest_Urls:
+		return s.startIDPIntent(ctx, req.GetIdpId(), t.Urls)
+	case *user.StartIdentityProviderFlowRequest_Ldap:
+		return s.startLDAPIntent(ctx, req.GetIdpId(), t.Ldap)
+	default:
+		return nil, errors.ThrowUnimplementedf(nil, "USERv2-S2g21", "type oneOf %T in method StartIdentityProviderFlow not implemented", t)
 	}
+}
+
+func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*user.StartIdentityProviderFlowResponse, error) {
+	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	authURL, err := s.command.AuthURLFromProvider(ctx, idpID, intentWriteModel.AggregateID, s.idpCallback(ctx))
+	if err != nil {
+		return nil, err
+	}
+	return &user.StartIdentityProviderFlowResponse{
+		Details:  object.DomainToDetailsPb(details),
+		NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: authURL},
+	}, nil
+}
+
+func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderFlowResponse, error) {
+	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, "", "", authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	externalUser, userID, attributes, err := s.ldapLogin(ctx, intentWriteModel.IDPID, ldapCredentials.GetUsername(), ldapCredentials.GetPassword())
+	if err != nil {
+		if err := s.command.FailIDPIntent(ctx, intentWriteModel, err.Error()); err != nil {
+			return nil, err
+		}
+		return nil, err
+	}
+	token, err := s.command.SucceedLDAPIDPIntent(ctx, intentWriteModel, externalUser, userID, attributes)
+	if err != nil {
+		return nil, err
+	}
+	return &user.StartIdentityProviderFlowResponse{
+		Details:  object.DomainToDetailsPb(details),
+		NextStep: &user.StartIdentityProviderFlowResponse_Intent{Intent: &user.Intent{IntentId: intentWriteModel.AggregateID, Token: token}},
+	}, nil
 }
 
 func (s *Server) checkLinkedExternalUser(ctx context.Context, idpID, externalUserID string) (string, error) {
@@ -230,13 +241,11 @@ func (s *Server) RetrieveIdentityProviderInformation(ctx context.Context, req *u
 }
 
 func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.EncryptionAlgorithm) (_ *user.RetrieveIdentityProviderInformationResponse, err error) {
-
 	rawInformation := new(structpb.Struct)
 	err = rawInformation.UnmarshalJSON(intent.IDPUser)
 	if err != nil {
 		return nil, err
 	}
-
 	information := &user.RetrieveIdentityProviderInformationResponse{
 		Details: intentToDetailsPb(intent),
 		IdpInformation: &user.IDPInformation{
@@ -246,24 +255,10 @@ func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.En
 			RawInformation: rawInformation,
 		},
 	}
-
 	if intent.IDPIDToken != "" || intent.IDPAccessToken != nil {
-		var idToken *string
-		if intent.IDPIDToken != "" {
-			idToken = &intent.IDPIDToken
-		}
-		var accessToken string
-		if intent.IDPAccessToken != nil {
-			accessToken, err = crypto.DecryptString(intent.IDPAccessToken, alg)
-			if err != nil {
-				return nil, err
-			}
-		}
-		information.IdpInformation.Access = &user.IDPInformation_Oauth{
-			Oauth: &user.IDPOAuthAccessInformation{
-				AccessToken: accessToken,
-				IdToken:     idToken,
-			},
+		information.IdpInformation.Access, err = idpOAuthTokensToPb(intent.IDPIDToken, intent.IDPAccessToken, alg)
+		if err != nil {
+			return nil, err
 		}
 	}
 
@@ -276,6 +271,26 @@ func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.En
 	}
 
 	return information, nil
+}
+
+func idpOAuthTokensToPb(idpIDToken string, idpAccessToken *crypto.CryptoValue, alg crypto.EncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
+	var idToken *string
+	if idpIDToken != "" {
+		idToken = &idpIDToken
+	}
+	var accessToken string
+	if idpAccessToken != nil {
+		accessToken, err = crypto.DecryptString(idpAccessToken, alg)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &user.IDPInformation_Oauth{
+		Oauth: &user.IDPOAuthAccessInformation{
+			AccessToken: accessToken,
+			IdToken:     idToken,
+		},
+	}, nil
 }
 
 func intentToDetailsPb(intent *command.IDPIntentWriteModel) *object_pb.Details {
