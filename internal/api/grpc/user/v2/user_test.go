@@ -24,7 +24,7 @@ import (
 
 var ignoreTypes = []protoreflect.FullName{"google.protobuf.Duration", "google.protobuf.Struct"}
 
-func Test_intentToIDPInformationPb(t *testing.T) {
+func Test_idpIntentToIDPIntentPb(t *testing.T) {
 	decryption := func(err error) crypto.EncryptionAlgorithm {
 		mCrypto := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
 		mCrypto.EXPECT().Algorithm().Return("enc")
@@ -44,7 +44,7 @@ func Test_intentToIDPInformationPb(t *testing.T) {
 		alg    crypto.EncryptionAlgorithm
 	}
 	type res struct {
-		resp *user.RetrieveIdentityProviderInformationResponse
+		resp *user.RetrieveIdentityProviderIntentResponse
 		err  error
 	}
 	tests := []struct {
@@ -112,7 +112,7 @@ func Test_intentToIDPInformationPb(t *testing.T) {
 				alg: decryption(nil),
 			},
 			res{
-				resp: &user.RetrieveIdentityProviderInformationResponse{
+				resp: &user.RetrieveIdentityProviderIntentResponse{
 					Details: &object_pb.Details{
 						Sequence:      123,
 						ChangeDate:    timestamppb.New(time.Date(2019, 4, 1, 1, 1, 1, 1, time.Local)),
@@ -144,7 +144,7 @@ func Test_intentToIDPInformationPb(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := intentToIDPInformationPb(tt.args.intent, tt.args.alg)
+			got, err := idpIntentToIDPIntentPb(tt.args.intent, tt.args.alg)
 			require.ErrorIs(t, err, tt.res.err)
 			grpc.AllFieldsEqual(t, got.ProtoReflect(), tt.res.resp.ProtoReflect(), grpc.CustomMappers)
 			if tt.res.resp != nil {

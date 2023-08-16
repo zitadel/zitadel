@@ -68,8 +68,8 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 	return &command.AddHuman{
 		ID:          req.GetUserId(),
 		Username:    username,
-		FirstName:   req.GetProfile().GetFirstName(),
-		LastName:    req.GetProfile().GetLastName(),
+		FirstName:   req.GetProfile().GetGivenName(),
+		LastName:    req.GetProfile().GetFamilyName(),
 		NickName:    req.GetProfile().GetNickName(),
 		DisplayName: req.GetProfile().GetDisplayName(),
 		Email: command.Email{
@@ -125,7 +125,7 @@ func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_
 	}, nil
 }
 
-func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartIdentityProviderFlowRequest) (_ *user.StartIdentityProviderFlowResponse, err error) {
+func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *user.StartIdentityProviderIntentRequest) (_ *user.StartIdentityProviderIntentResponse, err error) {
 	id, details, err := s.command.CreateIntent(ctx, req.GetIdpId(), req.GetSuccessUrl(), req.GetFailureUrl(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
@@ -134,27 +134,27 @@ func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartI
 	if err != nil {
 		return nil, err
 	}
-	return &user.StartIdentityProviderFlowResponse{
+	return &user.StartIdentityProviderIntentResponse{
 		Details:  object.DomainToDetailsPb(details),
-		NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: authURL},
+		NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: authURL},
 	}, nil
 }
 
-func (s *Server) RetrieveIdentityProviderInformation(ctx context.Context, req *user.RetrieveIdentityProviderInformationRequest) (_ *user.RetrieveIdentityProviderInformationResponse, err error) {
-	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIntentId(), authz.GetCtxData(ctx).OrgID)
+func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.RetrieveIdentityProviderIntentRequest) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
+	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIdpIntentId(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	if err := s.checkIntentToken(req.GetToken(), intent.AggregateID); err != nil {
+	if err := s.checkIntentToken(req.GetIdpIntentToken(), intent.AggregateID); err != nil {
 		return nil, err
 	}
 	if intent.State != domain.IDPIntentStateSucceeded {
 		return nil, errors.ThrowPreconditionFailed(nil, "IDP-Hk38e", "Errors.Intent.NotSucceeded")
 	}
-	return intentToIDPInformationPb(intent, s.idpAlg)
+	return idpIntentToIDPIntentPb(intent, s.idpAlg)
 }
 
-func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.EncryptionAlgorithm) (_ *user.RetrieveIdentityProviderInformationResponse, err error) {
+func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.EncryptionAlgorithm) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
 	var idToken *string
 	if intent.IDPIDToken != "" {
 		idToken = &intent.IDPIDToken
@@ -172,7 +172,7 @@ func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.En
 		return nil, err
 	}
 
-	return &user.RetrieveIdentityProviderInformationResponse{
+	return &user.RetrieveIdentityProviderIntentResponse{
 		Details: &object_pb.Details{
 			Sequence:      intent.ProcessedSequence,
 			ChangeDate:    timestamppb.New(intent.ChangeDate),

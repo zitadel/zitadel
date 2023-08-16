@@ -26,11 +26,12 @@ In the response, you will get an authentication URL of the provider you like.
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/users/idps/$IDP_ID/start \
+  --url https://$ZITADEL_DOMAIN/v2alpha/idp_intents/start \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
   --data '{
+  "idp_id": "$IDP_ID",
   "successUrl": "https://custom.com/login/idp/success",
   "failureUrl": "https://custom.com/login/idp/fail"
 }'
@@ -70,7 +71,7 @@ To get the information of the provider, make a request to ZITADEL.
 ### Request
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/users/intents/$INTENT_ID/information \
+  --url https://$ZITADEL_DOMAIN/v2alpha/idp_intents/$INTENT_ID \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -164,8 +165,8 @@ curl --request POST \
   --data '{
   "username": "minni-mouse@mouse.com",
   "profile": {
-    "firstName": "Minnie",
-    "lastName": "Mouse",
+    "givenName": "Minnie",
+    "familyName": "Mouse",
     "nickName": "Mini",
     "displayName": "Minnie Mouse",
     "preferredLanguage": "en",
