@@ -23,7 +23,6 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
-	mock_ldap "github.com/zitadel/zitadel/internal/idp/providers/ldap/mock"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	rep_idp "github.com/zitadel/zitadel/internal/repository/idp"
@@ -584,93 +583,6 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 			assert.Equal(t, tt.res.token, got)
 		})
 	}
-}
-
-func TestCommands_LoginWithLDAP(t *testing.T) {
-	type args struct {
-		ctx      context.Context
-		provider ldap.ProviderInterface
-		username string
-		password string
-		user     idp.User
-	}
-	type res struct {
-		user idp.User
-		err  error
-	}
-	tests := []struct {
-		name string
-		args args
-		res  res
-	}{{
-		"failed login",
-		args{
-			ctx:      context.Background(),
-			provider: getLdapProviderMockWithUser(t, nil, z_errors.ThrowInternal(nil, "id", "failed")),
-			username: "username",
-			password: "password",
-		},
-		res{
-			err: z_errors.ThrowInternal(nil, "id", "failed"),
-		},
-	},
-		{
-			"successful",
-			args{
-				ctx: context.Background(),
-				provider: getLdapProviderMockWithUser(t, ldap.NewUser(
-					"id",
-					"",
-					"",
-					"",
-					"",
-					"username",
-					"",
-					false,
-					"",
-					false,
-					language.Tag{},
-					"",
-					"",
-				), nil),
-				username: "username",
-				password: "password",
-			},
-			res{
-				user: ldap.NewUser(
-					"id",
-					"",
-					"",
-					"",
-					"",
-					"username",
-					"",
-					false,
-					"",
-					false,
-					language.Tag{},
-					"",
-					"",
-				),
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &Commands{}
-			got, _, err := c.LoginWithLDAP(tt.args.ctx, tt.args.provider, tt.args.username, tt.args.password)
-			require.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.user, got)
-		})
-	}
-}
-
-func getLdapProviderMockWithUser(t *testing.T, user idp.User, err error) ldap.ProviderInterface {
-	provider := mock_ldap.NewMockProviderInterface(gomock.NewController(t))
-	ldapSession := mock_ldap.NewMockSession(gomock.NewController(t))
-	ldapSession.EXPECT().FetchUser(gomock.Any()).Return(user, err)
-	provider.EXPECT().GetSession(gomock.Any(), gomock.Any()).Return(ldapSession)
-	return provider
 }
 
 func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {

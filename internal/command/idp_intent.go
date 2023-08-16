@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	errs "errors"
 	"net/url"
 
 	"github.com/zitadel/oidc/v2/pkg/oidc"
@@ -17,7 +16,6 @@ import (
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
-	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
@@ -50,18 +48,6 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID st
 			}, nil
 		}, nil
 	}
-}
-
-func (c *Commands) LoginWithLDAP(ctx context.Context, provider ldap.ProviderInterface, username string, password string) (idp.User, idp.Session, error) {
-	session := provider.GetSession(username, password)
-	user, err := session.FetchUser(ctx)
-	if errs.Is(err, ldap.ErrFailedLogin) || errs.Is(err, ldap.ErrNoSingleUser) {
-		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-nzun2i", "Errors.User.ExternalIDP.LoginFailed")
-	}
-	if err != nil {
-		return nil, nil, err
-	}
-	return user, session, nil
 }
 
 func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureURL, resourceOwner string) (*IDPIntentWriteModel, *domain.ObjectDetails, error) {

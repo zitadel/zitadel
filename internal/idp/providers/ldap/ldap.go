@@ -10,7 +10,6 @@ import (
 const DefaultPort = "389"
 
 var _ idp.Provider = (*Provider)(nil)
-var _ ProviderInterface = (*Provider)(nil)
 
 // Provider is the [idp.Provider] implementation for a generic LDAP provider
 type Provider struct {
@@ -48,11 +47,6 @@ type Provider struct {
 }
 
 type ProviderOpts func(provider *Provider)
-
-type ProviderInterface interface {
-	idp.Provider
-	GetSession(string, string) idp.Session
-}
 
 // WithLinkingAllowed allows end users to link the federated user to an existing one.
 func WithLinkingAllowed() ProviderOpts {
@@ -224,7 +218,7 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (
 	}, nil
 }
 
-func (p *Provider) GetSession(username, password string) idp.Session {
+func (p *Provider) GetSession(username, password string) *Session {
 	return &Session{
 		Provider: p,
 		User:     username,

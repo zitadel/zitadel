@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	errs "errors"
 	"io"
 
 	"golang.org/x/text/language"
@@ -203,24 +204,25 @@ func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string
 	if err != nil {
 		return nil, "", nil, err
 	}
-	ldapProvider, ok := provider.(ldap.ProviderInterface)
+	ldapProvider, ok := provider.(*ldap.Provider)
 	if !ok {
 		return nil, "", nil, errors.ThrowInvalidArgument(nil, "IDP-9a02j2n2bh", "Errors.ExternalIDP.IDPTypeNotImplemented")
 	}
-
-	externalUser, idpSession, err := s.command.LoginWithLDAP(ctx, ldapProvider, username, password)
+	session := ldapProvider.GetSession(username, password)
+	externalUser, err := session.FetchUser(ctx)
+	if errs.Is(err, ldap.ErrFailedLogin) || errs.Is(err, ldap.ErrNoSingleUser) {
+		return nil, "", nil, errors.ThrowInvalidArgument(nil, "COMMAND-nzun2i", "Errors.User.ExternalIDP.LoginFailed")
+	}
 	if err != nil {
 		return nil, "", nil, err
 	}
-
 	userID, err := s.checkLinkedExternalUser(ctx, idpID, externalUser.GetID())
 	if err != nil {
 		return nil, "", nil, err
 	}
 
-	ldapSession := idpSession.(*ldap.Session)
 	attributes := make(map[string][]string, 0)
-	for _, item := range ldapSession.Entry.Attributes {
+	for _, item := range session.Entry.Attributes {
 		attributes[item.Name] = item.Values
 	}
 	return externalUser, userID, attributes, nil
