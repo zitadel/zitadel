@@ -309,7 +309,6 @@ func (c *Commands) HumanCheckOTPSMS(ctx context.Context, userID, code, resourceO
 		resourceOwner,
 		authRequest,
 		writeModel,
-		domain.SecretGeneratorTypeOTPSMS,
 		succeededEvent,
 		failedEvent,
 	)
@@ -429,7 +428,6 @@ func (c *Commands) HumanCheckOTPEmail(ctx context.Context, userID, code, resourc
 		resourceOwner,
 		authRequest,
 		writeModel,
-		domain.SecretGeneratorTypeOTPEmail,
 		succeededEvent,
 		failedEvent,
 	)
@@ -494,7 +492,6 @@ func (c *Commands) humanCheckOTP(
 	userID, code, resourceOwner string,
 	authRequest *domain.AuthRequest,
 	writeModelByID func(ctx context.Context, userID string, resourceOwner string) (OTPCodeWriteModel, error),
-	secretGeneratorType domain.SecretGeneratorType,
 	checkSucceededEvent func(ctx context.Context, aggregate *eventstore.Aggregate, info *user.AuthRequestInfo) eventstore.Command,
 	checkFailedEvent func(ctx context.Context, aggregate *eventstore.Aggregate, info *user.AuthRequestInfo) eventstore.Command,
 ) error {

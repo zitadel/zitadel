@@ -27,12 +27,14 @@ type SessionCommands struct {
 	passwordWriteModel *HumanPasswordWriteModel
 	intentWriteModel   *IDPIntentWriteModel
 	totpWriteModel     *HumanTOTPWriteModel
-	eventstore         *eventstore.Eventstore
-	eventCommands      []eventstore.Command
+	//otpCodeWriteModel  OTPCodeWriteModel
+	eventstore    *eventstore.Eventstore
+	eventCommands []eventstore.Command
 
 	hasher      *crypto.PasswordHasher
 	intentAlg   crypto.EncryptionAlgorithm
 	totpAlg     crypto.EncryptionAlgorithm
+	otpAlg      crypto.EncryptionAlgorithm
 	createToken func(sessionID string) (id string, token string, err error)
 	now         func() time.Time
 }
@@ -45,6 +47,7 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 		hasher:            c.userPasswordHasher,
 		intentAlg:         c.idpConfigEncryption,
 		totpAlg:           c.multifactors.OTP.CryptoMFA,
+		otpAlg:            c.userEncryption,
 		createToken:       c.sessionTokenCreator,
 		now:               time.Now,
 	}
@@ -204,6 +207,22 @@ func (s *SessionCommands) TOTPChecked(ctx context.Context, checkedAt time.Time) 
 	s.eventCommands = append(s.eventCommands, session.NewTOTPCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
 }
 
+func (s *SessionCommands) OTPSMSChallenged(ctx context.Context, code *crypto.CryptoValue, expiry time.Duration, returnCode bool) {
+	s.eventCommands = append(s.eventCommands, session.NewOTPSMSChallengedEvent(ctx, s.sessionWriteModel.aggregate, code, expiry, returnCode))
+}
+
+func (s *SessionCommands) OTPSMSChecked(ctx context.Context, checkedAt time.Time) {
+	s.eventCommands = append(s.eventCommands, session.NewOTPSMSCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
+}
+
+func (s *SessionCommands) OTPEmailChallenged(ctx context.Context, code *crypto.CryptoValue, expiry time.Duration, returnCode bool, urlTmpl string) {
+	s.eventCommands = append(s.eventCommands, session.NewOTPEmailChallengedEvent(ctx, s.sessionWriteModel.aggregate, code, expiry, returnCode, urlTmpl))
+}
+
+func (s *SessionCommands) OTPEmailChecked(ctx context.Context, checkedAt time.Time) {
+	s.eventCommands = append(s.eventCommands, session.NewOTPEmailCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
+}
+
 func (s *SessionCommands) SetToken(ctx context.Context, tokenID string) {
 	s.eventCommands = append(s.eventCommands, session.NewTokenSetEvent(ctx, s.sessionWriteModel.aggregate, tokenID))
 }
@@ -245,6 +264,19 @@ func (s *SessionCommands) gethumanWriteModel(ctx context.Context) (*HumanWriteMo
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.ie4Ai.NotFound")
 	}
 	return humanWriteModel, nil
+}
+
+func (s *SessionCommands) generate(ctx context.Context, secretGeneratorType domain.SecretGeneratorType) (*crypto.CryptoValue, string, time.Duration, error) {
+	config, err := secretGeneratorConfig(ctx, s.eventstore.Filter, secretGeneratorType)
+	if err != nil {
+		return nil, "", 0, err
+	}
+	gen := crypto.NewEncryptionGenerator(*config, s.otpAlg)
+	code, plain, err := crypto.NewCode(gen)
+	if err != nil {
+		return nil, "", 0, err
+	}
+	return code, plain, gen.Expiry(), nil
 }
 
 func (s *SessionCommands) commands(ctx context.Context) (string, []eventstore.Command, error) {
