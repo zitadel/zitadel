@@ -177,7 +177,7 @@ func (db *dbMock) expectFilterEventsError(returnedErr error) *dbMock {
 	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(expectedGetAllEvents).
 		WillReturnError(returnedErr)
-	db.mock.ExpectCommit()
+	db.mock.ExpectRollback()
 	return db
 }
 
@@ -194,7 +194,7 @@ func (db *dbMock) expectLatestSequenceFilterError(aggregateType string, err erro
 	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(`SELECT MAX\(event_sequence\) FROM eventstore\.events AS OF SYSTEM TIME '-1 ms' WHERE \( aggregate_type = \$1 \)`).
 		WithArgs(aggregateType).WillReturnError(err)
-	db.mock.ExpectCommit()
+	// db.mock.ExpectRollback()
 	return db
 }
 

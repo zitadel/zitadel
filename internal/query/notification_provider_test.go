@@ -50,7 +50,7 @@ func Test_NotificationProviderPrepares(t *testing.T) {
 			name:    "prepareNotificationProviderQuery no result",
 			prepare: prepareDebugNotificationProviderQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(prepareNotificationProviderStmt),
 					nil,
 					nil,
@@ -109,7 +109,7 @@ func Test_NotificationProviderPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*DebugNotificationProvider)(nil),
 		},
 	}
 	for _, tt := range tests {

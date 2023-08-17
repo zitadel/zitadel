@@ -92,7 +92,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				expectations: []mockExpectation{
 					expectBegin(),
 					expectCurrentSequenceErr(false, "my_sequences", "my_projection", []string{"instanceID1"}, sql.ErrTxDone),
-					expectCommit(),
+					expectRollback(),
 				},
 				SearchQueryBuilder: nil,
 			},
@@ -212,7 +212,6 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				},
 				Reducers: tt.fields.reducers,
 			})
-			h.client.SetQueryCommitDelay(10 * time.Millisecond)
 
 			for _, expectation := range tt.want.expectations {
 				expectation(mock)
@@ -223,7 +222,6 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				t.Errorf("ProjectionHandler.prepareBulkStmts() error = %v", err)
 				return
 			}
-			time.Sleep(20 * time.Millisecond)
 
 			if !reflect.DeepEqual(query, tt.want.SearchQueryBuilder) {
 				t.Errorf("unexpected query: expected %v, got %v", tt.want.SearchQueryBuilder, query)

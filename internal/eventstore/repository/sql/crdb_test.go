@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -647,7 +646,6 @@ func TestCRDB_CreateInstance(t *testing.T) {
 			db := &CRDB{
 				DB: &database.DB{DB: testCRDBClient},
 			}
-			db.SetQueryCommitDelay(10 * time.Millisecond)
 
 			if err := db.CreateInstance(context.Background(), tt.args.instanceID); (err != nil) != tt.res.wantErr {
 				t.Errorf("CRDB.CreateInstance() error = %v, wantErr %v", err, tt.res.wantErr)
@@ -913,7 +911,6 @@ func TestCRDB_Filter(t *testing.T) {
 					Database: new(testDB),
 				},
 			}
-			db.SetQueryCommitDelay(10 * time.Millisecond)
 
 			// setup initial data for query
 			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
@@ -925,7 +922,6 @@ func TestCRDB_Filter(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CRDB.query() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			time.Sleep(20 * time.Millisecond)
 
 			if len(events) != tt.res.eventCount {
 				t.Errorf("CRDB.query() expected event count: %d got %d", tt.res.eventCount, len(events))
@@ -1008,7 +1004,6 @@ func TestCRDB_LatestSequence(t *testing.T) {
 					Database: new(testDB),
 				},
 			}
-			db.SetQueryCommitDelay(10 * time.Millisecond)
 
 			// setup initial data for query
 			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
