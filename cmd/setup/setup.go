@@ -77,7 +77,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.FirstInstance.smtpEncryptionKey = config.EncryptionKeys.SMTP
 	steps.FirstInstance.oidcEncryptionKey = config.EncryptionKeys.OIDC
 	steps.FirstInstance.masterKey = masterKey
-	steps.FirstInstance.db = dbClient.DB
+	steps.FirstInstance.db = dbClient
 	steps.FirstInstance.es = eventstoreClient
 	steps.FirstInstance.defaults = config.SystemDefaults
 	steps.FirstInstance.zitadelRoles = config.InternalAuthZ.RolePermissionMappings

@@ -1572,7 +1572,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 				t.Fatalf("unexpected err in begin: %v", err)
 			}
 
-			seq, err := h.currentSequences(context.Background(), true, tx.QueryContext, tt.args.instanceIDs)
+			seq, err := h.currentSequences(context.Background(), true, (&transaction{Tx: tx}).QueryContext, tt.args.instanceIDs)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}

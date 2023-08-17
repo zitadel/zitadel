@@ -115,7 +115,7 @@ var (
 	}
 )
 
-func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (_ *SMSConfig, err error) {
+func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (config *SMSConfig, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -130,11 +130,14 @@ func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (_ *SMSC
 		return nil, errors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		config, err = scan(row)
+		return err
+	}, stmt, args...)
+	return config, err
 }
 
-func (q *Queries) SMSProviderConfig(ctx context.Context, queries ...SearchQuery) (_ *SMSConfig, err error) {
+func (q *Queries) SMSProviderConfig(ctx context.Context, queries ...SearchQuery) (config *SMSConfig, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -151,11 +154,14 @@ func (q *Queries) SMSProviderConfig(ctx context.Context, queries ...SearchQuery)
 		return nil, errors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		config, err = scan(row)
+		return err
+	}, stmt, args...)
+	return config, err
 }
 
-func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearchQueries) (_ *SMSConfigs, err error) {
+func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearchQueries) (configs *SMSConfigs, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -168,16 +174,15 @@ func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearc
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-sn9Jf", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		configs, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
 	}
-	apps, err := scan(rows)
-	if err != nil {
-		return nil, err
-	}
-	apps.LatestSequence, err = q.latestSequence(ctx, smsConfigsTable)
-	return apps, err
+	configs.LatestSequence, err = q.latestSequence(ctx, smsConfigsTable)
+	return configs, err
 }
 
 func NewSMSProviderStateQuery(state domain.SMSConfigState) (SearchQuery, error) {

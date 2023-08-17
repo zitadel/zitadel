@@ -61,11 +61,15 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 
 	dst := new(AuthRequest)
 	err = q.client.QueryRowContext(
-		ctx, q.authRequestByIDQuery(ctx),
+		ctx,
+		func(row *sql.Row) error {
+			return row.Scan(
+				&dst.ID, &dst.CreationDate, &dst.LoginClient, &dst.ClientID, &scope, &dst.RedirectURI,
+				&prompt, &locales, &dst.LoginHint, &dst.MaxAge, &dst.HintUserID,
+			)
+		},
+		q.authRequestByIDQuery(ctx),
 		id, authz.GetInstance(ctx).InstanceID(),
-	).Scan(
-		&dst.ID, &dst.CreationDate, &dst.LoginClient, &dst.ClientID, &scope, &dst.RedirectURI,
-		&prompt, &locales, &dst.LoginHint, &dst.MaxAge, &dst.HintUserID,
 	)
 	if errs.Is(err, sql.ErrNoRows) {
 		return nil, errors.ThrowNotFound(err, "QUERY-Thee9", "Errors.AuthRequest.NotExisting")

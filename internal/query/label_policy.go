@@ -42,7 +42,7 @@ type Theme struct {
 	IconURL         string
 }
 
-func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (_ *LabelPolicy, err error) {
+func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (policy *LabelPolicy, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -68,11 +68,14 @@ func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string, with
 		return nil, errors.ThrowInternal(err, "QUERY-V22un", "unable to create sql stmt")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		policy, err = scan(row)
+		return err
+	}, query, args...)
+	return policy, err
 }
 
-func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (_ *LabelPolicy, err error) {
+func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (policy *LabelPolicy, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -98,11 +101,14 @@ func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (_ 
 		return nil, errors.ThrowInternal(err, "QUERY-AG5eq", "unable to create sql stmt")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		policy, err = scan(row)
+		return err
+	}, query, args...)
+	return policy, err
 }
 
-func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (_ *LabelPolicy, err error) {
+func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (policy *LabelPolicy, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -118,11 +124,14 @@ func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (_ *LabelPolicy,
 		return nil, errors.ThrowInternal(err, "QUERY-mN0Ci", "unable to create sql stmt")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		policy, err = scan(row)
+		return err
+	}, query, args...)
+	return policy, err
 }
 
-func (q *Queries) DefaultPreviewLabelPolicy(ctx context.Context) (_ *LabelPolicy, err error) {
+func (q *Queries) DefaultPreviewLabelPolicy(ctx context.Context) (policy *LabelPolicy, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -138,8 +147,11 @@ func (q *Queries) DefaultPreviewLabelPolicy(ctx context.Context) (_ *LabelPolicy
 		return nil, errors.ThrowInternal(err, "QUERY-B3JQR", "unable to create sql stmt")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		policy, err = scan(row)
+		return err
+	}, query, args...)
+	return policy, err
 }
 
 var (

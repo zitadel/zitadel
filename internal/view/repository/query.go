@@ -7,6 +7,8 @@ import (
 
 	"github.com/jinzhu/gorm"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -51,7 +53,11 @@ func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, r
 		}
 
 		query = query.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: true})
-		defer query.Commit()
+		defer func() {
+			if err := query.Commit().Error; err != nil {
+				logging.OnError(err).Info("commit failed")
+			}
+		}()
 
 		query = query.Count(&count)
 		if res == nil {

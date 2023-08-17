@@ -32,6 +32,26 @@ type querier interface {
 
 type scan func(dest ...interface{}) error
 
+type tx struct {
+	*sql.Tx
+}
+
+func (t *tx) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, query string, args ...any) error {
+	rows, err := t.Tx.QueryContext(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		closeErr := rows.Close()
+		logging.OnError(closeErr).Info("rows.Close failed")
+	}()
+
+	if err = scan(rows); err != nil {
+		return err
+	}
+	return rows.Err()
+}
+
 func query(ctx context.Context, criteria querier, searchQuery *repository.SearchQuery, dest interface{}) error {
 	query, rowScanner := prepareColumns(criteria, searchQuery.Columns)
 	where, values := prepareCondition(criteria, searchQuery.Filters)
@@ -57,25 +77,26 @@ func query(ctx context.Context, criteria querier, searchQuery *repository.Search
 	query = criteria.placeholder(query)
 
 	var contextQuerier interface {
-		QueryContext(context.Context, string, ...interface{}) (*sql.Rows, error)
+		QueryContext(context.Context, func(rows *sql.Rows) error, string, ...interface{}) error
 	}
 	contextQuerier = criteria.db()
 	if searchQuery.Tx != nil {
-		contextQuerier = searchQuery.Tx
+		contextQuerier = &tx{Tx: searchQuery.Tx}
 	}
 
-	rows, err := contextQuerier.QueryContext(ctx, query, values...)
+	err := contextQuerier.QueryContext(ctx,
+		func(rows *sql.Rows) error {
+			for rows.Next() {
+				err := rowScanner(rows.Scan, dest)
+				if err != nil {
+					return err
+				}
+			}
+			return nil
+		}, query, values...)
 	if err != nil {
 		logging.New().WithError(err).Info("query failed")
 		return z_errors.ThrowInternal(err, "SQL-KyeAx", "unable to filter events")
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		err = rowScanner(rows.Scan, dest)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil

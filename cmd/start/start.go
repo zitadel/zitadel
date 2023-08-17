@@ -123,7 +123,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		return fmt.Errorf("cannot start client for projection: %w", err)
 	}
 
-	keyStorage, err := cryptoDB.NewKeyStorage(dbClient.DB, masterKey)
+	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterKey)
 	if err != nil {
 		return fmt.Errorf("cannot start key storage: %w", err)
 	}

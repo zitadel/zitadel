@@ -25,7 +25,11 @@ func PrepareGetByQuery(table string, queries ...SearchQuery) func(db *gorm.DB, r
 		}
 
 		tx := query.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: true})
-		defer tx.Commit()
+		defer func() {
+			if err := tx.Commit().Error; err != nil {
+				logging.OnError(err).Info("commit failed")
+			}
+		}()
 
 		err := tx.Take(res).Error
 		if err == nil {

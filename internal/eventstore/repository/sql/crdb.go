@@ -161,13 +161,18 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 var instanceRegexp = regexp.MustCompile(`eventstore\.i_[0-9a-zA-Z]{1,}_seq`)
 
 func (db *CRDB) CreateInstance(ctx context.Context, instanceID string) error {
-	row := db.QueryRowContext(ctx, "SELECT CONCAT('eventstore.i_', $1::TEXT, '_seq')", instanceID)
-	if row.Err() != nil {
-		return caos_errs.ThrowInvalidArgument(row.Err(), "SQL-7gtFA", "Errors.InvalidArgument")
-	}
 	var sequenceName string
-	if err := row.Scan(&sequenceName); err != nil || !instanceRegexp.MatchString(sequenceName) {
-		return caos_errs.ThrowInvalidArgument(err, "SQL-7gtFA", "Errors.InvalidArgument")
+	err := db.QueryRowContext(ctx,
+		func(row *sql.Row) error {
+			if err := row.Scan(&sequenceName); err != nil || !instanceRegexp.MatchString(sequenceName) {
+				return caos_errs.ThrowInvalidArgument(err, "SQL-7gtFA", "Errors.InvalidArgument")
+			}
+			return nil
+		},
+		"SELECT CONCAT('eventstore.i_', $1::TEXT, '_seq')", instanceID,
+	)
+	if err != nil {
+		return err
 	}
 
 	if _, err := db.ExecContext(ctx, "CREATE SEQUENCE "+sequenceName); err != nil {
