@@ -25,45 +25,38 @@ type instanceSequence struct {
 	sequence   uint64
 }
 
-func (h *StatementHandler) currentSequences(ctx context.Context, isTx bool, query func(context.Context, string, ...interface{}) (*sql.Rows, error), instanceIDs database.StringArray) (currentSequences, error) {
+func (h *StatementHandler) currentSequences(ctx context.Context, isTx bool, query func(context.Context, func(*sql.Rows) error, string, ...interface{}) error, instanceIDs database.StringArray) (currentSequences, error) {
 	stmt := h.currentSequenceStmt
 	if !isTx {
 		stmt = h.currentSequenceWithoutLockStmt
 	}
-	rows, err := query(ctx, stmt, h.ProjectionName, instanceIDs)
+
+	sequences := make(currentSequences, len(h.aggregates))
+	err := query(ctx,
+		func(rows *sql.Rows) error {
+			for rows.Next() {
+				var (
+					aggregateType eventstore.AggregateType
+					sequence      uint64
+					instanceID    string
+				)
+
+				err := rows.Scan(&sequence, &aggregateType, &instanceID)
+				if err != nil {
+					return errors.ThrowInternal(err, "CRDB-dbatK", "scan failed")
+				}
+
+				sequences[aggregateType] = append(sequences[aggregateType], &instanceSequence{
+					sequence:   sequence,
+					instanceID: instanceID,
+				})
+			}
+			return nil
+		},
+		stmt, h.ProjectionName, instanceIDs)
 	if err != nil {
 		return nil, err
 	}
-
-	defer rows.Close()
-
-	sequences := make(currentSequences, len(h.aggregates))
-	for rows.Next() {
-		var (
-			aggregateType eventstore.AggregateType
-			sequence      uint64
-			instanceID    string
-		)
-
-		err = rows.Scan(&sequence, &aggregateType, &instanceID)
-		if err != nil {
-			return nil, errors.ThrowInternal(err, "CRDB-dbatK", "scan failed")
-		}
-
-		sequences[aggregateType] = append(sequences[aggregateType], &instanceSequence{
-			sequence:   sequence,
-			instanceID: instanceID,
-		})
-	}
-
-	if err = rows.Close(); err != nil {
-		return nil, errors.ThrowInternal(err, "CRDB-h5i5m", "close rows failed")
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, errors.ThrowInternal(err, "CRDB-O8zig", "errors in scanning rows")
-	}
-
 	return sequences, nil
 }
 

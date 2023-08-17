@@ -24,31 +24,32 @@ func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQueryFac
 	return db.filter(ctx, db.client, searchQuery)
 }
 
-func (sql *SQL) filter(ctx context.Context, db *database.DB, searchQuery *es_models.SearchQueryFactory) (events []*es_models.Event, err error) {
-	query, limit, values, rowScanner := sql.buildQuery(ctx, db, searchQuery)
+func (server *SQL) filter(ctx context.Context, db *database.DB, searchQuery *es_models.SearchQueryFactory) (events []*es_models.Event, err error) {
+	query, limit, values, rowScanner := server.buildQuery(ctx, db, searchQuery)
 	if query == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
 
-	rows, err := db.Query(query, values...)
+	events = make([]*es_models.Event, 0, limit)
+	err = db.QueryContext(ctx,
+		func(rows *sql.Rows) error {
+			for rows.Next() {
+				event := new(es_models.Event)
+				err := rowScanner(rows.Scan, event)
+				if err != nil {
+					return err
+				}
+
+				events = append(events, event)
+			}
+			return nil
+		},
+		query, values...,
+	)
 	if err != nil {
 		logging.New().WithError(err).Info("query failed")
 		return nil, errors.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
 	}
-	defer rows.Close()
-
-	events = make([]*es_models.Event, 0, limit)
-
-	for rows.Next() {
-		event := new(es_models.Event)
-		err := rowScanner(rows.Scan, event)
-		if err != nil {
-			return nil, err
-		}
-
-		events = append(events, event)
-	}
-
 	return events, nil
 }
 
@@ -57,9 +58,10 @@ func (db *SQL) LatestSequence(ctx context.Context, queryFactory *es_models.Searc
 	if query == "" {
 		return 0, errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
-	row := db.client.QueryRow(query, values...)
 	sequence := new(Sequence)
-	err := rowScanner(row.Scan, sequence)
+	err := db.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		return rowScanner(row.Scan, sequence)
+	}, query, values...)
 	if err != nil {
 		logging.New().WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Info("query failed")
 		return 0, errors.ThrowInternal(err, "SQL-Yczyx", "unable to filter latest sequence")
@@ -67,29 +69,29 @@ func (db *SQL) LatestSequence(ctx context.Context, queryFactory *es_models.Searc
 	return uint64(*sequence), nil
 }
 
-func (db *SQL) InstanceIDs(ctx context.Context, queryFactory *es_models.SearchQueryFactory) ([]string, error) {
+func (db *SQL) InstanceIDs(ctx context.Context, queryFactory *es_models.SearchQueryFactory) (ids []string, err error) {
 	query, _, values, rowScanner := db.buildQuery(ctx, db.client, queryFactory)
 	if query == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "SQL-Sfwg2", "invalid query factory")
 	}
 
-	rows, err := db.client.Query(query, values...)
+	err = db.client.QueryContext(ctx,
+		func(rows *sql.Rows) error {
+			for rows.Next() {
+				var id string
+				err := rowScanner(rows.Scan, &id)
+				if err != nil {
+					return err
+				}
+
+				ids = append(ids, id)
+			}
+			return nil
+		},
+		query, values...)
 	if err != nil {
 		logging.New().WithError(err).Info("query failed")
 		return nil, errors.ThrowInternal(err, "SQL-Sfg3r", "unable to filter instance ids")
-	}
-	defer rows.Close()
-
-	ids := make([]string, 0)
-
-	for rows.Next() {
-		var id string
-		err := rowScanner(rows.Scan, &id)
-		if err != nil {
-			return nil, err
-		}
-
-		ids = append(ids, id)
 	}
 
 	return ids, nil

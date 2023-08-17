@@ -142,6 +142,26 @@ func (h *StatementHandler) dbSearchQuery(ctx context.Context, instanceIDs []stri
 	return queryBuilder, h.bulkLimit, nil
 }
 
+type transaction struct {
+	*sql.Tx
+}
+
+func (t *transaction) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, query string, args ...any) error {
+	rows, err := t.Tx.QueryContext(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		closeErr := rows.Close()
+		logging.OnError(closeErr).Info("rows.Close failed")
+	}()
+
+	if err = scan(rows); err != nil {
+		return err
+	}
+	return rows.Err()
+}
+
 // Update implements handler.Update
 func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statement, reduce handler.Reduce) (index int, err error) {
 	if len(stmts) == 0 {
@@ -156,7 +176,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 		return -1, errors.ThrowInternal(err, "CRDB-e89Gq", "begin failed")
 	}
 
-	sequences, err := h.currentSequences(ctx, true, tx.QueryContext, instanceIDs)
+	sequences, err := h.currentSequences(ctx, true, (&transaction{Tx: tx}).QueryContext, instanceIDs)
 	if err != nil {
 		tx.Rollback()
 		return -1, err

@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	// z_db "github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
@@ -445,7 +446,7 @@ func Test_checkMasterKeyLength(t *testing.T) {
 
 type db struct {
 	mock sqlmock.Sqlmock
-	db   *sql.DB
+	db   *z_db.DB
 }
 
 func dbMock(t *testing.T, expectations ...func(m sqlmock.Sqlmock)) db {

@@ -70,7 +70,7 @@ var (
 	}
 )
 
-func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (_ *MailTemplate, err error) {
+func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (template *MailTemplate, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -93,11 +93,14 @@ func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string, withOwner
 		return nil, errors.ThrowInternal(err, "QUERY-m0sJg", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		template, err = scan(row)
+		return err
+	}, query, args...)
+	return template, err
 }
 
-func (q *Queries) DefaultMailTemplate(ctx context.Context) (_ *MailTemplate, err error) {
+func (q *Queries) DefaultMailTemplate(ctx context.Context) (template *MailTemplate, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -112,8 +115,11 @@ func (q *Queries) DefaultMailTemplate(ctx context.Context) (_ *MailTemplate, err
 		return nil, errors.ThrowInternal(err, "QUERY-2m0fH", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		template, err = scan(row)
+		return err
+	}, query, args...)
+	return template, err
 }
 
 func prepareMailTemplateQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*MailTemplate, error)) {
