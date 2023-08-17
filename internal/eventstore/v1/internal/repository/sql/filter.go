@@ -3,12 +3,13 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"runtime/debug"
 
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/errors"
+	errs "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -23,7 +24,7 @@ func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQueryFac
 func (server *SQL) filter(ctx context.Context, db *database.DB, searchQuery *es_models.SearchQueryFactory) (events []*es_models.Event, err error) {
 	query, limit, values, rowScanner := server.buildQuery(ctx, db, searchQuery)
 	if query == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
+		return nil, errs.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
 
 	events = make([]*es_models.Event, 0, limit)
@@ -44,7 +45,7 @@ func (server *SQL) filter(ctx context.Context, db *database.DB, searchQuery *es_
 	)
 	if err != nil {
 		logging.New().WithError(err).Info("query failed")
-		return nil, errors.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
+		return nil, errs.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
 	}
 	return events, nil
 }
@@ -52,15 +53,15 @@ func (server *SQL) filter(ctx context.Context, db *database.DB, searchQuery *es_
 func (db *SQL) LatestSequence(ctx context.Context, queryFactory *es_models.SearchQueryFactory) (uint64, error) {
 	query, _, values, rowScanner := db.buildQuery(ctx, db.client, queryFactory)
 	if query == "" {
-		return 0, errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
+		return 0, errs.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
 	sequence := new(Sequence)
 	err := db.client.QueryRowContext(ctx, func(row *sql.Row) error {
 		return rowScanner(row.Scan, sequence)
 	}, query, values...)
-	if err != nil {
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		logging.New().WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Info("query failed")
-		return 0, errors.ThrowInternal(err, "SQL-Yczyx", "unable to filter latest sequence")
+		return 0, errs.ThrowInternal(err, "SQL-Yczyx", "unable to filter latest sequence")
 	}
 	return uint64(*sequence), nil
 }
@@ -68,7 +69,7 @@ func (db *SQL) LatestSequence(ctx context.Context, queryFactory *es_models.Searc
 func (db *SQL) InstanceIDs(ctx context.Context, queryFactory *es_models.SearchQueryFactory) (ids []string, err error) {
 	query, _, values, rowScanner := db.buildQuery(ctx, db.client, queryFactory)
 	if query == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "SQL-Sfwg2", "invalid query factory")
+		return nil, errs.ThrowInvalidArgument(nil, "SQL-Sfwg2", "invalid query factory")
 	}
 
 	err = db.client.QueryContext(ctx,
@@ -87,7 +88,7 @@ func (db *SQL) InstanceIDs(ctx context.Context, queryFactory *es_models.SearchQu
 		query, values...)
 	if err != nil {
 		logging.New().WithError(err).Info("query failed")
-		return nil, errors.ThrowInternal(err, "SQL-Sfg3r", "unable to filter instance ids")
+		return nil, errs.ThrowInternal(err, "SQL-Sfg3r", "unable to filter instance ids")
 	}
 
 	return ids, nil

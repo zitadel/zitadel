@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"reflect"
-	"time"
 
 	"github.com/zitadel/logging"
 
@@ -26,11 +25,6 @@ func (c *Config) SetConnector(connector dialect.Connector) {
 type DB struct {
 	*sql.DB
 	dialect.Database
-	queryCommitDelay time.Duration
-}
-
-func (db *DB) SetQueryCommitDelay(d time.Duration) {
-	db.queryCommitDelay = d
 }
 
 func (db *DB) Query(scan func(*sql.Rows) error, query string, args ...any) error {
@@ -104,9 +98,8 @@ func Connect(config Config, useAdmin bool) (*DB, error) {
 	}
 
 	return &DB{
-		DB:               client,
-		Database:         config.connector,
-		queryCommitDelay: 10 * time.Millisecond,
+		DB:       client,
+		Database: config.connector,
 	}, nil
 }
 

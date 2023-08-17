@@ -741,7 +741,7 @@ func Test_query_events_mocked(t *testing.T) {
 				},
 			},
 			fields: fields{
-				mock: newMockClient(t).expectQuery(t,
+				mock: newMockClient(t).expectQueryScanErr(t,
 					`SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) ORDER BY creation_date DESC, event_sequence DESC`,
 					[]driver.Value{repository.AggregateType("user")},
 					&repository.Event{Sequence: 100}),
@@ -827,7 +827,6 @@ func Test_query_events_mocked(t *testing.T) {
 				},
 				AllowOrderByCreationDate: true,
 			}
-			crdb.SetQueryCommitDelay(10 * time.Millisecond)
 			if tt.fields.mock != nil {
 				crdb.DB.DB = tt.fields.mock.client
 			}
@@ -836,7 +835,6 @@ func Test_query_events_mocked(t *testing.T) {
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("query() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
-			time.Sleep(20 * time.Millisecond)
 
 			if tt.fields.mock == nil {
 				return
@@ -858,6 +856,18 @@ func (m *dbMock) expectQuery(t *testing.T, expectedQuery string, args []driver.V
 	m.mock.ExpectBegin()
 	query := m.mock.ExpectQuery(expectedQuery).WithArgs(args...)
 	m.mock.ExpectCommit()
+	rows := sqlmock.NewRows([]string{"event_sequence"})
+	for _, event := range events {
+		rows = rows.AddRow(event.Sequence)
+	}
+	query.WillReturnRows(rows).RowsWillBeClosed()
+	return m
+}
+
+func (m *dbMock) expectQueryScanErr(t *testing.T, expectedQuery string, args []driver.Value, events ...*repository.Event) *dbMock {
+	m.mock.ExpectBegin()
+	query := m.mock.ExpectQuery(expectedQuery).WithArgs(args...)
+	m.mock.ExpectRollback()
 	rows := sqlmock.NewRows([]string{"event_sequence"})
 	for _, event := range events {
 		rows = rows.AddRow(event.Sequence)
