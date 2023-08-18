@@ -17,7 +17,7 @@ Last revised: June 14, 2022
 
 **Downtime** means any period of time in which Core Services are not Available within the Region of the customer’s organization. Downtime excludes any time in which ZITADEL Cloud is not Available because of
 
-- Announced maintenance work
+- [Announced maintenance work](/docs/support/software-release-cycles-support#maintenance)
 - Emergency maintenance
 - Force majeure events.
 

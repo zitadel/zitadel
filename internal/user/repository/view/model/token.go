@@ -182,6 +182,23 @@ func (t *TokenView) appendPATRemoved(event *es_models.Event) error {
 	return nil
 }
 
+func (t *TokenView) GetRelevantEventTypes() []es_models.EventType {
+	return []es_models.EventType{
+		es_models.EventType(user_repo.UserTokenAddedType),
+		es_models.EventType(user_repo.PersonalAccessTokenAddedType),
+		es_models.EventType(user_repo.UserTokenRemovedType),
+		es_models.EventType(user_repo.HumanRefreshTokenRemovedType),
+		es_models.EventType(user_repo.UserV1SignedOutType),
+		es_models.EventType(user_repo.HumanSignedOutType),
+		es_models.EventType(user_repo.UserRemovedType),
+		es_models.EventType(user_repo.UserDeactivatedType),
+		es_models.EventType(user_repo.UserLockedType),
+		es_models.EventType(user_repo.UserLockedType),
+		es_models.EventType(user_repo.UserReactivatedType),
+		es_models.EventType(user_repo.PersonalAccessTokenRemovedType),
+	}
+}
+
 func eventToMap(event *es_models.Event) (map[string]interface{}, error) {
 	m := make(map[string]interface{})
 	if err := json.Unmarshal(event.Data, &m); err != nil {

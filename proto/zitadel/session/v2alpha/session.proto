@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package zitadel.session.v2alpha;
 
-import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
@@ -45,6 +44,9 @@ message Session {
 message Factors {
   UserFactor user = 1;
   PasswordFactor password = 2;
+  WebAuthNFactor web_auth_n = 3;
+  IntentFactor intent = 4;
+  TOTPFactor totp = 5;
 }
 
 message UserFactor {
@@ -68,12 +70,42 @@ message UserFactor {
       description: "\"display name of the checked user\"";
     }
   ];
+  string organisation_id = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"organisation id of the checked user\"";
+    }
+  ];
 }
 
 message PasswordFactor {
   google.protobuf.Timestamp verified_at = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"time when the password was last checked\"";
+    }
+  ];
+}
+
+message IntentFactor {
+  google.protobuf.Timestamp verified_at = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when an intent was last checked\"";
+    }
+  ];
+}
+
+message WebAuthNFactor {
+  google.protobuf.Timestamp verified_at = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the passkey challenge was last checked\"";
+    }
+  ];
+  bool user_verified = 2;
+}
+
+message TOTPFactor {
+  google.protobuf.Timestamp verified_at = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the Time-based One-Time Password was last checked\"";
     }
   ];
 }

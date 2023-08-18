@@ -111,15 +111,13 @@ func createInstancePbToAddMachine(req *system_pb.CreateInstanceRequest_Machine, 
 	if defaultMachine.Pat != nil || req.PersonalAccessToken != nil {
 		pat := command.AddPat{
 			// Scopes are currently static and can not be overwritten
-			Scopes: []string{oidc.ScopeOpenID, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner},
+			Scopes: []string{oidc.ScopeOpenID, oidc.ScopeProfile, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner},
 		}
-
-		if !defaultMachine.Pat.ExpirationDate.IsZero() {
-			pat.ExpirationDate = defaultMachine.Pat.ExpirationDate
-		} else if req.PersonalAccessToken.ExpirationDate.IsValid() {
+		if req.GetPersonalAccessToken().GetExpirationDate().IsValid() {
 			pat.ExpirationDate = req.PersonalAccessToken.ExpirationDate.AsTime()
+		} else if defaultMachine.Pat != nil && !defaultMachine.Pat.ExpirationDate.IsZero() {
+			pat.ExpirationDate = defaultMachine.Pat.ExpirationDate
 		}
-
 		machine.Pat = &pat
 	}
 

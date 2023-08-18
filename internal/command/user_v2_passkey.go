@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -15,23 +16,23 @@ import (
 )
 
 // RegisterUserPasskey creates a passkey registration for the current authenticated user.
-// UserID, ussualy taken from the request is compaired against the user ID in the context.
-func (c *Commands) RegisterUserPasskey(ctx context.Context, userID, resourceOwner string, authenticator domain.AuthenticatorAttachment) (*domain.PasskeyRegistrationDetails, error) {
+// UserID, usually taken from the request is compared against the user ID in the context.
+func (c *Commands) RegisterUserPasskey(ctx context.Context, userID, resourceOwner, rpID string, authenticator domain.AuthenticatorAttachment) (*domain.WebAuthNRegistrationDetails, error) {
 	if err := authz.UserIDInCTX(ctx, userID); err != nil {
 		return nil, err
 	}
-	return c.registerUserPasskey(ctx, userID, resourceOwner, authenticator)
+	return c.registerUserPasskey(ctx, userID, resourceOwner, rpID, authenticator)
 }
 
 // RegisterUserPasskeyWithCode registers a new passkey for a unauthenticated user id.
 // The resource is protected by the code, identified by the codeID.
-func (c *Commands) RegisterUserPasskeyWithCode(ctx context.Context, userID, resourceOwner string, authenticator domain.AuthenticatorAttachment, codeID, code string, alg crypto.EncryptionAlgorithm) (*domain.PasskeyRegistrationDetails, error) {
+func (c *Commands) RegisterUserPasskeyWithCode(ctx context.Context, userID, resourceOwner string, authenticator domain.AuthenticatorAttachment, codeID, code, rpID string, alg crypto.EncryptionAlgorithm) (*domain.WebAuthNRegistrationDetails, error) {
 	event, err := c.verifyUserPasskeyCode(ctx, userID, resourceOwner, codeID, code, alg)
 	if err != nil {
 		return nil, err
 	}
 
-	return c.registerUserPasskey(ctx, userID, resourceOwner, authenticator, event)
+	return c.registerUserPasskey(ctx, userID, resourceOwner, rpID, authenticator, event)
 }
 
 type eventCallback func(context.Context, *eventstore.Aggregate) eventstore.Command
@@ -40,7 +41,7 @@ type eventCallback func(context.Context, *eventstore.Aggregate) eventstore.Comma
 // A code can only be used once.
 // Upon success an event callback is returned, which must be called after
 // all other events for the current request are created.
-// This prevent consuming a code when another error occurred after verification.
+// This prevents consuming a code when another error occurred after verification.
 func (c *Commands) verifyUserPasskeyCode(ctx context.Context, userID, resourceOwner, codeID, code string, alg crypto.EncryptionAlgorithm) (eventCallback, error) {
 	wm := NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, wm)
@@ -63,25 +64,25 @@ func (c *Commands) verifyUserPasskeyCodeFailed(ctx context.Context, wm *HumanPas
 	logging.WithFields("userID", userAgg.ID).OnError(err).Error("RegisterUserPasskeyWithCode push failed")
 }
 
-func (c *Commands) registerUserPasskey(ctx context.Context, userID, resourceOwner string, authenticator domain.AuthenticatorAttachment, events ...eventCallback) (*domain.PasskeyRegistrationDetails, error) {
-	wm, userAgg, webAuthN, err := c.createUserPasskey(ctx, userID, resourceOwner, authenticator)
+func (c *Commands) registerUserPasskey(ctx context.Context, userID, resourceOwner, rpID string, authenticator domain.AuthenticatorAttachment, events ...eventCallback) (*domain.WebAuthNRegistrationDetails, error) {
+	wm, userAgg, webAuthN, err := c.createUserPasskey(ctx, userID, resourceOwner, rpID, authenticator)
 	if err != nil {
 		return nil, err
 	}
 	return c.pushUserPasskey(ctx, wm, userAgg, webAuthN, events...)
 }
 
-func (c *Commands) createUserPasskey(ctx context.Context, userID, resourceOwner string, authenticator domain.AuthenticatorAttachment) (*HumanWebAuthNWriteModel, *eventstore.Aggregate, *domain.WebAuthNToken, error) {
+func (c *Commands) createUserPasskey(ctx context.Context, userID, resourceOwner, rpID string, authenticator domain.AuthenticatorAttachment) (*HumanWebAuthNWriteModel, *eventstore.Aggregate, *domain.WebAuthNToken, error) {
 	passwordlessTokens, err := c.getHumanPasswordlessTokens(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	return c.addHumanWebAuthN(ctx, userID, resourceOwner, false, passwordlessTokens, authenticator, domain.UserVerificationRequirementRequired)
+	return c.addHumanWebAuthN(ctx, userID, resourceOwner, rpID, passwordlessTokens, authenticator, domain.UserVerificationRequirementRequired)
 }
 
-func (c *Commands) pushUserPasskey(ctx context.Context, wm *HumanWebAuthNWriteModel, userAgg *eventstore.Aggregate, webAuthN *domain.WebAuthNToken, events ...eventCallback) (*domain.PasskeyRegistrationDetails, error) {
+func (c *Commands) pushUserPasskey(ctx context.Context, wm *HumanWebAuthNWriteModel, userAgg *eventstore.Aggregate, webAuthN *domain.WebAuthNToken, events ...eventCallback) (*domain.WebAuthNRegistrationDetails, error) {
 	cmds := make([]eventstore.Command, len(events)+1)
-	cmds[0] = user.NewHumanPasswordlessAddedEvent(ctx, userAgg, wm.WebauthNTokenID, webAuthN.Challenge)
+	cmds[0] = user.NewHumanPasswordlessAddedEvent(ctx, userAgg, wm.WebauthNTokenID, webAuthN.Challenge, webAuthN.RPID)
 	for i, event := range events {
 		cmds[i+1] = event(ctx, userAgg)
 	}
@@ -90,9 +91,9 @@ func (c *Commands) pushUserPasskey(ctx context.Context, wm *HumanWebAuthNWriteMo
 	if err != nil {
 		return nil, err
 	}
-	return &domain.PasskeyRegistrationDetails{
+	return &domain.WebAuthNRegistrationDetails{
 		ObjectDetails:                      writeModelToObjectDetails(&wm.WriteModel),
-		PasskeyID:                          wm.WebauthNTokenID,
+		ID:                                 wm.WebauthNTokenID,
 		PublicKeyCredentialCreationOptions: webAuthN.CredentialCreationData,
 	}, nil
 }
@@ -122,7 +123,7 @@ func (c *Commands) AddUserPasskeyCodeURLTemplate(ctx context.Context, userID, re
 }
 
 // AddUserPasskeyCodeReturn generates and returns a Passkey code.
-// No email will be send to the user.
+// No email will be sent to the user.
 func (c *Commands) AddUserPasskeyCodeReturn(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm) (*domain.PasskeyCodeDetails, error) {
 	return c.addUserPasskeyCode(ctx, userID, resourceOwner, alg, "", true)
 }
@@ -132,7 +133,7 @@ func (c *Commands) addUserPasskeyCode(ctx context.Context, userID, resourceOwner
 	if err != nil {
 		return nil, err
 	}
-	code, err := c.newCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg)
+	code, err := c.newPasskeyCode(ctx, c.eventstore.Filter, alg)
 	if err != nil {
 		return nil, err
 	}
@@ -153,4 +154,8 @@ func (c *Commands) addUserPasskeyCode(ctx context.Context, userID, resourceOwner
 		CodeID:        codeID,
 		Code:          code.Plain,
 	}, nil
+}
+
+func (c *Commands) newPasskeyCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCode, error) {
+	return c.newCode(ctx, filter, domain.SecretGeneratorTypePasswordlessInitCode, alg)
 }

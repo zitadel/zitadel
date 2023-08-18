@@ -215,6 +215,12 @@ func (wm *OIDCIDPWriteModel) Reduce() error {
 			wm.reduceAddedEvent(e)
 		case *idp.OIDCIDPChangedEvent:
 			wm.reduceChangedEvent(e)
+		case *idp.OIDCIDPMigratedAzureADEvent:
+			wm.State = domain.IDPStateMigrated
+		case *idp.OIDCIDPMigratedGoogleEvent:
+			wm.State = domain.IDPStateMigrated
+		case *idp.RemovedEvent:
+			wm.State = domain.IDPStateRemoved
 		case *idpconfig.IDPConfigAddedEvent:
 			wm.reduceIDPConfigAddedEvent(e)
 		case *idpconfig.IDPConfigChangedEvent:
@@ -408,6 +414,8 @@ func (wm *JWTIDPWriteModel) Reduce() error {
 			wm.reduceAddedEvent(e)
 		case *idp.JWTIDPChangedEvent:
 			wm.reduceChangedEvent(e)
+		case *idp.RemovedEvent:
+			wm.State = domain.IDPStateRemoved
 		case *idpconfig.IDPConfigAddedEvent:
 			wm.reduceIDPConfigAddedEvent(e)
 		case *idpconfig.IDPConfigChangedEvent:
@@ -576,6 +584,8 @@ func (wm *AzureADIDPWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *idp.AzureADIDPAddedEvent:
 			wm.reduceAddedEvent(e)
+		case *idp.OIDCIDPMigratedAzureADEvent:
+			wm.reduceAddedEvent(&e.AzureADIDPAddedEvent)
 		case *idp.AzureADIDPChangedEvent:
 			wm.reduceChangedEvent(e)
 		case *idp.RemovedEvent:
@@ -1233,6 +1243,8 @@ func (wm *GoogleIDPWriteModel) Reduce() error {
 			wm.reduceAddedEvent(e)
 		case *idp.GoogleIDPChangedEvent:
 			wm.reduceChangedEvent(e)
+		case *idp.OIDCIDPMigratedGoogleEvent:
+			wm.reduceAddedEvent(&e.GoogleIDPAddedEvent)
 		case *idp.RemovedEvent:
 			wm.State = domain.IDPStateRemoved
 		}
@@ -1687,6 +1699,14 @@ func (wm *IDPTypeWriteModel) Reduce() error {
 			wm.reduceAdded(e.ID, domain.IDPTypeLDAP, e.Aggregate())
 		case *org.LDAPIDPAddedEvent:
 			wm.reduceAdded(e.ID, domain.IDPTypeLDAP, e.Aggregate())
+		case *instance.OIDCIDPMigratedAzureADEvent:
+			wm.reduceChanged(e.ID, domain.IDPTypeAzureAD)
+		case *org.OIDCIDPMigratedAzureADEvent:
+			wm.reduceChanged(e.ID, domain.IDPTypeAzureAD)
+		case *instance.OIDCIDPMigratedGoogleEvent:
+			wm.reduceChanged(e.ID, domain.IDPTypeGoogle)
+		case *org.OIDCIDPMigratedGoogleEvent:
+			wm.reduceChanged(e.ID, domain.IDPTypeGoogle)
 		case *instance.IDPRemovedEvent:
 			wm.reduceRemoved(e.ID)
 		case *org.IDPRemovedEvent:
@@ -1722,6 +1742,13 @@ func (wm *IDPTypeWriteModel) reduceAdded(id string, t domain.IDPType, agg events
 	wm.InstanceID = agg.InstanceID
 }
 
+func (wm *IDPTypeWriteModel) reduceChanged(id string, t domain.IDPType) {
+	if wm.ID != id {
+		return
+	}
+	wm.Type = t
+}
+
 func (wm *IDPTypeWriteModel) reduceRemoved(id string) {
 	if wm.ID != id {
 		return
@@ -1747,6 +1774,8 @@ func (wm *IDPTypeWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.GitLabSelfHostedIDPAddedEventType,
 			instance.GoogleIDPAddedEventType,
 			instance.LDAPIDPAddedEventType,
+			instance.OIDCIDPMigratedAzureADEventType,
+			instance.OIDCIDPMigratedGoogleEventType,
 			instance.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
@@ -1763,6 +1792,8 @@ func (wm *IDPTypeWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.GitLabSelfHostedIDPAddedEventType,
 			org.GoogleIDPAddedEventType,
 			org.LDAPIDPAddedEventType,
+			org.OIDCIDPMigratedAzureADEventType,
+			org.OIDCIDPMigratedGoogleEventType,
 			org.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).

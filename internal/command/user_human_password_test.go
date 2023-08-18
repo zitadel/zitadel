@@ -2,11 +2,14 @@ package command
 
 import (
 	"context"
+	"errors"
+	"io"
 	"testing"
 	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"github.com/zitadel/passwap"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -20,8 +23,9 @@ import (
 
 func TestCommandSide_SetOneTimePassword(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		userPasswordAlg crypto.HashAlgorithm
+		eventstore         *eventstore.Eventstore
+		userPasswordHasher *crypto.PasswordHasher
+		checkPermission    domain.PermissionCheck
 	}
 	type args struct {
 		ctx           context.Context
@@ -73,6 +77,49 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 			},
 		},
 		{
+			name: "missing permission, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+				checkPermission:    newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+				oneTime:       true,
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+				},
+			},
+		},
+		{
 			name: "change password onetime, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -115,12 +162,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 							eventFromEventPusher(
 								user.NewHumanPasswordChangedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeHash,
-										Algorithm:  "hash",
-										KeyID:      "",
-										Crypted:    []byte("password"),
-									},
+									"$plain$x$password",
 									true,
 									"",
 								),
@@ -128,7 +170,8 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 						},
 					),
 				),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				userPasswordHasher: mockPasswordHasher("x"),
+				checkPermission:    newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -186,12 +229,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 							eventFromEventPusher(
 								user.NewHumanPasswordChangedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeHash,
-										Algorithm:  "hash",
-										KeyID:      "",
-										Crypted:    []byte("password"),
-									},
+									"$plain$x$password",
 									false,
 									"",
 								),
@@ -199,7 +237,8 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 						},
 					),
 				),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				userPasswordHasher: mockPasswordHasher("x"),
+				checkPermission:    newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -218,8 +257,9 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore,
-				userPasswordAlg: tt.fields.userPasswordAlg,
+				eventstore:         tt.fields.eventstore,
+				userPasswordHasher: tt.fields.userPasswordHasher,
+				checkPermission:    tt.fields.checkPermission,
 			}
 			got, err := r.SetPassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.password, tt.args.oneTime)
 			if tt.res.err == nil {
@@ -235,19 +275,19 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 	}
 }
 
-func TestCommandSide_SetPassword(t *testing.T) {
+func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		userPasswordAlg crypto.HashAlgorithm
+		eventstore         *eventstore.Eventstore
+		userEncryption     crypto.EncryptionAlgorithm
+		userPasswordHasher *crypto.PasswordHasher
 	}
 	type args struct {
-		ctx             context.Context
-		userID          string
-		code            string
-		resourceOwner   string
-		password        string
-		agentID         string
-		secretGenerator crypto.Generator
+		ctx           context.Context
+		userID        string
+		code          string
+		resourceOwner string
+		password      string
+		agentID       string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -377,14 +417,14 @@ func TestCommandSide_SetPassword(t *testing.T) {
 						),
 					),
 				),
+				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:             context.Background(),
-				userID:          "user1",
-				code:            "test",
-				resourceOwner:   "org1",
-				password:        "password",
-				secretGenerator: GetMockSecretGenerator(t),
+				ctx:           context.Background(),
+				userID:        "user1",
+				code:          "test",
+				resourceOwner: "org1",
+				password:      "password",
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -446,12 +486,7 @@ func TestCommandSide_SetPassword(t *testing.T) {
 							eventFromEventPusher(
 								user.NewHumanPasswordChangedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeHash,
-										Algorithm:  "hash",
-										KeyID:      "",
-										Crypted:    []byte("password"),
-									},
+									"$plain$x$password",
 									false,
 									"",
 								),
@@ -459,15 +494,15 @@ func TestCommandSide_SetPassword(t *testing.T) {
 						},
 					),
 				),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				userPasswordHasher: mockPasswordHasher("x"),
+				userEncryption:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:             context.Background(),
-				userID:          "user1",
-				resourceOwner:   "org1",
-				password:        "password",
-				code:            "a",
-				secretGenerator: GetMockSecretGenerator(t),
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+				code:          "a",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -479,15 +514,19 @@ func TestCommandSide_SetPassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore,
-				userPasswordAlg: tt.fields.userPasswordAlg,
+				eventstore:         tt.fields.eventstore,
+				userPasswordHasher: tt.fields.userPasswordHasher,
+				userEncryption:     tt.fields.userEncryption,
 			}
-			err := r.SetPasswordWithVerifyCode(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.code, tt.args.password, tt.args.agentID, tt.args.secretGenerator)
+			got, err := r.SetPasswordWithVerifyCode(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.code, tt.args.password, tt.args.agentID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
 			if tt.res.err != nil && !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
 			}
 		})
 	}
@@ -495,8 +534,7 @@ func TestCommandSide_SetPassword(t *testing.T) {
 
 func TestCommandSide_ChangePassword(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		userPasswordAlg crypto.HashAlgorithm
+		userPasswordHasher *crypto.PasswordHasher
 	}
 	type args struct {
 		ctx           context.Context
@@ -514,73 +552,63 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 		name   string
 		fields fields
 		args   args
+		expect []expect
 		res    res
 	}{
 		{
-			name: "userid missing, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
+			name:   "userid missing, invalid argument error",
+			fields: fields{},
 			args: args{
 				ctx:           context.Background(),
 				oldPassword:   "password",
 				newPassword:   "password1",
 				resourceOwner: "org1",
 			},
+			expect: []expect{},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
-			name: "old password missing, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
+			name:   "old password missing, invalid argument error",
+			fields: fields{},
 			args: args{
 				ctx:           context.Background(),
 				userID:        "user1",
 				newPassword:   "password1",
 				resourceOwner: "org1",
 			},
+			expect: []expect{},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
-			name: "new password missing, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
+			name:   "new password missing, invalid argument error",
+			fields: fields{},
 			args: args{
 				ctx:           context.Background(),
 				userID:        "user1",
 				oldPassword:   "password",
 				resourceOwner: "org1",
 			},
+			expect: []expect{},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
-			name: "user not existing, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-				),
-			},
+			name:   "user not existing, precondition error",
+			fields: fields{},
 			args: args{
 				ctx:           context.Background(),
 				userID:        "user1",
 				resourceOwner: "org1",
 				oldPassword:   "password",
 				newPassword:   "password1",
+			},
+			expect: []expect{
+				expectFilter(),
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -589,26 +617,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 		{
 			name: "existing password empty, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-					),
-				),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -617,49 +626,32 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				newPassword:   "password1",
 				resourceOwner: "org1",
 			},
+			expect: []expect{
+				expectFilter(
+					eventFromEventPusher(
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.German,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
+						),
+					),
+				),
+			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
 			},
 		},
 		{
-			name: "password not matching, precondition error",
+			name: "password not matching, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-						eventFromEventPusher(
-							user.NewHumanEmailVerifiedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-						eventFromEventPusher(
-							user.NewHumanPasswordChangedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeHash,
-									Algorithm:  "hash",
-									KeyID:      "",
-									Crypted:    []byte("password"),
-								},
-								false,
-								"")),
-					),
-				),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -668,6 +660,47 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				newPassword:   "password1",
 				resourceOwner: "org1",
 			},
+			expect: []expect{
+				expectFilter(
+					eventFromEventPusher(
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.German,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$password",
+							false,
+							"")),
+				),
+				expectFilter(
+					eventFromEventPusher(
+						org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							1,
+							false,
+							false,
+							false,
+							false,
+						),
+					),
+				),
+			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
 			},
@@ -675,71 +708,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 		{
 			name: "change password, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-						eventFromEventPusher(
-							user.NewHumanEmailVerifiedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-						eventFromEventPusher(
-							user.NewHumanPasswordChangedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeHash,
-									Algorithm:  "hash",
-									KeyID:      "",
-									Crypted:    []byte("password"),
-								},
-								false,
-								"")),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								1,
-								false,
-								false,
-								false,
-								false,
-							),
-						),
-					),
-					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPasswordChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeHash,
-										Algorithm:  "hash",
-										KeyID:      "",
-										Crypted:    []byte("password1"),
-									},
-									false,
-									"",
-								),
-							),
-						},
-					),
-				),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -747,6 +716,59 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				resourceOwner: "org1",
 				oldPassword:   "password",
 				newPassword:   "password1",
+			},
+			expect: []expect{
+				expectFilter(
+					eventFromEventPusher(
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.German,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$password",
+							false,
+							"")),
+				),
+				expectFilter(
+					eventFromEventPusher(
+						org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							1,
+							false,
+							false,
+							false,
+							false,
+						),
+					),
+				),
+				expectPush(
+					[]*repository.Event{
+						eventFromEventPusher(
+							user.NewHumanPasswordChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"$plain$x$password1",
+								false,
+								"",
+							),
+						),
+					},
+				),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -758,8 +780,8 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore,
-				userPasswordAlg: tt.fields.userPasswordAlg,
+				eventstore:         eventstoreExpect(t, tt.expect...),
+				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
 			got, err := r.ChangePassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.oldPassword, tt.args.newPassword, tt.args.agentID)
 			if tt.res.err == nil {
@@ -1071,8 +1093,8 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 
 func TestCommandSide_CheckPassword(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		userPasswordAlg crypto.HashAlgorithm
+		eventstore         *eventstore.Eventstore
+		userPasswordHasher *crypto.PasswordHasher
 	}
 	type args struct {
 		ctx           context.Context
@@ -1160,6 +1182,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -1192,6 +1215,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 							org.NewLoginPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
 								true,
+								false,
 								false,
 								false,
 								false,
@@ -1241,6 +1265,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -1268,7 +1293,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 						),
 					),
 				),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1290,6 +1315,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 							org.NewLoginPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
 								true,
+								false,
 								false,
 								false,
 								false,
@@ -1331,12 +1357,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 						eventFromEventPusher(
 							user.NewHumanPasswordChangedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeHash,
-									Algorithm:  "hash",
-									KeyID:      "",
-									Crypted:    []byte("password"),
-								},
+								"$plain$x$password",
 								false,
 								"")),
 					),
@@ -1354,7 +1375,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 						},
 					),
 				),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1389,6 +1410,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -1422,12 +1444,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 						eventFromEventPusher(
 							user.NewHumanPasswordChangedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeHash,
-									Algorithm:  "hash",
-									KeyID:      "",
-									Crypted:    []byte("password"),
-								},
+								"$plain$x$password",
 								false,
 								"")),
 					),
@@ -1450,7 +1467,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 						},
 					),
 				),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1487,6 +1504,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -1520,12 +1538,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 						eventFromEventPusher(
 							user.NewHumanPasswordChangedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeHash,
-									Algorithm:  "hash",
-									KeyID:      "",
-									Crypted:    []byte("password"),
-								},
+								"$plain$x$password",
 								false,
 								"")),
 					),
@@ -1543,7 +1556,197 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 						},
 					),
 				),
-				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+				authReq: &domain.AuthRequest{
+					ID:      "request1",
+					AgentID: "agent1",
+				},
+			},
+			res: res{},
+		},
+		{
+			name: "check password, ok, updated hash",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPasswordChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"$plain$v$password",
+								false,
+								"")),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewHumanPasswordCheckSucceededEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&user.AuthRequestInfo{
+										ID:          "request1",
+										UserAgentID: "agent1",
+									},
+								),
+							),
+							eventFromEventPusher(
+								user.NewHumanPasswordHashUpdatedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"$plain$x$password",
+								),
+							),
+						},
+					),
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+				authReq: &domain.AuthRequest{
+					ID:      "request1",
+					AgentID: "agent1",
+				},
+			},
+			res: res{},
+		},
+		{
+			name: "regression test old version event",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							&user.HumanPasswordChangedEvent{
+								BaseEvent: *eventstore.NewBaseEventForPush(
+									context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									user.HumanPasswordChangedType,
+								),
+								Secret: &crypto.CryptoValue{
+									CryptoType: crypto.TypeHash,
+									Algorithm:  "plain",
+									KeyID:      "",
+									Crypted:    []byte("$plain$v$password"),
+								},
+								ChangeRequired: false,
+							},
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewHumanPasswordCheckSucceededEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&user.AuthRequestInfo{
+										ID:          "request1",
+										UserAgentID: "agent1",
+									},
+								),
+							),
+							eventFromEventPusher(
+								user.NewHumanPasswordHashUpdatedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"$plain$x$password",
+								),
+							),
+						},
+					),
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1561,8 +1764,8 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore,
-				userPasswordAlg: tt.fields.userPasswordAlg,
+				eventstore:         tt.fields.eventstore,
+				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
 			err := r.HumanCheckPassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.password, tt.args.authReq, tt.args.lockoutPolicy)
 			if tt.res.err == nil {
@@ -1571,6 +1774,44 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			if tt.res.err != nil && !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
 			}
+		})
+	}
+}
+
+func Test_convertPasswapErr(t *testing.T) {
+	type args struct {
+		err error
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr error
+	}{
+		{
+			name:    "nil",
+			args:    args{nil},
+			wantErr: nil,
+		},
+		{
+			name:    "mismatch",
+			args:    args{passwap.ErrPasswordMismatch},
+			wantErr: caos_errs.ThrowInvalidArgument(passwap.ErrPasswordMismatch, "COMMAND-3M0fs", "Errors.User.Password.Invalid"),
+		},
+		{
+			name:    "no change",
+			args:    args{passwap.ErrPasswordNoChange},
+			wantErr: caos_errs.ThrowPreconditionFailed(passwap.ErrPasswordNoChange, "COMMAND-Aesh5", "Errors.User.Password.NotChanged"),
+		},
+		{
+			name:    "other",
+			args:    args{io.ErrClosedPipe},
+			wantErr: caos_errs.ThrowInternal(io.ErrClosedPipe, "COMMAND-CahN2", "Errors.Internal"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := convertPasswapErr(tt.args.err)
+			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}
 }

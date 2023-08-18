@@ -3,18 +3,20 @@ package session
 import (
 	"context"
 
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
 )
 
 func (s *Server) GetSession(ctx context.Context, req *session.GetSessionRequest) (*session.GetSessionResponse, error) {
-	res, err := s.query.SessionByID(ctx, req.GetSessionId(), req.GetSessionToken())
+	res, err := s.query.SessionByID(ctx, true, req.GetSessionId(), req.GetSessionToken())
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +45,9 @@ func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRe
 	if err != nil {
 		return nil, err
 	}
-	set, err := s.command.CreateSession(ctx, checks, metadata)
+	challengeResponse, cmds := s.challengesToCommand(req.GetChallenges(), checks)
+
+	set, err := s.command.CreateSession(ctx, cmds, metadata)
 	if err != nil {
 		return nil, err
 	}
@@ -51,6 +55,7 @@ func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRe
 		Details:      object.DomainToDetailsPb(set.ObjectDetails),
 		SessionId:    set.ID,
 		SessionToken: set.NewToken,
+		Challenges:   challengeResponse,
 	}, nil
 }
 
@@ -59,7 +64,9 @@ func (s *Server) SetSession(ctx context.Context, req *session.SetSessionRequest)
 	if err != nil {
 		return nil, err
 	}
-	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), req.GetSessionToken(), checks, req.GetMetadata())
+	challengeResponse, cmds := s.challengesToCommand(req.GetChallenges(), checks)
+
+	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), req.GetSessionToken(), cmds, req.GetMetadata())
 	if err != nil {
 		return nil, err
 	}
@@ -70,6 +77,7 @@ func (s *Server) SetSession(ctx context.Context, req *session.SetSessionRequest)
 	return &session.SetSessionResponse{
 		Details:      object.DomainToDetailsPb(set.ObjectDetails),
 		SessionToken: set.NewToken,
+		Challenges:   challengeResponse,
 	}, nil
 }
 
@@ -104,13 +112,15 @@ func sessionToPb(s *query.Session) *session.Session {
 
 func factorsToPb(s *query.Session) *session.Factors {
 	user := userFactorToPb(s.UserFactor)
-	pw := passwordFactorToPb(s.PasswordFactor)
-	if user == nil && pw == nil {
+	if user == nil {
 		return nil
 	}
 	return &session.Factors{
 		User:     user,
-		Password: pw,
+		Password: passwordFactorToPb(s.PasswordFactor),
+		WebAuthN: webAuthNFactorToPb(s.WebAuthNFactor),
+		Intent:   intentFactorToPb(s.IntentFactor),
+		Totp:     totpFactorToPb(s.TOTPFactor),
 	}
 }
 
@@ -123,15 +133,44 @@ func passwordFactorToPb(factor query.SessionPasswordFactor) *session.PasswordFac
 	}
 }
 
+func intentFactorToPb(factor query.SessionIntentFactor) *session.IntentFactor {
+	if factor.IntentCheckedAt.IsZero() {
+		return nil
+	}
+	return &session.IntentFactor{
+		VerifiedAt: timestamppb.New(factor.IntentCheckedAt),
+	}
+}
+
+func webAuthNFactorToPb(factor query.SessionWebAuthNFactor) *session.WebAuthNFactor {
+	if factor.WebAuthNCheckedAt.IsZero() {
+		return nil
+	}
+	return &session.WebAuthNFactor{
+		VerifiedAt:   timestamppb.New(factor.WebAuthNCheckedAt),
+		UserVerified: factor.UserVerified,
+	}
+}
+
+func totpFactorToPb(factor query.SessionTOTPFactor) *session.TOTPFactor {
+	if factor.TOTPCheckedAt.IsZero() {
+		return nil
+	}
+	return &session.TOTPFactor{
+		VerifiedAt: timestamppb.New(factor.TOTPCheckedAt),
+	}
+}
+
 func userFactorToPb(factor query.SessionUserFactor) *session.UserFactor {
 	if factor.UserID == "" || factor.UserCheckedAt.IsZero() {
 		return nil
 	}
 	return &session.UserFactor{
-		VerifiedAt:  timestamppb.New(factor.UserCheckedAt),
-		Id:          factor.UserID,
-		LoginName:   factor.LoginName,
-		DisplayName: factor.DisplayName,
+		VerifiedAt:     timestamppb.New(factor.UserCheckedAt),
+		Id:             factor.UserID,
+		LoginName:      factor.LoginName,
+		DisplayName:    factor.DisplayName,
+		OrganisationId: factor.ResourceOwner,
 	}
 }
 
@@ -180,7 +219,7 @@ func idsQueryToQuery(q *session.IDsQuery) (query.SearchQuery, error) {
 	return query.NewSessionIDsSearchQuery(q.Ids)
 }
 
-func (s *Server) createSessionRequestToCommand(ctx context.Context, req *session.CreateSessionRequest) ([]command.SessionCheck, map[string][]byte, error) {
+func (s *Server) createSessionRequestToCommand(ctx context.Context, req *session.CreateSessionRequest) ([]command.SessionCommand, map[string][]byte, error) {
 	checks, err := s.checksToCommand(ctx, req.Checks)
 	if err != nil {
 		return nil, nil, err
@@ -188,7 +227,7 @@ func (s *Server) createSessionRequestToCommand(ctx context.Context, req *session
 	return checks, req.GetMetadata(), nil
 }
 
-func (s *Server) setSessionRequestToCommand(ctx context.Context, req *session.SetSessionRequest) ([]command.SessionCheck, error) {
+func (s *Server) setSessionRequestToCommand(ctx context.Context, req *session.SetSessionRequest) ([]command.SessionCommand, error) {
 	checks, err := s.checksToCommand(ctx, req.Checks)
 	if err != nil {
 		return nil, err
@@ -196,12 +235,12 @@ func (s *Server) setSessionRequestToCommand(ctx context.Context, req *session.Se
 	return checks, nil
 }
 
-func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([]command.SessionCheck, error) {
+func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([]command.SessionCommand, error) {
 	checkUser, err := userCheck(checks.GetUser())
 	if err != nil {
 		return nil, err
 	}
-	sessionChecks := make([]command.SessionCheck, 0, 2)
+	sessionChecks := make([]command.SessionCommand, 0, 3)
 	if checkUser != nil {
 		user, err := checkUser.search(ctx, s.query)
 		if err != nil {
@@ -212,7 +251,52 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	if password := checks.GetPassword(); password != nil {
 		sessionChecks = append(sessionChecks, command.CheckPassword(password.GetPassword()))
 	}
+	if intent := checks.GetIntent(); intent != nil {
+		sessionChecks = append(sessionChecks, command.CheckIntent(intent.GetIntentId(), intent.GetToken()))
+	}
+	if passkey := checks.GetWebAuthN(); passkey != nil {
+		sessionChecks = append(sessionChecks, s.command.CheckWebAuthN(passkey.GetCredentialAssertionData()))
+	}
+	if totp := checks.GetTotp(); totp != nil {
+		sessionChecks = append(sessionChecks, command.CheckTOTP(totp.GetTotp()))
+	}
 	return sessionChecks, nil
+}
+
+func (s *Server) challengesToCommand(challenges *session.RequestChallenges, cmds []command.SessionCommand) (*session.Challenges, []command.SessionCommand) {
+	if challenges == nil {
+		return nil, cmds
+	}
+	resp := new(session.Challenges)
+	if req := challenges.GetWebAuthN(); req != nil {
+		challenge, cmd := s.createWebAuthNChallengeCommand(req)
+		resp.WebAuthN = challenge
+		cmds = append(cmds, cmd)
+	}
+	return resp, cmds
+}
+
+func (s *Server) createWebAuthNChallengeCommand(req *session.RequestChallenges_WebAuthN) (*session.Challenges_WebAuthN, command.SessionCommand) {
+	challenge := &session.Challenges_WebAuthN{
+		PublicKeyCredentialRequestOptions: new(structpb.Struct),
+	}
+	userVerification := userVerificationRequirementToDomain(req.GetUserVerificationRequirement())
+	return challenge, s.command.CreateWebAuthNChallenge(userVerification, req.GetDomain(), challenge.PublicKeyCredentialRequestOptions)
+}
+
+func userVerificationRequirementToDomain(req session.UserVerificationRequirement) domain.UserVerificationRequirement {
+	switch req {
+	case session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_UNSPECIFIED:
+		return domain.UserVerificationRequirementUnspecified
+	case session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED:
+		return domain.UserVerificationRequirementRequired
+	case session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_PREFERRED:
+		return domain.UserVerificationRequirementPreferred
+	case session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_DISCOURAGED:
+		return domain.UserVerificationRequirementDiscouraged
+	default:
+		return domain.UserVerificationRequirementUnspecified
+	}
 }
 
 func userCheck(user *session.CheckUser) (userSearch, error) {

@@ -743,3 +743,119 @@ func TestCommandSide_ExternalLoginCheck(t *testing.T) {
 		})
 	}
 }
+
+func TestCommandSide_MigrateUserIDP(t *testing.T) {
+	type fields struct {
+		eventstore func(t *testing.T) *eventstore.Eventstore
+	}
+	type args struct {
+		ctx         context.Context
+		userID      string
+		orgID       string
+		idpConfigID string
+		previousID  string
+		newID       string
+	}
+	type res struct {
+		err error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:         context.Background(),
+				userID:      "",
+				orgID:       "org1",
+				idpConfigID: "idpConfig1",
+				previousID:  "previousID",
+				newID:       "newID",
+			},
+			res: res{
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-Sn3l1", "Errors.IDMissing"),
+			},
+		},
+		{
+			name: "idp link not active, precondition failed error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"idpConfig1",
+								"displayName",
+								"externalUserID",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:         context.Background(),
+				userID:      "user1",
+				orgID:       "org1",
+				idpConfigID: "idpConfig1",
+				previousID:  "previousID",
+				newID:       "newID",
+			},
+			res: res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-KJH2o", "Errors.User.ExternalIDP.NotFound"),
+			},
+		},
+		{
+			name: "external login check, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"idpConfig1",
+								"displayName",
+								"previousID",
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewUserIDPExternalIDMigratedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"idpConfig1",
+									"previousID",
+									"newID",
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:         context.Background(),
+				userID:      "user1",
+				orgID:       "org1",
+				idpConfigID: "idpConfig1",
+				previousID:  "previousID",
+				newID:       "newID",
+			},
+			res: res{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			err := r.MigrateUserIDP(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.idpConfigID, tt.args.previousID, tt.args.newID)
+			assert.ErrorIs(t, err, tt.res.err)
+		})
+	}
+}

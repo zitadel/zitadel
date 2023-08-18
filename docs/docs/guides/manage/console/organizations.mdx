@@ -104,6 +104,20 @@ If you need custom branding on a organization (for example in a B2B scenario, wh
 
 The behaviour of the login page, applyling custom design, is then defined on your projects detail page. Read more about it [here](./projects#branding)
 
+
+## Show Organization Login
+
+As you should know by now ZITADEL knows the concept of Organizations.
+You can define [default settings](/docs/guides/manage/console/instance-settings) for your ZITADEL, or you can overwrite them for an [Organization](#organization-settings).
+Per default the ZITADEL Login will always show what is defined per default. As soon as the Organization context is given, the settings defined on the specific organization can be triggered.
+This means when you want to trigger the settings of an organization directly, make sure to send the organization scope in the authentication request.
+``` bash
+urn:zitadel:iam:org:id:{id}
+```
+
+Read more about the [scopes](/docs/apis/openidoauth/scopes#reserved-scopes) or try it out in our [OIDC Playground](/docs/apis/openidoauth/authrequest).
+
+
 ## Default organization
 
 On the instance settings page ($YOUR_DOMAIN//ui/console/orgs) you can set an organization as default organization.

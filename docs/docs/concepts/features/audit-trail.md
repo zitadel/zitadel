@@ -4,7 +4,7 @@ title: Audit Trail
 
 ZITADEL provides you with an built-in audit trail to track all changes and events over an unlimited period of time.
 Most other solutions replace a historic record and track changes in a separate log when information is updated.
-ZITADEL only ever appends data in an [Eventstore](https://zitadel.com/docs/concepts/eventstore), keeping all historic record.
+ZITADEL only ever appends data in an [Eventstore](/docs/concepts/eventstore/overview), keeping all historic record.
 The audit trail itself is identical to the state, since ZITADEL calculates the state from all the past changes.
 
 ![Example of events that happen for a profile change and a login](/img/concepts/audit-trail/audit-log-events.png)

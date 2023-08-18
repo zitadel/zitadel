@@ -4,44 +4,57 @@ title: Configuration Options
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
-import LinuxUnix from './_linuxunix.mdx'
-import Compose from './_compose.mdx'
-import Helm from './_helm.mdx'
-
-# Configure ZITADEL
+import LinuxUnix from "./_linuxunix.mdx";
+import Compose from "./_compose.mdx";
+import Helm from "./_helm.mdx";
+import CodeBlock from "@theme/CodeBlock";
+import DefaultsYamlSource from "!!raw-loader!./defaults.yaml";
+import StepsYamlSource from "!!raw-loader!./steps.yaml";
 
 This guide assumes you are familiar with [running ZITADEL using the least amount of configuration possible](/docs/self-hosting/deploy/overview).
 
-## Configuration Files
+## Configuration files
 
-### Runtime Configuration File
+### Runtime configuration file
 
 You can configure the runtime using the `--config` flag of the `zitadel` binary.
-For a description of all _runtime configuration options_ and their defaults, read the [ZITADEL source code](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml).
+Also, you can use the environment variables listed in the defaults.yaml.
 
-### Database Initialization File
+<details>
+  <summary>defaults.yaml</summary>
+  <CodeBlock language="yaml">{DefaultsYamlSource}</CodeBlock>
+</details>
+
+### Database initialization file
 
 ZITADEL uses a [different configuration file](https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml) for _database initialization steps_.
 Use the `--steps` flag of the `zitadel` binary to provide this configuration file.
+Also, you can use the environment variables listed in the steps.yaml.
 
-### Multiple Configuration Files
+<details>
+  <summary>steps.yaml</summary>
+  <CodeBlock language="yaml">{StepsYamlSource}</CodeBlock>
+</details>
+
+### Multiple configuration files
 
 ZITADEL merges configuration files when multiple `--config` and `--steps` flags are provided.
 You can use these flags to handle standard configuration files differently from secret configuration files.
 For example, standard configuration files stored in git may contain public information such as a database hostname.
 To use private information — such as a database admin credential — without storing it in git, use an extra `--config` or `--steps` flag that requests the private information from a secret manager.
 
-## Environment Variables
+## Environment variables
 
 All configuration properties are configurable using environment variables.
 ZITADEL environment variable keys are prefixed with `ZITADEL_`.
-For example, to configure the default ZITADEL IAM admin username and password, set the `zitadel` binary runtime environment variables `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME` and `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD`.
+For example, to configure the default ZITADEL IAM admin username and password set the `zitadel` binary runtime environment variables `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME` and `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD`.
+All supported environment variables are listed in the [runtime configuration file](#runtime-configuration-file) and the [database initialization file](#database-initialization-file).
 
-### Proxy Configuration
+### Proxy configuration
 
 A proxy for outgoing connections can be configured using the environment variables: Use `HTTP_PROXY` for outgoing HTTP requests, and `HTTPS_PROXY` for outgoing HTTPS requests.
 These environment variables are used as a proxy URL.
-To exclude specific hosts from proxying, set the `NO_PROXY` environment variable: The value is interpreted as a comma separated string.
+To exclude specific hosts from proxying, set the `NO_PROXY` environment variable: The value is interpreted as a comma-separated string.
 For more information on the `NO_PROXY` environment variable, read the [`httpproxy` Go doc](https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config).
 
 ## Masterkey
@@ -49,6 +62,7 @@ For more information on the `NO_PROXY` environment variable, read the [`httpprox
 The masterkey is used to AES256-encrypt other generated encryption keys.
 It must be 32 bytes.
 There are three ways to pass the masterkey to the `zitadel` binary:
+
 - By value: Use the flag `--masterkey My_Master_Key_Which_Has_32_Bytes`
 - By environment variable `ZITADEL_MASTERKEY`: Use the flag `--masterkeyFromEnv`
 - By file: Use the flag `--masterkeyFile /path/to/file`
@@ -56,29 +70,30 @@ There are three ways to pass the masterkey to the `zitadel` binary:
 ## Passing the configuration
 
 <Tabs
-    groupId="installation-target"
-    default="linuxunix"
-    values={[
-        {'label': 'Linux and Unix', 'value': 'linuxunix'},
-        {'label': 'Docker Compose', 'value': 'compose'},
-        {'label': 'Kubernetes (Helm)', 'value': 'k8s'}
-    ]}
+  groupId="installation-target"
+  default="linuxunix"
+  values={[
+    { label: "Linux and Unix", value: "linuxunix" },
+    { label: "Docker Compose", value: "compose" },
+    { label: "Kubernetes (Helm)", value: "k8s" },
+  ]}
 >
-    <TabItem value="linuxunix">
-        <LinuxUnix/>
-    </TabItem>
-    <TabItem value="compose">
-        <Compose/>
-    </TabItem>
-    <TabItem value="k8s">
-        <Helm/>
-    </TabItem>
+  <TabItem value="linuxunix">
+    <LinuxUnix />
+  </TabItem>
+  <TabItem value="compose">
+    <Compose />
+  </TabItem>
+  <TabItem value="k8s">
+    <Helm />
+  </TabItem>
 </Tabs>
 
 Open your favorite internet browser at [http://localhost:8080/ui/console](http://localhost:8080/ui/console).
 This is the IAM admin users login according to your configuration in the [example-zitadel-init-steps.yaml](./example-zitadel-init-steps.yaml):
-- **username**: *root@<span></span>zitadel.localhost*
-- **password**: *RootPassword1!*
+
+- **username**: _root@<span></span>zitadel.localhost_
+- **password**: _RootPassword1!_
 
 ## What's next
 
@@ -90,4 +105,5 @@ This is the IAM admin users login according to your configuration in the [exampl
 :::caution
 
 <!-- TODO: Better mark the link in the UI -->
+
 The ZITADEL management console [requires end-to-end HTTP/2 support](/docs/self-hosting/manage/http2)

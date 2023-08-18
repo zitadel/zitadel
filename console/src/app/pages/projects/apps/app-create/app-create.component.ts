@@ -378,7 +378,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
           if (resp.clientId || resp.clientSecret) {
             this.showSavedDialog(resp);
           } else {
-            this.router.navigate(['projects', this.projectId, 'apps', resp.appId]);
+            this.router.navigate(['projects', this.projectId, 'apps', resp.appId], { queryParams: { new: true } });
           }
         })
         .catch((error) => {
@@ -396,7 +396,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
           if (resp.clientId || resp.clientSecret) {
             this.showSavedDialog(resp);
           } else {
-            this.router.navigate(['projects', this.projectId, 'apps', resp.appId]);
+            this.router.navigate(['projects', this.projectId, 'apps', resp.appId], { queryParams: { new: true } });
           }
         })
         .catch((error) => {
@@ -410,7 +410,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         .addSAMLApp(this.samlAppRequest)
         .then((resp) => {
           this.loading = false;
-          this.router.navigate(['projects', this.projectId, 'apps', resp.appId]);
+          this.router.navigate(['projects', this.projectId, 'apps', resp.appId], { queryParams: { new: true } });
         })
         .catch((error) => {
           this.loading = false;
@@ -436,7 +436,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe(() => {
-      this.router.navigate(['projects', this.projectId, 'apps', added.appId]);
+      this.router.navigate(['projects', this.projectId, 'apps', added.appId], { queryParams: { new: true } });
     });
   }
 

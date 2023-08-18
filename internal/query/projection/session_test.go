@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/session"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 func TestSessionProjection_reduces(t *testing.T) {
@@ -29,7 +30,9 @@ func TestSessionProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					session.AddedType,
 					session.AggregateType,
-					[]byte(`{}`),
+					[]byte(`{
+						"domain": "domain"
+					}`),
 				), session.AddedEventMapper),
 			},
 			reduce: (&sessionProjection{}).reduceSessionAdded,
@@ -40,7 +43,7 @@ func TestSessionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.sessions (id, instance_id, creation_date, change_date, resource_owner, state, sequence, creator) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.sessions4 (id, instance_id, creation_date, change_date, resource_owner, state, sequence, creator) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -76,7 +79,7 @@ func TestSessionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.sessions SET (change_date, sequence, user_id, user_checked_at) = ($1, $2, $3, $4) WHERE (id = $5) AND (instance_id = $6)",
+							expectedStmt: "UPDATE projections.sessions4 SET (change_date, sequence, user_id, user_checked_at) = ($1, $2, $3, $4) WHERE (id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -109,7 +112,105 @@ func TestSessionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.sessions SET (change_date, sequence, password_checked_at) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.sessions4 SET (change_date, sequence, password_checked_at) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								anyArg{},
+								time.Date(2023, time.May, 4, 0, 0, 0, 0, time.UTC),
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceWebAuthNChecked",
+			args: args{
+				event: getEvent(testEvent(
+					session.WebAuthNCheckedType,
+					session.AggregateType,
+					[]byte(`{
+						"checkedAt": "2023-05-04T00:00:00Z",
+						"userVerified": true
+					}`),
+				), eventstore.GenericEventMapper[session.WebAuthNCheckedEvent]),
+			},
+			reduce: (&sessionProjection{}).reduceWebAuthNChecked,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("session"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.sessions4 SET (change_date, sequence, webauthn_checked_at, webauthn_user_verified) = ($1, $2, $3, $4) WHERE (id = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								anyArg{},
+								time.Date(2023, time.May, 4, 0, 0, 0, 0, time.UTC),
+								true,
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceIntentChecked",
+			args: args{
+				event: getEvent(testEvent(
+					session.AddedType,
+					session.AggregateType,
+					[]byte(`{
+						"checkedAt": "2023-05-04T00:00:00Z"
+					}`),
+				), session.IntentCheckedEventMapper),
+			},
+			reduce: (&sessionProjection{}).reduceIntentChecked,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("session"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.sessions4 SET (change_date, sequence, intent_checked_at) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								anyArg{},
+								time.Date(2023, time.May, 4, 0, 0, 0, 0, time.UTC),
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceOTPChecked",
+			args: args{
+				event: getEvent(testEvent(
+					session.AddedType,
+					session.AggregateType,
+					[]byte(`{
+						"checkedAt": "2023-05-04T00:00:00Z"
+					}`),
+				), eventstore.GenericEventMapper[session.TOTPCheckedEvent]),
+			},
+			reduce: (&sessionProjection{}).reduceTOTPChecked,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("session"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.sessions4 SET (change_date, sequence, totp_checked_at) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -141,7 +242,7 @@ func TestSessionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.sessions SET (change_date, sequence, token_id) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.sessions4 SET (change_date, sequence, token_id) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -175,7 +276,7 @@ func TestSessionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.sessions SET (change_date, sequence, metadata) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.sessions4 SET (change_date, sequence, metadata) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -207,7 +308,7 @@ func TestSessionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.sessions WHERE (id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.sessions4 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -234,9 +335,42 @@ func TestSessionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.sessions WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.sessions4 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reducePasswordChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.HumanPasswordChangedType),
+					user.AggregateType,
+					[]byte(`{"secret": {
+								"cryptoType": 0,
+								"algorithm": "enc",
+								"keyID": "id",
+								"crypted": "cGFzc3dvcmQ="
+							}}`),
+				), user.HumanPasswordChangedEventMapper),
+			},
+			reduce: (&sessionProjection{}).reducePasswordChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("user"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.sessions4 SET password_checked_at = $1 WHERE (user_id = $2) AND (password_checked_at < $3)",
+							expectedArgs: []interface{}{
+								nil,
+								"agg-id",
+								anyArg{},
 							},
 						},
 					},

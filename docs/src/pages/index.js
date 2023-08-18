@@ -72,7 +72,7 @@ const features = [
               description=""
             />
             <ListElement
-              link="/docs/concepts/introduction"
+              link="/docs/concepts"
               type={ICONTYPE.TASKS}
               title="Concepts"
               description=""

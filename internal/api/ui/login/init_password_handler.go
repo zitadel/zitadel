@@ -60,10 +60,10 @@ func (l *Login) handleInitPasswordCheck(w http.ResponseWriter, r *http.Request) 
 		l.resendPasswordSet(w, r, authReq)
 		return
 	}
-	l.checkPWCode(w, r, authReq, data, nil)
+	l.checkPWCode(w, r, authReq, data)
 }
 
-func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *initPasswordFormData, err error) {
+func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *initPasswordFormData) {
 	if data.Password != data.PasswordConfirm {
 		err := errors.ThrowInvalidArgument(nil, "VIEW-KaGue", "Errors.User.Password.ConfirmationWrong")
 		l.renderInitPassword(w, r, authReq, data.UserID, data.Code, err)
@@ -74,12 +74,7 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *dom
 		userOrg = authReq.UserOrgID
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	passwordCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypePasswordResetCode, l.userCodeAlg)
-	if err != nil {
-		l.renderInitPassword(w, r, authReq, data.UserID, "", err)
-		return
-	}
-	err = l.command.SetPasswordWithVerifyCode(setContext(r.Context(), userOrg), userOrg, data.UserID, data.Code, data.Password, userAgentID, passwordCodeGenerator)
+	_, err := l.command.SetPasswordWithVerifyCode(setContext(r.Context(), userOrg), userOrg, data.UserID, data.Code, data.Password, userAgentID)
 	if err != nil {
 		l.renderInitPassword(w, r, authReq, data.UserID, "", err)
 		return

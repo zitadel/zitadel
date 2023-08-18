@@ -116,7 +116,7 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, 
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.ProjectGrantProjection.Trigger(ctx)
+		ctx = projection.ProjectGrantProjection.Trigger(ctx)
 	}
 
 	stmt, scan := prepareProjectGrantQuery(ctx, q.client)

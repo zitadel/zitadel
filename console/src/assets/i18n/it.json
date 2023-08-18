@@ -166,7 +166,13 @@
     "NEXT": "Avanti",
     "MORE": "azioni",
     "STEP": "Passo",
-    "COMINGSOON": "Coming soon",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Sei sicuro di voler eliminare questa nuova azione? La tua azione andrà persa",
+        "CANCEL": "Cancella",
+        "DISCARD": "Continua comunque"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Mostra utente {{value}}"
     }
@@ -404,8 +410,8 @@
       "DESCRIPTION": "Aggiungi un secondo fattore per garantire la sicurezza ottimale del tuo account.",
       "MANAGE_DESCRIPTION": "Gestite i metodi del secondo fattore dei vostri utenti.",
       "ADD": "Aggiungi fattore",
-      "OTP": "App di autenticazione per OTP (One-Time Password)",
-      "OTP_DIALOG_TITLE": "Aggiungi OTP",
+      "OTP": "App di autenticazione per TOTP (Time-based One-Time Password)",
+      "OTP_DIALOG_TITLE": "Aggiungi TOTP",
       "OTP_DIALOG_DESCRIPTION": "Scansiona il codice QR con un'app di autenticazione e inserisci il codice nel campo sottostante per verificare e attivare il metodo OTP.",
       "U2F": "Impronta digitale, chiave di sicurezza, Face ID e altri",
       "U2F_DIALOG_TITLE": "Verifica Fattore",
@@ -413,6 +419,12 @@
       "U2F_SUCCESS": "Fattore aggiunto con successo!",
       "U2F_ERROR": "Si \u00e8 verificato un errore durante la configurazione!",
       "U2F_NAME": "Nome dell'autenticatore",
+      "OTPSMS": "OTP (One-Time Password) con SMS",
+      "OTPEMAIL": "OTP (One-Time Password) with Email",
+      "SETUPOTPSMSDESCRIPTION": "Vuoi impostare questo numero di telefono come secondo fattore OTP (One-Time password)?",
+      "OTPSMSSUCCESS": "Fattore OTP impostato con successo.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Il tuo telefono deve essere verificato per utilizzare questo metodo.",
+      "OTPEMAILSUCCESS": "Fattore OTP impostato con successo.",
       "TYPE": {
         "0": "Nessun altro fattore definito",
         "1": "One Time Password (OTP)",
@@ -579,7 +591,8 @@
         "EDITVALUE": "Numero di telefono",
         "EDITDESC": "Inserisci il nuovo numero di telefono nel campo sottostante.",
         "DELETETITLE": "Rimuovi il numero di telefono",
-        "DELETEDESC": "Vuoi davvero rimuovere il numero di telefono"
+        "DELETEDESC": "Vuoi davvero rimuovere il numero di telefono",
+        "OTPSMSREMOVALWARNING": "Questo account utilizza questo numero di telefono come secondo fattore. Non sarai in grado di usarlo dopo aver proceduto."
       },
       "RESENDCODE": "Reinvia il codice",
       "ENTERCODE": "Verifica",
@@ -1033,7 +1046,10 @@
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български",
+      "pt": "Portuguese",
+      "mk": "Македонски"
     },
     "SMTP": {
       "TITLE": "Impostazioni SMTP",
@@ -1092,7 +1108,9 @@
         "3": "Verificazione del numero di telefono",
         "4": "Ripristino Password",
         "5": "Inizializzazione Passwordless",
-        "6": "Segreto dell'applicazione"
+        "6": "Segreto dell'applicazione",
+        "7": "One Time Password (OTP) - SMS",
+        "8": "One Time Password (OTP) - email"
       },
       "ADDGENERATOR": "Definisci aspetto",
       "GENERATORTYPE": "Tipo",
@@ -1232,7 +1250,10 @@
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -1279,6 +1300,8 @@
         "INIT": "Inizializzazione",
         "VE": "Verificazione l'e-mail",
         "VP": "Verificazione del telefono",
+        "VSO": "Verifica OTP SMS",
+        "VEO": "Verifica OTP Email",
         "PR": "Ripristino della password",
         "DC": "Rivendicazione del dominio",
         "PL": "Autenticazione Passwordless",
@@ -1299,7 +1322,9 @@
         "verifiedPhone": "Telefono verificato",
         "changedate": "Cambia data",
         "username": "Nome utente",
-        "tempUsername": "Nome utente temporaneo"
+        "tempUsername": "Nome utente temporaneo",
+        "otp": "Password monouso",
+        "verifyUrl": "URL per verificare la password monouso"
       },
       "TOAST": {
         "UPDATED": "Testi personalizzati salvati."
@@ -1331,6 +1356,8 @@
       "ALLOWREGISTER_DESC": "Se l'opzione \u00e8 selezionata, nel login apparirà un passo aggiuntivo per la registrazione di un utente.",
       "FORCEMFA": "Forza MFA",
       "FORCEMFA_DESC": "Se l'opzione \u00e8 selezionata, gli utenti devono configurare un secondo fattore per il login.",
+      "FORCEMFALOCALONLY": "Forza MFA per gli utenti locali",
+      "FORCEMFALOCALONLY_DESC": "Se l'opzione è selezionata, gli utenti locali autenticati devono configurare un secondo fattore per l'accesso.",
       "HIDEPASSWORDRESET": "Nascondi ripristino della password",
       "HIDEPASSWORDRESET_DESC": "Se l'opzione \u00e8 selezionata, l'utente non pu\u00f2 resettare la sua password nel interfaccia login.",
       "HIDELOGINNAMESUFFIX": "Nascondi il suffisso del nome utente",
@@ -1498,13 +1525,11 @@
         "SEL_PROJECT": "Cerca un progetto",
         "SEL_ROLES": "Seleziona i ruoli che vuoi aggiungere",
         "SEL_USER": "Seleziona utenti",
-        "SEL_ORG": "Impostare il dominio",
-        "SEL_ORG_DESC": "Inserisci il dominio completo per specificare l'organizzazione da concedere.",
-        "ORG_TITLE": "Organizzazione",
+        "SEL_ORG": "Cerca un'organizzazione",
+        "SEL_ORG_DESC": "Cerca l'organizzazione da concedere.",
         "ORG_DESCRIPTION": "Stai per concedere un utente per l'organizzazione {{name}}.",
         "ORG_DESCRIPTION_DESC": "Cambia il contesto nell'intestazione qui sopra per concedere un utente per un'altra organizzazione.",
-        "SEL_ORG_FORMFIELD": "Dominio completo",
-        "SEL_ORG_BUTTON": "Ricerca organizzazione",
+        "SEL_ORG_FORMFIELD": "Organizzazione",
         "FOR_ORG": "Org grant \u00e8 creato per:"
       },
       "DETAIL": {
@@ -1780,6 +1805,8 @@
     "DELETE": "Rimuovi IDP",
     "DELETE_TITLE": "Rimuovi IDP",
     "DELETE_DESCRIPTION": "Stai per rimuovere un fornitore di identit\u00e0. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
+    "REMOVE_WARN_TITLE": "Rimuovi IDP",
+    "REMOVE_WARN_DESCRIPTION": "Stai per rimuovere un provider di identità. Questo rimuoverà la selezione dell'IDP disponibile per i tuoi utenti e gli utenti già registrati non potranno accedere nuovamente. Sei sicuro di continuare?",
     "DELETE_SELECTION_TITLE": "Rimuovere IDP",
     "DELETE_SELECTION_DESCRIPTION": "Stai per rimuovere un fornitore di identit\u00e0. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
     "EMPTY": "Nessun IDP disponible",
@@ -1834,8 +1861,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Sconosciuto",
-      "1": "One Time Password (OTP)",
-      "2": "Impronta digitale, chiave di sicurezza, Face ID e altri"
+      "1": "One Time Password per Authenticator App (TOTP)",
+      "2": "Impronta digitale, chiave di sicurezza, Face ID e altri",
+      "3": "One Time Password per Email (Email OTP)",
+      "4": "One Time Password per SMS (SMS OTP)"
     }
   },
   "LOGINPOLICY": {
@@ -2101,7 +2130,10 @@
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

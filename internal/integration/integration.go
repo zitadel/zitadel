@@ -15,6 +15,7 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v2/pkg/client"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -23,12 +24,14 @@ import (
 	"github.com/zitadel/zitadel/cmd"
 	"github.com/zitadel/zitadel/cmd/start"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/webauthn"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -39,7 +42,13 @@ var (
 	cockroachYAML []byte
 	//go:embed config/postgres.yaml
 	postgresYAML []byte
+	//go:embed config/system-user-key.pem
+	systemUserKey []byte
 )
+
+// NotEmpty can be used as placeholder, when the returned values is unknown.
+// It can be used in tests to assert whether a value should be empty or not.
+const NotEmpty = "not empty"
 
 // UserType provides constants that give
 // a short explinanation with the purpose
@@ -52,6 +61,14 @@ type UserType int
 const (
 	Unspecified UserType = iota
 	OrgOwner
+	Login
+	IAMOwner
+	SystemUser // SystemUser is a user with access to the system service.
+)
+
+const (
+	FirstInstanceUsersKey = "first"
+	UserPassword          = "VeryS3cret!"
 )
 
 // User information with a Personal Access Token.
@@ -60,16 +77,33 @@ type User struct {
 	Token string
 }
 
+type InstanceUserMap map[string]map[UserType]*User
+
+func (m InstanceUserMap) Set(instanceID string, typ UserType, user *User) {
+	if m[instanceID] == nil {
+		m[instanceID] = make(map[UserType]*User)
+	}
+	m[instanceID][typ] = user
+}
+
+func (m InstanceUserMap) Get(instanceID string, typ UserType) *User {
+	if users, ok := m[instanceID]; ok {
+		return users[typ]
+	}
+	return nil
+}
+
 // Tester is a Zitadel server and client with all resources available for testing.
 type Tester struct {
 	*start.Server
 
 	Instance     authz.Instance
 	Organisation *query.Org
-	Users        map[UserType]User
+	Users        InstanceUserMap
 
-	GRPCClientConn *grpc.ClientConn
-	wg             sync.WaitGroup // used for shutdown
+	Client   Client
+	WebAuthN *webauthn.Client
+	wg       sync.WaitGroup // used for shutdown
 }
 
 const commandLine = `start --masterkeyFromEnv`
@@ -78,11 +112,12 @@ func (s *Tester) Host() string {
 	return fmt.Sprintf("%s:%d", s.Config.ExternalDomain, s.Config.Port)
 }
 
-func (s *Tester) createClientConn(ctx context.Context) {
+func (s *Tester) createClientConn(ctx context.Context, opts ...grpc.DialOption) {
 	target := s.Host()
-	cc, err := grpc.DialContext(ctx, target,
-		grpc.WithBlock(), grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
+	cc, err := grpc.DialContext(ctx, target, append(opts,
+		grpc.WithBlock(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)...)
 	if err != nil {
 		s.Shutdown <- os.Interrupt
 		s.wg.Wait()
@@ -90,7 +125,7 @@ func (s *Tester) createClientConn(ctx context.Context) {
 	logging.OnError(err).Fatal("integration tester client dial")
 	logging.New().WithField("target", target).Info("finished dialing grpc client conn")
 
-	s.GRPCClientConn = cc
+	s.Client = newClient(cc)
 	err = s.pollHealth(ctx)
 	logging.OnError(err).Fatal("integration tester health")
 }
@@ -99,14 +134,12 @@ func (s *Tester) createClientConn(ctx context.Context) {
 // TODO: remove when we make the setup blocking on all
 // projections completed.
 func (s *Tester) pollHealth(ctx context.Context) (err error) {
-	client := admin.NewAdminServiceClient(s.GRPCClientConn)
-
 	for {
 		err = func(ctx context.Context) error {
 			ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 			defer cancel()
 
-			_, err := client.Healthz(ctx, &admin.HealthzRequest{})
+			_, err := s.Client.Admin.Healthz(ctx, &admin.HealthzRequest{})
 			return err
 		}(ctx)
 		if err == nil {
@@ -124,10 +157,38 @@ func (s *Tester) pollHealth(ctx context.Context) (err error) {
 }
 
 const (
-	SystemUser = "integration"
+	LoginUser                = "loginClient"
+	MachineUserOrgOwner      = "integrationOrgOwner"
+	MachineUserInstanceOwner = "integrationInstanceOwner"
 )
 
-func (s *Tester) createSystemUser(ctx context.Context) {
+func (s *Tester) createMachineUserOrgOwner(ctx context.Context) {
+	var err error
+
+	ctx, user := s.createMachineUser(ctx, MachineUserOrgOwner, OrgOwner)
+	_, err = s.Commands.AddOrgMember(ctx, user.ResourceOwner, user.ID, "ORG_OWNER")
+	target := new(caos_errs.AlreadyExistsError)
+	if !errors.As(err, &target) {
+		logging.OnError(err).Fatal("add org member")
+	}
+}
+
+func (s *Tester) createMachineUserInstanceOwner(ctx context.Context) {
+	var err error
+
+	ctx, user := s.createMachineUser(ctx, MachineUserInstanceOwner, IAMOwner)
+	_, err = s.Commands.AddInstanceMember(ctx, user.ID, "IAM_OWNER")
+	target := new(caos_errs.AlreadyExistsError)
+	if !errors.As(err, &target) {
+		logging.OnError(err).Fatal("add instance member")
+	}
+}
+
+func (s *Tester) createLoginClient(ctx context.Context) {
+	s.createMachineUser(ctx, LoginUser, Login)
+}
+
+func (s *Tester) createMachineUser(ctx context.Context, username string, userType UserType) (context.Context, *query.User) {
 	var err error
 
 	s.Instance, err = s.Queries.InstanceByHost(ctx, s.Host())
@@ -137,52 +198,75 @@ func (s *Tester) createSystemUser(ctx context.Context) {
 	s.Organisation, err = s.Queries.OrgByID(ctx, true, s.Instance.DefaultOrganisationID())
 	logging.OnError(err).Fatal("query organisation")
 
-	query, err := query.NewUserUsernameSearchQuery(SystemUser, query.TextEquals)
+	usernameQuery, err := query.NewUserUsernameSearchQuery(username, query.TextEquals)
 	logging.OnError(err).Fatal("user query")
-	user, err := s.Queries.GetUser(ctx, true, true, query)
-
+	user, err := s.Queries.GetUser(ctx, true, true, usernameQuery)
 	if errors.Is(err, sql.ErrNoRows) {
 		_, err = s.Commands.AddMachine(ctx, &command.Machine{
 			ObjectRoot: models.ObjectRoot{
 				ResourceOwner: s.Organisation.ID,
 			},
-			Username:        SystemUser,
-			Name:            SystemUser,
+			Username:        username,
+			Name:            username,
 			Description:     "who cares?",
 			AccessTokenType: domain.OIDCTokenTypeJWT,
 		})
-		logging.OnError(err).Fatal("add machine user")
-		user, err = s.Queries.GetUser(ctx, true, true, query)
-
+		logging.WithFields("username", username).OnError(err).Fatal("add machine user")
+		user, err = s.Queries.GetUser(ctx, true, true, usernameQuery)
 	}
-	logging.OnError(err).Fatal("get user")
+	logging.WithFields("username", username).OnError(err).Fatal("get user")
 
-	_, err = s.Commands.AddOrgMember(ctx, s.Organisation.ID, user.ID, "ORG_OWNER")
-	target := new(caos_errs.AlreadyExistsError)
-	if !errors.As(err, &target) {
-		logging.OnError(err).Fatal("add org member")
-	}
-
-	scopes := []string{oidc.ScopeOpenID, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner}
+	scopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner}
 	pat := command.NewPersonalAccessToken(user.ResourceOwner, user.ID, time.Now().Add(time.Hour), scopes, domain.UserTypeMachine)
 	_, err = s.Commands.AddPersonalAccessToken(ctx, pat)
-	logging.OnError(err).Fatal("add pat")
-
-	s.Users = map[UserType]User{
-		OrgOwner: {
-			User:  user,
-			Token: pat.Token,
-		},
-	}
+	logging.WithFields("username", SystemUser).OnError(err).Fatal("add pat")
+	s.Users.Set(FirstInstanceUsersKey, userType, &User{
+		User:  user,
+		Token: pat.Token,
+	})
+	return ctx, user
 }
 
-func (s *Tester) WithSystemAuthorization(ctx context.Context, u UserType) context.Context {
-	return metadata.AppendToOutgoingContext(ctx, "Authorization", fmt.Sprintf("Bearer %s", s.Users[u].Token))
+func (s *Tester) WithAuthorization(ctx context.Context, u UserType) context.Context {
+	return s.WithInstanceAuthorization(ctx, u, FirstInstanceUsersKey)
+}
+
+func (s *Tester) WithInstanceAuthorization(ctx context.Context, u UserType, instanceID string) context.Context {
+	if u == SystemUser {
+		s.ensureSystemUser()
+	}
+	return s.WithAuthorizationToken(ctx, s.Users.Get(instanceID, u).Token)
+}
+
+func (s *Tester) WithAuthorizationToken(ctx context.Context, token string) context.Context {
+	md, ok := metadata.FromOutgoingContext(ctx)
+	if !ok {
+		md = make(metadata.MD)
+	}
+	md.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	return metadata.NewOutgoingContext(ctx, md)
+}
+
+func (s *Tester) ensureSystemUser() {
+	const ISSUER = "tester"
+	if s.Users.Get(FirstInstanceUsersKey, SystemUser) != nil {
+		return
+	}
+	audience := http_util.BuildOrigin(s.Host(), s.Server.Config.ExternalSecure)
+	signer, err := client.NewSignerFromPrivateKeyByte(systemUserKey, "")
+	logging.OnError(err).Fatal("system key signer")
+	jwt, err := client.SignedJWTProfileAssertion(ISSUER, []string{audience}, time.Hour, signer)
+	logging.OnError(err).Fatal("system key jwt")
+	s.Users.Set(FirstInstanceUsersKey, SystemUser, &User{Token: jwt})
+}
+
+func (s *Tester) WithSystemAuthorizationHTTP(u UserType) map[string]string {
+	return map[string]string{"Authorization": fmt.Sprintf("Bearer %s", s.Users.Get(FirstInstanceUsersKey, u).Token)}
 }
 
 // Done send an interrupt signal to cleanly shutdown the server.
 func (s *Tester) Done() {
-	err := s.GRPCClientConn.Close()
+	err := s.Client.CC.Close()
 	logging.OnError(err).Error("integration tester client close")
 
 	s.Shutdown <- os.Interrupt
@@ -224,7 +308,9 @@ func NewTester(ctx context.Context) *Tester {
 	}
 	logging.OnError(err).Fatal()
 
-	tester := new(Tester)
+	tester := Tester{
+		Users: make(InstanceUserMap),
+	}
 	tester.wg.Add(1)
 	go func(wg *sync.WaitGroup) {
 		logging.OnError(cmd.Execute()).Fatal()
@@ -237,9 +323,13 @@ func NewTester(ctx context.Context) *Tester {
 		logging.OnError(ctx.Err()).Fatal("waiting for integration tester server")
 	}
 	tester.createClientConn(ctx)
-	tester.createSystemUser(ctx)
+	tester.createLoginClient(ctx)
+	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, http_util.BuildOrigin(tester.Host(), tester.Config.ExternalSecure))
+	tester.createMachineUserOrgOwner(ctx)
+	tester.createMachineUserInstanceOwner(ctx)
+	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, "https://"+tester.Host())
 
-	return tester
+	return &tester
 }
 
 func Contexts(timeout time.Duration) (ctx, errCtx context.Context, cancel context.CancelFunc) {

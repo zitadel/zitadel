@@ -15,13 +15,18 @@ type AuthRequestRepository interface {
 	DeleteAuthRequest(ctx context.Context, id string) error
 
 	CheckLoginName(ctx context.Context, id, loginName, userAgentID string) error
-	CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID string, user *domain.ExternalUser, info *domain.BrowserInfo) error
+	CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID string, user *domain.ExternalUser, info *domain.BrowserInfo, migrationCheck bool) error
 	SetExternalUserLogin(ctx context.Context, authReqID, userAgentID string, user *domain.ExternalUser) error
+	SetLinkingUser(ctx context.Context, request *domain.AuthRequest, externalUser *domain.ExternalUser) error
 	SelectUser(ctx context.Context, id, userID, userAgentID string) error
 	SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID string) error
 	VerifyPassword(ctx context.Context, id, userID, resourceOwner, password, userAgentID string, info *domain.BrowserInfo) error
 
 	VerifyMFAOTP(ctx context.Context, authRequestID, userID, resourceOwner, code, userAgentID string, info *domain.BrowserInfo) error
+	SendMFAOTPSMS(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) error
+	VerifyMFAOTPSMS(ctx context.Context, userID, resourceOwner, code, authRequestID, userAgentID string, info *domain.BrowserInfo) error
+	SendMFAOTPEmail(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) error
+	VerifyMFAOTPEmail(ctx context.Context, userID, resourceOwner, code, authRequestID, userAgentID string, info *domain.BrowserInfo) error
 	BeginMFAU2FLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (*domain.WebAuthNLogin, error)
 	VerifyMFAU2F(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string, credentialData []byte, info *domain.BrowserInfo) error
 	BeginPasswordlessSetup(ctx context.Context, userID, resourceOwner string, preferredPlatformType domain.AuthenticatorAttachment) (login *domain.WebAuthNToken, err error)

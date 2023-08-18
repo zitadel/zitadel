@@ -107,6 +107,9 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 			if err != nil {
 				return nil, err
 			}
+			if consoleChangeEvent == nil {
+				return events, nil
+			}
 			return append(events, consoleChangeEvent), nil
 		}, nil
 	}
@@ -121,6 +124,9 @@ func (c *Commands) prepareUpdateConsoleRedirectURIs(instanceDomain string) prepa
 			consoleChangeEvent, err := c.updateConsoleRedirectURIs(ctx, filter, instanceDomain)
 			if err != nil {
 				return nil, err
+			}
+			if consoleChangeEvent == nil {
+				return nil, nil
 			}
 			return []eventstore.Command{
 				consoleChangeEvent,
@@ -146,23 +152,15 @@ func (c *Commands) updateConsoleRedirectURIs(ctx context.Context, filter prepara
 	if !containsURI(appWriteModel.PostLogoutRedirectUris, postLogoutRedirectURI) {
 		changes = append(changes, project.ChangePostLogoutRedirectURIs(append(appWriteModel.PostLogoutRedirectUris, postLogoutRedirectURI)))
 	}
+	if len(changes) == 0 {
+		return nil, nil
+	}
 	return project.NewOIDCConfigChangedEvent(
 		ctx,
 		ProjectAggregateFromWriteModel(&appWriteModel.WriteModel),
 		appWriteModel.AppID,
 		changes,
 	)
-}
-
-// checkUpdateConsoleRedirectURIs validates if the required console uri is present in the redirect_uris and post_logout_redirect_uris
-// it will return true only if present in both list, otherwise false
-func (c *Commands) checkUpdateConsoleRedirectURIs(instanceDomain string, redirectURIs, postLogoutRedirectURIs []string) bool {
-	redirectURI := http.BuildHTTP(instanceDomain, c.externalPort, c.externalSecure) + consoleRedirectPath
-	if !containsURI(redirectURIs, redirectURI) {
-		return false
-	}
-	postLogoutRedirectURI := http.BuildHTTP(instanceDomain, c.externalPort, c.externalSecure) + consolePostLogoutPath
-	return containsURI(postLogoutRedirectURIs, postLogoutRedirectURI)
 }
 
 func setPrimaryInstanceDomain(a *instance.Aggregate, instanceDomain string) preparation.Validation {

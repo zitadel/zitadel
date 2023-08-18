@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS eventstore.ca_fill_idx;

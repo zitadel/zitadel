@@ -165,8 +165,15 @@
     "PREVIOUS": "上一页",
     "NEXT": "下一页",
     "MORE": "更多",
-    "STEP": "Step",
-    "COMINGSOON": "Coming soon",
+    "STEP": "步",
+    "UNSAVEDCHANGES": "未保存的更改",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "您确定要放弃此新操作吗？你的行动将会失败",
+        "CANCEL": "取消",
+        "DISCARD": "丢弃"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     }
@@ -404,7 +411,7 @@
       "DESCRIPTION": "添加第二个因素以确保您帐户的最佳安全性。",
       "MANAGE_DESCRIPTION": "管理用户的第二因素身份认证方式。",
       "ADD": "添加因子",
-      "OTP": "用于 OTP 的身份验证器应用程序",
+      "OTP": "用于 TOTP 的身份验证器应用程序",
       "OTP_DIALOG_TITLE": "添加 OTP",
       "OTP_DIALOG_DESCRIPTION": "使用验证器应用程序扫描二维码并输入下面的代码以验证并激活 OTP 方法。",
       "U2F": "指纹、安全密钥、Face ID 等",
@@ -413,6 +420,12 @@
       "U2F_SUCCESS": "身份验证因子添加成功！",
       "U2F_ERROR": "安装过程中发生错误！",
       "U2F_NAME": "身份验证器名称",
+      "OTPSMS": "带短信的 OTP（一次性密码）",
+      "OTPEMAIL": "带电子邮件的 OTP（一次性密码）",
+      "SETUPOTPSMSDESCRIPTION": "您想将此电话号码设置为 OTP（一次性密码）第二因素吗？",
+      "OTPSMSSUCCESS": "OTP 因子设置成功。",
+      "OTPSMSPHONEMUSTBEVERIFIED": "您的手机必须经过验证才能使用此方法。",
+      "OTPEMAILSUCCESS": "OTP 因子设置成功。",
       "TYPE": {
         "0": "未定义 MFA",
         "1": "一次性密码 (OTP)",
@@ -579,7 +592,8 @@
         "EDITVALUE": "手机号码",
         "EDITDESC": "在下面的字段中输入新的手机号码。",
         "DELETETITLE": "删除手机号码",
-        "DELETEDESC": "你真的要删除手机号码吗"
+        "DELETEDESC": "你真的要删除手机号码吗",
+        "OTPSMSREMOVALWARNING": "此帐户使用此电话号码作为第二因素。继续后您将无法使用它。"
       },
       "RESENDCODE": "重新发送验证码",
       "ENTERCODE": "验证",
@@ -1032,7 +1046,10 @@
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български",
+      "pt": "Portuguese",
+      "mk": "Македонски"
     },
     "SMTP": {
       "TITLE": "SMTP 设置",
@@ -1091,7 +1108,9 @@
         "3": "电话号码验证",
         "4": "重置密码",
         "5": "无密码认证初始化",
-        "6": "App 验证"
+        "6": "App 验证",
+        "7": "一次性密码 (OTP) - SMS",
+        "8": "一次性密码 (OTP) - 电子邮件"
       },
       "ADDGENERATOR": "定义验证码外观",
       "GENERATORTYPE": "类型",
@@ -1230,7 +1249,10 @@
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -1277,6 +1299,8 @@
         "INIT": "初始化",
         "VE": "验证电子邮箱",
         "VP": "验证手机号码",
+        "VSO": "验证短信一次性密码",
+        "VEO": "验证电子邮件一次性密码",
         "PR": "重置密码",
         "DC": "域名声明",
         "PL": "无密码身份验证",
@@ -1297,7 +1321,9 @@
         "verifiedPhone": "已验证的手机号码",
         "changedate": "修改于",
         "username": "用户名",
-        "tempUsername": "临时用户名"
+        "tempUsername": "临时用户名",
+        "otp": "一次性密码",
+        "verifyUrl": "验证一次性密码的URL"
       },
       "TOAST": {
         "UPDATED": "自定义文本已保存。"
@@ -1329,6 +1355,8 @@
       "ALLOWREGISTER_DESC": "如果选择了该选项，登录中会出现一个用于注册用户的附加步骤。",
       "FORCEMFA": "强制使用 MFA",
       "FORCEMFA_DESC": "如果选择该选项，用户必须配置第二身份认证登录因素。",
+      "FORCEMFALOCALONLY": "对本地用户强制执行 MFA",
+      "FORCEMFALOCALONLY_DESC": "如果选择该选项，本地经过身份验证的用户必须配置第二个登录因素。",
       "HIDEPASSWORDRESET": "隐藏密码重置按钮",
       "HIDEPASSWORDRESET_DESC": "如果选择该选项，则用户无法在登录过程中重置其密码。",
       "HIDELOGINNAMESUFFIX": "隐藏登录名后缀",
@@ -1496,13 +1524,11 @@
         "SEL_PROJECT": "搜索项目",
         "SEL_ROLES": "选择要添加到授权中的角色",
         "SEL_USER": "选择一个或多个用户",
-        "SEL_ORG": "选择一个组织",
-        "SEL_ORG_DESC": "输入完整的域以指定要授予的组织。",
-        "ORG_TITLE": "组织",
+        "SEL_ORG": "搜索组织",
+        "SEL_ORG_DESC": "搜索要授予的组织",
         "ORG_DESCRIPTION": "您即将授予组织 {{name}} 的用户。",
         "ORG_DESCRIPTION_DESC": "切换上面标题中的上下文以授予另一个组织的用户。",
-        "SEL_ORG_FORMFIELD": "完整域名",
-        "SEL_ORG_BUTTON": "搜索组织",
+        "SEL_ORG_FORMFIELD": "组织",
         "FOR_ORG": "授予组织:"
       },
       "DETAIL": {
@@ -1778,6 +1804,8 @@
     "DELETE": "删除",
     "DELETE_TITLE": "删除 IDP",
     "DELETE_DESCRIPTION": "您即将删除身份提供者。由此产生的变化是不可撤销的。你真的想这样做吗？",
+    "REMOVE_WARN_TITLE": "删除国内流离失所者",
+    "REMOVE_WARN_DESCRIPTION": "您即将删除身份提供者。这将为您的用户删除可用 IDP 的选择，并且已经注册的用户将无法再次登录。您确定要继续吗？",
     "DELETE_SELECTION_TITLE": "删除 IDP",
     "DELETE_SELECTION_DESCRIPTION": "您即将删除身份提供者。由此产生的变化是不可撤销的。你真的想这样做吗？",
     "EMPTY": "没有可用的 IDP",
@@ -1832,8 +1860,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "未知",
-      "1": "一次性密码 (OTP)",
-      "2": "指纹、安全密钥、Face ID 等"
+      "1": "身份验证应用程序的一次性密码（TOTP）",
+      "2": "指纹、安全密钥、Face ID 等",
+      "3": "电子邮件一次性密码（email OTP）",
+      "4": "短信一次性密码（SMS OTP）"
     }
   },
   "LOGINPOLICY": {
@@ -2087,7 +2117,10 @@
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски"
   },
   "MEMBER": {
     "ADD": "添加管理者",

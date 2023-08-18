@@ -82,6 +82,8 @@ InitMFAPrompt:
   Description: 二要素認証でアカウントのセキュリティを強化します。
   Provider0: 認証アプリ（Google/Microsoft Authenticator、Authyなど）
   Provider1: デバイス依存（例：FaceID、Windows Hello、指紋など）
+  Provider3: OTP SMS
+  Provider4: OTPメール
   NextButtonText: 次へ
   SkipButtonText: スキップ
 
@@ -93,6 +95,16 @@ InitMFAOTP:
   CodeLabel: コード
   NextButtonText: 次へ
   CancelButtonText: キャンセル
+
+InitMFASMS:
+  Title: 二要素認証
+  DescriptionPhone: 二要素認証を作成します。確認するには電話番号を入力してください。
+  DescriptionCode: 二要素認証を作成します。受信したコードを入力して電話番号を確認します。
+  PhoneLabel: 電話番号
+  CodeLabel: コード
+  EditButtonText: 編集
+  ResendButtonText: コードを再送信
+  NextButtonText: 次へ
 
 InitMFAU2F:
   Title: セキュリティキーの追加
@@ -111,6 +123,8 @@ InitMFADone:
 MFAProvider:
   Provider0: Authenticatorアプリ（Google/Microsoft Authenticator、Authyなど）
   Provider1: デバイス依存（FaceID、Windows Hello、指紋など）
+  Provider3: OTP SMS
+  Provider4: OTPメール
   ChooseOther: または、他のオプションを選択
 
 VerifyMFAOTP:
@@ -214,6 +228,9 @@ RegistrationUser:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   GenderLabel: 性別
   Female: 女性
   Male: 男性
@@ -247,6 +264,9 @@ ExternalRegistrationUserOverview:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   TosAndPrivacyLabel: 利用規約
   TosConfirm: 私は利用規約を承諾します。
   TosLinkText: TOS
@@ -308,6 +328,9 @@ ExternalNotFound:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
 
 DeviceAuth:
   Title: デバイス認証
@@ -357,6 +380,7 @@ Errors:
       Empty: パスワードが空です
       Invalid: 無効なパスワードです
       InvalidAndLocked: パスワードが無効かつユーザーがロックされているため、管理者に連絡してください。
+      NotChanged: パスワードは変更されていません
     UsernameOrPassword:
       Invalid: ユーザー名またはパスワードは無効です
     PasswordComplexityPolicy:

@@ -120,6 +120,8 @@ Errors:
       Empty: La contraseña está vacía
       Invalid: La contraseña no es válida
       NotSet: El usuario no ha establecido una contraseña
+      NotChanged: Contraseña no modificada
+      NotSupported: No se admite la codificación hash de contraseña
     PasswordComplexityPolicy:
       NotFound: Política de contraseñas no encontrada
       MinLength: La contraseña es demasiado corta
@@ -135,6 +137,7 @@ Errors:
       MinimumExternalIDPNeeded: Al menos de añadirse un IDP
       AlreadyExists: IDP externo ya cogido
       NotFound: IDP no encontrado
+      LoginFailed: Error de inicio de sesión en IDP externo
     MFA:
       OTP:
         AlreadyReady: Multifactor OTP (OneTimePassword) ya está configurado
@@ -476,6 +479,8 @@ Errors:
     Terminated: Sesión ya terminada
     Token:
       Invalid: El identificador de sesión no es válido
+    WebAuthN:
+      NoChallenge: Sesión sin desafío WebAuthN
   Intent:
     IDPMissing: Falta IDP en la solicitud
     SuccessURLMissing: Falta la URL de éxito en la solicitud
@@ -485,6 +490,17 @@ Errors:
     NotSucceeded: Intento fallido
     TokenCreationFailed: Fallo en la creación del token
     InvalidToken: El token de la intención no es válido
+    OtherUser: Destinado a otro usuario
+  AuthRequest:
+    AlreadyExists: Auth Request ya existe
+    NotExisting: Auth Request no existe
+    WrongLoginClient: Auth Request creado por otro cliente de inicio de sesión
+  OIDCSession:
+    RefreshTokenInvalid: El token de refresco no es válido
+    Token:
+      Invalid: El token no es válido
+      Expired: El token ha caducado
+    InvalidClient: El token no ha sido emitido para este cliente
 
 AggregateTypes:
   action: Acción
@@ -568,6 +584,10 @@ EventTypes:
         check:
           succeeded: Comprobación exitosa de la contraseña
           failed: Fallo en la comprobación de la contraseña
+        change:
+          sent: Cambio de contraseña enviado
+        hash:
+          updated: Hash de contraseña actualizado
       externallogin:
         check:
           succeeded: Inicio de sesión externo con éxito
@@ -576,6 +596,8 @@ EventTypes:
         removed: IDP externo eliminado
         cascade:
           removed: IDP externo eliminado en cascada
+        id:
+          migrated: Se migró el ID de usuario externo del IDP
       phone:
         changed: Número de teléfono modificado
         verified: Número de teléfono verificado
@@ -597,6 +619,24 @@ EventTypes:
           check:
             succeeded: Comprobación exitosa de Multifactor OTP
             failed: Comprobación fallida de Multifactor OTP
+          sms:
+            added: Multifactor OTP SMS añadido
+            removed: Multifactor OTP SMS elimonado
+            code:
+              added: Código Multifactor OTP SMS añadido
+              sent: Código Multifactor OTP SMS enviado
+            check:
+              succeeded: Comprobación Multifactor OTP SMS exitosa
+              failed: Comprobación Multifactor OTP SMS fallida
+          email:
+            added: Multifactor OTP email añadido
+            removed: Multifactor OTP email elimonado
+            code:
+              added: Código Multifactor OTP email añadido
+              sent: Código Multifactor OTP email enviado
+            check:
+              succeeded: Comprobación Multifactor OTP email exitosa
+              failed: Comprobación Multifactor OTP email fallida
         u2f:
           token:
             added: Multifactor U2F Token añadido
@@ -1177,6 +1217,7 @@ Action:
       ExternalAuthentication: Autenticación externa
       CustomiseToken: Token complementario
       InternalAuthentication: Autenticación interna
+      CustomizeSAMLResponse: SAMLResponse complementario
   TriggerType:
     Unspecified: No especificado
     PostAuthentication: Post Autenticación
@@ -1184,3 +1225,4 @@ Action:
     PostCreation: Post Creación
     PreUserinfoCreation: Pre creación de Userinfo
     PreAccessTokenCreation: Pre creación de token de acceso
+    PreSAMLResponseCreation: Creación previa de SAMLResponse

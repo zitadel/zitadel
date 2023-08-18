@@ -13,6 +13,8 @@ import (
 	"time"
 
 	clockpkg "github.com/benbjohnson/clock"
+	"github.com/common-nighthawk/go-figure"
+	"github.com/fatih/color"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -22,6 +24,7 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
+	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/key"
 	cmd_tls "github.com/zitadel/zitadel/cmd/tls"
 	"github.com/zitadel/zitadel/internal/actions"
@@ -32,6 +35,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/admin"
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
+	oidc_v2 "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2"
+	"github.com/zitadel/zitadel/internal/api/grpc/org/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/session/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/settings/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/system"
@@ -47,6 +52,7 @@ import (
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/authz"
 	authz_repo "github.com/zitadel/zitadel/internal/authz/repository"
+	authz_es "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/eventstore"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
@@ -109,6 +115,8 @@ type Server struct {
 }
 
 func startZitadel(config *Config, masterKey string, server chan<- *Server) error {
+	showBasicInformation(config)
+
 	ctx := context.Background()
 
 	dbClient, err := database.Connect(config.Database, false)
@@ -145,6 +153,11 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		keys.SAML,
 		config.InternalAuthZ.RolePermissionMappings,
 		sessionTokenVerifier,
+		func(q *query.Queries) domain.PermissionCheck {
+			return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+				return internal_authz.CheckPermission(ctx, &authz_es.UserMembershipRepo{Queries: q}, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
+			}
+		},
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
@@ -186,6 +199,9 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		&http.Client{},
 		permissionCheck,
 		sessionTokenVerifier,
+		config.OIDC.DefaultAccessTokenLifetime,
+		config.OIDC.DefaultRefreshTokenExpiration,
+		config.OIDC.DefaultRefreshTokenIdleExpiration,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
@@ -201,14 +217,11 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		return err
 	}
 
-	usageReporter := logstore.UsageReporterFunc(commands.ReportUsage)
+	usageReporter := logstore.UsageReporterFunc(commands.ReportQuotaUsage)
 	actionsLogstoreSvc := logstore.New(queries, usageReporter, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
-	if actionsLogstoreSvc.Enabled() {
-		logging.Warn("execution logs are currently in beta")
-	}
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	notification.Start(ctx, config.Projections.Customizations["notifications"], config.Projections.Customizations["notificationsquotas"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
+	notification.Start(ctx, config.Projections.Customizations["notifications"], config.Projections.Customizations["notificationsquotas"], config.Projections.Customizations["telemetry"], *config.Telemetry, config.ExternalDomain, config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
 
 	router := mux.NewRouter()
 	tlsConfig, err := config.TLS.Config()
@@ -299,9 +312,6 @@ func startAPIs(
 	}
 
 	accessSvc := logstore.New(quotaQuerier, usageReporter, accessDBEmitter, accessStdoutEmitter)
-	if accessSvc.Enabled() {
-		logging.Warn("access logs are currently in beta")
-	}
 	exhaustedCookieHandler := http_util.NewCookieHandler(
 		http_util.WithUnsecure(),
 		http_util.WithNonHttpOnly(),
@@ -338,7 +348,11 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return err
 	}
+
 	if err := apis.RegisterService(ctx, settings.CreateServer(commands, queries, config.ExternalSecure)); err != nil {
+		return err
+	}
+	if err := apis.RegisterService(ctx, org.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return err
 	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)
@@ -391,6 +405,11 @@ func startAPIs(
 	apis.RegisterHandlerOnPrefix(login.HandlerPrefix, l.Handler())
 	apis.HandleFunc(login.EndpointDeviceAuth, login.RedirectDeviceAuthToPrefix)
 
+	// After OIDC provider so that the callback endpoint can be used
+	if err := apis.RegisterService(ctx, oidc_v2.CreateServer(commands, queries, oidcProvider, config.ExternalSecure)); err != nil {
+		return err
+	}
+
 	// handle grpc at last to be able to handle the root, because grpc and gateway require a lot of different prefixes
 	apis.RouteGRPC()
 	return nil
@@ -437,4 +456,30 @@ func shutdownServer(ctx context.Context, server *http.Server) error {
 	}
 	logging.New().Info("server shutdown gracefully")
 	return nil
+}
+
+func showBasicInformation(startConfig *Config) {
+	fmt.Println(color.MagentaString(figure.NewFigure("ZITADEL", "", true).String()))
+	http := "http"
+	if startConfig.TLS.Enabled || startConfig.ExternalSecure {
+		http = "https"
+	}
+
+	consoleURL := fmt.Sprintf("%s://%s:%v/ui/console\n", http, startConfig.ExternalDomain, startConfig.ExternalPort)
+	healthCheckURL := fmt.Sprintf("%s://%s:%v/debug/healthz\n", http, startConfig.ExternalDomain, startConfig.ExternalPort)
+
+	insecure := !startConfig.TLS.Enabled && !startConfig.ExternalSecure
+
+	fmt.Printf(" ===============================================================\n\n")
+	fmt.Printf(" Version          : %s\n", build.Version())
+	fmt.Printf(" TLS enabled      : %v\n", startConfig.TLS.Enabled)
+	fmt.Printf(" External Secure  : %v\n", startConfig.ExternalSecure)
+	fmt.Printf(" Console URL      : %s", color.BlueString(consoleURL))
+	fmt.Printf(" Health Check URL : %s", color.BlueString(healthCheckURL))
+	if insecure {
+		fmt.Printf("\n %s: you're using plain http without TLS. Be aware this is \n", color.RedString("Warning"))
+		fmt.Printf(" not a secure setup and should only be used for test systems.         \n")
+		fmt.Printf(" Visit: %s    \n", color.CyanString("https://zitadel.com/docs/self-hosting/manage/tls_modes"))
+	}
+	fmt.Printf("\n ===============================================================\n\n")
 }

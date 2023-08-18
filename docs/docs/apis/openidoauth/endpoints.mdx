@@ -1,5 +1,5 @@
 ---
-title: Endpoints
+title: OpenID Connect Endpoints
 ---
 
 import Tabs from "@theme/Tabs";
@@ -101,7 +101,7 @@ no additional parameters required
 | state         | Opaque value used to maintain state between the request and the callback. Used for Cross-Site Request Forgery (CSRF) mitigation as well, therefore highly **recommended**.                                                                                                                                                                                                                                                                                                                     |
 | ui_locales    | Spaces delimited list of preferred locales for the login UI, e.g. `de-CH de en`. If none is provided or matches the possible locales provided by the login UI, the `accept-language` header of the browser will be taken into account.                                                                                                                                                                                                                                                         |
 
-### Successful Code Response
+### Successful code response
 
 When your `response_type` was `code` and no error occurred, the following response will be returned:
 
@@ -110,9 +110,9 @@ When your `response_type` was `code` and no error occurred, the following respon
 | code     | Opaque string which will be necessary to request tokens on the token endpoint |
 | state    | Unmodified `state` parameter from the request                                 |
 
-### Successful Implicit Response
+### Successful implicit response
 
-When your `response_type` was either `it_token` or `id_token token` and no error occurred, the following response will be returned:
+When your `response_type` was either `id_token` or `id_token token` and no error occurred, the following response will be returned:
 
 | Property     | Description                                                                           |
 | ------------ | ------------------------------------------------------------------------------------- |
@@ -123,7 +123,7 @@ When your `response_type` was either `it_token` or `id_token token` and no error
 | scope        | Scopes of the `access_token`. These might differ from the provided `scope` parameter. |
 | state        | Unmodified `state` parameter from the request                                         |
 
-### Error Response
+### Error response
 
 Regardless of the authorization flow chosen, if an error occurs the following response will be returned to the redirect_uri.
 
@@ -158,11 +158,11 @@ The token_endpoint will as the name suggests return various tokens (access, id a
 When using [`authorization_code`](#authorization-code-grant-code-exchange) flow call this endpoint after receiving the code from the authorization_endpoint.
 When using [`refresh_token`](#authorization-code-grant-code-exchange) or [`urn:ietf:params:oauth:grant-type:jwt-bearer` (JWT Profile)](#jwt-profile-grant) you will call this endpoint directly.
 
-### Authorization Code Grant (Code Exchange)
+### Authorization code grant (Code Exchange)
 
 As mention above, when using `authorization_code` grant, this endpoint will be your second request for authorizing a user with its user agent (browser).
 
-#### Required request Parameters
+#### Required request parameters
 
 | Parameter    | Description                                                                                                   |
 | ------------ | ------------------------------------------------------------------------------------------------------------- |
@@ -229,9 +229,9 @@ Send a client assertion as JWT for us to validate the signature against the regi
 | refresh_token | An opaque token. Only returned if `offline_access` scope was requested                |
 | token_type    | Type of the `access_token`. Value is always `Bearer`                                  |
 
-### JWT Profile Grant
+### JWT profile grant
 
-#### Required request Parameters
+#### Required request parameters
 
 | Parameter  | Description                                                                                                             |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------- |
@@ -247,7 +247,7 @@ curl --request POST \
   --data assertion=eyJhbGciOiJSUzI1Ni...
 ```
 
-#### Successful JWT Profile response {#token-jwt-response}
+#### Successful JWT profile response {#token-jwt-response}
 
 | Property     | Description                                                                           |
 | ------------ | ------------------------------------------------------------------------------------- |
@@ -257,12 +257,12 @@ curl --request POST \
 | scope        | Scopes of the `access_token`. These might differ from the provided `scope` parameter. |
 | token_type   | Type of the `access_token`. Value is always `Bearer`                                  |
 
-### Refresh Token Grant
+### Refresh token grant
 
 To request a new `access_token` without user interaction, you can use the `refresh_token` grant.
 See [offline_access Scope](scopes#standard-scopes) for how to request a `refresh_token` in the authorization request.
 
-#### Required request Parameters
+#### Required request parameters
 
 | Parameter     | Description                                                                                                                                                                                                                                                                                                     |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -325,9 +325,9 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 | refresh_token | An new opaque refresh_token.                                                          |
 | token_type    | Type of the `access_token`. Value is always `Bearer`                                  |
 
-### Client Credentials Grant
+### Client credentials grant
 
-#### Required request Parameters
+#### Required request parameters
 
 | Parameter  | Description                                                                                                             |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------- |
@@ -363,7 +363,7 @@ curl --request POST \
   --data scope=openid profile
 ```
 
-#### Successful Client Credentials response {#token-client-credentials-response}
+#### Successful client credentials response {#token-client-credentials-response}
 
 | Property     | Description                                                                           |
 | ------------ | ------------------------------------------------------------------------------------- |
@@ -584,8 +584,27 @@ If both parameters are provided, they must be equal.
 
 {your_domain}/oauth/v2/keys
 
-> Be aware that these keys can be rotated without any prior notice. We will however make sure that a proper `kid` is set with each key!
+The endpoint returns a JSON Web Key Set (JWKS) containing the public keys that can be used to locally validate JWTs you received from ZITADEL.
+The alternative would be to validate tokens with the [introspection endpoint](#introspection_endpoint).
 
-## OAuth 2.0 Metadata
+### Key rotation
+
+Keys are automatically rotated on a regular basis or on demand, meaning keys can change in irregular intervals.
+ZITADEL ensures that a proper `kid` is set with each key.
+
+:::info Keys rotate without prior notice
+Be aware that these keys can be rotated without any prior notice.
+:::
+
+### Caching
+
+You can optimize performance of your clients by caching the response from the keys endpoint.
+We recommend to regularly update the cached response, since the [keys can be rotated without prior notice](#key-rotation).
+You could also combine caching with a risk-based on-demand refresh when a critical operation is executed.
+
+Without caching you will call this endpoint on each request.
+This might result in being rate limited for a large number of requests that come from the same backend.
+
+## OAuth 2.0 metadata
 
 **ZITADEL** does not yet provide a OAuth 2.0 Metadata endpoint but instead provides a [OpenID Connect Discovery Endpoint](https://openid.net/specs/openid-connect-discovery-1_0.html).

@@ -13,15 +13,12 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
-	"golang.org/x/oauth2"
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
+	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/internal/repository/idp"
+	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
@@ -41,66 +38,14 @@ func TestMain(m *testing.M) {
 		Tester = integration.NewTester(ctx)
 		defer Tester.Done()
 
-		CTX, ErrCTX = Tester.WithSystemAuthorization(ctx, integration.OrgOwner), errCtx
-		Client = user.NewUserServiceClient(Tester.GRPCClientConn)
+		CTX, ErrCTX = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
+		Client = Tester.Client.UserV2
 		return m.Run()
 	}())
 }
 
-func createProvider(t *testing.T) string {
-	ctx := authz.WithInstance(context.Background(), Tester.Instance)
-	id, _, err := Tester.Commands.AddOrgGenericOAuthProvider(ctx, Tester.Organisation.ID, command.GenericOAuthProvider{
-		"idp",
-		"clientID",
-		"clientSecret",
-		"https://example.com/oauth/v2/authorize",
-		"https://example.com/oauth/v2/token",
-		"https://api.example.com/user",
-		[]string{"openid", "profile", "email"},
-		"id",
-		idp.Options{
-			IsLinkingAllowed:  true,
-			IsCreationAllowed: true,
-			IsAutoCreation:    true,
-			IsAutoUpdate:      true,
-		},
-	})
-	require.NoError(t, err)
-	return id
-}
-
-func createIntent(t *testing.T, idpID string) string {
-	ctx := authz.WithInstance(context.Background(), Tester.Instance)
-	id, _, err := Tester.Commands.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", Tester.Organisation.ID)
-	require.NoError(t, err)
-	return id
-}
-
-func createSuccessfulIntent(t *testing.T, idpID string) (string, string, time.Time, uint64) {
-	ctx := authz.WithInstance(context.Background(), Tester.Instance)
-	intentID := createIntent(t, idpID)
-	writeModel, err := Tester.Commands.GetIntentWriteModel(ctx, intentID, Tester.Organisation.ID)
-	require.NoError(t, err)
-	idpUser := &oauth.UserMapper{
-		RawInfo: map[string]interface{}{
-			"id": "id",
-		},
-	}
-	idpSession := &oauth.Session{
-		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
-			Token: &oauth2.Token{
-				AccessToken: "accessToken",
-			},
-			IDToken: "idToken",
-		},
-	}
-	token, err := Tester.Commands.SucceedIDPIntent(ctx, writeModel, idpUser, idpSession, "")
-	require.NoError(t, err)
-	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
-}
-
 func TestServer_AddHumanUser(t *testing.T) {
-	idpID := createProvider(t)
+	idpID := Tester.AddGenericOAuthProvider(t)
 	type args struct {
 		ctx context.Context
 		req *user.AddHumanUserRequest
@@ -130,6 +75,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
 					},
 					Email: &user.SetHumanEmail{},
+					Phone: &user.SetHumanPhone{},
 					Metadata: []*user.SetMetadataEntry{
 						{
 							Key:   "somekey",
@@ -152,7 +98,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 			},
 		},
 		{
-			name: "return verification code",
+			name: "return email verification code",
 			args: args{
 				CTX,
 				&user.AddHumanUserRequest{
@@ -240,6 +186,53 @@ func TestServer_AddHumanUser(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
+			},
+		},
+		{
+			name: "return phone verification code",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organisation: &object.Organisation{
+						Org: &object.Organisation_OrgId{
+							OrgId: Tester.Organisation.ID,
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						FirstName:         "Donald",
+						LastName:          "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Phone: &user.SetHumanPhone{
+						Phone: "+41791234567",
+						Verification: &user.SetHumanPhone_ReturnCode{
+							ReturnCode: &user.ReturnPhoneVerificationCode{},
+						},
+					},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_Password{
+						Password: &user.Password{
+							Password:       "DifficultPW666!",
+							ChangeRequired: true,
+						},
+					},
+				},
+			},
+			want: &user.AddHumanUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+				PhoneCode: gu.Ptr("something"),
 			},
 		},
 		{
@@ -386,9 +379,9 @@ func TestServer_AddHumanUser(t *testing.T) {
 					},
 					IdpLinks: []*user.IDPLink{
 						{
-							IdpId:         "idpID",
-							IdpExternalId: "externalID",
-							DisplayName:   "displayName",
+							IdpId:    "idpID",
+							UserId:   "userID",
+							UserName: "username",
 						},
 					},
 				},
@@ -433,9 +426,9 @@ func TestServer_AddHumanUser(t *testing.T) {
 					},
 					IdpLinks: []*user.IDPLink{
 						{
-							IdpId:         idpID,
-							IdpExternalId: "externalID",
-							DisplayName:   "displayName",
+							IdpId:    idpID,
+							UserId:   "userID",
+							UserName: "username",
 						},
 					},
 				},
@@ -446,6 +439,79 @@ func TestServer_AddHumanUser(t *testing.T) {
 					ResourceOwner: Tester.Organisation.ID,
 				},
 			},
+		},
+		{
+			name: "hashed password",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organisation: &object.Organisation{
+						Org: &object.Organisation_OrgId{
+							OrgId: Tester.Organisation.ID,
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						FirstName:         "Donald",
+						LastName:          "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_HashedPassword{
+						HashedPassword: &user.HashedPassword{
+							Hash: "$2y$12$hXUrnqdq1RIIYZ2HPytIIe5lXdIvbhqrTvdPsSF7o.jFh817Z6lwm",
+						},
+					},
+				},
+			},
+			want: &user.AddHumanUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+		{
+			name: "unsupported hashed password",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organisation: &object.Organisation{
+						Org: &object.Organisation_OrgId{
+							OrgId: Tester.Organisation.ID,
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						FirstName:         "Donald",
+						LastName:          "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_HashedPassword{
+						HashedPassword: &user.HashedPassword{
+							Hash: "$scrypt$ln=16,r=8,p=1$cmFuZG9tc2FsdGlzaGFyZA$Rh+NnJNo1I6nRwaNqbDm6kmADswD1+7FTKZ7Ln9D8nQ",
+						},
+					},
+				},
+			},
+			wantErr: true,
 		},
 	}
 	for i, tt := range tests {
@@ -477,7 +543,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 }
 
 func TestServer_AddIDPLink(t *testing.T) {
-	idpID := createProvider(t)
+	idpID := Tester.AddGenericOAuthProvider(t)
 	type args struct {
 		ctx context.Context
 		req *user.AddIDPLinkRequest
@@ -495,9 +561,9 @@ func TestServer_AddIDPLink(t *testing.T) {
 				&user.AddIDPLinkRequest{
 					UserId: "userID",
 					IdpLink: &user.IDPLink{
-						IdpId:         idpID,
-						IdpExternalId: "externalID",
-						DisplayName:   "displayName",
+						IdpId:    idpID,
+						UserId:   "userID",
+						UserName: "username",
 					},
 				},
 			},
@@ -509,11 +575,11 @@ func TestServer_AddIDPLink(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddIDPLinkRequest{
-					UserId: Tester.Users[integration.OrgOwner].ID,
+					UserId: Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID,
 					IdpLink: &user.IDPLink{
-						IdpId:         "idpID",
-						IdpExternalId: "externalID",
-						DisplayName:   "displayName",
+						IdpId:    "idpID",
+						UserId:   "userID",
+						UserName: "username",
 					},
 				},
 			},
@@ -525,11 +591,11 @@ func TestServer_AddIDPLink(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddIDPLinkRequest{
-					UserId: Tester.Users[integration.OrgOwner].ID,
+					UserId: Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID,
 					IdpLink: &user.IDPLink{
-						IdpId:         idpID,
-						IdpExternalId: "externalID",
-						DisplayName:   "displayName",
+						IdpId:    idpID,
+						UserId:   "userID",
+						UserName: "username",
 					},
 				},
 			},
@@ -557,7 +623,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 }
 
 func TestServer_StartIdentityProviderFlow(t *testing.T) {
-	idpID := createProvider(t)
+	idpID := Tester.AddGenericOAuthProvider(t)
 	type args struct {
 		ctx context.Context
 		req *user.StartIdentityProviderFlowRequest
@@ -584,9 +650,13 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 			args: args{
 				CTX,
 				&user.StartIdentityProviderFlowRequest{
-					IdpId:      idpID,
-					SuccessUrl: "https://example.com/success",
-					FailureUrl: "https://example.com/failure",
+					IdpId: idpID,
+					Content: &user.StartIdentityProviderFlowRequest_Urls{
+						Urls: &user.RedirectURLs{
+							SuccessUrl: "https://example.com/success",
+							FailureUrl: "https://example.com/failure",
+						},
+					},
 				},
 			},
 			want: &user.StartIdentityProviderFlowResponse{
@@ -595,7 +665,7 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 					ResourceOwner: Tester.Organisation.ID,
 				},
 				NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{
-					AuthUrl: "https://example.com/oauth/v2/authorize?client_id=clientID&prompt=select_account&redirect_uri=https%3A%2F%2Flocalhost%3A8080%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=",
+					AuthUrl: "https://example.com/oauth/v2/authorize?client_id=clientID&prompt=select_account&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=",
 				},
 			},
 			wantErr: false,
@@ -621,9 +691,10 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 }
 
 func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
-	idpID := createProvider(t)
-	intentID := createIntent(t, idpID)
-	successfulID, token, changeDate, sequence := createSuccessfulIntent(t, idpID)
+	idpID := Tester.AddGenericOAuthProvider(t)
+	intentID := Tester.CreateIntent(t, idpID)
+	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulOAuthIntent(t, idpID, "", "id")
+	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Tester.CreateSuccessfulLDAPIntent(t, idpID, "", "id")
 	type args struct {
 		ctx context.Context
 		req *user.RetrieveIdentityProviderInformationRequest
@@ -678,7 +749,62 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 							IdToken:     gu.Ptr("idToken"),
 						},
 					},
-					IdpInformation: []byte(`{"RawInfo":{"id":"id"}}`),
+					IdpId:    idpID,
+					UserId:   "id",
+					UserName: "username",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"sub":                "id",
+							"preferred_username": "username",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "retrieve successful ldap intent",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderInformationRequest{
+					IntentId: ldapSuccessfulID,
+					Token:    ldapToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderInformationResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(ldapChangeDate),
+					ResourceOwner: Tester.Organisation.ID,
+					Sequence:      ldapSequence,
+				},
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Ldap{
+						Ldap: &user.IDPLDAPAccessInformation{
+							Attributes: func() *structpb.Struct {
+								s, err := structpb.NewStruct(map[string]interface{}{
+									"id":       []interface{}{"id"},
+									"username": []interface{}{"username"},
+									"language": []interface{}{"en"},
+								})
+								require.NoError(t, err)
+								return s
+							}(),
+						},
+					},
+					IdpId:    idpID,
+					UserId:   "id",
+					UserName: "username",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"id":                "id",
+							"preferredUsername": "username",
+							"preferredLanguage": "en",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
 				},
 			},
 			wantErr: false,
@@ -693,8 +819,113 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			require.Equal(t, tt.want.GetDetails(), got.GetDetails())
-			require.Equal(t, tt.want.GetIdpInformation(), got.GetIdpInformation())
+			grpc.AllFieldsEqual(t, tt.want.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
+		})
+	}
+}
+
+func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
+	userIDWithoutAuth := Tester.CreateHumanUser(CTX).GetUserId()
+
+	userIDWithPasskey := Tester.CreateHumanUser(CTX).GetUserId()
+	Tester.RegisterUserPasskey(CTX, userIDWithPasskey)
+
+	userMultipleAuth := Tester.CreateHumanUser(CTX).GetUserId()
+	Tester.RegisterUserPasskey(CTX, userMultipleAuth)
+	provider, err := Tester.Client.Mgmt.AddGenericOIDCProvider(CTX, &mgmt.AddGenericOIDCProviderRequest{
+		Name:         "ListAuthenticationMethodTypes",
+		Issuer:       "https://example.com",
+		ClientId:     "client_id",
+		ClientSecret: "client_secret",
+	})
+	require.NoError(t, err)
+	idpLink, err := Tester.Client.UserV2.AddIDPLink(CTX, &user.AddIDPLinkRequest{UserId: userMultipleAuth, IdpLink: &user.IDPLink{
+		IdpId:    provider.GetId(),
+		UserId:   "external-id",
+		UserName: "displayName",
+	}})
+	require.NoError(t, err)
+
+	type args struct {
+		ctx context.Context
+		req *user.ListAuthenticationMethodTypesRequest
+	}
+	tests := []struct {
+		name string
+		args args
+		want *user.ListAuthenticationMethodTypesResponse
+	}{
+		{
+			name: "no auth",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userIDWithoutAuth,
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+				},
+			},
+		},
+		{
+			name: "with auth (passkey)",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userIDWithPasskey,
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
+				},
+			},
+		},
+		{
+			name: "multiple auth",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userMultipleAuth,
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 2,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var got *user.ListAuthenticationMethodTypesResponse
+			var err error
+
+			for {
+				got, err = Client.ListAuthenticationMethodTypes(tt.args.ctx, tt.args.req)
+				if err == nil && got.GetDetails().GetProcessedSequence() >= idpLink.GetDetails().GetSequence() {
+					break
+				}
+				select {
+				case <-CTX.Done():
+					t.Fatal(CTX.Err(), err)
+				case <-time.After(time.Second):
+					t.Log("retrying ListAuthenticationMethodTypes")
+					continue
+				}
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want.GetDetails().GetTotalResult(), got.GetDetails().GetTotalResult())
+			require.Equal(t, tt.want.GetAuthMethodTypes(), got.GetAuthMethodTypes())
 		})
 	}
 }

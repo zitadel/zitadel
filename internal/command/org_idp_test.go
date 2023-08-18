@@ -1119,6 +1119,474 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 	}
 }
 
+func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
+	type fields struct {
+		eventstore   *eventstore.Eventstore
+		secretCrypto crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx           context.Context
+		resourceOwner string
+		id            string
+		provider      AzureADProvider
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid name",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider:      AzureADProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-sdf3g", ""))
+				},
+			},
+		},
+		{
+			"invalid client id",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: AzureADProvider{
+					Name: "name",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Fhbr2", ""))
+				},
+			},
+		},
+		{
+			"invalid client secret",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: AzureADProvider{
+					Name:     "name",
+					ClientID: "clientID",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Dzh3g", ""))
+				},
+			},
+		},
+		{
+			name: "not found",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "ro",
+				id:            "id1",
+				provider: AzureADProvider{
+					Name:         "name",
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+				},
+			},
+			res: res{
+				err: caos_errors.IsNotFound,
+			},
+		},
+		{
+			name: "migrate ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								nil,
+								false,
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								func() eventstore.Command {
+									event := org.NewOIDCIDPMigratedAzureADEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+										"id1",
+										"name",
+										"clientID",
+										&crypto.CryptoValue{
+											CryptoType: crypto.TypeEncryption,
+											Algorithm:  "enc",
+											KeyID:      "id",
+											Crypted:    []byte("clientSecret"),
+										},
+										nil,
+										"",
+										false,
+										idp.Options{},
+									)
+									return event
+								}(),
+							),
+						},
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: AzureADProvider{
+					Name:         "name",
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+		{
+			name: "migrate full ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								nil,
+								false,
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						eventPusherToEvents(
+							org.NewOIDCIDPMigratedAzureADEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{"openid"},
+								"tenant",
+								true,
+								idp.Options{
+									IsCreationAllowed: true,
+									IsLinkingAllowed:  true,
+									IsAutoCreation:    true,
+									IsAutoUpdate:      true,
+								},
+							)),
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: AzureADProvider{
+					Name:          "name",
+					ClientID:      "clientID",
+					ClientSecret:  "clientSecret",
+					Scopes:        []string{"openid"},
+					Tenant:        "tenant",
+					EmailVerified: true,
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:          tt.fields.eventstore,
+				idpConfigEncryption: tt.fields.secretCrypto,
+			}
+			got, err := c.MigrateOrgGenericOIDCToAzureADProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
+	type fields struct {
+		eventstore   *eventstore.Eventstore
+		secretCrypto crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx           context.Context
+		resourceOwner string
+		id            string
+		provider      GoogleProvider
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid clientID",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider:      GoogleProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-D3fvs", ""))
+				},
+			},
+		},
+		{
+			"invalid clientSecret",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: GoogleProvider{
+					ClientID: "clientID",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-W2vqs", ""))
+				},
+			},
+		},
+		{
+			"not found",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+				),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: GoogleProvider{
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+				},
+			},
+			res{
+				err: caos_errors.IsNotFound,
+			},
+		},
+		{
+			name: "migrate ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								nil,
+								false,
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						eventPusherToEvents(
+							org.NewOIDCIDPMigratedGoogleEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								nil,
+								idp.Options{},
+							)),
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: GoogleProvider{
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+		{
+			name: "migrate full ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								nil,
+								false,
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						eventPusherToEvents(
+							org.NewOIDCIDPMigratedGoogleEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{"openid"},
+								idp.Options{
+									IsCreationAllowed: true,
+									IsLinkingAllowed:  true,
+									IsAutoCreation:    true,
+									IsAutoUpdate:      true,
+								},
+							)),
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: GoogleProvider{
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					Scopes:       []string{"openid"},
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:          tt.fields.eventstore,
+				idpConfigEncryption: tt.fields.secretCrypto,
+			}
+			got, err := c.MigrateOrgGenericOIDCToGoogleProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
 func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 	type fields struct {
 		eventstore   *eventstore.Eventstore

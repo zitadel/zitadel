@@ -3,10 +3,13 @@ package user
 import (
 	"context"
 
+	"google.golang.org/protobuf/types/known/structpb"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
@@ -17,11 +20,11 @@ func (s *Server) RegisterPasskey(ctx context.Context, req *user.RegisterPasskeyR
 	)
 	if code := req.GetCode(); code != nil {
 		return passkeyRegistrationDetailsToPb(
-			s.command.RegisterUserPasskeyWithCode(ctx, req.GetUserId(), resourceOwner, authenticator, code.Id, code.Code, s.userCodeAlg),
+			s.command.RegisterUserPasskeyWithCode(ctx, req.GetUserId(), resourceOwner, authenticator, code.Id, code.Code, req.GetDomain(), s.userCodeAlg),
 		)
 	}
 	return passkeyRegistrationDetailsToPb(
-		s.command.RegisterUserPasskey(ctx, req.GetUserId(), resourceOwner, authenticator),
+		s.command.RegisterUserPasskey(ctx, req.GetUserId(), resourceOwner, req.GetDomain(), authenticator),
 	)
 }
 
@@ -38,20 +41,36 @@ func passkeyAuthenticatorToDomain(pa user.PasskeyAuthenticator) domain.Authentic
 	}
 }
 
-func passkeyRegistrationDetailsToPb(details *domain.PasskeyRegistrationDetails, err error) (*user.RegisterPasskeyResponse, error) {
+func webAuthNRegistrationDetailsToPb(details *domain.WebAuthNRegistrationDetails, err error) (*object_pb.Details, *structpb.Struct, error) {
+	if err != nil {
+		return nil, nil, err
+	}
+	options := new(structpb.Struct)
+	if err := options.UnmarshalJSON(details.PublicKeyCredentialCreationOptions); err != nil {
+		return nil, nil, caos_errs.ThrowInternal(err, "USERv2-Dohr6", "Errors.Internal")
+	}
+	return object.DomainToDetailsPb(details.ObjectDetails), options, nil
+}
+
+func passkeyRegistrationDetailsToPb(details *domain.WebAuthNRegistrationDetails, err error) (*user.RegisterPasskeyResponse, error) {
+	objectDetails, options, err := webAuthNRegistrationDetailsToPb(details, err)
 	if err != nil {
 		return nil, err
 	}
 	return &user.RegisterPasskeyResponse{
-		Details:                            object.DomainToDetailsPb(details.ObjectDetails),
-		PasskeyId:                          details.PasskeyID,
-		PublicKeyCredentialCreationOptions: details.PublicKeyCredentialCreationOptions,
+		Details:                            objectDetails,
+		PasskeyId:                          details.ID,
+		PublicKeyCredentialCreationOptions: options,
 	}, nil
 }
 
 func (s *Server) VerifyPasskeyRegistration(ctx context.Context, req *user.VerifyPasskeyRegistrationRequest) (*user.VerifyPasskeyRegistrationResponse, error) {
 	resourceOwner := authz.GetCtxData(ctx).ResourceOwner
-	objectDetails, err := s.command.HumanHumanPasswordlessSetup(ctx, req.GetUserId(), resourceOwner, req.GetPasskeyName(), "", req.GetPublicKeyCredential())
+	pkc, err := req.GetPublicKeyCredential().MarshalJSON()
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "USERv2-Pha2o", "Errors.Internal")
+	}
+	objectDetails, err := s.command.HumanHumanPasswordlessSetup(ctx, req.GetUserId(), resourceOwner, req.GetPasskeyName(), "", pkc)
 	if err != nil {
 		return nil, err
 	}

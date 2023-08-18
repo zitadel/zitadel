@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"github.com/zitadel/oidc/v2/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
@@ -15,18 +16,20 @@ import (
 type Client struct {
 	app                        *query.App
 	defaultLoginURL            string
+	defaultLoginURLV2          string
 	defaultAccessTokenLifetime time.Duration
 	defaultIdTokenLifetime     time.Duration
 	allowedScopes              []string
 }
 
-func ClientFromBusiness(app *query.App, defaultLoginURL string, defaultAccessTokenLifetime, defaultIdTokenLifetime time.Duration, allowedScopes []string) (op.Client, error) {
+func ClientFromBusiness(app *query.App, defaultLoginURL, defaultLoginURLV2 string, defaultAccessTokenLifetime, defaultIdTokenLifetime time.Duration, allowedScopes []string) (op.Client, error) {
 	if app.OIDCConfig == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "OIDC-d5bhD", "client is not a proper oidc application")
 	}
 	return &Client{
 			app:                        app,
 			defaultLoginURL:            defaultLoginURL,
+			defaultLoginURLV2:          defaultLoginURLV2,
 			defaultAccessTokenLifetime: defaultAccessTokenLifetime,
 			defaultIdTokenLifetime:     defaultIdTokenLifetime,
 			allowedScopes:              allowedScopes},
@@ -46,6 +49,9 @@ func (c *Client) GetID() string {
 }
 
 func (c *Client) LoginURL(id string) string {
+	if strings.HasPrefix(id, command.IDPrefixV2) {
+		return c.defaultLoginURLV2 + id
+	}
 	return c.defaultLoginURL + id
 }
 

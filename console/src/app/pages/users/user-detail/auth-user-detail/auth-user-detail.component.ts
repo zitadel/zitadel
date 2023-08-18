@@ -9,6 +9,7 @@ import { Buffer } from 'buffer';
 import { Subscription, take } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
+import { InfoDialogComponent } from 'src/app/modules/info-dialog/info-dialog.component';
 import { MetadataDialogComponent } from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
@@ -23,6 +24,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
+import { supportedLanguages } from 'src/app/utils/language';
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
 
 @Component({
@@ -33,7 +35,7 @@ import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.c
 export class AuthUserDetailComponent implements OnDestroy {
   public user?: User.AsObject;
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages: string[] = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pl', 'zh'];
+  public languages: string[] = supportedLanguages;
 
   private subscription: Subscription = new Subscription();
 
@@ -222,10 +224,36 @@ export class AuthUserDetailComponent implements OnDestroy {
       .then(() => {
         this.toast.showInfo('USER.TOAST.PHONESAVED', true);
         this.refreshUser();
+        this.promptSetupforSMSOTP();
       })
       .catch((error) => {
         this.toast.showError(error);
       });
+  }
+
+  public promptSetupforSMSOTP(): void {
+    const dialogRef = this.dialog.open(InfoDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.CONTINUE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'USER.MFA.OTPSMS',
+        descriptionKey: 'USER.MFA.SETUPOTPSMSDESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.userService.addMyAuthFactorOTPSMS().then(() => {
+          this.translate
+            .get('USER.MFA.OTPSMSSUCCESS')
+            .pipe(take(1))
+            .subscribe((msg) => {
+              this.toast.showInfo(msg);
+            });
+        });
+      }
+    });
   }
 
   public changedLanguage(language: string): void {

@@ -9,14 +9,18 @@ import {
   GetDefaultPasswordlessRegistrationMessageTextRequest as AdminGetDefaultPasswordlessRegistrationMessageTextRequest,
   GetDefaultPasswordResetMessageTextRequest as AdminGetDefaultPasswordResetMessageTextRequest,
   GetDefaultVerifyEmailMessageTextRequest as AdminGetDefaultVerifyEmailMessageTextRequest,
+  GetDefaultVerifyEmailOTPMessageTextRequest as AdminGetDefaultVerifyEmailOTPMessageTextRequest,
   GetDefaultVerifyPhoneMessageTextRequest as AdminGetDefaultVerifyPhoneMessageTextRequest,
+  GetDefaultVerifySMSOTPMessageTextRequest as AdminGetDefaultVerifySMSOTPMessageTextRequest,
   SetDefaultDomainClaimedMessageTextRequest,
   SetDefaultInitMessageTextRequest,
   SetDefaultPasswordChangeMessageTextRequest,
   SetDefaultPasswordlessRegistrationMessageTextRequest,
   SetDefaultPasswordResetMessageTextRequest,
   SetDefaultVerifyEmailMessageTextRequest,
+  SetDefaultVerifyEmailOTPMessageTextRequest,
   SetDefaultVerifyPhoneMessageTextRequest,
+  SetDefaultVerifySMSOTPMessageTextRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
   GetCustomDomainClaimedMessageTextRequest,
@@ -25,21 +29,27 @@ import {
   GetCustomPasswordlessRegistrationMessageTextRequest,
   GetCustomPasswordResetMessageTextRequest,
   GetCustomVerifyEmailMessageTextRequest,
+  GetCustomVerifyEmailOTPMessageTextRequest,
   GetCustomVerifyPhoneMessageTextRequest,
+  GetCustomVerifySMSOTPMessageTextRequest,
   GetDefaultDomainClaimedMessageTextRequest,
   GetDefaultInitMessageTextRequest,
   GetDefaultPasswordChangeMessageTextRequest,
   GetDefaultPasswordlessRegistrationMessageTextRequest,
   GetDefaultPasswordResetMessageTextRequest,
   GetDefaultVerifyEmailMessageTextRequest,
+  GetDefaultVerifyEmailOTPMessageTextRequest,
   GetDefaultVerifyPhoneMessageTextRequest,
+  GetDefaultVerifySMSOTPMessageTextRequest,
   SetCustomDomainClaimedMessageTextRequest,
   SetCustomInitMessageTextRequest,
   SetCustomPasswordChangeMessageTextRequest,
   SetCustomPasswordlessRegistrationMessageTextRequest,
   SetCustomPasswordResetMessageTextRequest,
   SetCustomVerifyEmailMessageTextRequest,
+  SetCustomVerifyEmailOTPMessageTextRequest,
   SetCustomVerifyPhoneMessageTextRequest,
+  SetCustomVerifySMSOTPMessageTextRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { MessageCustomText } from 'src/app/proto/generated/zitadel/text_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -47,6 +57,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { supportedLanguages } from 'src/app/utils/language';
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
@@ -59,6 +70,8 @@ enum MESSAGETYPES {
   DOMAINCLAIMED = 'DC',
   PASSWORDLESS = 'PL',
   PASSWORDCHANGE = 'PC',
+  VERIFYSMSOTP = 'VSO',
+  VERIFYEMAILOTP = 'VEO',
 }
 
 const REQUESTMAP = {
@@ -121,6 +134,33 @@ const REQUESTMAP = {
       setFcn: (map: Partial<MessageCustomText.AsObject>): SetCustomVerifyPhoneMessageTextRequest => {
         const req = new SetCustomVerifyPhoneMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
+        req.setFooterText(map.footerText ?? '');
+        req.setGreeting(map.greeting ?? '');
+        req.setPreHeader(map.preHeader ?? '');
+        req.setSubject(map.subject ?? '');
+        req.setText(map.text ?? '');
+        req.setTitle(map.title ?? '');
+
+        return req;
+      },
+    },
+    [MESSAGETYPES.VERIFYSMSOTP]: {
+      get: new GetCustomVerifySMSOTPMessageTextRequest(),
+      set: new SetCustomVerifySMSOTPMessageTextRequest(),
+      getDefault: new GetDefaultVerifySMSOTPMessageTextRequest(),
+      setFcn: (map: Partial<MessageCustomText.AsObject>): SetCustomVerifySMSOTPMessageTextRequest => {
+        const req = new SetCustomVerifySMSOTPMessageTextRequest();
+        req.setText(map.text ?? '');
+
+        return req;
+      },
+    },
+    [MESSAGETYPES.VERIFYEMAILOTP]: {
+      get: new GetCustomVerifyEmailOTPMessageTextRequest(),
+      set: new SetCustomVerifyEmailOTPMessageTextRequest(),
+      getDefault: new GetDefaultVerifyEmailOTPMessageTextRequest(),
+      setFcn: (map: Partial<MessageCustomText.AsObject>): SetCustomVerifyEmailOTPMessageTextRequest => {
+        const req = new SetCustomVerifyEmailOTPMessageTextRequest();
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
         req.setPreHeader(map.preHeader ?? '');
@@ -254,6 +294,31 @@ const REQUESTMAP = {
         return req;
       },
     },
+    [MESSAGETYPES.VERIFYSMSOTP]: {
+      get: new AdminGetDefaultVerifySMSOTPMessageTextRequest(),
+      set: new SetDefaultVerifySMSOTPMessageTextRequest(),
+      setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultVerifySMSOTPMessageTextRequest => {
+        const req = new SetDefaultVerifySMSOTPMessageTextRequest();
+        req.setText(map.text ?? '');
+
+        return req;
+      },
+    },
+    [MESSAGETYPES.VERIFYEMAILOTP]: {
+      get: new AdminGetDefaultVerifyEmailOTPMessageTextRequest(),
+      set: new SetDefaultVerifyEmailOTPMessageTextRequest(),
+      setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultVerifyEmailOTPMessageTextRequest => {
+        const req = new SetDefaultVerifyEmailOTPMessageTextRequest();
+        req.setFooterText(map.footerText ?? '');
+        req.setGreeting(map.greeting ?? '');
+        req.setPreHeader(map.preHeader ?? '');
+        req.setSubject(map.subject ?? '');
+        req.setText(map.text ?? '');
+        req.setTitle(map.title ?? '');
+
+        return req;
+      },
+    },
     [MESSAGETYPES.PASSWORDRESET]: {
       get: new AdminGetDefaultPasswordResetMessageTextRequest(),
       set: new SetDefaultPasswordResetMessageTextRequest(),
@@ -317,8 +382,8 @@ const REQUESTMAP = {
 })
 export class MessageTextsComponent implements OnInit, OnDestroy {
   public loading: boolean = false;
-  public getDefaultInitMessageTextMap$: Observable<{ [key: string]: string }> = of({});
-  public getCustomInitMessageTextMap$: BehaviorSubject<{ [key: string]: string | boolean }> = new BehaviorSubject({}); // boolean because of isDefault
+  public getDefaultMessageTextMap$: Observable<{ [key: string]: string }> = of({});
+  public getCustomMessageTextMap$: BehaviorSubject<{ [key: string]: string | boolean }> = new BehaviorSubject({}); // boolean because of isDefault
 
   public currentType: MESSAGETYPES = MESSAGETYPES.INIT;
 
@@ -328,7 +393,7 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
 
   public MESSAGETYPES: any = MESSAGETYPES;
 
-  public updateRequest!: SetCustomInitMessageTextRequest | SetDefaultInitMessageTextRequest;
+  public updateRequest!: any;
 
   public InfoSectionType: any = InfoSectionType;
   public chips: {
@@ -410,6 +475,38 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
       { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
       { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
     ],
+    [MESSAGETYPES.VERIFYSMSOTP]: [
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.otp', value: '{{.OTP}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifyUrl', value: '{{.VerifyURL}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.username', value: '{{.UserName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.firstname', value: '{{.FirstName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastname', value: '{{.Lastname}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.nickName', value: '{{.NickName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.displayName', value: '{{.DisplayName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastEmail', value: '{{.LastEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedEmail', value: '{{.VerifiedEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastPhone', value: '{{.LastPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
+    ],
+    [MESSAGETYPES.VERIFYEMAILOTP]: [
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.otp', value: '{{.OTP}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifyUrl', value: '{{.VerifyURL}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.username', value: '{{.UserName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.firstname', value: '{{.FirstName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastname', value: '{{.Lastname}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.nickName', value: '{{.NickName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.displayName', value: '{{.DisplayName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastEmail', value: '{{.LastEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedEmail', value: '{{.VerifiedEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastPhone', value: '{{.LastPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
+    ],
     [MESSAGETYPES.PASSWORDLESS]: [
       { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
       { key: 'POLICY.MESSAGE_TEXTS.CHIPS.username', value: '{{.UserName}}' },
@@ -441,7 +538,7 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
   };
 
   public locale: string = 'en';
-  public LOCALES: string[] = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pl', 'zh'];
+  public LOCALES: string[] = supportedLanguages;
   private sub: Subscription = new Subscription();
   public canWrite$: Observable<boolean> = this.authService.isAllowed([
     this.serviceType === PolicyComponentServiceType.ADMIN
@@ -480,64 +577,48 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
   public getDefaultValues(type: MESSAGETYPES, req: any): Promise<any> {
     switch (type) {
       case MESSAGETYPES.INIT:
-        return this.stripDetails(this.service.getDefaultInitMessageText(req));
-      case MESSAGETYPES.VERIFYPHONE:
-        return this.stripDetails(this.service.getDefaultVerifyPhoneMessageText(req));
+        return this.stripEmail(this.service.getDefaultInitMessageText(req));
       case MESSAGETYPES.VERIFYEMAIL:
-        return this.stripDetails(this.service.getDefaultVerifyEmailMessageText(req));
+        return this.stripEmail(this.service.getDefaultVerifyEmailMessageText(req));
+      case MESSAGETYPES.VERIFYPHONE:
+        return this.stripSMS(this.service.getDefaultVerifyPhoneMessageText(req));
+      case MESSAGETYPES.VERIFYSMSOTP:
+        return this.stripSMS(this.service.getDefaultVerifySMSOTPMessageText(req));
+      case MESSAGETYPES.VERIFYEMAILOTP:
+        return this.stripEmail(this.service.getDefaultVerifyEmailOTPMessageText(req));
       case MESSAGETYPES.PASSWORDRESET:
-        return this.stripDetails(this.service.getDefaultPasswordResetMessageText(req));
+        return this.stripEmail(this.service.getDefaultPasswordResetMessageText(req));
       case MESSAGETYPES.DOMAINCLAIMED:
-        return this.stripDetails(this.service.getDefaultDomainClaimedMessageText(req));
+        return this.stripEmail(this.service.getDefaultDomainClaimedMessageText(req));
       case MESSAGETYPES.PASSWORDLESS:
-        return this.stripDetails(this.service.getDefaultPasswordlessRegistrationMessageText(req));
+        return this.stripEmail(this.service.getDefaultPasswordlessRegistrationMessageText(req));
       case MESSAGETYPES.PASSWORDCHANGE:
-        return this.stripDetails(this.service.getDefaultPasswordChangeMessageText(req));
+        return this.stripEmail(this.service.getDefaultPasswordChangeMessageText(req));
     }
   }
 
   public getCurrentValues(type: MESSAGETYPES, req: any): Promise<any> | undefined {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      switch (type) {
-        case MESSAGETYPES.INIT:
-          return this.stripDetails((this.service as ManagementService).getCustomInitMessageText(req));
-        case MESSAGETYPES.VERIFYPHONE:
-          return this.stripDetails((this.service as ManagementService).getCustomVerifyPhoneMessageText(req));
-        case MESSAGETYPES.VERIFYEMAIL:
-          return this.stripDetails((this.service as ManagementService).getCustomVerifyEmailMessageText(req));
-        case MESSAGETYPES.PASSWORDRESET:
-          return this.stripDetails((this.service as ManagementService).getCustomPasswordResetMessageText(req));
-        case MESSAGETYPES.DOMAINCLAIMED:
-          return this.stripDetails((this.service as ManagementService).getCustomDomainClaimedMessageText(req));
-        case MESSAGETYPES.PASSWORDLESS:
-          return this.stripDetails((this.service as ManagementService).getCustomPasswordlessRegistrationMessageText(req));
-        case MESSAGETYPES.PASSWORDCHANGE:
-          return this.stripDetails((this.service as ManagementService).getCustomPasswordChangeMessageText(req));
-
-        default:
-          return undefined;
-      }
-    } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
-      switch (type) {
-        case MESSAGETYPES.INIT:
-          return this.stripDetails((this.service as AdminService).getCustomInitMessageText(req));
-        case MESSAGETYPES.VERIFYPHONE:
-          return this.stripDetails((this.service as AdminService).getCustomVerifyPhoneMessageText(req));
-        case MESSAGETYPES.VERIFYEMAIL:
-          return this.stripDetails((this.service as AdminService).getCustomVerifyEmailMessageText(req));
-        case MESSAGETYPES.PASSWORDRESET:
-          return this.stripDetails((this.service as AdminService).getCustomPasswordResetMessageText(req));
-        case MESSAGETYPES.DOMAINCLAIMED:
-          return this.stripDetails((this.service as AdminService).getCustomDomainClaimedMessageText(req));
-        case MESSAGETYPES.PASSWORDLESS:
-          return this.stripDetails((this.service as AdminService).getCustomPasswordlessRegistrationMessageText(req));
-        case MESSAGETYPES.PASSWORDCHANGE:
-          return this.stripDetails((this.service as AdminService).getCustomPasswordChangeMessageText(req));
-        default:
-          return undefined;
-      }
-    } else {
-      return undefined;
+    switch (type) {
+      case MESSAGETYPES.INIT:
+        return this.stripEmail(this.service.getCustomInitMessageText(req));
+      case MESSAGETYPES.VERIFYEMAIL:
+        return this.stripEmail(this.service.getCustomVerifyEmailMessageText(req));
+      case MESSAGETYPES.VERIFYPHONE:
+        return this.stripSMS(this.service.getCustomVerifyPhoneMessageText(req));
+      case MESSAGETYPES.VERIFYSMSOTP:
+        return this.stripSMS(this.service.getCustomVerifySMSOTPMessageText(req));
+      case MESSAGETYPES.VERIFYEMAILOTP:
+        return this.stripEmail(this.service.getCustomVerifyEmailOTPMessageText(req));
+      case MESSAGETYPES.PASSWORDRESET:
+        return this.stripEmail(this.service.getCustomPasswordResetMessageText(req));
+      case MESSAGETYPES.DOMAINCLAIMED:
+        return this.stripEmail(this.service.getCustomDomainClaimedMessageText(req));
+      case MESSAGETYPES.PASSWORDLESS:
+        return this.stripEmail(this.service.getCustomPasswordlessRegistrationMessageText(req));
+      case MESSAGETYPES.PASSWORDCHANGE:
+        return this.stripEmail(this.service.getCustomPasswordChangeMessageText(req));
+      default:
+        return undefined;
     }
   }
 
@@ -551,7 +632,7 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
       const reqDefaultInit = REQUESTMAP[this.serviceType][type].getDefault;
 
       reqDefaultInit.setLanguage(this.locale);
-      this.getDefaultInitMessageTextMap$ = from(this.getDefaultValues(type, reqDefaultInit));
+      this.getDefaultMessageTextMap$ = from(this.getDefaultValues(type, reqDefaultInit));
     }
 
     const reqCustomInit = REQUESTMAP[this.serviceType][type].get.setLanguage(this.locale);
@@ -559,7 +640,7 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
     return this.getCurrentValues(type, reqCustomInit)
       ?.then((data) => {
         this.loading = false;
-        this.getCustomInitMessageTextMap$.next(data);
+        this.getCustomMessageTextMap$.next(data);
       })
       .catch((error) => {
         this.loading = false;
@@ -586,10 +667,14 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
       switch (this.currentType) {
         case MESSAGETYPES.INIT:
           return handler((this.service as ManagementService).setCustomInitMessageText(this.updateRequest));
-        case MESSAGETYPES.VERIFYPHONE:
-          return handler((this.service as ManagementService).setCustomVerifyPhoneMessageText(this.updateRequest));
         case MESSAGETYPES.VERIFYEMAIL:
           return handler((this.service as ManagementService).setCustomVerifyEmailMessageText(this.updateRequest));
+        case MESSAGETYPES.VERIFYPHONE:
+          return handler((this.service as ManagementService).setCustomVerifyPhoneMessageText(this.updateRequest));
+        case MESSAGETYPES.VERIFYSMSOTP:
+          return handler((this.service as ManagementService).setCustomVerifySMSOTPMessageText(this.updateRequest));
+        case MESSAGETYPES.VERIFYEMAILOTP:
+          return handler((this.service as ManagementService).setCustomVerifyEmailOTPMessageText(this.updateRequest));
         case MESSAGETYPES.PASSWORDRESET:
           return handler((this.service as ManagementService).setCustomPasswordResetMessageText(this.updateRequest));
         case MESSAGETYPES.DOMAINCLAIMED:
@@ -607,6 +692,10 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
           return handler((this.service as AdminService).setDefaultInitMessageText(this.updateRequest));
         case MESSAGETYPES.VERIFYPHONE:
           return handler((this.service as AdminService).setDefaultVerifyPhoneMessageText(this.updateRequest));
+        case MESSAGETYPES.VERIFYSMSOTP:
+          return handler((this.service as AdminService).setDefaultVerifySMSOTPMessageText(this.updateRequest));
+        case MESSAGETYPES.VERIFYEMAILOTP:
+          return handler((this.service as AdminService).setDefaultVerifyEmailOTPMessageText(this.updateRequest));
         case MESSAGETYPES.VERIFYEMAIL:
           return handler((this.service as AdminService).setDefaultVerifyEmailMessageText(this.updateRequest));
         case MESSAGETYPES.PASSWORDRESET:
@@ -634,55 +723,68 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe((resp) => {
-      if (resp && this.serviceType === PolicyComponentServiceType.MGMT) {
-        const handler = (prom: Promise<any>): Promise<any> => {
-          return prom
-            .then(() => {
-              setTimeout(() => {
-                this.loadData(this.currentType);
-              }, 1000);
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
-        };
-
-        switch (this.currentType) {
-          case MESSAGETYPES.INIT:
-            return handler((this.service as ManagementService).resetCustomInitMessageTextToDefault(this.locale));
-          case MESSAGETYPES.VERIFYPHONE:
-            return handler((this.service as ManagementService).resetCustomVerifyPhoneMessageTextToDefault(this.locale));
-          case MESSAGETYPES.VERIFYEMAIL:
-            return handler((this.service as ManagementService).resetCustomVerifyEmailMessageTextToDefault(this.locale));
-          case MESSAGETYPES.PASSWORDRESET:
-            return handler((this.service as ManagementService).resetCustomPasswordResetMessageTextToDefault(this.locale));
-          case MESSAGETYPES.DOMAINCLAIMED:
-            return handler((this.service as ManagementService).resetCustomDomainClaimedMessageTextToDefault(this.locale));
-          case MESSAGETYPES.DOMAINCLAIMED:
-            return handler(
-              (this.service as ManagementService).resetCustomPasswordlessRegistrationMessageTextToDefault(this.locale),
-            );
-          case MESSAGETYPES.PASSWORDCHANGE:
-            return handler((this.service as ManagementService).resetCustomPasswordChangeMessageTextToDefault(this.locale));
-          default:
-            return Promise.reject();
-        }
-      } else {
+      if (!resp) {
         return Promise.reject();
+      }
+
+      const handler = (prom: Promise<any>): Promise<any> => {
+        return prom
+          .then(() => {
+            setTimeout(() => {
+              this.loadData(this.currentType);
+            }, 1000);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      };
+
+      switch (this.currentType) {
+        case MESSAGETYPES.INIT:
+          return handler(this.service.resetCustomInitMessageTextToDefault(this.locale));
+        case MESSAGETYPES.VERIFYPHONE:
+          return handler(this.service.resetCustomVerifyPhoneMessageTextToDefault(this.locale));
+        case MESSAGETYPES.VERIFYSMSOTP:
+          return handler(this.service.resetCustomVerifySMSOTPMessageTextToDefault(this.locale));
+        case MESSAGETYPES.VERIFYEMAILOTP:
+          return handler(this.service.resetCustomVerifyEmailOTPMessageTextToDefault(this.locale));
+        case MESSAGETYPES.VERIFYEMAIL:
+          return handler(this.service.resetCustomVerifyEmailMessageTextToDefault(this.locale));
+        case MESSAGETYPES.PASSWORDRESET:
+          return handler(this.service.resetCustomPasswordResetMessageTextToDefault(this.locale));
+        case MESSAGETYPES.DOMAINCLAIMED:
+          return handler(this.service.resetCustomDomainClaimedMessageTextToDefault(this.locale));
+        case MESSAGETYPES.PASSWORDLESS:
+          return handler(this.service.resetCustomPasswordlessRegistrationMessageTextToDefault(this.locale));
+        case MESSAGETYPES.PASSWORDCHANGE:
+          return handler(this.service.resetCustomPasswordChangeMessageTextToDefault(this.locale));
+        default:
+          return Promise.reject();
       }
     });
   }
 
-  private stripDetails(prom: Promise<any>): Promise<any> {
+  private strip(prom: Promise<any>, properties: Array<string>): Promise<any> {
     return prom.then((res) => {
       if (res.customText) {
-        delete res.customText.details;
+        properties.forEach((property) => {
+          delete res.customText[property];
+        });
         return Object.assign({}, res.customText as unknown as { [key: string]: string });
       } else {
         return {};
       }
     });
   }
+
+  private stripEmail(prom: Promise<any>): Promise<any> {
+    return this.strip(prom, ['details']);
+  }
+
+  private stripSMS(prom: Promise<any>): Promise<any> {
+    return this.strip(prom, ['details', 'buttonText', 'footerText', 'greeting', 'preHeader', 'subject', 'title']);
+  }
+
   public ngOnDestroy(): void {
     this.sub.unsubscribe();
   }

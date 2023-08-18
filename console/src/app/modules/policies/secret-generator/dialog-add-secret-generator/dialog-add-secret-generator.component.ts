@@ -7,7 +7,6 @@ import {
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { UpdateSecretGeneratorRequest } from 'src/app/proto/generated/zitadel/admin_pb';
-import { SecretGeneratorType } from 'src/app/proto/generated/zitadel/settings_pb';
 
 @Component({
   selector: 'cnsl-dialog-add-secret-generator',
@@ -15,15 +14,6 @@ import { SecretGeneratorType } from 'src/app/proto/generated/zitadel/settings_pb
   styleUrls: ['./dialog-add-secret-generator.component.scss'],
 })
 export class DialogAddSecretGeneratorComponent {
-  public SecretGeneratorType: any = SecretGeneratorType;
-  public availableGenerators: SecretGeneratorType[] = [
-    SecretGeneratorType.SECRET_GENERATOR_TYPE_INIT_CODE,
-    SecretGeneratorType.SECRET_GENERATOR_TYPE_VERIFY_EMAIL_CODE,
-    SecretGeneratorType.SECRET_GENERATOR_TYPE_VERIFY_PHONE_CODE,
-    SecretGeneratorType.SECRET_GENERATOR_TYPE_PASSWORD_RESET_CODE,
-    SecretGeneratorType.SECRET_GENERATOR_TYPE_PASSWORDLESS_INIT_CODE,
-    SecretGeneratorType.SECRET_GENERATOR_TYPE_APP_SECRET,
-  ];
   public req: UpdateSecretGeneratorRequest = new UpdateSecretGeneratorRequest();
 
   public specsForm!: UntypedFormGroup;
@@ -33,17 +23,19 @@ export class DialogAddSecretGeneratorComponent {
     public dialogRef: MatDialogRef<DialogAddSecretGeneratorComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
+    let exp = 1;
+    if (data.config?.expiry !== undefined) {
+      exp = this.durationToHour(data.config?.expiry);
+    }
     this.specsForm = this.fb.group({
-      generatorType: [SecretGeneratorType.SECRET_GENERATOR_TYPE_APP_SECRET, [requiredValidator]],
-      expiry: [1, [requiredValidator]],
-      includeDigits: [true, [requiredValidator]],
-      includeLowerLetters: [true, [requiredValidator]],
-      includeSymbols: [true, [requiredValidator]],
-      includeUpperLetters: [true, [requiredValidator]],
-      length: [6, [requiredValidator]],
+      generatorType: [data.type, [requiredValidator]],
+      expiry: [exp, [requiredValidator]],
+      length: [data.config?.length ?? 6, [requiredValidator]],
+      includeDigits: [data.config?.includeDigits ?? true, [requiredValidator]],
+      includeSymbols: [data.config?.includeSymbols ?? true, [requiredValidator]],
+      includeLowerLetters: [data.config?.includeLowerLetters ?? true, [requiredValidator]],
+      includeUpperLetters: [data.config?.includeUpperLetters ?? true, [requiredValidator]],
     });
-
-    this.generatorType?.setValue(data.type);
   }
 
   public closeDialog(): void {
@@ -52,10 +44,7 @@ export class DialogAddSecretGeneratorComponent {
 
   public closeDialogWithRequest(): void {
     this.req.setGeneratorType(this.generatorType?.value);
-
-    const expiry = new Duration().setSeconds((this.expiry?.value ?? 1) * 60 * 60);
-
-    this.req.setExpiry(expiry);
+    this.req.setExpiry(this.hourToDuration(this.expiry?.value));
     this.req.setIncludeDigits(this.includeDigits?.value);
     this.req.setIncludeLowerLetters(this.includeLowerLetters?.value);
     this.req.setIncludeSymbols(this.includeSymbols?.value);
@@ -91,5 +80,19 @@ export class DialogAddSecretGeneratorComponent {
 
   public get length(): AbstractControl | null {
     return this.specsForm.get('length');
+  }
+
+  private durationToHour(duration: Duration.AsObject): number {
+    if (duration.seconds === 0) {
+      return 0;
+    }
+    return (duration.seconds + duration.nanos / 1000000) / 3600;
+  }
+
+  private hourToDuration(hour: number): Duration {
+    const exp = hour * 60 * 60;
+    const sec = Math.floor(exp);
+    const nanos = Math.round((exp - sec) * 1000000);
+    return new Duration().setSeconds(sec).setNanos(nanos);
   }
 }

@@ -155,7 +155,9 @@ Use [Console](https://zitadel.com/docs/guides/manage/console/overview) or our [A
 
 ## Security
 
-See the policy [here](./SECURITY.md)
+See the policy [here](./SECURITY.md).
+
+[Technical Advisories](https://zitadel.com/docs/support/technical_advisory) are published regarding major issues with the ZITADEL platform that could potentially impact security or stability in production environments.
 
 ## License
 

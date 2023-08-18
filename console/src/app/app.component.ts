@@ -19,6 +19,7 @@ import { KeyboardShortcutsService } from './services/keyboard-shortcuts/keyboard
 import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
+import { fallbackLanguage, supportedLanguages, supportedLanguagesRegexp } from './utils/language';
 
 @Component({
   selector: 'cnsl-root',
@@ -267,15 +268,15 @@ export class AppComponent implements OnDestroy {
   }
 
   private setLanguage(): void {
-    this.translate.addLangs(['de', 'en', 'es', 'fr', 'it', 'ja', 'pl', 'zh']);
-    this.translate.setDefaultLang('en');
+    this.translate.addLangs(supportedLanguages);
+    this.translate.setDefaultLang(fallbackLanguage);
 
     this.authService.user.subscribe((userprofile) => {
       if (userprofile) {
-        const cropped = navigator.language.split('-')[0] ?? 'en';
-        const fallbackLang = cropped.match(/de|en|es|fr|it|ja|pl|zh/) ? cropped : 'en';
+        const cropped = navigator.language.split('-')[0] ?? fallbackLanguage;
+        const fallbackLang = cropped.match(supportedLanguagesRegexp) ? cropped : fallbackLanguage;
 
-        const lang = userprofile?.human?.profile?.preferredLanguage.match(/de|en|es|fr|it|ja|pl|zh/)
+        const lang = userprofile?.human?.profile?.preferredLanguage.match(supportedLanguagesRegexp)
           ? userprofile.human.profile?.preferredLanguage
           : fallbackLang;
         this.translate.use(lang);

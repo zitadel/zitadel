@@ -243,8 +243,6 @@
           }
 
           .font-preview {
-            height: 70px;
-            width: 70px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -252,22 +250,17 @@
             margin-bottom: 1rem;
             border: 1px solid map-get($foreground, divider);
             position: relative;
+            padding: 1rem 0.5rem 1rem 0.75rem;
 
-            .icon {
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              transform: translateX(-50%) translateY(-50%);
+            .font-name {
+              margin-left: 0.5rem;
+              font-size: 16px;
             }
 
             .dl-btn {
               z-index: 2;
-              position: absolute;
-              right: 0;
-              top: 0;
               cursor: pointer;
               visibility: hidden;
-              transform: translateX(50%) translateY(-50%);
             }
 
             &:hover {

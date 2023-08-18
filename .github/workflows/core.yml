@@ -1,0 +1,81 @@
+name: Build core
+
+on: 
+  workflow_call:
+    inputs:
+      go_version:
+        required: true
+        type: string
+      buf_version:
+        required: true
+        type: string
+      node_version:
+        required: true
+        type: string
+    outputs:
+      cache_key:
+        value: ${{ jobs.build.outputs.cache_key }}
+      cache_path:
+        value: ${{ jobs.build.outputs.cache_path }}
+
+env:
+  cache_path: |
+    internal/statik/statik.go
+    internal/notification/statik/statik.go
+    internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css*
+    internal/api/ui/login/statik/statik.go
+    internal/api/assets/authz.go 
+    internal/api/assets/router.go
+    openapi/v2
+    pkg/grpc/**/*.pb.*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      cache_key: ${{ steps.cache.outputs.cache-primary-key }}
+      cache_path: ${{ env.cache_path }}
+    steps:
+        - 
+          uses: actions/checkout@v3
+        - 
+          uses: actions/cache/restore@v3
+          timeout-minutes: 1
+          id: cache
+          with:
+            key: core-${{ hashFiles( 'go.*', 'openapi', 'cmd', 'pkg/grpc/**/*.go', 'proto', 'internal') }}
+            restore-keys: |
+              core-
+            path: ${{ env.cache_path }}
+        - 
+          if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+          uses: bufbuild/buf-setup-action@v1
+          with:
+            github_token: ${{ github.token }}
+            version: ${{ inputs.buf_version }}
+        
+        - 
+          # node to install sass
+          if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+          uses: actions/setup-node@v3
+          with:
+            node-version: ${{ inputs.node_version }}
+        - 
+          if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+          run: npm install -g sass
+        
+        - 
+          if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+          uses: actions/setup-go@v4
+          with:
+            go-version: ${{ inputs.go_version }}
+        - 
+          if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+          run: make core_build
+        - 
+          if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+          uses: actions/cache/save@v3
+          with:
+            key: ${{ steps.cache.outputs.cache-primary-key }}
+            path: ${{ env.cache_path }}
+        

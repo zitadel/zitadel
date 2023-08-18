@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/channels"
@@ -37,6 +38,7 @@ func (msg *Email) GetContent() (string, error) {
 	headers["Return-Path"] = msg.SenderEmail
 	headers["To"] = strings.Join(msg.Recipients, ", ")
 	headers["Cc"] = strings.Join(msg.CC, ", ")
+	headers["Date"] = time.Now().Format(time.RFC1123Z)
 
 	message := ""
 	for k, v := range headers {

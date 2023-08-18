@@ -89,6 +89,8 @@ type HumanView struct {
 	Region                   string         `json:"region" gorm:"column:region"`
 	StreetAddress            string         `json:"streetAddress" gorm:"column:street_address"`
 	OTPState                 int32          `json:"-" gorm:"column:otp_state"`
+	OTPSMSAdded              bool           `json:"-" gorm:"column:otp_sms_added"`
+	OTPEmailAdded            bool           `json:"-" gorm:"column:otp_email_added"`
 	U2FTokens                WebAuthNTokens `json:"-" gorm:"column:u2f_tokens"`
 	MFAMaxSetUp              int32          `json:"-" gorm:"column:mfa_max_set_up"`
 	MFAInitSkipped           time.Time      `json:"-" gorm:"column:mfa_init_skipped"`
@@ -178,6 +180,8 @@ func UserToModel(user *UserView) *model.UserView {
 			Region:                   user.Region,
 			StreetAddress:            user.StreetAddress,
 			OTPState:                 model.MFAState(user.OTPState),
+			OTPSMSAdded:              user.OTPSMSAdded,
+			OTPEmailAdded:            user.OTPEmailAdded,
 			MFAMaxSetUp:              domain.MFALevel(user.MFAMaxSetUp),
 			MFAInitSkipped:           user.MFAInitSkipped,
 			InitRequired:             user.InitRequired,
@@ -301,6 +305,8 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		user.HumanPhoneRemovedType:
 		u.Phone = ""
 		u.IsPhoneVerified = false
+		u.OTPSMSAdded = false
+		u.MFAInitSkipped = time.Time{}
 	case user.UserDeactivatedType:
 		u.State = int32(model.UserStateInactive)
 	case user.UserReactivatedType,
@@ -326,6 +332,16 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case user.UserV1MFAOTPRemovedType,
 		user.HumanMFAOTPRemovedType:
 		u.OTPState = int32(model.MFAStateUnspecified)
+	case user.HumanOTPSMSAddedType:
+		u.OTPSMSAdded = true
+	case user.HumanOTPSMSRemovedType:
+		u.OTPSMSAdded = false
+		u.MFAInitSkipped = time.Time{}
+	case user.HumanOTPEmailAddedType:
+		u.OTPEmailAdded = true
+	case user.HumanOTPEmailRemovedType:
+		u.OTPEmailAdded = false
+		u.MFAInitSkipped = time.Time{}
 	case user.HumanU2FTokenAddedType:
 		err = u.addU2FToken(event)
 	case user.HumanU2FTokenVerifiedType:
@@ -380,7 +396,7 @@ func (u *UserView) setPasswordData(event *models.Event) error {
 		logging.Log("MODEL-sdw4r").WithError(err).Error("could not unmarshal event data")
 		return errors.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
-	u.PasswordSet = password.Secret != nil
+	u.PasswordSet = password.Secret != nil || password.EncodedHash != ""
 	u.PasswordInitRequired = !u.PasswordSet
 	u.PasswordChangeRequired = password.ChangeRequired
 	u.PasswordChanged = event.CreationDate
@@ -520,7 +536,8 @@ func (u *UserView) ComputeMFAMaxSetUp() {
 			return
 		}
 	}
-	if u.OTPState == int32(model.MFAStateReady) {
+	if u.OTPState == int32(model.MFAStateReady) ||
+		u.OTPSMSAdded || u.OTPEmailAdded {
 		u.MFAMaxSetUp = int32(domain.MFALevelSecondFactor)
 		return
 	}
@@ -532,5 +549,65 @@ func (u *UserView) SetEmptyUserType() {
 		u.MachineView = nil
 	} else {
 		u.HumanView = nil
+	}
+}
+
+func (u *UserView) EventTypes() []models.EventType {
+	return []models.EventType{
+		models.EventType(user.MachineAddedEventType),
+		models.EventType(user.UserV1AddedType),
+		models.EventType(user.UserV1RegisteredType),
+		models.EventType(user.HumanRegisteredType),
+		models.EventType(user.HumanAddedType),
+		models.EventType(user.UserRemovedType),
+		models.EventType(user.UserV1PasswordChangedType),
+		models.EventType(user.HumanPasswordChangedType),
+		models.EventType(user.HumanPasswordlessTokenAddedType),
+		models.EventType(user.HumanPasswordlessTokenVerifiedType),
+		models.EventType(user.HumanPasswordlessTokenRemovedType),
+		models.EventType(user.UserV1ProfileChangedType),
+		models.EventType(user.HumanProfileChangedType),
+		models.EventType(user.UserV1AddressChangedType),
+		models.EventType(user.HumanAddressChangedType),
+		models.EventType(user.MachineChangedEventType),
+		models.EventType(user.UserDomainClaimedType),
+		models.EventType(user.UserUserNameChangedType),
+		models.EventType(user.UserV1EmailChangedType),
+		models.EventType(user.HumanEmailChangedType),
+		models.EventType(user.UserV1EmailVerifiedType),
+		models.EventType(user.HumanEmailVerifiedType),
+		models.EventType(user.UserV1PhoneChangedType),
+		models.EventType(user.HumanPhoneChangedType),
+		models.EventType(user.UserV1PhoneVerifiedType),
+		models.EventType(user.HumanPhoneVerifiedType),
+		models.EventType(user.UserV1PhoneRemovedType),
+		models.EventType(user.HumanPhoneRemovedType),
+		models.EventType(user.UserDeactivatedType),
+		models.EventType(user.UserReactivatedType),
+		models.EventType(user.UserUnlockedType),
+		models.EventType(user.UserLockedType),
+		models.EventType(user.UserV1MFAOTPAddedType),
+		models.EventType(user.HumanMFAOTPAddedType),
+		models.EventType(user.UserV1MFAOTPVerifiedType),
+		models.EventType(user.HumanMFAOTPVerifiedType),
+		models.EventType(user.UserV1MFAOTPRemovedType),
+		models.EventType(user.HumanMFAOTPRemovedType),
+		models.EventType(user.HumanOTPSMSAddedType),
+		models.EventType(user.HumanOTPSMSRemovedType),
+		models.EventType(user.HumanOTPEmailAddedType),
+		models.EventType(user.HumanOTPEmailRemovedType),
+		models.EventType(user.HumanU2FTokenAddedType),
+		models.EventType(user.HumanU2FTokenVerifiedType),
+		models.EventType(user.HumanU2FTokenRemovedType),
+		models.EventType(user.UserV1MFAInitSkippedType),
+		models.EventType(user.HumanMFAInitSkippedType),
+		models.EventType(user.UserV1InitialCodeAddedType),
+		models.EventType(user.HumanInitialCodeAddedType),
+		models.EventType(user.UserV1InitializedCheckSucceededType),
+		models.EventType(user.HumanInitializedCheckSucceededType),
+		models.EventType(user.HumanAvatarAddedType),
+		models.EventType(user.HumanAvatarRemovedType),
+		models.EventType(user.HumanPasswordlessInitCodeAddedType),
+		models.EventType(user.HumanPasswordlessInitCodeRequestedType),
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"regexp"
 	"sync"
 	"time"
 
@@ -18,9 +19,11 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/action"
+	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/session"
@@ -34,6 +37,7 @@ type Queries struct {
 
 	idpConfigEncryption  crypto.EncryptionAlgorithm
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error)
+	checkPermission      domain.PermissionCheck
 
 	DefaultLanguage                     language.Tag
 	LoginDir                            http.FileSystem
@@ -55,6 +59,7 @@ func StartQueries(
 	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	zitadelRoles []authz.RoleMapping,
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
+	permissionCheck func(q *Queries) domain.PermissionCheck,
 ) (repo *Queries, err error) {
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	if err != nil {
@@ -86,6 +91,8 @@ func StartQueries(
 	usergrant.RegisterEventMappers(repo.eventstore)
 	session.RegisterEventMappers(repo.eventstore)
 	idpintent.RegisterEventMappers(repo.eventstore)
+	authrequest.RegisterEventMappers(repo.eventstore)
+	oidcsession.RegisterEventMappers(repo.eventstore)
 
 	repo.idpConfigEncryption = idpConfigEncryption
 	repo.multifactors = domain.MultifactorConfigs{
@@ -94,6 +101,8 @@ func StartQueries(
 			Issuer:    defaults.Multifactors.OTP.Issuer,
 		},
 	}
+
+	repo.checkPermission = permissionCheck(repo)
 
 	err = projection.Create(ctx, sqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm)
 	if err != nil {
@@ -110,4 +119,20 @@ func (q *Queries) Health(ctx context.Context) error {
 
 type prepareDatabase interface {
 	Timetravel(d time.Duration) string
+}
+
+// cleanStaticQueries removes whitespaces,
+// such as ` `, \t, \n, from queries to improve
+// readability in logs and errors.
+func cleanStaticQueries(qs ...*string) {
+	regex := regexp.MustCompile(`\s+`)
+	for _, q := range qs {
+		*q = regex.ReplaceAllString(*q, " ")
+	}
+}
+
+func init() {
+	cleanStaticQueries(
+		&authRequestByIDQuery,
+	)
 }

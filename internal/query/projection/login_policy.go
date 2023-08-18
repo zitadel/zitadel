@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	LoginPolicyTable = "projections.login_policies4"
+	LoginPolicyTable = "projections.login_policies5"
 
 	LoginPolicyIDCol                    = "aggregate_id"
 	LoginPolicyInstanceIDCol            = "instance_id"
@@ -25,6 +25,7 @@ const (
 	LoginPolicyAllowUsernamePasswordCol = "allow_username_password"
 	LoginPolicyAllowExternalIDPsCol     = "allow_external_idps"
 	LoginPolicyForceMFACol              = "force_mfa"
+	LoginPolicyForceMFALocalOnlyCol     = "force_mfa_local_only"
 	LoginPolicy2FAsCol                  = "second_factors"
 	LoginPolicyMFAsCol                  = "multi_factors"
 	LoginPolicyPasswordlessTypeCol      = "passwordless_type"
@@ -62,6 +63,7 @@ func newLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(LoginPolicyAllowUsernamePasswordCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(LoginPolicyAllowExternalIDPsCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(LoginPolicyForceMFACol, crdb.ColumnTypeBool),
+			crdb.NewColumn(LoginPolicyForceMFALocalOnlyCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(LoginPolicy2FAsCol, crdb.ColumnTypeEnumArray, crdb.Nullable()),
 			crdb.NewColumn(LoginPolicyMFAsCol, crdb.ColumnTypeEnumArray, crdb.Nullable()),
 			crdb.NewColumn(LoginPolicyPasswordlessTypeCol, crdb.ColumnTypeEnum),
@@ -113,11 +115,11 @@ func (p *loginPolicyProjection) reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  org.LoginPolicySecondFactorAddedEventType,
-					Reduce: p.reduce2FAAdded,
+					Reduce: p.reduceSecondFactorAdded,
 				},
 				{
 					Event:  org.LoginPolicySecondFactorRemovedEventType,
-					Reduce: p.reduce2FARemoved,
+					Reduce: p.reduceSecondFactorRemoved,
 				},
 				{
 					Event:  org.OrgRemovedEventType,
@@ -146,11 +148,11 @@ func (p *loginPolicyProjection) reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  instance.LoginPolicySecondFactorAddedEventType,
-					Reduce: p.reduce2FAAdded,
+					Reduce: p.reduceSecondFactorAdded,
 				},
 				{
 					Event:  instance.LoginPolicySecondFactorRemovedEventType,
-					Reduce: p.reduce2FARemoved,
+					Reduce: p.reduceSecondFactorRemoved,
 				},
 				{
 					Event:  instance.InstanceRemovedEventType,
@@ -185,6 +187,7 @@ func (p *loginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 		handler.NewCol(LoginPolicyAllowUsernamePasswordCol, policyEvent.AllowUserNamePassword),
 		handler.NewCol(LoginPolicyAllowExternalIDPsCol, policyEvent.AllowExternalIDP),
 		handler.NewCol(LoginPolicyForceMFACol, policyEvent.ForceMFA),
+		handler.NewCol(LoginPolicyForceMFALocalOnlyCol, policyEvent.ForceMFALocalOnly),
 		handler.NewCol(LoginPolicyPasswordlessTypeCol, policyEvent.PasswordlessType),
 		handler.NewCol(LoginPolicyIsDefaultCol, isDefault),
 		handler.NewCol(LoginPolicyHidePWResetCol, policyEvent.HidePasswordReset),
@@ -227,6 +230,9 @@ func (p *loginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 	}
 	if policyEvent.ForceMFA != nil {
 		cols = append(cols, handler.NewCol(LoginPolicyForceMFACol, *policyEvent.ForceMFA))
+	}
+	if policyEvent.ForceMFALocalOnly != nil {
+		cols = append(cols, handler.NewCol(LoginPolicyForceMFALocalOnlyCol, *policyEvent.ForceMFALocalOnly))
 	}
 	if policyEvent.PasswordlessType != nil {
 		cols = append(cols, handler.NewCol(LoginPolicyPasswordlessTypeCol, *policyEvent.PasswordlessType))
@@ -339,7 +345,7 @@ func (p *loginPolicyProjection) reduceLoginPolicyRemoved(event eventstore.Event)
 	), nil
 }
 
-func (p *loginPolicyProjection) reduce2FAAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginPolicyProjection) reduceSecondFactorAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.SecondFactorAddedEvent
 	switch e := event.(type) {
 	case *instance.LoginPolicySecondFactorAddedEvent:
@@ -364,7 +370,7 @@ func (p *loginPolicyProjection) reduce2FAAdded(event eventstore.Event) (*handler
 	), nil
 }
 
-func (p *loginPolicyProjection) reduce2FARemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginPolicyProjection) reduceSecondFactorRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.SecondFactorRemovedEvent
 	switch e := event.(type) {
 	case *instance.LoginPolicySecondFactorRemovedEvent:
