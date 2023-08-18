@@ -116,7 +116,7 @@ func TestZitadelErrorToHTTPStatusCode(t *testing.T) {
 			wantOk:         true,
 		},
 		{
-			name: "wrapped resource exhausted",
+			name: "no caos/zitadel error",
 			args: args{
 				err: errors.New("error"),
 			},
