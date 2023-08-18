@@ -742,6 +742,10 @@
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in Sekunden",
     "ALLOWEDTOFAIL": "Scheitern erlaubt",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Warnung",
+      "DESCRIPTION": "Beachten Sie, dass durch das Deaktivieren dieser Einstellung der Vorgang zum Anmelden oder Anmelden von Benutzern der aktuellen Organisation unterbrochen werden kann und der Zugriff auf die Konsole zum Deaktivieren einer Aktion abgelehnt werden kann. Wir empfehlen, Administratorbenutzer in einer separaten Organisation einzurichten oder Skripte zunächst in einer Entwicklungsumgebung oder einer Entwicklungsorganisation auszuprobieren."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Typ",
     "TRIGGERTYPE": "Trigger Typ",

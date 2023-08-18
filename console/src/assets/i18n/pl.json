@@ -742,6 +742,10 @@
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout w sekundach",
     "ALLOWEDTOFAIL": "Dozwolone na porażkę",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Ostrzeżenie",
+      "DESCRIPTION": "Należy pamiętać, że wyłączenie tego ustawienia może przerwać proces logowania lub logowania użytkowników z bieżącej organizacji i uniemożliwić dostęp do konsoli w celu wyłączenia akcji. Zalecamy skonfigurowanie administratorów w oddzielnej organizacji lub wypróbowanie skryptów w środowisku deweloperskim lub organizacji deweloperskiej."
+    },
     "SCRIPT": "Skrypt",
     "FLOWTYPE": "Typ Przepływu",
     "TRIGGERTYPE": "Typ Wyzwalacza",

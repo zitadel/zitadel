@@ -741,6 +741,10 @@
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in secondi",
     "ALLOWEDTOFAIL": "Può fallire",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Attenzione",
+      "DESCRIPTION": "Tiene presente che disabilitando questa impostazione, il processo di accesso o accesso degli utenti dell'organizzazione corrente può essere interrotto e l'accesso alla console per disabilitare un'azione può essere rifiutato. Ti consigliamo di configurare gli utenti amministratori in un'organizzazione separata o di provare prima gli script in un ambiente di sviluppo o in un'organizzazione di sviluppo."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Tipo processo",
     "TRIGGERTYPE": "Tipo trigger",

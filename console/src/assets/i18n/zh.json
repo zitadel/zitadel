@@ -742,6 +742,10 @@
     "TIMEOUT": "超时时间",
     "TIMEOUTINSEC": "以秒为单位的超时时间",
     "ALLOWEDTOFAIL": "允许失败",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "警告",
+      "DESCRIPTION": "请注意，通过禁用此设置，当前组织的用户登录或登录的过程可能会被中断，并且可能会拒绝访问控制台以禁用操作。我们建议在单独的组织中设置管理员用户，或者首先在开发环境或开发组织中尝试脚本。"
+    },
     "SCRIPT": "脚本",
     "FLOWTYPE": "流程类型",
     "TRIGGERTYPE": "触发器类型",

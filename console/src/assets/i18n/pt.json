@@ -743,6 +743,10 @@
     "TIMEOUT": "Tempo Limite",
     "TIMEOUTINSEC": "Tempo Limite em segundos",
     "ALLOWEDTOFAIL": "Permitido Falhar",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Aviso",
+      "DESCRIPTION": "Esteja ciente de que, ao desabilitar essa configuração, o processo de login ou login dos usuários da organização atual pode ser interrompido e o acesso ao console para desabilitar uma ação pode ser recusado. Recomendamos configurar usuários administradores em uma organização separada ou testar scripts em um ambiente de desenvolvimento ou em uma organização de desenvolvimento primeiro."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Tipo de Fluxo",
     "TRIGGERTYPE": "Tipo de Gatilho",

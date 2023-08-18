@@ -742,6 +742,10 @@
     "TIMEOUT": "Délai d'attente",
     "TIMEOUTINSEC": "Délai en secondes",
     "ALLOWEDTOFAIL": "Autorisé à échouer",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Avertissement",
+      "DESCRIPTION": "Sachez qu'en désactivant ce paramètre, le processus de connexion ou de connexion des utilisateurs de l'organisation actuelle peut être interrompu et l'accès à la console pour désactiver une action peut être refusé. Nous vous recommandons de configurer des utilisateurs administrateurs dans une organisation distincte ou d'essayer d'abord des scripts dans un environnement de développement ou une organisation de développement."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Type de flux",
     "TRIGGERTYPE": "Type de déclencheur",
