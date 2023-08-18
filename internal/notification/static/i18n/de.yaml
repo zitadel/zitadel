@@ -26,6 +26,18 @@ VerifyPhone:
   Greeting: Hallo {{.DisplayName}},
   Text: Eine Telefonnummer wurde hinzugefügt. Bitte verifiziere diese in dem du folgenden Code eingibst&lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; 
   ButtonText: Telefon verifizieren
+VerifyEmailOTP:
+  Title: ZITADEL - Einmalpasswort verifizieren
+  PreHeader: Einmalpasswort verifizieren
+  Subject: Einmalpasswort verifizieren
+  Greeting: Hallo {{.DisplayName}},
+  Text: Bitte nutze den 'Authentifizieren'-Button oder kopiere das Einmalpasswort {{.OTP}} und füge es in den Authentifizierungsbildschirm ein, um dich innerhalb der nächsten fünf Minuten bei ZITADEL zu authentifizieren.
+  ButtonText: Authentifizieren
+VerifySMSOTP:
+  Text: >-
+    {{.OTP}} ist Ihr Einmalpasswort für {{ .Domain }}. Verwenden Sie es innerhalb der nächsten {{.Expiry}}.
+    
+    @{{.Domain}} #{{.OTP}}
 DomainClaimed:
   Title: ZITADEL - Domain wurde beansprucht
   PreHeader: Email / Username ändern

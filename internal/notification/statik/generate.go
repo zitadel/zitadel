@@ -1,3 +1,3 @@
 package statik
 
-//go:generate statik -src=../static -dest=.. -ns=notification
+//go:generate statik -f -src=../static -dest=.. -ns=notification

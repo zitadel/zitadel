@@ -1,0 +1,24 @@
+{
+	"name": "zitadel",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "devcontainer",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"features": {
+		"ghcr.io/devcontainers/features/go:1": {
+			"version": "1.20"
+		},
+		"ghcr.io/devcontainers/features/node:1": {
+			"version": "18"
+		},
+		"ghcr.io/guiyomh/features/golangci-lint:0": {},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/jungaretti/features/make:1": {}
+	},
+	"forwardPorts": [
+		3000,
+		4200,
+		8080
+	],
+	"onCreateCommand": "npm install -g sass@1.64.1"
+}

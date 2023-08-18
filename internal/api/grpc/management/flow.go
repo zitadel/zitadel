@@ -18,6 +18,7 @@ func (s *Server) ListFlowTypes(ctx context.Context, _ *mgmt_pb.ListFlowTypesRequ
 			action_grpc.FlowTypeToPb(domain.FlowTypeExternalAuthentication),
 			action_grpc.FlowTypeToPb(domain.FlowTypeCustomiseToken),
 			action_grpc.FlowTypeToPb(domain.FlowTypeInternalAuthentication),
+			action_grpc.FlowTypeToPb(domain.FlowTypeCustomizeSAMLResponse),
 		},
 	}, nil
 }

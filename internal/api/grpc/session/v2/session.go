@@ -47,7 +47,7 @@ func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRe
 	}
 	challengeResponse, cmds := s.challengesToCommand(req.GetChallenges(), checks)
 
-	set, err := s.command.CreateSession(ctx, cmds, req.GetDomain(), metadata)
+	set, err := s.command.CreateSession(ctx, cmds, metadata)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,6 @@ func sessionToPb(s *query.Session) *session.Session {
 		Sequence:     s.Sequence,
 		Factors:      factorsToPb(s),
 		Metadata:     s.Metadata,
-		Domain:       s.Domain,
 	}
 }
 
@@ -119,8 +118,9 @@ func factorsToPb(s *query.Session) *session.Factors {
 	return &session.Factors{
 		User:     user,
 		Password: passwordFactorToPb(s.PasswordFactor),
-		Passkey:  passkeyFactorToPb(s.PasskeyFactor),
+		WebAuthN: webAuthNFactorToPb(s.WebAuthNFactor),
 		Intent:   intentFactorToPb(s.IntentFactor),
+		Totp:     totpFactorToPb(s.TOTPFactor),
 	}
 }
 
@@ -142,12 +142,22 @@ func intentFactorToPb(factor query.SessionIntentFactor) *session.IntentFactor {
 	}
 }
 
-func passkeyFactorToPb(factor query.SessionPasskeyFactor) *session.PasskeyFactor {
-	if factor.PasskeyCheckedAt.IsZero() {
+func webAuthNFactorToPb(factor query.SessionWebAuthNFactor) *session.WebAuthNFactor {
+	if factor.WebAuthNCheckedAt.IsZero() {
 		return nil
 	}
-	return &session.PasskeyFactor{
-		VerifiedAt: timestamppb.New(factor.PasskeyCheckedAt),
+	return &session.WebAuthNFactor{
+		VerifiedAt:   timestamppb.New(factor.WebAuthNCheckedAt),
+		UserVerified: factor.UserVerified,
+	}
+}
+
+func totpFactorToPb(factor query.SessionTOTPFactor) *session.TOTPFactor {
+	if factor.TOTPCheckedAt.IsZero() {
+		return nil
+	}
+	return &session.TOTPFactor{
+		VerifiedAt: timestamppb.New(factor.TOTPCheckedAt),
 	}
 }
 
@@ -244,36 +254,49 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	if intent := checks.GetIntent(); intent != nil {
 		sessionChecks = append(sessionChecks, command.CheckIntent(intent.GetIntentId(), intent.GetToken()))
 	}
-	if passkey := checks.GetPasskey(); passkey != nil {
-		sessionChecks = append(sessionChecks, s.command.CheckPasskey(passkey.GetCredentialAssertionData()))
+	if passkey := checks.GetWebAuthN(); passkey != nil {
+		sessionChecks = append(sessionChecks, s.command.CheckWebAuthN(passkey.GetCredentialAssertionData()))
 	}
-
+	if totp := checks.GetTotp(); totp != nil {
+		sessionChecks = append(sessionChecks, command.CheckTOTP(totp.GetTotp()))
+	}
 	return sessionChecks, nil
 }
 
-func (s *Server) challengesToCommand(challenges []session.ChallengeKind, cmds []command.SessionCommand) (*session.Challenges, []command.SessionCommand) {
-	if len(challenges) == 0 {
+func (s *Server) challengesToCommand(challenges *session.RequestChallenges, cmds []command.SessionCommand) (*session.Challenges, []command.SessionCommand) {
+	if challenges == nil {
 		return nil, cmds
 	}
 	resp := new(session.Challenges)
-	for _, c := range challenges {
-		switch c {
-		case session.ChallengeKind_CHALLENGE_KIND_UNSPECIFIED:
-			continue
-		case session.ChallengeKind_CHALLENGE_KIND_PASSKEY:
-			passkeyChallenge, cmd := s.createPasskeyChallengeCommand()
-			resp.Passkey = passkeyChallenge
-			cmds = append(cmds, cmd)
-		}
+	if req := challenges.GetWebAuthN(); req != nil {
+		challenge, cmd := s.createWebAuthNChallengeCommand(req)
+		resp.WebAuthN = challenge
+		cmds = append(cmds, cmd)
 	}
 	return resp, cmds
 }
 
-func (s *Server) createPasskeyChallengeCommand() (*session.Challenges_Passkey, command.SessionCommand) {
-	challenge := &session.Challenges_Passkey{
+func (s *Server) createWebAuthNChallengeCommand(req *session.RequestChallenges_WebAuthN) (*session.Challenges_WebAuthN, command.SessionCommand) {
+	challenge := &session.Challenges_WebAuthN{
 		PublicKeyCredentialRequestOptions: new(structpb.Struct),
 	}
-	return challenge, s.command.CreatePasskeyChallenge(domain.UserVerificationRequirementRequired, challenge.PublicKeyCredentialRequestOptions)
+	userVerification := userVerificationRequirementToDomain(req.GetUserVerificationRequirement())
+	return challenge, s.command.CreateWebAuthNChallenge(userVerification, req.GetDomain(), challenge.PublicKeyCredentialRequestOptions)
+}
+
+func userVerificationRequirementToDomain(req session.UserVerificationRequirement) domain.UserVerificationRequirement {
+	switch req {
+	case session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_UNSPECIFIED:
+		return domain.UserVerificationRequirementUnspecified
+	case session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED:
+		return domain.UserVerificationRequirementRequired
+	case session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_PREFERRED:
+		return domain.UserVerificationRequirementPreferred
+	case session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_DISCOURAGED:
+		return domain.UserVerificationRequirementDiscouraged
+	default:
+		return domain.UserVerificationRequirementUnspecified
+	}
 }
 
 func userCheck(user *session.CheckUser) (userSearch, error) {

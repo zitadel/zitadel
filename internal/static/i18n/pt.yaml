@@ -477,8 +477,8 @@ Errors:
     Terminated: A sessão já foi encerrada
     Token:
       Invalid: O token da sessão é inválido
-    Passkey:
-      NoChallenge: Sessão sem desafio de senha
+    WebAuthN:
+      NoChallenge: Sessão sem desafio WebAuthN
   Intent:
     IDPMissing: O ID do IDP está faltando na solicitação
     SuccessURLMissing: A URL de sucesso está faltando na solicitação
@@ -609,6 +609,24 @@ EventTypes:
           check:
             succeeded: Verificação de OTP de autenticação multifator bem-sucedida
             failed: Verificação de OTP de autenticação multifator falhou
+          sms:
+            added: Adicionado SMS OTP multifator
+            removed: SMS OTP multifator removido
+            code:
+              added: Adicionado código SMS OTP multifator
+              sent: Código SMS OTP multifator enviado
+            check:
+              succeeded: Verificação multifator OTP SMS bem-sucedida
+              failed: Falha na verificação multifator OTP SMS
+          email:
+            added: Adicionado e-mail OTP multifator
+            removed: E-mail OTP multifator removido
+            code:
+              added: Adicionado código de e-mail OTP multifator
+              sent: Código de e-mail OTP multifator enviado
+            check:
+              succeeded: Verificação de e-mail OTP multifator bem-sucedida
+              failed: Falha na verificação de e-mail OTP multifator
         u2f:
           token:
             added: Token U2F de autenticação multifator adicionado
@@ -1193,6 +1211,7 @@ Action:
       ExternalAuthentication: Autenticação externa
       CustomiseToken: Complementar Token
       InternalAuthentication: Autenticação interna
+      CustomizeSAMLResponse: Complementar SAMLResponse
   TriggerType:
     Unspecified: Não especificado
     PostAuthentication: Pós-autenticação
@@ -1200,3 +1219,4 @@ Action:
     PostCreation: Póscriação
     PreUserinfoCreation: Pré-criação de informações do usuário
     PreAccessTokenCreation: Pré-criação de access token
+    PreSAMLResponseCreation: Pré-criação de SAMLResponse

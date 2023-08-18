@@ -218,6 +218,14 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (
 	}, nil
 }
 
+func (p *Provider) GetSession(username, password string) *Session {
+	return &Session{
+		Provider: p,
+		User:     username,
+		Password: password,
+	}
+}
+
 func (p *Provider) IsLinkingAllowed() bool {
 	return p.isLinkingAllowed
 }
