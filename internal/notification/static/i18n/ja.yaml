@@ -37,7 +37,7 @@ VerifySMSOTP:
   Text: >-
     {{.OTP}} は、{{ .Domain }} のワンタイムパスワードです。次の {{.Expiry}} 以内に使用してください。
     
-    @{{.ドメイン}} #{{.OTP}}
+    @{{.Domain}} #{{.OTP}}
 DomainClaimed:
   Title: ZITADEL - ドメインの登録
   PreHeader: メールアドレス・ユーザー名の変更
