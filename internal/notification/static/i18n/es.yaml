@@ -37,7 +37,7 @@ VerifySMSOTP:
   Text: >-
     {{.OTP}} es su contraseña de un solo uso para {{ .Domain }}. Úselo dentro de los próximos {{.Expiry}}.
     
-    @{{.Dominio}} #{{.OTP}}
+    @{{.Domain}} #{{.OTP}}
 DomainClaimed:
   Title: ZITADEL - Se ha reclamado un dominio
   PreHeader: Cambiar dirección de correo electrónico / nombre de usuario

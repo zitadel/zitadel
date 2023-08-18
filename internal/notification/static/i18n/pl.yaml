@@ -37,7 +37,7 @@ VerifySMSOTP:
   Text: >-
     {{.OTP}} to Twoje jednorazowe hasło do domeny {{ .Domain }}. Użyj go w ciągu najbliższych {{.Expiry}}.
     
-    @{{.Domena}} #{{.OTP}}
+    @{{.Domain}} #{{.OTP}}
 DomainClaimed:
   Title: ZITADEL - Domena została zarejestrowana
   PreHeader: Zmiana adresu e-mail / nazwy użytkownika
