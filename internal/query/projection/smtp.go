@@ -11,20 +11,21 @@ import (
 )
 
 const (
-	SMTPConfigProjectionTable = "projections.smtp_configs"
+	SMTPConfigProjectionTable = "projections.smtp_configs1"
 
-	SMTPConfigColumnAggregateID   = "aggregate_id"
-	SMTPConfigColumnCreationDate  = "creation_date"
-	SMTPConfigColumnChangeDate    = "change_date"
-	SMTPConfigColumnSequence      = "sequence"
-	SMTPConfigColumnResourceOwner = "resource_owner"
-	SMTPConfigColumnInstanceID    = "instance_id"
-	SMTPConfigColumnTLS           = "tls"
-	SMTPConfigColumnSenderAddress = "sender_address"
-	SMTPConfigColumnSenderName    = "sender_name"
-	SMTPConfigColumnSMTPHost      = "host"
-	SMTPConfigColumnSMTPUser      = "username"
-	SMTPConfigColumnSMTPPassword  = "password"
+	SMTPConfigColumnAggregateID    = "aggregate_id"
+	SMTPConfigColumnCreationDate   = "creation_date"
+	SMTPConfigColumnChangeDate     = "change_date"
+	SMTPConfigColumnSequence       = "sequence"
+	SMTPConfigColumnResourceOwner  = "resource_owner"
+	SMTPConfigColumnInstanceID     = "instance_id"
+	SMTPConfigColumnTLS            = "tls"
+	SMTPConfigColumnSenderAddress  = "sender_address"
+	SMTPConfigColumnSenderName     = "sender_name"
+	SMTPConfigColumnReplyToAddress = "reply_to_address"
+	SMTPConfigColumnSMTPHost       = "host"
+	SMTPConfigColumnSMTPUser       = "username"
+	SMTPConfigColumnSMTPPassword   = "password"
 )
 
 type smtpConfigProjection struct {
@@ -46,6 +47,7 @@ func newSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerCo
 			crdb.NewColumn(SMTPConfigColumnTLS, crdb.ColumnTypeBool),
 			crdb.NewColumn(SMTPConfigColumnSenderAddress, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnSenderName, crdb.ColumnTypeText),
+			crdb.NewColumn(SMTPConfigColumnReplyToAddress, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnSMTPHost, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnSMTPUser, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnSMTPPassword, crdb.ColumnTypeJSONB, crdb.Nullable()),
@@ -100,6 +102,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 			handler.NewCol(SMTPConfigColumnTLS, e.TLS),
 			handler.NewCol(SMTPConfigColumnSenderAddress, e.SenderAddress),
 			handler.NewCol(SMTPConfigColumnSenderName, e.SenderName),
+			handler.NewCol(SMTPConfigColumnReplyToAddress, e.ReplyToAddress),
 			handler.NewCol(SMTPConfigColumnSMTPHost, e.Host),
 			handler.NewCol(SMTPConfigColumnSMTPUser, e.User),
 			handler.NewCol(SMTPConfigColumnSMTPPassword, e.Password),
@@ -113,7 +116,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-wl0wd", "reduce.wrong.event.type %s", instance.SMTPConfigChangedEventType)
 	}
 
-	columns := make([]handler.Column, 0, 7)
+	columns := make([]handler.Column, 0, 8)
 	columns = append(columns, handler.NewCol(SMTPConfigColumnChangeDate, e.CreationDate()),
 		handler.NewCol(SMTPConfigColumnSequence, e.Sequence()))
 	if e.TLS != nil {
@@ -124,6 +127,9 @@ func (p *smtpConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 	}
 	if e.FromName != nil {
 		columns = append(columns, handler.NewCol(SMTPConfigColumnSenderName, *e.FromName))
+	}
+	if e.ReplyToAddress != nil {
+		columns = append(columns, handler.NewCol(SMTPConfigColumnReplyToAddress, *e.ReplyToAddress))
 	}
 	if e.Host != nil {
 		columns = append(columns, handler.NewCol(SMTPConfigColumnSMTPHost, *e.Host))

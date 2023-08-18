@@ -656,6 +656,7 @@ DefaultInstance:
     # if the host of the sender is different from ExternalDomain set DefaultInstance.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain to false
     From:
     FromName:
+    ReplyToAddress:
   MessageTexts:
     - MessageTextType: InitCode
       Language: de

@@ -1049,6 +1049,7 @@
       "TITLE": "SMTP Settings",
       "SENDERADDRESS": "Sender Email Address",
       "SENDERNAME": "Sender Name",
+      "REPLYTOADDRESS": "Reply-to Address",
       "HOSTANDPORT": "Host And Port",
       "USER": "User",
       "PASSWORD": "Password",

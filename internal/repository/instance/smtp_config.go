@@ -21,12 +21,13 @@ const (
 type SMTPConfigAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	SenderAddress string              `json:"senderAddress,omitempty"`
-	SenderName    string              `json:"senderName,omitempty"`
-	TLS           bool                `json:"tls,omitempty"`
-	Host          string              `json:"host,omitempty"`
-	User          string              `json:"user,omitempty"`
-	Password      *crypto.CryptoValue `json:"password,omitempty"`
+	SenderAddress  string              `json:"senderAddress,omitempty"`
+	SenderName     string              `json:"senderName,omitempty"`
+	ReplyToAddress string              `json:"replyToAddress,omitempty"`
+	TLS            bool                `json:"tls,omitempty"`
+	Host           string              `json:"host,omitempty"`
+	User           string              `json:"user,omitempty"`
+	Password       *crypto.CryptoValue `json:"password,omitempty"`
 }
 
 func NewSMTPConfigAddedEvent(
@@ -35,6 +36,7 @@ func NewSMTPConfigAddedEvent(
 	tls bool,
 	senderAddress,
 	senderName,
+	replyToAddress,
 	host,
 	user string,
 	password *crypto.CryptoValue,
@@ -45,12 +47,13 @@ func NewSMTPConfigAddedEvent(
 			aggregate,
 			SMTPConfigAddedEventType,
 		),
-		TLS:           tls,
-		SenderAddress: senderAddress,
-		SenderName:    senderName,
-		Host:          host,
-		User:          user,
-		Password:      password,
+		TLS:            tls,
+		SenderAddress:  senderAddress,
+		SenderName:     senderName,
+		ReplyToAddress: replyToAddress,
+		Host:           host,
+		User:           user,
+		Password:       password,
 	}
 }
 
@@ -77,11 +80,12 @@ func SMTPConfigAddedEventMapper(event *repository.Event) (eventstore.Event, erro
 type SMTPConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	FromAddress *string `json:"senderAddress,omitempty"`
-	FromName    *string `json:"senderName,omitempty"`
-	TLS         *bool   `json:"tls,omitempty"`
-	Host        *string `json:"host,omitempty"`
-	User        *string `json:"user,omitempty"`
+	FromAddress    *string `json:"senderAddress,omitempty"`
+	FromName       *string `json:"senderName,omitempty"`
+	ReplyToAddress *string `json:"replyToAddress,omitempty"`
+	TLS            *bool   `json:"tls,omitempty"`
+	Host           *string `json:"host,omitempty"`
+	User           *string `json:"user,omitempty"`
 }
 
 func (e *SMTPConfigChangedEvent) Data() interface{} {
@@ -130,6 +134,12 @@ func ChangeSMTPConfigFromAddress(senderAddress string) func(event *SMTPConfigCha
 func ChangeSMTPConfigFromName(senderName string) func(event *SMTPConfigChangedEvent) {
 	return func(e *SMTPConfigChangedEvent) {
 		e.FromName = &senderName
+	}
+}
+
+func ChangeSMTPConfigReplyToAddress(replyToAddress string) func(event *SMTPConfigChangedEvent) {
+	return func(e *SMTPConfigChangedEvent) {
+		e.ReplyToAddress = &replyToAddress
 	}
 }
 

@@ -22,6 +22,7 @@ type Email struct {
 	CC              []string
 	SenderEmail     string
 	SenderName      string
+	ReplyToAddress  string
 	Subject         string
 	Content         string
 	TriggeringEvent eventstore.Event
@@ -34,6 +35,9 @@ func (msg *Email) GetContent() (string, error) {
 		from = fmt.Sprintf("%s <%s>", msg.SenderName, msg.SenderEmail)
 	}
 	headers["From"] = from
+	if msg.ReplyToAddress != "" {
+		headers["Reply-to"] = msg.ReplyToAddress
+	}
 	headers["Return-Path"] = msg.SenderEmail
 	headers["To"] = strings.Join(msg.Recipients, ", ")
 	headers["Cc"] = strings.Join(msg.CC, ", ")
