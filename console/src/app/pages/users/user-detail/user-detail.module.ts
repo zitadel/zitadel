@@ -38,6 +38,7 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 
 import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
 import { QRCodeModule } from 'angularx-qrcode';
+import { InfoDialogModule } from 'src/app/modules/info-dialog/info-dialog.module';
 import { MetadataModule } from 'src/app/modules/metadata/metadata.module';
 import { CountryCallingCodesService } from 'src/app/services/country-calling-codes.service';
 import { InfoRowModule } from '../../../modules/info-row/info-row.module';
@@ -86,6 +87,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     ChangesModule,
     CommonModule,
     SidenavModule,
+    InfoDialogModule,
     FormsModule,
     ReactiveFormsModule,
     MembershipsTableModule,

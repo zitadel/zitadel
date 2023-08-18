@@ -73,9 +73,10 @@ func Test_intentToIDPInformationPb(t *testing.T) {
 						KeyID:      "id",
 						Crypted:    []byte("accessToken"),
 					},
-					IDPIDToken: "idToken",
-					UserID:     "userID",
-					State:      domain.IDPIntentStateSucceeded,
+					IDPIDToken:         "idToken",
+					IDPEntryAttributes: map[string][]string{},
+					UserID:             "userID",
+					State:              domain.IDPIntentStateSucceeded,
 				},
 				alg: decryption(caos_errs.ThrowInternal(nil, "id", "invalid key id")),
 			},
@@ -85,7 +86,7 @@ func Test_intentToIDPInformationPb(t *testing.T) {
 			},
 		},
 		{
-			"successful",
+			"successful oauth",
 			args{
 				intent: &command.IDPIntentWriteModel{
 					WriteModel: eventstore.WriteModel{
@@ -140,16 +141,73 @@ func Test_intentToIDPInformationPb(t *testing.T) {
 				},
 				err: nil,
 			},
+		}, {
+			"successful ldap",
+			args{
+				intent: &command.IDPIntentWriteModel{
+					WriteModel: eventstore.WriteModel{
+						AggregateID:       "intentID",
+						ProcessedSequence: 123,
+						ResourceOwner:     "ro",
+						InstanceID:        "instanceID",
+						ChangeDate:        time.Date(2019, 4, 1, 1, 1, 1, 1, time.Local),
+					},
+					IDPID:       "idpID",
+					IDPUser:     []byte(`{"userID": "idpUserID", "username": "username"}`),
+					IDPUserID:   "idpUserID",
+					IDPUserName: "username",
+					IDPEntryAttributes: map[string][]string{
+						"id":        {"idpUserID"},
+						"firstName": {"firstname1", "firstname2"},
+						"lastName":  {"lastname"},
+					},
+					UserID: "userID",
+					State:  domain.IDPIntentStateSucceeded,
+				},
+			},
+			res{
+				resp: &user.RetrieveIdentityProviderInformationResponse{
+					Details: &object_pb.Details{
+						Sequence:      123,
+						ChangeDate:    timestamppb.New(time.Date(2019, 4, 1, 1, 1, 1, 1, time.Local)),
+						ResourceOwner: "ro",
+					},
+					IdpInformation: &user.IDPInformation{
+						Access: &user.IDPInformation_Ldap{
+							Ldap: &user.IDPLDAPAccessInformation{
+								Attributes: func() *structpb.Struct {
+									s, err := structpb.NewStruct(map[string]interface{}{
+										"id":        []interface{}{"idpUserID"},
+										"firstName": []interface{}{"firstname1", "firstname2"},
+										"lastName":  []interface{}{"lastname"},
+									})
+									require.NoError(t, err)
+									return s
+								}(),
+							},
+						},
+						IdpId:    "idpID",
+						UserId:   "idpUserID",
+						UserName: "username",
+						RawInformation: func() *structpb.Struct {
+							s, err := structpb.NewStruct(map[string]interface{}{
+								"userID":   "idpUserID",
+								"username": "username",
+							})
+							require.NoError(t, err)
+							return s
+						}(),
+					},
+				},
+				err: nil,
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := intentToIDPInformationPb(tt.args.intent, tt.args.alg)
 			require.ErrorIs(t, err, tt.res.err)
-			grpc.AllFieldsEqual(t, got.ProtoReflect(), tt.res.resp.ProtoReflect(), grpc.CustomMappers)
-			if tt.res.resp != nil {
-				grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
-			}
+			grpc.AllFieldsEqual(t, tt.res.resp.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
 		})
 	}
 }

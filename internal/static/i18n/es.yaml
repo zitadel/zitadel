@@ -137,6 +137,7 @@ Errors:
       MinimumExternalIDPNeeded: Al menos de añadirse un IDP
       AlreadyExists: IDP externo ya cogido
       NotFound: IDP no encontrado
+      LoginFailed: Error de inicio de sesión en IDP externo
     MFA:
       OTP:
         AlreadyReady: Multifactor OTP (OneTimePassword) ya está configurado
@@ -1216,6 +1217,7 @@ Action:
       ExternalAuthentication: Autenticación externa
       CustomiseToken: Token complementario
       InternalAuthentication: Autenticación interna
+      CustomizeSAMLResponse: SAMLResponse complementario
   TriggerType:
     Unspecified: No especificado
     PostAuthentication: Post Autenticación
@@ -1223,3 +1225,4 @@ Action:
     PostCreation: Post Creación
     PreUserinfoCreation: Pre creación de Userinfo
     PreAccessTokenCreation: Pre creación de token de acceso
+    PreSAMLResponseCreation: Creación previa de SAMLResponse
