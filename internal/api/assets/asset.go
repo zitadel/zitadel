@@ -189,7 +189,6 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 			s.ErrorHandler()(w, r, fmt.Errorf("download failed: %v", err), http.StatusInternalServerError)
 			return
 		}
-		objectName = "a"
 		if objectName == "" {
 			s.ErrorHandler()(w, r, fmt.Errorf("file not found: %v", path), http.StatusNotFound)
 			return
