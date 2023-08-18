@@ -22,8 +22,10 @@ const (
 	WebAuthNCheckedType    = sessionEventPrefix + "webAuthN.checked"
 	TOTPCheckedType        = sessionEventPrefix + "totp.checked"
 	OTPSMSChallengedType   = sessionEventPrefix + "otp.sms.challenged"
+	OTPSMSSentType         = sessionEventPrefix + "otp.sms.sent"
 	OTPSMSCheckedType      = sessionEventPrefix + "otp.sms.checked"
 	OTPEmailChallengedType = sessionEventPrefix + "otp.email.challenged"
+	OTPEmailSentType       = sessionEventPrefix + "otp.email.sent"
 	OTPEmailCheckedType    = sessionEventPrefix + "otp.email.checked"
 	TokenSetType           = sessionEventPrefix + "token.set"
 	MetadataSetType        = sessionEventPrefix + "metadata.set"
@@ -306,9 +308,9 @@ func NewTOTPCheckedEvent(
 type OTPSMSChallengedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Code       *crypto.CryptoValue `json:"code"`
-	Expiry     time.Duration       `json:"expiry"`
-	ReturnCode bool                `json:"returnCode,omitempty"`
+	Code         *crypto.CryptoValue `json:"code"`
+	Expiry       time.Duration       `json:"expiry"`
+	CodeReturned bool                `json:"codeReturned,omitempty"`
 }
 
 func (e *OTPSMSChallengedEvent) Data() interface{} {
@@ -328,7 +330,7 @@ func NewOTPSMSChallengedEvent(
 	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
-	returnCode bool,
+	codeReturned bool,
 ) *OTPSMSChallengedEvent {
 	return &OTPSMSChallengedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -336,9 +338,38 @@ func NewOTPSMSChallengedEvent(
 			aggregate,
 			OTPSMSChallengedType,
 		),
-		Code:       code,
-		Expiry:     expiry,
-		ReturnCode: returnCode,
+		Code:         code,
+		Expiry:       expiry,
+		CodeReturned: codeReturned,
+	}
+}
+
+type OTPSMSSentEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *OTPSMSSentEvent) Data() interface{} {
+	return e
+}
+
+func (e *OTPSMSSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *OTPSMSSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewOTPSMSSentEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *OTPSMSSentEvent {
+	return &OTPSMSSentEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			OTPSMSSentType,
+		),
 	}
 }
 
@@ -414,6 +445,35 @@ func NewOTPEmailChallengedEvent(
 		Expiry:     expiry,
 		ReturnCode: returnCode,
 		URLTmpl:    urlTmpl,
+	}
+}
+
+type OTPEmailSentEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *OTPEmailSentEvent) Data() interface{} {
+	return e
+}
+
+func (e *OTPEmailSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *OTPEmailSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewOTPEmailSentEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *OTPEmailSentEvent {
+	return &OTPEmailSentEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			OTPEmailSentType,
+		),
 	}
 }
 

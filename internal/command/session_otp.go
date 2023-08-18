@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/repository/session"
 )
 
 func (c *Commands) CreateOTPSMSChallengeReturnCode(dst *string) SessionCommand {
@@ -36,6 +37,20 @@ func (c *Commands) createOTPSMSChallenge(returnCode bool, dst *string) SessionCo
 		cmd.OTPSMSChallenged(ctx, code, expiry, returnCode)
 		return nil
 	}
+}
+
+func (c *Commands) OTPSMSSent(ctx context.Context, sessionID, resourceOwner string) error {
+	sessionWriteModel := NewSessionWriteModel(sessionID, resourceOwner)
+	err := c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
+	if err != nil {
+		return err
+	}
+	if sessionWriteModel.OTPSMSCodeChallenge == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-G3t31", "Errors.User.Code.NotFound")
+	}
+	return c.pushAppendAndReduce(ctx, sessionWriteModel,
+		session.NewOTPSMSSentEvent(ctx, &session.NewAggregate(sessionID, sessionWriteModel.ResourceOwner).Aggregate),
+	)
 }
 
 func (c *Commands) CreateOTPEmailChallengeURLTemplate(urlTmpl string) (SessionCommand, error) {
@@ -72,6 +87,20 @@ func (c *Commands) createOTPEmailChallenge(returnCode bool, urlTmpl string, dst 
 		cmd.OTPEmailChallenged(ctx, code, expiry, returnCode, urlTmpl)
 		return nil
 	}
+}
+
+func (c *Commands) OTPEmailSent(ctx context.Context, sessionID, resourceOwner string) error {
+	sessionWriteModel := NewSessionWriteModel(sessionID, resourceOwner)
+	err := c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
+	if err != nil {
+		return err
+	}
+	if sessionWriteModel.OTPEmailCodeChallenge == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SLr02", "Errors.User.Code.NotFound")
+	}
+	return c.pushAppendAndReduce(ctx, sessionWriteModel,
+		session.NewOTPEmailSentEvent(ctx, &session.NewAggregate(sessionID, sessionWriteModel.ResourceOwner).Aggregate),
+	)
 }
 
 func CheckOTPSMS(code string) SessionCommand {
