@@ -410,7 +410,7 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 		l.renderExternalNotFoundOption(w, r, authReq, orgIAMPolicy, human, idpLink, err)
 		return
 	}
-	if changed {
+	if changed || len(externalUser.Metadatas) > 0 {
 		if err := l.authRepo.SetLinkingUser(r.Context(), authReq, externalUser); err != nil {
 			l.renderError(w, r, authReq, err)
 			return
