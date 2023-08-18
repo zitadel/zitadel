@@ -287,15 +287,15 @@ func (db *CRDB) db() *sql.DB {
 
 func (db *CRDB) orderByEventSequence(desc bool) string {
 	if desc {
-		return " ORDER BY created_at DESC, event_sequence DESC"
+		return " ORDER BY event_sequence DESC"
 	}
 
-	return " ORDER BY created_at, event_sequence"
+	return " ORDER BY event_sequence"
 }
 
 func (db *CRDB) eventQuery() string {
 	return "SELECT" +
-		" created_at" +
+		" creation_date" +
 		", event_type" +
 		", event_sequence" +
 		", previous_aggregate_sequence" +
