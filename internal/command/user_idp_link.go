@@ -81,11 +81,13 @@ func (c *Commands) addUserIDPLink(ctx context.Context, human *eventstore.Aggrega
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-39nfs", "Errors.IDPConfig.NotExisting")
 	}
+	// IDP user will either be linked or created on a new user
+	// Therefore we need to either check if linking is allowed or creation:
 	if linkToExistingUser && !idpWriteModel.GetProviderOptions().IsLinkingAllowed {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-Sfee2", "Errors.ExternalIDP.LinkingNotAllowed")
 	}
 	if !linkToExistingUser && !idpWriteModel.GetProviderOptions().IsCreationAllowed {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-Sfee2", "Errors.ExternalIDP.CreationNotAllowed")
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-SJI3g", "Errors.ExternalIDP.CreationNotAllowed")
 	}
 	return user.NewUserIDPLinkAddedEvent(ctx, human, link.IDPConfigID, link.DisplayName, link.ExternalUserID), nil
 
