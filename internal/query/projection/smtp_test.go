@@ -150,6 +150,33 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "reduceSMTPConfigRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.SMTPConfigRemovedEventType),
+					instance.AggregateType,
+					[]byte(`{}`),
+				), instance.SMTPConfigRemovedEventMapper),
+			},
+			reduce: (&smtpConfigProjection{}).reduceSMTPConfigRemoved,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.smtp_configs WHERE (aggregate_id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
