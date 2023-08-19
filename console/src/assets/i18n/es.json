@@ -1049,6 +1049,7 @@
       "TITLE": "Ajustes SMTP",
       "SENDERADDRESS": "Dirección email del emisor",
       "SENDERNAME": "Nombre del emisor",
+      "REPLYTOADDRESS": "Dirección Reply-To",
       "HOSTANDPORT": "Servidor y puerto",
       "USER": "Usuario",
       "PASSWORD": "Contraseña",

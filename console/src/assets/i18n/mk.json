@@ -1049,6 +1049,7 @@
       "TITLE": "SMTP подесувања",
       "SENDERADDRESS": "Адреса на испраќачот",
       "SENDERNAME": "Име на испраќачот",
+      "REPLYTOADDRESS": "Reply-to адреса",
       "HOSTANDPORT": "Host и Port",
       "USER": "Корисник",
       "PASSWORD": "Лозинка",

@@ -1048,6 +1048,7 @@
       "TITLE": "SMTP 设置",
       "SENDERADDRESS": "发件人地址",
       "SENDERNAME": "发件人名称",
+      "REPLYTOADDRESS": "Reply-to 地址",
       "HOSTANDPORT": "主机和端口",
       "USER": "用户名",
       "PASSWORD": "密码",

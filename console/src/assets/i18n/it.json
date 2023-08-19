@@ -1048,6 +1048,7 @@
       "TITLE": "Impostazioni SMTP",
       "SENDERADDRESS": "Indirizzo email del mittente",
       "SENDERNAME": "Nome del mittente",
+      "REPLYTOADDRESS": "Indirizzo Reply-to",
       "HOSTANDPORT": "Host e porta",
       "USER": "Utente",
       "PASSWORD": "Password",
