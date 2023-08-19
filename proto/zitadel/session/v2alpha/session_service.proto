@@ -244,12 +244,7 @@ message CreateSessionRequest{
       description: "\"custom key value list to be stored on the session\"";
     }
   ];
-  repeated ChallengeKind challenges = 3;
-  string domain = 4 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"Domain on which the session was created. Will be used for Passkey and U2F challenges.\"";
-    }
-  ];
+  RequestChallenges challenges = 3;
 }
 
 message CreateSessionResponse{
@@ -296,7 +291,7 @@ message SetSessionRequest{
       description: "\"custom key value list to be stored on the session\"";
     }
   ];
-  repeated ChallengeKind challenges = 5;
+  RequestChallenges challenges = 5;
 }
 
 message SetSessionResponse{
@@ -306,7 +301,7 @@ message SetSessionResponse{
       description: "\"token of the session, which is required for further updates of the session or the request other resources\"";
     }
   ];
-   Challenges challenges = 3;
+  Challenges challenges = 3;
 }
 
 message DeleteSessionRequest{
@@ -341,14 +336,19 @@ message Checks {
       description: "\"Checks the password and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
     }
   ];
-  optional CheckPasskey passkey = 3 [
+  optional CheckWebAuthN web_auth_n = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"Checks the public key credential issued by the passkey client. Requires that the user is already checked and a passkey challenge to be requested, in any previous request.\"";
+      description: "\"Checks the public key credential issued by the WebAuthN client. Requires that the user is already checked and a WebAuthN challenge to be requested, in any previous request.\"";
     }
   ];
   optional CheckIntent intent = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"Checks the intent. Requires that the userlink is already checked and a successful intent.\"";
+    }
+  ];
+  optional CheckTOTP totp = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Checks the Time-based One-Time Password and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
     }
   ];
 }
@@ -385,12 +385,12 @@ message CheckPassword {
   ];
 }
 
-message CheckPasskey {
+message CheckWebAuthN {
   google.protobuf.Struct credential_assertion_data = 1 [
     (validate.rules).message.required = true,
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "JSON representation of public key credential issued by the passkey client";
+      description: "JSON representation of public key credential issued by the webAuthN client";
       min_length: 55;
       max_length: 1048576; //1 MB
     }
@@ -414,6 +414,17 @@ message CheckIntent {
       min_length: 1;
       max_length: 200;
       example: "\"SJKL3ioIDpo342ioqw98fjp3sdf32wahb=\"";
+    }
+  ];
+}
+
+message CheckTOTP {
+  string totp = 1 [
+    (validate.rules).string = {min_len: 6, max_len: 6},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 6;
+      max_length: 6;
+      example: "\"323764\"";
     }
   ];
 }

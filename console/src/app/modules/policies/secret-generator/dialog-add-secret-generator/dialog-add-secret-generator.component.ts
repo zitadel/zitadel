@@ -32,8 +32,8 @@ export class DialogAddSecretGeneratorComponent {
       expiry: [exp, [requiredValidator]],
       length: [data.config?.length ?? 6, [requiredValidator]],
       includeDigits: [data.config?.includeDigits ?? true, [requiredValidator]],
-      includeLowerLetters: [data.config?.includeSymbols ?? true, [requiredValidator]],
-      includeSymbols: [data.config?.includeLowerLetters ?? true, [requiredValidator]],
+      includeSymbols: [data.config?.includeSymbols ?? true, [requiredValidator]],
+      includeLowerLetters: [data.config?.includeLowerLetters ?? true, [requiredValidator]],
       includeUpperLetters: [data.config?.includeUpperLetters ?? true, [requiredValidator]],
     });
   }

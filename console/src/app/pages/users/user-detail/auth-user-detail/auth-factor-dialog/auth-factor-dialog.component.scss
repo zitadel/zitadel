@@ -1,21 +1,67 @@
+.desc {
+  margin-top: 0;
+}
+
 .type-selection {
   display: flex;
+  flex-direction: column;
   margin: 0 -0.5rem;
 
   .otp-btn,
   .u2f-btn {
     flex: 1;
-    min-height: 100px;
     border-radius: 0.5rem;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex-direction: row;
     align-items: center;
-    margin: 1rem;
     box-sizing: border-box;
+    white-space: normal;
+    line-height: 1.5rem;
+    padding: 0.5rem 0;
+
+    .col {
+      display: flex;
+      flex-direction: column;
+
+      .info {
+        margin-left: calc(40px + 1rem);
+      }
+    }
+
+    .row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .authenticator-logo {
+      height: 40px;
+      width: 40px;
+    }
+
+    * {
+      white-space: normal;
+    }
 
     .icon-row {
+      height: 40px;
+      width: 40px;
       display: flex;
+      align-items: center;
+      margin-right: 1rem;
+
+      .sms,
+      .email,
+      .fingerprint {
+        height: 100%;
+        width: 100%;
+        padding: 0.25rem;
+      }
+    }
+
+    span {
+      text-align: start;
+      flex: 1;
     }
   }
 

@@ -26,6 +26,18 @@ VerifyPhone:
   Greeting: Hola {{.DisplayName}},
   Text: Se ha añadido un nuevo número de teléfono. Por favor, usa el siguiente código para verificarlo {{.Code}}
   ButtonText: Verificar teléfono
+VerifyEmailOTP:
+  Title: ZITADEL - Verifica la contraseña de un solo uso
+  PreHeader: Verifica la contraseña de un solo uso
+  Subject: Verifica la contraseña de un solo uso
+  Greeting: Hola {{.DisplayName}},
+  Text: Por favor, utiliza el botón 'Autenticar' o copia la contraseña de un solo uso {{.OTP}} y pégala en la pantalla de autenticación para autenticarte en ZITADEL en los próximos cinco minutos.
+  ButtonText: Autenticar
+VerifySMSOTP:
+  Text: >-
+    {{.OTP}} es su contraseña de un solo uso para {{ .Domain }}. Úselo dentro de los próximos {{.Expiry}}.
+    
+    @{{.Dominio}} #{{.OTP}}
 DomainClaimed:
   Title: ZITADEL - Se ha reclamado un dominio
   PreHeader: Cambiar dirección de correo electrónico / nombre de usuario

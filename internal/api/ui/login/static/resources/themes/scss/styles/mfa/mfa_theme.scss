@@ -4,26 +4,26 @@
 @mixin lgn-mfa-theme() {
   .lgn-mfa-options {
     .mfa {
-      label {
-        input[type="radio"] {
-          &:hover,
-          &:focus {
-            + .mfa-img {
-              background-color: var(--zitadel-color-card-hover);
-              border-color: var(--zitadel-color-input-border-hover);
-            }
-          }
+      input[type="radio"] {
+        &:hover,
+        &:focus {
+          background-color: var(--zitadel-color-card-hover);
+          border-color: var(--zitadel-color-input-border-hover);
         }
+      }
+
+      label {
+        border: 1px solid var(--zitadel-color-input-border);
 
         .mfa-img {
-          border: 1px solid var(--zitadel-color-input-border);
+          margin-right: 1rem;
         }
+      }
 
-        input[type="radio"]:checked + .mfa-img {
-          background-color: var(--zitadel-color-card-hover);
-          border: 1px solid var(--zitadel-color-input-border-active);
-          box-shadow: 0 0 0 2px var(--zitadel-color-input-border-active);
-        }
+      input[type="radio"]:checked + label {
+        background-color: var(--zitadel-color-card-hover);
+        border: 1px solid var(--zitadel-color-input-border-active);
+        box-shadow: 0 0 0 2px var(--zitadel-color-input-border-active);
       }
     }
   }
