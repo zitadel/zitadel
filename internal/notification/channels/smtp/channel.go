@@ -156,7 +156,9 @@ func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {
 		return nil
 	}
 	// Auth
-	auth := smtp.PlainAuth("", smtpConfig.User, smtpConfig.Password, host)
+	auth := unencryptedAuth{
+		smtp.PlainAuth("", smtpConfig.User, smtpConfig.Password, host),
+	}
 	err := client.Auth(auth)
 	if err != nil {
 		return caos_errs.ThrowInternalf(err, "EMAIL-s9kfs", "could not add smtp auth for user %s", smtpConfig.User)
