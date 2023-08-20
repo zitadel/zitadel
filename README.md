@@ -96,7 +96,7 @@ Authentication
 - Single Sign On (SSO)
 - Passwordless with FIDO2 support (Including Passkeys)
 - Username / Password
-- Multifactor authentication with OTP, U2F
+- Multifactor authentication with OTP, U2F, Email OTP, SMS OTP
 - LDAP
 - [OpenID Connect certified](https://openid.net/certification/#OPs) => [OIDC Endpoints](https://zitadel.com/docs/apis/openidoauth/endpoints)
 - [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html) => [SAML Endpoints](https://zitadel.com/docs/apis/saml/endpoints)
@@ -105,12 +105,12 @@ Authentication
 Multi-Tenancy
 - [Identity Brokering](https://zitadel.com/docs/guides/integrate/identity-brokering) with templates for popular identity providers
 - [Delegate role management to third-parties](https://zitadel.com/docs/guides/manage/console/projects)
-- Domain discovery
+- [Domain discovery](https://zitadel.com/docs/guides/solution-scenarios/domain-discovery)
 
 Integration
 - [GRPC and REST APIs](https://zitadel.com/docs/apis/introduction)
 - [Actions](https://zitadel.com/docs/apis/actions/introduction) to call any API, send webhooks, adjust workflows, or customize tokens
-- Role Based Access Control (RBAC)
+- [Role Based Access Control (RBAC)](https://zitadel.com/docs/guides/integrate/retrieve-user-roles)
 
 Self-Service
 - [Self-registration](https://zitadel.com/docs/concepts/features/selfservice#registration) including verification
