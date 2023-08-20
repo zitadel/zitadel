@@ -4,21 +4,23 @@
 </p>
 
 <p align="center">
+    <a href="https://github.com/zitadel/zitadel/blob/main/LICENSE" alt="License">
+        <img src="https://badgen.net/github/license/zitadel/zitadel/" /></a>
     <a href="https://bestpractices.coreinfrastructure.org/projects/6662"><img src="https://bestpractices.coreinfrastructure.org/projects/6662/badge"></a>
-    <a href="https://github.com/zitadel/zitadel/graphs/contributors" alt="Release">
-        <img src="https://badgen.net/github/contributors/zitadel/zitadel" /></a>
     <a href="https://github.com/semantic-release/semantic-release" alt="semantic-release">
         <img src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg" /></a>
     <a href="https://github.com/zitadel/zitadel/actions" alt="ZITADEL Release">
-        <img src="https://github.com/zitadel/zitadel/actions/workflows/zitadel.yml/badge.svg" /></a>
-    <a href="https://github.com/zitadel/zitadel/blob/main/LICENSE" alt="License">
-        <img src="https://badgen.net/github/license/zitadel/zitadel/" /></a>
+        <img alt="GitHub Workflow Status (with event)" src="https://img.shields.io/github/actions/workflow/status/zitadel/zitadel/build.yml?event=pull_request"></a>
     <a href="https://github.com/zitadel/zitadel/releases" alt="Release">
         <img src="https://badgen.net/github/release/zitadel/zitadel/stable" /></a>
+    <a href="https://github.com/zitadel/zitadel/releases" alt="Release">
+        <img alt="Dynamic YAML Badge" src="https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fzitadel%2Fzitadel%2Fmain%2Frelease-channels.yaml&query=%24.stable&label=stable"></a>
     <a href="https://goreportcard.com/report/github.com/zitadel/zitadel" alt="Go Report Card">
         <img src="https://goreportcard.com/badge/github.com/zitadel/zitadel" /></a>
     <a href="https://codecov.io/gh/zitadel/zitadel" alt="Code Coverage">
         <img src="https://codecov.io/gh/zitadel/zitadel/branch/main/graph/badge.svg" /></a>
+    <a href="https://github.com/zitadel/zitadel/graphs/contributors" alt="Release">
+        <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/zitadel/zitadel"></a>
     <a href="https://discord.gg/erh5Brh7jE" alt="Discord Chat">
         <img src="https://badgen.net/discord/online-members/erh5Brh7jE" /></a>
 </p>
