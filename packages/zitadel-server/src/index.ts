@@ -20,9 +20,9 @@ export {
 } from "./proto/server/zitadel/settings/v2alpha/login_settings";
 
 export {
-  ChallengeKind,
+  RequestChallenges,
   Challenges,
-  Challenges_Passkey,
+  Challenges_WebAuthN,
 } from "./proto/server/zitadel/session/v2alpha/challenge";
 
 export {

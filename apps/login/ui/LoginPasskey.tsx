@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Challenges_Passkey } from "@zitadel/server";
 import { coerceToArrayBuffer, coerceToBase64Url } from "#/utils/base64";
 import { Button, ButtonVariants } from "./Button";
 import Alert from "./Alert";
