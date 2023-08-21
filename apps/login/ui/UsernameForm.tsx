@@ -15,12 +15,14 @@ type Inputs = {
 type Props = {
   loginSettings: LoginSettings | undefined;
   loginName: string | undefined;
+  authRequestId: string | undefined;
   submit: boolean;
 };
 
 export default function UsernameForm({
   loginSettings,
   loginName,
+  authRequestId,
   submit,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
@@ -37,14 +39,17 @@ export default function UsernameForm({
 
   async function submitLoginName(values: Inputs) {
     setLoading(true);
+
+    const body = {
+      loginName: values.loginName,
+    };
+
     const res = await fetch("/api/loginname", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        loginName: values.loginName,
-      }),
+      body: JSON.stringify(authRequestId ? { ...body, authRequestId } : body),
     });
 
     setLoading(false);

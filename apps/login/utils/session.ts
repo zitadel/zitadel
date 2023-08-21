@@ -10,7 +10,8 @@ export async function createSessionAndUpdateCookie(
   loginName: string,
   password: string | undefined,
   domain: string,
-  challenges: ChallengeKind[] | undefined
+  challenges: ChallengeKind[] | undefined,
+  authRequestId: string | undefined
 ): Promise<Session> {
   const createdSession = await createSession(
     server,
@@ -33,6 +34,10 @@ export async function createSessionAndUpdateCookie(
           changeDate: response.session.changeDate?.toString() ?? "",
           loginName: response.session?.factors?.user?.loginName ?? "",
         };
+
+        if (authRequestId) {
+          sessionCookie.authRequestId = authRequestId;
+        }
 
         return addSessionToCookie(sessionCookie).then(() => {
           return response.session as Session;
@@ -57,7 +62,8 @@ export async function setSessionAndUpdateCookie(
   password: string | undefined,
   passkey: { credentialAssertionData: any } | undefined,
   domain: string | undefined,
-  challenges: ChallengeKind[] | undefined
+  challenges: ChallengeKind[] | undefined,
+  authRequestId: string | undefined
 ): Promise<SessionWithChallenges> {
   return setSession(
     server,
@@ -76,6 +82,10 @@ export async function setSessionAndUpdateCookie(
         loginName: loginName,
       };
 
+      if (authRequestId) {
+        sessionCookie.authRequestId = authRequestId;
+      }
+
       return getSession(server, sessionCookie.id, sessionCookie.token).then(
         (response) => {
           if (response?.session && response.session.factors?.user?.loginName) {
@@ -86,6 +96,10 @@ export async function setSessionAndUpdateCookie(
               changeDate: session.changeDate?.toString() ?? "",
               loginName: session.factors?.user?.loginName ?? "",
             };
+
+            if (sessionCookie.authRequestId) {
+              newCookie.authRequestId = sessionCookie.authRequestId;
+            }
 
             return updateSessionCookie(sessionCookie.id, newCookie).then(() => {
               return { challenges: updatedSession.challenges, ...session };

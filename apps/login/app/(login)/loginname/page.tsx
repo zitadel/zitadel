@@ -7,6 +7,7 @@ export default async function Page({
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
   const loginName = searchParams?.loginName;
+  const authRequestId = searchParams?.authRequestId;
   const submit: boolean = searchParams?.submit === "true";
 
   const loginSettings = await getLoginSettings(server);
@@ -19,6 +20,7 @@ export default async function Page({
       <UsernameForm
         loginSettings={loginSettings}
         loginName={loginName}
+        authRequestId={authRequestId}
         submit={submit}
       />
     </div>

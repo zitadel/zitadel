@@ -2,6 +2,7 @@ import {
   ZitadelServer,
   ZitadelServerOptions,
   user,
+  oidc,
   settings,
   getServers,
   initializeServer,
@@ -29,6 +30,10 @@ import {
   StartIdentityProviderFlowResponse,
   RetrieveIdentityProviderInformationRequest,
   RetrieveIdentityProviderInformationResponse,
+  GetAuthRequestResponse,
+  GetAuthRequestRequest,
+  CreateCallbackRequest,
+  CreateCallbackResponse,
 } from "@zitadel/server";
 
 export const zitadelConfig: ZitadelServerOptions = {
@@ -221,6 +226,28 @@ export async function retrieveIdentityProviderInformation(
   return userService.retrieveIdentityProviderInformation({
     intentId,
     token,
+  });
+}
+
+export async function getAuthRequest(
+  server: ZitadelServer,
+  { authRequestId }: GetAuthRequestRequest
+): Promise<GetAuthRequestResponse> {
+  const oidcService = oidc.getOidc(server);
+
+  return oidcService.getAuthRequest({
+    authRequestId,
+  });
+}
+
+export async function createCallback(
+  server: ZitadelServer,
+  { authRequestId }: CreateCallbackRequest
+): Promise<CreateCallbackResponse> {
+  const oidcService = oidc.getOidc(server);
+
+  return oidcService.createCallback({
+    authRequestId,
   });
 }
 

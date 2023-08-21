@@ -1,6 +1,7 @@
 import * as settings from "./v2/settings";
 import * as session from "./v2/session";
 import * as user from "./v2/user";
+import * as oidc from "./v2/oidc";
 import * as management from "./management";
 
 import * as login from "./proto/server/zitadel/settings/v2alpha/login_settings";
@@ -23,6 +24,13 @@ export {
   Challenges,
   Challenges_Passkey,
 } from "./proto/server/zitadel/session/v2alpha/challenge";
+
+export {
+  GetAuthRequestRequest,
+  GetAuthRequestResponse,
+  CreateCallbackRequest,
+  CreateCallbackResponse,
+} from "./proto/server/zitadel/oidc/v2alpha/oidc_service";
 
 export {
   Session,
@@ -96,4 +104,5 @@ export {
   login,
   password,
   legal,
+  oidc,
 };
