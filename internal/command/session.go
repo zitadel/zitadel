@@ -26,11 +26,13 @@ type SessionCommands struct {
 	sessionWriteModel  *SessionWriteModel
 	passwordWriteModel *HumanPasswordWriteModel
 	intentWriteModel   *IDPIntentWriteModel
+	totpWriteModel     *HumanTOTPWriteModel
 	eventstore         *eventstore.Eventstore
 	eventCommands      []eventstore.Command
 
 	hasher      *crypto.PasswordHasher
 	intentAlg   crypto.EncryptionAlgorithm
+	totpAlg     crypto.EncryptionAlgorithm
 	createToken func(sessionID string) (id string, token string, err error)
 	now         func() time.Time
 }
@@ -42,6 +44,7 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 		eventstore:        c.eventstore,
 		hasher:            c.userPasswordHasher,
 		intentAlg:         c.idpConfigEncryption,
+		totpAlg:           c.multifactors.OTP.CryptoMFA,
 		createToken:       c.sessionTokenCreator,
 		now:               time.Now,
 	}
@@ -127,6 +130,28 @@ func CheckIntent(intentID, token string) SessionCommand {
 	}
 }
 
+func CheckTOTP(code string) SessionCommand {
+	return func(ctx context.Context, cmd *SessionCommands) (err error) {
+		if cmd.sessionWriteModel.UserID == "" {
+			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Neil7", "Errors.User.UserIDMissing")
+		}
+		cmd.totpWriteModel = NewHumanTOTPWriteModel(cmd.sessionWriteModel.UserID, "")
+		err = cmd.eventstore.FilterToQueryReducer(ctx, cmd.totpWriteModel)
+		if err != nil {
+			return err
+		}
+		if cmd.totpWriteModel.State != domain.MFAStateReady {
+			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-eej1U", "Errors.User.MFA.OTP.NotReady")
+		}
+		err = domain.VerifyTOTP(code, cmd.totpWriteModel.Secret, cmd.totpAlg)
+		if err != nil {
+			return err
+		}
+		cmd.TOTPChecked(ctx, cmd.now())
+		return nil
+	}
+}
+
 // Exec will execute the commands specified and returns an error on the first occurrence
 func (s *SessionCommands) Exec(ctx context.Context) error {
 	for _, cmd := range s.sessionCommands {
@@ -173,6 +198,10 @@ func (s *SessionCommands) WebAuthNChecked(ctx context.Context, checkedAt time.Ti
 			user.NewHumanU2FSignCountChangedEvent(ctx, s.sessionWriteModel.aggregate, tokenID, signCount),
 		)
 	}
+}
+
+func (s *SessionCommands) TOTPChecked(ctx context.Context, checkedAt time.Time) {
+	s.eventCommands = append(s.eventCommands, session.NewTOTPCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
 }
 
 func (s *SessionCommands) SetToken(ctx context.Context, tokenID string) {

@@ -21,6 +21,7 @@ const (
 	FlowTypeExternalAuthentication
 	FlowTypeCustomiseToken
 	FlowTypeInternalAuthentication
+	FlowTypeCustomizeSAMLResponse
 	flowTypeCount
 )
 
@@ -56,6 +57,10 @@ func (s FlowType) TriggerTypes() []TriggerType {
 			TriggerTypePreCreation,
 			TriggerTypePostCreation,
 		}
+	case FlowTypeCustomizeSAMLResponse:
+		return []TriggerType{
+			TriggerTypePreSAMLResponseCreation,
+		}
 	default:
 		return nil
 	}
@@ -80,6 +85,8 @@ func (s FlowType) LocalizationKey() string {
 		return "Action.Flow.Type.CustomiseToken"
 	case FlowTypeInternalAuthentication:
 		return "Action.Flow.Type.InternalAuthentication"
+	case FlowTypeCustomizeSAMLResponse:
+		return "Action.Flow.Type.CustomizeSAMLResponse"
 	default:
 		return "Action.Flow.Type.Unspecified"
 	}
@@ -94,6 +101,7 @@ const (
 	TriggerTypePostCreation
 	TriggerTypePreUserinfoCreation
 	TriggerTypePreAccessTokenCreation
+	TriggerTypePreSAMLResponseCreation
 	triggerTypeCount
 )
 
@@ -124,6 +132,8 @@ func (s TriggerType) LocalizationKey() string {
 		return "Action.TriggerType.PreUserinfoCreation"
 	case TriggerTypePreAccessTokenCreation:
 		return "Action.TriggerType.PreAccessTokenCreation"
+	case TriggerTypePreSAMLResponseCreation:
+		return "Action.TriggerType.PreSAMLResponseCreation"
 	default:
 		return "Action.TriggerType.Unspecified"
 	}

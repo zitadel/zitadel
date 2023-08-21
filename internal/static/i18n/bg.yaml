@@ -139,6 +139,7 @@ Errors:
       MinimumExternalIDPNeeded: Трябва да се добави поне един IDP
       AlreadyExists: Външен IDP вече е зает
       NotFound: Външен IDP не е намерен
+      LoginFailed: Влизането във Външен IDP е неуспешно
     MFA:
       OTP:
         AlreadyReady: Многофакторният OTP (OneTimePassword) вече е настроен
@@ -630,6 +631,24 @@ EventTypes:
           check:
             succeeded: Многофакторната OTP проверка е успешна
             failed: Многофакторната OTP проверка е неуспешна
+          sms:
+            added: Добавен Многофакторната OTP SMS
+            removed: Премахнато многофакторно OTP SMS
+            code:
+              added: Добавен многофакторен OTP SMS код
+              sent: Многофакторната OTP SMS код е изпратен
+            check:
+              succeeded: Успешна многофакторна OTP SMS проверка
+              failed: Многофакторната OTP проверка на SMS не бе успешна
+          email:
+            added: Добавен Многофакторната OTP имейл
+            removed: Премахнат многофакторен OTP имейл
+            code:
+              added: Добавен многофакторен OTP имейл код
+              sent: Многофакторният OTP имейл код е изпратен
+            check:
+              succeeded: Многофакторната еднократна имейл потвърждение е успешна
+              failed: Многофакторната OTP проверка на имейл не бе успешна
         u2f:
           token:
             added: Добавен е многофакторен U2F токен
@@ -1248,6 +1267,7 @@ Action:
       ExternalAuthentication: Външно удостоверяване
       CustomiseToken: Токен за допълнение
       InternalAuthentication: Вътрешно удостоверяване
+      CustomizeSAMLResponse: Допълнение на SAMLResponse
   TriggerType:
     Unspecified: Неуточнено
     PostAuthentication: Публикуване на автентификация
@@ -1255,3 +1275,4 @@ Action:
     PostCreation: Създаване на публикации
     PreUserinfoCreation: Предварително създаване на потребителска информация
     PreAccessTokenCreation: Създаване на маркер за предварителен достъп
+    PreSAMLResponseCreation: Предварително създаване на SAMLResponse

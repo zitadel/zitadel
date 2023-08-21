@@ -120,6 +120,7 @@ func factorsToPb(s *query.Session) *session.Factors {
 		Password: passwordFactorToPb(s.PasswordFactor),
 		WebAuthN: webAuthNFactorToPb(s.WebAuthNFactor),
 		Intent:   intentFactorToPb(s.IntentFactor),
+		Totp:     totpFactorToPb(s.TOTPFactor),
 	}
 }
 
@@ -148,6 +149,15 @@ func webAuthNFactorToPb(factor query.SessionWebAuthNFactor) *session.WebAuthNFac
 	return &session.WebAuthNFactor{
 		VerifiedAt:   timestamppb.New(factor.WebAuthNCheckedAt),
 		UserVerified: factor.UserVerified,
+	}
+}
+
+func totpFactorToPb(factor query.SessionTOTPFactor) *session.TOTPFactor {
+	if factor.TOTPCheckedAt.IsZero() {
+		return nil
+	}
+	return &session.TOTPFactor{
+		VerifiedAt: timestamppb.New(factor.TOTPCheckedAt),
 	}
 }
 
@@ -247,7 +257,9 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	if passkey := checks.GetWebAuthN(); passkey != nil {
 		sessionChecks = append(sessionChecks, s.command.CheckWebAuthN(passkey.GetCredentialAssertionData()))
 	}
-
+	if totp := checks.GetTotp(); totp != nil {
+		sessionChecks = append(sessionChecks, command.CheckTOTP(totp.GetTotp()))
+	}
 	return sessionChecks, nil
 }
 

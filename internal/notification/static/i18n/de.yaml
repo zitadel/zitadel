@@ -34,7 +34,10 @@ VerifyEmailOTP:
   Text: Bitte nutze den 'Authentifizieren'-Button oder kopiere das Einmalpasswort {{.OTP}} und füge es in den Authentifizierungsbildschirm ein, um dich innerhalb der nächsten fünf Minuten bei ZITADEL zu authentifizieren.
   ButtonText: Authentifizieren
 VerifySMSOTP:
-  Text: Bitte besuche {{ .VerifyURL }} oder kopiere das Einmalpasswort {{.OTP}} und füge es in den Authentifizierungsbildschirm ein, um dich innerhalb der nächsten fünf Minuten bei ZITADEL zu authentifizieren.
+  Text: >-
+    {{.OTP}} ist Ihr Einmalpasswort für {{ .Domain }}. Verwenden Sie es innerhalb der nächsten {{.Expiry}}.
+    
+    @{{.Domain}} #{{.OTP}}
 DomainClaimed:
   Title: ZITADEL - Domain wurde beansprucht
   PreHeader: Email / Username ändern

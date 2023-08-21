@@ -89,6 +89,8 @@ InitMFAPrompt:
   Description: 2-факторската автентикација ви дава дополнителна безбедност за вашата корисничка сметка. Ова обезбедува само вие да имате пристап до вашата сметка.
   Provider0: Апликација за автентикација (на пример Google/Microsoft Authenticator, Authy)
   Provider1: Во зависност од вашиот уред (на пример FaceID, Windows Hello, отпечаток од прст)
+  Provider3: ОТП СМС
+  Provider4: ОТП е-пошта
   NextButtonText: следно
   SkipButtonText: прескокни
 
@@ -100,6 +102,16 @@ InitMFAOTP:
   CodeLabel: Код
   NextButtonText: следно
   CancelButtonText: откажи
+
+InitMFASMS:
+  Title: Потврда на 2-факторска автентикација
+  DescriptionPhone: Направете двофакторна автентикација. Внесете го вашиот телефонски број за да го потврдите.
+  DescriptionCode: Направете двофакторна автентикација. Внесете го примениот код за да го потврдите вашиот телефонски број.
+  PhoneLabel: Телефонски број
+  CodeLabel: Код
+  EditButtonText: Уредување
+  ResendButtonText: повторно испрати код
+  NextButtonText: следно
 
 InitMFAU2F:
   Title: Додајте безбедносен клуч
@@ -118,12 +130,21 @@ InitMFADone:
 MFAProvider:
   Provider0: Апликација за автентикација (на пример Google/Microsoft Authenticator, Authy)
   Provider1: Во зависност од вашиот уред (на пример FaceID, Windows Hello, отпечаток од прст)
+  Provider3: ОТП СМС
+  Provider4: ОТП е-пошта
   ChooseOther: или изберете друга опција
 
 VerifyMFAOTP:
   Title: Потврда на 2-факторска автентикација
   Description: Потврдете ја 2-факторска автентикација
   CodeLabel: Код
+  NextButtonText: следно
+
+VerifyOTP:
+  Title: Потврда на 2-факторска автентикација
+  Description: Потврдете ја 2-факторска автентикација
+  CodeLabel: Код
+  ResendButtonText: повторно испрати код
   NextButtonText: следно
 
 VerifyMFAU2F:

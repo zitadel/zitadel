@@ -34,7 +34,10 @@ VerifyEmailOTP:
   Text: Utilise le bouton 'Authentifier' ou copie le mot de passe à usage unique {{.OTP}} et colle-le à l'écran d'authentification pour t'authentifier sur ZITADEL dans les cinq prochaines minutes.
   ButtonText: Authentifier
 VerifySMSOTP:
-  Text: Visite {{ .VerifyURL }} ou copie le mot de passe à usage unique {{.OTP}} et colle-le à l'écran d'authentification pour t'authentifier sur ZITADEL dans les cinq prochaines minutes.
+  Text: >-
+    {{.OTP}} est votre mot de passe à usage unique pour {{ .Domain }}. Utilisez-le dans le prochain {{.Expiry}}.
+    
+    @{{.Domain}} #{{.OTP}}
 DomainClaimed:
   Title: ZITADEL - Le domaine a été réclamé
   PreHeader: Modifier l'email / le nom d'utilisateur

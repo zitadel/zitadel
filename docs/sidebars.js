@@ -284,6 +284,16 @@ module.exports = {
             "guides/integrate/services/auth0-oidc",
             "guides/integrate/services/auth0-saml",
             "guides/integrate/services/pingidentity-saml",
+            {
+              type: 'link',
+              label: 'Nextcloud', // The link label
+              href: 'https://zitadel.com/blog/zitadel-as-sso-provider-for-selfhosting', // The internal path
+            },
+            {
+              type: 'link',
+              label: 'Cloudflare workers', // The link label
+              href: 'https://zitadel.com/blog/increase-spa-security-with-cloudflare-workers', // The internal path
+            },
           ],
         },
         {
@@ -566,6 +576,7 @@ module.exports = {
         "apis/actions/internal-authentication",
         "apis/actions/external-authentication",
         "apis/actions/complement-token",
+        "apis/actions/customize-samlresponse",
         "apis/actions/objects",
       ]
     },

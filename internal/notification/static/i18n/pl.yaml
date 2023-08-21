@@ -34,7 +34,10 @@ VerifyEmailOTP:
   Text: Proszę, użyj przycisku 'Uwierzytelnij' lub skopiuj hasło jednorazowe {{.OTP}} i wklej go na ekran uwierzytelniania, aby uwierzytelnić się w ZITADEL w ciągu najbliższych pięciu minut.
   ButtonText: Uwierzytelnij
 VerifySMSOTP:
-  Text: Proszę, odwiedź {{ .VerifyURL }} lub skopiuj hasło jednorazowe {{.OTP}} i wklej go na ekran uwierzytelniania, aby uwierzytelnić się w ZITADEL w ciągu najbliższych pięciu minut.
+  Text: >-
+    {{.OTP}} to Twoje jednorazowe hasło do domeny {{ .Domain }}. Użyj go w ciągu najbliższych {{.Expiry}}.
+    
+    @{{.Domain}} #{{.OTP}}
 DomainClaimed:
   Title: ZITADEL - Domena została zarejestrowana
   PreHeader: Zmiana adresu e-mail / nazwy użytkownika
