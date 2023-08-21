@@ -1,8 +1,11 @@
 {{template "main-top" .}}
 
 <div class="lgn-head">
-    <h1>{{t "ExternalNotFound.Title"}}</h1>
+    <h1>{{.ProviderName}} - {{t "ExternalNotFound.Title"}}</h1>
+
+    {{ if or .IsLinkingAllowed .IsCreationAllowed }}
     <p>{{t "ExternalNotFound.Description"}}</p>
+    {{ end }}
 
 </div>
 
@@ -21,6 +24,7 @@
     <input type="hidden" id="external-phone-verified" name="external-phone-verified" value="{{ .ExternalPhoneVerified }}" />
 
     <div class="lgn-register">
+        {{ if or .IsCreationAllowed }}
         <div class="double-col">
             <div class="lgn-field">
                 <label class="lgn-label" for="firstname">{{t "ExternalRegistrationUserOverview.FirstnameLabel"}}</label>
@@ -85,8 +89,9 @@
                 </select>
             </div>
         </div>
+        {{end}}
 
-        {{ if or .TOSLink .PrivacyLink }}
+        {{ if and (or .IsLinkingAllowed .IsCreationAllowed) (or .TOSLink .PrivacyLink) }}
         <div class="lgn-field">
             <label class="lgn-label">{{t "ExternalNotFound.TosAndPrivacyLabel"}}</label>
             {{ if .TOSLink }}
