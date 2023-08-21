@@ -19,6 +19,7 @@ const (
 	IntentCheckedType      = sessionEventPrefix + "intent.checked"
 	WebAuthNChallengedType = sessionEventPrefix + "webAuthN.challenged"
 	WebAuthNCheckedType    = sessionEventPrefix + "webAuthN.checked"
+	TOTPCheckedType        = sessionEventPrefix + "totp.checked"
 	TokenSetType           = sessionEventPrefix + "token.set"
 	MetadataSetType        = sessionEventPrefix + "metadata.set"
 	TerminateType          = sessionEventPrefix + "terminated"
@@ -261,6 +262,39 @@ func NewWebAuthNCheckedEvent(
 		),
 		CheckedAt:    checkedAt,
 		UserVerified: userVerified,
+	}
+}
+
+type TOTPCheckedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	CheckedAt time.Time `json:"checkedAt"`
+}
+
+func (e *TOTPCheckedEvent) Data() interface{} {
+	return e
+}
+
+func (e *TOTPCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *TOTPCheckedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewTOTPCheckedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	checkedAt time.Time,
+) *TOTPCheckedEvent {
+	return &TOTPCheckedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			TOTPCheckedType,
+		),
+		CheckedAt: checkedAt,
 	}
 }
 

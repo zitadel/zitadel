@@ -31,10 +31,13 @@ VerifyEmailOTP:
   PreHeader: Verify One-Time Password
   Subject: Verify One-Time Password
   Greeting: Hello {{.DisplayName}},
-  Text: Please use the "Authenticate" button or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at ZITADEL within the next five minutes.
+  Text: Please use the one-time password {{.OTP}} to authenticate at ZITADEL within the next five minutes or click the "Authenticate" button.
   ButtonText: Authenticate
 VerifySMSOTP:
-  Text: Please visit {{ .VerifyURL }} or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at ZITADEL within the next five minutes.
+  Text: >-
+    {{.OTP}} is your one-time-password for {{ .Domain }}. Use it within the next {{.Expiry}}.
+    
+    @{{.Domain}} #{{.OTP}}
 DomainClaimed:
   Title: ZITADEL - Domain has been claimed
   PreHeader: Change email / username

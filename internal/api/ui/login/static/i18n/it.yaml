@@ -89,6 +89,8 @@ InitMFAPrompt:
   Description: L'autenticazione a due fattori offre un'ulteriore sicurezza al vostro account utente. Questo garantisce che solo voi possiate accedere al vostro account.
   Provider0: App Autenticatore (ad esempio Google/Microsoft Authenticator, Authy)
   Provider1: Dipende dal dispositivo (ad es. FaceID, Windows Hello, impronta digitale)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   NextButtonText: Avanti
   SkipButtonText: salta
 
@@ -100,6 +102,16 @@ InitMFAOTP:
   CodeLabel: Codice
   NextButtonText: Avanti
   CancelButtonText: annulla
+
+InitMFASMS:
+  Title: Verificazione a 2 fattori
+  DescriptionPhone: Crea il tuo 2 fattori. Inserisci il tuo numero di telefono per verificarlo.
+  DescriptionCode: Crea il tuo 2 fattori. Inserisci il codice ricevuto per verificare il tuo numero di telefono.
+  PhoneLabel: Numero di telefono
+  CodeLabel: Codice
+  EditButtonText: Modifica
+  ResendButtonText: Reinvia codice
+  NextButtonText: Avanti
 
 InitMFAU2F:
   Title: Aggiungi chiave di sicurezza
@@ -118,12 +130,21 @@ InitMFADone:
 MFAProvider:
   Provider0: App Autenticatore (ad esempio Google/Microsoft Authenticator, Authy)
   Provider1: Dipende dal dispositivo (ad es. FaceID, Windows Hello, impronta digitale)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   ChooseOther: o scegli un'altra opzione
 
 VerifyMFAOTP:
   Title: Verificazione fattore
   Description: Verifica il tuo secondo fattore con la tua app
   CodeLabel: Codice
+  NextButtonText: Avanti
+
+VerifyOTP:
+  Title: Verificazione fattore
+  Description: Verifica il tuo secondo fattore con la tua app
+  CodeLabel: Codice
+  ResendButtonText: Reinvia codice
   NextButtonText: Avanti
 
 VerifyMFAU2F:
