@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+
+  proxy:
+    restart: always
+    networks:
+      - 'internal'
+      - 'external'
+    image: nginx:latest
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+          - 8080:8080
+
+  core:
+    restart: 'always'
+    networks:
+      - 'internal'
+    image: 'ghcr.io/zitadel/zitadel:v2.31.1'
+    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
+    environment:
+      - 'ZITADEL_DATABASE_COCKROACH_HOST=db'
+      - 'ZITADEL_EXTERNALSECURE=false'
+    depends_on:
+      db:
+        condition: 'service_healthy'
+
+  console:
+    restart: 'always'
+    networks:
+      - 'internal'
+    image: 'ghcr.io/zitadel/console:latest'
+
+  # login:
+  #   restart: 'always'
+  #   networks:
+  #     - 'internal'
+  #   image: 'ghcr.io/zitadel/console:latest'
+  #   command: '-listen=:8082 -text="hello world"'
+
+  db:
+    restart: 'always'
+    networks:
+      - 'internal'
+    image: 'cockroachdb/cockroach:v22.2.2'
+    command: 'start-single-node --insecure'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: '10s'
+      timeout: '30s'
+      retries: 5
+      start_period: '20s'
+
+networks:
+  internal:
+  external:
