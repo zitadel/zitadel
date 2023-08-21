@@ -266,7 +266,7 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 					}),
 				),
 				actions.SetFields("user",
-					actions.SetFields("setMetadata", func(call goja.FunctionCall) {
+					actions.SetFields("setMetadata", func(call goja.FunctionCall) goja.Value {
 						if len(call.Arguments) != 2 {
 							panic("exactly 2 (key, value) arguments expected")
 						}
@@ -287,6 +287,7 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 							logging.WithError(err).Info("unable to set md in action")
 							panic(err)
 						}
+						return nil
 					}),
 				),
 			),
