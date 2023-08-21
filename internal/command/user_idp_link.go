@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner string, link *domain.UserIDPLink) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner string, link *AddLink) (_ *domain.ObjectDetails, err error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-03j8f", "Errors.IDMissing")
 	}
@@ -23,11 +23,7 @@ func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner str
 			return nil, err
 		}
 	}
-
-	linkWriteModel := NewUserIDPLinkWriteModel(userID, link.IDPConfigID, link.ExternalUserID, resourceOwner)
-	userAgg := UserAggregateFromWriteModel(&linkWriteModel.WriteModel)
-
-	event, err := c.addUserIDPLink(ctx, userAgg, link, true)
+	event, err := addLink(ctx, c.eventstore.Filter, user.NewAggregate(userID, resourceOwner), link)
 	if err != nil {
 		return nil, err
 	}
