@@ -20,7 +20,7 @@ Send the following two URLs in the request body:
 2. ErrorURL: Page that should be shown when an error happens during the authentication
 
 In the response, you will get an authentication URL of the provider you like.
-[Start Identity Provider Flow Documentation](/docs/apis/resources/user_service/user-service-start-identity-provider-flow)
+[Start Identity Provider Intent Documentation](/docs/apis/resources/user_service/user-service-start-identity-provider-intent)
 
 ### Request
 
@@ -66,7 +66,7 @@ After the user has successfully authenticated, a redirect to the ZITADEL backend
 ZITADEL will take the information of the provider. After this, a redirect will be made to either the success page in case of a successful login or to the error page in case of a failure will be performed. In the parameters, you will provide the IDP intentID, a token, and optionally, if a user could be found, a user ID.
 
 To get the information of the provider, make a request to ZITADEL.
-[Get Identity Provider Information Documentation](/docs/apis/resources/user_service/user-service-retrieve-identity-provider-information)
+[Retrieve Identity Provider Intent Documentation](/docs/apis/resources/user_service/user-service-retrieve-identity-provider-intent)
 
 ### Request
 ```bash
