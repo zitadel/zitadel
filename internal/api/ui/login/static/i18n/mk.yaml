@@ -140,6 +140,13 @@ VerifyMFAOTP:
   CodeLabel: Код
   NextButtonText: следно
 
+VerifyOTP:
+  Title: Потврда на 2-факторска автентикација
+  Description: Потврдете ја 2-факторска автентикација
+  CodeLabel: Код
+  ResendButtonText: повторно испрати код
+  NextButtonText: следно
+
 VerifyMFAU2F:
   Title: Потврда на 2-факторска автентикација
   Description: Потврдете ја вашата 2-факторска автентикација со регистрираниот уред (на пример FaceID, Windows Hello, отпечаток од прст)
