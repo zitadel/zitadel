@@ -263,9 +263,9 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),
 		Checks: &session.Checks{
-			Intent: &session.CheckIntent{
-				IntentId: intentID,
-				Token:    token,
+			IdpIntent: &session.CheckIDPIntent{
+				IdpIntentId:    intentID,
+				IdpIntentToken: token,
 			},
 		},
 	})
@@ -294,9 +294,9 @@ func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),
 		Checks: &session.Checks{
-			Intent: &session.CheckIntent{
-				IntentId: intentID,
-				Token:    token,
+			IdpIntent: &session.CheckIDPIntent{
+				IdpIntentId:    intentID,
+				IdpIntentToken: token,
 			},
 		},
 	})
@@ -306,9 +306,9 @@ func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),
 		Checks: &session.Checks{
-			Intent: &session.CheckIntent{
-				IntentId: intentID,
-				Token:    token,
+			IdpIntent: &session.CheckIDPIntent{
+				IdpIntentId:    intentID,
+				IdpIntentToken: token,
 			},
 		},
 	})
@@ -336,9 +336,9 @@ func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),
 		Checks: &session.Checks{
-			Intent: &session.CheckIntent{
-				IntentId: intentID,
-				Token:    "false",
+			IdpIntent: &session.CheckIDPIntent{
+				IdpIntentId:    intentID,
+				IdpIntentToken: "false",
 			},
 		},
 	})
