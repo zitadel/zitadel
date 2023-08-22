@@ -225,9 +225,9 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 }
 
 // Filter returns all events matching the given search query
-func (db *CRDB) Filter(ctx context.Context, searchQuery *repository.SearchQuery) (events []*repository.Event, err error) {
+func (crdb *CRDB) Filter(ctx context.Context, searchQuery *repository.SearchQuery) (events []*repository.Event, err error) {
 	events = []*repository.Event{}
-	err = query(ctx, db, searchQuery, &events)
+	err = query(ctx, crdb, searchQuery, &events)
 	if err != nil {
 		return nil, err
 	}
@@ -255,8 +255,8 @@ func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *repository.SearchQ
 	return ids, nil
 }
 
-func (db *CRDB) db() *sql.DB {
-	return db.DB.DB
+func (db *CRDB) db() *database.DB {
+	return db.DB
 }
 
 func (db *CRDB) orderByEventSequence(desc bool) string {

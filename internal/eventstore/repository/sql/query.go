@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	z_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -24,7 +25,7 @@ type querier interface {
 	eventQuery() string
 	maxSequenceQuery() string
 	instanceIDsQuery() string
-	db() *sql.DB
+	db() *database.DB
 	orderByEventSequence(desc bool) string
 	dialect.Database
 }
