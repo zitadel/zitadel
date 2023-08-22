@@ -140,6 +140,13 @@ VerifyMFAOTP:
   CodeLabel: Codice
   NextButtonText: Avanti
 
+VerifyOTP:
+  Title: Verificazione fattore
+  Description: Verifica il tuo secondo fattore con la tua app
+  CodeLabel: Codice
+  ResendButtonText: Reinvia codice
+  NextButtonText: Avanti
+
 VerifyMFAU2F:
   Title: Verificazione fattore
   Description: Verifica il tuo fattore con il dispositivo registrato (ad es. FaceID, Windows Hello, impronta digitale).

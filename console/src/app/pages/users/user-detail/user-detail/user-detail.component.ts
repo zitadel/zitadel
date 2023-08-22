@@ -508,7 +508,7 @@ export class UserDetailComponent implements OnInit {
         this.metadata = resp.resultList.map((md) => {
           return {
             key: md.key,
-            value: Buffer.from(md.value as string, 'base64').toString('ascii'),
+            value: Buffer.from(md.value as string, 'base64').toString('utf-8'),
           };
         });
       })
