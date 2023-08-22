@@ -234,13 +234,13 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*SecretGenerators)(nil),
 		},
 		{
 			name:    "prepareSecretGeneratorQuery no result",
 			prepare: prepareSecretGeneratorQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					prepareSecretGeneratorStmt,
 					nil,
 					nil,
@@ -307,7 +307,7 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*SecretGenerator)(nil),
 		},
 	}
 	for _, tt := range tests {

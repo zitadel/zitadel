@@ -52,7 +52,7 @@ func Test_OIDCConfigsPrepares(t *testing.T) {
 			name:    "prepareOIDCSettingsQuery no result",
 			prepare: prepareOIDCSettingsQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					prepareOIDCSettingsStmt,
 					nil,
 					nil,
@@ -113,7 +113,7 @@ func Test_OIDCConfigsPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*OIDCSettings)(nil),
 		},
 	}
 	for _, tt := range tests {
