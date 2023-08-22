@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/crewjam/saml"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/idp"
@@ -801,6 +803,81 @@ func (wm *OrgLDAPIDPWriteModel) NewChangedEvent(
 		return nil, err
 	}
 	return org.NewLDAPIDPChangedEvent(ctx, aggregate, id, changes)
+}
+
+type OrgSAMLIDPWriteModel struct {
+	SAMLIDPWriteModel
+}
+
+func NewSAMLOrgIDPWriteModel(orgID, id string) *OrgSAMLIDPWriteModel {
+	return &OrgSAMLIDPWriteModel{
+		SAMLIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *OrgSAMLIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *org.SAMLIDPAddedEvent:
+			wm.SAMLIDPWriteModel.AppendEvents(&e.SAMLIDPAddedEvent)
+		case *org.SAMLIDPChangedEvent:
+			wm.SAMLIDPWriteModel.AppendEvents(&e.SAMLIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			wm.SAMLIDPWriteModel.AppendEvents(&e.RemovedEvent)
+		default:
+			wm.SAMLIDPWriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *OrgSAMLIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			org.SAMLIDPAddedEventType,
+			org.SAMLIDPChangedEventType,
+			org.IDPRemovedEventType,
+		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Builder()
+}
+
+func (wm *OrgSAMLIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name string,
+	entityDescriptor *saml.EntityDescriptor,
+	keyString,
+	certificateString string,
+	secretCrypto crypto.Crypto,
+	binding string,
+	withSignedRequest bool,
+	options idp.Options,
+) (*org.SAMLIDPChangedEvent, error) {
+	changes, err := wm.SAMLIDPWriteModel.NewChanges(
+		name,
+		entityDescriptor,
+		keyString,
+		certificateString,
+		secretCrypto,
+		binding,
+		withSignedRequest,
+		options,
+	)
+	if err != nil || len(changes) == 0 {
+		return nil, err
+	}
+	return org.NewSAMLIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type OrgIDPRemoveWriteModel struct {

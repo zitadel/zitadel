@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 	"errors"
+	"net/http"
 
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
@@ -24,9 +25,9 @@ type Session struct {
 	Tokens   *oidc.Tokens[*oidc.IDTokenClaims]
 }
 
-// GetAuthURL implements the [idp.Session] interface.
-func (s *Session) GetAuthURL() string {
-	return s.AuthURL
+// GetAuth implements the [idp.Session] interface.
+func (s *Session) GetAuth() (http.Header, []byte) {
+	return idp.Redirect(s.AuthURL)
 }
 
 // FetchUser implements the [idp.Session] interface.

@@ -106,7 +106,9 @@ func (c *Commands) AuthURLFromProvider(ctx context.Context, idpID, state string,
 	if err != nil {
 		return "", err
 	}
-	return session.GetAuthURL(), nil
+
+	header, _ := session.GetAuth()
+	return header.Get("Location"), nil
 }
 
 func getIDPIntentWriteModel(ctx context.Context, writeModel *IDPIntentWriteModel, filter preparation.FilterToQueryReducer) error {

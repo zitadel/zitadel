@@ -25,9 +25,9 @@ type Session struct {
 	Provider *Provider
 }
 
-// GetAuthURL implements the [idp.Session] interface.
-func (s *Session) GetAuthURL() string {
-	return s.AuthURL
+// GetAuth implements the [idp.Session] interface.
+func (s *Session) GetAuth() (http.Header, []byte) {
+	return idp.Redirect(s.AuthURL)
 }
 
 // FetchUser implements the [idp.Session] interface.

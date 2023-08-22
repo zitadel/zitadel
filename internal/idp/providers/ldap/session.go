@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"net"
+	"net/http"
 	"net/url"
 	"strconv"
 	"time"
@@ -29,8 +30,9 @@ type Session struct {
 	Entry    *ldap.Entry
 }
 
-func (s *Session) GetAuthURL() string {
-	return s.loginUrl
+// GetAuth implements the [idp.Session] interface.
+func (s *Session) GetAuth() (http.Header, []byte) {
+	return idp.Redirect(s.loginUrl)
 }
 
 func (s *Session) FetchUser(_ context.Context) (_ idp.User, err error) {

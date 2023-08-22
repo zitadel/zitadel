@@ -26,6 +26,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
@@ -176,7 +177,16 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		l.renderLogin(w, r, authReq, err)
 		return
 	}
-	http.Redirect(w, r, session.GetAuthURL(), http.StatusFound)
+
+	header, content := session.GetAuth()
+	if location := header.Get("Location"); location != "" {
+		http.Redirect(w, r, location, http.StatusFound)
+	} else {
+		for k := range header {
+			w.Header().Add(k, header.Get(k))
+		}
+		w.Write(content)
+	}
 }
 
 // handleExternalLoginCallback handles the callback from a IDP
@@ -851,6 +861,28 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 		func() idp.User {
 			return oauth.NewUserMapper(identityProvider.OAuthIDPTemplate.IDAttribute)
 		},
+	)
+}
+
+func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*saml.Provider, error) {
+	secret, err := crypto.DecryptString(identityProvider.AzureADIDPTemplate.ClientSecret, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	opts := make([]azuread.ProviderOptions, 0, 2)
+	if identityProvider.AzureADIDPTemplate.IsEmailVerified {
+		opts = append(opts, azuread.WithEmailVerified())
+	}
+	if identityProvider.AzureADIDPTemplate.Tenant != "" {
+		opts = append(opts, azuread.WithTenant(azuread.TenantType(identityProvider.AzureADIDPTemplate.Tenant)))
+	}
+	return saml.New(
+		identityProvider.Name,
+		identityProvider.AzureADIDPTemplate.ClientID,
+		secret,
+		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		identityProvider.AzureADIDPTemplate.Scopes,
+		opts...,
 	)
 }
 

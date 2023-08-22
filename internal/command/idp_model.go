@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/crewjam/saml"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"golang.org/x/oauth2"
@@ -22,6 +23,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	saml2 "github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -1541,6 +1543,154 @@ func (wm *LDAPIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 	), nil
 }
 
+type SAMLIDPWriteModel struct {
+	eventstore.WriteModel
+
+	Name              string
+	ID                string
+	EntityDescriptor  *saml.EntityDescriptor
+	Key               *crypto.CryptoValue
+	Certificate       *crypto.CryptoValue
+	Binding           string
+	WithSignedRequest bool
+	idp.Options
+
+	State domain.IDPState
+}
+
+func (wm *SAMLIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.SAMLIDPAddedEvent:
+			wm.reduceAddedEvent(e)
+		case *idp.SAMLIDPChangedEvent:
+			wm.reduceChangedEvent(e)
+		case *idp.RemovedEvent:
+			wm.State = domain.IDPStateRemoved
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *SAMLIDPWriteModel) reduceAddedEvent(e *idp.SAMLIDPAddedEvent) {
+	wm.Name = e.Name
+	wm.EntityDescriptor = e.EntityDescriptor
+	wm.Key = e.Key
+	wm.Certificate = e.Certificate
+	wm.Binding = e.Binding
+	wm.WithSignedRequest = e.WithSignedRequest
+	wm.Options = e.Options
+	wm.State = domain.IDPStateActive
+}
+
+func (wm *SAMLIDPWriteModel) reduceChangedEvent(e *idp.SAMLIDPChangedEvent) {
+	if e.Key != nil {
+		wm.Key = e.Key
+	}
+	if e.Certificate != nil {
+		wm.Certificate = e.Certificate
+	}
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.EntityDescriptor != nil {
+		wm.EntityDescriptor = e.EntityDescriptor
+	}
+	if e.Binding != nil {
+		wm.Binding = *e.Binding
+	}
+	if e.WithSignedRequest != nil {
+		wm.WithSignedRequest = *e.WithSignedRequest
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *SAMLIDPWriteModel) NewChanges(
+	name string,
+	entityDescriptor *saml.EntityDescriptor,
+	keyString,
+	certificateString string,
+	secretCrypto crypto.Crypto,
+	binding string,
+	withSignedRequest bool,
+	options idp.Options,
+) ([]idp.SAMLIDPChanges, error) {
+	changes := make([]idp.SAMLIDPChanges, 0)
+	var key *crypto.CryptoValue
+	var err error
+	if keyString != "" {
+		key, err = crypto.Crypt([]byte(keyString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeSAMLKey(key))
+	}
+	var certificate *crypto.CryptoValue
+	if certificateString != "" {
+		certificate, err = crypto.Crypt([]byte(certificateString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeSAMLCertificate(certificate))
+	}
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeSAMLName(name))
+	}
+	if !reflect.DeepEqual(wm.EntityDescriptor, entityDescriptor) {
+		changes = append(changes, idp.ChangeSAMLEntityDescriptor(entityDescriptor))
+	}
+	if wm.Binding != binding {
+		changes = append(changes, idp.ChangeSAMLBinding(binding))
+	}
+	if wm.WithSignedRequest != withSignedRequest {
+		changes = append(changes, idp.ChangeSAMLWithSignedRequest(withSignedRequest))
+	}
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeSAMLOptions(opts))
+	}
+	return changes, nil
+}
+
+func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+	key, err := crypto.Decrypt(wm.Key, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	cert, err := crypto.Decrypt(wm.Certificate, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+
+	opts := make([]saml2.ProviderOpts, 0, 4)
+	if wm.IsCreationAllowed {
+		opts = append(opts, saml2.WithCreationAllowed())
+	}
+	if wm.IsLinkingAllowed {
+		opts = append(opts, saml2.WithLinkingAllowed())
+	}
+	if wm.IsAutoCreation {
+		opts = append(opts, saml2.WithAutoCreation())
+	}
+	if wm.IsAutoUpdate {
+		opts = append(opts, saml2.WithAutoUpdate())
+	}
+	if wm.WithSignedRequest {
+		opts = append(opts, saml2.WithSignedRequest())
+	}
+	if wm.Binding != "" {
+		opts = append(opts, saml2.WithBinding(wm.Binding))
+	}
+	return saml2.New(
+		wm.Name,
+		callbackURL,
+		wm.EntityDescriptor,
+		cert,
+		key,
+		opts...,
+	)
+}
+
 type IDPRemoveWriteModel struct {
 	eventstore.WriteModel
 
@@ -1570,6 +1720,8 @@ func (wm *IDPRemoveWriteModel) Reduce() error {
 		case *idp.GoogleIDPAddedEvent:
 			wm.reduceAdded(e.ID)
 		case *idp.LDAPIDPAddedEvent:
+			wm.reduceAdded(e.ID)
+		case *idp.SAMLIDPAddedEvent:
 			wm.reduceAdded(e.ID)
 		case *idp.RemovedEvent:
 			wm.reduceRemoved(e.ID)
@@ -1653,6 +1805,10 @@ func (wm *IDPTypeWriteModel) Reduce() error {
 			wm.reduceAdded(e.ID, domain.IDPTypeLDAP, e.Aggregate())
 		case *org.LDAPIDPAddedEvent:
 			wm.reduceAdded(e.ID, domain.IDPTypeLDAP, e.Aggregate())
+		case *instance.SAMLIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeSAML, e.Aggregate())
+		case *org.SAMLIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeSAML, e.Aggregate())
 		case *instance.OIDCIDPMigratedAzureADEvent:
 			wm.reduceChanged(e.ID, domain.IDPTypeAzureAD)
 		case *org.OIDCIDPMigratedAzureADEvent:

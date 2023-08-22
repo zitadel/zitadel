@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/crewjam/saml"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -33,6 +35,8 @@ const (
 	GoogleIDPChangedEventType           eventstore.EventType = "org.idp.google.changed"
 	LDAPIDPAddedEventType               eventstore.EventType = "org.idp.ldap.added"
 	LDAPIDPChangedEventType             eventstore.EventType = "org.idp.ldap.changed"
+	SAMLIDPAddedEventType               eventstore.EventType = "org.idp.saml.added"
+	SAMLIDPChangedEventType             eventstore.EventType = "org.idp.saml.changed"
 	IDPRemovedEventType                 eventstore.EventType = "org.idp.removed"
 )
 
@@ -918,6 +922,85 @@ func LDAPIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error
 	}
 
 	return &LDAPIDPChangedEvent{LDAPIDPChangedEvent: *e.(*idp.LDAPIDPChangedEvent)}, nil
+}
+
+type SAMLIDPAddedEvent struct {
+	idp.SAMLIDPAddedEvent
+}
+
+func NewSAMLIDPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name string,
+	entityDescriptor *saml.EntityDescriptor,
+	key *crypto.CryptoValue,
+	certificate *crypto.CryptoValue,
+	binding string,
+	withSignedRequest bool,
+	options idp.Options,
+) *SAMLIDPAddedEvent {
+
+	return &SAMLIDPAddedEvent{
+		SAMLIDPAddedEvent: *idp.NewSAMLIDPAddedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				SAMLIDPAddedEventType,
+			),
+			id,
+			name,
+			entityDescriptor,
+			key,
+			certificate,
+			binding,
+			withSignedRequest,
+			options,
+		),
+	}
+}
+
+func SAMLIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.SAMLIDPAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &SAMLIDPAddedEvent{SAMLIDPAddedEvent: *e.(*idp.SAMLIDPAddedEvent)}, nil
+}
+
+type SAMLIDPChangedEvent struct {
+	idp.SAMLIDPChangedEvent
+}
+
+func NewSAMLIDPChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+	changes []idp.SAMLIDPChanges,
+) (*SAMLIDPChangedEvent, error) {
+	changedEvent, err := idp.NewSAMLIDPChangedEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			SAMLIDPChangedEventType,
+		),
+		id,
+		changes,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &SAMLIDPChangedEvent{SAMLIDPChangedEvent: *changedEvent}, nil
+}
+
+func SAMLIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.SAMLIDPChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &SAMLIDPChangedEvent{SAMLIDPChangedEvent: *e.(*idp.SAMLIDPChangedEvent)}, nil
 }
 
 type IDPRemovedEvent struct {
