@@ -138,7 +138,7 @@ func Test_CertificatePrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Certificate)(nil),
 		},
 	}
 	for _, tt := range tests {

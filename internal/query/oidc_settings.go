@@ -75,7 +75,7 @@ type OIDCSettings struct {
 	RefreshTokenExpiration     time.Duration
 }
 
-func (q *Queries) OIDCSettingsByAggID(ctx context.Context, aggregateID string) (_ *OIDCSettings, err error) {
+func (q *Queries) OIDCSettingsByAggID(ctx context.Context, aggregateID string) (settings *OIDCSettings, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -88,8 +88,11 @@ func (q *Queries) OIDCSettingsByAggID(ctx context.Context, aggregateID string) (
 		return nil, errors.ThrowInternal(err, "QUERY-s9nle", "Errors.Query.SQLStatment")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		settings, err = scan(row)
+		return err
+	}, query, args...)
+	return settings, err
 }
 
 func prepareOIDCSettingsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*OIDCSettings, error)) {

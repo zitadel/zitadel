@@ -170,7 +170,7 @@ func Test_ProjectRolePrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*ProjectRoles)(nil),
 		},
 	}
 	for _, tt := range tests {

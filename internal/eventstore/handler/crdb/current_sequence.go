@@ -12,9 +12,10 @@ import (
 )
 
 const (
-	currentSequenceStmtFormat          = `SELECT current_sequence, aggregate_type, instance_id FROM %s WHERE projection_name = $1 AND instance_id = ANY ($2) FOR UPDATE`
-	updateCurrentSequencesStmtFormat   = `INSERT INTO %s (projection_name, aggregate_type, current_sequence, instance_id, timestamp) VALUES `
-	updateCurrentSequencesConflictStmt = ` ON CONFLICT (projection_name, aggregate_type, instance_id) DO UPDATE SET current_sequence = EXCLUDED.current_sequence, timestamp = EXCLUDED.timestamp`
+	currentSequenceStmtFormat            = `SELECT current_sequence, aggregate_type, instance_id FROM %s WHERE projection_name = $1 AND instance_id = ANY ($2) FOR UPDATE`
+	currentSequenceStmtWithoutLockFormat = `SELECT current_sequence, aggregate_type, instance_id FROM %s WHERE projection_name = $1 AND instance_id = ANY ($2)`
+	updateCurrentSequencesStmtFormat     = `INSERT INTO %s (projection_name, aggregate_type, current_sequence, instance_id, timestamp) VALUES `
+	updateCurrentSequencesConflictStmt   = ` ON CONFLICT (projection_name, aggregate_type, instance_id) DO UPDATE SET current_sequence = EXCLUDED.current_sequence, timestamp = EXCLUDED.timestamp`
 )
 
 type currentSequences map[eventstore.AggregateType][]*instanceSequence
@@ -24,41 +25,38 @@ type instanceSequence struct {
 	sequence   uint64
 }
 
-func (h *StatementHandler) currentSequences(ctx context.Context, query func(context.Context, string, ...interface{}) (*sql.Rows, error), instanceIDs database.StringArray) (currentSequences, error) {
-	rows, err := query(ctx, h.currentSequenceStmt, h.ProjectionName, instanceIDs)
+func (h *StatementHandler) currentSequences(ctx context.Context, isTx bool, query func(context.Context, func(*sql.Rows) error, string, ...interface{}) error, instanceIDs database.StringArray) (currentSequences, error) {
+	stmt := h.currentSequenceStmt
+	if !isTx {
+		stmt = h.currentSequenceWithoutLockStmt
+	}
+
+	sequences := make(currentSequences, len(h.aggregates))
+	err := query(ctx,
+		func(rows *sql.Rows) error {
+			for rows.Next() {
+				var (
+					aggregateType eventstore.AggregateType
+					sequence      uint64
+					instanceID    string
+				)
+
+				err := rows.Scan(&sequence, &aggregateType, &instanceID)
+				if err != nil {
+					return errors.ThrowInternal(err, "CRDB-dbatK", "scan failed")
+				}
+
+				sequences[aggregateType] = append(sequences[aggregateType], &instanceSequence{
+					sequence:   sequence,
+					instanceID: instanceID,
+				})
+			}
+			return nil
+		},
+		stmt, h.ProjectionName, instanceIDs)
 	if err != nil {
 		return nil, err
 	}
-
-	defer rows.Close()
-
-	sequences := make(currentSequences, len(h.aggregates))
-	for rows.Next() {
-		var (
-			aggregateType eventstore.AggregateType
-			sequence      uint64
-			instanceID    string
-		)
-
-		err = rows.Scan(&sequence, &aggregateType, &instanceID)
-		if err != nil {
-			return nil, errors.ThrowInternal(err, "CRDB-dbatK", "scan failed")
-		}
-
-		sequences[aggregateType] = append(sequences[aggregateType], &instanceSequence{
-			sequence:   sequence,
-			instanceID: instanceID,
-		})
-	}
-
-	if err = rows.Close(); err != nil {
-		return nil, errors.ThrowInternal(err, "CRDB-h5i5m", "close rows failed")
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, errors.ThrowInternal(err, "CRDB-O8zig", "errors in scanning rows")
-	}
-
 	return sequences, nil
 }
 
