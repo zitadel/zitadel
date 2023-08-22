@@ -34,7 +34,6 @@ const (
 
 type InstanceSetup struct {
 	zitadel                  ZitadelConfig
-	idGenerator              id.Generator
 	InstanceName             string
 	CustomDomain             string
 	DefaultLanguage          language.Tag
