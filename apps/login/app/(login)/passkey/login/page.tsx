@@ -13,7 +13,7 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName, altPassword } = searchParams;
+  const { loginName, altPassword, authRequestId } = searchParams;
 
   const sessionFactors = await loadSession(loginName);
 
@@ -48,6 +48,7 @@ export default async function Page({
       {loginName && (
         <LoginPasskey
           loginName={loginName}
+          authRequestId={authRequestId}
           altPassword={altPassword === "true"}
         />
       )}

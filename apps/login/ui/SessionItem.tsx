@@ -39,7 +39,7 @@ export default function SessionItem({
   }
 
   const validPassword = session?.factors?.password?.verifiedAt;
-  const validPasskey = session?.factors?.passkey?.verifiedAt;
+  const validPasskey = session?.factors?.webAuthN?.verifiedAt;
 
   const validUser = validPassword || validPasskey;
 

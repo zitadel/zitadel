@@ -101,7 +101,7 @@ export async function createSession(
   server: ZitadelServer,
   loginName: string,
   password: string | undefined,
-  challenges: RequestChallenges
+  challenges: RequestChallenges | undefined
 ): Promise<CreateSessionResponse | undefined> {
   const sessionService = session.getSession(server);
   return password
@@ -125,7 +125,7 @@ export async function setSession(
   sessionToken: string,
   password: string | undefined,
   webAuthN: { credentialAssertionData: any } | undefined,
-  challenges: RequestChallenges
+  challenges: RequestChallenges | undefined
 ): Promise<SetSessionResponse | undefined> {
   const sessionService = session.getSession(server);
 

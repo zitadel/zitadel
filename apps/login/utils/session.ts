@@ -4,19 +4,17 @@ import {
   addSessionToCookie,
   updateSessionCookie,
 } from "./cookies";
-import { ChallengeKind, Session, Challenges } from "@zitadel/server";
+import { Session, Challenges, RequestChallenges } from "@zitadel/server";
 
 export async function createSessionAndUpdateCookie(
   loginName: string,
   password: string | undefined,
-  domain: string,
-  challenges: ChallengeKind[] | undefined,
+  challenges: RequestChallenges | undefined,
   authRequestId: string | undefined
 ): Promise<Session> {
   const createdSession = await createSession(
     server,
     loginName,
-    domain,
     password,
     challenges
   );
@@ -61,15 +59,13 @@ export async function setSessionAndUpdateCookie(
   loginName: string,
   password: string | undefined,
   passkey: { credentialAssertionData: any } | undefined,
-  domain: string | undefined,
-  challenges: ChallengeKind[] | undefined,
+  challenges: RequestChallenges | undefined,
   authRequestId: string | undefined
 ): Promise<SessionWithChallenges> {
   return setSession(
     server,
     sessionId,
     sessionToken,
-    domain,
     password,
     passkey,
     challenges

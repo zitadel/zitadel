@@ -79,6 +79,7 @@ export default function SetPasswordForm({
       body: JSON.stringify({
         loginName: loginName,
         password: password,
+        // authRequestId, register does not need an oidc callback
       }),
     });
 

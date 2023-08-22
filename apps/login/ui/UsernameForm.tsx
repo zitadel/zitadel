@@ -65,16 +65,18 @@ export default function UsernameForm({
         const method = response.authMethodTypes[0];
         switch (method) {
           case 1: //AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSWORD:
+            const paramsPassword: any = { loginName: values.loginName };
+
+            if (loginSettings?.passkeysType === 1) {
+              paramsPassword.promptPasswordless = `true`; // PasskeysType.PASSKEYS_TYPE_ALLOWED,
+            }
+
+            if (authRequestId) {
+              paramsPassword.authRequestId = authRequestId;
+            }
+
             return router.push(
-              "/password?" +
-                new URLSearchParams(
-                  loginSettings?.passkeysType === 1
-                    ? {
-                        loginName: values.loginName,
-                        promptPasswordless: `true`, // PasskeysType.PASSKEYS_TYPE_ALLOWED,
-                      }
-                    : { loginName: values.loginName }
-                )
+              "/password?" + new URLSearchParams(paramsPassword)
             );
           case 2: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
             return router.push(
@@ -82,16 +84,17 @@ export default function UsernameForm({
                 new URLSearchParams({ loginName: values.loginName })
             );
           default:
+            const paramsPasskey: any = { loginName: values.loginName };
+
+            if (loginSettings?.passkeysType === 1) {
+              paramsPasskey.promptPasswordless = `true`; // PasskeysType.PASSKEYS_TYPE_ALLOWED,
+            }
+
+            if (authRequestId) {
+              paramsPasskey.authRequestId = authRequestId;
+            }
             return router.push(
-              "/password?" +
-                new URLSearchParams(
-                  loginSettings?.passkeysType === 1
-                    ? {
-                        loginName: values.loginName,
-                        promptPasswordless: `true`, // PasskeysType.PASSKEYS_TYPE_ALLOWED,
-                      }
-                    : { loginName: values.loginName }
-                )
+              "/password?" + new URLSearchParams(paramsPasskey)
             );
         }
       } else if (

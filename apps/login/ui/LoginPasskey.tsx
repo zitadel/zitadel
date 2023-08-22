@@ -9,10 +9,15 @@ import { Spinner } from "./Spinner";
 
 type Props = {
   loginName: string;
+  authRequestId?: string;
   altPassword: boolean;
 };
 
-export default function LoginPasskey({ loginName, altPassword }: Props) {
+export default function LoginPasskey({
+  loginName,
+  authRequestId,
+  altPassword,
+}: Props) {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -60,6 +65,7 @@ export default function LoginPasskey({ loginName, altPassword }: Props) {
       body: JSON.stringify({
         loginName,
         challenges: [1], // request passkey challenge
+        authRequestId,
       }),
     });
 
@@ -81,6 +87,7 @@ export default function LoginPasskey({ loginName, altPassword }: Props) {
       body: JSON.stringify({
         loginName,
         passkey: data,
+        authRequestId,
       }),
     });
 
@@ -168,11 +175,16 @@ export default function LoginPasskey({ loginName, altPassword }: Props) {
           <Button
             type="button"
             variant={ButtonVariants.Secondary}
-            onClick={() =>
-              router.push(
-                "/password?" + new URLSearchParams({ loginName, alt: "true" }) // alt is set because password is requested as alternative auth method, so passwordless prompt can be escaped
-              )
-            }
+            onClick={() => {
+              const params = { loginName, alt: "true" };
+
+              return router.push(
+                "/password?" +
+                  new URLSearchParams(
+                    authRequestId ? { ...params, authRequestId } : params
+                  ) // alt is set because password is requested as alternative auth method, so passwordless prompt can be escaped
+              );
+            }}
           >
             use password
           </Button>

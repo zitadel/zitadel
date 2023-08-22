@@ -45,12 +45,11 @@ export async function POST(request: NextRequest) {
   if (body) {
     const { loginName, authRequestId } = body;
 
-    const domain: string = request.nextUrl.hostname;
+    // const domain: string = request.nextUrl.hostname;
 
     return createSessionAndUpdateCookie(
       loginName,
       undefined,
-      domain,
       undefined,
       authRequestId
     )

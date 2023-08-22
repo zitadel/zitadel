@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     return createSessionAndUpdateCookie(
       loginName,
       password,
-      domain,
+      undefined,
       undefined
     ).then((session) => {
       return NextResponse.json(session);
@@ -44,7 +44,7 @@ export async function PUT(request: NextRequest) {
   const body = await request.json();
 
   if (body) {
-    const { loginName, password, challenges, passkey } = body;
+    const { loginName, password, challenges, passkey, authRequestId } = body;
 
     const recentPromise: Promise<SessionCookie> = loginName
       ? getSessionCookieByLoginName(loginName).catch((error) => {
@@ -54,7 +54,7 @@ export async function PUT(request: NextRequest) {
           return Promise.reject(error);
         });
 
-    const domain: string = request.nextUrl.hostname;
+    // const domain: string = request.nextUrl.hostname;
 
     return recentPromise
       .then((recent) => {
@@ -64,8 +64,8 @@ export async function PUT(request: NextRequest) {
           recent.loginName,
           password,
           passkey,
-          domain,
-          challenges
+          challenges,
+          authRequestId
         ).then((session) => {
           return NextResponse.json({
             sessionId: session.id,

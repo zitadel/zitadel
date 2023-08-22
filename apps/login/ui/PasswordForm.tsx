@@ -14,12 +14,14 @@ type Inputs = {
 
 type Props = {
   loginName?: string;
+  authRequestId?: string;
   isAlternative?: boolean; // whether password was requested as alternative auth method
   promptPasswordless?: boolean;
 };
 
 export default function PasswordForm({
   loginName,
+  authRequestId,
   promptPasswordless,
   isAlternative,
 }: Props) {
@@ -44,6 +46,7 @@ export default function PasswordForm({
       body: JSON.stringify({
         loginName,
         password: values.password,
+        authRequestId,
       }),
     });
 
