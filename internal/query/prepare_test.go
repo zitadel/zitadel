@@ -60,16 +60,6 @@ func assertPrepare(t *testing.T, prepareFunc, expectedObject interface{}, sqlExp
 		return false
 	}
 	if didScan {
-		// expectedObjectValue := reflect.ValueOf(expectedObject)
-		// if !expectedObjectValue.IsValid() && object != nil {
-		// 	t.Error(object)
-		// 	return false
-		// }
-		// if expectedObjectValue.IsValid() && expectedObjectValue.IsZero() && object != nil {
-		// 	t.Error(object)
-		// 	return false
-		// }
-
 		if !assert.Equal(t, expectedObject, object) {
 			return false
 		}
@@ -192,7 +182,6 @@ func execScan(client *database.DB, builder sq.SelectBuilder, scan interface{}, e
 
 	//resultSet represents *sql.Row or *sql.Rows,
 	// depending on whats assignable to the scan function
-	// var resultSet interface{}
 	var res []reflect.Value
 
 	//execute sql stmt
@@ -229,9 +218,6 @@ func execScan(client *database.DB, builder sq.SelectBuilder, scan interface{}, e
 		}
 		return err, ok, didScan
 	}
-
-	// res contains object and error
-	// res := reflect.ValueOf(scan).Call([]reflect.Value{reflect.ValueOf(resultSet)})
 
 	//check for error
 	if res[1].Interface() != nil {
