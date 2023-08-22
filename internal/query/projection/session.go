@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	SessionsProjectionTable = "projections.sessions5_1"
+	SessionsProjectionTable = "projections.sessions5"
 
 	SessionColumnID                   = "id"
 	SessionColumnCreationDate         = "creation_date"
