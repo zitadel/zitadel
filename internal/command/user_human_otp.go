@@ -278,6 +278,7 @@ func (c *Commands) HumanSendOTPSMS(ctx context.Context, userID, resourceOwner st
 		authRequest,
 		smsWriteModel,
 		domain.SecretGeneratorTypeOTPSMS,
+		c.defaultSecretGenerators.OTPSMS,
 		codeAddedEvent,
 	)
 }
@@ -398,6 +399,7 @@ func (c *Commands) HumanSendOTPEmail(ctx context.Context, userID, resourceOwner 
 		authRequest,
 		smsWriteModel,
 		domain.SecretGeneratorTypeOTPEmail,
+		c.defaultSecretGenerators.OTPEmail,
 		codeAddedEvent,
 	)
 }
@@ -442,6 +444,7 @@ func (c *Commands) sendHumanOTP(
 	authRequest *domain.AuthRequest,
 	writeModelByID func(ctx context.Context, userID string, resourceOwner string) (OTPWriteModel, error),
 	secretGeneratorType domain.SecretGeneratorType,
+	defaultSecretGenerator *crypto.GeneratorConfig,
 	codeAddedEvent func(ctx context.Context, aggregate *eventstore.Aggregate, code *crypto.CryptoValue, expiry time.Duration, info *user.AuthRequestInfo) eventstore.Command,
 ) (err error) {
 	if userID == "" {
@@ -454,7 +457,7 @@ func (c *Commands) sendHumanOTP(
 	if !existingOTP.OTPAdded() {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SFD52", "Errors.User.MFA.OTP.NotReady")
 	}
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, secretGeneratorType)
+	config, err := secretGeneratorConfigWithDefault(ctx, c.eventstore.Filter, secretGeneratorType, defaultSecretGenerator)
 	if err != nil {
 		return err
 	}
