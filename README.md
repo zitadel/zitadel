@@ -32,11 +32,11 @@
 
 Do you look for a user management that's quickly set up like Auth0 and open source like Keycloak?
 
-Do you have project that requires a multi-tenant user management with self-service for your customers?
+Do you have a project that requires multi-tenant user management with self-service for your customers?
 
 Look no further — ZITADEL combines the ease of Auth0 with the versatility of Keycloak.
 
-We provide you with a wide range of out of the box features to accelerate your project.
+We provide you with a wide range of out-of-the-box features to accelerate your project.
 Multi-tenancy with branding customization, secure login, self-service, OpenID Connect, OAuth2.x, SAML2, LDAP, Passwordless with FIDO2 (including Passkeys), OTP, U2F, and an unlimited audit trail is there for you, ready to use.
 
 With ZITADEL you can rely on a hardened and extensible turnkey solution to solve all of your authentication and authorization needs.
