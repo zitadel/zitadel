@@ -2,6 +2,7 @@ package access
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net/http"
 	"strings"
@@ -136,9 +137,15 @@ func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, 
 	}
 
 	var count uint64
-	if err = l.dbClient.
-		QueryRowContext(ctx, stmt, args...).
-		Scan(&count); err != nil {
+	err = l.dbClient.
+		QueryRowContext(ctx,
+			func(row *sql.Row) error {
+				return row.Scan(&count)
+			},
+			stmt, args...,
+		)
+
+	if err != nil {
 		return 0, caos_errors.ThrowInternal(err, "ACCESS-pBPrM", "Errors.Logstore.Access.ScanFailed")
 	}
 

@@ -225,7 +225,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*SMSConfigs)(nil),
 		},
 	}
 	for _, tt := range tests {
@@ -250,7 +250,7 @@ func Test_SMSConfigPrepare(t *testing.T) {
 			name:    "prepareSMSConfigQuery no result",
 			prepare: prepareSMSConfigQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					expectedSMSConfigQuery,
 					nil,
 					nil,
@@ -317,7 +317,7 @@ func Test_SMSConfigPrepare(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*SMSConfig)(nil),
 		},
 	}
 	for _, tt := range tests {
