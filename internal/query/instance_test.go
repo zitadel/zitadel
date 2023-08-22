@@ -97,7 +97,7 @@ func Test_InstancePrepares(t *testing.T) {
 			additionalArgs: []reflect.Value{reflect.ValueOf("")},
 			prepare:        prepareInstanceQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(instanceQuery),
 					nil,
 					nil,
@@ -160,7 +160,7 @@ func Test_InstancePrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Instance)(nil),
 		},
 		{
 			name: "prepareInstancesQuery no result",

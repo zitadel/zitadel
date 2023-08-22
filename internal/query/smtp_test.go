@@ -56,7 +56,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 			name:    "prepareSMTPConfigQuery no result",
 			prepare: prepareSMTPConfigQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					prepareSMTPConfigStmt,
 					nil,
 					nil,
@@ -121,7 +121,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*SMTPConfig)(nil),
 		},
 	}
 	for _, tt := range tests {

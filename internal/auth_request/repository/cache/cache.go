@@ -59,7 +59,12 @@ func (c *AuthRequestCache) getAuthRequest(key, value, instanceID string) (*domai
 	var b []byte
 	var requestType domain.AuthRequestType
 	query := fmt.Sprintf("SELECT request, request_type FROM auth.auth_requests WHERE instance_id = $1 and %s = $2", key)
-	err := c.client.QueryRow(query, instanceID, value).Scan(&b, &requestType)
+	err := c.client.QueryRow(
+		func(row *sql.Row) error {
+			return row.Scan(&b, &requestType)
+		},
+		query, instanceID, value)
+
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, caos_errs.ThrowNotFound(err, "CACHE-d24aD", "Errors.AuthRequest.NotFound")

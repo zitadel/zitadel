@@ -66,7 +66,7 @@ var (
 	}
 )
 
-func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage domain.KeyUsage) (_ *Certificates, err error) {
+func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage domain.KeyUsage) (certs *Certificates, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -88,19 +88,19 @@ func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage dom
 		return nil, errors.ThrowInternal(err, "QUERY-SDfkg", "Errors.Query.SQLStatement")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		certs, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Sgan4", "Errors.Internal")
 	}
-	keys, err := scan(rows)
-	if err != nil {
-		return nil, err
-	}
-	keys.LatestSequence, err = q.latestSequence(ctx, keyTable)
+
+	certs.LatestSequence, err = q.latestSequence(ctx, keyTable)
 	if !errors.IsNotFound(err) {
-		return keys, err
+		return certs, err
 	}
-	return keys, nil
+	return certs, nil
 }
 
 func prepareCertificateQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Certificates, error)) {
