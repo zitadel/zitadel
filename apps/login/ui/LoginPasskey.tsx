@@ -31,6 +31,7 @@ export default function LoginPasskey({
       setLoading(true);
       updateSessionForChallenge()
         .then((response) => {
+          console.log(response);
           const pK =
             response.challenges.passkey.publicKeyCredentialRequestOptions
               .publicKey;
@@ -64,7 +65,12 @@ export default function LoginPasskey({
       },
       body: JSON.stringify({
         loginName,
-        challenges: [1], // request passkey challenge
+        challenges: {
+          webAuthN: {
+            domain: "",
+            userVerificationRequirement: 2,
+          },
+        },
         authRequestId,
       }),
     });

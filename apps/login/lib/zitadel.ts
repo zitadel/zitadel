@@ -20,6 +20,7 @@ import {
   GetSessionResponse,
   VerifyEmailResponse,
   SetSessionResponse,
+  SetSessionRequest,
   DeleteSessionResponse,
   VerifyPasskeyRegistrationResponse,
   LoginSettings,
@@ -129,16 +130,23 @@ export async function setSession(
 ): Promise<SetSessionResponse | undefined> {
   const sessionService = session.getSession(server);
 
-  const payload = { sessionId, sessionToken, challenges };
-  return password
-    ? sessionService.setSession(
-        {
-          ...payload,
-          checks: { password: { password }, webAuthN },
-        },
-        {}
-      )
-    : sessionService.setSession(payload, {});
+  const payload: SetSessionRequest = {
+    sessionId,
+    sessionToken,
+    challenges,
+    checks: {},
+    metadata: {},
+  };
+
+  if (password && payload.checks) {
+    payload.checks.password = { password };
+  }
+
+  if (webAuthN && payload.checks) {
+    payload.checks.webAuthN = webAuthN;
+  }
+
+  return sessionService.setSession(payload, {});
 }
 
 export async function getSession(

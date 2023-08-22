@@ -62,6 +62,7 @@ export async function setSessionAndUpdateCookie(
   challenges: RequestChallenges | undefined,
   authRequestId: string | undefined
 ): Promise<SessionWithChallenges> {
+  console.log(password, passkey, challenges);
   return setSession(
     server,
     sessionId,

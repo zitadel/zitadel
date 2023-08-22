@@ -10,6 +10,7 @@ import {
   createSessionAndUpdateCookie,
   setSessionAndUpdateCookie,
 } from "#/utils/session";
+import { RequestChallenges } from "@zitadel/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
   if (body) {
     const { loginName, password } = body;
 
-    const domain: string = request.nextUrl.hostname;
+    // const domain: string = request.nextUrl.hostname;
 
     return createSessionAndUpdateCookie(
       loginName,
@@ -44,7 +45,8 @@ export async function PUT(request: NextRequest) {
   const body = await request.json();
 
   if (body) {
-    const { loginName, password, challenges, passkey, authRequestId } = body;
+    const { loginName, password, passkey, authRequestId } = body;
+    const challenges: RequestChallenges = body.challenges;
 
     const recentPromise: Promise<SessionCookie> = loginName
       ? getSessionCookieByLoginName(loginName).catch((error) => {
@@ -54,7 +56,11 @@ export async function PUT(request: NextRequest) {
           return Promise.reject(error);
         });
 
-    // const domain: string = request.nextUrl.hostname;
+    const domain: string = request.nextUrl.hostname;
+
+    if (challenges.webAuthN && !challenges.webAuthN.domain) {
+      challenges.webAuthN.domain = domain;
+    }
 
     return recentPromise
       .then((recent) => {
