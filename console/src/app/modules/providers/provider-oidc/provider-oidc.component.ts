@@ -1,7 +1,7 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
-import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import {AbstractControl, FormControl, UntypedFormControl, UntypedFormGroup} from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs';
@@ -27,6 +27,7 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 @Component({
   selector: 'cnsl-provider-oidc',
   templateUrl: './provider-oidc.component.html',
+  styleUrls: ['./provider-oidc.component.scss'],
 })
 export class ProviderOIDCComponent {
   public showOptional: boolean = false;
@@ -56,6 +57,7 @@ export class ProviderOIDCComponent {
       clientSecret: new UntypedFormControl('', [requiredValidator]),
       issuer: new UntypedFormControl('', [requiredValidator]),
       scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
+      isIdTokenMapping: new UntypedFormControl(),
     });
 
     this.route.data.pipe(take(1)).subscribe((data) => {
@@ -131,6 +133,7 @@ export class ProviderOIDCComponent {
     req.setIssuer(this.issuer?.value);
     req.setScopesList(this.scopesList?.value);
     req.setProviderOptions(this.options);
+    req.setIsIdTokenMapping(this.isIdTokenMapping?.value)
 
     this.loading = true;
     this.service
@@ -160,6 +163,7 @@ export class ProviderOIDCComponent {
       req.setIssuer(this.issuer?.value);
       req.setScopesList(this.scopesList?.value);
       req.setProviderOptions(this.options);
+      req.setIsIdTokenMapping(this.isIdTokenMapping?.value)
 
       this.loading = true;
       this.service
@@ -223,5 +227,9 @@ export class ProviderOIDCComponent {
 
   public get scopesList(): AbstractControl | null {
     return this.form.get('scopesList');
+  }
+
+  public get isIdTokenMapping(): AbstractControl | null {
+    return this.form.get('isIdTokenMapping');
   }
 }

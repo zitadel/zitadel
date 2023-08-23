@@ -1832,7 +1832,9 @@
       "DELETED": "Dostawca tożsamości usunięty pomyślnie!",
       "ADDED": "Dodano pomyślnie.",
       "REMOVED": "Usunięto pomyślnie."
-    }
+    },
+    "ISIDTOKENMAPPING": "Mapowanie z tokena ID",
+    "ISIDTOKENMAPPING_DESC": "Jeśli wybrane, informacje dostawcy są mapowane z tokena ID, a nie z punktu końcowego userinfo."
   },
   "MFA": {
     "LIST": {
