@@ -56,7 +56,7 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 			name:    "preparePrivacyPolicyQuery no result",
 			prepare: preparePrivacyPolicyQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(preparePrivacyPolicyStmt),
 					nil,
 					nil,
@@ -121,7 +121,7 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*PrivacyPolicy)(nil),
 		},
 	}
 	for _, tt := range tests {

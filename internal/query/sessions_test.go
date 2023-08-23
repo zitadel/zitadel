@@ -343,7 +343,7 @@ func Test_SessionsPrepare(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Sessions)(nil),
 		},
 	}
 	for _, tt := range tests {
@@ -368,7 +368,7 @@ func Test_SessionPrepare(t *testing.T) {
 			name:    "prepareSessionQuery no result",
 			prepare: prepareSessionQueryTesting(t, ""),
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					expectedSessionQuery,
 					nil,
 					nil,
@@ -460,7 +460,7 @@ func Test_SessionPrepare(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Session)(nil),
 		},
 	}
 	for _, tt := range tests {

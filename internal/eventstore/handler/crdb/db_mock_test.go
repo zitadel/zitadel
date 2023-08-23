@@ -124,13 +124,17 @@ func expectSavePointRelease() func(sqlmock.Sqlmock) {
 	}
 }
 
-func expectCurrentSequence(tableName, projection string, seq uint64, aggregateType string, instanceIDs []string) func(sqlmock.Sqlmock) {
+func expectCurrentSequence(isTx bool, tableName, projection string, seq uint64, aggregateType string, instanceIDs []string) func(sqlmock.Sqlmock) {
 	rows := sqlmock.NewRows([]string{"current_sequence", "aggregate_type", "instance_id"})
 	for _, instanceID := range instanceIDs {
 		rows.AddRow(seq, aggregateType, instanceID)
 	}
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM `+tableName+` WHERE projection_name = \$1 AND instance_id = ANY \(\$2\) FOR UPDATE`).
+		stmt := `SELECT current_sequence, aggregate_type, instance_id FROM ` + tableName + ` WHERE projection_name = \$1 AND instance_id = ANY \(\$2\)`
+		if isTx {
+			stmt += " FOR UPDATE"
+		}
+		m.ExpectQuery(stmt).
 			WithArgs(
 				projection,
 				database.StringArray(instanceIDs),
@@ -141,9 +145,13 @@ func expectCurrentSequence(tableName, projection string, seq uint64, aggregateTy
 	}
 }
 
-func expectCurrentSequenceErr(tableName, projection string, instanceIDs []string, err error) func(sqlmock.Sqlmock) {
+func expectCurrentSequenceErr(isTx bool, tableName, projection string, instanceIDs []string, err error) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM `+tableName+` WHERE projection_name = \$1 AND instance_id = ANY \(\$2\) FOR UPDATE`).
+		stmt := `SELECT current_sequence, aggregate_type, instance_id FROM ` + tableName + ` WHERE projection_name = \$1 AND instance_id = ANY \(\$2\)`
+		if isTx {
+			stmt += " FOR UPDATE"
+		}
+		m.ExpectQuery(stmt).
 			WithArgs(
 				projection,
 				database.StringArray(instanceIDs),
