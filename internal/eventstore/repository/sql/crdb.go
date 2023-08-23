@@ -312,7 +312,7 @@ func (db *CRDB) eventQuery() string {
 }
 
 func (db *CRDB) maxSequenceQuery() string {
-	return "SELECT MAX(created_at) FROM eventstore.events"
+	return "SELECT hlc_to_timestamp(MAX(crdb_internal_mvcc_timestamp))::TIMESTAMPTZ FROM eventstore.events"
 }
 
 func (db *CRDB) instanceIDsQuery() string {
@@ -340,7 +340,7 @@ func (db *CRDB) columnName(col repository.Field) string {
 	case repository.FieldEventData:
 		return "event_data"
 	case repository.FieldCreationDate:
-		return "created_at"
+		return "hlc_to_timestamp(crdb_internal_mvcc_timestamp)::TIMESTAMPTZ"
 	default:
 		return ""
 	}
