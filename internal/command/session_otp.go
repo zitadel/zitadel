@@ -27,14 +27,14 @@ func (c *Commands) createOTPSMSChallenge(returnCode bool, dst *string) SessionCo
 		if !writeModel.OTPAdded() {
 			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-BJ2g3", "Errors.User.MFA.OTP.NotReady")
 		}
-		code, plain, expiry, err := cmd.generate(ctx, domain.SecretGeneratorTypeOTPSMS)
+		code, err := cmd.createCode(ctx, cmd.eventstore.Filter, domain.SecretGeneratorTypeOTPSMS, cmd.otpAlg)
 		if err != nil {
 			return err
 		}
 		if returnCode {
-			*dst = plain
+			*dst = code.Plain
 		}
-		cmd.OTPSMSChallenged(ctx, code, expiry, returnCode)
+		cmd.OTPSMSChallenged(ctx, code.Crypted, code.Expiry, returnCode)
 		return nil
 	}
 }
@@ -77,14 +77,14 @@ func (c *Commands) createOTPEmailChallenge(returnCode bool, urlTmpl string, dst 
 		if !writeModel.OTPAdded() {
 			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JKLJ3", "Errors.User.MFA.OTP.NotReady")
 		}
-		code, plain, expiry, err := cmd.generate(ctx, domain.SecretGeneratorTypeOTPEmail)
+		code, err := cmd.createCode(ctx, cmd.eventstore.Filter, domain.SecretGeneratorTypeOTPEmail, cmd.otpAlg)
 		if err != nil {
 			return err
 		}
 		if returnCode {
-			*dst = plain
+			*dst = code.Plain
 		}
-		cmd.OTPEmailChallenged(ctx, code, expiry, returnCode, urlTmpl)
+		cmd.OTPEmailChallenged(ctx, code.Crypted, code.Expiry, returnCode, urlTmpl)
 		return nil
 	}
 }
