@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	z_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -25,12 +26,32 @@ type querier interface {
 	eventQuery() string
 	maxSequenceQuery() string
 	instanceIDsQuery() string
-	db() *sql.DB
+	db() *database.DB
 	orderByEventSequence(desc bool) string
 	dialect.Database
 }
 
 type scan func(dest ...interface{}) error
+
+type tx struct {
+	*sql.Tx
+}
+
+func (t *tx) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, query string, args ...any) error {
+	rows, err := t.Tx.QueryContext(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		closeErr := rows.Close()
+		logging.OnError(closeErr).Info("rows.Close failed")
+	}()
+
+	if err = scan(rows); err != nil {
+		return err
+	}
+	return rows.Err()
+}
 
 func query(ctx context.Context, criteria querier, searchQuery *eventstore.SearchQueryBuilder, dest interface{}) error {
 	q, err := repository.QueryFromBuilder(searchQuery)
@@ -61,25 +82,26 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	query = criteria.placeholder(query)
 
 	var contextQuerier interface {
-		QueryContext(context.Context, string, ...interface{}) (*sql.Rows, error)
+		QueryContext(context.Context, func(rows *sql.Rows) error, string, ...interface{}) error
 	}
 	contextQuerier = criteria.db()
 	if q.Tx != nil {
-		contextQuerier = q.Tx
+		contextQuerier = &tx{Tx: q.Tx}
 	}
 
-	rows, err := contextQuerier.QueryContext(ctx, query, values...)
+	err = contextQuerier.QueryContext(ctx,
+		func(rows *sql.Rows) error {
+			for rows.Next() {
+				err := rowScanner(rows.Scan, dest)
+				if err != nil {
+					return err
+				}
+			}
+			return nil
+		}, query, values...)
 	if err != nil {
 		logging.New().WithError(err).Info("query failed")
 		return z_errors.ThrowInternal(err, "SQL-KyeAx", "unable to filter events")
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		err = rowScanner(rows.Scan, dest)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
@@ -213,7 +235,7 @@ func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause 
 	// created_at <= now() must be added because clock_timestamp() could be in the future
 	// this could lead to skipped events which are not visible as of system time but have a lower
 	// created_at timestamp
-	return " WHERE (" + strings.Join(clauses, " OR ") + ") AND hlc_to_timestamp(crdb_internal_mvcc_timestamp)::TIMESTAMPTZ <= (SELECT MIN(start)::TIMESTAMPTZ FROM crdb_internal.cluster_transactions where application_name = 'zitadel')", values
+	return " WHERE (" + strings.Join(clauses, " OR ") + ") AND hlc_to_timestamp(crdb_internal_mvcc_timestamp)::TIMESTAMPTZ <= (SELECT COALESCE(MIN(start)::TIMESTAMPTZ, NOW()) FROM crdb_internal.cluster_transactions where application_name = 'zitadel')", values
 }
 
 func getCondition(cond querier, filter *repository.Filter) (condition string) {

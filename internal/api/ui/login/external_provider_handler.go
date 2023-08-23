@@ -410,7 +410,7 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 		l.renderExternalNotFoundOption(w, r, authReq, orgIAMPolicy, human, idpLink, err)
 		return
 	}
-	if changed {
+	if changed || len(externalUser.Metadatas) > 0 {
 		if err := l.authRepo.SetLinkingUser(r.Context(), authReq, externalUser); err != nil {
 			l.renderError(w, r, authReq, err)
 			return
@@ -966,6 +966,8 @@ func tokens(session idp.Session) *oidc.Tokens[*oidc.IDTokenClaims] {
 	case *jwt.Session:
 		return s.Tokens
 	case *oauth.Session:
+		return s.Tokens
+	case *azuread.Session:
 		return s.Tokens
 	}
 	return nil

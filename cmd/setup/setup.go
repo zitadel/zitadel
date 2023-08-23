@@ -81,7 +81,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.FirstInstance.smtpEncryptionKey = config.EncryptionKeys.SMTP
 	steps.FirstInstance.oidcEncryptionKey = config.EncryptionKeys.OIDC
 	steps.FirstInstance.masterKey = masterKey
-	steps.FirstInstance.db = dbClient.DB
+	steps.FirstInstance.db = dbClient
 	steps.FirstInstance.es = eventstoreClient
 	steps.FirstInstance.defaults = config.SystemDefaults
 	steps.FirstInstance.zitadelRoles = config.InternalAuthZ.RolePermissionMappings
@@ -97,8 +97,9 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.CorrectCreationDate.dbClient = dbClient
 	steps.AddEventCreatedAt.dbClient = dbClient
 	steps.AddEventCreatedAt.step10 = steps.CorrectCreationDate
-	steps.s12ChangeEvents = &ChangeEvents{dbClient: dbClient}
-	steps.s13CurrentStates = &CurrentProjectionState{dbClient: dbClient}
+	steps.s12AddOTPColumns = &AddOTPColumns{dbClient: dbClient}
+	steps.s13ChangeEvents = &ChangeEvents{dbClient: dbClient}
+	steps.s14CurrentStates = &CurrentProjectionState{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -121,8 +122,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.WithFields("name", steps.s4EventstoreIndexes.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.AddEventCreatedAt)
 	logging.WithFields("name", steps.AddEventCreatedAt.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s12ChangeEvents)
-	logging.WithFields("name", steps.s12ChangeEvents.String()).OnError(err).Fatal("migration failed")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s13ChangeEvents)
+	logging.WithFields("name", steps.s13ChangeEvents.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s1ProjectionTable)
 	logging.WithFields("name", steps.s1ProjectionTable.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s2AssetsTable)
@@ -138,9 +139,11 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	err = migration.Migrate(ctx, eventstoreClient, steps.s8AuthTokens)
 	logging.WithFields("name", steps.s8AuthTokens.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.CorrectCreationDate)
+	err = migration.Migrate(ctx, eventstoreClient, steps.s12AddOTPColumns)
+	logging.OnError(err).Fatal("unable to migrate step 12")
 	logging.WithFields("name", steps.CorrectCreationDate.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s13CurrentStates)
-	logging.WithFields("name", steps.s13CurrentStates.String()).OnError(err).Fatal("migration failed")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s14CurrentStates)
+	logging.WithFields("name", steps.s14CurrentStates.String()).OnError(err).Fatal("migration failed")
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)

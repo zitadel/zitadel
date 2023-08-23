@@ -69,7 +69,7 @@ var (
 )
 
 // SearchMilestones tries to defer the instanceID from the passed context if no instanceIDs are passed
-func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, queries *MilestonesSearchQueries) (_ *Milestones, err error) {
+func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, queries *MilestonesSearchQueries) (milestones *Milestones, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	query, scan := prepareMilestonesQuery(ctx, q.client)
@@ -80,22 +80,14 @@ func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, qu
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-A9i5k", "Errors.Query.SQLStatement")
 	}
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		milestones, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		if closeErr := rows.Close(); closeErr != nil && err == nil {
-			err = errors.ThrowInternal(closeErr, "QUERY-CK9mI", "Errors.Query.CloseRows")
-		}
-	}()
-	milestones, err := scan(rows)
-	if err != nil {
-		return nil, err
-	}
-	if err = rows.Err(); err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-asLsI", "Errors.Internal")
-	}
+
 	milestones.LatestState, err = q.latestState(ctx, milestonesTable)
 	return milestones, err
 

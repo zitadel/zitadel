@@ -130,11 +130,10 @@ func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMe
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-j9NJd", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-3n99f", "Errors.Internal")
-	}
-	userAuthMethods, err = scan(rows)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		userAuthMethods, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -165,11 +164,10 @@ func (q *Queries) ListActiveUserAuthMethodTypes(ctx context.Context, userID stri
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-Sfdrg", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil || rows.Err() != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SDgr3", "Errors.Internal")
-	}
-	userAuthMethodTypes, err = scan(rows)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		userAuthMethodTypes, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -200,11 +198,14 @@ func (q *Queries) ListUserAuthMethodTypesRequired(ctx context.Context, userID st
 		return nil, false, false, errors.ThrowInvalidArgument(err, "QUERY-E5ut4", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil || rows.Err() != nil {
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		userAuthMethodTypes, forceMFA, forceMFALocalOnly, err = scan(rows)
+		return err
+	}, stmt, args...)
+	if err != nil {
 		return nil, false, false, errors.ThrowInternal(err, "QUERY-Dun75", "Errors.Internal")
 	}
-	return scan(rows)
+	return userAuthMethodTypes, forceMFA, forceMFALocalOnly, nil
 }
 
 func NewUserAuthMethodUserIDSearchQuery(value string) (SearchQuery, error) {

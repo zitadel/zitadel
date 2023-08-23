@@ -14,24 +14,25 @@ import (
 )
 
 const (
-	SessionsProjectionTable = "projections.sessions3"
+	SessionsProjectionTable = "projections.sessions4"
 
-	SessionColumnID                = "id"
-	SessionColumnCreationDate      = "creation_date"
-	SessionColumnChangeDate        = "change_date"
-	SessionColumnSequence          = "sequence"
-	SessionColumnState             = "state"
-	SessionColumnResourceOwner     = "resource_owner"
-	SessionColumnDomain            = "domain"
-	SessionColumnInstanceID        = "instance_id"
-	SessionColumnCreator           = "creator"
-	SessionColumnUserID            = "user_id"
-	SessionColumnUserCheckedAt     = "user_checked_at"
-	SessionColumnPasswordCheckedAt = "password_checked_at"
-	SessionColumnIntentCheckedAt   = "intent_checked_at"
-	SessionColumnPasskeyCheckedAt  = "passkey_checked_at"
-	SessionColumnMetadata          = "metadata"
-	SessionColumnTokenID           = "token_id"
+	SessionColumnID                   = "id"
+	SessionColumnCreationDate         = "creation_date"
+	SessionColumnChangeDate           = "change_date"
+	SessionColumnSequence             = "sequence"
+	SessionColumnState                = "state"
+	SessionColumnResourceOwner        = "resource_owner"
+	SessionColumnInstanceID           = "instance_id"
+	SessionColumnCreator              = "creator"
+	SessionColumnUserID               = "user_id"
+	SessionColumnUserCheckedAt        = "user_checked_at"
+	SessionColumnPasswordCheckedAt    = "password_checked_at"
+	SessionColumnIntentCheckedAt      = "intent_checked_at"
+	SessionColumnWebAuthNCheckedAt    = "webauthn_checked_at"
+	SessionColumnWebAuthNUserVerified = "webauthn_user_verified"
+	SessionColumnTOTPCheckedAt        = "totp_checked_at"
+	SessionColumnMetadata             = "metadata"
+	SessionColumnTokenID              = "token_id"
 )
 
 type sessionProjection struct{}
@@ -53,14 +54,15 @@ func (*sessionProjection) Init() *old_handler.Check {
 			handler.NewColumn(SessionColumnSequence, handler.ColumnTypeInt64),
 			handler.NewColumn(SessionColumnState, handler.ColumnTypeEnum),
 			handler.NewColumn(SessionColumnResourceOwner, handler.ColumnTypeText),
-			handler.NewColumn(SessionColumnDomain, handler.ColumnTypeText),
 			handler.NewColumn(SessionColumnInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(SessionColumnCreator, handler.ColumnTypeText),
 			handler.NewColumn(SessionColumnUserID, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SessionColumnUserCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnPasswordCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnIntentCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
-			handler.NewColumn(SessionColumnPasskeyCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
+			handler.NewColumn(SessionColumnWebAuthNCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
+			handler.NewColumn(SessionColumnWebAuthNUserVerified, handler.ColumnTypeBool, handler.Nullable()),
+			handler.NewColumn(SessionColumnTOTPCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnMetadata, handler.ColumnTypeJSONB, handler.Nullable()),
 			handler.NewColumn(SessionColumnTokenID, handler.ColumnTypeText, handler.Nullable()),
 		},
@@ -91,8 +93,12 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceIntentChecked,
 				},
 				{
-					Event:  session.PasskeyCheckedType,
-					Reduce: p.reducePasskeyChecked,
+					Event:  session.WebAuthNCheckedType,
+					Reduce: p.reduceWebAuthNChecked,
+				},
+				{
+					Event:  session.TOTPCheckedType,
+					Reduce: p.reduceTOTPChecked,
 				},
 				{
 					Event:  session.TokenSetType,
@@ -143,7 +149,6 @@ func (p *sessionProjection) reduceSessionAdded(event eventstore.Event) (*handler
 			handler.NewCol(SessionColumnCreationDate, e.CreationDate()),
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnResourceOwner, e.Aggregate().ResourceOwner),
-			handler.NewCol(SessionColumnDomain, e.Domain),
 			handler.NewCol(SessionColumnState, domain.SessionStateActive),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
 			handler.NewCol(SessionColumnCreator, e.User),
@@ -211,10 +216,30 @@ func (p *sessionProjection) reduceIntentChecked(event eventstore.Event) (*handle
 	), nil
 }
 
-func (p *sessionProjection) reducePasskeyChecked(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*session.PasskeyCheckedEvent)
+func (p *sessionProjection) reduceWebAuthNChecked(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*session.WebAuthNCheckedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-WieM4", "reduce.wrong.event.type %s", session.PasskeyCheckedType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-WieM4", "reduce.wrong.event.type %s", session.WebAuthNCheckedType)
+	}
+	return handler.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnWebAuthNCheckedAt, e.CheckedAt),
+			handler.NewCol(SessionColumnWebAuthNUserVerified, e.UserVerified),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceTOTPChecked(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*session.TOTPCheckedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Oqu8i", "reduce.wrong.event.type %s", session.TOTPCheckedType)
 	}
 
 	return handler.NewUpdateStatement(
@@ -222,7 +247,7 @@ func (p *sessionProjection) reducePasskeyChecked(event eventstore.Event) (*handl
 		[]handler.Column{
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
-			handler.NewCol(SessionColumnPasskeyCheckedAt, e.CheckedAt),
+			handler.NewCol(SessionColumnTOTPCheckedAt, e.CheckedAt),
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnID, e.Aggregate().ID),

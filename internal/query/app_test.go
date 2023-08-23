@@ -1115,7 +1115,7 @@ func Test_AppsPrepare(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*App)(nil),
 		},
 	}
 	for _, tt := range tests {
@@ -1140,7 +1140,7 @@ func Test_AppPrepare(t *testing.T) {
 			name:    "prepareAppQuery no result",
 			prepare: prepareAppQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					expectedAppQuery,
 					nil,
 					nil,
@@ -1747,7 +1747,7 @@ func Test_AppPrepare(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*App)(nil),
 		},
 	}
 	for _, tt := range tests {
@@ -1833,7 +1833,7 @@ func Test_AppIDsPrepare(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*App)(nil),
 		},
 	}
 	for _, tt := range tests {
@@ -1858,7 +1858,7 @@ func Test_ProjectIDByAppPrepare(t *testing.T) {
 			name:    "prepareProjectIDByAppQuery no result",
 			prepare: prepareProjectIDByAppQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					expectedProjectIDByAppQuery,
 					nil,
 					nil,
@@ -1899,7 +1899,7 @@ func Test_ProjectIDByAppPrepare(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: "",
 		},
 	}
 	for _, tt := range tests {
@@ -1924,7 +1924,7 @@ func Test_ProjectByAppPrepare(t *testing.T) {
 			name:    "prepareProjectByAppQuery no result",
 			prepare: prepareProjectByAppQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					expectedProjectByAppQuery,
 					nil,
 					nil,
@@ -2097,7 +2097,7 @@ func Test_ProjectByAppPrepare(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Project)(nil),
 		},
 	}
 	for _, tt := range tests {

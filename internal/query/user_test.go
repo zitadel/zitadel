@@ -333,7 +333,7 @@ func Test_UserPrepares(t *testing.T) {
 			name:    "prepareUserQuery no result",
 			prepare: prepareUserQuery,
 			want: want{
-				sqlExpectations: mockQuery(
+				sqlExpectations: mockQueryScanErr(
 					regexp.QuoteMeta(userQuery),
 					nil,
 					nil,
@@ -489,13 +489,13 @@ func Test_UserPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*User)(nil),
 		},
 		{
 			name:    "prepareProfileQuery no result",
 			prepare: prepareProfileQuery,
 			want: want{
-				sqlExpectations: mockQuery(
+				sqlExpectations: mockQueryScanErr(
 					regexp.QuoteMeta(profileQuery),
 					nil,
 					nil,
@@ -552,7 +552,7 @@ func Test_UserPrepares(t *testing.T) {
 			name:    "prepareProfileQuery not human found (error)",
 			prepare: prepareProfileQuery,
 			want: want{
-				sqlExpectations: mockQuery(
+				sqlExpectations: mockQueryScanErr(
 					regexp.QuoteMeta(profileQuery),
 					profileCols,
 					[]driver.Value{
@@ -595,13 +595,13 @@ func Test_UserPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Profile)(nil),
 		},
 		{
 			name:    "prepareEmailQuery no result",
 			prepare: prepareEmailQuery,
 			want: want{
-				sqlExpectations: mockQuery(
+				sqlExpectations: mockQueryScanErr(
 					regexp.QuoteMeta(emailQuery),
 					nil,
 					nil,
@@ -650,7 +650,7 @@ func Test_UserPrepares(t *testing.T) {
 			name:    "prepareEmailQuery not human found (error)",
 			prepare: prepareEmailQuery,
 			want: want{
-				sqlExpectations: mockQuery(
+				sqlExpectations: mockQueryScanErr(
 					regexp.QuoteMeta(emailQuery),
 					emailCols,
 					[]driver.Value{
@@ -689,13 +689,13 @@ func Test_UserPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Email)(nil),
 		},
 		{
 			name:    "preparePhoneQuery no result",
 			prepare: preparePhoneQuery,
 			want: want{
-				sqlExpectations: mockQuery(
+				sqlExpectations: mockQueryScanErr(
 					regexp.QuoteMeta(phoneQuery),
 					nil,
 					nil,
@@ -744,7 +744,7 @@ func Test_UserPrepares(t *testing.T) {
 			name:    "preparePhoneQuery not human found (error)",
 			prepare: preparePhoneQuery,
 			want: want{
-				sqlExpectations: mockQuery(
+				sqlExpectations: mockQueryScanErr(
 					regexp.QuoteMeta(phoneQuery),
 					phoneCols,
 					[]driver.Value{
@@ -783,7 +783,7 @@ func Test_UserPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Phone)(nil),
 		},
 		{
 			name:    "prepareUserUniqueQuery no result",
@@ -837,13 +837,13 @@ func Test_UserPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: false,
 		},
 		{
 			name:    "prepareNotifyUserQuery no result",
 			prepare: prepareNotifyUserQuery,
 			want: want{
-				sqlExpectations: mockQuery(
+				sqlExpectations: mockQueryScanErr(
 					regexp.QuoteMeta(notifyUserQuery),
 					nil,
 					nil,
@@ -924,7 +924,7 @@ func Test_UserPrepares(t *testing.T) {
 			name:    "prepareNotifyUserQuery not notify found (error)",
 			prepare: prepareNotifyUserQuery,
 			want: want{
-				sqlExpectations: mockQuery(
+				sqlExpectations: mockQueryScanErr(
 					regexp.QuoteMeta(notifyUserQuery),
 					notifyUserCols,
 					[]driver.Value{
@@ -980,13 +980,13 @@ func Test_UserPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*NotifyUser)(nil),
 		},
 		{
 			name:    "prepareUsersQuery no result",
 			prepare: prepareUsersQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(usersQuery),
 					nil,
 					nil,
@@ -1214,7 +1214,7 @@ func Test_UserPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Users)(nil),
 		},
 	}
 	for _, tt := range tests {

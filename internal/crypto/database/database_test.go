@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	z_db "github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
@@ -46,7 +47,7 @@ func Test_database_ReadKeys(t *testing.T) {
 		{
 			"decryption error",
 			fields{
-				client: dbMock(t, expectQuery(
+				client: dbMock(t, expectQueryScanErr(
 					"SELECT id, key FROM system.encryption_keys",
 					[]string{"id", "key"},
 					[][]driver.Value{
@@ -172,7 +173,7 @@ func Test_database_ReadKey(t *testing.T) {
 		{
 			"key not found err",
 			fields{
-				client: dbMock(t, expectQuery(
+				client: dbMock(t, expectQueryScanErr(
 					"SELECT key FROM system.encryption_keys WHERE id = $1",
 					nil,
 					nil,
@@ -192,7 +193,7 @@ func Test_database_ReadKey(t *testing.T) {
 		{
 			"decryption error",
 			fields{
-				client: dbMock(t, expectQuery(
+				client: dbMock(t, expectQueryScanErr(
 					"SELECT key FROM system.encryption_keys WHERE id = $1",
 					[]string{"key"},
 					[][]driver.Value{
@@ -445,7 +446,7 @@ func Test_checkMasterKeyLength(t *testing.T) {
 
 type db struct {
 	mock sqlmock.Sqlmock
-	db   *sql.DB
+	db   *z_db.DB
 }
 
 func dbMock(t *testing.T, expectations ...func(m sqlmock.Sqlmock)) db {
@@ -459,19 +460,41 @@ func dbMock(t *testing.T, expectations ...func(m sqlmock.Sqlmock)) db {
 	}
 	return db{
 		mock: mock,
-		db:   client,
+		db:   &z_db.DB{DB: client},
 	}
 }
 
 func expectQueryErr(query string, err error, args ...driver.Value) func(m sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin()
 		m.ExpectQuery(regexp.QuoteMeta(query)).WithArgs(args...).WillReturnError(err)
+		m.ExpectRollback()
+	}
+}
+
+func expectQueryScanErr(stmt string, cols []string, rows [][]driver.Value, args ...driver.Value) func(m sqlmock.Sqlmock) {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin()
+		q := m.ExpectQuery(regexp.QuoteMeta(stmt)).WithArgs(args...)
+		m.ExpectRollback()
+		result := sqlmock.NewRows(cols)
+		count := uint64(len(rows))
+		for _, row := range rows {
+			if cols[len(cols)-1] == "count" {
+				row = append(row, count)
+			}
+			result.AddRow(row...)
+		}
+		q.WillReturnRows(result)
+		q.RowsWillBeClosed()
 	}
 }
 
 func expectQuery(stmt string, cols []string, rows [][]driver.Value, args ...driver.Value) func(m sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
+		m.ExpectBegin()
 		q := m.ExpectQuery(regexp.QuoteMeta(stmt)).WithArgs(args...)
+		m.ExpectCommit()
 		result := sqlmock.NewRows(cols)
 		count := uint64(len(rows))
 		for _, row := range rows {

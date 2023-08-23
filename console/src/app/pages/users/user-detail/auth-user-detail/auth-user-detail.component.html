@@ -115,7 +115,11 @@
 
         <cnsl-auth-passwordless *ngIf="user" #mfaComponent></cnsl-auth-passwordless>
 
-        <cnsl-auth-user-mfa *ngIf="user" #mfaComponent></cnsl-auth-user-mfa>
+        <cnsl-auth-user-mfa
+          [phoneVerified]="user.human?.phone?.isPhoneVerified ?? false"
+          *ngIf="user"
+          #mfaComponent
+        ></cnsl-auth-user-mfa>
       </ng-container>
 
       <ng-container *ngIf="currentSetting === 'grants'">

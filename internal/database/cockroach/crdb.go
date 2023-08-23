@@ -2,7 +2,6 @@ package cockroach
 
 import (
 	"database/sql"
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -21,6 +20,9 @@ func init() {
 
 const (
 	sslDisabledMode = "disable"
+	sslRequireMode  = "require"
+	sslAllowMode    = "allow"
+	sslPreferMode   = "prefer"
 )
 
 type Config struct {
@@ -97,12 +99,7 @@ func (c *Config) Type() string {
 }
 
 func (c *Config) Timetravel(d time.Duration) string {
-	// verify that it is at least 1 micro second
-	if d < time.Microsecond {
-		d = time.Microsecond
-	}
-
-	return fmt.Sprintf(" AS OF SYSTEM TIME '-%d µs' ", d.Microseconds())
+	return ""
 }
 
 type User struct {
@@ -127,6 +124,11 @@ func (c *Config) checkSSL(user User) {
 		user.SSL = SSL{Mode: sslDisabledMode}
 		return
 	}
+
+	if user.SSL.Mode == sslRequireMode || user.SSL.Mode == sslAllowMode || user.SSL.Mode == sslPreferMode {
+		return
+	}
+
 	if user.SSL.RootCert == "" {
 		logging.WithFields(
 			"cert set", user.SSL.Cert != "",

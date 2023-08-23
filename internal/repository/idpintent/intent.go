@@ -10,9 +10,10 @@ import (
 )
 
 const (
-	StartedEventType   = instanceEventTypePrefix + "started"
-	SucceededEventType = instanceEventTypePrefix + "succeeded"
-	FailedEventType    = instanceEventTypePrefix + "failed"
+	StartedEventType       = instanceEventTypePrefix + "started"
+	SucceededEventType     = instanceEventTypePrefix + "succeeded"
+	LDAPSucceededEventType = instanceEventTypePrefix + "ldap.succeeded"
+	FailedEventType        = instanceEventTypePrefix + "failed"
 )
 
 type StartedEvent struct {
@@ -66,10 +67,11 @@ func StartedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 type SucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	IDPUser        []byte              `json:"idpUser"`
-	IDPUserID      string              `json:"idpUserId,omitempty"`
-	IDPUserName    string              `json:"idpUserName,omitempty"`
-	UserID         string              `json:"userId,omitempty"`
+	IDPUser     []byte `json:"idpUser"`
+	IDPUserID   string `json:"idpUserId,omitempty"`
+	IDPUserName string `json:"idpUserName,omitempty"`
+	UserID      string `json:"userId,omitempty"`
+
 	IDPAccessToken *crypto.CryptoValue `json:"idpAccessToken,omitempty"`
 	IDPIDToken     string              `json:"idpIdToken,omitempty"`
 }
@@ -109,6 +111,61 @@ func (e *SucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 
 func SucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &SucceededEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := event.Unmarshal(e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "IDP-HBreq", "unable to unmarshal event")
+	}
+
+	return e, nil
+}
+
+type LDAPSucceededEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	IDPUser     []byte `json:"idpUser"`
+	IDPUserID   string `json:"idpUserId,omitempty"`
+	IDPUserName string `json:"idpUserName,omitempty"`
+	UserID      string `json:"userId,omitempty"`
+
+	EntryAttributes map[string][]string `json:"user,omitempty"`
+}
+
+func NewLDAPSucceededEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	idpUser []byte,
+	idpUserID,
+	idpUserName,
+	userID string,
+	attributes map[string][]string,
+) *LDAPSucceededEvent {
+	return &LDAPSucceededEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			LDAPSucceededEventType,
+		),
+		IDPUser:         idpUser,
+		IDPUserID:       idpUserID,
+		IDPUserName:     idpUserName,
+		UserID:          userID,
+		EntryAttributes: attributes,
+	}
+}
+
+func (e *LDAPSucceededEvent) Payload() interface{} {
+	return e
+}
+
+func (e *LDAPSucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func LDAPSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	e := &LDAPSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 

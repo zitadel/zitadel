@@ -349,13 +349,13 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*AuthNKey)(nil),
 		},
 		{
 			name:    "prepareAuthNKeyQuery no result",
 			prepare: prepareAuthNKeyQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(prepareAuthNKeyStmt),
 					nil,
 					nil,
@@ -412,13 +412,13 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*AuthNKey)(nil),
 		},
 		{
 			name:    "prepareAuthNKeyPublicKeyQuery no result",
 			prepare: prepareAuthNKeyPublicKeyQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(prepareAuthNKeyPublicKeyStmt),
 					nil,
 					nil,
@@ -461,7 +461,7 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: ([]byte)(nil),
 		},
 	}
 	for _, tt := range tests {

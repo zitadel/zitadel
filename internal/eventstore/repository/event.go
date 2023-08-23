@@ -64,6 +64,8 @@ type Event struct {
 	//InstanceID is the instance where this event belongs to
 	// use the ID of the instance
 	InstanceID string
+
+	Constraints []*eventstore.UniqueConstraint
 }
 
 // Aggregate implements [eventstore.Event]
@@ -119,4 +121,6 @@ func (e *Event) Payload() any {
 	return e.Data
 }
 
-func (e *Event) UniqueConstraints() []*eventstore.UniqueConstraint { return nil }
+func (e *Event) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return e.Constraints
+}

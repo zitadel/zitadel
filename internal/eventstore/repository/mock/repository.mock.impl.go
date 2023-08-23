@@ -87,8 +87,17 @@ func (m *MockRepository) ExpectPush(expectedCommands []eventstore.Command) *Mock
 				if !assert.Equal(m.MockPusher.ctrl.T, expectedCommand.Revision(), commands[i].Revision()) {
 					m.MockPusher.ctrl.T.Errorf("invalid command.Revision [%d]: expected: %#v got: %#v", i, expectedCommand.Revision(), commands[i].Revision())
 				}
-				expectedPayload, _ := json.Marshal(expectedCommand.Payload())
+
+				var expectedPayload []byte
+				expectedPayload, ok := expectedCommand.Payload().([]byte)
+				if !ok {
+					expectedPayload, _ = json.Marshal(expectedCommand.Payload())
+				}
+				if string(expectedPayload) == "" {
+					expectedPayload = []byte("null")
+				}
 				gotPayload, _ := json.Marshal(commands[i].Payload())
+
 				if !assert.Equal(m.MockPusher.ctrl.T, expectedPayload, gotPayload) {
 					m.MockPusher.ctrl.T.Errorf("invalid command.Payload [%d]: expected: %#v got: %#v", i, expectedCommand.Payload(), commands[i].Payload())
 				}

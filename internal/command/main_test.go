@@ -80,6 +80,7 @@ func eventPusherToEvents(eventsPushes ...eventstore.Command) []*repository.Event
 			Typ:           event.Type(),
 			Version:       event.Aggregate().Version,
 			Data:          data,
+			Constraints:   event.UniqueConstraints(),
 		}
 	}
 	return events
@@ -149,6 +150,7 @@ func eventFromEventPusher(event eventstore.Command) *repository.Event {
 		AggregateID:                   event.Aggregate().ID,
 		AggregateType:                 event.Aggregate().Type,
 		ResourceOwner:                 sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
+		Constraints:                   event.UniqueConstraints(),
 	}
 }
 

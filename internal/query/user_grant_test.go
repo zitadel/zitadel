@@ -122,7 +122,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 			name:    "prepareUserGrantQuery no result",
 			prepare: prepareUserGrantQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					userGrantStmt,
 					nil,
 					nil,
@@ -441,7 +441,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*UserGrant)(nil),
 		},
 		{
 			name:    "prepareUserGrantsQuery no result",
@@ -920,7 +920,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*UserGrants)(nil),
 		},
 	}
 	for _, tt := range tests {

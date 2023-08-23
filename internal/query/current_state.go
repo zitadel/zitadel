@@ -70,25 +70,18 @@ func (q *Queries) SearchCurrentStates(ctx context.Context, queries *CurrentState
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-MmFef", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		currentStates, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-22H8f", "Errors.Internal")
 	}
-	defer rows.Close()
 
-	states, err := scan(rows)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return states, nil
+	return currentStates, nil
 }
 
-func (q *Queries) latestState(ctx context.Context, projections ...table) (_ *LatestState, err error) {
+func (q *Queries) latestState(ctx context.Context, projections ...table) (state *LatestState, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -106,8 +99,12 @@ func (q *Queries) latestState(ctx context.Context, projections ...table) (_ *Lat
 		return nil, errors.ThrowInternal(err, "QUERY-5CfX9", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		state, err = scan(row)
+		return err
+	}, stmt, args...)
+
+	return state, err
 }
 
 func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName string) (err error) {

@@ -10,11 +10,14 @@ func _() {
 	var x [1]struct{}
 	_ = x[Unspecified-0]
 	_ = x[OrgOwner-1]
+	_ = x[Login-2]
+	_ = x[IAMOwner-3]
+	_ = x[SystemUser-4]
 }
 
-const _UserType_name = "UnspecifiedOrgOwner"
+const _UserType_name = "UnspecifiedOrgOwnerLoginIAMOwnerSystemUser"
 
-var _UserType_index = [...]uint8{0, 11, 19}
+var _UserType_index = [...]uint8{0, 11, 19, 24, 32, 42}
 
 func (i UserType) String() string {
 	if i < 0 || i >= UserType(len(_UserType_index)-1) {

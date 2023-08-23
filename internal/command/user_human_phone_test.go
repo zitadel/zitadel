@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
@@ -13,6 +14,7 @@ import (
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -671,13 +673,13 @@ func TestCommandSide_VerifyHumanPhone(t *testing.T) {
 
 func TestCommandSide_CreateVerificationCodeHumanPhone(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore     *eventstore.Eventstore
+		userEncryption crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx             context.Context
-		userID          string
-		resourceOwner   string
-		secretGenerator crypto.Generator
+		ctx           context.Context
+		userID        string
+		resourceOwner string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -791,6 +793,19 @@ func TestCommandSide_CreateVerificationCodeHumanPhone(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								domain.SecretGeneratorTypeVerifyPhoneCode,
+								8,
+								time.Hour,
+								true,
+								true,
+								true,
+								true,
+							)),
+					),
 					expectPush(
 						user.NewHumanPhoneCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -798,18 +813,18 @@ func TestCommandSide_CreateVerificationCodeHumanPhone(t *testing.T) {
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
 								KeyID:      "id",
-								Crypted:    []byte("a"),
+								Crypted:    []byte("12345678"),
 							},
 							time.Hour*1,
 						),
 					),
 				),
+				userEncryption: crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
 			},
 			args: args{
-				ctx:             context.Background(),
-				userID:          "user1",
-				resourceOwner:   "org1",
-				secretGenerator: GetMockSecretGenerator(t),
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -821,9 +836,10 @@ func TestCommandSide_CreateVerificationCodeHumanPhone(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:     tt.fields.eventstore,
+				userEncryption: tt.fields.userEncryption,
 			}
-			got, err := r.CreateHumanPhoneVerificationCode(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.secretGenerator)
+			got, err := r.CreateHumanPhoneVerificationCode(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

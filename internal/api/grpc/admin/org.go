@@ -72,18 +72,26 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 	}
 	human := setUpOrgHumanToCommand(req.User.(*admin_pb.SetUpOrgRequest_Human_).Human) //TODO: handle machine
 
-	userID, objectDetails, err := s.command.SetUpOrg(ctx, &command.OrgSetup{
+	createdOrg, err := s.command.SetUpOrg(ctx, &command.OrgSetup{
 		Name:         req.Org.Name,
 		CustomDomain: req.Org.Domain,
-		Human:        human,
-		Roles:        req.Roles,
-	}, userIDs...)
+		Admins: []*command.OrgSetupAdmin{
+			{
+				Human: human,
+				Roles: req.Roles,
+			},
+		},
+	}, true, userIDs...)
 	if err != nil {
 		return nil, err
 	}
+	var userID string
+	if len(createdOrg.CreatedAdmins) == 1 {
+		userID = createdOrg.CreatedAdmins[0].ID
+	}
 	return &admin_pb.SetUpOrgResponse{
-		Details: object.DomainToAddDetailsPb(objectDetails),
-		OrgId:   objectDetails.ResourceOwner,
+		Details: object.DomainToAddDetailsPb(createdOrg.ObjectDetails),
+		OrgId:   createdOrg.ObjectDetails.ResourceOwner,
 		UserId:  userID,
 	}, nil
 }

@@ -137,12 +137,32 @@ func (v *UserSessionView) AppendEvent(event eventstore.Event) error {
 	case user.UserV1MFAOTPCheckSucceededType,
 		user.HumanMFAOTPCheckSucceededType:
 		v.setSecondFactorVerification(event.CreatedAt(), domain.MFATypeTOTP)
+	case user.HumanOTPSMSCheckSucceededType:
+		data := new(es_model.OTPVerified)
+		err := data.SetData(event)
+		if err != nil {
+			return err
+		}
+		if v.UserAgentID == data.UserAgentID {
+			v.setSecondFactorVerification(event.CreatedAt(), domain.MFATypeOTPSMS)
+		}
+	case user.HumanOTPEmailCheckSucceededType:
+		data := new(es_model.OTPVerified)
+		err := data.SetData(event)
+		if err != nil {
+			return err
+		}
+		if v.UserAgentID == data.UserAgentID {
+			v.setSecondFactorVerification(event.CreatedAt(), domain.MFATypeOTPEmail)
+		}
 	case user.UserV1MFAOTPCheckFailedType,
 		user.UserV1MFAOTPRemovedType,
 		user.HumanMFAOTPCheckFailedType,
 		user.HumanMFAOTPRemovedType,
 		user.HumanU2FTokenCheckFailedType,
-		user.HumanU2FTokenRemovedType:
+		user.HumanU2FTokenRemovedType,
+		user.HumanOTPSMSCheckFailedType,
+		user.HumanOTPEmailCheckFailedType:
 		v.SecondFactorVerification = time.Time{}
 	case user.HumanU2FTokenVerifiedType:
 		data := new(es_model.WebAuthNVerify)
@@ -216,6 +236,10 @@ func (v *UserSessionView) EventTypes() []eventstore.EventType {
 		user.UserV1MFAOTPRemovedType,
 		user.HumanMFAOTPCheckFailedType,
 		user.HumanMFAOTPRemovedType,
+		user.HumanOTPSMSCheckSucceededType,
+		user.HumanOTPSMSCheckFailedType,
+		user.HumanOTPEmailCheckSucceededType,
+		user.HumanOTPEmailCheckFailedType,
 		user.HumanU2FTokenCheckFailedType,
 		user.HumanU2FTokenRemovedType,
 		user.HumanU2FTokenVerifiedType,

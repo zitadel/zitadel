@@ -105,13 +105,13 @@ func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string,
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-FDbKW", "Errors.Query.InvalidRequest")
 	}
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil || rows.Err() != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-ZkKUc", "Errors.Internal")
-	}
-	idps, err = scan(rows)
+
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		idps, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
-		return nil, err
+		return nil, errors.ThrowInternal(err, "QUERY-ZkKUc", "Errors.Internal")
 	}
 	idps.LatestState, err = q.latestState(ctx, idpLoginPolicyLinkTable)
 	return idps, err

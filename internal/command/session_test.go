@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
+	"github.com/pquerna/otp/totp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -146,7 +147,6 @@ func TestCommands_CreateSession(t *testing.T) {
 	type args struct {
 		ctx      context.Context
 		checks   []SessionCommand
-		domain   string
 		metadata map[string][]byte
 	}
 	type res struct {
@@ -204,38 +204,7 @@ func TestCommands_CreateSession(t *testing.T) {
 			[]expect{
 				expectFilter(),
 				expectPush(
-					session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, ""),
-					session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-						"tokenID",
-					),
-				),
-			},
-			res{
-				want: &SessionChanged{
-					ObjectDetails: &domain.ObjectDetails{ResourceOwner: "org1"},
-					ID:            "sessionID",
-					NewToken:      "token",
-				},
-			},
-		},
-		{
-			"empty session with domain",
-			fields{
-				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
-				tokenCreator: func(sessionID string) (string, string, error) {
-					return "tokenID",
-						"token",
-						nil
-				},
-			},
-			args{
-				ctx:    authz.NewMockContext("", "org1", ""),
-				domain: "domain.tld",
-			},
-			[]expect{
-				expectFilter(),
-				expectPush(
-					session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld"),
+					session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate),
 					session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 						"tokenID",
 					),
@@ -258,7 +227,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				idGenerator:         tt.fields.idGenerator,
 				sessionTokenCreator: tt.fields.tokenCreator,
 			}
-			got, err := c.CreateSession(tt.args.ctx, tt.args.checks, tt.args.domain, tt.args.metadata)
+			got, err := c.CreateSession(tt.args.ctx, tt.args.checks, tt.args.metadata)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})
@@ -307,7 +276,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld")),
+							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID")),
@@ -332,7 +301,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld")),
+							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID")),
@@ -725,6 +694,138 @@ func TestCommands_updateSession(t *testing.T) {
 	}
 }
 
+func TestCheckTOTP(t *testing.T) {
+	ctx := authz.NewMockContext("", "org1", "user1")
+
+	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
+	key, secret, err := domain.NewTOTPKey("example.com", "user1", cryptoAlg)
+	require.NoError(t, err)
+
+	sessAgg := &session.NewAggregate("session1", "org1").Aggregate
+	userAgg := &user.NewAggregate("user1", "org1").Aggregate
+
+	code, err := totp.GenerateCode(key.Secret(), testNow)
+	require.NoError(t, err)
+
+	type fields struct {
+		sessionWriteModel *SessionWriteModel
+		eventstore        func(*testing.T) *eventstore.Eventstore
+	}
+
+	tests := []struct {
+		name              string
+		code              string
+		fields            fields
+		wantEventCommands []eventstore.Command
+		wantErr           error
+	}{
+		{
+			name: "missing userID",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(),
+			},
+			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Neil7", "Errors.User.UserIDMissing"),
+		},
+		{
+			name: "filter error",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilterError(io.ErrClosedPipe),
+				),
+			},
+			wantErr: io.ErrClosedPipe,
+		},
+		{
+			name: "otp not ready error",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+					),
+				),
+			},
+			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-eej1U", "Errors.User.MFA.OTP.NotReady"),
+		},
+		{
+			name: "otp verify error",
+			code: "foobar",
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+						eventFromEventPusher(
+							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
+						),
+					),
+				),
+			},
+			wantErr: caos_errs.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.MFA.OTP.InvalidCode"),
+		},
+		{
+			name: "ok",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+						eventFromEventPusher(
+							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
+						),
+					),
+				),
+			},
+			wantEventCommands: []eventstore.Command{
+				session.NewTOTPCheckedEvent(ctx, sessAgg, testNow),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := &SessionCommands{
+				sessionWriteModel: tt.fields.sessionWriteModel,
+				eventstore:        tt.fields.eventstore(t),
+				totpAlg:           cryptoAlg,
+				now:               func() time.Time { return testNow },
+			}
+			err := CheckTOTP(tt.code)(ctx, cmd)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantEventCommands, cmd.eventCommands)
+		})
+	}
+}
+
 func TestCommands_TerminateSession(t *testing.T) {
 	type fields struct {
 		eventstore    *eventstore.Eventstore
@@ -765,7 +866,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld")),
+							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID")),
@@ -790,7 +891,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld")),
+							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID")),
@@ -819,7 +920,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld")),
+							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID"),
@@ -849,7 +950,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, "domain.tld")),
+							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID"),

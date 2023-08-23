@@ -75,7 +75,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 			name:    "preparePersonalAccessTokenQuery no result",
 			prepare: preparePersonalAccessTokenQuery,
 			want: want{
-				sqlExpectations: mockQuery(
+				sqlExpectations: mockQueryScanErr(
 					personalAccessTokenStmt,
 					nil,
 					nil,
@@ -134,7 +134,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*PersonalAccessToken)(nil),
 		},
 		{
 			name:    "preparePersonalAccessTokensQuery no result",
@@ -261,7 +261,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*PersonalAccessTokens)(nil),
 		},
 	}
 	for _, tt := range tests {

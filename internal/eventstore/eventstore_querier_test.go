@@ -2,6 +2,7 @@ package eventstore_test
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 	"time"
 
@@ -169,9 +170,10 @@ func TestCRDB_CreateInstance(t *testing.T) {
 					t.Errorf("CRDB.CreateInstance() error = %v, wantErr %v", err, tt.res.wantErr)
 				}
 
-				sequenceRow := testCRDBClient.QueryRow("SELECT EXISTS(SELECT 1 FROM [SHOW SEQUENCES FROM eventstore] WHERE sequence_name like $1)", "i_"+tt.args.instanceID+"%")
 				var exists bool
-				err := sequenceRow.Scan(&exists)
+				err := testCRDBClient.QueryRow(func(row *sql.Row) error {
+					return row.Scan(&exists)
+				}, "SELECT EXISTS(SELECT 1 FROM [SHOW SEQUENCES FROM eventstore] WHERE sequence_name like $1)", "i_"+tt.args.instanceID+"%")
 				if err != nil {
 					t.Error("unable to query inserted rows: ", err)
 					return

@@ -2,6 +2,7 @@ package eventstore_test
 
 import (
 	"context"
+	"database/sql"
 	"sync"
 	"testing"
 	"time"
@@ -12,9 +13,8 @@ import (
 
 func TestCRDB_Push_OneAggregate(t *testing.T) {
 	type args struct {
-		ctx      context.Context
-		commands []eventstore.Command
-		// uniqueConstraints    *eventstore.UniqueConstraint
+		ctx                  context.Context
+		commands             []eventstore.Command
 		uniqueDataType       string
 		uniqueDataField      string
 		uniqueDataInstanceID string
@@ -632,29 +632,24 @@ func pushAggregates(pusher eventstore.Pusher, aggregateCommands [][]eventstore.C
 func assertResourceOwners(t *testing.T, db *database.DB, resourceOwners, aggregateIDs database.TextArray[string], aggregateType string) {
 	t.Helper()
 
-	rows, err := db.Query("SELECT resource_owner FROM eventstore.events WHERE aggregate_type = $1 AND aggregate_id = ANY($2) ORDER BY created_at", aggregateType, aggregateIDs)
-	if err != nil {
-		t.Error("unable to query inserted rows: ", err)
-		return
-	}
-	defer rows.Close()
-
 	eventCount := 0
-	for i := 0; rows.Next(); i++ {
-		var resourceOwner string
-		err = rows.Scan(&resourceOwner)
-		if err != nil {
-			t.Error("unable to scan row: ", err)
-			return
+	err := db.Query(func(rows *sql.Rows) error {
+		for i := 0; rows.Next(); i++ {
+			var resourceOwner string
+			err := rows.Scan(&resourceOwner)
+			if err != nil {
+				return err
+			}
+			if resourceOwner != resourceOwners[i] {
+				t.Errorf("unexpected resource owner in queried event. want %q, got: %q", resourceOwners[i], resourceOwner)
+			}
+			eventCount++
 		}
-		if resourceOwner != resourceOwners[i] {
-			t.Errorf("unexpected resource owner in queried event. want %q, got: %q", resourceOwners[i], resourceOwner)
-		}
-		eventCount++
-	}
-
-	if err := rows.Err(); err != nil {
-		t.Errorf("unexpected rows.Err: %v", err)
+		return nil
+	}, "SELECT resource_owner FROM eventstore.events WHERE aggregate_type = $1 AND aggregate_id = ANY($2) ORDER BY created_at", aggregateType, aggregateIDs)
+	if err != nil {
+		t.Error("query failed: ", err)
+		return
 	}
 
 	if eventCount != len(resourceOwners) {
@@ -665,10 +660,12 @@ func assertResourceOwners(t *testing.T, db *database.DB, resourceOwners, aggrega
 func assertEventCount(t *testing.T, db *database.DB, aggTypes database.TextArray[eventstore.AggregateType], aggIDs database.TextArray[string], pushedEventsCount int) {
 	t.Helper()
 
-	row := db.QueryRow("SELECT count(*) FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2)", aggTypes, aggIDs)
-
 	var count int
-	if err := row.Scan(&count); err != nil {
+	err := db.QueryRow(func(row *sql.Row) error {
+		return row.Scan(&count)
+	}, "SELECT count(*) FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2)", aggTypes, aggIDs)
+
+	if err != nil {
 		t.Errorf("unexpected err in row.Scan: %v", err)
 		return
 	}
@@ -692,9 +689,10 @@ func assertUniqueConstraint(t *testing.T, db *database.DB, commands []eventstore
 		return
 	}
 
-	countUniqueRow := db.QueryRow("SELECT COUNT(*) FROM eventstore.unique_constraints where unique_type = $1 AND unique_field = $2", uniqueConstraint.UniqueType, uniqueConstraint.UniqueField)
 	var uniqueCount int
-	err := countUniqueRow.Scan(&uniqueCount)
+	err := db.QueryRow(func(row *sql.Row) error {
+		return row.Scan(&uniqueCount)
+	}, "SELECT COUNT(*) FROM eventstore.unique_constraints where unique_type = $1 AND unique_field = $2", uniqueConstraint.UniqueType, uniqueConstraint.UniqueField)
 	if err != nil {
 		t.Error("unable to query inserted rows: ", err)
 		return

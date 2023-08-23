@@ -105,6 +105,8 @@ const (
 	MFATypeTOTP MFAType = iota
 	MFATypeU2F
 	MFATypeU2FUserVerification
+	MFATypeOTPSMS
+	MFATypeOTPEmail
 )
 
 type MFALevel int

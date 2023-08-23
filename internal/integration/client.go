@@ -10,10 +10,12 @@ import (
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
+	"golang.org/x/text/language"
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -21,6 +23,7 @@ import (
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
+	organisation "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
@@ -34,6 +37,7 @@ type Client struct {
 	UserV2    user.UserServiceClient
 	SessionV2 session.SessionServiceClient
 	OIDCv2    oidc_pb.OIDCServiceClient
+	OrgV2     organisation.OrganizationServiceClient
 	System    system.SystemServiceClient
 }
 
@@ -46,6 +50,7 @@ func newClient(cc *grpc.ClientConn) Client {
 		UserV2:    user.NewUserServiceClient(cc),
 		SessionV2: session.NewSessionServiceClient(cc),
 		OIDCv2:    oidc_pb.NewOIDCServiceClient(cc),
+		OrgV2:     organisation.NewOrganizationServiceClient(cc),
 		System:    system.NewSystemServiceClient(cc),
 	}
 }
@@ -82,8 +87,8 @@ func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse
 			},
 		},
 		Profile: &user.SetHumanProfile{
-			FirstName: "Mickey",
-			LastName:  "Mouse",
+			GivenName:  "Mickey",
+			FamilyName: "Mouse",
 		},
 		Email: &user.SetHumanEmail{
 			Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
@@ -143,6 +148,24 @@ func (s *Tester) RegisterUserPasskey(ctx context.Context, userID string) {
 	logging.OnError(err).Fatal("create user passkey")
 }
 
+func (s *Tester) RegisterUserU2F(ctx context.Context, userID string) {
+	pkr, err := s.Client.UserV2.RegisterU2F(ctx, &user.RegisterU2FRequest{
+		UserId: userID,
+		Domain: s.Config.ExternalDomain,
+	})
+	logging.OnError(err).Fatal("create user u2f")
+	attestationResponse, err := s.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
+	logging.OnError(err).Fatal("create user u2f")
+
+	_, err = s.Client.UserV2.VerifyU2FRegistration(ctx, &user.VerifyU2FRegistrationRequest{
+		UserId:              userID,
+		U2FId:               pkr.GetU2FId(),
+		PublicKeyCredential: attestationResponse,
+		TokenName:           "nice name",
+	})
+	logging.OnError(err).Fatal("create user u2f")
+}
+
 func (s *Tester) SetUserPassword(ctx context.Context, userID, password string) {
 	_, err := s.Client.UserV2.SetPassword(ctx, &user.SetPasswordRequest{
 		UserId:      userID,
@@ -153,7 +176,7 @@ func (s *Tester) SetUserPassword(ctx context.Context, userID, password string) {
 
 func (s *Tester) AddGenericOAuthProvider(t *testing.T) string {
 	ctx := authz.WithInstance(context.Background(), s.Instance)
-	id, _, err := s.Commands.AddOrgGenericOAuthProvider(ctx, s.Organisation.ID, command.GenericOAuthProvider{
+	id, _, err := s.Commands.AddInstanceGenericOAuthProvider(ctx, command.GenericOAuthProvider{
 		Name:                  "idp",
 		ClientID:              "clientID",
 		ClientSecret:          "clientSecret",
@@ -175,12 +198,12 @@ func (s *Tester) AddGenericOAuthProvider(t *testing.T) string {
 
 func (s *Tester) CreateIntent(t *testing.T, idpID string) string {
 	ctx := authz.WithInstance(context.Background(), s.Instance)
-	id, _, err := s.Commands.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", s.Organisation.ID)
+	writeModel, _, err := s.Commands.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", s.Organisation.ID)
 	require.NoError(t, err)
-	return id
+	return writeModel.AggregateID
 }
 
-func (s *Tester) CreateSuccessfulIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+func (s *Tester) CreateSuccessfulOAuthIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
 	ctx := authz.WithInstance(context.Background(), s.Instance)
 	intentID := s.CreateIntent(t, idpID)
 	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Organisation.ID)
@@ -206,28 +229,58 @@ func (s *Tester) CreateSuccessfulIntent(t *testing.T, idpID, userID, idpUserID s
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
 }
 
-func (s *Tester) CreatePasskeySession(t *testing.T, ctx context.Context, userID string) (id, token string, start, change time.Time) {
+func (s *Tester) CreateSuccessfulLDAPIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+	ctx := authz.WithInstance(context.Background(), s.Instance)
+	intentID := s.CreateIntent(t, idpID)
+	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Organisation.ID)
+	require.NoError(t, err)
+	username := "username"
+	lang := language.Make("en")
+	idpUser := ldap.NewUser(
+		idpUserID,
+		"",
+		"",
+		"",
+		"",
+		username,
+		"",
+		false,
+		"",
+		false,
+		lang,
+		"",
+		"",
+	)
+	attributes := map[string][]string{"id": {idpUserID}, "username": {username}, "language": {lang.String()}}
+	token, err := s.Commands.SucceedLDAPIDPIntent(ctx, writeModel, idpUser, userID, attributes)
+	require.NoError(t, err)
+	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
+}
+
+func (s *Tester) CreateVerfiedWebAuthNSession(t *testing.T, ctx context.Context, userID string) (id, token string, start, change time.Time) {
 	createResp, err := s.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
 				Search: &session.CheckUser_UserId{UserId: userID},
 			},
 		},
-		Challenges: []session.ChallengeKind{
-			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
+		Challenges: &session.RequestChallenges{
+			WebAuthN: &session.RequestChallenges_WebAuthN{
+				Domain:                      s.Config.ExternalDomain,
+				UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
+			},
 		},
-		Domain: s.Config.ExternalDomain,
 	})
 	require.NoError(t, err)
 
-	assertion, err := s.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetPasskey().GetPublicKeyCredentialRequestOptions())
+	assertion, err := s.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions(), true)
 	require.NoError(t, err)
 
 	updateResp, err := s.Client.SessionV2.SetSession(ctx, &session.SetSessionRequest{
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),
 		Checks: &session.Checks{
-			Passkey: &session.CheckPasskey{
+			WebAuthN: &session.CheckWebAuthN{
 				CredentialAssertionData: assertion,
 			},
 		},
@@ -247,7 +300,6 @@ func (s *Tester) CreatePasswordSession(t *testing.T, ctx context.Context, userID
 				Password: password,
 			},
 		},
-		Domain: s.Config.ExternalDomain,
 	})
 	require.NoError(t, err)
 	return createResp.GetSessionId(), createResp.GetSessionToken(),

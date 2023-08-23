@@ -2,30 +2,25 @@ package setup
 
 import (
 	"context"
-	"embed"
+	_ "embed"
 
 	"github.com/zitadel/zitadel/internal/database"
 )
 
 var (
-	//go:embed 12/cockroach/12.sql
-	//go:embed 12/postgres/12.sql
-	changeEvents embed.FS
+	//go:embed 12/12_add_otp_columns.sql
+	addOTPColumns string
 )
 
-type ChangeEvents struct {
+type AddOTPColumns struct {
 	dbClient *database.DB
 }
 
-func (mig *ChangeEvents) Execute(ctx context.Context) error {
-	stmt, err := readStmt(changeEvents, "12", mig.dbClient.Type(), "12.sql")
-	if err != nil {
-		return err
-	}
-	_, err = mig.dbClient.ExecContext(ctx, stmt)
+func (mig *AddOTPColumns) Execute(ctx context.Context) error {
+	_, err := mig.dbClient.ExecContext(ctx, addOTPColumns)
 	return err
 }
 
-func (mig *ChangeEvents) String() string {
-	return "12_events_push"
+func (mig *AddOTPColumns) String() string {
+	return "12_auth_users_otp_columns"
 }

@@ -105,7 +105,7 @@ func (q *MembershipSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 	return query
 }
 
-func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuery, withOwnerRemoved bool) (_ *Memberships, err error) {
+func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuery, withOwnerRemoved bool) (memberships *Memberships, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -121,11 +121,10 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	}
 	queryArgs = append(queryArgs, args...)
 
-	rows, err := q.client.QueryContext(ctx, stmt, queryArgs...)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-eAV2x", "Errors.Internal")
-	}
-	memberships, err := scan(rows)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		memberships, err = scan(rows)
+		return err
+	}, stmt, queryArgs...)
 	if err != nil {
 		return nil, err
 	}

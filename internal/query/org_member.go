@@ -78,7 +78,7 @@ func addOrgMemberWithoutOwnerRemoved(eq map[string]interface{}) {
 	eq[OrgMemberOwnerRemovedUser.identifier()] = false
 }
 
-func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery, withOwnerRemoved bool) (_ *Members, err error) {
+func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery, withOwnerRemoved bool) (members *Members, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -98,14 +98,14 @@ func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery, with
 		return nil, err
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		members, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-5g4yV", "Errors.Internal")
 	}
-	members, err := scan(rows)
-	if err != nil {
-		return nil, err
-	}
+
 	members.LatestState = currentSequence
 	return members, err
 }

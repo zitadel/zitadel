@@ -173,6 +173,28 @@ const (
 	columnCompareMax
 )
 
+type InTextQuery struct {
+	Column Column
+	Values []string
+}
+
+func (q *InTextQuery) Col() Column {
+	return q.Column
+}
+
+func NewInTextQuery(col Column, values []string) (*InTextQuery, error) {
+	if len(values) == 0 {
+		return nil, ErrEmptyValues
+	}
+	if col.isZero() {
+		return nil, ErrMissingColumn
+	}
+	return &InTextQuery{
+		Column: col,
+		Values: values,
+	}, nil
+}
+
 type TextQuery struct {
 	Column  Column
 	Text    string
@@ -184,6 +206,7 @@ var (
 	ErrInvalidCompare  = errors.New("invalid compare")
 	ErrMissingColumn   = errors.New("missing column")
 	ErrInvalidNumber   = errors.New("value is no number")
+	ErrEmptyValues     = errors.New("values array must not be empty")
 )
 
 func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery, error) {
@@ -202,6 +225,15 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery,
 
 func (q *TextQuery) Col() Column {
 	return q.Column
+}
+
+func (q *InTextQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (s *InTextQuery) comp() sq.Sqlizer {
+	// This translates to an IN query
+	return sq.Eq{s.Column.identifier(): s.Values}
 }
 
 func (q *TextQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -290,7 +322,7 @@ func NewNumberQuery(c Column, value interface{}, compare NumberComparison) (*Num
 	}
 	switch reflect.TypeOf(value).Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Float32, reflect.Float64:
-		//everything fine
+		// everything fine
 	default:
 		return nil, ErrInvalidNumber
 	}

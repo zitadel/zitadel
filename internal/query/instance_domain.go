@@ -88,11 +88,10 @@ func (q *Queries) SearchInstanceDomainsGlobal(ctx context.Context, queries *Inst
 }
 
 func (q *Queries) queryInstanceDomains(ctx context.Context, stmt string, scan func(*sql.Rows) (*InstanceDomains, error), args ...interface{}) (domains *InstanceDomains, err error) {
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Dh9Ap", "Errors.Internal")
-	}
-	domains, err = scan(rows)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		domains, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, err
 	}

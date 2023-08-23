@@ -89,6 +89,8 @@ InitMFAPrompt:
   Description: 两步验证为您的账户提供了额外的安全保障。这确保只有你能访问你的账户。
   Provider0: 软件应用（如 Google/Migrosoft Authenticator、Authy）
   Provider1: 硬件设备（如 Face ID、Windows Hello、指纹）
+  Provider3: 一次性密码短信
+  Provider4: 一次性密码电子邮件
   NextButtonText: 继续
   SkipButtonText: 跳过
 
@@ -96,6 +98,16 @@ InitMFAOTP:
   Title: 双因素验证
   Description: 创建你的双因素。如果你还没有，请下载一个认证器应用程序。
   OTPDescription: 使用您的身份验证器应用程序（例如 Google Authenticator）扫描代码或复制密码并在下方插入生成的代码。
+  PhoneLabel: 电话号码
+  CodeLabel: 验证码
+  EditButtonText: 编辑
+  ResendButtonText: 重发代码
+  NextButtonText: 继续
+
+InitMFASMS:
+  Title: 双因素验证
+  DescriptionPhone: 创建双因素身份验证。输入您的电话号码进行验证。
+  DescriptionCode: 创建双因素身份验证。输入收到的代码以验证您的电话号码。
   SecretLabel: 秘钥
   CodeLabel: 验证码
   NextButtonText: 继续
@@ -118,12 +130,21 @@ InitMFADone:
 MFAProvider:
   Provider0: 软件应用（如 Google/Migrosoft Authenticator、Authy）
   Provider1: 硬件设备（如 Face ID、Windows Hello、指纹）
+  Provider3: 一次性密码短信
+  Provider4: 一次性密码电子邮件
   ChooseOther: 或选择其他选项
 
 VerifyMFAOTP:
   Title: 验证2-Factor
   Description: 验证你的第二个因素
   CodeLabel: 验证码
+  NextButtonText: 继续
+
+VerifyOTP:
+  Title: 验证2-Factor
+  Description: 验证你的第二个因素
+  CodeLabel: 验证码
+  ResendButtonText: 重发代码
   NextButtonText: 继续
 
 VerifyMFAU2F:

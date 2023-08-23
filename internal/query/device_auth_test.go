@@ -67,9 +67,11 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 	}
 	defer client.Close()
 
+	mock.ExpectBegin()
 	mock.ExpectQuery(expectedDeviceAuthWhereDeviceCodeQuery).WillReturnRows(
 		sqlmock.NewRows(deviceAuthSelectColumns).AddRow(expectedDeviceAuthValues...),
 	)
+	mock.ExpectCommit()
 	q := Queries{
 		client: &database.DB{DB: client},
 	}
@@ -86,9 +88,11 @@ func TestQueries_DeviceAuthByUserCode(t *testing.T) {
 	}
 	defer client.Close()
 
+	mock.ExpectBegin()
 	mock.ExpectQuery(expectedDeviceAuthWhereUserCodeQuery).WillReturnRows(
 		sqlmock.NewRows(deviceAuthSelectColumns).AddRow(expectedDeviceAuthValues...),
 	)
+	mock.ExpectCommit()
 	q := Queries{
 		client: &database.DB{DB: client},
 	}
@@ -133,6 +137,7 @@ func Test_prepareDeviceAuthQuery(t *testing.T) {
 					return nil, true
 				},
 			},
+			object: (*domain.DeviceAuth)(nil),
 		},
 		{
 			name: "other error",
@@ -148,6 +153,7 @@ func Test_prepareDeviceAuthQuery(t *testing.T) {
 					return nil, true
 				},
 			},
+			object: (*domain.DeviceAuth)(nil),
 		},
 	}
 	for _, tt := range tests {

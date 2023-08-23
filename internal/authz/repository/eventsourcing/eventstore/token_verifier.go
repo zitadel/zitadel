@@ -191,8 +191,12 @@ func authMethodsFromSession(session *query.Session) []domain.UserAuthMethodType 
 	if !session.PasswordFactor.PasswordCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypePassword)
 	}
-	if !session.PasskeyFactor.PasskeyCheckedAt.IsZero() {
-		types = append(types, domain.UserAuthMethodTypePasswordless)
+	if !session.WebAuthNFactor.WebAuthNCheckedAt.IsZero() {
+		if session.WebAuthNFactor.UserVerified {
+			types = append(types, domain.UserAuthMethodTypePasswordless)
+		} else {
+			types = append(types, domain.UserAuthMethodTypeU2F)
+		}
 	}
 	if !session.IntentFactor.IntentCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypeIDP)
@@ -201,9 +205,6 @@ func authMethodsFromSession(session *query.Session) []domain.UserAuthMethodType 
 	/*
 		if !session.TOTPFactor.TOTPCheckedAt.IsZero() {
 			types = append(types, domain.UserAuthMethodTypeTOTP)
-		}
-		if !session.U2FFactor.U2FCheckedAt.IsZero() {
-			types = append(types, domain.UserAuthMethodTypeU2F)
 		}
 	*/
 	// TODO: add checks with https://github.com/zitadel/zitadel/issues/6224

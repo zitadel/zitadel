@@ -125,7 +125,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 				shouldTriggerBulk: false,
 				id:                "123",
 			},
-			expect:  mockQuery(expQuery, cols, nil, "123", "instanceID"),
+			expect:  mockQueryScanErr(expQuery, cols, nil, "123", "instanceID"),
 			wantErr: errors.ThrowNotFound(sql.ErrNoRows, "QUERY-Thee9", "Errors.AuthRequest.NotExisting"),
 		},
 		{

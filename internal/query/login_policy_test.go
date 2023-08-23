@@ -98,7 +98,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			name:    "prepareLoginPolicyQuery no result",
 			prepare: prepareLoginPolicyQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(loginPolicyQuery),
 					nil,
 					nil,
@@ -189,13 +189,13 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*LoginPolicy)(nil),
 		},
 		{
 			name:    "prepareLoginPolicy2FAsQuery no result",
 			prepare: prepareLoginPolicy2FAsQuery,
 			want: want{
-				sqlExpectations: mockQuery(
+				sqlExpectations: mockQueryScanErr(
 					regexp.QuoteMeta(prepareLoginPolicy2FAsStmt),
 					prepareLoginPolicy2FAsCols,
 					nil,
@@ -257,13 +257,13 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*SecondFactors)(nil),
 		},
 		{
 			name:    "prepareLoginPolicyMFAsQuery no result",
 			prepare: prepareLoginPolicyMFAsQuery,
 			want: want{
-				sqlExpectations: mockQuery(
+				sqlExpectations: mockQueryScanErr(
 					regexp.QuoteMeta(prepareLoginPolicyMFAsStmt),
 					prepareLoginPolicyMFAsCols,
 					nil,
@@ -325,7 +325,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*MultiFactors)(nil),
 		},
 	}
 	for _, tt := range tests {

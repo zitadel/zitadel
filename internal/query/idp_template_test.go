@@ -443,7 +443,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 			name:    "prepareIDPTemplateByIDQuery no result",
 			prepare: prepareIDPTemplateByIDQuery,
 			want: want{
-				sqlExpectations: mockQuery(
+				sqlExpectations: mockQueryScanErr(
 					regexp.QuoteMeta(idpTemplateQuery),
 					nil,
 					nil,
@@ -1646,7 +1646,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*IDPTemplate)(nil),
 		},
 		{
 			name:    "prepareIDPTemplatesQuery no result",
@@ -2606,7 +2606,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*IDPTemplates)(nil),
 		},
 	}
 	for _, tt := range tests {

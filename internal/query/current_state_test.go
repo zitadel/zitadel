@@ -156,7 +156,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*CurrentStates)(nil),
 		},
 	}
 	for _, tt := range tests {

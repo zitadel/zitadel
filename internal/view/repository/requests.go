@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"strings"
@@ -22,7 +24,14 @@ func PrepareGetByQuery(table string, queries ...SearchQuery) func(db *gorm.DB, r
 			}
 		}
 
-		err := query.Take(res).Error
+		tx := query.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: true})
+		defer func() {
+			if err := tx.Commit().Error; err != nil {
+				logging.OnError(err).Info("commit failed")
+			}
+		}()
+
+		err := tx.Take(res).Error
 		if err == nil {
 			return nil
 		}
