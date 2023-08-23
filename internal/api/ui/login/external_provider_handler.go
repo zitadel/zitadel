@@ -66,6 +66,7 @@ type externalNotFoundOptionData struct {
 	ExternalEmailVerified      bool
 	ExternalPhone              domain.PhoneNumber
 	ExternalPhoneVerified      bool
+	ProviderName               string
 }
 
 type externalRegisterFormData struct {
@@ -503,6 +504,7 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		ShowUsername:               orgIAMPolicy.UserLoginMustBeDomain,
 		ShowUsernameSuffix:         !labelPolicy.HideLoginNameSuffix,
 		OrgRegister:                orgIAMPolicy.UserLoginMustBeDomain,
+		ProviderName:               domain.IDPName(idpTemplate.Name, idpTemplate.Type),
 	}
 	if human.Phone != nil {
 		data.Phone = human.PhoneNumber

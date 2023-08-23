@@ -116,10 +116,10 @@ func genderToDomain(gender user.Gender) domain.Gender {
 
 func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_ *user.AddIDPLinkResponse, err error) {
 	orgID := authz.GetCtxData(ctx).OrgID
-	details, err := s.command.AddUserIDPLink(ctx, req.UserId, orgID, &domain.UserIDPLink{
-		IDPConfigID:    req.GetIdpLink().GetIdpId(),
-		ExternalUserID: req.GetIdpLink().GetUserId(),
-		DisplayName:    req.GetIdpLink().GetUserName(),
+	details, err := s.command.AddUserIDPLink(ctx, req.UserId, orgID, &command.AddLink{
+		IDPID:         req.GetIdpLink().GetIdpId(),
+		DisplayName:   req.GetIdpLink().GetUserName(),
+		IDPExternalID: req.GetIdpLink().GetUserId(),
 	})
 	if err != nil {
 		return nil, err

@@ -63,15 +63,16 @@ type Commands struct {
 	defaultRefreshTokenLifetime     time.Duration
 	defaultRefreshTokenIdleLifetime time.Duration
 
-	multifactors         domain.MultifactorConfigs
-	webauthnConfig       *webauthn_helper.Config
-	keySize              int
-	keyAlgorithm         crypto.EncryptionAlgorithm
-	certificateAlgorithm crypto.EncryptionAlgorithm
-	certKeySize          int
-	privateKeyLifetime   time.Duration
-	publicKeyLifetime    time.Duration
-	certificateLifetime  time.Duration
+	multifactors            domain.MultifactorConfigs
+	webauthnConfig          *webauthn_helper.Config
+	keySize                 int
+	keyAlgorithm            crypto.EncryptionAlgorithm
+	certificateAlgorithm    crypto.EncryptionAlgorithm
+	certKeySize             int
+	privateKeyLifetime      time.Duration
+	publicKeyLifetime       time.Duration
+	certificateLifetime     time.Duration
+	defaultSecretGenerators *SecretGenerators
 }
 
 func StartCommands(
@@ -90,6 +91,7 @@ func StartCommands(
 	defaultAccessTokenLifetime,
 	defaultRefreshTokenLifetime,
 	defaultRefreshTokenIdleLifetime time.Duration,
+	defaultSecretGenerators *SecretGenerators,
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
@@ -127,6 +129,7 @@ func StartCommands(
 		defaultAccessTokenLifetime:      defaultAccessTokenLifetime,
 		defaultRefreshTokenLifetime:     defaultRefreshTokenLifetime,
 		defaultRefreshTokenIdleLifetime: defaultRefreshTokenIdleLifetime,
+		defaultSecretGenerators:         defaultSecretGenerators,
 	}
 
 	instance_repo.RegisterEventMappers(repo.eventstore)

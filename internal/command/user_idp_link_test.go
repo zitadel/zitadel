@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -28,7 +30,7 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 		links         []*domain.UserIDPLink
 	}
 	type res struct {
-		err func(error) bool
+		err error
 	}
 	tests := []struct {
 		name   string
@@ -55,7 +57,7 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-03j8f", "Errors.IDMissing"),
 			},
 		},
 		{
@@ -71,7 +73,7 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-Ek9s", "Errors.User.ExternalIDP.MinimumExternalIDPNeeded"),
 			},
 		},
 		{
@@ -113,7 +115,7 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-33M0g", "Errors.IDMissing"),
 			},
 		},
 		{
@@ -155,7 +157,7 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-6m9Kd", "Errors.User.ExternalIDP.Invalid"),
 			},
 		},
 		{
@@ -181,7 +183,6 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 						),
 					),
 					expectFilter(),
-					expectFilter(),
 				),
 			},
 			args: args{
@@ -199,7 +200,112 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-as02jin", "Errors.IDPConfig.NotExisting"),
+			},
+		},
+		{
+			name: "linking not allowed, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(
+								context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"userName",
+								"firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.German,
+								domain.GenderFemale,
+								"email@Address.ch",
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewIDPConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"config1",
+								"name",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeUnspecified,
+								true,
+							),
+						),
+						eventFromEventPusher(
+							org.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"clientID",
+								"config1",
+								"issuer",
+								"authEndpoint",
+								"tokenEndpoint",
+								nil,
+								domain.OIDCMappingFieldUnspecified,
+								domain.OIDCMappingFieldUnspecified,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewIDPConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"config1",
+								"name",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeUnspecified,
+								true,
+							),
+						),
+						eventFromEventPusher(
+							org.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"clientID",
+								"config1",
+								"issuer",
+								"authEndpoint",
+								"tokenEndpoint",
+								nil,
+								domain.OIDCMappingFieldUnspecified,
+								domain.OIDCMappingFieldUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							func() eventstore.Command {
+								e, _ := org.NewOIDCIDPChangedEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate,
+									"config1",
+									[]idp.OIDCIDPChanges{
+										idp.ChangeOIDCOptions(idp.OptionChanges{IsLinkingAllowed: gu.Ptr(false)}),
+									},
+								)
+								return e
+							}(),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				links: []*domain.UserIDPLink{
+					{
+						ObjectRoot: models.ObjectRoot{
+							AggregateID: "user1",
+						},
+						IDPConfigID:    "config1",
+						DisplayName:    "name",
+						ExternalUserID: "externaluser1",
+					},
+				},
+			},
+			res: res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfee2", "Errors.ExternalIDP.LinkingNotAllowed"),
 			},
 		},
 		{
@@ -233,6 +339,44 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 								domain.IDPConfigTypeOIDC,
 								domain.IDPConfigStylingTypeUnspecified,
 								true,
+							),
+						),
+						eventFromEventPusher(
+							org.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"clientID",
+								"config1",
+								"issuer",
+								"authEndpoint",
+								"tokenEndpoint",
+								nil,
+								domain.OIDCMappingFieldUnspecified,
+								domain.OIDCMappingFieldUnspecified,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewIDPConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"config1",
+								"name",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeUnspecified,
+								true,
+							),
+						),
+						eventFromEventPusher(
+							org.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"clientID",
+								"config1",
+								"issuer",
+								"authEndpoint",
+								"tokenEndpoint",
+								nil,
+								domain.OIDCMappingFieldUnspecified,
+								domain.OIDCMappingFieldUnspecified,
 							),
 						),
 					),
@@ -290,16 +434,53 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
 					expectFilter(
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID("instance1",
 							instance.NewIDPConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
+								&instance.NewAggregate("instance1").Aggregate,
 								"config1",
 								"name",
 								domain.IDPConfigTypeOIDC,
 								domain.IDPConfigStylingTypeUnspecified,
 								true,
+							),
+						),
+						eventFromEventPusherWithInstanceID("instance1",
+							instance.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("instance1").Aggregate,
+								"clientID",
+								"config1",
+								"issuer",
+								"authEndpoint",
+								"tokenEndpoint",
+								nil,
+								domain.OIDCMappingFieldUnspecified,
+								domain.OIDCMappingFieldUnspecified,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusherWithInstanceID("instance1",
+							instance.NewIDPConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("instance1").Aggregate,
+								"config1",
+								"name",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeUnspecified,
+								true,
+							),
+						),
+						eventFromEventPusherWithInstanceID("instance1",
+							instance.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("instance1").Aggregate,
+								"clientID",
+								"config1",
+								"issuer",
+								"authEndpoint",
+								"tokenEndpoint",
+								nil,
+								domain.OIDCMappingFieldUnspecified,
+								domain.OIDCMappingFieldUnspecified,
 							),
 						),
 					),
@@ -342,12 +523,7 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 				eventstore: tt.fields.eventstore,
 			}
 			err := r.BulkAddedUserIDPLinks(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.links)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
+			assert.ErrorIs(t, err, tt.res.err)
 		})
 	}
 }
