@@ -18,14 +18,6 @@ type Event struct {
 	// Seq is the sequence of the event
 	Seq uint64
 
-	//PreviousAggregateSequence is the sequence of the previous sequence of the aggregate (e.g. org.250989)
-	// if it's 0 then it's the first event of this aggregate
-	PreviousAggregateSequence uint64
-
-	//PreviousAggregateTypeSequence is the sequence of the previous sequence of the aggregate root (e.g. org)
-	// the first event of the aggregate has previous aggregate root sequence 0
-	PreviousAggregateTypeSequence uint64
-
 	//CreationDate is the time the event is created
 	// it's used for human readability.
 	// Don't use it for event ordering,
@@ -40,9 +32,6 @@ type Event struct {
 	// data must always a pointer to a struct, a struct or a byte array containing json bytes
 	Data []byte
 
-	//EditorService should be a unique identifier for the service which created the event
-	// it's meant for maintainability
-	EditorService string
 	//EditorUser should be a unique identifier for the user which created the event
 	// it's meant for maintainability.
 	// It's recommend to use the aggregate id of the user

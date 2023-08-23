@@ -81,7 +81,7 @@ const (
 		" aggregate_sequence AS previous_aggregate_sequence," +
 		" aggregate_type_sequence AS previous_aggregate_type_sequence " +
 		"FROM previous_data " +
-		"RETURNING id, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, creation_date, resource_owner, instance_id"
+		"RETURNING id, event_sequence, creation_date, resource_owner, instance_id"
 
 	uniqueInsert = `INSERT INTO eventstore.unique_constraints
 					(
@@ -118,11 +118,6 @@ func (db *CRDB) Push(ctx context.Context, commands ...eventstore.Command) (event
 
 	err = crdb.ExecuteTx(ctx, db.DB.DB, nil, func(tx *sql.Tx) error {
 
-		var (
-			previousAggregateSequence     Sequence
-			previousAggregateTypeSequence Sequence
-		)
-
 		var uniqueConstraints []*eventstore.UniqueConstraint
 
 		for i, command := range commands {
@@ -139,7 +134,6 @@ func (db *CRDB) Push(ctx context.Context, commands ...eventstore.Command) (event
 			}
 			e := &repository.Event{
 				Typ:           command.Type(),
-				EditorService: "eventstore.v2",
 				Data:          data,
 				EditorUser:    command.Creator(),
 				Version:       command.Aggregate().Version,
@@ -159,10 +153,7 @@ func (db *CRDB) Push(ctx context.Context, commands ...eventstore.Command) (event
 				"zitadel",
 				e.Aggregate().ResourceOwner,
 				e.Aggregate().InstanceID,
-			).Scan(&e.ID, &e.Seq, &previousAggregateSequence, &previousAggregateTypeSequence, &e.CreationDate, &e.ResourceOwner, &e.InstanceID)
-
-			e.PreviousAggregateSequence = uint64(previousAggregateSequence)
-			e.PreviousAggregateTypeSequence = uint64(previousAggregateTypeSequence)
+			).Scan(&e.ID, &e.Seq, &e.CreationDate, &e.ResourceOwner, &e.InstanceID)
 
 			if err != nil {
 				logging.WithFields(
@@ -233,7 +224,7 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("insert unique constraint failed")
 
 				if db.isUniqueViolationError(err) {
-					return caos_errs.ThrowAlreadyExists(err, "SQL-M0dsf", uniqueConstraint.ErrorMessage)
+					return caos_errs.ThrowAlreadyExists(err, "SQL-wHcEq", uniqueConstraint.ErrorMessage)
 				}
 
 				return caos_errs.ThrowInternal(err, "SQL-dM9ds", "unable to create unique constraint")
@@ -303,10 +294,7 @@ func (db *CRDB) eventQuery() string {
 		" hlc_to_timestamp(crdb_internal_mvcc_timestamp)::TIMESTAMPTZ" +
 		", event_type" +
 		", event_sequence" +
-		", previous_aggregate_sequence" +
-		", previous_aggregate_type_sequence" +
 		", event_data" +
-		", editor_service" +
 		", editor_user" +
 		", resource_owner" +
 		", instance_id" +

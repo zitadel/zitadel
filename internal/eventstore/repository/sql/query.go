@@ -161,23 +161,14 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 	if !ok {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-4GP6F", "type must be event")
 	}
-	var (
-		previousAggregateSequence     Sequence
-		previousAggregateTypeSequence Sequence
-	)
 	data := make(Data, 0)
 	event := new(repository.Event)
-
-	var editor sql.NullString
 
 	err = scanner(
 		&event.CreationDate,
 		&event.Typ,
 		&event.Seq,
-		&previousAggregateSequence,
-		&previousAggregateTypeSequence,
 		&data,
-		&editor,
 		&event.EditorUser,
 		&event.ResourceOwner,
 		&event.InstanceID,
@@ -191,9 +182,6 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 		return z_errors.ThrowInternal(err, "SQL-M0dsf", "unable to scan row")
 	}
 
-	event.EditorService = editor.String
-	event.PreviousAggregateSequence = uint64(previousAggregateSequence)
-	event.PreviousAggregateTypeSequence = uint64(previousAggregateTypeSequence)
 	event.Data = make([]byte, len(data))
 	copy(event.Data, data)
 

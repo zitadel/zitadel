@@ -267,7 +267,6 @@ func generateEvent(t *testing.T, aggregateID string, opts ...func(*repository.Ev
 	e := &repository.Event{
 		AggregateID:   aggregateID,
 		AggregateType: eventstore.AggregateType(t.Name()),
-		EditorService: "svc",
 		EditorUser:    "user",
 		ResourceOwner: sql.NullString{String: "ro", Valid: true},
 		Typ:           "test.created",
