@@ -26,15 +26,16 @@ import {
   LoginSettings,
   GetLoginSettingsResponse,
   ListAuthenticationMethodTypesResponse,
-  StartIdentityProviderFlowRequest,
-  StartIdentityProviderFlowResponse,
-  RetrieveIdentityProviderInformationRequest,
-  RetrieveIdentityProviderInformationResponse,
+  StartIdentityProviderIntentRequest,
+  StartIdentityProviderIntentResponse,
+  RetrieveIdentityProviderIntentRequest,
+  RetrieveIdentityProviderIntentResponse,
   GetAuthRequestResponse,
   GetAuthRequestRequest,
   CreateCallbackRequest,
   CreateCallbackResponse,
   RequestChallenges,
+  AddHumanUserRequest,
 } from "@zitadel/server";
 
 export const zitadelConfig: ZitadelServerOptions = {
@@ -190,10 +191,10 @@ export async function addHumanUser(
 ): Promise<string> {
   const userService = user.getUser(server);
 
-  const payload = {
+  const payload: Partial<AddHumanUserRequest> = {
     email: { email },
     username: email,
-    profile: { firstName, lastName },
+    profile: { givenName: firstName, familyName: lastName },
   };
   return userService
     .addHumanUser(
@@ -212,11 +213,11 @@ export async function addHumanUser(
 
 export async function startIdentityProviderFlow(
   server: ZitadelServer,
-  { idpId, urls }: StartIdentityProviderFlowRequest
-): Promise<StartIdentityProviderFlowResponse> {
+  { idpId, urls }: StartIdentityProviderIntentRequest
+): Promise<StartIdentityProviderIntentResponse> {
   const userService = user.getUser(server);
 
-  return userService.startIdentityProviderFlow({
+  return userService.startIdentityProviderIntent({
     idpId,
     urls,
   });
@@ -224,13 +225,13 @@ export async function startIdentityProviderFlow(
 
 export async function retrieveIdentityProviderInformation(
   server: ZitadelServer,
-  { intentId, token }: RetrieveIdentityProviderInformationRequest
-): Promise<RetrieveIdentityProviderInformationResponse> {
+  { idpIntentId, idpIntentToken }: RetrieveIdentityProviderIntentRequest
+): Promise<RetrieveIdentityProviderIntentResponse> {
   const userService = user.getUser(server);
 
-  return userService.retrieveIdentityProviderInformation({
-    intentId,
-    token,
+  return userService.retrieveIdentityProviderIntent({
+    idpIntentId,
+    idpIntentToken,
   });
 }
 
