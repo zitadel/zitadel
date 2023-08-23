@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"io"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -27,7 +28,15 @@ func (c *Commands) createOTPSMSChallenge(returnCode bool, dst *string) SessionCo
 		if !writeModel.OTPAdded() {
 			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-BJ2g3", "Errors.User.MFA.OTP.NotReady")
 		}
-		code, err := cmd.createCode(ctx, cmd.eventstore.Filter, domain.SecretGeneratorTypeOTPSMS, cmd.otpAlg)
+		code, err := cmd.createCode(ctx, cmd.eventstore.Filter, domain.SecretGeneratorTypeOTPSMS, cmd.otpAlg, //TODO: get from config
+			&crypto.GeneratorConfig{
+				Length:              7,
+				Expiry:              5 * time.Minute,
+				IncludeLowerLetters: false,
+				IncludeUpperLetters: false,
+				IncludeDigits:       true,
+				IncludeSymbols:      false,
+			})
 		if err != nil {
 			return err
 		}
@@ -77,7 +86,15 @@ func (c *Commands) createOTPEmailChallenge(returnCode bool, urlTmpl string, dst 
 		if !writeModel.OTPAdded() {
 			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JKLJ3", "Errors.User.MFA.OTP.NotReady")
 		}
-		code, err := cmd.createCode(ctx, cmd.eventstore.Filter, domain.SecretGeneratorTypeOTPEmail, cmd.otpAlg)
+		code, err := cmd.createCode(ctx, cmd.eventstore.Filter, domain.SecretGeneratorTypeOTPEmail, cmd.otpAlg, //TODO: get from config
+			&crypto.GeneratorConfig{
+				Length:              7,
+				Expiry:              5 * time.Minute,
+				IncludeLowerLetters: false,
+				IncludeUpperLetters: false,
+				IncludeDigits:       true,
+				IncludeSymbols:      false,
+			})
 		if err != nil {
 			return err
 		}

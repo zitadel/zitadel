@@ -19,7 +19,7 @@ import (
 func TestCommands_CreateOTPSMSChallengeReturnCode(t *testing.T) {
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
-		createCode cryptoCodeFunc
+		createCode cryptoCodeWithDefaultFunc
 	}
 	type res struct {
 		err        error
@@ -52,7 +52,7 @@ func TestCommands_CreateOTPSMSChallengeReturnCode(t *testing.T) {
 						),
 					),
 				),
-				createCode: mockCode("1234567", 5*time.Minute),
+				createCode: mockCodeWithDefault("1234567", 5*time.Minute),
 			},
 			res: res{
 				returnCode: "1234567",
@@ -102,7 +102,7 @@ func TestCommands_CreateOTPSMSChallengeReturnCode(t *testing.T) {
 func TestCommands_CreateOTPSMSChallenge(t *testing.T) {
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
-		createCode cryptoCodeFunc
+		createCode cryptoCodeWithDefaultFunc
 	}
 	type res struct {
 		err      error
@@ -134,7 +134,7 @@ func TestCommands_CreateOTPSMSChallenge(t *testing.T) {
 						),
 					),
 				),
-				createCode: mockCode("1234567", 5*time.Minute),
+				createCode: mockCodeWithDefault("1234567", 5*time.Minute),
 			},
 			res: res{
 				commands: []eventstore.Command{
@@ -255,7 +255,7 @@ func TestCommands_OTPSMSSent(t *testing.T) {
 func TestCommands_CreateOTPEmailChallengeURLTemplate(t *testing.T) {
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
-		createCode cryptoCodeFunc
+		createCode cryptoCodeWithDefaultFunc
 	}
 	type args struct {
 		urlTmpl string
@@ -310,7 +310,7 @@ func TestCommands_CreateOTPEmailChallengeURLTemplate(t *testing.T) {
 						),
 					),
 				),
-				createCode: mockCode("1234567", 5*time.Minute),
+				createCode: mockCodeWithDefault("1234567", 5*time.Minute),
 			},
 			res: res{
 				commands: []eventstore.Command{
@@ -363,7 +363,7 @@ func TestCommands_CreateOTPEmailChallengeURLTemplate(t *testing.T) {
 func TestCommands_CreateOTPEmailChallengeReturnCode(t *testing.T) {
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
-		createCode cryptoCodeFunc
+		createCode cryptoCodeWithDefaultFunc
 	}
 	type res struct {
 		err        error
@@ -396,7 +396,7 @@ func TestCommands_CreateOTPEmailChallengeReturnCode(t *testing.T) {
 						),
 					),
 				),
-				createCode: mockCode("1234567", 5*time.Minute),
+				createCode: mockCodeWithDefault("1234567", 5*time.Minute),
 			},
 			res: res{
 				returnCode: "1234567",
@@ -447,7 +447,7 @@ func TestCommands_CreateOTPEmailChallengeReturnCode(t *testing.T) {
 func TestCommands_CreateOTPEmailChallenge(t *testing.T) {
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
-		createCode cryptoCodeFunc
+		createCode cryptoCodeWithDefaultFunc
 	}
 	type res struct {
 		err      error
@@ -479,7 +479,7 @@ func TestCommands_CreateOTPEmailChallenge(t *testing.T) {
 						),
 					),
 				),
-				createCode: mockCode("1234567", 5*time.Minute),
+				createCode: mockCodeWithDefault("1234567", 5*time.Minute),
 			},
 			res: res{
 				commands: []eventstore.Command{
