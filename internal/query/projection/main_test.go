@@ -43,18 +43,15 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 func eventFromEventPusher(event eventstore.Command) *repository.Event {
 	data, _ := eventstore.EventData(event)
 	return &repository.Event{
-		ID:                            "",
-		Seq:                           0,
-		PreviousAggregateSequence:     0,
-		PreviousAggregateTypeSequence: 0,
-		CreationDate:                  time.Time{},
-		Typ:                           event.Type(),
-		Data:                          data,
-		EditorService:                 "zitadel",
-		EditorUser:                    event.Creator(),
-		Version:                       event.Aggregate().Version,
-		AggregateID:                   event.Aggregate().ID,
-		AggregateType:                 event.Aggregate().Type,
-		ResourceOwner:                 sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
+		ID:            "",
+		Seq:           0,
+		CreationDate:  time.Time{},
+		Typ:           event.Type(),
+		Data:          data,
+		EditorUser:    event.Creator(),
+		Version:       event.Aggregate().Version,
+		AggregateID:   event.Aggregate().ID,
+		AggregateType: event.Aggregate().Type,
+		ResourceOwner: sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
 	}
 }

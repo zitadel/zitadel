@@ -19,7 +19,6 @@ func testEvent(
 }
 
 func toSystemEvent(event *repository.Event) *repository.Event {
-	event.EditorService = "SYSTEM"
 	event.EditorUser = "SYSTEM"
 	return event
 }
@@ -31,20 +30,17 @@ func timedTestEvent(
 	creationDate time.Time,
 ) *repository.Event {
 	return &repository.Event{
-		Seq:                           15,
-		PreviousAggregateSequence:     10,
-		PreviousAggregateTypeSequence: 10,
-		CreationDate:                  creationDate,
-		Typ:                           eventType,
-		AggregateType:                 aggregateType,
-		Data:                          data,
-		Version:                       "v1",
-		AggregateID:                   "agg-id",
-		ResourceOwner:                 sql.NullString{String: "ro-id", Valid: true},
-		InstanceID:                    "instance-id",
-		ID:                            "event-id",
-		EditorService:                 "editor-svc",
-		EditorUser:                    "editor-user",
+		Seq:           15,
+		CreationDate:  creationDate,
+		Typ:           eventType,
+		AggregateType: aggregateType,
+		Data:          data,
+		Version:       "v1",
+		AggregateID:   "agg-id",
+		ResourceOwner: sql.NullString{String: "ro-id", Valid: true},
+		InstanceID:    "instance-id",
+		ID:            "event-id",
+		EditorUser:    "editor-user",
 	}
 }
 
