@@ -202,6 +202,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		config.OIDC.DefaultAccessTokenLifetime,
 		config.OIDC.DefaultRefreshTokenExpiration,
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
+		config.DefaultInstance.SecretGenerators,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
