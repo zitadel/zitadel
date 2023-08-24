@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -256,7 +257,7 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	if err != nil {
 		return nil, err
 	}
-	sessionChecks := make([]command.SessionCommand, 0, 3)
+	sessionChecks := make([]command.SessionCommand, 0, 7)
 	if checkUser != nil {
 		user, err := checkUser.search(ctx, s.query)
 		if err != nil {

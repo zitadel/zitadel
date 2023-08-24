@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/notification/types"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -474,7 +475,7 @@ func (u *userNotifier) reduceOTPEmailCodeAdded(event eventstore.Event) (*handler
 	if e.AuthRequestInfo != nil {
 		authRequestID = e.AuthRequestInfo.ID
 	}
-	url := func(code, origin string) (string, error) {
+	url := func(code, origin string, _ *query.NotifyUser) (string, error) {
 		return login.OTPLink(origin, authRequestID, code, domain.MFATypeOTPEmail), nil
 	}
 	return u.reduceOTPEmail(
@@ -503,13 +504,13 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 	if err != nil {
 		return nil, err
 	}
-	url := func(code, origin string) (string, error) {
+	url := func(code, origin string, user *query.NotifyUser) (string, error) {
 		var buf strings.Builder
 		urlTmpl := origin + u.otpEmailTmpl
 		if e.URLTmpl != "" {
 			urlTmpl = e.URLTmpl
 		}
-		if err := domain.RenderOTPEmailURLTemplate(&buf, urlTmpl, s.UserFactor.UserID, code); err != nil {
+		if err := domain.RenderOTPEmailURLTemplate(&buf, urlTmpl, code, user.ID, user.PreferredLoginName, user.DisplayName, user.PreferredLanguage); err != nil {
 			return "", err
 		}
 		return buf.String(), nil
@@ -533,7 +534,7 @@ func (u *userNotifier) reduceOTPEmail(
 	expiry time.Duration,
 	userID,
 	resourceOwner string,
-	urlTmpl func(code, origin string) (string, error),
+	urlTmpl func(code, origin string, user *query.NotifyUser) (string, error),
 	sentCommand func(ctx context.Context, userID string, resourceOwner string) (err error),
 	eventTypes ...eventstore.EventType,
 ) (*handler.Statement, error) {
@@ -572,7 +573,7 @@ func (u *userNotifier) reduceOTPEmail(
 	if err != nil {
 		return nil, err
 	}
-	url, err := urlTmpl(plainCode, origin)
+	url, err := urlTmpl(plainCode, origin, notifyUser)
 	if err != nil {
 		return nil, err
 	}

@@ -18,6 +18,7 @@ import (
 
 func TestCommands_CreateOTPSMSChallengeReturnCode(t *testing.T) {
 	type fields struct {
+		userID     string
 		eventstore func(*testing.T) *eventstore.Eventstore
 		createCode cryptoCodeWithDefaultFunc
 	}
@@ -32,8 +33,19 @@ func TestCommands_CreateOTPSMSChallengeReturnCode(t *testing.T) {
 		res    res
 	}{
 		{
+			name: "userID missing, precondition error",
+			fields: fields{
+				userID:     "",
+				eventstore: expectEventstore(),
+			},
+			res: res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JKL3g", "Errors.User.UserIDMissing"),
+			},
+		},
+		{
 			name: "otp not ready, precondition error",
 			fields: fields{
+				userID: "userID",
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
@@ -45,6 +57,7 @@ func TestCommands_CreateOTPSMSChallengeReturnCode(t *testing.T) {
 		{
 			name: "generate code",
 			fields: fields{
+				userID: "userID",
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
@@ -73,12 +86,18 @@ func TestCommands_CreateOTPSMSChallengeReturnCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Commands{}
+			c := &Commands{
+				// config will not be actively used for the test (is only for default),
+				// but not providing it would result in a nil pointer
+				defaultSecretGenerators: &SecretGenerators{
+					OTPSMS: emptyConfig,
+				},
+			}
 			var dst string
 			cmd := c.CreateOTPSMSChallengeReturnCode(&dst)
 
 			sessionModel := &SessionWriteModel{
-				UserID:        "userID",
+				UserID:        tt.fields.userID,
 				UserCheckedAt: testNow,
 				State:         domain.SessionStateActive,
 				aggregate:     &session.NewAggregate("sessionID", "instanceID").Aggregate,
@@ -101,6 +120,7 @@ func TestCommands_CreateOTPSMSChallengeReturnCode(t *testing.T) {
 
 func TestCommands_CreateOTPSMSChallenge(t *testing.T) {
 	type fields struct {
+		userID     string
 		eventstore func(*testing.T) *eventstore.Eventstore
 		createCode cryptoCodeWithDefaultFunc
 	}
@@ -114,8 +134,19 @@ func TestCommands_CreateOTPSMSChallenge(t *testing.T) {
 		res    res
 	}{
 		{
+			name: "userID missing, precondition error",
+			fields: fields{
+				userID:     "",
+				eventstore: expectEventstore(),
+			},
+			res: res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JKL3g", "Errors.User.UserIDMissing"),
+			},
+		},
+		{
 			name: "otp not ready, precondition error",
 			fields: fields{
+				userID: "userID",
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
@@ -127,6 +158,7 @@ func TestCommands_CreateOTPSMSChallenge(t *testing.T) {
 		{
 			name: "generate code",
 			fields: fields{
+				userID: "userID",
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
@@ -154,12 +186,18 @@ func TestCommands_CreateOTPSMSChallenge(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Commands{}
+			c := &Commands{
+				// config will not be actively used for the test (is only for default),
+				// but not providing it would result in a nil pointer
+				defaultSecretGenerators: &SecretGenerators{
+					OTPSMS: emptyConfig,
+				},
+			}
 
 			cmd := c.CreateOTPSMSChallenge()
 
 			sessionModel := &SessionWriteModel{
-				UserID:        "userID",
+				UserID:        tt.fields.userID,
 				UserCheckedAt: testNow,
 				State:         domain.SessionStateActive,
 				aggregate:     &session.NewAggregate("sessionID", "instanceID").Aggregate,
@@ -254,6 +292,7 @@ func TestCommands_OTPSMSSent(t *testing.T) {
 
 func TestCommands_CreateOTPEmailChallengeURLTemplate(t *testing.T) {
 	type fields struct {
+		userID     string
 		eventstore func(*testing.T) *eventstore.Eventstore
 		createCode cryptoCodeWithDefaultFunc
 	}
@@ -284,11 +323,24 @@ func TestCommands_CreateOTPEmailChallengeURLTemplate(t *testing.T) {
 			},
 		},
 		{
-			name: "otp not ready, precondition error",
+			name: "userID missing, precondition error",
 			args: args{
-				urlTmpl: "https://example.com/mfa/email?userID={{.UserID}}&code={{.Code}}",
+				urlTmpl: "https://example.com/mfa/email?userID={{.UserID}}&code={{.Code}}&lang={{.PreferredLanguage}}",
 			},
 			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			res: res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JK3gp", "Errors.User.UserIDMissing"),
+			},
+		},
+		{
+			name: "otp not ready, precondition error",
+			args: args{
+				urlTmpl: "https://example.com/mfa/email?userID={{.UserID}}&code={{.Code}}&lang={{.PreferredLanguage}}",
+			},
+			fields: fields{
+				userID: "userID",
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
@@ -300,9 +352,10 @@ func TestCommands_CreateOTPEmailChallengeURLTemplate(t *testing.T) {
 		{
 			name: "generate code",
 			args: args{
-				urlTmpl: "https://example.com/mfa/email?userID={{.UserID}}&code={{.Code}}",
+				urlTmpl: "https://example.com/mfa/email?userID={{.UserID}}&code={{.Code}}&lang={{.PreferredLanguage}}",
 			},
 			fields: fields{
+				userID: "userID",
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
@@ -323,7 +376,7 @@ func TestCommands_CreateOTPEmailChallengeURLTemplate(t *testing.T) {
 						},
 						5*time.Minute,
 						false,
-						"https://example.com/mfa/email?userID={{.UserID}}&code={{.Code}}",
+						"https://example.com/mfa/email?userID={{.UserID}}&code={{.Code}}&lang={{.PreferredLanguage}}",
 					),
 				},
 			},
@@ -331,7 +384,13 @@ func TestCommands_CreateOTPEmailChallengeURLTemplate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Commands{}
+			c := &Commands{
+				// config will not be actively used for the test (is only for default),
+				// but not providing it would result in a nil pointer
+				defaultSecretGenerators: &SecretGenerators{
+					OTPEmail: emptyConfig,
+				},
+			}
 
 			cmd, err := c.CreateOTPEmailChallengeURLTemplate(tt.args.urlTmpl)
 			assert.ErrorIs(t, err, tt.res.templateError)
@@ -340,7 +399,7 @@ func TestCommands_CreateOTPEmailChallengeURLTemplate(t *testing.T) {
 			}
 
 			sessionModel := &SessionWriteModel{
-				UserID:        "userID",
+				UserID:        tt.fields.userID,
 				UserCheckedAt: testNow,
 				State:         domain.SessionStateActive,
 				aggregate:     &session.NewAggregate("sessionID", "instanceID").Aggregate,
@@ -362,6 +421,7 @@ func TestCommands_CreateOTPEmailChallengeURLTemplate(t *testing.T) {
 
 func TestCommands_CreateOTPEmailChallengeReturnCode(t *testing.T) {
 	type fields struct {
+		userID     string
 		eventstore func(*testing.T) *eventstore.Eventstore
 		createCode cryptoCodeWithDefaultFunc
 	}
@@ -376,8 +436,18 @@ func TestCommands_CreateOTPEmailChallengeReturnCode(t *testing.T) {
 		res    res
 	}{
 		{
+			name: "userID missing, precondition error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			res: res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JK3gp", "Errors.User.UserIDMissing"),
+			},
+		},
+		{
 			name: "otp not ready, precondition error",
 			fields: fields{
+				userID: "userID",
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
@@ -389,6 +459,7 @@ func TestCommands_CreateOTPEmailChallengeReturnCode(t *testing.T) {
 		{
 			name: "generate code",
 			fields: fields{
+				userID: "userID",
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
@@ -418,12 +489,18 @@ func TestCommands_CreateOTPEmailChallengeReturnCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Commands{}
+			c := &Commands{
+				// config will not be actively used for the test (is only for default),
+				// but not providing it would result in a nil pointer
+				defaultSecretGenerators: &SecretGenerators{
+					OTPEmail: emptyConfig,
+				},
+			}
 			var dst string
 			cmd := c.CreateOTPEmailChallengeReturnCode(&dst)
 
 			sessionModel := &SessionWriteModel{
-				UserID:        "userID",
+				UserID:        tt.fields.userID,
 				UserCheckedAt: testNow,
 				State:         domain.SessionStateActive,
 				aggregate:     &session.NewAggregate("sessionID", "instanceID").Aggregate,
@@ -446,6 +523,7 @@ func TestCommands_CreateOTPEmailChallengeReturnCode(t *testing.T) {
 
 func TestCommands_CreateOTPEmailChallenge(t *testing.T) {
 	type fields struct {
+		userID     string
 		eventstore func(*testing.T) *eventstore.Eventstore
 		createCode cryptoCodeWithDefaultFunc
 	}
@@ -459,8 +537,18 @@ func TestCommands_CreateOTPEmailChallenge(t *testing.T) {
 		res    res
 	}{
 		{
+			name: "userID missing, precondition error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			res: res{
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JK3gp", "Errors.User.UserIDMissing"),
+			},
+		},
+		{
 			name: "otp not ready, precondition error",
 			fields: fields{
+				userID: "userID",
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
@@ -472,6 +560,7 @@ func TestCommands_CreateOTPEmailChallenge(t *testing.T) {
 		{
 			name: "generate code",
 			fields: fields{
+				userID: "userID",
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
@@ -500,12 +589,18 @@ func TestCommands_CreateOTPEmailChallenge(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Commands{}
+			c := &Commands{
+				// config will not be actively used for the test (is only for default),
+				// but not providing it would result in a nil pointer
+				defaultSecretGenerators: &SecretGenerators{
+					OTPEmail: emptyConfig,
+				},
+			}
 
 			cmd := c.CreateOTPEmailChallenge()
 
 			sessionModel := &SessionWriteModel{
-				UserID:        "userID",
+				UserID:        tt.fields.userID,
 				UserCheckedAt: testNow,
 				State:         domain.SessionStateActive,
 				aggregate:     &session.NewAggregate("sessionID", "instanceID").Aggregate,

@@ -3,7 +3,8 @@ package command
 import (
 	"context"
 	"io"
-	"time"
+
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -21,6 +22,9 @@ func (c *Commands) CreateOTPSMSChallenge() SessionCommand {
 
 func (c *Commands) createOTPSMSChallenge(returnCode bool, dst *string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) error {
+		if cmd.sessionWriteModel.UserID == "" {
+			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JKL3g", "Errors.User.UserIDMissing")
+		}
 		writeModel := NewHumanOTPSMSWriteModel(cmd.sessionWriteModel.UserID, "")
 		if err := cmd.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 			return err
@@ -28,15 +32,7 @@ func (c *Commands) createOTPSMSChallenge(returnCode bool, dst *string) SessionCo
 		if !writeModel.OTPAdded() {
 			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-BJ2g3", "Errors.User.MFA.OTP.NotReady")
 		}
-		code, err := cmd.createCode(ctx, cmd.eventstore.Filter, domain.SecretGeneratorTypeOTPSMS, cmd.otpAlg, //TODO: get from config
-			&crypto.GeneratorConfig{
-				Length:              7,
-				Expiry:              5 * time.Minute,
-				IncludeLowerLetters: false,
-				IncludeUpperLetters: false,
-				IncludeDigits:       true,
-				IncludeSymbols:      false,
-			})
+		code, err := cmd.createCode(ctx, cmd.eventstore.Filter, domain.SecretGeneratorTypeOTPSMS, cmd.otpAlg, c.defaultSecretGenerators.OTPSMS)
 		if err != nil {
 			return err
 		}
@@ -63,7 +59,7 @@ func (c *Commands) OTPSMSSent(ctx context.Context, sessionID, resourceOwner stri
 }
 
 func (c *Commands) CreateOTPEmailChallengeURLTemplate(urlTmpl string) (SessionCommand, error) {
-	if err := domain.RenderOTPEmailURLTemplate(io.Discard, urlTmpl, "userID", "code"); err != nil {
+	if err := domain.RenderOTPEmailURLTemplate(io.Discard, urlTmpl, "code", "userID", "loginName", "displayName", language.English); err != nil {
 		return nil, err
 	}
 	return c.createOTPEmailChallenge(false, urlTmpl, nil), nil
@@ -79,6 +75,9 @@ func (c *Commands) CreateOTPEmailChallenge() SessionCommand {
 
 func (c *Commands) createOTPEmailChallenge(returnCode bool, urlTmpl string, dst *string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) error {
+		if cmd.sessionWriteModel.UserID == "" {
+			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JK3gp", "Errors.User.UserIDMissing")
+		}
 		writeModel := NewHumanOTPEmailWriteModel(cmd.sessionWriteModel.UserID, "")
 		if err := cmd.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 			return err
@@ -86,15 +85,7 @@ func (c *Commands) createOTPEmailChallenge(returnCode bool, urlTmpl string, dst 
 		if !writeModel.OTPAdded() {
 			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JKLJ3", "Errors.User.MFA.OTP.NotReady")
 		}
-		code, err := cmd.createCode(ctx, cmd.eventstore.Filter, domain.SecretGeneratorTypeOTPEmail, cmd.otpAlg, //TODO: get from config
-			&crypto.GeneratorConfig{
-				Length:              7,
-				Expiry:              5 * time.Minute,
-				IncludeLowerLetters: false,
-				IncludeUpperLetters: false,
-				IncludeDigits:       true,
-				IncludeSymbols:      false,
-			})
+		code, err := cmd.createCode(ctx, cmd.eventstore.Filter, domain.SecretGeneratorTypeOTPEmail, cmd.otpAlg, c.defaultSecretGenerators.OTPEmail)
 		if err != nil {
 			return err
 		}
