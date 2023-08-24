@@ -235,7 +235,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		queries,
 		eventstoreClient,
 		assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort),
-		"/otp/verify?loginName={{.LoginName}}&code={{.Code}}", // TODO: config
+		config.Login.DefaultOTPEmailURLV2,
 		config.SystemDefaults.Notifications.FileSystemPath,
 		keys.User,
 		keys.SMTP,

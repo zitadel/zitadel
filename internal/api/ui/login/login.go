@@ -47,6 +47,9 @@ type Config struct {
 	CSRFCookieName     string
 	Cache              middleware.CacheConfig
 	AssetCache         middleware.CacheConfig
+
+	// LoginV2
+	DefaultOTPEmailURLV2 string
 }
 
 const (
