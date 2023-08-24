@@ -81,10 +81,8 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 				CurrentStates: []*CurrentState{
 					{
 						EventCreationDate: testNow,
-						AggregateType:     "agg-type",
-						AggregateID:       "agg-id",
 						LastRun:           testNow,
-						EventSequence:     20211108,
+						CurrentPosition:   20211108,
 						ProjectionName:    "projection-name",
 					},
 				},
@@ -124,18 +122,14 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 				CurrentStates: []*CurrentState{
 					{
 						EventCreationDate: testNow,
-						EventSequence:     20211108,
+						CurrentPosition:   20211108,
 						ProjectionName:    "projection-name",
-						AggregateType:     "agg-type",
-						AggregateID:       "agg-id",
 						LastRun:           testNow,
 					},
 					{
 						EventCreationDate: testNow,
-						EventSequence:     20211108,
+						CurrentPosition:   20211108,
 						ProjectionName:    "projection-name2",
-						AggregateType:     "agg-type",
-						AggregateID:       "agg-id",
 						LastRun:           testNow,
 					},
 				},

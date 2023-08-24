@@ -121,15 +121,15 @@ func (o *OPStorage) getSigningKey(ctx context.Context) (op.SigningKey, error) {
 	if len(keys.Keys) > 0 {
 		return o.privateKeyToSigningKey(selectSigningKey(keys.Keys))
 	}
-	var sequence time.Time
+	var position uint64
 	if keys.LatestState != nil {
-		sequence = keys.LatestState.EventTimestamp
+		position = keys.LatestState.Position
 	}
-	return nil, o.refreshSigningKey(ctx, o.signingKeyAlgorithm, sequence)
+	return nil, o.refreshSigningKey(ctx, o.signingKeyAlgorithm, position)
 }
 
-func (o *OPStorage) refreshSigningKey(ctx context.Context, algorithm string, sequence time.Time) error {
-	ok, err := o.ensureIsLatestKey(ctx, sequence)
+func (o *OPStorage) refreshSigningKey(ctx context.Context, algorithm string, position uint64) error {
+	ok, err := o.ensureIsLatestKey(ctx, position)
 	if err != nil || !ok {
 		return errors.ThrowInternal(err, "OIDC-ASfh3", "cannot ensure that projection is up to date")
 	}
@@ -140,12 +140,12 @@ func (o *OPStorage) refreshSigningKey(ctx context.Context, algorithm string, seq
 	return errors.ThrowInternal(nil, "OIDC-Df1bh", "")
 }
 
-func (o *OPStorage) ensureIsLatestKey(ctx context.Context, sequence time.Time) (bool, error) {
+func (o *OPStorage) ensureIsLatestKey(ctx context.Context, position uint64) (bool, error) {
 	maxSequence, err := o.getMaxKeySequence(ctx)
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
-	return sequence.Equal(maxSequence) || sequence.After(maxSequence), nil
+	return position == maxSequence || position > maxSequence, nil
 }
 
 func (o *OPStorage) privateKeyToSigningKey(key query.PrivateKey) (_ op.SigningKey, err error) {
@@ -183,7 +183,7 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm
 	return o.command.GenerateSigningKeyPair(setOIDCCtx(ctx), algorithm)
 }
 
-func (o *OPStorage) getMaxKeySequence(ctx context.Context) (time.Time, error) {
+func (o *OPStorage) getMaxKeySequence(ctx context.Context) (uint64, error) {
 	return o.eventstore.LatestSequence(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).

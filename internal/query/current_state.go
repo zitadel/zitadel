@@ -21,7 +21,7 @@ import (
 
 type LatestState struct {
 	EventTimestamp time.Time
-	Sequence       uint64
+	Position       uint64
 	LastUpdated    time.Time
 }
 
@@ -32,9 +32,7 @@ type CurrentStates struct {
 
 type CurrentState struct {
 	ProjectionName    string
-	AggregateType     string
-	AggregateID       string
-	EventSequence     uint64
+	CurrentPosition   uint64
 	EventCreationDate time.Time
 	LastRun           time.Time
 }
@@ -228,7 +226,7 @@ func reset(ctx context.Context, tx *sql.Tx, tables []string, projectionName stri
 func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*LatestState, error)) {
 	return sq.Select(
 			CurrentStateColEventDate.identifier(),
-			CurrentStateColSequence.identifier(),
+			CurrentStateColPosition.identifier(),
 			CurrentStateColLastUpdated.identifier()).
 			From(currentStateTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
@@ -236,11 +234,11 @@ func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 			var (
 				creationDate sql.NullTime
 				lastUpdated  sql.NullTime
-				sequence     sql.NullInt64
+				position     sql.NullInt64
 			)
 			err := row.Scan(
 				&creationDate,
-				&sequence,
+				&position,
 				&lastUpdated,
 			)
 			if err != nil && !errs.Is(err, sql.ErrNoRows) {
@@ -249,7 +247,7 @@ func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 			return &LatestState{
 				EventTimestamp: creationDate.Time,
 				LastUpdated:    lastUpdated.Time,
-				Sequence:       uint64(sequence.Int64),
+				Position:       uint64(position.Int64),
 			}, nil
 		}
 }
@@ -257,10 +255,8 @@ func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 func prepareCurrentStateQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*CurrentStates, error)) {
 	return sq.Select(
 			CurrentStateColLastUpdated.identifier(),
-			CurrentStateColLastAggregateType.identifier(),
-			CurrentStateColLastAggregateID.identifier(),
 			CurrentStateColEventDate.identifier(),
-			CurrentStateColSequence.identifier(),
+			CurrentStateColPosition.identifier(),
 			CurrentStateColProjectionName.identifier(),
 			countColumn.identifier()).
 			From(currentStateTable.identifier() + db.Timetravel(call.Took(ctx))).
@@ -272,16 +268,12 @@ func prepareCurrentStateQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				currentState := new(CurrentState)
 				var lastRun sql.NullTime
 				var eventDate sql.NullTime
-				var currentSequence sql.NullInt64
-				var aggregateType sql.NullString
-				var aggregateID sql.NullString
+				var currentPosition sql.NullInt64
 
 				err := rows.Scan(
 					&lastRun,
-					&aggregateType,
-					&aggregateID,
 					&eventDate,
-					&currentSequence,
+					&currentPosition,
 					&currentState.ProjectionName,
 					&count,
 				)
@@ -290,9 +282,7 @@ func prepareCurrentStateQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				}
 				currentState.EventCreationDate = eventDate.Time
 				currentState.LastRun = lastRun.Time
-				currentState.EventSequence = uint64(currentSequence.Int64)
-				currentState.AggregateType = aggregateType.String
-				currentState.AggregateID = aggregateID.String
+				currentState.CurrentPosition = uint64(currentPosition.Int64)
 				states = append(states, currentState)
 			}
 
@@ -318,20 +308,12 @@ var (
 		name:  "event_date",
 		table: currentStateTable,
 	}
-	CurrentStateColSequence = Column{
-		name:  "event_sequence",
+	CurrentStateColPosition = Column{
+		name:  "position",
 		table: currentStateTable,
 	}
 	CurrentStateColLastUpdated = Column{
 		name:  "last_updated",
-		table: currentStateTable,
-	}
-	CurrentStateColLastAggregateType = Column{
-		name:  "aggregate_type",
-		table: currentStateTable,
-	}
-	CurrentStateColLastAggregateID = Column{
-		name:  "aggregate_id",
 		table: currentStateTable,
 	}
 	CurrentStateColProjectionName = Column{

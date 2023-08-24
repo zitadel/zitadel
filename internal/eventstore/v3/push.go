@@ -58,7 +58,7 @@ func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, 
 	defer rows.Close()
 
 	for i := 0; rows.Next(); i++ {
-		err = rows.Scan(&events[i].(*event).createdAt)
+		err = rows.Scan(&events[i].(*event).createdAt, &events[i].(*event).position)
 		if err != nil {
 			return nil, err
 		}
@@ -96,7 +96,7 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 			return nil, nil, nil, err
 		}
 
-		placeHolders[i] = fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, 'zitadel', $%d, $%d, $%d)",
+		placeHolders[i] = fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, 'zitadel', $%d, $%d, $%d, cluster_logical_timestamp())",
 			i*argsPerCommand+1,
 			i*argsPerCommand+2,
 			i*argsPerCommand+3,

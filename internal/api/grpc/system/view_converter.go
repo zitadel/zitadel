@@ -19,7 +19,7 @@ func CurrentSequenceToPb(database string, currentSequence *query.CurrentState) *
 	return &system_pb.View{
 		Database:                 database,
 		ViewName:                 currentSequence.ProjectionName,
-		ProcessedSequence:        currentSequence.EventSequence,
+		ProcessedSequence:        currentSequence.CurrentPosition,
 		LastSuccessfulSpoolerRun: timestamppb.New(currentSequence.EventCreationDate),
 	}
 }

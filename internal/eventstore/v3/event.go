@@ -18,6 +18,7 @@ type event struct {
 	typ       eventstore.EventType
 	createdAt time.Time
 	sequence  uint64
+	position  float64
 	payload   Payload
 }
 
@@ -77,6 +78,11 @@ func (e *event) CreatedAt() time.Time {
 // Sequence implements [eventstore.Event]
 func (e *event) Sequence() uint64 {
 	return e.sequence
+}
+
+// Sequence implements [eventstore.Event]
+func (e *event) Position() float64 {
+	return e.position
 }
 
 // Unmarshal implements [eventstore.Event]

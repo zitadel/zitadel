@@ -10,6 +10,7 @@ INSERT INTO eventstore.events (
     , event_type
     , event_data
     , event_sequence
+    , position
 ) VALUES
     %s
-RETURNING created_at;
+RETURNING created_at, position;

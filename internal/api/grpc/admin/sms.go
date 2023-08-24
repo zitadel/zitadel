@@ -18,7 +18,7 @@ func (s *Server) ListSMSProviders(ctx context.Context, req *admin_pb.ListSMSProv
 		return nil, err
 	}
 	return &admin_pb.ListSMSProvidersResponse{
-		Details: object.ToListDetails(result.Count, result.Sequence, result.LastUpdated),
+		Details: object.ToListDetails(result.Count, result.Position, result.LastUpdated),
 		Result:  SMSConfigsToPb(result.Configs),
 	}, nil
 }

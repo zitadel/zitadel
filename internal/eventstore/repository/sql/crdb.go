@@ -8,7 +8,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/jackc/pgconn"
@@ -261,10 +260,10 @@ func (crdb *CRDB) Filter(ctx context.Context, searchQuery *eventstore.SearchQuer
 }
 
 // LatestSequence returns the latest sequence found by the search query
-func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (time.Time, error) {
-	var createdAt sql.NullTime
-	err := query(ctx, db, searchQuery, &createdAt)
-	return createdAt.Time, err
+func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (uint64, error) {
+	var position sql.NullInt64
+	err := query(ctx, db, searchQuery, &position)
+	return uint64(position.Int64), err
 }
 
 // InstanceIDs returns the instance ids found by the search query
@@ -283,17 +282,18 @@ func (db *CRDB) db() *database.DB {
 
 func (db *CRDB) orderByEventSequence(desc bool) string {
 	if desc {
-		return " ORDER BY crdb_internal_mvcc_timestamp DESC, event_sequence DESC"
+		return " ORDER BY position DESC, event_sequence DESC"
 	}
 
-	return " ORDER BY crdb_internal_mvcc_timestamp, event_sequence"
+	return " ORDER BY position, event_sequence"
 }
 
 func (db *CRDB) eventQuery() string {
 	return "SELECT" +
-		" hlc_to_timestamp(crdb_internal_mvcc_timestamp)::TIMESTAMPTZ" +
+		" hlc_to_timestamp(position)::TIMESTAMPTZ" +
 		", event_type" +
 		", event_sequence" +
+		", position" +
 		", event_data" +
 		", editor_user" +
 		", resource_owner" +
@@ -305,7 +305,7 @@ func (db *CRDB) eventQuery() string {
 }
 
 func (db *CRDB) maxSequenceQuery() string {
-	return "SELECT hlc_to_timestamp(MAX(crdb_internal_mvcc_timestamp))::TIMESTAMPTZ FROM eventstore.events"
+	return "SELECT MAX(position) FROM eventstore.events"
 }
 
 func (db *CRDB) instanceIDsQuery() string {
@@ -333,7 +333,9 @@ func (db *CRDB) columnName(col repository.Field) string {
 	case repository.FieldEventData:
 		return "event_data"
 	case repository.FieldCreationDate:
-		return "hlc_to_timestamp(crdb_internal_mvcc_timestamp)::TIMESTAMPTZ"
+		return "hlc_to_timestamp(position)::TIMESTAMPTZ"
+	case repository.FieldPosition:
+		return "position"
 	default:
 		return ""
 	}

@@ -69,6 +69,8 @@ const (
 	FieldEventData
 	//FieldCreationDate represents the creation date field
 	FieldCreationDate
+	// FieldPosition represents the field of the global sequence
+	FieldPosition
 
 	fieldCount
 )
@@ -113,6 +115,7 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 		instanceIDFilterFromBuilder,
 		editorUserFilter,
 		resourceOwnerFilter,
+		positionAfterFilter,
 	} {
 		filter := f(builder)
 		if filter == nil {
@@ -258,6 +261,13 @@ func instanceIDFilterFromBuilder(builder *eventstore.SearchQueryBuilder) *Filter
 		return nil
 	}
 	return NewFilter(FieldInstanceID, builder.GetInstanceID(), OperationEquals)
+}
+
+func positionAfterFilter(query *eventstore.SearchQueryBuilder) *Filter {
+	if query.GetPositionAfter() == 0 {
+		return nil
+	}
+	return NewFilter(FieldPosition, query.GetPositionAfter(), OperationGreater)
 }
 
 func creationDateAfterFilter(query *eventstore.SearchQuery) *Filter {

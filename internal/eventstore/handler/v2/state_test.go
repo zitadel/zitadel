@@ -164,10 +164,8 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 			args: args{
 				updatedState: &state{
 					instanceID:     "instance",
-					aggregateType:  "aggregate type",
-					aggregateID:    "aggregate id",
 					eventTimestamp: time.Now(),
-					eventSequence:  42,
+					position:       42,
 				},
 			},
 			isErr: func(t *testing.T, err error) {
@@ -192,10 +190,8 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 			args: args{
 				updatedState: &state{
 					instanceID:     "instance",
-					aggregateType:  "aggregate type",
-					aggregateID:    "aggregate id",
 					eventTimestamp: time.Now(),
-					eventSequence:  42,
+					position:       42,
 				},
 			},
 			isErr: func(t *testing.T, err error) {
@@ -228,10 +224,8 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 			args: args{
 				updatedState: &state{
 					instanceID:     "instance",
-					aggregateType:  "aggregate type",
-					aggregateID:    "aggregate id",
 					eventTimestamp: time.Now(),
-					eventSequence:  42,
+					position:       42,
 				},
 			},
 		},
@@ -409,10 +403,8 @@ func TestHandler_currentState(t *testing.T) {
 			want: want{
 				currentState: &state{
 					instanceID:     "instance",
-					aggregateType:  "aggregate type",
-					aggregateID:    "aggregate id",
 					eventTimestamp: testTime,
-					eventSequence:  42,
+					position:       42,
 				},
 			},
 		},

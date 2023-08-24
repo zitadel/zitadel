@@ -104,11 +104,7 @@ CREATE TABLE IF NOT EXISTS projections.current_states (
 
     , event_date TIMESTAMPTZ
     , last_updated TIMESTAMPTZ
-    --aggregate is needed if multiple events are created at the same
-    --point in time
-    , aggregate_type TEXT
-    , aggregate_id TEXT
-    , event_sequence INT8
+    , position DECIMAL
 
     , PRIMARY KEY (projection_name, instance_id)
 );
@@ -117,17 +113,13 @@ INSERT INTO projections.current_states (
     projection_name
     , instance_id
     , event_date
-    , aggregate_type
-    , aggregate_id
-    , event_sequence
+    , position
     , last_updated
 ) SELECT 
     cs.projection_name
     , cs.instance_id
     , e.creation_date
-    , e.aggregate_type
-    , e.aggregate_id
-    , e.event_sequence
+    , e.position
     , cs.timestamp
 FROM 
     projections.current_sequences cs
@@ -150,17 +142,13 @@ INSERT INTO projections.current_states (
     projection_name
     , instance_id
     , event_date
-    , aggregate_type
-    , aggregate_id
-    , event_sequence
+    , position
     , last_updated
 ) SELECT 
     cs.view_name
     , cs.instance_id
     , e.creation_date
-    , e.aggregate_type
-    , e.aggregate_id
-    , e.event_sequence
+    , e.position
     , cs.last_successful_spooler_run
 FROM 
     adminapi.current_sequences cs
@@ -182,17 +170,13 @@ INSERT INTO projections.current_states (
     projection_name
     , instance_id
     , event_date
-    , aggregate_type
-    , aggregate_id
-    , event_sequence
+    , position
     , last_updated
 ) SELECT 
     cs.view_name
     , cs.instance_id
     , e.creation_date
-    , e.aggregate_type
-    , e.aggregate_id
-    , e.event_sequence
+    , e.position
     , cs.last_successful_spooler_run
 FROM 
     auth.current_sequences cs

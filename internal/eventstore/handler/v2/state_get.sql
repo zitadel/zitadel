@@ -1,8 +1,6 @@
 SELECT 
     event_date
-    , aggregate_type
-    , aggregate_id
-    , event_sequence
+    , position
 FROM 
     projections.current_states
 WHERE

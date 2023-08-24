@@ -21,6 +21,7 @@ type BaseEvent struct {
 	Agg *Aggregate
 
 	Seq                           uint64
+	Pos                           float64
 	Creation                      time.Time
 	previousAggregateSequence     uint64
 	previousAggregateTypeSequence uint64
@@ -30,6 +31,11 @@ type BaseEvent struct {
 	//Service which created the event
 	Service string `json:"-"`
 	Data    []byte `json:"-"`
+}
+
+// Position implements Event.
+func (e *BaseEvent) Position() float64 {
+	return e.Pos
 }
 
 // EditorService implements Command
@@ -109,6 +115,7 @@ func BaseEventFromRepo(event Event) *BaseEvent {
 		Service: "zitadel",
 		User:    event.Creator(),
 		Data:    event.DataAsBytes(),
+		Pos:     event.Position(),
 	}
 }
 

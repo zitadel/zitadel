@@ -9,15 +9,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 type state struct {
 	instanceID     string
-	aggregateType  eventstore.AggregateType
-	aggregateID    string
+	position       float64
 	eventTimestamp time.Time
-	eventSequence  uint64
 }
 
 var (
@@ -37,17 +34,10 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 	}
 
 	timestamp := new(sql.NullTime)
-	aggregateType := new(sql.NullString)
-	aggregateID := new(sql.NullString)
-	sequence := new(sql.NullInt64)
+	position := new(sql.NullFloat64)
 
 	row := tx.QueryRowContext(ctx, currentStateStmt, currentState.instanceID, h.projection.Name())
-	err = row.Scan(
-		timestamp,
-		aggregateType,
-		aggregateID,
-		sequence,
-	)
+	err = row.Scan(timestamp, position)
 	if errors.Is(err, sql.ErrNoRows) {
 		err = h.lockState(ctx, tx, currentState.instanceID)
 	}
@@ -57,9 +47,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 	}
 
 	currentState.eventTimestamp = timestamp.Time
-	currentState.aggregateType = eventstore.AggregateType(aggregateType.String)
-	currentState.aggregateID = aggregateID.String
-	currentState.eventSequence = uint64(sequence.Int64)
+	currentState.position = position.Float64
 	return currentState, nil
 }
 
@@ -68,9 +56,7 @@ func (h *Handler) setState(ctx context.Context, tx *sql.Tx, updatedState *state)
 		h.projection.Name(),
 		updatedState.instanceID,
 		updatedState.eventTimestamp,
-		updatedState.aggregateType,
-		updatedState.aggregateID,
-		updatedState.eventSequence,
+		updatedState.position,
 	)
 	if err != nil {
 		h.log().WithError(err).Debug("unable to update state")

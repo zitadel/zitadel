@@ -77,20 +77,20 @@ func (p *Storage) getCertificateAndKey(ctx context.Context, usage domain.KeyUsag
 		return p.certificateToCertificateAndKey(selectCertificate(certs.Certificates))
 	}
 
-	var sequence time.Time
+	var position uint64
 	if certs.LatestState != nil {
-		sequence = certs.LatestState.EventTimestamp
+		position = certs.LatestState.Position
 	}
 
-	return nil, p.refreshCertificate(ctx, usage, sequence)
+	return nil, p.refreshCertificate(ctx, usage, position)
 }
 
 func (p *Storage) refreshCertificate(
 	ctx context.Context,
 	usage domain.KeyUsage,
-	sequence time.Time,
+	position uint64,
 ) error {
-	ok, err := p.ensureIsLatestCertificate(ctx, sequence)
+	ok, err := p.ensureIsLatestCertificate(ctx, position)
 	if err != nil {
 		logging.WithError(err).Error("could not ensure latest key")
 		return err
@@ -104,12 +104,12 @@ func (p *Storage) refreshCertificate(
 	return nil
 }
 
-func (p *Storage) ensureIsLatestCertificate(ctx context.Context, sequence time.Time) (bool, error) {
+func (p *Storage) ensureIsLatestCertificate(ctx context.Context, position uint64) (bool, error) {
 	maxSequence, err := p.getMaxKeySequence(ctx)
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
-	return sequence.Equal(maxSequence) || sequence.After(maxSequence), nil
+	return position == maxSequence || position > maxSequence, nil
 }
 
 func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage domain.KeyUsage) error {
@@ -152,7 +152,7 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage do
 	}
 }
 
-func (p *Storage) getMaxKeySequence(ctx context.Context) (time.Time, error) {
+func (p *Storage) getMaxKeySequence(ctx context.Context) (uint64, error) {
 	return p.eventstore.LatestSequence(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).

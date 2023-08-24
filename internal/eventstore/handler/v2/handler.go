@@ -284,9 +284,7 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 			return nil
 		}
 
-		currentState.aggregateID = statements[lastProcessedIndex].AggregateID
-		currentState.aggregateType = statements[lastProcessedIndex].AggregateType
-		currentState.eventSequence = statements[lastProcessedIndex].Sequence
+		currentState.position = statements[lastProcessedIndex].Position
 		currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
 
 		return h.setState(ctx, tx, currentState)
@@ -337,9 +335,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 
 func skipPreviouslyReduced(events []eventstore.Event, currentState *state) []eventstore.Event {
 	for i, event := range events {
-		if currentState.aggregateID == event.Aggregate().ID &&
-			currentState.aggregateType == event.Aggregate().Type &&
-			currentState.eventSequence == event.Sequence() {
+		if event.Position() == currentState.position {
 			return events[i+1:]
 		}
 	}
@@ -390,15 +386,15 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		OrderAsc().
 		InstanceID(currentState.instanceID)
 
+	if currentState.position > 0 {
+		builder = builder.PositionAfter(currentState.position)
+	}
+
 	for aggregateType, eventTypes := range h.eventTypes {
 		query := builder.
 			AddQuery().
 			AggregateTypes(aggregateType).
 			EventTypes(eventTypes...)
-
-		if !currentState.eventTimestamp.IsZero() {
-			query = query.CreationDateAfter(currentState.eventTimestamp.Add(-1 * time.Microsecond))
-		}
 
 		builder = query.Builder()
 	}

@@ -54,6 +54,6 @@ func (s *Server) ListMyMemberships(ctx context.Context, req *auth_pb.ListMyMembe
 	}
 	return &auth_pb.ListMyMembershipsResponse{
 		Result:  user_grpc.MembershipsToMembershipsPb(response.Memberships),
-		Details: object.ToListDetails(response.Count, response.Sequence, response.LastUpdated),
+		Details: object.ToListDetails(response.Count, response.Position, response.LastUpdated),
 	}, nil
 }

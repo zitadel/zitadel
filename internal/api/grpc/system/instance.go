@@ -103,7 +103,7 @@ func (s *Server) ListIAMMembers(ctx context.Context, req *system_pb.ListIAMMembe
 		return nil, err
 	}
 	return &system_pb.ListIAMMembersResponse{
-		Details: object.ToListDetails(res.Count, res.Sequence, res.LastUpdated),
+		Details: object.ToListDetails(res.Count, res.Position, res.LastUpdated),
 		//TODO: resource owner of user of the member instead of the membership resource owner
 		Result: member.MembersToPb("", res.Members),
 	}, nil
@@ -146,7 +146,7 @@ func (s *Server) ListDomains(ctx context.Context, req *system_pb.ListDomainsRequ
 	}
 	return &system_pb.ListDomainsResponse{
 		Result:  instance_grpc.DomainsToPb(domains.Domains),
-		Details: object.ToListDetails(domains.Count, domains.Sequence, domains.LastUpdated),
+		Details: object.ToListDetails(domains.Count, domains.Position, domains.LastUpdated),
 	}, nil
 }
 

@@ -19,6 +19,7 @@ type SearchQueryBuilder struct {
 	queries         []*SearchQuery
 	tx              *sql.Tx
 	allowTimeTravel bool
+	positionAfter   float64
 }
 
 func (b *SearchQueryBuilder) GetColumns() Columns {
@@ -55,6 +56,10 @@ func (b *SearchQueryBuilder) GetTx() *sql.Tx {
 
 func (b *SearchQueryBuilder) GetAllowTimeTravel() bool {
 	return b.allowTimeTravel
+}
+
+func (b SearchQueryBuilder) GetPositionAfter() float64 {
+	return b.positionAfter
 }
 
 type SearchQuery struct {
@@ -211,6 +216,12 @@ func (builder *SearchQueryBuilder) AllowTimeTravel() *SearchQueryBuilder {
 	return builder
 }
 
+// PositionAfter filters for events which happened after the specified time
+func (builder *SearchQueryBuilder) PositionAfter(position float64) *SearchQueryBuilder {
+	builder.positionAfter = position
+	return builder
+}
+
 // AddQuery creates a new sub query.
 // All fields in the sub query are AND-connected in the storage request.
 // Multiple sub queries are OR-connected in the storage request.
@@ -264,7 +275,7 @@ func (query *SearchQuery) ExcludedInstanceID(instanceIDs ...string) *SearchQuery
 	return query
 }
 
-// CreationDateNewer filters for events which happened after the specified time
+// CreationDateAfter filters for events which happened after the specified time
 func (query *SearchQuery) CreationDateAfter(time time.Time) *SearchQuery {
 	query.creationDateAfter = time
 	return query

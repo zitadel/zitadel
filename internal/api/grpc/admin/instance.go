@@ -32,7 +32,7 @@ func (s *Server) ListInstanceDomains(ctx context.Context, req *admin_pb.ListInst
 		Result: instance_grpc.DomainsToPb(domains.Domains),
 		Details: object.ToListDetails(
 			domains.Count,
-			domains.Sequence,
+			domains.Position,
 			domains.LastUpdated,
 		),
 	}, nil

@@ -50,6 +50,7 @@ type Statement struct {
 	AggregateType eventstore.AggregateType
 	AggregateID   string
 	Sequence      uint64
+	Position      float64
 	CreationDate  time.Time
 	InstanceID    string
 
@@ -74,6 +75,7 @@ func NewStatement(event eventstore.Event, e Exec) *Statement {
 	return &Statement{
 		AggregateType: event.Aggregate().Type,
 		Sequence:      event.Sequence(),
+		Position:      event.Position(),
 		AggregateID:   event.Aggregate().ID,
 		CreationDate:  event.CreatedAt(),
 		InstanceID:    event.Aggregate().InstanceID,

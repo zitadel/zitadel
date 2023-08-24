@@ -172,7 +172,7 @@ func (s *Server) ListOrgDomains(ctx context.Context, req *mgmt_pb.ListOrgDomains
 	}
 	return &mgmt_pb.ListOrgDomainsResponse{
 		Result:  org_grpc.DomainsToPb(domains.Domains),
-		Details: object.ToListDetails(domains.Count, domains.Sequence, domains.LastUpdated),
+		Details: object.ToListDetails(domains.Count, domains.Position, domains.LastUpdated),
 	}, nil
 }
 
@@ -268,7 +268,7 @@ func (s *Server) ListOrgMembers(ctx context.Context, req *mgmt_pb.ListOrgMembers
 	}
 	return &mgmt_pb.ListOrgMembersResponse{
 		Result:  member_grpc.MembersToPb(s.assetAPIPrefix(ctx), members.Members),
-		Details: object.ToListDetails(members.Count, members.Sequence, members.LastUpdated),
+		Details: object.ToListDetails(members.Count, members.Position, members.LastUpdated),
 	}, nil
 }
 
@@ -346,7 +346,7 @@ func (s *Server) ListOrgMetadata(ctx context.Context, req *mgmt_pb.ListOrgMetada
 	}
 	return &mgmt_pb.ListOrgMetadataResponse{
 		Result:  metadata.OrgMetadataListToPb(res.Metadata),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastUpdated),
+		Details: obj_grpc.ToListDetails(res.Count, res.Position, res.LastUpdated),
 	}, nil
 }
 

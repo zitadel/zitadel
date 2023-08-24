@@ -389,7 +389,7 @@ func (repo *testPusher) Push(ctx context.Context, commands ...Command) (events [
 
 type testQuerier struct {
 	events    []Event
-	sequence  time.Time
+	sequence  uint64
 	instances []string
 	err       error
 	t         *testing.T
@@ -409,9 +409,9 @@ func (repo *testQuerier) Filter(ctx context.Context, searchQuery *SearchQueryBui
 	return repo.events, nil
 }
 
-func (repo *testQuerier) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (time.Time, error) {
+func (repo *testQuerier) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (uint64, error) {
 	if repo.err != nil {
-		return time.Time{}, repo.err
+		return 0, repo.err
 	}
 	return repo.sequence, nil
 }
@@ -913,8 +913,8 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			},
 			fields: fields{
 				repo: &testQuerier{
-					sequence: time.Now(),
-					t:        t,
+					// sequence: time.Now(),
+					t: t,
 				},
 			},
 			res: res{

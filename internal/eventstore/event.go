@@ -39,7 +39,10 @@ type Event interface {
 
 	// Sequence of the event in the aggregate
 	Sequence() uint64
+	// CreatedAt is the time the event was created at
 	CreatedAt() time.Time
+	// Position is the global position of the event
+	Position() float64
 
 	// Unmarshal parses the payload and stores the result
 	// in the value pointed to by ptr. If ptr is nil or not a pointer,
