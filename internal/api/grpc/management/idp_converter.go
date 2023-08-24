@@ -260,12 +260,13 @@ func addGenericOIDCProviderToCommand(req *mgmt_pb.AddGenericOIDCProviderRequest)
 
 func updateGenericOIDCProviderToCommand(req *mgmt_pb.UpdateGenericOIDCProviderRequest) command.GenericOIDCProvider {
 	return command.GenericOIDCProvider{
-		Name:         req.Name,
-		Issuer:       req.Issuer,
-		ClientID:     req.ClientId,
-		ClientSecret: req.ClientSecret,
-		Scopes:       req.Scopes,
-		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:             req.Name,
+		Issuer:           req.Issuer,
+		ClientID:         req.ClientId,
+		ClientSecret:     req.ClientSecret,
+		Scopes:           req.Scopes,
+		IsIDTokenMapping: req.IsIdTokenMapping,
+		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
