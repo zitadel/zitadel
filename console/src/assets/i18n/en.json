@@ -1828,7 +1828,9 @@
       "DELETED": "Idp removed successfully!",
       "ADDED": "Added successfully.",
       "REMOVED": "Removed successfully."
-    }
+    },
+    "ISIDTOKENMAPPING": "Map from the ID token",
+    "ISIDTOKENMAPPING_DESC": "If selected, provider information gets mapped from the ID token, not from the userinfo endpoint."
   },
   "MFA": {
     "LIST": {

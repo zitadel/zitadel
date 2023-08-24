@@ -342,7 +342,12 @@ message GenericOIDCConfig {
             description: "the scopes requested by ZITADEL during the request on the identity provider";
         }
     ];
-    bool is_id_token_mapping = 4;
+    bool is_id_token_mapping = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "true";
+            description: "if true, provider information get mapped from the id token, not from the userinfo endpoint";
+        }
+    ];
 }
 
 message GitHubConfig {

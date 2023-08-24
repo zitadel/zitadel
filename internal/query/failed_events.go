@@ -77,11 +77,14 @@ func (q *Queries) SearchFailedEvents(ctx context.Context, queries *FailedEventSe
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-n8rjJ", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		failedEvents, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-3j99J", "Errors.Internal")
 	}
-	return scan(rows)
+	return failedEvents, nil
 }
 
 func (q *Queries) RemoveFailedEvent(ctx context.Context, projectionName, instanceID string, sequence uint64) (err error) {

@@ -224,7 +224,7 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*AuthMethodTypes)(nil),
 		},
 		{
 			name:    "prepareActiveUserAuthMethodTypesQuery no result",
@@ -313,7 +313,7 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*AuthMethodTypes)(nil),
 		},
 		{
 			name: "prepareUserAuthMethodTypesRequiredQuery no result",

@@ -135,7 +135,7 @@ func Test_IDPUserLinkPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*IDPUserLinks)(nil),
 		},
 	}
 	for _, tt := range tests {

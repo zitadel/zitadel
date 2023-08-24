@@ -287,7 +287,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*ProjectGrantMembership)(nil),
 		},
 	}
 	for _, tt := range tests {
