@@ -39,6 +39,14 @@ func TestMain(m *testing.M) {
 
 		CTX, _ = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
 		User = Tester.CreateHumanUser(CTX)
+		Tester.Client.UserV2.VerifyEmail(CTX, &user.VerifyEmailRequest{
+			UserId:           User.GetUserId(),
+			VerificationCode: User.GetEmailCode(),
+		})
+		Tester.Client.UserV2.VerifyPhone(CTX, &user.VerifyPhoneRequest{
+			UserId:           User.GetUserId(),
+			VerificationCode: User.GetPhoneCode(),
+		})
 		Tester.SetUserPassword(CTX, User.GetUserId(), integration.UserPassword)
 		Tester.RegisterUserPasskey(CTX, User.GetUserId())
 		return m.Run()
@@ -75,6 +83,8 @@ const (
 	wantWebAuthNFactorUserVerified
 	wantTOTPFactor
 	wantIntentFactor
+	wantOTPSMSFactor
+	wantOTPEmailFactor
 )
 
 func verifyFactors(t testing.TB, factors *session.Factors, window time.Duration, want []wantFactor) {
@@ -105,6 +115,14 @@ func verifyFactors(t testing.TB, factors *session.Factors, window time.Duration,
 			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
 		case wantIntentFactor:
 			pf := factors.GetIntent()
+			assert.NotNil(t, pf)
+			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
+		case wantOTPSMSFactor:
+			pf := factors.GetOtpSms()
+			assert.NotNil(t, pf)
+			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
+		case wantOTPEmailFactor:
+			pf := factors.GetOtpEmail()
 			assert.NotNil(t, pf)
 			assert.WithinRange(t, pf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
 		}
@@ -362,6 +380,20 @@ func registerTOTP(ctx context.Context, t *testing.T, userID string) (secret stri
 	return secret
 }
 
+func registerOTPSMS(ctx context.Context, t *testing.T, userID string) {
+	_, err := Tester.Client.UserV2.AddOTPSMS(ctx, &user.AddOTPSMSRequest{
+		UserId: userID,
+	})
+	require.NoError(t, err)
+}
+
+func registerOTPEmail(ctx context.Context, t *testing.T, userID string) {
+	_, err := Tester.Client.UserV2.AddOTPEmail(ctx, &user.AddOTPEmailRequest{
+		UserId: userID,
+	})
+	require.NoError(t, err)
+}
+
 func TestServer_SetSession_flow(t *testing.T) {
 	// create new, empty session
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{})
@@ -421,6 +453,8 @@ func TestServer_SetSession_flow(t *testing.T) {
 	userAuthCtx := Tester.WithAuthorizationToken(CTX, sessionToken)
 	Tester.RegisterUserU2F(userAuthCtx, User.GetUserId())
 	totpSecret := registerTOTP(userAuthCtx, t, User.GetUserId())
+	registerOTPSMS(userAuthCtx, t, User.GetUserId())
+	registerOTPEmail(userAuthCtx, t, User.GetUserId())
 
 	t.Run("check webauthn, user not verified (U2F)", func(t *testing.T) {
 
@@ -477,6 +511,66 @@ func TestServer_SetSession_flow(t *testing.T) {
 		require.NoError(t, err)
 		sessionToken = resp.GetSessionToken()
 		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, wantUserFactor, wantWebAuthNFactor, wantTOTPFactor)
+	})
+
+	t.Run("check OTP SMS", func(t *testing.T) {
+		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
+			SessionId:    createResp.GetSessionId(),
+			SessionToken: sessionToken,
+			Challenges: &session.RequestChallenges{
+				OtpSms: &session.RequestChallenges_OTPSMS{ReturnCode: true},
+			},
+		})
+		require.NoError(t, err)
+		verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), time.Minute, nil)
+		sessionToken = resp.GetSessionToken()
+
+		otp := resp.GetChallenges().GetOtpSms()
+		require.NotEmpty(t, otp)
+
+		resp, err = Client.SetSession(CTX, &session.SetSessionRequest{
+			SessionId:    createResp.GetSessionId(),
+			SessionToken: sessionToken,
+			Checks: &session.Checks{
+				OtpSms: &session.CheckOTP{
+					Otp: otp,
+				},
+			},
+		})
+		require.NoError(t, err)
+		sessionToken = resp.GetSessionToken()
+		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, wantUserFactor, wantWebAuthNFactor, wantOTPSMSFactor)
+	})
+
+	t.Run("check OTP Email", func(t *testing.T) {
+		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
+			SessionId:    createResp.GetSessionId(),
+			SessionToken: sessionToken,
+			Challenges: &session.RequestChallenges{
+				OtpEmail: &session.RequestChallenges_OTPEmail{
+					DeliveryType: &session.RequestChallenges_OTPEmail_ReturnCode_{},
+				},
+			},
+		})
+		require.NoError(t, err)
+		verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), time.Minute, nil)
+		sessionToken = resp.GetSessionToken()
+
+		otp := resp.GetChallenges().GetOtpEmail()
+		require.NotEmpty(t, otp)
+
+		resp, err = Client.SetSession(CTX, &session.SetSessionRequest{
+			SessionId:    createResp.GetSessionId(),
+			SessionToken: sessionToken,
+			Checks: &session.Checks{
+				OtpEmail: &session.CheckOTP{
+					Otp: otp,
+				},
+			},
+		})
+		require.NoError(t, err)
+		sessionToken = resp.GetSessionToken()
+		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, wantUserFactor, wantWebAuthNFactor, wantOTPEmailFactor)
 	})
 }
 

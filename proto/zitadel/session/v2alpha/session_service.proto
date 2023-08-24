@@ -380,6 +380,16 @@ message Checks {
       description: "\"Checks the Time-based One-Time Password and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
     }
   ];
+  optional CheckOTP otp_sms = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Checks the One-Time Password sent over SMS and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
+    }
+  ];
+  optional CheckOTP otp_email = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Checks the One-Time Password sent over Email and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
+    }
+  ];
 }
 
 message CheckUser {
@@ -454,6 +464,16 @@ message CheckTOTP {
       min_length: 6;
       max_length: 6;
       example: "\"323764\"";
+    }
+  ];
+}
+
+message CheckOTP {
+  string otp = 1 [
+    (validate.rules).string = {min_len: 1},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      example: "\"3237642\"";
     }
   ];
 }

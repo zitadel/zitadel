@@ -12,6 +12,10 @@ import (
 
 type cryptoCodeFunc func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (*CryptoCode, error)
 
+type cryptoCodeWithDefaultFunc func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto, defaultConfig *crypto.GeneratorConfig) (*CryptoCode, error)
+
+var emptyConfig = &crypto.GeneratorConfig{}
+
 type CryptoCode struct {
 	Crypted *crypto.CryptoValue
 	Plain   string
@@ -19,7 +23,11 @@ type CryptoCode struct {
 }
 
 func newCryptoCode(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (*CryptoCode, error) {
-	gen, config, err := secretGenerator(ctx, filter, typ, alg)
+	return newCryptoCodeWithDefaultConfig(ctx, filter, typ, alg, emptyConfig)
+}
+
+func newCryptoCodeWithDefaultConfig(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto, defaultConfig *crypto.GeneratorConfig) (*CryptoCode, error) {
+	gen, config, err := secretGenerator(ctx, filter, typ, alg, defaultConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -35,15 +43,15 @@ func newCryptoCode(ctx context.Context, filter preparation.FilterToQueryReducer,
 }
 
 func verifyCryptoCode(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto, creation time.Time, expiry time.Duration, crypted *crypto.CryptoValue, plain string) error {
-	gen, _, err := secretGenerator(ctx, filter, typ, alg)
+	gen, _, err := secretGenerator(ctx, filter, typ, alg, emptyConfig)
 	if err != nil {
 		return err
 	}
 	return crypto.VerifyCode(creation, expiry, crypted, plain, gen)
 }
 
-func secretGenerator(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (crypto.Generator, *crypto.GeneratorConfig, error) {
-	config, err := secretGeneratorConfig(ctx, filter, typ)
+func secretGenerator(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto, defaultConfig *crypto.GeneratorConfig) (crypto.Generator, *crypto.GeneratorConfig, error) {
+	config, err := secretGeneratorConfigWithDefault(ctx, filter, typ, defaultConfig)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -58,26 +66,10 @@ func secretGenerator(ctx context.Context, filter preparation.FilterToQueryReduce
 }
 
 func secretGeneratorConfig(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType) (*crypto.GeneratorConfig, error) {
-	wm := NewInstanceSecretGeneratorConfigWriteModel(ctx, typ)
-	events, err := filter(ctx, wm.Query())
-	if err != nil {
-		return nil, err
-	}
-	wm.AppendEvents(events...)
-	if err := wm.Reduce(); err != nil {
-		return nil, err
-	}
-	return &crypto.GeneratorConfig{
-		Length:              wm.Length,
-		Expiry:              wm.Expiry,
-		IncludeLowerLetters: wm.IncludeLowerLetters,
-		IncludeUpperLetters: wm.IncludeUpperLetters,
-		IncludeDigits:       wm.IncludeDigits,
-		IncludeSymbols:      wm.IncludeSymbols,
-	}, nil
+	return secretGeneratorConfigWithDefault(ctx, filter, typ, emptyConfig)
 }
 
-func secretGeneratorConfigWithDefault(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, defaultGenerator *crypto.GeneratorConfig) (*crypto.GeneratorConfig, error) {
+func secretGeneratorConfigWithDefault(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, defaultConfig *crypto.GeneratorConfig) (*crypto.GeneratorConfig, error) {
 	wm := NewInstanceSecretGeneratorConfigWriteModel(ctx, typ)
 	events, err := filter(ctx, wm.Query())
 	if err != nil {
@@ -88,7 +80,7 @@ func secretGeneratorConfigWithDefault(ctx context.Context, filter preparation.Fi
 		return nil, err
 	}
 	if wm.State != domain.SecretGeneratorStateActive {
-		return defaultGenerator, nil
+		return defaultConfig, nil
 	}
 	return &crypto.GeneratorConfig{
 		Length:              wm.Length,

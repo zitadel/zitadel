@@ -222,7 +222,25 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	actionsLogstoreSvc := logstore.New(queries, usageReporter, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	notification.Start(ctx, config.Projections.Customizations["notifications"], config.Projections.Customizations["notificationsquotas"], config.Projections.Customizations["telemetry"], *config.Telemetry, config.ExternalDomain, config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
+	notification.Start(
+		ctx,
+		config.Projections.Customizations["notifications"],
+		config.Projections.Customizations["notificationsquotas"],
+		config.Projections.Customizations["telemetry"],
+		*config.Telemetry,
+		config.ExternalDomain,
+		config.ExternalPort,
+		config.ExternalSecure,
+		commands,
+		queries,
+		eventstoreClient,
+		assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort),
+		config.Login.DefaultOTPEmailURLV2,
+		config.SystemDefaults.Notifications.FileSystemPath,
+		keys.User,
+		keys.SMTP,
+		keys.SMS,
+	)
 
 	router := mux.NewRouter()
 	tlsConfig, err := config.TLS.Config()

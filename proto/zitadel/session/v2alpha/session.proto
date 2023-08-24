@@ -47,6 +47,8 @@ message Factors {
   WebAuthNFactor web_auth_n = 3;
   IntentFactor intent = 4;
   TOTPFactor totp = 5;
+  OTPFactor otp_sms = 6;
+  OTPFactor otp_email = 7;
 }
 
 message UserFactor {
@@ -106,6 +108,14 @@ message TOTPFactor {
   google.protobuf.Timestamp verified_at = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"time when the Time-based One-Time Password was last checked\"";
+    }
+  ];
+}
+
+message OTPFactor {
+  google.protobuf.Timestamp verified_at = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the One-Time Password was last checked\"";
     }
   ];
 }

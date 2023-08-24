@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
@@ -2024,6 +2025,31 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 								domain.OIDCMappingFieldUnspecified,
 							),
 						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewIDPConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"idpID",
+								"name",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeUnspecified,
+								false,
+							),
+						),
+						eventFromEventPusher(
+							org.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"clientID",
+								"idpID",
+								"issuer",
+								"authEndpoint",
+								"tokenEndpoint",
+								nil,
+								domain.OIDCMappingFieldUnspecified,
+								domain.OIDCMappingFieldUnspecified,
+							),
+						),
 						eventFromEventPusher(
 							org.NewIdentityProviderAddedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
@@ -2100,6 +2126,146 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					},
 					State: domain.UserStateActive,
 				},
+			},
+		},
+		{
+			name: "add human (with idp, creation not allowed), precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewIDPConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"idpID",
+								"name",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeUnspecified,
+								false,
+							),
+						),
+						eventFromEventPusher(
+							org.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"clientID",
+								"idpID",
+								"issuer",
+								"authEndpoint",
+								"tokenEndpoint",
+								nil,
+								domain.OIDCMappingFieldUnspecified,
+								domain.OIDCMappingFieldUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							func() eventstore.Command {
+								e, _ := org.NewOIDCIDPChangedEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate,
+									"config1",
+									[]idp.OIDCIDPChanges{
+										idp.ChangeOIDCOptions(idp.OptionChanges{IsCreationAllowed: gu.Ptr(false)}),
+									},
+								)
+								return e
+							}(),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewIDPConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"idpID",
+								"name",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeUnspecified,
+								false,
+							),
+						),
+						eventFromEventPusher(
+							org.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"clientID",
+								"idpID",
+								"issuer",
+								"authEndpoint",
+								"tokenEndpoint",
+								nil,
+								domain.OIDCMappingFieldUnspecified,
+								domain.OIDCMappingFieldUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							func() eventstore.Command {
+								e, _ := org.NewOIDCIDPChangedEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate,
+									"config1",
+									[]idp.OIDCIDPChanges{
+										idp.ChangeOIDCOptions(idp.OptionChanges{IsCreationAllowed: gu.Ptr(false)}),
+									},
+								)
+								return e
+							}(),
+						),
+						eventFromEventPusher(
+							org.NewIdentityProviderAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"idpID",
+								domain.IdentityProviderTypeOrg,
+							),
+						),
+					),
+				),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						PreferredLanguage: language.English,
+					},
+					Email: &domain.Email{
+						EmailAddress:    "email@test.ch",
+						IsEmailVerified: true,
+					},
+				},
+				links: []*domain.UserIDPLink{
+					{
+						IDPConfigID:    "idpID",
+						ExternalUserID: "externalID",
+						DisplayName:    "name",
+					},
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
 			},
 		},
 	}
@@ -3330,6 +3496,31 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								"idpID",
 								domain.IdentityProviderTypeOrg,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewIDPConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"idpID",
+								"name",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeUnspecified,
+								false,
+							),
+						),
+						eventFromEventPusher(
+							org.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"clientID",
+								"idpID",
+								"issuer",
+								"authEndpoint",
+								"tokenEndpoint",
+								nil,
+								domain.OIDCMappingFieldUnspecified,
+								domain.OIDCMappingFieldUnspecified,
 							),
 						),
 					),
