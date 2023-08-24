@@ -175,48 +175,58 @@ func (db *dbMock) expectRollback(err error) *dbMock {
 
 func (db *dbMock) expectGetByID(table, key, value string) *dbMock {
 	query := fmt.Sprintf(expectedGetByID, table, key)
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(query).
 		WithArgs(value).
 		WillReturnRows(sqlmock.NewRows([]string{key}).
 			AddRow(key))
+	db.mock.ExpectCommit()
 
 	return db
 }
 
 func (db *dbMock) expectGetByIDErr(table, key, value string, err error) *dbMock {
 	query := fmt.Sprintf(expectedGetByID, table, key)
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(query).
 		WithArgs(value).
 		WillReturnError(err)
+	db.mock.ExpectCommit()
 
 	return db
 }
 
 func (db *dbMock) expectGetByQuery(table, key, method, value string) *dbMock {
 	query := fmt.Sprintf(expectedGetByQuery, table, key, method)
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(query).
 		WithArgs(value).
 		WillReturnRows(sqlmock.NewRows([]string{key}).
 			AddRow(key))
+	db.mock.ExpectCommit()
 
 	return db
 }
 
 func (db *dbMock) expectGetByQueryCaseSensitive(table, key, method, value string) *dbMock {
 	query := fmt.Sprintf(expectedGetByQueryCaseSensitive, table, key, method)
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(query).
 		WithArgs(value).
 		WillReturnRows(sqlmock.NewRows([]string{key}).
 			AddRow(key))
+	db.mock.ExpectCommit()
 
 	return db
 }
 
 func (db *dbMock) expectGetByQueryErr(table, key, method, value string, err error) *dbMock {
 	query := fmt.Sprintf(expectedGetByQuery, table, key, method)
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(query).
 		WithArgs(value).
 		WillReturnError(err)
+	db.mock.ExpectCommit()
 
 	return db
 }
@@ -313,10 +323,14 @@ func (db *dbMock) expectGetSearchRequestNoParams(table string, resultAmount, tot
 		rows.AddRow(fmt.Sprintf("hodor-%d", i))
 	}
 
+	db.mock.ExpectBegin()
+
 	db.mock.ExpectQuery(queryCount).
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(total))
 	db.mock.ExpectQuery(query).
 		WillReturnRows(rows)
+
+	db.mock.ExpectCommit()
 	return db
 }
 
@@ -329,10 +343,12 @@ func (db *dbMock) expectGetSearchRequestWithLimit(table string, limit, resultAmo
 		rows.AddRow(fmt.Sprintf("hodor-%d", i))
 	}
 
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(queryCount).
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(total))
 	db.mock.ExpectQuery(query).
 		WillReturnRows(rows)
+	db.mock.ExpectCommit()
 	return db
 }
 
@@ -345,10 +361,12 @@ func (db *dbMock) expectGetSearchRequestWithOffset(table string, offset, resultA
 		rows.AddRow(fmt.Sprintf("hodor-%d", i))
 	}
 
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(queryCount).
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(total))
 	db.mock.ExpectQuery(query).
 		WillReturnRows(rows)
+	db.mock.ExpectCommit()
 	return db
 }
 
@@ -361,10 +379,12 @@ func (db *dbMock) expectGetSearchRequestWithSorting(table, sorting string, sorti
 		rows.AddRow(fmt.Sprintf("hodor-%d", i))
 	}
 
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(queryCount).
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(total))
 	db.mock.ExpectQuery(query).
 		WillReturnRows(rows)
+	db.mock.ExpectCommit()
 	return db
 }
 
@@ -377,12 +397,14 @@ func (db *dbMock) expectGetSearchRequestWithSearchQuery(table, key, method, valu
 		rows.AddRow(fmt.Sprintf("hodor-%d", i))
 	}
 
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(queryCount).
 		WithArgs(value).
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(total))
 	db.mock.ExpectQuery(query).
 		WithArgs(value).
 		WillReturnRows(rows)
+	db.mock.ExpectCommit()
 	return db
 }
 
@@ -395,12 +417,14 @@ func (db *dbMock) expectGetSearchRequestWithAllParams(table, key, method, value,
 		rows.AddRow(fmt.Sprintf("hodor-%d", i))
 	}
 
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(queryCount).
 		WithArgs(value).
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(total))
 	db.mock.ExpectQuery(query).
 		WithArgs(value).
 		WillReturnRows(rows)
+	db.mock.ExpectCommit()
 	return db
 }
 
@@ -413,9 +437,11 @@ func (db *dbMock) expectGetSearchRequestErr(table string, resultAmount, total in
 		rows.AddRow(fmt.Sprintf("hodor-%d", i))
 	}
 
+	db.mock.ExpectBegin()
 	db.mock.ExpectQuery(queryCount).
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(total))
 	db.mock.ExpectQuery(query).
 		WillReturnError(err)
+	db.mock.ExpectCommit()
 	return db
 }

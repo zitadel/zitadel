@@ -140,6 +140,13 @@ VerifyMFAOTP:
   CodeLabel: Code
   NextButtonText: Suivant
 
+VerifyOTP:
+  Title: Vérifier 2-Facteurs
+  Description: Vérifiez votre second facteur
+  CodeLabel: Code
+  ResendButtonText: Renvoyer le code
+  NextButtonText: Suivant
+
 VerifyMFAU2F:
   Title: Vérifier 2-Facteurs
   Description: Vérifiez votre facteur 2 avec l'appareil enregistré (par exemple FaceID, Windows Hello, empreinte digitale).

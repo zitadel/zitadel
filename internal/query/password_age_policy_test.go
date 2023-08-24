@@ -52,7 +52,7 @@ func Test_PasswordAgePolicyPrepares(t *testing.T) {
 			name:    "preparePasswordAgePolicyQuery no result",
 			prepare: preparePasswordAgePolicyQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(preparePasswordAgePolicyStmt),
 					nil,
 					nil,
@@ -113,7 +113,7 @@ func Test_PasswordAgePolicyPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*PasswordAgePolicy)(nil),
 		},
 	}
 	for _, tt := range tests {

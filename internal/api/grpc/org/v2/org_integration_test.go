@@ -89,8 +89,8 @@ func TestServer_AddOrganization(t *testing.T) {
 						UserType: &org.AddOrganizationRequest_Admin_Human{
 							Human: &user.AddHumanUserRequest{
 								Profile: &user.SetHumanProfile{
-									FirstName: "firstname",
-									LastName:  "lastname",
+									GivenName:  "firstname",
+									FamilyName: "lastname",
 								},
 								Email: &user.SetHumanEmail{
 									Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
@@ -127,8 +127,8 @@ func TestServer_AddOrganization(t *testing.T) {
 						UserType: &org.AddOrganizationRequest_Admin_Human{
 							Human: &user.AddHumanUserRequest{
 								Profile: &user.SetHumanProfile{
-									FirstName: "firstname",
-									LastName:  "lastname",
+									GivenName:  "firstname",
+									FamilyName: "lastname",
 								},
 								Email: &user.SetHumanEmail{
 									Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
