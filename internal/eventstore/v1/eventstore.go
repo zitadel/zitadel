@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/internal/repository"
 	z_sql "github.com/zitadel/zitadel/internal/eventstore/v1/internal/repository/sql"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type Eventstore interface {
@@ -28,7 +29,10 @@ func Start(db *database.DB, allowOrderByCreationDate bool) (Eventstore, error) {
 	}, nil
 }
 
-func (es *eventstore) FilterEvents(ctx context.Context, searchQuery *models.SearchQuery) ([]*models.Event, error) {
+func (es *eventstore) FilterEvents(ctx context.Context, searchQuery *models.SearchQuery) (_ []*models.Event, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if err := searchQuery.Validate(); err != nil {
 		return nil, err
 	}
