@@ -77,6 +77,13 @@ func TestQuotasProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
+							expectedStmt: "DELETE FROM projections.quotas_periods WHERE (instance_id = $1) AND (unit = $2)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								quota.RequestsAllAuthenticated,
+							},
+						},
+						{
 							expectedStmt: "DELETE FROM projections.quotas WHERE (instance_id = $1) AND (unit = $2)",
 							expectedArgs: []interface{}{
 								"instance-id",
@@ -97,7 +104,7 @@ func TestQuotasProjection_reduces(t *testing.T) {
 			}
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, QuotassProjectionTable, tt.want)
+			assertReduce(t, got, err, QuotasProjectionTable, tt.want)
 		})
 	}
 }

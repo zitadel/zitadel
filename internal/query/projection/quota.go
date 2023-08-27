@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	QuotassProjectionTable = "projections.quotas"
+	QuotasProjectionTable = "projections.quotas"
 
 	QuotasColumnInstanceID = "instance_id"
 	QuotasColumnUnit       = "unit"
@@ -20,6 +20,12 @@ const (
 	QuotasColumnFrom       = "from_anchor"
 	QuotasColumnInterval   = "interval"
 	QuotasColumnLimit      = "limit_usage"
+
+	periodsTableSuffix           = "periods"
+	QuotaPeriodsColumnInstanceID = "instance_id"
+	QuotaPeriodsColumnUnit       = "unit"
+	QuotaPeriodsColumnStart      = "start"
+	QuotaPeriodsColumnUsage      = "usage"
 )
 
 type quotaProjection struct {
@@ -28,7 +34,7 @@ type quotaProjection struct {
 
 func newQuotaProjection(ctx context.Context, config crdb.StatementHandlerConfig) *quotaProjection {
 	p := new(quotaProjection)
-	config.ProjectionName = QuotassProjectionTable
+	config.ProjectionName = QuotasProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewMultiTableCheck(
 		crdb.NewTable(
@@ -41,6 +47,16 @@ func newQuotaProjection(ctx context.Context, config crdb.StatementHandlerConfig)
 				crdb.NewColumn(QuotasColumnLimit, crdb.ColumnTypeBool),
 			},
 			crdb.NewPrimaryKey(QuotasColumnInstanceID, QuotasColumnUnit),
+		),
+		crdb.NewSuffixedTable(
+			[]*crdb.Column{
+				crdb.NewColumn(QuotaPeriodsColumnInstanceID, crdb.ColumnTypeText),
+				crdb.NewColumn(QuotaPeriodsColumnUnit, crdb.ColumnTypeEnum),
+				crdb.NewColumn(QuotaPeriodsColumnStart, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(QuotaPeriodsColumnUsage, crdb.ColumnTypeInt64),
+			},
+			crdb.NewPrimaryKey(QuotaPeriodsColumnInstanceID, QuotaPeriodsColumnUnit, QuotaPeriodsColumnStart),
+			periodsTableSuffix,
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -102,11 +118,20 @@ func (p *quotaProjection) reduceQuotaRemoved(event eventstore.Event) (*handler.S
 	if err != nil {
 		return nil, err
 	}
-	return crdb.NewDeleteStatement(
+	return crdb.NewMultiStatement(
 		e,
-		[]handler.Condition{
-			handler.NewCond(QuotasColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCond(QuotasColumnUnit, e.Unit),
-		},
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(QuotaPeriodsColumnInstanceID, e.Aggregate().InstanceID),
+				handler.NewCond(QuotaPeriodsColumnUnit, e.Unit),
+			},
+			crdb.WithTableSuffix(periodsTableSuffix),
+		),
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(QuotasColumnInstanceID, e.Aggregate().InstanceID),
+				handler.NewCond(QuotasColumnUnit, e.Unit),
+			},
+		),
 	), nil
 }
