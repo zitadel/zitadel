@@ -67,6 +67,15 @@ func (p *quotaProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: quota.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  quota.RemovedEventType,
+					Reduce: p.reduceQuotaRemoved,
+				},
+			},
+		},
 	}
 }
 
@@ -84,6 +93,20 @@ func (p *quotaProjection) reduceQuotaAdded(event eventstore.Event) (*handler.Sta
 			handler.NewCol(QuotasColumnFrom, e.From),
 			handler.NewCol(QuotasColumnInterval, e.ResetInterval),
 			handler.NewCol(QuotasColumnLimit, e.Limit),
+		},
+	), nil
+}
+
+func (p *quotaProjection) reduceQuotaRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*quota.RemovedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return crdb.NewDeleteStatement(
+		e,
+		[]handler.Condition{
+			handler.NewCond(QuotasColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(QuotasColumnUnit, e.Unit),
 		},
 	), nil
 }

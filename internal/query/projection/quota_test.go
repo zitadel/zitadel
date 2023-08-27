@@ -31,7 +31,7 @@ func TestQuotasProjection_reduces(t *testing.T) {
 					[]byte(`{
 							"unit": 1,
 							"amount": 10,
-							"limit": true,	
+							"limit": true,
 							"from": "2023-01-01T00:00:00Z",
 							"interval": 300000000000
 					}`),
@@ -53,6 +53,34 @@ func TestQuotasProjection_reduces(t *testing.T) {
 								time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
 								time.Minute * 5,
 								true,
+							},
+						},
+					},
+				},
+			},
+		}, {
+			name: "reduceQuotaRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(quota.RemovedEventType),
+					quota.AggregateType,
+					[]byte(`{
+							"unit": 1
+					}`),
+				), quota.RemovedEventMapper),
+			},
+			reduce: (&quotaProjection{}).reduceQuotaRemoved,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("quota"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.quotas WHERE (instance_id = $1) AND (unit = $2)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								quota.RequestsAllAuthenticated,
 							},
 						},
 					},
