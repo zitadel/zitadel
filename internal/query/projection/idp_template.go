@@ -1952,8 +1952,8 @@ func (p *idpTemplateProjection) reduceAppleIDPChanged(event eventstore.Event) (*
 	switch e := event.(type) {
 	case *org.AppleIDPChangedEvent:
 		idpEvent = e.AppleIDPChangedEvent
-	//case *instance.AppleIDPChangedEvent:
-	//	idpEvent = e.AppleIDPChangedEvent
+	case *instance.AppleIDPChangedEvent:
+		idpEvent = e.AppleIDPChangedEvent
 	default:
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-GBez3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPChangedEventType /*, instance.AppleIDPChangedEventType*/})
 	}
@@ -1968,11 +1968,11 @@ func (p *idpTemplateProjection) reduceAppleIDPChanged(event eventstore.Event) (*
 			},
 		),
 	)
-	googleCols := reduceAppleIDPChangedColumns(idpEvent)
-	if len(googleCols) > 0 {
+	appleCols := reduceAppleIDPChangedColumns(idpEvent)
+	if len(appleCols) > 0 {
 		ops = append(ops,
 			crdb.AddUpdateStatement(
-				googleCols,
+				appleCols,
 				[]handler.Condition{
 					handler.NewCond(AppleIDCol, idpEvent.ID),
 					handler.NewCond(AppleInstanceIDCol, idpEvent.Aggregate().InstanceID),
@@ -2308,15 +2308,21 @@ func reduceLDAPIDPChangedColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Col
 }
 
 func reduceAppleIDPChangedColumns(idpEvent idp.AppleIDPChangedEvent) []handler.Column {
-	googleCols := make([]handler.Column, 0, 3)
+	appleCols := make([]handler.Column, 0, 5)
 	if idpEvent.ClientID != nil {
-		googleCols = append(googleCols, handler.NewCol(AppleClientIDCol, *idpEvent.ClientID))
+		appleCols = append(appleCols, handler.NewCol(AppleClientIDCol, *idpEvent.ClientID))
+	}
+	if idpEvent.TeamID != nil {
+		appleCols = append(appleCols, handler.NewCol(AppleTeamIDCol, *idpEvent.TeamID))
+	}
+	if idpEvent.KeyID != nil {
+		appleCols = append(appleCols, handler.NewCol(AppleKeyIDCol, *idpEvent.KeyID))
 	}
 	if idpEvent.PrivateKey != nil {
-		googleCols = append(googleCols, handler.NewCol(ApplePrivateKeyCol, *idpEvent.PrivateKey))
+		appleCols = append(appleCols, handler.NewCol(ApplePrivateKeyCol, *idpEvent.PrivateKey))
 	}
 	if idpEvent.Scopes != nil {
-		googleCols = append(googleCols, handler.NewCol(AppleScopesCol, database.StringArray(idpEvent.Scopes)))
+		appleCols = append(appleCols, handler.NewCol(AppleScopesCol, database.StringArray(idpEvent.Scopes)))
 	}
-	return googleCols
+	return appleCols
 }

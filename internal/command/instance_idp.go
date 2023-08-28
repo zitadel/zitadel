@@ -1571,9 +1571,9 @@ func (c *Commands) prepareAddInstanceAppleProvider(a *instance.Aggregate, writeM
 		if provider.KeyID = strings.TrimSpace(provider.KeyID); provider.KeyID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-GDjm5", "Errors.Invalid.Argument")
 		}
-		//if provider.PrivateKey = strings.TrimSpace(provider.PrivateKey); provider.PrivateKey == "" {
-		//	return nil, caos_errs.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.Invalid.Argument")
-		//}
+		if len(provider.PrivateKey) == 0 {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.Invalid.Argument")
+		}
 		if len(provider.PrivateKey) == 0 {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-LJKS3", "Errors.Invalid.Argument")
 		}

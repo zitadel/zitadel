@@ -1558,9 +1558,9 @@ func (c *Commands) prepareAddOrgAppleProvider(a *org.Aggregate, writeModel *OrgA
 		if provider.KeyID = strings.TrimSpace(provider.KeyID); provider.KeyID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-GDjm5", "Errors.Invalid.Argument")
 		}
-		//if provider.PrivateKey = strings.TrimSpace(provider.PrivateKey); provider.PrivateKey == "" {
-		//	return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-GVD4n", "Errors.Invalid.Argument")
-		//}
+		if len(provider.PrivateKey) == 0 {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-GVD4n", "Errors.Invalid.Argument")
+		}
 		if len(provider.PrivateKey) == 0 {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-LJKS3", "Errors.Invalid.Argument")
 		}

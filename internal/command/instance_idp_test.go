@@ -4932,27 +4932,26 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 				},
 			},
 		},
-		//{
-		//	"invalid privateKey",
-		//	fields{
-		//		eventstore:  eventstoreExpect(t),
-		//		idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-		//	},
-		//	args{
-		//		ctx:           context.Background(),
-		//		resourceOwner: "instance1",
-		//		provider: AppleProvider{
-		//			ClientID: "clientID",
-		//			TeamID:   "teamID",
-		//			KeyID:    "keyID",
-		//		},
-		//	},
-		//	res{
-		//		err: func(err error) bool {
-		//			return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GVD4n", ""))
-		//		},
-		//	},
-		//},
+		{
+			"invalid privateKey",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AppleProvider{
+					ClientID: "clientID",
+					TeamID:   "teamID",
+					KeyID:    "keyID",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GVD4n", ""))
+				},
+			},
+		},
 		{
 			name: "ok",
 			fields: fields{
