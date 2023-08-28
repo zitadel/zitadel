@@ -3,12 +3,12 @@ package projection
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/repository/quota"
-
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
 const (
@@ -63,7 +63,7 @@ func newQuotaProjection(ctx context.Context, config crdb.StatementHandlerConfig)
 	return p
 }
 
-func (p *quotaProjection) reducers() []handler.AggregateReducer {
+func (q *quotaProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
@@ -79,7 +79,7 @@ func (p *quotaProjection) reducers() []handler.AggregateReducer {
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  quota.AddedEventType,
-					Reduce: p.reduceQuotaAdded,
+					Reduce: q.reduceQuotaAdded,
 				},
 			},
 		},
@@ -88,14 +88,14 @@ func (p *quotaProjection) reducers() []handler.AggregateReducer {
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  quota.RemovedEventType,
-					Reduce: p.reduceQuotaRemoved,
+					Reduce: q.reduceQuotaRemoved,
 				},
 			},
 		},
 	}
 }
 
-func (p *quotaProjection) reduceQuotaAdded(event eventstore.Event) (*handler.Statement, error) {
+func (q *quotaProjection) reduceQuotaAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*quota.AddedEvent](event)
 	if err != nil {
 		return nil, err
@@ -113,7 +113,7 @@ func (p *quotaProjection) reduceQuotaAdded(event eventstore.Event) (*handler.Sta
 	), nil
 }
 
-func (p *quotaProjection) reduceQuotaRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (q *quotaProjection) reduceQuotaRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*quota.RemovedEvent](event)
 	if err != nil {
 		return nil, err
@@ -134,4 +134,27 @@ func (p *quotaProjection) reduceQuotaRemoved(event eventstore.Event) (*handler.S
 			},
 		),
 	), nil
+}
+
+func (q *quotaProjection) IncrementAccessLogs(records []*record.AccessLog) error {
+	byInstance := make(map[string]uint64)
+	for _, r := range records {
+		if r.IsAuthenticated() {
+			byInstance[r.InstanceID]++
+		}
+	}
+	for instanceID, count := range byInstance {
+		if err := incrementUsage(quota.RequestsAllAuthenticated, instanceID, count); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func incrementUsage(unit quota.Unit, instanceID string, count uint64) error {
+	/*	crdb.NewUpsertStatement(
+		pseudo.ScheduledEvent{},
+		[]handler.Column{},
+	)*/
+	return nil
 }

@@ -18,8 +18,8 @@ type QuotaQuerier interface {
 	GetDueQuotaNotifications(ctx context.Context, config *quota.AddedEvent, periodStart time.Time, used uint64) ([]*quota.NotificationDueEvent, error)
 }
 
-type UsageQuerier interface {
-	LogEmitter
+type UsageQuerier[T LogRecord[T]] interface {
+	LogEmitter[T]
 	QuotaUnit() quota.Unit
 	QueryUsage(ctx context.Context, instanceId string, start time.Time) (uint64, error)
 }
@@ -34,29 +34,29 @@ func (u UsageReporterFunc) Report(ctx context.Context, notifications []*quota.No
 	return u(ctx, notifications)
 }
 
-type Service struct {
-	usageQuerier     UsageQuerier
+type Service[T LogRecord[T]] struct {
+	usageQuerier     UsageQuerier[T]
 	quotaQuerier     QuotaQuerier
 	usageReporter    UsageReporter
-	enabledSinks     []*emitter
+	enabledSinks     []*emitter[T]
 	sinkEnabled      bool
 	reportingEnabled bool
 }
 
-func New(quotaQuerier QuotaQuerier, usageReporter UsageReporter, usageQuerierSink *emitter, additionalSink ...*emitter) *Service {
-	var usageQuerier UsageQuerier
+func New[T LogRecord[T]](quotaQuerier QuotaQuerier, usageReporter UsageReporter, usageQuerierSink *emitter[T], additionalSink ...*emitter[T]) *Service[T] {
+	var usageQuerier UsageQuerier[T]
 	if usageQuerierSink != nil {
-		usageQuerier = usageQuerierSink.emitter.(UsageQuerier)
+		usageQuerier = usageQuerierSink.emitter.(UsageQuerier[T])
 	}
 
-	svc := &Service{
+	svc := &Service[T]{
 		reportingEnabled: usageQuerierSink != nil && usageQuerierSink.enabled,
 		usageQuerier:     usageQuerier,
 		quotaQuerier:     quotaQuerier,
 		usageReporter:    usageReporter,
 	}
 
-	for _, s := range append([]*emitter{usageQuerierSink}, additionalSink...) {
+	for _, s := range append([]*emitter[T]{usageQuerierSink}, additionalSink...) {
 		if s != nil && s.enabled {
 			svc.enabledSinks = append(svc.enabledSinks, s)
 		}
@@ -67,17 +67,17 @@ func New(quotaQuerier QuotaQuerier, usageReporter UsageReporter, usageQuerierSin
 	return svc
 }
 
-func (s *Service) Enabled() bool {
+func (s *Service[T]) Enabled() bool {
 	return s.sinkEnabled
 }
 
-func (s *Service) Handle(ctx context.Context, record LogRecord) {
+func (s *Service[T]) Handle(ctx context.Context, record T) {
 	for _, sink := range s.enabledSinks {
 		logging.OnError(sink.Emit(ctx, record.Normalize())).WithField("record", record).Warn("failed to emit log record")
 	}
 }
 
-func (s *Service) Limit(ctx context.Context, instanceID string) *uint64 {
+func (s *Service[T]) Limit(ctx context.Context, instanceID string) *uint64 {
 	var err error
 	defer func() {
 		logging.OnError(err).Warn("failed to check is usage should be limited")
@@ -107,7 +107,7 @@ func (s *Service) Limit(ctx context.Context, instanceID string) *uint64 {
 	return remaining
 }
 
-func (s *Service) handleThresholds(ctx context.Context, quota *quota.AddedEvent, periodStart time.Time, usage uint64) {
+func (s *Service[T]) handleThresholds(ctx context.Context, quota *quota.AddedEvent, periodStart time.Time, usage uint64) {
 	var err error
 	defer func() {
 		logging.OnError(err).Warn("handling quota thresholds failed")

@@ -16,42 +16,42 @@ type EmitterConfig struct {
 	Debounce        *DebouncerConfig
 }
 
-type emitter struct {
+type emitter[T LogRecord[T]] struct {
 	enabled   bool
 	ctx       context.Context
-	debouncer *debouncer
-	emitter   LogEmitter
+	debouncer *debouncer[T]
+	emitter   LogEmitter[T]
 	clock     clock.Clock
 }
 
-type LogRecord interface {
-	Normalize() LogRecord
+type LogRecord[T any] interface {
+	Normalize() T
 }
 
-type LogRecordFunc func() LogRecord
+type LogRecordFunc[T any] func() T
 
-func (r LogRecordFunc) Normalize() LogRecord {
+func (r LogRecordFunc[T]) Normalize() T {
 	return r()
 }
 
-type LogEmitter interface {
-	Emit(ctx context.Context, bulk []LogRecord) error
+type LogEmitter[T LogRecord[T]] interface {
+	Emit(ctx context.Context, bulk []T) error
 }
 
-type LogEmitterFunc func(ctx context.Context, bulk []LogRecord) error
+type LogEmitterFunc[T LogRecord[T]] func(ctx context.Context, bulk []T) error
 
-func (l LogEmitterFunc) Emit(ctx context.Context, bulk []LogRecord) error {
+func (l LogEmitterFunc[T]) Emit(ctx context.Context, bulk []T) error {
 	return l(ctx, bulk)
 }
 
-type LogCleanupper interface {
-	LogEmitter
+type LogCleanupper[T LogRecord[T]] interface {
 	Cleanup(ctx context.Context, keep time.Duration) error
+	LogEmitter[T]
 }
 
 // NewEmitter accepts Clock from github.com/benbjohnson/clock so we can control timers and tickers in the unit tests
-func NewEmitter(ctx context.Context, clock clock.Clock, cfg *EmitterConfig, logger LogEmitter) (*emitter, error) {
-	svc := &emitter{
+func NewEmitter[T LogRecord[T]](ctx context.Context, clock clock.Clock, cfg *EmitterConfig, logger LogEmitter[T]) (*emitter[T], error) {
+	svc := &emitter[T]{
 		enabled: cfg != nil && cfg.Enabled,
 		ctx:     ctx,
 		emitter: logger,
@@ -63,10 +63,10 @@ func NewEmitter(ctx context.Context, clock clock.Clock, cfg *EmitterConfig, logg
 	}
 
 	if cfg.Debounce != nil && (cfg.Debounce.MinFrequency > 0 || cfg.Debounce.MaxBulkSize > 0) {
-		svc.debouncer = newDebouncer(ctx, *cfg.Debounce, clock, newStorageBulkSink(svc.emitter))
+		svc.debouncer = newDebouncer[T](ctx, *cfg.Debounce, clock, newStorageBulkSink(svc.emitter))
 	}
 
-	cleanupper, ok := logger.(LogCleanupper)
+	cleanupper, ok := logger.(LogCleanupper[T])
 	if !ok {
 		if cfg.Keep != 0 {
 			return nil, fmt.Errorf("cleaning up for this storage type is not supported, so keep duration must be 0, but is %d", cfg.Keep)
@@ -84,7 +84,7 @@ func NewEmitter(ctx context.Context, clock clock.Clock, cfg *EmitterConfig, logg
 	return svc, nil
 }
 
-func (s *emitter) startCleanupping(cleanupper LogCleanupper, cleanupInterval, keep time.Duration) {
+func (s *emitter[T]) startCleanupping(cleanupper LogCleanupper[T], cleanupInterval, keep time.Duration) {
 	for range s.clock.Tick(cleanupInterval) {
 		if err := cleanupper.Cleanup(s.ctx, keep); err != nil {
 			logging.WithError(err).Error("cleaning up logs failed")
@@ -92,7 +92,7 @@ func (s *emitter) startCleanupping(cleanupper LogCleanupper, cleanupInterval, ke
 	}
 }
 
-func (s *emitter) Emit(ctx context.Context, record LogRecord) (err error) {
+func (s *emitter[T]) Emit(ctx context.Context, record T) (err error) {
 	if !s.enabled {
 		return nil
 	}
@@ -102,11 +102,11 @@ func (s *emitter) Emit(ctx context.Context, record LogRecord) (err error) {
 		return nil
 	}
 
-	return s.emitter.Emit(ctx, []LogRecord{record})
+	return s.emitter.Emit(ctx, []T{record})
 }
 
-func newStorageBulkSink(emitter LogEmitter) bulkSinkFunc {
-	return func(ctx context.Context, bulk []LogRecord) error {
+func newStorageBulkSink[T LogRecord[T]](emitter LogEmitter[T]) bulkSinkFunc[T] {
+	return func(ctx context.Context, bulk []T) error {
 		return emitter.Emit(ctx, bulk)
 	}
 }

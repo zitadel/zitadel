@@ -232,7 +232,7 @@ func runTest(t *testing.T, name string, args args, want want) bool {
 	})
 }
 
-func given(t *testing.T, args args, want want) (context.Context, *clock.Mock, *emittermock.InmemLogStorage, *emittermock.InmemLogStorage, *logstore.Service) {
+func given(t *testing.T, args args, want want) (context.Context, *clock.Mock, *emittermock.InmemLogStorage, *emittermock.InmemLogStorage, *logstore.Service[*emittermock.Record]) {
 	ctx := context.Background()
 	clock := clock.NewMock()
 
@@ -240,12 +240,12 @@ func given(t *testing.T, args args, want want) (context.Context, *clock.Mock, *e
 	clock.Set(args.config.From)
 
 	mainStorage := emittermock.NewInMemoryStorage(clock)
-	mainEmitter, err := logstore.NewEmitter(ctx, clock, args.mainSink, mainStorage)
+	mainEmitter, err := logstore.NewEmitter[*emittermock.Record](ctx, clock, args.mainSink, mainStorage)
 	if err != nil {
 		t.Errorf("expected no error but got %v", err)
 	}
 	secondaryStorage := emittermock.NewInMemoryStorage(clock)
-	secondaryEmitter, err := logstore.NewEmitter(ctx, clock, args.secondarySink, secondaryStorage)
+	secondaryEmitter, err := logstore.NewEmitter[*emittermock.Record](ctx, clock, args.secondarySink, secondaryStorage)
 	if err != nil {
 		t.Errorf("expected no error but got %v", err)
 	}
@@ -262,7 +262,7 @@ func given(t *testing.T, args args, want want) (context.Context, *clock.Mock, *e
 	return ctx, clock, mainStorage, secondaryStorage, svc
 }
 
-func when(svc *logstore.Service, ctx context.Context, clock *clock.Mock) *uint64 {
+func when(svc *logstore.Service[*emittermock.Record], ctx context.Context, clock *clock.Mock) *uint64 {
 	var remaining *uint64
 	for i := 0; i < ticks; i++ {
 		svc.Handle(ctx, emittermock.NewRecord(clock))

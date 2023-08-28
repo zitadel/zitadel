@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/zitadel/zitadel/internal/logstore/record"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -27,8 +28,8 @@ const (
 	executionMetadataCol   = "metadata"
 )
 
-var _ logstore.UsageQuerier = (*databaseLogStorage)(nil)
-var _ logstore.LogCleanupper = (*databaseLogStorage)(nil)
+var _ logstore.UsageQuerier[*record.ExecutionLog] = (*databaseLogStorage)(nil)
+var _ logstore.LogCleanupper[*record.ExecutionLog] = (*databaseLogStorage)(nil)
 
 type databaseLogStorage struct {
 	dbClient *database.DB
@@ -42,7 +43,7 @@ func (l *databaseLogStorage) QuotaUnit() quota.Unit {
 	return quota.ActionsAllRunsSeconds
 }
 
-func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord) error {
+func (l *databaseLogStorage) Emit(ctx context.Context, bulk []*record.ExecutionLog) error {
 	if len(bulk) == 0 {
 		return nil
 	}
@@ -59,7 +60,7 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord
 		PlaceholderFormat(squirrel.Dollar)
 
 	for idx := range bulk {
-		item := bulk[idx].(*Record)
+		item := bulk[idx]
 
 		var took interface{}
 		if item.Took > 0 {

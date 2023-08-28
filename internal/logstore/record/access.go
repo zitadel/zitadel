@@ -1,46 +1,65 @@
-package access
+package record
 
 import (
+	"net/http"
 	"strings"
 	"time"
 
+	"google.golang.org/grpc/codes"
+
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/logstore"
 )
 
-var _ logstore.LogRecord = (*Record)(nil)
-
-type Record struct {
-	LogDate        time.Time `json:"logDate"`
-	Protocol       Protocol  `json:"protocol"`
-	RequestURL     string    `json:"requestUrl"`
-	ResponseStatus uint32    `json:"responseStatus"`
-	// RequestHeaders are plain maps so varying implementation
+type AccessLog struct {
+	LogDate        time.Time      `json:"logDate"`
+	Protocol       AccessProtocol `json:"protocol"`
+	RequestURL     string         `json:"requestUrl"`
+	ResponseStatus uint32         `json:"responseStatus"`
+	// RequestHeaders and ResponseHeaders are plain maps so varying implementations
 	// between HTTP and gRPC don't interfere with each other
-	RequestHeaders map[string][]string `json:"requestHeaders"`
-	// ResponseHeaders are plain maps so varying implementation
-	// between HTTP and gRPC don't interfere with each other
+	RequestHeaders  map[string][]string `json:"requestHeaders"`
 	ResponseHeaders map[string][]string `json:"responseHeaders"`
 	InstanceID      string              `json:"instanceId"`
 	ProjectID       string              `json:"projectId"`
 	RequestedDomain string              `json:"requestedDomain"`
 	RequestedHost   string              `json:"requestedHost"`
+	normalized      bool                `json:"-"`
 }
 
-type Protocol uint8
+type AccessProtocol uint8
 
 const (
-	GRPC Protocol = iota
+	GRPC AccessProtocol = iota
 	HTTP
 
 	redacted = "[REDACTED]"
 )
 
-func (a Record) Normalize() logstore.LogRecord {
+func (a AccessLog) IsAuthenticated() bool {
+	if !a.normalized {
+		panic("access log not normalized, Normalize() must be called before IsAuthenticated()")
+	}
+	// TODO: Is it possible to maliciously produce usage on public endpoints like this, just by adding an auth header?
+	_, hasHTTPAuthHeader := a.RequestHeaders[strings.ToLower(zitadel_http.Authorization)]
+	return hasHTTPAuthHeader &&
+		!strings.HasPrefix(a.RequestURL, "/zitadel.system.v1.SystemService/") &&
+		!strings.HasPrefix(a.RequestURL, "/system/v1/") &&
+		(a.Protocol == HTTP &&
+			a.ResponseStatus != http.StatusForbidden &&
+			a.ResponseStatus != http.StatusInternalServerError &&
+			a.ResponseStatus != http.StatusTooManyRequests) ||
+		(a.Protocol == GRPC &&
+			a.ResponseStatus != uint32(codes.PermissionDenied) &&
+			a.ResponseStatus != uint32(codes.Internal) &&
+			a.ResponseStatus != uint32(codes.ResourceExhausted))
+}
+
+func (a AccessLog) Normalize() *AccessLog {
 	a.RequestedDomain = cutString(a.RequestedDomain, 200)
 	a.RequestURL = cutString(a.RequestURL, 200)
 	a.RequestHeaders = normalizeHeaders(a.RequestHeaders, strings.ToLower(zitadel_http.Authorization), "grpcgateway-authorization", "cookie", "grpcgateway-cookie")
 	a.ResponseHeaders = normalizeHeaders(a.ResponseHeaders, "set-cookie")
+	a.normalized = true
 	return &a
 }
 
@@ -87,11 +106,4 @@ func pruneKeys(header map[string][]string) map[string][]string {
 		prunedKeys[key] = valueItems
 	}
 	return prunedKeys
-}
-
-func cutString(str string, pos int) string {
-	if len(str) <= pos {
-		return str
-	}
-	return str[:pos-1]
 }

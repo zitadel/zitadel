@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/zitadel/zitadel/internal/logstore/record"
 	"net/http"
 	"strings"
 	"time"
@@ -34,8 +35,8 @@ const (
 	accessRequestedHostCol   = "requested_host"
 )
 
-var _ logstore.UsageQuerier = (*databaseLogStorage)(nil)
-var _ logstore.LogCleanupper = (*databaseLogStorage)(nil)
+var _ logstore.UsageQuerier[*record.AccessLog] = (*databaseLogStorage)(nil)
+var _ logstore.LogCleanupper[*record.AccessLog] = (*databaseLogStorage)(nil)
 
 type databaseLogStorage struct {
 	dbClient *database.DB
@@ -49,7 +50,7 @@ func (l *databaseLogStorage) QuotaUnit() quota.Unit {
 	return quota.RequestsAllAuthenticated
 }
 
-func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord) error {
+func (l *databaseLogStorage) Emit(ctx context.Context, bulk []*record.AccessLog) error {
 	if len(bulk) == 0 {
 		return nil
 	}
@@ -69,7 +70,7 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord
 		PlaceholderFormat(squirrel.Dollar)
 
 	for idx := range bulk {
-		item := bulk[idx].(*Record)
+		item := bulk[idx]
 		builder = builder.Values(
 			item.LogDate,
 			item.Protocol,
@@ -116,13 +117,13 @@ func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, 
 			squirrel.NotLike{accessRequestURLCol: "%/system/v1/%"},
 			squirrel.Or{
 				squirrel.And{
-					squirrel.Eq{accessProtocolCol: HTTP},
+					squirrel.Eq{accessProtocolCol: record.HTTP},
 					squirrel.NotEq{accessResponseStatusCol: http.StatusForbidden},
 					squirrel.NotEq{accessResponseStatusCol: http.StatusInternalServerError},
 					squirrel.NotEq{accessResponseStatusCol: http.StatusTooManyRequests},
 				},
 				squirrel.And{
-					squirrel.Eq{accessProtocolCol: GRPC},
+					squirrel.Eq{accessProtocolCol: record.GRPC},
 					squirrel.NotEq{accessResponseStatusCol: codes.PermissionDenied},
 					squirrel.NotEq{accessResponseStatusCol: codes.Internal},
 					squirrel.NotEq{accessResponseStatusCol: codes.ResourceExhausted},

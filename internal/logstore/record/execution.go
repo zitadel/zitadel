@@ -1,16 +1,12 @@
-package execution
+package record
 
 import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-
-	"github.com/zitadel/zitadel/internal/logstore"
 )
 
-var _ logstore.LogRecord = (*Record)(nil)
-
-type Record struct {
+type ExecutionLog struct {
 	LogDate    time.Time              `json:"logDate"`
 	Took       time.Duration          `json:"took"`
 	Message    string                 `json:"message"`
@@ -20,14 +16,7 @@ type Record struct {
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 }
 
-func (e Record) Normalize() logstore.LogRecord {
+func (e ExecutionLog) Normalize() *ExecutionLog {
 	e.Message = cutString(e.Message, 2000)
 	return &e
-}
-
-func cutString(str string, pos int) string {
-	if len(str) <= pos {
-		return str
-	}
-	return str[:pos]
 }
