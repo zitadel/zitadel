@@ -793,6 +793,73 @@ func (wm *InstanceLDAPIDPWriteModel) NewChangedEvent(
 	return instance.NewLDAPIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
+type InstanceAppleIDPWriteModel struct {
+	AppleIDPWriteModel
+}
+
+func NewAppleInstanceIDPWriteModel(instanceID, id string) *InstanceAppleIDPWriteModel {
+	return &InstanceAppleIDPWriteModel{
+		AppleIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *InstanceAppleIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *instance.AppleIDPAddedEvent:
+			wm.AppleIDPWriteModel.AppendEvents(&e.AppleIDPAddedEvent)
+		case *instance.AppleIDPChangedEvent:
+			wm.AppleIDPWriteModel.AppendEvents(&e.AppleIDPChangedEvent)
+		case *instance.IDPRemovedEvent:
+			wm.AppleIDPWriteModel.AppendEvents(&e.RemovedEvent)
+		default:
+			wm.AppleIDPWriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *InstanceAppleIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(instance.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			instance.AppleIDPAddedEventType,
+			instance.AppleIDPChangedEventType,
+			instance.IDPRemovedEventType,
+		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Builder()
+}
+
+func (wm *InstanceAppleIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID,
+	teamID,
+	keyID string,
+	privateKey []byte,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	options idp.Options,
+) (*instance.AppleIDPChangedEvent, error) {
+
+	changes, err := wm.AppleIDPWriteModel.NewChanges(name, clientID, teamID, keyID, privateKey, secretCrypto, scopes, options)
+	if err != nil || len(changes) == 0 {
+		return nil, err
+	}
+	return instance.NewAppleIDPChangedEvent(ctx, aggregate, id, changes)
+}
+
 type InstanceIDPRemoveWriteModel struct {
 	IDPRemoveWriteModel
 }
