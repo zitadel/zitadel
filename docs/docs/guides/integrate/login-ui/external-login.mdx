@@ -26,7 +26,7 @@ In the response, you will get an authentication URL of the provider you like.
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/idp_intents/start \
+  --url https://$ZITADEL_DOMAIN/v2alpha/idp_intents \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
