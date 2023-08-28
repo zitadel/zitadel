@@ -1692,8 +1692,7 @@ func (wm *AppleIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encry
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]oidc.ProviderOpts, 1, 5)
-	opts[0] = oidc.WithResponseMode("form_post")
+	opts := make([]oidc.ProviderOpts, 0, 4)
 	if wm.IsCreationAllowed {
 		opts = append(opts, oidc.WithCreationAllowed())
 	}

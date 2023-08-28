@@ -30,6 +30,7 @@ func New(clientID, teamID, keyID, callbackURL string, key []byte, scopes []strin
 	if err != nil {
 		return nil, err
 	}
+	options = append(options, oidc.WithResponseMode("form_post"))
 	rp, err := oidc.New(name, issuer, clientID, secret, callbackURL, scopes, oidc.DefaultMapper, options...)
 	if err != nil {
 		return nil, err
