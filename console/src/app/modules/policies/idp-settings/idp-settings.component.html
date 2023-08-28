@@ -113,6 +113,25 @@
     class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'apple', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/org', 'provider', 'apple', 'create']
+        : []
+    "
+  >
+    <div class="idp-icon">
+      <img class="idp-logo dark" src="./assets/images/idp/apple-dark.svg" alt="Apple" />
+      <img class="idp-logo light" src="./assets/images/idp/apple.svg" alt="Apple" />
+    </div>
+    <div class="text-container">
+      <span class="title">Apple</span>
+    </div>
+  </a>
+
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'provider', 'oidc', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
         ? ['/org', 'provider', 'oidc', 'create']

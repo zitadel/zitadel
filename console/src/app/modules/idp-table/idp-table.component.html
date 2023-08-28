@@ -80,6 +80,11 @@
               <i class="idp-icon las la-building"></i>
               Active Directory / LDAP
             </div>
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_APPLE">
+              <img class="idp-logo dark" src="./assets/images/idp/apple-dark.svg" alt="apple" />
+              <img class="idp-logo light" src="./assets/images/idp/apple.svg" alt="apple" />
+              Apple
+            </div>
             <div class="idp-table-provider-type" *ngSwitchDefault>coming soon</div>
           </div>
         </td>

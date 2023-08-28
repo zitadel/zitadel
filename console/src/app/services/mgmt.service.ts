@@ -15,6 +15,8 @@ import {
   AddAPIAppResponse,
   AddAppKeyRequest,
   AddAppKeyResponse,
+  AddAppleProviderRequest,
+  AddAppleProviderResponse,
   AddAzureADProviderRequest,
   AddAzureADProviderResponse,
   AddCustomLabelPolicyRequest,
@@ -441,6 +443,8 @@ import {
   UpdateActionResponse,
   UpdateAPIAppConfigRequest,
   UpdateAPIAppConfigResponse,
+  UpdateAppleProviderRequest,
+  UpdateAppleProviderResponse,
   UpdateAppRequest,
   UpdateAppResponse,
   UpdateAzureADProviderRequest,
@@ -1039,6 +1043,14 @@ export class ManagementService {
     req: UpdateGitHubEnterpriseServerProviderRequest,
   ): Promise<UpdateGitHubEnterpriseServerProviderResponse.AsObject> {
     return this.grpcService.mgmt.updateGitHubEnterpriseServerProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addAppleProvider(req: AddAppleProviderRequest): Promise<AddAppleProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addAppleProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateAppleProvider(req: UpdateAppleProviderRequest): Promise<UpdateAppleProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateAppleProvider(req, null).then((resp) => resp.toObject());
   }
 
   public deleteProvider(id: string): Promise<DeleteProviderResponse.AsObject> {
