@@ -3,6 +3,7 @@ package login
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/zitadel/logging"
@@ -18,6 +19,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/apple"
 	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/idp/providers/github"
 	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
@@ -39,8 +41,9 @@ type externalIDPData struct {
 }
 
 type externalIDPCallbackData struct {
-	State string `schema:"state"`
-	Code  string `schema:"code"`
+	State    string `schema:"state"`
+	Code     string `schema:"code"`
+	FormData url.Values
 }
 
 type externalNotFoundOptionFormData struct {
@@ -159,6 +162,8 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		provider, err = l.gitlabSelfHostedProvider(r.Context(), identityProvider)
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
+	case domain.IDPTypeApple:
+		provider, err = l.appleProvider(r.Context(), identityProvider)
 	case domain.IDPTypeLDAP:
 		provider, err = l.ldapProvider(r.Context(), identityProvider)
 	case domain.IDPTypeUnspecified:
@@ -180,11 +185,23 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 	http.Redirect(w, r, session.GetAuthURL(), http.StatusFound)
 }
 
+// handleExternalLoginCallbackForm handles the callback from a IDP with form_post.
+// It will redirect to the "normal" callback endpoint with the form data as query parameter.
+// This way cookies will be handled correctly (same site = lax).
+func (l *Login) handleExternalLoginCallbackForm(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		l.renderLogin(w, r, nil, err)
+		return
+	}
+	http.Redirect(w, r, HandlerPrefix+EndpointExternalLoginCallback+"?"+r.Form.Encode(), 302)
+}
+
 // handleExternalLoginCallback handles the callback from a IDP
 // and tries to extract the user with the provided data
 func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Request) {
 	data := new(externalIDPCallbackData)
-	err := l.getParseData(r, data)
+	formData, err := l.getParseDataWithForm(r, data)
 	if err != nil {
 		l.renderLogin(w, r, nil, err)
 		return
@@ -259,6 +276,13 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			return
 		}
 		session = &openid.Session{Provider: provider.(*google.Provider).Provider, Code: data.Code}
+	case domain.IDPTypeApple:
+		provider, err = l.appleProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = &apple.Session{Session: &openid.Session{Provider: provider.(*apple.Provider).Provider, Code: data.Code}, FormData: formData}
 	case domain.IDPTypeJWT,
 		domain.IDPTypeLDAP,
 		domain.IDPTypeUnspecified:
@@ -936,6 +960,21 @@ func (l *Login) gitlabSelfHostedProvider(ctx context.Context, identityProvider *
 	)
 }
 
+func (l *Login) appleProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*apple.Provider, error) {
+	privateKey, err := crypto.Decrypt(identityProvider.AppleIDPTemplate.PrivateKey, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	return apple.New(
+		identityProvider.AppleIDPTemplate.ClientID,
+		identityProvider.AppleIDPTemplate.TeamID,
+		identityProvider.AppleIDPTemplate.KeyID,
+		l.baseURL(ctx)+EndpointExternalLoginCallbackFormPost,
+		privateKey,
+		identityProvider.AppleIDPTemplate.Scopes,
+	)
+}
+
 func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserGrant, resourceOwner string) error {
 	if len(userGrants) == 0 {
 		return nil
@@ -970,6 +1009,8 @@ func tokens(session idp.Session) *oidc.Tokens[*oidc.IDTokenClaims] {
 	case *oauth.Session:
 		return s.Tokens
 	case *azuread.Session:
+		return s.Tokens
+	case *apple.Session:
 		return s.Tokens
 	}
 	return nil

@@ -75,4 +75,16 @@ $lgn-idp-border-radius: 0.5rem;
       border-radius: 5px;
     }
   }
+
+  &.apple {
+    span.logo {
+      height: 46px;
+      width: 46px;
+      background-image: var(--apple-image-src);
+      background-size: 25px;
+      background-position: center;
+      background-repeat: no-repeat;
+      border-radius: 5px;
+    }
+  }
 }
