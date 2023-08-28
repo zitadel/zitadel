@@ -64,6 +64,7 @@ import (
 	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/execution"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/stdout"
+	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/static"
@@ -108,7 +109,7 @@ type Server struct {
 	AuthzRepo  authz_repo.Repository
 	Storage    static.Storage
 	Commands   *command.Commands
-	LogStore   *logstore.Service
+	LogStore   *logstore.Service[*record.ExecutionLog]
 	Router     *mux.Router
 	TLSConfig  *tls.Config
 	Shutdown   chan<- os.Signal
@@ -209,11 +210,11 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	}
 
 	clock := clockpkg.New()
-	actionsExecutionStdoutEmitter, err := logstore.NewEmitter(ctx, clock, config.LogStore.Execution.Stdout, stdout.NewStdoutEmitter())
+	actionsExecutionStdoutEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, config.LogStore.Execution.Stdout, stdout.NewStdoutEmitter[*record.ExecutionLog]())
 	if err != nil {
 		return err
 	}
-	actionsExecutionDBEmitter, err := logstore.NewEmitter(ctx, clock, config.LogStore.Execution.Database, execution.NewDatabaseLogStorage(dbClient))
+	actionsExecutionDBEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, config.LogStore.Execution.Database, execution.NewDatabaseLogStorage(dbClient))
 	if err != nil {
 		return err
 	}
@@ -321,16 +322,16 @@ func startAPIs(
 		return err
 	}
 
-	accessStdoutEmitter, err := logstore.NewEmitter(ctx, clock, config.LogStore.Access.Stdout, stdout.NewStdoutEmitter())
+	accessStdoutEmitter, err := logstore.NewEmitter[*record.AccessLog](ctx, clock, config.LogStore.Access.Stdout, stdout.NewStdoutEmitter[*record.AccessLog]())
 	if err != nil {
 		return err
 	}
-	accessDBEmitter, err := logstore.NewEmitter(ctx, clock, config.LogStore.Access.Database, access.NewDatabaseLogStorage(dbClient))
+	accessDBEmitter, err := logstore.NewEmitter[*record.AccessLog](ctx, clock, config.LogStore.Access.Database, access.NewDatabaseLogStorage(dbClient))
 	if err != nil {
 		return err
 	}
 
-	accessSvc := logstore.New(quotaQuerier, usageReporter, accessDBEmitter, accessStdoutEmitter)
+	accessSvc := logstore.New[*record.AccessLog](quotaQuerier, usageReporter, accessDBEmitter, accessStdoutEmitter)
 	exhaustedCookieHandler := http_util.NewCookieHandler(
 		http_util.WithUnsecure(),
 		http_util.WithNonHttpOnly(),

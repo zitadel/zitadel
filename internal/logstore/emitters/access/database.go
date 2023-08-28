@@ -3,8 +3,10 @@ package access
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/zitadel/zitadel/internal/logstore/record"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"net/http"
 	"strings"
 	"time"
@@ -54,6 +56,21 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []*record.AccessLog)
 	if len(bulk) == 0 {
 		return nil
 	}
+	incrementErr := projection.QuotaProjection.IncrementAccessLogs(ctx, bulk)
+	storeErr := l.store(ctx, bulk)
+	joinedErr := errors.Join(incrementErr, storeErr)
+	if joinedErr != nil {
+		joinedErr = fmt.Errorf("storing access logs and/or incrementing quota usage failed: storing error: %w", joinedErr)
+	}
+	return joinedErr
+}
+
+func (l *databaseLogStorage) store(ctx context.Context, bulk []*record.AccessLog) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("storing access logs failed: %w", err)
+		}
+	}()
 	builder := squirrel.Insert(accessLogsTable).
 		Columns(
 			accessTimestampCol,

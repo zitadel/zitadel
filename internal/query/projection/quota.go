@@ -2,7 +2,16 @@ package projection
 
 import (
 	"context"
+	"database/sql"
+	"errors"
+	"fmt"
+	"strconv"
+	"strings"
+	"time"
 
+	sq "github.com/Masterminds/squirrel"
+
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
@@ -12,7 +21,8 @@ import (
 )
 
 const (
-	QuotasProjectionTable = "projections.quotas"
+	QuotasProjectionTable       = "projections.quotas"
+	QuotaPeriodsProjectionTable = QuotasProjectionTable + "_" + periodsTableSuffix
 
 	QuotasColumnInstanceID = "instance_id"
 	QuotasColumnUnit       = "unit"
@@ -30,6 +40,7 @@ const (
 
 type quotaProjection struct {
 	crdb.StatementHandler
+	client *database.DB
 }
 
 func newQuotaProjection(ctx context.Context, config crdb.StatementHandlerConfig) *quotaProjection {
@@ -60,6 +71,7 @@ func newQuotaProjection(ctx context.Context, config crdb.StatementHandlerConfig)
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	p.client = config.Client
 	return p
 }
 
@@ -136,7 +148,12 @@ func (q *quotaProjection) reduceQuotaRemoved(event eventstore.Event) (*handler.S
 	), nil
 }
 
-func (q *quotaProjection) IncrementAccessLogs(records []*record.AccessLog) error {
+func (q *quotaProjection) IncrementAccessLogs(ctx context.Context, records []*record.AccessLog) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("incrementing access relevant usage failed for at least one quota period: %w", err)
+		}
+	}()
 	byInstance := make(map[string]uint64)
 	for _, r := range records {
 		if r.IsAuthenticated() {
@@ -144,17 +161,77 @@ func (q *quotaProjection) IncrementAccessLogs(records []*record.AccessLog) error
 		}
 	}
 	for instanceID, count := range byInstance {
-		if err := incrementUsage(quota.RequestsAllAuthenticated, instanceID, count); err != nil {
-			return err
-		}
+		err = errors.Join(err, q.incrementUsage(ctx, quota.RequestsAllAuthenticated, instanceID, count))
 	}
-	return nil
+	return err
 }
 
-func incrementUsage(unit quota.Unit, instanceID string, count uint64) error {
-	/*	crdb.NewUpsertStatement(
-		pseudo.ScheduledEvent{},
-		[]handler.Column{},
-	)*/
-	return nil
+func (q *quotaProjection) incrementUsage(ctx context.Context, unit quota.Unit, instanceID string, count uint64) error {
+	insertCols := []string{QuotaPeriodsColumnInstanceID, QuotaPeriodsColumnUnit, QuotaPeriodsColumnStart, QuotaPeriodsColumnUsage}
+	conflictTarget := []string{QuotaPeriodsColumnInstanceID, QuotaPeriodsColumnUnit, QuotaPeriodsColumnStart}
+	stmt, args, err := sq.
+		Select(
+			QuotasColumnFrom,
+			QuotasColumnInterval,
+		).
+		Where(sq.Eq{
+			QuotasColumnInstanceID: instanceID,
+			QuotasColumnUnit:       unit,
+		}).
+		From(QuotasProjectionTable).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+	if err != nil {
+		panic(err)
+	}
+	var (
+		from     = time.Time{}
+		interval database.Duration
+	)
+	if err := q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		if err := row.Scan(&from, &interval); err != nil {
+			// TODO: return nil if not found
+			return err
+		}
+		return nil
+	}, stmt, args...); err != nil {
+		// TODO: return nil if not found
+		return err
+	}
+	currentPeriodStart := pushPeriodStart(from, time.Duration(interval), time.Now())
+	vals := []interface{}{instanceID, unit, currentPeriodStart, count, count}
+	params := make([]string, len(vals))
+	for i := range vals {
+		params[i] = "$" + strconv.Itoa(i+1)
+	}
+	_, err = q.client.ExecContext(
+		ctx,
+		fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s) ON CONFLICT (%s) DO UPDATE SET %s = %s.%s + %s",
+			QuotaPeriodsProjectionTable,
+			strings.Join(insertCols, ", "),
+			strings.Join(params[0:len(params)-1], ", "),
+			strings.Join(conflictTarget, ", "),
+			QuotaPeriodsColumnUsage,
+			QuotaPeriodsProjectionTable,
+			QuotaPeriodsColumnUsage,
+			params[len(params)-1]),
+		vals...,
+	)
+	return err
+}
+
+func pushPeriodStart(from time.Time, interval time.Duration, now time.Time) time.Time {
+	next := from.Add(interval)
+	if next.After(now) {
+		return from
+	}
+	return pushPeriodStart(next, interval, now)
+}
+
+var _ sq.Sqlizer = sqlizerFunc(nil)
+
+type sqlizerFunc func() (string, []interface{}, error)
+
+func (s sqlizerFunc) ToSql() (string, []interface{}, error) {
+	return s()
 }

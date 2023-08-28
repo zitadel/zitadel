@@ -9,11 +9,11 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func QuotaExhaustedInterceptor(svc *logstore.Service, ignoreService ...string) grpc.UnaryServerInterceptor {
-
+func QuotaExhaustedInterceptor(svc *logstore.Service[*record.AccessLog], ignoreService ...string) grpc.UnaryServerInterceptor {
 	prunedIgnoredServices := make([]string, len(ignoreService))
 	for idx, service := range ignoreService {
 		if !strings.HasPrefix(service, "/") {
@@ -21,7 +21,6 @@ func QuotaExhaustedInterceptor(svc *logstore.Service, ignoreService ...string) g
 		}
 		prunedIgnoredServices[idx] = service
 	}
-
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ interface{}, err error) {
 		if !svc.Enabled() {
 			return handler(ctx, req)
@@ -34,7 +33,6 @@ func QuotaExhaustedInterceptor(svc *logstore.Service, ignoreService ...string) g
 				return handler(ctx, req)
 			}
 		}
-
 		instance := authz.GetInstance(ctx)
 		remaining := svc.Limit(interceptorCtx, instance.InstanceID())
 		if remaining != nil && *remaining == 0 {

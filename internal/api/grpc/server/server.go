@@ -12,6 +12,7 @@ import (
 	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
@@ -39,7 +40,7 @@ func CreateServer(
 	queries *query.Queries,
 	hostHeaderName string,
 	tlsConfig *tls.Config,
-	accessSvc *logstore.Service,
+	accessSvc *logstore.Service[*record.AccessLog],
 ) *grpc.Server {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
 	serverOptions := []grpc.ServerOption{

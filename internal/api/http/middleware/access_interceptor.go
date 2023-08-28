@@ -14,12 +14,12 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/logstore"
-	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
+	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type AccessInterceptor struct {
-	svc           *logstore.Service
+	svc           *logstore.Service[*record.AccessLog]
 	cookieHandler *http_utils.CookieHandler
 	limitConfig   *AccessConfig
 	storeOnly     bool
@@ -33,7 +33,7 @@ type AccessConfig struct {
 // NewAccessInterceptor intercepts all requests and stores them to the logstore.
 // If storeOnly is false, it also checks if requests are exhausted.
 // If requests are exhausted, it also returns http.StatusTooManyRequests and sets a cookie
-func NewAccessInterceptor(svc *logstore.Service, cookieHandler *http_utils.CookieHandler, cookieConfig *AccessConfig) *AccessInterceptor {
+func NewAccessInterceptor(svc *logstore.Service[*record.AccessLog], cookieHandler *http_utils.CookieHandler, cookieConfig *AccessConfig) *AccessInterceptor {
 	return &AccessInterceptor{
 		svc:           svc,
 		cookieHandler: cookieHandler,
@@ -50,7 +50,7 @@ func (a *AccessInterceptor) WithoutLimiting() *AccessInterceptor {
 	}
 }
 
-func (a *AccessInterceptor) AccessService() *logstore.Service {
+func (a *AccessInterceptor) AccessService() *logstore.Service[*record.AccessLog] {
 	return a.svc
 }
 
@@ -109,9 +109,9 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 			logging.WithError(err).WithField("url", requestURL).Warning("failed to unescape request url")
 		}
 		instance := authz.GetInstance(tracingCtx)
-		a.svc.Handle(tracingCtx, &access.Record{
+		a.svc.Handle(tracingCtx, &record.AccessLog{
 			LogDate:         time.Now(),
-			Protocol:        access.HTTP,
+			Protocol:        record.HTTP,
 			RequestURL:      unescapedURL,
 			ResponseStatus:  uint32(wrappedWriter.status),
 			RequestHeaders:  request.Header,
