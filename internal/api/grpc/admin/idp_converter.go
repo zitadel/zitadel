@@ -438,3 +438,25 @@ func updateLDAPProviderToCommand(req *admin_pb.UpdateLDAPProviderRequest) comman
 		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
+
+func addSAMLProviderToCommand(req *admin_pb.AddSAMLProviderRequest) command.SAMLProvider {
+	return command.SAMLProvider{
+		Name:              req.Name,
+		Metadata:          req.GetMetadataXml(),
+		MetadataURL:       req.GetMetadataUrl(),
+		Binding:           req.Binding,
+		WithSignedRequest: req.WithSignedRequest,
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateSAMLProviderToCommand(req *admin_pb.UpdateSAMLProviderRequest) command.SAMLProvider {
+	return command.SAMLProvider{
+		Name:              req.Name,
+		Metadata:          req.GetMetadataXml(),
+		MetadataURL:       req.GetMetadataUrl(),
+		Binding:           req.Binding,
+		WithSignedRequest: req.WithSignedRequest,
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}

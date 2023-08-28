@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/crewjam/saml"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/idp"
@@ -856,9 +854,9 @@ func (wm *OrgSAMLIDPWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	id,
 	name string,
-	entityDescriptor *saml.EntityDescriptor,
-	keyString,
-	certificateString string,
+	metadata,
+	key,
+	certificate []byte,
 	secretCrypto crypto.Crypto,
 	binding string,
 	withSignedRequest bool,
@@ -866,9 +864,9 @@ func (wm *OrgSAMLIDPWriteModel) NewChangedEvent(
 ) (*org.SAMLIDPChangedEvent, error) {
 	changes, err := wm.SAMLIDPWriteModel.NewChanges(
 		name,
-		entityDescriptor,
-		keyString,
-		certificateString,
+		metadata,
+		key,
+		certificate,
 		secretCrypto,
 		binding,
 		withSignedRequest,
@@ -919,6 +917,8 @@ func (wm *OrgIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) {
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
 		case *org.LDAPIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.LDAPIDPAddedEvent)
+		case *org.SAMLIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.SAMLIDPAddedEvent)
 		case *org.IDPRemovedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.RemovedEvent)
 		case *org.IDPConfigAddedEvent:
@@ -948,6 +948,7 @@ func (wm *OrgIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.GitLabSelfHostedIDPAddedEventType,
 			org.GoogleIDPAddedEventType,
 			org.LDAPIDPAddedEventType,
+			org.SAMLIDPAddedEventType,
 			org.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).

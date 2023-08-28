@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/crewjam/saml"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	openid "github.com/zitadel/oidc/v2/pkg/oidc"
@@ -4971,7 +4970,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid entityDescriptor",
+			"invalid metadata",
 			fields{
 				eventstore:  eventstoreExpect(t),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -4990,7 +4989,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid key",
+			"missing key",
 			fields{
 				eventstore:  eventstoreExpect(t),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -4999,18 +4998,19 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 				ctx:           context.Background(),
 				resourceOwner: "org1",
 				provider: SAMLProvider{
-					Name:             "name",
-					EntityDescriptor: &saml.EntityDescriptor{},
+					Name:        "name",
+					Metadata:    []byte("metadata"),
+					Certificate: []byte("certificate"),
 				},
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Dbgzf", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-x8720s2j1", ""))
 				},
 			},
 		},
 		{
-			"invalid certificate",
+			"missing certificate",
 			fields{
 				eventstore:  eventstoreExpect(t),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -5019,14 +5019,14 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 				ctx:           context.Background(),
 				resourceOwner: "org1",
 				provider: SAMLProvider{
-					Name:             "name",
-					EntityDescriptor: &saml.EntityDescriptor{},
-					Key:              "key",
+					Name:     "name",
+					Metadata: []byte("metadata"),
+					Key:      []byte("key"),
 				},
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-DF4ga", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-x8720s2j1", ""))
 				},
 			},
 		},
@@ -5040,7 +5040,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 							org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
 								"name",
-								&saml.EntityDescriptor{},
+								[]byte("metadata"),
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -5066,10 +5066,10 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 				ctx:           context.Background(),
 				resourceOwner: "org1",
 				provider: SAMLProvider{
-					Name:             "name",
-					EntityDescriptor: &saml.EntityDescriptor{},
-					Key:              "key",
-					Certificate:      "certificate",
+					Name:        "name",
+					Metadata:    []byte("metadata"),
+					Key:         []byte("key"),
+					Certificate: []byte("certificate"),
 				},
 			},
 			res: res{
@@ -5087,7 +5087,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 							org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
 								"name",
-								&saml.EntityDescriptor{},
+								[]byte("metadata"),
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -5118,9 +5118,9 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 				resourceOwner: "org1",
 				provider: SAMLProvider{
 					Name:              "name",
-					EntityDescriptor:  &saml.EntityDescriptor{},
-					Key:               "key",
-					Certificate:       "certificate",
+					Metadata:          []byte("metadata"),
+					Key:               []byte("key"),
+					Certificate:       []byte("certificate"),
 					Binding:           "binding",
 					WithSignedRequest: true,
 					IDPOptions: idp.Options{
@@ -5214,7 +5214,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid entityDescriptor",
+			"invalid metadata",
 			fields{
 				eventstore: eventstoreExpect(t),
 			},
@@ -5233,6 +5233,48 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			},
 		},
 		{
+			"missing key",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: SAMLProvider{
+					Name:        "name",
+					Metadata:    []byte("metadata"),
+					Certificate: []byte("certificate"),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-x8720s2j1", ""))
+				},
+			},
+		},
+		{
+			"missing certificate",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: SAMLProvider{
+					Name:     "name",
+					Metadata: []byte("metadata"),
+					Key:      []byte("key"),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-x8720s2j1", ""))
+				},
+			},
+		},
+		{
 			name: "not found",
 			fields: fields{
 				eventstore: eventstoreExpect(t,
@@ -5244,8 +5286,8 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				resourceOwner: "org1",
 				id:            "id1",
 				provider: SAMLProvider{
-					Name:             "name",
-					EntityDescriptor: &saml.EntityDescriptor{},
+					Name:     "name",
+					Metadata: []byte("metadata"),
 				},
 			},
 			res: res{
@@ -5263,7 +5305,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 							org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
 								"name",
-								&saml.EntityDescriptor{},
+								[]byte("metadata"),
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -5288,8 +5330,8 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				resourceOwner: "org1",
 				id:            "id1",
 				provider: SAMLProvider{
-					Name:             "name",
-					EntityDescriptor: &saml.EntityDescriptor{},
+					Name:     "name",
+					Metadata: []byte("metadata"),
 				},
 			},
 			res: res{
@@ -5305,7 +5347,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 							org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
 								"name",
-								&saml.EntityDescriptor{EntityID: "entityID"},
+								[]byte("metadata"),
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -5331,7 +5373,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 									"id1",
 									[]idp.SAMLIDPChanges{
 										idp.ChangeSAMLName("new name"),
-										idp.ChangeSAMLEntityDescriptor(&saml.EntityDescriptor{EntityID: "new entityID"}),
+										idp.ChangeSAMLMetadata([]byte("new metadata")),
 										idp.ChangeSAMLKey(&crypto.CryptoValue{
 											CryptoType: crypto.TypeEncryption,
 											Algorithm:  "enc",
@@ -5367,9 +5409,9 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				id:            "id1",
 				provider: SAMLProvider{
 					Name:              "new name",
-					EntityDescriptor:  &saml.EntityDescriptor{EntityID: "new entityID"},
-					Key:               "new key",
-					Certificate:       "new certificate",
+					Metadata:          []byte("new metadata"),
+					Key:               []byte("new key"),
+					Certificate:       []byte("new certificate"),
 					Binding:           "new binding",
 					WithSignedRequest: true,
 					IDPOptions: idp.Options{

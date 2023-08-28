@@ -145,7 +145,7 @@ func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.Re
 	if err != nil {
 		return nil, err
 	}
-	authURL, err := s.command.AuthURLFromProvider(ctx, idpID, intentWriteModel.AggregateID, s.idpCallback(ctx))
+	authURL, err := s.command.AuthURLFromProvider(ctx, idpID, intentWriteModel.AggregateID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID))
 	if err != nil {
 		return nil, err
 	}
@@ -200,7 +200,7 @@ func (s *Server) checkLinkedExternalUser(ctx context.Context, idpID, externalUse
 }
 
 func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string) (idp.User, string, map[string][]string, error) {
-	provider, err := s.command.GetProvider(ctx, idpID, "")
+	provider, err := s.command.GetProvider(ctx, idpID, "", "")
 	if err != nil {
 		return nil, "", nil, err
 	}

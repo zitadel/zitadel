@@ -3,8 +3,6 @@ package idp
 import (
 	"encoding/json"
 
-	"github.com/crewjam/saml"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -14,13 +12,13 @@ import (
 type SAMLIDPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID                string                 `json:"id"`
-	Name              string                 `json:"name,omitempty"`
-	EntityDescriptor  *saml.EntityDescriptor `json:"entityDescriptor,omitempty"`
-	Key               *crypto.CryptoValue    `json:"key,omitempty"`
-	Certificate       *crypto.CryptoValue    `json:"certificate,omitempty"`
-	Binding           string                 `json:"binding,omitempty"`
-	WithSignedRequest bool                   `json:"withSignedRequest"`
+	ID                string              `json:"id"`
+	Name              string              `json:"name,omitempty"`
+	Metadata          []byte              `json:"metadata,omitempty"`
+	Key               *crypto.CryptoValue `json:"key,omitempty"`
+	Certificate       *crypto.CryptoValue `json:"certificate,omitempty"`
+	Binding           string              `json:"binding,omitempty"`
+	WithSignedRequest bool                `json:"withSignedRequest"`
 	Options
 }
 
@@ -28,7 +26,7 @@ func NewSAMLIDPAddedEvent(
 	base *eventstore.BaseEvent,
 	id,
 	name string,
-	entityDescriptor *saml.EntityDescriptor,
+	metadata []byte,
 	key *crypto.CryptoValue,
 	certificate *crypto.CryptoValue,
 	binding string,
@@ -39,7 +37,7 @@ func NewSAMLIDPAddedEvent(
 		BaseEvent:         *base,
 		ID:                id,
 		Name:              name,
-		EntityDescriptor:  entityDescriptor,
+		Metadata:          metadata,
 		Key:               key,
 		Certificate:       certificate,
 		Binding:           binding,
@@ -72,13 +70,13 @@ func SAMLIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) 
 type SAMLIDPChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID                string                 `json:"id"`
-	Name              *string                `json:"name,omitempty"`
-	EntityDescriptor  *saml.EntityDescriptor `json:"entityDescriptor,omitempty"`
-	Key               *crypto.CryptoValue    `json:"key,omitempty"`
-	Certificate       *crypto.CryptoValue    `json:"certificate,omitempty"`
-	Binding           *string                `json:"binding,omitempty"`
-	WithSignedRequest *bool                  `json:"withSignedRequest"`
+	ID                string              `json:"id"`
+	Name              *string             `json:"name,omitempty"`
+	Metadata          []byte              `json:"metadata,omitempty"`
+	Key               *crypto.CryptoValue `json:"key,omitempty"`
+	Certificate       *crypto.CryptoValue `json:"certificate,omitempty"`
+	Binding           *string             `json:"binding,omitempty"`
+	WithSignedRequest *bool               `json:"withSignedRequest"`
 	OptionChanges
 }
 
@@ -108,9 +106,9 @@ func ChangeSAMLName(name string) func(*SAMLIDPChangedEvent) {
 	}
 }
 
-func ChangeSAMLEntityDescriptor(entityDescriptor *saml.EntityDescriptor) func(*SAMLIDPChangedEvent) {
+func ChangeSAMLMetadata(metadata []byte) func(*SAMLIDPChangedEvent) {
 	return func(e *SAMLIDPChangedEvent) {
-		e.EntityDescriptor = entityDescriptor
+		e.Metadata = metadata
 	}
 }
 

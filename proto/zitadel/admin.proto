@@ -26,7 +26,7 @@ import "validate/validate.proto";
 
 package zitadel.admin.v1;
 
-option go_package ="github.com/zitadel/zitadel/pkg/grpc/admin";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/admin";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
@@ -85,7 +85,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             name: "Message Texts"
         },
         {
-           name: "Notification Providers"
+            name: "Notification Providers"
         },
         {
             name: "Notification Settings"
@@ -139,41 +139,41 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
 
     security_definitions: {
-		security: {
-			key: "BasicAuth";
-			value: {
-				type: TYPE_BASIC;
-			}
-		}
-		security: {
-			key: "OAuth2";
-			value: {
-				type: TYPE_OAUTH2;
-				flow: FLOW_ACCESS_CODE;
-				authorization_url: "$ZITADEL_DOMAIN/oauth/v2/authorize";
-				token_url: "$ZITADEL_DOMAIN/oauth/v2/token";
-        scopes: {
-					scope: {
-						key: "openid";
-						value: "openid";
-					}
-          scope: {
-            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
-            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
-          }
-				}
-			}
-		}
-	}
+        security: {
+            key: "BasicAuth";
+            value: {
+                type: TYPE_BASIC;
+            }
+        }
+        security: {
+            key: "OAuth2";
+            value: {
+                type: TYPE_OAUTH2;
+                flow: FLOW_ACCESS_CODE;
+                authorization_url: "$ZITADEL_DOMAIN/oauth/v2/authorize";
+                token_url: "$ZITADEL_DOMAIN/oauth/v2/token";
+                scopes: {
+                    scope: {
+                        key: "openid";
+                        value: "openid";
+                    }
+                    scope: {
+                        key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+                        value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+                    }
+                }
+            }
+        }
+    }
     security: {
         security_requirement: {
-          key: "OAuth2";
-                value: {
-                    scope: "openid";
-                    scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
-                }
+            key: "OAuth2";
+            value: {
+                scope: "openid";
+                scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            }
         }
-	  }
+    }
     responses: {
         key: "403";
         value: {
@@ -1648,6 +1648,42 @@ service AdminService {
         };
     }
 
+    // Add a new SAML identity provider on the instance
+    rpc AddSAMLProvider(AddSAMLProviderRequest) returns (AddSAMLProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/saml"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add SAML Identity Provider";
+            description: "";
+        };
+    }
+
+    // Change an existing SAML identity provider on the instance
+    rpc UpdateSAMLProvider(UpdateSAMLProviderRequest) returns (UpdateSAMLProviderResponse) {
+        option (google.api.http) = {
+            put: "/idps/saml/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update SAML Identity Provider";
+            description: "";
+        };
+    }
+
     // Remove an identity provider
     // Will remove all linked providers of this configuration on the users
     rpc DeleteProvider(DeleteProviderRequest) returns (DeleteProviderResponse) {
@@ -1666,7 +1702,7 @@ service AdminService {
         };
     }
 
-     rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
+    rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/orgiam";
         };
@@ -1968,7 +2004,7 @@ service AdminService {
         };
     }
 
-   rpc UpdateLabelPolicy(UpdateLabelPolicyRequest) returns (UpdateLabelPolicyResponse) {
+    rpc UpdateLabelPolicy(UpdateLabelPolicyRequest) returns (UpdateLabelPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/label";
             body: "*";
@@ -4041,10 +4077,10 @@ message GetOIDCSettingsResponse {
 }
 
 message AddOIDCSettingsRequest {
-    google.protobuf.Duration  access_token_lifetime   = 1;
-    google.protobuf.Duration  id_token_lifetime   = 2;
-    google.protobuf.Duration  refresh_token_idle_expiration   = 3;
-    google.protobuf.Duration  refresh_token_expiration   = 4;
+    google.protobuf.Duration  access_token_lifetime = 1;
+    google.protobuf.Duration  id_token_lifetime = 2;
+    google.protobuf.Duration  refresh_token_idle_expiration = 3;
+    google.protobuf.Duration  refresh_token_expiration = 4;
 }
 
 message AddOIDCSettingsResponse {
@@ -4052,10 +4088,10 @@ message AddOIDCSettingsResponse {
 }
 
 message UpdateOIDCSettingsRequest {
-    google.protobuf.Duration  access_token_lifetime   = 1;
-    google.protobuf.Duration  id_token_lifetime   = 2;
-    google.protobuf.Duration  refresh_token_idle_expiration   = 3;
-    google.protobuf.Duration  refresh_token_expiration   = 4;
+    google.protobuf.Duration  access_token_lifetime = 1;
+    google.protobuf.Duration  id_token_lifetime = 2;
+    google.protobuf.Duration  refresh_token_idle_expiration = 3;
+    google.protobuf.Duration  refresh_token_expiration = 4;
 }
 
 message UpdateOIDCSettingsResponse {
@@ -4071,9 +4107,9 @@ message GetSecurityPolicyResponse{
 
 message SetSecurityPolicyRequest{
     // states if iframe embedding is enabled or disabled
-   bool enable_iframe_embedding = 1;
-   // origins allowed loading ZITADEL in an iframe if enable_iframe_embedding is true
-   repeated string allowed_origins = 2;
+    bool enable_iframe_embedding = 1;
+    // origins allowed loading ZITADEL in an iframe if enable_iframe_embedding is true
+    repeated string allowed_origins = 2;
 }
 
 message SetSecurityPolicyResponse{
@@ -4084,11 +4120,11 @@ message SetSecurityPolicyResponse{
 // at least one argument has to be provided
 message IsOrgUniqueRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			description: "All unique fields of an organization";
-			required: ["name", "domain"]
-		};
-	};
+        json_schema: {
+            description: "All unique fields of an organization";
+            required: ["name", "domain"]
+        };
+    };
 
     string name = 1 [
         (validate.rules).string = {max_len: 200},
@@ -4127,11 +4163,11 @@ message GetOrgByIDResponse {
 
 message ListOrgsRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			description: "Search query for lists";
-			required: ["query"]
-		};
-	};
+        json_schema: {
+            description: "Search query for lists";
+            required: ["query"]
+        };
+    };
 
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
@@ -4149,18 +4185,18 @@ message ListOrgsResponse {
 
 message SetUpOrgRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			description: "Request to set up an organization. User is required";
-			required: ["org", "user"]
-		};
-	};
+        json_schema: {
+            description: "Request to set up an organization. User is required";
+            required: ["org", "user"]
+        };
+    };
 
     message Org {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
             json_schema: {
                 required: ["name"]
             };
-		};
+        };
         string name = 1 [
             (validate.rules).string = {min_len: 1, max_len: 200},
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -4184,7 +4220,7 @@ message SetUpOrgRequest {
             json_schema: {
                 required: ["user_name", "profile", "email", "password"];
             };
-		};
+        };
 
         message Profile {
             option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
@@ -4518,11 +4554,11 @@ message AddJWTIDPResponse {
 
 message UpdateIDPRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			description: "Updates fields of an IDP";
-			required: ["idp_id", "name"]
-		};
-	};
+        json_schema: {
+            description: "Updates fields of an IDP";
+            required: ["idp_id", "name"]
+        };
+    };
 
     string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [
@@ -4548,10 +4584,10 @@ message UpdateIDPResponse {
 
 message DeactivateIDPRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["idp_id"]
-		};
-	};
+        json_schema: {
+            required: ["idp_id"]
+        };
+    };
     string idp_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -4568,10 +4604,10 @@ message DeactivateIDPResponse {
 
 message ReactivateIDPRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["idp_id"]
-		};
-	};
+        json_schema: {
+            required: ["idp_id"]
+        };
+    };
     string idp_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -4588,10 +4624,10 @@ message ReactivateIDPResponse {
 
 message RemoveIDPRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["idp_id"]
-		};
-	};
+        json_schema: {
+            required: ["idp_id"]
+        };
+    };
 
     string idp_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -4609,10 +4645,10 @@ message RemoveIDPResponse {
 
 message UpdateIDPOIDCConfigRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["idp_id", "issuer", "client_id"]
-		};
-	};
+        json_schema: {
+            required: ["idp_id", "issuer", "client_id"]
+        };
+    };
 
     string idp_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -5548,6 +5584,39 @@ message UpdateLDAPProviderResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message AddSAMLProviderRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    oneof metadata {
+        option (validate.required) = true;
+        bytes metadata_xml = 2 [(validate.rules).bytes.max_len = 500000];
+        string metadata_url = 3 [(validate.rules).string.max_len = 200];
+    }
+    string binding = 4;
+    bool withSignedRequest = 5;
+    zitadel.idp.v1.Options provider_options = 6;
+}
+
+message AddSAMLProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateSAMLProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    oneof metadata {
+        bytes metadata_xml = 3 [(validate.rules).bytes.max_len = 500000];
+        string metadata_url = 4 [(validate.rules).string.max_len = 200];
+    }
+    string binding = 5;
+    bool withSignedRequest = 6;
+    zitadel.idp.v1.Options provider_options = 7;
+}
+
+message UpdateSAMLProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message DeleteProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -5683,10 +5752,10 @@ message UpdateDomainPolicyResponse {
 
 message GetCustomDomainPolicyRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["org_id"]
-		};
-	};
+        json_schema: {
+            required: ["org_id"]
+        };
+    };
     string org_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -5705,10 +5774,10 @@ message GetCustomDomainPolicyResponse {
 
 message AddCustomDomainPolicyRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["org_id"]
-		};
-	};
+        json_schema: {
+            required: ["org_id"]
+        };
+    };
 
     string org_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -5741,10 +5810,10 @@ message AddCustomDomainPolicyResponse {
 
 message UpdateCustomDomainPolicyRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["org_id"]
-		};
-	};
+        json_schema: {
+            required: ["org_id"]
+        };
+    };
 
     string org_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -5777,10 +5846,10 @@ message UpdateCustomDomainPolicyResponse {
 
 message ResetCustomDomainPolicyToDefaultRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["org_id"]
-		};
-	};
+        json_schema: {
+            required: ["org_id"]
+        };
+    };
 
     string org_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -5857,7 +5926,7 @@ message UpdateLabelPolicyRequest {
         }
     ];
     string background_color_dark = 8 [
-        (validate.rules).string = { max_len: 50},
+        (validate.rules).string = {max_len: 50},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "hex value for background color dark theme";
             example: "\"#111827\"";
@@ -5865,7 +5934,7 @@ message UpdateLabelPolicyRequest {
         }
     ];
     string warn_color_dark = 9 [
-        (validate.rules).string = { max_len: 50},
+        (validate.rules).string = {max_len: 50},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "hex value for warning color dark theme";
             example: "\"#FF3B5B\"";
@@ -5873,7 +5942,7 @@ message UpdateLabelPolicyRequest {
         }
     ];
     string font_color_dark = 10 [
-        (validate.rules).string = { max_len: 50},
+        (validate.rules).string = {max_len: 50},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "hex value for font color dark theme";
             example: "\"#FFFFFF\"";
@@ -6021,10 +6090,10 @@ message ListLoginPolicyIDPsResponse {
 
 message AddIDPToLoginPolicyRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["org_id"]
-		};
-	};
+        json_schema: {
+            required: ["org_id"]
+        };
+    };
 
     string idp_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -6044,10 +6113,10 @@ message AddIDPToLoginPolicyResponse {
 
 message RemoveIDPFromLoginPolicyRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["idp_id"]
-		};
-	};
+        json_schema: {
+            required: ["idp_id"]
+        };
+    };
 
     string idp_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -6073,10 +6142,10 @@ message ListLoginPolicySecondFactorsResponse {
 
 message AddSecondFactorToLoginPolicyRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["type"]
-		};
-	};
+        json_schema: {
+            required: ["type"]
+        };
+    };
 
     zitadel.policy.v1.SecondFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
@@ -6087,10 +6156,10 @@ message AddSecondFactorToLoginPolicyResponse {
 
 message RemoveSecondFactorFromLoginPolicyRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["type"]
-		};
-	};
+        json_schema: {
+            required: ["type"]
+        };
+    };
 
     zitadel.policy.v1.SecondFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
@@ -6109,10 +6178,10 @@ message ListLoginPolicyMultiFactorsResponse {
 
 message AddMultiFactorToLoginPolicyRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["type"]
-		};
-	};
+        json_schema: {
+            required: ["type"]
+        };
+    };
 
     zitadel.policy.v1.MultiFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
@@ -6123,10 +6192,10 @@ message AddMultiFactorToLoginPolicyResponse {
 
 message RemoveMultiFactorFromLoginPolicyRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["type"]
-		};
-	};
+        json_schema: {
+            required: ["type"]
+        };
+    };
 
     zitadel.policy.v1.MultiFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
@@ -6276,11 +6345,11 @@ message GetNotificationPolicyResponse {
 }
 
 message UpdateNotificationPolicyRequest {
-   bool password_change = 1 [
-       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-           description: "If set to true the users will get a notification whenever their password has been changed.";
-       }
-   ];
+    bool password_change = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "If set to true the users will get a notification whenever their password has been changed.";
+        }
+    ];
 }
 
 message UpdateNotificationPolicyResponse {
@@ -7068,10 +7137,10 @@ message ResetCustomLoginTextsToDefaultResponse {
 
 message AddIAMMemberRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["user_id"]
-		};
-	};
+        json_schema: {
+            required: ["user_id"]
+        };
+    };
 
     string user_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -7095,10 +7164,10 @@ message AddIAMMemberResponse {
 
 message UpdateIAMMemberRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["user_id"]
-		};
-	};
+        json_schema: {
+            required: ["user_id"]
+        };
+    };
 
     string user_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -7122,10 +7191,10 @@ message UpdateIAMMemberResponse {
 
 message RemoveIAMMemberRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["user_id"]
-		};
-	};
+        json_schema: {
+            required: ["user_id"]
+        };
+    };
 
     string user_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -7183,10 +7252,10 @@ message ListFailedEventsResponse {
 
 message RemoveFailedEventRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["database", "view_name", "failed_sequence"]
-		};
-	};
+        json_schema: {
+            required: ["database", "view_name", "failed_sequence"]
+        };
+    };
 
     string database = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -7283,7 +7352,7 @@ message ImportDataRequest {
     message S3Input{
         string path = 1;
         string endpoint = 2;
-        string access_key_id =3;
+        string access_key_id = 3;
         string secret_access_key = 4;
         bool ssl = 5;
         string bucket = 6;
@@ -7442,7 +7511,7 @@ message ExportDataRequest {
     message S3Output{
         string path = 1;
         string endpoint = 2;
-        string access_key_id =3;
+        string access_key_id = 3;
         string secret_access_key = 4;
         bool ssl = 5;
         string bucket = 6;

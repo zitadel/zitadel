@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/crewjam/saml"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"golang.org/x/oauth2"
@@ -1548,7 +1547,7 @@ type SAMLIDPWriteModel struct {
 
 	Name              string
 	ID                string
-	EntityDescriptor  *saml.EntityDescriptor
+	Metadata          []byte
 	Key               *crypto.CryptoValue
 	Certificate       *crypto.CryptoValue
 	Binding           string
@@ -1574,7 +1573,7 @@ func (wm *SAMLIDPWriteModel) Reduce() error {
 
 func (wm *SAMLIDPWriteModel) reduceAddedEvent(e *idp.SAMLIDPAddedEvent) {
 	wm.Name = e.Name
-	wm.EntityDescriptor = e.EntityDescriptor
+	wm.Metadata = e.Metadata
 	wm.Key = e.Key
 	wm.Certificate = e.Certificate
 	wm.Binding = e.Binding
@@ -1593,8 +1592,8 @@ func (wm *SAMLIDPWriteModel) reduceChangedEvent(e *idp.SAMLIDPChangedEvent) {
 	if e.Name != nil {
 		wm.Name = *e.Name
 	}
-	if e.EntityDescriptor != nil {
-		wm.EntityDescriptor = e.EntityDescriptor
+	if e.Metadata != nil {
+		wm.Metadata = e.Metadata
 	}
 	if e.Binding != nil {
 		wm.Binding = *e.Binding
@@ -1607,37 +1606,34 @@ func (wm *SAMLIDPWriteModel) reduceChangedEvent(e *idp.SAMLIDPChangedEvent) {
 
 func (wm *SAMLIDPWriteModel) NewChanges(
 	name string,
-	entityDescriptor *saml.EntityDescriptor,
-	keyString,
-	certificateString string,
+	metadata,
+	key,
+	certificate []byte,
 	secretCrypto crypto.Crypto,
 	binding string,
 	withSignedRequest bool,
 	options idp.Options,
 ) ([]idp.SAMLIDPChanges, error) {
 	changes := make([]idp.SAMLIDPChanges, 0)
-	var key *crypto.CryptoValue
-	var err error
-	if keyString != "" {
-		key, err = crypto.Crypt([]byte(keyString), secretCrypto)
+	if key != nil {
+		keyEnc, err := crypto.Crypt(key, secretCrypto)
 		if err != nil {
 			return nil, err
 		}
-		changes = append(changes, idp.ChangeSAMLKey(key))
+		changes = append(changes, idp.ChangeSAMLKey(keyEnc))
 	}
-	var certificate *crypto.CryptoValue
-	if certificateString != "" {
-		certificate, err = crypto.Crypt([]byte(certificateString), secretCrypto)
+	if certificate != nil {
+		certificateEnc, err := crypto.Crypt(certificate, secretCrypto)
 		if err != nil {
 			return nil, err
 		}
-		changes = append(changes, idp.ChangeSAMLCertificate(certificate))
+		changes = append(changes, idp.ChangeSAMLCertificate(certificateEnc))
 	}
 	if wm.Name != name {
 		changes = append(changes, idp.ChangeSAMLName(name))
 	}
-	if !reflect.DeepEqual(wm.EntityDescriptor, entityDescriptor) {
-		changes = append(changes, idp.ChangeSAMLEntityDescriptor(entityDescriptor))
+	if !reflect.DeepEqual(wm.Metadata, metadata) {
+		changes = append(changes, idp.ChangeSAMLMetadata(metadata))
 	}
 	if wm.Binding != binding {
 		changes = append(changes, idp.ChangeSAMLBinding(binding))
@@ -1684,7 +1680,7 @@ func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 	return saml2.New(
 		wm.Name,
 		callbackURL,
-		wm.EntityDescriptor,
+		wm.Metadata,
 		cert,
 		key,
 		opts...,
@@ -1884,6 +1880,7 @@ func (wm *IDPTypeWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.GitLabSelfHostedIDPAddedEventType,
 			instance.GoogleIDPAddedEventType,
 			instance.LDAPIDPAddedEventType,
+			instance.SAMLIDPAddedEventType,
 			instance.OIDCIDPMigratedAzureADEventType,
 			instance.OIDCIDPMigratedGoogleEventType,
 			instance.IDPRemovedEventType,
@@ -1902,6 +1899,7 @@ func (wm *IDPTypeWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.GitLabSelfHostedIDPAddedEventType,
 			org.GoogleIDPAddedEventType,
 			org.LDAPIDPAddedEventType,
+			org.SAMLIDPAddedEventType,
 			org.OIDCIDPMigratedAzureADEventType,
 			org.OIDCIDPMigratedGoogleEventType,
 			org.IDPRemovedEventType,
@@ -1968,6 +1966,8 @@ func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idp
 			writeModel.model = NewGitLabSelfHostedInstanceIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeGoogle:
 			writeModel.model = NewGoogleInstanceIDPWriteModel(resourceOwner, id)
+		case domain.IDPTypeSAML:
+			writeModel.model = NewSAMLInstanceIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeUnspecified:
 			fallthrough
 		default:
@@ -1995,6 +1995,8 @@ func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idp
 			writeModel.model = NewGitLabSelfHostedOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeGoogle:
 			writeModel.model = NewGoogleOrgIDPWriteModel(resourceOwner, id)
+		case domain.IDPTypeSAML:
+			writeModel.model = NewSAMLOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeUnspecified:
 			fallthrough
 		default:

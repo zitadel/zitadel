@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/crewjam/saml"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/idp"
@@ -844,9 +842,9 @@ func (wm *InstanceSAMLIDPWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	id,
 	name string,
-	entityDescriptor *saml.EntityDescriptor,
-	keyString,
-	certificateString string,
+	metadata,
+	key,
+	certificate []byte,
 	secretCrypto crypto.Crypto,
 	binding string,
 	withSignedRequest bool,
@@ -854,9 +852,9 @@ func (wm *InstanceSAMLIDPWriteModel) NewChangedEvent(
 ) (*instance.SAMLIDPChangedEvent, error) {
 	changes, err := wm.SAMLIDPWriteModel.NewChanges(
 		name,
-		entityDescriptor,
-		keyString,
-		certificateString,
+		metadata,
+		key,
+		certificate,
 		secretCrypto,
 		binding,
 		withSignedRequest,

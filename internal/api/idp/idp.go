@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/crewjam/saml/samlsp"
 	"github.com/gorilla/mux"
 	"github.com/zitadel/logging"
 
@@ -24,19 +25,24 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	saml2 "github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
 const (
-	HandlerPrefix    = "/idps"
-	callbackPath     = "/callback"
-	ldapCallbackPath = callbackPath + "/ldap"
+	HandlerPrefix       = "/idps"
+	callbackPath        = "/callback"
+	defaultMetadataPath = "/saml/metadata"
+	defaultAcsPath      = "/saml/acs"
+	metadataPath        = "/{" + varIDPID + ":[0-9]+}" + defaultMetadataPath
+	acsPath             = "/{" + varIDPID + ":[0-9]+}" + defaultAcsPath
 
 	paramIntentID         = "id"
 	paramToken            = "token"
 	paramUserID           = "user"
 	paramError            = "error"
 	paramErrorDescription = "error_description"
+	varIDPID              = "idpid"
 )
 
 type Handler struct {
@@ -45,6 +51,7 @@ type Handler struct {
 	parser              *form.Parser
 	encryptionAlgorithm crypto.EncryptionAlgorithm
 	callbackURL         func(ctx context.Context) string
+	samlRootURL         func(ctx context.Context, idpID string) string
 }
 
 type externalIDPCallbackData struct {
@@ -61,6 +68,12 @@ func CallbackURL(externalSecure bool) func(ctx context.Context) string {
 	}
 }
 
+func SAMLRootURL(externalSecure bool) func(ctx context.Context, idpID string) string {
+	return func(ctx context.Context, idpID string) string {
+		return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + HandlerPrefix + "/" + idpID + "/"
+	}
+}
+
 func NewHandler(
 	commands *command.Commands,
 	queries *query.Queries,
@@ -74,12 +87,73 @@ func NewHandler(
 		parser:              form.NewParser(),
 		encryptionAlgorithm: encryptionAlgorithm,
 		callbackURL:         CallbackURL(externalSecure),
+		samlRootURL:         SAMLRootURL(externalSecure),
 	}
 
 	router := mux.NewRouter()
 	router.Use(instanceInterceptor)
 	router.HandleFunc(callbackPath, h.handleCallback)
+	router.HandleFunc(metadataPath, h.handleMetadata)
+	router.HandleFunc(acsPath, h.handleACS)
 	return router
+}
+
+func (h *Handler) handleMetadata(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	ctx := r.Context()
+
+	template, err := h.queries.IDPTemplateByID(ctx, true, vars[varIDPID], false)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if template.SAMLIDPTemplate == nil {
+		//TODO failed type
+	}
+	sp, err := getServiceProvider(h.samlRootURL(ctx, template.ID), template.Name, template.SAMLIDPTemplate, h.encryptionAlgorithm)
+	if err != nil {
+		//TODO failed sp
+	}
+	sp.ServeMetadata(w, r)
+}
+
+func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	ctx := r.Context()
+
+	template, err := h.queries.IDPTemplateByID(ctx, true, vars[varIDPID], false)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if template.SAMLIDPTemplate == nil {
+		//TODO failed type
+	}
+	sp, err := getServiceProvider(h.samlRootURL(ctx, template.ID), template.Name, template.SAMLIDPTemplate, h.encryptionAlgorithm)
+	if err != nil {
+		//TODO failed sp
+	}
+	sp.ServeACS(w, r)
+}
+
+func getServiceProvider(rootURL string, name string, template *query.SAMLIDPTemplate, alg crypto.EncryptionAlgorithm) (*samlsp.Middleware, error) {
+	cert, err := crypto.Decrypt(template.Certificate, alg)
+	if err != nil {
+		//TODO failed decrypt
+	}
+	key, err := crypto.Decrypt(template.Key, alg)
+	if err != nil {
+		//TODO failed decrypt
+	}
+
+	provider, err := saml2.New(name, rootURL, template.Metadata, cert, key)
+	if err != nil {
+		//TODO failed config
+	}
+
+	return provider.GetSP()
 }
 
 func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
@@ -107,7 +181,7 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	provider, err := h.commands.GetProvider(ctx, intent.IDPID, h.callbackURL(ctx))
+	provider, err := h.commands.GetProvider(ctx, intent.IDPID, h.callbackURL(ctx), h.samlRootURL(ctx, intent.IDPID))
 	if err != nil {
 		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
 		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")

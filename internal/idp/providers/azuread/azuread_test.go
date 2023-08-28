@@ -80,7 +80,10 @@ func TestProvider_BeginAuth(t *testing.T) {
 			session, err := provider.BeginAuth(context.Background(), "testState")
 			r.NoError(err)
 
-			a.Equal(tt.want.GetAuthURL(), session.GetAuthURL())
+			wantHeaders, wantContent := tt.want.GetAuth()
+			gotHeaders, gotContent := session.GetAuth()
+			a.Equal(wantHeaders, gotHeaders)
+			a.Equal(wantContent, gotContent)
 		})
 	}
 }

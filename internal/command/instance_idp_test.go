@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/crewjam/saml"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	openid "github.com/zitadel/oidc/v2/pkg/oidc"
@@ -4897,7 +4896,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid entityDescriptor",
+			"invalid metadata",
 			fields{
 				eventstore:  eventstoreExpect(t),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -4915,7 +4914,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid key",
+			"missing certificate",
 			fields{
 				eventstore:  eventstoreExpect(t),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -4923,18 +4922,19 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				provider: SAMLProvider{
-					Name:             "name",
-					EntityDescriptor: &saml.EntityDescriptor{},
+					Name:     "name",
+					Metadata: []byte("metadata"),
+					Key:      []byte("key"),
 				},
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dbgzf", "Errors.Invalid.Argument"))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-x8720s2j1", "Errors.Invalid.Argument"))
 				},
 			},
 		},
 		{
-			"invalid certificate",
+			"missing key",
 			fields{
 				eventstore:  eventstoreExpect(t),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -4942,14 +4942,14 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				provider: SAMLProvider{
-					Name:             "name",
-					EntityDescriptor: &saml.EntityDescriptor{},
-					Key:              "key",
+					Name:        "name",
+					Metadata:    []byte("metadata"),
+					Certificate: []byte("certificate"),
 				},
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DF4ga", "Errors.Invalid.Argument"))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-x8720s2j1", "Errors.Invalid.Argument"))
 				},
 			},
 		},
@@ -4965,7 +4965,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 								instance.NewSAMLIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 									"id1",
 									"name",
-									&saml.EntityDescriptor{},
+									[]byte("metadata"),
 									&crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
@@ -4990,10 +4990,10 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				provider: SAMLProvider{
-					Name:             "name",
-					EntityDescriptor: &saml.EntityDescriptor{},
-					Key:              "key",
-					Certificate:      "certificate",
+					Name:        "name",
+					Metadata:    []byte("metadata"),
+					Key:         []byte("key"),
+					Certificate: []byte("certificate"),
 				},
 			},
 			res: res{
@@ -5013,7 +5013,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 								instance.NewSAMLIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 									"id1",
 									"name",
-									&saml.EntityDescriptor{},
+									[]byte("metadata"),
 									&crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
@@ -5044,9 +5044,9 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				provider: SAMLProvider{
 					Name:              "name",
-					EntityDescriptor:  &saml.EntityDescriptor{},
-					Key:               "key",
-					Certificate:       "certificate",
+					Metadata:          []byte("metadata"),
+					Key:               []byte("key"),
+					Certificate:       []byte("certificate"),
 					Binding:           "binding",
 					WithSignedRequest: true,
 					IDPOptions: idp.Options{
@@ -5137,7 +5137,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid entityDescriptor",
+			"invalid metadata",
 			fields{
 				eventstore: eventstoreExpect(t),
 			},
@@ -5155,6 +5155,46 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			},
 		},
 		{
+			"missing certificate",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: SAMLProvider{
+					Name:     "name",
+					Metadata: []byte("metadata"),
+					Key:      []byte("key"),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-x8720s2j1", "Errors.Invalid.Argument"))
+				},
+			},
+		},
+		{
+			"missing key",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: SAMLProvider{
+					Name:        "name",
+					Metadata:    []byte("metadata"),
+					Certificate: []byte("certificate"),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-x8720s2j1", "Errors.Invalid.Argument"))
+				},
+			},
+		},
+		{
 			name: "not found",
 			fields: fields{
 				eventstore: eventstoreExpect(t,
@@ -5165,8 +5205,8 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
 				provider: SAMLProvider{
-					Name:             "name",
-					EntityDescriptor: &saml.EntityDescriptor{},
+					Name:     "name",
+					Metadata: []byte("metadata"),
 				},
 			},
 			res: res{
@@ -5182,7 +5222,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 							instance.NewSAMLIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 								"id1",
 								"name",
-								&saml.EntityDescriptor{},
+								[]byte("metadata"),
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -5206,8 +5246,8 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
 				provider: SAMLProvider{
-					Name:             "name",
-					EntityDescriptor: &saml.EntityDescriptor{},
+					Name:     "name",
+					Metadata: []byte("metadata"),
 				},
 			},
 			res: res{
@@ -5223,7 +5263,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 							instance.NewSAMLIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 								"id1",
 								"name",
-								&saml.EntityDescriptor{EntityID: "entityID"},
+								[]byte("metadata"),
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -5251,7 +5291,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 										"id1",
 										[]idp.SAMLIDPChanges{
 											idp.ChangeSAMLName("new name"),
-											idp.ChangeSAMLEntityDescriptor(&saml.EntityDescriptor{EntityID: "new entityID"}),
+											idp.ChangeSAMLMetadata([]byte("new metadata")),
 											idp.ChangeSAMLKey(&crypto.CryptoValue{
 												CryptoType: crypto.TypeEncryption,
 												Algorithm:  "enc",
@@ -5287,9 +5327,9 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 				id:  "id1",
 				provider: SAMLProvider{
 					Name:              "new name",
-					EntityDescriptor:  &saml.EntityDescriptor{EntityID: "new entityID"},
-					Key:               "new key",
-					Certificate:       "new certificate",
+					Metadata:          []byte("new metadata"),
+					Key:               []byte("new key"),
+					Certificate:       []byte("new certificate"),
 					Binding:           "new binding",
 					WithSignedRequest: true,
 					IDPOptions: idp.Options{

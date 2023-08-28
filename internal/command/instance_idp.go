@@ -1,8 +1,18 @@
 package command
 
 import (
+	"bytes"
 	"context"
+	"crypto/rand"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/pem"
+	"math/big"
+	"strconv"
 	"strings"
+	"time"
+
+	"github.com/zitadel/saml/pkg/provider/xml"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -1565,14 +1575,26 @@ func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeMo
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-D32ef", "Errors.Invalid.Argument")
 		}
-		if provider.EntityDescriptor == nil {
+		if provider.Metadata == nil && provider.MetadataURL == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-D2gj8", "Errors.Invalid.Argument")
 		}
-		if provider.Key = strings.TrimSpace(provider.Key); provider.Key == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Dbgzf", "Errors.Invalid.Argument")
+		if provider.Metadata == nil && provider.MetadataURL != "" {
+			data, err := xml.ReadMetadataFromURL(c.httpClient, provider.MetadataURL)
+			if err != nil {
+				return nil, caos_errs.ThrowInvalidArgument(err, "INST-891mns", "Errors.Project.App.SAMLMetadataMissing")
+			}
+			provider.Metadata = data
 		}
-		if provider.Certificate = strings.TrimSpace(provider.Certificate); provider.Certificate == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-DF4ga", "Errors.Invalid.Argument")
+		if (provider.Key != nil && provider.Certificate == nil) || (provider.Key == nil && provider.Certificate != nil) {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-x8720s2j1", "Errors.Invalid.Argument")
+		}
+		if provider.Key == nil && provider.Certificate == nil {
+			key, cert, err := generateSAMLCertAndKey(writeModel.ID, c.keySize)
+			if err != nil {
+				return nil, err
+			}
+			provider.Key = key
+			provider.Certificate = cert
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
@@ -1583,11 +1605,12 @@ func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeMo
 			if err = writeModel.Reduce(); err != nil {
 				return nil, err
 			}
-			key, err := crypto.Encrypt([]byte(provider.Key), c.idpConfigEncryption)
+
+			keyEnc, err := crypto.Encrypt(provider.Key, c.idpConfigEncryption)
 			if err != nil {
 				return nil, err
 			}
-			certificate, err := crypto.Encrypt([]byte(provider.Certificate), c.idpConfigEncryption)
+			certificateEnc, err := crypto.Encrypt(provider.Certificate, c.idpConfigEncryption)
 			if err != nil {
 				return nil, err
 			}
@@ -1597,9 +1620,9 @@ func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeMo
 					&a.Aggregate,
 					writeModel.ID,
 					provider.Name,
-					provider.EntityDescriptor,
-					key,
-					certificate,
+					provider.Metadata,
+					keyEnc,
+					certificateEnc,
 					provider.Binding,
 					provider.WithSignedRequest,
 					provider.IDPOptions,
@@ -1617,8 +1640,18 @@ func (c *Commands) prepareUpdateInstanceSAMLProvider(a *instance.Aggregate, writ
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Sf3gh", "Errors.Invalid.Argument")
 		}
-		if provider.EntityDescriptor == nil {
+		if provider.Metadata == nil && provider.MetadataURL == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-D2gj8", "Errors.Invalid.Argument")
+		}
+		if provider.Metadata == nil && provider.MetadataURL != "" {
+			data, err := xml.ReadMetadataFromURL(c.httpClient, provider.MetadataURL)
+			if err != nil {
+				return nil, caos_errs.ThrowInvalidArgument(err, "INST-L98723b1", "Errors.Project.App.SAMLMetadataMissing")
+			}
+			provider.Metadata = data
+		}
+		if (provider.Key != nil && provider.Certificate == nil) || (provider.Key == nil && provider.Certificate != nil) {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-x8720s2j1", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
@@ -1637,7 +1670,7 @@ func (c *Commands) prepareUpdateInstanceSAMLProvider(a *instance.Aggregate, writ
 				&a.Aggregate,
 				writeModel.ID,
 				provider.Name,
-				provider.EntityDescriptor,
+				provider.Metadata,
 				provider.Key,
 				provider.Certificate,
 				c.idpConfigEncryption,
@@ -1671,4 +1704,47 @@ func (c *Commands) prepareDeleteInstanceProvider(a *instance.Aggregate, id strin
 			return []eventstore.Command{instance.NewIDPRemovedEvent(ctx, &a.Aggregate, id)}, nil
 		}, nil
 	}
+}
+
+func generateSAMLCertAndKey(id string, keySize int) ([]byte, []byte, error) {
+	priv, pub, err := crypto.GenerateKeyPair(keySize)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	serial, err := strconv.Atoi(id)
+	if err != nil {
+		return nil, nil, err
+	}
+	template := x509.Certificate{
+		SerialNumber: big.NewInt(int64(serial)),
+		Subject: pkix.Name{
+			Organization: []string{"ZITADEL"},
+		},
+		NotBefore: time.Now(),
+		NotAfter:  time.Now().Add(time.Hour * 24 * 365),
+
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+	}
+
+	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, pub, priv)
+	if err != nil {
+		return nil, nil, caos_errs.ThrowInternalf(err, "COMMAND-x92u101j", "failed to create certificate")
+	}
+
+	certBuff := &bytes.Buffer{}
+	defer certBuff.Reset()
+	if err := pem.Encode(certBuff, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes}); err != nil {
+		return nil, nil, err
+	}
+
+	keyBuff := &bytes.Buffer{}
+	defer keyBuff.Reset()
+	if err := pem.Encode(keyBuff, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(priv)}); err != nil {
+		return nil, nil, err
+	}
+
+	return keyBuff.Bytes(), certBuff.Bytes(), nil
 }

@@ -75,12 +75,17 @@ func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureU
 	return writeModel, writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) GetProvider(ctx context.Context, idpID string, callbackURL string) (idp.Provider, error) {
+func (c *Commands) GetProvider(ctx context.Context, idpID string, idpCallback string, samlRootURL string) (idp.Provider, error) {
 	writeModel, err := IDPProviderWriteModel(ctx, c.eventstore.Filter, idpID)
 	if err != nil {
 		return nil, err
 	}
-	return writeModel.ToProvider(callbackURL, c.idpConfigEncryption)
+	switch writeModel.IDPType {
+	case domain.IDPTypeSAML:
+		return writeModel.ToProvider(samlRootURL, c.idpConfigEncryption)
+	default:
+		return writeModel.ToProvider(idpCallback, c.idpConfigEncryption)
+	}
 }
 
 func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIntentWriteModel, error) {
@@ -97,8 +102,8 @@ func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIn
 	return intent, nil
 }
 
-func (c *Commands) AuthURLFromProvider(ctx context.Context, idpID, state string, callbackURL string) (string, error) {
-	provider, err := c.GetProvider(ctx, idpID, callbackURL)
+func (c *Commands) AuthURLFromProvider(ctx context.Context, idpID, state string, idpCallback string, samlRootURL string) (string, error) {
+	provider, err := c.GetProvider(ctx, idpID, idpCallback, samlRootURL)
 	if err != nil {
 		return "", err
 	}

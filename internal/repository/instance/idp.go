@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/crewjam/saml"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -899,7 +897,6 @@ func NewLDAPIDPChangedEvent(
 	id string,
 	changes []idp.LDAPIDPChanges,
 ) (*LDAPIDPChangedEvent, error) {
-
 	changedEvent, err := idp.NewLDAPIDPChangedEvent(
 		eventstore.NewBaseEventForPush(
 			ctx,
@@ -933,7 +930,7 @@ func NewSAMLIDPAddedEvent(
 	aggregate *eventstore.Aggregate,
 	id,
 	name string,
-	entityDescriptor *saml.EntityDescriptor,
+	metadata []byte,
 	key *crypto.CryptoValue,
 	certificate *crypto.CryptoValue,
 	binding string,
@@ -949,7 +946,7 @@ func NewSAMLIDPAddedEvent(
 			),
 			id,
 			name,
-			entityDescriptor,
+			metadata,
 			key,
 			certificate,
 			binding,

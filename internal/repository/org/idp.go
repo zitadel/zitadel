@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/crewjam/saml"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -933,7 +931,7 @@ func NewSAMLIDPAddedEvent(
 	aggregate *eventstore.Aggregate,
 	id,
 	name string,
-	entityDescriptor *saml.EntityDescriptor,
+	metadata []byte,
 	key *crypto.CryptoValue,
 	certificate *crypto.CryptoValue,
 	binding string,
@@ -950,7 +948,7 @@ func NewSAMLIDPAddedEvent(
 			),
 			id,
 			name,
-			entityDescriptor,
+			metadata,
 			key,
 			certificate,
 			binding,

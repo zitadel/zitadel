@@ -161,6 +161,8 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		provider, err = l.googleProvider(r.Context(), identityProvider)
 	case domain.IDPTypeLDAP:
 		provider, err = l.ldapProvider(r.Context(), identityProvider)
+	case domain.IDPTypeSAML:
+		provider, err = l.samlProvider(r.Context(), identityProvider)
 	case domain.IDPTypeUnspecified:
 		fallthrough
 	default:
@@ -865,23 +867,27 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 }
 
 func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*saml.Provider, error) {
-	secret, err := crypto.DecryptString(identityProvider.AzureADIDPTemplate.ClientSecret, l.idpConfigAlg)
+	key, err := crypto.Decrypt(identityProvider.SAMLIDPTemplate.Key, l.idpConfigAlg)
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]azuread.ProviderOptions, 0, 2)
-	if identityProvider.AzureADIDPTemplate.IsEmailVerified {
-		opts = append(opts, azuread.WithEmailVerified())
+	certificate, err := crypto.Decrypt(identityProvider.SAMLIDPTemplate.Certificate, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
 	}
-	if identityProvider.AzureADIDPTemplate.Tenant != "" {
-		opts = append(opts, azuread.WithTenant(azuread.TenantType(identityProvider.AzureADIDPTemplate.Tenant)))
+	opts := make([]saml.ProviderOpts, 0, 2)
+	if identityProvider.SAMLIDPTemplate.WithSignedRequest {
+		opts = append(opts, saml.WithSignedRequest())
+	}
+	if identityProvider.SAMLIDPTemplate.Binding != "" {
+		opts = append(opts, saml.WithBinding(identityProvider.SAMLIDPTemplate.Binding))
 	}
 	return saml.New(
 		identityProvider.Name,
-		identityProvider.AzureADIDPTemplate.ClientID,
-		secret,
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
-		identityProvider.AzureADIDPTemplate.Scopes,
+		identityProvider.SAMLIDPTemplate.Metadata,
+		key,
+		certificate,
 		opts...,
 	)
 }

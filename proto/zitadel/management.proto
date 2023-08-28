@@ -7058,6 +7058,42 @@ service ManagementService {
         };
     }
 
+    // Add a new SAML identity provider in the organization
+    rpc AddSAMLProvider(AddSAMLProviderRequest) returns (AddSAMLProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/saml"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add SAML Identity Provider";
+            description: "";
+        };
+    }
+
+    // Change an existing SAML identity provider in the organization
+    rpc UpdateSAMLProvider(UpdateSAMLProviderRequest) returns (UpdateSAMLProviderResponse) {
+        option (google.api.http) = {
+            put: "/idps/saml/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update SAML Identity Provider";
+            description: "";
+        };
+    }
+
     // Remove an identity provider
     // Will remove all linked providers of this configuration on the users
     rpc DeleteProvider(DeleteProviderRequest) returns (DeleteProviderResponse) {
@@ -12445,6 +12481,39 @@ message UpdateLDAPProviderRequest {
 }
 
 message UpdateLDAPProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddSAMLProviderRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    oneof metadata {
+        option (validate.required) = true;
+        bytes metadata_xml = 2 [(validate.rules).bytes.max_len = 500000];
+        string metadata_url = 3 [(validate.rules).string.max_len = 200];
+    }
+    string binding = 4;
+    bool withSignedRequest = 5;
+    zitadel.idp.v1.Options provider_options = 6;
+}
+
+message AddSAMLProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateSAMLProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    oneof metadata {
+        bytes metadata_xml = 3 [(validate.rules).bytes.max_len = 500000];
+        string metadata_url = 4 [(validate.rules).string.max_len = 200];
+    }
+    string binding = 5;
+    bool withSignedRequest = 6;
+    zitadel.idp.v1.Options provider_options = 7;
+}
+
+message UpdateSAMLProviderResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

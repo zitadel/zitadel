@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/crewjam/saml"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -114,9 +112,10 @@ type LDAPProvider struct {
 
 type SAMLProvider struct {
 	Name              string
-	EntityDescriptor  *saml.EntityDescriptor
-	Key               string
-	Certificate       string
+	Metadata          []byte
+	MetadataURL       string
+	Key               []byte
+	Certificate       []byte
 	Binding           string
 	WithSignedRequest bool
 	IDPOptions        idp.Options

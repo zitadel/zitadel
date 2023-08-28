@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/xml"
 	"net/http"
 	"net/url"
 
@@ -79,11 +80,15 @@ func WithBinding(binding string) ProviderOpts {
 func New(
 	name string,
 	rootURLStr string,
-	metadata *saml.EntityDescriptor,
+	metadata []byte,
 	certificate []byte,
 	key []byte,
 	options ...ProviderOpts,
 ) (*Provider, error) {
+	entityDescriptor := new(saml.EntityDescriptor)
+	if err := xml.Unmarshal(metadata, entityDescriptor); err != nil {
+		return nil, err
+	}
 	keyPair, err := tls.X509KeyPair(certificate, key)
 	if err != nil {
 		return nil, err
@@ -100,7 +105,7 @@ func New(
 		URL:         *rootURL,
 		Key:         keyPair.PrivateKey.(*rsa.PrivateKey),
 		Certificate: keyPair.Leaf,
-		IDPMetadata: metadata,
+		IDPMetadata: entityDescriptor,
 		SignRequest: false,
 		RelayStateFunc: func(w http.ResponseWriter, r *http.Request) string {
 			return r.URL.String()
@@ -136,8 +141,12 @@ func (p *Provider) IsAutoUpdate() bool {
 	return p.isAutoUpdate
 }
 
+func (p *Provider) GetSP() (*samlsp.Middleware, error) {
+	return samlsp.New(*p.spOptions)
+}
+
 func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (idp.Session, error) {
-	m, err := samlsp.New(*p.spOptions)
+	m, err := p.GetSP()
 	if err != nil {
 		return nil, err
 	}
