@@ -62,7 +62,7 @@ func Test_UserMetadataPrepares(t *testing.T) {
 			name:    "prepareUserMetadataQuery no result",
 			prepare: prepareUserMetadataQuery,
 			want: want{
-				sqlExpectations: mockQuery(
+				sqlExpectations: mockQueryScanErr(
 					regexp.QuoteMeta(userMetadataQuery),
 					nil,
 					nil,
@@ -117,7 +117,7 @@ func Test_UserMetadataPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*UserMetadata)(nil),
 		},
 		{
 			name:    "prepareUserMetadataListQuery no result",
@@ -238,7 +238,7 @@ func Test_UserMetadataPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*UserMetadataList)(nil),
 		},
 	}
 	for _, tt := range tests {

@@ -1827,7 +1827,9 @@
       "DELETED": "Provedor de identidade removido com sucesso!",
       "ADDED": "Adicionado com sucesso.",
       "REMOVED": "Removido com sucesso."
-    }
+    },
+    "ISIDTOKENMAPPING": "Mapeamento do token ID",
+    "ISIDTOKENMAPPING_DESC": "Se selecionado, as informações do provedor são mapeadas a partir do token ID, e não do ponto final userinfo."
   },
   "MFA": {
     "LIST": {

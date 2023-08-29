@@ -74,8 +74,8 @@ func Test_addOrganizationRequestToCommand(t *testing.T) {
 							UserType: &org.AddOrganizationRequest_Admin_Human{
 								Human: &user.AddHumanUserRequest{
 									Profile: &user.SetHumanProfile{
-										FirstName: "firstname",
-										LastName:  "lastname",
+										GivenName:  "firstname",
+										FamilyName: "lastname",
 									},
 									Email: &user.SetHumanEmail{
 										Email: "email@test.com",

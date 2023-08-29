@@ -1832,7 +1832,9 @@
       "DELETED": "IDP 删除成功！",
       "ADDED": "添加成功。",
       "REMOVED": "成功删除。"
-    }
+    },
+    "ISIDTOKENMAPPING": "从ID令牌映射",
+    "ISIDTOKENMAPPING_DESC": "如果选中，提供商信息将从ID令牌映射，而不是从userinfo端点。"
   },
   "MFA": {
     "LIST": {

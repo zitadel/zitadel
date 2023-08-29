@@ -64,7 +64,7 @@ func Test_MessageTextPrepares(t *testing.T) {
 			name:    "prepareMessageTextQuery no result",
 			prepare: prepareMessageTextQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(prepareMessageTextStmt),
 					nil,
 					nil,
@@ -135,7 +135,7 @@ func Test_MessageTextPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*MessageText)(nil),
 		},
 	}
 	for _, tt := range tests {

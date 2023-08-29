@@ -1829,7 +1829,9 @@
       "DELETED": "¡IDP eliminado con éxito!",
       "ADDED": "Añadido con éxito.",
       "REMOVED": "Eliminado con éxito."
-    }
+    },
+    "ISIDTOKENMAPPING": "Asignación del ID token",
+    "ISIDTOKENMAPPING_DESC": "Si se selecciona, la información del proveedor se asigna desde el ID token, no desde el punto final de userinfo."
   },
   "MFA": {
     "LIST": {

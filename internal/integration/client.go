@@ -87,8 +87,8 @@ func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse
 			},
 		},
 		Profile: &user.SetHumanProfile{
-			FirstName: "Mickey",
-			LastName:  "Mouse",
+			GivenName:  "Mickey",
+			FamilyName: "Mouse",
 		},
 		Email: &user.SetHumanEmail{
 			Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),

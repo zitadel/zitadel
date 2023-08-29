@@ -1824,7 +1824,9 @@
       "DELETED": "IDPは正常に削除されました！",
       "ADDED": "正常に追加されました。",
       "REMOVED": "正常に削除されました。"
-    }
+    },
+    "ISIDTOKENMAPPING": "IDトークンからのマッピング",
+    "ISIDTOKENMAPPING_DESC": "選択された場合、プロバイダ情報はIDトークンからマッピングされ、userinfoエンドポイントからではありません。"
   },
   "MFA": {
     "LIST": {

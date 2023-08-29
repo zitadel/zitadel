@@ -50,7 +50,7 @@ func Test_NotificationPolicyPrepares(t *testing.T) {
 			name:    "prepareNotificationPolicyQuery no result",
 			prepare: prepareNotificationPolicyQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					notificationPolicyStmt,
 					nil,
 					nil,
@@ -109,7 +109,7 @@ func Test_NotificationPolicyPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*NotificationPolicy)(nil),
 		},
 	}
 	for _, tt := range tests {

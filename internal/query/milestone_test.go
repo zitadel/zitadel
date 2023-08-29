@@ -178,7 +178,7 @@ func Test_MilestonesPrepare(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Milestones)(nil),
 		},
 	}
 	for _, tt := range tests {
