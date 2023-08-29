@@ -1055,6 +1055,7 @@
       "TITLE": "Ustawienia SMTP",
       "SENDERADDRESS": "Adres e-mail nadawcy",
       "SENDERNAME": "Nazwa nadawcy",
+      "REPLYTOADDRESS": "Adres Reply-to",
       "HOSTANDPORT": "Host i port",
       "USER": "Użytkownik",
       "PASSWORD": "Hasło",

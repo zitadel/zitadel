@@ -15,12 +15,17 @@
 <form (ngSubmit)="savePolicy()" [formGroup]="form" autocomplete="off">
   <cnsl-form-field class="smtp-form-field" label="Sender Address" required="true">
     <cnsl-label>{{ 'SETTING.SMTP.SENDERADDRESS' | translate }}</cnsl-label>
-    <input cnslInput name="senderAddress" formControlName="senderAddress" />
+    <input cnslInput name="senderAddress" formControlName="senderAddress" required />
   </cnsl-form-field>
 
   <cnsl-form-field class="smtp-form-field" label="Sender Name" required="true">
     <cnsl-label>{{ 'SETTING.SMTP.SENDERNAME' | translate }}</cnsl-label>
-    <input cnslInput name="senderName" formControlName="senderName" />
+    <input cnslInput name="senderName" formControlName="senderName" required />
+  </cnsl-form-field>
+
+  <cnsl-form-field class="smtp-form-field" label="Reply-To Address">
+    <cnsl-label>{{ 'SETTING.SMTP.REPLYTOADDRESS' | translate }}</cnsl-label>
+    <input cnslInput name="senderReplyToAddress" formControlName="replyToAddress" />
   </cnsl-form-field>
 
   <mat-checkbox class="smtp-checkbox" formControlName="tls">
@@ -29,12 +34,12 @@
 
   <cnsl-form-field class="smtp-form-field" label="Host And Port" required="true">
     <cnsl-label>{{ 'SETTING.SMTP.HOSTANDPORT' | translate }}</cnsl-label>
-    <input cnslInput name="hostAndPort" formControlName="hostAndPort" placeholder="smtp.mailtrap.io:2525" />
+    <input cnslInput name="hostAndPort" formControlName="hostAndPort" placeholder="smtp.mailtrap.io:2525" required />
   </cnsl-form-field>
 
   <cnsl-form-field class="smtp-form-field" label="User" required="true">
     <cnsl-label>{{ 'SETTING.SMTP.USER' | translate }}</cnsl-label>
-    <input id="smtp-user" cnslInput name="smtp-user" autocomplete="smtp-user" formControlName="user" />
+    <input id="smtp-user" cnslInput name="smtp-user" autocomplete="smtp-user" formControlName="user" required />
   </cnsl-form-field>
 
   <button

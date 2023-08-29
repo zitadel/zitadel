@@ -12,13 +12,14 @@ import (
 type InstanceSMTPConfigWriteModel struct {
 	eventstore.WriteModel
 
-	SenderAddress string
-	SenderName    string
-	TLS           bool
-	Host          string
-	User          string
-	Password      *crypto.CryptoValue
-	State         domain.SMTPConfigState
+	SenderAddress  string
+	SenderName     string
+	ReplyToAddress string
+	TLS            bool
+	Host           string
+	User           string
+	Password       *crypto.CryptoValue
+	State          domain.SMTPConfigState
 
 	domain                                 string
 	domainState                            domain.InstanceDomainState
@@ -62,6 +63,7 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 			wm.TLS = e.TLS
 			wm.SenderAddress = e.SenderAddress
 			wm.SenderName = e.SenderName
+			wm.ReplyToAddress = e.ReplyToAddress
 			wm.Host = e.Host
 			wm.User = e.User
 			wm.Password = e.Password
@@ -76,6 +78,9 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 			if e.FromName != nil {
 				wm.SenderName = *e.FromName
 			}
+			if e.ReplyToAddress != nil {
+				wm.ReplyToAddress = *e.ReplyToAddress
+			}
 			if e.Host != nil {
 				wm.Host = *e.Host
 			}
@@ -87,6 +92,7 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 			wm.TLS = false
 			wm.SenderName = ""
 			wm.SenderAddress = ""
+			wm.ReplyToAddress = ""
 			wm.Host = ""
 			wm.User = ""
 			wm.Password = nil
@@ -122,7 +128,7 @@ func (wm *InstanceSMTPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (wm *InstanceSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, tls bool, fromAddress, fromName, smtpHost, smtpUser string) (*instance.SMTPConfigChangedEvent, bool, error) {
+func (wm *InstanceSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, tls bool, fromAddress, fromName, replyToAddress, smtpHost, smtpUser string) (*instance.SMTPConfigChangedEvent, bool, error) {
 	changes := make([]instance.SMTPConfigChanges, 0)
 	var err error
 
@@ -134,6 +140,9 @@ func (wm *InstanceSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, agg
 	}
 	if wm.SenderName != fromName {
 		changes = append(changes, instance.ChangeSMTPConfigFromName(fromName))
+	}
+	if wm.ReplyToAddress != replyToAddress {
+		changes = append(changes, instance.ChangeSMTPConfigReplyToAddress(replyToAddress))
 	}
 	if wm.Host != smtpHost {
 		changes = append(changes, instance.ChangeSMTPConfigSMTPHost(smtpHost))
