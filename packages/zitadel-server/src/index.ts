@@ -33,6 +33,11 @@ export {
 } from "./proto/server/zitadel/oidc/v2alpha/oidc_service";
 
 export {
+  AuthRequest,
+  Prompt,
+} from "./proto/server/zitadel/oidc/v2alpha/authorization";
+
+export {
   Session,
   Factors,
 } from "./proto/server/zitadel/session/v2alpha/session";

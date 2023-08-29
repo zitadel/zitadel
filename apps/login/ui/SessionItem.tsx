@@ -9,9 +9,11 @@ import { XCircleIcon } from "@heroicons/react/24/outline";
 export default function SessionItem({
   session,
   reload,
+  authRequestId,
 }: {
   session: Session;
   reload: () => void;
+  authRequestId?: string;
 }) {
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -52,10 +54,18 @@ export default function SessionItem({
               loginName: session.factors?.user?.loginName as string,
             })
           : `/loginname?` +
-            new URLSearchParams({
-              loginName: session.factors?.user?.loginName as string,
-              submit: "true",
-            })
+            new URLSearchParams(
+              authRequestId
+                ? {
+                    loginName: session.factors?.user?.loginName as string,
+                    submit: "true",
+                    authRequestId,
+                  }
+                : {
+                    loginName: session.factors?.user?.loginName as string,
+                    submit: "true",
+                  }
+            )
       }
       className="group flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light hover:shadow-lg dark:hover:bg-white/10 py-2 px-4 rounded-md transition-all"
     >

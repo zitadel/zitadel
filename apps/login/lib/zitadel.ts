@@ -248,13 +248,11 @@ export async function getAuthRequest(
 
 export async function createCallback(
   server: ZitadelServer,
-  { authRequestId }: CreateCallbackRequest
+  req: CreateCallbackRequest
 ): Promise<CreateCallbackResponse> {
   const oidcService = oidc.getOidc(server);
 
-  return oidcService.createCallback({
-    authRequestId,
-  });
+  return oidcService.createCallback(req);
 }
 
 export async function verifyEmail(
