@@ -67,8 +67,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 						},
 					},
 					Profile: &user.SetHumanProfile{
-						FirstName:         "Donald",
-						LastName:          "Duck",
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
 						NickName:          gu.Ptr("Dukkie"),
 						DisplayName:       gu.Ptr("Donald Duck"),
 						PreferredLanguage: gu.Ptr("en"),
@@ -108,8 +108,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 						},
 					},
 					Profile: &user.SetHumanProfile{
-						FirstName:         "Donald",
-						LastName:          "Duck",
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
 						NickName:          gu.Ptr("Dukkie"),
 						DisplayName:       gu.Ptr("Donald Duck"),
 						PreferredLanguage: gu.Ptr("en"),
@@ -153,8 +153,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 						},
 					},
 					Profile: &user.SetHumanProfile{
-						FirstName:         "Donald",
-						LastName:          "Duck",
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
 						NickName:          gu.Ptr("Dukkie"),
 						DisplayName:       gu.Ptr("Donald Duck"),
 						PreferredLanguage: gu.Ptr("en"),
@@ -199,8 +199,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 						},
 					},
 					Profile: &user.SetHumanProfile{
-						FirstName:         "Donald",
-						LastName:          "Duck",
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
 						NickName:          gu.Ptr("Dukkie"),
 						DisplayName:       gu.Ptr("Donald Duck"),
 						PreferredLanguage: gu.Ptr("en"),
@@ -246,8 +246,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 						},
 					},
 					Profile: &user.SetHumanProfile{
-						FirstName:         "Donald",
-						LastName:          "Duck",
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
 						NickName:          gu.Ptr("Dukkie"),
 						DisplayName:       gu.Ptr("Donald Duck"),
 						PreferredLanguage: gu.Ptr("en"),
@@ -318,8 +318,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 						},
 					},
 					Profile: &user.SetHumanProfile{
-						FirstName:         "Donald",
-						LastName:          "Duck",
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
 						NickName:          gu.Ptr("Dukkie"),
 						DisplayName:       gu.Ptr("Donald Duck"),
 						PreferredLanguage: gu.Ptr("en"),
@@ -352,8 +352,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 						},
 					},
 					Profile: &user.SetHumanProfile{
-						FirstName:         "Donald",
-						LastName:          "Duck",
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
 						NickName:          gu.Ptr("Dukkie"),
 						DisplayName:       gu.Ptr("Donald Duck"),
 						PreferredLanguage: gu.Ptr("en"),
@@ -399,8 +399,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 						},
 					},
 					Profile: &user.SetHumanProfile{
-						FirstName:         "Donald",
-						LastName:          "Duck",
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
 						NickName:          gu.Ptr("Dukkie"),
 						DisplayName:       gu.Ptr("Donald Duck"),
 						PreferredLanguage: gu.Ptr("en"),
@@ -451,8 +451,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 						},
 					},
 					Profile: &user.SetHumanProfile{
-						FirstName:         "Donald",
-						LastName:          "Duck",
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
 						NickName:          gu.Ptr("Dukkie"),
 						DisplayName:       gu.Ptr("Donald Duck"),
 						PreferredLanguage: gu.Ptr("en"),
@@ -490,8 +490,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 						},
 					},
 					Profile: &user.SetHumanProfile{
-						FirstName:         "Donald",
-						LastName:          "Duck",
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
 						NickName:          gu.Ptr("Dukkie"),
 						DisplayName:       gu.Ptr("Donald Duck"),
 						PreferredLanguage: gu.Ptr("en"),
@@ -622,23 +622,23 @@ func TestServer_AddIDPLink(t *testing.T) {
 	}
 }
 
-func TestServer_StartIdentityProviderFlow(t *testing.T) {
+func TestServer_StartIdentityProviderIntent(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t)
 	type args struct {
 		ctx context.Context
-		req *user.StartIdentityProviderFlowRequest
+		req *user.StartIdentityProviderIntentRequest
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *user.StartIdentityProviderFlowResponse
+		want    *user.StartIdentityProviderIntentResponse
 		wantErr bool
 	}{
 		{
 			name: "missing urls",
 			args: args{
 				CTX,
-				&user.StartIdentityProviderFlowRequest{
+				&user.StartIdentityProviderIntentRequest{
 					IdpId: idpID,
 				},
 			},
@@ -649,9 +649,9 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 			name: "next step auth url",
 			args: args{
 				CTX,
-				&user.StartIdentityProviderFlowRequest{
+				&user.StartIdentityProviderIntentRequest{
 					IdpId: idpID,
-					Content: &user.StartIdentityProviderFlowRequest_Urls{
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
 						Urls: &user.RedirectURLs{
 							SuccessUrl: "https://example.com/success",
 							FailureUrl: "https://example.com/failure",
@@ -659,12 +659,12 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 					},
 				},
 			},
-			want: &user.StartIdentityProviderFlowResponse{
+			want: &user.StartIdentityProviderIntentResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
-				NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{
+				NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{
 					AuthUrl: "https://example.com/oauth/v2/authorize?client_id=clientID&prompt=select_account&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=",
 				},
 			},
@@ -673,7 +673,7 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.StartIdentityProviderFlow(tt.args.ctx, tt.args.req)
+			got, err := Client.StartIdentityProviderIntent(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -690,28 +690,28 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 	}
 }
 
-func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
+func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t)
 	intentID := Tester.CreateIntent(t, idpID)
 	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulOAuthIntent(t, idpID, "", "id")
 	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Tester.CreateSuccessfulLDAPIntent(t, idpID, "", "id")
 	type args struct {
 		ctx context.Context
-		req *user.RetrieveIdentityProviderInformationRequest
+		req *user.RetrieveIdentityProviderIntentRequest
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *user.RetrieveIdentityProviderInformationResponse
+		want    *user.RetrieveIdentityProviderIntentResponse
 		wantErr bool
 	}{
 		{
 			name: "failed intent",
 			args: args{
 				CTX,
-				&user.RetrieveIdentityProviderInformationRequest{
-					IntentId: intentID,
-					Token:    "",
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    intentID,
+					IdpIntentToken: "",
 				},
 			},
 			wantErr: true,
@@ -720,9 +720,9 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 			name: "wrong token",
 			args: args{
 				CTX,
-				&user.RetrieveIdentityProviderInformationRequest{
-					IntentId: successfulID,
-					Token:    "wrong token",
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    successfulID,
+					IdpIntentToken: "wrong token",
 				},
 			},
 			wantErr: true,
@@ -731,12 +731,12 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 			name: "retrieve successful intent",
 			args: args{
 				CTX,
-				&user.RetrieveIdentityProviderInformationRequest{
-					IntentId: successfulID,
-					Token:    token,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    successfulID,
+					IdpIntentToken: token,
 				},
 			},
-			want: &user.RetrieveIdentityProviderInformationResponse{
+			want: &user.RetrieveIdentityProviderIntentResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.New(changeDate),
 					ResourceOwner: Tester.Organisation.ID,
@@ -768,12 +768,12 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 			name: "retrieve successful ldap intent",
 			args: args{
 				CTX,
-				&user.RetrieveIdentityProviderInformationRequest{
-					IntentId: ldapSuccessfulID,
-					Token:    ldapToken,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    ldapSuccessfulID,
+					IdpIntentToken: ldapToken,
 				},
 			},
-			want: &user.RetrieveIdentityProviderInformationResponse{
+			want: &user.RetrieveIdentityProviderIntentResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.New(ldapChangeDate),
 					ResourceOwner: Tester.Organisation.ID,
@@ -812,7 +812,7 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.RetrieveIdentityProviderInformation(tt.args.ctx, tt.args.req)
+			got, err := Client.RetrieveIdentityProviderIntent(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {

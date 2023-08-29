@@ -140,6 +140,13 @@ VerifyMFAOTP:
   CodeLabel: Kod
   NextButtonText: dalej
 
+VerifyOTP:
+  Title: Zweryfikuj 2-etapowe uwierzytelnianie
+  Description: Zweryfikuj swój drugi czynnik
+  CodeLabel: Kod
+  ResendButtonText: wyślij kod ponownie
+  NextButtonText: dalej
+
 VerifyMFAU2F:
   Title: Weryfikacja 2-etapowego uwierzytelniania
   Description: Zweryfikuj swoje 2-etapowe uwierzytelnianie za pomocą zarejestrowanego urządzenia (np. FaceID, Windows Hello, odcisk palca)

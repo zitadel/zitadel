@@ -209,13 +209,13 @@ func Test_OrgPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Orgs)(nil),
 		},
 		{
 			name:    "prepareOrgQuery no result",
 			prepare: prepareOrgQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(prepareOrgQueryStmt),
 					nil,
 					nil,
@@ -274,13 +274,13 @@ func Test_OrgPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Org)(nil),
 		},
 		{
 			name:    "prepareOrgUniqueQuery no result",
 			prepare: prepareOrgUniqueQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(prepareOrgUniqueStmt),
 					nil,
 					nil,
@@ -323,7 +323,7 @@ func Test_OrgPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: false,
 		},
 	}
 	for _, tt := range tests {

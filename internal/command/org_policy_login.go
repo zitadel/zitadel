@@ -473,6 +473,7 @@ func prepareChangeLoginPolicy(a *org.Aggregate, policy *ChangeLoginPolicy) prepa
 				policy.AllowRegister,
 				policy.AllowExternalIDP,
 				policy.ForceMFA,
+				policy.ForceMFALocalOnly,
 				policy.HidePasswordReset,
 				policy.IgnoreUnknownUsernames,
 				policy.AllowDomainDiscovery,

@@ -1055,6 +1055,7 @@
       "TITLE": "SMTP 设置",
       "SENDERADDRESS": "发件人地址",
       "SENDERNAME": "发件人名称",
+      "REPLYTOADDRESS": "Reply-to 地址",
       "HOSTANDPORT": "主机和端口",
       "USER": "用户名",
       "PASSWORD": "密码",
@@ -1831,7 +1832,9 @@
       "DELETED": "IDP 删除成功！",
       "ADDED": "添加成功。",
       "REMOVED": "成功删除。"
-    }
+    },
+    "ISIDTOKENMAPPING": "从ID令牌映射",
+    "ISIDTOKENMAPPING_DESC": "如果选中，提供商信息将从ID令牌映射，而不是从userinfo端点。"
   },
   "MFA": {
     "LIST": {

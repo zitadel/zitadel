@@ -146,7 +146,7 @@ func Test_FailedEventsPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*FailedEvents)(nil),
 		},
 	}
 	for _, tt := range tests {

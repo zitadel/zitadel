@@ -1056,6 +1056,7 @@
       "TITLE": "Ajustes SMTP",
       "SENDERADDRESS": "Dirección email del emisor",
       "SENDERNAME": "Nombre del emisor",
+      "REPLYTOADDRESS": "Dirección Reply-To",
       "HOSTANDPORT": "Servidor y puerto",
       "USER": "Usuario",
       "PASSWORD": "Contraseña",
@@ -1828,7 +1829,9 @@
       "DELETED": "¡IDP eliminado con éxito!",
       "ADDED": "Añadido con éxito.",
       "REMOVED": "Eliminado con éxito."
-    }
+    },
+    "ISIDTOKENMAPPING": "Asignación del ID token",
+    "ISIDTOKENMAPPING_DESC": "Si se selecciona, la información del proveedor se asigna desde el ID token, no desde el punto final de userinfo."
   },
   "MFA": {
     "LIST": {

@@ -58,7 +58,7 @@ func Test_PasswordComplexityPolicyPrepares(t *testing.T) {
 			name:    "preparePasswordComplexityPolicyQuery no result",
 			prepare: preparePasswordComplexityPolicyQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(preparePasswordComplexityPolicyStmt),
 					nil,
 					nil,
@@ -125,7 +125,7 @@ func Test_PasswordComplexityPolicyPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*PasswordComplexityPolicy)(nil),
 		},
 	}
 	for _, tt := range tests {
