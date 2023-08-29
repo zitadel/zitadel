@@ -41,6 +41,17 @@
         <cnsl-form-field *ngIf="!provider || (provider && updatePrivateKey)" class="formfield">
           <cnsl-label>{{ 'IDP.PRIVATEKEY' | translate }}</cnsl-label>
           <input cnslInput formControlName="privateKey" />
+          <input
+            #keyFileInput
+            style="display: none"
+            class="file-input"
+            type="file"
+            accept=".p8"
+            (change)="onDropKey($any($event.target).files)"
+          />
+          <button type="button" mat-stroked-button (click)="$event.preventDefault(); keyFileInput.click()">
+            {{ 'IDP.UPLOADPRIVATEKEY' | translate }}
+          </button>
         </cnsl-form-field>
 
         <div class="identity-provider-optional-h-wrapper">

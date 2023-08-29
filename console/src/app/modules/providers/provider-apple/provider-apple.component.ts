@@ -25,6 +25,8 @@ import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
+const MAX_ALLOWED_SIZE = 5 * 1024;
+
 @Component({
   selector: 'cnsl-provider-apple',
   templateUrl: './provider-apple.component.html',
@@ -230,6 +232,28 @@ export class ProviderAppleComponent {
 
   public close(): void {
     this._location.back();
+  }
+
+  public onDropKey(filelist: FileList): void {
+    const file = filelist.item(0);
+    if (file) {
+      if (file.size > MAX_ALLOWED_SIZE) {
+        this.toast.showInfo('IDP.PRIVATEKEY.MAXSIZEEXCEEDED', true);
+      } else {
+        this.privateKey?.setValue('');
+        const reader = new FileReader();
+        reader.onload = ((aXML) => {
+          return (e) => {
+            const keyBase64 =e.target?.result
+            if (keyBase64 && typeof keyBase64 === 'string') {
+              const cropped = keyBase64.replace('data:application/octet-stream;base64,', '');
+              this.privateKey?.setValue(cropped);
+            }
+          };
+        })(file);
+        reader.readAsDataURL(file);
+      }
+    }
   }
 
   public addScope(event: MatChipInputEvent): void {
