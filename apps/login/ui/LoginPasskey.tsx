@@ -139,7 +139,7 @@ export default function LoginPasskey({
           const userHandle = new Uint8Array(
             assertedCredential.response.userHandle
           );
-          const data = JSON.stringify({
+          const data = {
             id: assertedCredential.id,
             rawId: coerceToBase64Url(rawId, "rawId"),
             type: assertedCredential.type,
@@ -152,7 +152,7 @@ export default function LoginPasskey({
               signature: coerceToBase64Url(sig, "sig"),
               userHandle: coerceToBase64Url(userHandle, "userHandle"),
             },
-          });
+          };
           return submitLogin(data).then(() => {
             return router.push(`/accounts`);
           });
