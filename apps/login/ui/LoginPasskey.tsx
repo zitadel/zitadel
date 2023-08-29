@@ -33,7 +33,7 @@ export default function LoginPasskey({
         .then((response) => {
           console.log(response);
           const pK =
-            response.challenges.passkey.publicKeyCredentialRequestOptions
+            response.challenges.webAuthN.publicKeyCredentialRequestOptions
               .publicKey;
           if (pK) {
             submitLoginAndContinue(pK)
@@ -68,7 +68,7 @@ export default function LoginPasskey({
         challenges: {
           webAuthN: {
             domain: "",
-            userVerificationRequirement: 2,
+            userVerificationRequirement: 1,
           },
         },
         authRequestId,
@@ -85,6 +85,7 @@ export default function LoginPasskey({
 
   async function submitLogin(data: any) {
     setLoading(true);
+    console.log(data);
     const res = await fetch("/api/session", {
       method: "PUT",
       headers: {
@@ -92,7 +93,7 @@ export default function LoginPasskey({
       },
       body: JSON.stringify({
         loginName,
-        passkey: data,
+        webAuthN: { credentialAssertionData: data },
         authRequestId,
       }),
     });
@@ -127,18 +128,18 @@ export default function LoginPasskey({
       })
       .then((assertedCredential: any) => {
         if (assertedCredential) {
-          let authData = new Uint8Array(
+          const authData = new Uint8Array(
             assertedCredential.response.authenticatorData
           );
-          let clientDataJSON = new Uint8Array(
+          const clientDataJSON = new Uint8Array(
             assertedCredential.response.clientDataJSON
           );
-          let rawId = new Uint8Array(assertedCredential.rawId);
-          let sig = new Uint8Array(assertedCredential.response.signature);
-          let userHandle = new Uint8Array(
+          const rawId = new Uint8Array(assertedCredential.rawId);
+          const sig = new Uint8Array(assertedCredential.response.signature);
+          const userHandle = new Uint8Array(
             assertedCredential.response.userHandle
           );
-          let data = JSON.stringify({
+          const data = JSON.stringify({
             id: assertedCredential.id,
             rawId: coerceToBase64Url(rawId, "rawId"),
             type: assertedCredential.type,

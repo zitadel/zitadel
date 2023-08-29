@@ -58,17 +58,16 @@ export async function setSessionAndUpdateCookie(
   sessionToken: string,
   loginName: string,
   password: string | undefined,
-  passkey: { credentialAssertionData: any } | undefined,
+  webAuthN: { credentialAssertionData: any } | undefined,
   challenges: RequestChallenges | undefined,
   authRequestId: string | undefined
 ): Promise<SessionWithChallenges> {
-  console.log(password, passkey, challenges);
   return setSession(
     server,
     sessionId,
     sessionToken,
     password,
-    passkey,
+    webAuthN,
     challenges
   ).then((updatedSession) => {
     if (updatedSession) {
@@ -83,28 +82,36 @@ export async function setSessionAndUpdateCookie(
         sessionCookie.authRequestId = authRequestId;
       }
 
-      return getSession(server, sessionCookie.id, sessionCookie.token).then(
-        (response) => {
-          if (response?.session && response.session.factors?.user?.loginName) {
-            const { session } = response;
-            const newCookie: SessionCookie = {
-              id: sessionCookie.id,
-              token: updatedSession.sessionToken,
-              changeDate: session.changeDate?.toString() ?? "",
-              loginName: session.factors?.user?.loginName ?? "",
-            };
+      return new Promise((resolve) => setTimeout(resolve, 1000)).then(() =>
+        // TODO: remove
+        getSession(server, sessionCookie.id, sessionCookie.token).then(
+          (response) => {
+            if (
+              response?.session &&
+              response.session.factors?.user?.loginName
+            ) {
+              const { session } = response;
+              const newCookie: SessionCookie = {
+                id: sessionCookie.id,
+                token: updatedSession.sessionToken,
+                changeDate: session.changeDate?.toString() ?? "",
+                loginName: session.factors?.user?.loginName ?? "",
+              };
 
-            if (sessionCookie.authRequestId) {
-              newCookie.authRequestId = sessionCookie.authRequestId;
+              if (sessionCookie.authRequestId) {
+                newCookie.authRequestId = sessionCookie.authRequestId;
+              }
+
+              return updateSessionCookie(sessionCookie.id, newCookie).then(
+                () => {
+                  return { challenges: updatedSession.challenges, ...session };
+                }
+              );
+            } else {
+              throw "could not get session or session does not have loginName";
             }
-
-            return updateSessionCookie(sessionCookie.id, newCookie).then(() => {
-              return { challenges: updatedSession.challenges, ...session };
-            });
-          } else {
-            throw "could not get session or session does not have loginName";
           }
-        }
+        )
       );
     } else {
       throw "Session not be set";

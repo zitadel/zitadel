@@ -45,7 +45,7 @@ export async function PUT(request: NextRequest) {
   const body = await request.json();
 
   if (body) {
-    const { loginName, password, passkey, authRequestId } = body;
+    const { loginName, password, webAuthN, authRequestId } = body;
     const challenges: RequestChallenges = body.challenges;
 
     const recentPromise: Promise<SessionCookie> = loginName
@@ -64,12 +64,13 @@ export async function PUT(request: NextRequest) {
 
     return recentPromise
       .then((recent) => {
+        console.log("setsession", webAuthN);
         return setSessionAndUpdateCookie(
           recent.id,
           recent.token,
           recent.loginName,
           password,
-          passkey,
+          webAuthN,
           challenges,
           authRequestId
         ).then((session) => {
