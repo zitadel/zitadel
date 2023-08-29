@@ -7,7 +7,7 @@ import (
 
 // Session is the minimal implementation for a session of a 3rd party authentication [Provider]
 type Session interface {
-	GetAuth() (http.Header, []byte)
+	GetAuth(ctx context.Context) (http.Header, []byte)
 	FetchUser(ctx context.Context) (User, error)
 }
 

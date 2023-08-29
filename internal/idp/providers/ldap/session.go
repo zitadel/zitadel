@@ -31,7 +31,7 @@ type Session struct {
 }
 
 // GetAuth implements the [idp.Session] interface.
-func (s *Session) GetAuth() (http.Header, []byte) {
+func (s *Session) GetAuth(ctx context.Context) (http.Header, []byte) {
 	return idp.Redirect(s.loginUrl)
 }
 

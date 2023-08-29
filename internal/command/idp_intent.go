@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"net/http"
 	"net/url"
 
+	"github.com/crewjam/saml/samlsp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -82,7 +84,28 @@ func (c *Commands) GetProvider(ctx context.Context, idpID string, idpCallback st
 	}
 	switch writeModel.IDPType {
 	case domain.IDPTypeSAML:
-		return writeModel.ToProvider(samlRootURL, c.idpConfigEncryption)
+		return writeModel.ToSAMLProvider(
+			samlRootURL,
+			c.idpConfigEncryption,
+			func(ctx context.Context, intentID string) (*samlsp.TrackedRequest, error) {
+				intent, err := c.GetActiveIntent(ctx, intentID)
+				if err != nil {
+					return nil, err
+				}
+				return &samlsp.TrackedRequest{
+					SAMLRequestID: intent.RequestID,
+					Index:         intentID,
+					URI:           intent.SuccessURL.String(),
+				}, nil
+			},
+			func(ctx context.Context, intentID, samlRequestID string) error {
+				intent, err := c.GetActiveIntent(ctx, intentID)
+				if err != nil {
+					return err
+				}
+				return c.RequestSAMLIDPIntent(ctx, intent, samlRequestID)
+			},
+		)
 	default:
 		return writeModel.ToProvider(idpCallback, c.idpConfigEncryption)
 	}
@@ -102,18 +125,18 @@ func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIn
 	return intent, nil
 }
 
-func (c *Commands) AuthURLFromProvider(ctx context.Context, idpID, state string, idpCallback string, samlRootURL string) (string, error) {
+func (c *Commands) AuthFromProvider(ctx context.Context, idpID, state string, idpCallback, samlRootURL string) (http.Header, []byte, error) {
 	provider, err := c.GetProvider(ctx, idpID, idpCallback, samlRootURL)
 	if err != nil {
-		return "", err
+		return nil, nil, err
 	}
 	session, err := provider.BeginAuth(ctx, state)
 	if err != nil {
-		return "", err
+		return nil, nil, err
 	}
 
-	header, _ := session.GetAuth()
-	return header.Get("Location"), nil
+	header, content := session.GetAuth(ctx)
+	return header, content, nil
 }
 
 func getIDPIntentWriteModel(ctx context.Context, writeModel *IDPIntentWriteModel, filter preparation.FilterToQueryReducer) error {
@@ -156,6 +179,40 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 		return "", err
 	}
 	return token, nil
+}
+
+func (c *Commands) SucceedSAMLIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, userID string, response string) (string, error) {
+	token, err := c.generateIntentToken(writeModel.AggregateID)
+	if err != nil {
+		return "", err
+	}
+	idpInfo, err := json.Marshal(idpUser)
+	if err != nil {
+		return "", err
+	}
+	cmd := idpintent.NewSAMLSucceededEvent(
+		ctx,
+		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
+		idpInfo,
+		idpUser.GetID(),
+		idpUser.GetPreferredUsername(),
+		userID,
+		response,
+	)
+	err = c.pushAppendAndReduce(ctx, writeModel, cmd)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
+
+func (c *Commands) RequestSAMLIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, requestID string) error {
+	cmd := idpintent.NewSAMLRequestEvent(
+		ctx,
+		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
+		requestID,
+	)
+	return c.pushAppendAndReduce(ctx, writeModel, cmd)
 }
 
 func (c *Commands) generateIntentToken(intentID string) (string, error) {

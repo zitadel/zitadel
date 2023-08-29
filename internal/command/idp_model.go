@@ -1648,7 +1648,7 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 	return changes, nil
 }
 
-func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, getRequest saml2.GetRequest, addRequest saml2.AddRequest) (providers.Provider, error) {
 	key, err := crypto.Decrypt(wm.Key, idpAlg)
 	if err != nil {
 		return nil, err
@@ -1683,6 +1683,8 @@ func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 		wm.Metadata,
 		cert,
 		key,
+		getRequest,
+		addRequest,
 		opts...,
 	)
 }
@@ -1927,8 +1929,14 @@ type IDP interface {
 	ToProvider(string, crypto.EncryptionAlgorithm) (providers.Provider, error)
 }
 
+type SAMLIDP interface {
+	eventstore.QueryReducer
+	ToProvider(string, crypto.EncryptionAlgorithm, saml2.GetRequest, saml2.AddRequest) (providers.Provider, error)
+}
+
 type AllIDPWriteModel struct {
-	model IDP
+	model     IDP
+	samlModel SAMLIDP
 
 	ID            string
 	IDPType       domain.IDPType
@@ -1967,7 +1975,7 @@ func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idp
 		case domain.IDPTypeGoogle:
 			writeModel.model = NewGoogleInstanceIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeSAML:
-			writeModel.model = NewSAMLInstanceIDPWriteModel(resourceOwner, id)
+			writeModel.samlModel = NewSAMLInstanceIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeUnspecified:
 			fallthrough
 		default:
@@ -1996,7 +2004,7 @@ func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idp
 		case domain.IDPTypeGoogle:
 			writeModel.model = NewGoogleOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeSAML:
-			writeModel.model = NewSAMLOrgIDPWriteModel(resourceOwner, id)
+			writeModel.samlModel = NewSAMLOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeUnspecified:
 			fallthrough
 		default:
@@ -2007,17 +2015,36 @@ func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idp
 }
 
 func (wm *AllIDPWriteModel) Reduce() error {
-	return wm.model.Reduce()
+	if wm.model != nil {
+		return wm.model.Reduce()
+	}
+	return wm.samlModel.Reduce()
 }
 
 func (wm *AllIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return wm.model.Query()
+	if wm.model != nil {
+		return wm.model.Query()
+	}
+	return wm.samlModel.Query()
 }
 
 func (wm *AllIDPWriteModel) AppendEvents(events ...eventstore.Event) {
-	wm.model.AppendEvents(events...)
+	if wm.model != nil {
+		wm.model.AppendEvents(events...)
+	}
+	wm.samlModel.AppendEvents(events...)
 }
 
 func (wm *AllIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+	if wm.model == nil {
+		return nil, errors.ThrowInternal(nil, "COMMAND-i7cnu3", "ErrorsIDPConfig.NotExisting")
+	}
 	return wm.model.ToProvider(callbackURL, idpAlg)
+}
+
+func (wm *AllIDPWriteModel) ToSAMLProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, getRequest saml2.GetRequest, addRequest saml2.AddRequest) (providers.Provider, error) {
+	if wm.samlModel == nil {
+		return nil, errors.ThrowInternal(nil, "COMMAND-i7xnu3", "ErrorsIDPConfig.NotExisting")
+	}
+	return wm.samlModel.ToProvider(callbackURL, idpAlg, getRequest, addRequest)
 }

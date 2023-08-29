@@ -222,6 +222,7 @@ func TestCommands_AuthURLFromProvider(t *testing.T) {
 		idpID       string
 		state       string
 		callbackURL string
+		samlRootURL string
 	}
 	type res struct {
 		authURL string
@@ -450,9 +451,9 @@ func TestCommands_AuthURLFromProvider(t *testing.T) {
 				eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
-			authURL, err := c.AuthURLFromProvider(tt.args.ctx, tt.args.idpID, tt.args.state, tt.args.callbackURL)
+			authURL, _, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.state, tt.args.callbackURL, tt.args.samlRootURL)
 			require.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.authURL, authURL)
+			assert.Equal(t, tt.res.authURL, authURL.Get("Location"))
 		})
 	}
 }

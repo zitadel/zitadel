@@ -6,20 +6,26 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/xml"
-	"net/http"
 	"net/url"
 
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/idp"
 )
 
 var _ idp.Provider = (*Provider)(nil)
 
+type GetRequest func(ctx context.Context, intentID string) (*samlsp.TrackedRequest, error)
+type AddRequest func(ctx context.Context, intentID, requestID string) error
+
 // Provider is the [idp.Provider] implementation for a generic SAML provider
 type Provider struct {
 	name string
+
+	getRequest GetRequest
+	addRequest AddRequest
 
 	spOptions *samlsp.Options
 	metadata  *saml.EntityDescriptor
@@ -83,6 +89,8 @@ func New(
 	metadata []byte,
 	certificate []byte,
 	key []byte,
+	getRequest GetRequest,
+	addRequest AddRequest,
 	options ...ProviderOpts,
 ) (*Provider, error) {
 	entityDescriptor := new(saml.EntityDescriptor)
@@ -107,13 +115,12 @@ func New(
 		Certificate: keyPair.Leaf,
 		IDPMetadata: entityDescriptor,
 		SignRequest: false,
-		RelayStateFunc: func(w http.ResponseWriter, r *http.Request) string {
-			return r.URL.String()
-		},
 	}
 	provider := &Provider{
-		name:      name,
-		spOptions: &opts,
+		name:       name,
+		addRequest: addRequest,
+		getRequest: getRequest,
+		spOptions:  &opts,
 	}
 	for _, option := range options {
 		option(provider)
@@ -142,7 +149,15 @@ func (p *Provider) IsAutoUpdate() bool {
 }
 
 func (p *Provider) GetSP() (*samlsp.Middleware, error) {
-	return samlsp.New(*p.spOptions)
+	sp, err := samlsp.New(*p.spOptions)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "SAML-x1v0hlrcjd", "Errors.Intent.IDPInvalid")
+	}
+	sp.RequestTracker = &RequestTracker{
+		getRequest: p.getRequest,
+		addRequest: p.addRequest,
+	}
+	return sp, nil
 }
 
 func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (idp.Session, error) {

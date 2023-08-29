@@ -14,6 +14,8 @@ import (
 const (
 	StartedEventType       = instanceEventTypePrefix + "started"
 	SucceededEventType     = instanceEventTypePrefix + "succeeded"
+	SAMLSucceededEventType = instanceEventTypePrefix + "saml.succeeded"
+	SAMLRequestEventType   = instanceEventTypePrefix + "saml.request"
 	LDAPSucceededEventType = instanceEventTypePrefix + "ldap.succeeded"
 	FailedEventType        = instanceEventTypePrefix + "failed"
 )
@@ -113,6 +115,103 @@ func (e *SucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint
 
 func SucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &SucceededEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "IDP-HBreq", "unable to unmarshal event")
+	}
+
+	return e, nil
+}
+
+type SAMLSucceededEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	IDPUser     []byte `json:"idpUser"`
+	IDPUserID   string `json:"idpUserId,omitempty"`
+	IDPUserName string `json:"idpUserName,omitempty"`
+	UserID      string `json:"userId,omitempty"`
+
+	Response string `json:"response"`
+}
+
+func NewSAMLSucceededEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	idpUser []byte,
+	idpUserID,
+	idpUserName,
+	userID string,
+	response string,
+) *SAMLSucceededEvent {
+	return &SAMLSucceededEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			SAMLSucceededEventType,
+		),
+		IDPUser:     idpUser,
+		IDPUserID:   idpUserID,
+		IDPUserName: idpUserName,
+		UserID:      userID,
+		Response:    response,
+	}
+}
+
+func (e *SAMLSucceededEvent) Data() interface{} {
+	return e
+}
+
+func (e *SAMLSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func SAMLSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e := &SAMLSucceededEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "IDP-HBreq", "unable to unmarshal event")
+	}
+
+	return e, nil
+}
+
+type SAMLRequestEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	RequestID string `json:"requestId"`
+}
+
+func NewSAMLRequestEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	requestID string,
+) *SAMLRequestEvent {
+	return &SAMLRequestEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			SAMLRequestEventType,
+		),
+		RequestID: requestID,
+	}
+}
+
+func (e *SAMLRequestEvent) Data() interface{} {
+	return e
+}
+
+func (e *SAMLRequestEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func SAMLRequestEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e := &SAMLRequestEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 

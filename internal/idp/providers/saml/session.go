@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 
 	"github.com/zitadel/zitadel/internal/errors"
@@ -24,15 +25,16 @@ type Session struct {
 }
 
 // GetAuthURL implements the [idp.Session] interface.
-func (s *Session) GetAuth() (http.Header, []byte) {
+func (s *Session) GetAuth(ctx context.Context) (http.Header, []byte) {
 	url, _ := url.Parse(s.state)
 	resp := NewTempResponseWriter()
 
+	request := &http.Request{
+		URL: url,
+	}
 	s.serviceProvider.HandleStartAuthFlow(
 		resp,
-		&http.Request{
-			URL: url,
-		},
+		request.WithContext(ctx),
 	)
 	return resp.header, resp.content.Bytes()
 }
@@ -48,6 +50,10 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 		return nil, err
 	}
 
+	return ParseAssertionToUser(assertion)
+}
+
+func ParseAssertionToUser(assertion *saml.Assertion) (user idp.User, err error) {
 	userMapper := &UserMapper{}
 	userMapper.SetID(assertion.Subject.NameID)
 	return userMapper, nil

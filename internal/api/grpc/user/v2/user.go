@@ -145,14 +145,35 @@ func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.Re
 	if err != nil {
 		return nil, err
 	}
-	authURL, err := s.command.AuthURLFromProvider(ctx, idpID, intentWriteModel.AggregateID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID))
+	header, content, err := s.command.AuthFromProvider(ctx, idpID, intentWriteModel.AggregateID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID))
 	if err != nil {
 		return nil, err
 	}
-	return &user.StartIdentityProviderFlowResponse{
-		Details:  object.DomainToDetailsPb(details),
-		NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: authURL},
-	}, nil
+	if authURL := header.Get("Location"); authURL != "" {
+		return &user.StartIdentityProviderFlowResponse{
+			Details:  object.DomainToDetailsPb(details),
+			NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: authURL},
+		}, nil
+	} else {
+		headers := make([]*user.PostForm_Header, len(content))
+		i := 0
+		for k, v := range header {
+			headers[i] = &user.PostForm_Header{
+				Key:    k,
+				Values: v,
+			}
+			i++
+		}
+		return &user.StartIdentityProviderFlowResponse{
+			Details: object.DomainToDetailsPb(details),
+			NextStep: &user.StartIdentityProviderFlowResponse_Post{
+				Post: &user.PostForm{
+					Header: headers,
+					Form:   content,
+				},
+			},
+		}, nil
+	}
 }
 
 func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderFlowResponse, error) {
@@ -272,6 +293,10 @@ func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.En
 		information.IdpInformation.Access = access
 	}
 
+	if intent.Response != "" {
+		information.IdpInformation.Access = IDPSAMLResponseToPb(intent.Response)
+	}
+
 	return information, nil
 }
 
@@ -321,6 +346,14 @@ func IDPEntryAttributesToPb(entryAttributes map[string][]string) (*user.IDPInfor
 			Attributes: attributes,
 		},
 	}, nil
+}
+
+func IDPSAMLResponseToPb(response string) *user.IDPInformation_Saml {
+	return &user.IDPInformation_Saml{
+		Saml: &user.IDPSAMLAccessInformation{
+			Response: response,
+		},
+	}
 }
 
 func (s *Server) checkIntentToken(token string, intentID string) error {

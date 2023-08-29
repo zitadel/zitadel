@@ -2,10 +2,10 @@ package idp
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"net/http"
 
-	"github.com/crewjam/saml/samlsp"
 	"github.com/gorilla/mux"
 	"github.com/zitadel/logging"
 
@@ -13,7 +13,6 @@ import (
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
 	z_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/form"
 	"github.com/zitadel/zitadel/internal/idp"
@@ -61,6 +60,12 @@ type externalIDPCallbackData struct {
 	ErrorDescription string `schema:"error_description"`
 }
 
+type externalSAMLIDPCallbackData struct {
+	IDPID      string
+	Response   string
+	RelayState string
+}
+
 // CallbackURL generates the instance specific URL to the IDP callback handler
 func CallbackURL(externalSecure bool) func(ctx context.Context) string {
 	return func(ctx context.Context) string {
@@ -98,62 +103,114 @@ func NewHandler(
 	return router
 }
 
-func (h *Handler) handleMetadata(w http.ResponseWriter, r *http.Request) {
+func parseSAMLRequest(r *http.Request) *externalSAMLIDPCallbackData {
 	vars := mux.Vars(r)
-	ctx := r.Context()
+	return &externalSAMLIDPCallbackData{
+		IDPID:      vars[varIDPID],
+		Response:   r.FormValue("SAMLResponse"),
+		RelayState: r.FormValue("RelayState"),
+	}
+}
 
-	template, err := h.queries.IDPTemplateByID(ctx, true, vars[varIDPID], false)
+func (h *Handler) getProvider(ctx context.Context, idpID string) (idp.Provider, error) {
+	return h.commands.GetProvider(ctx, idpID, h.callbackURL(ctx), h.samlRootURL(ctx, idpID))
+}
+
+func (h *Handler) handleMetadata(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	data := parseSAMLRequest(r)
+
+	provider, err := h.getProvider(ctx, data.IDPID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if template.SAMLIDPTemplate == nil {
-		//TODO failed type
+	samlProvider, ok := provider.(*saml2.Provider)
+	if !ok {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
-	sp, err := getServiceProvider(h.samlRootURL(ctx, template.ID), template.Name, template.SAMLIDPTemplate, h.encryptionAlgorithm)
+
+	sp, err := samlProvider.GetSP()
 	if err != nil {
-		//TODO failed sp
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
+
 	sp.ServeMetadata(w, r)
 }
 
 func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
 	ctx := r.Context()
+	data := parseSAMLRequest(r)
 
-	template, err := h.queries.IDPTemplateByID(ctx, true, vars[varIDPID], false)
+	provider, err := h.getProvider(ctx, data.IDPID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	if template.SAMLIDPTemplate == nil {
-		//TODO failed type
-	}
-	sp, err := getServiceProvider(h.samlRootURL(ctx, template.ID), template.Name, template.SAMLIDPTemplate, h.encryptionAlgorithm)
-	if err != nil {
-		//TODO failed sp
-	}
-	sp.ServeACS(w, r)
-}
-
-func getServiceProvider(rootURL string, name string, template *query.SAMLIDPTemplate, alg crypto.EncryptionAlgorithm) (*samlsp.Middleware, error) {
-	cert, err := crypto.Decrypt(template.Certificate, alg)
-	if err != nil {
-		//TODO failed decrypt
-	}
-	key, err := crypto.Decrypt(template.Key, alg)
-	if err != nil {
-		//TODO failed decrypt
+	samlProvider, ok := provider.(*saml2.Provider)
+	if !ok {
+		err := z_errs.ThrowInvalidArgument(nil, "SAML-ui9wyux0hp", "Errors.Intent.IDPInvalid")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
-	provider, err := saml2.New(name, rootURL, template.Metadata, cert, key)
+	intent, err := h.commands.GetActiveIntent(ctx, data.RelayState)
 	if err != nil {
-		//TODO failed config
+		if z_errs.IsNotFound(err) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		redirectToFailureURLErr(w, r, intent, err)
+		return
 	}
 
-	return provider.GetSP()
+	sp, err := samlProvider.GetSP()
+	if err != nil {
+		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
+		redirectToFailureURLErr(w, r, intent, err)
+		return
+	}
+
+	responseData, err := base64.StdEncoding.DecodeString(data.Response)
+	if err != nil {
+		err = z_errs.ThrowInvalidArgument(err, "SAML-9klilyge7e", "Errors.Intent.ResponseInvalid")
+		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
+		redirectToFailureURLErr(w, r, intent, err)
+		return
+	}
+
+	assertion, err := sp.ServiceProvider.ParseXMLResponse(responseData, []string{intent.RequestID})
+	if err != nil {
+		err = z_errs.ThrowInvalidArgument(err, "SAML-hq6hwiyy03", "Errors.Intent.ResponseInvalid")
+		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
+		redirectToFailureURLErr(w, r, intent, err)
+		return
+	}
+
+	idpUser, err := saml2.ParseAssertionToUser(assertion)
+	if err != nil {
+		err = z_errs.ThrowInvalidArgument(err, "SAML-i07awpe1tm", "Errors.Intent.ResponseInvalid")
+		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
+		redirectToFailureURLErr(w, r, intent, err)
+		return
+	}
+
+	userID, err := h.checkExternalUser(ctx, intent.IDPID, assertion.Subject.NameID.Value)
+	logging.WithFields("intent", intent.AggregateID).OnError(err).Error("could not check if idp user already exists")
+
+	token, err := h.commands.SucceedSAMLIDPIntent(ctx, intent, idpUser, userID, data.Response)
+	if err != nil {
+		redirectToFailureURLErr(w, r, intent, z_errs.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
+		return
+	}
+	redirectToSuccessURL(w, r, intent, token, userID)
 }
 
 func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
@@ -181,7 +238,7 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	provider, err := h.commands.GetProvider(ctx, intent.IDPID, h.callbackURL(ctx), h.samlRootURL(ctx, intent.IDPID))
+	provider, err := h.getProvider(ctx, intent.IDPID)
 	if err != nil {
 		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
 		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
@@ -189,7 +246,7 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idpUser, idpSession, err := h.fetchIDPUser(ctx, provider, data.Code)
+	idpUser, idpSession, err := h.fetchIDPUserFromCode(ctx, provider, data.Code)
 	if err != nil {
 		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
 		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
@@ -240,23 +297,6 @@ func (h *Handler) parseCallbackRequest(r *http.Request) (*externalIDPCallbackDat
 	return data, nil
 }
 
-func (h *Handler) getActiveIntent(w http.ResponseWriter, r *http.Request, state string) *command.IDPIntentWriteModel {
-	intent, err := h.commands.GetIntentWriteModel(r.Context(), state, "")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return nil
-	}
-	if intent.State == domain.IDPIntentStateUnspecified {
-		http.Error(w, reason("IDP-Hk38e", "Errors.Intent.NotStarted"), http.StatusBadRequest)
-		return nil
-	}
-	if intent.State != domain.IDPIntentStateStarted {
-		redirectToFailureURL(w, r, intent, "IDP-Sfrgs", "Errors.Intent.NotStarted")
-		return nil
-	}
-	return intent
-}
-
 func redirectToSuccessURL(w http.ResponseWriter, r *http.Request, intent *command.IDPIntentWriteModel, token, userID string) {
 	queries := intent.SuccessURL.Query()
 	queries.Set(paramIntentID, intent.AggregateID)
@@ -288,7 +328,7 @@ func redirectToFailureURL(w http.ResponseWriter, r *http.Request, i *command.IDP
 	http.Redirect(w, r, i.FailureURL.String(), http.StatusFound)
 }
 
-func (h *Handler) fetchIDPUser(ctx context.Context, identityProvider idp.Provider, code string) (user idp.User, idpTokens idp.Session, err error) {
+func (h *Handler) fetchIDPUserFromCode(ctx context.Context, identityProvider idp.Provider, code string) (user idp.User, idpTokens idp.Session, err error) {
 	var session idp.Session
 	switch provider := identityProvider.(type) {
 	case *oauth.Provider:
@@ -303,7 +343,7 @@ func (h *Handler) fetchIDPUser(ctx context.Context, identityProvider idp.Provide
 		session = &openid.Session{Provider: provider.Provider, Code: code}
 	case *google.Provider:
 		session = &openid.Session{Provider: provider.Provider, Code: code}
-	case *jwt.Provider, *ldap.Provider:
+	case *jwt.Provider, *ldap.Provider, *saml2.Provider:
 		return nil, nil, z_errs.ThrowInvalidArgument(nil, "IDP-52jmn", "Errors.ExternalIDP.IDPTypeNotImplemented")
 	default:
 		return nil, nil, z_errs.ThrowUnimplemented(nil, "IDP-SSDg", "Errors.ExternalIDP.IDPTypeNotImplemented")

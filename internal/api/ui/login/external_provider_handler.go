@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/crewjam/saml/samlsp"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
@@ -180,7 +181,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		return
 	}
 
-	header, content := session.GetAuth()
+	header, content := session.GetAuth(r.Context())
 	if location := header.Get("Location"); location != "" {
 		http.Redirect(w, r, location, http.StatusFound)
 	} else {
@@ -886,8 +887,26 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 		identityProvider.Name,
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.SAMLIDPTemplate.Metadata,
-		key,
 		certificate,
+		key,
+		func(ctx context.Context, intentID string) (*samlsp.TrackedRequest, error) {
+			intent, err := l.command.GetActiveIntent(ctx, intentID)
+			if err != nil {
+				return nil, err
+			}
+			return &samlsp.TrackedRequest{
+				SAMLRequestID: intent.RequestID,
+				Index:         intentID,
+				URI:           intent.SuccessURL.String(),
+			}, nil
+		},
+		func(ctx context.Context, intentID, samlRequestID string) error {
+			intent, err := l.command.GetActiveIntent(ctx, intentID)
+			if err != nil {
+				return err
+			}
+			return l.command.RequestSAMLIDPIntent(ctx, intent, samlRequestID)
+		},
 		opts...,
 	)
 }
