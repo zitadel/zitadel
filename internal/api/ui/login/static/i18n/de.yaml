@@ -138,13 +138,13 @@ VerifyMFAOTP:
   Title: 2-Faktor verifizieren
   Description: Verifiziere deinen Zweitfaktor
   CodeLabel: Code
-  ResendButtonText: Code erneut senden
   NextButtonText: next
 
 VerifyOTP:
   Title: 2-Faktor verifizieren
   Description: Verifiziere deinen Zweitfaktor
   CodeLabel: Code
+  ResendButtonText: Code erneut senden
   NextButtonText: next
 
 VerifyMFAU2F:

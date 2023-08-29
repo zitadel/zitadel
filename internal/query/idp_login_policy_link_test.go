@@ -128,7 +128,7 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*IDPs)(nil),
 		},
 	}
 	for _, tt := range tests {

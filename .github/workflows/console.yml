@@ -32,7 +32,7 @@ jobs:
           timeout-minutes: 1
           id: cache
           with:
-            key: console-${{ hashFiles('console', 'proto') }}
+            key: console-${{ hashFiles('console', 'proto', '!console/dist') }}
             restore-keys: |
               console-
             path: ${{ env.cache_path }}

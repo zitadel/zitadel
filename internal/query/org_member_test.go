@@ -284,7 +284,7 @@ func Test_OrgMemberPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*OrgMembership)(nil),
 		},
 	}
 	for _, tt := range tests {

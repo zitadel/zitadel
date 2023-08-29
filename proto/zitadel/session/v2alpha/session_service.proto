@@ -49,7 +49,36 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     description: "Detailed information about ZITADEL",
     url: "https://zitadel.com/docs"
   }
-
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$ZITADEL_DOMAIN/oauth/v2/authorize";
+        token_url: "$ZITADEL_DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
   responses: {
     key: "403";
     value: {
@@ -79,7 +108,7 @@ service SessionService {
   // Search sessions
   rpc ListSessions (ListSessionsRequest) returns (ListSessionsResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/sessions/_search"
+      post: "/v2alpha/sessions/search"
       body: "*"
     };
 
@@ -341,14 +370,24 @@ message Checks {
       description: "\"Checks the public key credential issued by the WebAuthN client. Requires that the user is already checked and a WebAuthN challenge to be requested, in any previous request.\"";
     }
   ];
-  optional CheckIntent intent = 4 [
+  optional CheckIDPIntent idp_intent = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"Checks the intent. Requires that the userlink is already checked and a successful intent.\"";
+      description: "\"Checks the IDP intent. Requires that the userlink is already checked and a successful idp intent.\"";
     }
   ];
   optional CheckTOTP totp = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"Checks the Time-based One-Time Password and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
+    }
+  ];
+  optional CheckOTP otp_sms = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Checks the One-Time Password sent over SMS and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
+    }
+  ];
+  optional CheckOTP otp_email = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Checks the One-Time Password sent over Email and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
     }
   ];
 }
@@ -397,20 +436,20 @@ message CheckWebAuthN {
   ];
 }
 
-message CheckIntent {
-  string intent_id = 1 [
+message CheckIDPIntent {
+  string idp_intent_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of the intent, previously returned on the success response of the IDP callback"
+      description: "ID of the idp intent, previously returned on the success response of the IDP callback"
       min_length: 1;
       max_length: 200;
       example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
     }
   ];
-  string token = 2 [
+  string idp_intent_token = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "token of the intent, previously returned on the success response of the IDP callback"
+      description: "token of the idp intent, previously returned on the success response of the IDP callback"
       min_length: 1;
       max_length: 200;
       example: "\"SJKL3ioIDpo342ioqw98fjp3sdf32wahb=\"";
@@ -425,6 +464,16 @@ message CheckTOTP {
       min_length: 6;
       max_length: 6;
       example: "\"323764\"";
+    }
+  ];
+}
+
+message CheckOTP {
+  string otp = 1 [
+    (validate.rules).string = {min_len: 1},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      example: "\"3237642\"";
     }
   ];
 }

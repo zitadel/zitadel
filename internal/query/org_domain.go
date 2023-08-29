@@ -70,14 +70,14 @@ func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearch
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-ZRfj1", "Errors.Query.SQLStatement")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		domains, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-M6mYN", "Errors.Internal")
 	}
-	domains, err = scan(rows)
-	if err != nil {
-		return nil, err
-	}
+
 	domains.LatestSequence, err = q.latestSequence(ctx, orgDomainsTable)
 	return domains, err
 }

@@ -712,7 +712,7 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userG
 					}),
 				),
 				actions.SetFields("user",
-					actions.SetFields("setMetadata", func(call goja.FunctionCall) {
+					actions.SetFields("setMetadata", func(call goja.FunctionCall) goja.Value {
 						if len(call.Arguments) != 2 {
 							panic("exactly 2 (key, value) arguments expected")
 						}
@@ -733,6 +733,7 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userG
 							logging.WithError(err).Info("unable to set md in action")
 							panic(err)
 						}
+						return nil
 					}),
 				),
 			),

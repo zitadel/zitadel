@@ -130,19 +130,19 @@ func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQuerie
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-SDgwg", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		actions, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SDfr52", "Errors.Internal")
 	}
-	actions, err = scan(rows)
-	if err != nil {
-		return nil, err
-	}
+
 	actions.LatestSequence, err = q.latestSequence(ctx, actionTable)
 	return actions, err
 }
 
-func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string, withOwnerRemoved bool) (_ *Action, err error) {
+func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string, withOwnerRemoved bool) (action *Action, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -160,8 +160,11 @@ func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string, wi
 		return nil, errors.ThrowInternal(err, "QUERY-Dgff3", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		action, err = scan(row)
+		return err
+	}, query, args...)
+	return action, err
 }
 
 func NewActionResourceOwnerQuery(id string) (SearchQuery, error) {

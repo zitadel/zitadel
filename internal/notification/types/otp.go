@@ -3,7 +3,6 @@ package types
 import (
 	"time"
 
-	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 )
@@ -13,8 +12,7 @@ func (notify Notify) SendOTPSMSCode(requestedDomain, origin, code string, expiry
 	return notify("", args, domain.VerifySMSOTPMessageType, false)
 }
 
-func (notify Notify) SendOTPEmailCode(user *query.NotifyUser, requestedDomain, origin, code, authRequestID string, expiry time.Duration) error {
-	url := login.OTPLink(origin, authRequestID, code, domain.MFATypeOTPEmail)
+func (notify Notify) SendOTPEmailCode(user *query.NotifyUser, url, requestedDomain, origin, code string, expiry time.Duration) error {
 	args := otpArgs(code, origin, requestedDomain, expiry)
 	return notify(url, args, domain.VerifyEmailOTPMessageType, false)
 }

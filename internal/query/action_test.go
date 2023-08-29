@@ -25,8 +25,8 @@ var (
 		` projections.actions3.timeout,` +
 		` projections.actions3.allowed_to_fail,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.actions3` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.actions3`
+		// ` AS OF SYSTEM TIME '-1 ms'`
 	prepareActionsCols = []string{
 		"id",
 		"creation_date",
@@ -51,8 +51,8 @@ var (
 		` projections.actions3.script,` +
 		` projections.actions3.timeout,` +
 		` projections.actions3.allowed_to_fail` +
-		` FROM projections.actions3` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.actions3`
+		// ` AS OF SYSTEM TIME '-1 ms'`
 	prepareActionCols = []string{
 		"id",
 		"creation_date",
@@ -215,13 +215,13 @@ func Test_ActionPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Action)(nil),
 		},
 		{
 			name:    "prepareActionQuery no result",
 			prepare: prepareActionQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(prepareActionStmt),
 					nil,
 					nil,
@@ -284,7 +284,7 @@ func Test_ActionPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Action)(nil),
 		},
 	}
 	for _, tt := range tests {
