@@ -4,10 +4,6 @@ import (
 	"net/smtp"
 )
 
-type plainAuth struct {
-	identity, username, password string
-	host                         string
-}
 type unencryptedAuth struct {
 	smtp.Auth
 }
