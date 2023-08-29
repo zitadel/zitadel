@@ -5,6 +5,8 @@ sidebar_label: Multi-Factor (MFA)
 
 import MfaOptions from './_list-mfa-options.mdx';
 import BrowserRegisterWebAuthN from './_browser_register_webauthn.mdx';
+import BrowserSigninWebAuthN from './_browser_signin_webauthn.mdx';
+import UpdateSessionWebAuthN from './_update_session_webauthn.mdx';
 
 
 Multi-factor authentication (MFA) is a multi-step account authentication which requires to user to enter more than only the password.
@@ -75,6 +77,77 @@ curl --request POST \
   --header 'Content-Type: application/json' \
   --data '{
   "code": "123456"
+}'
+```
+
+## TOTP Authentication
+
+### Flow
+
+![Authenticate TOTP](/img/guides/login-ui/authenticate-totp-flow.png)
+
+### Check User
+
+To be able to check the TOTP you need a session with a checked user. This can either happen before the TOTP check or at the same time.
+In this example we do two separate requests. So the first step is to create a new Sessions.
+
+More detailed information about the API: [Create new session Documentation](https://zitadel.com/docs/apis/resources/session_service/session-service-create-session)
+
+Example Request
+
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/sessions \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"'' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "checks": {
+    "user": {
+      "loginName": "minnie-mouse@mouse.com"
+    }
+  }
+}'
+```
+
+Example Response
+
+```bash
+{
+	"details": {
+		"sequence": "580",
+		"changeDate": "2023-06-14T05:32:39.007096Z",
+		"resourceOwner": "163840776835432705"
+	},
+	"sessionId": "218480890961985793",
+	"sessionToken": "yMDi6uVPJAcphbbz0LaxC07ihWkNTe7m0Xqch8SzfM5Cz3HSIQIDZ65x1f5Qal0jxz0MEyo-_zYcUg"
+}
+```
+
+### Check TOTP
+
+Now you can show the code field to the user, where he has to enter the code from the Authenticator App.
+With that code you have to update the existing session with a totp check.
+
+More detailed information about the API: [Update session Documentation](https://zitadel.com/docs/apis/resources/session_service/session-service-set-session)
+
+Example Request
+```bash
+curl --request PATCH \
+  --url https://hi-fabienne-dxmbrv.zitadel.cloud/v2alpha/sessions/225307381909694507 \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer tySiWbojwZGZXisvjPSVoKZVTz4htmUBK_J04ALDWveuKJHlvcpXFoMmuwKy9q95bKPKo14' \
+  --header 'Content-Type: application/json' \
+  --cookie __Secure-zitadel.useragent=MTY5MDgwODc3OHxIUmZ1NFhjVVJwYTJWWmZRaTJfUF9fRkdiREdFaW5JU0pCbWZnLW1zNndMYTBWejdndmlZSXllMWdQRkhfelBIbG8xcEYxYUZWeTVoZXlrQXR3ZkxkN2FsNjdKUW5yOD18SCzGXSHce2EURD2fndgvcSm2gt7KG0FsNqIDgM2dviI%3D \
+  --data '{
+  "sessionToken": "W3mEoesTiYOsiR1LYUCRw3WaEwXKLGDTsqOV_bkOhlah_-ZpuiLgvnzADwe_iYMusbwkMhp7VfMn7g",
+  "checks": {
+    "totp": {
+			"totp": {
+				"totp": 123456
+			}
+    }
+  }
 }'
 ```
 
@@ -181,7 +254,7 @@ curl --request POST \
     "rawId": "pawVarF4xPxLFmfCnRkwXWeTrKGzabcAi92LEI1WC00",
     "response": {
       "attestationObject": "o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIgRKS3VpeE9tfExXRzkoUKnG4rQWPvtSSt4YtDGgTx32oCIQDPey-2YJ4uIg-QCM4jj6aE2U3tgMFM_RP7Efx6xRu3JGhhdXRoRGF0YVikSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFAAAAADju76085Yhmlt1CEOHkwLQAIKWsFWqxeMT8SxZnwp0ZMF1nk6yhs2m3AIvdixCNVgtNpQECAyYgASFYIMGUDSP2FAQn2MIfPMy7cyB_Y30VqixVgGULTBtFjfRiIlggjUGfQo3_-CrMmH3S-ZQkFKWKnNBQEAMkFtG-9A4zqW0",
-      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQlhXdHh0WGxJeFZZa0pHT1dVaUVmM25zby02aXZKdWw2YmNmWHdMVlFIayIsIm9yaWdpbiI6Imh0dHBzOi8vbG9jYWxob3N0OjgwODAifQ"
+      "clientDataJSON": "eyJ0eXBlJjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQlhXdHh0WGxJeFZZa0pHT1dVaUVmM25zby02aXZKdWw2YmNmWHdMVlFIayIsIm9yaWdpbiI6Imh0dHBzOi8vbG9jYWxob3N0OjgwODAifQ"
     }
   },
   "tokenName": "Google Pixel"
@@ -189,3 +262,65 @@ curl --request POST \
 ```
 
 You have successfully registered a new U2F to the user.
+
+## U2F Authentication
+
+### Flow
+
+![Authenticate U2F](/img/guides/login-ui/authenticate-u2f-flow.png)
+
+### Check User
+
+To be able to check the Universal-Second-Factor (U2F) you need a user check and a webAuthN challenge.
+In the creat session request you can check for the user and directly initiate the webAuthN challenge.
+
+For U2F you can choose between "USER_VERIFICATION_REQUIREMENT_PREFERRED" and "USER_VERIFICATION_REQUIREMENT_DISCOURAGED" for the challenge.
+Best practice is using discouraged, as this doesn't require the user to enter a pin. With preferred the PIN will be shown, but is not necessary.
+
+More detailed information about the API: [Create new session Documentation](https://zitadel.com/docs/apis/resources/session_service/session-service-create-session)
+
+Example Request
+
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/sessions \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"'' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "checks": {
+    "user": {
+      "loginName": "minni-mouse@mouse.com"
+    }
+  },
+  "metadata": {},
+  "challenges": {
+		"webAuthN": {
+			"domain": "YOUR-Domain",
+			"userVerificationRequirement": "USER_VERIFICATION_REQUIREMENT_DISCOURAGED"
+		}
+	}
+}'
+```
+
+Example Response
+
+```bash
+{
+	"details": {
+		"sequence": "580",
+		"changeDate": "2023-06-14T05:32:39.007096Z",
+		"resourceOwner": "163840776835432705"
+	},
+	"sessionId": "218480890961985793",
+	"sessionToken": "yMDi6uVPJAcphbbz0LaxC07ihWkNTe7m0Xqch8SzfM5Cz3HSIQIDZ65x1f5Qal0jxz0MEyo-_zYcUg"
+}
+```
+
+### Signin in Browser
+
+<BrowserSigninWebAuthN/>
+
+### Update Session with WebAuthN
+
+<UpdateSessionWebAuthN/>
