@@ -1574,9 +1574,6 @@ func (c *Commands) prepareAddInstanceAppleProvider(a *instance.Aggregate, writeM
 		if len(provider.PrivateKey) == 0 {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.Invalid.Argument")
 		}
-		if len(provider.PrivateKey) == 0 {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-LJKS3", "Errors.Invalid.Argument")
-		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {

@@ -1561,9 +1561,6 @@ func (c *Commands) prepareAddOrgAppleProvider(a *org.Aggregate, writeModel *OrgA
 		if len(provider.PrivateKey) == 0 {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-GVD4n", "Errors.Invalid.Argument")
 		}
-		if len(provider.PrivateKey) == 0 {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-LJKS3", "Errors.Invalid.Argument")
-		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
