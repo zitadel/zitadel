@@ -58,7 +58,7 @@ export async function PUT(request: NextRequest) {
 
     const domain: string = request.nextUrl.hostname;
 
-    if (challenges.webAuthN && !challenges.webAuthN.domain) {
+    if (challenges && challenges.webAuthN && !challenges.webAuthN.domain) {
       challenges.webAuthN.domain = domain;
     }
 

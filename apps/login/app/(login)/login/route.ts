@@ -64,9 +64,9 @@ export async function GET(request: NextRequest) {
         // check for loginHint, userId hint sessions
         let selectedSession = findSession(sessions, authRequest);
 
-        if (!selectedSession) {
-          selectedSession = sessions[0]; // TODO: remove
-        }
+        // if (!selectedSession) {
+        //   selectedSession = sessions[0]; // TODO: remove
+        // }
 
         if (selectedSession && selectedSession.id) {
           const cookie = sessionCookies.find(
@@ -92,7 +92,13 @@ export async function GET(request: NextRequest) {
             return NextResponse.redirect(accountsUrl);
           }
         } else {
-          return NextResponse.error();
+          const accountsUrl = new URL("/accounts", request.url);
+          if (authRequest?.id) {
+            accountsUrl.searchParams.set("authRequestId", authRequest?.id);
+          }
+
+          return NextResponse.redirect(accountsUrl);
+          // return NextResponse.error();
         }
       }
     } else {

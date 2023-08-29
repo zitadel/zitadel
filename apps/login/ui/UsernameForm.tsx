@@ -79,22 +79,26 @@ export default function UsernameForm({
               "/password?" + new URLSearchParams(paramsPassword)
             );
           case 2: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
-            return router.push(
-              "/passkey/login?" +
-                new URLSearchParams({ loginName: values.loginName })
-            );
-          default:
             const paramsPasskey: any = { loginName: values.loginName };
-
-            if (loginSettings?.passkeysType === 1) {
-              paramsPasskey.promptPasswordless = `true`; // PasskeysType.PASSKEYS_TYPE_ALLOWED,
-            }
-
             if (authRequestId) {
               paramsPasskey.authRequestId = authRequestId;
             }
+
             return router.push(
-              "/password?" + new URLSearchParams(paramsPasskey)
+              "/passkey/login?" + new URLSearchParams(paramsPasskey)
+            );
+          default:
+            const paramsPasskeyDefault: any = { loginName: values.loginName };
+
+            if (loginSettings?.passkeysType === 1) {
+              paramsPasskeyDefault.promptPasswordless = `true`; // PasskeysType.PASSKEYS_TYPE_ALLOWED,
+            }
+
+            if (authRequestId) {
+              paramsPasskeyDefault.authRequestId = authRequestId;
+            }
+            return router.push(
+              "/password?" + new URLSearchParams(paramsPasskeyDefault)
             );
         }
       } else if (
@@ -107,12 +111,17 @@ export default function UsernameForm({
       } else {
         // prefer passkey in favor of other methods
         if (response.authMethodTypes.includes(2)) {
+          const passkeyParams: any = {
+            loginName: values.loginName,
+            altPassword: `${response.authMethodTypes.includes(1)}`, // show alternative password option
+          };
+
+          if (authRequestId) {
+            passkeyParams.authRequestId = authRequestId;
+          }
+
           return router.push(
-            "/passkey/login?" +
-              new URLSearchParams({
-                loginName: values.loginName,
-                altPassword: `${response.authMethodTypes.includes(1)}`, // show alternative password option
-              })
+            "/passkey/login?" + new URLSearchParams(passkeyParams)
           );
         }
       }
