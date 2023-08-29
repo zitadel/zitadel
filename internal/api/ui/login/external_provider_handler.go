@@ -66,6 +66,7 @@ type externalNotFoundOptionData struct {
 	ExternalEmailVerified      bool
 	ExternalPhone              domain.PhoneNumber
 	ExternalPhoneVerified      bool
+	ProviderName               string
 }
 
 type externalRegisterFormData struct {
@@ -410,7 +411,7 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 		l.renderExternalNotFoundOption(w, r, authReq, orgIAMPolicy, human, idpLink, err)
 		return
 	}
-	if changed {
+	if changed || len(externalUser.Metadatas) > 0 {
 		if err := l.authRepo.SetLinkingUser(r.Context(), authReq, externalUser); err != nil {
 			l.renderError(w, r, authReq, err)
 			return
@@ -503,6 +504,7 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		ShowUsername:               orgIAMPolicy.UserLoginMustBeDomain,
 		ShowUsernameSuffix:         !labelPolicy.HideLoginNameSuffix,
 		OrgRegister:                orgIAMPolicy.UserLoginMustBeDomain,
+		ProviderName:               domain.IDPName(idpTemplate.Name, idpTemplate.Type),
 	}
 	if human.Phone != nil {
 		data.Phone = human.PhoneNumber

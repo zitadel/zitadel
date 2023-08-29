@@ -411,7 +411,7 @@
       "DESCRIPTION": "添加第二个因素以确保您帐户的最佳安全性。",
       "MANAGE_DESCRIPTION": "管理用户的第二因素身份认证方式。",
       "ADD": "添加因子",
-      "OTP": "用于 OTP 的身份验证器应用程序",
+      "OTP": "用于 TOTP 的身份验证器应用程序",
       "OTP_DIALOG_TITLE": "添加 OTP",
       "OTP_DIALOG_DESCRIPTION": "使用验证器应用程序扫描二维码并输入下面的代码以验证并激活 OTP 方法。",
       "U2F": "指纹、安全密钥、Face ID 等",
@@ -420,6 +420,12 @@
       "U2F_SUCCESS": "身份验证因子添加成功！",
       "U2F_ERROR": "安装过程中发生错误！",
       "U2F_NAME": "身份验证器名称",
+      "OTPSMS": "带短信的 OTP（一次性密码）",
+      "OTPEMAIL": "带电子邮件的 OTP（一次性密码）",
+      "SETUPOTPSMSDESCRIPTION": "您想将此电话号码设置为 OTP（一次性密码）第二因素吗？",
+      "OTPSMSSUCCESS": "OTP 因子设置成功。",
+      "OTPSMSPHONEMUSTBEVERIFIED": "您的手机必须经过验证才能使用此方法。",
+      "OTPEMAILSUCCESS": "OTP 因子设置成功。",
       "TYPE": {
         "0": "未定义 MFA",
         "1": "一次性密码 (OTP)",
@@ -586,7 +592,8 @@
         "EDITVALUE": "手机号码",
         "EDITDESC": "在下面的字段中输入新的手机号码。",
         "DELETETITLE": "删除手机号码",
-        "DELETEDESC": "你真的要删除手机号码吗"
+        "DELETEDESC": "你真的要删除手机号码吗",
+        "OTPSMSREMOVALWARNING": "此帐户使用此电话号码作为第二因素。继续后您将无法使用它。"
       },
       "RESENDCODE": "重新发送验证码",
       "ENTERCODE": "验证",
@@ -1048,6 +1055,7 @@
       "TITLE": "SMTP 设置",
       "SENDERADDRESS": "发件人地址",
       "SENDERNAME": "发件人名称",
+      "REPLYTOADDRESS": "Reply-to 地址",
       "HOSTANDPORT": "主机和端口",
       "USER": "用户名",
       "PASSWORD": "密码",
@@ -1824,7 +1832,9 @@
       "DELETED": "IDP 删除成功！",
       "ADDED": "添加成功。",
       "REMOVED": "成功删除。"
-    }
+    },
+    "ISIDTOKENMAPPING": "从ID令牌映射",
+    "ISIDTOKENMAPPING_DESC": "如果选中，提供商信息将从ID令牌映射，而不是从userinfo端点。"
   },
   "MFA": {
     "LIST": {

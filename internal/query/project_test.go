@@ -238,13 +238,13 @@ func Test_ProjectPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Projects)(nil),
 		},
 		{
 			name:    "prepareProjectQuery no result",
 			prepare: prepareProjectQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					prepareProjectStmt,
 					nil,
 					nil,
@@ -309,7 +309,7 @@ func Test_ProjectPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Project)(nil),
 		},
 	}
 	for _, tt := range tests {

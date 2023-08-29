@@ -103,13 +103,12 @@ func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQ
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-4zzFK", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		idps, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-C1E4D", "Errors.Internal")
-	}
-	idps, err = scan(rows)
-	if err != nil {
-		return nil, err
 	}
 	idps.LatestSequence, err = q.latestSequence(ctx, idpUserLinkTable)
 	return idps, err

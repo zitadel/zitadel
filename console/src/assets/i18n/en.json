@@ -412,7 +412,7 @@
       "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
       "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
       "ADD": "Add Factor",
-      "OTP": "Authenticator App for OTP (One-Time Password)",
+      "OTP": "Authenticator App for TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "Add OTP",
       "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
       "U2F": "Fingerprint, Security Keys, Face ID and other",
@@ -421,6 +421,12 @@
       "U2F_SUCCESS": "Factor added successfully!",
       "U2F_ERROR": "An error during setup occurred!",
       "U2F_NAME": "Authenticator Name",
+      "OTPSMS": "OTP (One-Time Password) with SMS",
+      "OTPEMAIL": "OTP (One-Time Password) with Email",
+      "SETUPOTPSMSDESCRIPTION": "Do you want to setup this phonenumber as OTP (One-Time password) second factor?",
+      "OTPSMSSUCCESS": "OTP factor set up with success.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Your phone must be verified in order to use this method.",
+      "OTPEMAILSUCCESS": "OTP factor set up with success.",
       "TYPE": {
         "0": "No MFA defined",
         "1": "One Time Password (OTP)",
@@ -587,7 +593,8 @@
         "EDITVALUE": "Phone number",
         "EDITDESC": "Enter the new phone number in the field below.",
         "DELETETITLE": "Delete phone number",
-        "DELETEDESC": "Do you really want to delete the phone number"
+        "DELETEDESC": "Do you really want to delete the phone number",
+        "OTPSMSREMOVALWARNING": "This account uses this phone number as second factor. You won't be able to use it after you proceed."
       },
       "RESENDCODE": "Resend Code",
       "ENTERCODE": "Verify",
@@ -1049,6 +1056,7 @@
       "TITLE": "SMTP Settings",
       "SENDERADDRESS": "Sender Email Address",
       "SENDERNAME": "Sender Name",
+      "REPLYTOADDRESS": "Reply-to Address",
       "HOSTANDPORT": "Host And Port",
       "USER": "User",
       "PASSWORD": "Password",
@@ -1821,7 +1829,9 @@
       "DELETED": "Idp removed successfully!",
       "ADDED": "Added successfully.",
       "REMOVED": "Removed successfully."
-    }
+    },
+    "ISIDTOKENMAPPING": "Map from the ID token",
+    "ISIDTOKENMAPPING_DESC": "If selected, provider information gets mapped from the ID token, not from the userinfo endpoint."
   },
   "MFA": {
     "LIST": {

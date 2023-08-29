@@ -2,6 +2,7 @@ package execution
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"time"
 
@@ -113,9 +114,14 @@ func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, 
 	}
 
 	var durationSeconds uint64
-	if err = l.dbClient.
-		QueryRowContext(ctx, stmt, args...).
-		Scan(&durationSeconds); err != nil {
+	err = l.dbClient.
+		QueryRowContext(ctx,
+			func(row *sql.Row) error {
+				return row.Scan(&durationSeconds)
+			},
+			stmt, args...,
+		)
+	if err != nil {
 		return 0, caos_errors.ThrowInternal(err, "EXEC-Ad8nP", "Errors.Logstore.Execution.ScanFailed")
 	}
 	return durationSeconds, nil

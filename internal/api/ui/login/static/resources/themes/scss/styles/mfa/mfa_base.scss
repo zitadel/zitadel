@@ -1,42 +1,46 @@
 @mixin lgn-mfa-base {
   display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
+  flex-direction: column;
   margin: 2rem 0;
 
   .mfa {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     flex: 1;
-    padding: 0 0.5rem;
+    margin: 0.5rem 0;
+    position: relative;
+
+    input[type="radio"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
 
     label {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
-      position: relative;
-
-      input[type="radio"] {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-      }
-
-      span {
-        text-align: center;
-      }
+      border-radius: 0.5rem;
+      padding: 1rem;
+      width: 100%;
 
       .mfa-img {
-        border-width: 1px;
-        border-style: solid;
-        border-radius: 0.5rem;
-        padding: 1rem;
+        height: 40px;
+        width: 40px;
+        object-fit: contain;
+        object-position: center;
         display: flex;
-        margin-bottom: 0.5rem;
         transition: all 0.2s ease;
+
+        &.fingerprint,
+        &.email,
+        &.sms {
+          padding: 0.25rem;
+          box-sizing: border-box;
+        }
       }
     }
   }

@@ -231,23 +231,25 @@ func updateGenericOAuthProviderToCommand(req *admin_pb.UpdateGenericOAuthProvide
 
 func addGenericOIDCProviderToCommand(req *admin_pb.AddGenericOIDCProviderRequest) command.GenericOIDCProvider {
 	return command.GenericOIDCProvider{
-		Name:         req.Name,
-		Issuer:       req.Issuer,
-		ClientID:     req.ClientId,
-		ClientSecret: req.ClientSecret,
-		Scopes:       req.Scopes,
-		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:             req.Name,
+		Issuer:           req.Issuer,
+		ClientID:         req.ClientId,
+		ClientSecret:     req.ClientSecret,
+		Scopes:           req.Scopes,
+		IsIDTokenMapping: req.IsIdTokenMapping,
+		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
 func updateGenericOIDCProviderToCommand(req *admin_pb.UpdateGenericOIDCProviderRequest) command.GenericOIDCProvider {
 	return command.GenericOIDCProvider{
-		Name:         req.Name,
-		Issuer:       req.Issuer,
-		ClientID:     req.ClientId,
-		ClientSecret: req.ClientSecret,
-		Scopes:       req.Scopes,
-		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:             req.Name,
+		Issuer:           req.Issuer,
+		ClientID:         req.ClientId,
+		ClientSecret:     req.ClientSecret,
+		Scopes:           req.Scopes,
+		IsIDTokenMapping: req.IsIdTokenMapping,
+		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 

@@ -47,6 +47,9 @@ type Config struct {
 	CSRFCookieName     string
 	Cache              middleware.CacheConfig
 	AssetCache         middleware.CacheConfig
+
+	// LoginV2
+	DefaultOTPEmailURLV2 string
 }
 
 const (
@@ -166,6 +169,14 @@ func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string
 func setContext(ctx context.Context, resourceOwner string) context.Context {
 	data := authz.CtxData{
 		UserID: login,
+		OrgID:  resourceOwner,
+	}
+	return authz.SetCtxData(ctx, data)
+}
+
+func setUserContext(ctx context.Context, userID, resourceOwner string) context.Context {
+	data := authz.CtxData{
+		UserID: userID,
 		OrgID:  resourceOwner,
 	}
 	return authz.SetCtxData(ctx, data)

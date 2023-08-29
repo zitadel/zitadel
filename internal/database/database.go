@@ -1,8 +1,11 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"reflect"
+
+	"github.com/zitadel/logging"
 
 	_ "github.com/zitadel/zitadel/internal/database/cockroach"
 	"github.com/zitadel/zitadel/internal/database/dialect"
@@ -22,6 +25,66 @@ func (c *Config) SetConnector(connector dialect.Connector) {
 type DB struct {
 	*sql.DB
 	dialect.Database
+}
+
+func (db *DB) Query(scan func(*sql.Rows) error, query string, args ...any) error {
+	return db.QueryContext(context.Background(), scan, query, args...)
+}
+
+func (db *DB) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, query string, args ...any) (err error) {
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			rollbackErr := tx.Rollback()
+			logging.OnError(rollbackErr).Info("commit of read only transaction failed")
+			return
+		}
+		err = tx.Commit()
+	}()
+
+	rows, err := tx.QueryContext(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		closeErr := rows.Close()
+		logging.OnError(closeErr).Info("rows.Close failed")
+	}()
+
+	if err = scan(rows); err != nil {
+		return err
+	}
+	return rows.Err()
+}
+
+func (db *DB) QueryRow(scan func(*sql.Row) error, query string, args ...any) (err error) {
+	return db.QueryRowContext(context.Background(), scan, query, args...)
+}
+
+func (db *DB) QueryRowContext(ctx context.Context, scan func(row *sql.Row) error, query string, args ...any) (err error) {
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			rollbackErr := tx.Rollback()
+			logging.OnError(rollbackErr).Info("commit of read only transaction failed")
+			return
+		}
+		err = tx.Commit()
+	}()
+
+	row := tx.QueryRowContext(ctx, query, args...)
+
+	err = scan(row)
+	if err != nil {
+		return err
+	}
+	return row.Err()
 }
 
 func Connect(config Config, useAdmin bool) (*DB, error) {

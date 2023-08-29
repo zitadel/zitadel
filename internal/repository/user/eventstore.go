@@ -91,10 +91,14 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, HumanMFAOTPCheckFailedType, HumanOTPCheckFailedEventMapper).
 		RegisterFilterEventMapper(AggregateType, HumanOTPSMSAddedType, eventstore.GenericEventMapper[HumanOTPSMSAddedEvent]).
 		RegisterFilterEventMapper(AggregateType, HumanOTPSMSRemovedType, eventstore.GenericEventMapper[HumanOTPSMSRemovedEvent]).
+		RegisterFilterEventMapper(AggregateType, HumanOTPSMSCodeAddedType, eventstore.GenericEventMapper[HumanOTPSMSCodeAddedEvent]).
+		RegisterFilterEventMapper(AggregateType, HumanOTPSMSCodeSentType, eventstore.GenericEventMapper[HumanOTPSMSCodeSentEvent]).
 		RegisterFilterEventMapper(AggregateType, HumanOTPSMSCheckSucceededType, eventstore.GenericEventMapper[HumanOTPSMSCheckSucceededEvent]).
 		RegisterFilterEventMapper(AggregateType, HumanOTPSMSCheckFailedType, eventstore.GenericEventMapper[HumanOTPSMSCheckFailedEvent]).
 		RegisterFilterEventMapper(AggregateType, HumanOTPEmailAddedType, eventstore.GenericEventMapper[HumanOTPEmailAddedEvent]).
 		RegisterFilterEventMapper(AggregateType, HumanOTPEmailRemovedType, eventstore.GenericEventMapper[HumanOTPEmailRemovedEvent]).
+		RegisterFilterEventMapper(AggregateType, HumanOTPEmailCodeAddedType, eventstore.GenericEventMapper[HumanOTPEmailCodeAddedEvent]).
+		RegisterFilterEventMapper(AggregateType, HumanOTPEmailCodeSentType, eventstore.GenericEventMapper[HumanOTPEmailCodeSentEvent]).
 		RegisterFilterEventMapper(AggregateType, HumanOTPEmailCheckSucceededType, eventstore.GenericEventMapper[HumanOTPEmailCheckSucceededEvent]).
 		RegisterFilterEventMapper(AggregateType, HumanOTPEmailCheckFailedType, eventstore.GenericEventMapper[HumanOTPEmailCheckFailedEvent]).
 		RegisterFilterEventMapper(AggregateType, HumanU2FTokenAddedType, HumanU2FAddedEventMapper).

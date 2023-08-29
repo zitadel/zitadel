@@ -70,7 +70,7 @@ var (
 	}
 )
 
-func (q *Queries) DeviceAuthByDeviceCode(ctx context.Context, clientID, deviceCode string) (_ *domain.DeviceAuth, err error) {
+func (q *Queries) DeviceAuthByDeviceCode(ctx context.Context, clientID, deviceCode string) (deviceAuth *domain.DeviceAuth, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -85,10 +85,14 @@ func (q *Queries) DeviceAuthByDeviceCode(ctx context.Context, clientID, deviceCo
 		return nil, errors.ThrowInternal(err, "QUERY-uk1Oh", "Errors.Query.SQLStatement")
 	}
 
-	return scan(q.client.QueryRowContext(ctx, query, args...))
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		deviceAuth, err = scan(row)
+		return err
+	}, query, args...)
+	return deviceAuth, err
 }
 
-func (q *Queries) DeviceAuthByUserCode(ctx context.Context, userCode string) (_ *domain.DeviceAuth, err error) {
+func (q *Queries) DeviceAuthByUserCode(ctx context.Context, userCode string) (deviceAuth *domain.DeviceAuth, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -102,7 +106,11 @@ func (q *Queries) DeviceAuthByUserCode(ctx context.Context, userCode string) (_ 
 		return nil, errors.ThrowInternal(err, "QUERY-Axu7l", "Errors.Query.SQLStatement")
 	}
 
-	return scan(q.client.QueryRowContext(ctx, query, args...))
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		deviceAuth, err = scan(row)
+		return err
+	}, query, args...)
+	return deviceAuth, err
 }
 
 var deviceAuthSelectColumns = []string{

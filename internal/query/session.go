@@ -34,6 +34,9 @@ type Session struct {
 	PasswordFactor SessionPasswordFactor
 	IntentFactor   SessionIntentFactor
 	WebAuthNFactor SessionWebAuthNFactor
+	TOTPFactor     SessionTOTPFactor
+	OTPSMSFactor   SessionOTPFactor
+	OTPEmailFactor SessionOTPFactor
 	Metadata       map[string][]byte
 }
 
@@ -56,6 +59,14 @@ type SessionIntentFactor struct {
 type SessionWebAuthNFactor struct {
 	WebAuthNCheckedAt time.Time
 	UserVerified      bool
+}
+
+type SessionTOTPFactor struct {
+	TOTPCheckedAt time.Time
+}
+
+type SessionOTPFactor struct {
+	OTPCheckedAt time.Time
 }
 
 type SessionsSearchQueries struct {
@@ -132,6 +143,18 @@ var (
 		name:  projection.SessionColumnWebAuthNUserVerified,
 		table: sessionsTable,
 	}
+	SessionColumnTOTPCheckedAt = Column{
+		name:  projection.SessionColumnTOTPCheckedAt,
+		table: sessionsTable,
+	}
+	SessionColumnOTPSMSCheckedAt = Column{
+		name:  projection.SessionColumnOTPSMSCheckedAt,
+		table: sessionsTable,
+	}
+	SessionColumnOTPEmailCheckedAt = Column{
+		name:  projection.SessionColumnOTPEmailCheckedAt,
+		table: sessionsTable,
+	}
 	SessionColumnMetadata = Column{
 		name:  projection.SessionColumnMetadata,
 		table: sessionsTable,
@@ -142,7 +165,7 @@ var (
 	}
 )
 
-func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string) (_ *Session, err error) {
+func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string) (session *Session, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -161,8 +184,11 @@ func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, s
 		return nil, errors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	session, tokenID, err := scan(row)
+	var tokenID string
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		session, tokenID, err = scan(row)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +201,7 @@ func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, s
 	return session, nil
 }
 
-func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQueries) (_ *Sessions, err error) {
+func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQueries) (sessions *Sessions, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -188,14 +214,14 @@ func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQue
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-sn9Jf", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil || rows.Err() != nil {
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		sessions, err = scan(rows)
+		return err
+	}, stmt, args...)
+	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Sfg42", "Errors.Internal")
 	}
-	sessions, err := scan(rows)
-	if err != nil {
-		return nil, err
-	}
+
 	sessions.LatestSequence, err = q.latestSequence(ctx, sessionsTable)
 	return sessions, err
 }
@@ -230,6 +256,9 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			SessionColumnIntentCheckedAt.identifier(),
 			SessionColumnWebAuthNCheckedAt.identifier(),
 			SessionColumnWebAuthNUserVerified.identifier(),
+			SessionColumnTOTPCheckedAt.identifier(),
+			SessionColumnOTPSMSCheckedAt.identifier(),
+			SessionColumnOTPEmailCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			SessionColumnToken.identifier(),
 		).From(sessionsTable.identifier()).
@@ -249,6 +278,9 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				intentCheckedAt     sql.NullTime
 				webAuthNCheckedAt   sql.NullTime
 				webAuthNUserPresent sql.NullBool
+				totpCheckedAt       sql.NullTime
+				otpSMSCheckedAt     sql.NullTime
+				otpEmailCheckedAt   sql.NullTime
 				metadata            database.Map[[]byte]
 				token               sql.NullString
 			)
@@ -270,6 +302,9 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&intentCheckedAt,
 				&webAuthNCheckedAt,
 				&webAuthNUserPresent,
+				&totpCheckedAt,
+				&otpSMSCheckedAt,
+				&otpEmailCheckedAt,
 				&metadata,
 				&token,
 			)
@@ -290,6 +325,9 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
 			session.WebAuthNFactor.WebAuthNCheckedAt = webAuthNCheckedAt.Time
 			session.WebAuthNFactor.UserVerified = webAuthNUserPresent.Bool
+			session.TOTPFactor.TOTPCheckedAt = totpCheckedAt.Time
+			session.OTPSMSFactor.OTPCheckedAt = otpSMSCheckedAt.Time
+			session.OTPEmailFactor.OTPCheckedAt = otpEmailCheckedAt.Time
 			session.Metadata = metadata
 
 			return session, token.String, nil
@@ -314,6 +352,9 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			SessionColumnIntentCheckedAt.identifier(),
 			SessionColumnWebAuthNCheckedAt.identifier(),
 			SessionColumnWebAuthNUserVerified.identifier(),
+			SessionColumnTOTPCheckedAt.identifier(),
+			SessionColumnOTPSMSCheckedAt.identifier(),
+			SessionColumnOTPEmailCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			countColumn.identifier(),
 		).From(sessionsTable.identifier()).
@@ -336,6 +377,9 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					intentCheckedAt     sql.NullTime
 					webAuthNCheckedAt   sql.NullTime
 					webAuthNUserPresent sql.NullBool
+					totpCheckedAt       sql.NullTime
+					otpSMSCheckedAt     sql.NullTime
+					otpEmailCheckedAt   sql.NullTime
 					metadata            database.Map[[]byte]
 				)
 
@@ -356,6 +400,9 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&intentCheckedAt,
 					&webAuthNCheckedAt,
 					&webAuthNUserPresent,
+					&totpCheckedAt,
+					&otpSMSCheckedAt,
+					&otpEmailCheckedAt,
 					&metadata,
 					&sessions.Count,
 				)
@@ -372,6 +419,9 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
 				session.WebAuthNFactor.WebAuthNCheckedAt = webAuthNCheckedAt.Time
 				session.WebAuthNFactor.UserVerified = webAuthNUserPresent.Bool
+				session.TOTPFactor.TOTPCheckedAt = totpCheckedAt.Time
+				session.OTPSMSFactor.OTPCheckedAt = otpSMSCheckedAt.Time
+				session.OTPEmailFactor.OTPCheckedAt = otpEmailCheckedAt.Time
 				session.Metadata = metadata
 
 				sessions.Sessions = append(sessions.Sessions, session)

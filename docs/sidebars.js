@@ -284,6 +284,31 @@ module.exports = {
             "guides/integrate/services/auth0-oidc",
             "guides/integrate/services/auth0-saml",
             "guides/integrate/services/pingidentity-saml",
+            {
+              type: 'link',
+              label: 'Nextcloud',
+              href: 'https://zitadel.com/blog/zitadel-as-sso-provider-for-selfhosting',
+            },
+            {
+              type: 'link',
+              label: 'Cloudflare workers',
+              href: 'https://zitadel.com/blog/increase-spa-security-with-cloudflare-workers',
+            },
+            {
+              type: 'link',
+              label: 'Firezone (firezone.dev)',
+              href: 'https://www.firezone.dev/docs/authenticate/oidc/zitadel',
+            },
+            {
+              type: 'link',
+              label: 'Psono (psono.com)',
+              href: 'https://doc.psono.com/admin/configuration/oidc-zitadel.html',
+            },
+            {
+              type: 'link',
+              label: 'Netbird (netbird.io)',
+              href: 'https://docs.netbird.io/selfhosted/identity-providers',
+            },
           ],
         },
         {
@@ -566,6 +591,7 @@ module.exports = {
         "apis/actions/internal-authentication",
         "apis/actions/external-authentication",
         "apis/actions/complement-token",
+        "apis/actions/customize-samlresponse",
         "apis/actions/objects",
       ]
     },

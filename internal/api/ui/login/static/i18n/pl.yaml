@@ -89,6 +89,8 @@ InitMFAPrompt:
   Description: 2-etapowe uwierzytelnianie daje Ci dodatkową ochronę dla Twojego konta użytkownika. Dzięki temu masz pewność, że tylko Ty masz dostęp do swojego konta.
   Provider0: Aplikacja uwierzytelniająca (np. Google/Microsoft Authenticator, Authy)
   Provider1: Zależny od urządzenia (np. FaceID, Windows Hello, Odcisk palca)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   NextButtonText: dalej
   SkipButtonText: pomiń
 
@@ -100,6 +102,16 @@ InitMFAOTP:
   CodeLabel: Kod
   NextButtonText: dalej
   CancelButtonText: anuluj
+
+InitMFASMS:
+  Title: Weryfikacja 2-etapowa
+  DescriptionPhone: Utwórz uwierzytelnianie dwuskładnikowe. Wprowadź swój numer telefonu, aby go zweryfikować.
+  DescriptionCode: Utwórz uwierzytelnianie dwuskładnikowe. Wprowadź otrzymany kod, aby zweryfikować swój numer telefonu.
+  PhoneLabel: Numer telefonu
+  CodeLabel: Kod
+  EditButtonText: edytować
+  ResendButtonText: wyślij kod ponownie
+  NextButtonText: dalej
 
 InitMFAU2F:
   Title: Dodaj klucz zabezpieczeń
@@ -118,12 +130,21 @@ InitMFADone:
 MFAProvider:
   Provider0: Aplikacja uwierzytelniająca (np. Google/Microsoft Authenticator, Authy)
   Provider1: Zależny od urządzenia (np. FaceID, Windows Hello, Odcisk palca)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   ChooseOther: lub wybierz inną opcję
 
 VerifyMFAOTP:
   Title: Zweryfikuj 2-etapowe uwierzytelnianie
   Description: Zweryfikuj swój drugi czynnik
   CodeLabel: Kod
+  NextButtonText: dalej
+
+VerifyOTP:
+  Title: Zweryfikuj 2-etapowe uwierzytelnianie
+  Description: Zweryfikuj swój drugi czynnik
+  CodeLabel: Kod
+  ResendButtonText: wyślij kod ponownie
   NextButtonText: dalej
 
 VerifyMFAU2F:
