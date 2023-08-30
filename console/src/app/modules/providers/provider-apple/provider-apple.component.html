@@ -4,8 +4,8 @@
 >
   <div class="identity-provider-create-content">
     <div class="title-row">
-      <img class="idp-logo dark" src="./assets/images/idp/apple-dark.svg" alt="apple" />
-      <img class="idp-logo light" src="./assets/images/idp/apple.svg" alt="apple" />
+      <img class="idp-logo apple dark" src="./assets/images/idp/apple-dark.svg" alt="apple" />
+      <img class="idp-logo apple light" src="./assets/images/idp/apple.svg" alt="apple" />
       <h1>{{ 'IDP.CREATE.APPLE.TITLE' | translate }}</h1>
       <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
     </div>
@@ -38,21 +38,42 @@
           [ngModelOptions]="{ standalone: true }"
           >{{ 'IDP.APPLE.UPDATEPRIVATEKEY' | translate }}</mat-checkbox
         >
-        <cnsl-form-field *ngIf="!provider || (provider && updatePrivateKey)" class="formfield">
-          <cnsl-label>{{ 'IDP.APPLE.PRIVATEKEY' | translate }}</cnsl-label>
-          <input cnslInput formControlName="privateKey" />
-          <input
-            #keyFileInput
-            style="display: none"
-            class="file-input"
-            type="file"
-            accept=".p8"
-            (change)="onDropKey($any($event.target).files)"
-          />
-          <button type="button" mat-stroked-button (click)="$event.preventDefault(); keyFileInput.click()">
-            {{ 'IDP.APPLE.UPLOADPRIVATEKEY' | translate }}
-          </button>
-        </cnsl-form-field>
+
+        <ng-container *ngIf="!provider || (provider && updatePrivateKey)">
+          <span class="pk-label cnsl-secondary-text">{{ 'IDP.APPLE.PRIVATEKEY' | translate }}</span>
+          <div class="private-key-wrapper">
+            <ng-container *ngIf="privateKey?.value; else addLogoButton">
+              <i class="las la-file"></i>
+              <button
+                class="dl-btn"
+                mat-icon-button
+                color="warn"
+                (click)="privateKey?.setValue('')"
+                matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+              >
+                <i class="las la-trash"></i>
+              </button>
+            </ng-container>
+            <ng-template #addLogoButton>
+              <input
+                #keyFileInput
+                style="display: none"
+                class="file-input"
+                type="file"
+                accept=".p8"
+                (change)="onDropKey($any($event.target).files)"
+              />
+              <button
+                class="asset-add-btn"
+                mat-icon-button
+                matTooltip="{{ 'IDP.APPLE.UPLOADPRIVATEKEY' | translate }}"
+                (click)="$event.preventDefault(); keyFileInput.click()"
+              >
+                <mat-icon>add</mat-icon>
+              </button>
+            </ng-template>
+          </div>
+        </ng-container>
 
         <div class="identity-provider-optional-h-wrapper">
           <h2>{{ 'IDP.OPTIONAL' | translate }}</h2>
