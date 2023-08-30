@@ -6591,10 +6591,10 @@ message SetDefaultVerifyPhoneMessageTextRequest {
         }
     ];
     string text = 6 [
-        (validate.rules).string = {max_bytes: 40000},
+        (validate.rules).string = {max_len: 800},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"A new phone number has been added. Please use the following code to verify it {{.Code}}.\""
-            max_length: 10000;
+            max_length: 800;
         }
     ];
     string button_text = 7 [
