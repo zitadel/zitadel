@@ -3,6 +3,7 @@ package command
 import (
 	"net/http"
 	"reflect"
+	"slices"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -1676,7 +1677,7 @@ func (wm *AppleIDPWriteModel) NewChanges(
 	if wm.KeyID != keyID {
 		changes = append(changes, idp.ChangeAppleKeyID(keyID))
 	}
-	if !reflect.DeepEqual(wm.Scopes, scopes) {
+	if slices.Compare(wm.Scopes, scopes) != 0 {
 		changes = append(changes, idp.ChangeAppleScopes(scopes))
 	}
 
