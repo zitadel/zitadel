@@ -154,7 +154,7 @@ func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 		return nil, errors.ThrowInternal(err, "QUERY-Dbg53", "Errors.Internal")
 	}
 
-	authNKeys.LatestState, err = q.latestState(ctx, authNKeyTable)
+	authNKeys.State, err = q.latestState(ctx, authNKeyTable)
 	return authNKeys, err
 }
 
@@ -183,7 +183,7 @@ func (q *Queries) SearchAuthNKeysData(ctx context.Context, queries *AuthNKeySear
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dbi53", "Errors.Internal")
 	}
-	authNKeys.LatestState, err = q.latestState(ctx, authNKeyTable)
+	authNKeys.State, err = q.latestState(ctx, authNKeyTable)
 	return authNKeys, err
 }
 

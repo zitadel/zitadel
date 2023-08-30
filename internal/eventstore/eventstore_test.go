@@ -389,7 +389,7 @@ func (repo *testPusher) Push(ctx context.Context, commands ...Command) (events [
 
 type testQuerier struct {
 	events    []Event
-	sequence  uint64
+	sequence  float64
 	instances []string
 	err       error
 	t         *testing.T
@@ -409,7 +409,7 @@ func (repo *testQuerier) Filter(ctx context.Context, searchQuery *SearchQueryBui
 	return repo.events, nil
 }
 
-func (repo *testQuerier) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (uint64, error) {
+func (repo *testQuerier) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (float64, error) {
 	if repo.err != nil {
 		return 0, repo.err
 	}

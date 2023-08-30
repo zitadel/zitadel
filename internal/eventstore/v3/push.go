@@ -71,12 +71,12 @@ func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, 
 	return events, nil
 }
 
-const argsPerCommand = 9
+const argsPerCommand = 10
 
-func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (events []eventstore.Event, placeHolders []string, args []any, err error) {
+func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (events []eventstore.Event, placeholders []string, args []any, err error) {
 	events = make([]eventstore.Event, len(commands))
 	args = make([]any, 0, len(commands)*argsPerCommand)
-	placeHolders = make([]string, len(commands))
+	placeholders = make([]string, len(commands))
 
 	for i, command := range commands {
 		sequence := searchSequenceByCommand(sequences, command)
@@ -96,7 +96,7 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 			return nil, nil, nil, err
 		}
 
-		placeHolders[i] = fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, 'zitadel', $%d, $%d, $%d, cluster_logical_timestamp())",
+		placeholders[i] = fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, 'zitadel', $%d, $%d, $%d, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $%d)",
 			i*argsPerCommand+1,
 			i*argsPerCommand+2,
 			i*argsPerCommand+3,
@@ -106,6 +106,7 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 			i*argsPerCommand+7,
 			i*argsPerCommand+8,
 			i*argsPerCommand+9,
+			i*argsPerCommand+10,
 		)
 		args = append(args,
 			events[i].(*event).aggregate.InstanceID,
@@ -117,8 +118,9 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 			events[i].(*event).typ,
 			events[i].(*event).payload,
 			events[i].(*event).sequence,
+			i,
 		)
 	}
 
-	return events, placeHolders, args, nil
+	return events, placeholders, args, nil
 }

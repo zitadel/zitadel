@@ -77,9 +77,9 @@ func (p *Storage) getCertificateAndKey(ctx context.Context, usage domain.KeyUsag
 		return p.certificateToCertificateAndKey(selectCertificate(certs.Certificates))
 	}
 
-	var position uint64
-	if certs.LatestState != nil {
-		position = certs.LatestState.Position
+	var position float64
+	if certs.State != nil {
+		position = certs.State.Position
 	}
 
 	return nil, p.refreshCertificate(ctx, usage, position)
@@ -88,7 +88,7 @@ func (p *Storage) getCertificateAndKey(ctx context.Context, usage domain.KeyUsag
 func (p *Storage) refreshCertificate(
 	ctx context.Context,
 	usage domain.KeyUsage,
-	position uint64,
+	position float64,
 ) error {
 	ok, err := p.ensureIsLatestCertificate(ctx, position)
 	if err != nil {
@@ -104,7 +104,7 @@ func (p *Storage) refreshCertificate(
 	return nil
 }
 
-func (p *Storage) ensureIsLatestCertificate(ctx context.Context, position uint64) (bool, error) {
+func (p *Storage) ensureIsLatestCertificate(ctx context.Context, position float64) (bool, error) {
 	maxSequence, err := p.getMaxKeySequence(ctx)
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
@@ -152,7 +152,7 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage do
 	}
 }
 
-func (p *Storage) getMaxKeySequence(ctx context.Context) (uint64, error) {
+func (p *Storage) getMaxKeySequence(ctx context.Context) (float64, error) {
 	return p.eventstore.LatestSequence(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).

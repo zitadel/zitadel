@@ -17,7 +17,7 @@ type Event struct {
 
 	// Seq is the sequence of the event
 	Seq uint64
-	// Pos is the global sequence of the event
+	// Pos is the global sequence of the event multiple events can have the same sequence
 	Pos float64
 
 	//CreationDate is the time the event is created

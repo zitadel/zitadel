@@ -61,7 +61,7 @@ func (s *Server) ListOrgs(ctx context.Context, req *admin_pb.ListOrgsRequest) (*
 	}
 	return &admin_pb.ListOrgsResponse{
 		Result:  org_grpc.OrgViewsToPb(orgs.Orgs),
-		Details: object.ToListDetails(orgs.Count, orgs.Position, orgs.LastUpdated),
+		Details: object.ToListDetails(orgs.Count, orgs.Sequence, orgs.LastRun),
 	}, nil
 }
 

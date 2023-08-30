@@ -9,12 +9,16 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 type state struct {
 	instanceID     string
 	position       float64
 	eventTimestamp time.Time
+	aggregateType  eventstore.AggregateType
+	aggregateID    string
+	sequence       uint64
 }
 
 var (
@@ -33,11 +37,22 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 		instanceID: authz.GetInstance(ctx).InstanceID(),
 	}
 
-	timestamp := new(sql.NullTime)
-	position := new(sql.NullFloat64)
+	var (
+		aggregateID   = new(sql.NullString)
+		aggregateType = new(sql.NullString)
+		sequence      = new(sql.NullInt64)
+		timestamp     = new(sql.NullTime)
+		position      = new(sql.NullFloat64)
+	)
 
 	row := tx.QueryRowContext(ctx, currentStateStmt, currentState.instanceID, h.projection.Name())
-	err = row.Scan(timestamp, position)
+	err = row.Scan(
+		aggregateID,
+		aggregateType,
+		sequence,
+		timestamp,
+		position,
+	)
 	if errors.Is(err, sql.ErrNoRows) {
 		err = h.lockState(ctx, tx, currentState.instanceID)
 	}
@@ -46,6 +61,9 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 		return nil, err
 	}
 
+	currentState.aggregateID = aggregateID.String
+	currentState.aggregateType = eventstore.AggregateType(aggregateType.String)
+	currentState.sequence = uint64(sequence.Int64)
 	currentState.eventTimestamp = timestamp.Time
 	currentState.position = position.Float64
 	return currentState, nil
@@ -55,6 +73,9 @@ func (h *Handler) setState(ctx context.Context, tx *sql.Tx, updatedState *state)
 	res, err := tx.ExecContext(ctx, updateStateStmt,
 		h.projection.Name(),
 		updatedState.instanceID,
+		updatedState.aggregateID,
+		updatedState.aggregateType,
+		updatedState.sequence,
 		updatedState.eventTimestamp,
 		updatedState.position,
 	)

@@ -15,14 +15,19 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-type LatestState struct {
-	EventTimestamp time.Time
-	Position       uint64
-	LastUpdated    time.Time
+type State struct {
+	LastRun time.Time
+
+	Position       float64
+	EventCreatedAt time.Time
+	AggregateID    string
+	AggregateType  eventstore.AggregateType
+	Sequence       uint64
 }
 
 type CurrentStates struct {
@@ -31,10 +36,8 @@ type CurrentStates struct {
 }
 
 type CurrentState struct {
-	ProjectionName    string
-	CurrentPosition   uint64
-	EventCreationDate time.Time
-	LastRun           time.Time
+	ProjectionName string
+	State
 }
 
 type CurrentStateSearchQueries struct {
@@ -79,7 +82,7 @@ func (q *Queries) SearchCurrentStates(ctx context.Context, queries *CurrentState
 	return currentStates, nil
 }
 
-func (q *Queries) latestState(ctx context.Context, projections ...table) (state *LatestState, err error) {
+func (q *Queries) latestState(ctx context.Context, projections ...table) (state *State, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -223,18 +226,18 @@ func reset(ctx context.Context, tx *sql.Tx, tables []string, projectionName stri
 	return nil
 }
 
-func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*LatestState, error)) {
+func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*State, error)) {
 	return sq.Select(
 			CurrentStateColEventDate.identifier(),
 			CurrentStateColPosition.identifier(),
 			CurrentStateColLastUpdated.identifier()).
 			From(currentStateTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*LatestState, error) {
+		func(row *sql.Row) (*State, error) {
 			var (
 				creationDate sql.NullTime
 				lastUpdated  sql.NullTime
-				position     sql.NullInt64
+				position     sql.NullFloat64
 			)
 			err := row.Scan(
 				&creationDate,
@@ -244,10 +247,10 @@ func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 			if err != nil && !errs.Is(err, sql.ErrNoRows) {
 				return nil, errors.ThrowInternal(err, "QUERY-aAZ1D", "Errors.Internal")
 			}
-			return &LatestState{
-				EventTimestamp: creationDate.Time,
-				LastUpdated:    lastUpdated.Time,
-				Position:       uint64(position.Int64),
+			return &State{
+				EventCreatedAt: creationDate.Time,
+				LastRun:        lastUpdated.Time,
+				Position:       position.Float64,
 			}, nil
 		}
 }
@@ -258,6 +261,9 @@ func prepareCurrentStateQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			CurrentStateColEventDate.identifier(),
 			CurrentStateColPosition.identifier(),
 			CurrentStateColProjectionName.identifier(),
+			CurrentStateColAggregateType.identifier(),
+			CurrentStateColAggregateID.identifier(),
+			CurrentStateColSequence.identifier(),
 			countColumn.identifier()).
 			From(currentStateTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
@@ -266,23 +272,34 @@ func prepareCurrentStateQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			var count uint64
 			for rows.Next() {
 				currentState := new(CurrentState)
-				var lastRun sql.NullTime
-				var eventDate sql.NullTime
-				var currentPosition sql.NullInt64
+				var (
+					lastRun         sql.NullTime
+					eventDate       sql.NullTime
+					currentPosition sql.NullFloat64
+					aggregateType   sql.NullString
+					aggregateID     sql.NullString
+					sequence        sql.NullInt64
+				)
 
 				err := rows.Scan(
 					&lastRun,
 					&eventDate,
 					&currentPosition,
 					&currentState.ProjectionName,
+					&aggregateType,
+					&aggregateID,
+					&sequence,
 					&count,
 				)
 				if err != nil {
 					return nil, err
 				}
-				currentState.EventCreationDate = eventDate.Time
-				currentState.LastRun = lastRun.Time
-				currentState.CurrentPosition = uint64(currentPosition.Int64)
+				currentState.State.EventCreatedAt = eventDate.Time
+				currentState.State.LastRun = lastRun.Time
+				currentState.Position = currentPosition.Float64
+				currentState.AggregateType = eventstore.AggregateType(aggregateType.String)
+				currentState.AggregateID = aggregateID.String
+				currentState.Sequence = uint64(sequence.Int64)
 				states = append(states, currentState)
 			}
 
@@ -310,6 +327,18 @@ var (
 	}
 	CurrentStateColPosition = Column{
 		name:  "position",
+		table: currentStateTable,
+	}
+	CurrentStateColAggregateType = Column{
+		name:  "aggregate_type",
+		table: currentStateTable,
+	}
+	CurrentStateColAggregateID = Column{
+		name:  "aggregate_id",
+		table: currentStateTable,
+	}
+	CurrentStateColSequence = Column{
+		name:  "sequence",
 		table: currentStateTable,
 	}
 	CurrentStateColLastUpdated = Column{

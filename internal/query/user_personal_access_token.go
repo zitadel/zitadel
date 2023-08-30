@@ -147,7 +147,7 @@ func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *Perso
 		return nil, errors.ThrowInternal(err, "QUERY-Bmz63", "Errors.Internal")
 	}
 
-	personalAccessTokens.LatestState, err = q.latestState(ctx, personalAccessTokensTable)
+	personalAccessTokens.State, err = q.latestState(ctx, personalAccessTokensTable)
 	return personalAccessTokens, err
 }
 

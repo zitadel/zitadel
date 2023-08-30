@@ -1,5 +1,4 @@
 SET experimental_enable_hash_sharded_indexes = on;
-SET serial_normalization = 'sql_sequence_cached';
 
 CREATE TABLE IF NOT EXISTS eventstore.events (
 	id UUID DEFAULT gen_random_uuid()
@@ -17,7 +16,8 @@ CREATE TABLE IF NOT EXISTS eventstore.events (
 	, editor_service TEXT
 	, resource_owner TEXT NOT NULL
 	, instance_id TEXT NOT NULL
-	, position DECIMAL NOT NULL
+	, "position" BIGINT NOT NULL
+	, commit_order DECIMAL NOT NULL
 
 	, PRIMARY KEY (instance_id, aggregate_type, aggregate_id, event_sequence DESC)
 );

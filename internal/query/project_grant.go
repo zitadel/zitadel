@@ -194,7 +194,7 @@ func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrant
 		return nil, errors.ThrowInternal(err, "QUERY-PP02n", "Errors.Internal")
 	}
 
-	grants.LatestState, err = q.latestState(ctx, projectGrantsTable)
+	grants.State, err = q.latestState(ctx, projectGrantsTable)
 	return grants, err
 }
 

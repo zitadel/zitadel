@@ -112,7 +112,7 @@ func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-5Ngd9", "Errors.Internal")
 	}
-	roles.LatestState, err = q.latestState(ctx, projectRolesTable)
+	roles.State, err = q.latestState(ctx, projectRolesTable)
 	return roles, err
 }
 
@@ -148,7 +148,7 @@ func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grante
 		return nil, errors.ThrowInternal(err, "QUERY-5Ngd9", "Errors.Internal")
 	}
 
-	roles.LatestState, err = q.latestState(ctx, projectRolesTable)
+	roles.State, err = q.latestState(ctx, projectRolesTable)
 	return roles, err
 }
 

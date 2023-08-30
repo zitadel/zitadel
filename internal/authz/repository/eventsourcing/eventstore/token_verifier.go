@@ -59,8 +59,8 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 		token.ID = tokenID
 		token.UserID = userID
 		if sequence != nil {
-			token.Sequence = sequence.CurrentPosition
-			token.ChangeDate = sequence.EventCreationDate
+			token.Sequence = sequence.Sequence
+			token.ChangeDate = sequence.EventCreatedAt
 		}
 	}
 

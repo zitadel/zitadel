@@ -53,7 +53,7 @@ func (s *Server) ListProjects(ctx context.Context, req *mgmt_pb.ListProjectsRequ
 	}
 	return &mgmt_pb.ListProjectsResponse{
 		Result:  project_grpc.ProjectViewsToPb(projects.Projects),
-		Details: object_grpc.ToListDetails(projects.Count, projects.Position, projects.LastUpdated),
+		Details: object_grpc.ToListDetails(projects.Count, projects.Sequence, projects.LastRun),
 	}, nil
 }
 
@@ -115,7 +115,7 @@ func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrant
 	}
 	return &mgmt_pb.ListGrantedProjectsResponse{
 		Result:  project_grpc.GrantedProjectViewsToPb(projects.ProjectGrants),
-		Details: object_grpc.ToListDetails(projects.Count, projects.Position, projects.LastUpdated),
+		Details: object_grpc.ToListDetails(projects.Count, projects.Sequence, projects.LastRun),
 	}, nil
 }
 
@@ -134,7 +134,7 @@ func (s *Server) ListGrantedProjectRoles(ctx context.Context, req *mgmt_pb.ListG
 	}
 	return &mgmt_pb.ListGrantedProjectRolesResponse{
 		Result:  project_grpc.RoleViewsToPb(roles.ProjectRoles),
-		Details: object_grpc.ToListDetails(roles.Count, roles.Position, roles.LastUpdated),
+		Details: object_grpc.ToListDetails(roles.Count, roles.Sequence, roles.LastRun),
 	}, nil
 }
 
@@ -259,7 +259,7 @@ func (s *Server) ListProjectRoles(ctx context.Context, req *mgmt_pb.ListProjectR
 	}
 	return &mgmt_pb.ListProjectRolesResponse{
 		Result:  project_grpc.RoleViewsToPb(roles.ProjectRoles),
-		Details: object_grpc.ToListDetails(roles.Count, roles.Position, roles.LastUpdated),
+		Details: object_grpc.ToListDetails(roles.Count, roles.Sequence, roles.LastRun),
 	}, nil
 }
 
@@ -349,7 +349,7 @@ func (s *Server) ListProjectMembers(ctx context.Context, req *mgmt_pb.ListProjec
 	}
 	return &mgmt_pb.ListProjectMembersResponse{
 		Result:  member_grpc.MembersToPb(s.assetAPIPrefix(ctx), members.Members),
-		Details: object_grpc.ToListDetails(members.Count, members.Position, members.LastUpdated),
+		Details: object_grpc.ToListDetails(members.Count, members.Sequence, members.LastRun),
 	}, nil
 }
 

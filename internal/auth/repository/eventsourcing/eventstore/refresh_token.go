@@ -99,7 +99,7 @@ func (r *RefreshTokenRepo) SearchMyRefreshTokens(ctx context.Context, userID str
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Sequence:    sequence.CurrentPosition,
+		Sequence:    sequence.Sequence,
 		Timestamp:   sequence.LastRun,
 		Result:      model.RefreshTokenViewsToModel(tokens),
 	}, nil

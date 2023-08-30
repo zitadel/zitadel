@@ -285,6 +285,9 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 		}
 
 		currentState.position = statements[lastProcessedIndex].Position
+		currentState.aggregateID = statements[lastProcessedIndex].AggregateID
+		currentState.aggregateType = statements[lastProcessedIndex].AggregateType
+		currentState.sequence = statements[lastProcessedIndex].Sequence
 		currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
 
 		return h.setState(ctx, tx, currentState)
@@ -387,7 +390,7 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		InstanceID(currentState.instanceID)
 
 	if currentState.position > 0 {
-		builder = builder.PositionAfter(currentState.position)
+		builder = builder.PositionAfter(currentState.position - 1)
 	}
 
 	for aggregateType, eventTypes := range h.eventTypes {

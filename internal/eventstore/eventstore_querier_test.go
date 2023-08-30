@@ -193,7 +193,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 		existingEvents []eventstore.Command
 	}
 	type res struct {
-		sequence uint64
+		sequence float64
 	}
 	tests := []struct {
 		name    string

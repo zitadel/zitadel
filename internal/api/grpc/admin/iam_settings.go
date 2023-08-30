@@ -19,7 +19,7 @@ func (s *Server) ListSecretGenerators(ctx context.Context, req *admin_pb.ListSec
 	}
 	return &admin_pb.ListSecretGeneratorsResponse{
 		Result:  SecretGeneratorsToPb(result.SecretGenerators),
-		Details: object.ToListDetails(result.Count, result.Position, result.LastUpdated),
+		Details: object.ToListDetails(result.Count, result.Sequence, result.LastRun),
 	}, nil
 }
 

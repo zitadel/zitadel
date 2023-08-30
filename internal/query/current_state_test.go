@@ -80,10 +80,12 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 				},
 				CurrentStates: []*CurrentState{
 					{
-						EventCreationDate: testNow,
-						LastRun:           testNow,
-						CurrentPosition:   20211108,
-						ProjectionName:    "projection-name",
+						ProjectionName: "projection-name",
+						State: State{
+							EventCreatedAt: testNow,
+							LastRun:        testNow,
+							Position:       20211108,
+						},
 					},
 				},
 			},
@@ -121,16 +123,20 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 				},
 				CurrentStates: []*CurrentState{
 					{
-						EventCreationDate: testNow,
-						CurrentPosition:   20211108,
-						ProjectionName:    "projection-name",
-						LastRun:           testNow,
+						ProjectionName: "projection-name",
+						State: State{
+							EventCreatedAt: testNow,
+							Position:       20211108,
+							LastRun:        testNow,
+						},
 					},
 					{
-						EventCreationDate: testNow,
-						CurrentPosition:   20211108,
-						ProjectionName:    "projection-name2",
-						LastRun:           testNow,
+						ProjectionName: "projection-name2",
+						State: State{
+							EventCreatedAt: testNow,
+							Position:       20211108,
+							LastRun:        testNow,
+						},
 					},
 				},
 			},

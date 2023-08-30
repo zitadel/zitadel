@@ -103,7 +103,7 @@ func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery, with
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Pdg1I", "Errors.Internal")
 	}
-	members.LatestState = currentSequence
+	members.State = currentSequence
 	return members, err
 }
 

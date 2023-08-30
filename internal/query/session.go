@@ -211,7 +211,7 @@ func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQue
 		return nil, errors.ThrowInternal(err, "QUERY-Sfg42", "Errors.Internal")
 	}
 
-	sessions.LatestState, err = q.latestState(ctx, sessionsTable)
+	sessions.State, err = q.latestState(ctx, sessionsTable)
 	return sessions, err
 }
 

@@ -139,7 +139,7 @@ func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQu
 }
 
 // LatestSequence filters the latest sequence for the given search query
-func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (uint64, error) {
+func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (float64, error) {
 	queryFactory.InstanceID(authz.GetInstance(ctx).InstanceID())
 
 	return es.querier.LatestSequence(ctx, queryFactory)
@@ -192,7 +192,7 @@ type Querier interface {
 	// Filter returns all events matching the given search query
 	Filter(ctx context.Context, searchQuery *SearchQueryBuilder) (events []Event, err error)
 	// LatestSequence returns the latest sequence found by the search query
-	LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (uint64, error)
+	LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (float64, error)
 	// InstanceIDs returns the instance ids found by the search query
 	InstanceIDs(ctx context.Context, queryFactory *SearchQueryBuilder) ([]string, error)
 	// CreateInstance creates a new sequence for the given instance

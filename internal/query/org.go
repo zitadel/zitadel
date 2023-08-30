@@ -232,7 +232,7 @@ func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (or
 		return nil, errors.ThrowInternal(err, "QUERY-M6mYN", "Errors.Internal")
 	}
 
-	orgs.LatestState, err = q.latestState(ctx, orgsTable)
+	orgs.State, err = q.latestState(ctx, orgsTable)
 	return orgs, err
 }
 

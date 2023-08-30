@@ -129,7 +129,7 @@ func prepareTimeTravel(ctx context.Context, criteria querier, allow bool) string
 }
 
 func maxSequenceScanner(row scan, dest interface{}) (err error) {
-	position, ok := dest.(*sql.NullInt64)
+	position, ok := dest.(*sql.NullFloat64)
 	if !ok {
 		return z_errors.ThrowInvalidArgumentf(nil, "SQL-NBjA9", "type must be sql.NullInt64 got: %T", dest)
 	}
@@ -224,7 +224,7 @@ func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause 
 	// created_at <= now() must be added because clock_timestamp() could be in the future
 	// this could lead to skipped events which are not visible as of system time but have a lower
 	// created_at timestamp
-	return " WHERE (" + strings.Join(clauses, " OR ") + ") AND hlc_to_timestamp(position)::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = 'zitadel')", values
+	return " WHERE (" + strings.Join(clauses, " OR ") + ") AND created_at::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = 'zitadel')", values
 }
 
 func getCondition(cond querier, filter *repository.Filter) (condition string) {

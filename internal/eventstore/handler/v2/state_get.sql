@@ -1,5 +1,8 @@
-SELECT 
-    event_date
+SELECT
+    aggregate_id
+    , aggregate_type
+    , "sequence"
+    , event_date
     , position
 FROM 
     projections.current_states

@@ -88,7 +88,7 @@ func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, qu
 		return nil, err
 	}
 
-	milestones.LatestState, err = q.latestState(ctx, milestonesTable)
+	milestones.State, err = q.latestState(ctx, milestonesTable)
 	return milestones, err
 
 }
