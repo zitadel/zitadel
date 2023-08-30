@@ -57,6 +57,10 @@ var (
 		name:  projection.SMTPConfigColumnSenderName,
 		table: smtpConfigsTable,
 	}
+	SMTPConfigColumnReplyToAddress = Column{
+		name:  projection.SMTPConfigColumnReplyToAddress,
+		table: smtpConfigsTable,
+	}
 	SMTPConfigColumnSMTPHost = Column{
 		name:  projection.SMTPConfigColumnSMTPHost,
 		table: smtpConfigsTable,
@@ -83,15 +87,16 @@ type SMTPConfig struct {
 	ResourceOwner string
 	Sequence      uint64
 
-	TLS           bool
-	SenderAddress string
-	SenderName    string
-	Host          string
-	User          string
-	Password      *crypto.CryptoValue
+	TLS            bool
+	SenderAddress  string
+	SenderName     string
+	ReplyToAddress string
+	Host           string
+	User           string
+	Password       *crypto.CryptoValue
 }
 
-func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (_ *SMTPConfig, err error) {
+func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (config *SMTPConfig, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -104,8 +109,11 @@ func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID strin
 		return nil, errors.ThrowInternal(err, "QUERY-3m9sl", "Errors.Query.SQLStatment")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		config, err = scan(row)
+		return err
+	}, query, args...)
+	return config, err
 }
 
 func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, error)) {
@@ -120,6 +128,7 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			SMTPConfigColumnTLS.identifier(),
 			SMTPConfigColumnSenderAddress.identifier(),
 			SMTPConfigColumnSenderName.identifier(),
+			SMTPConfigColumnReplyToAddress.identifier(),
 			SMTPConfigColumnSMTPHost.identifier(),
 			SMTPConfigColumnSMTPUser.identifier(),
 			SMTPConfigColumnSMTPPassword.identifier()).
@@ -136,6 +145,7 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				&config.TLS,
 				&config.SenderAddress,
 				&config.SenderName,
+				&config.ReplyToAddress,
 				&config.Host,
 				&config.User,
 				&password,

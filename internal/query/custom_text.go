@@ -104,14 +104,14 @@ func (q *Queries) CustomTextList(ctx context.Context, aggregateID, template, lan
 		return nil, errors.ThrowInternal(err, "QUERY-M9gse", "Errors.Query.SQLStatement")
 	}
 
-	rows, err := q.client.QueryContext(ctx, query, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		texts, err = scan(rows)
+		return err
+	}, query, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-2j00f", "Errors.Internal")
 	}
-	texts, err = scan(rows)
-	if err != nil {
-		return nil, err
-	}
+
 	texts.LatestSequence, err = q.latestSequence(ctx, projectsTable)
 	return texts, err
 }
@@ -134,14 +134,14 @@ func (q *Queries) CustomTextListByTemplate(ctx context.Context, aggregateID, tem
 		return nil, errors.ThrowInternal(err, "QUERY-M49fs", "Errors.Query.SQLStatement")
 	}
 
-	rows, err := q.client.QueryContext(ctx, query, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		texts, err = scan(rows)
+		return err
+	}, query, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-3n9ge", "Errors.Internal")
 	}
-	texts, err = scan(rows)
-	if err != nil {
-		return nil, err
-	}
+
 	texts.LatestSequence, err = q.latestSequence(ctx, projectsTable)
 	return texts, err
 }

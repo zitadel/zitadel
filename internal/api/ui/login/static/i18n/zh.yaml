@@ -140,6 +140,13 @@ VerifyMFAOTP:
   CodeLabel: 验证码
   NextButtonText: 继续
 
+VerifyOTP:
+  Title: 验证2-Factor
+  Description: 验证你的第二个因素
+  CodeLabel: 验证码
+  ResendButtonText: 重发代码
+  NextButtonText: 继续
+
 VerifyMFAU2F:
   Title: 验证2-Factor
   Description: 用注册的设备验证你的2-Factor（如FaceID、Windows Hello、Fingerprint）。

@@ -6,11 +6,12 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	z_db "github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 type database struct {
-	client    *sql.DB
+	client    *z_db.DB
 	masterKey string
 	encrypt   func(key, masterKey string) (encryptedKey string, err error)
 	decrypt   func(encryptedKey, masterKey string) (key string, err error)
@@ -22,7 +23,7 @@ const (
 	encryptionKeysKeyCol = "key"
 )
 
-func NewKeyStorage(client *sql.DB, masterKey string) (*database, error) {
+func NewKeyStorage(client *z_db.DB, masterKey string) (*database, error) {
 	if err := checkMasterKeyLength(masterKey); err != nil {
 		return nil, err
 	}
@@ -42,32 +43,30 @@ func (d *database) ReadKeys() (crypto.Keys, error) {
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "", "unable to read keys")
 	}
-	rows, err := d.client.Query(stmt, args...)
+	err = d.client.Query(func(rows *sql.Rows) error {
+		for rows.Next() {
+			var id, encryptionKey string
+			err = rows.Scan(&id, &encryptionKey)
+			if err != nil {
+				return caos_errs.ThrowInternal(err, "", "unable to read keys")
+			}
+			key, err := d.decrypt(encryptionKey, d.masterKey)
+			if err != nil {
+				return caos_errs.ThrowInternal(err, "", "unable to decrypt key")
+			}
+			keys[id] = key
+		}
+		return nil
+	}, stmt, args...)
+
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "", "unable to read keys")
 	}
-	for rows.Next() {
-		var id, encryptionKey string
-		err = rows.Scan(&id, &encryptionKey)
-		if err != nil {
-			return nil, caos_errs.ThrowInternal(err, "", "unable to read keys")
-		}
-		key, err := d.decrypt(encryptionKey, d.masterKey)
-		if err != nil {
-			if err := rows.Close(); err != nil {
-				return nil, caos_errs.ThrowInternal(err, "", "unable to close rows")
-			}
-			return nil, caos_errs.ThrowInternal(err, "", "unable to decrypt key")
-		}
-		keys[id] = key
-	}
-	if err := rows.Close(); err != nil {
-		return nil, caos_errs.ThrowInternal(err, "", "unable to close rows")
-	}
-	return keys, err
+
+	return keys, nil
 }
 
-func (d *database) ReadKey(id string) (*crypto.Key, error) {
+func (d *database) ReadKey(id string) (_ *crypto.Key, err error) {
 	stmt, args, err := sq.Select(encryptionKeysKeyCol).
 		From(EncryptionKeysTable).
 		Where(sq.Eq{encryptionKeysIDCol: id}).
@@ -76,19 +75,23 @@ func (d *database) ReadKey(id string) (*crypto.Key, error) {
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "", "unable to read key")
 	}
-	row := d.client.QueryRow(stmt, args...)
+	var key string
+	err = d.client.QueryRow(func(row *sql.Row) error {
+		var encryptionKey string
+		err = row.Scan(&encryptionKey)
+		if err != nil {
+			return caos_errs.ThrowInternal(err, "", "unable to read key")
+		}
+		key, err = d.decrypt(encryptionKey, d.masterKey)
+		if err != nil {
+			return caos_errs.ThrowInternal(err, "", "unable to decrypt key")
+		}
+		return nil
+	}, stmt, args...)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "", "unable to read key")
 	}
-	var encryptionKey string
-	err = row.Scan(&encryptionKey)
-	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "", "unable to read key")
-	}
-	key, err := d.decrypt(encryptionKey, d.masterKey)
-	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "", "unable to decrypt key")
-	}
+
 	return &crypto.Key{
 		ID:    id,
 		Value: key,

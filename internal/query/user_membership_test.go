@@ -444,7 +444,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Memberships)(nil),
 		},
 	}
 	for _, tt := range tests {
