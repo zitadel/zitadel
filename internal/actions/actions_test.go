@@ -8,7 +8,9 @@ import (
 	"time"
 
 	"github.com/dop251/goja"
+
 	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/logstore/record"
 )
 
 func TestRun(t *testing.T) {

@@ -45,8 +45,9 @@ func TestQuotasProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.quotas (instance_id, unit, amount, from_anchor, interval, limit_usage) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.quotas (id, instance_id, unit, amount, from_anchor, interval, limit_usage) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
+								"agg-id",
 								"instance-id",
 								quota.RequestsAllAuthenticated,
 								uint64(10),
@@ -78,6 +79,13 @@ func TestQuotasProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.quotas_periods WHERE (instance_id = $1) AND (unit = $2)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								quota.RequestsAllAuthenticated,
+							},
+						},
+						{
+							expectedStmt: "DELETE FROM projections.quotas_notifications WHERE (instance_id = $1) AND (unit = $2)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								quota.RequestsAllAuthenticated,
