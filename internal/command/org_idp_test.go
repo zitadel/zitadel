@@ -4961,7 +4961,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-jkn3w", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-jkn3w", "Errors.IDP.ClientIDMissing"))
 				},
 			},
 		},
@@ -4980,7 +4980,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Ffg32", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Ffg32", "Errors.IDP.TeamIDMissing"))
 				},
 			},
 		},
@@ -5000,7 +5000,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-GDjm5", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-GDjm5", "Errors.IDP.KeyIDMissing"))
 				},
 			},
 		},
@@ -5021,7 +5021,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-GVD4n", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-GVD4n", "Errors.IDP.PrivateKeyMissing"))
 				},
 			},
 		},
@@ -5177,7 +5177,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-FRHBH", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-FRHBH", "Errors.IDMissing"))
 				},
 			},
 		},
@@ -5194,7 +5194,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SFm4l", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SFm4l", "Errors.IDP.ClientIDMissing"))
 				},
 			},
 		},
@@ -5213,12 +5213,12 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SG34t", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SG34t", "Errors.IDP.TeamIDMissing"))
 				},
 			},
 		},
 		{
-			"invalid lkeyID",
+			"invalid keyID",
 			fields{
 				eventstore: eventstoreExpect(t),
 			},
@@ -5233,7 +5233,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Gh4z2", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Gh4z2", "Errors.IDP.KeyIDMissing"))
 				},
 			},
 		},

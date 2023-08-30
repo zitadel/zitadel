@@ -4891,7 +4891,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-jkn3w", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-jkn3w", "Errors.ClientIDMissing"))
 				},
 			},
 		},
@@ -4909,7 +4909,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Ffg32", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Ffg32", "Errors.IDP.TeamIDMissing"))
 				},
 			},
 		},
@@ -4928,7 +4928,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GDjm5", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GDjm5", "Errors.IDP.KeyIDMissing"))
 				},
 			},
 		},
@@ -4948,7 +4948,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GVD4n", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.IDP.PrivateKeyMissing"))
 				},
 			},
 		},
@@ -5106,7 +5106,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-FRHBH", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-FRHBH", "Errors.IDMissing"))
 				},
 			},
 		},
@@ -5122,7 +5122,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SFm4l", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SFm4l", "Errors.IDP.ClientIDMissing"))
 				},
 			},
 		},
@@ -5140,12 +5140,12 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SG34t", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SG34t", "Errors.IDP.TeamIDMissing"))
 				},
 			},
 		},
 		{
-			"invalid lkeyID",
+			"invalid keyID",
 			fields{
 				eventstore: eventstoreExpect(t),
 			},
@@ -5159,7 +5159,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Gh4z2", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Gh4z2", "Errors.IDP.KeyIDMissing"))
 				},
 			},
 		},

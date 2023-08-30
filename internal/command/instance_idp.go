@@ -1563,16 +1563,16 @@ func (c *Commands) prepareUpdateInstanceLDAPProvider(a *instance.Aggregate, writ
 func (c *Commands) prepareAddInstanceAppleProvider(a *instance.Aggregate, writeModel *InstanceAppleIDPWriteModel, provider AppleProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-jkn3w", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-jkn3w", "Errors.IDP.ClientIDMissing")
 		}
 		if provider.TeamID = strings.TrimSpace(provider.TeamID); provider.TeamID == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Ffg32", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Ffg32", "Errors.IDP.TeamIDMissing")
 		}
 		if provider.KeyID = strings.TrimSpace(provider.KeyID); provider.KeyID == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-GDjm5", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-GDjm5", "Errors.IDP.KeyIDMissing")
 		}
 		if len(provider.PrivateKey) == 0 {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.IDP.PrivateKeyMissing")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
@@ -1608,16 +1608,16 @@ func (c *Commands) prepareAddInstanceAppleProvider(a *instance.Aggregate, writeM
 func (c *Commands) prepareUpdateInstanceAppleProvider(a *instance.Aggregate, writeModel *InstanceAppleIDPWriteModel, provider AppleProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-FRHBH", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-FRHBH", "Errors.IDMissing")
 		}
 		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-SFm4l", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-SFm4l", "Errors.IDP.ClientIDMissing")
 		}
 		if provider.TeamID = strings.TrimSpace(provider.TeamID); provider.TeamID == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-SG34t", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-SG34t", "Errors.IDP.TeamIDMissing")
 		}
 		if provider.KeyID = strings.TrimSpace(provider.KeyID); provider.KeyID == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Gh4z2", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Gh4z2", "Errors.IDP.KeyIDMissing")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
