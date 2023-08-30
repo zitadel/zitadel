@@ -22,12 +22,12 @@
         </cnsl-form-field>
 
         <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'IDP.TEAMID' | translate }}</cnsl-label>
+          <cnsl-label>{{ 'IDP.APPLE.TEAMID' | translate }}</cnsl-label>
           <input cnslInput formControlName="teamId" />
         </cnsl-form-field>
 
         <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'IDP.KEYID' | translate }}</cnsl-label>
+          <cnsl-label>{{ 'IDP.APPLE.KEYID' | translate }}</cnsl-label>
           <input cnslInput formControlName="keyId" />
         </cnsl-form-field>
 
@@ -36,10 +36,10 @@
           *ngIf="provider"
           [(ngModel)]="updatePrivateKey"
           [ngModelOptions]="{ standalone: true }"
-          >{{ 'IDP.UPDATEPRIVATEKEY' | translate }}</mat-checkbox
+          >{{ 'IDP.APPLE.UPDATEPRIVATEKEY' | translate }}</mat-checkbox
         >
         <cnsl-form-field *ngIf="!provider || (provider && updatePrivateKey)" class="formfield">
-          <cnsl-label>{{ 'IDP.PRIVATEKEY' | translate }}</cnsl-label>
+          <cnsl-label>{{ 'IDP.APPLE.PRIVATEKEY' | translate }}</cnsl-label>
           <input cnslInput formControlName="privateKey" />
           <input
             #keyFileInput
@@ -50,7 +50,7 @@
             (change)="onDropKey($any($event.target).files)"
           />
           <button type="button" mat-stroked-button (click)="$event.preventDefault(); keyFileInput.click()">
-            {{ 'IDP.UPLOADPRIVATEKEY' | translate }}
+            {{ 'IDP.APPLE.UPLOADPRIVATEKEY' | translate }}
           </button>
         </cnsl-form-field>
 

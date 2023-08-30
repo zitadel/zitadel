@@ -238,7 +238,7 @@ export class ProviderAppleComponent {
     const file = filelist.item(0);
     if (file) {
       if (file.size > MAX_ALLOWED_SIZE) {
-        this.toast.showInfo('IDP.PRIVATEKEY.MAXSIZEEXCEEDED', true);
+        this.toast.showInfo('IDP.APPLE.KEYMAXSIZEEXCEEDED', true);
       } else {
         this.privateKey?.setValue('');
         const reader = new FileReader();
