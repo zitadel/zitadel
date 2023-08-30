@@ -12,8 +12,10 @@ import UpdateSessionWebAuthN from './_update_session_webauthn.mdx';
 Multi-factor authentication (MFA) is a multi-step account authentication which requires to user to enter more than only the password.
 It is highly recommended to use MFA or [Passkeys](./passkey) to make your user accounts more secure.
 
-ZITADEL supports two different Methods:
+ZITADEL supports different Methods:
 - Time-based one time password (TOTP), which are Authenticator apps like Google/Microsoft Authenticator, Authy, etc
+- One time code sent as SMS
+- One time code sent as E-Mail
 - Universal Second Factor (U2F), which is authentication with your device like Windows Hello, Apple FaceID, Fingerprint, FIDO2 keys, Yubikey, etc.
 
 ## TOTP Registration
@@ -91,7 +93,7 @@ curl --request POST \
 To be able to check the TOTP you need a session with a checked user. This can either happen before the TOTP check or at the same time.
 In this example we do two separate requests. So the first step is to create a new Sessions.
 
-More detailed information about the API: [Create new session Documentation](https://zitadel.com/docs/apis/resources/session_service/session-service-create-session)
+More detailed information about the API: [Create new session Documentation](/apis/resources/session_service/session-service-create-session)
 
 Example Request
 
@@ -129,18 +131,16 @@ Example Response
 Now you can show the code field to the user, where he has to enter the code from the Authenticator App.
 With that code you have to update the existing session with a totp check.
 
-More detailed information about the API: [Update session Documentation](https://zitadel.com/docs/apis/resources/session_service/session-service-set-session)
+More detailed information about the API: [Update session Documentation](/apis/resources/session_service/session-service-set-session)
 
 Example Request
 ```bash
 curl --request PATCH \
-  --url https://hi-fabienne-dxmbrv.zitadel.cloud/v2alpha/sessions/225307381909694507 \
+  --url https://$ZITADEL_DOMAIN/v2alpha/sessions/$SESSION-ID \
   --header 'Accept: application/json' \
-  --header 'Authorization: Bearer tySiWbojwZGZXisvjPSVoKZVTz4htmUBK_J04ALDWveuKJHlvcpXFoMmuwKy9q95bKPKo14' \
   --header 'Content-Type: application/json' \
-  --cookie __Secure-zitadel.useragent=MTY5MDgwODc3OHxIUmZ1NFhjVVJwYTJWWmZRaTJfUF9fRkdiREdFaW5JU0pCbWZnLW1zNndMYTBWejdndmlZSXllMWdQRkhfelBIbG8xcEYxYUZWeTVoZXlrQXR3ZkxkN2FsNjdKUW5yOD18SCzGXSHce2EURD2fndgvcSm2gt7KG0FsNqIDgM2dviI%3D \
   --data '{
-  "sessionToken": "W3mEoesTiYOsiR1LYUCRw3WaEwXKLGDTsqOV_bkOhlah_-ZpuiLgvnzADwe_iYMusbwkMhp7VfMn7g",
+  "sessionToken": "W3mEoesTiYOsiR1LYUCRw3vaEwXKLGDTsqOV_bkOhlah_-ZbuiLgvnzADwe_iYMusbwkMhp7VfMn8j",
   "checks": {
     "totp": {
 			"totp": {
@@ -149,6 +149,78 @@ curl --request PATCH \
     }
   }
 }'
+```
+
+## SMS Code Registration
+
+### Flow
+
+![Register TOTP](/img/guides/login-ui/register-phone-otp-flow.png)
+
+### List the Possible Methods
+
+<MfaOptions/>
+
+### Add Phone Number
+
+When the user has decided to register the phone number to get a code as a second factor, the first step is to add a verified phone number to the user.
+If the user already has a verified phone number you can skip this step.
+
+When adding a new phone number, you can choose if you want ZITADEL to send the verification code to the number, or if you want to send it by yourself.
+If ZITADEL should do it, make sure that you have registered an [SMS Provider](/docs/guides/manage/console/instance-settings#sms) and send an empty sendCode object in the request.
+With an empty returnCode object in the request, ZITADEL will not send the code, but return it in the response.
+
+If you don't want the user to verify the phone number, you can also create it directly as verified, by sending the isVerified attribute.
+
+More detailed information about the API: [Add phone](/apis/resources/user_service/user-service-set-phone)
+
+Example Request:
+
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER-ID/phone \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"'' \
+  --header 'Content-Type: application/json' \
+  --data '{
+      "phone": "+41791234567",
+      "sendCode": {}
+  }'
+```
+
+### Verify Phone Number
+
+The next step is to show a screen, so the user is able to enter the code for verifying the phone number.
+Send a verify phone request with the code in the body.
+
+More detailed information about the API: [Verify phone](/apis/resources/user_service/user-service-verify-phone)
+
+Example Request:
+```bash
+curl --request POST \
+    --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER-ID/phone/verify \
+    --header 'Accept: application/json' \
+    --header 'Authorization: Bearer '"$TOKEN"'' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      "verificationCode": "VBQREB"
+    }'
+```
+
+### Add OTP SMS to the user
+
+Now that the user has a verified phone number you can enable SMS OTP on the user.
+
+
+More detailed information about the API: [Add OTP SMS for a user](/apis/resources/user_service/user-service-add-otpsms)
+
+Example Request:
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER-ID/otp_sms \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"'' \
+  --header 'Content-Type: application/json'
 ```
 
 ## U2F Registration
@@ -277,7 +349,7 @@ In the creat session request you can check for the user and directly initiate th
 For U2F you can choose between "USER_VERIFICATION_REQUIREMENT_PREFERRED" and "USER_VERIFICATION_REQUIREMENT_DISCOURAGED" for the challenge.
 Best practice is using discouraged, as this doesn't require the user to enter a pin. With preferred the PIN will be shown, but is not necessary.
 
-More detailed information about the API: [Create new session Documentation](https://zitadel.com/docs/apis/resources/session_service/session-service-create-session)
+More detailed information about the API: [Create new session Documentation](/apis/resources/session_service/session-service-create-session)
 
 Example Request
 
