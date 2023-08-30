@@ -899,6 +899,8 @@ func (wm *InstanceIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) 
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
 		case *instance.LDAPIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.LDAPIDPAddedEvent)
+		case *instance.AppleIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.AppleIDPAddedEvent)
 		case *instance.IDPRemovedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.RemovedEvent)
 		case *instance.IDPConfigAddedEvent:
@@ -928,6 +930,7 @@ func (wm *InstanceIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.GitLabSelfHostedIDPAddedEventType,
 			instance.GoogleIDPAddedEventType,
 			instance.LDAPIDPAddedEventType,
+			instance.AppleIDPAddedEventType,
 			instance.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
