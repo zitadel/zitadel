@@ -73,7 +73,7 @@ func (q *Queries) GetDueQuotaNotifications(ctx context.Context, instanceID strin
 			},
 			sq.Or{
 				// If the relative usage is greater than the next due threshold, it's clear we can notify,
-				// because min next threshold is equal to the percent field or null (LtOrEq to Null comparision is null -> false)
+				// because min next threshold is equal to the percent field or null (LtOrEq to Null comparison is null -> false)
 				sq.LtOrEq{QuotaNotificationColumnNextDueThreshold.identifier(): usedRel},
 				sq.And{
 					// In case we haven't seen a due notification for this quota period, we compare against the configured percent
