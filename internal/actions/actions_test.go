@@ -3,6 +3,7 @@ package actions
 import (
 	"context"
 	"errors"
+	"github.com/zitadel/zitadel/internal/logstore/record"
 	"testing"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 )
 
 func TestRun(t *testing.T) {
-	SetLogstoreService(logstore.New(nil, nil, nil))
+	SetLogstoreService(logstore.New[*record.ExecutionLog](nil, nil, nil))
 	type args struct {
 		timeout time.Duration
 		api     apiFields

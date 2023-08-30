@@ -2,6 +2,7 @@ package mock
 
 import (
 	"context"
+	"github.com/zitadel/zitadel/internal/query"
 	"sync"
 	"time"
 
@@ -13,19 +14,23 @@ import (
 
 var _ logstore.UsageStorer[*Record] = (*InmemLogStorage)(nil)
 var _ logstore.LogCleanupper[*Record] = (*InmemLogStorage)(nil)
+var _ logstore.Queries = (*InmemLogStorage)(nil)
+var _ logstore.Commands = (*InmemLogStorage)(nil)
 
 type InmemLogStorage struct {
 	mux     sync.Mutex
 	clock   clock.Clock
 	emitted []*Record
 	bulks   []int
+	quota   *query.Quota
 }
 
-func NewInMemoryStorage(clock clock.Clock) *InmemLogStorage {
+func NewInMemoryStorage(clock clock.Clock, quota *query.Quota) *InmemLogStorage {
 	return &InmemLogStorage{
 		clock:   clock,
 		emitted: make([]*Record, 0),
 		bulks:   make([]int, 0),
+		quota:   quota,
 	}
 }
 
@@ -86,4 +91,20 @@ func (l *InmemLogStorage) Len() int {
 	defer l.mux.Unlock()
 
 	return len(l.emitted)
+}
+
+func (l *InmemLogStorage) GetQuota(ctx context.Context, instanceID string, unit quota.Unit) (qu *query.Quota, err error) {
+	return l.quota, nil
+}
+
+func (l *InmemLogStorage) GetQuotaUsage(ctx context.Context, instanceID string, unit quota.Unit, periodStart time.Time) (usage uint64, err error) {
+	return uint64(l.Len()), nil
+}
+
+func (l *InmemLogStorage) GetDueQuotaNotifications(ctx context.Context, instanceID string, unit quota.Unit, qu *query.Quota, periodStart time.Time, usedAbs uint64) (dueNotifications []*quota.NotificationDueEvent, err error) {
+	return nil, nil
+}
+
+func (l *InmemLogStorage) ReportQuotaUsage(ctx context.Context, dueNotifications []*quota.NotificationDueEvent) error {
+	return nil
 }

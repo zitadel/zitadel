@@ -6,6 +6,7 @@ package logstore_test
 
 import (
 	"context"
+	"github.com/zitadel/zitadel/internal/query"
 	"reflect"
 	"runtime"
 	"testing"
@@ -14,9 +15,7 @@ import (
 	"github.com/benbjohnson/clock"
 
 	"github.com/zitadel/zitadel/internal/logstore"
-	emittermock "github.com/zitadel/zitadel/internal/logstore/emitters/mock"
-	quotaqueriermock "github.com/zitadel/zitadel/internal/logstore/quotaqueriers/mock"
-	"github.com/zitadel/zitadel/internal/repository/quota"
+	emittermock "github.com/zitadel/zitadel/internal/logstore/mock"
 )
 
 const (
@@ -27,7 +26,7 @@ const (
 type args struct {
 	mainSink      *logstore.EmitterConfig
 	secondarySink *logstore.EmitterConfig
-	config        quota.AddedEvent
+	config        *query.Quota
 }
 
 type want struct {
@@ -236,23 +235,21 @@ func given(t *testing.T, args args, want want) (context.Context, *clock.Mock, *e
 	ctx := context.Background()
 	clock := clock.NewMock()
 
-	periodStart := time.Time{}
 	clock.Set(args.config.From)
 
-	mainStorage := emittermock.NewInMemoryStorage(clock)
+	mainStorage := emittermock.NewInMemoryStorage(clock, args.config)
 	mainEmitter, err := logstore.NewEmitter[*emittermock.Record](ctx, clock, args.mainSink, mainStorage)
 	if err != nil {
 		t.Errorf("expected no error but got %v", err)
 	}
-	secondaryStorage := emittermock.NewInMemoryStorage(clock)
+	secondaryStorage := emittermock.NewInMemoryStorage(clock, args.config)
 	secondaryEmitter, err := logstore.NewEmitter[*emittermock.Record](ctx, clock, args.secondarySink, secondaryStorage)
 	if err != nil {
 		t.Errorf("expected no error but got %v", err)
 	}
-
-	svc := logstore.New(
-		quotaqueriermock.NewNoopQuerier(&args.config, periodStart),
-		logstore.UsageReporterFunc(func(context.Context, []*quota.NotificationDueEvent) error { return nil }),
+	svc := logstore.New[*emittermock.Record](
+		mainStorage,
+		mainStorage,
 		mainEmitter,
 		secondaryEmitter)
 

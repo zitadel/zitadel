@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/command"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/quota"
@@ -22,15 +21,25 @@ type UsageStorer[T LogRecord[T]] interface {
 }
 
 type Service[T LogRecord[T]] struct {
-	commands         *command.Commands
-	queries          *query.Queries
+	commands         Commands
+	queries          Queries
 	usageStorer      UsageStorer[T]
 	enabledSinks     []*emitter[T]
 	sinkEnabled      bool
 	reportingEnabled bool
 }
 
-func New[T LogRecord[T]](queries *query.Queries, commands *command.Commands, usageQuerierSink *emitter[T], additionalSink ...*emitter[T]) *Service[T] {
+type Queries interface {
+	GetQuota(ctx context.Context, instanceID string, unit quota.Unit) (qu *query.Quota, err error)
+	GetQuotaUsage(ctx context.Context, instanceID string, unit quota.Unit, periodStart time.Time) (usage uint64, err error)
+	GetDueQuotaNotifications(ctx context.Context, instanceID string, unit quota.Unit, qu *query.Quota, periodStart time.Time, usedAbs uint64) (dueNotifications []*quota.NotificationDueEvent, err error)
+}
+
+type Commands interface {
+	ReportQuotaUsage(ctx context.Context, dueNotifications []*quota.NotificationDueEvent) error
+}
+
+func New[T LogRecord[T]](queries Queries, commands Commands, usageQuerierSink *emitter[T], additionalSink ...*emitter[T]) *Service[T] {
 	var usageStorer UsageStorer[T]
 	if usageQuerierSink != nil {
 		usageStorer = usageQuerierSink.emitter.(UsageStorer[T])
