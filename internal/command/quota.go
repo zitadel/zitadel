@@ -51,7 +51,7 @@ func (c *Commands) AddQuota(
 	if err != nil {
 		return nil, err
 	}
-	aggregate := quota.NewAggregate(aggregateId, instanceId, instanceId)
+	aggregate := quota.NewAggregate(aggregateId, instanceId)
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddQuotaCommand(aggregate, q))
 	if err != nil {
@@ -80,7 +80,7 @@ func (c *Commands) RemoveQuota(ctx context.Context, unit QuotaUnit) (*domain.Obj
 		return nil, errors.ThrowNotFound(nil, "COMMAND-WDfFf", "Errors.Quota.NotFound")
 	}
 
-	aggregate := quota.NewAggregate(wm.AggregateID, instanceId, instanceId)
+	aggregate := quota.NewAggregate(wm.AggregateID, instanceId)
 
 	events := []eventstore.Command{
 		quota.NewRemovedEvent(ctx, &aggregate.Aggregate, unit.Enum()),

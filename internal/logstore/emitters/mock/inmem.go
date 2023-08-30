@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
-var _ logstore.UsageQuerier[*Record] = (*InmemLogStorage)(nil)
+var _ logstore.UsageStorer[*Record] = (*InmemLogStorage)(nil)
 var _ logstore.LogCleanupper[*Record] = (*InmemLogStorage)(nil)
 
 type InmemLogStorage struct {

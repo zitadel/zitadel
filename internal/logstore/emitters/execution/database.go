@@ -28,7 +28,7 @@ const (
 	executionMetadataCol   = "metadata"
 )
 
-var _ logstore.UsageQuerier[*record.ExecutionLog] = (*databaseLogStorage)(nil)
+var _ logstore.UsageStorer[*record.ExecutionLog] = (*databaseLogStorage)(nil)
 var _ logstore.LogCleanupper[*record.ExecutionLog] = (*databaseLogStorage)(nil)
 
 type databaseLogStorage struct {

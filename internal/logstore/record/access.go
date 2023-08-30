@@ -39,7 +39,6 @@ func (a AccessLog) IsAuthenticated() bool {
 	if !a.normalized {
 		panic("access log not normalized, Normalize() must be called before IsAuthenticated()")
 	}
-	// TODO: Is it possible to maliciously produce usage on public endpoints like this, just by adding an auth header?
 	_, hasHTTPAuthHeader := a.RequestHeaders[strings.ToLower(zitadel_http.Authorization)]
 	return hasHTTPAuthHeader &&
 		!strings.HasPrefix(a.RequestURL, "/zitadel.system.v1.SystemService/") &&
@@ -51,7 +50,9 @@ func (a AccessLog) IsAuthenticated() bool {
 		(a.Protocol == GRPC &&
 			a.ResponseStatus != uint32(codes.PermissionDenied) &&
 			a.ResponseStatus != uint32(codes.Internal) &&
-			a.ResponseStatus != uint32(codes.ResourceExhausted))
+			a.ResponseStatus != uint32(codes.ResourceExhausted) &&
+			// TODO: Ok to filter these out? Else, it would be possible to maliciously produce usage just by adding an auth header, right?
+			a.ResponseStatus != uint32(codes.Unauthenticated))
 }
 
 func (a AccessLog) Normalize() *AccessLog {

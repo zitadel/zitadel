@@ -7,7 +7,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/ui/console"
+	"github.com/zitadel/zitadel/internal/api/ui"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -28,8 +28,8 @@ const (
 	adminAppName          = "Admin-API"
 	authAppName           = "Auth-API"
 	consoleAppName        = "Console"
-	consoleRedirectPath   = console.HandlerPrefix + "/auth/callback"
-	consolePostLogoutPath = console.HandlerPrefix + "/signedout"
+	consoleRedirectPath   = ui.ConsoleHandlerPrefix + "/auth/callback"
+	consolePostLogoutPath = ui.ConsoleHandlerPrefix + "/signedout"
 )
 
 type InstanceSetup struct {
@@ -284,7 +284,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 				return "", "", nil, nil, err
 			}
 
-			quotaAggregate := quota.NewAggregate(quotaId, instanceID, instanceID)
+			quotaAggregate := quota.NewAggregate(quotaId, instanceID)
 
 			validations = append(validations, c.AddQuotaCommand(quotaAggregate, q))
 		}

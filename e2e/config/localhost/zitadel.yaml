@@ -51,7 +51,7 @@ DefaultInstance:
       - Unit: "requests.all.authenticated"
         From: "2023-01-01T00:00:00Z"
         ResetInterval: 5m
-        Amount: 100
+        Amount: 20
         Limit: false
         Notifications:
           - Percent: 100

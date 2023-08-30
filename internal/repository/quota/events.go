@@ -14,13 +14,12 @@ import (
 type Unit uint
 
 const (
-	UniqueQuotaNameType           = "quota_units"
-	UniqueQuotaNotificationIDType = "quota_notification"
-	eventTypePrefix               = eventstore.EventType("quota.")
-	AddedEventType                = eventTypePrefix + "added"
-	NotifiedEventType             = eventTypePrefix + "notified"
-	NotificationDueEventType      = eventTypePrefix + "notificationdue"
-	RemovedEventType              = eventTypePrefix + "removed"
+	UniqueQuotaNameType      = "quota_units"
+	eventTypePrefix          = eventstore.EventType("quota.")
+	AddedEventType           = eventTypePrefix + "added"
+	NotifiedEventType        = eventTypePrefix + "notified"
+	NotificationDueEventType = eventTypePrefix + "notificationdue"
+	RemovedEventType         = eventTypePrefix + "removed"
 )
 
 const (
@@ -47,8 +46,9 @@ func NewRemoveQuotaNameUniqueConstraint(unit Unit) *eventstore.EventUniqueConstr
 type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Unit          Unit                      `json:"unit"`
-	From          time.Time                 `json:"from"`
+	Unit Unit      `json:"unit"`
+	From time.Time `json:"from"`
+	// TODO: Omit empty?
 	ResetInterval time.Duration             `json:"interval,omitempty"`
 	Amount        uint64                    `json:"amount"`
 	Limit         bool                      `json:"limit"`

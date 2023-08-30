@@ -2,40 +2,47 @@ package projection
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
-	sq "github.com/Masterminds/squirrel"
-
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
-	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
 const (
 	QuotasProjectionTable       = "projections.quotas"
-	QuotaPeriodsProjectionTable = QuotasProjectionTable + "_" + periodsTableSuffix
+	QuotaPeriodsProjectionTable = QuotasProjectionTable + "_" + quotaPeriodsTableSuffix
+	QuotaNotificationsTable     = QuotasProjectionTable + "_" + quotaNotificationsTableSuffix
 
-	QuotasColumnInstanceID = "instance_id"
-	QuotasColumnUnit       = "unit"
-	QuotasColumnAmount     = "amount"
-	QuotasColumnFrom       = "from_anchor"
-	QuotasColumnInterval   = "interval"
-	QuotasColumnLimit      = "limit_usage"
+	QuotaColumnID         = "id"
+	QuotaColumnInstanceID = "instance_id"
+	QuotaColumnUnit       = "unit"
+	QuotaColumnAmount     = "amount"
+	QuotaColumnFrom       = "from_anchor"
+	QuotaColumnInterval   = "interval"
+	QuotaColumnLimit      = "limit_usage"
 
-	periodsTableSuffix           = "periods"
-	QuotaPeriodsColumnInstanceID = "instance_id"
-	QuotaPeriodsColumnUnit       = "unit"
-	QuotaPeriodsColumnStart      = "start"
-	QuotaPeriodsColumnUsage      = "usage"
+	quotaPeriodsTableSuffix     = "periods"
+	QuotaPeriodColumnInstanceID = "instance_id"
+	QuotaPeriodColumnUnit       = "unit"
+	QuotaPeriodColumnStart      = "start"
+	QuotaPeriodColumnUsage      = "usage"
+
+	quotaNotificationsTableSuffix               = "notifications"
+	QuotaNotificationColumnInstanceID           = "instance_id"
+	QuotaNotificationColumnUnit                 = "unit"
+	QuotaNotificationColumnID                   = "id"
+	QuotaNotificationColumnCallURL              = "call_url"
+	QuotaNotificationColumnPercent              = "percent"
+	QuotaNotificationColumnRepeat               = "repeat"
+	QuotaNotificationColumnLatestDuePeriodStart = "latest_due_period_start"
+	QuotaNotificationColumnNextDueThreshold     = "next_due_threshold"
 )
 
 type quotaProjection struct {
@@ -50,24 +57,39 @@ func newQuotaProjection(ctx context.Context, config crdb.StatementHandlerConfig)
 	config.InitCheck = crdb.NewMultiTableCheck(
 		crdb.NewTable(
 			[]*crdb.Column{
-				crdb.NewColumn(QuotasColumnInstanceID, crdb.ColumnTypeText),
-				crdb.NewColumn(QuotasColumnUnit, crdb.ColumnTypeEnum),
-				crdb.NewColumn(QuotasColumnAmount, crdb.ColumnTypeInt64),
-				crdb.NewColumn(QuotasColumnFrom, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(QuotasColumnInterval, crdb.ColumnTypeInterval),
-				crdb.NewColumn(QuotasColumnLimit, crdb.ColumnTypeBool),
+				crdb.NewColumn(QuotaColumnID, crdb.ColumnTypeText),
+				crdb.NewColumn(QuotaColumnInstanceID, crdb.ColumnTypeText),
+				crdb.NewColumn(QuotaColumnUnit, crdb.ColumnTypeEnum),
+				crdb.NewColumn(QuotaColumnAmount, crdb.ColumnTypeInt64),
+				crdb.NewColumn(QuotaColumnFrom, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(QuotaColumnInterval, crdb.ColumnTypeInterval),
+				crdb.NewColumn(QuotaColumnLimit, crdb.ColumnTypeBool),
 			},
-			crdb.NewPrimaryKey(QuotasColumnInstanceID, QuotasColumnUnit),
+			crdb.NewPrimaryKey(QuotaColumnInstanceID, QuotaColumnUnit),
 		),
 		crdb.NewSuffixedTable(
 			[]*crdb.Column{
-				crdb.NewColumn(QuotaPeriodsColumnInstanceID, crdb.ColumnTypeText),
-				crdb.NewColumn(QuotaPeriodsColumnUnit, crdb.ColumnTypeEnum),
-				crdb.NewColumn(QuotaPeriodsColumnStart, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(QuotaPeriodsColumnUsage, crdb.ColumnTypeInt64),
+				crdb.NewColumn(QuotaPeriodColumnInstanceID, crdb.ColumnTypeText),
+				crdb.NewColumn(QuotaPeriodColumnUnit, crdb.ColumnTypeEnum),
+				crdb.NewColumn(QuotaPeriodColumnStart, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(QuotaPeriodColumnUsage, crdb.ColumnTypeInt64),
 			},
-			crdb.NewPrimaryKey(QuotaPeriodsColumnInstanceID, QuotaPeriodsColumnUnit, QuotaPeriodsColumnStart),
-			periodsTableSuffix,
+			crdb.NewPrimaryKey(QuotaPeriodColumnInstanceID, QuotaPeriodColumnUnit, QuotaPeriodColumnStart),
+			quotaPeriodsTableSuffix,
+		),
+		crdb.NewSuffixedTable(
+			[]*crdb.Column{
+				crdb.NewColumn(QuotaNotificationColumnInstanceID, crdb.ColumnTypeText),
+				crdb.NewColumn(QuotaNotificationColumnUnit, crdb.ColumnTypeEnum),
+				crdb.NewColumn(QuotaNotificationColumnID, crdb.ColumnTypeText),
+				crdb.NewColumn(QuotaNotificationColumnCallURL, crdb.ColumnTypeText),
+				crdb.NewColumn(QuotaNotificationColumnPercent, crdb.ColumnTypeInt64),
+				crdb.NewColumn(QuotaNotificationColumnRepeat, crdb.ColumnTypeBool),
+				crdb.NewColumn(QuotaNotificationColumnLatestDuePeriodStart, crdb.ColumnTypeTimestamp, crdb.Nullable()),
+				crdb.NewColumn(QuotaNotificationColumnNextDueThreshold, crdb.ColumnTypeInt64, crdb.Nullable()),
+			},
+			crdb.NewPrimaryKey(QuotaNotificationColumnInstanceID, QuotaNotificationColumnUnit, QuotaNotificationColumnID),
+			quotaNotificationsTableSuffix,
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -82,7 +104,7 @@ func (q *quotaProjection) reducers() []handler.AggregateReducer {
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
-					Reduce: reduceInstanceRemovedHelper(QuotasColumnInstanceID),
+					Reduce: q.reduceInstanceRemoved,
 				},
 			},
 		},
@@ -104,7 +126,29 @@ func (q *quotaProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: quota.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  quota.NotificationDueEventType,
+					Reduce: q.reduceQuotaNotificationDue,
+				},
+			},
+		},
+		{
+			Aggregate: quota.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  quota.NotifiedEventType,
+					Reduce: q.reduceQuotaNotified,
+				},
+			},
+		},
 	}
+}
+
+func (q *quotaProjection) reduceQuotaNotified(event eventstore.Event) (*handler.Statement, error) {
+	return crdb.NewNoOpStatement(event), nil
 }
 
 func (q *quotaProjection) reduceQuotaAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -112,16 +156,60 @@ func (q *quotaProjection) reduceQuotaAdded(event eventstore.Event) (*handler.Sta
 	if err != nil {
 		return nil, err
 	}
-	return crdb.NewCreateStatement(
-		e,
+
+	createStatements := make([]func(e eventstore.Event) crdb.Exec, len(e.Notifications)+1)
+	createStatements[0] = crdb.AddCreateStatement(
 		[]handler.Column{
-			handler.NewCol(QuotasColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCol(QuotasColumnUnit, e.Unit),
-			handler.NewCol(QuotasColumnAmount, e.Amount),
-			handler.NewCol(QuotasColumnFrom, e.From),
-			handler.NewCol(QuotasColumnInterval, e.ResetInterval),
-			handler.NewCol(QuotasColumnLimit, e.Limit),
+			handler.NewCol(QuotaColumnID, e.Aggregate().ID),
+			handler.NewCol(QuotaColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCol(QuotaColumnUnit, e.Unit),
+			handler.NewCol(QuotaColumnAmount, e.Amount),
+			handler.NewCol(QuotaColumnFrom, e.From),
+			handler.NewCol(QuotaColumnInterval, e.ResetInterval),
+			handler.NewCol(QuotaColumnLimit, e.Limit),
+		})
+	for i := range e.Notifications {
+		notification := e.Notifications[i]
+		createStatements[i+1] = crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(QuotaNotificationColumnInstanceID, e.Aggregate().InstanceID),
+				handler.NewCol(QuotaNotificationColumnUnit, e.Unit),
+				handler.NewCol(QuotaNotificationColumnID, notification.ID),
+				handler.NewCol(QuotaNotificationColumnCallURL, notification.CallURL),
+				handler.NewCol(QuotaNotificationColumnPercent, notification.Percent),
+				handler.NewCol(QuotaNotificationColumnRepeat, notification.Repeat),
+			},
+			crdb.WithTableSuffix(quotaNotificationsTableSuffix),
+		)
+	}
+
+	return crdb.NewMultiStatement(e, createStatements...), nil
+}
+
+func (q *quotaProjection) reduceQuotaNotificationDue(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*quota.NotificationDueEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return crdb.NewUpdateStatement(e,
+		[]handler.Column{
+			handler.NewCol(QuotaNotificationColumnLatestDuePeriodStart, e.PeriodStart),
+			{
+				Name:  QuotaNotificationColumnNextDueThreshold,
+				Value: e.Threshold,
+				ParameterOpt: func(thresholdFromEvent string) string {
+					// We increment the threshold if the periodStart matches, else we reset it to percent
+					// TODO: Use multiple parameters for a single column
+					return fmt.Sprintf("CASE WHEN %s = '%s' THEN CAST ( floor ( %s / %s + 1 ) AS INT ) * %s ELSE %s END", QuotaNotificationColumnLatestDuePeriodStart, e.PeriodStart.Format(time.RFC3339), thresholdFromEvent, QuotaNotificationColumnPercent, QuotaNotificationColumnPercent, QuotaNotificationColumnPercent)
+				},
+			},
 		},
+		[]handler.Condition{
+			handler.NewCond(QuotaNotificationColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(QuotaNotificationColumnUnit, e.Unit),
+			handler.NewCond(QuotaNotificationColumnID, e.ID),
+		},
+		crdb.WithTableSuffix(quotaNotificationsTableSuffix),
 	), nil
 }
 
@@ -134,104 +222,78 @@ func (q *quotaProjection) reduceQuotaRemoved(event eventstore.Event) (*handler.S
 		e,
 		crdb.AddDeleteStatement(
 			[]handler.Condition{
-				handler.NewCond(QuotaPeriodsColumnInstanceID, e.Aggregate().InstanceID),
-				handler.NewCond(QuotaPeriodsColumnUnit, e.Unit),
+				handler.NewCond(QuotaPeriodColumnInstanceID, e.Aggregate().InstanceID),
+				handler.NewCond(QuotaPeriodColumnUnit, e.Unit),
 			},
-			crdb.WithTableSuffix(periodsTableSuffix),
+			crdb.WithTableSuffix(quotaPeriodsTableSuffix),
 		),
 		crdb.AddDeleteStatement(
 			[]handler.Condition{
-				handler.NewCond(QuotasColumnInstanceID, e.Aggregate().InstanceID),
-				handler.NewCond(QuotasColumnUnit, e.Unit),
+				handler.NewCond(QuotaNotificationColumnInstanceID, e.Aggregate().InstanceID),
+				handler.NewCond(QuotaNotificationColumnUnit, e.Unit),
+			},
+			crdb.WithTableSuffix(quotaNotificationsTableSuffix),
+		),
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(QuotaColumnInstanceID, e.Aggregate().InstanceID),
+				handler.NewCond(QuotaColumnUnit, e.Unit),
 			},
 		),
 	), nil
 }
 
-func (q *quotaProjection) IncrementAccessLogs(ctx context.Context, records []*record.AccessLog) (err error) {
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("incrementing access relevant usage failed for at least one quota period: %w", err)
-		}
-	}()
-	byInstance := make(map[string]uint64)
-	for _, r := range records {
-		if r.IsAuthenticated() {
-			byInstance[r.InstanceID]++
-		}
+func (q *quotaProjection) reduceInstanceRemoved(event eventstore.Event) (*handler.Statement, error) {
+	// we only assert the event to make sure it is the correct type
+	e, err := assertEvent[*instance.InstanceRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
-	for instanceID, count := range byInstance {
-		err = errors.Join(err, q.incrementUsage(ctx, quota.RequestsAllAuthenticated, instanceID, count))
-	}
-	return err
+	return crdb.NewMultiStatement(
+		e,
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(QuotaPeriodColumnInstanceID, e.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(quotaPeriodsTableSuffix),
+		),
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(QuotaNotificationColumnInstanceID, e.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(quotaNotificationsTableSuffix),
+		),
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(QuotaColumnInstanceID, e.Aggregate().InstanceID),
+			},
+		),
+	), nil
 }
 
-func (q *quotaProjection) incrementUsage(ctx context.Context, unit quota.Unit, instanceID string, count uint64) error {
-	insertCols := []string{QuotaPeriodsColumnInstanceID, QuotaPeriodsColumnUnit, QuotaPeriodsColumnStart, QuotaPeriodsColumnUsage}
-	conflictTarget := []string{QuotaPeriodsColumnInstanceID, QuotaPeriodsColumnUnit, QuotaPeriodsColumnStart}
-	stmt, args, err := sq.
-		Select(
-			QuotasColumnFrom,
-			QuotasColumnInterval,
-		).
-		Where(sq.Eq{
-			QuotasColumnInstanceID: instanceID,
-			QuotasColumnUnit:       unit,
-		}).
-		From(QuotasProjectionTable).
-		PlaceholderFormat(sq.Dollar).
-		ToSql()
-	if err != nil {
-		panic(err)
-	}
-	var (
-		from     = time.Time{}
-		interval database.Duration
-	)
-	if err := q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		if err := row.Scan(&from, &interval); err != nil {
-			// TODO: return nil if not found
-			return err
-		}
+func (q *quotaProjection) IncrementUsage(ctx context.Context, unit quota.Unit, instanceID string, periodStart time.Time, count uint64) error {
+	if count == 0 {
 		return nil
-	}, stmt, args...); err != nil {
-		// TODO: return nil if not found
-		return err
 	}
-	currentPeriodStart := pushPeriodStart(from, time.Duration(interval), time.Now())
-	vals := []interface{}{instanceID, unit, currentPeriodStart, count, count}
+	insertCols := []string{QuotaPeriodColumnInstanceID, QuotaPeriodColumnUnit, QuotaPeriodColumnStart, QuotaPeriodColumnUsage}
+	conflictTarget := []string{QuotaPeriodColumnInstanceID, QuotaPeriodColumnUnit, QuotaPeriodColumnStart}
+	vals := []interface{}{instanceID, unit, periodStart, count, count}
 	params := make([]string, len(vals))
 	for i := range vals {
 		params[i] = "$" + strconv.Itoa(i+1)
 	}
-	_, err = q.client.ExecContext(
+	_, err := q.client.ExecContext(
 		ctx,
 		fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s) ON CONFLICT (%s) DO UPDATE SET %s = %s.%s + %s",
 			QuotaPeriodsProjectionTable,
 			strings.Join(insertCols, ", "),
 			strings.Join(params[0:len(params)-1], ", "),
 			strings.Join(conflictTarget, ", "),
-			QuotaPeriodsColumnUsage,
+			QuotaPeriodColumnUsage,
 			QuotaPeriodsProjectionTable,
-			QuotaPeriodsColumnUsage,
+			QuotaPeriodColumnUsage,
 			params[len(params)-1]),
 		vals...,
 	)
 	return err
-}
-
-func pushPeriodStart(from time.Time, interval time.Duration, now time.Time) time.Time {
-	next := from.Add(interval)
-	if next.After(now) {
-		return from
-	}
-	return pushPeriodStart(next, interval, now)
-}
-
-var _ sq.Sqlizer = sqlizerFunc(nil)
-
-type sqlizerFunc func() (string, []interface{}, error)
-
-func (s sqlizerFunc) ToSql() (string, []interface{}, error) {
-	return s()
 }
