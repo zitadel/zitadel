@@ -11,7 +11,6 @@ import (
 func (c *Commands) ReportQuotaUsage(ctx context.Context, dueNotifications []*quota.NotificationDueEvent) error {
 	cmds := make([]eventstore.Command, 0)
 	for _, notification := range dueNotifications {
-		// TODO: doesnt' work, never returns any events
 		events, err := c.eventstore.Filter(
 			ctx,
 			eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
@@ -22,7 +21,7 @@ func (c *Commands) ReportQuotaUsage(ctx context.Context, dueNotifications []*quo
 				EventTypes(quota.NotificationDueEventType).
 				EventData(map[string]interface{}{
 					"id":          notification.ID,
-					"periodStart": notification.PeriodStart.Format("2023-08-30T02:00:00+02:00"),
+					"periodStart": notification.PeriodStart,
 					"threshold":   notification.Threshold,
 				}).Builder(),
 		)
