@@ -46,12 +46,14 @@ func (a AccessLog) IsAuthenticated() bool {
 		(a.Protocol == HTTP &&
 			a.ResponseStatus != http.StatusForbidden &&
 			a.ResponseStatus != http.StatusInternalServerError &&
-			a.ResponseStatus != http.StatusTooManyRequests) ||
+			a.ResponseStatus != http.StatusTooManyRequests &&
+			a.ResponseStatus != http.StatusUnauthorized) ||
 		(a.Protocol == GRPC &&
 			a.ResponseStatus != uint32(codes.PermissionDenied) &&
 			a.ResponseStatus != uint32(codes.Internal) &&
 			a.ResponseStatus != uint32(codes.ResourceExhausted) &&
 			// TODO: Ok to filter these out? Else, it would be possible to maliciously produce usage just by adding an auth header, right?
+			// Same for http.StatusUnauthorized?
 			a.ResponseStatus != uint32(codes.Unauthenticated))
 }
 

@@ -215,7 +215,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	if err != nil {
 		return err
 	}
-	actionsExecutionDBEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, config.LogStore.Execution.Database, execution.NewDatabaseLogStorage(dbClient))
+	actionsExecutionDBEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, config.LogStore.Execution.Database, execution.NewDatabaseLogStorage(dbClient, commands, queries))
 	if err != nil {
 		return err
 	}

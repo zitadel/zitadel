@@ -3,8 +3,11 @@ package execution
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/logstore/record"
+	"github.com/zitadel/zitadel/internal/query"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -33,10 +36,12 @@ var _ logstore.LogCleanupper[*record.ExecutionLog] = (*databaseLogStorage)(nil)
 
 type databaseLogStorage struct {
 	dbClient *database.DB
+	commands *command.Commands
+	queries  *query.Queries
 }
 
-func NewDatabaseLogStorage(dbClient *database.DB) *databaseLogStorage {
-	return &databaseLogStorage{dbClient: dbClient}
+func NewDatabaseLogStorage(dbClient *database.DB, commands *command.Commands, queries *query.Queries) *databaseLogStorage {
+	return &databaseLogStorage{dbClient: dbClient, commands: commands, queries: queries}
 }
 
 func (l *databaseLogStorage) QuotaUnit() quota.Unit {
@@ -47,6 +52,47 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []*record.ExecutionL
 	if len(bulk) == 0 {
 		return nil
 	}
+	incrementErr := l.incrementUsage(ctx, bulk)
+	storeErr := l.store(ctx, bulk)
+	joinedErr := errors.Join(incrementErr, storeErr)
+	if joinedErr != nil {
+		joinedErr = fmt.Errorf("storing exection logs and/or incrementing quota usage failed: %w", joinedErr)
+	}
+	return joinedErr
+}
+
+func (l *databaseLogStorage) incrementUsage(ctx context.Context, bulk []*record.ExecutionLog) (err error) {
+	byInstance := make(map[string][]*record.ExecutionLog)
+	for _, r := range bulk {
+		if r.InstanceID != "" {
+			byInstance[r.InstanceID] = append(byInstance[r.InstanceID], r)
+		}
+	}
+	for instanceID, instanceBulk := range byInstance {
+		q, getQuotaErr := l.queries.GetQuota(ctx, instanceID, quota.ActionsAllRunsSeconds)
+		if errors.Is(getQuotaErr, sql.ErrNoRows) {
+			getQuotaErr = nil
+			continue
+		}
+		err = errors.Join(err, getQuotaErr)
+		if getQuotaErr != nil {
+			continue
+		}
+		incrementErr := l.commands.IncrementUsageFromExecutionLogs(ctx, instanceID, q.CurrentPeriodStart, instanceBulk)
+		err = errors.Join(err, incrementErr)
+		if incrementErr != nil {
+			continue
+		}
+	}
+	return err
+}
+
+func (l *databaseLogStorage) store(ctx context.Context, bulk []*record.ExecutionLog) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("storing execution logs failed: %w", err)
+		}
+	}()
 	builder := squirrel.Insert(executionLogsTable).
 		Columns(
 			executionTimestampCol,

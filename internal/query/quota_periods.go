@@ -3,9 +3,10 @@ package query
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 
 	"github.com/zitadel/zitadel/internal/api/call"
 
@@ -51,12 +52,15 @@ func (q *Queries) GetQuotaUsage(ctx context.Context, instanceID string, unit quo
 		}).
 		ToSql()
 	if err != nil {
-		return 0, errors.ThrowInternal(err, "QUERY-mEZX2", "Errors.Query.SQLStatement")
+		return 0, zitadel_errors.ThrowInternal(err, "QUERY-mEZX2", "Errors.Query.SQLStatement")
 	}
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
 		usage, err = scan(row)
 		return err
 	}, stmt, args...)
+	if errors.Is(err, sql.ErrNoRows) {
+		return 0, nil
+	}
 	return usage, err
 }
 

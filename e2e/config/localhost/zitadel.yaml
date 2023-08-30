@@ -28,7 +28,7 @@ LogStore:
     Database:
       Enabled: true
     Stdout:
-      Enabled: false
+      Enabled: true
 
 Console:
   InstanceManagementURL: "https://example.com/instances/{{.InstanceID}}"
@@ -48,7 +48,7 @@ DefaultInstance:
     MfaInitSkipLifetime: "0"
   Quotas:
     Items:
-      - Unit: "requests.all.authenticated"
+      - Unit: "actions.all.runs.seconds"
         From: "2023-01-01T00:00:00Z"
         ResetInterval: 5m
         Amount: 20

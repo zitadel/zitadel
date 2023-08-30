@@ -2,6 +2,7 @@ package access
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/zitadel/zitadel/internal/command"
@@ -56,7 +57,7 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []*record.AccessLog)
 	storeErr := l.store(ctx, bulk)
 	joinedErr := errors.Join(incrementErr, storeErr)
 	if joinedErr != nil {
-		joinedErr = fmt.Errorf("storing access logs and/or incrementing quota usage failed: storing error: %w", joinedErr)
+		joinedErr = fmt.Errorf("storing access logs and/or incrementing quota usage failed: %w", joinedErr)
 	}
 	return joinedErr
 }
@@ -64,10 +65,16 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []*record.AccessLog)
 func (l *databaseLogStorage) incrementUsage(ctx context.Context, bulk []*record.AccessLog) (err error) {
 	byInstance := make(map[string][]*record.AccessLog)
 	for _, r := range bulk {
-		byInstance[r.InstanceID] = append(byInstance[r.InstanceID], r)
+		if r.InstanceID != "" {
+			byInstance[r.InstanceID] = append(byInstance[r.InstanceID], r)
+		}
 	}
 	for instanceID, instanceBulk := range byInstance {
 		q, getQuotaErr := l.queries.GetQuota(ctx, instanceID, quota.RequestsAllAuthenticated)
+		if errors.Is(getQuotaErr, sql.ErrNoRows) {
+			getQuotaErr = nil
+			continue
+		}
 		err = errors.Join(err, getQuotaErr)
 		if getQuotaErr != nil {
 			continue
