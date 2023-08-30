@@ -76,7 +76,19 @@ export default function PasswordForm({
             })
         );
       } else {
-        return router.push(`/accounts`);
+        return router.push(
+          `/signedin?` +
+            new URLSearchParams(
+              authRequestId
+                ? {
+                    loginName: resp.factors.user.loginName,
+                    authRequestId,
+                  }
+                : {
+                    loginName: resp.factors.user.loginName,
+                  }
+            )
+        );
       }
     });
   }

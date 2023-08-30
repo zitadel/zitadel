@@ -153,8 +153,20 @@ export default function LoginPasskey({
               userHandle: coerceToBase64Url(userHandle, "userHandle"),
             },
           };
-          return submitLogin(data).then(() => {
-            return router.push(`/accounts`);
+          return submitLogin(data).then((resp) => {
+            return router.push(
+              `/signedin?` +
+                new URLSearchParams(
+                  authRequestId
+                    ? {
+                        loginName: resp.factors.user.loginName,
+                        authRequestId,
+                      }
+                    : {
+                        loginName: resp.factors.user.loginName,
+                      }
+                )
+            );
           });
         } else {
           setLoading(false);

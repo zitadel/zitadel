@@ -47,13 +47,16 @@ export async function GET(request: NextRequest) {
       sessions = await loadSessions(ids);
     } else {
       console.info("No session cookie found.");
-      return [];
+      sessions = [];
     }
 
     // use existing session and hydrate it for oidc
     if (authRequest && sessions.length) {
       // if some accounts are available for selection and select_account is set
-      if (authRequest && authRequest.prompt === Prompt.PROMPT_SELECT_ACCOUNT) {
+      if (
+        authRequest &&
+        authRequest.prompt.includes(Prompt.PROMPT_SELECT_ACCOUNT)
+      ) {
         const accountsUrl = new URL("/accounts", request.url);
         if (authRequest?.id) {
           accountsUrl.searchParams.set("authRequestId", authRequest?.id);
@@ -105,6 +108,10 @@ export async function GET(request: NextRequest) {
       const loginNameUrl = new URL("/loginname", request.url);
       if (authRequest?.id) {
         loginNameUrl.searchParams.set("authRequestId", authRequest?.id);
+        if (authRequest.loginHint) {
+          loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
+          loginNameUrl.searchParams.set("submit", "true"); // autosubmit
+        }
       }
 
       return NextResponse.redirect(loginNameUrl);
