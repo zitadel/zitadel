@@ -50,9 +50,16 @@ export default function SessionItem({
       href={
         validUser
           ? `/signedin?` +
-            new URLSearchParams({
-              loginName: session.factors?.user?.loginName as string,
-            })
+            new URLSearchParams(
+              authRequestId
+                ? {
+                    loginName: session.factors?.user?.loginName as string,
+                    authRequestId,
+                  }
+                : {
+                    loginName: session.factors?.user?.loginName as string,
+                  }
+            )
           : `/loginname?` +
             new URLSearchParams(
               authRequestId
