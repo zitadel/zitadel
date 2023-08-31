@@ -185,6 +185,7 @@ curl --request POST \
       "sendCode": {}
   }'
 ```
+
 ### Verify Phone Number
 
 The next step is to show a screen, so the user is able to enter the code for verifying the phone number.
@@ -272,6 +273,95 @@ curl --request PATCH \
   "sessionToken": "W3mEoesTiYOsiR1LYUCRw3WaFwXKLGDRsqOV_bkOhlah_-ZpuiLgvnzADwe_iYMusbwkMhp7VfMn8g",
   "checks": {
     "otpSms": {
+      "code": "3237642"
+    },
+  }
+}'
+```
+
+## Email Code Registration
+
+### Flow
+
+![Register Email OTP](/img/guides/login-ui/register-email-otp-flow.png)
+
+### List the Possible Methods
+
+<MfaOptions/>
+
+### Verified Email
+
+As ZITADEL required all users to have a verified email address, you do not need to add a new email and verify it for setting up the second factor.
+For the Email second factor the already verified email address will be taken.
+
+### Add OTP Email to the user
+
+Now that the user has a verified phone number you can enable SMS OTP on the user.
+
+More detailed information about the API: [Add OTP Email for a user](/apis/resources/user_service/user-service-add-otp-email)
+
+Example Request:
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER-ID/otp_email \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"'' \
+  --header 'Content-Type: application/json'
+```
+
+## Email Code Authentication
+
+### Flow
+
+![Authenticate OTP Email](/img/guides/login-ui/authenticate-email-otp-flow.png)
+
+### Check User
+
+To be able to check the Email Code you need a session with a checked user.
+When creating the session you can already start the sms challenge, this will only be executed if the user check was successful.
+You can tell the challenge, if the code should be returned (returnCode: true) or if ZITADEL should send it (returnCode: false).
+
+More detailed information about the API: [Create new session Documentation](/apis/resources/session_service/session-service-create-session)
+
+Example Request
+
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/sessions \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"'' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "checks": {
+    "user": {
+      "loginName": "minni-mouse@mouse.com"
+    }
+  },
+  "challenges": {
+		"otpEmail": {
+			"returnCode": false
+		}
+	}
+}'
+```
+
+### Check Email Code
+
+In the next step you should show the user a code field, where he can enter the code, he got per E-Mail.
+The update session request has a check otpEmail where you should send the code, the user has entered.
+
+Example Request
+
+```bash
+curl --request PATCH \
+  --url https://$ZITADEL_DOMAIN/v2alpha/sessions/225307381909694507 \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"'' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "sessionToken": "W3mEoesTiYOsiR1LYUCRw3WaFwXKLGDRsqOV_bkOhlah_-ZpuiLgvnzADwe_iYMusbwkMhp7VfMn8g",
+  "checks": {
+    "otpEmail": {
       "code": "3237642"
     },
   }
