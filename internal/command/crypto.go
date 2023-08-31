@@ -91,26 +91,3 @@ func secretGeneratorConfigWithDefault(ctx context.Context, filter preparation.Fi
 		IncludeSymbols:      wm.IncludeSymbols,
 	}, nil
 }
-
-func secretGeneratorConfigWithDefault(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, defaultGenerator *crypto.GeneratorConfig) (*crypto.GeneratorConfig, error) {
-	wm := NewInstanceSecretGeneratorConfigWriteModel(ctx, typ)
-	events, err := filter(ctx, wm.Query())
-	if err != nil {
-		return nil, err
-	}
-	wm.AppendEvents(events...)
-	if err := wm.Reduce(); err != nil {
-		return nil, err
-	}
-	if wm.State != domain.SecretGeneratorStateActive {
-		return defaultGenerator, nil
-	}
-	return &crypto.GeneratorConfig{
-		Length:              wm.Length,
-		Expiry:              wm.Expiry,
-		IncludeLowerLetters: wm.IncludeLowerLetters,
-		IncludeUpperLetters: wm.IncludeUpperLetters,
-		IncludeDigits:       wm.IncludeDigits,
-		IncludeSymbols:      wm.IncludeSymbols,
-	}, nil
-}
