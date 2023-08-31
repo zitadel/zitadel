@@ -43,6 +43,7 @@ type IDPTemplate struct {
 	*GitLabSelfHostedIDPTemplate
 	*GoogleIDPTemplate
 	*LDAPIDPTemplate
+	*AppleIDPTemplate
 }
 
 type IDPTemplates struct {
@@ -138,6 +139,15 @@ type LDAPIDPTemplate struct {
 	UserFilters       []string
 	Timeout           time.Duration
 	idp.LDAPAttributes
+}
+
+type AppleIDPTemplate struct {
+	IDPID      string
+	ClientID   string
+	TeamID     string
+	KeyID      string
+	PrivateKey *crypto.CryptoValue
+	Scopes     database.StringArray
 }
 
 var (
@@ -605,6 +615,41 @@ var (
 	}
 )
 
+var (
+	appleIdpTemplateTable = table{
+		name:          projection.IDPTemplateAppleTable,
+		instanceIDCol: projection.AppleInstanceIDCol,
+	}
+	AppleIDCol = Column{
+		name:  projection.AppleIDCol,
+		table: appleIdpTemplateTable,
+	}
+	AppleInstanceIDCol = Column{
+		name:  projection.AppleInstanceIDCol,
+		table: appleIdpTemplateTable,
+	}
+	AppleClientIDCol = Column{
+		name:  projection.AppleClientIDCol,
+		table: appleIdpTemplateTable,
+	}
+	AppleTeamIDCol = Column{
+		name:  projection.AppleTeamIDCol,
+		table: appleIdpTemplateTable,
+	}
+	AppleKeyIDCol = Column{
+		name:  projection.AppleKeyIDCol,
+		table: appleIdpTemplateTable,
+	}
+	ApplePrivateKeyCol = Column{
+		name:  projection.ApplePrivateKeyCol,
+		table: appleIdpTemplateTable,
+	}
+	AppleScopesCol = Column{
+		name:  projection.AppleScopesCol,
+		table: appleIdpTemplateTable,
+	}
+)
+
 // IDPTemplateByID searches for the requested id
 func (q *Queries) IDPTemplateByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, queries ...SearchQuery) (template *IDPTemplate, err error) {
 	ctx, span := tracing.NewSpan(ctx)
@@ -799,6 +844,13 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			LDAPPreferredLanguageAttributeCol.identifier(),
 			LDAPAvatarURLAttributeCol.identifier(),
 			LDAPProfileAttributeCol.identifier(),
+			// apple
+			AppleIDCol.identifier(),
+			AppleClientIDCol.identifier(),
+			AppleTeamIDCol.identifier(),
+			AppleKeyIDCol.identifier(),
+			ApplePrivateKeyCol.identifier(),
+			AppleScopesCol.identifier(),
 		).From(idpTemplateTable.identifier()).
 			LeftJoin(join(OAuthIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(OIDCIDCol, IDPTemplateIDCol)).
@@ -809,7 +861,8 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			LeftJoin(join(GitLabIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GitLabSelfHostedIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
-			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(AppleIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*IDPTemplate, error) {
 			idpTemplate := new(IDPTemplate)
@@ -897,6 +950,13 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			ldapPreferredLanguageAttribute := sql.NullString{}
 			ldapAvatarURLAttribute := sql.NullString{}
 			ldapProfileAttribute := sql.NullString{}
+
+			appleID := sql.NullString{}
+			appleClientID := sql.NullString{}
+			appleTeamID := sql.NullString{}
+			appleKeyID := sql.NullString{}
+			applePrivateKey := new(crypto.CryptoValue)
+			appleScopes := database.StringArray{}
 
 			err := row.Scan(
 				&idpTemplate.ID,
@@ -994,6 +1054,13 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&ldapPreferredLanguageAttribute,
 				&ldapAvatarURLAttribute,
 				&ldapProfileAttribute,
+				// apple
+				&appleID,
+				&appleClientID,
+				&appleTeamID,
+				&appleKeyID,
+				&applePrivateKey,
+				&appleScopes,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
@@ -1118,6 +1185,16 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					},
 				}
 			}
+			if appleID.Valid {
+				idpTemplate.AppleIDPTemplate = &AppleIDPTemplate{
+					IDPID:      appleID.String,
+					ClientID:   appleClientID.String,
+					TeamID:     appleTeamID.String,
+					KeyID:      appleKeyID.String,
+					PrivateKey: applePrivateKey,
+					Scopes:     appleScopes,
+				}
+			}
 
 			return idpTemplate, nil
 		}
@@ -1220,6 +1297,14 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			LDAPPreferredLanguageAttributeCol.identifier(),
 			LDAPAvatarURLAttributeCol.identifier(),
 			LDAPProfileAttributeCol.identifier(),
+			// apple
+			AppleIDCol.identifier(),
+			AppleClientIDCol.identifier(),
+			AppleTeamIDCol.identifier(),
+			AppleKeyIDCol.identifier(),
+			ApplePrivateKeyCol.identifier(),
+			AppleScopesCol.identifier(),
+			// count
 			countColumn.identifier(),
 		).From(idpTemplateTable.identifier()).
 			LeftJoin(join(OAuthIDCol, IDPTemplateIDCol)).
@@ -1231,7 +1316,8 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			LeftJoin(join(GitLabIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GitLabSelfHostedIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
-			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(AppleIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPTemplates, error) {
 			templates := make([]*IDPTemplate, 0)
@@ -1322,6 +1408,13 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				ldapPreferredLanguageAttribute := sql.NullString{}
 				ldapAvatarURLAttribute := sql.NullString{}
 				ldapProfileAttribute := sql.NullString{}
+
+				appleID := sql.NullString{}
+				appleClientID := sql.NullString{}
+				appleTeamID := sql.NullString{}
+				appleKeyID := sql.NullString{}
+				applePrivateKey := new(crypto.CryptoValue)
+				appleScopes := database.StringArray{}
 
 				err := rows.Scan(
 					&idpTemplate.ID,
@@ -1419,6 +1512,13 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&ldapPreferredLanguageAttribute,
 					&ldapAvatarURLAttribute,
 					&ldapProfileAttribute,
+					// apple
+					&appleID,
+					&appleClientID,
+					&appleTeamID,
+					&appleKeyID,
+					&applePrivateKey,
+					&appleScopes,
 					&count,
 				)
 
@@ -1540,6 +1640,16 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 							AvatarURLAttribute:         ldapAvatarURLAttribute.String,
 							ProfileAttribute:           ldapProfileAttribute.String,
 						},
+					}
+				}
+				if appleID.Valid {
+					idpTemplate.AppleIDPTemplate = &AppleIDPTemplate{
+						IDPID:      appleID.String,
+						ClientID:   appleClientID.String,
+						TeamID:     appleTeamID.String,
+						KeyID:      appleKeyID.String,
+						PrivateKey: applePrivateKey,
+						Scopes:     appleScopes,
 					}
 				}
 				templates = append(templates, idpTemplate)

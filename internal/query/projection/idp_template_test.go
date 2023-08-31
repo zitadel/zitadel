@@ -2440,6 +2440,268 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 	}
 }
 
+func TestIDPTemplateProjection_reducesApple(t *testing.T) {
+	type args struct {
+		event func(t *testing.T) eventstore.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		reduce func(event eventstore.Event) (*handler.Statement, error)
+		want   wantReduce
+	}{
+		{
+			name: "instance reduceAppleIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.AppleIDPAddedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"clientId": "client_id",
+	"teamId": "team_id",
+	"keyId": "key_id",
+	"privateKey": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["name"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.AppleIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceAppleIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateInsertStmt,
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"",
+								domain.IdentityProviderTypeSystem,
+								domain.IDPTypeApple,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates5_apple (idp_id, instance_id, client_id, team_id, key_id, private_key, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"client_id",
+								"team_id",
+								"key_id",
+								anyArg{},
+								database.StringArray{"name"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceAppleIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.AppleIDPAddedEventType),
+					org.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"clientId": "client_id",
+	"teamId": "team_id",
+	"keyId": "key_id",
+	"privateKey": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["name"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), org.AppleIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceAppleIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateInsertStmt,
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"",
+								domain.IdentityProviderTypeOrg,
+								domain.IDPTypeApple,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates5_apple (idp_id, instance_id, client_id, team_id, key_id, private_key, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"client_id",
+								"team_id",
+								"key_id",
+								anyArg{},
+								database.StringArray{"name"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceAppleIDPChanged minimal",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.AppleIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+			"id": "idp-id",
+			"isCreationAllowed": true,
+			"clientId": "id"
+		}`),
+				), instance.AppleIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceAppleIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateMinimalStmt,
+							expectedArgs: []interface{}{
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates5_apple SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"id",
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceAppleIDPChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.AppleIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+			"id": "idp-id",
+			"name": "name",
+			"clientId": "client_id",
+			"teamId": "team_id",
+			"keyId": "key_id",
+			"privateKey": {
+				"cryptoType": 0,
+				"algorithm": "RSA-265",
+				"keyId": "key-id"
+			},
+			"scopes": ["name"],
+			"isCreationAllowed": true,
+			"isLinkingAllowed": true,
+			"isAutoCreation": true,
+			"isAutoUpdate": true
+		}`),
+				), instance.AppleIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceAppleIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateStmt,
+							expectedArgs: []interface{}{
+								"name",
+								true,
+								true,
+								true,
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates5_apple SET (client_id, team_id, key_id, private_key, scopes) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
+							expectedArgs: []interface{}{
+								"client_id",
+								"team_id",
+								"key_id",
+								anyArg{},
+								database.StringArray{"name"},
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			event := baseEvent(t)
+			got, err := tt.reduce(event)
+			if !errors.IsErrorInvalidArgument(err) {
+				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
+			}
+
+			event = tt.args.event(t)
+			got, err = tt.reduce(event)
+			assertReduce(t, got, err, IDPTemplateTable, tt.want)
+		})
+	}
+}
+
 func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 	type args struct {
 		event func(t *testing.T) eventstore.Event

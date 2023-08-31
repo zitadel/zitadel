@@ -803,6 +803,73 @@ func (wm *OrgLDAPIDPWriteModel) NewChangedEvent(
 	return org.NewLDAPIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
+type OrgAppleIDPWriteModel struct {
+	AppleIDPWriteModel
+}
+
+func NewAppleOrgIDPWriteModel(orgID, id string) *OrgAppleIDPWriteModel {
+	return &OrgAppleIDPWriteModel{
+		AppleIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *OrgAppleIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *org.AppleIDPAddedEvent:
+			wm.AppleIDPWriteModel.AppendEvents(&e.AppleIDPAddedEvent)
+		case *org.AppleIDPChangedEvent:
+			wm.AppleIDPWriteModel.AppendEvents(&e.AppleIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			wm.AppleIDPWriteModel.AppendEvents(&e.RemovedEvent)
+		default:
+			wm.AppleIDPWriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *OrgAppleIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			org.AppleIDPAddedEventType,
+			org.AppleIDPChangedEventType,
+			org.IDPRemovedEventType,
+		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Builder()
+}
+
+func (wm *OrgAppleIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID,
+	teamID,
+	keyID string,
+	privateKey []byte,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	options idp.Options,
+) (*org.AppleIDPChangedEvent, error) {
+
+	changes, err := wm.AppleIDPWriteModel.NewChanges(name, clientID, teamID, keyID, privateKey, secretCrypto, scopes, options)
+	if err != nil || len(changes) == 0 {
+		return nil, err
+	}
+	return org.NewAppleIDPChangedEvent(ctx, aggregate, id, changes)
+}
+
 type OrgIDPRemoveWriteModel struct {
 	IDPRemoveWriteModel
 }
@@ -842,6 +909,8 @@ func (wm *OrgIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) {
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
 		case *org.LDAPIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.LDAPIDPAddedEvent)
+		case *org.AppleIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.AppleIDPAddedEvent)
 		case *org.IDPRemovedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.RemovedEvent)
 		case *org.IDPConfigAddedEvent:
@@ -871,6 +940,7 @@ func (wm *OrgIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.GitLabSelfHostedIDPAddedEventType,
 			org.GoogleIDPAddedEventType,
 			org.LDAPIDPAddedEventType,
+			org.AppleIDPAddedEventType,
 			org.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
