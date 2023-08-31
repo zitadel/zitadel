@@ -2,13 +2,11 @@ import { createCallback, getSession, server } from "#/lib/zitadel";
 import UserAvatar from "#/ui/UserAvatar";
 import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
 import { redirect } from "next/navigation";
-import { NextResponse } from "next/server";
 
 async function loadSession(loginName: string, authRequestId?: string) {
   const recent = await getMostRecentCookieWithLoginname(`${loginName}`);
 
   if (authRequestId) {
-    console.log(authRequestId);
     return createCallback(server, {
       authRequestId,
       session: { sessionId: recent.id, sessionToken: recent.token },

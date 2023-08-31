@@ -18,8 +18,6 @@ export async function POST(request: NextRequest) {
   if (body) {
     const { loginName, password } = body;
 
-    // const domain: string = request.nextUrl.hostname;
-
     return createSessionAndUpdateCookie(
       loginName,
       password,

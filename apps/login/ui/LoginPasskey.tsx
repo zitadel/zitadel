@@ -31,7 +31,6 @@ export default function LoginPasskey({
       setLoading(true);
       updateSessionForChallenge()
         .then((response) => {
-          console.log(response);
           const pK =
             response.challenges.webAuthN.publicKeyCredentialRequestOptions
               .publicKey;
@@ -85,7 +84,6 @@ export default function LoginPasskey({
 
   async function submitLogin(data: any) {
     setLoading(true);
-    console.log(data);
     const res = await fetch("/api/session", {
       method: "PUT",
       headers: {
