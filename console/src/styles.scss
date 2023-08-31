@@ -429,6 +429,7 @@ $custom-typography: mat.define-legacy-typography-config(
     background-color: map-get($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     border-radius: 6px;
+    min-height: fit-content;
   }
 
   .mat-option {
@@ -500,6 +501,7 @@ $custom-typography: mat.define-legacy-typography-config(
     background-color: map-get($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     border-radius: 6px;
+    min-height: fit-content;
   }
 
   .mat-option {

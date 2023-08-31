@@ -786,7 +786,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       this.app.samlConfig.metadataXml &&
       typeof this.app.samlConfig.metadataXml === 'string'
     ) {
-      return Buffer.from(this.app?.samlConfig.metadataXml, 'base64').toString('ascii');
+      return Buffer.from(this.app?.samlConfig.metadataXml, 'base64').toString('utf-8');
     } else {
       return '';
     }
@@ -794,7 +794,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   set decodedBase64(xmlString: string) {
     if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml) {
-      const base64 = Buffer.from(xmlString, 'ascii').toString('base64');
+      const base64 = Buffer.from(xmlString, 'utf-8').toString('base64');
 
       if (this.app.samlConfig) {
         this.app.samlConfig.metadataXml = base64;

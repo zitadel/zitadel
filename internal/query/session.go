@@ -35,6 +35,8 @@ type Session struct {
 	IntentFactor   SessionIntentFactor
 	WebAuthNFactor SessionWebAuthNFactor
 	TOTPFactor     SessionTOTPFactor
+	OTPSMSFactor   SessionOTPFactor
+	OTPEmailFactor SessionOTPFactor
 	Metadata       map[string][]byte
 }
 
@@ -61,6 +63,10 @@ type SessionWebAuthNFactor struct {
 
 type SessionTOTPFactor struct {
 	TOTPCheckedAt time.Time
+}
+
+type SessionOTPFactor struct {
+	OTPCheckedAt time.Time
 }
 
 type SessionsSearchQueries struct {
@@ -139,6 +145,14 @@ var (
 	}
 	SessionColumnTOTPCheckedAt = Column{
 		name:  projection.SessionColumnTOTPCheckedAt,
+		table: sessionsTable,
+	}
+	SessionColumnOTPSMSCheckedAt = Column{
+		name:  projection.SessionColumnOTPSMSCheckedAt,
+		table: sessionsTable,
+	}
+	SessionColumnOTPEmailCheckedAt = Column{
+		name:  projection.SessionColumnOTPEmailCheckedAt,
 		table: sessionsTable,
 	}
 	SessionColumnMetadata = Column{
@@ -243,6 +257,8 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			SessionColumnWebAuthNCheckedAt.identifier(),
 			SessionColumnWebAuthNUserVerified.identifier(),
 			SessionColumnTOTPCheckedAt.identifier(),
+			SessionColumnOTPSMSCheckedAt.identifier(),
+			SessionColumnOTPEmailCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			SessionColumnToken.identifier(),
 		).From(sessionsTable.identifier()).
@@ -263,6 +279,8 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				webAuthNCheckedAt   sql.NullTime
 				webAuthNUserPresent sql.NullBool
 				totpCheckedAt       sql.NullTime
+				otpSMSCheckedAt     sql.NullTime
+				otpEmailCheckedAt   sql.NullTime
 				metadata            database.Map[[]byte]
 				token               sql.NullString
 			)
@@ -285,6 +303,8 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&webAuthNCheckedAt,
 				&webAuthNUserPresent,
 				&totpCheckedAt,
+				&otpSMSCheckedAt,
+				&otpEmailCheckedAt,
 				&metadata,
 				&token,
 			)
@@ -306,6 +326,8 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session.WebAuthNFactor.WebAuthNCheckedAt = webAuthNCheckedAt.Time
 			session.WebAuthNFactor.UserVerified = webAuthNUserPresent.Bool
 			session.TOTPFactor.TOTPCheckedAt = totpCheckedAt.Time
+			session.OTPSMSFactor.OTPCheckedAt = otpSMSCheckedAt.Time
+			session.OTPEmailFactor.OTPCheckedAt = otpEmailCheckedAt.Time
 			session.Metadata = metadata
 
 			return session, token.String, nil
@@ -331,6 +353,8 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			SessionColumnWebAuthNCheckedAt.identifier(),
 			SessionColumnWebAuthNUserVerified.identifier(),
 			SessionColumnTOTPCheckedAt.identifier(),
+			SessionColumnOTPSMSCheckedAt.identifier(),
+			SessionColumnOTPEmailCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			countColumn.identifier(),
 		).From(sessionsTable.identifier()).
@@ -354,6 +378,8 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					webAuthNCheckedAt   sql.NullTime
 					webAuthNUserPresent sql.NullBool
 					totpCheckedAt       sql.NullTime
+					otpSMSCheckedAt     sql.NullTime
+					otpEmailCheckedAt   sql.NullTime
 					metadata            database.Map[[]byte]
 				)
 
@@ -375,6 +401,8 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&webAuthNCheckedAt,
 					&webAuthNUserPresent,
 					&totpCheckedAt,
+					&otpSMSCheckedAt,
+					&otpEmailCheckedAt,
 					&metadata,
 					&sessions.Count,
 				)
@@ -392,6 +420,8 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session.WebAuthNFactor.WebAuthNCheckedAt = webAuthNCheckedAt.Time
 				session.WebAuthNFactor.UserVerified = webAuthNUserPresent.Bool
 				session.TOTPFactor.TOTPCheckedAt = totpCheckedAt.Time
+				session.OTPSMSFactor.OTPCheckedAt = otpSMSCheckedAt.Time
+				session.OTPEmailFactor.OTPCheckedAt = otpEmailCheckedAt.Time
 				session.Metadata = metadata
 
 				sessions.Sessions = append(sessions.Sessions, session)
