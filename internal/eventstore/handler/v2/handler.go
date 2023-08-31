@@ -7,7 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/jackc/pgconn"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -227,6 +226,7 @@ func (h *Handler) Trigger(ctx context.Context) (_ context.Context, err error) {
 
 	for i := 0; ; i++ {
 		additionalIteration, err := h.processEvents(ctx)
+		h.log().OnError(err).Warn("process events failed")
 		h.log().WithField("iteration", i).Debug("trigger iteration")
 		if !additionalIteration || err != nil {
 			return call.ResetTimestamp(ctx), err
@@ -264,38 +264,41 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	var processErr error
-
-	err = crdb.ExecuteTx(ctx, h.client.DB, nil, func(tx *sql.Tx) error {
-		currentState, err := h.currentState(ctx, tx)
-		if err != nil {
-			return err
-		}
-
-		var statements []*Statement
-		statements, additionalIteration, err = h.generateStatements(ctx, tx, currentState)
-		if err != nil || len(statements) == 0 {
-			return err
-		}
-
-		lastProcessedIndex, err := h.execute(ctx, tx, currentState, statements)
-		if lastProcessedIndex < 0 {
-			processErr = err
-			return nil
-		}
-
-		currentState.position = statements[lastProcessedIndex].Position
-		currentState.aggregateID = statements[lastProcessedIndex].AggregateID
-		currentState.aggregateType = statements[lastProcessedIndex].AggregateType
-		currentState.sequence = statements[lastProcessedIndex].Sequence
-		currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
-
-		return h.setState(ctx, tx, currentState)
-	})
-
-	if processErr != nil {
-		return false, processErr
+	tx, err := h.client.Begin()
+	if err != nil {
+		return false, err
 	}
+	defer func() {
+		if err != nil {
+			rollbackErr := tx.Rollback()
+			h.log().OnError(rollbackErr).Debug("unable to rollback tx")
+			return
+		}
+		err = tx.Commit()
+	}()
+
+	currentState, err := h.currentState(ctx, tx)
+	if err != nil {
+		return additionalIteration, err
+	}
+
+	var statements []*Statement
+	statements, additionalIteration, err = h.generateStatements(ctx, tx, currentState)
+	if err != nil || len(statements) == 0 {
+		return additionalIteration, err
+	}
+
+	lastProcessedIndex, err := h.executeStatements(ctx, tx, currentState, statements)
+	if lastProcessedIndex < 0 {
+		return false, err
+	}
+
+	currentState.position = statements[lastProcessedIndex].Position
+	currentState.aggregateID = statements[lastProcessedIndex].AggregateID
+	currentState.aggregateType = statements[lastProcessedIndex].AggregateType
+	currentState.sequence = statements[lastProcessedIndex].Sequence
+	currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
+	err = h.setState(ctx, tx, currentState)
 
 	return additionalIteration, err
 }
@@ -345,41 +348,49 @@ func skipPreviouslyReduced(events []eventstore.Event, currentState *state) []eve
 	return events
 }
 
-func (h *Handler) execute(ctx context.Context, tx *sql.Tx, currentState *state, statements []*Statement) (lastProcessedIndex int, err error) {
+func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, currentState *state, statements []*Statement) (lastProcessedIndex int, err error) {
 	lastProcessedIndex = -1
 
 	for i, statement := range statements {
-		if statement.Execute == nil {
-			lastProcessedIndex = i
-			continue
-		}
-		_, err := tx.Exec("SAVEPOINT exec")
+		err := h.executeStatement(ctx, tx, currentState, statement)
 		if err != nil {
-			h.log().WithError(err).Debug("create savepoint failed")
-			return lastProcessedIndex, err
-		}
-		if err = statement.Execute(tx, h.projection.Name()); err != nil {
-			h.log().WithError(err).Error("statement execution failed")
-
-			_, savepointErr := tx.Exec("ROLLBACK TO SAVEPOINT exec")
-			if savepointErr != nil {
-				h.log().WithError(savepointErr).Debug("rollback savepoint failed")
-				return lastProcessedIndex, savepointErr
-			}
-
-			if h.handleFailedStmt(tx, currentState, failureFromStatement(statement, err)) {
-				lastProcessedIndex = i
-				continue
-			}
-
-			return lastProcessedIndex, err
-		}
-		if _, err = tx.Exec("RELEASE SAVEPOINT exec"); err != nil {
 			return lastProcessedIndex, err
 		}
 		lastProcessedIndex = i
 	}
 	return lastProcessedIndex, nil
+}
+
+func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, currentState *state, statement *Statement) (err error) {
+	if statement.Execute == nil {
+		return nil
+	}
+
+	_, err = tx.Exec("SAVEPOINT exec")
+	if err != nil {
+		h.log().WithError(err).Debug("create savepoint failed")
+		return err
+	}
+	defer func() {
+		if err != nil {
+			_, savepointErr := tx.Exec("ROLLBACK TO SAVEPOINT exec")
+			h.log().WithError(savepointErr).Debug("rollback savepoint failed")
+			return
+		}
+		_, err = tx.Exec("RELEASE SAVEPOINT exec")
+	}()
+
+	if err = statement.Execute(tx, h.projection.Name()); err != nil {
+		h.log().WithError(err).Error("statement execution failed")
+
+		if h.handleFailedStmt(tx, currentState, failureFromStatement(statement, err)) {
+			return nil
+		}
+
+		return err
+	}
+
+	return nil
 }
 
 func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder {

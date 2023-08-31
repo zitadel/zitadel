@@ -31,11 +31,11 @@ DROP INDEX IF EXISTS eventstore.events@events_event_sequence_instance_id_key CAS
 COMMIT;
 
 BEGIN;
-CREATE INDEX IF NOT EXISTS es_handler_idx ON eventstore.events (instance_id, aggregate_type, event_type) INCLUDE (created_at, event_sequence, commit_order, event_data, editor_user, resource_owner, aggregate_id, aggregate_version, "position", commit_order);
-CREATE INDEX IF NOT EXISTS es_agg_id_event_idx ON eventstore.events (aggregate_type, aggregate_id, event_type) INCLUDE (created_at, event_sequence, commit_order, event_data, editor_user, resource_owner, instance_id, aggregate_version, "position", commit_order);
-CREATE INDEX IF NOT EXISTS es_active_instances ON eventstore.events (instance_id, commit_order);
-CREATE INDEX IF NOT EXISTS es_global ON eventstore.events (aggregate_type, aggregate_id) INCLUDE (created_at, event_type, event_sequence, commit_order, event_data, editor_user, resource_owner, instance_id, aggregate_version, "position", commit_order);
-CREATE INDEX IF NOT EXISTS es_inst_agg_type_agg_id_cd ON eventstore.events (instance_id, aggregate_type, aggregate_id) INCLUDE (created_at, event_type, event_sequence, commit_order, event_data, editor_user, resource_owner, aggregate_version, "position", commit_order);
+CREATE INDEX IF NOT EXISTS es_handler_idx ON eventstore.events (instance_id, commit_order, aggregate_type, event_type) INCLUDE (created_at, event_data, editor_user, resource_owner, aggregate_version, "position");
+CREATE INDEX IF NOT EXISTS es_agg_id_event_idx ON eventstore.events (aggregate_type, aggregate_id, event_type) INCLUDE (created_at, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_version, "position", commit_order);
+CREATE INDEX IF NOT EXISTS es_active_instances ON eventstore.events (created_at, instance_id) USING HASH;
+CREATE INDEX IF NOT EXISTS es_global ON eventstore.events (aggregate_type, aggregate_id) INCLUDE (created_at, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_version, "position", commit_order);
+CREATE INDEX IF NOT EXISTS es_inst_agg_type_agg_id_cd ON eventstore.events (instance_id, aggregate_type, aggregate_id, event_sequence) INCLUDE (created_at, event_type, event_data, editor_user, resource_owner, aggregate_version, "position", commit_order);
 COMMIT;
 
 

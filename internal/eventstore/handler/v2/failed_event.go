@@ -78,7 +78,7 @@ func (h *Handler) failureCount(tx *sql.Tx, f *failure) (count uint8, err error) 
 }
 
 func (h *Handler) setFailureCount(tx *sql.Tx, count uint8, f *failure) error {
-	_, dbErr := tx.Exec(setFailedEventStmt,
+	_, err := tx.Exec(setFailedEventStmt,
 		h.projection.Name(),
 		f.instance,
 		f.aggregateType,
@@ -88,8 +88,8 @@ func (h *Handler) setFailureCount(tx *sql.Tx, count uint8, f *failure) error {
 		count,
 		f.err.Error(),
 	)
-	if dbErr != nil {
-		return errors.ThrowInternal(dbErr, "CRDB-4Ht4x", "set failure count failed")
+	if err != nil {
+		return errors.ThrowInternal(err, "CRDB-4Ht4x", "set failure count failed")
 	}
 	return nil
 }
