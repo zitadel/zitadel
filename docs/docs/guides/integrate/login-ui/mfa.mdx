@@ -143,10 +143,8 @@ curl --request PATCH \
   "sessionToken": "W3mEoesTiYOsiR1LYUCRw3vaEwXKLGDTsqOV_bkOhlah_-ZbuiLgvnzADwe_iYMusbwkMhp7VfMn8j",
   "checks": {
     "totp": {
-			"totp": {
-				"totp": 123456
-			}
-    }
+      "code": "323764"
+    },
   }
 }'
 ```
@@ -155,7 +153,7 @@ curl --request PATCH \
 
 ### Flow
 
-![Register TOTP](/img/guides/login-ui/register-phone-otp-flow.png)
+![Register SMS OTP](/img/guides/login-ui/register-phone-otp-flow.png)
 
 ### List the Possible Methods
 
@@ -187,7 +185,6 @@ curl --request POST \
       "sendCode": {}
   }'
 ```
-
 ### Verify Phone Number
 
 The next step is to show a screen, so the user is able to enter the code for verifying the phone number.
@@ -220,6 +217,65 @@ curl --request POST \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json'
+```
+
+## SMS Code Authentication
+
+### Flow
+
+![Authenticate SMS OTP](/img/guides/login-ui/authenticate-phone-otp-flow.png)
+
+### Check User
+
+To be able to check the SMS Code you need a session with a checked user.
+When creating the session you can already start the sms challenge, this will only be executed if the user check was successful.
+You can tell the challenge, if the code should be returned (returnCode: true) or if ZITADEL should send it (returnCode: false).
+
+More detailed information about the API: [Create new session Documentation](/apis/resources/session_service/session-service-create-session)
+
+Example Request
+
+```bash
+curl --request POST \
+  --url https://$ZITADEL_DOMAIN/v2alpha/sessions \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"'' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "checks": {
+    "user": {
+      "loginName": "minni-mouse@mouse.com"
+    }
+  },
+  "challenges": {
+		"otpSms": {
+			"returnCode": false
+		}
+	}
+}'
+```
+
+### Check SMS Code
+
+In the next step you should show the user a code field, where he can enter the code, he got as SMS.
+The update session request has a check otpSMS where you should send the code, the user has entered.
+
+Example Request
+
+```bash
+curl --request PATCH \
+  --url https://$ZITADEL_DOMAIN/v2alpha/sessions/225307381909694507 \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"'' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "sessionToken": "W3mEoesTiYOsiR1LYUCRw3WaFwXKLGDRsqOV_bkOhlah_-ZpuiLgvnzADwe_iYMusbwkMhp7VfMn8g",
+  "checks": {
+    "otpSms": {
+      "code": "3237642"
+    },
+  }
+}'
 ```
 
 ## U2F Registration
