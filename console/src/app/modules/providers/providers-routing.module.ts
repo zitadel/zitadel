@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { ProviderType } from 'src/app/proto/generated/zitadel/idp_pb';
+import { ProviderAppleComponent } from './provider-apple/provider-apple.component';
 import { ProviderAzureADComponent } from './provider-azure-ad/provider-azure-ad.component';
 import { ProviderGithubESComponent } from './provider-github-es/provider-github-es.component';
 import { ProviderGithubComponent } from './provider-github/provider-github.component';
@@ -27,6 +28,7 @@ const typeMap = {
   [ProviderType.PROVIDER_TYPE_OAUTH]: { path: 'oauth', component: ProviderOAuthComponent },
   [ProviderType.PROVIDER_TYPE_OIDC]: { path: 'oidc', component: ProviderOIDCComponent },
   [ProviderType.PROVIDER_TYPE_LDAP]: { path: 'ldap', component: ProviderLDAPComponent },
+  [ProviderType.PROVIDER_TYPE_APPLE]: { path: 'apple', component: ProviderAppleComponent },
 };
 
 const routes: Routes = Object.entries(typeMap).map(([key, value]) => {

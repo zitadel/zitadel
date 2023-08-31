@@ -199,6 +199,10 @@ Errors:
       InvalidCharacter: Дозволени се само алфанумерички знаци, . и - се дозволени за домен
     IDP:
       InvalidSearchQuery: Невалидно пребарување
+      ClientID Missing: ClientID недостасува
+      TeamIDMissing: TeamID недостасува
+      Клучен ID Недостасува: Недостасува ID на клуч
+      PrivateKeyMissing: Недостасува приватен клуч
     LoginPolicy:
       NotFound: Политиката за најавување не е пронајдена
       Invalid: Политиката за најавување е невалидна

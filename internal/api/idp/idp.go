@@ -16,6 +16,7 @@ import (
 	z_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/form"
 	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/apple"
 	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/idp/providers/github"
 	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
@@ -52,6 +53,9 @@ type externalIDPCallbackData struct {
 	Code             string `schema:"code"`
 	Error            string `schema:"error"`
 	ErrorDescription string `schema:"error_description"`
+
+	// Apple returns a user on first registration
+	User string `schema:"user"`
 }
 
 // CallbackURL generates the instance specific URL to the IDP callback handler
@@ -115,7 +119,7 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idpUser, idpSession, err := h.fetchIDPUser(ctx, provider, data.Code)
+	idpUser, idpSession, err := h.fetchIDPUser(ctx, provider, data.Code, data.User)
 	if err != nil {
 		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
 		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
@@ -214,7 +218,7 @@ func redirectToFailureURL(w http.ResponseWriter, r *http.Request, i *command.IDP
 	http.Redirect(w, r, i.FailureURL.String(), http.StatusFound)
 }
 
-func (h *Handler) fetchIDPUser(ctx context.Context, identityProvider idp.Provider, code string) (user idp.User, idpTokens idp.Session, err error) {
+func (h *Handler) fetchIDPUser(ctx context.Context, identityProvider idp.Provider, code string, appleUser string) (user idp.User, idpTokens idp.Session, err error) {
 	var session idp.Session
 	switch provider := identityProvider.(type) {
 	case *oauth.Provider:
@@ -229,6 +233,8 @@ func (h *Handler) fetchIDPUser(ctx context.Context, identityProvider idp.Provide
 		session = &openid.Session{Provider: provider.Provider, Code: code}
 	case *google.Provider:
 		session = &openid.Session{Provider: provider.Provider, Code: code}
+	case *apple.Provider:
+		session = &apple.Session{Session: &openid.Session{Provider: provider.Provider, Code: code}, UserFormValue: appleUser}
 	case *jwt.Provider, *ldap.Provider:
 		return nil, nil, z_errs.ThrowInvalidArgument(nil, "IDP-52jmn", "Errors.ExternalIDP.IDPTypeNotImplemented")
 	default:
