@@ -2,7 +2,6 @@ package login
 
 import (
 	"net/http"
-	"net/url"
 
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -33,8 +32,4 @@ func (l *Login) getAuthRequestAndParseData(r *http.Request, data interface{}) (*
 
 func (l *Login) getParseData(r *http.Request, data interface{}) error {
 	return l.parser.Parse(r, data)
-}
-
-func (l *Login) getParseDataWithForm(r *http.Request, data interface{}) (url.Values, error) {
-	return l.parser.ParseWithFormData(r, data)
 }

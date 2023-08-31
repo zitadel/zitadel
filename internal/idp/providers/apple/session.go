@@ -3,7 +3,6 @@ package apple
 import (
 	"context"
 	"encoding/json"
-	"net/url"
 
 	openid "github.com/zitadel/oidc/v2/pkg/oidc"
 
@@ -15,16 +14,16 @@ import (
 // This enables to parse the user (name and email), which Apple only returns as form params on registration
 type Session struct {
 	*oidc.Session
-	FormData url.Values
+	UserFormValue string
 }
 
 type userFormValue struct {
-	Name userNamesFormValue `json:"name,omitempty"`
+	Name userNamesFormValue `json:"name,omitempty" schema:"name"`
 }
 
 type userNamesFormValue struct {
-	FirstName string `json:"firstName,omitempty"`
-	LastName  string `json:"lastName,omitempty"`
+	FirstName string `json:"firstName,omitempty" schema:"firstName"`
+	LastName  string `json:"lastName,omitempty" schema:"lastName"`
 }
 
 // FetchUser implements the [idp.Session] interface.
@@ -38,25 +37,14 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 		}
 	}
 	info := s.Tokens.IDTokenClaims.GetUserInfo()
-	names, err := s.userFormValue()
-	if err != nil {
-		return nil, err
+	userName := userFormValue{}
+	if s.UserFormValue != "" {
+		if err = json.Unmarshal([]byte(s.UserFormValue), &userName); err != nil {
+			return nil, err
+		}
 	}
-	return NewUser(info, names), nil
-}
 
-// userFormValue gets the name of the user from the `user` from value
-func (s *Session) userFormValue() (userNamesFormValue, error) {
-	user := s.FormData.Get("user")
-	if user == "" {
-		return userNamesFormValue{}, nil
-	}
-	userValue := new(userFormValue)
-	err := json.Unmarshal([]byte(user), userValue)
-	if err != nil {
-		return userNamesFormValue{}, err
-	}
-	return userValue.Name, nil
+	return NewUser(info, userName.Name), nil
 }
 
 func NewUser(info *openid.UserInfo, names userNamesFormValue) *User {

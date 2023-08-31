@@ -3,7 +3,6 @@ package login
 import (
 	"context"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/zitadel/logging"
@@ -41,9 +40,11 @@ type externalIDPData struct {
 }
 
 type externalIDPCallbackData struct {
-	State    string `schema:"state"`
-	Code     string `schema:"code"`
-	FormData url.Values
+	State string `schema:"state"`
+	Code  string `schema:"code"`
+
+	// Apple returns a user on first registration
+	User string `schema:"user"`
 }
 
 type externalNotFoundOptionFormData struct {
@@ -201,7 +202,7 @@ func (l *Login) handleExternalLoginCallbackForm(w http.ResponseWriter, r *http.R
 // and tries to extract the user with the provided data
 func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Request) {
 	data := new(externalIDPCallbackData)
-	formData, err := l.getParseDataWithForm(r, data)
+	err := l.getParseData(r, data)
 	if err != nil {
 		l.renderLogin(w, r, nil, err)
 		return
@@ -282,7 +283,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			l.externalAuthFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &apple.Session{Session: &openid.Session{Provider: provider.(*apple.Provider).Provider, Code: data.Code}, FormData: formData}
+		session = &apple.Session{Session: &openid.Session{Provider: provider.(*apple.Provider).Provider, Code: data.Code}, UserFormValue: data.User}
 	case domain.IDPTypeJWT,
 		domain.IDPTypeLDAP,
 		domain.IDPTypeUnspecified:
