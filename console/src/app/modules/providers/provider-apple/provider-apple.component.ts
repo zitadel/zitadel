@@ -244,7 +244,7 @@ export class ProviderAppleComponent {
         const reader = new FileReader();
         reader.onload = ((aXML) => {
           return (e) => {
-            const keyBase64 =e.target?.result
+            const keyBase64 = e.target?.result;
             if (keyBase64 && typeof keyBase64 === 'string') {
               const cropped = keyBase64.replace('data:application/octet-stream;base64,', '');
               this.privateKey?.setValue(cropped);
