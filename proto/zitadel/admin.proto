@@ -3878,6 +3878,14 @@ message AddSMTPConfigRequest {
             example: "\"this-is-my-password\"";
         }
     ];
+    string reply_to_address = 7 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"replyto@m.zitadel.cloud\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
 }
 
 message AddSMTPConfigResponse {
@@ -3917,6 +3925,14 @@ message UpdateSMTPConfigRequest {
     string user = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+        }
+    ];
+    string reply_to_address = 6 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"replyto@m.zitadel.cloud\"";
+            min_length: 1;
+            max_length: 200;
         }
     ];
 }

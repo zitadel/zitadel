@@ -17,7 +17,7 @@ import (
 
 func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.Config) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareAddSMTPConfig(instanceAgg, config.From, config.FromName, config.SMTP.Host, config.SMTP.User, []byte(config.SMTP.Password), config.Tls)
+	validation := c.prepareAddSMTPConfig(instanceAgg, config.From, config.FromName, config.ReplyToAddress, config.SMTP.Host, config.SMTP.User, []byte(config.SMTP.Password), config.Tls)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.Config) (*dom
 
 func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *smtp.Config) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareChangeSMTPConfig(instanceAgg, config.From, config.FromName, config.SMTP.Host, config.SMTP.User, config.Tls)
+	validation := c.prepareChangeSMTPConfig(instanceAgg, config.From, config.FromName, config.ReplyToAddress, config.SMTP.Host, config.SMTP.User, config.Tls)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -99,11 +99,14 @@ func (c *Commands) RemoveSMTPConfig(ctx context.Context) (*domain.ObjectDetails,
 	}, nil
 }
 
-func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, hostAndPort, user string, password []byte, tls bool) preparation.Validation {
+func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, replyTo, hostAndPort, user string, password []byte, tls bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if from = strings.TrimSpace(from); from == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-mruNY", "Errors.Invalid.Argument")
 		}
+
+		replyTo = strings.TrimSpace(replyTo)
+
 		hostAndPort = strings.TrimSpace(hostAndPort)
 		if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-9JdRe", "Errors.Invalid.Argument")
@@ -136,6 +139,7 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, hostA
 					tls,
 					from,
 					name,
+					replyTo,
 					hostAndPort,
 					user,
 					smtpPassword,
@@ -145,11 +149,13 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, hostA
 	}
 }
 
-func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, hostAndPort, user string, tls bool) preparation.Validation {
+func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, replyTo, hostAndPort, user string, tls bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if from = strings.TrimSpace(from); from == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-ASv2d", "Errors.Invalid.Argument")
 		}
+
+		replyTo = strings.TrimSpace(replyTo)
 		hostAndPort = strings.TrimSpace(hostAndPort)
 		if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-Kv875", "Errors.Invalid.Argument")
@@ -174,6 +180,7 @@ func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, ho
 				tls,
 				from,
 				name,
+				replyTo,
 				hostAndPort,
 				user,
 			)
