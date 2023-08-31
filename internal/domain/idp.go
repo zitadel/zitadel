@@ -99,6 +99,12 @@ func (t IDPType) DisplayName() string {
 	}
 }
 
+// IsSignInButton returns if the button should be displayed with a translated
+// "Sign in with {{.DisplayName}}", e.g. "Sign in with Apple"
+func (t IDPType) IsSignInButton() bool {
+	return t == IDPTypeApple
+}
+
 type IDPIntentState int32
 
 const (
