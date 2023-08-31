@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import { LoginSettings } from "@zitadel/server";
+import Alert from "./Alert";
 
 type Inputs = {
   loginName: string;
@@ -54,7 +55,10 @@ export default function UsernameForm({
 
     setLoading(false);
     if (!res.ok) {
-      throw new Error("Failed to load authentication methods");
+      const response = await res.json();
+
+      setError(response.details);
+      return Promise.reject(response.details);
     }
     return res.json();
   }
@@ -145,14 +149,16 @@ export default function UsernameForm({
           autoComplete="username"
           {...register("loginName", { required: "This field is required" })}
           label="Loginname"
-          //   error={errors.username?.message as string}
         />
       </div>
 
+      {error && (
+        <div className="py-4">
+          <Alert>{error}</Alert>
+        </div>
+      )}
+
       <div className="mt-8 flex w-full flex-row items-center">
-        {/* <Button type="button" variant={ButtonVariants.Secondary}>
-          back
-        </Button> */}
         <span className="flex-grow"></span>
         <Button
           type="submit"

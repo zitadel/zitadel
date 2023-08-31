@@ -27,16 +27,11 @@ export async function POST(request: NextRequest) {
               return NextResponse.json(error, { status: 500 });
             });
         } else {
-          throw "No user id found in session";
+          throw { details: "No user id found in session" };
         }
       })
       .catch((error) => {
-        return NextResponse.json(
-          {
-            details: "could not add session to cookie",
-          },
-          { status: 500 }
-        );
+        return NextResponse.json(error, { status: 500 });
       });
   } else {
     return NextResponse.error();
