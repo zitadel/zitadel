@@ -29,11 +29,10 @@ describe("login", () => {
               loginName: "john@zitadel.com",
             },
             password: undefined,
-            passkey: undefined,
+            webAuthN: undefined,
             intent: undefined,
           },
           metadata: {},
-          domain: "localhost",
         },
       },
     });
