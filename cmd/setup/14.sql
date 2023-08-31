@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS projections.current_states (
     , aggregate_type TEXT
     , "sequence" INT8
     , event_date TIMESTAMPTZ
-    , position DECIMAL
+    , "position" DECIMAL
 
     , PRIMARY KEY (projection_name, instance_id)
 );
@@ -117,7 +117,7 @@ INSERT INTO projections.current_states (
     projection_name
     , instance_id
     , event_date
-    , position
+    , "position"
     , last_updated
 ) SELECT 
     cs.projection_name
@@ -146,7 +146,7 @@ INSERT INTO projections.current_states (
     projection_name
     , instance_id
     , event_date
-    , position
+    , "position"
     , last_updated
 ) SELECT 
     cs.view_name
@@ -174,7 +174,7 @@ INSERT INTO projections.current_states (
     projection_name
     , instance_id
     , event_date
-    , position
+    , "position"
     , last_updated
 ) SELECT 
     cs.view_name

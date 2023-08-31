@@ -12,8 +12,8 @@ INSERT INTO eventstore.events (
     , event_sequence
 
     , created_at
-    , commit_order
-    , position
+    , "position"
+    , in_tx_order
 ) VALUES
     %s
-RETURNING created_at, commit_order;
+RETURNING created_at, "position";

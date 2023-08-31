@@ -3,7 +3,7 @@ SELECT
     , aggregate_type
     , "sequence"
     , event_date
-    , position
+    , "position"
 FROM 
     projections.current_states
 WHERE

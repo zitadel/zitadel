@@ -278,10 +278,10 @@ func (db *CRDB) db() *database.DB {
 
 func (db *CRDB) orderByEventSequence(desc bool) string {
 	if desc {
-		return " ORDER BY commit_order DESC, position DESC"
+		return ` ORDER BY "position" DESC, in_tx_order DESC`
 	}
 
-	return " ORDER BY commit_order, position"
+	return ` ORDER BY "position", in_tx_order`
 }
 
 func (db *CRDB) eventQuery() string {
@@ -289,7 +289,7 @@ func (db *CRDB) eventQuery() string {
 		" created_at" +
 		", event_type" +
 		", event_sequence" +
-		", commit_order" +
+		`, "position"` +
 		", event_data" +
 		", editor_user" +
 		", resource_owner" +
@@ -301,7 +301,7 @@ func (db *CRDB) eventQuery() string {
 }
 
 func (db *CRDB) maxSequenceQuery() string {
-	return "SELECT MAX(commit_order) FROM eventstore.events"
+	return `SELECT MAX("position") FROM eventstore.events`
 }
 
 func (db *CRDB) instanceIDsQuery() string {
@@ -331,7 +331,7 @@ func (db *CRDB) columnName(col repository.Field) string {
 	case repository.FieldCreationDate:
 		return "created_at"
 	case repository.FieldPosition:
-		return "commit_order"
+		return `"position"`
 	default:
 		return ""
 	}

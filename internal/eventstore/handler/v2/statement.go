@@ -501,7 +501,7 @@ type execConfig struct {
 type query func(config execConfig) string
 
 func exec(config execConfig, q query, opts []execOption) Exec {
-	return func(ex Executer, projectionName string) error {
+	return func(ex Executer, projectionName string) (err error) {
 		if projectionName == "" {
 			return ErrNoProjection
 		}
@@ -515,7 +515,20 @@ func exec(config execConfig, q query, opts []execOption) Exec {
 			opt(&config)
 		}
 
-		if _, err := ex.Exec(q(config), config.args...); err != nil {
+		_, err = ex.Exec("SAVEPOINT stmt_exec")
+		if err != nil {
+			return errors.ThrowInternal(err, "CRDB-YdOXD", "create savepoint failed")
+		}
+		defer func() {
+			if err != nil {
+				_, rollbackErr := ex.Exec("ROLLBACK TO SAVEPOINT stmt_exec")
+				logging.OnError(rollbackErr).Debug("rollback failed")
+				return
+			}
+			_, err = ex.Exec("RELEASE SAVEPOINT stmt_exec")
+		}()
+		_, err = ex.Exec(q(config), config.args...)
+		if err != nil {
 			return errors.ThrowInternal(err, "CRDB-pKtsr", "exec failed")
 		}
 

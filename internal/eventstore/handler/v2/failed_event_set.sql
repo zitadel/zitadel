@@ -17,8 +17,8 @@ INSERT INTO projections.failed_events2 (
     , $6
     , $7
     , $8
-    , statement_timestamp()) 
-ON CONFLICT (
+    , now()
+) ON CONFLICT (
     projection_name
     , aggregate_type
     , aggregate_id

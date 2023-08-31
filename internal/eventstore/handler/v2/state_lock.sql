@@ -5,5 +5,5 @@ INSERT INTO projections.current_states (
 ) VALUES (
     $1
     , $2
-    , statement_timestamp()
+    , now()
 ) ON CONFLICT DO NOTHING;
