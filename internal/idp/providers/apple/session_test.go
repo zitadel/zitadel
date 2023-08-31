@@ -3,7 +3,6 @@ package apple
 import (
 	"context"
 	"errors"
-	"net/url"
 	"testing"
 	"time"
 
@@ -20,17 +19,17 @@ import (
 
 func TestSession_FetchUser(t *testing.T) {
 	type fields struct {
-		clientID    string
-		teamID      string
-		keyID       string
-		privateKey  []byte
-		redirectURI string
-		scopes      []string
-		httpMock    func()
-		authURL     string
-		code        string
-		tokens      *openid.Tokens[*openid.IDTokenClaims]
-		formData    url.Values
+		clientID      string
+		teamID        string
+		keyID         string
+		privateKey    []byte
+		redirectURI   string
+		scopes        []string
+		httpMock      func()
+		authURL       string
+		code          string
+		tokens        *openid.Tokens[*openid.IDTokenClaims]
+		userFormValue string
 	}
 	type want struct {
 		err               error
@@ -90,7 +89,7 @@ func TestSession_FetchUser(t *testing.T) {
 					},
 					IDTokenClaims: id_token(),
 				},
-				formData: nil,
+				userFormValue: "",
 			},
 			want: want{
 				id:                "sub",
@@ -128,9 +127,7 @@ func TestSession_FetchUser(t *testing.T) {
 					},
 					IDTokenClaims: id_token(),
 				},
-				formData: url.Values{
-					"user": []string{`{"name": {"firstName": "firstName", "lastName": "lastName"}}`},
-				},
+				userFormValue: `{"name": {"firstName": "firstName", "lastName": "lastName"}}`,
 			},
 			want: want{
 				id:                "sub",
@@ -169,7 +166,7 @@ func TestSession_FetchUser(t *testing.T) {
 					Code:     tt.fields.code,
 					Tokens:   tt.fields.tokens,
 				},
-				FormData: tt.fields.formData,
+				UserFormValue: tt.fields.userFormValue,
 			}
 
 			user, err := session.FetchUser(context.Background())

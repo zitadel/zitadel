@@ -201,12 +201,6 @@ func Test_parseCallbackRequest(t *testing.T) {
 					Code:             "code",
 					Error:            "error",
 					ErrorDescription: "desc",
-					FormData: url.Values{
-						"code":              []string{"code"},
-						"error":             []string{"error"},
-						"error_description": []string{"desc"},
-						"state":             []string{"state"},
-					},
 				},
 			},
 		},

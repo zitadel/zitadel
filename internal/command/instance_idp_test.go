@@ -4891,7 +4891,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-jkn3w", "Errors.ClientIDMissing"))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-jkn3w", "Errors.IDP.ClientIDMissing"))
 				},
 			},
 		},
