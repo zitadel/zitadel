@@ -1049,6 +1049,7 @@
       "TITLE": "SMTP настройки",
       "SENDERADDRESS": "Имейл адрес на изпращача",
       "SENDERNAME": "Име на изпращача",
+      "REPLYTOADDRESS": "Reply-to адрес",
       "HOSTANDPORT": "Хост и порт",
       "USER": "Потребител",
       "PASSWORD": "Парола",

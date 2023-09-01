@@ -75,6 +75,11 @@ message SMTPConfig {
       example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
     }
   ];
+  string reply_to_address = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"replyto@m.zitadel.cloud\"";
+    }
+  ];
 }
 
 message SMSProvider {

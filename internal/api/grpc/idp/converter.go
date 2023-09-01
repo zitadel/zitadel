@@ -414,6 +414,8 @@ func providerTypeToPb(idpType domain.IDPType) idp_pb.ProviderType {
 		return idp_pb.ProviderType_PROVIDER_TYPE_GITLAB_SELF_HOSTED
 	case domain.IDPTypeGoogle:
 		return idp_pb.ProviderType_PROVIDER_TYPE_GOOGLE
+	case domain.IDPTypeApple:
+		return idp_pb.ProviderType_PROVIDER_TYPE_APPLE
 	case domain.IDPTypeUnspecified:
 		return idp_pb.ProviderType_PROVIDER_TYPE_UNSPECIFIED
 	default:
@@ -468,6 +470,10 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 	}
 	if config.LDAPIDPTemplate != nil {
 		ldapConfigToPb(providerConfig, config.LDAPIDPTemplate)
+		return providerConfig
+	}
+	if config.AppleIDPTemplate != nil {
+		appleConfigToPb(providerConfig, config.AppleIDPTemplate)
 		return providerConfig
 	}
 	return providerConfig
@@ -618,5 +624,16 @@ func ldapAttributesToPb(attributes idp.LDAPAttributes) *idp_pb.LDAPAttributes {
 		PreferredLanguageAttribute: attributes.PreferredLanguageAttribute,
 		AvatarUrlAttribute:         attributes.AvatarURLAttribute,
 		ProfileAttribute:           attributes.ProfileAttribute,
+	}
+}
+
+func appleConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.AppleIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Apple{
+		Apple: &idp_pb.AppleConfig{
+			ClientId: template.ClientID,
+			TeamId:   template.TeamID,
+			KeyId:    template.KeyID,
+			Scopes:   template.Scopes,
+		},
 	}
 }

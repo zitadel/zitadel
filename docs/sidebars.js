@@ -286,13 +286,28 @@ module.exports = {
             "guides/integrate/services/pingidentity-saml",
             {
               type: 'link',
-              label: 'Nextcloud', // The link label
-              href: 'https://zitadel.com/blog/zitadel-as-sso-provider-for-selfhosting', // The internal path
+              label: 'Nextcloud',
+              href: 'https://zitadel.com/blog/zitadel-as-sso-provider-for-selfhosting',
             },
             {
               type: 'link',
-              label: 'Cloudflare workers', // The link label
-              href: 'https://zitadel.com/blog/increase-spa-security-with-cloudflare-workers', // The internal path
+              label: 'Cloudflare workers',
+              href: 'https://zitadel.com/blog/increase-spa-security-with-cloudflare-workers',
+            },
+            {
+              type: 'link',
+              label: 'Firezone (firezone.dev)',
+              href: 'https://www.firezone.dev/docs/authenticate/oidc/zitadel',
+            },
+            {
+              type: 'link',
+              label: 'Psono (psono.com)',
+              href: 'https://doc.psono.com/admin/configuration/oidc-zitadel.html',
+            },
+            {
+              type: 'link',
+              label: 'Netbird (netbird.io)',
+              href: 'https://docs.netbird.io/selfhosted/identity-providers',
             },
           ],
         },

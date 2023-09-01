@@ -457,3 +457,27 @@ func updateLDAPProviderToCommand(req *mgmt_pb.UpdateLDAPProviderRequest) command
 		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
+
+func addAppleProviderToCommand(req *mgmt_pb.AddAppleProviderRequest) command.AppleProvider {
+	return command.AppleProvider{
+		Name:       req.Name,
+		ClientID:   req.ClientId,
+		TeamID:     req.TeamId,
+		KeyID:      req.KeyId,
+		PrivateKey: req.PrivateKey,
+		Scopes:     req.Scopes,
+		IDPOptions: idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateAppleProviderToCommand(req *mgmt_pb.UpdateAppleProviderRequest) command.AppleProvider {
+	return command.AppleProvider{
+		Name:       req.Name,
+		ClientID:   req.ClientId,
+		TeamID:     req.TeamId,
+		KeyID:      req.KeyId,
+		PrivateKey: req.PrivateKey,
+		Scopes:     req.Scopes,
+		IDPOptions: idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}

@@ -275,13 +275,13 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 		sessionChecks = append(sessionChecks, s.command.CheckWebAuthN(passkey.GetCredentialAssertionData()))
 	}
 	if totp := checks.GetTotp(); totp != nil {
-		sessionChecks = append(sessionChecks, command.CheckTOTP(totp.GetTotp()))
+		sessionChecks = append(sessionChecks, command.CheckTOTP(totp.GetCode()))
 	}
 	if otp := checks.GetOtpSms(); otp != nil {
-		sessionChecks = append(sessionChecks, command.CheckOTPSMS(otp.GetOtp()))
+		sessionChecks = append(sessionChecks, command.CheckOTPSMS(otp.GetCode()))
 	}
 	if otp := checks.GetOtpEmail(); otp != nil {
-		sessionChecks = append(sessionChecks, command.CheckOTPEmail(otp.GetOtp()))
+		sessionChecks = append(sessionChecks, command.CheckOTPEmail(otp.GetCode()))
 	}
 	return sessionChecks, nil
 }
