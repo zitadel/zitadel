@@ -199,6 +199,10 @@ Errors:
       InvalidCharacter: Solo caracteres alfanuméricos, . y - se permiten para un dominio
     IDP:
       InvalidSearchQuery: Consulta de búsqueda no válida
+      ClientIDMissing: Falta ClientID
+      TeamIDMissing: Falta TeamID
+      KeyIDMissing: Falta KeyID
+      PrivateKeyMissing: Falta la clave privada
     LoginPolicy:
       NotFound: Política de inicio de sesión no encontrada
       Invalid: Política de inicio de sesión no es válida
