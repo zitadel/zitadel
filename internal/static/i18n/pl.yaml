@@ -137,6 +137,7 @@ Errors:
       MinimumExternalIDPNeeded: Przynajmniej jeden IDP musi być dodany
       AlreadyExists: IDP zewnętrzne już istnieje
       NotFound: IDP zewnętrzne nie znaleziony
+      LoginFailed: Logowanie w zewnętrznym IDP nie powiodło się
     MFA:
       OTP:
         AlreadyReady: Wieloskładnikowe OTP (OneTimePassword) jest już skonfigurowane
@@ -198,6 +199,10 @@ Errors:
       InvalidCharacter: Tylko znaki alfanumeryczne, . i - są dozwolone dla domeny
     IDP:
       InvalidSearchQuery: Nieprawidłowe zapytanie wyszukiwania
+      ClientIDMissing: Brak ClientID
+      TeamIDMissing: Brak TeamID
+      KeyIDMissing: Brak KeyID
+      PrivateKeyMissing: Brak klucza prywatnego
     LoginPolicy:
       NotFound: Polityka logowania nie znaleziona
       Invalid: Polityka logowania jest nieprawidłowa

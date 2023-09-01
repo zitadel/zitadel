@@ -17,9 +17,10 @@ import (
 var _ channels.NotificationChannel = (*Email)(nil)
 
 type Email struct {
-	smtpClient    *smtp.Client
-	senderAddress string
-	senderName    string
+	smtpClient     *smtp.Client
+	senderAddress  string
+	senderName     string
+	replyToAddress string
 }
 
 func InitChannel(ctx context.Context, getSMTPConfig func(ctx context.Context) (*Config, error)) (*Email, error) {
@@ -36,9 +37,10 @@ func InitChannel(ctx context.Context, getSMTPConfig func(ctx context.Context) (*
 	logging.New().Debug("successfully initialized smtp email channel")
 
 	return &Email{
-		smtpClient:    client,
-		senderName:    smtpConfig.FromName,
-		senderAddress: smtpConfig.From,
+		smtpClient:     client,
+		senderName:     smtpConfig.FromName,
+		senderAddress:  smtpConfig.From,
+		replyToAddress: smtpConfig.ReplyToAddress,
 	}, nil
 }
 
@@ -54,6 +56,7 @@ func (email *Email) HandleMessage(message channels.Message) error {
 	}
 	emailMsg.SenderEmail = email.senderAddress
 	emailMsg.SenderName = email.senderName
+	emailMsg.ReplyToAddress = email.replyToAddress
 	// To && From
 	if err := email.smtpClient.Mail(emailMsg.SenderEmail); err != nil {
 		return caos_errs.ThrowInternalf(err, "EMAIL-s3is3", "could not set sender: %v", emailMsg.SenderEmail)
@@ -156,7 +159,9 @@ func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {
 		return nil
 	}
 	// Auth
-	auth := smtp.PlainAuth("", smtpConfig.User, smtpConfig.Password, host)
+	auth := unencryptedAuth{
+		smtp.PlainAuth("", smtpConfig.User, smtpConfig.Password, host),
+	}
 	err := client.Auth(auth)
 	if err != nil {
 		return caos_errs.ThrowInternalf(err, "EMAIL-s9kfs", "could not add smtp auth for user %s", smtpConfig.User)

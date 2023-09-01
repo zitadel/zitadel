@@ -212,7 +212,7 @@ Next step is to authenticate the user with the new registered passkey.
 ### Create Session
 
 First step is to ask the user for his username and create a new session with the ZITADEL API.
-When creating the new session make sure to include the challenge for passkey.
+When creating the new session make sure to include the challenge for passkey, resp. webAuthN with a required user verification and the domain of your login UI.
 The response will include the public key credential request options for the passkey in the challenges.
 
 More detailed information about the API: [Create Session Documentation](/apis/resources/session_service/session-service-create-session)
@@ -231,9 +231,12 @@ curl --request POST \
     }
   },
   "metadata": {},
-  "challenges": [
-    "CHALLENGE_KIND_PASSKEY"
-  ]
+  "challenges": {
+    "webAuthN": {
+      "domain": "example.domain.com",
+      "userVerificationRequirement": "USER_VERIFICATION_REQUIREMENT_REQUIRED"
+    }
+  }
 }'
 ```
 
@@ -248,7 +251,7 @@ Example Response:
   "sessionId": "d654e6ba-70a3-48ef-a95d-37c8d8a7901a",
   "sessionToken": "string",
   "challenges": {
-    "passkey": {
+    "webAuthN": {
       "publicKeyCredentialRequestOptions": {
         "publicKey": {
           "allowCredentials": [
@@ -274,7 +277,7 @@ After starting the passkey authentication on the side of ZITADEL you have to cha
 To do this you need to call the browser API to get the credentials.
 Make sure to send the public key credential request options you got from ZITADEL.
 
-```bash
+```javascript
 const credential = await navigator.credentials.get({
     publicKey: publicKeyCredentialRequestOptions
 });
@@ -300,7 +303,7 @@ curl --request PATCH \
   --data '{
   "sessionToken": "yMDi6uVPJAcphbbz0LaxC07ihWkNTe7m0Xqch8SzfM5Cz3HSIQIDZ65x1f5Qal0jxz0MEyo-_zYcUg",
   "checks": {
-    "passkey": {
+    "webAuthN": {
       "credentialAssertionData": {}
     }
   }

@@ -53,7 +53,7 @@ func Test_LockoutPolicyPrepares(t *testing.T) {
 			name:    "prepareLockoutPolicyQuery no result",
 			prepare: prepareLockoutPolicyQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(prepareLockoutPolicyStmt),
 					nil,
 					nil,
@@ -114,7 +114,7 @@ func Test_LockoutPolicyPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*LockoutPolicy)(nil),
 		},
 	}
 	for _, tt := range tests {

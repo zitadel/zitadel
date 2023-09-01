@@ -134,7 +134,7 @@ func (q *Queries) InitHashGenerator(ctx context.Context, generatorType domain.Se
 	return crypto.NewHashGenerator(cryptoConfig, algorithm), nil
 }
 
-func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType domain.SecretGeneratorType) (_ *SecretGenerator, err error) {
+func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType domain.SecretGeneratorType) (generator *SecretGenerator, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -147,8 +147,11 @@ func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType domai
 		return nil, errors.ThrowInternal(err, "QUERY-3k99f", "Errors.Query.SQLStatment")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		generator, err = scan(row)
+		return err
+	}, query, args...)
+	return generator, err
 }
 
 func (q *Queries) SearchSecretGenerators(ctx context.Context, queries *SecretGeneratorSearchQueries) (secretGenerators *SecretGenerators, err error) {
@@ -164,13 +167,12 @@ func (q *Queries) SearchSecretGenerators(ctx context.Context, queries *SecretGen
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-sn9lw", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		secretGenerators, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-4miii", "Errors.Internal")
-	}
-	secretGenerators, err = scan(rows)
-	if err != nil {
-		return nil, err
 	}
 	secretGenerators.LatestSequence, err = q.latestSequence(ctx, secretGeneratorsTable)
 	return secretGenerators, err

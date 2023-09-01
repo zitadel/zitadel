@@ -139,6 +139,7 @@ Errors:
       MinimumExternalIDPNeeded: Трябва да се добави поне един IDP
       AlreadyExists: Външен IDP вече е зает
       NotFound: Външен IDP не е намерен
+      LoginFailed: Влизането във Външен IDP е неуспешно
     MFA:
       OTP:
         AlreadyReady: Многофакторният OTP (OneTimePassword) вече е настроен
@@ -200,6 +201,10 @@ Errors:
       InvalidCharacter: 'Само буквено-цифрови знаци, . '
     IDP:
       InvalidSearchQuery: Невалидна заявка за търсене
+      ClientIDMissing: Липсва ClientID
+      TeamIDMissing: TeamID липсва
+      KeyIDMissing: Липсва KeyID
+      PrivateKeyMissing: Липсва частен ключ
     LoginPolicy:
       NotFound: Правилата за влизане не са намерени
       Invalid: Правилата за влизане са невалидни

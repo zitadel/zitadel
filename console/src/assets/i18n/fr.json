@@ -1059,6 +1059,7 @@
       "TITLE": "Paramètres SMTP",
       "SENDERADDRESS": "Adresse e-mail de l'expéditeur",
       "SENDERNAME": "Nom de l'expéditeur",
+      "REPLYTOADDRESS": "Adresse Reply-to",
       "HOSTANDPORT": "Hôte et port",
       "USER": "Utilisateur",
       "PASSWORD": "Mot de passe",
@@ -1836,7 +1837,9 @@
       "DELETED": "Idp supprimé avec succès !",
       "ADDED": "Ajouté avec succès.",
       "REMOVED": "Suppression réussie."
-    }
+    },
+    "ISIDTOKENMAPPING": "Mappage depuis le jeton ID",
+    "ISIDTOKENMAPPING_DESC": "Si sélectionné, les informations du fournisseur sont mappées à partir du jeton ID, et non à partir du point d'extrémité userinfo."
   },
   "MFA": {
     "LIST": {

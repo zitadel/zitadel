@@ -136,7 +136,8 @@ Errors:
       NotAllowed: Externer IDP ist auf dieser Organisation nicht erlaubt.
       MinimumExternalIDPNeeded: Mindestens ein IDP muss hinzugefügt werden.
       AlreadyExists: External IDP ist bereits vergeben
-      NotFound: Externe IDP nicht gefunden
+      NotFound: Externer IDP nicht gefunden
+      LoginFailed: Externer IDP Login fehlgeschlagen
     MFA:
       OTP:
         AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet
@@ -198,6 +199,10 @@ Errors:
       InvalidCharacter: Nur alphanumerische Zeichen, . und - sind für eine Domäne erlaubt
     IDP:
       InvalidSearchQuery: Ungültiger Suchparameter
+      ClientIDMissing: ClientID fehlt
+      TeamIDMissing: TeamID fehlt
+      KeyIDMissing: KeyID fehlt
+      PrivateKeyMissing: Private Key fehlt
     LoginPolicy:
       NotFound: Login Policy konnte nicht gefunden werden
       Invalid: Login Policy ist ungültig

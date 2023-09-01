@@ -1060,6 +1060,7 @@
       "TITLE": "SMTP подесувања",
       "SENDERADDRESS": "Адреса на испраќачот",
       "SENDERNAME": "Име на испраќачот",
+      "REPLYTOADDRESS": "Reply-to адреса",
       "HOSTANDPORT": "Host и Port",
       "USER": "Корисник",
       "PASSWORD": "Лозинка",
@@ -1832,7 +1833,9 @@
       "DELETED": "IDP успешно отстранет!",
       "ADDED": "Успешно додадено.",
       "REMOVED": "Успешно отстрането."
-    }
+    },
+    "ISIDTOKENMAPPING": "Совпаѓање од ID токен",
+    "ISIDTOKENMAPPING_DESC": "Ако е избрано, информациите од провајдерот се мапираат од ID токенот, а не од userinfo крајната точка."
   },
   "MFA": {
     "LIST": {

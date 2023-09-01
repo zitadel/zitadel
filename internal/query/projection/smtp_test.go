@@ -30,6 +30,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						"tls": true,
 						"senderAddress": "sender",
 						"senderName": "name",
+						"replyToAddress": "reply-to",
 						"host": "host",
 						"user": "user"
 					}`,
@@ -44,13 +45,14 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.smtp_configs SET (change_date, sequence, tls, sender_address, sender_name, host, username) = ($1, $2, $3, $4, $5, $6, $7) WHERE (aggregate_id = $8) AND (instance_id = $9)",
+							expectedStmt: "UPDATE projections.smtp_configs1 SET (change_date, sequence, tls, sender_address, sender_name, reply_to_address, host, username) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (aggregate_id = $9) AND (instance_id = $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								true,
 								"sender",
 								"name",
+								"reply-to",
 								"host",
 								"user",
 								"agg-id",
@@ -71,6 +73,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						"tls": true,
 						"senderAddress": "sender",
 						"senderName": "name",
+						"replyToAddress": "reply-to",
 						"host": "host",
 						"user": "user",
 						"password": {
@@ -89,7 +92,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.smtp_configs (aggregate_id, creation_date, change_date, resource_owner, instance_id, sequence, tls, sender_address, sender_name, host, username, password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+							expectedStmt: "INSERT INTO projections.smtp_configs1 (aggregate_id, creation_date, change_date, resource_owner, instance_id, sequence, tls, sender_address, sender_name, reply_to_address, host, username, password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -100,6 +103,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 								true,
 								"sender",
 								"name",
+								"reply-to",
 								"host",
 								"user",
 								anyArg{},
@@ -132,11 +136,38 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.smtp_configs SET (change_date, sequence, password) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.smtp_configs1 SET (change_date, sequence, password) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								anyArg{},
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceSMTPConfigRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.SMTPConfigRemovedEventType),
+					instance.AggregateType,
+					[]byte(`{}`),
+				), instance.SMTPConfigRemovedEventMapper),
+			},
+			reduce: (&smtpConfigProjection{}).reduceSMTPConfigRemoved,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.smtp_configs1 WHERE (aggregate_id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
 							},
@@ -162,7 +193,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.smtp_configs WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.smtp_configs1 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

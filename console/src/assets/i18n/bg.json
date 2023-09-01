@@ -1053,6 +1053,7 @@
       "TITLE": "SMTP настройки",
       "SENDERADDRESS": "Имейл адрес на изпращача",
       "SENDERNAME": "Име на изпращача",
+      "REPLYTOADDRESS": "Reply-to адрес",
       "HOSTANDPORT": "Хост и порт",
       "USER": "Потребител",
       "PASSWORD": "Парола",
@@ -1826,7 +1827,9 @@
       "DELETED": "Idp премахнат успешно!",
       "ADDED": "Добавено успешно.",
       "REMOVED": "Премахнато успешно."
-    }
+    },
+    "ISIDTOKENMAPPING": "Съответствие от ID токен",
+    "ISIDTOKENMAPPING_DESC": "Ако е избрано, информацията на доставчика се съответства от ID токена, а не от userinfo крайната точка."
   },
   "MFA": {
     "LIST": {

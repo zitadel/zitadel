@@ -133,6 +133,13 @@ VerifyMFAOTP:
   CodeLabel: コード
   NextButtonText: 次へ
 
+VerifyOTP:
+  Title: 二要素認証の検証
+  Description: 二要素認証を検証します。
+  CodeLabel: コード
+  ResendButtonText: コードを再送信
+  NextButtonText: 次へ
+
 VerifyMFAU2F:
   Title: 二要素認証
   Description: 登録されたデバイスで二要素認証を実行します（FaceID、Windows Hello、指紋など）
@@ -355,6 +362,8 @@ Footer:
   Tos: TOS
   PrivacyPolicy: プライバシーポリシー
   Help: ヘルプ
+
+SignIn: '{{.Provider}} でサインイン'
 
 Errors:
   Internal: 内部でエラーが発生しました

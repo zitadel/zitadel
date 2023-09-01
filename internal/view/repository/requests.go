@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"strings"
@@ -13,7 +15,14 @@ import (
 
 func PrepareGetByKey(table string, key ColumnKey, id string) func(db *gorm.DB, res interface{}) error {
 	return func(db *gorm.DB, res interface{}) error {
-		err := db.Table(table).
+		tx := db.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: true})
+		defer func() {
+			if err := tx.Commit().Error; err != nil {
+				logging.OnError(err).Info("commit failed")
+			}
+		}()
+
+		err := tx.Table(table).
 			Where(fmt.Sprintf("%s = ?", key.ToColumnName()), id).
 			Take(res).
 			Error
@@ -39,7 +48,14 @@ func PrepareGetByQuery(table string, queries ...SearchQuery) func(db *gorm.DB, r
 			}
 		}
 
-		err := query.Take(res).Error
+		tx := query.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: true})
+		defer func() {
+			if err := tx.Commit().Error; err != nil {
+				logging.OnError(err).Info("commit failed")
+			}
+		}()
+
+		err := tx.Take(res).Error
 		if err == nil {
 			return nil
 		}

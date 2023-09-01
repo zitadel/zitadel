@@ -137,6 +137,7 @@ Errors:
       MinimumExternalIDPNeeded: 必须添加至少一个 IDP
       AlreadyExists: 外部 IDP 已存在
       NotFound: 未找到外部 IDP
+      LoginFailed: 外部 IDP 登录失败
     MFA:
       OTP:
         AlreadyReady: OTP (一次性密码) 已经设置好了
@@ -198,6 +199,10 @@ Errors:
       InvalidCharacter: 只有字母数字字符，.和 - 允许用于域名中
     IDP:
       InvalidSearchQuery: 无效的搜索查询
+      ClientIDMissing: 客户端 ID 丢失
+      TeamIDMissing: 团队 ID 丢失
+      KeyIDMissing: 密钥 ID 丢失
+      PrivateKeyMissing: 私钥丢失
     LoginPolicy:
       NotFound: 未找到登录策略
       Invalid: 登录策略无效

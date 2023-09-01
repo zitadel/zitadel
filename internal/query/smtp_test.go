@@ -13,18 +13,19 @@ import (
 )
 
 var (
-	prepareSMTPConfigStmt = `SELECT projections.smtp_configs.aggregate_id,` +
-		` projections.smtp_configs.creation_date,` +
-		` projections.smtp_configs.change_date,` +
-		` projections.smtp_configs.resource_owner,` +
-		` projections.smtp_configs.sequence,` +
-		` projections.smtp_configs.tls,` +
-		` projections.smtp_configs.sender_address,` +
-		` projections.smtp_configs.sender_name,` +
-		` projections.smtp_configs.host,` +
-		` projections.smtp_configs.username,` +
-		` projections.smtp_configs.password` +
-		` FROM projections.smtp_configs` +
+	prepareSMTPConfigStmt = `SELECT projections.smtp_configs1.aggregate_id,` +
+		` projections.smtp_configs1.creation_date,` +
+		` projections.smtp_configs1.change_date,` +
+		` projections.smtp_configs1.resource_owner,` +
+		` projections.smtp_configs1.sequence,` +
+		` projections.smtp_configs1.tls,` +
+		` projections.smtp_configs1.sender_address,` +
+		` projections.smtp_configs1.sender_name,` +
+		` projections.smtp_configs1.reply_to_address,` +
+		` projections.smtp_configs1.host,` +
+		` projections.smtp_configs1.username,` +
+		` projections.smtp_configs1.password` +
+		` FROM projections.smtp_configs1` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	prepareSMTPConfigCols = []string{
 		"aggregate_id",
@@ -35,6 +36,7 @@ var (
 		"tls",
 		"sender_address",
 		"sender_name",
+		"reply_to_address",
 		"smtp_host",
 		"smtp_user",
 		"smtp_password",
@@ -56,7 +58,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 			name:    "prepareSMTPConfigQuery no result",
 			prepare: prepareSMTPConfigQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					prepareSMTPConfigStmt,
 					nil,
 					nil,
@@ -86,6 +88,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 						true,
 						"sender",
 						"name",
+						"reply-to",
 						"host",
 						"user",
 						&crypto.CryptoValue{},
@@ -93,17 +96,18 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 				),
 			},
 			object: &SMTPConfig{
-				AggregateID:   "agg-id",
-				CreationDate:  testNow,
-				ChangeDate:    testNow,
-				ResourceOwner: "ro",
-				Sequence:      20211108,
-				TLS:           true,
-				SenderAddress: "sender",
-				SenderName:    "name",
-				Host:          "host",
-				User:          "user",
-				Password:      &crypto.CryptoValue{},
+				AggregateID:    "agg-id",
+				CreationDate:   testNow,
+				ChangeDate:     testNow,
+				ResourceOwner:  "ro",
+				Sequence:       20211108,
+				TLS:            true,
+				SenderAddress:  "sender",
+				SenderName:     "name",
+				ReplyToAddress: "reply-to",
+				Host:           "host",
+				User:           "user",
+				Password:       &crypto.CryptoValue{},
 			},
 		},
 		{
@@ -121,7 +125,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*SMTPConfig)(nil),
 		},
 	}
 	for _, tt := range tests {

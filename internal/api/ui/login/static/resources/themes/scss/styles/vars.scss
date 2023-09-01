@@ -117,6 +117,8 @@
   --zitadel-color-github-background: #ffffff;
   --zitadel-color-gitlab-text: #8b8d8d;
   --zitadel-color-gitlab-background: #ffffff;
+  --zitadel-color-apple-text: #8b8d8d;
+  --zitadel-color-apple-background: #ffffff;
 
   --zitadel-color-qr: var(--zitadel-color-black);
   --zitadel-color-qr-background: var(--zitadel-color-white);
@@ -125,6 +127,7 @@
   --github-image-src: url(../../../images/idp/github.png);
   --gitlab-image-src: url(../../../images/idp/gitlab.png);
   --azure-image-src: url(../../../images/idp/ms.svg);
+  --apple-image-src: url(../../../images/idp/apple.svg);
 }
 
 .lgn-dark-theme {
@@ -227,9 +230,12 @@
   --zitadel-color-github-background: #ffffff;
   --zitadel-color-gitlab-text: #8b8d8d;
   --zitadel-color-gitlab-background: #ffffff;
+  --zitadel-color-apple-text: #8b8d8d;
+  --zitadel-color-apple-background: #ffffff;
 
   --google-image-src: url(../../../images/idp/google.png);
   --github-image-src: url(../../../images/idp/github-white.png);
   --gitlab-image-src: url(../../../images/idp/gitlab.png);
   --azure-image-src: url(../../../images/idp/ms.svg);
+  --apple-image-src: url(../../../images/idp/apple-dark.svg);
 }

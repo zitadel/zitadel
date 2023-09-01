@@ -76,7 +76,7 @@ func addIamMemberWithoutOwnerRemoved(eq map[string]interface{}) {
 	eq[InstanceMemberOwnerRemovedUser.identifier()] = false
 }
 
-func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery, withOwnerRemoved bool) (_ *Members, err error) {
+func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery, withOwnerRemoved bool) (members *Members, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -96,13 +96,12 @@ func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery, with
 		return nil, err
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		members, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Pdg1I", "Errors.Internal")
-	}
-	members, err := scan(rows)
-	if err != nil {
-		return nil, err
 	}
 	members.LatestSequence = currentSequence
 	return members, err

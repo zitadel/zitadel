@@ -521,7 +521,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   get decodedBase64(): string {
     const samlReq = this.samlAppRequest.toObject();
     if (samlReq && samlReq.metadataXml && typeof samlReq.metadataXml === 'string') {
-      return Buffer.from(samlReq.metadataXml, 'base64').toString('ascii');
+      return Buffer.from(samlReq.metadataXml, 'base64').toString('utf-8');
     } else {
       return '';
     }
@@ -529,7 +529,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
   set decodedBase64(xmlString) {
     if (this.samlAppRequest) {
-      const base64 = Buffer.from(xmlString, 'ascii').toString('base64');
+      const base64 = Buffer.from(xmlString, 'utf-8').toString('base64');
       this.samlAppRequest.setMetadataXml(base64);
     }
   }
