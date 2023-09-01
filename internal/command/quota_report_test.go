@@ -85,20 +85,7 @@ func TestQuotaReport_ReportQuotaUsage(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(
-						eventFromEventPusherWithInstanceID(
-							"INSTANCE",
-							quota.NewNotificationDueEvent(context.Background(),
-								&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
-								QuotaRequestsAllAuthenticated.Enum(),
-								"id1",
-								"url",
-								time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
-								1000,
-								200,
-							),
-						),
-					),
+					expectFilter(),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID(
@@ -106,7 +93,7 @@ func TestQuotaReport_ReportQuotaUsage(t *testing.T) {
 								quota.NewNotificationDueEvent(context.Background(),
 									&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
 									QuotaRequestsAllAuthenticated.Enum(),
-									"id2",
+									"id",
 									"url",
 									time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
 									1000,
@@ -120,14 +107,104 @@ func TestQuotaReport_ReportQuotaUsage(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				dueNotifications: []*quota.NotificationDueEvent{
-					{
-						Unit:        QuotaRequestsAllAuthenticated.Enum(),
-						ID:          "id2",
-						CallURL:     "url",
-						PeriodStart: time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
-						Threshold:   1000,
-						Usage:       250,
-					},
+					quota.NewNotificationDueEvent(
+						context.Background(),
+						&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+						QuotaRequestsAllAuthenticated.Enum(),
+						"id",
+						"url",
+						time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
+						1000,
+						250,
+					),
+				},
+			},
+			res: res{},
+		},
+		{
+			name: "due events",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							quota.NewNotificationDueEvent(context.Background(),
+								&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+								QuotaRequestsAllAuthenticated.Enum(),
+								"id2",
+								"url",
+								time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
+								1000,
+								250,
+							),
+						),
+					),
+					expectFilter(),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								quota.NewNotificationDueEvent(context.Background(),
+									&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+									QuotaRequestsAllAuthenticated.Enum(),
+									"id1",
+									"url",
+									time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
+									1000,
+									250,
+								),
+							),
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								quota.NewNotificationDueEvent(context.Background(),
+									&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+									QuotaRequestsAllAuthenticated.Enum(),
+									"id3",
+									"url",
+									time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
+									1000,
+									250,
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				dueNotifications: []*quota.NotificationDueEvent{
+					quota.NewNotificationDueEvent(
+						context.Background(),
+						&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+						QuotaRequestsAllAuthenticated.Enum(),
+						"id1",
+						"url",
+						time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
+						1000,
+						250,
+					),
+					quota.NewNotificationDueEvent(
+						context.Background(),
+						&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+						QuotaRequestsAllAuthenticated.Enum(),
+						"id2",
+						"url",
+						time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
+						1000,
+						250,
+					),
+					quota.NewNotificationDueEvent(
+						context.Background(),
+						&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+						QuotaRequestsAllAuthenticated.Enum(),
+						"id3",
+						"url",
+						time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
+						1000,
+						250,
+					),
 				},
 			},
 			res: res{},
