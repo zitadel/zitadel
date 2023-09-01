@@ -55,6 +55,7 @@ const (
 		" aggregate_id," +
 		" aggregate_version," +
 		" creation_date," +
+		" position," +
 		" event_data," +
 		" editor_user," +
 		" editor_service," +
@@ -62,7 +63,8 @@ const (
 		" instance_id," +
 		" event_sequence," +
 		" previous_aggregate_sequence," +
-		" previous_aggregate_type_sequence" +
+		" previous_aggregate_type_sequence," +
+		" in_tx_order" +
 		") " +
 		// defines the data to be inserted
 		"SELECT" +
@@ -70,7 +72,8 @@ const (
 		" $2::VARCHAR AS aggregate_type," +
 		" $3::VARCHAR AS aggregate_id," +
 		" $4::VARCHAR AS aggregate_version," +
-		" statement_timestamp() AS creation_date," +
+		" hlc_to_timestamp(cluster_logical_timestamp()) AS creation_date," +
+		" cluster_logical_timestamp() AS position," +
 		" $5::JSONB AS event_data," +
 		" $6::VARCHAR AS editor_user," +
 		" $7::VARCHAR AS editor_service," +
@@ -78,7 +81,8 @@ const (
 		" $9::VARCHAR AS instance_id," +
 		" COALESCE(aggregate_sequence, 0)+1," +
 		" aggregate_sequence AS previous_aggregate_sequence," +
-		" aggregate_type_sequence AS previous_aggregate_type_sequence " +
+		" aggregate_type_sequence AS previous_aggregate_type_sequence," +
+		" $10 AS in_tx_order " +
 		"FROM previous_data " +
 		"RETURNING id, event_sequence, creation_date, resource_owner, instance_id"
 
@@ -152,6 +156,7 @@ func (db *CRDB) Push(ctx context.Context, commands ...eventstore.Command) (event
 				"zitadel",
 				e.Aggregate().ResourceOwner,
 				e.Aggregate().InstanceID,
+				i,
 			).Scan(&e.ID, &e.Seq, &e.CreationDate, &e.ResourceOwner, &e.InstanceID)
 
 			if err != nil {

@@ -12,22 +12,24 @@ import (
 var (
 	currentSequenceStmt = `SELECT` +
 		` projections.current_states.last_updated,` +
+		` projections.current_states.event_date,` +
+		` projections.current_states.position,` +
+		` projections.current_states.projection_name,` +
 		` projections.current_states.aggregate_type,` +
 		` projections.current_states.aggregate_id,` +
-		` projections.current_states.event_date,` +
-		` projections.current_states.event_sequence,` +
-		` projections.current_states.projection_name,` +
+		` projections.current_states.sequence,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.current_states` +
 		" AS OF SYSTEM TIME '-1 ms' "
 
 	currentSequenceCols = []string{
 		"last_updated",
+		"event_date",
+		"position",
+		"projection_name",
 		"aggregate_type",
 		"aggregate_id",
-		"event_date",
 		"event_sequence",
-		"projection_name",
 		"count",
 	}
 )
@@ -65,11 +67,12 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							testNow,
+							testNow,
+							float64(20211108),
+							"projection-name",
 							"agg-type",
 							"agg-id",
-							testNow,
 							uint64(20211108),
-							"projection-name",
 						},
 					},
 				),
@@ -85,6 +88,9 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 							EventCreatedAt: testNow,
 							LastRun:        testNow,
 							Position:       20211108,
+							AggregateID:    "agg-id",
+							AggregateType:  "agg-type",
+							Sequence:       20211108,
 						},
 					},
 				},
@@ -100,19 +106,21 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							testNow,
+							testNow,
+							float64(20211108),
+							"projection-name",
 							"agg-type",
 							"agg-id",
-							testNow,
 							uint64(20211108),
-							"projection-name",
 						},
 						{
 							testNow,
+							testNow,
+							float64(20211108),
+							"projection-name2",
 							"agg-type",
 							"agg-id",
-							testNow,
 							uint64(20211108),
-							"projection-name2",
 						},
 					},
 				),
@@ -128,6 +136,9 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 							EventCreatedAt: testNow,
 							Position:       20211108,
 							LastRun:        testNow,
+							AggregateID:    "agg-id",
+							AggregateType:  "agg-type",
+							Sequence:       20211108,
 						},
 					},
 					{
@@ -136,6 +147,9 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 							EventCreatedAt: testNow,
 							Position:       20211108,
 							LastRun:        testNow,
+							AggregateID:    "agg-id",
+							AggregateType:  "agg-type",
+							Sequence:       20211108,
 						},
 					},
 				},

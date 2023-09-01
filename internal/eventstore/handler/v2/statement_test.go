@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/database"
@@ -64,6 +65,9 @@ func (ex *wantExecuter) check(t *testing.T) {
 
 func (ex *wantExecuter) Exec(query string, args ...interface{}) (sql.Result, error) {
 	ex.t.Helper()
+	if strings.Contains(query, "SAVEPOINT") {
+		return nil, nil
+	}
 	ex.wasExecuted = true
 	if ex.i >= len(ex.params) {
 		ex.t.Errorf("did not expect more exec, but got:\n    %q with %q", query, args)

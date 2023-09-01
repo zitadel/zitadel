@@ -63,7 +63,7 @@ func Test_mapCommands(t *testing.T) {
 					),
 				},
 				placeHolders: []string{
-					"($1, $2, $3, $4, $5, $6, 'zitadel', $7, $8, $9)",
+					"($1, $2, $3, $4, $5, $6, 'zitadel', $7, $8, $9, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $10)",
 				},
 				args: []any{
 					"instance",
@@ -75,6 +75,7 @@ func Test_mapCommands(t *testing.T) {
 					eventstore.EventType("event.type"),
 					Payload(nil),
 					uint64(1),
+					0,
 				},
 				err: func(t *testing.T, err error) {},
 			},
@@ -111,8 +112,8 @@ func Test_mapCommands(t *testing.T) {
 					),
 				},
 				placeHolders: []string{
-					"($1, $2, $3, $4, $5, $6, 'zitadel', $7, $8, $9)",
-					"($10, $11, $12, $13, $14, $15, 'zitadel', $16, $17, $18)",
+					"($1, $2, $3, $4, $5, $6, 'zitadel', $7, $8, $9, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $10)",
+					"($11, $12, $13, $14, $15, $16, 'zitadel', $17, $18, $19, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $20)",
 				},
 				args: []any{
 					// first event
@@ -125,6 +126,7 @@ func Test_mapCommands(t *testing.T) {
 					eventstore.EventType("event.type"),
 					Payload(nil),
 					uint64(6),
+					0,
 					// second event
 					"instance",
 					"ro",
@@ -135,6 +137,7 @@ func Test_mapCommands(t *testing.T) {
 					eventstore.EventType("event.type"),
 					Payload(nil),
 					uint64(7),
+					1,
 				},
 				err: func(t *testing.T, err error) {},
 			},
@@ -175,8 +178,8 @@ func Test_mapCommands(t *testing.T) {
 					),
 				},
 				placeHolders: []string{
-					"($1, $2, $3, $4, $5, $6, 'zitadel', $7, $8, $9)",
-					"($10, $11, $12, $13, $14, $15, 'zitadel', $16, $17, $18)",
+					"($1, $2, $3, $4, $5, $6, 'zitadel', $7, $8, $9, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $10)",
+					"($11, $12, $13, $14, $15, $16, 'zitadel', $17, $18, $19, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $20)",
 				},
 				args: []any{
 					// first event
@@ -189,6 +192,7 @@ func Test_mapCommands(t *testing.T) {
 					eventstore.EventType("event.type"),
 					Payload(nil),
 					uint64(6),
+					0,
 					// second event
 					"instance",
 					"ro",
@@ -199,6 +203,7 @@ func Test_mapCommands(t *testing.T) {
 					eventstore.EventType("event.type"),
 					Payload(nil),
 					uint64(1),
+					1,
 				},
 				err: func(t *testing.T, err error) {},
 			},
