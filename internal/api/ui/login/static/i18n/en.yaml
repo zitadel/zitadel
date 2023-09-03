@@ -372,6 +372,8 @@ Footer:
   Help: Help
   SupportEmail: Support E-mail
 
+SignIn: Sign in with {{.Provider}}
+
 Errors:
   Internal: An internal error occurred
   AuthRequest:

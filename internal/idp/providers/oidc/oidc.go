@@ -77,6 +77,14 @@ func WithSelectAccount() ProviderOpts {
 	}
 }
 
+// WithResponseMode sets the `response_mode` params in the auth request
+func WithResponseMode(mode oidc.ResponseMode) ProviderOpts {
+	return func(p *Provider) {
+		paramOpt := rp.WithResponseModeURLParam(mode)
+		p.authOptions = append(p.authOptions, rp.AuthURLOpt(paramOpt))
+	}
+}
+
 type UserInfoMapper func(info *oidc.UserInfo) idp.User
 
 var DefaultMapper UserInfoMapper = func(info *oidc.UserInfo) idp.User {

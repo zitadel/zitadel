@@ -363,6 +363,8 @@ Footer:
   PrivacyPolicy: プライバシーポリシー
   Help: ヘルプ
 
+SignIn: '{{.Provider}} でサインイン'
+
 Errors:
   Internal: 内部でエラーが発生しました
   AuthRequest:

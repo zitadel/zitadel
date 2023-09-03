@@ -397,6 +397,27 @@ func (s *Server) UpdateLDAPProvider(ctx context.Context, req *mgmt_pb.UpdateLDAP
 	}, nil
 }
 
+func (s *Server) AddAppleProvider(ctx context.Context, req *mgmt_pb.AddAppleProviderRequest) (*mgmt_pb.AddAppleProviderResponse, error) {
+	id, details, err := s.command.AddOrgAppleProvider(ctx, authz.GetCtxData(ctx).OrgID, addAppleProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddAppleProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateAppleProvider(ctx context.Context, req *mgmt_pb.UpdateAppleProviderRequest) (*mgmt_pb.UpdateAppleProviderResponse, error) {
+	details, err := s.command.UpdateOrgAppleProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateAppleProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateAppleProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
 func (s *Server) DeleteProvider(ctx context.Context, req *mgmt_pb.DeleteProviderRequest) (*mgmt_pb.DeleteProviderResponse, error) {
 	details, err := s.command.DeleteOrgProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id)
 	if err != nil {

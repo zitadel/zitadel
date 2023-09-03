@@ -354,6 +354,8 @@ Footer:
   Help: Ayuda
   SupportEmail: Email de soporte
 
+SignIn: Iniciar sesión con {{.Provider}}
+
 Errors:
   Internal: Se produjo un error interno
   AuthRequest:

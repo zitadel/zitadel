@@ -372,6 +372,8 @@ Footer:
   Help: Помош
   SupportEmail: Е-пошта за поддршка
 
+SignIn: Пријавете се со {{.Provider}}
+
 Errors:
   Internal: Се појави внатрешна грешка
   AuthRequest:
