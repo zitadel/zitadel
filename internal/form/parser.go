@@ -3,9 +3,9 @@ package form
 import (
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/errors"
-
 	"github.com/gorilla/schema"
+
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 type Parser struct {

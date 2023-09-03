@@ -66,14 +66,17 @@ func (q *Queries) SearchCurrentSequences(ctx context.Context, queries *CurrentSe
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-MmFef", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		failedEvents, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-22H8f", "Errors.Internal")
 	}
-	return scan(rows)
+	return failedEvents, nil
 }
 
-func (q *Queries) latestSequence(ctx context.Context, projections ...table) (_ *LatestSequence, err error) {
+func (q *Queries) latestSequence(ctx context.Context, projections ...table) (seq *LatestSequence, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -91,8 +94,12 @@ func (q *Queries) latestSequence(ctx context.Context, projections ...table) (_ *
 		return nil, errors.ThrowInternal(err, "QUERY-5CfX9", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		seq, err = scan(row)
+		return err
+	}, stmt, args...)
+
+	return seq, err
 }
 
 func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName string) (err error) {
@@ -129,11 +136,17 @@ func (q *Queries) checkAndLock(ctx context.Context, projectionName string) error
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-Dfwf2", "Errors.ProjectionName.Invalid")
 	}
-	row := q.client.QueryRowContext(ctx, projectionQuery, args...)
 	var count int
-	if err := row.Scan(&count); err != nil || count == 0 {
-		return errors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		if err := row.Scan(&count); err != nil || count == 0 {
+			return errors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
+		}
+		return err
+	}, projectionQuery, args...)
+	if err != nil {
+		return err
 	}
+
 	lock := fmt.Sprintf(lockStmtFormat, locksTable.identifier())
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-DVfg3", "Errors.RemoveFailed")

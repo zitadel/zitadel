@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/apple"
 	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
@@ -50,32 +51,32 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID st
 	}
 }
 
-func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureURL, resourceOwner string) (string, *domain.ObjectDetails, error) {
+func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureURL, resourceOwner string) (*IDPIntentWriteModel, *domain.ObjectDetails, error) {
 	id, err := c.idGenerator.Next()
 	if err != nil {
-		return "", nil, err
+		return nil, nil, err
 	}
 	writeModel := NewIDPIntentWriteModel(id, resourceOwner)
 	if err != nil {
-		return "", nil, err
+		return nil, nil, err
 	}
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareCreateIntent(writeModel, idpID, successURL, failureURL))
 	if err != nil {
-		return "", nil, err
+		return nil, nil, err
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return "", nil, err
+		return nil, nil, err
 	}
 	err = AppendAndReduce(writeModel, pushedEvents...)
 	if err != nil {
-		return "", nil, err
+		return nil, nil, err
 	}
-	return id, writeModelToObjectDetails(&writeModel.WriteModel), nil
+	return writeModel, writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) GetProvider(ctx context.Context, idpID, callbackURL string) (idp.Provider, error) {
+func (c *Commands) GetProvider(ctx context.Context, idpID string, callbackURL string) (idp.Provider, error) {
 	writeModel, err := IDPProviderWriteModel(ctx, c.eventstore.Filter, idpID)
 	if err != nil {
 		return nil, err
@@ -83,7 +84,21 @@ func (c *Commands) GetProvider(ctx context.Context, idpID, callbackURL string) (
 	return writeModel.ToProvider(callbackURL, c.idpConfigEncryption)
 }
 
-func (c *Commands) AuthURLFromProvider(ctx context.Context, idpID, state, callbackURL string) (string, error) {
+func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIntentWriteModel, error) {
+	intent, err := c.GetIntentWriteModel(ctx, intentID, "")
+	if err != nil {
+		return nil, err
+	}
+	if intent.State == domain.IDPIntentStateUnspecified {
+		return nil, errors.ThrowNotFound(nil, "IDP-Hk38e", "Errors.Intent.NotStarted")
+	}
+	if intent.State != domain.IDPIntentStateStarted {
+		return nil, errors.ThrowInvalidArgument(nil, "IDP-Sfrgs", "Errors.Intent.NotStarted")
+	}
+	return intent, nil
+}
+
+func (c *Commands) AuthURLFromProvider(ctx context.Context, idpID, state string, callbackURL string) (string, error) {
 	provider, err := c.GetProvider(ctx, idpID, callbackURL)
 	if err != nil {
 		return "", err
@@ -108,7 +123,7 @@ func getIDPIntentWriteModel(ctx context.Context, writeModel *IDPIntentWriteModel
 }
 
 func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, idpSession idp.Session, userID string) (string, error) {
-	token, err := c.idpConfigEncryption.Encrypt([]byte(writeModel.AggregateID))
+	token, err := c.generateIntentToken(writeModel.AggregateID)
 	if err != nil {
 		return "", err
 	}
@@ -134,7 +149,40 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 	if err != nil {
 		return "", err
 	}
+	return token, nil
+}
+
+func (c *Commands) generateIntentToken(intentID string) (string, error) {
+	token, err := c.idpConfigEncryption.Encrypt([]byte(intentID))
+	if err != nil {
+		return "", err
+	}
 	return base64.RawURLEncoding.EncodeToString(token), nil
+}
+
+func (c *Commands) SucceedLDAPIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, userID string, attributes map[string][]string) (string, error) {
+	token, err := c.generateIntentToken(writeModel.AggregateID)
+	if err != nil {
+		return "", err
+	}
+	idpInfo, err := json.Marshal(idpUser)
+	if err != nil {
+		return "", err
+	}
+	cmd := idpintent.NewLDAPSucceededEvent(
+		ctx,
+		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
+		idpInfo,
+		idpUser.GetID(),
+		idpUser.GetPreferredUsername(),
+		userID,
+		attributes,
+	)
+	err = c.pushAppendAndReduce(ctx, writeModel, cmd)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }
 
 func (c *Commands) FailIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, reason string) error {
@@ -167,6 +215,8 @@ func tokensForSucceededIDPIntent(session idp.Session, encryptionAlg crypto.Encry
 	case *jwt.Session:
 		tokens = s.Tokens
 	case *azuread.Session:
+		tokens = s.Tokens
+	case *apple.Session:
 		tokens = s.Tokens
 	default:
 		return nil, "", nil

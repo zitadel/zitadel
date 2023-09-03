@@ -137,6 +137,7 @@ Errors:
       MinimumExternalIDPNeeded: Al menos de añadirse un IDP
       AlreadyExists: IDP externo ya cogido
       NotFound: IDP no encontrado
+      LoginFailed: Error de inicio de sesión en IDP externo
     MFA:
       OTP:
         AlreadyReady: Multifactor OTP (OneTimePassword) ya está configurado
@@ -198,6 +199,10 @@ Errors:
       InvalidCharacter: Solo caracteres alfanuméricos, . y - se permiten para un dominio
     IDP:
       InvalidSearchQuery: Consulta de búsqueda no válida
+      ClientIDMissing: Falta ClientID
+      TeamIDMissing: Falta TeamID
+      KeyIDMissing: Falta KeyID
+      PrivateKeyMissing: Falta la clave privada
     LoginPolicy:
       NotFound: Política de inicio de sesión no encontrada
       Invalid: Política de inicio de sesión no es válida
@@ -618,6 +623,24 @@ EventTypes:
           check:
             succeeded: Comprobación exitosa de Multifactor OTP
             failed: Comprobación fallida de Multifactor OTP
+          sms:
+            added: Multifactor OTP SMS añadido
+            removed: Multifactor OTP SMS elimonado
+            code:
+              added: Código Multifactor OTP SMS añadido
+              sent: Código Multifactor OTP SMS enviado
+            check:
+              succeeded: Comprobación Multifactor OTP SMS exitosa
+              failed: Comprobación Multifactor OTP SMS fallida
+          email:
+            added: Multifactor OTP email añadido
+            removed: Multifactor OTP email elimonado
+            code:
+              added: Código Multifactor OTP email añadido
+              sent: Código Multifactor OTP email enviado
+            check:
+              succeeded: Comprobación Multifactor OTP email exitosa
+              failed: Comprobación Multifactor OTP email fallida
         u2f:
           token:
             added: Multifactor U2F Token añadido
@@ -1198,6 +1221,7 @@ Action:
       ExternalAuthentication: Autenticación externa
       CustomiseToken: Token complementario
       InternalAuthentication: Autenticación interna
+      CustomizeSAMLResponse: SAMLResponse complementario
   TriggerType:
     Unspecified: No especificado
     PostAuthentication: Post Autenticación
@@ -1205,3 +1229,4 @@ Action:
     PostCreation: Post Creación
     PreUserinfoCreation: Pre creación de Userinfo
     PreAccessTokenCreation: Pre creación de token de acceso
+    PreSAMLResponseCreation: Creación previa de SAMLResponse

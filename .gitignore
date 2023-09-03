@@ -73,6 +73,7 @@ migrations/cockroach/migrate_cloud.go
 /.artifacts/*
 !/.artifacts/zitadel
 /zitadel
+node_modules/
 
 go.work
 go.work.sum

@@ -78,6 +78,14 @@
             </cnsl-form-field>
           </div>
 
+          <div class="id-token-mapping">
+            <cnsl-info-section>
+              <div>
+                <p class="checkbox-desc">{{ 'IDP.ISIDTOKENMAPPING_DESC' | translate }}</p>
+                <mat-checkbox formControlName="isIdTokenMapping">{{ 'IDP.ISIDTOKENMAPPING' | translate }}</mat-checkbox>
+              </div>
+            </cnsl-info-section>
+          </div>
           <cnsl-provider-options
             [initialOptions]="provider?.config?.options"
             (optionsChanged)="options = $event"

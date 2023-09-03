@@ -135,7 +135,7 @@ ZITADEL uses [golangci-lint](https://golangci-lint.run) for code quality checks.
 The commands in this section are tested against the following software versions:
 
 - [Docker version 20.10.17](https://docs.docker.com/engine/install/)
-- [Go version 1.20](https://go.dev/doc/install)
+- [Go version 1.21](https://go.dev/doc/install)
 - [Delve 1.9.1](https://github.com/go-delve/delve/tree/v1.9.1/Documentation/installation)
 
 Make some changes to the source code, then run the database locally.

@@ -2,7 +2,6 @@ package setup
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"os"
 	"strings"
@@ -14,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	crypto_db "github.com/zitadel/zitadel/internal/crypto/database"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -30,7 +30,7 @@ type FirstInstance struct {
 	smtpEncryptionKey *crypto.KeyConfig
 	oidcEncryptionKey *crypto.KeyConfig
 	masterKey         string
-	db                *sql.DB
+	db                *database.DB
 	es                *eventstore.Eventstore
 	defaults          systemdefaults.SystemDefaults
 	zitadelRoles      []authz.RoleMapping
@@ -91,6 +91,7 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 		0,
 		0,
 		0,
+		nil,
 	)
 	if err != nil {
 		return err

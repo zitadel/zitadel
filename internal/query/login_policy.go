@@ -166,7 +166,7 @@ var (
 	}
 )
 
-func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (_ *LoginPolicy, err error) {
+func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (policy *LoginPolicy, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -191,11 +191,14 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		policy, err = q.scanAndAddLinksToLoginPolicy(ctx, rows, scan)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SWgr3", "Errors.Internal")
 	}
-	return q.scanAndAddLinksToLoginPolicy(ctx, rows, scan)
+	return policy, nil
 }
 
 func (q *Queries) scanAndAddLinksToLoginPolicy(ctx context.Context, rows *sql.Rows, scan func(*sql.Rows) (*LoginPolicy, error)) (*LoginPolicy, error) {
@@ -214,7 +217,7 @@ func (q *Queries) scanAndAddLinksToLoginPolicy(ctx context.Context, rows *sql.Ro
 	return policy, nil
 }
 
-func (q *Queries) DefaultLoginPolicy(ctx context.Context) (_ *LoginPolicy, err error) {
+func (q *Queries) DefaultLoginPolicy(ctx context.Context) (policy *LoginPolicy, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -227,14 +230,17 @@ func (q *Queries) DefaultLoginPolicy(ctx context.Context) (_ *LoginPolicy, err e
 		return nil, errors.ThrowInternal(err, "QUERY-t4TBK", "Errors.Query.SQLStatement")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		policy, err = q.scanAndAddLinksToLoginPolicy(ctx, rows, scan)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SArt2", "Errors.Internal")
 	}
-	return q.scanAndAddLinksToLoginPolicy(ctx, rows, scan)
+	return policy, nil
 }
 
-func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (_ *SecondFactors, err error) {
+func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (factors *SecondFactors, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -259,8 +265,10 @@ func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (_ *Seco
 		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	factors, err := scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		factors, err = scan(row)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -268,7 +276,7 @@ func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (_ *Seco
 	return factors, err
 }
 
-func (q *Queries) DefaultSecondFactors(ctx context.Context) (_ *SecondFactors, err error) {
+func (q *Queries) DefaultSecondFactors(ctx context.Context) (factors *SecondFactors, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -281,8 +289,10 @@ func (q *Queries) DefaultSecondFactors(ctx context.Context) (_ *SecondFactors, e
 		return nil, errors.ThrowInternal(err, "QUERY-CZ2Nv", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	factors, err := scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		factors, err = scan(row)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -290,7 +300,7 @@ func (q *Queries) DefaultSecondFactors(ctx context.Context) (_ *SecondFactors, e
 	return factors, err
 }
 
-func (q *Queries) MultiFactorsByOrg(ctx context.Context, orgID string) (_ *MultiFactors, err error) {
+func (q *Queries) MultiFactorsByOrg(ctx context.Context, orgID string) (factors *MultiFactors, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -315,8 +325,10 @@ func (q *Queries) MultiFactorsByOrg(ctx context.Context, orgID string) (_ *Multi
 		return nil, errors.ThrowInternal(err, "QUERY-B4o7h", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	factors, err := scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		factors, err = scan(row)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -324,7 +336,7 @@ func (q *Queries) MultiFactorsByOrg(ctx context.Context, orgID string) (_ *Multi
 	return factors, err
 }
 
-func (q *Queries) DefaultMultiFactors(ctx context.Context) (_ *MultiFactors, err error) {
+func (q *Queries) DefaultMultiFactors(ctx context.Context) (factors *MultiFactors, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -337,8 +349,10 @@ func (q *Queries) DefaultMultiFactors(ctx context.Context) (_ *MultiFactors, err
 		return nil, errors.ThrowInternal(err, "QUERY-WxYjr", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	factors, err := scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		factors, err = scan(row)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, err
 	}

@@ -137,6 +137,9 @@ func writeModelToWebAuthN(wm *HumanWebAuthNWriteModel) *domain.WebAuthNToken {
 }
 
 func authRequestDomainToAuthRequestInfo(authRequest *domain.AuthRequest) *user.AuthRequestInfo {
+	if authRequest == nil {
+		return nil
+	}
 	info := &user.AuthRequestInfo{
 		ID:                  authRequest.ID,
 		UserAgentID:         authRequest.AgentID,

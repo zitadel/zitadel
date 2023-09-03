@@ -9,6 +9,13 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, IntentCheckedType, IntentCheckedEventMapper).
 		RegisterFilterEventMapper(AggregateType, WebAuthNChallengedType, eventstore.GenericEventMapper[WebAuthNChallengedEvent]).
 		RegisterFilterEventMapper(AggregateType, WebAuthNCheckedType, eventstore.GenericEventMapper[WebAuthNCheckedEvent]).
+		RegisterFilterEventMapper(AggregateType, TOTPCheckedType, eventstore.GenericEventMapper[TOTPCheckedEvent]).
+		RegisterFilterEventMapper(AggregateType, OTPSMSChallengedType, eventstore.GenericEventMapper[OTPSMSChallengedEvent]).
+		RegisterFilterEventMapper(AggregateType, OTPSMSSentType, eventstore.GenericEventMapper[OTPSMSSentEvent]).
+		RegisterFilterEventMapper(AggregateType, OTPSMSCheckedType, eventstore.GenericEventMapper[OTPSMSCheckedEvent]).
+		RegisterFilterEventMapper(AggregateType, OTPEmailChallengedType, eventstore.GenericEventMapper[OTPEmailChallengedEvent]).
+		RegisterFilterEventMapper(AggregateType, OTPEmailSentType, eventstore.GenericEventMapper[OTPEmailSentEvent]).
+		RegisterFilterEventMapper(AggregateType, OTPEmailCheckedType, eventstore.GenericEventMapper[OTPEmailCheckedEvent]).
 		RegisterFilterEventMapper(AggregateType, TokenSetType, TokenSetEventMapper).
 		RegisterFilterEventMapper(AggregateType, MetadataSetType, MetadataSetEventMapper).
 		RegisterFilterEventMapper(AggregateType, TerminateType, TerminateEventMapper)

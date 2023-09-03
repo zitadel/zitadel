@@ -475,7 +475,8 @@ func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domai
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(err, "COMMAND-Dfg3g", "Errors.Org.LoginPolicy.NotFound")
 	}
-	if !loginPolicy.AllowRegister {
+	// check only if local registration is allowed, the idp will be checked separately
+	if !loginPolicy.AllowRegister && link == nil {
 		return nil, errors.ThrowPreconditionFailed(err, "COMMAND-SAbr3", "Errors.Org.LoginPolicy.RegistrationNotAllowed")
 	}
 	userEvents, registeredHuman, err := c.registerHuman(ctx, orgID, human, link, domainPolicy, pwPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
@@ -605,7 +606,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	}
 
 	for _, link := range links {
-		event, err := c.addUserIDPLink(ctx, userAgg, link)
+		event, err := c.addUserIDPLink(ctx, userAgg, link, false)
 		if err != nil {
 			return nil, nil, err
 		}

@@ -114,6 +114,14 @@ func (p *userAuthMethodProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceRemoveAuthMethod,
 				},
 				{
+					Event:  user.HumanPhoneRemovedType,
+					Reduce: p.reduceRemoveAuthMethod,
+				},
+				{
+					Event:  user.UserV1PhoneRemovedType,
+					Reduce: p.reduceRemoveAuthMethod,
+				},
+				{
 					Event:  user.HumanOTPEmailRemovedType,
 					Reduce: p.reduceRemoveAuthMethod,
 				},

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	SessionsProjectionTable = "projections.sessions4"
+	SessionsProjectionTable = "projections.sessions5"
 
 	SessionColumnID                   = "id"
 	SessionColumnCreationDate         = "creation_date"
@@ -30,6 +30,9 @@ const (
 	SessionColumnIntentCheckedAt      = "intent_checked_at"
 	SessionColumnWebAuthNCheckedAt    = "webauthn_checked_at"
 	SessionColumnWebAuthNUserVerified = "webauthn_user_verified"
+	SessionColumnTOTPCheckedAt        = "totp_checked_at"
+	SessionColumnOTPSMSCheckedAt      = "otp_sms_checked_at"
+	SessionColumnOTPEmailCheckedAt    = "otp_email_checked_at"
 	SessionColumnMetadata             = "metadata"
 	SessionColumnTokenID              = "token_id"
 )
@@ -58,6 +61,9 @@ func newSessionProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(SessionColumnIntentCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnWebAuthNCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnWebAuthNUserVerified, crdb.ColumnTypeBool, crdb.Nullable()),
+			crdb.NewColumn(SessionColumnTOTPCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
+			crdb.NewColumn(SessionColumnOTPSMSCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
+			crdb.NewColumn(SessionColumnOTPEmailCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnMetadata, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnTokenID, crdb.ColumnTypeText, crdb.Nullable()),
 		},
@@ -92,6 +98,18 @@ func (p *sessionProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  session.WebAuthNCheckedType,
 					Reduce: p.reduceWebAuthNChecked,
+				},
+				{
+					Event:  session.TOTPCheckedType,
+					Reduce: p.reduceTOTPChecked,
+				},
+				{
+					Event:  session.OTPSMSCheckedType,
+					Reduce: p.reduceOTPSMSChecked,
+				},
+				{
+					Event:  session.OTPEmailCheckedType,
+					Reduce: p.reduceOTPEmailChecked,
 				},
 				{
 					Event:  session.TokenSetType,
@@ -221,6 +239,66 @@ func (p *sessionProjection) reduceWebAuthNChecked(event eventstore.Event) (*hand
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
 			handler.NewCol(SessionColumnWebAuthNCheckedAt, e.CheckedAt),
 			handler.NewCol(SessionColumnWebAuthNUserVerified, e.UserVerified),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceTOTPChecked(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*session.TOTPCheckedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Oqu8i", "reduce.wrong.event.type %s", session.TOTPCheckedType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnTOTPCheckedAt, e.CheckedAt),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceOTPSMSChecked(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*session.OTPSMSCheckedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnOTPSMSCheckedAt, e.CheckedAt),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceOTPEmailChecked(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*session.OTPEmailCheckedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnOTPEmailCheckedAt, e.CheckedAt),
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnID, e.Aggregate().ID),

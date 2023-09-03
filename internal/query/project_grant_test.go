@@ -381,13 +381,13 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*ProjectGrants)(nil),
 		},
 		{
 			name:    "prepareProjectGrantQuery no result",
 			prepare: prepareProjectGrantQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(projectGrantQuery),
 					nil,
 					nil,
@@ -568,7 +568,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*ProjectGrant)(nil),
 		},
 	}
 	for _, tt := range tests {

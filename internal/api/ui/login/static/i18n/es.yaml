@@ -89,6 +89,8 @@ InitMFAPrompt:
   Description: La autenticación de doble factor te proporciona seguridad adicional para tu cuenta de usuario. Ésta asegura que solo tú tienes acceso a tu cuenta.
   Provider0: App autenticadora (p.e Google/Microsoft Authenticator, Authy)
   Provider1: Dependiente de un dispositivo (p.e FaceID, Windows Hello, Huella dactilar)
+  Provider3: OTP SMS
+  Provider4: OTP email
   NextButtonText: siguiente
   SkipButtonText: saltar
 
@@ -100,6 +102,16 @@ InitMFAOTP:
   CodeLabel: Código
   NextButtonText: siguiente
   CancelButtonText: cancelar
+
+InitMFASMS:
+  Title: Verificación de doble factor
+  DescriptionPhone: Crea tu doble factor de autenticación. Introduce tu número de teléfono para verificarlo.
+  DescriptionCode: Crea tu doble factor de autenticación. Ingrese el código recibido para verificar su número de teléfono.
+  PhoneLabel: Número de teléfono
+  CodeLabel: Código
+  EditButtonText: editar
+  ResendButtonText: reenviar código
+  NextButtonText: siguiente
 
 InitMFAU2F:
   Title: Añadir clave de seguridad
@@ -118,12 +130,21 @@ InitMFADone:
 MFAProvider:
   Provider0: App autenticadora (p.e Google/Microsoft Authenticator, Authy)
   Provider1: Dependiente de un dispositivo (p.e FaceID, Windows Hello, Huella dactilar)
+  Provider3: OTP SMS
+  Provider4: OTP email
   ChooseOther: o elige otra opción
 
 VerifyMFAOTP:
   Title: Verificar doble factor
   Description: Verifica tu doble factor
   CodeLabel: Código
+  NextButtonText: siguiente
+
+VerifyOTP:
+  Title: Verificar doble factor
+  Description: Verifica tu doble factor
+  CodeLabel: Código
+  ResendButtonText: reenviar código
   NextButtonText: siguiente
 
 VerifyMFAU2F:
@@ -332,6 +353,8 @@ Footer:
   PrivacyPolicy: Política de privacidad
   Help: Ayuda
   SupportEmail: Email de soporte
+
+SignIn: Iniciar sesión con {{.Provider}}
 
 Errors:
   Internal: Se produjo un error interno

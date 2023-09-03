@@ -16,8 +16,12 @@ import {
 } from 'rxjs/operators';
 
 import {
+  AddMyAuthFactorOTPEmailRequest,
+  AddMyAuthFactorOTPEmailResponse,
   AddMyAuthFactorOTPRequest,
   AddMyAuthFactorOTPResponse,
+  AddMyAuthFactorOTPSMSRequest,
+  AddMyAuthFactorOTPSMSResponse,
   AddMyAuthFactorU2FRequest,
   AddMyAuthFactorU2FResponse,
   AddMyPasswordlessLinkRequest,
@@ -61,8 +65,12 @@ import {
   ListMyUserSessionsResponse,
   ListMyZitadelPermissionsRequest,
   ListMyZitadelPermissionsResponse,
+  RemoveMyAuthFactorOTPEmailRequest,
+  RemoveMyAuthFactorOTPEmailResponse,
   RemoveMyAuthFactorOTPRequest,
   RemoveMyAuthFactorOTPResponse,
+  RemoveMyAuthFactorOTPSMSRequest,
+  RemoveMyAuthFactorOTPSMSResponse,
   RemoveMyAuthFactorU2FRequest,
   RemoveMyAuthFactorU2FResponse,
   RemoveMyAvatarRequest,
@@ -557,6 +565,18 @@ export class GrpcAuthService {
     return this.grpcService.auth.addMyAuthFactorOTP(new AddMyAuthFactorOTPRequest(), null).then((resp) => resp.toObject());
   }
 
+  public addMyAuthFactorOTPSMS(): Promise<AddMyAuthFactorOTPSMSResponse.AsObject> {
+    return this.grpcService.auth
+      .addMyAuthFactorOTPSMS(new AddMyAuthFactorOTPSMSRequest(), null)
+      .then((resp) => resp.toObject());
+  }
+
+  public addMyAuthFactorOTPEmail(): Promise<AddMyAuthFactorOTPEmailResponse.AsObject> {
+    return this.grpcService.auth
+      .addMyAuthFactorOTPEmail(new AddMyAuthFactorOTPEmailRequest(), null)
+      .then((resp) => resp.toObject());
+  }
+
   public addMyMultiFactorU2F(): Promise<AddMyAuthFactorU2FResponse.AsObject> {
     return this.grpcService.auth.addMyAuthFactorU2F(new AddMyAuthFactorU2FRequest(), null).then((resp) => resp.toObject());
   }
@@ -614,6 +634,18 @@ export class GrpcAuthService {
   public removeMyMultiFactorOTP(): Promise<RemoveMyAuthFactorOTPResponse.AsObject> {
     return this.grpcService.auth
       .removeMyAuthFactorOTP(new RemoveMyAuthFactorOTPRequest(), null)
+      .then((resp) => resp.toObject());
+  }
+
+  public removeMyAuthFactorOTPSMS(): Promise<RemoveMyAuthFactorOTPSMSResponse.AsObject> {
+    return this.grpcService.auth
+      .removeMyAuthFactorOTPSMS(new RemoveMyAuthFactorOTPSMSRequest(), null)
+      .then((resp) => resp.toObject());
+  }
+
+  public removeMyAuthFactorOTPEmail(): Promise<RemoveMyAuthFactorOTPEmailResponse.AsObject> {
+    return this.grpcService.auth
+      .removeMyAuthFactorOTPEmail(new RemoveMyAuthFactorOTPEmailRequest(), null)
       .then((resp) => resp.toObject());
   }
 

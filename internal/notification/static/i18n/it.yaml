@@ -34,7 +34,10 @@ VerifyEmailOTP:
   Text: Per favore, utilizza il pulsante 'Autentica' o copia la password monouso {{.OTP}} e incollala nella schermata di autenticazione per autenticarti a ZITADEL entro i prossimi cinque minuti.
   ButtonText: Autentica
 VerifySMSOTP:
-  Text: Per favore, visita {{ .VerifyURL }} o copia la password monouso {{.OTP}} e incollala nella schermata di autenticazione per autenticarti a ZITADEL entro i prossimi cinque minuti.
+  Text: >-
+    {{.OTP}} è la tua password monouso per {{ .Domain }}. Usalo entro il prossimo {{.Expiry}}.
+    
+    @{{.Domain}} #{{.OTP}}
 DomainClaimed:
   Title: ZITADEL - Il dominio è stato rivendicato
   PreHeader: Cambiare email / nome utente

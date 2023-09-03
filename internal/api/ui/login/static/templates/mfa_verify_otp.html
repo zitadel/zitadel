@@ -1,34 +1,37 @@
 {{template "main-top" .}}
 
 <div class="lgn-head">
-    <h1>{{t "VerifyMFAOTP.Title"}}</h1>
+    <h1>{{t "VerifyOTP.Title"}}</h1>
 
     {{ template "user-profile" . }}
 
-    <p>{{t "VerifyMFAOTP.Description"}}</p>
+    <p>{{t "VerifyOTP.Description"}}</p>
 </div>
 
-<form action="{{ mfaVerifyUrl }}" method="POST">
+<form action="{{ mfaOTPVerifyUrl }}" method="POST">
 
     {{ .CSRF }}
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
-    <input type="hidden" name="mfaType" value="{{ .SelectedMFAProvider }}" />
+    <input type="hidden" name="selectedProvider" value="{{ .SelectedProvider }}" />
 
     <div class="fields">
-        <label class="lgn-label" for="code">{{t "VerifyMFAOTP.CodeLabel"}}</label>
-        <input class="lgn-input" type="text" id="code" name="code" autocomplete="off" autofocus required>
+        <label class="lgn-label" for="code">{{t "VerifyOTP.CodeLabel"}}</label>
+        <input class="lgn-input" type="text" id="code" name="code" autocomplete="one-time-code" autofocus required>
     </div>
 
     {{ template "error-message" .}}
 
-    <div class="lgn-actions">
+    <div class="lgn-actions lgn-reverse-order">
         <!-- position element in header -->
         <a class="lgn-icon-button lgn-left-action" href="{{ loginUrl }}">
             <i class="lgn-icon-arrow-left-solid"></i>
         </a>
+        <button class="lgn-raised-button lgn-primary" id="submit-button" type="submit">{{t "VerifyOTP.NextButtonText"}}</button>
+
         <span class="fill-space"></span>
-        <button class="lgn-raised-button lgn-primary" id="submit-button" type="submit">{{t "VerifyMFAOTP.NextButtonText"}}</button>
+
+        <button type="submit" name="resend" value="true" class="lgn-stroked-button" formnovalidate>{{t "VerifyOTP.ResendButtonText"}}</button>
     </div>
 
     {{ if .MFAProviders }}

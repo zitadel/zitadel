@@ -91,6 +91,26 @@ func Test_sessionsToPb(t *testing.T) {
 			},
 			Metadata: map[string][]byte{"hello": []byte("world")},
 		},
+		{ // totp factor
+			ID:            "999",
+			CreationDate:  now,
+			ChangeDate:    now,
+			Sequence:      123,
+			State:         domain.SessionStateActive,
+			ResourceOwner: "me",
+			Creator:       "he",
+			UserFactor: query.SessionUserFactor{
+				UserID:        "345",
+				UserCheckedAt: past,
+				LoginName:     "donald",
+				DisplayName:   "donald duck",
+				ResourceOwner: "org1",
+			},
+			TOTPFactor: query.SessionTOTPFactor{
+				TOTPCheckedAt: past,
+			},
+			Metadata: map[string][]byte{"hello": []byte("world")},
+		},
 	}
 
 	want := []*session.Session{
@@ -153,6 +173,25 @@ func Test_sessionsToPb(t *testing.T) {
 				WebAuthN: &session.WebAuthNFactor{
 					VerifiedAt:   timestamppb.New(past),
 					UserVerified: true,
+				},
+			},
+			Metadata: map[string][]byte{"hello": []byte("world")},
+		},
+		{ // totp factor
+			Id:           "999",
+			CreationDate: timestamppb.New(now),
+			ChangeDate:   timestamppb.New(now),
+			Sequence:     123,
+			Factors: &session.Factors{
+				User: &session.UserFactor{
+					VerifiedAt:     timestamppb.New(past),
+					Id:             "345",
+					LoginName:      "donald",
+					DisplayName:    "donald duck",
+					OrganisationId: "org1",
+				},
+				Totp: &session.TOTPFactor{
+					VerifiedAt: timestamppb.New(past),
 				},
 			},
 			Metadata: map[string][]byte{"hello": []byte("world")},

@@ -9,7 +9,7 @@ For a list of supported or unsupported `Grant Types` please have a look at the t
 | Authorization Code                                    | yes                 |
 | Authorization Code with PKCE                          | yes                 |
 | Client Credentials                                    | yes                 |
-| Device Authorization                                  | under consideration |
+| Device Authorization                                  | yes                 |
 | Implicit                                              | yes                 |
 | JSON Web Token (JWT) Profile                          | yes                 |
 | Refresh Token                                         | yes                 |

@@ -28,6 +28,7 @@ const (
 	IDPTemplateGitLabSelfHostedTable = IDPTemplateTable + "_" + IDPTemplateGitLabSelfHostedSuffix
 	IDPTemplateGoogleTable           = IDPTemplateTable + "_" + IDPTemplateGoogleSuffix
 	IDPTemplateLDAPTable             = IDPTemplateTable + "_" + IDPTemplateLDAPSuffix
+	IDPTemplateAppleTable            = IDPTemplateTable + "_" + IDPTemplateAppleSuffix
 
 	IDPTemplateOAuthSuffix            = "oauth2"
 	IDPTemplateOIDCSuffix             = "oidc"
@@ -39,6 +40,7 @@ const (
 	IDPTemplateGitLabSelfHostedSuffix = "gitlab_self_hosted"
 	IDPTemplateGoogleSuffix           = "google"
 	IDPTemplateLDAPSuffix             = "ldap2"
+	IDPTemplateAppleSuffix            = "apple"
 
 	IDPTemplateIDCol                = "id"
 	IDPTemplateCreationDateCol      = "creation_date"
@@ -147,6 +149,14 @@ const (
 	LDAPPreferredLanguageAttributeCol = "preferred_language_attribute"
 	LDAPAvatarURLAttributeCol         = "avatar_url_attribute"
 	LDAPProfileAttributeCol           = "profile_attribute"
+
+	AppleIDCol         = "idp_id"
+	AppleInstanceIDCol = "instance_id"
+	AppleClientIDCol   = "client_id"
+	AppleTeamIDCol     = "team_id"
+	AppleKeyIDCol      = "key_id"
+	ApplePrivateKeyCol = "private_key"
+	AppleScopesCol     = "scopes"
 )
 
 type idpTemplateProjection struct {
@@ -321,6 +331,19 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 			IDPTemplateLDAPSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(AppleIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AppleInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AppleClientIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AppleTeamIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AppleKeyIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(ApplePrivateKeyCol, crdb.ColumnTypeJSONB),
+			crdb.NewColumn(AppleScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(AppleInstanceIDCol, AppleIDCol),
+			IDPTemplateAppleSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
@@ -442,6 +465,14 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.LDAPIDPChangedEventType,
 					Reduce: p.reduceLDAPIDPChanged,
+				},
+				{
+					Event:  instance.AppleIDPAddedEventType,
+					Reduce: p.reduceAppleIDPAdded,
+				},
+				{
+					Event:  instance.AppleIDPChangedEventType,
+					Reduce: p.reduceAppleIDPChanged,
 				},
 				{
 					Event:  instance.IDPConfigRemovedEventType,
@@ -571,6 +602,14 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.LDAPIDPChangedEventType,
 					Reduce: p.reduceLDAPIDPChanged,
+				},
+				{
+					Event:  org.AppleIDPAddedEventType,
+					Reduce: p.reduceAppleIDPAdded,
+				},
+				{
+					Event:  org.AppleIDPChangedEventType,
+					Reduce: p.reduceAppleIDPChanged,
 				},
 				{
 					Event:  org.IDPConfigRemovedEventType,
@@ -1858,6 +1897,97 @@ func (p *idpTemplateProjection) reduceLDAPIDPChanged(event eventstore.Event) (*h
 		ops...,
 	), nil
 }
+
+func (p *idpTemplateProjection) reduceAppleIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.AppleIDPAddedEvent
+	var idpOwnerType domain.IdentityProviderType
+	switch e := event.(type) {
+	case *org.AppleIDPAddedEvent:
+		idpEvent = e.AppleIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeOrg
+	case *instance.AppleIDPAddedEvent:
+		idpEvent = e.AppleIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeSystem
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SFvg3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPAddedEventType /*, instance.AppleIDPAddedEventType*/})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
+				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeApple),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+			},
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(AppleIDCol, idpEvent.ID),
+				handler.NewCol(AppleInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(AppleClientIDCol, idpEvent.ClientID),
+				handler.NewCol(AppleTeamIDCol, idpEvent.TeamID),
+				handler.NewCol(AppleKeyIDCol, idpEvent.KeyID),
+				handler.NewCol(ApplePrivateKeyCol, idpEvent.PrivateKey),
+				handler.NewCol(AppleScopesCol, database.StringArray(idpEvent.Scopes)),
+			},
+			crdb.WithTableSuffix(IDPTemplateAppleSuffix),
+		),
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceAppleIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.AppleIDPChangedEvent
+	switch e := event.(type) {
+	case *org.AppleIDPChangedEvent:
+		idpEvent = e.AppleIDPChangedEvent
+	case *instance.AppleIDPChangedEvent:
+		idpEvent = e.AppleIDPChangedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-GBez3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPChangedEventType /*, instance.AppleIDPChangedEventType*/})
+	}
+
+	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops = append(ops,
+		crdb.AddUpdateStatement(
+			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+	)
+	appleCols := reduceAppleIDPChangedColumns(idpEvent)
+	if len(appleCols) > 0 {
+		ops = append(ops,
+			crdb.AddUpdateStatement(
+				appleCols,
+				[]handler.Condition{
+					handler.NewCond(AppleIDCol, idpEvent.ID),
+					handler.NewCond(AppleInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				},
+				crdb.WithTableSuffix(IDPTemplateAppleSuffix),
+			),
+		)
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		ops...,
+	), nil
+}
+
 func (p *idpTemplateProjection) reduceIDPConfigRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var idpEvent idpconfig.IDPConfigRemovedEvent
 	switch e := event.(type) {
@@ -2170,4 +2300,24 @@ func reduceLDAPIDPChangedColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Col
 		ldapCols = append(ldapCols, handler.NewCol(LDAPProfileAttributeCol, *idpEvent.ProfileAttribute))
 	}
 	return ldapCols
+}
+
+func reduceAppleIDPChangedColumns(idpEvent idp.AppleIDPChangedEvent) []handler.Column {
+	appleCols := make([]handler.Column, 0, 5)
+	if idpEvent.ClientID != nil {
+		appleCols = append(appleCols, handler.NewCol(AppleClientIDCol, *idpEvent.ClientID))
+	}
+	if idpEvent.TeamID != nil {
+		appleCols = append(appleCols, handler.NewCol(AppleTeamIDCol, *idpEvent.TeamID))
+	}
+	if idpEvent.KeyID != nil {
+		appleCols = append(appleCols, handler.NewCol(AppleKeyIDCol, *idpEvent.KeyID))
+	}
+	if idpEvent.PrivateKey != nil {
+		appleCols = append(appleCols, handler.NewCol(ApplePrivateKeyCol, *idpEvent.PrivateKey))
+	}
+	if idpEvent.Scopes != nil {
+		appleCols = append(appleCols, handler.NewCol(AppleScopesCol, database.StringArray(idpEvent.Scopes)))
+	}
+	return appleCols
 }

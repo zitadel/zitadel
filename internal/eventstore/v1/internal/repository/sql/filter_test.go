@@ -130,6 +130,7 @@ func TestSQL_Filter(t *testing.T) {
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("SQL.Filter() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
+
 			if tt.res.eventsLen != 0 && len(events) != tt.res.eventsLen {
 				t.Errorf("events has wrong length got: %d want %d", len(events), tt.res.eventsLen)
 			}
@@ -221,10 +222,12 @@ func TestSQL_LatestSequence(t *testing.T) {
 			sql := &SQL{
 				client: &database.DB{DB: tt.fields.client.sqlClient, Database: new(testDB)},
 			}
+
 			sequence, err := sql.LatestSequence(context.Background(), tt.args.searchQuery)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("SQL.Filter() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
+
 			if tt.res.sequence != sequence {
 				t.Errorf("events has wrong length got: %d want %d", sequence, tt.res.sequence)
 			}

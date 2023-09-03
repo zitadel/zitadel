@@ -31,7 +31,7 @@ you can setup ZITADEL and either
 # Install CockroachDB
 helm install crdb cockroachdb/cockroachdb \
   --set fullnameOverride=crdb \
-  --set single-node=true \
+  --set conf.single-node=true \
   --set statefulset.replicas=1
 
 # Install ZITADEL
@@ -65,7 +65,7 @@ With this setup you only get a key for a service account. Logging in at ZITADEL 
 # Install CockroachDB
 helm install crdb cockroachdb/cockroachdb \
   --set fullnameOverride=crdb \
-  --set single-node=true \
+  --set conf.single-node=true \
   --set statefulset.replicas=1
 
 # Install ZITADEL
