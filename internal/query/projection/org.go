@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	OrgProjectionTable = "projections.orgs"
+	OrgProjectionTable = "projections.orgs1"
 
 	OrgColumnID            = "id"
 	OrgColumnCreationDate  = "creation_date"

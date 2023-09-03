@@ -17,19 +17,19 @@ import (
 )
 
 var (
-	orgUniqueQuery = "SELECT COUNT(*) = 0 FROM projections.orgs LEFT JOIN projections.org_domains2 ON projections.orgs.id = projections.org_domains2.org_id AND projections.orgs.instance_id = projections.org_domains2.instance_id AS OF SYSTEM TIME '-1 ms' WHERE (projections.org_domains2.is_verified = $1 AND projections.orgs.instance_id = $2 AND (projections.org_domains2.domain ILIKE $3 OR projections.orgs.name ILIKE $4) AND projections.orgs.org_state <> $5)"
+	orgUniqueQuery = "SELECT COUNT(*) = 0 FROM projections.orgs1 LEFT JOIN projections.org_domains2 ON projections.orgs1.id = projections.org_domains2.org_id AND projections.orgs1.instance_id = projections.org_domains2.instance_id AS OF SYSTEM TIME '-1 ms' WHERE (projections.org_domains2.is_verified = $1 AND projections.orgs1.instance_id = $2 AND (projections.org_domains2.domain ILIKE $3 OR projections.orgs1.name ILIKE $4) AND projections.orgs1.org_state <> $5)"
 	orgUniqueCols  = []string{"is_unique"}
 
-	prepareOrgsQueryStmt = `SELECT projections.orgs.id,` +
-		` projections.orgs.creation_date,` +
-		` projections.orgs.change_date,` +
-		` projections.orgs.resource_owner,` +
-		` projections.orgs.org_state,` +
-		` projections.orgs.sequence,` +
-		` projections.orgs.name,` +
-		` projections.orgs.primary_domain,` +
+	prepareOrgsQueryStmt = `SELECT projections.orgs1.id,` +
+		` projections.orgs1.creation_date,` +
+		` projections.orgs1.change_date,` +
+		` projections.orgs1.resource_owner,` +
+		` projections.orgs1.org_state,` +
+		` projections.orgs1.sequence,` +
+		` projections.orgs1.name,` +
+		` projections.orgs1.primary_domain,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.orgs` +
+		` FROM projections.orgs1` +
 		` AS OF SYSTEM TIME '-1 ms' `
 	prepareOrgsQueryCols = []string{
 		"id",
@@ -43,15 +43,15 @@ var (
 		"count",
 	}
 
-	prepareOrgQueryStmt = `SELECT projections.orgs.id,` +
-		` projections.orgs.creation_date,` +
-		` projections.orgs.change_date,` +
-		` projections.orgs.resource_owner,` +
-		` projections.orgs.org_state,` +
-		` projections.orgs.sequence,` +
-		` projections.orgs.name,` +
-		` projections.orgs.primary_domain` +
-		` FROM projections.orgs` +
+	prepareOrgQueryStmt = `SELECT projections.orgs1.id,` +
+		` projections.orgs1.creation_date,` +
+		` projections.orgs1.change_date,` +
+		` projections.orgs1.resource_owner,` +
+		` projections.orgs1.org_state,` +
+		` projections.orgs1.sequence,` +
+		` projections.orgs1.name,` +
+		` projections.orgs1.primary_domain` +
+		` FROM projections.orgs1` +
 		` AS OF SYSTEM TIME '-1 ms' `
 	prepareOrgQueryCols = []string{
 		"id",
@@ -65,8 +65,8 @@ var (
 	}
 
 	prepareOrgUniqueStmt = `SELECT COUNT(*) = 0` +
-		` FROM projections.orgs` +
-		` LEFT JOIN projections.org_domains2 ON projections.orgs.id = projections.org_domains2.org_id AND projections.orgs.instance_id = projections.org_domains2.instance_id` +
+		` FROM projections.orgs1` +
+		` LEFT JOIN projections.org_domains2 ON projections.orgs1.id = projections.org_domains2.org_id AND projections.orgs1.instance_id = projections.org_domains2.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms' `
 	prepareOrgUniqueCols = []string{
 		"count",
