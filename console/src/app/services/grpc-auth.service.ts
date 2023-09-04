@@ -174,7 +174,6 @@ export class GrpcAuthService {
 
     this.labelpolicy$.subscribe({
       next: (policy) => {
-        themeService.applyLabelPolicy(policy);
         this.labelpolicy.next(policy);
         this.labelPolicyLoading$.next(false);
       },

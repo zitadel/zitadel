@@ -30,6 +30,7 @@
               "includePaths": ["node_modules"]
             },
             "allowedCommonJsDependencies": [
+              "opentype.js",
               "fast-sha256",
               "buffer",
               "moment",
