@@ -3,9 +3,9 @@ import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, 
 import { UntypedFormControl } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import {
-  MatLegacyAutocomplete as MatAutocomplete,
-  MatLegacyAutocompleteSelectedEvent as MatAutocompleteSelectedEvent,
-} from '@angular/material/legacy-autocomplete';
+  MatAutocomplete,
+  MatAutocompleteSelectedEvent,
+} from '@angular/material/autocomplete';
 import { forkJoin, from, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { ListProjectGrantsResponse, ListProjectsResponse } from 'src/app/proto/generated/zitadel/management_pb';

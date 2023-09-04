@@ -3,9 +3,9 @@ import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChil
 import { UntypedFormControl } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import {
-  MatLegacyAutocomplete as MatAutocomplete,
-  MatLegacyAutocompleteSelectedEvent as MatAutocompleteSelectedEvent,
-} from '@angular/material/legacy-autocomplete';
+  MatAutocomplete,
+  MatAutocompleteSelectedEvent,
+} from '@angular/material/autocomplete';
 import { from, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { Role, RoleDisplayNameQuery, RoleQuery } from 'src/app/proto/generated/zitadel/project_pb';

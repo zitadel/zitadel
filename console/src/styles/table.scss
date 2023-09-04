@@ -7,7 +7,7 @@
   $foreground: map-get($theme, foreground);
   $background: map-get($theme, background);
 
-  .mat-table,
+  .mat-mdc-table,
   .mat-paginator {
     background-color: inherit !important;
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -28,7 +28,7 @@
     font-weight: bold;
     white-space: nowrap;
 
-    &.mat-header-cell {
+    &.mat-mdc-header-cell {
       color: map-get($foreground, text);
       font-size: 11px;
       font-weight: 500;
@@ -40,7 +40,7 @@
   }
 
   tr {
-    &.mat-header-row {
+    &.mat-mdc-header-row {
       height: 40px !important;
       padding-bottom: 4px;
     }

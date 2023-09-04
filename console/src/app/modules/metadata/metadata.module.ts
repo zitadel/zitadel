@@ -11,7 +11,7 @@ import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/local
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 import { CardModule } from '../card/card.module';
 
-import { MatLegacyTableModule } from '@angular/material/legacy-table';
+import { MatTableModule } from '@angular/material/table';
 import { InputModule } from '../input/input.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { MetadataDialogComponent } from './metadata-dialog/metadata-dialog.component';
@@ -33,7 +33,7 @@ import { MetadataComponent } from './metadata/metadata.component';
     LocalizedDatePipeModule,
     TimestampToDatePipeModule,
     RefreshTableModule,
-    MatLegacyTableModule,
+    MatTableModule,
   ],
   exports: [MetadataComponent, MetadataDialogComponent],
 })

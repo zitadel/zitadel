@@ -66,7 +66,7 @@
       background-color: if($is-dark-theme, #00000020, #00000008);
       margin: 0 -0.5rem;
 
-      .aggregate-type-select .mat-select {
+      .aggregate-type-select .mat-mdc-select {
         height: 36px;
         padding: 7px 10px;
       }

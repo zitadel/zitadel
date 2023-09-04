@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import {
-  MatLegacySnackBar as MatSnackBar,
-  MatLegacySnackBarHorizontalPosition as MatSnackBarHorizontalPosition,
-  MatLegacySnackBarVerticalPosition as MatSnackBarVerticalPosition,
-} from '@angular/material/legacy-snack-bar';
+  MatSnackBar,
+  MatSnackBarHorizontalPosition,
+  MatSnackBarVerticalPosition,
+} from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';

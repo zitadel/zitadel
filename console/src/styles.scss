@@ -583,7 +583,7 @@ $custom-typography: mat.define-typography-config(
   padding: 1rem;
 }
 
-.mat-menu-item {
+.mat-mdc-menu-item {
   line-height: 35px !important;
   height: 35px !important;
 }
@@ -636,14 +636,14 @@ $custom-typography: mat.define-typography-config(
   --success: #10b981;
   $border-color: map-get($foreground, divider);
 
-  .mat-menu-panel {
+  .mat-mdc-menu-panel {
     background-color: map-get($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     border-radius: 6px;
     min-height: fit-content;
   }
 
-  .mat-option {
+  .mat-mdc-option {
     background-color: map-get($background, cards);
 
     &:hover {
@@ -709,14 +709,14 @@ $custom-typography: mat.define-typography-config(
     color: map-get($foreground, text);
   }
 
-  .mat-menu-panel {
+  .mat-mdc-menu-panel {
     background-color: map-get($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     border-radius: 6px;
     min-height: fit-content;
   }
 
-  .mat-option {
+  .mat-mdc-option {
     background-color: map-get($background, cards);
 
     &:hover {
@@ -800,7 +800,7 @@ h2 {
   opacity: 0;
 }
 
-.mat-paginator .mat-select {
+.mat-paginator .mat-mdc-select {
   border: none;
 }
 

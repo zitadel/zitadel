@@ -1,6 +1,6 @@
 import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatLegacySelectChange as MatSelectChange } from '@angular/material/legacy-select';
+import { MatSelectChange } from '@angular/material/select';
 import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import {
   GetDefaultDomainClaimedMessageTextRequest as AdminGetDefaultDomainClaimedMessageTextRequest,

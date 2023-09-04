@@ -10,7 +10,7 @@
   $is-dark-theme: map-get($theme, is-dark);
 
   [cnslInput],
-  .mat-select {
+  .mat-mdc-select {
     box-sizing: border-box;
     padding-inline-start: 10px;
     outline: none;
@@ -63,7 +63,7 @@
   }
 
   .mat-paginator {
-    .mat-select {
+    .mat-mdc-select {
       background-color: inherit;
     }
   }
