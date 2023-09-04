@@ -40,6 +40,7 @@ var (
 	}
 )
 
+// TODO: unsued, maybe remove
 func (q *Queries) GetQuotaUsage(ctx context.Context, instanceID string, unit quota.Unit, periodStart time.Time) (usage uint64, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
