@@ -108,6 +108,9 @@ func prepareQuotaQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 }
 
 func pushPeriodStart(from time.Time, interval time.Duration, now time.Time) time.Time {
+	if now.IsZero() {
+		now = time.Now()
+	}
 	next := from.Add(interval)
 	if next.After(now) {
 		return from

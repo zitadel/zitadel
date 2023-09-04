@@ -194,15 +194,13 @@ func (q *quotaProjection) reduceQuotaNotificationDue(event eventstore.Event) (*h
 	return crdb.NewUpdateStatement(e,
 		[]handler.Column{
 			handler.NewCol(QuotaNotificationColumnLatestDuePeriodStart, e.PeriodStart),
-			{
-				Name:  QuotaNotificationColumnNextDueThreshold,
-				Value: e.Threshold,
-				ParameterOpt: func(thresholdFromEvent string) string {
-					// We increment the threshold if the periodStart matches, else we reset it to percent
-					// TODO: Use multiple parameters for a single column
-					return fmt.Sprintf("CASE WHEN %s = '%s' THEN CAST ( floor ( %s / %s + 1 ) AS INT ) * %s ELSE %s END", QuotaNotificationColumnLatestDuePeriodStart, e.PeriodStart.Format(time.RFC3339), thresholdFromEvent, QuotaNotificationColumnPercent, QuotaNotificationColumnPercent, QuotaNotificationColumnPercent)
-				},
-			},
+			handler.NewCol(QuotaNotificationColumnNextDueThreshold, e.Threshold+100), // next due_threshold is always the reached + 100 => percent (e.g. 90) in the next bucket (e.g. 190)
+			//ParameterOpt: func(thresholdFromEvent string) string {
+			//	// We increment the threshold if the periodStart matches, else we reset it to percent
+			//	// TODO: Use multiple parameters for a single column
+			//	return fmt.Sprintf("CASE WHEN %s = '%s' THEN %s + 100 ELSE %s END", QuotaNotificationColumnLatestDuePeriodStart, e.PeriodStart.Format(time.RFC3339), thresholdFromEvent, QuotaNotificationColumnPercent)
+			//},
+			//},
 		},
 		[]handler.Condition{
 			handler.NewCond(QuotaNotificationColumnInstanceID, e.Aggregate().InstanceID),
@@ -271,9 +269,9 @@ func (q *quotaProjection) reduceInstanceRemoved(event eventstore.Event) (*handle
 	), nil
 }
 
-func (q *quotaProjection) IncrementUsage(ctx context.Context, unit quota.Unit, instanceID string, periodStart time.Time, count uint64) error {
+func (q *quotaProjection) IncrementUsage(ctx context.Context, unit quota.Unit, instanceID string, periodStart time.Time, count uint64) (sum uint64, err error) {
 	if count == 0 {
-		return nil
+		return 0, nil
 	}
 	insertCols := []string{QuotaPeriodColumnInstanceID, QuotaPeriodColumnUnit, QuotaPeriodColumnStart, QuotaPeriodColumnUsage}
 	conflictTarget := []string{QuotaPeriodColumnInstanceID, QuotaPeriodColumnUnit, QuotaPeriodColumnStart}
@@ -282,9 +280,9 @@ func (q *quotaProjection) IncrementUsage(ctx context.Context, unit quota.Unit, i
 	for i := range vals {
 		params[i] = "$" + strconv.Itoa(i+1)
 	}
-	_, err := q.client.ExecContext(
+	err = q.client.DB.QueryRowContext(
 		ctx,
-		fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s) ON CONFLICT (%s) DO UPDATE SET %s = %s.%s + %s",
+		fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s) ON CONFLICT (%s) DO UPDATE SET %s = %s.%s + %s RETURNING %s",
 			QuotaPeriodsProjectionTable,
 			strings.Join(insertCols, ", "),
 			strings.Join(params[0:len(params)-1], ", "),
@@ -292,8 +290,10 @@ func (q *quotaProjection) IncrementUsage(ctx context.Context, unit quota.Unit, i
 			QuotaPeriodColumnUsage,
 			QuotaPeriodsProjectionTable,
 			QuotaPeriodColumnUsage,
-			params[len(params)-1]),
+			params[len(params)-1],
+			QuotaPeriodColumnUsage),
 		vals...,
-	)
-	return err
+	).Scan(&sum)
+
+	return sum, err
 }

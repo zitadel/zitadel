@@ -5,16 +5,18 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/logstore/record"
-	"github.com/zitadel/zitadel/internal/query"
 	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/database"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/logstore/record"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
@@ -72,16 +74,26 @@ func (l *databaseLogStorage) incrementUsage(ctx context.Context, bulk []*record.
 	for instanceID, instanceBulk := range byInstance {
 		q, getQuotaErr := l.queries.GetQuota(ctx, instanceID, quota.RequestsAllAuthenticated)
 		if errors.Is(getQuotaErr, sql.ErrNoRows) {
-			getQuotaErr = nil
 			continue
 		}
 		err = errors.Join(err, getQuotaErr)
 		if getQuotaErr != nil {
 			continue
 		}
-		incrementErr := l.commands.IncrementUsageFromAccessLogs(ctx, instanceID, q.CurrentPeriodStart, instanceBulk)
+		count, incrementErr := l.commands.IncrementUsageFromAccessLogs(ctx, instanceID, q.CurrentPeriodStart, instanceBulk)
 		err = errors.Join(err, incrementErr)
 		if incrementErr != nil {
+			continue
+		}
+		notifications, getNotificationErr := l.queries.GetDueQuotaNotifications(ctx, instanceID, quota.RequestsAllAuthenticated, q, q.CurrentPeriodStart, count)
+		err = errors.Join(err, getNotificationErr)
+		if getNotificationErr != nil || len(notifications) == 0 {
+			continue
+		}
+		ctx = authz.WithInstanceID(ctx, instanceID)
+		reportErr := l.commands.ReportQuotaUsage(ctx, notifications)
+		err = errors.Join(err, reportErr)
+		if reportErr != nil {
 			continue
 		}
 	}

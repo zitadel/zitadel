@@ -11,13 +11,12 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
-func (c *Commands) IncrementUsageFromAccessLogs(ctx context.Context, instanceID string, periodStart time.Time, records []*record.AccessLog) (err error) {
+func (c *Commands) IncrementUsageFromAccessLogs(ctx context.Context, instanceID string, periodStart time.Time, records []*record.AccessLog) (count uint64, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("incrementing access relevant usage failed for at least one quota period: %w", err)
 		}
 	}()
-	count := uint64(0)
 	for _, r := range records {
 		if r.IsAuthenticated() {
 			count++
@@ -36,5 +35,6 @@ func (c *Commands) IncrementUsageFromExecutionLogs(ctx context.Context, instance
 	for _, r := range records {
 		total += r.Took
 	}
-	return projection.QuotaProjection.IncrementUsage(ctx, quota.ActionsAllRunsSeconds, instanceID, periodStart, uint64(math.Floor(total.Seconds())))
+	_, err = projection.QuotaProjection.IncrementUsage(ctx, quota.ActionsAllRunsSeconds, instanceID, periodStart, uint64(math.Floor(total.Seconds())))
+	return err
 }
