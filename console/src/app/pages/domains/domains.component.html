@@ -22,12 +22,13 @@
         matTooltip="Add domain"
         mat-raised-button
         color="primary"
-        class="cnsl-action-button"
         (click)="addNewDomain()"
       >
-        <mat-icon>add</mat-icon>
-        <span>{{ 'ACTIONS.NEW' | translate }}</span>
-        <cnsl-action-keys (actionTriggered)="addNewDomain()"> </cnsl-action-keys>
+        <div class="cnsl-action-button">
+          <mat-icon>add</mat-icon>
+          <span>{{ 'ACTIONS.NEW' | translate }}</span>
+          <cnsl-action-keys (actionTriggered)="addNewDomain()"> </cnsl-action-keys>
+        </div>
       </button>
     </div>
 

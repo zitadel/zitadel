@@ -10,15 +10,16 @@
   <button
     color="warn"
     matTooltip="{{ 'GRANTS.DELETE' | translate }}"
-    class="cnsl-action-button"
     mat-raised-button
     actions
     (click)="deleteGrantSelection()"
     *ngIf="selection.hasValue() && disableDelete === false"
   >
-    <i class="las la-trash"></i>
-    <span>{{ 'ACTIONS.DELETE' | translate }}</span>
-    <cnsl-action-keys (actionTriggered)="deleteGrantSelection()" [type]="ActionKeysType.DELETE"></cnsl-action-keys>
+    <div class="cnsl-action-button">
+      <i class="las la-trash"></i>
+      <span>{{ 'ACTIONS.DELETE' | translate }}</span>
+      <cnsl-action-keys (actionTriggered)="deleteGrantSelection()" [type]="ActionKeysType.DELETE"></cnsl-action-keys>
+    </div>
   </button>
 
   <cnsl-filter-user-grants
@@ -33,13 +34,14 @@
     *ngIf="disableWrite === false && selection.hasValue() === false"
     matTooltip="{{ 'GRANTS.ADD' | translate }}"
     color="primary"
-    class="cnsl-action-button"
     mat-raised-button
     [routerLink]="routerLink"
   >
-    <mat-icon class="icon">add</mat-icon>
-    <span>{{ 'GRANTS.ADD_BTN' | translate }}</span>
-    <cnsl-action-keys (actionTriggered)="gotoCreateLink(routerLink)" [type]="ActionKeysType.ADD"></cnsl-action-keys>
+    <div class="cnsl-action-button">
+      <mat-icon class="icon">add</mat-icon>
+      <span>{{ 'GRANTS.ADD_BTN' | translate }}</span>
+      <cnsl-action-keys (actionTriggered)="gotoCreateLink(routerLink)" [type]="ActionKeysType.ADD"></cnsl-action-keys>
+    </div>
   </a>
 
   <div class="table-wrapper">

@@ -390,6 +390,7 @@ $custom-typography: mat.define-typography-config(
 .cnsl-action-button {
   display: flex;
   align-items: center;
+  margin-left: -0.5rem;
 
   &.mat-mdc-raised-button,
   &.mat-mdc-outlined-button {

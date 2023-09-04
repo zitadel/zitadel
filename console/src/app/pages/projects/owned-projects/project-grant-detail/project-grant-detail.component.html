@@ -67,7 +67,6 @@
     [refreshTrigger]="changePage"
   >
     <button
-      class="cnsl-action-button"
       selectactions
       (click)="removeProjectMemberSelection()"
       [disabled]="
@@ -77,13 +76,14 @@
       color="warn"
       mat-raised-button
     >
-      <i class="las la-trash"></i>
-      <span>{{ 'ACTIONS.SELECTIONDELETE' | translate }}</span>
-      <cnsl-action-keys [type]="ActionKeysType.DELETE" (actionTriggered)="removeProjectMemberSelection()">
-      </cnsl-action-keys>
+      <div class="cnsl-action-button">
+        <i class="las la-trash"></i>
+        <span>{{ 'ACTIONS.SELECTIONDELETE' | translate }}</span>
+        <cnsl-action-keys [type]="ActionKeysType.DELETE" (actionTriggered)="removeProjectMemberSelection()">
+        </cnsl-action-keys>
+      </div>
     </button>
     <button
-      class="cnsl-action-button"
       writeactions
       color="primary"
       [disabled]="
@@ -93,8 +93,10 @@
       color="primary"
       mat-raised-button
     >
-      <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
-      <cnsl-action-keys (actionTriggered)="openAddMember()"> </cnsl-action-keys>
+      <div class="cnsl-action-button">
+        <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+        <cnsl-action-keys (actionTriggered)="openAddMember()"> </cnsl-action-keys>
+      </div>
     </button>
   </cnsl-members-table>
 </cnsl-detail-layout>

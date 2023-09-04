@@ -26,25 +26,31 @@
   <ng-template cnslHasRole [hasRole]="['user.write']" actions>
     <button
       (click)="deactivateSelectedUsers()"
-      class="cnsl-action-button bg-state inactive"
+      class="bg-state inactive"
       mat-raised-button
       *ngIf="selection.hasValue() && multipleDeactivatePossible"
       [disabled]="!canWrite"
       color="primary"
     >
-      <span class="">{{ 'USER.TABLE.DEACTIVATE' | translate }}</span>
-      <cnsl-action-keys (actionTriggered)="deactivateSelectedUsers()" [type]="ActionKeysType.DEACTIVATE"> </cnsl-action-keys>
+      <div class="cnsl-action-button">
+        <span class="">{{ 'USER.TABLE.DEACTIVATE' | translate }}</span>
+        <cnsl-action-keys (actionTriggered)="deactivateSelectedUsers()" [type]="ActionKeysType.DEACTIVATE">
+        </cnsl-action-keys>
+      </div>
     </button>
     <button
       (click)="reactivateSelectedUsers()"
-      class="cnsl-action-button bg-state active margin-left"
+      class="bg-state active margin-left"
       mat-raised-button
       *ngIf="selection.hasValue() && multipleActivatePossible"
       [disabled]="!canWrite"
       color="primary"
     >
-      <span class="">{{ 'USER.TABLE.ACTIVATE' | translate }}</span>
-      <cnsl-action-keys (actionTriggered)="reactivateSelectedUsers()" [type]="ActionKeysType.REACTIVATE"> </cnsl-action-keys>
+      <div class="cnsl-action-button">
+        <span class="">{{ 'USER.TABLE.ACTIVATE' | translate }}</span>
+        <cnsl-action-keys (actionTriggered)="reactivateSelectedUsers()" [type]="ActionKeysType.REACTIVATE">
+        </cnsl-action-keys>
+      </div>
     </button>
     <cnsl-filter-user
       *ngIf="!selection.hasValue()"
@@ -56,17 +62,18 @@
       color="primary"
       mat-raised-button
       [disabled]="!canWrite"
-      class="cnsl-action-button"
       *ngIf="!selection.hasValue()"
       data-e2e="create-user-button"
     >
-      <mat-icon class="icon">add</mat-icon>
-      <span>{{ 'ACTIONS.NEW' | translate }}</span>
-      <cnsl-action-keys
-        *ngIf="!filterOpen"
-        (actionTriggered)="gotoRouterLink(['/users', type === Type.TYPE_HUMAN ? 'create' : 'create-machine'])"
-      >
-      </cnsl-action-keys>
+      <div class="cnsl-action-button">
+        <mat-icon class="icon">add</mat-icon>
+        <span>{{ 'ACTIONS.NEW' | translate }}</span>
+        <cnsl-action-keys
+          *ngIf="!filterOpen"
+          (actionTriggered)="gotoRouterLink(['/users', type === Type.TYPE_HUMAN ? 'create' : 'create-machine'])"
+        >
+        </cnsl-action-keys>
+      </div>
     </a>
   </ng-template>
 
