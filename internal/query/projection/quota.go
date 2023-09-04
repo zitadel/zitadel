@@ -195,12 +195,6 @@ func (q *quotaProjection) reduceQuotaNotificationDue(event eventstore.Event) (*h
 		[]handler.Column{
 			handler.NewCol(QuotaNotificationColumnLatestDuePeriodStart, e.PeriodStart),
 			handler.NewCol(QuotaNotificationColumnNextDueThreshold, e.Threshold+100), // next due_threshold is always the reached + 100 => percent (e.g. 90) in the next bucket (e.g. 190)
-			//ParameterOpt: func(thresholdFromEvent string) string {
-			//	// We increment the threshold if the periodStart matches, else we reset it to percent
-			//	// TODO: Use multiple parameters for a single column
-			//	return fmt.Sprintf("CASE WHEN %s = '%s' THEN %s + 100 ELSE %s END", QuotaNotificationColumnLatestDuePeriodStart, e.PeriodStart.Format(time.RFC3339), thresholdFromEvent, QuotaNotificationColumnPercent)
-			//},
-			//},
 		},
 		[]handler.Condition{
 			handler.NewCond(QuotaNotificationColumnInstanceID, e.Aggregate().InstanceID),

@@ -75,40 +75,10 @@ func (s *Service[T]) Limit(ctx context.Context, instanceID string) *uint64 {
 	if !s.reportingEnabled || instanceID == "" {
 		return nil
 	}
-	//quotaUnit := s.usageStorer.QuotaUnit()
-	//q, err := s.queries.GetQuota(ctx, instanceID, quotaUnit)
-	//if caos_errors.IsNotFound(err) {
-	//	err = nil
-	//	return nil
-	//}
-	//if err != nil {
-	//	return nil
-	//}
 	remaining, err := s.queries.GetRemainingQuotaUsage(ctx, instanceID, s.usageStorer.QuotaUnit())
 	if err != nil {
 		// TODO: shouldn't we just limit then or return the error and decide there?
 		return nil
 	}
 	return remaining
-	//var remaining *uint64
-	//if q.Limit {
-	//	r := uint64(math.Max(0, float64(q.Amount)-float64(usage)))
-	//	remaining = &r
-	//}
-	//return remaining
 }
-
-//
-//func (s *Service[T]) handleThresholds(ctx context.Context, instanceID string, unit quota.Unit, q *query.Quota, usage uint64) {
-//	var err error
-//	defer func() {
-//		logging.OnError(err).Warn("handling quota thresholds failed")
-//	}()
-//	detatchedCtx, cancel := context.WithTimeout(authz.Detach(ctx), handleThresholdTimeout)
-//	defer cancel()
-//	notifications, err := s.queries.GetDueQuotaNotifications(detatchedCtx, instanceID, unit, q, q.CurrentPeriodStart, usage)
-//	if err != nil || len(notifications) == 0 {
-//		return
-//	}
-//	err = s.commands.ReportQuotaUsage(detatchedCtx, notifications)
-//}

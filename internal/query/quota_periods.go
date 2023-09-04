@@ -75,10 +75,6 @@ func (q *Queries) GetRemainingQuotaUsage(ctx context.Context, instanceID string,
 				QuotaPeriodColumnUnit.identifier():       unit,
 				QuotaColumnLimit.identifier():            true,
 			},
-			//sq.Lt{
-			//	//"age(" + QuotaPeriodColumnStart.identifier() + ")": QuotaColumnInterval.identifier,
-			//	//:                "now()",
-			//},
 			sq.Expr("age(" + QuotaPeriodColumnStart.identifier() + ") < " + QuotaColumnInterval.identifier()),
 			sq.Expr(QuotaPeriodColumnStart.identifier() + " < now()"),
 		}).

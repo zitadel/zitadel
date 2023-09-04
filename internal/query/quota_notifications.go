@@ -7,19 +7,15 @@ import (
 	"math"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-
 	sq "github.com/Masterminds/squirrel"
+	"github.com/pkg/errors"
 
 	"github.com/zitadel/zitadel/internal/api/call"
 	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
-
-	"github.com/zitadel/zitadel/internal/query/projection"
-
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
