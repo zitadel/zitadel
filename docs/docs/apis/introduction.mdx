@@ -9,7 +9,8 @@ import Column from "../../src/components/column";
 ZITADEL exposes all features via different gRPC and REST APIs and provides SDKs for popular languages and frameworks.
 
 The [OpenID Connect & OAuth endpoints](/docs/apis/openidoauth/endpoints) and [SAML 2.0 endpoints](/docs/apis/saml/endpoints) are implemented and exposed according to the specific standards. Managing resources such as users, organizations, instances, or settings must be done with the different [ZITADEL APIs](#zitadel-apis-resource-based).
-[Action](/docs/apis/actions/introduction) allow to extend ZITADEL with custom code to change default behaviors or calling external systems.
+
+[Actions](/docs/apis/actions/introduction) allow to extend ZITADEL with custom code to change default behaviors or calling external systems.
 
 ## Authentication & authorization
 
@@ -41,6 +42,11 @@ ZITADEL provides APIs for each [core resource](/docs/apis/resources):
 - [User](/docs/apis/resources/user_service)
 - [Session](/docs/apis/resources/session_service)
 - [Settings](/docs/apis/resources/settings_service)
+
+:::info
+We are migrating to a resource-based API approach.
+You might need to use the existing [service-based](#zitadel-apis-service-based) APIs for now to manage Organizations, Instances, Assets etc.
+:::
 
 ## ZITADEL APIs (service-based)
 
