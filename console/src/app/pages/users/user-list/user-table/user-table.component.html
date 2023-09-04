@@ -80,39 +80,48 @@
   <div class="table-wrapper">
     <table class="table" mat-table [dataSource]="dataSource" matSort (matSortChange)="sortChange($event)">
       <ng-container matColumnDef="select">
-        <th mat-header-cell *matHeaderCellDef class="selection">
-          <mat-checkbox
-            [disabled]="!canWrite"
-            color="primary"
-            (change)="$event ? masterToggle() : null"
-            [checked]="selection.hasValue() && isAllSelected()"
-            [indeterminate]="selection.hasValue() && !isAllSelected()"
-          >
-          </mat-checkbox>
-        </th>
-        <td mat-cell *matCellDef="let user" class="selection">
-          <mat-checkbox
-            [disabled]="!canWrite"
-            color="primary"
-            (click)="$event.stopPropagation()"
-            (change)="$event ? selection.toggle(user) : null"
-            [checked]="selection.isSelected(user)"
-          >
-            <cnsl-avatar
-              *ngIf="user.human && user.human.profile; else cog"
-              class="avatar"
-              [name]="user.human.profile.displayName"
-              [avatarUrl]="user.human.profile.avatarUrl || ''"
-              [forColor]="user.preferredLoginName"
-              [size]="32"
+        <th mat-header-cell *matHeaderCellDef>
+          <div class="selection">
+            <mat-checkbox
+              class="checkbox"
+              [disabled]="!canWrite"
+              color="primary"
+              (change)="$event ? masterToggle() : null"
+              [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()"
             >
-            </cnsl-avatar>
-            <ng-template #cog>
-              <cnsl-avatar [forColor]="user?.preferredLoginName" [isMachine]="true">
+              <cnsl-avatar class="hidden" [isMachine]="true">
                 <i class="las la-robot"></i>
               </cnsl-avatar>
-            </ng-template>
-          </mat-checkbox>
+            </mat-checkbox>
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let user">
+          <div class="selection">
+            <mat-checkbox
+              class="checkbox"
+              [disabled]="!canWrite"
+              color="primary"
+              (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(user) : null"
+              [checked]="selection.isSelected(user)"
+            >
+              <cnsl-avatar
+                *ngIf="user.human && user.human.profile; else cog"
+                class="avatar"
+                [name]="user.human.profile.displayName"
+                [avatarUrl]="user.human.profile.avatarUrl || ''"
+                [forColor]="user.preferredLoginName"
+                [size]="32"
+              >
+              </cnsl-avatar>
+              <ng-template #cog>
+                <cnsl-avatar [forColor]="user?.preferredLoginName" [isMachine]="true">
+                  <i class="las la-robot"></i>
+                </cnsl-avatar>
+              </ng-template>
+            </mat-checkbox>
+          </div>
         </td>
       </ng-container>
 

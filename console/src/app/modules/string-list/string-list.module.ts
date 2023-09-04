@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatLegacyChipsModule } from '@angular/material/legacy-chips';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { InputModule } from '../input/input.module';
@@ -16,7 +16,7 @@ import { StringListComponent } from './string-list.component';
     InputModule,
     FormsModule,
     ReactiveFormsModule,
-    MatLegacyChipsModule,
+    MatChipsModule,
     TranslateModule,
     MatIconModule,
     MatTooltipModule,

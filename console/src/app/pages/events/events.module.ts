@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy-table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSortModule } from '@angular/material/sort';
@@ -19,7 +19,7 @@ import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/local
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
 import { OverlayModule } from '@angular/cdk/overlay';
-import { MatLegacyDialogModule } from '@angular/material/legacy-dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
 import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { DisplayJsonDialogModule } from 'src/app/modules/display-json-dialog/display-json-dialog.module';
@@ -41,7 +41,7 @@ import { EventsComponent } from './events.component';
     ToObjectPipeModule,
     ToPayloadPipeModule,
     HasRolePipeModule,
-    MatLegacyDialogModule,
+    MatDialogModule,
     MatButtonModule,
     CopyToClipboardModule,
     InputModule,

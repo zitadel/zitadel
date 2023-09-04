@@ -14,7 +14,6 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
   styleUrls: ['./search-org-autocomplete.component.scss'],
 })
 export class SearchOrgAutocompleteComponent implements OnInit, OnDestroy {
-  public selectable: boolean = true;
   public myControl: UntypedFormControl = new UntypedFormControl();
   public filteredOrgs: Array<Org.AsObject> = [];
   public isLoading: boolean = false;

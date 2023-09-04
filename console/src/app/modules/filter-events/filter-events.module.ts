@@ -7,8 +7,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox';
-import { MatLegacyProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { InputModule } from '../input/input.module';
 import { FilterEventsComponent } from './filter-events.component';
@@ -23,9 +23,9 @@ import { FilterEventsComponent } from './filter-events.component';
     ReactiveFormsModule,
     OverlayModule,
     MatDatepickerModule,
-    MatLegacyProgressSpinnerModule,
+    MatProgressSpinnerModule,
     TranslateModule,
-    MatLegacyCheckboxModule,
+    MatCheckboxModule,
     MatSelectModule,
     ActionKeysModule,
   ],

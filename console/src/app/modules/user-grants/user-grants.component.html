@@ -47,50 +47,55 @@
   <div class="table-wrapper">
     <table mat-table multiTemplateDataRows class="table" aria-label="Elements" [dataSource]="dataSource">
       <ng-container matColumnDef="select">
-        <th class="selection" mat-header-cell *matHeaderCellDef>
-          <mat-checkbox
-            [disabled]="disableWrite"
-            color="primary"
-            (change)="$event ? masterToggle() : null"
-            [checked]="selection.hasValue() && isAllSelected()"
-            [indeterminate]="selection.hasValue() && !isAllSelected()"
-          >
-          </mat-checkbox>
-        </th>
-        <td class="selection" mat-cell *matCellDef="let row">
-          <mat-checkbox
-            [disabled]="
-              disableWrite ||
-              !(
-                (['user.grant.write$'] | hasRole | async) ||
-                ((context === UserGrantContext.OWNED_PROJECT
-                  ? ['user.grant.write:' + row?.projectId]
-                  : context === UserGrantContext.GRANTED_PROJECT
-                  ? ['user.grant.write:' + row?.id]
-                  : []
-                )
-                  | hasRole
-                  | async)
-              )
-            "
-            color="primary"
-            (click)="$event.stopPropagation()"
-            (change)="$event ? selection.toggle(row) : null"
-            [checked]="selection.isSelected(row)"
-          >
-            <cnsl-avatar
-              *ngIf="row && row.userType === Type.TYPE_HUMAN; else cog"
-              class="avatar"
-              [name]="row.displayName"
-              [avatarUrl]="row.avatarUrl || ''"
-              [forColor]="row?.preferredLoginName"
-              [size]="32"
+        <th mat-header-cell *matHeaderCellDef>
+          <div class="selection">
+            <mat-checkbox
+              [disabled]="disableWrite"
+              color="primary"
+              (change)="$event ? masterToggle() : null"
+              [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()"
             >
-            </cnsl-avatar>
-            <ng-template #cog>
-              <cnsl-avatar class="avatar" [isMachine]="true" [forColor]="row.preferredLoginName" [size]="32"> </cnsl-avatar>
-            </ng-template>
-          </mat-checkbox>
+            </mat-checkbox>
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <div class="selection">
+            <mat-checkbox
+              [disabled]="
+                disableWrite ||
+                !(
+                  (['user.grant.write$'] | hasRole | async) ||
+                  ((context === UserGrantContext.OWNED_PROJECT
+                    ? ['user.grant.write:' + row?.projectId]
+                    : context === UserGrantContext.GRANTED_PROJECT
+                    ? ['user.grant.write:' + row?.id]
+                    : []
+                  )
+                    | hasRole
+                    | async)
+                )
+              "
+              color="primary"
+              (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(row) : null"
+              [checked]="selection.isSelected(row)"
+            >
+              <cnsl-avatar
+                *ngIf="row && row.userType === Type.TYPE_HUMAN; else cog"
+                class="avatar"
+                [name]="row.displayName"
+                [avatarUrl]="row.avatarUrl || ''"
+                [forColor]="row?.preferredLoginName"
+                [size]="32"
+              >
+              </cnsl-avatar>
+              <ng-template #cog>
+                <cnsl-avatar class="avatar" [isMachine]="true" [forColor]="row.preferredLoginName" [size]="32">
+                </cnsl-avatar>
+              </ng-template>
+            </mat-checkbox>
+          </div>
         </td>
       </ng-container>
 

@@ -14,23 +14,27 @@
   <div class="table-wrapper">
     <table [dataSource]="dataSource" mat-table class="table" aria-label="Elements">
       <ng-container matColumnDef="select">
-        <th class="selection" mat-header-cell *matHeaderCellDef>
-          <mat-checkbox
-            color="primary"
-            (change)="$event ? masterToggle() : null"
-            [checked]="selection.hasValue() && isAllSelected()"
-            [indeterminate]="selection.hasValue() && !isAllSelected()"
-          >
-          </mat-checkbox>
+        <th mat-header-cell *matHeaderCellDef>
+          <div class="selection">
+            <mat-checkbox
+              color="primary"
+              (change)="$event ? masterToggle() : null"
+              [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()"
+            >
+            </mat-checkbox>
+          </div>
         </th>
-        <td class="selection" mat-cell *matCellDef="let row">
-          <mat-checkbox
-            color="primary"
-            (click)="$event.stopPropagation()"
-            (change)="$event ? selection.toggle(row) : null"
-            [checked]="selection.isSelected(row)"
-          >
-          </mat-checkbox>
+        <td mat-cell *matCellDef="let row">
+          <div class="selection">
+            <mat-checkbox
+              color="primary"
+              (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(row) : null"
+              [checked]="selection.isSelected(row)"
+            >
+            </mat-checkbox>
+          </div>
         </td>
       </ng-container>
 

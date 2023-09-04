@@ -78,7 +78,7 @@
     padding: 0 0.5rem !important;
   }
 
-  td .mat-checkbox,
+  td .mat-mdc-checkbox,
   th .mat-checkbox {
     margin-left: 1rem;
   }
@@ -96,9 +96,20 @@
   }
 
   .selection {
-    width: 65px;
-    max-width: 65px;
-    padding-right: 1rem !important;
+    width: 80px;
+    max-width: 80px;
+
+    .checkbox {
+      margin-right: auto;
+    }
+
+    .hidden {
+      visibility: hidden;
+    }
+  }
+
+  th .selection {
+    margin-left: 1rem;
   }
 
   .state {

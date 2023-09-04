@@ -519,51 +519,51 @@ $caos-light-theme-foreground: (
   slash: #0000006e,
 );
 
-// $caos-dark-app-theme: (
-//   primary: mat-palette($caos-dark-primary),
-//   accent: mat-palette($caos-dark-primary),
-//   warn: mat-palette($caos-dark-warn),
-//   is-dark: true,
-//   foreground: $caos-dark-theme-foreground,
-//   background: $caos-dark-theme-background,
-// );
+$caos-dark-app-theme: (
+  primary: mat-palette($caos-dark-primary),
+  accent: mat-palette($caos-dark-primary),
+  warn: mat-palette($caos-dark-warn),
+  is-dark: true,
+  foreground: $caos-dark-theme-foreground,
+  background: $caos-dark-theme-background,
+);
 
-// $caos-light-app-theme: (
-//   primary: mat-palette($caos-light-primary),
-//   accent: mat-palette($caos-light-primary),
-//   warn: mat-palette($caos-light-warn),
-//   is-dark: false,
-//   foreground: $caos-light-theme-foreground,
-//   background: $caos-light-theme-background,
-// );
+$caos-light-app-theme: (
+  primary: mat-palette($caos-light-primary),
+  accent: mat-palette($caos-light-primary),
+  warn: mat-palette($caos-light-warn),
+  is-dark: false,
+  foreground: $caos-light-theme-foreground,
+  background: $caos-light-theme-background,
+);
 
 $custom-typography: mat.define-typography-config(
   $font-family: 'Lato',
 );
 
-$caos-light-app-theme: mat.define-light-theme(
-  (
-    color: (
-      primary: mat-palette($caos-light-primary),
-      accent: mat-palette($caos-light-primary),
-      warn: mat-palette($caos-light-warn),
-    ),
-    typography: mat.define-typography-config(),
-    density: 0,
-  )
-);
+// $caos-light-app-theme: mat.define-light-theme(
+//   (
+//     color: (
+//       primary: mat-palette($caos-light-primary),
+//       accent: mat-palette($caos-light-primary),
+//       warn: mat-palette($caos-light-warn),
+//     ),
+//     typography: mat.define-typography-config(),
+//     density: 0,
+//   )
+// );
 
-$caos-dark-app-theme: mat.define-dark-theme(
-  (
-    color: (
-      primary: mat-palette($caos-dark-primary),
-      accent: mat-palette($caos-dark-primary),
-      warn: mat-palette($caos-dark-warn),
-    ),
-    typography: mat.define-typography-config(),
-    density: 0,
-  )
-);
+// $caos-dark-app-theme: mat.define-dark-theme(
+//   (
+//     color: (
+//       primary: mat-palette($caos-dark-primary),
+//       accent: mat-palette($caos-dark-primary),
+//       warn: mat-palette($caos-dark-warn),
+//     ),
+//     typography: mat.define-typography-config(),
+//     density: 0,
+//   )
+// );
 
 /* TODO(mdc-migration): Remove all-legacy-component-typographies once all legacy components are migrated */
 @include mat.all-legacy-component-typographies($custom-typography);
@@ -573,7 +573,7 @@ $caos-dark-app-theme: mat.define-dark-theme(
 @include mat.legacy-core();
 @include mat.core();
 
-.mat-dialog-container,
+.mat-mdc-dialog-container,
 .mat-mdc-raised-button,
 .mat-mdc-outlined-button {
   border-radius: 6px !important;
@@ -663,7 +663,7 @@ $caos-dark-app-theme: mat.define-dark-theme(
   }
 
   .main-container,
-  .mat-dialog-container,
+  .mat-mdc-dialog-container,
   .mat-calendar {
     background-color: map-get($background, background);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -736,7 +736,7 @@ $caos-dark-app-theme: mat.define-dark-theme(
   }
 
   .main-container,
-  .mat-dialog-container,
+  .mat-mdc-dialog-container,
   .mat-calendar {
     background-color: map-get($background, background);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -817,6 +817,7 @@ i {
   font-size: 1.5rem;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of checkbox that may no longer apply for the MDC version.*/
 .mat-checkbox-inner-container.mat-checkbox-inner-container-no-side-margin {
   margin-right: 0.5rem !important;
 }

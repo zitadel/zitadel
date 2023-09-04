@@ -8,29 +8,6 @@
     display: flex;
     margin: 0;
     height: 100%;
-
-    .toggle-row {
-      display: flex;
-      align-items: center;
-
-      i {
-        margin-right: 0.5rem;
-      }
-
-      .info-i {
-        font-size: 1.2rem;
-        margin-left: 0.5rem;
-        margin-right: 0;
-      }
-
-      .current-dot {
-        height: 8px;
-        width: 8px;
-        border-radius: 50%;
-        background-color: rgb(84, 142, 230);
-        margin-left: 0.5rem;
-      }
-    }
   }
 }
 

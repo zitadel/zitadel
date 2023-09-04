@@ -2,12 +2,12 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { ShortcutsModule } from 'src/app/modules/shortcuts/shortcuts.module';
 
-import { MatLegacyProgressBarModule } from '@angular/material/legacy-progress-bar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { RouterModule } from '@angular/router';
 import { EventPipeModule } from 'src/app/pipes/event-pipe/event-pipe.module';
 import { OnboardingComponent } from './onboarding.component';
@@ -23,7 +23,7 @@ import { OnboardingComponent } from './onboarding.component';
     MatRippleModule,
     RouterModule,
     MatProgressSpinnerModule,
-    MatLegacyProgressBarModule,
+    MatProgressBarModule,
     EventPipeModule,
   ],
   exports: [OnboardingComponent],
