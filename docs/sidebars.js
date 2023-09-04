@@ -593,11 +593,6 @@ module.exports = {
           collapsed: true,
           items: ["apis/saml/endpoints"],
         },
-        {
-          type: 'link',
-          label: 'Custom Login',
-          href: '/docs/guides/integrate/login-ui',
-        },
       ],
     },
     {
