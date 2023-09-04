@@ -11,7 +11,7 @@ ZITADEL exposes all features via different gRPC and REST APIs and provides SDKs 
 The [OpenID Connect & OAuth endpoints](/docs/apis/openidoauth/endpoints) and [SAML 2.0 endpoints](/docs/apis/saml/endpoints) are implemented and exposed according to the specific standards. Managing resources such as users, organizations, instances, or settings must be done with the different [ZITADEL APIs](#zitadel-apis-resource-based).
 [Action](/docs/apis/actions/introduction) allow to extend ZITADEL with custom code to change default behaviors or calling external systems.
 
-## Authentication & Authorization
+## Authentication & authorization
 
 ZITADEL implements industry standards such as OpenID Connect, OAuth 2.0, or SAML for authentication.
 Please refer to our guides how to [authenticate users](/docs/guides/integrate/human-users) through an interactive authentication process and how to [authenticate service users](/docs/guides/integrate/serviceusers) with a programmatic authentication.
@@ -261,7 +261,7 @@ ZITADEL hosts everything under a single domain: `{instance}.zitadel.cloud` or yo
 
 The domain is used as the OIDC issuer and as the base url for the gRPC and REST APIs, the Login and Console UI, which you'll find under `{your_domain}/ui/console/`.
 
-## ZITADEL Path Prefixes
+## API path prefixes
 
 If you run ZITADEL on a custom domain, you may want to reuse that domain for other applications.
 For easy copying to your reverse proxy configuration, here is the list of URL path prefixes, ZITADEL uses.
