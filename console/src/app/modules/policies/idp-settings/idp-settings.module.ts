@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyButtonModule } from '@angular/material/legacy-button';
+import { MatButtonModule } from '@angular/material/button';
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
@@ -15,7 +15,7 @@ import { IdpSettingsComponent } from './idp-settings.component';
   declarations: [IdpSettingsComponent],
   imports: [
     CommonModule,
-    MatLegacyButtonModule,
+    MatButtonModule,
     CardModule,
     MatIconModule,
     IdpTableModule,
