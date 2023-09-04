@@ -3,14 +3,14 @@ package actions
 import (
 	"context"
 	"errors"
-	"github.com/zitadel/zitadel/internal/logstore/record"
 	"testing"
 	"time"
+
+	"github.com/zitadel/zitadel/internal/logstore/record"
 
 	"github.com/dop251/goja"
 
 	"github.com/zitadel/zitadel/internal/logstore"
-	"github.com/zitadel/zitadel/internal/logstore/record"
 )
 
 func TestRun(t *testing.T) {

@@ -275,6 +275,16 @@ func TestQuotaReport_UsageNotificationSent(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				dueNotification: quota.NewNotificationDueEvent(
+					context.Background(),
+					&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+					QuotaRequestsAllAuthenticated.Enum(),
+					"id1",
+					"url",
+					time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
+					1000,
+					250,
+				),
 			},
 			res: res{},
 		},
