@@ -2,7 +2,10 @@
 title: SDKs
 ---
 
-## ZITADEL SDK
+On this page you find our official SDKs, links to supporting frameworks and providers, and resources to help with SDKs.
+The SDKs wrap either our [gRPC or REST APIs](/docs/apis/introduction) to provide the client with User Authentication and Management for resources.
+
+## ZITADEL SDKs
 
 | Language / Framework | Link Github | User Authentication | Manage resources | Notes |
 |--- | --- | --- | --- | --- |
@@ -13,7 +16,7 @@ title: SDKs
 | Python   | 🚧 [WIP](https://github.com/zitadel/zitadel/issues/3675) | ❓ | ❓ | TBD |
 | NodeJS   | [@zitadel/node](https://www.npmjs.com/package/@zitadel/node) | ❌ | ✔️ | `community` |
 
-## Missing an SDK
+## Missing SDK
 
 Is your language/framework missing? Fear not, you can generate your gRPC API Client with ease.
 
