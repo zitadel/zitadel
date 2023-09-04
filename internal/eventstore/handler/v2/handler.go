@@ -374,7 +374,7 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, currentState
 	defer func() {
 		if err != nil {
 			_, savepointErr := tx.Exec("ROLLBACK TO SAVEPOINT exec")
-			h.log().WithError(savepointErr).Debug("rollback savepoint failed")
+			h.log().OnError(savepointErr).Debug("rollback savepoint failed")
 			return
 		}
 		_, err = tx.Exec("RELEASE SAVEPOINT exec")
