@@ -70,7 +70,16 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	}
 	query += where
 
-	if q.Columns == eventstore.ColumnsEvent {
+	// instead of using the max function of the database (which doesn't work for postgres)
+	// we select the most recent row
+	if q.Columns == eventstore.ColumnsMaxSequence {
+		q.Limit = 1
+		q.Desc = true
+	}
+
+	switch q.Columns {
+	case eventstore.ColumnsEvent,
+		eventstore.ColumnsMaxSequence:
 		query += criteria.orderByEventSequence(q.Desc)
 	}
 
@@ -221,10 +230,8 @@ func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause 
 		}
 		clauses[idx] = "( " + strings.Join(subClauses, " AND ") + " )"
 	}
-	// created_at <= now() must be added because clock_timestamp() could be in the future
-	// this could lead to skipped events which are not visible as of system time but have a lower
-	// created_at timestamp
-	return " WHERE (" + strings.Join(clauses, " OR ") + ") AND created_at::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = 'zitadel')", values
+
+	return " WHERE (" + strings.Join(clauses, " OR ") + ") " + ensureOrder, values
 }
 
 func getCondition(cond querier, filter *repository.Filter) (condition string) {

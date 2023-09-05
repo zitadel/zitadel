@@ -177,6 +177,7 @@ AssetStorage:
 
 # The Projections section defines the behavior for the scheduled and synchronous events projections.
 Projections:
+  TransactionDuration: 5s
   # Time interval between scheduled projections
   RequeueEvery: 60s # ZITADEL_PROJECTIONS_REQUEUEEVERY
   # Time between retried database statements resulting from projected events
@@ -225,6 +226,7 @@ Projections:
 Auth:
   SearchLimit: 1000 # ZITADEL_AUTH_SEARCHLIMIT
   Spooler:
+    TransactionDuration: 10s
     BulkLimit: 100
     FailureCountUntilSkip: 5
     # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
@@ -235,6 +237,7 @@ Auth:
 Admin:
   SearchLimit: 1000 # ZITADEL_ADMIN_SEARCHLIMIT
   Spooler:
+    TransactionDuration: 10s
     BulkLimit: 200
     FailureCountUntilSkip: 5
     # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
@@ -325,6 +328,7 @@ Console:
 Notification:
   Repository:
     Spooler:
+      TransactionDuration: 10s
       ConcurrentWorkers: 1
       ConcurrentInstances: 10
       BulkLimit: 200

@@ -20,6 +20,10 @@ type Eventstore struct {
 
 	pusher  Pusher
 	querier Querier
+
+	instances         []string
+	lastInstanceQuery time.Time
+	instancesMu       sync.Mutex
 }
 
 type eventTypeInterceptors struct {
@@ -34,6 +38,8 @@ func NewEventstore(config *Config) *Eventstore {
 
 		pusher:  config.Pusher,
 		querier: config.Querier,
+
+		instancesMu: sync.Mutex{},
 	}
 }
 
@@ -69,7 +75,14 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 
 // TODO(adlerhurst): still needed?
 func (es *Eventstore) NewInstance(ctx context.Context, instanceID string) error {
-	return es.querier.CreateInstance(ctx, instanceID)
+	err := es.querier.CreateInstance(ctx, instanceID)
+	if err != nil {
+		return err
+	}
+	es.instancesMu.Lock()
+	es.instances = append(es.instances, instanceID)
+	es.instancesMu.Unlock()
+	return nil
 }
 
 func (es *Eventstore) EventTypes() []string {
@@ -146,8 +159,21 @@ func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQu
 }
 
 // InstanceIDs returns the instance ids found by the search query
-func (es *Eventstore) InstanceIDs(ctx context.Context, queryFactory *SearchQueryBuilder) ([]string, error) {
-	return es.querier.InstanceIDs(ctx, queryFactory)
+func (es *Eventstore) InstanceIDs(ctx context.Context, maxAge time.Duration, queryFactory *SearchQueryBuilder) ([]string, error) {
+	es.instancesMu.Lock()
+	defer es.instancesMu.Unlock()
+
+	if time.Since(es.lastInstanceQuery) <= maxAge {
+		return es.instances, nil
+	}
+
+	instances, err := es.querier.InstanceIDs(ctx, queryFactory)
+	if err != nil {
+		return nil, err
+	}
+	es.instances = instances
+	es.lastInstanceQuery = time.Now()
+	return instances, nil
 }
 
 type QueryReducer interface {

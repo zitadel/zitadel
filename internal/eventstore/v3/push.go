@@ -46,12 +46,12 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 var pushStmt string
 
 func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, commands []eventstore.Command) ([]eventstore.Event, error) {
-	events, placeHolders, args, err := mapCommands(commands, sequences)
+	events, placeholders, args, err := mapCommands(commands, sequences)
 	if err != nil {
 		return nil, err
 	}
 
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf(pushStmt, strings.Join(placeHolders, ", ")), args...)
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf(pushStmt, strings.Join(placeholders, ", ")), args...)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 			return nil, nil, nil, err
 		}
 
-		placeholders[i] = fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, 'zitadel', $%d, $%d, $%d, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $%d)",
+		placeholders[i] = fmt.Sprintf(pushPlaceholderFmt,
 			i*argsPerCommand+1,
 			i*argsPerCommand+2,
 			i*argsPerCommand+3,

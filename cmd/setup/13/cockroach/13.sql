@@ -13,11 +13,11 @@ DROP INDEX IF EXISTS eventstore.events@active_instances;
 COMMIT;
 
 -- BEGIN;
--- ALTER TABLE eventstore.events ADD COLUMN IF NOT EXISTS "position" BIGINT NOT NULL;
+-- ALTER TABLE eventstore.events ADD COLUMN IF NOT EXISTS "position" DECIMAL NOT NULL;
 -- COMMIT;
 
 -- BEGIN;
--- ALTER TABLE eventstore.events ADD COLUMN IF NOT EXISTS commit_order DECIMAL NOT NULL;
+-- ALTER TABLE eventstore.events ADD COLUMN IF NOT EXISTS in_tx_order SMALLINT NOT NULL;
 -- COMMIT;
 
 -- TOOD: create a new migration step which removes created_at, previous_aggregate_*
@@ -32,7 +32,6 @@ COMMIT;
 
 BEGIN;
 CREATE INDEX IF NOT EXISTS es_handler_idx ON eventstore.events (instance_id, "position", aggregate_type, event_type) INCLUDE (created_at, event_data, editor_user, resource_owner, aggregate_version, in_tx_order);
-CREATE INDEX IF NOT EXISTS es_handler_idx_2 ON eventstore.events (instance_id, aggregate_type, "position", event_type) INCLUDE (created_at, event_data, editor_user, resource_owner, aggregate_version, in_tx_order);
 CREATE INDEX IF NOT EXISTS es_agg_id_event_idx ON eventstore.events (aggregate_type, aggregate_id, event_type) INCLUDE (created_at, event_data, editor_user, resource_owner, aggregate_version, "position", in_tx_order);
 CREATE INDEX IF NOT EXISTS es_active_instances ON eventstore.events (created_at, instance_id) USING HASH;
 CREATE INDEX IF NOT EXISTS es_global ON eventstore.events (aggregate_type, aggregate_id) INCLUDE (created_at, event_type, event_data, editor_user, resource_owner, aggregate_version, "position", in_tx_order);

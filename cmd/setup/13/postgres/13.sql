@@ -14,15 +14,23 @@ DROP INDEX IF EXISTS eventstore.active_instances;
 COMMIT;
 
 BEGIN;
+ALTER TABLE eventstore.events ADD COLUMN IF NOT EXISTS "position" BIGINT NOT NULL;
+COMMIT;
+
+BEGIN;
+ALTER TABLE eventstore.events ADD COLUMN IF NOT EXISTS in_tx_order SMALLINT NOT NULL;
+COMMIT;
+
+BEGIN;
 ALTER TABLE eventstore.events DROP CONSTRAINT IF EXISTS events_pkey;
 ALTER TABLE eventstore.events ADD PRIMARY KEY (instance_id, aggregate_type, aggregate_id, event_sequence);
 COMMIT;
 
 BEGIN;
-CREATE INDEX IF NOT EXISTS es_handler_idx ON eventstore.events (instance_id, aggregate_type, event_type, created_at);
+CREATE INDEX IF NOT EXISTS es_handler_idx ON eventstore.events (instance_id, aggregate_type, event_type);
 CREATE INDEX IF NOT EXISTS es_agg_id_event_idx ON eventstore.events (aggregate_type, aggregate_id, event_type);
-CREATE INDEX IF NOT EXISTS es_active_instances ON eventstore.events (aggregate_type, event_type, created_at);
-CREATE INDEX IF NOT EXISTS es_global ON eventstore.events (aggregate_type, aggregate_id, created_at);
-CREATE INDEX IF NOT EXISTS es_inst_agg_type_agg_id_cd ON eventstore.events (instance_id, aggregate_type, aggregate_id, created_at);
+CREATE INDEX IF NOT EXISTS es_active_instances ON eventstore.events (created_at DESC, instance_id);
+CREATE INDEX IF NOT EXISTS es_global ON eventstore.events (aggregate_type, aggregate_id);
+CREATE INDEX IF NOT EXISTS es_inst_agg_type_agg_id_cd ON eventstore.events (instance_id, aggregate_type, aggregate_id, event_sequence);
 COMMIT;
 

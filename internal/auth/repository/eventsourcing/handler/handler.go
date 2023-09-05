@@ -18,6 +18,7 @@ type Config struct {
 	BulkLimit             uint64
 	FailureCountUntilSkip uint64
 	HandleActiveInstances time.Duration
+	TransactionDuration   time.Duration
 	Handlers              map[string]*ConfigOverwrites
 }
 
@@ -57,6 +58,7 @@ func (config Config) overwrite(viewModel string) handler2.Config {
 		RequeueEvery:          3 * time.Minute,
 		HandleActiveInstances: config.HandleActiveInstances,
 		MaxFailureCount:       uint8(config.FailureCountUntilSkip),
+		TransactionDuration:   config.TransactionDuration,
 	}
 	overwrite, ok := config.Handlers[viewModel]
 	if !ok {

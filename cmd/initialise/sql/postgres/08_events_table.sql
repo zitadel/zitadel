@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS eventstore.events (
 	, editor_service TEXT
 	, resource_owner TEXT NOT NULL
 	, instance_id TEXT NOT NULL
+	, "position" xid8 NOT NULL
+	, in_tx_order SMALLINT NOT NULL
 
 	, PRIMARY KEY (instance_id, aggregate_type, aggregate_id, event_sequence)
 );

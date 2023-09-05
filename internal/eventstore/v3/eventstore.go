@@ -6,11 +6,21 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 )
 
+// pushPlaceholderFmt defines how data are inserted into the events table
+var pushPlaceholderFmt string
+
 type Eventstore struct {
 	client *database.DB
 }
 
 func NewEventstore(client *database.DB) *Eventstore {
+	switch client.Type() {
+	case "cockroach":
+		pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, 'zitadel', $%d, $%d, $%d, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $%d)"
+	case "postgres":
+		pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, 'zitadel', $%d, $%d, $%d, now(), pg_current_xact_id(), $%d)"
+	}
+
 	return &Eventstore{client: client}
 }
 

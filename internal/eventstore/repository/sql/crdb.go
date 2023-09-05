@@ -104,11 +104,21 @@ const (
 					WHERE instance_id = $1`
 )
 
+// ensureOrder ensures event ordering, so we don't events younger that open transactions
+var ensureOrder string
+
 type CRDB struct {
 	*database.DB
 }
 
 func NewCRDB(client *database.DB) *CRDB {
+	switch client.Type() {
+	case "cockroach":
+		ensureOrder = "AND created_at::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = 'zitadel')"
+	case "postgres":
+		ensureOrder = `AND "position" < pg_snapshot_xmin(pg_current_snapshot())`
+	}
+
 	return &CRDB{client}
 }
 
@@ -306,7 +316,7 @@ func (db *CRDB) eventQuery() string {
 }
 
 func (db *CRDB) maxSequenceQuery() string {
-	return `SELECT MAX("position") FROM eventstore.events`
+	return `SELECT "position" FROM eventstore.events`
 }
 
 func (db *CRDB) instanceIDsQuery() string {
