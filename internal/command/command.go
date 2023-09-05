@@ -34,8 +34,9 @@ import (
 type Commands struct {
 	httpClient *http.Client
 
-	checkPermission domain.PermissionCheck
-	newCode         cryptoCodeFunc
+	checkPermission    domain.PermissionCheck
+	newCode            cryptoCodeFunc
+	newCodeWithDefault cryptoCodeWithDefaultFunc
 
 	eventstore     *eventstore.Eventstore
 	static         static.Storage
@@ -122,6 +123,7 @@ func StartCommands(
 		httpClient:                      httpClient,
 		checkPermission:                 permissionCheck,
 		newCode:                         newCryptoCode,
+		newCodeWithDefault:              newCryptoCodeWithDefaultConfig,
 		sessionTokenCreator:             sessionTokenCreator(idGenerator, sessionAlg),
 		sessionTokenVerifier:            sessionTokenVerifier,
 		defaultAccessTokenLifetime:      defaultAccessTokenLifetime,
