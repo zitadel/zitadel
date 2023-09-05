@@ -6,7 +6,6 @@ package logstore_test
 
 import (
 	"context"
-	"github.com/zitadel/zitadel/internal/query"
 	"reflect"
 	"runtime"
 	"testing"
@@ -16,6 +15,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/logstore"
 	emittermock "github.com/zitadel/zitadel/internal/logstore/mock"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 const (

@@ -2,13 +2,13 @@ package mock
 
 import (
 	"context"
-	"github.com/zitadel/zitadel/internal/query"
 	"sync"
 	"time"
 
 	"github.com/benbjohnson/clock"
 
 	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
@@ -99,6 +99,19 @@ func (l *InmemLogStorage) GetQuota(ctx context.Context, instanceID string, unit 
 
 func (l *InmemLogStorage) GetQuotaUsage(ctx context.Context, instanceID string, unit quota.Unit, periodStart time.Time) (usage uint64, err error) {
 	return uint64(l.Len()), nil
+}
+
+func (l *InmemLogStorage) GetRemainingQuotaUsage(ctx context.Context, instanceID string, unit quota.Unit) (remaining *uint64, err error) {
+	if !l.quota.Limit {
+		return nil, nil
+	}
+	var r uint64
+	used := uint64(l.Len())
+	if used > l.quota.Amount {
+		return &r, nil
+	}
+	r = l.quota.Amount - used
+	return &r, nil
 }
 
 func (l *InmemLogStorage) GetDueQuotaNotifications(ctx context.Context, instanceID string, unit quota.Unit, qu *query.Quota, periodStart time.Time, usedAbs uint64) (dueNotifications []*quota.NotificationDueEvent, err error) {
