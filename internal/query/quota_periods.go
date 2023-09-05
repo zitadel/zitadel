@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
@@ -38,36 +37,11 @@ var (
 	}
 )
 
-// TODO: unsued, maybe remove
-func (q *Queries) GetQuotaUsage(ctx context.Context, instanceID string, unit quota.Unit, periodStart time.Time) (usage uint64, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-	query, scan := prepareQuotaUsageQuery(ctx, q.client)
-	stmt, args, err := query.Where(
-		sq.Eq{
-			QuotaPeriodColumnInstanceID.identifier(): instanceID,
-			QuotaPeriodColumnUnit.identifier():       unit,
-			QuotaPeriodColumnStart.identifier():      periodStart,
-		}).
-		ToSql()
-	if err != nil {
-		return 0, zitadel_errors.ThrowInternal(err, "QUERY-mEZX2", "Errors.Query.SQLStatement")
-	}
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		usage, err = scan(row)
-		return err
-	}, stmt, args...)
-	if errors.Is(err, sql.ErrNoRows) {
-		return 0, nil
-	}
-	return usage, err
-}
-
 func (q *Queries) GetRemainingQuotaUsage(ctx context.Context, instanceID string, unit quota.Unit) (remaining *uint64, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	query, scan := prepareRemainingQuotaUsageQuery(ctx, q.client)
-	stmt, args, err := query.Where(
+	stmt, scan := prepareRemainingQuotaUsageQuery(ctx, q.client)
+	query, args, err := stmt.Where(
 		sq.And{
 			sq.Eq{
 				QuotaPeriodColumnInstanceID.identifier(): instanceID,
@@ -84,20 +58,11 @@ func (q *Queries) GetRemainingQuotaUsage(ctx context.Context, instanceID string,
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
 		remaining, err = scan(row)
 		return err
-	}, stmt, args...)
-	if errors.Is(err, sql.ErrNoRows) {
+	}, query, args...)
+	if zitadel_errors.IsNotFound(err) {
 		return nil, nil
 	}
 	return remaining, err
-}
-
-func prepareQuotaUsageQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (uint64, error)) {
-	return sq.
-			Select(QuotaPeriodColumnUsage.identifier()).
-			From(quotaPeriodsTable.identifier() + db.Timetravel(call.Took(ctx))).
-			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (usage uint64, err error) {
-			return usage, row.Scan(&usage)
-		}
 }
 
 func prepareRemainingQuotaUsageQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*uint64, error)) {
@@ -107,7 +72,15 @@ func prepareRemainingQuotaUsageQuery(ctx context.Context, db prepareDatabase) (s
 			).
 			From(quotaPeriodsTable.identifier()).
 			Join(join(QuotaColumnUnit, QuotaPeriodColumnUnit) + db.Timetravel(call.Took(ctx))).
-			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (usage *uint64, err error) {
-			return usage, row.Scan(&usage)
+			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*uint64, error) {
+			usage := new(uint64)
+			err := row.Scan(usage)
+			if err != nil {
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zitadel_errors.ThrowNotFound(err, "QUERY-quiowi2", "Errors.Internal")
+				}
+				return nil, zitadel_errors.ThrowInternal(err, "QUERY-81j1jn2", "Errors.Internal")
+			}
+			return usage, nil
 		}
 }
