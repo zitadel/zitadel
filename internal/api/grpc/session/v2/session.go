@@ -45,7 +45,10 @@ func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRe
 	if err != nil {
 		return nil, err
 	}
-	challengeResponse, cmds := s.challengesToCommand(req.GetChallenges(), checks)
+	challengeResponse, cmds, err := s.challengesToCommand(req.GetChallenges(), checks)
+	if err != nil {
+		return nil, err
+	}
 
 	set, err := s.command.CreateSession(ctx, cmds, metadata)
 	if err != nil {
@@ -64,7 +67,10 @@ func (s *Server) SetSession(ctx context.Context, req *session.SetSessionRequest)
 	if err != nil {
 		return nil, err
 	}
-	challengeResponse, cmds := s.challengesToCommand(req.GetChallenges(), checks)
+	challengeResponse, cmds, err := s.challengesToCommand(req.GetChallenges(), checks)
+	if err != nil {
+		return nil, err
+	}
 
 	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), req.GetSessionToken(), cmds, req.GetMetadata())
 	if err != nil {
@@ -121,6 +127,8 @@ func factorsToPb(s *query.Session) *session.Factors {
 		WebAuthN: webAuthNFactorToPb(s.WebAuthNFactor),
 		Intent:   intentFactorToPb(s.IntentFactor),
 		Totp:     totpFactorToPb(s.TOTPFactor),
+		OtpSms:   otpFactorToPb(s.OTPSMSFactor),
+		OtpEmail: otpFactorToPb(s.OTPEmailFactor),
 	}
 }
 
@@ -158,6 +166,15 @@ func totpFactorToPb(factor query.SessionTOTPFactor) *session.TOTPFactor {
 	}
 	return &session.TOTPFactor{
 		VerifiedAt: timestamppb.New(factor.TOTPCheckedAt),
+	}
+}
+
+func otpFactorToPb(factor query.SessionOTPFactor) *session.OTPFactor {
+	if factor.OTPCheckedAt.IsZero() {
+		return nil
+	}
+	return &session.OTPFactor{
+		VerifiedAt: timestamppb.New(factor.OTPCheckedAt),
 	}
 }
 
@@ -240,7 +257,7 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	if err != nil {
 		return nil, err
 	}
-	sessionChecks := make([]command.SessionCommand, 0, 3)
+	sessionChecks := make([]command.SessionCommand, 0, 7)
 	if checkUser != nil {
 		user, err := checkUser.search(ctx, s.query)
 		if err != nil {
@@ -251,21 +268,27 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	if password := checks.GetPassword(); password != nil {
 		sessionChecks = append(sessionChecks, command.CheckPassword(password.GetPassword()))
 	}
-	if intent := checks.GetIntent(); intent != nil {
-		sessionChecks = append(sessionChecks, command.CheckIntent(intent.GetIntentId(), intent.GetToken()))
+	if intent := checks.GetIdpIntent(); intent != nil {
+		sessionChecks = append(sessionChecks, command.CheckIntent(intent.GetIdpIntentId(), intent.GetIdpIntentToken()))
 	}
 	if passkey := checks.GetWebAuthN(); passkey != nil {
 		sessionChecks = append(sessionChecks, s.command.CheckWebAuthN(passkey.GetCredentialAssertionData()))
 	}
 	if totp := checks.GetTotp(); totp != nil {
-		sessionChecks = append(sessionChecks, command.CheckTOTP(totp.GetTotp()))
+		sessionChecks = append(sessionChecks, command.CheckTOTP(totp.GetCode()))
+	}
+	if otp := checks.GetOtpSms(); otp != nil {
+		sessionChecks = append(sessionChecks, command.CheckOTPSMS(otp.GetCode()))
+	}
+	if otp := checks.GetOtpEmail(); otp != nil {
+		sessionChecks = append(sessionChecks, command.CheckOTPEmail(otp.GetCode()))
 	}
 	return sessionChecks, nil
 }
 
-func (s *Server) challengesToCommand(challenges *session.RequestChallenges, cmds []command.SessionCommand) (*session.Challenges, []command.SessionCommand) {
+func (s *Server) challengesToCommand(challenges *session.RequestChallenges, cmds []command.SessionCommand) (*session.Challenges, []command.SessionCommand, error) {
 	if challenges == nil {
-		return nil, cmds
+		return nil, cmds, nil
 	}
 	resp := new(session.Challenges)
 	if req := challenges.GetWebAuthN(); req != nil {
@@ -273,7 +296,20 @@ func (s *Server) challengesToCommand(challenges *session.RequestChallenges, cmds
 		resp.WebAuthN = challenge
 		cmds = append(cmds, cmd)
 	}
-	return resp, cmds
+	if req := challenges.GetOtpSms(); req != nil {
+		challenge, cmd := s.createOTPSMSChallengeCommand(req)
+		resp.OtpSms = challenge
+		cmds = append(cmds, cmd)
+	}
+	if req := challenges.GetOtpEmail(); req != nil {
+		challenge, cmd, err := s.createOTPEmailChallengeCommand(req)
+		if err != nil {
+			return nil, nil, err
+		}
+		resp.OtpEmail = challenge
+		cmds = append(cmds, cmd)
+	}
+	return resp, cmds, nil
 }
 
 func (s *Server) createWebAuthNChallengeCommand(req *session.RequestChallenges_WebAuthN) (*session.Challenges_WebAuthN, command.SessionCommand) {
@@ -296,6 +332,34 @@ func userVerificationRequirementToDomain(req session.UserVerificationRequirement
 		return domain.UserVerificationRequirementDiscouraged
 	default:
 		return domain.UserVerificationRequirementUnspecified
+	}
+}
+
+func (s *Server) createOTPSMSChallengeCommand(req *session.RequestChallenges_OTPSMS) (*string, command.SessionCommand) {
+	if req.GetReturnCode() {
+		challenge := new(string)
+		return challenge, s.command.CreateOTPSMSChallengeReturnCode(challenge)
+	}
+
+	return nil, s.command.CreateOTPSMSChallenge()
+
+}
+
+func (s *Server) createOTPEmailChallengeCommand(req *session.RequestChallenges_OTPEmail) (*string, command.SessionCommand, error) {
+	switch t := req.GetDeliveryType().(type) {
+	case *session.RequestChallenges_OTPEmail_SendCode_:
+		cmd, err := s.command.CreateOTPEmailChallengeURLTemplate(t.SendCode.GetUrlTemplate())
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, cmd, nil
+	case *session.RequestChallenges_OTPEmail_ReturnCode_:
+		challenge := new(string)
+		return challenge, s.command.CreateOTPEmailChallengeReturnCode(challenge), nil
+	case nil:
+		return nil, s.command.CreateOTPEmailChallenge(), nil
+	default:
+		return nil, nil, caos_errs.ThrowUnimplementedf(nil, "SESSION-k3ng0", "delivery_type oneOf %T in OTPEmailChallenge not implemented", t)
 	}
 }
 

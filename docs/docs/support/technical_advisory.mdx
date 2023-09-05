@@ -2,12 +2,11 @@
 title: Technical Advisory
 ---
 
-Technical advisories are notices that report major issues with ZITADEL Self-Hosted or the ZITADEL Cloud platform that could potentially impact security or stability in production environments. 
+Technical advisories are notices that report major issues with ZITADEL Self-Hosted or the ZITADEL Cloud platform that could potentially impact security or stability in production environments.
 These advisories may include details about the nature of the issue, its potential impact, and recommended mitigation actions.
 
-Users are strongly encouraged to evaluate these advisories and consider the recommended mitigation actions independently from their version upgrade schedule. 
+Users are strongly encouraged to evaluate these advisories and consider the recommended mitigation actions independently from their version upgrade schedule.
 We understand that these advisories may include breaking changes, and we aim to provide clear guidance on how to address these changes.
-
 
 <table>
   <tr>
@@ -19,12 +18,54 @@ We understand that these advisories may include breaking changes, and we aim to 
     <th>Date</th>
   </tr>
   <tr>
-    <td><a href="./advisory/a10000">A-10000</a></td>
+    <td>
+      <a href="./advisory/a10000">A-10000</a>
+    </td>
     <td>Reusing user session</td>
     <td>Breaking Behaviour Change</td>
-    <td>The default behavior for users logging in is to be directed to the Select Account Page on the Login. With the upcoming changes, users will be automatically authenticated when logging into a second application, as long as they only have one active session. No action is required on your part if this is the intended behavior.</td>
+    <td>
+      The default behavior for users logging in is to be directed to the Select
+      Account Page on the Login. With the upcoming changes, users will be
+      automatically authenticated when logging into a second application, as
+      long as they only have one active session. No action is required on your
+      part if this is the intended behavior.
+    </td>
     <td>2.32.0</td>
     <td>Calendar week 32</td>
+  </tr>
+  <tr>
+    <td>
+      <a href="./advisory/a10001">A-10001</a>
+    </td>
+    <td>Login Policy - Allow Register</td>
+    <td>Breaking Behaviour Change</td>
+    <td>
+      When disabling the option, users are currently not able to register
+      locally and also not through an external IDP. With the upcoming change,
+      the setting will only prevent local registration. Restriction to Identity
+      Providers can be managed through the corresponding IDP Template. No action
+      is required on your side if this is the intended behaviour or if you
+      already disabled registration on your IDP.
+    </td>
+    <td>TBD</td>
+    <td>Calendar week 34/35</td>
+  </tr>
+  <tr>
+    <td>
+      <a href="./advisory/a10002">A-10002</a>
+    </td>
+    <td>Console - Branding</td>
+    <td>Breaking Design Change</td>
+    <td>
+      Since Angular Material v15 many of the UI components have been refactored
+      to be based on the official Material Design Components for Web (MDC).
+      These refactored components do not support dynamic styling, so in order to
+      keep the library up-to-date, the console UI will loose its dynamic theming
+      capability. If you need users to have your branding settings (background-,
+      button-, link and text coloring) you should implemement your own user
+      facing UI yourself and not use ZITADELs console UI.
+    </td>
+    <td>TBD</td>
   </tr>
 </table>
 
@@ -43,4 +84,3 @@ A breaking behavior change refers to a modification or update that changes the b
 This change does not necessarily affect the APIs or any functions you are calling, so it may not require an update to your code.
 However, if you rely on specific results or behaviors, they may no longer be guaranteed after the change is implemented.
 Therefore, it is important to be aware of breaking behavior changes and their potential impact on your use of ZITADEL, and to take appropriate action if needed to ensure continued functionality.
-

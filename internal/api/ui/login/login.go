@@ -47,6 +47,9 @@ type Config struct {
 	CSRFCookieName     string
 	Cache              middleware.CacheConfig
 	AssetCache         middleware.CacheConfig
+
+	// LoginV2
+	DefaultOTPEmailURLV2 string
 }
 
 const (
@@ -114,6 +117,12 @@ func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecu
 	return func(handler http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if strings.HasPrefix(r.URL.Path, EndpointResources) {
+				handler.ServeHTTP(w, r)
+				return
+			}
+			// ignore form post callback
+			// it will redirect to the "normal" callback, where the cookie is set again
+			if r.URL.Path == EndpointExternalLoginCallbackFormPost && r.Method == http.MethodPost {
 				handler.ServeHTTP(w, r)
 				return
 			}
