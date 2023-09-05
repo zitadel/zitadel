@@ -1,6 +1,6 @@
 import { Component, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator';
+import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
