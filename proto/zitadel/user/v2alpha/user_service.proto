@@ -490,7 +490,7 @@ service UserService {
   // Start an IDP authentication (for external login, registration or linking)
   rpc StartIdentityProviderIntent (StartIdentityProviderIntentRequest) returns (StartIdentityProviderIntentResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/idp_intents/start"
+      post: "/v2alpha/idp_intents"
       body: "*"
     };
 

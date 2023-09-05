@@ -95,6 +95,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 								true,
 								"from@domain.ch",
 								"name",
+								"",
 								"host:587",
 								"user",
 								&crypto.CryptoValue{},
@@ -106,9 +107,10 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				smtp: &smtp.Config{
-					Tls:      true,
-					From:     "from@domain.ch",
-					FromName: "name",
+					Tls:            true,
+					From:           "from@domain.ch",
+					FromName:       "name",
+					ReplyToAddress: "",
 					SMTP: smtp.SMTP{
 						Host:     "host:587",
 						User:     "user",
@@ -150,6 +152,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 									true,
 									"from@domain.ch",
 									"name",
+									"",
 									"host:587",
 									"user",
 									&crypto.CryptoValue{
@@ -171,6 +174,72 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					Tls:      true,
 					From:     "from@domain.ch",
 					FromName: "name",
+					SMTP: smtp.SMTP{
+						Host:     "host:587",
+						User:     "user",
+						Password: "password",
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "add smtp config with reply to address, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"domain.ch",
+								false,
+							),
+						),
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true, true, false,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewSMTPConfigAddedEvent(
+									context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									true,
+									"from@domain.ch",
+									"name",
+									"replyto@domain.ch",
+									"host:587",
+									"user",
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("password"),
+									},
+								),
+							),
+						},
+					),
+				),
+				alg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				smtp: &smtp.Config{
+					Tls:            true,
+					From:           "from@domain.ch",
+					FromName:       "name",
+					ReplyToAddress: "replyto@domain.ch",
 					SMTP: smtp.SMTP{
 						Host:     "host:587",
 						User:     "user",
@@ -258,6 +327,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 									true,
 									"from@domain.ch",
 									"name",
+									"",
 									"[2001:db8::1]:2525",
 									"user",
 									&crypto.CryptoValue{
@@ -396,6 +466,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								true,
 								"from@domain.ch",
 								"name",
+								"",
 								"host:587",
 								"user",
 								&crypto.CryptoValue{},
@@ -446,6 +517,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								true,
 								"from@domain.ch",
 								"name",
+								"",
 								"host:587",
 								"user",
 								&crypto.CryptoValue{},
@@ -496,6 +568,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								true,
 								"from@domain.ch",
 								"name",
+								"",
 								"host:587",
 								"user",
 								&crypto.CryptoValue{},
@@ -511,6 +584,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 									false,
 									"from2@domain.ch",
 									"name2",
+									"replyto@domain.ch",
 									"host2:587",
 									"user2",
 								),
@@ -522,9 +596,10 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				smtp: &smtp.Config{
-					Tls:      false,
-					From:     "from2@domain.ch",
-					FromName: "name2",
+					Tls:            false,
+					From:           "from2@domain.ch",
+					FromName:       "name2",
+					ReplyToAddress: "replyto@domain.ch",
 					SMTP: smtp.SMTP{
 						Host: "host2:587",
 						User: "user2",
@@ -607,6 +682,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								true,
 								"from@domain.ch",
 								"name",
+								"",
 								"host:587",
 								"user",
 								&crypto.CryptoValue{},
@@ -622,6 +698,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 									false,
 									"from2@domain.ch",
 									"name2",
+									"replyto@domain.ch",
 									"[2001:db8::1]:2525",
 									"user2",
 								),
@@ -633,9 +710,10 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				smtp: &smtp.Config{
-					Tls:      false,
-					From:     "from2@domain.ch",
-					FromName: "name2",
+					Tls:            false,
+					From:           "from2@domain.ch",
+					FromName:       "name2",
+					ReplyToAddress: "replyto@domain.ch",
 					SMTP: smtp.SMTP{
 						Host: "[2001:db8::1]:2525",
 						User: "user2",
@@ -716,6 +794,7 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 								true,
 								"from",
 								"name",
+								"",
 								"host:587",
 								"user",
 								&crypto.CryptoValue{},
@@ -819,6 +898,7 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 								true,
 								"from",
 								"name",
+								"",
 								"host:587",
 								"user",
 								&crypto.CryptoValue{},
@@ -868,11 +948,12 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 	}
 }
 
-func newSMTPConfigChangedEvent(ctx context.Context, tls bool, fromAddress, fromName, host, user string) *instance.SMTPConfigChangedEvent {
+func newSMTPConfigChangedEvent(ctx context.Context, tls bool, fromAddress, fromName, replyTo, host, user string) *instance.SMTPConfigChangedEvent {
 	changes := []instance.SMTPConfigChanges{
 		instance.ChangeSMTPConfigTLS(tls),
 		instance.ChangeSMTPConfigFromAddress(fromAddress),
 		instance.ChangeSMTPConfigFromName(fromName),
+		instance.ChangeSMTPConfigReplyToAddress(replyTo),
 		instance.ChangeSMTPConfigSMTPHost(host),
 		instance.ChangeSMTPConfigSMTPUser(user),
 	}
