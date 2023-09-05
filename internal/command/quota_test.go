@@ -204,6 +204,62 @@ func TestQuota_AddQuota(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "create quota with notifications, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								quota.NewAddedEvent(context.Background(),
+									&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+									QuotaRequestsAllAuthenticated.Enum(),
+									time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
+									30*24*time.Hour,
+									1000,
+									true,
+									[]*quota.AddedEventNotification{
+										{
+											ID:      "notification1",
+											Percent: 20,
+											Repeat:  false,
+											CallURL: "https://url.com",
+										},
+									},
+								),
+							),
+						},
+						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", quota.NewAddQuotaUnitUniqueConstraint(quota.RequestsAllAuthenticated)),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "quota1", "notification1"),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				addQuota: &AddQuota{
+					Unit:          QuotaRequestsAllAuthenticated,
+					From:          time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
+					ResetInterval: 30 * 24 * time.Hour,
+					Amount:        1000,
+					Limit:         true,
+					Notifications: QuotaNotifications{
+						{
+							Percent: 20,
+							Repeat:  false,
+							CallURL: "https://url.com",
+						},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
