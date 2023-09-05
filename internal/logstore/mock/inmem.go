@@ -15,7 +15,6 @@ import (
 var _ logstore.UsageStorer[*Record] = (*InmemLogStorage)(nil)
 var _ logstore.LogCleanupper[*Record] = (*InmemLogStorage)(nil)
 var _ logstore.Queries = (*InmemLogStorage)(nil)
-var _ logstore.Commands = (*InmemLogStorage)(nil)
 
 type InmemLogStorage struct {
 	mux     sync.Mutex
@@ -44,9 +43,7 @@ func (l *InmemLogStorage) Emit(_ context.Context, bulk []*Record) error {
 	}
 	l.mux.Lock()
 	defer l.mux.Unlock()
-	for idx := range bulk {
-		l.emitted = append(l.emitted, bulk[idx])
-	}
+	l.emitted = append(l.emitted, bulk...)
 	l.bulks = append(l.bulks, len(bulk))
 	return nil
 }

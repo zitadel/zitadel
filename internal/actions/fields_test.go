@@ -11,7 +11,7 @@ import (
 )
 
 func TestSetFields(t *testing.T) {
-	SetLogstoreService(logstore.New[*record.ExecutionLog](nil, nil, nil))
+	SetLogstoreService(logstore.New[*record.ExecutionLog](nil, nil))
 	primitveFn := func(a string) { fmt.Println(a) }
 	complexFn := func(*FieldConfig) interface{} {
 		return primitveFn

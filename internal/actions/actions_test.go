@@ -6,15 +6,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/logstore/record"
-
 	"github.com/dop251/goja"
 
 	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/logstore/record"
 )
 
 func TestRun(t *testing.T) {
-	SetLogstoreService(logstore.New[*record.ExecutionLog](nil, nil, nil))
+	SetLogstoreService(logstore.New[*record.ExecutionLog](nil, nil))
 	type args struct {
 		timeout time.Duration
 		api     apiFields

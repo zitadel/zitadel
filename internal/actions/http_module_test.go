@@ -17,7 +17,7 @@ import (
 )
 
 func Test_isHostBlocked(t *testing.T) {
-	SetLogstoreService(logstore.New[*record.ExecutionLog](nil, nil, nil))
+	SetLogstoreService(logstore.New[*record.ExecutionLog](nil, nil))
 	var denyList = []AddressChecker{
 		mustNewIPChecker(t, "192.168.5.0/24"),
 		mustNewIPChecker(t, "127.0.0.1"),

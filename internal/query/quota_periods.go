@@ -6,12 +6,10 @@ import (
 	"errors"
 	"time"
 
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
-
-	"github.com/zitadel/zitadel/internal/api/call"
-
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/internal/api/call"
+	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"

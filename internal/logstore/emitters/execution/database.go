@@ -5,18 +5,18 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/logstore/record"
-	"github.com/zitadel/zitadel/internal/query"
 	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/database"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/logstore/record"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
@@ -56,7 +56,7 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []*record.ExecutionL
 	storeErr := l.store(ctx, bulk)
 	joinedErr := errors.Join(incrementErr, storeErr)
 	if joinedErr != nil {
-		joinedErr = fmt.Errorf("storing exection logs and/or incrementing quota usage failed: %w", joinedErr)
+		joinedErr = fmt.Errorf("storing execution logs and/or incrementing quota usage failed: %w", joinedErr)
 	}
 	return joinedErr
 }
@@ -71,7 +71,6 @@ func (l *databaseLogStorage) incrementUsage(ctx context.Context, bulk []*record.
 	for instanceID, instanceBulk := range byInstance {
 		q, getQuotaErr := l.queries.GetQuota(ctx, instanceID, quota.ActionsAllRunsSeconds)
 		if errors.Is(getQuotaErr, sql.ErrNoRows) {
-			getQuotaErr = nil
 			continue
 		}
 		err = errors.Join(err, getQuotaErr)

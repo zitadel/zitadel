@@ -10,12 +10,12 @@ import (
 )
 
 type bulkSink[T LogRecord[T]] interface {
-	sendBulk(ctx context.Context, bulk []T) error
+	SendBulk(ctx context.Context, bulk []T) error
 }
 
 type bulkSinkFunc[T LogRecord[T]] func(ctx context.Context, bulk []T) error
 
-func (s bulkSinkFunc[T]) sendBulk(ctx context.Context, bulk []T) error {
+func (s bulkSinkFunc[T]) SendBulk(ctx context.Context, bulk []T) error {
 	return s(ctx, bulk)
 }
 
@@ -73,7 +73,7 @@ func (d *debouncer[T]) ship() {
 	}
 	d.mux.Lock()
 	defer d.mux.Unlock()
-	if err := d.storage.sendBulk(d.binarySignaledCtx, d.cache); err != nil {
+	if err := d.storage.SendBulk(d.binarySignaledCtx, d.cache); err != nil {
 		logging.WithError(err).WithField("size", len(d.cache)).Error("storing bulk failed")
 	}
 	d.cache = nil

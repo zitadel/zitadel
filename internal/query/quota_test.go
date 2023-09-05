@@ -37,9 +37,12 @@ func dayNow() time.Time {
 	return t
 }
 
-func interval(src time.Duration) pgtype.Interval {
+func interval(t *testing.T, src time.Duration) pgtype.Interval {
 	interval := pgtype.Interval{}
-	interval.Set(src)
+	err := interval.Set(src)
+	if err != nil {
+		t.Fatal(err)
+	}
 	return interval
 }
 
@@ -82,7 +85,7 @@ func Test_QuotaPrepare(t *testing.T) {
 					[]driver.Value{
 						"quota-id",
 						dayNow(),
-						interval(time.Hour * 24),
+						interval(t, time.Hour*24),
 						uint64(1000),
 						true,
 					},

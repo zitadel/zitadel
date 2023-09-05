@@ -6,8 +6,6 @@ import (
 	errs "errors"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/call"
@@ -15,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (

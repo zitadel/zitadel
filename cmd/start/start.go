@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	_ "embed"
 	"fmt"
-	"github.com/zitadel/zitadel/internal/api/ui"
 	"math"
 	"net/http"
 	"os"
@@ -48,6 +47,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/robots_txt"
 	"github.com/zitadel/zitadel/internal/api/saml"
+	"github.com/zitadel/zitadel/internal/api/ui"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
@@ -110,10 +110,10 @@ type Server struct {
 	AuthzRepo  authz_repo.Repository
 	Storage    static.Storage
 	Commands   *command.Commands
-	LogStore   *logstore.Service[*record.ExecutionLog]
-	Router     *mux.Router
-	TLSConfig  *tls.Config
-	Shutdown   chan<- os.Signal
+	//LogStore   *logstore.Service[*record.ExecutionLog]
+	Router    *mux.Router
+	TLSConfig *tls.Config
+	Shutdown  chan<- os.Signal
 }
 
 func startZitadel(config *Config, masterKey string, server chan<- *Server) error {
@@ -220,7 +220,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		return err
 	}
 
-	actionsLogstoreSvc := logstore.New(queries, commands, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
+	actionsLogstoreSvc := logstore.New(queries, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
 	notification.Start(
@@ -280,10 +280,10 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 			AuthzRepo:  authZRepo,
 			Storage:    storage,
 			Commands:   commands,
-			LogStore:   actionsLogstoreSvc,
-			Router:     router,
-			TLSConfig:  tlsConfig,
-			Shutdown:   shutdown,
+			//LogStore:   actionsLogstoreSvc,
+			Router:    router,
+			TLSConfig: tlsConfig,
+			Shutdown:  shutdown,
 		}
 		close(server)
 	}
@@ -327,7 +327,7 @@ func startAPIs(
 		return err
 	}
 
-	accessSvc := logstore.New[*record.AccessLog](queries, commands, accessDBEmitter, accessStdoutEmitter)
+	accessSvc := logstore.New[*record.AccessLog](queries, accessDBEmitter, accessStdoutEmitter)
 	exhaustedCookieHandler := http_util.NewCookieHandler(
 		http_util.WithUnsecure(),
 		http_util.WithNonHttpOnly(),

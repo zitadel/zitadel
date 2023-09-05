@@ -249,7 +249,6 @@ func given(t *testing.T, args args, want want) (context.Context, *clock.Mock, *e
 	}
 	svc := logstore.New[*emittermock.Record](
 		mainStorage,
-		mainStorage,
 		mainEmitter,
 		secondaryEmitter)
 
