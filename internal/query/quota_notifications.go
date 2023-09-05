@@ -12,7 +12,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/call"
 	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -170,9 +169,4 @@ func prepareQuotaNotificationsQuery(ctx context.Context, db prepareDatabase) (sq
 			}
 			return cfgs, nil
 		}
-}
-
-func (q *Queries) getQuotaNotificationsReadModel(ctx context.Context, aggregate eventstore.Aggregate, periodStart time.Time) (*quotaNotificationsReadModel, error) {
-	wm := newQuotaNotificationsReadModel(aggregate.ID, aggregate.InstanceID, aggregate.ResourceOwner, periodStart)
-	return wm, q.eventstore.FilterToQueryReducer(ctx, wm)
 }
