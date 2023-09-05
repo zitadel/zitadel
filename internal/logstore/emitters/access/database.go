@@ -80,12 +80,12 @@ func (l *databaseLogStorage) incrementUsage(ctx context.Context, bulk []*record.
 		if getQuotaErr != nil {
 			continue
 		}
-		count, incrementErr := l.commands.IncrementUsageFromAccessLogs(ctx, instanceID, q.CurrentPeriodStart, instanceBulk)
+		sum, incrementErr := l.commands.IncrementUsageFromAccessLogs(ctx, instanceID, q.CurrentPeriodStart, instanceBulk)
 		err = errors.Join(err, incrementErr)
 		if incrementErr != nil {
 			continue
 		}
-		notifications, getNotificationErr := l.queries.GetDueQuotaNotifications(ctx, instanceID, quota.RequestsAllAuthenticated, q, q.CurrentPeriodStart, count)
+		notifications, getNotificationErr := l.queries.GetDueQuotaNotifications(ctx, instanceID, quota.RequestsAllAuthenticated, q, q.CurrentPeriodStart, sum)
 		err = errors.Join(err, getNotificationErr)
 		if getNotificationErr != nil || len(notifications) == 0 {
 			continue

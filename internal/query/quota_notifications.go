@@ -74,7 +74,10 @@ func (q *Queries) GetDueQuotaNotifications(ctx context.Context, instanceID strin
 					sq.LtOrEq{QuotaNotificationColumnNextDueThreshold.identifier(): usedRel},
 				},
 				// In case we haven't seen a due notification for this quota period, we compare against the configured percent
-				sq.LtOrEq{QuotaNotificationColumnPercent.identifier(): usedRel},
+				sq.And{
+					sq.NotEq{QuotaNotificationColumnLatestDuePeriodStart.identifier(): periodStart},
+					sq.LtOrEq{QuotaNotificationColumnPercent.identifier(): usedRel},
+				},
 			},
 		},
 	).ToSql()

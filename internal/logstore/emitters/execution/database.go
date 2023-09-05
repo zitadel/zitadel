@@ -10,6 +10,7 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/database"
@@ -77,9 +78,21 @@ func (l *databaseLogStorage) incrementUsage(ctx context.Context, bulk []*record.
 		if getQuotaErr != nil {
 			continue
 		}
-		incrementErr := l.commands.IncrementUsageFromExecutionLogs(ctx, instanceID, q.CurrentPeriodStart, instanceBulk)
+		sum, incrementErr := l.commands.IncrementUsageFromExecutionLogs(ctx, instanceID, q.CurrentPeriodStart, instanceBulk)
 		err = errors.Join(err, incrementErr)
 		if incrementErr != nil {
+			continue
+		}
+
+		notifications, getNotificationErr := l.queries.GetDueQuotaNotifications(ctx, instanceID, quota.ActionsAllRunsSeconds, q, q.CurrentPeriodStart, sum)
+		err = errors.Join(err, getNotificationErr)
+		if getNotificationErr != nil || len(notifications) == 0 {
+			continue
+		}
+		ctx = authz.WithInstanceID(ctx, instanceID)
+		reportErr := l.commands.ReportQuotaUsage(ctx, notifications)
+		err = errors.Join(err, reportErr)
+		if reportErr != nil {
 			continue
 		}
 	}
