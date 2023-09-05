@@ -105,7 +105,7 @@ func prepareQuotaUsageQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 func prepareRemainingQuotaUsageQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*uint64, error)) {
 	return sq.
 			Select(
-				"greatest(0, (" + QuotaPeriodColumnUsage.identifier() + "-" + QuotaColumnAmount.identifier() + "))",
+				"greatest(0, " + QuotaColumnAmount.identifier() + "-" + QuotaPeriodColumnUsage.identifier() + ")",
 			).
 			From(quotaPeriodsTable.identifier()).
 			Join(join(QuotaColumnUnit, QuotaPeriodColumnUnit) + db.Timetravel(call.Took(ctx))).
