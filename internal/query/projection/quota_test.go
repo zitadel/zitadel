@@ -117,11 +117,11 @@ func TestQuotasProjection_reduces(t *testing.T) {
 				},
 			},
 		},
-		/*{
-			name: "reduceQuotaNotified",
+		{
+			name: "reduceQuotaNotificationDue",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(quota.NotifiedEventType),
+					repository.EventType(quota.NotificationDueEventType),
 					quota.AggregateType,
 					[]byte(`{
 							"id": "id",
@@ -129,21 +129,31 @@ func TestQuotasProjection_reduces(t *testing.T) {
 							"callURL": "url",
 							"periodStart": "2023-01-01T00:00:00Z",
 							"threshold": 200,
-							"usage": 100,
-							"dueEventID": "iddue"
+							"usage": 100
 					}`),
-				), quota.NotifiedEventMapper),
+				), quota.NotificationDueEventMapper),
 			},
-			reduce: (&quotaProjection{}).reduceQuotaNotified,
+			reduce: (&quotaProjection{}).reduceQuotaNotificationDue,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("quota"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
-					executions: []execution{},
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.quotas_notifications SET (latest_due_period_start, next_due_threshold) = ($1, $2) WHERE (instance_id = $3) AND (unit = $4) AND (id = $5)",
+							expectedArgs: []interface{}{
+								time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
+								uint16(300),
+								"instance-id",
+								quota.RequestsAllAuthenticated,
+								"id",
+							},
+						},
+					},
 				},
 			},
-		}, */
+		},
 		{
 			name: "reduceQuotaRemoved",
 			args: args{
