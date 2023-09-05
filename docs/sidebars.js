@@ -144,6 +144,13 @@ module.exports = {
           type: "category",
           label: "Authenticate users",
           collapsed: true,
+          link: {
+            type: "generated-index",
+            title: "Authenticate human users",
+            slug: "guides/integrate/human-users",
+            description:
+              "How to authenticate human users with OpenID Connect",
+          },
           items: [
             "guides/integrate/login-users",
             "guides/integrate/oauth-recommended-flows",
@@ -439,6 +446,13 @@ module.exports = {
       type: "category",
       label: "Core Resources",
       collapsed: false,
+      link: {
+        type: "generated-index",
+        title: "Core Resources",
+        slug: "/apis/resources/",
+        description:
+          "Resource based API definitions",
+      },
       items: [
         {
           type: "category",
