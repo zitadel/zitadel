@@ -538,8 +538,16 @@ $caos-light-theme-foreground: (
 //   background: $caos-light-theme-background,
 // );
 
-$custom-typography: mat.define-typography-config(
+$custom-level: mat.define-typography-level(
   $font-family: 'Lato',
+  $font-weight: 500,
+  $font-size: 1rem,
+  $line-height: 1,
+  $letter-spacing: normal,
+);
+
+$custom-typography: mat.define-typography-config(
+  $button: $custom-level,
 );
 
 $caos-light-app-theme: mat.define-light-theme(
@@ -549,9 +557,9 @@ $caos-light-app-theme: mat.define-light-theme(
       accent: mat-palette($caos-light-primary),
       warn: mat-palette($caos-light-warn),
       // foreground: $caos-light-theme-foreground,
-      // background: $caos-light-theme-background,,,,,,,,
+      // background: $caos-light-theme-background,,,,,,,,,,,,
     ),
-    typography: mat.define-typography-config(),
+    typography: $custom-typography,
     density: 0,
   )
 );
@@ -563,9 +571,9 @@ $caos-dark-app-theme: mat.define-dark-theme(
       accent: mat-palette($caos-dark-primary),
       warn: mat-palette($caos-dark-warn),
       // foreground: $caos-dark-theme-foreground,
-      // background: $caos-dark-theme-background,,,,,,,,
+      // background: $caos-dark-theme-background,,,,,,,,,,,,
     ),
-    typography: mat.define-typography-config(),
+    typography: $custom-typography,
     density: 0,
   )
 );
