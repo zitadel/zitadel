@@ -33,8 +33,7 @@ var (
 )
 
 func dayNow() time.Time {
-	t, _ := time.Parse("2006-01-02", time.Now().Format("2006-01-02"))
-	return t
+	return time.Now().Truncate(24 * time.Hour)
 }
 
 func interval(t *testing.T, src time.Duration) pgtype.Interval {
