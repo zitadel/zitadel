@@ -279,7 +279,7 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 			// This ensures that only instances with recent events on the handler are projected
 			query = query.CreationDateAfter(h.nowFunc().Add(-1 * h.handleActiveInstances))
 		}
-		ids, err := h.Eventstore.InstanceIDs(ctx, query.Builder())
+		ids, err := h.Eventstore.InstanceIDs(ctx, h.requeueAfter, query.Builder())
 		if err != nil {
 			logging.WithFields("projection", h.ProjectionName).WithError(err).Error("instance ids")
 			h.triggerProjection.Reset(h.requeueAfter)
