@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
@@ -80,7 +81,7 @@ func (l *databaseLogStorage) incrementUsage(ctx context.Context, bulk []*record.
 		if getQuotaErr != nil {
 			continue
 		}
-		sum, incrementErr := l.commands.IncrementUsageFromAccessLogs(ctx, instanceID, q.CurrentPeriodStart, instanceBulk)
+		sum, incrementErr := l.incrementUsageFromAccessLogs(ctx, instanceID, q.CurrentPeriodStart, instanceBulk)
 		err = errors.Join(err, incrementErr)
 		if incrementErr != nil {
 			continue
@@ -154,6 +155,21 @@ func (l *databaseLogStorage) store(ctx context.Context, bulk []*record.AccessLog
 
 	logging.WithFields("rows", rows).Debug("successfully stored access logs")
 	return nil
+}
+
+func (l *databaseLogStorage) incrementUsageFromAccessLogs(ctx context.Context, instanceID string, periodStart time.Time, records []*record.AccessLog) (sum uint64, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("incrementing access relevant usage failed for at least one quota period: %w", err)
+		}
+	}()
+	var count uint64
+	for _, r := range records {
+		if r.IsAuthenticated() {
+			count++
+		}
+	}
+	return projection.QuotaProjection.IncrementUsage(ctx, quota.RequestsAllAuthenticated, instanceID, periodStart, count)
 }
 
 func (l *databaseLogStorage) Cleanup(ctx context.Context, keep time.Duration) error {

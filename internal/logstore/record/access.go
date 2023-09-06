@@ -35,26 +35,54 @@ const (
 	redacted = "[REDACTED]"
 )
 
+var (
+	unaccountableHTTPEndpoints = []string{
+		"/system/v1/",
+		"/admin/v1/healthz",
+		"/management/v1/healthz",
+		"/management/v1/zitadel/docs",
+		"/auth/v1/healthz",
+		"./well-known/openid-configuration",
+		"/oauth/v2/authorize",
+		"/oauth/v2/keys",
+		"/saml/v2/metadata",
+		"/saml/v2/certificate",
+		"/saml/v2/SSO",
+	}
+	unaccountableGRPCEndpoints = []string{
+		"/zitadel.system.v1.SystemService/",
+		"/zitadel.admin.v1.AdminService/Healthz",
+		"/zitadel.management.v1.ManagementService/Healthz",
+		"/zitadel.management.v1.ManagementService/GetOIDCInformation",
+		"/zitadel.auth.v1.AuthService/Healthz",
+	}
+)
+
 func (a AccessLog) IsAuthenticated() bool {
 	if !a.normalized {
 		panic("access log not normalized, Normalize() must be called before IsAuthenticated()")
 	}
 	_, hasHTTPAuthHeader := a.RequestHeaders[strings.ToLower(zitadel_http.Authorization)]
 	return hasHTTPAuthHeader &&
-		!strings.HasPrefix(a.RequestURL, "/zitadel.system.v1.SystemService/") &&
-		!strings.HasPrefix(a.RequestURL, "/system/v1/") &&
 		(a.Protocol == HTTP &&
-			a.ResponseStatus != http.StatusForbidden &&
 			a.ResponseStatus != http.StatusInternalServerError &&
 			a.ResponseStatus != http.StatusTooManyRequests &&
-			a.ResponseStatus != http.StatusUnauthorized) ||
+			a.ResponseStatus != http.StatusUnauthorized &&
+			!a.isUnaccountableEndpoint(unaccountableHTTPEndpoints)) ||
 		(a.Protocol == GRPC &&
-			a.ResponseStatus != uint32(codes.PermissionDenied) &&
 			a.ResponseStatus != uint32(codes.Internal) &&
 			a.ResponseStatus != uint32(codes.ResourceExhausted) &&
-			// TODO: Ok to filter these out? Else, it would be possible to maliciously produce usage just by adding an auth header, right?
-			// Same for http.StatusUnauthorized?
-			a.ResponseStatus != uint32(codes.Unauthenticated))
+			a.ResponseStatus != uint32(codes.Unauthenticated) &&
+			!a.isUnaccountableEndpoint(unaccountableGRPCEndpoints))
+}
+
+func (a AccessLog) isUnaccountableEndpoint(endpoints []string) bool {
+	for _, endpoint := range endpoints {
+		if strings.HasPrefix(a.RequestURL, endpoint) {
+			return false
+		}
+	}
+	return true
 }
 
 func (a AccessLog) Normalize() *AccessLog {

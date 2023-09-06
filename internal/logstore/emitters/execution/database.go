@@ -5,19 +5,20 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/database"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
@@ -78,7 +79,7 @@ func (l *databaseLogStorage) incrementUsage(ctx context.Context, bulk []*record.
 		if getQuotaErr != nil {
 			continue
 		}
-		sum, incrementErr := l.commands.IncrementUsageFromExecutionLogs(ctx, instanceID, q.CurrentPeriodStart, instanceBulk)
+		sum, incrementErr := l.incrementUsageFromExecutionLogs(ctx, instanceID, q.CurrentPeriodStart, instanceBulk)
 		err = errors.Join(err, incrementErr)
 		if incrementErr != nil {
 			continue
@@ -155,35 +156,17 @@ func (l *databaseLogStorage) store(ctx context.Context, bulk []*record.Execution
 	return nil
 }
 
-func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, start time.Time) (uint64, error) {
-	stmt, args, err := squirrel.Select(
-		fmt.Sprintf("COALESCE(SUM(%s)::INT,0)", executionTookCol),
-	).
-		From(executionLogsTable + l.dbClient.Timetravel(call.Took(ctx))).
-		Where(squirrel.And{
-			squirrel.Eq{executionInstanceIdCol: instanceId},
-			squirrel.GtOrEq{executionTimestampCol: start},
-			squirrel.NotEq{executionTookCol: nil},
-		}).
-		PlaceholderFormat(squirrel.Dollar).
-		ToSql()
-
-	if err != nil {
-		return 0, caos_errors.ThrowInternal(err, "EXEC-DXtzg", "Errors.Internal")
+func (l *databaseLogStorage) incrementUsageFromExecutionLogs(ctx context.Context, instanceID string, periodStart time.Time, records []*record.ExecutionLog) (sum uint64, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("incrementing access relevant usage failed for at least one quota period: %w", err)
+		}
+	}()
+	var total time.Duration
+	for _, r := range records {
+		total += r.Took
 	}
-
-	var durationSeconds uint64
-	err = l.dbClient.
-		QueryRowContext(ctx,
-			func(row *sql.Row) error {
-				return row.Scan(&durationSeconds)
-			},
-			stmt, args...,
-		)
-	if err != nil {
-		return 0, caos_errors.ThrowInternal(err, "EXEC-Ad8nP", "Errors.Logstore.Execution.ScanFailed")
-	}
-	return durationSeconds, nil
+	return projection.QuotaProjection.IncrementUsage(ctx, quota.ActionsAllRunsSeconds, instanceID, periodStart, uint64(math.Floor(total.Seconds())))
 }
 
 func (l *databaseLogStorage) Cleanup(ctx context.Context, keep time.Duration) error {
