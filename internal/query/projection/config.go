@@ -12,6 +12,7 @@ type Config struct {
 	BulkLimit             uint64
 	Customizations        map[string]CustomConfig
 	HandleActiveInstances time.Duration
+	TransactionDuration   time.Duration
 }
 
 type CustomConfig struct {
@@ -21,4 +22,5 @@ type CustomConfig struct {
 	ConcurrentInstances   *uint
 	BulkLimit             *uint16
 	HandleActiveInstances *time.Duration
+	TransactionDuration   *time.Duration
 }

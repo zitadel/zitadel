@@ -11,7 +11,7 @@ import (
 
 type SearchResponse struct {
 	Count uint64
-	*LatestState
+	*State
 }
 
 type SearchRequest struct {

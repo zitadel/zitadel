@@ -88,6 +88,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 		HandleActiveInstances: config.HandleActiveInstances,
 		MaxFailureCount:       config.MaxFailureCount,
 		RetryFailedAfter:      config.RetryFailedAfter,
+		TransactionDuration:   config.TransactionDuration,
 	}
 
 	OrgProjection = newOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
@@ -176,6 +177,9 @@ func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler
 	}
 	if customConfig.HandleActiveInstances != nil {
 		config.HandleActiveInstances = *customConfig.HandleActiveInstances
+	}
+	if customConfig.TransactionDuration != nil {
+		config.TransactionDuration = *customConfig.TransactionDuration
 	}
 
 	return config

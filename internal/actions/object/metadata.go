@@ -15,8 +15,8 @@ import (
 func UserMetadataListFromQuery(c *actions.FieldConfig, metadata *query.UserMetadataList) goja.Value {
 	result := &userMetadataList{
 		Count:      metadata.Count,
-		ChangeDate: metadata.EventTimestamp,
-		Timestamp:  metadata.LastUpdated,
+		ChangeDate: metadata.EventCreatedAt,
+		Timestamp:  metadata.LastRun,
 		Metadata:   make([]*userMetadata, len(metadata.Metadata)),
 	}
 

@@ -295,7 +295,7 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, sh
 		return nil, err
 	}
 
-	grants.LatestState = latestSequence
+	grants.State = latestSequence
 	return grants, nil
 }
 

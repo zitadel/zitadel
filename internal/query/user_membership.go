@@ -128,7 +128,7 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	if err != nil {
 		return nil, err
 	}
-	memberships.LatestState = latestSequence
+	memberships.State = latestSequence
 	return memberships, nil
 }
 

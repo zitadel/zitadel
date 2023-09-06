@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"testing"
-	"time"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -194,7 +193,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 		existingEvents []eventstore.Command
 	}
 	type res struct {
-		sequence time.Time
+		sequence float64
 	}
 	tests := []struct {
 		name    string
@@ -218,9 +217,6 @@ func TestCRDB_LatestSequence(t *testing.T) {
 					generateCommand(eventstore.AggregateType(t.Name()), "400"),
 				},
 			},
-			res: res{
-				sequence: time.Time{},
-			},
 			wantErr: false,
 		},
 		{
@@ -237,9 +233,6 @@ func TestCRDB_LatestSequence(t *testing.T) {
 					generateCommand(eventstore.AggregateType(t.Name()), "401"),
 					generateCommand(eventstore.AggregateType(t.Name()), "401"),
 				},
-			},
-			res: res{
-				sequence: time.Time{},
 			},
 			wantErr: false,
 		},
@@ -267,7 +260,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 				if (err != nil) != tt.wantErr {
 					t.Errorf("CRDB.query() error = %v, wantErr %v", err, tt.wantErr)
 				}
-				if tt.res.sequence.After(sequence) {
+				if tt.res.sequence > sequence {
 					t.Errorf("CRDB.query() expected sequence: %v got %v", tt.res.sequence, sequence)
 				}
 			})

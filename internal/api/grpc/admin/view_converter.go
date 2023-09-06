@@ -17,10 +17,10 @@ func CurrentSequencesToPb(database string, currentSequences *query.CurrentStates
 
 func CurrentSequenceToPb(database string, currentSequence *query.CurrentState) *admin_pb.View {
 	return &admin_pb.View{
-		Database:                 database,
-		ViewName:                 currentSequence.ProjectionName,
-		ProcessedSequence:        currentSequence.EventSequence,
+		Database: database,
+		ViewName: currentSequence.ProjectionName,
+		// ProcessedSequence:        currentSequence.CurrentPosition,
 		LastSuccessfulSpoolerRun: timestamppb.New(currentSequence.LastRun),
-		EventTimestamp:           timestamppb.New(currentSequence.EventCreationDate),
+		EventTimestamp:           timestamppb.New(currentSequence.EventCreatedAt),
 	}
 }

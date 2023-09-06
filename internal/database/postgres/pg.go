@@ -71,7 +71,6 @@ func (c *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 }
 
 func (c *Config) Connect(useAdmin bool) (*sql.DB, error) {
-	logging.Warn("postgres is currently in beta")
 	db, err := sql.Open("pgx", c.String(useAdmin))
 	if err != nil {
 		return nil, err
@@ -125,6 +124,7 @@ type SSL struct {
 func (s *Config) checkSSL(user User) {
 	if user.SSL.Mode == sslDisabledMode || user.SSL.Mode == "" {
 		user.SSL = SSL{Mode: sslDisabledMode}
+		return
 	}
 
 	if user.SSL.Mode == sslRequireMode || user.SSL.Mode == sslAllowMode || user.SSL.Mode == sslPreferMode {

@@ -7,7 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/jackc/pgconn"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -19,7 +18,7 @@ import (
 )
 
 type EventStore interface {
-	InstanceIDs(ctx context.Context, query *eventstore.SearchQueryBuilder) ([]string, error)
+	InstanceIDs(ctx context.Context, maxAge time.Duration, query *eventstore.SearchQueryBuilder) ([]string, error)
 	Filter(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error)
 	Push(ctx context.Context, cmds ...eventstore.Command) ([]eventstore.Event, error)
 }
@@ -32,6 +31,7 @@ type Config struct {
 	RequeueEvery          time.Duration
 	RetryFailedAfter      time.Duration
 	HandleActiveInstances time.Duration
+	TransactionDuration   time.Duration
 	MaxFailureCount       uint8
 
 	TriggerWithoutEvents Reduce
@@ -49,6 +49,7 @@ type Handler struct {
 	retryFailedAfter      time.Duration
 	requeueEvery          time.Duration
 	handleActiveInstances time.Duration
+	txDuration            time.Duration
 	now                   nowFunc
 
 	triggeredInstancesSync sync.Map
@@ -91,6 +92,7 @@ func NewHandler(
 		retryFailedAfter:       config.RetryFailedAfter,
 		triggeredInstancesSync: sync.Map{},
 		triggerWithoutEvents:   config.TriggerWithoutEvents,
+		txDuration:             config.TransactionDuration,
 	}
 
 	return handler
@@ -142,7 +144,7 @@ func (h *Handler) schedule(ctx context.Context) {
 			if !didInitialize && !instanceFailed {
 				err = h.setSucceededOnce(ctx)
 				h.log().OnError(err).Debug("unable to set succeeded once")
-				didInitialize = err != nil
+				didInitialize = err == nil
 			}
 
 			t.Reset(h.requeueEvery)
@@ -212,7 +214,7 @@ func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]str
 		query = query.
 			CreationDateAfter(h.now().Add(-1 * h.handleActiveInstances))
 	}
-	return h.es.InstanceIDs(ctx, query.Builder())
+	return h.es.InstanceIDs(ctx, h.requeueEvery, query.Builder())
 }
 
 func (h *Handler) Trigger(ctx context.Context) (_ context.Context, err error) {
@@ -227,6 +229,7 @@ func (h *Handler) Trigger(ctx context.Context) (_ context.Context, err error) {
 
 	for i := 0; ; i++ {
 		additionalIteration, err := h.processEvents(ctx)
+		h.log().OnError(err).Warn("process events failed")
 		h.log().WithField("iteration", i).Debug("trigger iteration")
 		if !additionalIteration || err != nil {
 			return call.ResetTimestamp(ctx), err
@@ -261,40 +264,47 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 		}
 	}()
 
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
-	var processErr error
-
-	err = crdb.ExecuteTx(ctx, h.client.DB, nil, func(tx *sql.Tx) error {
-		currentState, err := h.currentState(ctx, tx)
-		if err != nil {
-			return err
-		}
-
-		var statements []*Statement
-		statements, additionalIteration, err = h.generateStatements(ctx, tx, currentState)
-		if err != nil || len(statements) == 0 {
-			return err
-		}
-
-		lastProcessedIndex, err := h.execute(ctx, tx, currentState, statements)
-		if lastProcessedIndex < 0 {
-			processErr = err
-			return nil
-		}
-
-		currentState.aggregateID = statements[lastProcessedIndex].AggregateID
-		currentState.aggregateType = statements[lastProcessedIndex].AggregateType
-		currentState.eventSequence = statements[lastProcessedIndex].Sequence
-		currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
-
-		return h.setState(ctx, tx, currentState)
-	})
-
-	if processErr != nil {
-		return false, processErr
+	if h.txDuration > 0 {
+		var cancel func()
+		ctx, cancel = context.WithTimeout(ctx, h.txDuration)
+		defer cancel()
 	}
+
+	tx, err := h.client.BeginTx(ctx, nil)
+	if err != nil {
+		return false, err
+	}
+	defer func() {
+		if err != nil {
+			rollbackErr := tx.Rollback()
+			h.log().OnError(rollbackErr).Debug("unable to rollback tx")
+			return
+		}
+		err = tx.Commit()
+	}()
+
+	currentState, err := h.currentState(ctx, tx)
+	if err != nil {
+		return additionalIteration, err
+	}
+
+	var statements []*Statement
+	statements, additionalIteration, err = h.generateStatements(ctx, tx, currentState)
+	if err != nil || len(statements) == 0 {
+		return additionalIteration, err
+	}
+
+	lastProcessedIndex, err := h.executeStatements(ctx, tx, currentState, statements)
+	if lastProcessedIndex < 0 {
+		return false, err
+	}
+
+	currentState.position = statements[lastProcessedIndex].Position
+	currentState.aggregateID = statements[lastProcessedIndex].AggregateID
+	currentState.aggregateType = statements[lastProcessedIndex].AggregateType
+	currentState.sequence = statements[lastProcessedIndex].Sequence
+	currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
+	err = h.setState(ctx, tx, currentState)
 
 	return additionalIteration, err
 }
@@ -337,50 +347,56 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 
 func skipPreviouslyReduced(events []eventstore.Event, currentState *state) []eventstore.Event {
 	for i, event := range events {
-		if currentState.aggregateID == event.Aggregate().ID &&
-			currentState.aggregateType == event.Aggregate().Type &&
-			currentState.eventSequence == event.Sequence() {
+		if event.Position() == currentState.position &&
+			event.Aggregate().ID == currentState.aggregateID &&
+			event.Aggregate().Type == currentState.aggregateType &&
+			event.Sequence() == currentState.sequence {
 			return events[i+1:]
 		}
 	}
 	return events
 }
 
-func (h *Handler) execute(ctx context.Context, tx *sql.Tx, currentState *state, statements []*Statement) (lastProcessedIndex int, err error) {
+func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, currentState *state, statements []*Statement) (lastProcessedIndex int, err error) {
 	lastProcessedIndex = -1
 
 	for i, statement := range statements {
-		if statement.Execute == nil {
-			lastProcessedIndex = i
-			continue
-		}
-		_, err := tx.Exec("SAVEPOINT exec")
+		err := h.executeStatement(ctx, tx, currentState, statement)
 		if err != nil {
-			h.log().WithError(err).Debug("create savepoint failed")
-			return lastProcessedIndex, err
-		}
-		if err = statement.Execute(tx, h.projection.Name()); err != nil {
-			h.log().WithError(err).Error("statement execution failed")
-
-			_, savepointErr := tx.Exec("ROLLBACK TO SAVEPOINT exec")
-			if savepointErr != nil {
-				h.log().WithError(savepointErr).Debug("rollback savepoint failed")
-				return lastProcessedIndex, savepointErr
-			}
-
-			if h.handleFailedStmt(tx, currentState, failureFromStatement(statement, err)) {
-				lastProcessedIndex = i
-				continue
-			}
-
-			return lastProcessedIndex, err
-		}
-		if _, err = tx.Exec("RELEASE SAVEPOINT exec"); err != nil {
 			return lastProcessedIndex, err
 		}
 		lastProcessedIndex = i
 	}
 	return lastProcessedIndex, nil
+}
+
+func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, currentState *state, statement *Statement) (err error) {
+	if statement.Execute == nil {
+		return nil
+	}
+
+	_, err = tx.Exec("SAVEPOINT exec")
+	if err != nil {
+		h.log().WithError(err).Debug("create savepoint failed")
+		return err
+	}
+	var shouldContinue bool
+	defer func() {
+		_, err = tx.Exec("RELEASE SAVEPOINT exec")
+	}()
+
+	if err = statement.Execute(tx, h.projection.Name()); err != nil {
+		h.log().WithError(err).Error("statement execution failed")
+
+		shouldContinue = h.handleFailedStmt(tx, currentState, failureFromStatement(statement, err))
+		if shouldContinue {
+			return nil
+		}
+
+		return err
+	}
+
+	return nil
 }
 
 func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder {
@@ -390,15 +406,15 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		OrderAsc().
 		InstanceID(currentState.instanceID)
 
+	if currentState.position > 0 {
+		builder = builder.PositionAfter(currentState.position - 1)
+	}
+
 	for aggregateType, eventTypes := range h.eventTypes {
 		query := builder.
 			AddQuery().
 			AggregateTypes(aggregateType).
 			EventTypes(eventTypes...)
-
-		if !currentState.eventTimestamp.IsZero() {
-			query = query.CreationDateAfter(currentState.eventTimestamp.Add(-1 * time.Microsecond))
-		}
 
 		builder = query.Builder()
 	}

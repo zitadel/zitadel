@@ -572,7 +572,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, w
 		return nil, errors.ThrowInternal(err, "QUERY-AG4gs", "Errors.Internal")
 	}
 
-	users.LatestState, err = q.latestState(ctx, userTable)
+	users.State, err = q.latestState(ctx, userTable)
 	return users, err
 }
 

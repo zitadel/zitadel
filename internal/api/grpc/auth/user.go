@@ -104,7 +104,7 @@ func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadata
 	}
 	return &auth_pb.ListMyMetadataResponse{
 		Result:  metadata.UserMetadataListToPb(res.Metadata),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastUpdated),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastRun),
 	}, nil
 }
 
@@ -158,7 +158,7 @@ func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGr
 	}
 	return &auth_pb.ListMyUserGrantsResponse{
 		Result:  UserGrantsToPb(res.UserGrants),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastUpdated),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastRun),
 	}, nil
 }
 
@@ -225,7 +225,7 @@ func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProje
 		return nil, err
 	}
 	return &auth_pb.ListMyProjectOrgsResponse{
-		Details: obj_grpc.ToListDetails(orgs.Count, orgs.Sequence, orgs.LastUpdated),
+		Details: obj_grpc.ToListDetails(orgs.Count, orgs.Sequence, orgs.LastRun),
 		Result:  org.OrgsToPb(orgs.Orgs),
 	}, nil
 }

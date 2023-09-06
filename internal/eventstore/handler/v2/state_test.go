@@ -164,10 +164,8 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 			args: args{
 				updatedState: &state{
 					instanceID:     "instance",
-					aggregateType:  "aggregate type",
-					aggregateID:    "aggregate id",
 					eventTimestamp: time.Now(),
-					eventSequence:  42,
+					position:       42,
 				},
 			},
 			isErr: func(t *testing.T, err error) {
@@ -192,10 +190,8 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 			args: args{
 				updatedState: &state{
 					instanceID:     "instance",
-					aggregateType:  "aggregate type",
-					aggregateID:    "aggregate id",
 					eventTimestamp: time.Now(),
-					eventSequence:  42,
+					position:       42,
 				},
 			},
 			isErr: func(t *testing.T, err error) {
@@ -216,10 +212,11 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 						mock.WithExecArgs(
 							"projection",
 							"instance",
-							mock.AnyType[time.Time]{},
-							"aggregate type",
 							"aggregate id",
+							"aggregate type",
 							uint64(42),
+							mock.AnyType[time.Time]{},
+							float64(42),
 						),
 						mock.WithExecRowsAffected(1),
 					),
@@ -228,10 +225,11 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 			args: args{
 				updatedState: &state{
 					instanceID:     "instance",
+					eventTimestamp: time.Now(),
+					position:       42,
 					aggregateType:  "aggregate type",
 					aggregateID:    "aggregate id",
-					eventTimestamp: time.Now(),
-					eventSequence:  42,
+					sequence:       42,
 				},
 			},
 		},
@@ -390,13 +388,14 @@ func TestHandler_currentState(t *testing.T) {
 							"projection",
 						),
 						mock.WithQueryResult(
-							[]string{"event_date", "aggregate_type", "aggregate_id", "event_sequence"},
+							[]string{"aggregate_id", "aggregate_type", "event_sequence", "event_date", "position"},
 							[][]driver.Value{
 								{
-									testTime,
-									"aggregate type",
 									"aggregate id",
+									"aggregate type",
 									int64(42),
+									testTime,
+									float64(42),
 								},
 							},
 						),
@@ -409,10 +408,11 @@ func TestHandler_currentState(t *testing.T) {
 			want: want{
 				currentState: &state{
 					instanceID:     "instance",
+					eventTimestamp: testTime,
+					position:       42,
 					aggregateType:  "aggregate type",
 					aggregateID:    "aggregate id",
-					eventTimestamp: testTime,
-					eventSequence:  42,
+					sequence:       42,
 				},
 			},
 		},

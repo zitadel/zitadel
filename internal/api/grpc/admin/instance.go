@@ -33,7 +33,7 @@ func (s *Server) ListInstanceDomains(ctx context.Context, req *admin_pb.ListInst
 		Details: object.ToListDetails(
 			domains.Count,
 			domains.Sequence,
-			domains.LastUpdated,
+			domains.LastRun,
 		),
 	}, nil
 }

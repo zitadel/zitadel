@@ -200,7 +200,7 @@ func (h *Handler) Init(ctx context.Context) error {
 	}
 	for i, execute := range check.Init().Executes {
 		logging.WithFields("projection", h.projection.Name(), "execute", i).Debug("executing check")
-		next, err := execute(h.client, h.projection.Name())
+		next, err := execute(tx, h.projection.Name())
 		if err != nil {
 			logging.OnError(tx.Rollback()).Debug("unable to rollback")
 			return err

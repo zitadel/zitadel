@@ -503,7 +503,7 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, wit
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
 	}
-	apps.LatestState, err = q.latestState(ctx, appsTable)
+	apps.State, err = q.latestState(ctx, appsTable)
 	return apps, err
 }
 

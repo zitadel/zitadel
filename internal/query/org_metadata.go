@@ -141,7 +141,7 @@ func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool,
 		return nil, errors.ThrowInternal(err, "QUERY-Ho2wf", "Errors.Internal")
 	}
 
-	metadata.LatestState, err = q.latestState(ctx, orgMetadataTable)
+	metadata.State, err = q.latestState(ctx, orgMetadataTable)
 	return metadata, err
 }
 

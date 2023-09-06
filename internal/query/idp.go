@@ -250,7 +250,7 @@ func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries, withOwner
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-xPlVH", "Errors.Internal")
 	}
-	idps.LatestState, err = q.latestState(ctx, idpTable)
+	idps.State, err = q.latestState(ctx, idpTable)
 	return idps, err
 }
 

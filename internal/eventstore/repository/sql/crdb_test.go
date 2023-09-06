@@ -271,6 +271,7 @@ func generateEvent(t *testing.T, aggregateID string, opts ...func(*repository.Ev
 		ResourceOwner: sql.NullString{String: "ro", Valid: true},
 		Typ:           "test.created",
 		Version:       "v1",
+		Pos:           42,
 	}
 
 	for _, opt := range opts {

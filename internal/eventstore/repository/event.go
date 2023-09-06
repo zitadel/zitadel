@@ -17,6 +17,8 @@ type Event struct {
 
 	// Seq is the sequence of the event
 	Seq uint64
+	// Pos is the global sequence of the event multiple events can have the same sequence
+	Pos float64
 
 	//CreationDate is the time the event is created
 	// it's used for human readability.
@@ -86,6 +88,11 @@ func (e *Event) Revision() uint16 {
 // Sequence implements [eventstore.Event]
 func (e *Event) Sequence() uint64 {
 	return e.Seq
+}
+
+// Position implements [eventstore.Event]
+func (e *Event) Position() float64 {
+	return e.Pos
 }
 
 // CreatedAt implements [eventstore.Event]

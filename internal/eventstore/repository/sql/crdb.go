@@ -8,7 +8,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/jackc/pgconn"
@@ -56,6 +55,7 @@ const (
 		" aggregate_id," +
 		" aggregate_version," +
 		" creation_date," +
+		" position," +
 		" event_data," +
 		" editor_user," +
 		" editor_service," +
@@ -63,7 +63,8 @@ const (
 		" instance_id," +
 		" event_sequence," +
 		" previous_aggregate_sequence," +
-		" previous_aggregate_type_sequence" +
+		" previous_aggregate_type_sequence," +
+		" in_tx_order" +
 		") " +
 		// defines the data to be inserted
 		"SELECT" +
@@ -71,7 +72,8 @@ const (
 		" $2::VARCHAR AS aggregate_type," +
 		" $3::VARCHAR AS aggregate_id," +
 		" $4::VARCHAR AS aggregate_version," +
-		" statement_timestamp() AS creation_date," +
+		" hlc_to_timestamp(cluster_logical_timestamp()) AS creation_date," +
+		" cluster_logical_timestamp() AS position," +
 		" $5::JSONB AS event_data," +
 		" $6::VARCHAR AS editor_user," +
 		" $7::VARCHAR AS editor_service," +
@@ -79,7 +81,8 @@ const (
 		" $9::VARCHAR AS instance_id," +
 		" COALESCE(aggregate_sequence, 0)+1," +
 		" aggregate_sequence AS previous_aggregate_sequence," +
-		" aggregate_type_sequence AS previous_aggregate_type_sequence " +
+		" aggregate_type_sequence AS previous_aggregate_type_sequence," +
+		" $10 AS in_tx_order " +
 		"FROM previous_data " +
 		"RETURNING id, event_sequence, creation_date, resource_owner, instance_id"
 
@@ -101,11 +104,21 @@ const (
 					WHERE instance_id = $1`
 )
 
+// ensureOrder ensures event ordering, so we don't events younger that open transactions
+var ensureOrder string
+
 type CRDB struct {
 	*database.DB
 }
 
 func NewCRDB(client *database.DB) *CRDB {
+	switch client.Type() {
+	case "cockroach":
+		ensureOrder = "AND created_at::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = 'zitadel')"
+	case "postgres":
+		ensureOrder = `AND "position" < pg_snapshot_xmin(pg_current_snapshot())`
+	}
+
 	return &CRDB{client}
 }
 
@@ -153,6 +166,7 @@ func (db *CRDB) Push(ctx context.Context, commands ...eventstore.Command) (event
 				"zitadel",
 				e.Aggregate().ResourceOwner,
 				e.Aggregate().InstanceID,
+				i,
 			).Scan(&e.ID, &e.Seq, &e.CreationDate, &e.ResourceOwner, &e.InstanceID)
 
 			if err != nil {
@@ -170,11 +184,7 @@ func (db *CRDB) Push(ctx context.Context, commands ...eventstore.Command) (event
 			events[i] = e
 		}
 
-		err := db.handleUniqueConstraints(ctx, tx, uniqueConstraints...)
-		if err != nil {
-			return err
-		}
-		return nil
+		return db.handleUniqueConstraints(ctx, tx, uniqueConstraints...)
 	})
 	if err != nil && !errors.Is(err, &caos_errs.CaosError{}) {
 		err = caos_errs.ThrowInternal(err, "SQL-DjgtG", "unable to store events")
@@ -261,10 +271,10 @@ func (crdb *CRDB) Filter(ctx context.Context, searchQuery *eventstore.SearchQuer
 }
 
 // LatestSequence returns the latest sequence found by the search query
-func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (time.Time, error) {
-	var createdAt sql.NullTime
-	err := query(ctx, db, searchQuery, &createdAt)
-	return createdAt.Time, err
+func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (float64, error) {
+	var position sql.NullFloat64
+	err := query(ctx, db, searchQuery, &position)
+	return position.Float64, err
 }
 
 // InstanceIDs returns the instance ids found by the search query
@@ -283,17 +293,18 @@ func (db *CRDB) db() *database.DB {
 
 func (db *CRDB) orderByEventSequence(desc bool) string {
 	if desc {
-		return " ORDER BY crdb_internal_mvcc_timestamp DESC, event_sequence DESC"
+		return ` ORDER BY "position" DESC, in_tx_order DESC`
 	}
 
-	return " ORDER BY crdb_internal_mvcc_timestamp, event_sequence"
+	return ` ORDER BY "position", in_tx_order`
 }
 
 func (db *CRDB) eventQuery() string {
 	return "SELECT" +
-		" hlc_to_timestamp(crdb_internal_mvcc_timestamp)::TIMESTAMPTZ" +
+		" created_at" +
 		", event_type" +
 		", event_sequence" +
+		`, "position"` +
 		", event_data" +
 		", editor_user" +
 		", resource_owner" +
@@ -305,7 +316,7 @@ func (db *CRDB) eventQuery() string {
 }
 
 func (db *CRDB) maxSequenceQuery() string {
-	return "SELECT hlc_to_timestamp(MAX(crdb_internal_mvcc_timestamp))::TIMESTAMPTZ FROM eventstore.events"
+	return `SELECT "position" FROM eventstore.events`
 }
 
 func (db *CRDB) instanceIDsQuery() string {
@@ -333,7 +344,9 @@ func (db *CRDB) columnName(col repository.Field) string {
 	case repository.FieldEventData:
 		return "event_data"
 	case repository.FieldCreationDate:
-		return "hlc_to_timestamp(crdb_internal_mvcc_timestamp)::TIMESTAMPTZ"
+		return "created_at"
+	case repository.FieldPosition:
+		return `"position"`
 	default:
 		return ""
 	}

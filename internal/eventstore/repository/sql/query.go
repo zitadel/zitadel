@@ -70,7 +70,16 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	}
 	query += where
 
-	if q.Columns == eventstore.ColumnsEvent {
+	// instead of using the max function of the database (which doesn't work for postgres)
+	// we select the most recent row
+	if q.Columns == eventstore.ColumnsMaxSequence {
+		q.Limit = 1
+		q.Desc = true
+	}
+
+	switch q.Columns {
+	case eventstore.ColumnsEvent,
+		eventstore.ColumnsMaxSequence:
 		query += criteria.orderByEventSequence(q.Desc)
 	}
 
@@ -129,11 +138,11 @@ func prepareTimeTravel(ctx context.Context, criteria querier, allow bool) string
 }
 
 func maxSequenceScanner(row scan, dest interface{}) (err error) {
-	sequence, ok := dest.(*sql.NullTime)
+	position, ok := dest.(*sql.NullFloat64)
 	if !ok {
-		return z_errors.ThrowInvalidArgumentf(nil, "SQL-NBjA9", "type must be sql.NullTime got: %T", dest)
+		return z_errors.ThrowInvalidArgumentf(nil, "SQL-NBjA9", "type must be sql.NullInt64 got: %T", dest)
 	}
-	err = row(sequence)
+	err = row(position)
 	if err == nil || errors.Is(err, sql.ErrNoRows) {
 		return nil
 	}
@@ -168,6 +177,7 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 		&event.CreationDate,
 		&event.Typ,
 		&event.Seq,
+		&event.Pos,
 		&data,
 		&event.EditorUser,
 		&event.ResourceOwner,
@@ -220,10 +230,8 @@ func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause 
 		}
 		clauses[idx] = "( " + strings.Join(subClauses, " AND ") + " )"
 	}
-	// created_at <= now() must be added because clock_timestamp() could be in the future
-	// this could lead to skipped events which are not visible as of system time but have a lower
-	// created_at timestamp
-	return " WHERE (" + strings.Join(clauses, " OR ") + ") AND hlc_to_timestamp(crdb_internal_mvcc_timestamp)::TIMESTAMPTZ <= (SELECT COALESCE(MIN(start)::TIMESTAMPTZ, NOW()) FROM crdb_internal.cluster_transactions where application_name = 'zitadel')", values
+
+	return " WHERE (" + strings.Join(clauses, " OR ") + ") " + ensureOrder, values
 }
 
 func getCondition(cond querier, filter *repository.Filter) (condition string) {

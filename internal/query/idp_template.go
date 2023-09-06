@@ -664,7 +664,7 @@ func (q *Queries) IDPTemplates(ctx context.Context, queries *IDPTemplateSearchQu
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-BDFrq", "Errors.Internal")
 	}
-	idps.LatestState, err = q.latestState(ctx, idpTemplateTable)
+	idps.State, err = q.latestState(ctx, idpTemplateTable)
 	return idps, err
 }
 

@@ -113,7 +113,7 @@ func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string,
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-ZkKUc", "Errors.Internal")
 	}
-	idps.LatestState, err = q.latestState(ctx, idpLoginPolicyLinkTable)
+	idps.State, err = q.latestState(ctx, idpLoginPolicyLinkTable)
 	return idps, err
 }
 

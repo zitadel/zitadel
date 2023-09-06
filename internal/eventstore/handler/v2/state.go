@@ -14,10 +14,11 @@ import (
 
 type state struct {
 	instanceID     string
+	position       float64
+	eventTimestamp time.Time
 	aggregateType  eventstore.AggregateType
 	aggregateID    string
-	eventTimestamp time.Time
-	eventSequence  uint64
+	sequence       uint64
 }
 
 var (
@@ -36,17 +37,21 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 		instanceID: authz.GetInstance(ctx).InstanceID(),
 	}
 
-	timestamp := new(sql.NullTime)
-	aggregateType := new(sql.NullString)
-	aggregateID := new(sql.NullString)
-	sequence := new(sql.NullInt64)
+	var (
+		aggregateID   = new(sql.NullString)
+		aggregateType = new(sql.NullString)
+		sequence      = new(sql.NullInt64)
+		timestamp     = new(sql.NullTime)
+		position      = new(sql.NullFloat64)
+	)
 
 	row := tx.QueryRowContext(ctx, currentStateStmt, currentState.instanceID, h.projection.Name())
 	err = row.Scan(
-		timestamp,
-		aggregateType,
 		aggregateID,
+		aggregateType,
 		sequence,
+		timestamp,
+		position,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
 		err = h.lockState(ctx, tx, currentState.instanceID)
@@ -56,10 +61,11 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 		return nil, err
 	}
 
-	currentState.eventTimestamp = timestamp.Time
-	currentState.aggregateType = eventstore.AggregateType(aggregateType.String)
 	currentState.aggregateID = aggregateID.String
-	currentState.eventSequence = uint64(sequence.Int64)
+	currentState.aggregateType = eventstore.AggregateType(aggregateType.String)
+	currentState.sequence = uint64(sequence.Int64)
+	currentState.eventTimestamp = timestamp.Time
+	currentState.position = position.Float64
 	return currentState, nil
 }
 
@@ -67,10 +73,11 @@ func (h *Handler) setState(ctx context.Context, tx *sql.Tx, updatedState *state)
 	res, err := tx.ExecContext(ctx, updateStateStmt,
 		h.projection.Name(),
 		updatedState.instanceID,
-		updatedState.eventTimestamp,
-		updatedState.aggregateType,
 		updatedState.aggregateID,
-		updatedState.eventSequence,
+		updatedState.aggregateType,
+		updatedState.sequence,
+		updatedState.eventTimestamp,
+		updatedState.position,
 	)
 	if err != nil {
 		h.log().WithError(err).Debug("unable to update state")

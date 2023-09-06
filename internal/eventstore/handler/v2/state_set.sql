@@ -1,10 +1,11 @@
 INSERT INTO projections.current_states (
     projection_name
     , instance_id
-    , event_date
-    , aggregate_type
     , aggregate_id
-    , event_sequence
+    , aggregate_type
+    , "sequence"
+    , event_date
+    , "position"
     , last_updated
 ) VALUES (
     $1
@@ -13,14 +14,16 @@ INSERT INTO projections.current_states (
     , $4
     , $5
     , $6
-    , statement_timestamp()
+    , $7
+    , now()
 ) ON CONFLICT (
     projection_name
     , instance_id
 ) DO UPDATE SET
-    event_date = $3
+    aggregate_id = $3
     , aggregate_type = $4
-    , aggregate_id = $5
-    , event_sequence = $6
+    , "sequence" = $5
+    , event_date = $6
+    , "position" = $7
     , last_updated = statement_timestamp()
 ;

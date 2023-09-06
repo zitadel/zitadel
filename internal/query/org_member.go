@@ -106,7 +106,7 @@ func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery, with
 		return nil, errors.ThrowInternal(err, "QUERY-5g4yV", "Errors.Internal")
 	}
 
-	members.LatestState = currentSequence
+	members.State = currentSequence
 	return members, err
 }
 
