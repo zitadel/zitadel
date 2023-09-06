@@ -1,9 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
-import {
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-} from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
   selector: 'cnsl-add-token-dialog',

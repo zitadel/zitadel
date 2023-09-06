@@ -1,10 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import {
-  MatDialog,
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-} from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import {
   AddSMSProviderTwilioRequest,

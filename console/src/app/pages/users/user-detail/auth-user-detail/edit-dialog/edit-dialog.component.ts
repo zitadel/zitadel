@@ -1,9 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import {
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-} from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
 import { formatPhone } from 'src/app/utils/formatPhone';

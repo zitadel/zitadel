@@ -6,8 +6,8 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { OverlayModule } from '@angular/cdk/overlay';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { InputModule } from '../input/input.module';

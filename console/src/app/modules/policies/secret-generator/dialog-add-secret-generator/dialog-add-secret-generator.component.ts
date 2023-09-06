@@ -1,9 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import {
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-} from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { UpdateSecretGeneratorRequest } from 'src/app/proto/generated/zitadel/admin_pb';
