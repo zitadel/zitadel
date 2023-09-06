@@ -199,6 +199,10 @@ Errors:
       InvalidCharacter: Nur alphanumerische Zeichen, . und - sind für eine Domäne erlaubt
     IDP:
       InvalidSearchQuery: Ungültiger Suchparameter
+      ClientIDMissing: ClientID fehlt
+      TeamIDMissing: TeamID fehlt
+      KeyIDMissing: KeyID fehlt
+      PrivateKeyMissing: Private Key fehlt
     LoginPolicy:
       NotFound: Login Policy konnte nicht gefunden werden
       Invalid: Login Policy ist ungültig

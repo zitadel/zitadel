@@ -2,6 +2,7 @@ $lgn-idp-margin: 0.5rem 0;
 $lgn-idp-padding: 0 1px;
 $lgn-idp-provider-name-line-height: 36px;
 $lgn-idp-border-radius: 0.5rem;
+$lgn-idp-logo-size: 46px;
 
 @mixin lgn-idp-base {
   display: block;
@@ -17,14 +18,14 @@ $lgn-idp-border-radius: 0.5rem;
   transition: border-color 0.2s ease-in-out;
 
   span.logo {
-    height: 46px;
-    width: 46px;
+    height: $lgn-idp-logo-size;
+    width: $lgn-idp-logo-size;
   }
 
   span.provider-name {
     line-height: $lgn-idp-provider-name-line-height;
-    position: absolute;
-    left: 50%;
+    position: relative;
+    left: calc(50% - $lgn-idp-logo-size);
     transform: translateX(-50%);
   }
 
@@ -73,6 +74,19 @@ $lgn-idp-border-radius: 0.5rem;
       background-position: center;
       background-repeat: no-repeat;
       border-radius: 5px;
+    }
+  }
+
+  &.apple {
+    span.logo {
+      height: 46px;
+      width: 46px;
+      background-image: var(--apple-image-src);
+      background-size: 25px;
+      background-position: center;
+      background-repeat: no-repeat;
+      border-radius: 5px;
+      transform: translateY(-2px);
     }
   }
 }

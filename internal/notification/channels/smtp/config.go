@@ -1,10 +1,11 @@
 package smtp
 
 type Config struct {
-	SMTP     SMTP
-	Tls      bool
-	From     string
-	FromName string
+	SMTP           SMTP
+	Tls            bool
+	From           string
+	FromName       string
+	ReplyToAddress string
 }
 
 type SMTP struct {

@@ -411,6 +411,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 				instanceAgg,
 				setup.SMTPConfiguration.From,
 				setup.SMTPConfiguration.FromName,
+				setup.SMTPConfiguration.ReplyToAddress,
 				setup.SMTPConfiguration.SMTP.Host,
 				setup.SMTPConfiguration.SMTP.User,
 				[]byte(setup.SMTPConfiguration.SMTP.Password),
