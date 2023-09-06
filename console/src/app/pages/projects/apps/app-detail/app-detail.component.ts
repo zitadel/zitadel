@@ -243,6 +243,15 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             if (app.app) {
               this.app = app.app;
 
+              // TODO: duplicates should be handled in the API
+              if (this.app.oidcConfig?.complianceProblemsList && this.app.oidcConfig?.complianceProblemsList.length) {
+                this.app.oidcConfig.complianceProblemsList = this.app.oidcConfig?.complianceProblemsList.filter(
+                  (element, index) => {
+                    return this.app?.oidcConfig?.complianceProblemsList.findIndex((e) => e.key === element.key) === index;
+                  },
+                );
+              }
+
               const breadcrumbs = [
                 new Breadcrumb({
                   type: BreadcrumbType.ORG,

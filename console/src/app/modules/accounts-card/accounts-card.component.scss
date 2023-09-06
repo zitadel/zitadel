@@ -54,10 +54,6 @@
     button {
       border-radius: 50vh;
       margin: 0.5rem;
-      /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-      .mat-button-wrapper {
-        font-size: 0.8rem;
-      }
     }
 
     .l-accounts {

@@ -539,15 +539,26 @@ $caos-light-theme-foreground: (
 // );
 
 $custom-level: mat.define-typography-level(
-  $font-family: 'Lato',
-  $font-weight: 500,
-  $font-size: 1rem,
+  $font-family: Lato,
+  $font-weight: 600,
+  $font-size: 14px,
   $line-height: 1,
   $letter-spacing: normal,
 );
 
+$custom-body-level: mat.define-typography-level(
+  $font-family: Lato,
+  $font-weight: 500,
+  $font-size: 16px,
+  $letter-spacing: normal,
+);
+
 $custom-typography: mat.define-typography-config(
+  $font-family: Lato,
   $button: $custom-level,
+  $body-1: $custom-body-level,
+  $body-2: $custom-body-level,
+  $caption: $custom-body-level,
 );
 
 $caos-light-app-theme: mat.define-light-theme(
@@ -557,7 +568,7 @@ $caos-light-app-theme: mat.define-light-theme(
       accent: mat-palette($caos-light-primary),
       warn: mat-palette($caos-light-warn),
       // foreground: $caos-light-theme-foreground,
-      // background: $caos-light-theme-background,,,,,,,,,,,,
+      // background: $caos-light-theme-background,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
     ),
     typography: $custom-typography,
     density: 0,
@@ -571,15 +582,15 @@ $caos-dark-app-theme: mat.define-dark-theme(
       accent: mat-palette($caos-dark-primary),
       warn: mat-palette($caos-dark-warn),
       // foreground: $caos-dark-theme-foreground,
-      // background: $caos-dark-theme-background,,,,,,,,,,,,
+      // background: $caos-dark-theme-background,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
     ),
     typography: $custom-typography,
     density: 0,
   )
 );
 
-$caos-light-app-theme: modify-background($caos-light-app-theme, $caos-light-theme-background);
-$caos-dark-app-theme: modify-background($caos-dark-app-theme, $caos-dark-theme-background);
+$caos-light-app-theme: modify-background($caos-light-app-theme, background, $caos-light-theme-background);
+$caos-dark-app-theme: modify-background($caos-dark-app-theme, background, $caos-dark-theme-background);
 
 @include mat.all-component-typographies($custom-typography);
 @include mat.core();
@@ -634,8 +645,24 @@ $caos-dark-app-theme: modify-background($caos-dark-app-theme, $caos-dark-theme-b
   background-color: map-get($backgroundpalette, background);
 }
 
+.mat-mdc-select-panel {
+  margin-left: -11px;
+}
+
+.mat-mdc-select {
+  padding-top: 7px !important;
+}
+
 @include component-themes($caos-dark-app-theme);
 @include mat.all-component-themes($caos-dark-app-theme);
+
+.progress {
+  --mdc-linear-progress-active-indicator-color: var(--success);
+  --mdc-linear-progress-track-height: 8px !important;
+  --mdc-linear-progress-track-color: #00000010;
+  --mat-select-enabled-trigger-text-color: #000;
+  --mdc-linear-progress-active-indicator-height: 8px !important;
+}
 
 .light-theme {
   @include component-themes($caos-light-app-theme);
@@ -647,6 +674,13 @@ $caos-dark-app-theme: modify-background($caos-dark-app-theme, $caos-dark-theme-b
   --warn: #cd3d56;
   --success: #10b981;
   $border-color: map-get($foreground, divider);
+
+  --mat-select-enabled-trigger-text-color: #000;
+
+  .progress {
+    --mdc-linear-progress-track-color: #00000010;
+    --mdc-linear-progress-active-indicator-color: var(--success);
+  }
 
   .mat-mdc-menu-panel {
     background-color: map-get($background, cards);
@@ -718,6 +752,13 @@ $caos-dark-app-theme: modify-background($caos-dark-app-theme, $caos-dark-theme-b
   --warn: #ff3b5b;
   --success: #10b981;
   $border-color: map-get($foreground, divider);
+
+  --mat-select-enabled-trigger-text-color: #fff;
+
+  .progress {
+    --mdc-linear-progress-track-color: #ffffff20;
+    --mdc-linear-progress-active-indicator-color: var(--success);
+  }
 
   .main-container,
   .mat-app-background {

@@ -40,18 +40,6 @@
         height: 8px;
         max-width: 300px;
         margin-right: 1rem;
-        /* TODO(mdc-migration): The following rule targets internal classes of progress-bar that may no longer apply for the MDC version. */
-        .mat-progress-bar-buffer {
-          background-color: if($is-dark-theme, rgb(69, 91, 84), #cccccc) !important;
-        }
-        /* TODO(mdc-migration): The following rule targets internal classes of progress-bar that may no longer apply for the MDC version. */
-        .mat-progress-bar-background {
-          fill: if($is-dark-theme, rgb(69, 91, 84), #cccccc) !important;
-        }
-        /* TODO(mdc-migration): The following rule targets internal classes of progress-bar that may no longer apply for the MDC version. */
-        .mat-progress-bar-fill:after {
-          background-color: var(--success);
-        }
       }
 
       .prog-desc {
