@@ -42,7 +42,7 @@ func TestServer_QuotaNotification(t *testing.T) {
 		bodies <- body
 		w.WriteHeader(http.StatusOK)
 	}))
-	host := "localhost:8082"
+	host := "localhost:8081"
 	listener, err := net.Listen("tcp", host)
 	if err != nil {
 		t.Fatal(err)
@@ -103,11 +103,20 @@ func awaitNotification(t *testing.T, bodies chan []byte, unit quota.Unit, percen
 				t.Fatal(err)
 			}
 			t.Log("received notificationDueEvent", plain.String())
-			var event *quota.NotificationDueEvent
-			if err := json.Unmarshal(body, event); err != nil {
+			event := struct {
+				Unit        quota.Unit `json:"unit"`
+				ID          string     `json:"id"`
+				CallURL     string     `json:"callURL"`
+				PeriodStart time.Time  `json:"periodStart"`
+				Threshold   uint16     `json:"threshold"`
+				Usage       uint64     `json:"usage"`
+			}{}
+			if err := json.Unmarshal(body, &event); err != nil {
 				t.Error(err)
 			}
-
+			if event.ID == "" {
+				continue
+			}
 			if event.Unit == unit && event.Threshold == uint16(percent) {
 				return
 			}
@@ -131,7 +140,7 @@ func TestServer_AddAndRemoveQuota(t *testing.T) {
 			{
 				Percent: 20,
 				Repeat:  true,
-				CallUrl: "url",
+				CallUrl: "http://localhost:8082",
 			},
 		},
 	})
@@ -154,7 +163,7 @@ func TestServer_AddAndRemoveQuota(t *testing.T) {
 			{
 				Percent: 20,
 				Repeat:  true,
-				CallUrl: "url",
+				CallUrl: "http://localhost:8082",
 			},
 		},
 	})

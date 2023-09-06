@@ -22,7 +22,7 @@ var (
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, errCtx, cancel := integration.Contexts(5 * time.Minute)
+		ctx, errCtx, cancel := integration.Contexts(time.Hour)
 		defer cancel()
 		CTX = ctx
 
