@@ -1,6 +1,6 @@
 //go:build integration
 
-package handlers_test
+package system_test
 
 import (
 	"context"
@@ -9,24 +9,28 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
 var (
 	CTX       context.Context
 	SystemCTX context.Context
+	ErrCTX    context.Context
 	Tester    *integration.Tester
+	Client    system.SystemServiceClient
 )
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, _, cancel := integration.Contexts(5 * time.Minute)
+		ctx, errCtx, cancel := integration.Contexts(5 * time.Minute)
 		defer cancel()
 		CTX = ctx
 
 		Tester = integration.NewTester(ctx)
 		defer Tester.Done()
 
-		SystemCTX = Tester.WithAuthorization(ctx, integration.SystemUser)
+		SystemCTX, ErrCTX = Tester.WithAuthorization(ctx, integration.SystemUser), errCtx
+		Client = Tester.Client.System
 		return m.Run()
 	}())
 }
