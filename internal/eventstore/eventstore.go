@@ -243,7 +243,7 @@ func (es *Eventstore) InstanceIDs(ctx context.Context, maxAge time.Duration, for
 		es.lastInstancesQuery = time.Now()
 	}
 
-	return es.instances, nil
+	return instances, nil
 }
 
 type QueryReducer interface {
