@@ -372,6 +372,8 @@ Footer:
   Help: 帮助
   SupportEmail: 支持邮箱
 
+SignIn: 通过 {{.Provider}} 登录
+
 Errors:
   Internal: 发生了内部错误
   AuthRequest:

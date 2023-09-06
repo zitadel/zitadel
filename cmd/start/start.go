@@ -47,7 +47,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/robots_txt"
 	"github.com/zitadel/zitadel/internal/api/saml"
-	"github.com/zitadel/zitadel/internal/api/ui"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
@@ -110,10 +109,9 @@ type Server struct {
 	AuthzRepo  authz_repo.Repository
 	Storage    static.Storage
 	Commands   *command.Commands
-	//LogStore   *logstore.Service[*record.ExecutionLog]
-	Router    *mux.Router
-	TLSConfig *tls.Config
-	Shutdown  chan<- os.Signal
+	Router     *mux.Router
+	TLSConfig  *tls.Config
+	Shutdown   chan<- os.Signal
 }
 
 func startZitadel(config *Config, masterKey string, server chan<- *Server) error {
@@ -280,10 +278,9 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 			AuthzRepo:  authZRepo,
 			Storage:    storage,
 			Commands:   commands,
-			//LogStore:   actionsLogstoreSvc,
-			Router:    router,
-			TLSConfig: tlsConfig,
-			Shutdown:  shutdown,
+			Router:     router,
+			TLSConfig:  tlsConfig,
+			Shutdown:   shutdown,
 		}
 		close(server)
 	}
@@ -377,7 +374,7 @@ func startAPIs(
 
 	apis.RegisterHandlerOnPrefix(idp.HandlerPrefix, idp.NewHandler(commands, queries, keys.IDPConfig, config.ExternalSecure, instanceInterceptor.Handler))
 
-	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator(), config.ExternalSecure, login.EndpointResources)
+	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator(), config.ExternalSecure, login.EndpointResources, login.EndpointExternalLoginCallbackFormPost)
 	if err != nil {
 		return err
 	}
@@ -412,9 +409,9 @@ func startAPIs(
 	if err != nil {
 		return fmt.Errorf("unable to start console: %w", err)
 	}
-	apis.RegisterHandlerOnPrefix(ui.ConsoleHandlerPrefix, c)
+	apis.RegisterHandlerOnPrefix(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, ui.ConsoleHandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), provider.AuthCallbackURL(samlProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.Handle, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
+	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), provider.AuthCallbackURL(samlProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.Handle, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}

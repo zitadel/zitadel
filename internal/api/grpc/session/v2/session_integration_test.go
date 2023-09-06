@@ -504,7 +504,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 			SessionToken: sessionToken,
 			Checks: &session.Checks{
 				Totp: &session.CheckTOTP{
-					Totp: code,
+					Code: code,
 				},
 			},
 		})
@@ -533,7 +533,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 			SessionToken: sessionToken,
 			Checks: &session.Checks{
 				OtpSms: &session.CheckOTP{
-					Otp: otp,
+					Code: otp,
 				},
 			},
 		})
@@ -564,7 +564,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 			SessionToken: sessionToken,
 			Checks: &session.Checks{
 				OtpEmail: &session.CheckOTP{
-					Otp: otp,
+					Code: otp,
 				},
 			},
 		})

@@ -173,7 +173,43 @@ export class FilterEventsComponent implements OnInit {
     return this.adminService
       .listEventTypes(req)
       .then((list) => {
-        this.eventTypes = list.eventTypesList ?? [];
+        this.eventTypes =
+          list.eventTypesList.sort((a, b) => {
+            if (b.localized && b.localized.localizedMessage) {
+              if (a.localized && a.localized.localizedMessage) {
+                if (a.localized.localizedMessage < b.localized.localizedMessage) {
+                  return -1;
+                }
+                if (a.localized.localizedMessage > b.localized.localizedMessage) {
+                  return 1;
+                }
+              } else {
+                if (a.type < b.localized.localizedMessage) {
+                  return -1;
+                }
+                if (a.type > b.localized.localizedMessage) {
+                  return 1;
+                }
+              }
+            } else {
+              if (a.localized && a.localized.localizedMessage) {
+                if (a.localized.localizedMessage < b.type) {
+                  return -1;
+                }
+                if (a.localized.localizedMessage > b.type) {
+                  return 1;
+                }
+              } else {
+                if (a.type < b.type) {
+                  return -1;
+                }
+                if (a.type > b.type) {
+                  return 1;
+                }
+              }
+            }
+            return 0;
+          }) ?? [];
       })
       .catch((error) => {
         this.toast.showError(error);
