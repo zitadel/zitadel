@@ -13,8 +13,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/api/ui"
-
 	"github.com/gorilla/mux"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/op"
@@ -42,6 +40,7 @@ var (
 
 const (
 	envRequestPath = "/assets/environment.json"
+	HandlerPrefix  = "/ui/console"
 )
 
 var (
@@ -57,7 +56,7 @@ var (
 )
 
 func LoginHintLink(origin, username string) string {
-	return origin + ui.ConsoleHandlerPrefix + "?login_hint=" + username
+	return origin + HandlerPrefix + "?login_hint=" + username
 }
 
 func (i *spaHandler) Open(name string) (http.File, error) {
