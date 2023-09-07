@@ -1024,7 +1024,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Privacy Policy",
       "OIDC": "OIDC Token lifetime and expiration",
-      "SECRETS": "Secret Appearance",
+      "SECRETS": "Secret Generator",
       "SECURITY": "Security settings"
     },
     "GROUPS": {
@@ -1101,7 +1101,7 @@
       "INDAYS": "Days"
     },
     "SECRETS": {
-      "TITLE": "Secret Appearance",
+      "TITLE": "Secret Generator",
       "TYPES": "Secret Types",
       "TYPE": {
         "1": "Initialization Mail",

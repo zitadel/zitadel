@@ -1023,7 +1023,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Datenschutzrichtlinie",
       "OIDC": "OIDC Token Lifetime und Expiration",
-      "SECRETS": "Secret Erscheinungsbild",
+      "SECRETS": "Secret Generator",
       "SECURITY": "Sicherheitseinstellungen"
     },
     "GROUPS": {
