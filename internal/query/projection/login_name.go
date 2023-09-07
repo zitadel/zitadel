@@ -586,30 +586,21 @@ func (p *loginNameProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 
 	return handler.NewMultiStatement(
 		event,
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(LoginNameDomainOwnerRemovedCol, true),
-			},
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ID),
 			},
 			handler.WithTableSuffix(loginNameDomainSuffix),
 		),
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(LoginNamePoliciesOwnerRemovedCol, true),
-			},
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(LoginNamePoliciesInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCond(LoginNamePoliciesResourceOwnerCol, e.Aggregate().ID),
 			},
 			handler.WithTableSuffix(loginNamePolicySuffix),
 		),
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(LoginNameUserOwnerRemovedCol, true),
-			},
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCond(LoginNameUserResourceOwnerCol, e.Aggregate().ID),

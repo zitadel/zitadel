@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	SessionsProjectionTable = "projections.sessions4"
+	SessionsProjectionTable = "projections.sessions5"
 
 	SessionColumnID                   = "id"
 	SessionColumnCreationDate         = "creation_date"
@@ -31,6 +31,8 @@ const (
 	SessionColumnWebAuthNCheckedAt    = "webauthn_checked_at"
 	SessionColumnWebAuthNUserVerified = "webauthn_user_verified"
 	SessionColumnTOTPCheckedAt        = "totp_checked_at"
+	SessionColumnOTPSMSCheckedAt      = "otp_sms_checked_at"
+	SessionColumnOTPEmailCheckedAt    = "otp_email_checked_at"
 	SessionColumnMetadata             = "metadata"
 	SessionColumnTokenID              = "token_id"
 )
@@ -63,6 +65,8 @@ func (*sessionProjection) Init() *old_handler.Check {
 			handler.NewColumn(SessionColumnWebAuthNCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnWebAuthNUserVerified, handler.ColumnTypeBool, handler.Nullable()),
 			handler.NewColumn(SessionColumnTOTPCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
+			handler.NewColumn(SessionColumnOTPSMSCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
+			handler.NewColumn(SessionColumnOTPEmailCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnMetadata, handler.ColumnTypeJSONB, handler.Nullable()),
 			handler.NewColumn(SessionColumnTokenID, handler.ColumnTypeText, handler.Nullable()),
 		},
@@ -99,6 +103,14 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  session.TOTPCheckedType,
 					Reduce: p.reduceTOTPChecked,
+				},
+				{
+					Event:  session.OTPSMSCheckedType,
+					Reduce: p.reduceOTPSMSChecked,
+				},
+				{
+					Event:  session.OTPEmailCheckedType,
+					Reduce: p.reduceOTPEmailChecked,
 				},
 				{
 					Event:  session.TokenSetType,
@@ -248,6 +260,46 @@ func (p *sessionProjection) reduceTOTPChecked(event eventstore.Event) (*handler.
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
 			handler.NewCol(SessionColumnTOTPCheckedAt, e.CheckedAt),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceOTPSMSChecked(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*session.OTPSMSCheckedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnOTPSMSCheckedAt, e.CheckedAt),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceOTPEmailChecked(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*session.OTPEmailCheckedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnOTPEmailCheckedAt, e.CheckedAt),
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnID, e.Aggregate().ID),

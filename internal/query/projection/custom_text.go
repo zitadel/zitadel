@@ -189,13 +189,8 @@ func (p *customTextProjection) reduceOwnerRemoved(event eventstore.Event) (*hand
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-V2T3z", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return handler.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(CustomTextChangeDateCol, e.CreationDate()),
-			handler.NewCol(CustomTextSequenceCol, e.Sequence()),
-			handler.NewCol(CustomTextOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(CustomTextInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(CustomTextAggregateIDCol, e.Aggregate().ID),

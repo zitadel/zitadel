@@ -1211,9 +1211,20 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 
 func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
 	ctx := authz.NewMockContext("inst1", "org1", "user1")
+	defaultGenerators := &SecretGenerators{
+		OTPSMS: &crypto.GeneratorConfig{
+			Length:              8,
+			Expiry:              time.Hour,
+			IncludeLowerLetters: true,
+			IncludeUpperLetters: true,
+			IncludeDigits:       true,
+			IncludeSymbols:      true,
+		},
+	}
 	type fields struct {
-		eventstore     func(*testing.T) *eventstore.Eventstore
-		userEncryption crypto.EncryptionAlgorithm
+		eventstore              func(*testing.T) *eventstore.Eventstore
+		userEncryption          crypto.EncryptionAlgorithm
+		defaultSecretGenerators *SecretGenerators
 	}
 	type (
 		args struct {
@@ -1236,7 +1247,8 @@ func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:              expectEventstore(),
+				defaultSecretGenerators: defaultGenerators,
 			},
 			args: args{
 				ctx:           ctx,
@@ -1253,6 +1265,7 @@ func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				defaultSecretGenerators: defaultGenerators,
 			},
 			args: args{
 				ctx:           ctx,
@@ -1301,7 +1314,52 @@ func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
 						),
 					),
 				),
-				userEncryption: crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
+				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
+				defaultSecretGenerators: defaultGenerators,
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "successful add (without secret config)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPSMSAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectFilter(),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID("inst1",
+								user.NewHumanOTPSMSCodeAddedEvent(ctx,
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("12345678"),
+									},
+									time.Hour,
+									nil,
+								),
+							),
+						},
+					),
+				),
+				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
+				defaultSecretGenerators: defaultGenerators,
 			},
 			args: args{
 				ctx:           ctx,
@@ -1360,7 +1418,8 @@ func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
 						),
 					),
 				),
-				userEncryption: crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
+				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
+				defaultSecretGenerators: defaultGenerators,
 			},
 			args: args{
 				ctx:           ctx,
@@ -1386,8 +1445,9 @@ func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:     tt.fields.eventstore(t),
-				userEncryption: tt.fields.userEncryption,
+				eventstore:              tt.fields.eventstore(t),
+				userEncryption:          tt.fields.userEncryption,
+				defaultSecretGenerators: tt.fields.defaultSecretGenerators,
 			}
 			err := r.HumanSendOTPSMS(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authRequest)
 			assert.ErrorIs(t, err, tt.res.err)
@@ -2100,9 +2160,20 @@ func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
 
 func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
 	ctx := authz.NewMockContext("inst1", "org1", "user1")
+	defaultGenerators := &SecretGenerators{
+		OTPEmail: &crypto.GeneratorConfig{
+			Length:              8,
+			Expiry:              time.Hour,
+			IncludeLowerLetters: true,
+			IncludeUpperLetters: true,
+			IncludeDigits:       true,
+			IncludeSymbols:      true,
+		},
+	}
 	type fields struct {
-		eventstore     func(*testing.T) *eventstore.Eventstore
-		userEncryption crypto.EncryptionAlgorithm
+		eventstore              func(*testing.T) *eventstore.Eventstore
+		userEncryption          crypto.EncryptionAlgorithm
+		defaultSecretGenerators *SecretGenerators
 	}
 	type (
 		args struct {
@@ -2125,7 +2196,8 @@ func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore:              expectEventstore(),
+				defaultSecretGenerators: defaultGenerators,
 			},
 			args: args{
 				ctx:           ctx,
@@ -2142,6 +2214,7 @@ func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				defaultSecretGenerators: defaultGenerators,
 			},
 			args: args{
 				ctx:           ctx,
@@ -2190,7 +2263,52 @@ func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
 						),
 					),
 				),
-				userEncryption: crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
+				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
+				defaultSecretGenerators: defaultGenerators,
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "successful add (without secret config)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPEmailAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectFilter(),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID("inst1",
+								user.NewHumanOTPEmailCodeAddedEvent(ctx,
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("12345678"),
+									},
+									time.Hour,
+									nil,
+								),
+							),
+						},
+					),
+				),
+				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
+				defaultSecretGenerators: defaultGenerators,
 			},
 			args: args{
 				ctx:           ctx,
@@ -2249,7 +2367,8 @@ func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
 						),
 					),
 				),
-				userEncryption: crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
+				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
+				defaultSecretGenerators: defaultGenerators,
 			},
 			args: args{
 				ctx:           ctx,
@@ -2275,8 +2394,9 @@ func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:     tt.fields.eventstore(t),
-				userEncryption: tt.fields.userEncryption,
+				eventstore:              tt.fields.eventstore(t),
+				userEncryption:          tt.fields.userEncryption,
+				defaultSecretGenerators: tt.fields.defaultSecretGenerators,
 			}
 			err := r.HumanSendOTPEmail(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authRequest)
 			assert.ErrorIs(t, err, tt.res.err)

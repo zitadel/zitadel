@@ -29,8 +29,8 @@ var (
 		` COUNT(*) OVER () ` +
 		` FROM projections.project_grants3 ` +
 		` LEFT JOIN projections.projects3 ON projections.project_grants3.project_id = projections.projects3.id AND projections.project_grants3.instance_id = projections.projects3.instance_id ` +
-		` LEFT JOIN projections.orgs AS r ON projections.project_grants3.resource_owner = r.id AND projections.project_grants3.instance_id = r.instance_id` +
-		` LEFT JOIN projections.orgs AS o ON projections.project_grants3.granted_org_id = o.id AND projections.project_grants3.instance_id = o.instance_id` +
+		` LEFT JOIN projections.orgs1 AS r ON projections.project_grants3.resource_owner = r.id AND projections.project_grants3.instance_id = r.instance_id` +
+		` LEFT JOIN projections.orgs1 AS o ON projections.project_grants3.granted_org_id = o.id AND projections.project_grants3.instance_id = o.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	projectGrantsCols = []string{
 		"project_id",
@@ -61,8 +61,8 @@ var (
 		` r.name` +
 		` FROM projections.project_grants3 ` +
 		` LEFT JOIN projections.projects3 ON projections.project_grants3.project_id = projections.projects3.id AND projections.project_grants3.instance_id = projections.projects3.instance_id ` +
-		` LEFT JOIN projections.orgs AS r ON projections.project_grants3.resource_owner = r.id AND projections.project_grants3.instance_id = r.instance_id` +
-		` LEFT JOIN projections.orgs AS o ON projections.project_grants3.granted_org_id = o.id AND projections.project_grants3.instance_id = o.instance_id` +
+		` LEFT JOIN projections.orgs1 AS r ON projections.project_grants3.resource_owner = r.id AND projections.project_grants3.instance_id = r.instance_id` +
+		` LEFT JOIN projections.orgs1 AS o ON projections.project_grants3.granted_org_id = o.id AND projections.project_grants3.instance_id = o.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	projectGrantCols = []string{
 		"project_id",

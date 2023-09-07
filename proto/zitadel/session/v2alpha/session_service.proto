@@ -49,7 +49,36 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     description: "Detailed information about ZITADEL",
     url: "https://zitadel.com/docs"
   }
-
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$ZITADEL_DOMAIN/oauth/v2/authorize";
+        token_url: "$ZITADEL_DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
   responses: {
     key: "403";
     value: {
@@ -351,6 +380,16 @@ message Checks {
       description: "\"Checks the Time-based One-Time Password and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
     }
   ];
+  optional CheckOTP otp_sms = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Checks the One-Time Password sent over SMS and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
+    }
+  ];
+  optional CheckOTP otp_email = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Checks the One-Time Password sent over Email and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
+    }
+  ];
 }
 
 message CheckUser {
@@ -419,12 +458,22 @@ message CheckIDPIntent {
 }
 
 message CheckTOTP {
-  string totp = 1 [
+  string code = 1 [
     (validate.rules).string = {min_len: 6, max_len: 6},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 6;
       max_length: 6;
       example: "\"323764\"";
+    }
+  ];
+}
+
+message CheckOTP {
+  string code = 1 [
+    (validate.rules).string = {min_len: 1},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      example: "\"3237642\"";
     }
   ];
 }

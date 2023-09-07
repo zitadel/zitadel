@@ -553,6 +553,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 							false,
 							false,
 							false,
+							false,
 							domain.PasswordlessTypeNotAllowed,
 							"",
 							&duration10,
@@ -2117,7 +2118,7 @@ func TestCommandSide_RemoveMultiFactorLoginPolicy(t *testing.T) {
 }
 
 func newLoginPolicyChangedEvent(ctx context.Context, orgID string,
-	usernamePassword, register, externalIDP, mfa, passwordReset, ignoreUnknownUsernames, allowDomainDiscovery, disableLoginWithEmail, disableLoginWithPhone bool,
+	usernamePassword, register, externalIDP, mfa, mfaLocalOnly, passwordReset, ignoreUnknownUsernames, allowDomainDiscovery, disableLoginWithEmail, disableLoginWithPhone bool,
 	passwordlessType domain.PasswordlessType,
 	redirectURI string,
 	passwordLifetime, externalLoginLifetime, mfaInitSkipLifetime, secondFactorLifetime, multiFactorLifetime *time.Duration) *org.LoginPolicyChangedEvent {
@@ -2126,6 +2127,7 @@ func newLoginPolicyChangedEvent(ctx context.Context, orgID string,
 		policy.ChangeAllowRegister(register),
 		policy.ChangeAllowExternalIDP(externalIDP),
 		policy.ChangeForceMFA(mfa),
+		policy.ChangeForceMFALocalOnly(mfaLocalOnly),
 		policy.ChangeHidePasswordReset(passwordReset),
 		policy.ChangeIgnoreUnknownUsernames(ignoreUnknownUsernames),
 		policy.ChangeAllowDomainDiscovery(allowDomainDiscovery),

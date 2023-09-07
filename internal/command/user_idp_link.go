@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner string, link *domain.UserIDPLink) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner string, link *AddLink) (_ *domain.ObjectDetails, err error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-03j8f", "Errors.IDMissing")
 	}
@@ -23,11 +23,7 @@ func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner str
 			return nil, err
 		}
 	}
-
-	linkWriteModel := NewUserIDPLinkWriteModel(userID, link.IDPConfigID, link.ExternalUserID, resourceOwner)
-	userAgg := UserAggregateFromWriteModel(&linkWriteModel.WriteModel)
-
-	event, err := c.addUserIDPLink(ctx, userAgg, link)
+	event, err := addLink(ctx, c.eventstore.Filter, user.NewAggregate(userID, resourceOwner), link)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +56,7 @@ func (c *Commands) BulkAddedUserIDPLinks(ctx context.Context, userID, resourceOw
 		linkWriteModel := NewUserIDPLinkWriteModel(userID, link.IDPConfigID, link.ExternalUserID, resourceOwner)
 		userAgg := UserAggregateFromWriteModel(&linkWriteModel.WriteModel)
 
-		events[i], err = c.addUserIDPLink(ctx, userAgg, link)
+		events[i], err = c.addUserIDPLink(ctx, userAgg, link, true)
 		if err != nil {
 			return err
 		}
@@ -70,17 +66,24 @@ func (c *Commands) BulkAddedUserIDPLinks(ctx context.Context, userID, resourceOw
 	return err
 }
 
-func (c *Commands) addUserIDPLink(ctx context.Context, human *eventstore.Aggregate, link *domain.UserIDPLink) (eventstore.Command, error) {
+func (c *Commands) addUserIDPLink(ctx context.Context, human *eventstore.Aggregate, link *domain.UserIDPLink, linkToExistingUser bool) (eventstore.Command, error) {
 	if link.AggregateID != "" && human.ID != link.AggregateID {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-33M0g", "Errors.IDMissing")
 	}
 	if !link.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-6m9Kd", "Errors.User.ExternalIDP.Invalid")
 	}
-
-	exists, err := ExistsIDP(ctx, c.eventstore.Filter, link.IDPConfigID, human.ResourceOwner)
-	if !exists || err != nil {
+	idpWriteModel, err := IDPProviderWriteModel(ctx, c.eventstore.Filter, link.IDPConfigID)
+	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-39nfs", "Errors.IDPConfig.NotExisting")
+	}
+	// IDP user will either be linked or created on a new user
+	// Therefore we need to either check if linking is allowed or creation:
+	if linkToExistingUser && !idpWriteModel.GetProviderOptions().IsLinkingAllowed {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-Sfee2", "Errors.ExternalIDP.LinkingNotAllowed")
+	}
+	if !linkToExistingUser && !idpWriteModel.GetProviderOptions().IsCreationAllowed {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-SJI3g", "Errors.ExternalIDP.CreationNotAllowed")
 	}
 	return user.NewUserIDPLinkAddedEvent(ctx, human, link.IDPConfigID, link.DisplayName, link.ExternalUserID), nil
 

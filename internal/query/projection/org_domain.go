@@ -216,13 +216,8 @@ func (p *orgDomainProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-dMUKJ", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return handler.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(OrgDomainChangeDateCol, e.CreationDate()),
-			handler.NewCol(OrgDomainSequenceCol, e.Sequence()),
-			handler.NewCol(OrgDomainOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(OrgDomainInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(OrgDomainOrgIDCol, e.Aggregate().ID),

@@ -159,11 +159,12 @@ func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQu
 }
 
 // InstanceIDs returns the instance ids found by the search query
-func (es *Eventstore) InstanceIDs(ctx context.Context, maxAge time.Duration, queryFactory *SearchQueryBuilder) ([]string, error) {
+// forceDBCall forces to query the database, the instance ids are not cached
+func (es *Eventstore) InstanceIDs(ctx context.Context, maxAge time.Duration, forceDBCall bool, queryFactory *SearchQueryBuilder) ([]string, error) {
 	es.instancesMu.Lock()
 	defer es.instancesMu.Unlock()
 
-	if time.Since(es.lastInstanceQuery) <= maxAge {
+	if !forceDBCall && time.Since(es.lastInstanceQuery) <= maxAge {
 		return es.instances, nil
 	}
 
@@ -171,8 +172,12 @@ func (es *Eventstore) InstanceIDs(ctx context.Context, maxAge time.Duration, que
 	if err != nil {
 		return nil, err
 	}
-	es.instances = instances
-	es.lastInstanceQuery = time.Now()
+
+	if !forceDBCall {
+		es.instances = instances
+		es.lastInstanceQuery = time.Now()
+	}
+
 	return instances, nil
 }
 

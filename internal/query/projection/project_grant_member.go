@@ -212,12 +212,7 @@ func (p *projectGrantMemberProjection) reduceOrgRemoved(event eventstore.Event) 
 		e,
 		multiReduceMemberOwnerRemoved(e),
 		multiReduceMemberUserOwnerRemoved(e),
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(MemberChangeDate, e.CreationDate()),
-				handler.NewCol(MemberSequence, e.Sequence()),
-				handler.NewCol(ProjectGrantMemberGrantedOrgRemoved, true),
-			},
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCond(ProjectGrantMemberGrantedOrg, e.Aggregate().ID),

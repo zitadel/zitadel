@@ -21,6 +21,10 @@
       width: 28px;
       flex-shrink: 0;
 
+      &.apple {
+        margin-bottom: 4px;
+      }
+
       &.dark {
         display: if($is-dark-theme, block, none);
       }

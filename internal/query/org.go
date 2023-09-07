@@ -217,8 +217,10 @@ func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (or
 
 	query, scan := prepareOrgsQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		Where(sq.And{
+			sq.Eq{
+				OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+			},
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-wQ3by", "Errors.Query.InvalidRequest")

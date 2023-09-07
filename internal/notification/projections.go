@@ -27,9 +27,7 @@ const (
 
 func Start(
 	ctx context.Context,
-	userHandlerCustomConfig projection.CustomConfig,
-	quotaHandlerCustomConfig projection.CustomConfig,
-	telemetryHandlerCustomConfig projection.CustomConfig,
+	userHandlerCustomConfig, quotaHandlerCustomConfig, telemetryHandlerCustomConfig projection.CustomConfig,
 	telemetryCfg handlers.TelemetryPusherConfig,
 	externalDomain string,
 	externalPort uint16,
@@ -38,10 +36,9 @@ func Start(
 	queries *query.Queries,
 	es *eventstore.Eventstore,
 	assetsPrefix func(context.Context) string,
+	otpEmailTmpl string,
 	fileSystemPath string,
-	userEncryption,
-	smtpEncryption,
-	smsEncryption crypto.EncryptionAlgorithm,
+	userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm,
 ) {
 	statikFS, err := statik_fs.NewWithNamespace("notification")
 	logging.OnError(err).Panic("unable to start listener")
@@ -64,6 +61,7 @@ func Start(
 		commands,
 		q,
 		assetsPrefix,
+		otpEmailTmpl,
 		metricSuccessfulDeliveriesEmail,
 		metricFailedDeliveriesEmail,
 		metricSuccessfulDeliveriesSMS,

@@ -964,8 +964,7 @@
     "STATE": {
       "0": "Not defined",
       "1": "Active",
-      "2": "Deactivated",
-      "3": "Removed"
+      "2": "Deactivated"
     },
     "MEMBER": {
       "TITLE": "Organization Managers",
@@ -1056,6 +1055,7 @@
       "TITLE": "SMTP Settings",
       "SENDERADDRESS": "Sender Email Address",
       "SENDERNAME": "Sender Name",
+      "REPLYTOADDRESS": "Reply-to Address",
       "HOSTANDPORT": "Host And Port",
       "USER": "User",
       "PASSWORD": "Password",
@@ -1705,6 +1705,10 @@
       "LDAP": {
         "TITLE": "Active Directory / LDAP",
         "DESCRIPTION": "Enter the credentials for your LDAP Provider"
+      },
+      "APPLE": {
+        "TITLE": "Sign in with Apple",
+        "DESCRIPTION": "Enter the credentials for your Apple Provider"
       }
     },
     "DETAIL": {
@@ -1818,6 +1822,14 @@
       "JWTENDPOINT": "JWT Endpoint",
       "JWTKEYSENDPOINT": "JWT Keys Endpoint"
     },
+    "APPLE": {
+      "TEAMID": "Team ID",
+      "KEYID": "Key ID",
+      "PRIVATEKEY": "Private Key",
+      "UPDATEPRIVATEKEY": "Update Private Key",
+      "UPLOADPRIVATEKEY": "Upload Private Key",
+      "KEYMAXSIZEEXCEEDED": "Maximum size of 5kB exceeded."
+    },
     "TOAST": {
       "SAVED": "Successfully saved.",
       "REACTIVATED": "Idp reactivated.",
@@ -1828,7 +1840,9 @@
       "DELETED": "Idp removed successfully!",
       "ADDED": "Added successfully.",
       "REMOVED": "Removed successfully."
-    }
+    },
+    "ISIDTOKENMAPPING": "Map from the ID token",
+    "ISIDTOKENMAPPING_DESC": "If selected, provider information gets mapped from the ID token, not from the userinfo endpoint."
   },
   "MFA": {
     "LIST": {

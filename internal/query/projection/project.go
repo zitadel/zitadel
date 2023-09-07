@@ -232,13 +232,8 @@ func (p *projectProjection) reduceOwnerRemoved(event eventstore.Event) (*handler
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-sbgru", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return handler.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
-			handler.NewCol(ProjectColumnSequence, e.Sequence()),
-			handler.NewCol(ProjectColumnOwnerRemoved, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(ProjectColumnResourceOwner, e.Aggregate().ID),

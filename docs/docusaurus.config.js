@@ -20,7 +20,7 @@ module.exports = {
   ],
   customFields: {
     description:
-      "Documentation for ZITADEL - The best of Auth0 and Keycloak combined. Built for the serverless era.",
+      "Documentation for ZITADEL - Identity infrastructure, simplified for you.",
   },
   themeConfig: {
     metadata: [

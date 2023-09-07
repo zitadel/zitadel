@@ -172,13 +172,8 @@ func (p *idpUserLinkProjection) reduceOwnerRemoved(event eventstore.Event) (*han
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-PGiAY", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return handler.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(IDPUserLinkChangeDateCol, e.CreationDate()),
-			handler.NewCol(IDPUserLinkSequenceCol, e.Sequence()),
-			handler.NewCol(IDPUserLinkOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(IDPUserLinkResourceOwnerCol, e.Aggregate().ID),
 			handler.NewCond(IDPUserLinkInstanceIDCol, e.Aggregate().InstanceID),

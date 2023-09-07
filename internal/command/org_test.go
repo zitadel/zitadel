@@ -1066,34 +1066,6 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 			},
 		},
 		{
-			name: "org already removed, error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(), // zitadel project check
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								"org"),
-						),
-						eventFromEventPusher(
-							org.NewOrgRemovedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								"org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{}),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-			},
-			res: res{
-				err: errors.IsNotFound,
-			},
-		},
-		{
 			name: "push failed, error",
 			fields: fields{
 				eventstore: eventstoreExpect(

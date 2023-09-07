@@ -257,13 +257,8 @@ func (p *authNKeyProjection) reduceOwnerRemoved(event eventstore.Event) (*handle
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Hyd1f", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return handler.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(AuthNKeyChangeDateCol, e.CreationDate()),
-			handler.NewCol(AuthNKeySequenceCol, e.Sequence()),
-			handler.NewCol(AuthNKeyOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(AuthNKeyInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(AuthNKeyResourceOwnerCol, e.Aggregate().ID),

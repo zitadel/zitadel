@@ -3,6 +3,7 @@ package command
 import (
 	"time"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/session"
@@ -13,6 +14,12 @@ type WebAuthNChallengeModel struct {
 	AllowedCrentialIDs [][]byte
 	UserVerification   domain.UserVerificationRequirement
 	RPID               string
+}
+
+type OTPCode struct {
+	Code         *crypto.CryptoValue
+	Expiry       time.Duration
+	CreationDate time.Time
 }
 
 func (p *WebAuthNChallengeModel) WebAuthNLogin(human *domain.Human, credentialAssertionData []byte) *domain.WebAuthNLogin {
@@ -36,11 +43,15 @@ type SessionWriteModel struct {
 	IntentCheckedAt      time.Time
 	WebAuthNCheckedAt    time.Time
 	TOTPCheckedAt        time.Time
+	OTPSMSCheckedAt      time.Time
+	OTPEmailCheckedAt    time.Time
 	WebAuthNUserVerified bool
 	Metadata             map[string][]byte
 	State                domain.SessionState
 
-	WebAuthNChallenge *WebAuthNChallengeModel
+	WebAuthNChallenge     *WebAuthNChallengeModel
+	OTPSMSCodeChallenge   *OTPCode
+	OTPEmailCodeChallenge *OTPCode
 
 	aggregate *eventstore.Aggregate
 }
@@ -73,6 +84,14 @@ func (wm *SessionWriteModel) Reduce() error {
 			wm.reduceWebAuthNChecked(e)
 		case *session.TOTPCheckedEvent:
 			wm.reduceTOTPChecked(e)
+		case *session.OTPSMSChallengedEvent:
+			wm.reduceOTPSMSChallenged(e)
+		case *session.OTPSMSCheckedEvent:
+			wm.reduceOTPSMSChecked(e)
+		case *session.OTPEmailChallengedEvent:
+			wm.reduceOTPEmailChallenged(e)
+		case *session.OTPEmailCheckedEvent:
+			wm.reduceOTPEmailChecked(e)
 		case *session.TokenSetEvent:
 			wm.reduceTokenSet(e)
 		case *session.TerminateEvent:
@@ -95,6 +114,10 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 			session.WebAuthNChallengedType,
 			session.WebAuthNCheckedType,
 			session.TOTPCheckedType,
+			session.OTPSMSChallengedType,
+			session.OTPSMSCheckedType,
+			session.OTPEmailChallengedType,
+			session.OTPEmailCheckedType,
 			session.TokenSetType,
 			session.MetadataSetType,
 			session.TerminateType,
@@ -143,6 +166,32 @@ func (wm *SessionWriteModel) reduceTOTPChecked(e *session.TOTPCheckedEvent) {
 	wm.TOTPCheckedAt = e.CheckedAt
 }
 
+func (wm *SessionWriteModel) reduceOTPSMSChallenged(e *session.OTPSMSChallengedEvent) {
+	wm.OTPSMSCodeChallenge = &OTPCode{
+		Code:         e.Code,
+		Expiry:       e.Expiry,
+		CreationDate: e.CreationDate(),
+	}
+}
+
+func (wm *SessionWriteModel) reduceOTPSMSChecked(e *session.OTPSMSCheckedEvent) {
+	wm.OTPSMSCodeChallenge = nil
+	wm.OTPSMSCheckedAt = e.CheckedAt
+}
+
+func (wm *SessionWriteModel) reduceOTPEmailChallenged(e *session.OTPEmailChallengedEvent) {
+	wm.OTPEmailCodeChallenge = &OTPCode{
+		Code:         e.Code,
+		Expiry:       e.Expiry,
+		CreationDate: e.CreationDate(),
+	}
+}
+
+func (wm *SessionWriteModel) reduceOTPEmailChecked(e *session.OTPEmailCheckedEvent) {
+	wm.OTPEmailCodeChallenge = nil
+	wm.OTPEmailCheckedAt = e.CheckedAt
+}
+
 func (wm *SessionWriteModel) reduceTokenSet(e *session.TokenSetEvent) {
 	wm.TokenID = e.TokenID
 }
@@ -159,7 +208,8 @@ func (wm *SessionWriteModel) AuthenticationTime() time.Time {
 		wm.WebAuthNCheckedAt,
 		wm.TOTPCheckedAt,
 		wm.IntentCheckedAt,
-		// TODO: add OTP (sms and email) check https://github.com/zitadel/zitadel/issues/6224
+		wm.OTPSMSCheckedAt,
+		wm.OTPEmailCheckedAt,
 	} {
 		if check.After(authTime) {
 			authTime = check
@@ -187,14 +237,11 @@ func (wm *SessionWriteModel) AuthMethodTypes() []domain.UserAuthMethodType {
 	if !wm.TOTPCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypeTOTP)
 	}
-	// TODO: add checks with https://github.com/zitadel/zitadel/issues/6224
-	/*
-		if !wm.TOTPFactor.OTPSMSCheckedAt.IsZero() {
-			types = append(types, domain.UserAuthMethodTypeOTPSMS)
-		}
-		if !wm.TOTPFactor.OTPEmailCheckedAt.IsZero() {
-			types = append(types, domain.UserAuthMethodTypeOTPEmail)
-		}
-	*/
+	if !wm.OTPSMSCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypeOTPSMS)
+	}
+	if !wm.OTPEmailCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypeOTPEmail)
+	}
 	return types
 }

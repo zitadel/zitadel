@@ -398,45 +398,25 @@ func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 
 	return handler.NewMultiStatement(
 		e,
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(UserGrantChangeDate, e.CreatedAt()),
-				handler.NewCol(UserGrantSequence, e.Sequence()),
-				handler.NewCol(UserGrantOwnerRemoved, true),
-			},
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(UserGrantInstanceID, e.Aggregate().InstanceID),
 				handler.NewCond(UserGrantResourceOwner, e.Aggregate().ID),
 			},
 		),
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(UserGrantChangeDate, e.CreatedAt()),
-				handler.NewCol(UserGrantSequence, e.Sequence()),
-				handler.NewCol(UserGrantUserOwnerRemoved, true),
-			},
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(UserGrantInstanceID, e.Aggregate().InstanceID),
 				handler.NewCond(UserGrantResourceOwnerUser, e.Aggregate().ID),
 			},
 		),
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(UserGrantChangeDate, e.CreatedAt()),
-				handler.NewCol(UserGrantSequence, e.Sequence()),
-				handler.NewCol(UserGrantProjectOwnerRemoved, true),
-			},
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(UserGrantInstanceID, e.Aggregate().InstanceID),
 				handler.NewCond(UserGrantResourceOwnerProject, e.Aggregate().ID),
 			},
 		),
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(UserGrantChangeDate, e.CreatedAt()),
-				handler.NewCol(UserGrantSequence, e.Sequence()),
-				handler.NewCol(UserGrantGrantedOrgRemoved, true),
-			},
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(UserGrantInstanceID, e.Aggregate().InstanceID),
 				handler.NewCond(UserGrantGrantedOrg, e.Aggregate().ID),

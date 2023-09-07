@@ -299,13 +299,8 @@ func (p *userAuthMethodProjection) reduceOwnerRemoved(event eventstore.Event) (*
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-FwDZ8", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return handler.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(UserAuthMethodChangeDateCol, e.CreatedAt()),
-			handler.NewCol(UserAuthMethodSequenceCol, e.Sequence()),
-			handler.NewCol(UserAuthMethodOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(UserAuthMethodInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(UserAuthMethodResourceOwnerCol, e.Aggregate().ID),

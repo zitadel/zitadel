@@ -33,24 +33,12 @@ const (
 )
 
 type InstanceSetup struct {
-	zitadel          ZitadelConfig
-	idGenerator      id.Generator
-	InstanceName     string
-	CustomDomain     string
-	DefaultLanguage  language.Tag
-	Org              InstanceOrgSetup
-	SecretGenerators struct {
-		PasswordSaltCost         uint
-		ClientSecret             *crypto.GeneratorConfig
-		InitializeUserCode       *crypto.GeneratorConfig
-		EmailVerificationCode    *crypto.GeneratorConfig
-		PhoneVerificationCode    *crypto.GeneratorConfig
-		PasswordVerificationCode *crypto.GeneratorConfig
-		PasswordlessInitCode     *crypto.GeneratorConfig
-		DomainVerification       *crypto.GeneratorConfig
-		OTPSMS                   *crypto.GeneratorConfig
-		OTPEmail                 *crypto.GeneratorConfig
-	}
+	zitadel                  ZitadelConfig
+	InstanceName             string
+	CustomDomain             string
+	DefaultLanguage          language.Tag
+	Org                      InstanceOrgSetup
+	SecretGenerators         *SecretGenerators
 	PasswordComplexityPolicy struct {
 		MinLength    uint64
 		HasLowercase bool
@@ -124,6 +112,19 @@ type InstanceSetup struct {
 	Quotas *struct {
 		Items []*AddQuota
 	}
+}
+
+type SecretGenerators struct {
+	PasswordSaltCost         uint
+	ClientSecret             *crypto.GeneratorConfig
+	InitializeUserCode       *crypto.GeneratorConfig
+	EmailVerificationCode    *crypto.GeneratorConfig
+	PhoneVerificationCode    *crypto.GeneratorConfig
+	PasswordVerificationCode *crypto.GeneratorConfig
+	PasswordlessInitCode     *crypto.GeneratorConfig
+	DomainVerification       *crypto.GeneratorConfig
+	OTPSMS                   *crypto.GeneratorConfig
+	OTPEmail                 *crypto.GeneratorConfig
 }
 
 type ZitadelConfig struct {
@@ -411,6 +412,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 				instanceAgg,
 				setup.SMTPConfiguration.From,
 				setup.SMTPConfiguration.FromName,
+				setup.SMTPConfiguration.ReplyToAddress,
 				setup.SMTPConfiguration.SMTP.Host,
 				setup.SMTPConfiguration.SMTP.User,
 				[]byte(setup.SMTPConfiguration.SMTP.Password),

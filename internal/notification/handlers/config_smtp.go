@@ -19,9 +19,10 @@ func (n *NotificationQueries) GetSMTPConfig(ctx context.Context) (*smtp.Config, 
 		return nil, err
 	}
 	return &smtp.Config{
-		From:     config.SenderAddress,
-		FromName: config.SenderName,
-		Tls:      config.TLS,
+		From:           config.SenderAddress,
+		FromName:       config.SenderName,
+		ReplyToAddress: config.ReplyToAddress,
+		Tls:            config.TLS,
 		SMTP: smtp.SMTP{
 			Host:     config.Host,
 			User:     config.User,

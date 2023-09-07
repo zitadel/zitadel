@@ -402,13 +402,8 @@ func (p *loginPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*han
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-B8NZW", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return handler.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(LoginPolicyChangeDateCol, e.CreationDate()),
-			handler.NewCol(LoginPolicySequenceCol, e.Sequence()),
-			handler.NewCol(LoginPolicyOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(LoginPolicyIDCol, e.Aggregate().ID),

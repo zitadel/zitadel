@@ -4721,3 +4721,464 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 		})
 	}
 }
+
+func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
+	type fields struct {
+		eventstore   *eventstore.Eventstore
+		idGenerator  id.Generator
+		secretCrypto crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx      context.Context
+		provider AppleProvider
+	}
+	type res struct {
+		id   string
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid clientID",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AppleProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-jkn3w", "Errors.IDP.ClientIDMissing"))
+				},
+			},
+		},
+		{
+			"invalid teamID",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AppleProvider{
+					ClientID: "clientID",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Ffg32", "Errors.IDP.TeamIDMissing"))
+				},
+			},
+		},
+		{
+			"invalid keyID",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AppleProvider{
+					ClientID: "clientID",
+					TeamID:   "teamID",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GDjm5", "Errors.IDP.KeyIDMissing"))
+				},
+			},
+		},
+		{
+			"invalid privateKey",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AppleProvider{
+					ClientID: "clientID",
+					TeamID:   "teamID",
+					KeyID:    "keyID",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.IDP.PrivateKeyMissing"))
+				},
+			},
+		},
+		{
+			name: "ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"instance1",
+								instance.NewAppleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+									"id1",
+									"",
+									"clientID",
+									"teamID",
+									"keyID",
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("privateKey"),
+									},
+									nil,
+									idp.Options{},
+								)),
+						},
+					),
+				),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AppleProvider{
+					ClientID:   "clientID",
+					TeamID:     "teamID",
+					KeyID:      "keyID",
+					PrivateKey: []byte("privateKey"),
+				},
+			},
+			res: res{
+				id:   "id1",
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+		{
+			name: "ok all set",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"instance1",
+								instance.NewAppleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+									"id1",
+									"",
+									"clientID",
+									"teamID",
+									"keyID",
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("privateKey"),
+									},
+									[]string{"name", "email"},
+									idp.Options{
+										IsCreationAllowed: true,
+										IsLinkingAllowed:  true,
+										IsAutoCreation:    true,
+										IsAutoUpdate:      true,
+									},
+								)),
+						},
+					),
+				),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AppleProvider{
+					ClientID:   "clientID",
+					TeamID:     "teamID",
+					KeyID:      "keyID",
+					PrivateKey: []byte("privateKey"),
+					Scopes:     []string{"name", "email"},
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+				},
+			},
+			res: res{
+				id:   "id1",
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:          tt.fields.eventstore,
+				idGenerator:         tt.fields.idGenerator,
+				idpConfigEncryption: tt.fields.secretCrypto,
+			}
+			id, got, err := c.AddInstanceAppleProvider(tt.args.ctx, tt.args.provider)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.id, id)
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
+	type fields struct {
+		eventstore   *eventstore.Eventstore
+		secretCrypto crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx      context.Context
+		id       string
+		provider AppleProvider
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid id",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AppleProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-FRHBH", "Errors.IDMissing"))
+				},
+			},
+		},
+		{
+			"invalid clientID",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
+				id:       "id1",
+				provider: AppleProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SFm4l", "Errors.IDP.ClientIDMissing"))
+				},
+			},
+		},
+		{
+			"invalid teamID",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: AppleProvider{
+					ClientID: "clientID",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SG34t", "Errors.IDP.TeamIDMissing"))
+				},
+			},
+		},
+		{
+			"invalid keyID",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: AppleProvider{
+					ClientID: "clientID",
+					TeamID:   "teamID",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Gh4z2", "Errors.IDP.KeyIDMissing"))
+				},
+			},
+		},
+		{
+			name: "not found",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: AppleProvider{
+					ClientID: "clientID",
+					TeamID:   "teamID",
+					KeyID:    "keyID",
+				},
+			},
+			res: res{
+				err: caos_errors.IsNotFound,
+			},
+		},
+		{
+			name: "no changes",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewAppleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"",
+								"clientID",
+								"teamID",
+								"keyID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("privateKey"),
+								},
+								nil,
+								idp.Options{},
+							)),
+					),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: AppleProvider{
+					ClientID: "clientID",
+					TeamID:   "teamID",
+					KeyID:    "keyID",
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+		{
+			name: "change ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewAppleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"",
+								"clientID",
+								"teamID",
+								"keyID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("privateKey"),
+								},
+								nil,
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"instance1",
+								func() eventstore.Command {
+									t := true
+									event, _ := instance.NewAppleIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+										"id1",
+										[]idp.AppleIDPChanges{
+											idp.ChangeAppleClientID("clientID2"),
+											idp.ChangeAppleTeamID("teamID2"),
+											idp.ChangeAppleKeyID("keyID2"),
+											idp.ChangeApplePrivateKey(&crypto.CryptoValue{
+												CryptoType: crypto.TypeEncryption,
+												Algorithm:  "enc",
+												KeyID:      "id",
+												Crypted:    []byte("newPrivateKey"),
+											}),
+											idp.ChangeAppleScopes([]string{"name", "email"}),
+											idp.ChangeAppleOptions(idp.OptionChanges{
+												IsCreationAllowed: &t,
+												IsLinkingAllowed:  &t,
+												IsAutoCreation:    &t,
+												IsAutoUpdate:      &t,
+											}),
+										},
+									)
+									return event
+								}(),
+							),
+						},
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: AppleProvider{
+					ClientID:   "clientID2",
+					TeamID:     "teamID2",
+					KeyID:      "keyID2",
+					PrivateKey: []byte("newPrivateKey"),
+					Scopes:     []string{"name", "email"},
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:          tt.fields.eventstore,
+				idpConfigEncryption: tt.fields.secretCrypto,
+			}
+			got, err := c.UpdateInstanceAppleProvider(tt.args.ctx, tt.args.id, tt.args.provider)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}

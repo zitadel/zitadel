@@ -543,25 +543,22 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_names2_domains SET owner_removed = $1 WHERE (instance_id = $2) AND (resource_owner = $3)",
+							expectedStmt: "DELETE FROM projections.login_names2_domains WHERE (instance_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
-								true,
 								"instance-id",
 								"agg-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.login_names2_policies SET owner_removed = $1 WHERE (instance_id = $2) AND (resource_owner = $3)",
+							expectedStmt: "DELETE FROM projections.login_names2_policies WHERE (instance_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
-								true,
 								"instance-id",
 								"agg-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.login_names2_users SET owner_removed = $1 WHERE (instance_id = $2) AND (resource_owner = $3)",
+							expectedStmt: "DELETE FROM projections.login_names2_users WHERE (instance_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
-								true,
 								"instance-id",
 								"agg-id",
 							},

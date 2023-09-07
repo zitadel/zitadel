@@ -1065,13 +1065,8 @@ func (p *userProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.St
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-NCsdV", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return handler.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(UserChangeDateCol, e.CreationDate()),
-			handler.NewCol(UserSequenceCol, e.Sequence()),
-			handler.NewCol(UserOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(UserResourceOwnerCol, e.Aggregate().ID),

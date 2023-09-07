@@ -192,13 +192,8 @@ func (p *privacyPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*h
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-bxJCY", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return handler.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(PrivacyPolicyChangeDateCol, e.CreationDate()),
-			handler.NewCol(PrivacyPolicySequenceCol, e.Sequence()),
-			handler.NewCol(PrivacyPolicyOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(PrivacyPolicyInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(PrivacyPolicyResourceOwnerCol, e.Aggregate().ID),
