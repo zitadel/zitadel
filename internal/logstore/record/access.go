@@ -23,7 +23,10 @@ type AccessLog struct {
 	ProjectID       string              `json:"projectId"`
 	RequestedDomain string              `json:"requestedDomain"`
 	RequestedHost   string              `json:"requestedHost"`
-	normalized      bool                `json:"-"`
+	// NotCountable can be used by the logging service to explicitly stating,
+	// that the request must not increase the amount of countable (authenticated) requests
+	NotCountable bool `json:"-"`
+	normalized   bool `json:"-"`
 }
 
 type AccessProtocol uint8
@@ -36,20 +39,7 @@ const (
 )
 
 var (
-	unaccountableHTTPEndpoints = []string{
-		"/system/v1/",
-		"/admin/v1/healthz",
-		"/management/v1/healthz",
-		"/management/v1/zitadel/docs",
-		"/auth/v1/healthz",
-		"./well-known/openid-configuration",
-		"/oauth/v2/authorize",
-		"/oauth/v2/keys",
-		"/saml/v2/metadata",
-		"/saml/v2/certificate",
-		"/saml/v2/SSO",
-	}
-	unaccountableGRPCEndpoints = []string{
+	unaccountableEndpoints = []string{
 		"/zitadel.system.v1.SystemService/",
 		"/zitadel.admin.v1.AdminService/Healthz",
 		"/zitadel.management.v1.ManagementService/Healthz",
@@ -59,30 +49,35 @@ var (
 )
 
 func (a AccessLog) IsAuthenticated() bool {
+	if a.NotCountable {
+		return false
+	}
 	if !a.normalized {
 		panic("access log not normalized, Normalize() must be called before IsAuthenticated()")
 	}
 	_, hasHTTPAuthHeader := a.RequestHeaders[strings.ToLower(zitadel_http.Authorization)]
+	// ignore requests, which were unauthorized or do not require an authorization (even if one was sent)
+	// also ignore if the limit was already reached or if the server returned an internal error
+	// not that endpoints paths are only checked with the gRPC representation as HTTP (gateway) will not log them
 	return hasHTTPAuthHeader &&
 		(a.Protocol == HTTP &&
 			a.ResponseStatus != http.StatusInternalServerError &&
 			a.ResponseStatus != http.StatusTooManyRequests &&
-			a.ResponseStatus != http.StatusUnauthorized &&
-			!a.isUnaccountableEndpoint(unaccountableHTTPEndpoints)) ||
+			a.ResponseStatus != http.StatusUnauthorized) ||
 		(a.Protocol == GRPC &&
 			a.ResponseStatus != uint32(codes.Internal) &&
 			a.ResponseStatus != uint32(codes.ResourceExhausted) &&
 			a.ResponseStatus != uint32(codes.Unauthenticated) &&
-			!a.isUnaccountableEndpoint(unaccountableGRPCEndpoints))
+			!a.isUnaccountableEndpoint())
 }
 
-func (a AccessLog) isUnaccountableEndpoint(endpoints []string) bool {
-	for _, endpoint := range endpoints {
+func (a AccessLog) isUnaccountableEndpoint() bool {
+	for _, endpoint := range unaccountableEndpoints {
 		if strings.HasPrefix(a.RequestURL, endpoint) {
-			return false
+			return true
 		}
 	}
-	return true
+	return false
 }
 
 func (a AccessLog) Normalize() *AccessLog {

@@ -38,8 +38,8 @@ func NewProvider(
 	es *eventstore.Eventstore,
 	projections *database.DB,
 	instanceHandler,
-	userAgentCookie,
-	accessHandler func(http.Handler) http.Handler,
+	userAgentCookie func(http.Handler) http.Handler,
+	accessHandler *middleware.AccessInterceptor,
 ) (*provider.Provider, error) {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 
@@ -63,7 +63,7 @@ func NewProvider(
 			middleware.NoCacheInterceptor().Handler,
 			instanceHandler,
 			userAgentCookie,
-			accessHandler,
+			accessHandler.HandleIgnorePathPrefixes(ignoredQuotaLimitEndpoint(conf.ProviderConfig)),
 			http_utils.CopyHeadersToContext,
 		),
 		provider.WithCustomTimeFormat("2006-01-02T15:04:05.999Z"),
@@ -99,4 +99,24 @@ func newStorage(
 		query:           query,
 		defaultLoginURL: fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
 	}, nil
+}
+
+func ignoredQuotaLimitEndpoint(config *provider.Config) []string {
+	ignoredEndpoints := make([]string, 3)
+	ignoredEndpoints[0] = HandlerPrefix + provider.DefaultMetadataEndpoint
+	ignoredEndpoints[1] = HandlerPrefix + provider.DefaultCertificateEndpoint
+	ignoredEndpoints[2] = HandlerPrefix + provider.DefaultSingleSignOnEndpoint
+	if config.MetadataConfig != nil && config.MetadataConfig.Path != "" {
+		ignoredEndpoints[0] = HandlerPrefix + config.MetadataConfig.Path
+	}
+	if config.IDPConfig == nil || config.IDPConfig.Endpoints == nil {
+		return ignoredEndpoints
+	}
+	if config.IDPConfig.Endpoints.Certificate != nil && config.IDPConfig.Endpoints.Certificate.Relative() != "" {
+		ignoredEndpoints[1] = HandlerPrefix + config.IDPConfig.Endpoints.Certificate.Relative()
+	}
+	if config.IDPConfig.Endpoints.SingleSignOn != nil && config.IDPConfig.Endpoints.SingleSignOn.Relative() != "" {
+		ignoredEndpoints[2] = HandlerPrefix + config.IDPConfig.Endpoints.SingleSignOn.Relative()
+	}
+	return ignoredEndpoints
 }
