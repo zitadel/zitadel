@@ -40,11 +40,13 @@
 
       .icon-button {
         height: 30px;
+        width: 30px;
         line-height: 30px;
+        padding: 0;
 
         .icon {
           font-size: 1rem;
-          margin-bottom: 3px;
+          height: 1rem;
         }
 
         &:not(:hover) {
@@ -84,7 +86,7 @@
   }
 
   button {
-    margin-bottom: 14px;
+    margin-bottom: 0.5rem;
     margin-right: -0.5rem;
   }
 }

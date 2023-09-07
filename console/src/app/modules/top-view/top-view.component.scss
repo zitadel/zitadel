@@ -72,11 +72,12 @@
           display: flex;
           align-items: center;
           margin-top: -10px;
+          color: map-get($foreground, text);
 
-          i {
+          .icon {
             font-size: 1.2rem;
             height: 1.2rem;
-            line-height: 1.2rem;
+            width: 1.2rem;
           }
         }
       }

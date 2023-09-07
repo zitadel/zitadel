@@ -553,12 +553,19 @@ $custom-body-level: mat.define-typography-level(
   $letter-spacing: normal,
 );
 
+$custom-caption-level: mat.define-typography-level(
+  $font-family: Lato,
+  $font-weight: 500,
+  $font-size: 12px,
+  $letter-spacing: normal,
+);
+
 $custom-typography: mat.define-typography-config(
   $font-family: Lato,
   $button: $custom-level,
   $body-1: $custom-body-level,
   $body-2: $custom-body-level,
-  $caption: $custom-body-level,
+  $caption: $custom-caption-level,
 );
 
 $caos-light-app-theme: mat.define-light-theme(
@@ -568,7 +575,7 @@ $caos-light-app-theme: mat.define-light-theme(
       accent: mat-palette($caos-light-primary),
       warn: mat-palette($caos-light-warn),
       // foreground: $caos-light-theme-foreground,
-      // background: $caos-light-theme-background,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+      // background: $caos-light-theme-background,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
     ),
     typography: $custom-typography,
     density: 0,
@@ -582,7 +589,7 @@ $caos-dark-app-theme: mat.define-dark-theme(
       accent: mat-palette($caos-dark-primary),
       warn: mat-palette($caos-dark-warn),
       // foreground: $caos-dark-theme-foreground,
-      // background: $caos-dark-theme-background,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+      // background: $caos-dark-theme-background,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
     ),
     typography: $custom-typography,
     density: 0,
@@ -619,11 +626,6 @@ $caos-dark-app-theme: modify-background($caos-dark-app-theme, background, $caos-
   &.mat-mdc-outlined-button {
     padding-left: 0.5rem;
     height: 36px;
-    /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-    .mat-button-wrapper {
-      display: flex;
-      align-items: center;
-    }
 
     i:not(.no-margin) {
       margin-right: 0.25rem;
@@ -687,6 +689,10 @@ $caos-dark-app-theme: modify-background($caos-dark-app-theme, background, $caos-
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     border-radius: 6px;
     min-height: fit-content;
+  }
+
+  .mat-mdc-select-panel {
+    background-color: map-get($background, cards);
   }
 
   .mat-mdc-option {
@@ -771,6 +777,10 @@ $caos-dark-app-theme: modify-background($caos-dark-app-theme, background, $caos-
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     border-radius: 6px;
     min-height: fit-content;
+  }
+
+  .mat-mdc-select-panel {
+    background-color: map-get($background, cards);
   }
 
   .mat-mdc-option {

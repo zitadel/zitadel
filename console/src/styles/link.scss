@@ -5,11 +5,11 @@
   $primary-color: mat.get-color-from-palette($primary, 500);
   $primary-color-lighter: mat.get-color-from-palette($primary, A300);
 
-  a {
-    color: $primary-color;
-  }
+  // a:not([mat-icon-button]):not([mat-stroked-button]):not([mat-raised-button]) {
+  //   color: $primary-color;
+  // }
 
-  a:hover {
-    color: $primary-color-lighter;
-  }
+  // a:not([mat-icon-button]):not([mat-stroked-button]):not([mat-raised-button]):hover {
+  //   color: $primary-color-lighter;
+  // }
 }

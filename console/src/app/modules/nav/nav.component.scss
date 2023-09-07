@@ -56,7 +56,7 @@
           font-size: 14px;
           line-height: 14px;
           padding: 0.4rem 12px;
-          color: mat.get-color-from-palette($foreground, text) !important;
+          color: mat.get-color-from-palette($foreground, text);
           transition: all 0.2s ease;
           text-decoration: none;
           border-radius: 50vw;
@@ -105,7 +105,7 @@
 
           &.active {
             background-color: $primary-color;
-            color: mat.get-color-from-palette($foreground, toolbar-items) !important;
+            color: mat.get-color-from-palette($primary, default-contrast);
 
             .c_label {
               .count {
