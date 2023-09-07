@@ -844,7 +844,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             summary: "Remove Organization";
-            description: "Sets the state of the organization and all its resource (Users, Projects, Grants to and from the org) to remove. Users of this organization will not be able to log in."
+            description: "Deletes the organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in."
             responses: {
                 key: "200";
                 value: {

@@ -964,8 +964,7 @@
     "STATE": {
       "0": "No definida",
       "1": "Activa",
-      "2": "Desactivada",
-      "3": "Eliminada"
+      "2": "Desactivada"
     },
     "MEMBER": {
       "TITLE": "Mánagers de la organización",
