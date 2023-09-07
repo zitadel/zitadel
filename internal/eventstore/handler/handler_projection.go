@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/pseudo"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 const (
@@ -141,6 +142,9 @@ func (h *ProjectionHandler) Trigger(ctx context.Context, instances ...string) co
 // If a bulk action was executed, the call timestamp in context will be reset for subsequent queries.
 // The returned context is never nil. It is either the original context or an updated context.
 func (h *ProjectionHandler) TriggerErr(ctx context.Context, instances ...string) (outCtx context.Context, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.EndWithError(err)
+
 	instances = triggerInstances(ctx, instances)
 	defer func() {
 		outCtx = call.ResetTimestamp(ctx)
