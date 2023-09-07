@@ -173,11 +173,6 @@ func (q *AddQuota) validate() error {
 	if q.ResetInterval < time.Minute {
 		return errors.ThrowInvalidArgument(nil, "QUOTA-R5otd", "Errors.Quota.Invalid.ResetInterval")
 	}
-
-	if !q.Limit && len(q.Notifications) == 0 {
-		return errors.ThrowInvalidArgument(nil, "QUOTA-4Nv68", "Errors.Quota.Invalid.Noop")
-	}
-
 	return nil
 }
 

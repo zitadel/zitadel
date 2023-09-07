@@ -41,6 +41,7 @@ func (wm *quotaWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *quota.AddedEvent:
 			wm.AggregateID = e.Aggregate().ID
+			wm.ChangeDate = e.CreationDate()
 			wm.active = true
 		case *quota.RemovedEvent:
 			wm.AggregateID = e.Aggregate().ID

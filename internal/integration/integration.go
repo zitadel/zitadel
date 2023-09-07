@@ -8,7 +8,12 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"io"
+	"net"
+	"net/http"
+	"net/http/httptest"
 	"os"
+	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -100,6 +105,11 @@ type Tester struct {
 	Instance     authz.Instance
 	Organisation *query.Org
 	Users        InstanceUserMap
+
+	MilestoneChan           chan []byte
+	milestoneServer         *httptest.Server
+	QuotaNotificationChan   chan []byte
+	quotaNotificationServer *httptest.Server
 
 	Client   Client
 	WebAuthN *webauthn.Client
@@ -271,6 +281,8 @@ func (s *Tester) Done() {
 
 	s.Shutdown <- os.Interrupt
 	s.wg.Wait()
+	s.milestoneServer.Close()
+	s.quotaNotificationServer.Close()
 }
 
 // NewTester start a new Zitadel server by passing the default commandline.
@@ -328,6 +340,12 @@ func NewTester(ctx context.Context) *Tester {
 	tester.createMachineUserOrgOwner(ctx)
 	tester.createMachineUserInstanceOwner(ctx)
 	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, "https://"+tester.Host())
+	tester.MilestoneChan = make(chan []byte)
+	tester.milestoneServer, err = runMilestoneServer(tester.MilestoneChan)
+	logging.OnError(err).Fatal()
+	tester.QuotaNotificationChan = make(chan []byte)
+	tester.quotaNotificationServer, err = runQuotaServer(tester.QuotaNotificationChan)
+	logging.OnError(err).Fatal()
 
 	return &tester
 }
@@ -337,4 +355,50 @@ func Contexts(timeout time.Duration) (ctx, errCtx context.Context, cancel contex
 	cancel()
 	ctx, cancel = context.WithTimeout(context.Background(), timeout)
 	return ctx, errCtx, cancel
+}
+
+func runMilestoneServer(bodies chan []byte) (*httptest.Server, error) {
+	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if r.Header.Get("single-value") != "single-value" {
+			http.Error(w, "single-value header not set", http.StatusInternalServerError)
+			return
+		}
+		if reflect.DeepEqual(r.Header.Get("multi-value"), "multi-value-1,multi-value-2") {
+			http.Error(w, "single-value header not set", http.StatusInternalServerError)
+			return
+		}
+		bodies <- body
+		w.WriteHeader(http.StatusOK)
+	}))
+	listener, err := net.Listen("tcp", "localhost:8081")
+	if err != nil {
+		return nil, err
+	}
+	mockServer.Listener = listener
+	mockServer.Start()
+	return mockServer, nil
+}
+
+func runQuotaServer(bodies chan []byte) (*httptest.Server, error) {
+	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		bodies <- body
+		w.WriteHeader(http.StatusOK)
+	}))
+	listener, err := net.Listen("tcp", "localhost:8082")
+	if err != nil {
+		return nil, err
+	}
+	mockServer.Listener = listener
+	mockServer.Start()
+	return mockServer, nil
 }

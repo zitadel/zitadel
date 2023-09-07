@@ -608,24 +608,6 @@ func TestQuota_AddQuota_validate(t *testing.T) {
 			},
 		},
 		{
-			name: "not limit and no notifications",
-			args: args{
-				addQuota: &AddQuota{
-					Unit:          QuotaRequestsAllAuthenticated,
-					From:          time.Now(),
-					ResetInterval: time.Minute * 10,
-					Amount:        100,
-					Limit:         false,
-					Notifications: nil,
-				},
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "QUOTA-4Nv68", ""))
-				},
-			},
-		},
-		{
 			name: "validate, ok",
 			args: args{
 				addQuota: &AddQuota{
@@ -633,7 +615,7 @@ func TestQuota_AddQuota_validate(t *testing.T) {
 					From:          time.Now(),
 					ResetInterval: time.Minute * 10,
 					Amount:        100,
-					Limit:         true,
+					Limit:         false,
 					Notifications: nil,
 				},
 			},
