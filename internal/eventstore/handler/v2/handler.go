@@ -18,7 +18,7 @@ import (
 )
 
 type EventStore interface {
-	InstanceIDs(ctx context.Context, maxAge time.Duration, query *eventstore.SearchQueryBuilder) ([]string, error)
+	InstanceIDs(ctx context.Context, maxAge time.Duration, forceLoad bool, query *eventstore.SearchQueryBuilder) ([]string, error)
 	Filter(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error)
 	Push(ctx context.Context, cmds ...eventstore.Command) ([]eventstore.Event, error)
 }
@@ -207,14 +207,12 @@ func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]str
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).
 		AllowTimeTravel().
 		AddQuery().
-		// AggregateTypes(instance.AggregateType).
-		// EventTypes(instance.InstanceAddedEventType).
 		ExcludedInstanceID("")
 	if didInitialize {
 		query = query.
 			CreationDateAfter(h.now().Add(-1 * h.handleActiveInstances))
 	}
-	return h.es.InstanceIDs(ctx, h.requeueEvery, query.Builder())
+	return h.es.InstanceIDs(ctx, h.requeueEvery, !didInitialize, query.Builder())
 }
 
 func (h *Handler) Trigger(ctx context.Context) (_ context.Context, err error) {

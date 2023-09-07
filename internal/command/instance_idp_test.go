@@ -4822,25 +4822,21 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewAppleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"",
-									"clientID",
-									"teamID",
-									"keyID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("privateKey"),
-									},
-									nil,
-									idp.Options{},
-								)),
-						},
+						instance.NewAppleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"",
+							"clientID",
+							"teamID",
+							"keyID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("privateKey"),
+							},
+							nil,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -4866,30 +4862,26 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewAppleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"",
-									"clientID",
-									"teamID",
-									"keyID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("privateKey"),
-									},
-									[]string{"name", "email"},
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewAppleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"",
+							"clientID",
+							"teamID",
+							"keyID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("privateKey"),
+							},
+							[]string{"name", "email"},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -5107,36 +5099,31 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewAppleIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.AppleIDPChanges{
-											idp.ChangeAppleClientID("clientID2"),
-											idp.ChangeAppleTeamID("teamID2"),
-											idp.ChangeAppleKeyID("keyID2"),
-											idp.ChangeApplePrivateKey(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("newPrivateKey"),
-											}),
-											idp.ChangeAppleScopes([]string{"name", "email"}),
-											idp.ChangeAppleOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewAppleIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.AppleIDPChanges{
+									idp.ChangeAppleClientID("clientID2"),
+									idp.ChangeAppleTeamID("teamID2"),
+									idp.ChangeAppleKeyID("keyID2"),
+									idp.ChangeApplePrivateKey(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newPrivateKey"),
+									}),
+									idp.ChangeAppleScopes([]string{"name", "email"}),
+									idp.ChangeAppleOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
