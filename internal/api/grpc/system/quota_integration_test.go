@@ -82,12 +82,12 @@ func TestServer_QuotaNotification_NoLimit(t *testing.T) {
 		Notifications: []*quota_pb.Notification{
 			{
 				Percent: uint32(percent),
-				Repeat:  true,
+				Repeat:  false,
 				CallUrl: "http://localhost:8082",
 			},
 			{
 				Percent: 100,
-				Repeat:  false,
+				Repeat:  true,
 				CallUrl: "http://localhost:8082",
 			},
 		},
@@ -116,7 +116,7 @@ func TestServer_QuotaNotification_NoLimit(t *testing.T) {
 			require.NoError(t, fmt.Errorf("error in %d call of %d over limit: %f", i, amount, err))
 		}
 	}
-	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, 100+percent)
+	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, 200)
 
 	_, limitErr := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
 	require.NoError(t, limitErr)

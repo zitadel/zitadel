@@ -19,7 +19,7 @@ var (
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, _, cancel := integration.Contexts(2 * time.Hour)
+		ctx, _, cancel := integration.Contexts(5 * time.Minute)
 		defer cancel()
 		CTX = ctx
 

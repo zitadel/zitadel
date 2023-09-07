@@ -100,6 +100,9 @@ func (q *Queries) GetDueQuotaNotifications(ctx context.Context, instanceID strin
 	}
 	for _, notification := range notifications.Configs {
 		reachedThreshold := calculateThreshold(usedRel, notification.Percent)
+		if !notification.Repeat && notification.Percent < reachedThreshold {
+			continue
+		}
 		dueNotifications = append(
 			dueNotifications,
 			quota.NewNotificationDueEvent(
