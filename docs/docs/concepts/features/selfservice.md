@@ -152,6 +152,8 @@ Users can setup and delete a second factor and FIDO Passkeys (Passwordless).
 Available authenticators are:
 
 - Mobile one-time password (OTP) (Authenticator Apps)
+- One time E-Mail Code
+- One time SMS Code
 - FIDO Universal Second Factor (U2F) (Security Keys, Device, etc.)
 - FIDO2 WebAuthN (Passkeys)
 
