@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/pseudo"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 const (
@@ -141,6 +142,9 @@ func (h *ProjectionHandler) Trigger(ctx context.Context, instances ...string) co
 // If a bulk action was executed, the call timestamp in context will be reset for subsequent queries.
 // The returned context is never nil. It is either the original context or an updated context.
 func (h *ProjectionHandler) TriggerErr(ctx context.Context, instances ...string) (outCtx context.Context, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.EndWithError(err)
+
 	instances = triggerInstances(ctx, instances)
 	defer func() {
 		outCtx = call.ResetTimestamp(ctx)
@@ -279,7 +283,7 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 			// This ensures that only instances with recent events on the handler are projected
 			query = query.CreationDateAfter(h.nowFunc().Add(-1 * h.handleActiveInstances))
 		}
-		ids, err := h.Eventstore.InstanceIDs(ctx, query.Builder())
+		ids, err := h.Eventstore.InstanceIDs(ctx, h.requeueAfter, !succeededOnce, query.Builder())
 		if err != nil {
 			logging.WithFields("projection", h.ProjectionName).WithError(err).Error("instance ids")
 			h.triggerProjection.Reset(h.requeueAfter)

@@ -200,12 +200,9 @@ func authMethodsFromSession(session *query.Session) []domain.UserAuthMethodType 
 	if !session.IntentFactor.IntentCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypeIDP)
 	}
-	// TODO: add checks with https://github.com/zitadel/zitadel/issues/5477
-	/*
-		if !session.TOTPFactor.TOTPCheckedAt.IsZero() {
-			types = append(types, domain.UserAuthMethodTypeTOTP)
-		}
-	*/
+	if !session.TOTPFactor.TOTPCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypeTOTP)
+	}
 	if !session.OTPSMSFactor.OTPCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypeOTPSMS)
 	}

@@ -360,6 +360,7 @@ Footer:
   PrivacyPolicy: Политика за поверителност
   Help: Помогне
   SupportEmail: Поддръжка на имейл
+SignIn: Влезте с {{.Provider}}
 Errors:
   Internal: Възникна вътрешна грешка
   AuthRequest:

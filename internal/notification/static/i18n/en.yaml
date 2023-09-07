@@ -1,37 +1,37 @@
 InitCode:
-  Title: ZITADEL - Initialize User
+  Title: Initialize User
   PreHeader: Initialize User
   Subject: Initialize User
   Greeting: Hello {{.DisplayName}},
-  Text: This user was created in ZITADEL. Use the username {{.PreferredLoginName}} to login. Please click the button below to finish the initialization process. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
+  Text: This user was created. Use the username {{.PreferredLoginName}} to login. Please click the button below to finish the initialization process. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
   ButtonText: Finish initialization
 PasswordReset:
-  Title: ZITADEL - Reset password
+  Title: Reset password
   PreHeader: Reset password
   Subject: Reset password
   Greeting: Hello {{.DisplayName}},
   Text: We received a password reset request. Please use the button below to reset your password. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
   ButtonText: Reset password
 VerifyEmail:
-  Title: ZITADEL - Verify email
+  Title: Verify email
   PreHeader: Verify email
   Subject: Verify email
   Greeting: Hello {{.DisplayName}},
-  Text: A new email has been added. Please use the button below to verify your mail. (Code {{.Code}}) If you didn't add a new email, please ignore this email.
+  Text: A new email has been added. Please use the button below to verify your email. (Code {{.Code}}) If you didn't add a new email, please ignore this email.
   ButtonText: Verify email
 VerifyPhone:
-  Title: ZITADEL - Verify phone
+  Title: Verify phone
   PreHeader: Verify phone
   Subject: Verify phone
   Greeting: Hello {{.DisplayName}},
   Text: A new phone number has been added. Please use the following code to verify it {{.Code}}
   ButtonText: Verify phone
 VerifyEmailOTP:
-  Title: ZITADEL - Verify One-Time Password
+  Title: Verify One-Time Password
   PreHeader: Verify One-Time Password
   Subject: Verify One-Time Password
   Greeting: Hello {{.DisplayName}},
-  Text: Please use the one-time password {{.OTP}} to authenticate at ZITADEL within the next five minutes or click the "Authenticate" button.
+  Text: Please use the one-time password {{.OTP}} to authenticate within the next five minutes or click the "Authenticate" button.
   ButtonText: Authenticate
 VerifySMSOTP:
   Text: >-
@@ -39,23 +39,23 @@ VerifySMSOTP:
     
     @{{.Domain}} #{{.OTP}}
 DomainClaimed:
-  Title: ZITADEL - Domain has been claimed
+  Title: Domain has been claimed
   PreHeader: Change email / username
   Subject: Domain has been claimed
   Greeting: Hello {{.DisplayName}},
   Text: The domain {{.Domain}} has been claimed by an organization. Your current user {{.Username}} is not part of this organization. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
   ButtonText: Login
 PasswordlessRegistration:
-  Title: ZITADEL - Add Passwordless Login
+  Title: Add Passwordless Login
   PreHeader: Add Passwordless Login
   Subject: Add Passwordless Login
   Greeting: Hello {{.DisplayName}},
   Text: We received a request to add a token for passwordless login. Please use the button below to add your token or device for passwordless login.
   ButtonText: Add Passwordless Login
 PasswordChange:
-  Title: ZITADEL - Password of user has changed
+  Title: Password of user has changed
   PreHeader: Change password
   Subject: Password of user has changed
   Greeting: Hello {{.DisplayName}},
-  Text: The password of your user has changed, if this change was not done by you, please be advised to immediately reset your password.
+  Text: The password of your user has changed. If this change was not done by you, please be advised to immediately reset your password.
   ButtonText: Login

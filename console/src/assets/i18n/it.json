@@ -963,8 +963,7 @@
     "STATE": {
       "0": "Non definito",
       "1": "Attivo",
-      "2": "Disattivato",
-      "3": "Rimosso"
+      "2": "Disattivato"
     },
     "MEMBER": {
       "TITLE": "Manager dell'organizzazione",
@@ -1055,6 +1054,7 @@
       "TITLE": "Impostazioni SMTP",
       "SENDERADDRESS": "Indirizzo email del mittente",
       "SENDERNAME": "Nome del mittente",
+      "REPLYTOADDRESS": "Indirizzo Reply-to",
       "HOSTANDPORT": "Host e porta",
       "USER": "Utente",
       "PASSWORD": "Password",

@@ -963,8 +963,7 @@
     "STATE": {
       "0": "Nieokreślone",
       "1": "Aktywne",
-      "2": "Dezaktywowane",
-      "3": "Usunięte"
+      "2": "Dezaktywowane"
     },
     "MEMBER": {
       "TITLE": "Menadżerowie organizacji",
@@ -1055,6 +1054,7 @@
       "TITLE": "Ustawienia SMTP",
       "SENDERADDRESS": "Adres e-mail nadawcy",
       "SENDERNAME": "Nazwa nadawcy",
+      "REPLYTOADDRESS": "Adres Reply-to",
       "HOSTANDPORT": "Host i port",
       "USER": "Użytkownik",
       "PASSWORD": "Hasło",

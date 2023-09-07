@@ -199,6 +199,10 @@ Errors:
     IDP:
       InvalidSearchQuery: Parametro di ricerca non valido
       InvalidCharacter: Per un dominio sono ammessi solo caratteri alfanumerici, . e -
+      ClientIDMissing: ClientID mancante
+      TeamIDMissing: TeamID mancante
+      KeyIDMissing: ID chiave mancante
+      PrivateKeyMissing: Chiave privata mancante
     LoginPolicy:
       NotFound: Impostazioni di accesso non trovati
       Invalid: Impostazioni di accesso non sono validi

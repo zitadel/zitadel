@@ -110,7 +110,14 @@ var (
 		` projections.idp_templates5_ldap2.phone_verified_attribute,` +
 		` projections.idp_templates5_ldap2.preferred_language_attribute,` +
 		` projections.idp_templates5_ldap2.avatar_url_attribute,` +
-		` projections.idp_templates5_ldap2.profile_attribute` +
+		` projections.idp_templates5_ldap2.profile_attribute,` +
+		// apple
+		` projections.idp_templates5_apple.idp_id,` +
+		` projections.idp_templates5_apple.client_id,` +
+		` projections.idp_templates5_apple.team_id,` +
+		` projections.idp_templates5_apple.key_id,` +
+		` projections.idp_templates5_apple.private_key,` +
+		` projections.idp_templates5_apple.scopes` +
 		` FROM projections.idp_templates5` +
 		` LEFT JOIN projections.idp_templates5_oauth2 ON projections.idp_templates5.id = projections.idp_templates5_oauth2.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_oauth2.instance_id` +
 		` LEFT JOIN projections.idp_templates5_oidc ON projections.idp_templates5.id = projections.idp_templates5_oidc.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_oidc.instance_id` +
@@ -122,6 +129,7 @@ var (
 		` LEFT JOIN projections.idp_templates5_gitlab_self_hosted ON projections.idp_templates5.id = projections.idp_templates5_gitlab_self_hosted.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_gitlab_self_hosted.instance_id` +
 		` LEFT JOIN projections.idp_templates5_google ON projections.idp_templates5.id = projections.idp_templates5_google.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_google.instance_id` +
 		` LEFT JOIN projections.idp_templates5_ldap2 ON projections.idp_templates5.id = projections.idp_templates5_ldap2.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_ldap2.instance_id` +
+		` LEFT JOIN projections.idp_templates5_apple ON projections.idp_templates5.id = projections.idp_templates5_apple.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_apple.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	idpTemplateCols = []string{
 		"id",
@@ -219,6 +227,13 @@ var (
 		"preferred_language_attribute",
 		"avatar_url_attribute",
 		"profile_attribute",
+		// apple config
+		"idp_id",
+		"client_id",
+		"team_id",
+		"key_id",
+		"private_key",
+		"scopes",
 	}
 	idpTemplatesQuery = `SELECT projections.idp_templates5.id,` +
 		` projections.idp_templates5.resource_owner,` +
@@ -315,6 +330,13 @@ var (
 		` projections.idp_templates5_ldap2.preferred_language_attribute,` +
 		` projections.idp_templates5_ldap2.avatar_url_attribute,` +
 		` projections.idp_templates5_ldap2.profile_attribute,` +
+		// apple
+		` projections.idp_templates5_apple.idp_id,` +
+		` projections.idp_templates5_apple.client_id,` +
+		` projections.idp_templates5_apple.team_id,` +
+		` projections.idp_templates5_apple.key_id,` +
+		` projections.idp_templates5_apple.private_key,` +
+		` projections.idp_templates5_apple.scopes,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.idp_templates5` +
 		` LEFT JOIN projections.idp_templates5_oauth2 ON projections.idp_templates5.id = projections.idp_templates5_oauth2.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_oauth2.instance_id` +
@@ -327,6 +349,7 @@ var (
 		` LEFT JOIN projections.idp_templates5_gitlab_self_hosted ON projections.idp_templates5.id = projections.idp_templates5_gitlab_self_hosted.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_gitlab_self_hosted.instance_id` +
 		` LEFT JOIN projections.idp_templates5_google ON projections.idp_templates5.id = projections.idp_templates5_google.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_google.instance_id` +
 		` LEFT JOIN projections.idp_templates5_ldap2 ON projections.idp_templates5.id = projections.idp_templates5_ldap2.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_ldap2.instance_id` +
+		` LEFT JOIN projections.idp_templates5_apple ON projections.idp_templates5.id = projections.idp_templates5_apple.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_apple.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	idpTemplatesCols = []string{
 		"id",
@@ -424,6 +447,13 @@ var (
 		"preferred_language_attribute",
 		"avatar_url_attribute",
 		"profile_attribute",
+		// apple config
+		"idp_id",
+		"client_id",
+		"team_id",
+		"key_id",
+		"private_key",
+		"scopes",
 		"count",
 	}
 )
@@ -554,6 +584,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// apple
 						nil,
 						nil,
 						nil,
@@ -692,6 +729,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -816,6 +860,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// apple
 						nil,
 						nil,
 						nil,
@@ -951,6 +1002,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -1079,6 +1137,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -1201,6 +1266,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// apple
 						nil,
 						nil,
 						nil,
@@ -1336,6 +1408,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -1464,6 +1543,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						"lang",
 						"avatar",
 						"profile",
+						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -1506,6 +1592,143 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						AvatarURLAttribute:         "avatar",
 						ProfileAttribute:           "profile",
 					},
+				},
+			},
+		},
+		{
+			name:    "prepareIDPTemplateByIDQuery apple idp",
+			prepare: prepareIDPTemplateByIDQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(idpTemplateQuery),
+					idpTemplateCols,
+					[]driver.Value{
+						"idp-id",
+						"ro",
+						testNow,
+						testNow,
+						uint64(20211109),
+						domain.IDPConfigStateActive,
+						"idp-name",
+						domain.IDPTypeApple,
+						domain.IdentityProviderTypeOrg,
+						true,
+						true,
+						true,
+						true,
+						// oauth
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// oidc
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// azure
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// github
+						nil,
+						nil,
+						nil,
+						nil,
+						// github enterprise
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab self hosted
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// google
+						nil,
+						nil,
+						nil,
+						nil,
+						// ldap config
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// apple
+						"idp-id",
+						"client_id",
+						"team_id",
+						"key_id",
+						nil,
+						database.StringArray{"profile"},
+					},
+				),
+			},
+			object: &IDPTemplate{
+				CreationDate:      testNow,
+				ChangeDate:        testNow,
+				Sequence:          20211109,
+				ResourceOwner:     "ro",
+				ID:                "idp-id",
+				State:             domain.IDPStateActive,
+				Name:              "idp-name",
+				Type:              domain.IDPTypeApple,
+				OwnerType:         domain.IdentityProviderTypeOrg,
+				IsCreationAllowed: true,
+				IsLinkingAllowed:  true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AppleIDPTemplate: &AppleIDPTemplate{
+					IDPID:      "idp-id",
+					ClientID:   "client_id",
+					TeamID:     "team_id",
+					KeyID:      "key_id",
+					PrivateKey: nil,
+					Scopes:     []string{"profile"},
 				},
 			},
 		},
@@ -1606,6 +1829,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// apple
 						nil,
 						nil,
 						nil,
@@ -1770,6 +2000,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							"lang",
 							"avatar",
 							"profile",
+							// apple
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1927,6 +2164,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// apple
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -2058,6 +2302,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							"lang",
 							"avatar",
 							"profile",
+							// apple
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 						{
 							"idp-id-google",
@@ -2149,6 +2400,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// apple
 							nil,
 							nil,
 							nil,
@@ -2252,6 +2510,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// apple
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 						{
 							"idp-id-oidc",
@@ -2349,6 +2614,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// apple
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 						{
 							"idp-id-jwt",
@@ -2440,6 +2712,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// apple
 							nil,
 							nil,
 							nil,

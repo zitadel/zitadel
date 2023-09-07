@@ -458,7 +458,7 @@ message CheckIDPIntent {
 }
 
 message CheckTOTP {
-  string totp = 1 [
+  string code = 1 [
     (validate.rules).string = {min_len: 6, max_len: 6},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 6;
@@ -469,7 +469,7 @@ message CheckTOTP {
 }
 
 message CheckOTP {
-  string otp = 1 [
+  string code = 1 [
     (validate.rules).string = {min_len: 1},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
