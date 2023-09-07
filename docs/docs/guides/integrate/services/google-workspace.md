@@ -103,7 +103,7 @@ Save the settings.
 
 Now you should be all set to verify your setup:
 
-- Open Gmail with the following link: https://mail.google.com/a/<your_domain>
+- Open Gmail in an incognito session with the following link: https://mail.google.com/a/<your_domain>
 - Enter your username and credentials
 - You should be redirected to Gmail and logged in
 
@@ -114,4 +114,101 @@ Now you should be all set to verify your setup:
 :::warning Unknown 500 Error from Google
 There is currently an open support case with Google to investigate an issue related to this configuration.
 As soon as users are being redirected to Google, their service returns an Error 500.
+:::
+
+### Add SAML profile on Google Workspace
+
+Open the Google settings for [SSO with third-party IdP](https://admin.google.com/u/1/ac/security/sso) and click on *ADD SAML PROFILE*.
+
+![SSO with third-party IdP](/img/guides/integrate/services/google-workspace-sso-overview.png)
+
+Download the public certificate from your ZITADEL instance by requesting `$YOUR_DOMAIN/saml/v2/certificate`
+
+```bash
+ wget $YOUR_DOMAIN/saml/v2/certificate -O idp.crt
+```
+
+Always replace `$YOUR_DOMAIN` with your instance domain.
+
+Use the following configuration
+
+| Setting | Value |
+| --- | --- |
+| SSO profile name | ZITADEL SSO |
+| IDP entity ID | leave blank |
+| Sign-in page URL | $YOUR_DOMAIN/saml/v2/SSO |
+| Sign-out page URL | $YOUR_DOMAIN/saml/v2/SLO |
+| Change password URL | $YOUR_DOMAIN/ui/console/users/me?id=security |
+| Verification Certifificate | Upload the certificate (idp.crt) |
+
+Now go ahead and click *SAVE*
+
+### Entity ID and ACS URL
+
+Open the Google settings for [SSO with third-party IdP](https://admin.google.com/u/1/ac/security/sso) and click on the SAML Profile *ZITADEL SSO*
+
+![SSO Profile Overview](/img/guides/integrate/services/google-workspace-sso-zitadel.png)
+
+You can copy the "Entity ID" and "ACS URL" from the "SP details" section.
+
+![ZITADEL SSO Profile](/img/guides/integrate/services/google-workspace-zitadel-profile-configured.png)
+
+### Create a SAML application in ZITADEL
+
+Create a new .xml file with the following minimal SAML metadata contents:
+
+```xml
+<?xml version="1.0"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="${ENTITYID}">
+    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol">
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${ACSURL}" index="0"/>
+    </md:SPSSODescriptor>
+</md:EntityDescriptor>
+```
+
+Set or replace the variables with the values from the next screen as follows:
+
+- `${ENTITYID}`: https://accounts.google.com/samlrp/metadata?rpid=<your_value>
+- `${ACSURL}`: https://accounts.google.com/samlrp/acs?rpid=<your_value>
+
+Replace `<your_value>` with the values from the [SSO profile](#entity-id-and-acs-url).
+
+In your existing project:
+
+Press the "+"-button to add an application
+![Project](/img/saml/zitadel/project.png)
+
+Fill in a name for the application and chose the SAML type, then click "Continue".
+![New Application](/img/saml/zitadel/application_saml.png)
+
+Either fill in the URL where ZITADEL can read the metadata from, or upload the metadata XML directly, then click "Continue".
+![Add Metadata to Application](/img/saml/zitadel/application_saml_metadata.png)
+
+Check your application, if everything is correct, press "Create".
+![Create Application](/img/saml/zitadel/application_saml_create.png)
+
+### Activate the SSO profile
+
+Make sure to enable the SSO profile.
+
+In the [domain-specific service URLs](https://admin.google.com/u/1/ac/security/sso/domain-specific-service-urls) settings select "Automatically redirect users to the third-party IdP in the following SSO profile" and select as SSO profile "SSO profile for your organization.
+
+![domain-specific service URLs with ZITADEL SSO](/img/guides/integrate/services/google-workspace-zitadel-set-profile.png)
+
+Save the settings.
+
+![SSO with third-party IdP lower part with ZITADEL SSO](/img/guides/integrate/services/google-workspace-sso-zitadel.png)
+
+### Verify the SSO profile for your organization
+
+Now you should be all set to verify your setup:
+
+- Open Gmail in an incognito session with the following link: https://mail.google.com/a/<your_domain>
+- Enter your username and credentials
+- You should be redirected to Gmail and logged in
+
+`<your_domain>` is the domain you have verified in Google Workspace.
+
+:::warning Unknown 500 Error from Google
+At the moment you will encounter an Error 500 after being redirected to Google.
 :::
