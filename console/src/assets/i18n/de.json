@@ -1112,7 +1112,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - Email"
       },
-      "ADDGENERATOR": "Secret Erscheinungsbild definieren",
+      "ADDGENERATOR": "Secret Generator definieren",
       "GENERATORTYPE": "Typ",
       "EXPIRY": "Ablauf (in Stunden)",
       "INCLUDEDIGITS": "Enthält Zahlen",
