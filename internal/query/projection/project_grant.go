@@ -260,23 +260,13 @@ func (p *projectGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*ha
 
 	return crdb.NewMultiStatement(
 		e,
-		crdb.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
-				handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
-				handler.NewCol(ProjectGrantColumnOwnerRemoved, true),
-			},
+		crdb.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCond(ProjectGrantColumnResourceOwner, e.Aggregate().ID),
 			},
 		),
-		crdb.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
-				handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
-				handler.NewCol(ProjectGrantColumnGrantedOrgRemoved, true),
-			},
+		crdb.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCond(ProjectGrantColumnGrantedOrgID, e.Aggregate().ID),

@@ -18,7 +18,7 @@ SelectAccount:
   DescriptionLinking: アカウントを選択して、外部ユーザーにリンクします。
   OtherUser: その他のユーザー
   SessionState0: アクティブ
-  SessionState1: 非アクティブ
+  SessionState1: ログアウトしました
   MustBeMemberOfOrg: ユーザーは組織 {{.OrgName}} のメンバーである必要があります。
 
 Password:
@@ -362,6 +362,8 @@ Footer:
   Tos: TOS
   PrivacyPolicy: プライバシーポリシー
   Help: ヘルプ
+
+SignIn: '{{.Provider}} でサインイン'
 
 Errors:
   Internal: 内部でエラーが発生しました

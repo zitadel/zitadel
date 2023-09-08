@@ -202,8 +202,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Change the user phone";
-      description: "Change the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms."
+      summary: "Set the user phone";
+      description: "Set the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms."
       responses: {
         key: "200"
         value: {
@@ -490,7 +490,7 @@ service UserService {
   // Start an IDP authentication (for external login, registration or linking)
   rpc StartIdentityProviderIntent (StartIdentityProviderIntentRequest) returns (StartIdentityProviderIntentResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/idp_intents/start"
+      post: "/v2alpha/idp_intents"
       body: "*"
     };
 

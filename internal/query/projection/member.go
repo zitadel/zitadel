@@ -139,12 +139,8 @@ func multiReduceMemberOwnerRemoved(e eventstore.Event, opts ...reduceMemberOpt) 
 	for _, opt := range opts {
 		config = opt(config)
 	}
-	return crdb.AddUpdateStatement(
-		[]handler.Column{
-			handler.NewCol(MemberChangeDate, e.CreationDate()),
-			handler.NewCol(MemberSequence, e.Sequence()),
-			handler.NewCol(MemberOwnerRemoved, true),
-		},
+
+	return crdb.AddDeleteStatement(
 		config.conds,
 	)
 }
@@ -172,16 +168,14 @@ func memberUserOwnerRemovedCols(e eventstore.Event) []handler.Column {
 }
 
 func reduceMemberUserOwnerRemoved(e eventstore.Event, opts ...reduceMemberOpt) (*handler.Statement, error) {
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		memberUserOwnerRemovedCols(e),
 		memberUserOwnerRemovedConds(e, opts...),
 	), nil
 }
 
 func multiReduceMemberUserOwnerRemoved(e eventstore.Event, opts ...reduceMemberOpt) func(eventstore.Event) crdb.Exec {
-	return crdb.AddUpdateStatement(
-		memberUserOwnerRemovedCols(e),
+	return crdb.AddDeleteStatement(
 		memberUserOwnerRemovedConds(e, opts...),
 	)
 }

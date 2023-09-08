@@ -25,7 +25,7 @@ SelectAccount:
   DescriptionLinking: 'Изберете своя акаунт, който да свържете с вашия външен потребител.'
   OtherUser: Друг потребител
   SessionState0: активен
-  SessionState1: неактивен
+  SessionState1: Не сте в профила си
   MustBeMemberOfOrg: 'Потребителят трябва да е член на {{.OrgName}} организация.'
 Password:
   Title: Парола
@@ -360,6 +360,7 @@ Footer:
   PrivacyPolicy: Политика за поверителност
   Help: Помогне
   SupportEmail: Поддръжка на имейл
+SignIn: Влезте с {{.Provider}}
 Errors:
   Internal: Възникна вътрешна грешка
   AuthRequest:

@@ -191,6 +191,10 @@ Errors:
       InvalidCharacter: ドメインは英数字、'.'、'-'のみ使用可能です。
     IDP:
       InvalidSearchQuery: 無効な検索クエリです
+      ClientIDMissing: クライアントIDがありません
+      TeamIDMissing: チームIDがありません
+      KeyIDMissing: キーIDがありません
+      PrivateKeyMissing: 秘密キーがありません
     LoginPolicy:
       NotFound: ログインポリシーが見つかりません
       Invalid: 無効なログインポリシーです

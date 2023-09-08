@@ -6,6 +6,8 @@ import {
   ActivateLabelPolicyResponse,
   ActivateSMSProviderRequest,
   ActivateSMSProviderResponse,
+  AddAppleProviderRequest,
+  AddAppleProviderResponse,
   AddAzureADProviderRequest,
   AddAzureADProviderResponse,
   AddCustomDomainPolicyRequest,
@@ -214,6 +216,8 @@ import {
   SetSecurityPolicyResponse,
   SetUpOrgRequest,
   SetUpOrgResponse,
+  UpdateAppleProviderRequest,
+  UpdateAppleProviderResponse,
   UpdateAzureADProviderRequest,
   UpdateAzureADProviderResponse,
   UpdateCustomDomainPolicyRequest,
@@ -1171,6 +1175,14 @@ export class AdminService {
     req: UpdateGitHubEnterpriseServerProviderRequest,
   ): Promise<UpdateGitHubEnterpriseServerProviderResponse.AsObject> {
     return this.grpcService.admin.updateGitHubEnterpriseServerProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addAppleProvider(req: AddAppleProviderRequest): Promise<AddAppleProviderResponse.AsObject> {
+    return this.grpcService.admin.addAppleProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateAppleProvider(req: UpdateAppleProviderRequest): Promise<UpdateAppleProviderResponse.AsObject> {
+    return this.grpcService.admin.updateAppleProvider(req, null).then((resp) => resp.toObject());
   }
 
   public deleteProvider(id: string): Promise<DeleteProviderResponse.AsObject> {

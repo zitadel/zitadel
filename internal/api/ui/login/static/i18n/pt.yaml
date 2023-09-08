@@ -25,7 +25,7 @@ SelectAccount:
   DescriptionLinking: Selecione sua conta para vincular com seu usuário externo.
   OtherUser: Outro usuário
   SessionState0: ativo
-  SessionState1: inativo
+  SessionState1: Sem sessão iniciada
   MustBeMemberOfOrg: O usuário deve ser membro da organização {{.OrgName}}.
 
 Password:
@@ -365,6 +365,8 @@ Footer:
   PrivacyPolicy: Política de privacidade
   Help: Ajuda
   SupportEmail: E-mail de suporte
+
+SignIn: Iniciar sessão com a {{.Provider}}
 
 Errors:
   Internal: Ocorreu um erro interno

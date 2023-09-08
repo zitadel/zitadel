@@ -25,7 +25,7 @@ SelectAccount:
   DescriptionLinking: Изберете ја вашата корисничка сметка за да ја поврзете со вашиот надворешен корисник.
   OtherUser: Друг корисник
   SessionState0: активна
-  SessionState1: неактивна
+  SessionState1: Одјавени
   MustBeMemberOfOrg: Корисникот мора да биде член на организацијата {{.OrgName}}.
 
 Password:
@@ -371,6 +371,8 @@ Footer:
   PrivacyPolicy: Политика за приватност
   Help: Помош
   SupportEmail: Е-пошта за поддршка
+
+SignIn: Пријавете се со {{.Provider}}
 
 Errors:
   Internal: Се појави внатрешна грешка

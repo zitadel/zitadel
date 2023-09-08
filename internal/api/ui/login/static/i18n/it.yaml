@@ -25,7 +25,7 @@ SelectAccount:
   DescriptionLinking: Seleziona il tuo account da collegare al tuo utente esterno.
   OtherUser: Altro utente
   SessionState0: attivo
-  SessionState1: inattivo
+  SessionState1: Disconnesso
   MustBeMemberOfOrg: "L'utente deve essere membro dell'organizzazione {{.OrgName}}."
 
 Password:
@@ -371,6 +371,8 @@ Footer:
   PrivacyPolicy: l'informativa sulla privacy
   Help: Aiuto
   SupportEmail: E-mail di supporto
+
+SignIn: Accedi con {{.Provider}}
 
 Errors:
   Internal: Si è verificato un errore interno

@@ -3,6 +3,7 @@ package command
 import (
 	"net/http"
 	"reflect"
+	"slices"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -14,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	providers "github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/apple"
 	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/idp/providers/github"
 	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
@@ -1587,6 +1589,138 @@ func (wm *LDAPIDPWriteModel) GetProviderOptions() idp.Options {
 	return wm.Options
 }
 
+type AppleIDPWriteModel struct {
+	eventstore.WriteModel
+
+	ID         string
+	Name       string
+	ClientID   string
+	TeamID     string
+	KeyID      string
+	PrivateKey *crypto.CryptoValue
+	Scopes     []string
+	idp.Options
+
+	State domain.IDPState
+}
+
+func (wm *AppleIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.AppleIDPAddedEvent:
+			wm.reduceAddedEvent(e)
+		case *idp.AppleIDPChangedEvent:
+			wm.reduceChangedEvent(e)
+		case *idp.RemovedEvent:
+			wm.State = domain.IDPStateRemoved
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *AppleIDPWriteModel) reduceAddedEvent(e *idp.AppleIDPAddedEvent) {
+	wm.Name = e.Name
+	wm.ClientID = e.ClientID
+	wm.TeamID = e.TeamID
+	wm.KeyID = e.KeyID
+	wm.PrivateKey = e.PrivateKey
+	wm.Scopes = e.Scopes
+	wm.Options = e.Options
+	wm.State = domain.IDPStateActive
+}
+
+func (wm *AppleIDPWriteModel) reduceChangedEvent(e *idp.AppleIDPChangedEvent) {
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.PrivateKey != nil {
+		wm.PrivateKey = e.PrivateKey
+	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *AppleIDPWriteModel) NewChanges(
+	name string,
+	clientID string,
+	teamID string,
+	keyID string,
+	privateKey []byte,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	options idp.Options,
+) ([]idp.AppleIDPChanges, error) {
+	changes := make([]idp.AppleIDPChanges, 0)
+	var encryptedKey *crypto.CryptoValue
+	var err error
+	if len(privateKey) != 0 {
+		encryptedKey, err = crypto.Crypt(privateKey, secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeApplePrivateKey(encryptedKey))
+	}
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeAppleName(name))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeAppleClientID(clientID))
+	}
+	if wm.TeamID != teamID {
+		changes = append(changes, idp.ChangeAppleTeamID(teamID))
+	}
+	if wm.KeyID != keyID {
+		changes = append(changes, idp.ChangeAppleKeyID(keyID))
+	}
+	if slices.Compare(wm.Scopes, scopes) != 0 {
+		changes = append(changes, idp.ChangeAppleScopes(scopes))
+	}
+
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeAppleOptions(opts))
+	}
+	return changes, nil
+}
+
+func (wm *AppleIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+	privateKey, err := crypto.Decrypt(wm.PrivateKey, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	opts := make([]oidc.ProviderOpts, 0, 4)
+	if wm.IsCreationAllowed {
+		opts = append(opts, oidc.WithCreationAllowed())
+	}
+	if wm.IsLinkingAllowed {
+		opts = append(opts, oidc.WithLinkingAllowed())
+	}
+	if wm.IsAutoCreation {
+		opts = append(opts, oidc.WithAutoCreation())
+	}
+	if wm.IsAutoUpdate {
+		opts = append(opts, oidc.WithAutoUpdate())
+	}
+	return apple.New(
+		wm.ClientID,
+		wm.TeamID,
+		wm.KeyID,
+		callbackURL,
+		privateKey,
+		wm.Scopes,
+		opts...,
+	)
+}
+
+func (wm *AppleIDPWriteModel) GetProviderOptions() idp.Options {
+	return wm.Options
+}
+
 type IDPRemoveWriteModel struct {
 	eventstore.WriteModel
 
@@ -1616,6 +1750,8 @@ func (wm *IDPRemoveWriteModel) Reduce() error {
 		case *idp.GoogleIDPAddedEvent:
 			wm.reduceAdded(e.ID)
 		case *idp.LDAPIDPAddedEvent:
+			wm.reduceAdded(e.ID)
+		case *idp.AppleIDPAddedEvent:
 			wm.reduceAdded(e.ID)
 		case *idp.RemovedEvent:
 			wm.reduceRemoved(e.ID)
@@ -1699,6 +1835,10 @@ func (wm *IDPTypeWriteModel) Reduce() error {
 			wm.reduceAdded(e.ID, domain.IDPTypeLDAP, e.Aggregate())
 		case *org.LDAPIDPAddedEvent:
 			wm.reduceAdded(e.ID, domain.IDPTypeLDAP, e.Aggregate())
+		case *instance.AppleIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeApple, e.Aggregate())
+		case *org.AppleIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeApple, e.Aggregate())
 		case *instance.OIDCIDPMigratedAzureADEvent:
 			wm.reduceChanged(e.ID, domain.IDPTypeAzureAD)
 		case *org.OIDCIDPMigratedAzureADEvent:
@@ -1774,6 +1914,7 @@ func (wm *IDPTypeWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.GitLabSelfHostedIDPAddedEventType,
 			instance.GoogleIDPAddedEventType,
 			instance.LDAPIDPAddedEventType,
+			instance.AppleIDPAddedEventType,
 			instance.OIDCIDPMigratedAzureADEventType,
 			instance.OIDCIDPMigratedGoogleEventType,
 			instance.IDPRemovedEventType,
@@ -1792,6 +1933,7 @@ func (wm *IDPTypeWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.GitLabSelfHostedIDPAddedEventType,
 			org.GoogleIDPAddedEventType,
 			org.LDAPIDPAddedEventType,
+			org.AppleIDPAddedEventType,
 			org.OIDCIDPMigratedAzureADEventType,
 			org.OIDCIDPMigratedGoogleEventType,
 			org.IDPRemovedEventType,
@@ -1859,6 +2001,8 @@ func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idp
 			writeModel.model = NewGitLabSelfHostedInstanceIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeGoogle:
 			writeModel.model = NewGoogleInstanceIDPWriteModel(resourceOwner, id)
+		case domain.IDPTypeApple:
+			writeModel.model = NewAppleInstanceIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeUnspecified:
 			fallthrough
 		default:
@@ -1886,6 +2030,8 @@ func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idp
 			writeModel.model = NewGitLabSelfHostedOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeGoogle:
 			writeModel.model = NewGoogleOrgIDPWriteModel(resourceOwner, id)
+		case domain.IDPTypeApple:
+			writeModel.model = NewAppleOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeUnspecified:
 			fallthrough
 		default:
