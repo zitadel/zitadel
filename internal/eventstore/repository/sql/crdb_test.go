@@ -651,7 +651,7 @@ func TestCRDB_CreateInstance(t *testing.T) {
 				t.Errorf("CRDB.CreateInstance() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
-			sequenceRow := testCRDBClient.QueryRow("SELECT EXISTS(SELECT 1 FROM [SHOW SEQUENCES FROM eventstore] WHERE sequence_name like $1)", "i_"+tt.args.instanceID+"%")
+			sequenceRow := testCRDBClient.QueryRow("SELECT EXISTS(SELECT 1 FROM [SHOW SEQUENCES] WHERE sequence_schema = 'eventstore' sequence_name like $1)", "i_"+tt.args.instanceID+"%")
 			var exists bool
 			err := sequenceRow.Scan(&exists)
 			if err != nil {
