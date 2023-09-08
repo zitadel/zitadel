@@ -745,7 +745,7 @@
     "ALLOWEDTOFAIL": "Permitido el fallo",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Advertencia",
-      "DESCRIPTION": "Tenga en cuenta que al deshabilitar una acción para que falle, el proceso para iniciar sesión en los usuarios de la organización actual puede interrumpirse y se puede rechazar el acceso a la consola para deshabilitar una acción. Recomendamos configurar usuarios administradores en una organización separada o probar primero los scripts en un entorno de desarrollo o en una organización de desarrollo."
+      "DESCRIPTION": "Si desactiva esta configuración, puede hacer que los usuarios de su organización no puedan iniciar sesión. Además, ya no podrá acceder a la consola para desactivar la acción. Recomendamos crear un usuario administrador en una organización separada o probar scripts primero en un entorno de desarrollo o una organización de desarrollo."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Tipo de flujo",

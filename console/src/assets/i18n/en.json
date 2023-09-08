@@ -745,7 +745,7 @@
     "ALLOWEDTOFAIL": "Allowed To Fail",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Warning",
-      "DESCRIPTION": "Be aware that by disabling an action to fail, the process to log in users of the current organization can be interrupted and access to the console to disable an action can be declined. We recommend setting up admin users in a seperate organization or trying scripts in a dev environment or a dev organization first."
+      "DESCRIPTION": "If you disable this setting, it may cause users in your organization to be unable to sign in. Additionally, you will no longer be able to access the console to disable the action. We recommend creating an administrator user in a separate organization or testing scripts first in a development environment or a development organization."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Type",

@@ -745,7 +745,7 @@
     "ALLOWEDTOFAIL": "Permitido Falhar",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Aviso",
-      "DESCRIPTION": "Esteja ciente de que ao desabilitar uma ação para falhar, o processo de login dos usuários da organização atual pode ser interrompido e o acesso ao console para desabilitar uma ação pode ser recusado. Recomendamos configurar usuários administradores em uma organização separada ou tentar scripts primeiro em um ambiente de desenvolvimento ou em uma organização de desenvolvimento."
+      "DESCRIPTION": "Se você desabilitar esta configuração, pode fazer com que os usuários da sua organização não possam fazer login. Além disso, você não poderá mais acessar a console para desabilitar a ação. Recomendamos criar um usuário administrador em uma organização separada ou testar scripts primeiro em um ambiente de desenvolvimento ou uma organização de desenvolvimento."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Tipo de Fluxo",

@@ -744,7 +744,7 @@
     "ALLOWEDTOFAIL": "Dozwolone na porażkę",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Ostrzeżenie",
-      "DESCRIPTION": "Należy pamiętać, że wyłączenie akcji w celu niepowodzenia może spowodować przerwanie procesu logowania użytkowników bieżącej organizacji i uniemożliwienie dostępu do konsoli w celu wyłączenia akcji. Zalecamy skonfigurowanie użytkowników administracyjnych w osobnej organizacji lub najpierw wypróbowanie skryptów w środowisku deweloperskim lub organizacji deweloperskiej."
+      "DESCRIPTION": "Jeśli wyłączysz tę opcję, może to spowodować, że użytkownicy Twojej organizacji nie będą mogli się zalogować. Ponadto nie będziesz już mógł uzyskać dostępu do konsoli, aby wyłączyć akcję. Zalecamy utworzenie administratora w oddzielnej organizacji lub przetestowanie skryptów najpierw w środowisku deweloperskim lub organizacji deweloperskiej."
     },
     "SCRIPT": "Skrypt",
     "FLOWTYPE": "Typ Przepływu",
