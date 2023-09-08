@@ -114,17 +114,20 @@
         <td mat-cell *matCellDef="let member" class="role-row">
           <mat-chip-listbox class="cnsl-chip-list" aria-label="role selection">
             <mat-chip-option
+              [selectable]="false"
               class="cnsl-chip"
               *ngFor="let role of member.rolesList"
               [removable]="canWrite"
               (removed)="removeRole(member, role)"
               data-e2e="role"
             >
-              <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
-              <span>{{ role | roletransform }}</span>
-              <button *ngIf="canWrite" matChipRemove data-e2e="remove-role-button">
-                <mat-icon>cancel</mat-icon>
-              </button>
+              <div class="cnsl-chip-content">
+                <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
+                <span>{{ role | roletransform }}</span>
+                <button *ngIf="canWrite" matChipRemove data-e2e="remove-role-button">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </div>
             </mat-chip-option>
           </mat-chip-listbox>
         </td>

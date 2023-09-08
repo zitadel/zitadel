@@ -59,6 +59,13 @@
   .cnsl-chip {
     height: auto;
     border: 1px solid $border-color;
+    background: if($is-dark-theme, map-get($background, state), #e4e7e4) !important;
+
+    .cnsl-chip-content {
+      display: flex;
+      align-items: center;
+      font-size: 14px !important;
+    }
   }
 
   .cnsl-chip-list {

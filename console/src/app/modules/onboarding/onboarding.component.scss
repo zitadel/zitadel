@@ -173,6 +173,7 @@
           justify-content: flex-end;
           font-size: 14px;
           margin-bottom: 0.5rem;
+          color: mat.get-color-from-palette($primary, 400);
 
           .icon {
             margin-left: 0rem;

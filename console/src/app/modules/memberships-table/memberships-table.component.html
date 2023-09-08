@@ -71,16 +71,19 @@
           <div class="membership-line">
             <mat-chip-listbox class="cnsl-chip-list" aria-label="role selection">
               <mat-chip-option
+                [selectable]="false"
                 class="cnsl-chip"
                 *ngFor="let role of membership.rolesList"
                 [removable]="!!userId"
                 (removed)="removeRole(membership, role)"
               >
-                <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
-                <span>{{ role | roletransform }}</span>
-                <button *ngIf="!!userId" matChipRemove>
-                  <mat-icon>cancel</mat-icon>
-                </button>
+                <div class="cnsl-chip-content">
+                  <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
+                  <span>{{ role | roletransform }}</span>
+                  <button *ngIf="!!userId" matChipRemove>
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </div>
               </mat-chip-option>
             </mat-chip-listbox>
             <button
@@ -89,7 +92,7 @@
               mat-icon-button
               class="goto-btn"
             >
-              <i class="las la-angle-right"></i>
+              <mat-icon>navigate_next</mat-icon>
             </button>
           </div>
         </td>
