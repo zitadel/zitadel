@@ -109,12 +109,9 @@ Now you should be all set to verify your setup:
 
 `<your_domain>` is the domain you have verified in Google Workspace.
 
-## Third-party SSO profile
+## Third-party SSO SAML profile
 
-:::warning Unknown 500 Error from Google
-There is currently an open support case with Google to investigate an issue related to this configuration.
-As soon as users are being redirected to Google, their service returns an Error 500.
-:::
+Configure a third party SSO SAML profile and login users with ZITADEL to Google Workspace.
 
 ### Add SAML profile on Google Workspace
 
@@ -199,7 +196,7 @@ Save the settings.
 
 ![SSO with third-party IdP lower part with ZITADEL SSO](/img/guides/integrate/services/google-workspace-sso-zitadel.png)
 
-### Verify the SSO profile for your organization
+### Verify the SAML SSO profile
 
 Now you should be all set to verify your setup:
 
@@ -209,6 +206,6 @@ Now you should be all set to verify your setup:
 
 `<your_domain>` is the domain you have verified in Google Workspace.
 
-:::warning Unknown 500 Error from Google
-At the moment you will encounter an Error 500 after being redirected to Google.
-:::
+### Troubleshooting
+
+Make sure you don't use a super admin account in Google Workspace to test SSO. Super Admin users are not allowed to login with SSO and you might receive an status code 500.
