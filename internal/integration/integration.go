@@ -323,6 +323,13 @@ func NewTester(ctx context.Context) *Tester {
 	tester := Tester{
 		Users: make(InstanceUserMap),
 	}
+	tester.MilestoneChan = make(chan []byte)
+	tester.milestoneServer, err = runMilestoneServer(tester.MilestoneChan)
+	logging.OnError(err).Fatal()
+	tester.QuotaNotificationChan = make(chan []byte)
+	tester.quotaNotificationServer, err = runQuotaServer(tester.QuotaNotificationChan)
+	logging.OnError(err).Fatal()
+
 	tester.wg.Add(1)
 	go func(wg *sync.WaitGroup) {
 		logging.OnError(cmd.Execute()).Fatal()
@@ -340,13 +347,6 @@ func NewTester(ctx context.Context) *Tester {
 	tester.createMachineUserOrgOwner(ctx)
 	tester.createMachineUserInstanceOwner(ctx)
 	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, "https://"+tester.Host())
-	tester.MilestoneChan = make(chan []byte)
-	tester.milestoneServer, err = runMilestoneServer(tester.MilestoneChan)
-	logging.OnError(err).Fatal()
-	tester.QuotaNotificationChan = make(chan []byte)
-	tester.quotaNotificationServer, err = runQuotaServer(tester.QuotaNotificationChan)
-	logging.OnError(err).Fatal()
-
 	return &tester
 }
 
