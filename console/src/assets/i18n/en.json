@@ -964,8 +964,7 @@
     "STATE": {
       "0": "Not defined",
       "1": "Active",
-      "2": "Deactivated",
-      "3": "Removed"
+      "2": "Deactivated"
     },
     "MEMBER": {
       "TITLE": "Organization Managers",
