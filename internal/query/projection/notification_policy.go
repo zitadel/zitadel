@@ -172,13 +172,8 @@ func (p *notificationPolicyProjection) reduceOwnerRemoved(event eventstore.Event
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-poxi9a", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(DomainPolicyChangeDateCol, e.CreationDate()),
-			handler.NewCol(DomainPolicySequenceCol, e.Sequence()),
-			handler.NewCol(DomainPolicyOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(DomainPolicyInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(DomainPolicyResourceOwnerCol, e.Aggregate().ID),

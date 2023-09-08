@@ -607,13 +607,8 @@ func (p *labelPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*han
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Su6pX", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(LabelPolicyChangeDateCol, e.CreationDate()),
-			handler.NewCol(LabelPolicySequenceCol, e.Sequence()),
-			handler.NewCol(LabelPolicyOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(LabelPolicyResourceOwnerCol, e.Aggregate().ID),

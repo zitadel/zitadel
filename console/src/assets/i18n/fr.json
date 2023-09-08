@@ -963,8 +963,7 @@
     "STATE": {
       "0": "Non défini",
       "1": "Actif",
-      "2": "Désactivé",
-      "3": "Supprimé"
+      "2": "Désactivé"
     },
     "MEMBER": {
       "TITLE": "Gestionnaires de l'organisation",
