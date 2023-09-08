@@ -554,13 +554,8 @@ func (p *idpProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Sta
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-YsbQC", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(IDPChangeDateCol, e.CreationDate()),
-			handler.NewCol(IDPSequenceCol, e.Sequence()),
-			handler.NewCol(IDPOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(IDPInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(IDPResourceOwnerCol, e.Aggregate().ID),

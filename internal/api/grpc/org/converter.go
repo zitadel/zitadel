@@ -103,8 +103,6 @@ func OrgStateToPb(state domain.OrgState) org_pb.OrgState {
 		return org_pb.OrgState_ORG_STATE_ACTIVE
 	case domain.OrgStateInactive:
 		return org_pb.OrgState_ORG_STATE_INACTIVE
-	case domain.OrgStateRemoved:
-		return org_pb.OrgState_ORG_STATE_REMOVED
 	default:
 		return org_pb.OrgState_ORG_STATE_UNSPECIFIED
 	}
@@ -116,8 +114,6 @@ func OrgStateToDomain(state org_pb.OrgState) domain.OrgState {
 		return domain.OrgStateActive
 	case org_pb.OrgState_ORG_STATE_INACTIVE:
 		return domain.OrgStateInactive
-	case org_pb.OrgState_ORG_STATE_REMOVED:
-		return domain.OrgStateRemoved
 	case org_pb.OrgState_ORG_STATE_UNSPECIFIED:
 		fallthrough
 	default:

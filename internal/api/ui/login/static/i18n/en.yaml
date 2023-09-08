@@ -2,7 +2,7 @@ Login:
   Title: Welcome back!
   Description: Enter your login data.
   TitleLinking: Login for user linking
-  DescriptionLinking: Enter your login data to link your external user with a ZITADEL user.
+  DescriptionLinking: Enter your login data to link your external user.
   LoginNameLabel: Loginname
   UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@domain
@@ -20,7 +20,7 @@ LDAP:
 
 SelectAccount:
   Title: Select account
-  Description: Use your ZITADEL-Account
+  Description: Use your account
   TitleLinking: Select account for user linking
   DescriptionLinking: Select your account to link with your external user.
   OtherUser: Other User
