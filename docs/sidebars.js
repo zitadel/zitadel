@@ -293,11 +293,6 @@ module.exports = {
             "guides/integrate/services/pingidentity-saml",
             {
               type: 'link',
-              label: 'Nextcloud',
-              href: 'https://zitadel.com/blog/zitadel-as-sso-provider-for-selfhosting',
-            },
-            {
-              type: 'link',
               label: 'Cloudflare workers',
               href: 'https://zitadel.com/blog/increase-spa-security-with-cloudflare-workers',
             },
@@ -308,14 +303,20 @@ module.exports = {
             },
             {
               type: 'link',
-              label: 'Psono (psono.com)',
-              href: 'https://doc.psono.com/admin/configuration/oidc-zitadel.html',
+              label: 'Nextcloud',
+              href: 'https://zitadel.com/blog/zitadel-as-sso-provider-for-selfhosting',
             },
             {
               type: 'link',
               label: 'Netbird (netbird.io)',
               href: 'https://docs.netbird.io/selfhosted/identity-providers',
             },
+            {
+              type: 'link',
+              label: 'Psono (psono.com)',
+              href: 'https://doc.psono.com/admin/configuration/oidc-zitadel.html',
+            },
+
           ],
         },
         {
@@ -331,6 +332,11 @@ module.exports = {
           },
           collapsed: true,
           items: [
+            {
+              type: 'link',
+              label: 'Argo CD',
+              href: 'https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/zitadel/',
+            },
             "guides/integrate/authenticated-mongodb-charts",
             "examples/identity-proxy/oauth2-proxy"
           ],
