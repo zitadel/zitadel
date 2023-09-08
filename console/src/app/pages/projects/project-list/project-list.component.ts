@@ -62,7 +62,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject();
   public INITIAL_PAGE_SIZE: number = 20;
 
-
   constructor(
     public translate: TranslateService,
     private mgmtService: ManagementService,
