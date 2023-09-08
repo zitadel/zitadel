@@ -197,8 +197,14 @@
       transition: background ease 0.15s;
     }
 
-    .progress {
-      border-radius: 50vw;
+    .progress-div {
+      display: block;
+      height: 100%;
+      width: 100%;
+
+      .progress {
+        border-radius: 50vw;
+      }
     }
   }
 

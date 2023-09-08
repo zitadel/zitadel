@@ -116,7 +116,7 @@
     border-radius: 50vw;
     padding: 2px 0.5rem;
     letter-spacing: 0.05em;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 12px;
     white-space: nowrap;
     background-color: if($is-dark-theme, map-get($background, state), #e4e7e4);

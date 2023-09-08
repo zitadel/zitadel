@@ -33,20 +33,21 @@
     <ng-container matColumnDef="primaryDomain">
       <th mat-header-cell *matHeaderCellDef>{{ 'ORG.PAGES.PRIMARYDOMAIN' | translate }}</th>
       <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">
-        <span>{{ org.primaryDomain }}</span>
-        <button
-          color="primary"
-          class="cpy-button"
-          mat-icon-button
-          [disabled]="copied === org.primaryDomain"
-          [matTooltip]="(copied !== org.primaryDomain ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
-          cnslCopyToClipboard
-          [valueToCopy]="org.primaryDomain"
-          (copiedValue)="copied = $event"
-        >
-          <i *ngIf="copied !== org.primaryDomain" class="las la-clipboard"></i>
-          <i *ngIf="copied === org.primaryDomain" class="las la-clipboard-check"></i>
-        </button>
+        <div class="primary-domain-wrapper">
+          <span>{{ org.primaryDomain }}</span>
+          <button
+            class="cpy-button"
+            mat-icon-button
+            [disabled]="copied === org.primaryDomain"
+            [matTooltip]="(copied !== org.primaryDomain ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
+            cnslCopyToClipboard
+            [valueToCopy]="org.primaryDomain"
+            (copiedValue)="copied = $event"
+          >
+            <i *ngIf="copied !== org.primaryDomain" class="las la-clipboard"></i>
+            <i *ngIf="copied === org.primaryDomain" class="las la-clipboard-check"></i>
+          </button>
+        </div>
       </td>
     </ng-container>
 
