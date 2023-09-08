@@ -1,4 +1,4 @@
-@function modify-background($theme, $map, $partial) {
+@function modify-palette($theme, $map, $partial) {
   // A theme is a map with the following structure:
   // (
   //   color: (..., background),
@@ -12,8 +12,8 @@
 
   // Replace the background in the color object's background palette.
   $theme-color: map-get($theme, color);
-  $color-background-palette: map-get($theme-color, $map);
-  $color-background-palette: map-merge($color-background-palette, $partial);
+  $color-map-palette: map-get($theme-color, $map);
+  $color-map-palette: map-merge($color-map-palette, $partial);
 
   // Replace the background in the background palette.
   $background-palette: map-get($theme, $map);
@@ -23,7 +23,7 @@
   $modified-theme-color: map-merge(
     $theme-color,
     (
-      $map: $color-background-palette,
+      $map: $color-map-palette,
     )
   );
   $modified-theme: map-merge(

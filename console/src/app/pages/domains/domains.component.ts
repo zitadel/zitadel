@@ -58,7 +58,6 @@ export class DomainsComponent implements OnInit {
 
   public addNewDomain(): void {
     const dialogRef = this.dialog.open(AddDomainDialogComponent, {
-      data: {},
       width: '400px',
     });
 
