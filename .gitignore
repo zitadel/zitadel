@@ -16,7 +16,7 @@ profile.cov
 *.out
 
 #Debug
-__debug_bin
+__debug_bin*
 debug
 sandbox.go
 /cmd/dev/
