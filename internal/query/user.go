@@ -333,7 +333,7 @@ func addUserWithoutOwnerRemoved(eq map[string]interface{}) {
 	eq[userPreferredLoginNameOwnerRemovedDomainCol.identifier()] = false
 }
 
-func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, withOwnerRemoved bool, queries ...SearchQuery) (user *User, err error) {
+func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, withOwnerRemoved bool) (user *User, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -343,9 +343,6 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	}
 
 	query, scan := prepareUserQuery(ctx, q.client)
-	for _, q := range queries {
-		query = q.toQuery(query)
-	}
 	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -750,6 +747,9 @@ func preparePreferredLoginNamesQuery() (string, []interface{}, error) {
 			userPreferredLoginNameIsPrimaryCol.identifier(): true,
 		},
 		).ToSql()
+}
+
+func prepareUserByIDQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 }
 
 func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*User, error)) {

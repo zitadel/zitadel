@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -27,13 +28,12 @@ import (
 )
 
 func (s *Server) getUserByID(ctx context.Context, id string) (*query.User, error) {
-	owner, err := query.NewUserResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID, query.TextEquals)
+	user, err := s.query.GetUserByID(ctx, true, id, false)
 	if err != nil {
 		return nil, err
 	}
-	user, err := s.query.GetUserByID(ctx, true, id, false, owner)
-	if err != nil {
-		return nil, err
+	if user.ResourceOwner != authz.GetCtxData(ctx).OrgID {
+		return nil, errors.ThrowNotFound(nil, "MANAG-fpo4B", "Errors.User.NotFound")
 	}
 	return user, nil
 }
