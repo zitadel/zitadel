@@ -1112,7 +1112,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
-      "ADDGENERATOR": "Definire il generatore di password",
+      "ADDGENERATOR": "Imposta il generatore di password",
       "GENERATORTYPE": "Tipo",
       "EXPIRY": "Scadenza (in ore)",
       "INCLUDEDIGITS": "Contiene numeri",
