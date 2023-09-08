@@ -1101,7 +1101,7 @@
       "INDAYS": "días"
     },
     "SECRETS": {
-      "TITLE": "Apariencia del secreto",
+      "TITLE": "Generador del secreto",
       "TYPES": "Tipos de secreto",
       "TYPE": {
         "1": "Correo de inicialización",
@@ -1113,7 +1113,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
-      "ADDGENERATOR": "Definir apariencia del secreto",
+      "ADDGENERATOR": "Definir generador del secreto",
       "GENERATORTYPE": "Tipo",
       "EXPIRY": "Caducidad (en horas)",
       "INCLUDEDIGITS": "Incluir números",

@@ -1100,7 +1100,7 @@
       "INDAYS": "Tage"
     },
     "SECRETS": {
-      "TITLE": "Secret Erscheinungsbild",
+      "TITLE": "Passwort Generator",
       "TYPES": "Schlüsseltypen",
       "TYPE": {
         "1": "Email Initialisierungscode",
@@ -1112,7 +1112,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - Email"
       },
-      "ADDGENERATOR": "Secret Generator definieren",
+      "ADDGENERATOR": "Passwort Generator definieren",
       "GENERATORTYPE": "Typ",
       "EXPIRY": "Ablauf (in Stunden)",
       "INCLUDEDIGITS": "Enthält Zahlen",
