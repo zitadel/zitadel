@@ -492,7 +492,7 @@ To be able to check the Universal-Second-Factor (U2F) you need a user check and 
 In the creat session request you can check for the user and directly initiate the webAuthN challenge.
 
 For U2F you can choose between "USER_VERIFICATION_REQUIREMENT_PREFERRED" and "USER_VERIFICATION_REQUIREMENT_DISCOURAGED" for the challenge.
-Best practice is using discouraged, as this doesn't require the user to enter a pin. With preferred the PIN will be shown, but is not necessary.
+Best practice is using discouraged, as this doesn't require the user to enter a PIN. With `preferred` the user might be prompted for the PIN, but it is not necessary.
 
 More detailed information about the API: [Create new session Documentation](/apis/resources/session_service/session-service-create-session)
 
