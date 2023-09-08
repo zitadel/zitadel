@@ -21,8 +21,8 @@
         <img src="https://codecov.io/gh/zitadel/zitadel/branch/main/graph/badge.svg" /></a>
     <a href="https://github.com/zitadel/zitadel/graphs/contributors" alt="Release">
         <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/zitadel/zitadel"></a>
-    <a href="https://discord.gg/erh5Brh7jE" alt="Discord Chat">
-        <img src="https://badgen.net/discord/online-members/erh5Brh7jE" /></a>
+    <a href="https://discord.gg/YgjEuJzZ3x" alt="Discord Chat">
+        <img src="https://badgen.net/discord/online-members/YgjEuJzZ3x" /></a>
 </p>
 
 <p align="center">
