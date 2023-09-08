@@ -744,7 +744,7 @@
     "ALLOWEDTOFAIL": "Scheitern erlaubt",
     "ALLOWEDTOFAILWARN": {
       "TITLE": "Warnung",
-      "DESCRIPTION": "Beachten Sie, dass durch das Deaktivieren dieser Einstellung der Vorgang zum Anmelden von Benutzern der aktuellen Organisation unterbrochen werden kann und der Zugriff auf die Konsole zum Deaktivieren einer Aktion abgelehnt werden kann. Wir empfehlen, Administratorbenutzer in einer separaten Organisation einzurichten oder Skripte zunächst in einer Entwicklungsumgebung oder einer Entwicklungsorganisation auszuprobieren."
+      "DESCRIPTION": "Wenn du diese Einstellung deaktivierst, kann es dazu führen, dass sich Benutzer deiner Organisation nicht mehr anmelden können. Ausserdem kannst du dann nicht mehr auf die Konsole zugreifen, um die Action zu deaktivieren. Wir empfehlen, einen Administratorbenutzer in einer separaten Organisation zu erstellen oder Skripte zuerst in einer Entwicklungsumgebung oder einer Entwicklungsorganisation zu testen."
     },
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Typ",
