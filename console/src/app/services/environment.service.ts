@@ -28,7 +28,7 @@ interface WellKnown {
 })
 export class EnvironmentService {
   private environmentJsonPath = './assets/environment.json';
-  private wellknownPath = '/.well-known/openid-configuration`';
+  private wellknownPath = '/.well-known/openid-configuration';
   public auth!: AuthServiceClient;
   public mgmt!: ManagementServiceClient;
   public admin!: AdminServiceClient;

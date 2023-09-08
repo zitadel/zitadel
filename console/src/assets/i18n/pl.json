@@ -967,8 +967,7 @@
     "STATE": {
       "0": "Nieokreślone",
       "1": "Aktywne",
-      "2": "Dezaktywowane",
-      "3": "Usunięte"
+      "2": "Dezaktywowane"
     },
     "MEMBER": {
       "TITLE": "Menadżerowie organizacji",

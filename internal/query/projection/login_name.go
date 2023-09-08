@@ -574,30 +574,21 @@ func (p *loginNameProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 
 	return crdb.NewMultiStatement(
 		event,
-		crdb.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(LoginNameDomainOwnerRemovedCol, true),
-			},
+		crdb.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ID),
 			},
 			crdb.WithTableSuffix(loginNameDomainSuffix),
 		),
-		crdb.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(LoginNamePoliciesOwnerRemovedCol, true),
-			},
+		crdb.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(LoginNamePoliciesInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCond(LoginNamePoliciesResourceOwnerCol, e.Aggregate().ID),
 			},
 			crdb.WithTableSuffix(loginNamePolicySuffix),
 		),
-		crdb.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(LoginNameUserOwnerRemovedCol, true),
-			},
+		crdb.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCond(LoginNameUserResourceOwnerCol, e.Aggregate().ID),
