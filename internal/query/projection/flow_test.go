@@ -122,11 +122,8 @@ func TestFlowProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.flow_triggers2 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedStmt: "DELETE FROM projections.flow_triggers2 WHERE (instance_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								true,
 								"instance-id",
 								"agg-id",
 							},

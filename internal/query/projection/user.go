@@ -352,7 +352,7 @@ func (p *userProjection) reduceHumanAdded(event eventstore.Event) (*handler.Stat
 				handler.NewCol(NotifyInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(NotifyLastEmailCol, e.EmailAddress),
 				handler.NewCol(NotifyLastPhoneCol, &sql.NullString{String: string(e.PhoneNumber), Valid: e.PhoneNumber != ""}),
-				handler.NewCol(NotifyPasswordSetCol, e.Secret != nil),
+				handler.NewCol(NotifyPasswordSetCol, user.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""),
 			},
 			crdb.WithTableSuffix(UserNotifySuffix),
 		),
@@ -400,7 +400,7 @@ func (p *userProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 				handler.NewCol(NotifyInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(NotifyLastEmailCol, e.EmailAddress),
 				handler.NewCol(NotifyLastPhoneCol, &sql.NullString{String: string(e.PhoneNumber), Valid: e.PhoneNumber != ""}),
-				handler.NewCol(NotifyPasswordSetCol, e.Secret != nil),
+				handler.NewCol(NotifyPasswordSetCol, user.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""),
 			},
 			crdb.WithTableSuffix(UserNotifySuffix),
 		),
@@ -1064,13 +1064,8 @@ func (p *userProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.St
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-NCsdV", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(UserChangeDateCol, e.CreationDate()),
-			handler.NewCol(UserSequenceCol, e.Sequence()),
-			handler.NewCol(UserOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(UserResourceOwnerCol, e.Aggregate().ID),
