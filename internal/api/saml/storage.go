@@ -155,11 +155,7 @@ func (p *Storage) SetUserinfoWithLoginName(ctx context.Context, userinfo models.
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	loginNameSQ, err := query.NewUserLoginNamesSearchQuery(loginName)
-	if err != nil {
-		return err
-	}
-	user, err := p.query.GetUser(ctx, true, false, loginNameSQ)
+	user, err := p.query.GetUserByLoginName(ctx, true, loginName, false)
 	if err != nil {
 		return err
 	}

@@ -49,11 +49,7 @@ func (s *Server) GetUserByID(ctx context.Context, req *mgmt_pb.GetUserByIDReques
 }
 
 func (s *Server) GetUserByLoginNameGlobal(ctx context.Context, req *mgmt_pb.GetUserByLoginNameGlobalRequest) (*mgmt_pb.GetUserByLoginNameGlobalResponse, error) {
-	loginName, err := query.NewUserPreferredLoginNameSearchQuery(req.LoginName, query.TextEquals)
-	if err != nil {
-		return nil, err
-	}
-	user, err := s.query.GetUser(ctx, true, false, loginName)
+	user, err := s.query.GetUserByLoginName(ctx, true, req.LoginName, false)
 	if err != nil {
 		return nil, err
 	}

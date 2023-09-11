@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	errs "errors"
 	"strings"
+	"sync"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -342,12 +343,7 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		_, userSpan := tracing.NewNamedSpan(ctx, "TriggerUser")
-		ctx = projection.UserProjection.Trigger(ctx)
-		userSpan.End()
-		_, loginNameSpan := tracing.NewNamedSpan(ctx, "TriggerLoginName")
-		ctx = projection.LoginNameProjection.Trigger(ctx)
-		loginNameSpan.End()
+		ctx = q.userTrigger(ctx)
 	}
 
 	_, userSpan := tracing.NewNamedSpan(ctx, "DatabaseQuery")
@@ -360,6 +356,57 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 		},
 		userByIDQuery,
 		userID,
+		authz.GetInstance(ctx).InstanceID(),
+	)
+	return user, err
+}
+
+func (q *Queries) userTrigger(ctx context.Context) context.Context {
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+	go func() {
+		_, userSpan := tracing.NewNamedSpan(ctx, "TriggerUser")
+		ctx = projection.UserProjection.Trigger(ctx)
+		userSpan.End()
+		wg.Done()
+	}()
+	go func() {
+		_, loginNameSpan := tracing.NewNamedSpan(ctx, "TriggerLoginName")
+		ctx = projection.LoginNameProjection.Trigger(ctx)
+		loginNameSpan.End()
+		wg.Done()
+	}()
+	wg.Wait()
+	return ctx
+}
+
+//go:embed user_by_login_name.sql
+var userByLoginNameQuery string
+
+func (q *Queries) GetUserByLoginName(ctx context.Context, shouldTriggered bool, loginName string, withOwnerRemoved bool) (user *User, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if shouldTriggered {
+		ctx = q.userTrigger(ctx)
+	}
+
+	loginNameSplit := strings.Split(loginName, "@")
+	domain := loginNameSplit[len(loginNameSplit)-1]
+	username := strings.TrimSuffix(loginName, domain)
+
+	_, userSpan := tracing.NewNamedSpan(ctx, "DatabaseQuery")
+	defer userSpan.End()
+
+	err = q.client.QueryRowContext(ctx,
+		func(row *sql.Row) error {
+			user, err = scanUser(row)
+			return err
+		},
+		userByLoginNameQuery,
+		username,
+		domain,
+		loginName,
 		authz.GetInstance(ctx).InstanceID(),
 	)
 	return user, err
@@ -477,35 +524,61 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, withOwnerRem
 	return phone, err
 }
 
-func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string, withOwnerRemoved bool, queries ...SearchQuery) (user *NotifyUser, err error) {
+//go:embed user_notify_by_id.sql
+var notifyUserByIDQuery string
+
+func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string, withOwnerRemoved bool) (user *NotifyUser, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		ctx = projection.UserProjection.Trigger(ctx)
-		ctx = projection.LoginNameProjection.Trigger(ctx)
+		ctx = q.userTrigger(ctx)
 	}
 
-	query, scan := prepareNotifyUserQuery(ctx, q.client)
-	for _, q := range queries {
-		query = q.toQuery(query)
-	}
-	eq := sq.Eq{
-		UserIDCol.identifier():         userID,
-		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		addUserWithoutOwnerRemoved(eq)
-	}
-	stmt, args, err := query.Where(eq).ToSql()
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Err3g", "Errors.Query.SQLStatment")
+	_, userSpan := tracing.NewNamedSpan(ctx, "DatabaseQuery")
+	defer userSpan.End()
+
+	err = q.client.QueryRowContext(ctx,
+		func(row *sql.Row) error {
+			user, err = scanNotifyUser(row)
+			return err
+		},
+		notifyUserByIDQuery,
+		userID,
+		authz.GetInstance(ctx).InstanceID(),
+	)
+	return user, err
+}
+
+//go:embed user_notify_by_login_name.sql
+var notifyUserByLoginNameQuery string
+
+func (q *Queries) GetNotifyUserByLoginName(ctx context.Context, shouldTriggered bool, loginName string, withOwnerRemoved bool) (user *NotifyUser, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if shouldTriggered {
+		ctx = q.userTrigger(ctx)
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		user, err = scan(row)
-		return err
-	}, stmt, args...)
+	loginNameSplit := strings.Split(loginName, "@")
+	domain := loginNameSplit[len(loginNameSplit)-1]
+	username := strings.TrimSuffix(loginName, domain)
+
+	_, userSpan := tracing.NewNamedSpan(ctx, "DatabaseQuery")
+	defer userSpan.End()
+
+	err = q.client.QueryRowContext(ctx,
+		func(row *sql.Row) error {
+			user, err = scanNotifyUser(row)
+			return err
+		},
+		notifyUserByLoginNameQuery,
+		username,
+		domain,
+		loginName,
+		authz.GetInstance(ctx).InstanceID(),
+	)
 	return user, err
 }
 
@@ -1103,88 +1176,90 @@ func prepareNotifyUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier()+db.Timetravel(call.Took(ctx)),
 				preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*NotifyUser, error) {
-			u := new(NotifyUser)
-			var count int
-			loginNames := database.StringArray{}
-			preferredLoginName := sql.NullString{}
+		scanNotifyUser
+}
 
-			humanID := sql.NullString{}
-			firstName := sql.NullString{}
-			lastName := sql.NullString{}
-			nickName := sql.NullString{}
-			displayName := sql.NullString{}
-			preferredLanguage := sql.NullString{}
-			gender := sql.NullInt32{}
-			avatarKey := sql.NullString{}
+func scanNotifyUser(row *sql.Row) (*NotifyUser, error) {
+	u := new(NotifyUser)
+	var count int
+	loginNames := database.StringArray{}
+	preferredLoginName := sql.NullString{}
 
-			notifyUserID := sql.NullString{}
-			notifyEmail := sql.NullString{}
-			notifyVerifiedEmail := sql.NullString{}
-			notifyPhone := sql.NullString{}
-			notifyVerifiedPhone := sql.NullString{}
-			notifyPasswordSet := sql.NullBool{}
+	humanID := sql.NullString{}
+	firstName := sql.NullString{}
+	lastName := sql.NullString{}
+	nickName := sql.NullString{}
+	displayName := sql.NullString{}
+	preferredLanguage := sql.NullString{}
+	gender := sql.NullInt32{}
+	avatarKey := sql.NullString{}
 
-			err := row.Scan(
-				&u.ID,
-				&u.CreationDate,
-				&u.ChangeDate,
-				&u.ResourceOwner,
-				&u.Sequence,
-				&u.State,
-				&u.Type,
-				&u.Username,
-				&loginNames,
-				&preferredLoginName,
-				&humanID,
-				&firstName,
-				&lastName,
-				&nickName,
-				&displayName,
-				&preferredLanguage,
-				&gender,
-				&avatarKey,
-				&notifyUserID,
-				&notifyEmail,
-				&notifyVerifiedEmail,
-				&notifyPhone,
-				&notifyVerifiedPhone,
-				&notifyPasswordSet,
-				&count,
-			)
+	notifyUserID := sql.NullString{}
+	notifyEmail := sql.NullString{}
+	notifyVerifiedEmail := sql.NullString{}
+	notifyPhone := sql.NullString{}
+	notifyVerifiedPhone := sql.NullString{}
+	notifyPasswordSet := sql.NullBool{}
 
-			if err != nil || count != 1 {
-				if errs.Is(err, sql.ErrNoRows) || count != 1 {
-					return nil, errors.ThrowNotFound(err, "QUERY-Dgqd2", "Errors.User.NotFound")
-				}
-				return nil, errors.ThrowInternal(err, "QUERY-Dbwsg", "Errors.Internal")
-			}
+	err := row.Scan(
+		&u.ID,
+		&u.CreationDate,
+		&u.ChangeDate,
+		&u.ResourceOwner,
+		&u.Sequence,
+		&u.State,
+		&u.Type,
+		&u.Username,
+		&loginNames,
+		&preferredLoginName,
+		&humanID,
+		&firstName,
+		&lastName,
+		&nickName,
+		&displayName,
+		&preferredLanguage,
+		&gender,
+		&avatarKey,
+		&notifyUserID,
+		&notifyEmail,
+		&notifyVerifiedEmail,
+		&notifyPhone,
+		&notifyVerifiedPhone,
+		&notifyPasswordSet,
+		&count,
+	)
 
-			if !notifyUserID.Valid {
-				return nil, errors.ThrowPreconditionFailed(nil, "QUERY-Sfw3f", "Errors.User.NotFound")
-			}
-
-			u.LoginNames = loginNames
-			if preferredLoginName.Valid {
-				u.PreferredLoginName = preferredLoginName.String
-			}
-			if humanID.Valid {
-				u.FirstName = firstName.String
-				u.LastName = lastName.String
-				u.NickName = nickName.String
-				u.DisplayName = displayName.String
-				u.AvatarKey = avatarKey.String
-				u.PreferredLanguage = language.Make(preferredLanguage.String)
-				u.Gender = domain.Gender(gender.Int32)
-			}
-			u.LastEmail = notifyEmail.String
-			u.VerifiedEmail = notifyVerifiedEmail.String
-			u.LastPhone = notifyPhone.String
-			u.VerifiedPhone = notifyVerifiedPhone.String
-			u.PasswordSet = notifyPasswordSet.Bool
-
-			return u, nil
+	if err != nil || count != 1 {
+		if errs.Is(err, sql.ErrNoRows) || count != 1 {
+			return nil, errors.ThrowNotFound(err, "QUERY-Dgqd2", "Errors.User.NotFound")
 		}
+		return nil, errors.ThrowInternal(err, "QUERY-Dbwsg", "Errors.Internal")
+	}
+
+	if !notifyUserID.Valid {
+		return nil, errors.ThrowPreconditionFailed(nil, "QUERY-Sfw3f", "Errors.User.NotFound")
+	}
+
+	u.LoginNames = loginNames
+	if preferredLoginName.Valid {
+		u.PreferredLoginName = preferredLoginName.String
+	}
+	if humanID.Valid {
+		u.FirstName = firstName.String
+		u.LastName = lastName.String
+		u.NickName = nickName.String
+		u.DisplayName = displayName.String
+		u.AvatarKey = avatarKey.String
+		u.PreferredLanguage = language.Make(preferredLanguage.String)
+		u.Gender = domain.Gender(gender.Int32)
+	}
+	u.LastEmail = notifyEmail.String
+	u.VerifiedEmail = notifyVerifiedEmail.String
+	u.LastPhone = notifyPhone.String
+	u.VerifiedPhone = notifyVerifiedPhone.String
+	u.PasswordSet = notifyPasswordSet.Bool
+
+	return u, nil
 }
 
 func prepareUserUniqueQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (bool, error)) {

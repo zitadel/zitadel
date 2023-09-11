@@ -7,7 +7,6 @@ import (
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/query"
 )
 
 const (
@@ -91,17 +90,12 @@ func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authRe
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
 	}
-	loginName, err := query.NewUserLoginNamesSearchQuery(authReq.LoginName)
+	user, err := l.query.GetUserByLoginName(setContext(r.Context(), userOrg), false, authReq.LoginName, false)
 	if err != nil {
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 		return
 	}
 	passwordCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypePasswordResetCode, l.userCodeAlg)
-	if err != nil {
-		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
-		return
-	}
-	user, err := l.query.GetUser(setContext(r.Context(), userOrg), false, false, loginName)
 	if err != nil {
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 		return
