@@ -138,3 +138,16 @@ p.desc {
     padding: 0.5rem 4rem;
   }
 }
+
+.metadata-option {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+
+  .upload-button {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    width: 25%;
+  }
+}

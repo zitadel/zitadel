@@ -159,26 +159,64 @@
     <mat-step *ngIf="appType?.value?.createType === AppCreateType.SAML" [editable]="true">
       <ng-template matStepLabel>{{ 'APP.SAML.CONFIGSECTION' | translate }}</ng-template>
 
-      <form [formGroup]="samlConfigForm">
-        <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'APP.SAML.URL' | translate }}</cnsl-label>
-          <input cnslInput formControlName="metadataUrl" placeholder="https://" />
-        </cnsl-form-field>
-      </form>
+      <div class="cnsl-secondary-text">
+        {{ 'APP.SAML.CHOOSEMETADATASOURCE' | translate }}
+      </div>
 
-      <span class="cnsl-app-or cnsl-secondary-text">{{ 'APP.SAML.OR' | translate }}</span>
+      <div class="cnsl-secondary-text metadata-option">
+        <span>{{ 'APP.SAML.URL' | translate }}</span>
+        <form [formGroup]="samlConfigForm">
+          <cnsl-form-field class="formfield">
+            <cnsl-label></cnsl-label>
+            <input cnslInput formControlName="metadataUrl" placeholder="https://" />
+          </cnsl-form-field>
+        </form>
+      </div>
 
-      <input
-        #xmlFileInput
-        style="display: none"
-        class="file-input"
-        type="file"
-        accept="text/xml,application/xml"
-        (change)="onDropXML($any($event.target).files)"
-      />
-      <button type="button" mat-stroked-button (click)="$event.preventDefault(); xmlFileInput.click()">
-        {{ 'APP.SAML.XML' | translate }}
-      </button>
+      <div class="cnsl-secondary-text metadata-option">
+        <span>{{ 'APP.SAML.UPLOADXML' | translate }}</span>
+
+        <form>
+          <input
+            #xmlFileInput
+            style="display: none"
+            class="file-input"
+            type="file"
+            accept="text/xml,application/xml"
+            (change)="onDropXML($any($event.target).files)"
+          />
+          <button
+            type="button"
+            class="upload-button"
+            mat-stroked-button
+            (click)="$event.preventDefault(); xmlFileInput.click()"
+          >
+            {{ 'APP.SAML.UPLOAD' | translate }}
+          </button>
+        </form>
+      </div>
+
+      <div class="cnsl-secondary-text metadata-option">
+        <span>{{ 'APP.SAML.MINIMALMETADATA' | translate }}</span>
+        <form [formGroup]="samlConfigForm">
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'APP.SAML.ENTITYID' | translate }}</cnsl-label>
+            <input cnslInput formControlName="entityId" placeholder="https://" />
+          </cnsl-form-field>
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'APP.SAML.ACSURL' | translate }}</cnsl-label>
+            <input cnslInput formControlName="acsURL" placeholder="https://" />
+          </cnsl-form-field>
+          <button
+            type="button"
+            class="upload-button"
+            mat-stroked-button
+            (click)="$event.preventDefault(); xmlFileInput.click()"
+          >
+            {{ 'APP.SAML.UPLOAD' | translate }}
+          </button>
+        </form>
+      </div>
 
       <div
         class="saml-xml"

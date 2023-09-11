@@ -2078,11 +2078,15 @@
         "DESCRIPTION": "SAML Applications"
       },
       "CONFIGSECTION": "SAML Configuration",
-      "URL": "Url where Metadata file is located",
-      "OR": "or",
-      "XML": "Upload Metadata XML",
+      "CHOOSEMETADATASOURCE": "Provide your SAML configuration using one of the following options:",
+      "URL": "Option 1. Specify the url where Metadata file is located",
+      "UPLOADXML": "Option 2. Upload a file containing your Metadata XML",
+      "UPLOAD": "Upload file",
       "METADATA": "Metadata",
-      "METADATAFROMFILE": "Metadata from File"
+      "METADATAFROMFILE": "Metadata from File",
+      "MINIMALMETADATA": "Option 3. Create a minimal metadata file on-the-fly providing your ENTITYID and your ACS URL",
+      "ENTITYID": "Your Entity ID",
+      "ACSURL": "Your ACS endpoint URL "
     },
     "AUTHMETHODS": {
       "CODE": {
