@@ -48,7 +48,7 @@ Use the following configuration
 | Set up SSO with third-party identity provider | Enable (check) |
 | Sign-in page URL | $YOUR_DOMAIN/saml/v2/SSO |
 | Sign-out page URL | $YOUR_DOMAIN/saml/v2/SLO |
-| Verification Certifificate | Upload the certificate (idp.crt) |
+| Verification Certificate | Upload the certificate (idp.crt) |
 | Use a domain-specific issuer | Enable (check) |
 | Network masks | Leave blank|
 | Change password URL | $YOUR_DOMAIN/ui/console/users/me?id=security |
@@ -132,11 +132,11 @@ Use the following configuration
 | Setting | Value |
 | --- | --- |
 | SSO profile name | ZITADEL SSO |
-| IDP entity ID | leave blank |
+| IDP entity ID | $YOUR_DOMAIN/saml/v2/metadata |
 | Sign-in page URL | $YOUR_DOMAIN/saml/v2/SSO |
 | Sign-out page URL | $YOUR_DOMAIN/saml/v2/SLO |
 | Change password URL | $YOUR_DOMAIN/ui/console/users/me?id=security |
-| Verification Certifificate | Upload the certificate (idp.crt) |
+| Verification Certificate | Upload the certificate (idp.crt) |
 
 Now go ahead and click *SAVE*
 
