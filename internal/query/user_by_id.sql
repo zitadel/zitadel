@@ -72,4 +72,5 @@ LEFT JOIN
 WHERE 
   u.id = $1
   AND u.instance_id = $2
+LIMIT 1
 ;

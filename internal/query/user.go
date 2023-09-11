@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
+	_ "embed"
 	errs "errors"
 	"strings"
 	"time"
@@ -333,32 +334,34 @@ func addUserWithoutOwnerRemoved(eq map[string]interface{}) {
 	eq[userPreferredLoginNameOwnerRemovedDomainCol.identifier()] = false
 }
 
+//go:embed user_by_id.sql
+var userByIDQuery string
+
 func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, withOwnerRemoved bool) (user *User, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, userSpan := tracing.NewNamedSpan(ctx, "TriggerUser")
 		ctx = projection.UserProjection.Trigger(ctx)
+		userSpan.End()
+		_, loginNameSpan := tracing.NewNamedSpan(ctx, "TriggerLoginName")
 		ctx = projection.LoginNameProjection.Trigger(ctx)
+		loginNameSpan.End()
 	}
 
-	query, scan := prepareUserQuery(ctx, q.client)
-	eq := sq.Eq{
-		UserIDCol.identifier():         userID,
-		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		addUserWithoutOwnerRemoved(eq)
-	}
-	stmt, args, err := query.Where(eq).ToSql()
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-FBg21", "Errors.Query.SQLStatment")
-	}
+	_, userSpan := tracing.NewNamedSpan(ctx, "DatabaseQuery")
+	defer userSpan.End()
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		user, err = scan(row)
-		return err
-	}, stmt, args...)
+	err = q.client.QueryRowContext(ctx,
+		func(row *sql.Row) error {
+			user, err = scanUser(row)
+			return err
+		},
+		userByIDQuery,
+		userID,
+		authz.GetInstance(ctx).InstanceID(),
+	)
 	return user, err
 }
 
@@ -749,7 +752,93 @@ func preparePreferredLoginNamesQuery() (string, []interface{}, error) {
 		).ToSql()
 }
 
-func prepareUserByIDQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
+func scanUser(row *sql.Row) (*User, error) {
+	u := new(User)
+	var count int
+	preferredLoginName := sql.NullString{}
+
+	humanID := sql.NullString{}
+	firstName := sql.NullString{}
+	lastName := sql.NullString{}
+	nickName := sql.NullString{}
+	displayName := sql.NullString{}
+	preferredLanguage := sql.NullString{}
+	gender := sql.NullInt32{}
+	avatarKey := sql.NullString{}
+	email := sql.NullString{}
+	isEmailVerified := sql.NullBool{}
+	phone := sql.NullString{}
+	isPhoneVerified := sql.NullBool{}
+
+	machineID := sql.NullString{}
+	name := sql.NullString{}
+	description := sql.NullString{}
+	hasSecret := sql.NullBool{}
+	accessTokenType := sql.NullInt32{}
+
+	err := row.Scan(
+		&u.ID,
+		&u.CreationDate,
+		&u.ChangeDate,
+		&u.ResourceOwner,
+		&u.Sequence,
+		&u.State,
+		&u.Type,
+		&u.Username,
+		&u.LoginNames,
+		&preferredLoginName,
+		&humanID,
+		&firstName,
+		&lastName,
+		&nickName,
+		&displayName,
+		&preferredLanguage,
+		&gender,
+		&avatarKey,
+		&email,
+		&isEmailVerified,
+		&phone,
+		&isPhoneVerified,
+		&machineID,
+		&name,
+		&description,
+		&hasSecret,
+		&accessTokenType,
+		&count,
+	)
+
+	if err != nil || count != 1 {
+		if errs.Is(err, sql.ErrNoRows) || count != 1 {
+			return nil, errors.ThrowNotFound(err, "QUERY-Dfbg2", "Errors.User.NotFound")
+		}
+		return nil, errors.ThrowInternal(err, "QUERY-Bgah2", "Errors.Internal")
+	}
+
+	u.PreferredLoginName = preferredLoginName.String
+
+	if humanID.Valid {
+		u.Human = &Human{
+			FirstName:         firstName.String,
+			LastName:          lastName.String,
+			NickName:          nickName.String,
+			DisplayName:       displayName.String,
+			AvatarKey:         avatarKey.String,
+			PreferredLanguage: language.Make(preferredLanguage.String),
+			Gender:            domain.Gender(gender.Int32),
+			Email:             domain.EmailAddress(email.String),
+			IsEmailVerified:   isEmailVerified.Bool,
+			Phone:             domain.PhoneNumber(phone.String),
+			IsPhoneVerified:   isPhoneVerified.Bool,
+		}
+	} else if machineID.Valid {
+		u.Machine = &Machine{
+			Name:            name.String,
+			Description:     description.String,
+			HasSecret:       hasSecret.Bool,
+			AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
+		}
+	}
+	return u, nil
 }
 
 func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
@@ -803,94 +892,7 @@ func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier()+db.Timetravel(call.Took(ctx)),
 				preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*User, error) {
-			u := new(User)
-			var count int
-			preferredLoginName := sql.NullString{}
-
-			humanID := sql.NullString{}
-			firstName := sql.NullString{}
-			lastName := sql.NullString{}
-			nickName := sql.NullString{}
-			displayName := sql.NullString{}
-			preferredLanguage := sql.NullString{}
-			gender := sql.NullInt32{}
-			avatarKey := sql.NullString{}
-			email := sql.NullString{}
-			isEmailVerified := sql.NullBool{}
-			phone := sql.NullString{}
-			isPhoneVerified := sql.NullBool{}
-
-			machineID := sql.NullString{}
-			name := sql.NullString{}
-			description := sql.NullString{}
-			hasSecret := sql.NullBool{}
-			accessTokenType := sql.NullInt32{}
-
-			err := row.Scan(
-				&u.ID,
-				&u.CreationDate,
-				&u.ChangeDate,
-				&u.ResourceOwner,
-				&u.Sequence,
-				&u.State,
-				&u.Type,
-				&u.Username,
-				&u.LoginNames,
-				&preferredLoginName,
-				&humanID,
-				&firstName,
-				&lastName,
-				&nickName,
-				&displayName,
-				&preferredLanguage,
-				&gender,
-				&avatarKey,
-				&email,
-				&isEmailVerified,
-				&phone,
-				&isPhoneVerified,
-				&machineID,
-				&name,
-				&description,
-				&hasSecret,
-				&accessTokenType,
-				&count,
-			)
-
-			if err != nil || count != 1 {
-				if errs.Is(err, sql.ErrNoRows) || count != 1 {
-					return nil, errors.ThrowNotFound(err, "QUERY-Dfbg2", "Errors.User.NotFound")
-				}
-				return nil, errors.ThrowInternal(err, "QUERY-Bgah2", "Errors.Internal")
-			}
-
-			u.PreferredLoginName = preferredLoginName.String
-
-			if humanID.Valid {
-				u.Human = &Human{
-					FirstName:         firstName.String,
-					LastName:          lastName.String,
-					NickName:          nickName.String,
-					DisplayName:       displayName.String,
-					AvatarKey:         avatarKey.String,
-					PreferredLanguage: language.Make(preferredLanguage.String),
-					Gender:            domain.Gender(gender.Int32),
-					Email:             domain.EmailAddress(email.String),
-					IsEmailVerified:   isEmailVerified.Bool,
-					Phone:             domain.PhoneNumber(phone.String),
-					IsPhoneVerified:   isPhoneVerified.Bool,
-				}
-			} else if machineID.Valid {
-				u.Machine = &Machine{
-					Name:            name.String,
-					Description:     description.String,
-					HasSecret:       hasSecret.Bool,
-					AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
-				}
-			}
-			return u, nil
-		}
+		scanUser
 }
 
 func prepareProfileQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Profile, error)) {
