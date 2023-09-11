@@ -8006,6 +8006,7 @@ message UpdateHumanProfileRequest {
     ];
     string display_name = 5 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             min_length: 1;
             max_length: 200;
