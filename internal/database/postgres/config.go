@@ -8,6 +8,7 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
@@ -62,7 +63,6 @@ func (c *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 }
 
 func (c *Config) Connect(useAdmin bool) (*sql.DB, error) {
-	logging.Warn("postgres is currently in beta")
 	db, err := sql.Open("pgx", c.String(useAdmin))
 	if err != nil {
 		return nil, err
