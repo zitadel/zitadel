@@ -91,7 +91,7 @@ Check your application, if everything is correct, press "Create".
 
 Make sure to enable the SSO profile for your organization.
 
-In the [domain-specific service URLs](https://admin.google.com/u/1/ac/security/sso/domain-specific-service-urls) settings select "Automatically redirect users to the third-party IdP in the following SSO profile" and select as SSO profile "SSO profile for your organization.
+In the [domain-specific service URLs](https://admin.google.com/u/1/ac/security/sso/domain-specific-service-urls) settings select "Automatically redirect users to the third-party IdP in the following SSO profile" and select as SSO profile "SSO profile for your organization".
 
 ![domain-specific service URLs](/img/guides/integrate/services/google-workspace-domain-sepcific-urls.png)
 
@@ -188,7 +188,7 @@ Check your application, if everything is correct, press "Create".
 
 Make sure to enable the SSO profile.
 
-In the [domain-specific service URLs](https://admin.google.com/u/1/ac/security/sso/domain-specific-service-urls) settings select "Automatically redirect users to the third-party IdP in the following SSO profile" and select as SSO profile "SSO profile for your organization.
+In the [domain-specific service URLs](https://admin.google.com/u/1/ac/security/sso/domain-specific-service-urls) settings select "Automatically redirect users to the third-party IdP in the following SSO profile" and select as SSO profile "ZITADEL SSO".
 
 ![domain-specific service URLs with ZITADEL SSO](/img/guides/integrate/services/google-workspace-zitadel-set-profile.png)
 
