@@ -5,7 +5,6 @@ package system_test
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"testing"
 	"time"
@@ -14,11 +13,14 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	quota_pb "github.com/zitadel/zitadel/pkg/grpc/quota"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
+
+var callURL = "http://localhost:" + integration.PortQuotaServer
 
 func TestServer_QuotaNotification_Limit(t *testing.T) {
 	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(CTX, SystemCTX)
@@ -37,12 +39,12 @@ func TestServer_QuotaNotification_Limit(t *testing.T) {
 			{
 				Percent: uint32(percent),
 				Repeat:  true,
-				CallUrl: "http://localhost:8082",
+				CallUrl: callURL,
 			},
 			{
 				Percent: 100,
 				Repeat:  true,
-				CallUrl: "http://localhost:8082",
+				CallUrl: callURL,
 			},
 		},
 	})
@@ -50,15 +52,13 @@ func TestServer_QuotaNotification_Limit(t *testing.T) {
 
 	for i := 0; i < percentAmount; i++ {
 		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
-		if err != nil {
-			require.NoError(t, fmt.Errorf("error in %d call of %d: %f", i, percentAmount, err))
-		}
+		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
 	}
 	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, percent)
 
 	for i := 0; i < (amount - percentAmount); i++ {
 		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
-		require.NoError(t, err)
+		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
 	}
 	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, 100)
 
@@ -83,12 +83,12 @@ func TestServer_QuotaNotification_NoLimit(t *testing.T) {
 			{
 				Percent: uint32(percent),
 				Repeat:  false,
-				CallUrl: "http://localhost:8082",
+				CallUrl: callURL,
 			},
 			{
 				Percent: 100,
 				Repeat:  true,
-				CallUrl: "http://localhost:8082",
+				CallUrl: callURL,
 			},
 		},
 	})
@@ -96,25 +96,19 @@ func TestServer_QuotaNotification_NoLimit(t *testing.T) {
 
 	for i := 0; i < percentAmount; i++ {
 		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
-		if err != nil {
-			require.NoError(t, fmt.Errorf("error in %d call of %d: %f", i, percentAmount, err))
-		}
+		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
 	}
 	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, percent)
 
 	for i := 0; i < (amount - percentAmount); i++ {
 		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
-		if err != nil {
-			require.NoError(t, fmt.Errorf("error in %d call of %d: %f", percentAmount+i, amount, err))
-		}
+		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
 	}
 	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, 100)
 
 	for i := 0; i < amount; i++ {
 		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
-		if err != nil {
-			require.NoError(t, fmt.Errorf("error in %d call of %d over limit: %f", i, amount, err))
-		}
+		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
 	}
 	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, 200)
 
@@ -168,7 +162,7 @@ func TestServer_AddAndRemoveQuota(t *testing.T) {
 			{
 				Percent: 20,
 				Repeat:  true,
-				CallUrl: "http://localhost:8082",
+				CallUrl: callURL,
 			},
 		},
 	})
@@ -186,7 +180,7 @@ func TestServer_AddAndRemoveQuota(t *testing.T) {
 			{
 				Percent: 20,
 				Repeat:  true,
-				CallUrl: "http://localhost:8082",
+				CallUrl: callURL,
 			},
 		},
 	})

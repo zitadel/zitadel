@@ -65,6 +65,7 @@ import (
 	"github.com/zitadel/zitadel/internal/logstore/emitters/execution"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/stdout"
 	"github.com/zitadel/zitadel/internal/logstore/record"
+	"github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/static"
@@ -432,7 +433,7 @@ func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls
 	http2Server := &http2.Server{}
 	http1Server := &http.Server{Handler: h2c.NewHandler(router, http2Server), TLSConfig: tlsConfig}
 
-	lc := listenConfig()
+	lc := net.ListenConfig()
 	lis, err := lc.Listen(ctx, "tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		return fmt.Errorf("tcp listener on %d failed: %w", port, err)

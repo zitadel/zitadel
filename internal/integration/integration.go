@@ -9,7 +9,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -35,6 +34,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/webauthn"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -74,6 +74,11 @@ const (
 const (
 	FirstInstanceUsersKey = "first"
 	UserPassword          = "VeryS3cret!"
+)
+
+const (
+	PortMilestoneServer = "8081"
+	PortQuotaServer     = "8082"
 )
 
 // User information with a Personal Access Token.
@@ -291,13 +296,13 @@ func (s *Tester) Done() {
 // INTEGRATION_DB_FLAVOR environment variable and can have the values "cockroach"
 // or "postgres". Defaults to "cockroach".
 //
-// The deault Instance and Organisation are read from the DB and system
+// The default Instance and Organisation are read from the DB and system
 // users are created as needed.
 //
 // After the server is started, a [grpc.ClientConn] will be created and
 // the server is polled for it's health status.
 //
-// Note: the database must already be setup and intialized before
+// Note: the database must already be setup and initialized before
 // using NewTester. See the CONTRIBUTING.md document for details.
 func NewTester(ctx context.Context) *Tester {
 	args := strings.Split(commandLine, " ")
@@ -323,11 +328,11 @@ func NewTester(ctx context.Context) *Tester {
 	tester := Tester{
 		Users: make(InstanceUserMap),
 	}
-	tester.MilestoneChan = make(chan []byte)
-	tester.milestoneServer, err = runMilestoneServer(tester.MilestoneChan)
+	tester.MilestoneChan = make(chan []byte, 100)
+	tester.milestoneServer, err = runMilestoneServer(ctx, tester.MilestoneChan)
 	logging.OnError(err).Fatal()
-	tester.QuotaNotificationChan = make(chan []byte)
-	tester.quotaNotificationServer, err = runQuotaServer(tester.QuotaNotificationChan)
+	tester.QuotaNotificationChan = make(chan []byte, 100)
+	tester.quotaNotificationServer, err = runQuotaServer(ctx, tester.QuotaNotificationChan)
 	logging.OnError(err).Fatal()
 
 	tester.wg.Add(1)
@@ -357,7 +362,7 @@ func Contexts(timeout time.Duration) (ctx, errCtx context.Context, cancel contex
 	return ctx, errCtx, cancel
 }
 
-func runMilestoneServer(bodies chan []byte) (*httptest.Server, error) {
+func runMilestoneServer(ctx context.Context, bodies chan []byte) (*httptest.Server, error) {
 	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
@@ -375,7 +380,8 @@ func runMilestoneServer(bodies chan []byte) (*httptest.Server, error) {
 		bodies <- body
 		w.WriteHeader(http.StatusOK)
 	}))
-	listener, err := net.Listen("tcp", "localhost:8081")
+	config := net.ListenConfig()
+	listener, err := config.Listen(ctx, "tcp", ":"+PortMilestoneServer)
 	if err != nil {
 		return nil, err
 	}
@@ -384,7 +390,7 @@ func runMilestoneServer(bodies chan []byte) (*httptest.Server, error) {
 	return mockServer, nil
 }
 
-func runQuotaServer(bodies chan []byte) (*httptest.Server, error) {
+func runQuotaServer(ctx context.Context, bodies chan []byte) (*httptest.Server, error) {
 	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
@@ -394,7 +400,8 @@ func runQuotaServer(bodies chan []byte) (*httptest.Server, error) {
 		bodies <- body
 		w.WriteHeader(http.StatusOK)
 	}))
-	listener, err := net.Listen("tcp", "localhost:8082")
+	config := net.ListenConfig()
+	listener, err := config.Listen(ctx, "tcp", ":"+PortQuotaServer)
 	if err != nil {
 		return nil, err
 	}
