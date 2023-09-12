@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
@@ -275,7 +276,9 @@ func (q *quotaProjection) IncrementUsage(ctx context.Context, unit quota.Unit, i
 		q.incrementQuotaStatement,
 		instanceID, unit, periodStart, count,
 	).Scan(&sum)
-
+	if err != nil {
+		return 0, errors.ThrowInternalf(err, "PROJ-SJL3h", "incrementing usage for unit %d failed for at least one quota period", unit)
+	}
 	return sum, err
 }
 

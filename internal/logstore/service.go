@@ -2,14 +2,11 @@ package logstore
 
 import (
 	"context"
-	"time"
 
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
-
-const handleThresholdTimeout = time.Minute
 
 type UsageStorer[T LogRecord[T]] interface {
 	LogEmitter[T]

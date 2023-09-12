@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -77,11 +76,6 @@ func (l *databaseLogStorage) incrementUsage(ctx context.Context, bulk []*record.
 }
 
 func (l *databaseLogStorage) incrementUsageFromAccessLogs(ctx context.Context, instanceID string, periodStart time.Time, records []*record.AccessLog) (sum uint64, err error) {
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("incrementing access relevant usage failed for at least one quota period: %w", err)
-		}
-	}()
 	var count uint64
 	for _, r := range records {
 		if r.IsAuthenticated() {
