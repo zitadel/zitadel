@@ -9,7 +9,7 @@ import (
 
 // ReportQuotaUsage writes a slice of *quota.NotificationDueEvent directly to the eventstore
 func (c *Commands) ReportQuotaUsage(ctx context.Context, dueNotifications []*quota.NotificationDueEvent) error {
-	cmds := make([]eventstore.Command, 0)
+	cmds := make([]eventstore.Command, 0, len(dueNotifications))
 	for _, notification := range dueNotifications {
 		events, err := c.eventstore.Filter(
 			ctx,

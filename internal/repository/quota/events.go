@@ -46,9 +46,8 @@ func NewRemoveQuotaNameUniqueConstraint(unit Unit) *eventstore.EventUniqueConstr
 type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Unit Unit      `json:"unit"`
-	From time.Time `json:"from"`
-	// TODO: Omit empty?
+	Unit          Unit                      `json:"unit"`
+	From          time.Time                 `json:"from"`
 	ResetInterval time.Duration             `json:"interval,omitempty"`
 	Amount        uint64                    `json:"amount"`
 	Limit         bool                      `json:"limit"`

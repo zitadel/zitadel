@@ -209,11 +209,11 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	}
 
 	clock := clockpkg.New()
-	actionsExecutionStdoutEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, config.LogStore.Execution.Stdout, stdout.NewStdoutEmitter[*record.ExecutionLog]())
+	actionsExecutionStdoutEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, &logstore.EmitterConfig{Enabled: config.LogStore.Execution.Stdout.Enabled}, stdout.NewStdoutEmitter[*record.ExecutionLog]())
 	if err != nil {
 		return err
 	}
-	actionsExecutionDBEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, config.LogStore.Execution.Database, execution.NewDatabaseLogStorage(dbClient, commands, queries))
+	actionsExecutionDBEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, config.Quotas.Execution, execution.NewDatabaseLogStorage(dbClient, commands, queries))
 	if err != nil {
 		return err
 	}
@@ -315,11 +315,11 @@ func startAPIs(
 		return err
 	}
 
-	accessStdoutEmitter, err := logstore.NewEmitter[*record.AccessLog](ctx, clock, config.LogStore.Access.Stdout, stdout.NewStdoutEmitter[*record.AccessLog]())
+	accessStdoutEmitter, err := logstore.NewEmitter[*record.AccessLog](ctx, clock, &logstore.EmitterConfig{Enabled: config.LogStore.Access.Stdout.Enabled}, stdout.NewStdoutEmitter[*record.AccessLog]())
 	if err != nil {
 		return err
 	}
-	accessDBEmitter, err := logstore.NewEmitter[*record.AccessLog](ctx, clock, config.LogStore.Access.Database, access.NewDatabaseLogStorage(dbClient, commands, queries))
+	accessDBEmitter, err := logstore.NewEmitter[*record.AccessLog](ctx, clock, &config.Quotas.Access.EmitterConfig, access.NewDatabaseLogStorage(dbClient, commands, queries))
 	if err != nil {
 		return err
 	}
@@ -330,7 +330,7 @@ func startAPIs(
 		http_util.WithNonHttpOnly(),
 		http_util.WithMaxAge(int(math.Floor(config.Quotas.Access.ExhaustedCookieMaxAge.Seconds()))),
 	)
-	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, exhaustedCookieHandler, config.Quotas.Access)
+	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, exhaustedCookieHandler, &config.Quotas.Access.AccessConfig)
 	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, limitingAccessInterceptor)
 	if err != nil {
 		return fmt.Errorf("error creating api %w", err)

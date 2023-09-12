@@ -11,9 +11,7 @@ type emitterOption func(config *logstore.EmitterConfig)
 
 func emitterConfig(options ...emitterOption) *logstore.EmitterConfig {
 	cfg := &logstore.EmitterConfig{
-		Enabled:         true,
-		Keep:            time.Hour,
-		CleanupInterval: time.Hour,
+		Enabled: true,
 		Debounce: &logstore.DebouncerConfig{
 			MinFrequency: 0,
 			MaxBulkSize:  0,
@@ -34,13 +32,6 @@ func withDebouncerConfig(config *logstore.DebouncerConfig) emitterOption {
 func withDisabled() emitterOption {
 	return func(c *logstore.EmitterConfig) {
 		c.Enabled = false
-	}
-}
-
-func withCleanupping(keep, interval time.Duration) emitterOption {
-	return func(c *logstore.EmitterConfig) {
-		c.Keep = keep
-		c.CleanupInterval = interval
 	}
 }
 

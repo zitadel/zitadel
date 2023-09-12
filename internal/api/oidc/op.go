@@ -122,20 +122,18 @@ func NewProvider(
 }
 
 func ignoredQuotaLimitEndpoint(endpoints *EndpointConfig) []string {
-	ignoredEndpoints := make([]string, 3)
-	ignoredEndpoints[0] = oidc.DiscoveryEndpoint
-	ignoredEndpoints[1] = op.DefaultEndpoints.Authorization.Relative()
-	ignoredEndpoints[2] = op.DefaultEndpoints.JwksURI.Relative()
+	authURL := op.DefaultEndpoints.Authorization.Relative()
+	keysURL := op.DefaultEndpoints.JwksURI.Relative()
 	if endpoints == nil {
-		return ignoredEndpoints
+		return []string{oidc.DiscoveryEndpoint, authURL, keysURL}
 	}
 	if endpoints.Auth != nil && endpoints.Auth.Path != "" {
-		ignoredEndpoints[1] = endpoints.Auth.Path
+		authURL = endpoints.Auth.Path
 	}
 	if endpoints.Keys != nil && endpoints.Keys.Path != "" {
-		ignoredEndpoints[2] = endpoints.Keys.Path
+		keysURL = endpoints.Keys.Path
 	}
-	return ignoredEndpoints
+	return []string{oidc.DiscoveryEndpoint, authURL, keysURL}
 }
 
 func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []byte) (*op.Config, error) {

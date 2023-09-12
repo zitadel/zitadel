@@ -137,28 +137,6 @@ func TestService(t *testing.T) {
 			},
 		},
 	}, {
-		name: "cleanupping works",
-		args: args{
-			mainSink: emitterConfig(withCleanupping(17*time.Second, 28*time.Second)),
-			secondarySink: emitterConfig(withDebouncerConfig(&logstore.DebouncerConfig{
-				MinFrequency: 0,
-				MaxBulkSize:  15,
-			}), withCleanupping(5*time.Second, 47*time.Second)),
-			config: quotaConfig(),
-		},
-		want: want{
-			enabled:   true,
-			remaining: nil,
-			mainSink: wantSink{
-				bulks: repeat(1, 60),
-				len:   21,
-			},
-			secondarySink: wantSink{
-				bulks: repeat(15, 4),
-				len:   18,
-			},
-		},
-	}, {
 		name: "when quota has a limit of 90, 30 are remaining",
 		args: args{
 			mainSink:      emitterConfig(),

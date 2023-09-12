@@ -8,7 +8,6 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -88,12 +87,14 @@ func prepareQuotaQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 				QuotaColumnInterval.identifier(),
 				QuotaColumnAmount.identifier(),
 				QuotaColumnLimit.identifier(),
+				"now()",
 			).
-			From(quotasTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(quotasTable.identifier()).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*Quota, error) {
 			q := new(Quota)
 			var interval database.Duration
-			err := row.Scan(&q.ID, &q.From, &interval, &q.Amount, &q.Limit)
+			var now time.Time
+			err := row.Scan(&q.ID, &q.From, &interval, &q.Amount, &q.Limit, &now)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
 					return nil, errors.ThrowNotFound(err, "QUERY-rDTM6", "Errors.Quota.NotExisting")
@@ -101,7 +102,7 @@ func prepareQuotaQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 				return nil, errors.ThrowInternal(err, "QUERY-LqySK", "Errors.Internal")
 			}
 			q.ResetInterval = time.Duration(interval)
-			q.CurrentPeriodStart = pushPeriodStart(q.From, q.ResetInterval, call.FromContext(ctx))
+			q.CurrentPeriodStart = pushPeriodStart(q.From, q.ResetInterval, now)
 			return q, nil
 		}
 }
@@ -110,9 +111,11 @@ func pushPeriodStart(from time.Time, interval time.Duration, now time.Time) time
 	if now.IsZero() {
 		now = time.Now()
 	}
-	next := from.Add(interval)
-	if next.After(now) {
-		return from
+	for {
+		next := from.Add(interval)
+		if next.After(now) {
+			return from
+		}
+		from = next
 	}
-	return pushPeriodStart(next, interval, now)
 }

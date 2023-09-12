@@ -19,9 +19,9 @@ var (
 		` projections.quotas.from_anchor,` +
 		` projections.quotas.interval,` +
 		` projections.quotas.amount,` +
-		` projections.quotas.limit_usage` +
-		` FROM projections.quotas` +
-		` AS OF SYSTEM TIME '-1 ms'`)
+		` projections.quotas.limit_usage,` +
+		` now()` +
+		` FROM projections.quotas`)
 
 	quotaCols = []string{
 		"id",
@@ -29,6 +29,7 @@ var (
 		"interval",
 		"amount",
 		"limit_usage",
+		"now",
 	}
 )
 
@@ -87,6 +88,7 @@ func Test_QuotaPrepare(t *testing.T) {
 						interval(t, time.Hour*24),
 						uint64(1000),
 						true,
+						testNow,
 					},
 				),
 			},

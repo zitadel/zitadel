@@ -14,12 +14,10 @@ import (
 )
 
 func QuotaExhaustedInterceptor(svc *logstore.Service[*record.AccessLog], ignoreService ...string) grpc.UnaryServerInterceptor {
-	prunedIgnoredServices := make([]string, len(ignoreService))
 	for idx, service := range ignoreService {
 		if !strings.HasPrefix(service, "/") {
-			service = "/" + service
+			ignoreService[idx] = "/" + service
 		}
-		prunedIgnoredServices[idx] = service
 	}
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ interface{}, err error) {
 		if !svc.Enabled() {
@@ -34,7 +32,7 @@ func QuotaExhaustedInterceptor(svc *logstore.Service[*record.AccessLog], ignoreS
 			return handler(ctx, req)
 		}
 
-		for _, service := range prunedIgnoredServices {
+		for _, service := range ignoreService {
 			if strings.HasPrefix(info.FullMethod, service) {
 				return handler(ctx, req)
 			}

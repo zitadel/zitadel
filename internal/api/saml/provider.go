@@ -102,21 +102,20 @@ func newStorage(
 }
 
 func ignoredQuotaLimitEndpoint(config *provider.Config) []string {
-	ignoredEndpoints := make([]string, 3)
-	ignoredEndpoints[0] = HandlerPrefix + provider.DefaultMetadataEndpoint
-	ignoredEndpoints[1] = HandlerPrefix + provider.DefaultCertificateEndpoint
-	ignoredEndpoints[2] = HandlerPrefix + provider.DefaultSingleSignOnEndpoint
+	metadataEndpoint := HandlerPrefix + provider.DefaultMetadataEndpoint
+	certificateEndpoint := HandlerPrefix + provider.DefaultCertificateEndpoint
+	ssoEndpoint := HandlerPrefix + provider.DefaultSingleSignOnEndpoint
 	if config.MetadataConfig != nil && config.MetadataConfig.Path != "" {
-		ignoredEndpoints[0] = HandlerPrefix + config.MetadataConfig.Path
+		metadataEndpoint = HandlerPrefix + config.MetadataConfig.Path
 	}
 	if config.IDPConfig == nil || config.IDPConfig.Endpoints == nil {
-		return ignoredEndpoints
+		return []string{metadataEndpoint, certificateEndpoint, ssoEndpoint}
 	}
 	if config.IDPConfig.Endpoints.Certificate != nil && config.IDPConfig.Endpoints.Certificate.Relative() != "" {
-		ignoredEndpoints[1] = HandlerPrefix + config.IDPConfig.Endpoints.Certificate.Relative()
+		certificateEndpoint = HandlerPrefix + config.IDPConfig.Endpoints.Certificate.Relative()
 	}
 	if config.IDPConfig.Endpoints.SingleSignOn != nil && config.IDPConfig.Endpoints.SingleSignOn.Relative() != "" {
-		ignoredEndpoints[2] = HandlerPrefix + config.IDPConfig.Endpoints.SingleSignOn.Relative()
+		ssoEndpoint = HandlerPrefix + config.IDPConfig.Endpoints.SingleSignOn.Relative()
 	}
-	return ignoredEndpoints
+	return []string{metadataEndpoint, certificateEndpoint, ssoEndpoint}
 }

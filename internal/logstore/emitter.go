@@ -2,18 +2,14 @@ package logstore
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/benbjohnson/clock"
-	"github.com/zitadel/logging"
 )
 
 type EmitterConfig struct {
-	Enabled         bool
-	Keep            time.Duration
-	CleanupInterval time.Duration
-	Debounce        *DebouncerConfig
+	Enabled  bool
+	Debounce *DebouncerConfig
 }
 
 type emitter[T LogRecord[T]] struct {
@@ -65,31 +61,7 @@ func NewEmitter[T LogRecord[T]](ctx context.Context, clock clock.Clock, cfg *Emi
 	if cfg.Debounce != nil && (cfg.Debounce.MinFrequency > 0 || cfg.Debounce.MaxBulkSize > 0) {
 		svc.debouncer = newDebouncer[T](ctx, *cfg.Debounce, clock, newStorageBulkSink(svc.emitter))
 	}
-
-	cleanupper, ok := logger.(LogCleanupper[T])
-	if !ok {
-		if cfg.Keep != 0 {
-			return nil, fmt.Errorf("cleaning up for this storage type is not supported, so keep duration must be 0, but is %d", cfg.Keep)
-		}
-		if cfg.CleanupInterval != 0 {
-			return nil, fmt.Errorf("cleaning up for this storage type is not supported, so cleanup interval duration must be 0, but is %d", cfg.Keep)
-		}
-
-		return svc, nil
-	}
-
-	if cfg.Keep != 0 && cfg.CleanupInterval != 0 {
-		go svc.startCleanupping(cleanupper, cfg.CleanupInterval, cfg.Keep)
-	}
 	return svc, nil
-}
-
-func (s *emitter[T]) startCleanupping(cleanupper LogCleanupper[T], cleanupInterval, keep time.Duration) {
-	for range s.clock.Tick(cleanupInterval) {
-		if err := cleanupper.Cleanup(s.ctx, keep); err != nil {
-			logging.WithError(err).Error("cleaning up logs failed")
-		}
-	}
 }
 
 func (s *emitter[T]) Emit(ctx context.Context, record T) (err error) {

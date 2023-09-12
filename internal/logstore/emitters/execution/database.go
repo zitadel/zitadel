@@ -8,13 +8,9 @@ import (
 	"math"
 	"time"
 
-	"github.com/Masterminds/squirrel"
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/database"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/query"
@@ -22,19 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
-const (
-	executionLogsTable     = "logstore.execution"
-	executionTimestampCol  = "log_date"
-	executionTookCol       = "took"
-	executionMessageCol    = "message"
-	executionLogLevelCol   = "loglevel"
-	executionInstanceIdCol = "instance_id"
-	executionActionIdCol   = "action_id"
-	executionMetadataCol   = "metadata"
-)
-
 var _ logstore.UsageStorer[*record.ExecutionLog] = (*databaseLogStorage)(nil)
-var _ logstore.LogCleanupper[*record.ExecutionLog] = (*databaseLogStorage)(nil)
 
 type databaseLogStorage struct {
 	dbClient *database.DB
@@ -54,13 +38,7 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []*record.ExecutionL
 	if len(bulk) == 0 {
 		return nil
 	}
-	incrementErr := l.incrementUsage(ctx, bulk)
-	storeErr := l.store(ctx, bulk)
-	joinedErr := errors.Join(incrementErr, storeErr)
-	if joinedErr != nil {
-		joinedErr = fmt.Errorf("storing execution logs and/or incrementing quota usage failed: %w", joinedErr)
-	}
-	return joinedErr
+	return l.incrementUsage(ctx, bulk)
 }
 
 func (l *databaseLogStorage) incrementUsage(ctx context.Context, bulk []*record.ExecutionLog) (err error) {
@@ -100,62 +78,6 @@ func (l *databaseLogStorage) incrementUsage(ctx context.Context, bulk []*record.
 	return err
 }
 
-func (l *databaseLogStorage) store(ctx context.Context, bulk []*record.ExecutionLog) (err error) {
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("storing execution logs failed: %w", err)
-		}
-	}()
-	builder := squirrel.Insert(executionLogsTable).
-		Columns(
-			executionTimestampCol,
-			executionTookCol,
-			executionMessageCol,
-			executionLogLevelCol,
-			executionInstanceIdCol,
-			executionActionIdCol,
-			executionMetadataCol,
-		).
-		PlaceholderFormat(squirrel.Dollar)
-
-	for idx := range bulk {
-		item := bulk[idx]
-
-		var took interface{}
-		if item.Took > 0 {
-			took = item.Took
-		}
-
-		builder = builder.Values(
-			item.LogDate,
-			took,
-			item.Message,
-			item.LogLevel,
-			item.InstanceID,
-			item.ActionID,
-			item.Metadata,
-		)
-	}
-
-	stmt, args, err := builder.ToSql()
-	if err != nil {
-		return caos_errors.ThrowInternal(err, "EXEC-KOS7I", "Errors.Internal")
-	}
-
-	result, err := l.dbClient.ExecContext(ctx, stmt, args...)
-	if err != nil {
-		return caos_errors.ThrowInternal(err, "EXEC-0j6i5", "Errors.Access.StorageFailed")
-	}
-
-	rows, err := result.RowsAffected()
-	if err != nil {
-		return caos_errors.ThrowInternal(err, "EXEC-MGchJ", "Errors.Internal")
-	}
-
-	logging.WithFields("rows", rows).Debug("successfully stored execution logs")
-	return nil
-}
-
 func (l *databaseLogStorage) incrementUsageFromExecutionLogs(ctx context.Context, instanceID string, periodStart time.Time, records []*record.ExecutionLog) (sum uint64, err error) {
 	defer func() {
 		if err != nil {
@@ -167,20 +89,4 @@ func (l *databaseLogStorage) incrementUsageFromExecutionLogs(ctx context.Context
 		total += r.Took
 	}
 	return projection.QuotaProjection.IncrementUsage(ctx, quota.ActionsAllRunsSeconds, instanceID, periodStart, uint64(math.Floor(total.Seconds())))
-}
-
-func (l *databaseLogStorage) Cleanup(ctx context.Context, keep time.Duration) error {
-	stmt, args, err := squirrel.Delete(executionLogsTable).
-		Where(squirrel.LtOrEq{executionTimestampCol: time.Now().Add(-keep)}).
-		PlaceholderFormat(squirrel.Dollar).
-		ToSql()
-
-	if err != nil {
-		return caos_errors.ThrowInternal(err, "EXEC-Bja8V", "Errors.Internal")
-	}
-
-	execCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
-	_, err = l.dbClient.ExecContext(execCtx, stmt, args...)
-	return err
 }
