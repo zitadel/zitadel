@@ -742,6 +742,10 @@
     "TIMEOUT": "Délai d'attente",
     "TIMEOUTINSEC": "Délai en secondes",
     "ALLOWEDTOFAIL": "Autorisé à échouer",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Avertissement",
+      "DESCRIPTION": "Si vous désactivez ce paramètre, cela peut empêcher les utilisateurs de votre organisation de se connecter. De plus, vous ne pourrez plus accéder à la console pour désactiver l'action. Nous vous recommandons de créer un utilisateur administrateur dans une organisation distincte ou de tester les scripts d'abord dans un environnement de développement ou une organisation de développement."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Type de flux",
     "TRIGGERTYPE": "Type de déclencheur",
@@ -963,8 +967,7 @@
     "STATE": {
       "0": "Non défini",
       "1": "Actif",
-      "2": "Désactivé",
-      "3": "Supprimé"
+      "2": "Désactivé"
     },
     "MEMBER": {
       "TITLE": "Gestionnaires de l'organisation",

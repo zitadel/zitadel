@@ -741,6 +741,10 @@
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in secondi",
     "ALLOWEDTOFAIL": "Può fallire",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Attenzione",
+      "DESCRIPTION": "Se disabiliti questa impostazione, potrebbe impedire agli utenti della tua organizzazione di accedere. Inoltre, non sarai più in grado di accedere alla console per disabilitare l'azione. Ti consigliamo di creare un utente amministratore in un'organizzazione separata o di testare gli script prima in un ambiente di sviluppo o in un'organizzazione di sviluppo."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Tipo processo",
     "TRIGGERTYPE": "Tipo trigger",
@@ -963,8 +967,7 @@
     "STATE": {
       "0": "Non definito",
       "1": "Attivo",
-      "2": "Disattivato",
-      "3": "Rimosso"
+      "2": "Disattivato"
     },
     "MEMBER": {
       "TITLE": "Manager dell'organizzazione",

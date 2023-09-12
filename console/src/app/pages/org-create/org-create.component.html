@@ -170,7 +170,7 @@
             <div class="content">
               <cnsl-form-field class="formfield">
                 <cnsl-label>{{ 'ORG_DETAIL.DETAIL.NAME' | translate }}</cnsl-label>
-                <input cnslInput formControlName="name" />
+                <input cnslInput formControlName="name" data-e2e="org-name-input" />
               </cnsl-form-field>
             </div>
 
@@ -182,6 +182,7 @@
                 class="big-button"
                 cdkFocusInitial
                 type="submit"
+                data-e2e="create-org-button"
               >
                 {{ 'ACTIONS.CREATE' | translate }}
               </button>

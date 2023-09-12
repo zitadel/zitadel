@@ -743,6 +743,10 @@
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in seconds",
     "ALLOWEDTOFAIL": "Allowed To Fail",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Warning",
+      "DESCRIPTION": "If you disable this setting, it may cause users in your organization to be unable to sign in. Additionally, you will no longer be able to access the console to disable the action. We recommend creating an administrator user in a separate organization or testing scripts first in a development environment or a development organization."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Type",
     "TRIGGERTYPE": "Trigger Type",
@@ -964,8 +968,7 @@
     "STATE": {
       "0": "Not defined",
       "1": "Active",
-      "2": "Deactivated",
-      "3": "Removed"
+      "2": "Deactivated"
     },
     "MEMBER": {
       "TITLE": "Organization Managers",

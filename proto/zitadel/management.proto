@@ -2027,7 +2027,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             summary: "Delete Organization";
-            description: "Sets the state of my organization and all its resource (Users, Projects, Grants to and from the org) to remove. Users of this organization will not be able to log in."
+            description: "Deletes my organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -8006,6 +8006,7 @@ message UpdateHumanProfileRequest {
     ];
     string display_name = 5 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             min_length: 1;
             max_length: 200;
@@ -10599,48 +10600,48 @@ message SetCustomInitMessageTextRequest {
         }
     ];
     string title = 2 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"ZITADEL - Initialize User\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string pre_header = 3 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Initialize User\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string subject = 4 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Initialize User\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string greeting = 5  [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 4000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Hello {{.FirstName}} {{.LastName}},\""
-            max_length: 200;
+            max_length: 1000;
         }
     ];
     string text = 6 [
-        (validate.rules).string = {max_len: 800},
+        (validate.rules).string = {max_bytes: 40000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"This user was created in Zitadel. Use the username {{.PreferredLoginName}} to log in. Please click the button below to finish the initialization process. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.\""
-            max_length: 800;
+            max_length: 10000;
         }
     ];
     string button_text = 7 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 4000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Finish initialization\""
-            max_length: 200;
+            max_length: 1000;
         }
     ];
-    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
 }
 
 message SetCustomInitMessageTextResponse {
@@ -10749,48 +10750,48 @@ message SetCustomPasswordResetMessageTextRequest {
         }
     ];
     string title = 2 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"ZITADEL - Reset Password\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string pre_header = 3 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Reset Password\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string subject = 4 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Reset Password\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string greeting = 5 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 4000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Hello {{.FirstName}} {{.LastName}},\""
-            max_length: 200;
+            max_length: 1000;
         }
     ];
     string text = 6 [
-        (validate.rules).string = {max_len: 800},
+        (validate.rules).string = {max_bytes: 40000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"We received a password reset request. Please use the button below to reset your password. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.\""
-            max_length: 800;
+            max_length: 10000;
         }
     ];
     string button_text = 7 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 4000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Reset Password\""
-            max_length: 200;
+            max_length: 1000;
         }
     ];
-    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
 }
 
 message SetCustomPasswordResetMessageTextResponse {
@@ -10829,48 +10830,48 @@ message SetCustomVerifyEmailMessageTextRequest {
         }
     ];
     string title = 2 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"ZITADEL - Verify Email\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string pre_header = 3 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Verify Email\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string subject = 4 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Verify Email\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string greeting = 5  [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 4000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Hello {{.FirstName}} {{.LastName}},\""
-            max_length: 200;
+            max_length: 1000;
         }
     ];
     string text = 6 [
-        (validate.rules).string = {max_len: 800},
+        (validate.rules).string = {max_bytes: 40000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"A new email has been added. Please use the button below to verify your mail. (Code {{.Code}}) If you didn't add a new email, please ignore this email.\""
-            max_length: 800;
+            max_length: 10000;
         }
     ];
     string button_text = 7 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 4000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Verify Email\""
-            max_length: 200;
+            max_length: 1000;
         }
     ];
-    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
 }
 
 message SetCustomVerifyEmailMessageTextResponse {
@@ -10909,31 +10910,31 @@ message SetCustomVerifyPhoneMessageTextRequest {
         }
     ];
     string title = 2 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"ZITADEL - Verify Phone\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string pre_header = 3 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Verify Phone\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string subject = 4 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Verify Phone\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string greeting = 5  [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 4000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Hello {{.FirstName}} {{.LastName}},\""
-            max_length: 200;
+            max_length: 1000;
         }
     ];
     string text = 6 [
@@ -10944,13 +10945,13 @@ message SetCustomVerifyPhoneMessageTextRequest {
         }
     ];
     string button_text = 7 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 4000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Verify Phone\""
-            max_length: 200;
+            max_length: 1000;
         }
     ];
-    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
 }
 
 message SetCustomVerifyPhoneMessageTextResponse {
@@ -11033,48 +11034,48 @@ message SetCustomVerifyEmailOTPMessageTextRequest {
         }
     ];
     string title = 2 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"ZITADEL - One-time Password\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string pre_header = 3 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Verify One-time Password \""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string subject = 4 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Verify One-time Password\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string greeting = 5  [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 4000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Hello {{.FirstName}} {{.LastName}},\""
-            max_length: 200;
+            max_length: 1000;
         }
     ];
     string text = 6 [
-        (validate.rules).string = {max_len: 800},
+        (validate.rules).string = {max_bytes: 40000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Please use the \\\"Authenticate\\\" button or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at ZITADEL within the next five minutes.\""
-            max_length: 800;
+            max_length: 10000;
         }
     ];
     string button_text = 7 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 4000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Authenticate\""
-            max_length: 200;
+            max_length: 1000;
         }
     ];
-    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
 }
 
 message SetCustomVerifyEmailOTPMessageTextResponse {
@@ -11113,48 +11114,48 @@ message SetCustomDomainClaimedMessageTextRequest {
         }
     ];
     string title = 2 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"ZITADEL - Domain has been claimed\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string pre_header = 3 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Change email / username\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string subject = 4 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Domain has been claimed\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string greeting = 5 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 4000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Hello {{.FirstName}} {{.LastName}},\""
-            max_length: 200;
+            max_length: 1000;
         }
     ];
     string text = 6 [
-        (validate.rules).string = {max_len: 800},
+        (validate.rules).string = {max_bytes: 40000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"The domain {{.Domain}} has been claimed by an organization. Your current user {{.UserName}} is not part of this organization. Therefore you'll have to change your email when you log in. We have created a temporary username ({{.TempUsername}}) for this login.\""
-            max_length: 800;
+            max_length: 10000;
         }
     ];
     string button_text = 7 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 4000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Login\""
-            max_length: 200;
+            max_length: 1000;
         }
     ];
-    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
 }
 
 message SetCustomDomainClaimedMessageTextResponse {
@@ -11194,48 +11195,48 @@ message SetCustomPasswordlessRegistrationMessageTextRequest {
         }
     ];
     string title = 2 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"ZITADEL - Password of the user has changed\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string pre_header = 3 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Password Changed\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string subject = 4 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Password of user has changed\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string greeting = 5 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 4000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Hello {{.FirstName}} {{.LastName}},\""
-            max_length: 200;
+            max_length: 1000;
         }
     ];
     string text = 6 [
-        (validate.rules).string = {max_len: 800},
+        (validate.rules).string = {max_bytes: 40000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"The password of your user has changed, if this change was not done by you, please be advised to immediately reset your password.\""
-            max_length: 800;
+            max_length: 10000;
         }
     ];
     string button_text = 7 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 4000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Login\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
-    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
 }
 
 message SetCustomPasswordlessRegistrationMessageTextResponse {
@@ -11274,48 +11275,48 @@ message SetCustomPasswordChangeMessageTextRequest {
         }
     ];
     string title = 2 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"ZITADEL - Add Passwordless Login\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string pre_header = 3 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Add Passwordless Login\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string subject = 4 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 2000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Add Passwordless Login\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
     string greeting = 5 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 4000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Hello {{.FirstName}} {{.LastName}},\""
-            max_length: 200;
+            max_length: 1000;
         }
     ];
     string text = 6 [
-        (validate.rules).string = {max_len: 800},
+        (validate.rules).string = {max_bytes: 40000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"We received a request to add a token for passwordless login. Please use the button below to add your token or device for passwordless login.\""
-            max_length: 800;
+            max_length: 10000;
         }
     ];
     string button_text = 7 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_bytes: 4000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Add Passwordless Login\""
-            max_length: 200;
+            max_length: 500;
         }
     ];
-    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
 }
 
 message SetCustomPasswordChangeMessageTextResponse {
@@ -12656,13 +12657,13 @@ message CreateActionRequest {
         }
     ];
     string script = 2 [
-        (validate.rules).string = {min_len: 1, max_len: 2000},
+        (validate.rules).string = {min_len: 1, max_bytes: 40000},
         (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"function log(context, calls){console.log(context)}\"";
             description: "Javascript code that should be executed"
             min_length: 1;
-            max_length: 2000;
+            max_length: 10000;
         }
     ];
     google.protobuf.Duration timeout = 3 [
@@ -12705,9 +12706,12 @@ message UpdateActionRequest {
         }
     ];
     string script = 3 [
-        (validate.rules).string = {min_len: 1, max_len: 2000},
+        (validate.rules).string = {min_len: 1, max_bytes: 40000},
          (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
              example: "\"function log(context, calls){console.log(context)}\"";
+             description: "Javascript code that should be executed"
+             min_length: 1;
+             max_length: 10000;
          }
     ];
     google.protobuf.Duration timeout = 4 [
