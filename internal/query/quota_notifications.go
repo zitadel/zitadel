@@ -136,7 +136,7 @@ type QuotaNotifications struct {
 // calculateThreshold calculates the nearest reached threshold.
 // It makes sure that the percent configured on the notification is calculated within the "current" 100%,
 // e.g. when configuring 80%, the thresholds are 80, 180, 280, ...
-// so 170% use is always 70% of the current bucket, with thh above config, the reached threshold would be 80.
+// so 170% use is always 70% of the current bucket, with the above config, the reached threshold would be 80.
 func calculateThreshold(usedRel, notificationPercent uint16) uint16 {
 	// check how many times we reached 100%
 	times := math.Floor(float64(usedRel) / 100)
