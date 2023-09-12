@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	//go:embed 13/cockroach/13.sql
-	//go:embed 13/postgres/13.sql
+	//go:embed 13/cockroach/*.sql
+	//go:embed 13/postgres/*.sql
 	changeEvents embed.FS
 )
 
@@ -18,12 +18,21 @@ type ChangeEvents struct {
 }
 
 func (mig *ChangeEvents) Execute(ctx context.Context) error {
-	stmt, err := readStmt(changeEvents, "13", mig.dbClient.Type(), "13.sql")
+	migrations, err := changeEvents.ReadDir("13/" + mig.dbClient.Type())
 	if err != nil {
 		return err
 	}
-	_, err = mig.dbClient.ExecContext(ctx, stmt)
-	return err
+	for _, migration := range migrations {
+		stmt, err := readStmt(changeEvents, "13", mig.dbClient.Type(), migration.Name())
+		if err != nil {
+			return err
+		}
+		_, err = mig.dbClient.ExecContext(ctx, stmt)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (mig *ChangeEvents) String() string {

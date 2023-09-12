@@ -1,0 +1,1 @@
+ALTER TABLE eventstore.events ADD COLUMN IF NOT EXISTS in_tx_order SMALLINT NOT NULL;

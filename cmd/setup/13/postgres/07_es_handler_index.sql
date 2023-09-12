@@ -1,0 +1,2 @@
+CREATE INDEX IF NOT EXISTS es_handler_idx ON eventstore.events (instance_id, "position", aggregate_type, event_type);
+CREATE INDEX IF NOT EXISTS es_handler_idx_2 ON eventstore.events (instance_id, aggregate_type, event_type);

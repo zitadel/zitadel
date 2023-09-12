@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS es_global ON eventstore.events (aggregate_type, aggregate_id);
