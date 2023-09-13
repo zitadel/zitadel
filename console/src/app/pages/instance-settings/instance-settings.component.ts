@@ -20,6 +20,8 @@ import {
   PRIVACYPOLICY,
   SECRETS,
   SECURITY,
+  SMS_PROVIDER,
+  SMTP_PROVIDER,
 } from '../../modules/settings-list/settings';
 
 @Component({
@@ -35,6 +37,8 @@ export class InstanceSettingsComponent implements OnDestroy {
     // notifications
     // { showWarn: true, ...NOTIFICATIONS },
     NOTIFICATIONS,
+    SMTP_PROVIDER,
+    SMS_PROVIDER,
     // login
     LOGIN,
     IDP,
