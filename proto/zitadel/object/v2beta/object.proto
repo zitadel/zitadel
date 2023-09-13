@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package zitadel.object.v2alpha;
+package zitadel.object.v2beta;
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha;object";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/object/v2beta;object";
 
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";

@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 )
 
 var _ oidc_pb.OIDCServiceServer = (*Server)(nil)

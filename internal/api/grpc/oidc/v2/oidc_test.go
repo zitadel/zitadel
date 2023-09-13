@@ -12,7 +12,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 )
 
 func Test_authRequestToPb(t *testing.T) {
