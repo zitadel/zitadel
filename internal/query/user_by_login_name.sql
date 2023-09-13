@@ -43,7 +43,7 @@ SELECT
   , u.state
   , u.type
   , u.username
-  , (select array_agg(ln.login_name)::STRING[] login_names from login_names ln group by ln.user_id, ln.instance_id) loginnames
+  , (select array_agg(ln.login_name)::TEXT[] login_names from login_names ln group by ln.user_id, ln.instance_id) loginnames
   , (select ln.login_name login_names_lower from login_names ln where ln.is_primary is true) preferred_login_name
   , h.user_id
   , h.first_name
