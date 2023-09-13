@@ -5,7 +5,7 @@ sidebar_label: From Keycloak
 
 ## Migrating from Keycloak to ZITADEL
 
-This tutorial will use [Docker installation](https://www.docker.com/) for the prerequisites. However, both Keycloak and ZITADEL offer different installation methods. As a result, this guide won't include any required production tuning or security hardening for either system. However, it's advised you follow [recommended guidelines](https://docs.zitadel.com/docs/guides/manage/self-hosted/production) before putting those systems into production.
+This tutorial will use [Docker installation](https://www.docker.com/) for the prerequisites. However, both Keycloak and ZITADEL offer different installation methods. As a result, this guide won't include any required production tuning or security hardening for either system. However, it's advised you follow [recommended guidelines](https://zitadel.com/docs/guides/manage/self-hosted/production) before putting those systems into production.
 
 ## Set up Keycloak
 ### Run Keycloak
@@ -51,7 +51,7 @@ You don't need to make any changes to the **Capability config**. Go ahead and cl
 
 <img src="/docs/img/guides/migrate/keycloak-08.png" alt="Migrating users from Keycloak to ZITADEL"/>
 
-The web application used for this demo will run on `http://localhost:4200/`. In order to allow login and logout from the application, this client needs to be configured to accept your application URL in **Login settings**. Edit **Root URL**, **Valid redirect URI**, and **Valid post logout redirect URIs** to point to your application URLs. Without this configuration, Keycloak will refuse login and logout from your application due to security concerns.
+The web application used for this demo will run on [http://localhost:4200/](http://localhost:4200/). In order to allow login and logout from the application, this client needs to be configured to accept your application URL in **Login settings**. Edit **Root URL**, **Valid redirect URI**, and **Valid post logout redirect URIs** to point to your application URLs. Without this configuration, Keycloak will refuse login and logout from your application due to security concerns.
  
 Additionally, **Web origins** needs to be configured to support required cross-domain requests; otherwise, the request will be blocked on all browsers due to security concerns. To make this application work, fill in all the fields as shown below. 
 
@@ -164,19 +164,9 @@ Now, you've successfully created a sample application that uses Keycloak for use
 
 ## Set up ZITADEL
 
-After creating a sample application that connects to Keycloak, you need to set up ZITADEL in order to migrate the application and users from Keycloak to ZITADEL. For this, ZITADEL offers a [Docker Compose](https://zitadel.com/docs/self-hosting/deploy/compose) installation guide:
+After creating a sample application that connects to Keycloak, you need to set up ZITADEL in order to migrate the application and users from Keycloak to ZITADEL. For this, ZITADEL offers a [Docker Compose](https://zitadel.com/docs/self-hosting/deploy/compose) installation guide. Follow the instructions under the [Docker compose](https://zitadel.com/docs/self-hosting/deploy/compose#docker-compose) section to run a ZITADEL instance locally. 
 
-```bash
-# Download the docker compose example configuration.
-
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/docker-compose.yaml
-
-
-# Run the database and application containers. It will start both the database and the web-server components
-docker compose up --detach
-```
-
-In a few seconds, the application will be available at [http://localhost:8080/ui/console/](http://localhost:8080/ui/console/).
+Next, the application will be available at [http://localhost:8080/ui/console/](http://localhost:8080/ui/console/).
 
 <img src="/docs/img/guides/migrate/keycloak-22.png" alt="Migrating users from Keycloak to ZITADEL"/>
 
@@ -304,7 +294,7 @@ Next, select your service user that you created and select the **Org Owner** che
 
 ### Generate an access token for the service user
 
-In order for the service user to access the API, they must be able to authenticate themselves. To authenticate the user, you can use either [JWT with Private Key](https://docs.zitadel.com/docs/guides/integrate/serviceusers#authenticating-a-service-user) flow (recommended for production) or [Personal Access Tokens](https://zitadel.com/docs/guides/integrate/pat)(PAT). In this tutorial we will choose the latter. 
+In order for the service user to access the API, they must be able to authenticate themselves. To authenticate the user, you can use either [JWT with Private Key](/docs/guides/integrate/serviceusers#authenticating-a-service-user) flow (recommended for production) or [Personal Access Tokens](/docs/guides/integrate/pat)(PAT). In this tutorial we will choose the latter. 
 
 Go to **Users** -> **Service Users** again and click on the service user, then select **Personal Access Tokens** on the left and click the **+ New** button. Copy the generated personal access token to use it later.  Click **Close** after copying the PAT. 
 
@@ -344,7 +334,7 @@ if your Keycloak Realm has a single user, your `my-realm-users-0.json` file, int
 }
 ```
 
-Now, you need to transform the JSON to the ZITADEL data format by adhering to the ZITADEL API [specification](https://docs.zitadel.com/docs/apis/proto/management#importhumanuser) to import a user. The minimal format would be as shown below: 
+Now, you need to transform the JSON to the ZITADEL data format by adhering to the ZITADEL API [specification](/docs/apis/proto/management#importhumanuser) to import a user. The minimal format would be as shown below: 
 
 ```js
 {
