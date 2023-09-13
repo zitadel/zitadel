@@ -121,7 +121,7 @@ func (p *idpProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.IDPConfigAddedEventType,
 					Reduce: p.reduceIDPAdded,
@@ -166,7 +166,7 @@ func (p *idpProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.IDPConfigAddedEventType,
 					Reduce: p.reduceIDPAdded,

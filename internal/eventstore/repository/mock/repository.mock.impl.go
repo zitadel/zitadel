@@ -105,11 +105,6 @@ func (m *MockRepository) ExpectPush(expectedCommands []eventstore.Command) *Mock
 					m.MockPusher.ctrl.T.Errorf("invalid command.UniqueConstraints [%d]: expected: %#v got: %#v", i, expectedCommand.UniqueConstraints(), commands[i].UniqueConstraints())
 				}
 			}
-			// assert.ElementsMatch(m.MockPusher.ctrl.T, expectedCommands, commands)
-			// if expectedUniqueConstraints == nil {
-			// 	expectedUniqueConstraints = []*repository.UniqueConstraint{}
-			// }
-			// assert.Equal(m.MockPusher.ctrl.T, expectedUniqueConstraints, uniqueConstraints)
 			events := make([]eventstore.Event, len(commands))
 			for i, command := range commands {
 				events[i] = &mockEvent{

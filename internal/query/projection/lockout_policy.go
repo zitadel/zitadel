@@ -64,7 +64,7 @@ func (p *lockoutPolicyProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.LockoutPolicyAddedEventType,
 					Reduce: p.reduceAdded,
@@ -85,7 +85,7 @@ func (p *lockoutPolicyProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.LockoutPolicyAddedEventType,
 					Reduce: p.reduceAdded,

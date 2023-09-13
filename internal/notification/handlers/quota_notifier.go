@@ -49,7 +49,7 @@ func (u *quotaNotifier) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: quota.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  quota.NotificationDueEventType,
 					Reduce: u.reduceNotificationDue,

@@ -61,7 +61,7 @@ func (p *orgDomainProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.OrgDomainAddedEventType,
 					Reduce: p.reduceDomainAdded,
@@ -90,7 +90,7 @@ func (p *orgDomainProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(OrgDomainInstanceIDCol),

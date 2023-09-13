@@ -57,7 +57,7 @@ func (p *instanceDomainProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceDomainAddedEventType,
 					Reduce: p.reduceDomainAdded,

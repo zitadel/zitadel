@@ -115,7 +115,7 @@ func (p *keyProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: keypair.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  keypair.AddedEventType,
 					Reduce: p.reduceKeyPairAdded,
@@ -128,7 +128,7 @@ func (p *keyProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(KeyColumnInstanceID),

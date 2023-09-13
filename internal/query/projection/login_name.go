@@ -237,7 +237,7 @@ func (p *loginNameProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  user.UserV1AddedType,
 					Reduce: p.reduceUserCreated,
@@ -277,7 +277,7 @@ func (p *loginNameProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.DomainPolicyAddedEventType,
 					Reduce: p.reduceOrgIAMPolicyAdded,
@@ -310,7 +310,7 @@ func (p *loginNameProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.DomainPolicyAddedEventType,
 					Reduce: p.reduceOrgIAMPolicyAdded,

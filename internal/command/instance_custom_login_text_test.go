@@ -1009,7 +1009,6 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						Help:          "Help",
 						SupportEmail:  "Support Email",
 					},
-					// },
 				},
 			},
 			res: res{

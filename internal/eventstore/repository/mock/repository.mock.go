@@ -35,14 +35,6 @@ func (m *MockQuerier) EXPECT() *MockQuerierMockRecorder {
 	return m.recorder
 }
 
-// CreateInstance mocks base method.
-func (m *MockQuerier) CreateInstance(arg0 context.Context, arg1 string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateInstance", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
 // CreateInstance indicates an expected call of CreateInstance.
 func (mr *MockQuerierMockRecorder) CreateInstance(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()

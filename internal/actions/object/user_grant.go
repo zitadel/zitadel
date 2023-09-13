@@ -21,10 +21,10 @@ type UserGrant struct {
 }
 
 type userGrantList struct {
-	Count      uint64
-	ChangeDate time.Time
-	Timestamp  time.Time
-	Grants     []*userGrant
+	Count     uint64
+	Sequence  uint64
+	Timestamp time.Time
+	Grants    []*userGrant
 }
 
 type userGrant struct {
@@ -63,10 +63,10 @@ func UserGrantsFromQuery(c *actions.FieldConfig, userGrants *query.UserGrants) g
 		return c.Runtime.ToValue(nil)
 	}
 	grantList := &userGrantList{
-		Count:      userGrants.Count,
-		ChangeDate: userGrants.EventCreatedAt,
-		Timestamp:  userGrants.LastRun,
-		Grants:     make([]*userGrant, len(userGrants.UserGrants)),
+		Count:     userGrants.Count,
+		Sequence:  userGrants.Sequence,
+		Timestamp: userGrants.LastRun,
+		Grants:    make([]*userGrant, len(userGrants.UserGrants)),
 	}
 
 	for i, grant := range userGrants.UserGrants {

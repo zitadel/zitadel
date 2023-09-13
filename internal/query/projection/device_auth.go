@@ -66,7 +66,7 @@ func (p *deviceAuthProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: deviceauth.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  deviceauth.AddedEventType,
 					Reduce: p.reduceAdded,

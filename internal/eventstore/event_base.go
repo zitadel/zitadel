@@ -48,11 +48,12 @@ func (e *BaseEvent) EditorUser() string {
 	return e.User
 }
 
+// Creator implements action
 func (e *BaseEvent) Creator() string {
 	return e.EditorUser()
 }
 
-// Type implements Command
+// Type implements action
 func (e *BaseEvent) Type() EventType {
 	return e.EventType
 }
@@ -67,12 +68,12 @@ func (e *BaseEvent) CreationDate() time.Time {
 	return e.Creation
 }
 
-// CreationDate is the the time, the event is inserted into the eventstore
+// CreatedAt implements Event
 func (e *BaseEvent) CreatedAt() time.Time {
 	return e.CreationDate()
 }
 
-// Aggregate represents the metadata of the event's aggregate
+// Aggregate implements action
 func (e *BaseEvent) Aggregate() *Aggregate {
 	return e.Agg
 }
@@ -82,26 +83,20 @@ func (e *BaseEvent) DataAsBytes() []byte {
 	return e.Data
 }
 
-// PreviousAggregateSequence implements EventReader
-func (e *BaseEvent) PreviousAggregateSequence() uint64 {
-	return e.previousAggregateSequence
-}
-
-// PreviousAggregateTypeSequence implements EventReader
-func (e *BaseEvent) PreviousAggregateTypeSequence() uint64 {
-	return e.previousAggregateTypeSequence
-}
-
+// Revision implements action
 func (*BaseEvent) Revision() uint16 {
 	return 0
 }
 
+// Unmarshal implements Event
 func (e *BaseEvent) Unmarshal(ptr any) error {
 	if len(e.Data) == 0 {
 		return nil
 	}
 	return json.Unmarshal(e.Data, ptr)
 }
+
+const defaultService = "zitadel"
 
 // BaseEventFromRepo maps a stored event to a BaseEvent
 func BaseEventFromRepo(event Event) *BaseEvent {
@@ -110,12 +105,10 @@ func BaseEventFromRepo(event Event) *BaseEvent {
 		EventType: event.Type(),
 		Creation:  event.CreatedAt(),
 		Seq:       event.Sequence(),
-		// previousAggregateSequence:     event.PreviousAggregateSequence,
-		// previousAggregateTypeSequence: event.PreviousAggregateTypeSequence,
-		Service: "zitadel",
-		User:    event.Creator(),
-		Data:    event.DataAsBytes(),
-		Pos:     event.Position(),
+		Service:   defaultService,
+		User:      event.Creator(),
+		Data:      event.DataAsBytes(),
+		Pos:       event.Position(),
 	}
 }
 

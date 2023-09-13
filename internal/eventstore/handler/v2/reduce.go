@@ -17,5 +17,5 @@ type Reduce func(eventstore.Event) (*Statement, error)
 // to work with aggregates
 type AggregateReducer struct {
 	Aggregate     eventstore.AggregateType
-	EventRedusers []EventReducer
+	EventReducers []EventReducer
 }

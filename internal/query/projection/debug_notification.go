@@ -59,7 +59,7 @@ func (p *debugNotificationProviderProjection) Reducers() []handler.AggregateRedu
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.DebugNotificationProviderFileAddedEventType,
 					Reduce: p.reduceDebugNotificationProviderAdded,

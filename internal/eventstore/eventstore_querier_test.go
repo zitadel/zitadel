@@ -2,7 +2,6 @@ package eventstore_test
 
 import (
 	"context"
-	"database/sql"
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -93,92 +92,6 @@ func TestCRDB_Filter(t *testing.T) {
 
 				if len(events) != tt.res.eventCount {
 					t.Errorf("CRDB.query() expected event count: %d got %d", tt.res.eventCount, len(events))
-				}
-			})
-		}
-	}
-}
-
-func TestCRDB_CreateInstance(t *testing.T) {
-	type args struct {
-		instanceID string
-	}
-	type res struct {
-		wantErr bool
-		exists  bool
-	}
-	tests := []struct {
-		name string
-		args args
-		res  res
-	}{
-		{
-			name: "no number",
-			args: args{
-				instanceID: "asdf;use defaultdb;DROP DATABASE zitadel;--",
-			},
-			res: res{
-				wantErr: true,
-				exists:  false,
-			},
-		},
-		{
-			name: "no instance id",
-			args: args{
-				instanceID: "",
-			},
-			res: res{
-				wantErr: true,
-				exists:  false,
-			},
-		},
-		{
-			name: "correct number",
-			args: args{
-				instanceID: "1235",
-			},
-			res: res{
-				wantErr: false,
-				exists:  true,
-			},
-		},
-		{
-			name: "correct text",
-			args: args{
-				instanceID: "system",
-			},
-			res: res{
-				wantErr: false,
-				exists:  true,
-			},
-		},
-	}
-	for _, tt := range tests {
-		for querierName, querier := range queriers {
-			t.Run(querierName+"/"+tt.name, func(t *testing.T) {
-				t.Cleanup(cleanupEventstore(clients[querierName]))
-
-				db := eventstore.NewEventstore(
-					&eventstore.Config{
-						Querier: querier,
-						Pusher:  pushers["v3(inmemory)"],
-					},
-				)
-
-				if err := db.NewInstance(context.Background(), tt.args.instanceID); (err != nil) != tt.res.wantErr {
-					t.Errorf("CRDB.CreateInstance() error = %v, wantErr %v", err, tt.res.wantErr)
-				}
-
-				var exists bool
-				err := testCRDBClient.QueryRow(func(row *sql.Row) error {
-					return row.Scan(&exists)
-				}, "SELECT EXISTS(SELECT 1 FROM [SHOW SEQUENCES FROM eventstore] WHERE sequence_name like $1)", "i_"+tt.args.instanceID+"%")
-				if err != nil {
-					t.Error("unable to query inserted rows: ", err)
-					return
-				}
-				if exists != tt.res.exists {
-					t.Errorf("expected exists %v got %v", tt.res.exists, exists)
 				}
 			})
 		}

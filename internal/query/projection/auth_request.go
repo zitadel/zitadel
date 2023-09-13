@@ -70,7 +70,7 @@ func (p *authRequestProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: authrequest.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  authrequest.AddedType,
 					Reduce: p.reduceAuthRequestAdded,
@@ -87,7 +87,7 @@ func (p *authRequestProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(AuthRequestColumnInstanceID),

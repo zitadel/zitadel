@@ -73,7 +73,7 @@ func (p *authNKeyProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: project.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  project.ApplicationKeyAddedEventType,
 					Reduce: p.reduceAuthNKeyAdded,
@@ -102,7 +102,7 @@ func (p *authNKeyProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  user.MachineKeyAddedEventType,
 					Reduce: p.reduceAuthNKeyAdded,
@@ -119,7 +119,7 @@ func (p *authNKeyProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceOwnerRemoved,
@@ -128,7 +128,7 @@ func (p *authNKeyProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(AuthNKeyInstanceIDCol),

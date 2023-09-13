@@ -65,7 +65,7 @@ func (p *userAuthMethodProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  user.HumanPasswordlessTokenAddedType,
 					Reduce: p.reduceInitAuthMethod,
@@ -130,7 +130,7 @@ func (p *userAuthMethodProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceOwnerRemoved,
@@ -139,7 +139,7 @@ func (p *userAuthMethodProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(UserAuthMethodInstanceIDCol),

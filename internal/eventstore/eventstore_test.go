@@ -1191,24 +1191,6 @@ func TestEventstore_mapEvents(t *testing.T) {
 		args   args
 		res    res
 	}{
-		// {
-		// 	name: "no mapper",
-		// 	args: args{
-		// 		events: []Event{
-		// 			{
-		// 				Typ: "no.mapper.found",
-		// 			},
-		// 		},
-		// 	},
-		// 	fields: fields{
-		// 		eventMapper: map[EventType]func(Event) (Event, error){},
-		// 	},
-		// 	res: res{
-		// 		//TODO: as long as not all events are implemented in v2 eventstore doesn't return an error
-		// 		// afterwards it will return an error on un
-		// 		wantErr: true,
-		// 	},
-		// },
 		{
 			name: "mapping failed",
 			args: args{

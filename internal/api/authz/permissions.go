@@ -3,7 +3,6 @@ package authz
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -38,7 +37,6 @@ func getUserPermissions(ctx context.Context, resolver MembershipsResolver, requi
 	}
 	if len(memberships) == 0 {
 		err = retry(func() error {
-			ctx = call.WithTimestamp(ctx)
 			memberships, err = resolver.SearchMyMemberships(ctx, orgID)
 			if err != nil {
 				return err

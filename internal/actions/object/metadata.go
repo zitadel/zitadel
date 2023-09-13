@@ -14,10 +14,10 @@ import (
 
 func UserMetadataListFromQuery(c *actions.FieldConfig, metadata *query.UserMetadataList) goja.Value {
 	result := &userMetadataList{
-		Count:      metadata.Count,
-		ChangeDate: metadata.EventCreatedAt,
-		Timestamp:  metadata.LastRun,
-		Metadata:   make([]*userMetadata, len(metadata.Metadata)),
+		Count:     metadata.Count,
+		Sequence:  metadata.Sequence,
+		Timestamp: metadata.LastRun,
+		Metadata:  make([]*userMetadata, len(metadata.Metadata)),
 	}
 
 	for i, md := range metadata.Metadata {
@@ -53,10 +53,10 @@ func metadataByteArrayToValue(val []byte, runtime *goja.Runtime) goja.Value {
 }
 
 type userMetadataList struct {
-	Count      uint64
-	ChangeDate time.Time
-	Timestamp  time.Time
-	Metadata   []*userMetadata
+	Count     uint64
+	Sequence  uint64
+	Timestamp time.Time
+	Metadata  []*userMetadata
 }
 
 type userMetadata struct {

@@ -64,7 +64,7 @@ func (p *secretGeneratorProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.SecretGeneratorAddedEventType,
 					Reduce: p.reduceSecretGeneratorAdded,

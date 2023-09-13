@@ -93,7 +93,7 @@ func (p *loginPolicyProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.LoginPolicyAddedEventType,
 					Reduce: p.reduceLoginPolicyAdded,
@@ -130,7 +130,7 @@ func (p *loginPolicyProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.LoginPolicyAddedEventType,
 					Reduce: p.reduceLoginPolicyAdded,

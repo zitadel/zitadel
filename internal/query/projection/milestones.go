@@ -57,7 +57,7 @@ func (p *milestoneProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceAddedEventType,
 					Reduce: p.reduceInstanceAdded,
@@ -74,7 +74,7 @@ func (p *milestoneProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: project.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  project.ProjectAddedType,
 					Reduce: p.reduceProjectAdded,
@@ -95,7 +95,7 @@ func (p *milestoneProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					// user.UserTokenAddedType is not emitted on creation of personal access tokens
 					// PATs have no effect on milestone.AuthenticationSucceededOnApplication or milestone.AuthenticationSucceededOnInstance
@@ -106,7 +106,7 @@ func (p *milestoneProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: milestone.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  milestone.PushedEventType,
 					Reduce: p.reduceMilestonePushed,

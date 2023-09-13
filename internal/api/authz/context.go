@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -90,7 +89,6 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 	verifiedOrgID, err := t.ExistsOrg(ctx, orgID, orgDomain)
 	if err != nil {
 		err = retry(func() error {
-			ctx = call.WithTimestamp(ctx)
 			verifiedOrgID, err = t.ExistsOrg(ctx, orgID, orgDomain)
 			return err
 		})

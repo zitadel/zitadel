@@ -94,7 +94,7 @@ func (p *labelPolicyProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.LabelPolicyAddedEventType,
 					Reduce: p.reduceAdded,
@@ -163,7 +163,7 @@ func (p *labelPolicyProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.LabelPolicyAddedEventType,
 					Reduce: p.reduceAdded,

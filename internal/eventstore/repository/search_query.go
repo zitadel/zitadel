@@ -103,7 +103,6 @@ func (f *Filter) Validate() error {
 
 func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, error) {
 	if builder == nil ||
-		// len(builder.GetQueries()) < 1 ||
 		builder.GetColumns().Validate() != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "builder invalid")
 	}

@@ -152,7 +152,7 @@ func (p *userProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  user.UserV1AddedType,
 					Reduce: p.reduceHumanAdded,
@@ -293,7 +293,7 @@ func (p *userProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceOwnerRemoved,
@@ -302,7 +302,7 @@ func (p *userProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(UserInstanceIDCol),

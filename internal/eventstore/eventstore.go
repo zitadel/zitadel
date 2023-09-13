@@ -73,18 +73,6 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 	return mappedEvents, nil
 }
 
-// TODO(adlerhurst): still needed?
-func (es *Eventstore) NewInstance(ctx context.Context, instanceID string) error {
-	err := es.querier.CreateInstance(ctx, instanceID)
-	if err != nil {
-		return err
-	}
-	es.instancesMu.Lock()
-	es.instances = append(es.instances, instanceID)
-	es.instancesMu.Unlock()
-	return nil
-}
-
 func (es *Eventstore) EventTypes() []string {
 	return es.eventTypes
 }
@@ -226,8 +214,6 @@ type Querier interface {
 	LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (float64, error)
 	// InstanceIDs returns the instance ids found by the search query
 	InstanceIDs(ctx context.Context, queryFactory *SearchQueryBuilder) ([]string, error)
-	// CreateInstance creates a new sequence for the given instance
-	CreateInstance(ctx context.Context, instanceID string) error
 }
 
 type Pusher interface {

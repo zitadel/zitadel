@@ -72,7 +72,7 @@ func (u *telemetryPusher) Name() string {
 func (t *telemetryPusher) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{{
 		Aggregate: pseudo.AggregateType,
-		EventRedusers: []handler.EventReducer{{
+		EventReducers: []handler.EventReducer{{
 			Event:  pseudo.ScheduledEventType,
 			Reduce: t.pushMilestones,
 		}},

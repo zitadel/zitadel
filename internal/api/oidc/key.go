@@ -145,7 +145,7 @@ func (o *OPStorage) ensureIsLatestKey(ctx context.Context, position float64) (bo
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
-	return position == maxSequence || position > maxSequence, nil
+	return position >= maxSequence, nil
 }
 
 func (o *OPStorage) privateKeyToSigningKey(key query.PrivateKey) (_ op.SigningKey, err error) {
@@ -192,7 +192,6 @@ func (o *OPStorage) getMaxKeySequence(ctx context.Context) (float64, error) {
 			AggregateTypes(keypair.AggregateType).
 			EventTypes(
 				keypair.AddedEventType,
-				keypair.AddedCertificateEventType,
 			).
 			Or().
 			AggregateTypes(instance.AggregateType).

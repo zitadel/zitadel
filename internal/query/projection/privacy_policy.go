@@ -68,7 +68,7 @@ func (p *privacyPolicyProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.PrivacyPolicyAddedEventType,
 					Reduce: p.reduceAdded,
@@ -89,7 +89,7 @@ func (p *privacyPolicyProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.PrivacyPolicyAddedEventType,
 					Reduce: p.reduceAdded,

@@ -64,7 +64,7 @@ func (p *smtpConfigProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.SMTPConfigAddedEventType,
 					Reduce: p.reduceSMTPConfigAdded,

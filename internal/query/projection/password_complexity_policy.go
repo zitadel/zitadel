@@ -70,7 +70,7 @@ func (p *passwordComplexityProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.PasswordComplexityPolicyAddedEventType,
 					Reduce: p.reduceAdded,
@@ -91,7 +91,7 @@ func (p *passwordComplexityProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.PasswordComplexityPolicyAddedEventType,
 					Reduce: p.reduceAdded,

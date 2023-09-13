@@ -60,7 +60,7 @@ func (p *mailTemplateProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.MailTemplateAddedEventType,
 					Reduce: p.reduceAdded,
@@ -81,7 +81,7 @@ func (p *mailTemplateProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.MailTemplateAddedEventType,
 					Reduce: p.reduceAdded,

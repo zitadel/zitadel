@@ -74,7 +74,7 @@ func (p *smsConfigProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.SMSConfigTwilioAddedEventType,
 					Reduce: p.reduceSMSConfigTwilioAdded,

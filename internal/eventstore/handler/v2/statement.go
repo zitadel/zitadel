@@ -36,7 +36,7 @@ func (h *Handler) reduce(event eventstore.Event) (*Statement, error) {
 		if reducer.Aggregate != event.Aggregate().Type {
 			continue
 		}
-		for _, reduce := range reducer.EventRedusers {
+		for _, reduce := range reducer.EventReducers {
 			if reduce.Event != event.Type() {
 				continue
 			}

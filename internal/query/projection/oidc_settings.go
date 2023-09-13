@@ -58,7 +58,7 @@ func (p *oidcSettingsProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.OIDCSettingsAddedEventType,
 					Reduce: p.reduceOIDCSettingsAdded,

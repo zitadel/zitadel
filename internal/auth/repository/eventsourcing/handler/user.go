@@ -57,7 +57,27 @@ func (u *User) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user_repo.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  user_repo.HumanOTPSMSAddedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanOTPSMSRemovedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanOTPEmailAddedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanOTPEmailRemovedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanU2FTokenAddedType,
+					Reduce: u.ProcessUser,
+				},
 				{
 					Event:  user_repo.MachineAddedEventType,
 					Reduce: u.ProcessUser,
@@ -266,7 +286,7 @@ func (u *User) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.OrgDomainVerifiedEventType,
 					Reduce: u.ProcessOrg,
@@ -299,7 +319,7 @@ func (u *User) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: u.ProcessInstance,

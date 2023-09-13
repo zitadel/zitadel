@@ -56,7 +56,11 @@ func (t *Token) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  user.PersonalAccessTokenAddedType,
+					Reduce: t.Reduce,
+				},
 				{
 					Event:  user.UserTokenAddedType,
 					Reduce: t.Reduce,
@@ -105,7 +109,7 @@ func (t *Token) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: project.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  project.ApplicationDeactivatedType,
 					Reduce: t.Reduce,
@@ -126,7 +130,7 @@ func (t *Token) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: t.Reduce,
@@ -135,7 +139,7 @@ func (t *Token) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: t.Reduce,

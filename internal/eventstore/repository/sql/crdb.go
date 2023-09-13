@@ -193,30 +193,6 @@ func (db *CRDB) Push(ctx context.Context, commands ...eventstore.Command) (event
 	return events, err
 }
 
-var instanceRegexp = regexp.MustCompile(`eventstore\.i_[0-9a-zA-Z]{1,}_seq`)
-
-func (db *CRDB) CreateInstance(ctx context.Context, instanceID string) error {
-	var sequenceName string
-	err := db.QueryRowContext(ctx,
-		func(row *sql.Row) error {
-			if err := row.Scan(&sequenceName); err != nil || !instanceRegexp.MatchString(sequenceName) {
-				return caos_errs.ThrowInvalidArgument(err, "SQL-7gtFA", "Errors.InvalidArgument")
-			}
-			return nil
-		},
-		"SELECT CONCAT('eventstore.i_', $1::TEXT, '_seq')", instanceID,
-	)
-	if err != nil {
-		return err
-	}
-
-	if _, err := db.ExecContext(ctx, "CREATE SEQUENCE "+sequenceName); err != nil {
-		return caos_errs.ThrowInternal(err, "SQL-7gtFA", "Errors.Internal")
-	}
-
-	return nil
-}
-
 // handleUniqueConstraints adds or removes unique constraints
 func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueConstraints ...*eventstore.UniqueConstraint) (err error) {
 	if len(uniqueConstraints) == 0 || (len(uniqueConstraints) == 1 && uniqueConstraints[0] == nil) {

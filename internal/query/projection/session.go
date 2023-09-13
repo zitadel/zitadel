@@ -79,7 +79,7 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: session.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  session.AddedType,
 					Reduce: p.reduceSessionAdded,
@@ -128,7 +128,7 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(SMSColumnInstanceID),
@@ -137,7 +137,7 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  user.HumanPasswordChangedType,
 					Reduce: p.reducePasswordChanged,

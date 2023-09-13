@@ -185,8 +185,8 @@ func Test_prepareColumns(t *testing.T) {
 			if tt.res.dbErr != nil && tt.res.dbErr(err) {
 				return
 			}
-			if equaler, ok := tt.res.expected.(interface{ Equal(time.Time) bool }); ok {
-				equaler.Equal(tt.args.dest.(*sql.NullTime).Time)
+			if equalizer, ok := tt.res.expected.(interface{ Equal(time.Time) bool }); ok {
+				equalizer.Equal(tt.args.dest.(*sql.NullTime).Time)
 				return
 			}
 			if !reflect.DeepEqual(reflect.Indirect(reflect.ValueOf(tt.args.dest)).Interface(), tt.res.expected) {

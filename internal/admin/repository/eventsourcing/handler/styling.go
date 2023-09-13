@@ -53,7 +53,7 @@ func (s *Styling) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.LabelPolicyAddedEventType,
 					Reduce: s.processLabelPolicy,
@@ -118,7 +118,7 @@ func (s *Styling) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.LabelPolicyAddedEventType,
 					Reduce: s.processLabelPolicy,

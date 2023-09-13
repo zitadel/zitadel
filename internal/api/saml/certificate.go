@@ -109,7 +109,7 @@ func (p *Storage) ensureIsLatestCertificate(ctx context.Context, position float6
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
-	return position == maxSequence || position > maxSequence, nil
+	return position >= maxSequence, nil
 }
 
 func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage domain.KeyUsage) error {
@@ -156,7 +156,6 @@ func (p *Storage) getMaxKeySequence(ctx context.Context) (float64, error) {
 	return p.eventstore.LatestSequence(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
-			AllowTimeTravel().
 			AddQuery().
 			AggregateTypes(keypair.AggregateType).
 			EventTypes(

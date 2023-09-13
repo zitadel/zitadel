@@ -61,7 +61,7 @@ func (p *idpUserLinkProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  user.UserIDPLinkAddedType,
 					Reduce: p.reduceAdded,
@@ -86,7 +86,7 @@ func (p *idpUserLinkProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
@@ -99,7 +99,7 @@ func (p *idpUserLinkProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,

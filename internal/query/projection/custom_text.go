@@ -63,7 +63,7 @@ func (p *customTextProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.CustomTextSetEventType,
 					Reduce: p.reduceSet,
@@ -84,7 +84,7 @@ func (p *customTextProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.CustomTextSetEventType,
 					Reduce: p.reduceSet,

@@ -89,7 +89,7 @@ func (p *userGrantProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: usergrant.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  usergrant.UserGrantAddedType,
 					Reduce: p.reduceAdded,
@@ -122,7 +122,7 @@ func (p *userGrantProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  user.UserRemovedType,
 					Reduce: p.reduceUserRemoved,
@@ -131,7 +131,7 @@ func (p *userGrantProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: project.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  project.ProjectRemovedType,
 					Reduce: p.reduceProjectRemoved,
@@ -156,7 +156,7 @@ func (p *userGrantProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceOwnerRemoved,
@@ -165,7 +165,7 @@ func (p *userGrantProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(UserGrantInstanceID),

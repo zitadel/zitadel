@@ -72,8 +72,8 @@ func NewHandler(
 ) *Handler {
 	aggregates := make(map[eventstore.AggregateType][]eventstore.EventType, len(projection.Reducers()))
 	for _, reducer := range projection.Reducers() {
-		eventTypes := make([]eventstore.EventType, len(reducer.EventRedusers))
-		for i, eventReducer := range reducer.EventRedusers {
+		eventTypes := make([]eventstore.EventType, len(reducer.EventReducers))
+		for i, eventReducer := range reducer.EventReducers {
 			eventTypes[i] = eventReducer.Event
 		}
 		aggregates[reducer.Aggregate] = eventTypes
@@ -235,9 +235,14 @@ func (h *Handler) Trigger(ctx context.Context) (_ context.Context, err error) {
 	}
 }
 
+// lockInstances tries to lock the instance.
+// If the instance is already locked from another process no cancel function is returned
+// the instance can be skipped then
+// If the instance is locked, an unlock deferable function is returned
 func (h *Handler) lockInstance(ctx context.Context) func() {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 
+	// Check that the instance has a mutex to lock
 	instanceMu, _ := h.triggeredInstancesSync.LoadOrStore(instanceID, new(sync.Mutex))
 	if !instanceMu.(*sync.Mutex).TryLock() {
 		instanceMu.(*sync.Mutex).Lock()

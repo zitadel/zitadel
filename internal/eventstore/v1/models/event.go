@@ -46,7 +46,7 @@ func (e *Event) Aggregate() *eventstore.Aggregate {
 	}
 }
 
-// CreationDate implements [eventstore.Event]
+// CreatedAt implements [eventstore.Event]
 func (e *Event) CreatedAt() time.Time {
 	return e.CreationDate
 }
@@ -56,6 +56,7 @@ func (e *Event) DataAsBytes() []byte {
 	return e.Data
 }
 
+// Unmarshal implements [eventstore.Event]
 func (e *Event) Unmarshal(ptr any) error {
 	if len(e.Data) == 0 {
 		return nil
@@ -68,19 +69,9 @@ func (e *Event) EditorService() string {
 	return e.Service
 }
 
-// EditorUser implements [eventstore.Event]
+// Creator implements [eventstore.action]
 func (e *Event) Creator() string {
 	return e.User
-}
-
-// PreviousAggregateSequence implements [eventstore.Event]
-func (e *Event) PreviousAggregateSequence() uint64 {
-	return e.PreviousSequence
-}
-
-// PreviousAggregateTypeSequence implements [eventstore.Event]
-func (e *Event) PreviousAggregateTypeSequence() uint64 {
-	return e.PreviousSequence
 }
 
 // Sequence implements [eventstore.Event]
@@ -93,11 +84,12 @@ func (e *Event) Position() float64 {
 	return e.Pos
 }
 
-// Type implements [eventstore.Event]
+// Type implements [eventstore.action]
 func (e *Event) Type() eventstore.EventType {
 	return e.Typ
 }
 
+// Type implements [eventstore.action]
 func (e *Event) Revision() uint16 {
 	return 0
 }

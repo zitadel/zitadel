@@ -66,7 +66,7 @@ func (u *userNotifier) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  user.UserV1InitialCodeAddedType,
 					Reduce: u.reduceInitCodeAdded,
@@ -123,7 +123,7 @@ func (u *userNotifier) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: session.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  session.OTPSMSChallengedType,
 					Reduce: u.reduceSessionOTPSMSChallenged,

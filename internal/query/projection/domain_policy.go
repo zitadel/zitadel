@@ -66,7 +66,7 @@ func (p *domainPolicyProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.DomainPolicyAddedEventType,
 					Reduce: p.reduceAdded,
@@ -87,7 +87,7 @@ func (p *domainPolicyProjection) Reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.DomainPolicyAddedEventType,
 					Reduce: p.reduceAdded,

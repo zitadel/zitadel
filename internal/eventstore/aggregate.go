@@ -29,8 +29,6 @@ func NewAggregate(
 		opt(a)
 	}
 
-	var _ EventType
-
 	return a
 }
 
