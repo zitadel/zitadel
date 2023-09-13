@@ -121,9 +121,13 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 		baseData:    l.getBaseData(r, authReq, "InitUser.Title", "InitUser.Description", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
-		LoginName:   loginName,
 		Code:        code,
 		PasswordSet: passwordSet,
+	}
+	// if the user clicked on the link in the mail, we need to make sure the loginName is rendered
+	if authReq == nil {
+		data.LoginName = loginName
+		data.UserName = loginName
 	}
 	policy := l.getPasswordComplexityPolicyByUserID(r, userID)
 	if policy != nil {
