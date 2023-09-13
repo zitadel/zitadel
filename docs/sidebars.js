@@ -241,7 +241,7 @@ module.exports = {
             "guides/integrate/identity-providers/ldap",
             "guides/integrate/identity-providers/openldap",
             "guides/integrate/identity-providers/migrate",
-            "guides/integrate/identity-providers/okta-generic-oidc",
+            "guides/integrate/identity-providers/okta",
           ],
         },
         {
