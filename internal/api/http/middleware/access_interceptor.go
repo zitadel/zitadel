@@ -100,12 +100,12 @@ func (a *AccessInterceptor) handle(ignoredPathPrefixes ...string) func(http.Hand
 			wrappedWriter := &statusRecorder{ResponseWriter: writer, status: 0}
 			for _, ignoredPathPrefix := range ignoredPathPrefixes {
 				if !strings.HasPrefix(request.RequestURI, ignoredPathPrefix) {
-                    continue
-                }
-                checkSpan.End()
-                next.ServeHTTP(wrappedWriter, request)
-                a.writeLog(tracingCtx, wrappedWriter, writer, request, true)
-                return
+					continue
+				}
+				checkSpan.End()
+				next.ServeHTTP(wrappedWriter, request)
+				a.writeLog(tracingCtx, wrappedWriter, writer, request, true)
+				return
 			}
 			limited := a.Limit(tracingCtx)
 			checkSpan.End()
