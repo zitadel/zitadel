@@ -1,9 +1,15 @@
 package projection
 
 import (
+	"context"
+	"regexp"
 	"testing"
 	"time"
 
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -247,6 +253,69 @@ func TestQuotasProjection_reduces(t *testing.T) {
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
 			assertReduce(t, got, err, QuotasProjectionTable, tt.want)
+		})
+	}
+}
+
+func Test_quotaProjection_IncrementUsage(t *testing.T) {
+	testNow := time.Now()
+	type fields struct {
+		client *database.DB
+	}
+	type args struct {
+		ctx         context.Context
+		unit        quota.Unit
+		instanceID  string
+		periodStart time.Time
+		count       uint64
+	}
+	type res struct {
+		sum uint64
+		err error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "",
+			fields: fields{
+				client: func() *database.DB {
+					db, mock, _ := sqlmock.New()
+					mock.ExpectQuery(regexp.QuoteMeta(incrementQuotaStatement)).
+						WithArgs(
+							"instance_id",
+							1,
+							testNow,
+							2,
+						).
+						WillReturnRows(sqlmock.NewRows([]string{"key"}).
+							AddRow(3))
+					return &database.DB{DB: db}
+				}(),
+			},
+			args: args{
+				ctx:         context.Background(),
+				unit:        quota.RequestsAllAuthenticated,
+				instanceID:  "instance_id",
+				periodStart: testNow,
+				count:       2,
+			},
+			res: res{
+				sum: 3,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			q := &quotaProjection{
+				client: tt.fields.client,
+			}
+			gotSum, err := q.IncrementUsage(tt.args.ctx, tt.args.unit, tt.args.instanceID, tt.args.periodStart, tt.args.count)
+			assert.Equal(t, tt.res.sum, gotSum)
+			assert.ErrorIs(t, err, tt.res.err)
 		})
 	}
 }
