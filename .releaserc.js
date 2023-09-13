@@ -2,7 +2,7 @@ module.exports = {
   branches: [
     { name: "next" },
     { name: "next-rc", prerelease: "rc" },
-    { name: "quota-projection", prerelease: "alpha" },
+    { name: "quota-projection", prerelease: true },
   ],
   plugins: [
     "@semantic-release/commit-analyzer",
