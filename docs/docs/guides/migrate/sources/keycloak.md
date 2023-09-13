@@ -111,7 +111,7 @@ docker cp <keycloak container ID>:/tmp/my-realm-users-0.json .
 
 Now that you have fully configured Keycloak, you need to configure an application to use Keycloak as its user management interface.
 
-This stage focuses on ZITADEL's [sample Angular application](https://github.com/zitadel/zitadel-angular) (client-side application) as a sample application that requires a user login. This application uses [OAuth Authorization Code flow with PKCE](https://docs.zitadel.com/docs/guides/integrate/login-users#code-flow) for its authentication, which is supported by both Keycloak and ZITADEL.
+This stage focuses on ZITADEL's [sample Angular application](https://github.com/zitadel/zitadel-angular) (client-side application) as a sample application that requires a user login. This application uses [OAuth Authorization Code flow with PKCE](https://zitadel.com/docs/guides/integrate/login-users#code-flow) for its authentication, which is supported by both Keycloak and ZITADEL.
 
 In order to set up the ZITADEL sample Angular application, ensure you have [Node.js](https://nodejs.org/en/) installed and clone the example repository:
 
