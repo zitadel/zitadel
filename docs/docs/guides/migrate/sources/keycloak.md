@@ -334,7 +334,7 @@ if your Keycloak Realm has a single user, your `my-realm-users-0.json` file, int
 }
 ```
 
-Now, you need to transform the JSON to the ZITADEL data format by adhering to the ZITADEL API [specification](/docs/apis/proto/management#importhumanuser) to import a user. The minimal format would be as shown below: 
+Now, you need to transform the JSON to the ZITADEL data format by adhering to the ZITADEL API [specification](https://zitadel.com/docs/apis/resources/mgmt/management-service-import-human-user) to import a user. The minimal format would be as shown below: 
 
 ```js
 {
