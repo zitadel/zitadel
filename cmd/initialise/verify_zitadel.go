@@ -3,6 +3,7 @@ package initialise
 import (
 	"database/sql"
 	_ "embed"
+	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -62,6 +63,16 @@ func VerifyZitadel(db *sql.DB, config database.Config) error {
 	if err := exec(db, createUniqueConstraints, nil); err != nil {
 		return err
 	}
+
+	existsPosition, err := existsPositionColumn(db)
+	if err != nil {
+		return err
+	}
+	if !existsPosition {
+		if err := exec(db, eventsColumns, nil); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -105,4 +116,16 @@ func createEvents(db *sql.DB) error {
 	}
 
 	return tx.Commit()
+}
+
+func existsPositionColumn(db *sql.DB) (bool, error) {
+	row := db.QueryRow("SELECT COUNT(*) FROM [SHOW COLUMNS FROM eventstore.events] WHERE column_name = 'position'")
+
+	var count int8
+	err := row.Scan(&count)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return false, err
+	}
+
+	return count == 1, nil
 }

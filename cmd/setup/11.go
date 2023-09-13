@@ -32,6 +32,7 @@ type AddEventCreatedAt struct {
 	dbClient   *database.DB
 }
 
+// TODO: adlerhurst this step is not needed anymore, because we stick with creation_date, and can be removed
 func (mig *AddEventCreatedAt) Execute(ctx context.Context) error {
 	// execute step 10 again because events created after the first execution of step 10
 	// could still have the wrong ordering of sequences and creation date

@@ -1,2 +1,2 @@
-CREATE INDEX IF NOT EXISTS es_handler_idx ON eventstore.events (instance_id, "position", aggregate_type, event_type) INCLUDE (created_at, event_data, editor_user, resource_owner, aggregate_version, in_tx_order);
-CREATE INDEX IF NOT EXISTS es_handler_idx_2 ON eventstore.events (instance_id, aggregate_type, event_type) INCLUDE (created_at, event_data, editor_user, resource_owner, aggregate_version, "position", in_tx_order);
+CREATE INDEX IF NOT EXISTS es_handler_idx ON eventstore.events (instance_id, "position", aggregate_type, event_type) INCLUDE (creation_date, event_data, editor_user, resource_owner, aggregate_version, in_tx_order);
+CREATE INDEX IF NOT EXISTS es_handler_idx_2 ON eventstore.events (instance_id, aggregate_type, event_type) INCLUDE (creation_date, event_data, editor_user, resource_owner, aggregate_version, "position", in_tx_order);

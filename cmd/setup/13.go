@@ -4,6 +4,8 @@ import (
 	"context"
 	"embed"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/database"
 )
 
@@ -23,6 +25,7 @@ func (mig *ChangeEvents) Execute(ctx context.Context) error {
 		return err
 	}
 	for _, migration := range migrations {
+		logging.WithFields("migration", mig.String(), "file", migration.Name()).Debug("execute statement")
 		stmt, err := readStmt(changeEvents, "13", mig.dbClient.Type(), migration.Name())
 		if err != nil {
 			return err

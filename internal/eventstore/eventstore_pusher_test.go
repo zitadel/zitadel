@@ -646,7 +646,7 @@ func assertResourceOwners(t *testing.T, db *database.DB, resourceOwners, aggrega
 			eventCount++
 		}
 		return nil
-	}, "SELECT resource_owner FROM eventstore.events WHERE aggregate_type = $1 AND aggregate_id = ANY($2) ORDER BY created_at", aggregateType, aggregateIDs)
+	}, "SELECT resource_owner FROM eventstore.events WHERE aggregate_type = $1 AND aggregate_id = ANY($2) ORDER BY creation_date", aggregateType, aggregateIDs)
 	if err != nil {
 		t.Error("query failed: ", err)
 		return

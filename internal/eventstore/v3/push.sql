@@ -11,9 +11,9 @@ INSERT INTO eventstore.events (
     , event_data
     , event_sequence
 
-    , created_at
+    , creation_date
     , "position"
     , in_tx_order
 ) VALUES
     %s
-RETURNING created_at, "position";
+RETURNING creation_date, "position";

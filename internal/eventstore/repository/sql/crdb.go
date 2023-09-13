@@ -114,7 +114,7 @@ type CRDB struct {
 func NewCRDB(client *database.DB) *CRDB {
 	switch client.Type() {
 	case "cockroach":
-		ensureOrder = "AND created_at::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = 'zitadel')"
+		ensureOrder = "AND creation_date::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = 'zitadel')"
 	case "postgres":
 		ensureOrder = `AND "position" < pg_snapshot_xmin(pg_current_snapshot())`
 	}
@@ -301,10 +301,11 @@ func (db *CRDB) orderByEventSequence(desc bool) string {
 
 func (db *CRDB) eventQuery() string {
 	return "SELECT" +
-		" created_at" +
+		" creation_date" +
 		", event_type" +
 		", event_sequence" +
-		`, "position"` +
+		// coalesce is used because position can be null until setup step 13 was executed
+		`, COALESCE("position", 0::DECIMAL)` +
 		", event_data" +
 		", editor_user" +
 		", resource_owner" +
@@ -344,7 +345,7 @@ func (db *CRDB) columnName(col repository.Field) string {
 	case repository.FieldEventData:
 		return "event_data"
 	case repository.FieldCreationDate:
-		return "created_at"
+		return "creation_date"
 	case repository.FieldPosition:
 		return `"position"`
 	default:

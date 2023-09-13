@@ -1,1 +1,0 @@
-ALTER TABLE eventstore.events ADD COLUMN IF NOT EXISTS "position" DECIMAL NOT NULL;
