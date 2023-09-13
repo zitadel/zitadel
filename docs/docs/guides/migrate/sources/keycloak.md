@@ -13,11 +13,8 @@ This tutorial will use [Docker installation](https://www.docker.com/) for the pr
 To begin setting up Keycloak, you need to refer to the official [Keycloak Docker image](https://www.keycloak.org/getting-started/getting-started-docker). You'll use it to run a development version of the Keycloak server on your local machine:
 
 
-```
-Bash Script
-
+```bash
 docker run -p 8081:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:22.0.1 start-dev
-
 ```
 
 In a few seconds, Keycloak will be available at [http://localhost:8081](http://localhost:8081). Access the **Administration Console** via the username `admin` and password `admin`:
@@ -92,7 +89,7 @@ Keycloak provides an [export](https://www.keycloak.org/server/importExport) func
 
 For example, in order to generate the export files with Keycloak, you will need to enter the Docker container, run the export command, and copy it outside the container:
 
-```Bash Script
+```bash
 # Recover the Container ID for Keycloak
 docker ps
 
@@ -118,7 +115,7 @@ This stage focuses on ZITADEL's [sample Angular application](https://github.com/
 
 In order to set up the ZITADEL sample Angular application, ensure you have [Node.js](https://nodejs.org/en/) installed and clone the example repository:
 
-```Bash Script
+```bash
 git clone https://github.com/zitadel/zitadel-angular.git
 npm install -g @angular/cli
 npm install
@@ -126,7 +123,7 @@ npm install
 
 In this tutorial, the Keycloak realm is named `my-realm`, and the client ID is `test-client`. Edit the [src/app/app.module.ts file](https://github.com/zitadel/zitadel-angular/blob/main/src/app/app.module.ts) and update the `client ID` and `issuer`:
 
-```JavaScript 
+```js 
 const authConfig: AuthConfig = {
    scope: 'openid profile email',
    responseType: 'code',
@@ -145,7 +142,7 @@ The landing page of the application will be as follows:
 
 Per the sample [documentation](https://github.com/zitadel/zitadel-angular#readme), running the development server will serve the browser-side application at [http://localhost:4200/](http://localhost:4200/):
 
-```Bash Script
+```bash
 npm start
 ```
 
@@ -156,9 +153,6 @@ After clicking the **Authenticate** button, users will be redirected to the logi
 <img src="/docs/img/guides/migrate/keycloak-18.png" alt="Migrating users from Keycloak to ZITADEL"/>
 
 After successfully logging into Keycloak, users are redirected back to the sample application:
-
-
-Now, you've successfully created a sample application that uses Keycloak for user and session management.
 
 <img src="/docs/img/guides/migrate/keycloak-19.png" alt="Migrating users from Keycloak to ZITADEL"/>
 
@@ -172,7 +166,7 @@ Now, you've successfully created a sample application that uses Keycloak for use
 
 After creating a sample application that connects to Keycloak, you need to set up ZITADEL in order to migrate the application and users from Keycloak to ZITADEL. For this, ZITADEL offers a [Docker Compose](https://zitadel.com/docs/self-hosting/deploy/compose) installation guide:
 
-```Bash Script
+```bash
 # Download the docker compose example configuration.
 
 wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/docker-compose.yaml
@@ -241,7 +235,7 @@ Click on Redirect Settings and select **Development Mode** via the toggle button
 
 Now that you've finalized the ZITADEL configuration for the project and application, your last required change is to modify the sample application to now use ZITADEL instead of Keycloak. Since both tools implement the same authentication flows, all you need to do is change the `issuer` URL and the `clientId`:
 
-```JavaScript
+```js
 const authConfig: AuthConfig = {
    scope: 'openid profile email',
    responseType: 'code',
@@ -258,7 +252,7 @@ const authConfig: AuthConfig = {
 
 After you change the sample configuration, when attempting to authenticate, the login page will be served by ZITADEL:
 
-```Bash Script
+```bash
 npm start
 ```
 Access [http://localhost:4200/](http://localhost:4200/). Now, you should have the sample application with ZITADEL for user access management. However, ZITADEL doesn't have any users other than the admin user yet. Try out the application with the ZITADEL admin user for now. 
@@ -320,7 +314,7 @@ Go to **Users** -> **Service Users** again and click on the service user, then s
 
 if your Keycloak Realm has a single user, your `my-realm-users-0.json` file, into which you exported your Keycloak user previously, will look like this:
 
-```JSON
+```js
 {
   "realm" : "my-realm",
   "users" : [ {
@@ -348,12 +342,11 @@ if your Keycloak Realm has a single user, your `my-realm-users-0.json` file, int
     "groups" : [ ]
   } ]
 }
-
 ```
 
 Now, you need to transform the JSON to the ZITADEL data format by adhering to the ZITADEL API [specification](https://docs.zitadel.com/docs/apis/proto/management#importhumanuser) to import a user. The minimal format would be as shown below: 
 
-```JSON
+```js
 {
     "userName": "test-user",
     "email": {
@@ -374,8 +367,7 @@ Now, you need to transform the JSON to the ZITADEL data format by adhering to th
 ```
 You can generate a transformed JSON file with the following script (install jq before running the script): 
 
-```Bash Script
-
+```bash
 #!/bin/bash
 
 # Check if jq is installed
@@ -406,7 +398,6 @@ transformed=$(jq '
 }' my-realm-users-0.json)
 
 echo "$transformed" > zitadel-users-file.json
-
 ```
 
 If you want to run the provided bash script in one go, you can follow these steps:
@@ -415,13 +406,13 @@ If you want to run the provided bash script in one go, you can follow these step
 
 2. Make the script executable by running the following command to give the script execute permissions:
 
-    ```Bash Script
+    ```bash
     chmod +x keycloak-to-zitadel.sh
     ```
 
 3. Once the script has execute permissions, you can run it using:
 
-   ```Bash Script
+   ```bash
    ./keycloak-to-zitadel.sh
    ```
     <img src="/docs/img/guides/migrate/keycloak-45.png" alt="Migrating users from Keycloak to ZITADEL"/>
@@ -433,7 +424,7 @@ Now that we have the user details in the required JSON format, let’s call the 
 
 Run the following cURL command to invoke the API and don't forget to replace `<service user access token>` with the service user's personal access token 
 
-```Bash Script
+```bash
 curl --request POST \
  --url http://localhost:8080/management/v1/users/human/_import \
  --header 'Content-Type: application/json' \
