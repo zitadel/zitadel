@@ -96,7 +96,7 @@ func (a *AccessInterceptor) handle(ignoredPathPrefixes ...string) func(http.Hand
 		}
 		return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 			ctx := request.Context()
-			tracingCtx, checkSpan := tracing.NewNamedSpan(ctx, "checkAccess")
+			tracingCtx, checkSpan := tracing.NewNamedSpan(ctx, "checkAccessQuota")
 			wrappedWriter := &statusRecorder{ResponseWriter: writer, status: 0}
 			for _, ignoredPathPrefix := range ignoredPathPrefixes {
 				if !strings.HasPrefix(request.RequestURI, ignoredPathPrefix) {
