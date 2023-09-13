@@ -2,9 +2,6 @@ package projection
 
 import (
 	"context"
-	"fmt"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
@@ -46,10 +43,16 @@ const (
 	QuotaNotificationColumnNextDueThreshold     = "next_due_threshold"
 )
 
+const (
+	incrementQuotaStatement = `INSERT INTO projections.quotas_periods` +
+		` (instance_id, unit, start, usage)` +
+		` VALUES ($1, $2, $3, $4) ON CONFLICT (instance_id, unit, start)` +
+		` DO UPDATE SET usage = projections.quotas_periods.usage + excluded.usage RETURNING usage`
+)
+
 type quotaProjection struct {
 	crdb.StatementHandler
-	client                  *database.DB
-	incrementQuotaStatement string
+	client *database.DB
 }
 
 func newQuotaProjection(ctx context.Context, config crdb.StatementHandlerConfig) *quotaProjection {
@@ -96,7 +99,6 @@ func newQuotaProjection(ctx context.Context, config crdb.StatementHandlerConfig)
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	p.client = config.Client
-	p.buildIncrementUsageStatement()
 	return p
 }
 
@@ -273,28 +275,11 @@ func (q *quotaProjection) IncrementUsage(ctx context.Context, unit quota.Unit, i
 
 	err = q.client.DB.QueryRowContext(
 		ctx,
-		q.incrementQuotaStatement,
+		incrementQuotaStatement,
 		instanceID, unit, periodStart, count,
 	).Scan(&sum)
 	if err != nil {
 		return 0, errors.ThrowInternalf(err, "PROJ-SJL3h", "incrementing usage for unit %d failed for at least one quota period", unit)
 	}
 	return sum, err
-}
-
-func (q *quotaProjection) buildIncrementUsageStatement() {
-	insertCols := []string{QuotaPeriodColumnInstanceID, QuotaPeriodColumnUnit, QuotaPeriodColumnStart, QuotaPeriodColumnUsage}
-	conflictTarget := []string{QuotaPeriodColumnInstanceID, QuotaPeriodColumnUnit, QuotaPeriodColumnStart}
-
-	params := make([]string, len(insertCols))
-	for i := range params {
-		params[i] = "$" + strconv.Itoa(i+1)
-	}
-	q.incrementQuotaStatement = fmt.Sprintf("INSERT INTO %[1]s (%[2]s) VALUES (%[3]s) ON CONFLICT (%[4]s) DO UPDATE SET %[5]s = %[1]s.%[5]s + %[6]s RETURNING %[5]s",
-		QuotaPeriodsProjectionTable,
-		strings.Join(insertCols, ", "),
-		strings.Join(params, ", "),
-		strings.Join(conflictTarget, ", "),
-		QuotaPeriodColumnUsage,
-		params[len(params)-1])
 }
