@@ -11,6 +11,7 @@ import localeMk from '@angular/common/locales/mk';
 import localePl from '@angular/common/locales/pl';
 import localePt from '@angular/common/locales/pt';
 import localeZh from '@angular/common/locales/zh';
+import localeRu from '@angular/common/locales/ru';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
@@ -89,6 +90,8 @@ registerLocaleData(localePt);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/pt.json'));
 registerLocaleData(localeMk);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/mk.json'));
+registerLocaleData(localeRu);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/ru.json'));
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {
