@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func TestServer_AddOTPSMS(t *testing.T) {

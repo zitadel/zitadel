@@ -197,13 +197,8 @@ func (p *passwordComplexityProjection) reduceOwnerRemoved(event eventstore.Event
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-pGTz9", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(ComplexityPolicyChangeDateCol, e.CreationDate()),
-			handler.NewCol(ComplexityPolicySequenceCol, e.Sequence()),
-			handler.NewCol(ComplexityPolicyOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(ComplexityPolicyInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(ComplexityPolicyResourceOwnerCol, e.Aggregate().ID),

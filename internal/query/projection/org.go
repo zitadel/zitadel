@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	OrgProjectionTable = "projections.orgs"
+	OrgProjectionTable = "projections.orgs1"
 
 	OrgColumnID            = "id"
 	OrgColumnCreationDate  = "creation_date"
@@ -202,13 +202,8 @@ func (p *orgProjection) reduceOrgRemoved(event eventstore.Event) (*handler.State
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-DgMSg", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(OrgColumnChangeDate, e.CreationDate()),
-			handler.NewCol(OrgColumnSequence, e.Sequence()),
-			handler.NewCol(OrgColumnState, domain.OrgStateRemoved),
-		},
 		[]handler.Condition{
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
 			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),

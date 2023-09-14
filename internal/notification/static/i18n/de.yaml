@@ -6,56 +6,56 @@ InitCode:
   Text: Dieser Benutzer wurde soeben in ZITADEL erstellt. Mit dem Benutzernamen &lt;br&gt;&lt;strong&gt;{{.PreferredLoginName}}&lt;/strong&gt;&lt;br&gt; kannst du dich anmelden. Nutze den untenstehenden Button, um die Initialisierung abzuschliessen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du dieses Mail nicht angefordert hast, kannst du es einfach ignorieren.
   ButtonText: Initialisierung abschliessen
 PasswordReset:
-  Title: ZITADEL - Passwort zurücksetzen
+  Title: Passwort zurücksetzen
   PreHeader: Passwort zurücksetzen
   Subject: Passwort zurücksetzen
   Greeting: Hallo {{.DisplayName}},
-  Text: Wir haben eine Anfrage für das Zurücksetzen deines Passwortes bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du dieses Mail nicht angefordert hast, kannst du es ignorieren.
+  Text: Wir haben eine Anfrage für das Zurücksetzen deines Passworts bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du das Zurücksetzen des Passworts nicht angefordert hast, kannst du diese E-Mail ignorieren.
   ButtonText: Passwort zurücksetzen
 VerifyEmail:
-  Title: ZITADEL - Email verifizieren
-  PreHeader: Email verifizieren
-  Subject: Email verifizieren
+  Title: E-Mail-Adresse verifizieren
+  PreHeader: E-Mail-Adresse verifizieren
+  Subject: E-Mail-Adresse verifizieren
   Greeting: Hallo {{.DisplayName}},
-  Text: Eine neue E-Mail Adresse wurde hinzugefügt. Bitte verwende den untenstehenden Button um diese zu verifizieren &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du deine E-Mail Adresse nicht selber hinzugefügt hast, kannst du dieses E-Mail ignorieren.
-  ButtonText: Email verifizieren
+  Text: Eine neue E-Mail-Adresse wurde hinzugefügt. Bitte verwende den untenstehenden Button, um diese zu verifizieren &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du die E-Mail-Adresse nicht selber hinzugefügt hast, kannst du diese E-Mail ignorieren.
+  ButtonText: E-Mail-Adresse verifizieren
 VerifyPhone:
-  Title: ZITADEL - Telefonnummer verifizieren
+  Title: Telefonnummer verifizieren
   PreHeader: Telefonnummer verifizieren
   Subject: Telefonnummer verifizieren
   Greeting: Hallo {{.DisplayName}},
-  Text: Eine Telefonnummer wurde hinzugefügt. Bitte verifiziere diese in dem du folgenden Code eingibst&lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; 
-  ButtonText: Telefon verifizieren
+  Text: Eine Telefonnummer wurde hinzugefügt. Bitte verifiziere diese, indem du folgenden Code eingibst&lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; 
+  ButtonText: Telefonnummer verifizieren
 VerifyEmailOTP:
-  Title: ZITADEL - Einmalpasswort verifizieren
+  Title: Einmalpasswort verifizieren
   PreHeader: Einmalpasswort verifizieren
   Subject: Einmalpasswort verifizieren
   Greeting: Hallo {{.DisplayName}},
-  Text: Bitte nutze den 'Authentifizieren'-Button oder kopiere das Einmalpasswort {{.OTP}} und füge es in den Authentifizierungsbildschirm ein, um dich innerhalb der nächsten fünf Minuten bei ZITADEL zu authentifizieren.
+  Text: Bitte nutze den 'Authentifizieren'-Button oder kopiere das Einmalpasswort {{.OTP}} und füge es in den Authentifizierungsbildschirm ein, um dich innerhalb der nächsten fünf Minuten zu authentifizieren.
   ButtonText: Authentifizieren
 VerifySMSOTP:
   Text: >-
-    {{.OTP}} ist Ihr Einmalpasswort für {{ .Domain }}. Verwenden Sie es innerhalb der nächsten {{.Expiry}}.
+    {{.OTP}} ist dein Einmalpasswort für {{ .Domain }}. Verwende es innerhalb der nächsten {{.Expiry}}.
     
     @{{.Domain}} #{{.OTP}}
 DomainClaimed:
-  Title: ZITADEL - Domain wurde beansprucht
-  PreHeader: Email / Username ändern
+  Title: Domain wurde beansprucht
+  PreHeader: E-Mail / Benutzername ändern
   Subject: Domain wurde beansprucht
   Greeting: Hallo {{.DisplayName}},
-  Text: Die Domain {{.Domain}} wurde von einer Organisation beansprucht. Dein derzeitiger User {{.Username}} ist nicht Teil dieser Organisation. Daher musst du beim nächsten Login eine neue Email hinterlegen. Für diesen Login haben wir dir einen temporären Usernamen ({{.TempUsername}}) erstellt.
+  Text: Die Domain {{.Domain}} wurde von einer Organisation beansprucht. Dein derzeitiger User {{.Username}} ist nicht Teil dieser Organisation. Daher musst du beim nächsten Login eine neue E-Mail-Adresse hinterlegen. Für diesen Login haben wir dir einen temporären Usernamen ({{.TempUsername}}) erstellt.
   ButtonText: Login
 PasswordlessRegistration:
-  Title: ZITADEL - Passwortlosen Login hinzufügen
+  Title: Passwortlosen Login hinzufügen
   PreHeader: Passwortlosen Login hinzufügen
   Subject: Passwortlosen Login hinzufügen
   Greeting: Hallo {{.DisplayName}},
   Text: Wir haben eine Anfrage für das Hinzufügen eines Token für den passwortlosen Login erhalten. Du kannst den untenstehenden Button verwenden, um dein Token oder Gerät hinzuzufügen.
   ButtonText: Passwortlosen Login hinzufügen
 PasswordChange:
-  Title: ZITADEL - Passwort von Benutzer wurde geändert
-  PreHeader: Passwort Änderung
-  Subject: Passwort von Benutzer wurde geändert
+  Title: Passwort wurde geändert
+  PreHeader: Passwortänderung
+  Subject: Passwort wurde geändert
   Greeting: Hallo {{.DisplayName}},
-  Text: Das Password vom Benutzer wurde geändert, wenn diese Änderung von jemand anderem gemacht wurde, empfehlen wir die sofortige Zurücksetzung ihres Passworts.
+  Text: Dein Passwort wurde geändert. Wenn diese Änderung nicht von dir gemacht wurde, empfehlen wir das sofortige Zurücksetzen deines Passworts.
   ButtonText: Login

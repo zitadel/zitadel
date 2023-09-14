@@ -2,7 +2,7 @@ Login:
   Title: ¡Hola de nuevo!
   Description: Introduce tus datos de inicio de sesión.
   TitleLinking: Inicio de sesión para vincular un usuario
-  DescriptionLinking: Introduce tus datos de inicio de sesión para vincular tu usuario externo con un usuario ZITADEL.
+  DescriptionLinking: Introduce tus datos de inicio de sesión para vincular tu usuario externo con un usuario.
   LoginNameLabel: Nombre de inicio de sesión
   UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@dominio
@@ -20,12 +20,12 @@ LDAP:
 
 SelectAccount:
   Title: Seleccionar cuenta
-  Description: Utiliza tu cuenta ZITADEL
+  Description: Utiliza tu cuenta
   TitleLinking: Selecciona tu cuenta para vincular el usuario
   DescriptionLinking: Selecciona tu cuenta para vincular con tu usuario externo.
   OtherUser: Otro Usuario
   SessionState0: activo
-  SessionState1: inactivo
+  SessionState1: Se ha cerrado la sesión
   MustBeMemberOfOrg: El usuario debe ser miembro de la organización {{.OrgName}}.
 
 Password:

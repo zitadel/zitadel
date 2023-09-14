@@ -144,6 +144,13 @@ module.exports = {
           type: "category",
           label: "Authenticate users",
           collapsed: true,
+          link: {
+            type: "generated-index",
+            title: "Authenticate human users",
+            slug: "guides/integrate/human-users",
+            description:
+              "How to authenticate human users with OpenID Connect",
+          },
           items: [
             "guides/integrate/login-users",
             "guides/integrate/oauth-recommended-flows",
@@ -231,6 +238,7 @@ module.exports = {
             "guides/integrate/identity-providers/azure-ad",
             "guides/integrate/identity-providers/github",
             "guides/integrate/identity-providers/gitlab",
+            "guides/integrate/identity-providers/apple",
             "guides/integrate/identity-providers/ldap",
             "guides/integrate/identity-providers/openldap",
             "guides/integrate/identity-providers/migrate",
@@ -439,6 +447,13 @@ module.exports = {
       type: "category",
       label: "Core Resources",
       collapsed: false,
+      link: {
+        type: "generated-index",
+        title: "Core Resources",
+        slug: "/apis/resources/",
+        description:
+          "Resource based API definitions",
+      },
       items: [
         {
           type: "category",
@@ -493,57 +508,57 @@ module.exports = {
         },
         {
           type: "category",
-          label: "User lifecycle (alpha)",
+          label: "User lifecycle (Beta)",
           link: {
             type: "generated-index",
-            title: "User service API (Alpha)",
+            title: "User service API (Beta)",
             slug: "/apis/resources/user_service",
             description:
               "This API is intended to manage users in a ZITADEL instance.\n"+
               "\n"+
-              "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+              "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
           },
           items: require("./docs/apis/resources/user_service/sidebar.js"),
         },
         {
           type: "category",
-          label: "Session lifecycle (Alpha)",
+          label: "Session lifecycle (Beta)",
           link: {
             type: "generated-index",
-            title: "Session service API (Alpha)",
+            title: "Session service API (Beta)",
             slug: "/apis/resources/session_service",
             description:
               "This API is intended to manage sessions in a ZITADEL instance.\n"+
               "\n"+
-              "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+              "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
           },
           items: require("./docs/apis/resources/session_service/sidebar.js"),
         },
         {
           type: "category",
-          label: "OIDC lifecycle (Alpha)",
+          label: "OIDC lifecycle (Beta)",
           link: {
             type: "generated-index",
-            title: "OIDC service API (Alpha)",
+            title: "OIDC service API (Beta)",
             slug: "/apis/resources/oidc_service",
             description:
               "Get OIDC Auth Request details and create callback URLs.\n"+
               "\n"+
-              "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+              "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
           },
           items: require("./docs/apis/resources/oidc_service/sidebar.js"),
         },
         {
           type: "category",
-          label: "Settings lifecycle (alpha)",
+          label: "Settings lifecycle (Beta)",
           link: {
             type: "generated-index",
-            title: "Settings service API (Alpha)",
+            title: "Settings service API (Beta)",
             slug: "/apis/resources/settings_service",
             description:
               "This API is intended to manage settings in a ZITADEL instance.\n"+
               "\n"+
-              "This project is in alpha state. It can AND will continue to break until the services provide the same functionality as the current login.",
+              "This project is in beta state. It can AND will continue to break until the services provide the same functionality as the current login.",
           },
           items: require("./docs/apis/resources/settings_service/sidebar.js"),
         },

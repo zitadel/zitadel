@@ -18,8 +18,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 var ignoreTypes = []protoreflect.FullName{"google.protobuf.Duration", "google.protobuf.Struct"}
