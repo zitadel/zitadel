@@ -17,8 +17,8 @@ import (
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
+	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 )
 
 var (

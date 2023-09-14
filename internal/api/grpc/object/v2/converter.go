@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 )
 
 func DomainToDetailsPb(objectDetail *domain.ObjectDetails) *object.Details {
