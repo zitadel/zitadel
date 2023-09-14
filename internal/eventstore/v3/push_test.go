@@ -7,6 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/cockroach"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -233,6 +235,8 @@ func Test_mapCommands(t *testing.T) {
 				require.NoError(t, err)
 			}
 		}
+		// is used to set the the [pushPlaceholderFmt]
+		NewEventstore(&database.DB{Database: new(cockroach.Config)})
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
 				cause := recover()

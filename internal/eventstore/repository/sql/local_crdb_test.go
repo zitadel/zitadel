@@ -71,4 +71,4 @@ func (*testDB) DatabaseName() string { return "db" }
 
 func (*testDB) Username() string { return "user" }
 
-func (*testDB) Type() string { return "type" }
+func (*testDB) Type() string { return "cockroach" }
