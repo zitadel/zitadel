@@ -10,3 +10,7 @@ ALTER TABLE eventstore.events ALTER COLUMN "position" SET NOT NULL;
 ALTER TABLE eventstore.events ADD COLUMN IF NOT EXISTS in_tx_order INTEGER;
 ALTER TABLE eventstore.events ALTER COLUMN in_tx_order TYPE INTEGER USING event_sequence;
 ALTER TABLE eventstore.events ALTER COLUMN in_tx_order SET NOT NULL;
+
+RESET enable_experimental_alter_column_type_general;
+RESET enable_implicit_transaction_for_batch_statements;
+RESET sql_safe_updates;
