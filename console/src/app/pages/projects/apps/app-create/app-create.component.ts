@@ -149,6 +149,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
     this.samlConfigForm = this.fb.group({
       metadataUrl: ['', []],
+      entityId: ['', []],
+      acsURL: ['', []],
+      minimalMetadata: ['', []],
     });
 
     this.firstFormGroup.valueChanges.subscribe((value) => {
@@ -536,5 +539,24 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
   public get metadataUrl(): AbstractControl | null {
     return this.samlConfigForm.get('metadataUrl');
+  }
+
+  public get entityId(): AbstractControl | null {
+    return this.samlConfigForm.get('entityId');
+  }
+
+  public get acsURL(): AbstractControl | null {
+    return this.samlConfigForm.get('acsURL');
+  }
+
+  public changeEntitityIdOrAcsURL() {
+    // prettier-ignore
+    this.samlConfigForm.controls['minimalMetadata'].setValue(`
+<?xml version="1.0"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="${this.entityId?.value || ''}">
+    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol">
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${this.acsURL?.value || ''}" index="0"/>
+    </md:SPSSODescriptor>
+</md:EntityDescriptor>`);
   }
 }

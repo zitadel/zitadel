@@ -164,7 +164,7 @@
       </div>
 
       <div class="cnsl-secondary-text metadata-option">
-        <span>{{ 'APP.SAML.URL' | translate }}</span>
+        <span>{{ 'APP.SAML.METADATAOPT1' | translate }}</span>
         <form [formGroup]="samlConfigForm">
           <cnsl-form-field class="formfield">
             <cnsl-label></cnsl-label>
@@ -174,7 +174,7 @@
       </div>
 
       <div class="cnsl-secondary-text metadata-option">
-        <span>{{ 'APP.SAML.UPLOADXML' | translate }}</span>
+        <span>{{ 'APP.SAML.METADATAOPT2' | translate }}</span>
 
         <form>
           <input
@@ -197,15 +197,19 @@
       </div>
 
       <div class="cnsl-secondary-text metadata-option">
-        <span>{{ 'APP.SAML.MINIMALMETADATA' | translate }}</span>
+        <span>{{ 'APP.SAML.METADATAOPT3' | translate }}</span>
         <form [formGroup]="samlConfigForm">
           <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'APP.SAML.ENTITYID' | translate }}</cnsl-label>
-            <input cnslInput formControlName="entityId" placeholder="https://" />
+            <input cnslInput formControlName="entityId" placeholder="https://" (change)="changeEntitityIdOrAcsURL()" />
           </cnsl-form-field>
           <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'APP.SAML.ACSURL' | translate }}</cnsl-label>
-            <input cnslInput formControlName="acsURL" placeholder="https://" />
+            <input cnslInput formControlName="acsURL" placeholder="https://" (change)="changeEntitityIdOrAcsURL()" />
+          </cnsl-form-field>
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'APP.SAML.MINIMALMETADATA' | translate }}</cnsl-label>
+            <textarea cnslInput formControlName="minimalMetadata"> </textarea>
           </cnsl-form-field>
           <button
             type="button"
@@ -213,7 +217,7 @@
             mat-stroked-button
             (click)="$event.preventDefault(); xmlFileInput.click()"
           >
-            {{ 'APP.SAML.UPLOAD' | translate }}
+            {{ 'APP.SAML.CREATEMETADATA' | translate }}
           </button>
         </form>
       </div>
