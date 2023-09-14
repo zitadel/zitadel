@@ -29,6 +29,7 @@ var (
 			", projections.project_grants3.granted_org_id" +
 			", projections.projects3.name" +
 			", projections.orgs1.name" +
+			", projections.instances.name" +
 			", COUNT(*) OVER ()" +
 			" FROM (" +
 			"SELECT members.user_id" +
@@ -86,10 +87,11 @@ var (
 			", members.grant_id" +
 			" FROM projections.project_grant_members3 AS members" +
 			" WHERE members.granted_org_removed = $7 AND members.owner_removed = $8 AND members.user_owner_removed = $9" +
-			") AS memberships" +
-			" LEFT JOIN projections.projects3 ON memberships.project_id = projections.projects3.id AND memberships.instance_id = projections.projects3.instance_id" +
-			" LEFT JOIN projections.orgs1 ON memberships.org_id = projections.orgs1.id AND memberships.instance_id = projections.orgs1.instance_id" +
-			" LEFT JOIN projections.project_grants3 ON memberships.grant_id = projections.project_grants3.grant_id AND memberships.instance_id = projections.project_grants3.instance_id" +
+			") AS members" +
+			" LEFT JOIN projections.projects3 ON members.project_id = projections.projects3.id AND members.instance_id = projections.projects3.instance_id" +
+			" LEFT JOIN projections.orgs1 ON members.org_id = projections.orgs1.id AND members.instance_id = projections.orgs1.instance_id" +
+			" LEFT JOIN projections.project_grants3 ON members.grant_id = projections.project_grants3.grant_id AND members.instance_id = projections.project_grants3.instance_id" +
+			" LEFT JOIN projections.instances ON members.instance_id = projections.instances.id" +
 			` AS OF SYSTEM TIME '-1 ms'`)
 	membershipCols = []string{
 		"user_id",
