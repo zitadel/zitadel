@@ -39,10 +39,16 @@
         [disabled]="(['iam.write'] | hasRole | async) === false"
         mat-icon-button
         (click)="removeSMSProvider(twilio.id)"
+        data-e2e="remove-sms-provider-button"
       >
         <i class="las la-trash"></i>
       </button>
-      <button [disabled]="(['iam.write'] | hasRole | async) === false" mat-icon-button (click)="editSMSProvider()">
+      <button
+        [disabled]="(['iam.write'] | hasRole | async) === false"
+        mat-icon-button
+        (click)="editSMSProvider()"
+        data-e2e="new-twilio-button"
+      >
         <i class="las la-pen"></i>
       </button>
     </div>

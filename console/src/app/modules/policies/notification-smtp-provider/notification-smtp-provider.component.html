@@ -48,6 +48,7 @@
     (click)="setSMTPPassword()"
     type="button"
     mat-stroked-button
+    data-e2e="add-smtp-password-button"
   >
     {{ 'SETTING.SMTP.SETPASSWORD' | translate }}
   </button>
@@ -60,6 +61,7 @@
       color="primary"
       type="submit"
       mat-raised-button
+      data-e2e="save-smtp-settings-button"
     >
       {{ 'ACTIONS.SAVE' | translate }}
     </button>
