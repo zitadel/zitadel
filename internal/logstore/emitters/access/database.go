@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var _ logstore.UsageStorer[*record.AccessLog] = (*databaseLogStorage)(nil)
@@ -40,6 +41,9 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []*record.AccessLog)
 }
 
 func (l *databaseLogStorage) incrementUsage(ctx context.Context, bulk []*record.AccessLog) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	byInstance := make(map[string][]*record.AccessLog)
 	for _, r := range bulk {
 		if r.InstanceID != "" {
@@ -76,6 +80,9 @@ func (l *databaseLogStorage) incrementUsage(ctx context.Context, bulk []*record.
 }
 
 func (l *databaseLogStorage) incrementUsageFromAccessLogs(ctx context.Context, instanceID string, periodStart time.Time, records []*record.AccessLog) (sum uint64, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	var count uint64
 	for _, r := range records {
 		if r.IsAuthenticated() {

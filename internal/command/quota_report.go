@@ -5,14 +5,19 @@ import (
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 // ReportQuotaUsage writes a slice of *quota.NotificationDueEvent directly to the eventstore
-func (c *Commands) ReportQuotaUsage(ctx context.Context, dueNotifications []*quota.NotificationDueEvent) error {
+func (c *Commands) ReportQuotaUsage(ctx context.Context, dueNotifications []*quota.NotificationDueEvent) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	cmds := make([]eventstore.Command, 0, len(dueNotifications))
 	for _, notification := range dueNotifications {
-		events, err := c.eventstore.Filter(
-			ctx,
+		ctxFilter, spanFilter := tracing.NewNamedSpan(ctx, "filterNotificationDueEvents")
+		events, errFilter := c.eventstore.Filter(
+			ctxFilter,
 			eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 				InstanceID(notification.Aggregate().InstanceID).
 				AddQuery().
@@ -25,8 +30,9 @@ func (c *Commands) ReportQuotaUsage(ctx context.Context, dueNotifications []*quo
 					"threshold":   notification.Threshold,
 				}).Builder(),
 		)
-		if err != nil {
-			return err
+		spanFilter.EndWithError(errFilter)
+		if errFilter != nil {
+			return errFilter
 		}
 		if len(events) > 0 {
 			continue
@@ -36,8 +42,10 @@ func (c *Commands) ReportQuotaUsage(ctx context.Context, dueNotifications []*quo
 	if len(cmds) == 0 {
 		return nil
 	}
-	_, err := c.eventstore.Push(ctx, cmds...)
-	return err
+	ctxPush, spanPush := tracing.NewNamedSpan(ctx, "pushNotificationDueEvents")
+	_, errPush := c.eventstore.Push(ctxPush, cmds...)
+	spanPush.EndWithError(errPush)
+	return errPush
 }
 
 func (c *Commands) UsageNotificationSent(ctx context.Context, dueEvent *quota.NotificationDueEvent) error {
