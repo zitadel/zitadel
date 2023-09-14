@@ -5,7 +5,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 )
 
 type myMsg struct {

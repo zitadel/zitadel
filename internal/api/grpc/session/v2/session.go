@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
+	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 )
 
 func (s *Server) GetSession(ctx context.Context, req *session.GetSessionRequest) (*session.GetSessionResponse, error) {
