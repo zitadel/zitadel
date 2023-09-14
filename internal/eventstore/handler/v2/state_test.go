@@ -126,7 +126,7 @@ func TestHandler_lockState(t *testing.T) {
 				t.Fatalf("unable to begin transaction: %v", err)
 			}
 
-			err = h.lockState(context.Background(), tx, tt.args.instanceID)
+			err = h.lockState(tx, tt.args.instanceID)
 			tt.isErr(t, err)
 
 			tt.fields.mock.Assert(t)
@@ -251,7 +251,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 			h := &Handler{
 				projection: tt.fields.projection,
 			}
-			err = h.setState(context.Background(), tx, tt.args.updatedState)
+			err = h.setState(tx, tt.args.updatedState)
 
 			tt.isErr(t, err)
 			tt.fields.mock.Assert(t)

@@ -45,7 +45,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 		position      = new(sql.NullFloat64)
 	)
 
-	row := tx.QueryRowContext(ctx, currentStateStmt, currentState.instanceID, h.projection.Name())
+	row := tx.QueryRow(currentStateStmt, currentState.instanceID, h.projection.Name())
 	err = row.Scan(
 		aggregateID,
 		aggregateType,
@@ -54,7 +54,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 		position,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
-		err = h.lockState(ctx, tx, currentState.instanceID)
+		err = h.lockState(tx, currentState.instanceID)
 	}
 	if err != nil {
 		h.log().WithError(err).Debug("unable to query current state")
@@ -69,8 +69,8 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 	return currentState, nil
 }
 
-func (h *Handler) setState(ctx context.Context, tx *sql.Tx, updatedState *state) error {
-	res, err := tx.ExecContext(ctx, updateStateStmt,
+func (h *Handler) setState(tx *sql.Tx, updatedState *state) error {
+	res, err := tx.Exec(updateStateStmt,
 		h.projection.Name(),
 		updatedState.instanceID,
 		updatedState.aggregateID,
@@ -95,8 +95,8 @@ func (h *Handler) updateLastUpdated(ctx context.Context, tx *sql.Tx, updatedStat
 	h.log().OnError(err).Debug("unable to update last updated")
 }
 
-func (h *Handler) lockState(ctx context.Context, tx *sql.Tx, instanceID string) error {
-	res, err := tx.ExecContext(ctx, lockStateStmt,
+func (h *Handler) lockState(tx *sql.Tx, instanceID string) error {
+	res, err := tx.Exec(lockStateStmt,
 		h.projection.Name(),
 		instanceID,
 	)

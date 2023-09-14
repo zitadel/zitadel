@@ -273,7 +273,7 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 		defer cancel()
 	}
 
-	tx, err := h.client.BeginTx(ctx, nil)
+	tx, err := h.client.Begin()
 	if err != nil {
 		return false, err
 	}
@@ -307,7 +307,7 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 	currentState.aggregateType = statements[lastProcessedIndex].AggregateType
 	currentState.sequence = statements[lastProcessedIndex].Sequence
 	currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
-	err = h.setState(ctx, tx, currentState)
+	err = h.setState(tx, currentState)
 
 	return additionalIteration, err
 }
@@ -364,11 +364,16 @@ func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, currentStat
 	lastProcessedIndex = -1
 
 	for i, statement := range statements {
-		err := h.executeStatement(ctx, tx, currentState, statement)
-		if err != nil {
-			return lastProcessedIndex, err
+		select {
+		case <-ctx.Done():
+			break
+		default:
+			err := h.executeStatement(ctx, tx, currentState, statement)
+			if err != nil {
+				return lastProcessedIndex, err
+			}
+			lastProcessedIndex = i
 		}
-		lastProcessedIndex = i
 	}
 	return lastProcessedIndex, nil
 }
