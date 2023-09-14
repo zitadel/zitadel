@@ -35,12 +35,6 @@ func (m *MockQuerier) EXPECT() *MockQuerierMockRecorder {
 	return m.recorder
 }
 
-// CreateInstance indicates an expected call of CreateInstance.
-func (mr *MockQuerierMockRecorder) CreateInstance(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateInstance", reflect.TypeOf((*MockQuerier)(nil).CreateInstance), arg0, arg1)
-}
-
 // Filter mocks base method.
 func (m *MockQuerier) Filter(arg0 context.Context, arg1 *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 	m.ctrl.T.Helper()
