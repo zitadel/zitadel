@@ -238,6 +238,7 @@ module.exports = {
             "guides/integrate/identity-providers/azure-ad",
             "guides/integrate/identity-providers/github",
             "guides/integrate/identity-providers/gitlab",
+            "guides/integrate/identity-providers/apple",
             "guides/integrate/identity-providers/ldap",
             "guides/integrate/identity-providers/openldap",
             "guides/integrate/identity-providers/migrate",
@@ -298,6 +299,11 @@ module.exports = {
             },
             {
               type: 'link',
+              label: 'Bold BI (boldbi.com)',
+              href: 'https://support.boldbi.com/kb/article/13708/how-to-configure-zitadel-oauth-login-in-bold-bi',
+            },
+            {
+              type: 'link',
               label: 'Cloudflare workers',
               href: 'https://zitadel.com/blog/increase-spa-security-with-cloudflare-workers',
             },
@@ -315,6 +321,11 @@ module.exports = {
               type: 'link',
               label: 'Netbird (netbird.io)',
               href: 'https://docs.netbird.io/selfhosted/identity-providers',
+            },
+            {
+              type: 'link',
+              label: 'Zoho Desk (zoho.com)',
+              href: 'https://help.zoho.com/portal/en/kb/desk/user-management-and-security/data-security/articles/setting-up-saml-single-signon-for-help-center#Zitadel_IDP',
             },
           ],
         },
