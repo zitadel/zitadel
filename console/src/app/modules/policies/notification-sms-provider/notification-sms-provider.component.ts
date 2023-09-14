@@ -1,11 +1,9 @@
 import { Component, Input } from '@angular/core';
-import { UntypedFormBuilder } from '@angular/forms';
 import { AddSMSProviderTwilioRequest, UpdateSMSProviderTwilioRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { DebugNotificationProvider, SMSProvider, SMSProviderConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
 
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { AdminService } from 'src/app/services/admin.service';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
@@ -30,13 +28,7 @@ export class NotificationSMSProviderComponent {
   public SMSProviderConfigState: any = SMSProviderConfigState;
   public InfoSectionType: any = InfoSectionType;
 
-  constructor(
-    private service: AdminService,
-    private dialog: MatDialog,
-    private toast: ToastService,
-    private fb: UntypedFormBuilder,
-    private authService: GrpcAuthService,
-  ) {}
+  constructor(private service: AdminService, private dialog: MatDialog, private toast: ToastService) {}
 
   private fetchData(): void {
     this.smsProvidersLoading = true;
