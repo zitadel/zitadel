@@ -1344,7 +1344,7 @@
       "MAXAGEDAYS": "Максимална възраст в дни",
       "USERLOGINMUSTBEDOMAIN": "Добавяне на домейн на организация като суфикс към имената за вход",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Ако активирате тази настройка, всички имена за вход ще имат суфикс с домейна на организацията. ",
-      "VALIDATEORGDOMAINS": "Валидиране на организационни домейни",
+      "VALIDATEORGDOMAINS": "Верификация на домейна на организацията е необходима (DNS или HTTP предизвикателство)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP адресът на изпращача съвпада с домейна на екземпляра",
       "ALLOWUSERNAMEPASSWORD": "Потребителско име Паролата е разрешена",
       "ALLOWEXTERNALIDP": "Допуска се външен IDP",

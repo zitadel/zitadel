@@ -1350,7 +1350,7 @@
       "MAXAGEDAYS": "Maximale Gültigkeit in Tagen",
       "USERLOGINMUSTBEDOMAIN": "Organisationsdomain dem Loginname hinzufügen",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
-      "VALIDATEORGDOMAINS": "Org Domains validieren",
+      "VALIDATEORGDOMAINS": "Verifizierung des Organisations Domain erforderlich (DNS- oder HTTP-Herausforderung)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Adresse entspricht Instanzdomain",
       "ALLOWUSERNAMEPASSWORD": "Benutzername Passwort erlaubt",
       "ALLOWEXTERNALIDP": "Externer IDP erlaubt",
