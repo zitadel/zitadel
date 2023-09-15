@@ -19,6 +19,7 @@ export class DomainsComponent implements OnInit {
   public domains: Domain.AsObject[] = [];
   public primaryDomain: string = '';
   public InfoSectionType: any = InfoSectionType;
+  public verifyOrgDomains: boolean | undefined;
 
   constructor(
     private mgmtService: ManagementService,
@@ -38,6 +39,10 @@ export class DomainsComponent implements OnInit {
   }
 
   public loadDomains(): void {
+    this.mgmtService.getDomainPolicy().then((result) => {
+      this.verifyOrgDomains = result.policy?.validateOrgDomains;
+    });
+
     this.mgmtService.listOrgDomains().then((result) => {
       this.domains = result.resultList;
       this.primaryDomain = this.domains.find((domain) => domain.isPrimary)?.domainName ?? '';
@@ -68,28 +73,14 @@ export class DomainsComponent implements OnInit {
           .addOrgDomain(domainName)
           .then(() => {
             this.toast.showInfo('ORG.TOAST.DOMAINADDED', true);
-
-            let validateOrgDomains: boolean = true;
-            this.mgmtService
-              .getDomainPolicy()
-              .then((resp) => {
-                if (resp?.policy) {
-                  validateOrgDomains = resp.policy.validateOrgDomains;
-                }
-                if (validateOrgDomains) {
-                  this.verifyDomain({
-                    domainName: domainName,
-                    validationType: DomainValidationType.DOMAIN_VALIDATION_TYPE_UNSPECIFIED,
-                  });
-                }
-              })
-              .catch((error) => {
-                this.toast.showError(error);
+            if (this.verifyOrgDomains) {
+              this.verifyDomain({
+                domainName: domainName,
+                validationType: DomainValidationType.DOMAIN_VALIDATION_TYPE_UNSPECIFIED,
               });
-
-            setTimeout(() => {
+            } else {
               this.loadDomains();
-            }, 1000);
+            }
           })
           .catch((error) => {
             this.toast.showError(error);
@@ -135,10 +126,8 @@ export class DomainsComponent implements OnInit {
       width: '500px',
     });
 
-    dialogRef.afterClosed().subscribe((reload: boolean) => {
-      if (reload) {
-        this.loadDomains();
-      }
+    dialogRef.afterClosed().subscribe(() => {
+      this.loadDomains();
     });
   }
 }
