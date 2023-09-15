@@ -3,7 +3,7 @@ package setup
 import (
 	"context"
 	"database/sql"
-	_ "embed"
+	"embed"
 	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
@@ -17,8 +17,9 @@ var (
 	correctCreationDate10CreateTable string
 	//go:embed 10/10_fill_table.sql
 	correctCreationDate10FillTable string
-	//go:embed 10/10_update.sql
-	correctCreationDate10Update string
+	//go:embed 10/cockroach/10_update.sql
+	//go:embed 10/postgres/10_update.sql
+	correctCreationDate10Update embed.FS
 	//go:embed 10/10_count_wrong_events.sql
 	correctCreationDate10CountWrongEvents string
 	//go:embed 10/10_empty_table.sql
@@ -61,10 +62,15 @@ func (mig *CorrectCreationDate) Execute(ctx context.Context) (err error) {
 				return err
 			}
 
-			_, err = tx.ExecContext(ctx, correctCreationDate10Update)
+			updateStmt, err := readStmt(correctCreationDate10Update, "10", mig.dbClient.Type(), "10_update.sql")
 			if err != nil {
 				return err
 			}
+			_, err = mig.dbClient.ExecContext(ctx, updateStmt)
+			if err != nil {
+				return err
+			}
+
 			logging.WithFields("count", affected).Info("creation dates changed")
 			return nil
 		})
