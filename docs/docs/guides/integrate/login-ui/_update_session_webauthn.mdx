@@ -1,0 +1,25 @@
+
+Now that you have successfully authenticated in the browser, you can update the session of the user.
+Fill the webAuthN checks with the credential assertion data you get from the browser.
+
+More detailed information about the API: [Update Session Documentation](/apis/resources/session_service/session-service-set-session)
+
+Example Request:
+
+```bash
+curl --request PATCH \
+  --url https://$ZITADEL_DOMAIN/v2beta/sessions/218480890961985793 \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Content-Type: application/json' \
+  --data '{
+  "sessionToken": "yMDi6uVPJAcphbbz0LaxC07ihWkNTe7m0Xqch8SzfM5Cz3HSIQIDZ65x1f5Qal0jxz0MEyo-_zYcUg",
+  "checks": {
+    "webAuthN": {
+      "credentialAssertionData": {}
+    }
+  }
+}'
+```
+
+

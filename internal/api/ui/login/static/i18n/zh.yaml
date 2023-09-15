@@ -25,7 +25,7 @@ SelectAccount:
   DescriptionLinking: 选择您的帐户以与您的外部用户关联。
   OtherUser: 其他用户
   SessionState0: 启用
-  SessionState1: 停用
+  SessionState1: 未登入
   MustBeMemberOfOrg: 用户必须是 {{.OrgName}} 组织的成员。
 
 Password:

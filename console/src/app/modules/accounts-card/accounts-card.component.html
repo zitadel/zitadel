@@ -31,14 +31,9 @@
       <div class="col">
         <span class="user-title">{{ session.displayName ? session.displayName : session.userName }} </span>
         <span class="loginname">{{ session.loginName }}</span>
-        <span
-          class="state"
-          [ngClass]="{
-            active: session.authState === UserState.USER_STATE_ACTIVE,
-            inactive: session.authState === UserState.USER_STATE_INACTIVE
-          }"
-          >{{ 'USER.STATE.' + session.authState | translate }}</span
-        >
+        <span class="state inactive" *ngIf="session.authState === UserState.USER_STATE_INACTIVE">{{
+          'USER.STATE.' + session.authState | translate
+        }}</span>
       </div>
       <mat-icon>keyboard_arrow_right</mat-icon>
     </a>

@@ -8006,6 +8006,7 @@ message UpdateHumanProfileRequest {
     ];
     string display_name = 5 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             min_length: 1;
             max_length: 200;
@@ -12656,13 +12657,13 @@ message CreateActionRequest {
         }
     ];
     string script = 2 [
-        (validate.rules).string = {min_len: 1, max_len: 2000},
+        (validate.rules).string = {min_len: 1, max_bytes: 40000},
         (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"function log(context, calls){console.log(context)}\"";
             description: "Javascript code that should be executed"
             min_length: 1;
-            max_length: 2000;
+            max_length: 10000;
         }
     ];
     google.protobuf.Duration timeout = 3 [
@@ -12705,9 +12706,12 @@ message UpdateActionRequest {
         }
     ];
     string script = 3 [
-        (validate.rules).string = {min_len: 1, max_len: 2000},
+        (validate.rules).string = {min_len: 1, max_bytes: 40000},
          (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
              example: "\"function log(context, calls){console.log(context)}\"";
+             description: "Javascript code that should be executed"
+             min_length: 1;
+             max_length: 10000;
          }
     ];
     google.protobuf.Duration timeout = 4 [
