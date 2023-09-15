@@ -49,7 +49,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$ZITADEL_DOMAIN";
+  host: "$CUSTOM-DOMAIN";
   base_path: "/system/v1";
 
   external_docs: {
