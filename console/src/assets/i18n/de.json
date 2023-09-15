@@ -953,7 +953,7 @@
     "DOMAINS": {
       "NEW": "Domain hinzufügen",
       "TITLE": "Domänen",
-      "DESCRIPTION": "Konfiguriere die Domains, mit denen sich Deine Benutzer anmelden können.",
+      "DESCRIPTION": "Konfiguriere die Domains, die für Domain discovery und als Suffix für die Benutzer verwendet werden können.",
       "SETPRIMARY": "Primäre Domain setzen",
       "DELETE": {
         "TITLE": "Domain löschen?",

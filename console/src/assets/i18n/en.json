@@ -954,7 +954,7 @@
     "DOMAINS": {
       "NEW": "Add Domain",
       "TITLE": "Domains",
-      "DESCRIPTION": "Configure your domains. This domain can be used to log in with your users.",
+      "DESCRIPTION": "Configure your organization domains. This domain can be used for domain discovery and username suffixing.",
       "SETPRIMARY": "Set as Primary",
       "DELETE": {
         "TITLE": "Delete Domain",
