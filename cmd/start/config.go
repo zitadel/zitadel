@@ -72,7 +72,11 @@ type Config struct {
 }
 
 type QuotasConfig struct {
-	Access *middleware.AccessConfig
+	Access struct {
+		logstore.EmitterConfig  `mapstructure:",squash"`
+		middleware.AccessConfig `mapstructure:",squash"`
+	}
+	Execution *logstore.EmitterConfig
 }
 
 func MustNewConfig(v *viper.Viper) *Config {

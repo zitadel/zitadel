@@ -1,20 +1,18 @@
-package access_test
+package record
 
 import (
 	"reflect"
 	"testing"
-
-	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
 )
 
 func TestRecord_Normalize(t *testing.T) {
 	tests := []struct {
 		name   string
-		record access.Record
-		want   *access.Record
+		record AccessLog
+		want   *AccessLog
 	}{{
 		name: "headers with certain keys should be redacted",
-		record: access.Record{
+		record: AccessLog{
 			RequestHeaders: map[string][]string{
 				"authorization":             {"AValue"},
 				"grpcgateway-authorization": {"AValue"},
@@ -24,7 +22,7 @@ func TestRecord_Normalize(t *testing.T) {
 				"set-cookie": {"AValue"},
 			},
 		},
-		want: &access.Record{
+		want: &AccessLog{
 			RequestHeaders: map[string][]string{
 				"authorization":             {"[REDACTED]"},
 				"grpcgateway-authorization": {"[REDACTED]"},
@@ -36,22 +34,22 @@ func TestRecord_Normalize(t *testing.T) {
 		},
 	}, {
 		name: "header keys should be lower cased",
-		record: access.Record{
+		record: AccessLog{
 			RequestHeaders:  map[string][]string{"AKey": {"AValue"}},
 			ResponseHeaders: map[string][]string{"AKey": {"AValue"}}},
-		want: &access.Record{
+		want: &AccessLog{
 			RequestHeaders:  map[string][]string{"akey": {"AValue"}},
 			ResponseHeaders: map[string][]string{"akey": {"AValue"}}},
 	}, {
 		name: "an already prune record should stay unchanged",
-		record: access.Record{
+		record: AccessLog{
 			RequestURL: "https://my.zitadel.cloud/",
 			RequestHeaders: map[string][]string{
 				"authorization": {"[REDACTED]"},
 			},
 			ResponseHeaders: map[string][]string{},
 		},
-		want: &access.Record{
+		want: &AccessLog{
 			RequestURL: "https://my.zitadel.cloud/",
 			RequestHeaders: map[string][]string{
 				"authorization": {"[REDACTED]"},
@@ -60,17 +58,18 @@ func TestRecord_Normalize(t *testing.T) {
 		},
 	}, {
 		name: "empty record should stay empty",
-		record: access.Record{
+		record: AccessLog{
 			RequestHeaders:  map[string][]string{},
 			ResponseHeaders: map[string][]string{},
 		},
-		want: &access.Record{
+		want: &AccessLog{
 			RequestHeaders:  map[string][]string{},
 			ResponseHeaders: map[string][]string{},
 		},
 	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tt.want.normalized = true
 			if got := tt.record.Normalize(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Normalize() = %v, want %v", got, tt.want)
 			}
