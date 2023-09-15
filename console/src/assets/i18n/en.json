@@ -796,7 +796,7 @@
     },
     "PAGES": {
       "STATE": "Status",
-      "DOMAINLIST": "Domains"
+      "DOMAINLIST": "Custom Domains"
     },
     "STATE": {
       "0": "Unspecified",
@@ -958,11 +958,11 @@
       "SETPRIMARY": "Set as Primary",
       "DELETE": {
         "TITLE": "Delete Domain",
-        "DESCRIPTION": "You are about to delete one of your domains. Note that your users can no longer use this domain for their login."
+        "DESCRIPTION": "You are about to delete one of your domains."
       },
       "ADD": {
         "TITLE": "Add Domain",
-        "DESCRIPTION": "You are about to add a domain for your organization. After successful process, you users will be able to use the domain for their login."
+        "DESCRIPTION": "You are about to add a domain for your organization. After successful process, the domain can be used for domain discovery and as suffix for your users."
       }
     },
     "STATE": {

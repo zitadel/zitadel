@@ -795,7 +795,7 @@
     },
     "PAGES": {
       "STATE": "Statut",
-      "DOMAINLIST": "Domaines"
+      "DOMAINLIST": "Domaines personnalisés"
     },
     "STATE": {
       "0": "Inconnu",

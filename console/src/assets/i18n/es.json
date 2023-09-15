@@ -796,7 +796,7 @@
     },
     "PAGES": {
       "STATE": "Estado",
-      "DOMAINLIST": "Dominios"
+      "DOMAINLIST": "Dominios personalizados"
     },
     "STATE": {
       "0": "No especificado",

@@ -795,7 +795,7 @@
     },
     "PAGES": {
       "STATE": "状态",
-      "DOMAINLIST": "域名"
+      "DOMAINLIST": "自定义域名"
     },
     "STATE": {
       "0": "未指定",
