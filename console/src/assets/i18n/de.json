@@ -957,11 +957,11 @@
       "SETPRIMARY": "Primäre Domain setzen",
       "DELETE": {
         "TITLE": "Domain löschen?",
-        "DESCRIPTION": "Du bist im Begriff, eine Domain aus Deiner Organisation zu löschen. Deine Benutzer können diese nach dem Löschen nicht mehr für den Login nutzen."
+        "DESCRIPTION": "Du bist im Begriff, eine Domain aus deiner Organisation zu löschen."
       },
       "ADD": {
         "TITLE": "Domain hinzufügen",
-        "DESCRIPTION": "Du bist im Begriff, Deiner Organisation eine Domain hinzuzufügen. Deine Benutzer können diese nach der erfolgreichen Ausführung für den Login nutzen."
+        "DESCRIPTION": "Du bist im Begriff, Deiner Organisation eine Domain hinzuzufügen. Die Domain kann für Domain discovery genutzt werden und als Suffix für deine Benutzernamen."
       }
     },
     "STATE": {
