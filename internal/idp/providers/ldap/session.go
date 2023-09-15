@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"errors"
 	"net"
-	"net/http"
 	"net/url"
 	"strconv"
 	"time"
@@ -31,7 +30,7 @@ type Session struct {
 }
 
 // GetAuth implements the [idp.Session] interface.
-func (s *Session) GetAuth(ctx context.Context) (http.Header, []byte) {
+func (s *Session) GetAuth(ctx context.Context) (string, bool) {
 	return idp.Redirect(s.loginUrl)
 }
 

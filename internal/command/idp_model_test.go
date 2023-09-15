@@ -157,6 +157,19 @@ func TestCommands_AllIDPWriteModel(t *testing.T) {
 			},
 		},
 		{
+			name: "writemodel instance saml",
+			args: args{
+				resourceOwner: "owner",
+				instanceBool:  true,
+				id:            "id",
+				idpType:       domain.IDPTypeSAML,
+			},
+			res: res{
+				writeModelType: &InstanceSAMLIDPWriteModel{},
+				err:            nil,
+			},
+		},
+		{
 			name: "writemodel instance unspecified",
 			args: args{
 				resourceOwner: "owner",
@@ -295,6 +308,19 @@ func TestCommands_AllIDPWriteModel(t *testing.T) {
 			},
 			res: res{
 				writeModelType: &OrgGoogleIDPWriteModel{},
+				err:            nil,
+			},
+		},
+		{
+			name: "writemodel org saml",
+			args: args{
+				resourceOwner: "owner",
+				instanceBool:  false,
+				id:            "id",
+				idpType:       domain.IDPTypeSAML,
+			},
+			res: res{
+				writeModelType: &OrgSAMLIDPWriteModel{},
 				err:            nil,
 			},
 		},

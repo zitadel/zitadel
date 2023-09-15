@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"net/http"
 	"net/url"
 
 	"github.com/crewjam/saml/samlsp"
@@ -82,33 +81,31 @@ func (c *Commands) GetProvider(ctx context.Context, idpID string, idpCallback st
 	if err != nil {
 		return nil, err
 	}
-	switch writeModel.IDPType {
-	case domain.IDPTypeSAML:
-		return writeModel.ToSAMLProvider(
-			samlRootURL,
-			c.idpConfigEncryption,
-			func(ctx context.Context, intentID string) (*samlsp.TrackedRequest, error) {
-				intent, err := c.GetActiveIntent(ctx, intentID)
-				if err != nil {
-					return nil, err
-				}
-				return &samlsp.TrackedRequest{
-					SAMLRequestID: intent.RequestID,
-					Index:         intentID,
-					URI:           intent.SuccessURL.String(),
-				}, nil
-			},
-			func(ctx context.Context, intentID, samlRequestID string) error {
-				intent, err := c.GetActiveIntent(ctx, intentID)
-				if err != nil {
-					return err
-				}
-				return c.RequestSAMLIDPIntent(ctx, intent, samlRequestID)
-			},
-		)
-	default:
+	if writeModel.IDPType != domain.IDPTypeSAML {
 		return writeModel.ToProvider(idpCallback, c.idpConfigEncryption)
 	}
+	return writeModel.ToSAMLProvider(
+		samlRootURL,
+		c.idpConfigEncryption,
+		func(ctx context.Context, intentID string) (*samlsp.TrackedRequest, error) {
+			intent, err := c.GetActiveIntent(ctx, intentID)
+			if err != nil {
+				return nil, err
+			}
+			return &samlsp.TrackedRequest{
+				SAMLRequestID: intent.RequestID,
+				Index:         intentID,
+				URI:           intent.SuccessURL.String(),
+			}, nil
+		},
+		func(ctx context.Context, intentID, samlRequestID string) error {
+			intent, err := c.GetActiveIntent(ctx, intentID)
+			if err != nil {
+				return err
+			}
+			return c.RequestSAMLIDPIntent(ctx, intent, samlRequestID)
+		},
+	)
 }
 
 func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIntentWriteModel, error) {
@@ -125,18 +122,18 @@ func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIn
 	return intent, nil
 }
 
-func (c *Commands) AuthFromProvider(ctx context.Context, idpID, state string, idpCallback, samlRootURL string) (http.Header, []byte, error) {
+func (c *Commands) AuthFromProvider(ctx context.Context, idpID, state string, idpCallback, samlRootURL string) (string, bool, error) {
 	provider, err := c.GetProvider(ctx, idpID, idpCallback, samlRootURL)
 	if err != nil {
-		return nil, nil, err
+		return "", false, err
 	}
 	session, err := provider.BeginAuth(ctx, state)
 	if err != nil {
-		return nil, nil, err
+		return "", false, err
 	}
 
-	header, content := session.GetAuth(ctx)
-	return header, content, nil
+	content, redirect := session.GetAuth(ctx)
+	return content, redirect, nil
 }
 
 func getIDPIntentWriteModel(ctx context.Context, writeModel *IDPIntentWriteModel, filter preparation.FilterToQueryReducer) error {
@@ -207,12 +204,11 @@ func (c *Commands) SucceedSAMLIDPIntent(ctx context.Context, writeModel *IDPInte
 }
 
 func (c *Commands) RequestSAMLIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, requestID string) error {
-	cmd := idpintent.NewSAMLRequestEvent(
+	return c.pushAppendAndReduce(ctx, writeModel, idpintent.NewSAMLRequestEvent(
 		ctx,
 		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
 		requestID,
-	)
-	return c.pushAppendAndReduce(ctx, writeModel, cmd)
+	))
 }
 
 func (c *Commands) generateIntentToken(intentID string) (string, error) {

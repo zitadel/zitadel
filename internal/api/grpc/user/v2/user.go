@@ -145,32 +145,20 @@ func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.Re
 	if err != nil {
 		return nil, err
 	}
-	header, content, err := s.command.AuthFromProvider(ctx, idpID, intentWriteModel.AggregateID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID))
+	content, redirect, err := s.command.AuthFromProvider(ctx, idpID, intentWriteModel.AggregateID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID))
 	if err != nil {
 		return nil, err
 	}
-	if authURL := header.Get("Location"); authURL != "" {
+	if redirect {
 		return &user.StartIdentityProviderFlowResponse{
 			Details:  object.DomainToDetailsPb(details),
-			NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: authURL},
+			NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: content},
 		}, nil
 	} else {
-		headers := make([]*user.PostForm_Header, len(content))
-		i := 0
-		for k, v := range header {
-			headers[i] = &user.PostForm_Header{
-				Key:    k,
-				Values: v,
-			}
-			i++
-		}
 		return &user.StartIdentityProviderFlowResponse{
 			Details: object.DomainToDetailsPb(details),
-			NextStep: &user.StartIdentityProviderFlowResponse_Post{
-				Post: &user.PostForm{
-					Header: headers,
-					Form:   content,
-				},
+			NextStep: &user.StartIdentityProviderFlowResponse_PostForm{
+				PostForm: []byte(content),
 			},
 		}, nil
 	}

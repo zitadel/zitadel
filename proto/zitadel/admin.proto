@@ -1656,7 +1656,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.idp.write"
+            permission: "iam.idp.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -1674,7 +1674,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.idp.write"
+            permission: "iam.idp.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -1692,7 +1692,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.idp.write"
+            permission: "iam.idp.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -5588,11 +5588,30 @@ message AddSAMLProviderRequest {
     string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     oneof metadata {
         option (validate.required) = true;
-        bytes metadata_xml = 2 [(validate.rules).bytes.max_len = 500000];
-        string metadata_url = 3 [(validate.rules).string.max_len = 200];
+        bytes metadata_xml = 2 [
+            (validate.rules).bytes.max_len = 500000,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "Metadata of the SAML identity provider";
+            }
+        ];
+        string metadata_url = 3 [
+            (validate.rules).string.max_len = 200,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"https://test.com/saml/metadata\""
+                description: "Url to the metadata of the SAML identity provider";
+            }
+        ];
     }
-    string binding = 4;
-    bool withSignedRequest = 5;
+    zitadel.idp.v1.Binding binding = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Binding which defines the type of communication with the identity provider";
+        }
+    ];
+    bool with_signed_request = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Boolean which defines if the authentication requests are signed";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 6;
 }
 
@@ -5605,11 +5624,30 @@ message UpdateSAMLProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     oneof metadata {
-        bytes metadata_xml = 3 [(validate.rules).bytes.max_len = 500000];
-        string metadata_url = 4 [(validate.rules).string.max_len = 200];
+        bytes metadata_xml = 3 [
+            (validate.rules).bytes.max_len = 500000,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "Metadata of the SAML identity provider";
+            }
+        ];
+        string metadata_url = 4 [
+            (validate.rules).string.max_len = 200,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"https://test.com/saml/metadata\""
+                description: "Url to the metadata of the SAML identity provider";
+            }
+        ];
     }
-    string binding = 5;
-    bool withSignedRequest = 6;
+    zitadel.idp.v1.Binding binding = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Binding which defines the type of communication with the identity provider";
+        }
+    ];
+    bool with_signed_request = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Boolean which defines if the authentication requests are signed";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 7;
 }
 

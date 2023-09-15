@@ -23,6 +23,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	saml2 "github.com/zitadel/zitadel/internal/idp/providers/saml"
+	"github.com/zitadel/zitadel/internal/idp/providers/saml/requesttracker"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -1648,7 +1649,7 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 	return changes, nil
 }
 
-func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, getRequest saml2.GetRequest, addRequest saml2.AddRequest) (providers.Provider, error) {
+func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, getRequest requesttracker.GetRequest, addRequest requesttracker.AddRequest) (providers.Provider, error) {
 	key, err := crypto.Decrypt(wm.Key, idpAlg)
 	if err != nil {
 		return nil, err
@@ -1658,7 +1659,7 @@ func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 		return nil, err
 	}
 
-	opts := make([]saml2.ProviderOpts, 0, 4)
+	opts := make([]saml2.ProviderOpts, 0, 7)
 	if wm.IsCreationAllowed {
 		opts = append(opts, saml2.WithCreationAllowed())
 	}
@@ -1677,14 +1678,18 @@ func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 	if wm.Binding != "" {
 		opts = append(opts, saml2.WithBinding(wm.Binding))
 	}
+	opts = append(opts, saml2.WithCustomRequestTracker(
+		requesttracker.New(
+			addRequest,
+			getRequest,
+		),
+	))
 	return saml2.New(
 		wm.Name,
 		callbackURL,
 		wm.Metadata,
 		cert,
 		key,
-		getRequest,
-		addRequest,
 		opts...,
 	)
 }
@@ -1931,7 +1936,7 @@ type IDP interface {
 
 type SAMLIDP interface {
 	eventstore.QueryReducer
-	ToProvider(string, crypto.EncryptionAlgorithm, saml2.GetRequest, saml2.AddRequest) (providers.Provider, error)
+	ToProvider(string, crypto.EncryptionAlgorithm, requesttracker.GetRequest, requesttracker.AddRequest) (providers.Provider, error)
 }
 
 type AllIDPWriteModel struct {
@@ -2031,6 +2036,7 @@ func (wm *AllIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 func (wm *AllIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	if wm.model != nil {
 		wm.model.AppendEvents(events...)
+		return
 	}
 	wm.samlModel.AppendEvents(events...)
 }
@@ -2042,7 +2048,7 @@ func (wm *AllIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encrypt
 	return wm.model.ToProvider(callbackURL, idpAlg)
 }
 
-func (wm *AllIDPWriteModel) ToSAMLProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, getRequest saml2.GetRequest, addRequest saml2.AddRequest) (providers.Provider, error) {
+func (wm *AllIDPWriteModel) ToSAMLProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, getRequest requesttracker.GetRequest, addRequest requesttracker.AddRequest) (providers.Provider, error) {
 	if wm.samlModel == nil {
 		return nil, errors.ThrowInternal(nil, "COMMAND-i7xnu3", "ErrorsIDPConfig.NotExisting")
 	}

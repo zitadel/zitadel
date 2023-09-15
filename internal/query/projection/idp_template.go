@@ -604,6 +604,14 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceLDAPIDPChanged,
 				},
 				{
+					Event:  org.SAMLIDPAddedEventType,
+					Reduce: p.reduceSAMLIDPAdded,
+				},
+				{
+					Event:  org.SAMLIDPChangedEventType,
+					Reduce: p.reduceSAMLIDPChanged,
+				},
+				{
 					Event:  org.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
 				},

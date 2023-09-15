@@ -17,15 +17,12 @@ import (
 
 var _ idp.Provider = (*Provider)(nil)
 
-type GetRequest func(ctx context.Context, intentID string) (*samlsp.TrackedRequest, error)
-type AddRequest func(ctx context.Context, intentID, requestID string) error
-
 // Provider is the [idp.Provider] implementation for a generic SAML provider
 type Provider struct {
 	name string
 
-	getRequest GetRequest
-	addRequest AddRequest
+	requestTracker samlsp.RequestTracker
+	Certificate    []byte
 
 	spOptions *samlsp.Options
 	metadata  *saml.EntityDescriptor
@@ -83,14 +80,18 @@ func WithBinding(binding string) ProviderOpts {
 	}
 }
 
+func WithCustomRequestTracker(tracker samlsp.RequestTracker) ProviderOpts {
+	return func(p *Provider) {
+		p.requestTracker = tracker
+	}
+}
+
 func New(
 	name string,
 	rootURLStr string,
 	metadata []byte,
 	certificate []byte,
 	key []byte,
-	getRequest GetRequest,
-	addRequest AddRequest,
 	options ...ProviderOpts,
 ) (*Provider, error) {
 	entityDescriptor := new(saml.EntityDescriptor)
@@ -117,10 +118,9 @@ func New(
 		SignRequest: false,
 	}
 	provider := &Provider{
-		name:       name,
-		addRequest: addRequest,
-		getRequest: getRequest,
-		spOptions:  &opts,
+		name:        name,
+		spOptions:   &opts,
+		Certificate: certificate,
 	}
 	for _, option := range options {
 		option(provider)
@@ -153,9 +153,8 @@ func (p *Provider) GetSP() (*samlsp.Middleware, error) {
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SAML-x1v0hlrcjd", "Errors.Intent.IDPInvalid")
 	}
-	sp.RequestTracker = &RequestTracker{
-		getRequest: p.getRequest,
-		addRequest: p.addRequest,
+	if p.requestTracker != nil {
+		sp.RequestTracker = p.requestTracker
 	}
 	return sp, nil
 }
@@ -167,7 +166,7 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (
 	}
 
 	return &Session{
-		serviceProvider: m,
+		ServiceProvider: m,
 		state:           state,
 	}, nil
 }

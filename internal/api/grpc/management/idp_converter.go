@@ -3,6 +3,8 @@ package management
 import (
 	"context"
 
+	"github.com/crewjam/saml"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
@@ -12,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 	"github.com/zitadel/zitadel/internal/query"
+	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
@@ -461,7 +464,7 @@ func addSAMLProviderToCommand(req *mgmt_pb.AddSAMLProviderRequest) command.SAMLP
 		Name:              req.Name,
 		Metadata:          req.GetMetadataXml(),
 		MetadataURL:       req.GetMetadataUrl(),
-		Binding:           req.Binding,
+		Binding:           bindingToCommand(req.Binding),
 		WithSignedRequest: req.WithSignedRequest,
 		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
@@ -472,8 +475,23 @@ func updateSAMLProviderToCommand(req *mgmt_pb.UpdateSAMLProviderRequest) command
 		Name:              req.Name,
 		Metadata:          req.GetMetadataXml(),
 		MetadataURL:       req.GetMetadataUrl(),
-		Binding:           req.Binding,
+		Binding:           bindingToCommand(req.Binding),
 		WithSignedRequest: req.WithSignedRequest,
 		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func bindingToCommand(binding idp_pb.Binding) string {
+	switch binding {
+	case idp_pb.Binding_BINDING_UNSPECIFIED:
+		return ""
+	case idp_pb.Binding_BINDING_POST:
+		return saml.HTTPPostBinding
+	case idp_pb.Binding_BINDING_REDIRECT:
+		return saml.HTTPRedirectBinding
+	case idp_pb.Binding_BINDING_ARTIFACT:
+		return saml.HTTPArtifactBinding
+	default:
+		return ""
 	}
 }

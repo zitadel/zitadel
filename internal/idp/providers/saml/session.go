@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 
 	"github.com/zitadel/zitadel/internal/errors"
@@ -17,7 +16,7 @@ var _ idp.Session = (*Session)(nil)
 
 // Session is the [idp.Session] implementation for the SAML provider.
 type Session struct {
-	serviceProvider *samlsp.Middleware
+	ServiceProvider *samlsp.Middleware
 	state           string
 
 	RequestID string
@@ -25,37 +24,46 @@ type Session struct {
 }
 
 // GetAuthURL implements the [idp.Session] interface.
-func (s *Session) GetAuth(ctx context.Context) (http.Header, []byte) {
+func (s *Session) GetAuth(ctx context.Context) (string, bool) {
 	url, _ := url.Parse(s.state)
 	resp := NewTempResponseWriter()
 
 	request := &http.Request{
 		URL: url,
 	}
-	s.serviceProvider.HandleStartAuthFlow(
+	s.ServiceProvider.HandleStartAuthFlow(
 		resp,
 		request.WithContext(ctx),
 	)
-	return resp.header, resp.content.Bytes()
+
+	if location := resp.Header().Get("Location"); location != "" {
+		return idp.Redirect(location)
+	}
+	return idp.Form(string(resp.content.Bytes()))
 }
 
 // FetchUser implements the [idp.Session] interface.
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if s.RequestID == "" && s.Request == nil {
-		return nil, errors.ThrowInvalidArgument(nil, "SAML-tzb2sj", "Errors.*")
+		return nil, errors.ThrowInvalidArgument(nil, "SAML-tzb2sj", "Errors.Intent.ResponseInvalid")
 	}
 
-	assertion, err := s.serviceProvider.ServiceProvider.ParseResponse(s.Request, []string{s.RequestID})
+	assertion, err := s.ServiceProvider.ServiceProvider.ParseResponse(s.Request, []string{s.RequestID})
 	if err != nil {
 		return nil, err
 	}
 
-	return ParseAssertionToUser(assertion)
-}
-
-func ParseAssertionToUser(assertion *saml.Assertion) (user idp.User, err error) {
 	userMapper := &UserMapper{}
 	userMapper.SetID(assertion.Subject.NameID)
+	for _, statement := range assertion.AttributeStatements {
+		for _, attribute := range statement.Attributes {
+			values := make([]string, len(statement.Attributes))
+			for i := range attribute.Values {
+				values[i] = attribute.Values[i].Value
+			}
+			userMapper.Attributes[attribute.Name] = values
+		}
+	}
 	return userMapper, nil
 }
 

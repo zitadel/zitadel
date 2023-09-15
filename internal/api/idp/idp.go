@@ -1,9 +1,11 @@
 package idp
 
 import (
+	"bytes"
 	"context"
-	"encoding/base64"
 	"errors"
+	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -29,12 +31,14 @@ import (
 )
 
 const (
-	HandlerPrefix       = "/idps"
-	callbackPath        = "/callback"
-	defaultMetadataPath = "/saml/metadata"
-	defaultAcsPath      = "/saml/acs"
-	metadataPath        = "/{" + varIDPID + ":[0-9]+}" + defaultMetadataPath
-	acsPath             = "/{" + varIDPID + ":[0-9]+}" + defaultAcsPath
+	HandlerPrefix = "/idps"
+
+	idpPrefix = "/{" + varIDPID + ":[0-9]+}"
+
+	callbackPath    = "/callback"
+	metadataPath    = idpPrefix + "/saml/metadata"
+	acsPath         = idpPrefix + "/saml/acs"
+	certificatePath = idpPrefix + "/saml/certificate"
 
 	paramIntentID         = "id"
 	paramToken            = "token"
@@ -99,6 +103,7 @@ func NewHandler(
 	router.Use(instanceInterceptor)
 	router.HandleFunc(callbackPath, h.handleCallback)
 	router.HandleFunc(metadataPath, h.handleMetadata)
+	router.HandleFunc(certificatePath, h.handleCertificate)
 	router.HandleFunc(acsPath, h.handleACS)
 	return router
 }
@@ -116,6 +121,36 @@ func (h *Handler) getProvider(ctx context.Context, idpID string) (idp.Provider, 
 	return h.commands.GetProvider(ctx, idpID, h.callbackURL(ctx), h.samlRootURL(ctx, idpID))
 }
 
+func (h *Handler) handleCertificate(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	data := parseSAMLRequest(r)
+
+	provider, err := h.getProvider(ctx, data.IDPID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	samlProvider, ok := provider.(*saml2.Provider)
+	if !ok {
+		http.Error(w, z_errs.ThrowInvalidArgument(nil, "SAML-lrud8s9coi", "Errors.Intent.IDPInvalid").Error(), http.StatusBadRequest)
+		return
+	}
+
+	certPem := new(bytes.Buffer)
+	if _, err := certPem.Write(samlProvider.Certificate); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Disposition", "attachment; filename=idp.crt")
+	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
+	_, err = io.Copy(w, certPem)
+	if err != nil {
+		http.Error(w, fmt.Errorf("failed to response with certificate: %w", err).Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func (h *Handler) handleMetadata(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	data := parseSAMLRequest(r)
@@ -128,7 +163,7 @@ func (h *Handler) handleMetadata(w http.ResponseWriter, r *http.Request) {
 
 	samlProvider, ok := provider.(*saml2.Provider)
 	if !ok {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, z_errs.ThrowInvalidArgument(nil, "SAML-lrud8s9coi", "Errors.Intent.IDPInvalid").Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -156,6 +191,11 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	sp, err := samlProvider.GetSP()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	intent, err := h.commands.GetActiveIntent(ctx, data.RelayState)
 	if err != nil {
@@ -167,7 +207,13 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sp, err := samlProvider.GetSP()
+	session := saml2.Session{
+		ServiceProvider: sp,
+		RequestID:       intent.RequestID,
+		Request:         r,
+	}
+
+	idpUser, err := session.FetchUser(r.Context())
 	if err != nil {
 		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
 		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
@@ -175,34 +221,7 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responseData, err := base64.StdEncoding.DecodeString(data.Response)
-	if err != nil {
-		err = z_errs.ThrowInvalidArgument(err, "SAML-9klilyge7e", "Errors.Intent.ResponseInvalid")
-		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
-		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
-		redirectToFailureURLErr(w, r, intent, err)
-		return
-	}
-
-	assertion, err := sp.ServiceProvider.ParseXMLResponse(responseData, []string{intent.RequestID})
-	if err != nil {
-		err = z_errs.ThrowInvalidArgument(err, "SAML-hq6hwiyy03", "Errors.Intent.ResponseInvalid")
-		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
-		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
-		redirectToFailureURLErr(w, r, intent, err)
-		return
-	}
-
-	idpUser, err := saml2.ParseAssertionToUser(assertion)
-	if err != nil {
-		err = z_errs.ThrowInvalidArgument(err, "SAML-i07awpe1tm", "Errors.Intent.ResponseInvalid")
-		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
-		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
-		redirectToFailureURLErr(w, r, intent, err)
-		return
-	}
-
-	userID, err := h.checkExternalUser(ctx, intent.IDPID, assertion.Subject.NameID.Value)
+	userID, err := h.checkExternalUser(ctx, intent.IDPID, idpUser.GetID())
 	logging.WithFields("intent", intent.AggregateID).OnError(err).Error("could not check if idp user already exists")
 
 	token, err := h.commands.SucceedSAMLIDPIntent(ctx, intent, idpUser, userID, data.Response)

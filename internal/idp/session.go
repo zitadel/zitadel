@@ -2,12 +2,11 @@ package idp
 
 import (
 	"context"
-	"net/http"
 )
 
 // Session is the minimal implementation for a session of a 3rd party authentication [Provider]
 type Session interface {
-	GetAuth(ctx context.Context) (http.Header, []byte)
+	GetAuth(ctx context.Context) (content string, redirect bool)
 	FetchUser(ctx context.Context) (User, error)
 }
 
@@ -20,8 +19,10 @@ type SessionSupportsMigration interface {
 	RetrievePreviousID() (previousID string, err error)
 }
 
-func Redirect(redirectURL string) (http.Header, []byte) {
-	header := http.Header{}
-	header.Add("Location", redirectURL)
-	return header, nil
+func Redirect(redirectURL string) (string, bool) {
+	return redirectURL, true
+}
+
+func Form(html string) (string, bool) {
+	return html, false
 }

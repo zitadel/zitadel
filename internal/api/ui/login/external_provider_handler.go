@@ -28,6 +28,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
+	"github.com/zitadel/zitadel/internal/idp/providers/saml/requesttracker"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
@@ -181,15 +182,12 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		return
 	}
 
-	header, content := session.GetAuth(r.Context())
-	if location := header.Get("Location"); location != "" {
-		http.Redirect(w, r, location, http.StatusFound)
-	} else {
-		for k := range header {
-			w.Header().Add(k, header.Get(k))
-		}
-		w.Write(content)
+	content, redirect := session.GetAuth(r.Context())
+	if redirect {
+		http.Redirect(w, r, content, http.StatusFound)
+		return
 	}
+	w.Write([]byte(content))
 }
 
 // handleExternalLoginCallback handles the callback from a IDP
@@ -883,30 +881,34 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 	if identityProvider.SAMLIDPTemplate.Binding != "" {
 		opts = append(opts, saml.WithBinding(identityProvider.SAMLIDPTemplate.Binding))
 	}
+	opts = append(opts, saml.WithCustomRequestTracker(
+		requesttracker.New(
+			func(ctx context.Context, intentID, samlRequestID string) error {
+				intent, err := l.command.GetActiveIntent(ctx, intentID)
+				if err != nil {
+					return err
+				}
+				return l.command.RequestSAMLIDPIntent(ctx, intent, samlRequestID)
+			},
+			func(ctx context.Context, intentID string) (*samlsp.TrackedRequest, error) {
+				intent, err := l.command.GetActiveIntent(ctx, intentID)
+				if err != nil {
+					return nil, err
+				}
+				return &samlsp.TrackedRequest{
+					SAMLRequestID: intent.RequestID,
+					Index:         intentID,
+					URI:           intent.SuccessURL.String(),
+				}, nil
+			},
+		),
+	))
 	return saml.New(
 		identityProvider.Name,
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.SAMLIDPTemplate.Metadata,
 		certificate,
 		key,
-		func(ctx context.Context, intentID string) (*samlsp.TrackedRequest, error) {
-			intent, err := l.command.GetActiveIntent(ctx, intentID)
-			if err != nil {
-				return nil, err
-			}
-			return &samlsp.TrackedRequest{
-				SAMLRequestID: intent.RequestID,
-				Index:         intentID,
-				URI:           intent.SuccessURL.String(),
-			}, nil
-		},
-		func(ctx context.Context, intentID, samlRequestID string) error {
-			intent, err := l.command.GetActiveIntent(ctx, intentID)
-			if err != nil {
-				return err
-			}
-			return l.command.RequestSAMLIDPIntent(ctx, intent, samlRequestID)
-		},
 		opts...,
 	)
 }

@@ -15,7 +15,7 @@ const (
 	StartedEventType       = instanceEventTypePrefix + "started"
 	SucceededEventType     = instanceEventTypePrefix + "succeeded"
 	SAMLSucceededEventType = instanceEventTypePrefix + "saml.succeeded"
-	SAMLRequestEventType   = instanceEventTypePrefix + "saml.request"
+	SAMLRequestEventType   = instanceEventTypePrefix + "saml.requested"
 	LDAPSucceededEventType = instanceEventTypePrefix + "ldap.succeeded"
 	FailedEventType        = instanceEventTypePrefix + "failed"
 )

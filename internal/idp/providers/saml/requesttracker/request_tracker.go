@@ -1,14 +1,25 @@
-package saml
+package requesttracker
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/crewjam/saml/samlsp"
 )
 
+type GetRequest func(ctx context.Context, intentID string) (*samlsp.TrackedRequest, error)
+type AddRequest func(ctx context.Context, intentID, requestID string) error
+
 type RequestTracker struct {
 	addRequest AddRequest
 	getRequest GetRequest
+}
+
+func New(addRequestF AddRequest, getRequestF GetRequest) samlsp.RequestTracker {
+	return &RequestTracker{
+		addRequest: addRequestF,
+		getRequest: getRequestF,
+	}
 }
 
 func (rt *RequestTracker) TrackRequest(w http.ResponseWriter, r *http.Request, samlRequestID string) (index string, err error) {

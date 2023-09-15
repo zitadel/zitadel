@@ -1103,23 +1103,13 @@ message StartIdentityProviderFlowResponse{
         description: "Intent information"
       }
     ];
-    PostForm post = 4 [
+    bytes post_form = 4 [
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         description: "POST call information"
       }
     ];
   }
 }
-
-message PostForm{
-  message Header {
-    string key = 1;
-    repeated string values = 2;
-  }
-  repeated Header header = 1;
-  bytes form = 2;
-}
-
 
 message RetrieveIdentityProviderInformationRequest{
   string intent_id = 1 [

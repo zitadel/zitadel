@@ -10,7 +10,6 @@ import (
 	"math/big"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/zitadel/saml/pkg/provider/xml"
 
@@ -1720,10 +1719,8 @@ func generateSAMLCertAndKey(id string, keySize int) ([]byte, []byte, error) {
 		SerialNumber: big.NewInt(int64(serial)),
 		Subject: pkix.Name{
 			Organization: []string{"ZITADEL"},
+			SerialNumber: id,
 		},
-		NotBefore: time.Now(),
-		NotAfter:  time.Now().Add(time.Hour * 24 * 365),
-
 		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,

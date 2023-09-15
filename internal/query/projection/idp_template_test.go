@@ -2460,7 +2460,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
-	"metadata": "metadata",
+	"metadata": `+stringToJSONByte("metadata")+`,
 	"key": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
@@ -2511,7 +2511,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
-								anyArg{},
+								[]byte("metadata"),
 								anyArg{},
 								anyArg{},
 								"binding",

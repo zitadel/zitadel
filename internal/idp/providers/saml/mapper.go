@@ -12,17 +12,17 @@ var _ idp.User = (*UserMapper)(nil)
 
 // UserMapper is an implementation of [idp.User].
 type UserMapper struct {
-	id         string
-	attributes map[string][]string
+	ID         string
+	Attributes map[string][]string
 }
 
 func (u *UserMapper) SetID(id *saml.NameID) {
-	u.id = id.Value
+	u.ID = id.Value
 }
 
 // GetID is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetID() string {
-	return u.id
+	return u.ID
 }
 
 // GetFirstName is an implementation of the [idp.User] interface.
