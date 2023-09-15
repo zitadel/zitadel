@@ -8,8 +8,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/database"
 )
 
@@ -30,7 +30,7 @@ Prereqesits:
 	}
 }
 
-func VerifyZitadel(db *sql.DB, config database.Config) error {
+func VerifyZitadel(db *database.DB, config database.Config) error {
 	err := ReadStmts(config.Type())
 	if err != nil {
 		return err
@@ -64,9 +64,13 @@ func VerifyZitadel(db *sql.DB, config database.Config) error {
 		return err
 	}
 
-	existsPosition, err := existsPositionColumn(db)
-	if err != nil {
-		return err
+	var existsPosition bool
+
+	if db.Type() == "cockroach" {
+		existsPosition, err = existsPositionColumn(db)
+		if err != nil {
+			return err
+		}
 	}
 	if !existsPosition {
 		if err := exec(db, eventsColumns, nil); err != nil {
@@ -84,14 +88,14 @@ func verifyZitadel(config database.Config) error {
 		return err
 	}
 
-	if err := VerifyZitadel(db.DB, config); err != nil {
+	if err := VerifyZitadel(db, config); err != nil {
 		return err
 	}
 
 	return db.Close()
 }
 
-func createEncryptionKeys(db *sql.DB) error {
+func createEncryptionKeys(db *database.DB) error {
 	tx, err := db.Begin()
 	if err != nil {
 		return err
@@ -104,7 +108,7 @@ func createEncryptionKeys(db *sql.DB) error {
 	return tx.Commit()
 }
 
-func createEvents(db *sql.DB) error {
+func createEvents(db *database.DB) error {
 	tx, err := db.Begin()
 	if err != nil {
 		return err
@@ -118,11 +122,15 @@ func createEvents(db *sql.DB) error {
 	return tx.Commit()
 }
 
-func existsPositionColumn(db *sql.DB) (bool, error) {
-	row := db.QueryRow("SELECT COUNT(*) FROM [SHOW COLUMNS FROM eventstore.events] WHERE column_name = 'position'")
-
+func existsPositionColumn(db *database.DB) (bool, error) {
 	var count int8
-	err := row.Scan(&count)
+
+	err := db.QueryRow(
+		func(r *sql.Row) error {
+			return r.Scan(&count)
+		},
+		"SELECT COUNT(*) FROM [SHOW COLUMNS FROM eventstore.events] WHERE column_name = 'position'",
+	)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return false, err
 	}

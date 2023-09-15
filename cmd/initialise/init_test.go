@@ -1,17 +1,17 @@
 package initialise
 
 import (
-	"database/sql"
 	"database/sql/driver"
 	"regexp"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 type db struct {
 	mock sqlmock.Sqlmock
-	db   *sql.DB
+	db   *database.DB
 }
 
 func prepareDB(t *testing.T, expectations ...expectation) db {
@@ -25,7 +25,7 @@ func prepareDB(t *testing.T, expectations ...expectation) db {
 	}
 	return db{
 		mock: mock,
-		db:   client,
+		db:   &database.DB{DB: client},
 	}
 }
 

@@ -1,13 +1,14 @@
 package initialise
 
 import (
-	"database/sql"
 	_ "embed"
 	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 func newDatabase() *cobra.Command {
@@ -33,8 +34,8 @@ The user provided by flags needs priviledge to
 	}
 }
 
-func VerifyDatabase(databaseName string) func(*sql.DB) error {
-	return func(db *sql.DB) error {
+func VerifyDatabase(databaseName string) func(*database.DB) error {
+	return func(db *database.DB) error {
 		logging.WithFields("database", databaseName).Info("verify database")
 
 		return exec(db, fmt.Sprintf(string(databaseStmt), databaseName), []string{dbAlreadyExistsCode})

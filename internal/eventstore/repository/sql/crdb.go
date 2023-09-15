@@ -280,8 +280,7 @@ func (db *CRDB) eventQuery() string {
 		" creation_date" +
 		", event_type" +
 		", event_sequence" +
-		// coalesce is used because position can be null until setup step 13 was executed
-		`, COALESCE("position", 0::DECIMAL)` +
+		`, "position"` +
 		", event_data" +
 		", editor_user" +
 		", resource_owner" +

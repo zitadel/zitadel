@@ -51,7 +51,7 @@ func TestMain(m *testing.M) {
 	clients["v3(inmemory)"] = testCRDBClient
 
 	if localDB, err := connectLocalhost(); err == nil {
-		if err = initDB(localDB.DB); err != nil {
+		if err = initDB(localDB); err != nil {
 			logging.WithFields("error", err).Fatal("migrations failed")
 		}
 		pushers["v3(singlenode)"] = new_es.NewEventstore(localDB)
@@ -65,14 +65,14 @@ func TestMain(m *testing.M) {
 		ts.Stop()
 	}()
 
-	if err = initDB(testCRDBClient.DB); err != nil {
+	if err = initDB(testCRDBClient); err != nil {
 		logging.WithFields("error", err).Fatal("migrations failed")
 	}
 
 	os.Exit(m.Run())
 }
 
-func initDB(db *sql.DB) error {
+func initDB(db *database.DB) error {
 	initialise.ReadStmts("cockroach")
 	config := new(database.Config)
 	config.SetConnector(&cockroach.Config{

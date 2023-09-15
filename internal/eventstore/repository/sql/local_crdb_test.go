@@ -37,14 +37,14 @@ func TestMain(m *testing.M) {
 		ts.Stop()
 	}()
 
-	if err = initDB(testCRDBClient); err != nil {
+	if err = initDB(&database.DB{DB: testCRDBClient}); err != nil {
 		logging.WithFields("error", err).Fatal("migrations failed")
 	}
 
 	os.Exit(m.Run())
 }
 
-func initDB(db *sql.DB) error {
+func initDB(db *database.DB) error {
 	config := new(database.Config)
 	config.SetConnector(&cockroach.Config{User: cockroach.User{Username: "zitadel"}, Database: "zitadel"})
 
