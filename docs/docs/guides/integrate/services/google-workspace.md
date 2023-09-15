@@ -8,7 +8,7 @@ This guide shows how to enable login with ZITADEL on Google Workspace.
 You can configure two types of SAML SSO on Google Workspace:
 
 - [SSO profile for your organization](#sso-profile-for-your-organization)
-- [Third-party SSO profile](#third-party-sso-profile)
+- [Third-party SSO SAML profile](#third-party-sso-saml-profile)
 
 Both profiles need to be configured differently.
 Please make sure to configure your application for the correct type.
