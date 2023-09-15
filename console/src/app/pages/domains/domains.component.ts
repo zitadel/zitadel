@@ -68,10 +68,25 @@ export class DomainsComponent implements OnInit {
           .addOrgDomain(domainName)
           .then(() => {
             this.toast.showInfo('ORG.TOAST.DOMAINADDED', true);
-            this.verifyDomain({
-              domainName: domainName,
-              validationType: DomainValidationType.DOMAIN_VALIDATION_TYPE_UNSPECIFIED,
-            });
+
+            let validateOrgDomains: boolean = true;
+            this.mgmtService
+              .getDomainPolicy()
+              .then((resp) => {
+                if (resp?.policy) {
+                  validateOrgDomains = resp.policy.validateOrgDomains;
+                }
+                if (validateOrgDomains) {
+                  this.verifyDomain({
+                    domainName: domainName,
+                    validationType: DomainValidationType.DOMAIN_VALIDATION_TYPE_UNSPECIFIED,
+                  });
+                }
+              })
+              .catch((error) => {
+                this.toast.showError(error);
+              });
+
             setTimeout(() => {
               this.loadDomains();
             }, 1000);
