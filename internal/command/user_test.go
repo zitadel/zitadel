@@ -23,7 +23,7 @@ import (
 
 func TestCommandSide_UsernameChange(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type (
 		args struct {
@@ -46,9 +46,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -63,9 +61,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 		{
 			name: "orgid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -80,9 +76,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 		{
 			name: "username missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -97,9 +91,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 		{
 			name: "username only spaces, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -114,8 +106,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 		{
 			name: "user removed, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -132,8 +123,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 		{
 			name: "username not changed, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -165,8 +155,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 		{
 			name: "username not changed (spaces), precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -198,8 +187,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 		{
 			name: "org iam policy not found, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -229,10 +217,60 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid username, precondition error",
+			name: "domain verified, wrong org",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								false,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"test.ch",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:      context.Background(),
+				orgID:    "wrong",
+				userID:   "user1",
+				username: "test@test.ch",
+			},
+			res: res{
+				err: errors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "email as username, ok",
+			fields: fields{
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -260,6 +298,20 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 							),
 						),
 					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewUsernameChangedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"username",
+									"test@test.ch",
+									true,
+								),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("username", "org1", true)),
+						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("test@test.ch", "org1", true)),
+					),
 				),
 			},
 			args: args{
@@ -269,14 +321,82 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "test@test.ch",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "email as username, verified domain, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								false,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"test.ch",
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewUsernameChangedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"username",
+									"test@test.ch",
+									true,
+								),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("username", "org1", false)),
+						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("test@test.ch", "org1", false)),
+					),
+				),
+			},
+			args: args{
+				ctx:      context.Background(),
+				orgID:    "org1",
+				userID:   "user1",
+				username: "test@test.ch",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
 			},
 		},
 		{
 			name: "change username, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -335,8 +455,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 		{
 			name: "change username (remove spaces), ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -396,7 +515,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.ChangeUsername(tt.args.ctx, tt.args.orgID, tt.args.userID, tt.args.username)
 			if tt.res.err == nil {
