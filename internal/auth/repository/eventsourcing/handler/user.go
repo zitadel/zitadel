@@ -75,10 +75,6 @@ func (u *User) Reducers() []handler.AggregateReducer {
 					Reduce: u.ProcessUser,
 				},
 				{
-					Event:  user_repo.HumanU2FTokenAddedType,
-					Reduce: u.ProcessUser,
-				},
-				{
 					Event:  user_repo.MachineAddedEventType,
 					Reduce: u.ProcessUser,
 				},
