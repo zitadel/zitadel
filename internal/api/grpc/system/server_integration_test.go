@@ -1,6 +1,6 @@
 //go:build integration
 
-package handlers_test
+package system_test
 
 import (
 	"context"
