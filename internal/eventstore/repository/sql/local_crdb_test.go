@@ -37,7 +37,7 @@ func TestMain(m *testing.M) {
 		ts.Stop()
 	}()
 
-	if err = initDB(&database.DB{DB: testCRDBClient}); err != nil {
+	if err = initDB(&database.DB{DB: testCRDBClient, Database: &cockroach.Config{Database: "zitadel"}}); err != nil {
 		logging.WithFields("error", err).Fatal("migrations failed")
 	}
 

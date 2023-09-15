@@ -101,7 +101,8 @@ func connectLocalhost() (*database.DB, error) {
 	}
 
 	return &database.DB{
-		DB: client,
+		DB:       client,
+		Database: new(testDB),
 	}, nil
 }
 
