@@ -7,9 +7,9 @@ This integration guide shows you the basic OpenID Connect integration with ZITAD
 ## Setup PKCE client in ZITADEL
 
 - Go to your organization and setup a new application with the type PKCE
-- When created go to the "Redirect Settings" and **enable Development Mode*
-- Add the Redirect Uri `http://localhost:8080/secure/callback`
-- Add the Post Logout Uri `http://localhost:8080/index.html`
+- When created go to the "Redirect Settings" and *enable Development Mode*
+- Add the Redirect Uri, f.e. `http://localhost:8080/secure/callback`
+- Add the Post Logout Uri, f.e. `http://localhost:8080/index.html`
 ![Configuration](/img/guides/integrate/tools/apache-configuration.png)
 ![Redirect Settings](/img/guides/integrate/tools/apache-redirect_settings.png)
 
@@ -51,7 +51,7 @@ With the following parameters
 
 If you want to secure a route / path then add do so by adding the following Location functionality with the directives:
 
-```
+```text
 <Location /secure/>
    AuthType openid-connect
    Require valid-user
@@ -63,7 +63,10 @@ Please consult the official documentation on more information.
 
 ### Handling logout
 
-
+Consult the official documentation on how to [logout users](https://github.com/OpenIDC/mod_auth_openidc/wiki#9-how-do-i-logout-users).
+Or check out the [example code](#example-code) for a minimal  version.
 
 ## Example code
 
+We provide a [minimum boilerplate example](https://github.com/zitadel/example-apache2) to test the integration of ZITADEL with an Apache server.
+Follow the instructions in the readme.
