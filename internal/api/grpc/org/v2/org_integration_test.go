@@ -15,7 +15,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 var (

@@ -3,15 +3,38 @@ import { v4 as uuidv4 } from 'uuid';
 import { Context } from 'support/commands';
 
 const orgPath = `/org`;
+const orgsPath = `/orgs`;
+const orgsPathCreate = `/orgs/create`;
 
 const orgNameOnCreation = 'e2eorgrename';
 const testOrgNameChange = uuidv4();
+const newOrg = uuidv4();
 
 beforeEach(() => {
   cy.context().as('ctx');
 });
 
 describe('organizations', () => {
+  describe('add and delete org', () => {
+    it('should create an org', () => {
+      cy.visit(orgsPathCreate);
+      cy.get('[data-e2e="org-name-input"]').focus().clear().type(newOrg);
+      cy.get('[data-e2e="create-org-button"]').click();
+      cy.contains('tr', newOrg);
+    });
+
+    it('should delete an org', () => {
+      cy.visit(orgsPath);
+      cy.contains('tr', newOrg).click();
+      cy.get('[data-e2e="actions"]').click();
+      cy.get('[data-e2e="delete"]', { timeout: 1000 }).should('be.visible').click();
+      cy.get('[data-e2e="confirm-dialog-input"]').focus().clear().type(newOrg);
+      cy.get('[data-e2e="confirm-dialog-button"]').click();
+      cy.shouldConfirmSuccess();
+      cy.contains('tr', newOrg).should('not.exist');
+    });
+  });
+
   describe('rename', () => {
     beforeEach(() => {
       cy.get<Context>('@ctx').then((ctx) => {

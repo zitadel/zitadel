@@ -1,0 +1,12 @@
+
+After starting the WebAuthN authentication on the side of ZITADEL you have to challenge the browser.
+To do this you need to call the browser API to get the credentials.
+Make sure to send the public key credential request options you got from ZITADEL.
+
+```javascript
+const credential = await navigator.credentials.get({
+    publicKey: publicKeyCredentialRequestOptions
+});
+```
+
+Read the [WebAuthN Guide](https://webauthn.guide/#authentication) for more information about "Authenticating with a WebAuthN Credential".

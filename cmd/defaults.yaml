@@ -415,7 +415,7 @@ SystemDefaults:
     # https://passlib.readthedocs.io/en/stable/modular_crypt_format.html
     #
     # Supported verifiers: (uncomment to enable)
-    # Verifiers:
+    Verifiers:
     #   - "argon2" # verifier for both argon2i and argon2id.
     #   - "bcrypt"
     #   - "md5"
