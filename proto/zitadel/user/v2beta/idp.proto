@@ -57,7 +57,7 @@ message IDPIntent {
       description: "ID of the IDP intent"
       min_length: 1;
       max_length: 200;
-      example: "\"163840776835432705=\"";
+      example: "\"163840776835432705\"";
     }
   ];
   string idp_intent_token = 2 [
@@ -66,6 +66,13 @@ message IDPIntent {
       min_length: 1;
       max_length: 200;
       example: "\"SJKL3ioIDpo342ioqw98fjp3sdf32wahb=\"";
+    }
+  ];
+  string user_id = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the ZITADEL user if external user already linked"
+      max_length: 200;
+      example: "\"163840776835432345\"";
     }
   ];
 }
