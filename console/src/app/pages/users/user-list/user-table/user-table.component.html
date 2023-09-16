@@ -124,6 +124,20 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="preferredLoginName">
+        <th
+          mat-header-cell
+          *matHeaderCellDef
+          mat-sort-header
+          [ngClass]="{ 'search-active': this.userSearchKey === UserListSearchKey.DISPLAY_NAME }"
+        >
+          {{ 'USER.PROFILE.PREFERREDLOGINNAME' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id] : null">
+          <span *ngIf="user.human">{{ user.preferredLoginName }}</span>
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="username">
         <th
           mat-header-cell

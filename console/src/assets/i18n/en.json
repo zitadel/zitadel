@@ -496,6 +496,7 @@
       "LASTNAME": "Family Name",
       "NICKNAME": "Nickname",
       "DISPLAYNAME": "Display Name",
+      "PREFERREDLOGINNAME": "Preferred login name",
       "PREFERRED_LANGUAGE": "Language",
       "GENDER": "Gender",
       "PASSWORD": "Password",

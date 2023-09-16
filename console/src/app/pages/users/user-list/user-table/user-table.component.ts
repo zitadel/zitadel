@@ -51,10 +51,10 @@ export class UserTableComponent implements OnInit {
   @Input() public displayedColumnsHuman: string[] = [
     'select',
     'displayName',
+    'preferredLoginName',
     'username',
     'email',
     'state',
-    'creationDate',
     'changeDate',
     'actions',
   ];
