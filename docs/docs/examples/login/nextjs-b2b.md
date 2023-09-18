@@ -1,5 +1,6 @@
 ---
 title: ZITADEL with Next.js - A B2B Scenario
+sidebar_label: Next.js - B2B
 ---
 
 This is our ZITADEL [Next.js](https://nextjs.org/) B2B template. It shows how to authenticate as a user with multiple organizations. The application shows your users roles on the selected organizations, other projects your organization is allowed to use and other users having a grant to use the application.

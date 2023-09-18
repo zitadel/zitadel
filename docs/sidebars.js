@@ -3,7 +3,7 @@ module.exports = {
     "guides/overview",
     {
       type: "category",
-      label: "Get started",
+      label: "Get Started",
       collapsed: false,
       items: [
         "guides/start/quickstart",
@@ -33,7 +33,7 @@ module.exports = {
     "examples/sdks",
     {
       type: "category",
-      label: "Example applications",
+      label: "Example Applications",
       items: [
         "examples/introduction",
         {
@@ -142,11 +142,11 @@ module.exports = {
       items: [
         {
           type: "category",
-          label: "Authenticate users",
+          label: "Authenticate Users",
           collapsed: true,
           link: {
             type: "generated-index",
-            title: "Authenticate human users",
+            title: "Authenticate Human Users",
             slug: "guides/integrate/human-users",
             description:
               "How to authenticate human users with OpenID Connect",
@@ -159,10 +159,10 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Token introspection",
+          label: "Token Introspection",
           link: {
             type: "generated-index",
-            title: "Token introspection",
+            title: "Token Introspection",
             slug: "/guides/integrate/token-introspection",
             description:
               "Token introspection is the process of checking whether an access token is valid and can be used to access protected resources. You have an API that acts as an OAuth resource server and can be accessed by user-facing applications. To validate an access token by calling the ZITADEL introspection API, you can use the JSON Web Token (JWT) Profile (recommended) or Basic Authentication for token introspection. It's crucial to understand that the API is entirely separate from the front end. The API shouldn’t concern itself with the token type received. Instead, it's about how the API chooses to call the introspection endpoint, either through JWT Profile or Basic Authentication. Many APIs assume they might receive a JWT and attempt to verify it based on signature or expiration. However, with ZITADEL, you can send either a JWT or an opaque Bearer token from the client end to the API. This flexibility is one of ZITADEL's standout features.",
@@ -175,10 +175,10 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Authenticate service users",
+          label: "Authenticate Service Users",
           link: {
             type: "generated-index",
-            title: "Authenticate Service Users",
+            title: "Authenticate ZITADEL Service Users",
             slug: "/guides/integrate/serviceusers",
             description:
               "How to authenticate service users for machine-to-machine (M2M) communication between services. You also need to authenticate service users to access ZITADEL's APIs.",
@@ -192,7 +192,7 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Role management",
+          label: "Role Management",
           collapsed: true,
           items: [
             "guides/integrate/retrieve-user-roles"
@@ -200,10 +200,10 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Build your own login UI",
+          label: "Build your own Login UI",
           link: {
             type: "generated-index",
-            title: "Build your own login UI",
+            title: "Build your own Login UI",
             slug: "/guides/integrate/login-ui",
             description:
                 "In the following guides you will learn how to create your own login UI with our APIs. The different scenarios like username/password, external identity provider, etc. will be shown."
@@ -223,10 +223,10 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Configure identity providers",
+          label: "Configure Identity Providers",
           link: {
             type: "generated-index",
-            title: "Let users login with their preferred identity provider",
+            title: "Let Users Login with Preferred Identity Provider in ZITADEL",
             slug: "/guides/integrate/identity-providers",
             description:
               "In the following guides you will learn how to configure and setup your preferred external identity provider in ZITADEL.",
@@ -252,7 +252,7 @@ module.exports = {
           items: [
             {
               type: 'link',
-              label: 'Authenticate service users',
+              label: 'Authenticate Service Users',
               href: '/guides/integrate/serviceusers',
             },
             "guides/integrate/access-zitadel-apis",
@@ -260,7 +260,7 @@ module.exports = {
             "guides/integrate/event-api",
             {
               type: "category",
-              label: "Example code",
+              label: "Example Code",
               items: [
                 "examples/call-zitadel-api/go",
                 "examples/call-zitadel-api/dot-net",
@@ -274,7 +274,7 @@ module.exports = {
           label: "Services",
           link: {
             type: "generated-index",
-            title: "Integrate ZITADEL with your favorite services",
+            title: "Integrate ZITADEL with your Favorite Services",
             slug: "/guides/integrate/services",
             description:
               "With the guides in this section you will learn how to integrate ZITADEL with your services.",
@@ -333,7 +333,7 @@ module.exports = {
           label: "Tools",
           link: {
             type: "generated-index",
-            title: "Integrate ZITADEL with your tools",
+            title: "Integrate ZITADEL with your Tools",
             slug: "/guides/integrate/tools",
             description:
               "With the guides in this section you will learn how to integrate ZITADEL with your favorite tools.",
@@ -349,10 +349,10 @@ module.exports = {
     },
     {
       type: "category",
-      label: "Solution scenarios",
+      label: "Solution Scenarios",
       link: {
         type: "generated-index",
-        title: "Solution scenarios",
+        title: "Solution Scenarios",
         slug: "guides/solution-scenarios/introduction",
         description:
           "Customers of an SaaS Identity and access management system usually have all distinct use cases and requirements. This guide attempts to explain real-world implementations and break them down into solution scenarios which aim to help you getting started with ZITADEL.",
@@ -405,7 +405,7 @@ module.exports = {
         "concepts/principles",
         {
           type: "category",
-          label: "Eventstore",
+          label: "Event Store",
           collapsed: true,
           items: [
             "concepts/eventstore/overview",
@@ -423,7 +423,7 @@ module.exports = {
         "support/troubleshooting",
         {
           type: 'category',
-          label: "Technical advisory",
+          label: "Technical Advisory",
           link: {
             type: 'doc',
             id: 'support/technical_advisory',
@@ -466,7 +466,7 @@ module.exports = {
       items: [
         {
           type: "category",
-          label: "Authenticated user",
+          label: "Authenticated User",
           link: {
             type: "generated-index",
             title: "Auth API",
@@ -479,7 +479,7 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Organization objects",
+          label: "Organization Objects",
           link: {
             type: "generated-index",
             title: "Management API",
@@ -491,7 +491,7 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Instance objects",
+          label: "Instance Objects",
           link: {
             type: "generated-index",
             title: "Admin API",
@@ -503,7 +503,7 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Instance lifecycle",
+          label: "Instance Lifecycle",
           link: {
             type: "generated-index",
             title: "System API",
@@ -517,10 +517,10 @@ module.exports = {
         },
         {
           type: "category",
-          label: "User lifecycle (Beta)",
+          label: "User Lifecycle (Beta)",
           link: {
             type: "generated-index",
-            title: "User service API (Beta)",
+            title: "User Service API (Beta)",
             slug: "/apis/resources/user_service",
             description:
               "This API is intended to manage users in a ZITADEL instance.\n"+
@@ -531,10 +531,10 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Session lifecycle (Beta)",
+          label: "Session Lifecycle (Beta)",
           link: {
             type: "generated-index",
-            title: "Session service API (Beta)",
+            title: "Session Service API (Beta)",
             slug: "/apis/resources/session_service",
             description:
               "This API is intended to manage sessions in a ZITADEL instance.\n"+
@@ -545,10 +545,10 @@ module.exports = {
         },
         {
           type: "category",
-          label: "OIDC lifecycle (Beta)",
+          label: "OIDC Lifecycle (Beta)",
           link: {
             type: "generated-index",
-            title: "OIDC service API (Beta)",
+            title: "OIDC Service API (Beta)",
             slug: "/apis/resources/oidc_service",
             description:
               "Get OIDC Auth Request details and create callback URLs.\n"+
@@ -559,10 +559,10 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Settings lifecycle (Beta)",
+          label: "Settings Lifecycle (Beta)",
           link: {
             type: "generated-index",
-            title: "Settings service API (Beta)",
+            title: "Settings Service API (Beta)",
             slug: "/apis/resources/settings_service",
             description:
               "This API is intended to manage settings in a ZITADEL instance.\n"+
@@ -621,7 +621,7 @@ module.exports = {
     },
     {
       type: "doc",
-      label: "gRPC status codes",
+      label: "gRPC Status Codes",
       id: "apis/statuscodes"
     },
     {
@@ -632,7 +632,7 @@ module.exports = {
     },
     {
       type: 'link',
-      label: 'Rate limits (cloud)', // The link label
+      label: 'Rate Limits (Cloud)', // The link label
       href: '/legal/rate-limit-policy', // The internal path
     },
   ],
@@ -673,11 +673,11 @@ module.exports = {
   legal: [
     {
       type: "category",
-      label: "Legal agreements",
+      label: "Legal Agreements",
       collapsed: false,
       link: {
         type: "generated-index",
-        title: "Legal agreements",
+        title: "Legal Agreements",
         slug: "legal",
         description:
           "This section contains important agreements, policies and appendices relevant for users of our websites and services. All documents will be provided in English language.",
@@ -687,7 +687,7 @@ module.exports = {
         "legal/data-processing-agreement",
         {
           type: "category",
-          label: "Service description",
+          label: "Service Description",
           collapsed: false,
           items: [
             "legal/cloud-service-description",
@@ -697,7 +697,7 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Support program",
+          label: "Support Program",
           collapsed: true,
           items: [
             "legal/terms-support-service",

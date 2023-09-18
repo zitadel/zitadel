@@ -1,5 +1,6 @@
 ---
 title: ZITADEL Applications
+sidebar_label: Applications
 ---
 
 # Applications

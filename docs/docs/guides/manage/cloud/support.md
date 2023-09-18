@@ -1,5 +1,6 @@
 ---
 title: ZITADEL Support
+sidebar_label: Support
 ---
 
 :::note

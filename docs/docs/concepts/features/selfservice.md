@@ -1,5 +1,6 @@
 ---
-title: Self-Service in ZITADEL
+title: Self Service in ZITADEL
+sidebar_label: Self Service
 ---
 
 ZITADEL allows users to perform many tasks themselves.

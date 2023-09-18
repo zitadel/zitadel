@@ -1,5 +1,6 @@
 ---
 title: ZITADEL Settings and Policies
+sidebar_label: Setting and Policies
 ---
 
 Settings and policies are configurations of all the different parts of the instance or an organization. For all parts we have a suitable default in the instance.

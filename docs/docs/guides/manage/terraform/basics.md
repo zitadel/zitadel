@@ -1,5 +1,6 @@
 ---
 title: ZITADEL Terraform Provider
+sidebar_label: Terraform Provider
 ---
 
 It covers how to:

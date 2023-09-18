@@ -1,5 +1,6 @@
 ---
 title: ZITADEL Production Checklist
+sidebar_label: Production Checklist
 ---
 
 

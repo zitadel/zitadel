@@ -1,5 +1,6 @@
 ---
 title: ZITADEL's Software Architecture
+sidebar_label: Software Architecture
 ---
 
 ZITADEL is built with two essential patterns. Event Sourcing (ES) and Command and Query Responsibility Segregation (CQRS). 

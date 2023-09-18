@@ -1,5 +1,6 @@
 ---
 title: ZITADEL's Personal Access Tokens(PATs)
+sidebar_label: Personal Access Tokens(PATs)
 ---
 
 

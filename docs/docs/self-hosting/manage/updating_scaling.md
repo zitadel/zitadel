@@ -1,5 +1,6 @@
 ---
 title: Update and Scale ZITADEL
+sidebar_label: Update and Scale
 ---
 
 ## TL;DR
