@@ -268,6 +268,7 @@ func Test_prepareCondition(t *testing.T) {
 			name: "array as condition value",
 			args: args{
 				query: &repository.SearchQuery{
+					AwaitOpenTransactions: true,
 					Filters: [][]*repository.Filter{
 						{
 							repository.NewFilter(repository.FieldAggregateType, []eventstore.AggregateType{"user", "org"}, repository.OperationIn),
@@ -284,6 +285,7 @@ func Test_prepareCondition(t *testing.T) {
 			name: "multiple filters",
 			args: args{
 				query: &repository.SearchQuery{
+					AwaitOpenTransactions: true,
 					Filters: [][]*repository.Filter{
 						{
 							repository.NewFilter(repository.FieldAggregateType, []eventstore.AggregateType{"user", "org"}, repository.OperationIn),
@@ -513,6 +515,7 @@ func Test_query_events_mocked(t *testing.T) {
 				dest: &[]*repository.Event{},
 				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 					OrderDesc().
+					AwaitOpenTransactions().
 					AddQuery().
 					AggregateTypes("user").
 					Builder(),
@@ -533,6 +536,7 @@ func Test_query_events_mocked(t *testing.T) {
 				dest: &[]*repository.Event{},
 				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 					OrderAsc().
+					AwaitOpenTransactions().
 					Limit(5).
 					AddQuery().
 					AggregateTypes("user").
@@ -554,6 +558,7 @@ func Test_query_events_mocked(t *testing.T) {
 				dest: &[]*repository.Event{},
 				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 					OrderDesc().
+					AwaitOpenTransactions().
 					Limit(5).
 					AddQuery().
 					AggregateTypes("user").
@@ -575,6 +580,7 @@ func Test_query_events_mocked(t *testing.T) {
 				dest: &[]*repository.Event{},
 				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 					OrderDesc().
+					AwaitOpenTransactions().
 					Limit(5).
 					AllowTimeTravel().
 					AddQuery().
@@ -597,6 +603,7 @@ func Test_query_events_mocked(t *testing.T) {
 				dest: &[]*repository.Event{},
 				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 					OrderDesc().
+					AwaitOpenTransactions().
 					Limit(0).
 					AddQuery().
 					AggregateTypes("user").
@@ -618,6 +625,7 @@ func Test_query_events_mocked(t *testing.T) {
 				dest: nil,
 				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 					OrderDesc().
+					AwaitOpenTransactions().
 					Limit(0).
 					AddQuery().
 					AggregateTypes("user").
@@ -648,6 +656,7 @@ func Test_query_events_mocked(t *testing.T) {
 				dest: &[]*repository.Event{},
 				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 					OrderDesc().
+					AwaitOpenTransactions().
 					Limit(5).
 					AddQuery().
 					AggregateTypes("user").
