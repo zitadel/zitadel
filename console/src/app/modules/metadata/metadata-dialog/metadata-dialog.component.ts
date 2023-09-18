@@ -11,7 +11,6 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class MetadataDialogComponent {
   public metadata: Partial<Metadata.AsObject>[] = [];
-  public loading: boolean = false;
   public ts!: Timestamp.AsObject | undefined;
 
   constructor(

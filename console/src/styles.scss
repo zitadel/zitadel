@@ -378,11 +378,6 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   height: 280px;
 }
 
-.mat-app-background {
-  $backgroundpalette: map-get($caos-dark-app-theme, background);
-  background-color: map-get($backgroundpalette, background);
-}
-
 .mat-mdc-select-panel {
   margin-left: -11px;
 }
@@ -459,7 +454,6 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
 
   .main-container,
   .mat-mdc-dialog-container,
-  .mat-app-background,
   .mat-calendar {
     background-color: map-get($background, background);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -506,8 +500,7 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
     --mdc-linear-progress-active-indicator-color: var(--success);
   }
 
-  .main-container,
-  .mat-app-background {
+  .main-container {
     background-color: mat.get-color-from-palette($background, background);
     color: map-get($foreground, text);
   }
@@ -548,7 +541,6 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
 
   .main-container,
   .mat-mdc-dialog-container,
-  .mat-app-background,
   .mat-calendar {
     background-color: mat.get-color-from-palette($background, background);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);

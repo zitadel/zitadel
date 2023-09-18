@@ -118,14 +118,8 @@ export class KeyboardShortcutsService implements OnDestroy {
   }
 
   public openOverviewDialog(): void {
-    const dialogRef = this.dialog.open(KeyboardShortcutsComponent, {
-      data: {},
+    this.dialog.open(KeyboardShortcutsComponent, {
       width: '400px',
-    });
-
-    dialogRef.afterClosed().subscribe((resp) => {
-      if (resp) {
-      }
     });
   }
 
