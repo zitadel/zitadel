@@ -3,7 +3,7 @@ Database:
     Host: localhost
     Port: 5432
     Database: zitadel
-    MaxOpenConns: 20
+    MaxOpenConns: 40
     MaxIdleConns: 10
     User:
       Username: zitadel
