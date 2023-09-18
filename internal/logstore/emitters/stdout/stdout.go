@@ -9,8 +9,8 @@ import (
 	"github.com/zitadel/zitadel/internal/logstore"
 )
 
-func NewStdoutEmitter() logstore.LogEmitter {
-	return logstore.LogEmitterFunc(func(ctx context.Context, bulk []logstore.LogRecord) error {
+func NewStdoutEmitter[T logstore.LogRecord[T]]() logstore.LogEmitter[T] {
+	return logstore.LogEmitterFunc[T](func(ctx context.Context, bulk []T) error {
 		for idx := range bulk {
 			bytes, err := json.Marshal(bulk[idx])
 			if err != nil {

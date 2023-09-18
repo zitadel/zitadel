@@ -60,6 +60,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public ProjectState: any = ProjectState;
   public ProjectType: any = ProjectType;
   private destroy$: Subject<void> = new Subject();
+  public INITIAL_PAGE_SIZE: number = 20;
 
   constructor(
     public translate: TranslateService,
@@ -84,7 +85,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
           break;
       }
 
-      this.getData(type);
+      this.getData(type, this.INITIAL_PAGE_SIZE, 0);
     });
   }
 

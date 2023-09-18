@@ -43,10 +43,10 @@ title: Objects
 
 ## user grant
 
-- `projectId` *string*  
+- `projectID` *string*  
   Required. Id of the project to be granted
-- `projectGrantId` *string*  
-  If the grant is for a project grant
+- `projectGrantID` *string*  
+  Optional. If the grant is for a project grant, include projectGrantID
 - `roles` Array of *string*  
   Containing the roles
 

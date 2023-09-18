@@ -14,13 +14,12 @@ import (
 type Unit uint
 
 const (
-	UniqueQuotaNameType           = "quota_units"
-	UniqueQuotaNotificationIDType = "quota_notification"
-	eventTypePrefix               = eventstore.EventType("quota.")
-	AddedEventType                = eventTypePrefix + "added"
-	NotifiedEventType             = eventTypePrefix + "notified"
-	NotificationDueEventType      = eventTypePrefix + "notificationdue"
-	RemovedEventType              = eventTypePrefix + "removed"
+	UniqueQuotaNameType      = "quota_units"
+	eventTypePrefix          = eventstore.EventType("quota.")
+	AddedEventType           = eventTypePrefix + "added"
+	NotifiedEventType        = eventTypePrefix + "notified"
+	NotificationDueEventType = eventTypePrefix + "notificationdue"
+	RemovedEventType         = eventTypePrefix + "removed"
 )
 
 const (

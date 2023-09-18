@@ -3,7 +3,6 @@ package command
 import (
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -33,9 +32,6 @@ type HumanWriteModel struct {
 	PostalCode    string
 	Region        string
 	StreetAddress string
-
-	Secret               *crypto.CryptoValue
-	SecretChangeRequired bool
 
 	UserState domain.UserState
 }
@@ -74,8 +70,6 @@ func (wm *HumanWriteModel) Reduce() error {
 			wm.reduceHumanPhoneVerifiedEvent()
 		case *user.HumanPhoneRemovedEvent:
 			wm.reduceHumanPhoneRemovedEvent()
-		case *user.HumanPasswordChangedEvent:
-			wm.reduceHumanPasswordChangedEvent(e)
 		case *user.HumanAvatarAddedEvent:
 			wm.Avatar = e.StoreKey
 		case *user.HumanAvatarRemovedEvent:
@@ -123,7 +117,6 @@ func (wm *HumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanPhoneRemovedType,
 			user.HumanAvatarAddedType,
 			user.HumanAvatarRemovedType,
-			user.HumanPasswordChangedType,
 			user.UserLockedType,
 			user.UserUnlockedType,
 			user.UserDeactivatedType,
@@ -138,8 +131,7 @@ func (wm *HumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserV1EmailVerifiedType,
 			user.UserV1PhoneChangedType,
 			user.UserV1PhoneVerifiedType,
-			user.UserV1PhoneRemovedType,
-			user.UserV1PasswordChangedType).
+			user.UserV1PhoneRemovedType).
 		Builder()
 }
 
@@ -158,8 +150,6 @@ func (wm *HumanWriteModel) reduceHumanAddedEvent(e *user.HumanAddedEvent) {
 	wm.PostalCode = e.PostalCode
 	wm.Region = e.Region
 	wm.StreetAddress = e.StreetAddress
-	wm.Secret = e.Secret
-	wm.SecretChangeRequired = e.ChangeRequired
 	wm.UserState = domain.UserStateActive
 }
 
@@ -178,8 +168,6 @@ func (wm *HumanWriteModel) reduceHumanRegisteredEvent(e *user.HumanRegisteredEve
 	wm.PostalCode = e.PostalCode
 	wm.Region = e.Region
 	wm.StreetAddress = e.StreetAddress
-	wm.Secret = e.Secret
-	wm.SecretChangeRequired = e.ChangeRequired
 	wm.UserState = domain.UserStateActive
 }
 
@@ -243,9 +231,4 @@ func (wm *HumanWriteModel) reduceHumanAddressChangedEvent(e *user.HumanAddressCh
 	if e.StreetAddress != nil {
 		wm.StreetAddress = *e.StreetAddress
 	}
-}
-
-func (wm *HumanWriteModel) reduceHumanPasswordChangedEvent(e *user.HumanPasswordChangedEvent) {
-	wm.Secret = e.Secret
-	wm.SecretChangeRequired = e.ChangeRequired
 }
