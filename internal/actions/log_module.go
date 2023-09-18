@@ -10,15 +10,15 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/logstore"
-	"github.com/zitadel/zitadel/internal/logstore/emitters/execution"
+	"github.com/zitadel/zitadel/internal/logstore/record"
 )
 
 var (
-	logstoreService *logstore.Service
+	logstoreService *logstore.Service[*record.ExecutionLog]
 	_               console.Printer = (*logger)(nil)
 )
 
-func SetLogstoreService(svc *logstore.Service) {
+func SetLogstoreService(svc *logstore.Service[*record.ExecutionLog]) {
 	logstoreService = svc
 }
 
@@ -55,19 +55,16 @@ func (l *logger) log(msg string, level logrus.Level, last bool) {
 	if l.started.IsZero() {
 		l.started = ts
 	}
-
-	record := &execution.Record{
+	r := &record.ExecutionLog{
 		LogDate:    ts,
 		InstanceID: l.instanceID,
 		Message:    msg,
 		LogLevel:   level,
 	}
-
 	if last {
-		record.Took = ts.Sub(l.started)
+		r.Took = ts.Sub(l.started)
 	}
-
-	logstoreService.Handle(l.ctx, record)
+	logstoreService.Handle(l.ctx, r)
 }
 
 func withLogger(ctx context.Context) Option {

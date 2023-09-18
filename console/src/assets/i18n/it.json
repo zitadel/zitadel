@@ -1105,7 +1105,7 @@
       "INDAYS": "giorni"
     },
     "SECRETS": {
-      "TITLE": "Aspetto dei segreti",
+      "TITLE": "Generatore di password",
       "TYPES": "Tipi di segreti",
       "TYPE": {
         "1": "Initializzazione email",
@@ -1117,7 +1117,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
-      "ADDGENERATOR": "Definisci aspetto",
+      "ADDGENERATOR": "Imposta il generatore di password",
       "GENERATORTYPE": "Tipo",
       "EXPIRY": "Scadenza (in ore)",
       "INCLUDEDIGITS": "Contiene numeri",

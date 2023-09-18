@@ -1029,7 +1029,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Privacy Policy",
       "OIDC": "OIDC Token lifetime and expiration",
-      "SECRETS": "Secret Appearance",
+      "SECRETS": "Secret Generator",
       "SECURITY": "Security settings"
     },
     "GROUPS": {
@@ -1106,7 +1106,7 @@
       "INDAYS": "Days"
     },
     "SECRETS": {
-      "TITLE": "Secret Appearance",
+      "TITLE": "Secret Generator",
       "TYPES": "Secret Types",
       "TYPE": {
         "1": "Initialization Mail",
@@ -1118,7 +1118,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - Email"
       },
-      "ADDGENERATOR": "Define Secret Appearance",
+      "ADDGENERATOR": "Define Secret Generator",
       "GENERATORTYPE": "Type",
       "EXPIRY": "Expiration (in hours)",
       "INCLUDEDIGITS": "Include Numbers",
