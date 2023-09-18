@@ -18,8 +18,10 @@
     </p>
   </div>
   <button [disabled]="!newerVersionExists" color="primary" mat-raised-button (click)="loadData()">
-    <i class="las la-sync-alt"></i>
-    {{ 'ACTIONS.REFRESH' | translate }}
+    <div class="cnsl-action-button">
+      <i class="las la-sync-alt"></i>
+      <span>{{ 'ACTIONS.REFRESH' | translate }}</span>
+    </div>
   </button>
 </div>
 <form *ngIf="form" class="top-actions" [formGroup]="form">
@@ -70,7 +72,10 @@
     type="submit"
     mat-stroked-button
   >
-    <i class="las la-history"></i> {{ 'ACTIONS.RESETDEFAULT' | translate }}
+    <div class="cnsl-action-button">
+      <i class="las la-history"></i>
+      <span>{{ 'ACTIONS.RESETDEFAULT' | translate }}</span>
+    </div>
   </button>
   <button
     class="save-button"

@@ -15,12 +15,14 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
+    flex-wrap: wrap;
 
     .type {
       display: block;
       min-width: 200px;
       width: fit-content;
       margin-right: 1rem;
+      flex: 1;
     }
 
     .language {

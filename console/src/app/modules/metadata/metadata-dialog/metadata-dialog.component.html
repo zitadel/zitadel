@@ -38,9 +38,11 @@
       </button>
     </div>
   </form>
-  <button (click)="addEntry()" mat-stroked-button class="continue-button" type="button">
-    <mat-icon>add</mat-icon>
-    {{ 'ACTIONS.ADD' | translate }}
+  <button (click)="addEntry()" mat-stroked-button type="button">
+    <div class="cnsl-action-button">
+      <mat-icon>add</mat-icon>
+      <span> {{ 'ACTIONS.ADD' | translate }}</span>
+    </div>
   </button>
 </div>
 <div mat-dialog-actions class="action">

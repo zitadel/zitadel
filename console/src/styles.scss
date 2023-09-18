@@ -357,20 +357,16 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   align-items: center;
   margin-left: -0.5rem;
   height: 100%;
+  padding-left: 0.25rem;
+  height: 36px;
 
-  &.mat-mdc-raised-button,
-  &.mat-mdc-outlined-button {
-    padding-left: 0.5rem;
-    height: 36px;
+  i:not(.no-margin) {
+    margin-right: 0.25rem;
+    font-size: 1.3rem;
+  }
 
-    i:not(.no-margin) {
-      margin-right: 0.25rem;
-      font-size: 1.3rem;
-    }
-
-    .mat-icon {
-      margin-right: 0.25rem;
-    }
+  .mat-icon {
+    margin-right: 0.25rem;
   }
 }
 
