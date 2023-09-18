@@ -1,6 +1,6 @@
 //go:build integration
 
-package start
+package net
 
 import (
 	"net"
@@ -9,7 +9,7 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func listenConfig() *net.ListenConfig {
+func ListenConfig() *net.ListenConfig {
 	return &net.ListenConfig{
 		Control: reusePort,
 	}
