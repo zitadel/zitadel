@@ -9,19 +9,17 @@ import (
 	"github.com/zitadel/logging"
 )
 
-type bulkSink interface {
-	sendBulk(ctx context.Context, bulk []LogRecord) error
+type bulkSink[T LogRecord[T]] interface {
+	SendBulk(ctx context.Context, bulk []T) error
 }
 
-var _ bulkSink = bulkSinkFunc(nil)
+type bulkSinkFunc[T LogRecord[T]] func(ctx context.Context, bulk []T) error
 
-type bulkSinkFunc func(ctx context.Context, items []LogRecord) error
-
-func (s bulkSinkFunc) sendBulk(ctx context.Context, items []LogRecord) error {
-	return s(ctx, items)
+func (s bulkSinkFunc[T]) SendBulk(ctx context.Context, bulk []T) error {
+	return s(ctx, bulk)
 }
 
-type debouncer struct {
+type debouncer[T LogRecord[T]] struct {
 	// Storing context.Context in a struct is generally bad practice
 	// https://go.dev/blog/context-and-structs
 	// However, debouncer starts a go routine that triggers side effects itself.
@@ -33,8 +31,8 @@ type debouncer struct {
 	ticker            *clock.Ticker
 	mux               sync.Mutex
 	cfg               DebouncerConfig
-	storage           bulkSink
-	cache             []LogRecord
+	storage           bulkSink[T]
+	cache             []T
 	cacheLen          uint
 }
 
@@ -43,8 +41,8 @@ type DebouncerConfig struct {
 	MaxBulkSize  uint
 }
 
-func newDebouncer(binarySignaledCtx context.Context, cfg DebouncerConfig, clock clock.Clock, ship bulkSink) *debouncer {
-	a := &debouncer{
+func newDebouncer[T LogRecord[T]](binarySignaledCtx context.Context, cfg DebouncerConfig, clock clock.Clock, ship bulkSink[T]) *debouncer[T] {
+	a := &debouncer[T]{
 		binarySignaledCtx: binarySignaledCtx,
 		clock:             clock,
 		cfg:               cfg,
@@ -58,7 +56,7 @@ func newDebouncer(binarySignaledCtx context.Context, cfg DebouncerConfig, clock 
 	return a
 }
 
-func (d *debouncer) add(item LogRecord) {
+func (d *debouncer[T]) add(item T) {
 	d.mux.Lock()
 	defer d.mux.Unlock()
 	d.cache = append(d.cache, item)
@@ -69,13 +67,13 @@ func (d *debouncer) add(item LogRecord) {
 	}
 }
 
-func (d *debouncer) ship() {
+func (d *debouncer[T]) ship() {
 	if d.cacheLen == 0 {
 		return
 	}
 	d.mux.Lock()
 	defer d.mux.Unlock()
-	if err := d.storage.sendBulk(d.binarySignaledCtx, d.cache); err != nil {
+	if err := d.storage.SendBulk(d.binarySignaledCtx, d.cache); err != nil {
 		logging.WithError(err).WithField("size", len(d.cache)).Error("storing bulk failed")
 	}
 	d.cache = nil
@@ -85,7 +83,7 @@ func (d *debouncer) ship() {
 	}
 }
 
-func (d *debouncer) shipOnTicks() {
+func (d *debouncer[T]) shipOnTicks() {
 	for range d.ticker.C {
 		d.ship()
 	}

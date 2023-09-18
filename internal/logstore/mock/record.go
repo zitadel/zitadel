@@ -8,18 +8,18 @@ import (
 	"github.com/zitadel/zitadel/internal/logstore"
 )
 
-var _ logstore.LogRecord = (*record)(nil)
+var _ logstore.LogRecord[*Record] = (*Record)(nil)
 
-func NewRecord(clock clock.Clock) *record {
-	return &record{ts: clock.Now()}
+func NewRecord(clock clock.Clock) *Record {
+	return &Record{ts: clock.Now()}
 }
 
-type record struct {
+type Record struct {
 	ts       time.Time
 	redacted bool
 }
 
-func (r record) Normalize() logstore.LogRecord {
+func (r Record) Normalize() *Record {
 	r.redacted = true
 	return &r
 }
