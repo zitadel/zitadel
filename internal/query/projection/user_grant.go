@@ -429,6 +429,7 @@ func getResourceOwnerOfUser(ctx context.Context, es handler.EventStore, instance
 	events, err := es.Filter(
 		ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+			AwaitOpenTransactions().
 			InstanceID(instanceID).
 			AddQuery().
 			AggregateTypes(user.AggregateType).
@@ -449,6 +450,7 @@ func getResourceOwnerOfProject(ctx context.Context, es handler.EventStore, insta
 	events, err := es.Filter(
 		ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+			AwaitOpenTransactions().
 			InstanceID(instanceID).
 			AddQuery().
 			AggregateTypes(project.AggregateType).
@@ -469,6 +471,7 @@ func getGrantedOrgOfGrantedProject(ctx context.Context, es handler.EventStore, i
 	events, err := es.Filter(
 		ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+			AwaitOpenTransactions().
 			InstanceID(instanceID).
 			AddQuery().
 			AggregateTypes(project.AggregateType).

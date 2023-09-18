@@ -156,6 +156,7 @@ func (p *Storage) getMaxKeySequence(ctx context.Context) (float64, error) {
 	return p.eventstore.LatestSequence(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
+			AwaitOpenTransactions().
 			AddQuery().
 			AggregateTypes(keypair.AggregateType).
 			EventTypes(

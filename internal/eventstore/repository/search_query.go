@@ -10,12 +10,13 @@ import (
 
 // SearchQuery defines the which and how data are queried
 type SearchQuery struct {
-	Columns         eventstore.Columns
-	Limit           uint64
-	Desc            bool
-	Filters         [][]*Filter
-	Tx              *sql.Tx
-	AllowTimeTravel bool
+	Columns               eventstore.Columns
+	Limit                 uint64
+	Desc                  bool
+	Filters               [][]*Filter
+	Tx                    *sql.Tx
+	AllowTimeTravel       bool
+	AwaitOpenTransactions bool
 }
 
 // Filter represents all fields needed to compare a field of an event with a value
@@ -155,12 +156,13 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 	}
 
 	return &SearchQuery{
-		Columns:         builder.GetColumns(),
-		Limit:           builder.GetLimit(),
-		Desc:            builder.GetDesc(),
-		Filters:         filters,
-		Tx:              builder.GetTx(),
-		AllowTimeTravel: builder.GetAllowTimeTravel(),
+		Columns:               builder.GetColumns(),
+		Limit:                 builder.GetLimit(),
+		Desc:                  builder.GetDesc(),
+		Filters:               filters,
+		Tx:                    builder.GetTx(),
+		AllowTimeTravel:       builder.GetAllowTimeTravel(),
+		AwaitOpenTransactions: builder.GetAwaitOpenTransactions(),
 	}, nil
 }
 

@@ -25,6 +25,7 @@ func newQuotaReadModel(instanceId, resourceOwner string, unit quota.Unit) *quota
 
 func (rm *quotaReadModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
 		ResourceOwner(rm.ResourceOwner).
 		AllowTimeTravel().
 		AddQuery().

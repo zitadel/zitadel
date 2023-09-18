@@ -215,7 +215,7 @@ func prepareTestScan(err error, res []interface{}) scan {
 
 func Test_prepareCondition(t *testing.T) {
 	type args struct {
-		filters [][]*repository.Filter
+		query *repository.SearchQuery
 	}
 	type res struct {
 		clause string
@@ -229,7 +229,7 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "nil filters",
 			args: args{
-				filters: nil,
+				query: &repository.SearchQuery{},
 			},
 			res: res{
 				clause: "",
@@ -239,7 +239,9 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "empty filters",
 			args: args{
-				filters: [][]*repository.Filter{},
+				query: &repository.SearchQuery{
+					Filters: [][]*repository.Filter{},
+				},
 			},
 			res: res{
 				clause: "",
@@ -249,9 +251,11 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "invalid condition",
 			args: args{
-				filters: [][]*repository.Filter{
-					{
-						repository.NewFilter(repository.FieldAggregateID, "wrong", repository.Operation(-1)),
+				query: &repository.SearchQuery{
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldAggregateID, "wrong", repository.Operation(-1)),
+						},
 					},
 				},
 			},
@@ -263,9 +267,11 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "array as condition value",
 			args: args{
-				filters: [][]*repository.Filter{
-					{
-						repository.NewFilter(repository.FieldAggregateType, []eventstore.AggregateType{"user", "org"}, repository.OperationIn),
+				query: &repository.SearchQuery{
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldAggregateType, []eventstore.AggregateType{"user", "org"}, repository.OperationIn),
+						},
 					},
 				},
 			},
@@ -277,11 +283,13 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "multiple filters",
 			args: args{
-				filters: [][]*repository.Filter{
-					{
-						repository.NewFilter(repository.FieldAggregateType, []eventstore.AggregateType{"user", "org"}, repository.OperationIn),
-						repository.NewFilter(repository.FieldAggregateID, "1234", repository.OperationEquals),
-						repository.NewFilter(repository.FieldEventType, []eventstore.EventType{"user.created", "org.created"}, repository.OperationIn),
+				query: &repository.SearchQuery{
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldAggregateType, []eventstore.AggregateType{"user", "org"}, repository.OperationIn),
+							repository.NewFilter(repository.FieldAggregateID, "1234", repository.OperationEquals),
+							repository.NewFilter(repository.FieldEventType, []eventstore.EventType{"user.created", "org.created"}, repository.OperationIn),
+						},
 					},
 				},
 			},
@@ -294,7 +302,7 @@ func Test_prepareCondition(t *testing.T) {
 	crdb := NewCRDB(&database.DB{Database: new(cockroach.Config)})
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotClause, gotValues := prepareCondition(crdb, tt.args.filters)
+			gotClause, gotValues := prepareCondition(crdb, tt.args.query)
 			if gotClause != tt.res.clause {
 				t.Errorf("prepareCondition() gotClause = %v, want %v", gotClause, tt.res.clause)
 			}

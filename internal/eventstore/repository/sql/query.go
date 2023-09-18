@@ -59,7 +59,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		return err
 	}
 	query, rowScanner := prepareColumns(criteria, q.Columns)
-	where, values := prepareCondition(criteria, q.Filters)
+	where, values := prepareCondition(criteria, q)
 	if where == "" || query == "" {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
@@ -200,15 +200,15 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 	return nil
 }
 
-func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause string, values []interface{}) {
-	values = make([]interface{}, 0, len(filters))
+func prepareCondition(criteria querier, query *repository.SearchQuery) (clause string, values []interface{}) {
+	values = make([]interface{}, 0, len(query.Filters))
 
-	if len(filters) == 0 {
+	if len(query.Filters) == 0 {
 		return clause, values
 	}
 
-	clauses := make([]string, len(filters))
-	for idx, filter := range filters {
+	clauses := make([]string, len(query.Filters))
+	for idx, filter := range query.Filters {
 		subClauses := make([]string, 0, len(filter))
 		for _, f := range filter {
 			value := f.Value
@@ -231,7 +231,12 @@ func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause 
 		clauses[idx] = "( " + strings.Join(subClauses, " AND ") + " )"
 	}
 
-	return " WHERE (" + strings.Join(clauses, " OR ") + ") " + ensureOrder, values
+	where := " WHERE (" + strings.Join(clauses, " OR ") + ") "
+	if query.AwaitOpenTransactions {
+		where += awaitOpenTransactions
+	}
+
+	return where, values
 }
 
 func getCondition(cond querier, filter *repository.Filter) (condition string) {

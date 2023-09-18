@@ -205,6 +205,7 @@ func checkAdditionalEvents(eventQueue chan eventstore.Event, event eventstore.Ev
 
 func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]string, error) {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).
+		AwaitOpenTransactions().
 		AllowTimeTravel().
 		AddQuery().
 		ExcludedInstanceID("")
@@ -409,6 +410,7 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, currentState
 
 func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder {
 	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
 		Limit(uint64(h.bulkLimit)).
 		AllowTimeTravel().
 		OrderAsc().

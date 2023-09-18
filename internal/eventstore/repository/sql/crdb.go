@@ -104,8 +104,8 @@ const (
 					WHERE instance_id = $1`
 )
 
-// ensureOrder ensures event ordering, so we don't events younger that open transactions
-var ensureOrder string
+// awaitOpenTransactions ensures event ordering, so we don't events younger that open transactions
+var awaitOpenTransactions string
 
 type CRDB struct {
 	*database.DB
@@ -114,9 +114,9 @@ type CRDB struct {
 func NewCRDB(client *database.DB) *CRDB {
 	switch client.Type() {
 	case "cockroach":
-		ensureOrder = "AND creation_date::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = 'zitadel')"
+		awaitOpenTransactions = "AND creation_date::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = 'zitadel')"
 	case "postgres":
-		ensureOrder = `AND "position" < pg_snapshot_xmin(pg_current_snapshot())`
+		awaitOpenTransactions = `AND "position" < pg_snapshot_xmin(pg_current_snapshot())`
 	}
 
 	return &CRDB{client}

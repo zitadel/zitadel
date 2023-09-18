@@ -73,6 +73,7 @@ func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserC
 		AllowTimeTravel().
 		Limit(limit).
 		OrderDesc().
+		AwaitOpenTransactions().
 		ResourceOwner(authz.GetCtxData(ctx).ResourceOwner).
 		AddQuery().
 		SequenceGreater(sequence).

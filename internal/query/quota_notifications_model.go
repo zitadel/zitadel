@@ -27,6 +27,7 @@ func newQuotaNotificationsReadModel(aggregateId, instanceId, resourceOwner strin
 
 func (rm *quotaNotificationsReadModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
 		ResourceOwner(rm.ResourceOwner).
 		AllowTimeTravel().
 		AddQuery().

@@ -10,16 +10,17 @@ import (
 // SearchQueryBuilder represents the builder for your filter
 // if invalid data are set the filter will fail
 type SearchQueryBuilder struct {
-	columns         Columns
-	limit           uint64
-	desc            bool
-	resourceOwner   string
-	instanceID      string
-	editorUser      string
-	queries         []*SearchQuery
-	tx              *sql.Tx
-	allowTimeTravel bool
-	positionAfter   float64
+	columns               Columns
+	limit                 uint64
+	desc                  bool
+	resourceOwner         string
+	instanceID            string
+	editorUser            string
+	queries               []*SearchQuery
+	tx                    *sql.Tx
+	allowTimeTravel       bool
+	positionAfter         float64
+	awaitOpenTransactions bool
 }
 
 func (b *SearchQueryBuilder) GetColumns() Columns {
@@ -60,6 +61,10 @@ func (b *SearchQueryBuilder) GetAllowTimeTravel() bool {
 
 func (b SearchQueryBuilder) GetPositionAfter() float64 {
 	return b.positionAfter
+}
+
+func (b SearchQueryBuilder) GetAwaitOpenTransactions() bool {
+	return b.awaitOpenTransactions
 }
 
 type SearchQuery struct {
@@ -219,6 +224,12 @@ func (builder *SearchQueryBuilder) AllowTimeTravel() *SearchQueryBuilder {
 // PositionAfter filters for events which happened after the specified time
 func (builder *SearchQueryBuilder) PositionAfter(position float64) *SearchQueryBuilder {
 	builder.positionAfter = position
+	return builder
+}
+
+// AwaitOpenTransactions filters for events which are older than the oldest transaction of the database
+func (builder *SearchQueryBuilder) AwaitOpenTransactions() *SearchQueryBuilder {
+	builder.awaitOpenTransactions = true
 	return builder
 }
 

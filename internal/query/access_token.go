@@ -54,6 +54,7 @@ func (wm *OIDCSessionAccessTokenReadModel) Reduce() error {
 
 func (wm *OIDCSessionAccessTokenReadModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
 		AllowTimeTravel().
 		AddQuery().
 		AggregateTypes(oidcsession.AggregateType).
@@ -133,6 +134,7 @@ func (q *Queries) checkSessionNotTerminatedAfter(ctx context.Context, sessionID 
 	defer func() { span.EndWithError(err) }()
 
 	events, err := q.eventstore.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
 		AllowTimeTravel().
 		AddQuery().
 		AggregateTypes(session.AggregateType).

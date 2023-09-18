@@ -55,6 +55,7 @@ func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChanges
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AllowTimeTravel().
 		Limit(limit).
+		AwaitOpenTransactions().
 		OrderDesc().
 		ResourceOwner(authz.GetCtxData(ctx).OrgID).
 		AddQuery().

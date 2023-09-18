@@ -13,6 +13,7 @@ func UserByIDQuery(id, instanceID string, lastCreationDate time.Time, eventTypes
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d8isw", "Errors.User.UserIDMissing")
 	}
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
 		InstanceID(instanceID).
 		AddQuery().
 		AggregateTypes(user.AggregateType).

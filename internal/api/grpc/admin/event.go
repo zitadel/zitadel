@@ -57,6 +57,7 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 		OrderDesc().
 		InstanceID(authz.GetInstance(ctx).InstanceID()).
 		Limit(limit).
+		AwaitOpenTransactions().
 		ResourceOwner(req.ResourceOwner).
 		EditorUser(req.EditorUserId).
 		AddQuery().

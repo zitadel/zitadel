@@ -52,6 +52,7 @@ func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChanges
 		AllowTimeTravel().
 		Limit(limit).
 		OrderDesc().
+		AwaitOpenTransactions().
 		ResourceOwner(authz.GetCtxData(ctx).OrgID).
 		AddQuery().
 		SequenceGreater(sequence).
