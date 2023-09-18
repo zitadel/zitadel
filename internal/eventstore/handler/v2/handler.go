@@ -237,7 +237,7 @@ func (h *Handler) Trigger(ctx context.Context, opts ...triggerOpt) (_ context.Co
 		opt(config)
 	}
 
-	cancel := h.lockInstance(ctx)
+	cancel := h.lockInstance(ctx, config)
 	if cancel == nil {
 		return call.ResetTimestamp(ctx), nil
 	}
@@ -257,19 +257,23 @@ func (h *Handler) Trigger(ctx context.Context, opts ...triggerOpt) (_ context.Co
 // If the instance is already locked from another process no cancel function is returned
 // the instance can be skipped then
 // If the instance is locked, an unlock deferable function is returned
-func (h *Handler) lockInstance(ctx context.Context) func() {
+func (h *Handler) lockInstance(ctx context.Context, config *triggerConfig) func() {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 
 	// Check that the instance has a mutex to lock
 	instanceMu, _ := h.triggeredInstancesSync.LoadOrStore(instanceID, new(sync.Mutex))
-	if !instanceMu.(*sync.Mutex).TryLock() {
-		instanceMu.(*sync.Mutex).Lock()
-		defer instanceMu.(*sync.Mutex).Unlock()
-		return nil
-	}
-	return func() {
+	unlock := func() {
 		instanceMu.(*sync.Mutex).Unlock()
 	}
+	if !instanceMu.(*sync.Mutex).TryLock() {
+		instanceMu.(*sync.Mutex).Lock()
+		if config.awaitRunning {
+			return unlock
+		}
+		defer unlock()
+		return nil
+	}
+	return unlock
 }
 
 func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (additionalIteration bool, err error) {
