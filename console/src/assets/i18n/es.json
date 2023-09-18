@@ -496,6 +496,7 @@
       "LASTNAME": "Apellidos",
       "NICKNAME": "Apodo",
       "DISPLAYNAME": "Nombre mostrado",
+      "PREFERREDLOGINNAME": "Nombre de inicio de sesión preferido",
       "PREFERRED_LANGUAGE": "Idioma",
       "GENDER": "Género",
       "PASSWORD": "Contraseña",

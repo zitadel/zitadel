@@ -496,6 +496,7 @@
       "LASTNAME": "Презиме",
       "NICKNAME": "Прекар",
       "DISPLAYNAME": "Име за приказ",
+      "PREFERREDLOGINNAME": "Претпочитано име за најава",
       "PREFERRED_LANGUAGE": "Јазик",
       "GENDER": "Пол",
       "PASSWORD": "Лозинка",

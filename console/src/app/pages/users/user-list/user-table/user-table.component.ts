@@ -52,9 +52,9 @@ export class UserTableComponent implements OnInit {
     'select',
     'displayName',
     'preferredLoginName',
-    'username',
     'email',
     'state',
+    'creationDate',
     'changeDate',
     'actions',
   ];
@@ -192,6 +192,9 @@ export class UserTableComponent implements OnInit {
           sortingField = UserFieldName.USER_FIELD_NAME_DISPLAY_NAME;
           break;
         case 'username':
+          sortingField = UserFieldName.USER_FIELD_NAME_USER_NAME;
+          break;
+        case 'preferredLoginName':
           sortingField = UserFieldName.USER_FIELD_NAME_USER_NAME;
           break;
         case 'email':

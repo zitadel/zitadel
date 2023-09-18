@@ -496,6 +496,7 @@
       "LASTNAME": "姓",
       "NICKNAME": "ニックネーム",
       "DISPLAYNAME": "表示名",
+      "PREFERREDLOGINNAME": "優先ログイン名",
       "PREFERRED_LANGUAGE": "言語",
       "GENDER": "性別",
       "PASSWORD": "パスワード",

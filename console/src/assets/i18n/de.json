@@ -495,6 +495,7 @@
       "LASTNAME": "Nachname",
       "NICKNAME": "Spitzname",
       "DISPLAYNAME": "Anzeigename",
+      "PREFERREDLOGINNAME": "Bevorzugter Anmeldename",
       "PREFERRED_LANGUAGE": "Sprache",
       "GENDER": "Geschlecht",
       "PASSWORD": "Passwort",
