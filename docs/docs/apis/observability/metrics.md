@@ -1,5 +1,5 @@
 ---
-title: Metrics
+title: ZITADEL Metrics
 ---
 
 ZITADEL provides a `metrics` endpoint with the help of the [opentelemetry-go](https://github.com/open-telemetry/opentelemetry-go) package.

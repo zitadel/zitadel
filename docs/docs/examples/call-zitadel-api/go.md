@@ -1,5 +1,5 @@
 ---
-title: Go
+title: Integrate ZITADEL into a Go Application
 ---
 
 This integration guide shows you how to integrate **ZITADEL** into your Go application.

@@ -1,5 +1,5 @@
 ---
-title: Usage Quotas
+title: Usage Quotas in ZITADEL
 ---
 
 Quotas is an enterprise feature that is relevant if you want to host ZITADEL as a service.

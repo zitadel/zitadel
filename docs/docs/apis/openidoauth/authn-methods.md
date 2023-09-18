@@ -1,5 +1,5 @@
 ---
-title: Authentication Methods
+title: Authentication Methods in ZITADEL
 ---
 
 ## Client Secret Basic

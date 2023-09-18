@@ -1,5 +1,5 @@
 ---
-title: Applications
+title: ZITADEL Applications
 ---
 
 # Applications

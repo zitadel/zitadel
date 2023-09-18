@@ -1,5 +1,5 @@
 ---
-title: Updating and Scaling
+title: Update and Scale ZITADEL
 ---
 
 ## TL;DR

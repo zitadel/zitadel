@@ -1,5 +1,5 @@
 ---
-title: Projects
+title: ZITADEL Projects
 ---
 
 # Project

@@ -1,5 +1,5 @@
 ---
-title: Granted Projects
+title: ZITADEL's Granted Projects
 ---
 
 # Granted Project

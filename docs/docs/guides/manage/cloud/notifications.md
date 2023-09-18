@@ -1,5 +1,5 @@
 ---
-title: Notifications
+title: ZITADEL Notifications
 ---
 
 You can subscribe to different newsletters and notifications.

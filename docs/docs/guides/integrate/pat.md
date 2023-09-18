@@ -1,5 +1,5 @@
 ---
-title: PAT (Personal Access Token)
+title: ZITADEL's Personal Access Tokens(PATs)
 ---
 
 

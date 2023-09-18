@@ -1,5 +1,5 @@
 ---
-title: Identity Brokering
+title: Identity Brokering in ZITADEL
 ---
 
 ## What are Identity Brokering and Federated Identities?

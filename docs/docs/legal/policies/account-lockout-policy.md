@@ -1,5 +1,5 @@
 ---
-title: Account Lockout Policy
+title: ZITADEL Account Lockout Policy
 custom_edit_url: null
 ---
 

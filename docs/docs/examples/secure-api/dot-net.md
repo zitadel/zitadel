@@ -1,4 +1,4 @@
 ---
-title: .NET
+title: ZITADEL with .NET
 ---
 Coming soon

@@ -1,5 +1,5 @@
 ---
-title: Go
+title: ZITADEL with Go
 ---
 
 This integration guide shows you how to integrate **ZITADEL** into your Go API. It demonstrates how to secure your API using

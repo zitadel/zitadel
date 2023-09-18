@@ -1,5 +1,5 @@
 ---
-title: SAML endpoints
+title: SAML Endpoints in ZITADEL
 ---
 
 ## SAML 2.0 metadata

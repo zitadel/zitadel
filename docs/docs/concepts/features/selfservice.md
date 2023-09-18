@@ -1,5 +1,5 @@
 ---
-title: Self-Service
+title: Self-Service in ZITADEL
 ---
 
 ZITADEL allows users to perform many tasks themselves.

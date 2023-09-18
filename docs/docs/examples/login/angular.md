@@ -1,5 +1,5 @@
 ---
-title: Angular
+title: ZITADEL with Angular
 ---
 
 This integration guide demonstrates the recommended way to incorporate ZITADEL into your Angular application. 

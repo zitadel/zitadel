@@ -1,5 +1,5 @@
 ---
-title: Users
+title: ZITADEL Users
 ---
 
 ## Types of users

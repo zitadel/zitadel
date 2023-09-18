@@ -1,5 +1,5 @@
 ---
-title: Eventstore
+title: ZITADEL Eventstore
 sidebar_label: Overview
 ---
 

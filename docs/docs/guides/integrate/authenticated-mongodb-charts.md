@@ -1,5 +1,5 @@
 ---
-title: Authenticated MongoDB Charts
+title: Embed Authenticated MongoDB Charts Using ZITADEL
 ---
 
 This integration guide shows how you can embed authenticated MongoDB Charts in your web application using ZITADEL as authentication provider.
