@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -339,9 +340,9 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx, err = projection.UserProjection.Trigger(ctx)
+		ctx, err = projection.UserProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
-		ctx, err = projection.LoginNameProjection.Trigger(ctx)
+		ctx, err = projection.LoginNameProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
 	}
 
@@ -373,9 +374,9 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwner
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx, err = projection.UserProjection.Trigger(ctx)
+		ctx, err = projection.UserProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
-		ctx, err = projection.LoginNameProjection.Trigger(ctx)
+		ctx, err = projection.LoginNameProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
 	}
 
@@ -487,9 +488,9 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		ctx, err = projection.UserProjection.Trigger(ctx)
+		ctx, err = projection.UserProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
-		ctx, err = projection.LoginNameProjection.Trigger(ctx)
+		ctx, err = projection.LoginNameProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
 	}
 
@@ -521,9 +522,9 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		ctx, err = projection.UserProjection.Trigger(ctx)
+		ctx, err = projection.UserProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
-		ctx, err = projection.LoginNameProjection.Trigger(ctx)
+		ctx, err = projection.LoginNameProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
 	}
 

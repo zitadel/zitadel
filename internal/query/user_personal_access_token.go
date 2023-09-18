@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -92,7 +93,7 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx, err = projection.PersonalAccessTokenProjection.Trigger(ctx)
+		ctx, err = projection.PersonalAccessTokenProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
 	}
 

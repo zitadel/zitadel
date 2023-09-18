@@ -435,7 +435,7 @@ func TestHandler_currentState(t *testing.T) {
 				t.Fatalf("unable to begin transaction: %v", err)
 			}
 
-			gotCurrentState, err := h.currentState(tt.args.ctx, tx)
+			gotCurrentState, err := h.currentState(tt.args.ctx, tx, new(triggerConfig))
 
 			tt.want.isErr(t, err)
 			if !reflect.DeepEqual(gotCurrentState, tt.want.currentState) {

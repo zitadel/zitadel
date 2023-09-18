@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -172,7 +173,7 @@ func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, s
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx, err = projection.SessionProjection.Trigger(ctx)
+		ctx, err = projection.SessionProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("unable to trigger")
 	}
 

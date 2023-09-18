@@ -7,6 +7,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/jackc/pgconn"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -24,15 +26,21 @@ type state struct {
 var (
 	//go:embed state_get.sql
 	currentStateStmt string
+	//go:embed state_await.sql
+	awaitStateStmt string
 	//go:embed state_set.sql
 	updateStateStmt string
 	//go:embed state_lock.sql
 	lockStateStmt string
 	//go:embed state_set_last_run.sql
 	updateStateLastRunStmt string
+
+	errJustUpdated = errors.New("projection was just updated")
 )
 
-func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *state, err error) {
+const lockOnRowCode = "55P03"
+
+func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, config *triggerConfig) (currentState *state, err error) {
 	currentState = &state{
 		instanceID: authz.GetInstance(ctx).InstanceID(),
 	}
@@ -55,6 +63,13 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 	)
 	if errors.Is(err, sql.ErrNoRows) {
 		err = h.lockState(tx, currentState.instanceID)
+	}
+	// await running projection if required
+	pgErr := new(pgconn.PgError)
+	if errors.As(err, &pgErr) && pgErr.Code == lockOnRowCode && config.awaitRunning {
+		// we only have to wait, the result does not matter
+		tx.QueryRow(awaitStateStmt, currentState.instanceID, h.projection.Name())
+		return nil, errJustUpdated
 	}
 	if err != nil {
 		h.log().WithError(err).Debug("unable to query current state")

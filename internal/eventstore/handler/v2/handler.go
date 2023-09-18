@@ -216,9 +216,26 @@ func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]str
 	return h.es.InstanceIDs(ctx, h.requeueEvery, !didInitialize, query.Builder())
 }
 
-func (h *Handler) Trigger(ctx context.Context) (_ context.Context, err error) {
+type triggerConfig struct {
+	awaitRunning bool
+}
+
+type triggerOpt func(conf *triggerConfig)
+
+func WithAwaitRunning() triggerOpt {
+	return func(conf *triggerConfig) {
+		conf.awaitRunning = true
+	}
+}
+
+func (h *Handler) Trigger(ctx context.Context, opts ...triggerOpt) (_ context.Context, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	config := new(triggerConfig)
+	for _, opt := range opts {
+		opt(config)
+	}
 
 	cancel := h.lockInstance(ctx)
 	if cancel == nil {
@@ -227,7 +244,7 @@ func (h *Handler) Trigger(ctx context.Context) (_ context.Context, err error) {
 	defer cancel()
 
 	for i := 0; ; i++ {
-		additionalIteration, err := h.processEvents(ctx)
+		additionalIteration, err := h.processEvents(ctx, config)
 		h.log().OnError(err).Warn("process events failed")
 		h.log().WithField("iteration", i).Debug("trigger iteration")
 		if !additionalIteration || err != nil {
@@ -255,7 +272,7 @@ func (h *Handler) lockInstance(ctx context.Context) func() {
 	}
 }
 
-func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, err error) {
+func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (additionalIteration bool, err error) {
 	defer func() {
 		pgErr := new(pgconn.PgError)
 		if errors.As(err, &pgErr) {
@@ -287,8 +304,11 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 		err = tx.Commit()
 	}()
 
-	currentState, err := h.currentState(ctx, tx)
+	currentState, err := h.currentState(ctx, tx, config)
 	if err != nil {
+		if errors.Is(err, errJustUpdated) {
+			return false, nil
+		}
 		return additionalIteration, err
 	}
 
