@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql/driver"
 	"encoding/json"
+	"time"
 
 	"github.com/jackc/pgtype"
 )
@@ -89,4 +90,16 @@ func (m Map[V]) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return json.Marshal(m)
+}
+
+type Duration time.Duration
+
+// Scan implements the [database/sql.Scanner] interface.
+func (d *Duration) Scan(src any) error {
+	interval := new(pgtype.Interval)
+	if err := interval.Scan(src); err != nil {
+		return err
+	}
+	*d = Duration(time.Duration(interval.Microseconds*1000) + time.Duration(interval.Days)*24*time.Hour + time.Duration(interval.Months)*30*24*time.Hour)
+	return nil
 }

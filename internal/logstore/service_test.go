@@ -14,9 +14,8 @@ import (
 	"github.com/benbjohnson/clock"
 
 	"github.com/zitadel/zitadel/internal/logstore"
-	emittermock "github.com/zitadel/zitadel/internal/logstore/emitters/mock"
-	quotaqueriermock "github.com/zitadel/zitadel/internal/logstore/quotaqueriers/mock"
-	"github.com/zitadel/zitadel/internal/repository/quota"
+	emittermock "github.com/zitadel/zitadel/internal/logstore/mock"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 const (
@@ -27,7 +26,7 @@ const (
 type args struct {
 	mainSink      *logstore.EmitterConfig
 	secondarySink *logstore.EmitterConfig
-	config        quota.AddedEvent
+	config        *query.Quota
 }
 
 type want struct {
@@ -138,28 +137,6 @@ func TestService(t *testing.T) {
 			},
 		},
 	}, {
-		name: "cleanupping works",
-		args: args{
-			mainSink: emitterConfig(withCleanupping(17*time.Second, 28*time.Second)),
-			secondarySink: emitterConfig(withDebouncerConfig(&logstore.DebouncerConfig{
-				MinFrequency: 0,
-				MaxBulkSize:  15,
-			}), withCleanupping(5*time.Second, 47*time.Second)),
-			config: quotaConfig(),
-		},
-		want: want{
-			enabled:   true,
-			remaining: nil,
-			mainSink: wantSink{
-				bulks: repeat(1, 60),
-				len:   21,
-			},
-			secondarySink: wantSink{
-				bulks: repeat(15, 4),
-				len:   18,
-			},
-		},
-	}, {
 		name: "when quota has a limit of 90, 30 are remaining",
 		args: args{
 			mainSink:      emitterConfig(),
@@ -232,27 +209,24 @@ func runTest(t *testing.T, name string, args args, want want) bool {
 	})
 }
 
-func given(t *testing.T, args args, want want) (context.Context, *clock.Mock, *emittermock.InmemLogStorage, *emittermock.InmemLogStorage, *logstore.Service) {
+func given(t *testing.T, args args, want want) (context.Context, *clock.Mock, *emittermock.InmemLogStorage, *emittermock.InmemLogStorage, *logstore.Service[*emittermock.Record]) {
 	ctx := context.Background()
 	clock := clock.NewMock()
 
-	periodStart := time.Time{}
 	clock.Set(args.config.From)
 
-	mainStorage := emittermock.NewInMemoryStorage(clock)
-	mainEmitter, err := logstore.NewEmitter(ctx, clock, args.mainSink, mainStorage)
+	mainStorage := emittermock.NewInMemoryStorage(clock, args.config)
+	mainEmitter, err := logstore.NewEmitter[*emittermock.Record](ctx, clock, args.mainSink, mainStorage)
 	if err != nil {
 		t.Errorf("expected no error but got %v", err)
 	}
-	secondaryStorage := emittermock.NewInMemoryStorage(clock)
-	secondaryEmitter, err := logstore.NewEmitter(ctx, clock, args.secondarySink, secondaryStorage)
+	secondaryStorage := emittermock.NewInMemoryStorage(clock, args.config)
+	secondaryEmitter, err := logstore.NewEmitter[*emittermock.Record](ctx, clock, args.secondarySink, secondaryStorage)
 	if err != nil {
 		t.Errorf("expected no error but got %v", err)
 	}
-
-	svc := logstore.New(
-		quotaqueriermock.NewNoopQuerier(&args.config, periodStart),
-		logstore.UsageReporterFunc(func(context.Context, []*quota.NotificationDueEvent) error { return nil }),
+	svc := logstore.New[*emittermock.Record](
+		mainStorage,
 		mainEmitter,
 		secondaryEmitter)
 
@@ -262,7 +236,7 @@ func given(t *testing.T, args args, want want) (context.Context, *clock.Mock, *e
 	return ctx, clock, mainStorage, secondaryStorage, svc
 }
 
-func when(svc *logstore.Service, ctx context.Context, clock *clock.Mock) *uint64 {
+func when(svc *logstore.Service[*emittermock.Record], ctx context.Context, clock *clock.Mock) *uint64 {
 	var remaining *uint64
 	for i := 0; i < ticks; i++ {
 		svc.Handle(ctx, emittermock.NewRecord(clock))

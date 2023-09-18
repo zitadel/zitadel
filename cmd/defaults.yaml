@@ -460,54 +460,29 @@ Actions:
 
 LogStore:
   Access:
-    Database:
-      # If enabled, all access logs are stored in the database table logstore.access
-      Enabled: false # ZITADEL_LOGSTORE_ACCESS_DATABASE_ENABLED
-      # Logs that are older than the keep duration are cleaned up continuously
-      # 2160h are 90 days, 3 months
-      Keep: 2160h # ZITADEL_LOGSTORE_ACCESS_DATABASE_KEEP
-      # CleanupInterval defines the time between cleanup iterations
-      CleanupInterval: 4h # ZITADEL_LOGSTORE_ACCESS_DATABASE_CLEANUPINTERVAL
-      # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
-      # Log entries are held in memory until one of the conditions MinFrequency or MaxBulkSize meets.
-      Debounce:
-        MinFrequency: 2m # ZITADEL_LOGSTORE_ACCESS_DATABASE_DEBOUNCE_MINFREQUENCY
-        MaxBulkSize: 100 # ZITADEL_LOGSTORE_ACCESS_DATABASE_DEBOUNCE_MAXBULKSIZE
     Stdout:
       # If enabled, all access logs are printed to the binary's standard output
       Enabled: false # ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED
-      # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
-      # Log entries are held in memory until one of the conditions MinFrequency or MaxBulkSize meets.
-      Debounce:
-        MinFrequency: 0s # ZITADEL_LOGSTORE_ACCESS_STDOUT_DEBOUNCE_MINFREQUENCY
-        MaxBulkSize: 0 # ZITADEL_LOGSTORE_ACCESS_STDOUT_DEBOUNCE_MAXBULKSIZE
   Execution:
-    Database:
-      # If enabled, all action execution logs are stored in the database table logstore.execution
-      Enabled: false # ZITADEL_LOGSTORE_EXECUTION_DATABASE_ENABLED
-      # Logs that are older than the keep duration are cleaned up continuously
-      # 2160h are 90 days, 3 months
-      Keep: 2160h # ZITADEL_LOGSTORE_EXECUTION_DATABASE_KEEP
-      # CleanupInterval defines the time between cleanup iterations
-      CleanupInterval: 4h # ZITADEL_LOGSTORE_EXECUTION_DATABASE_CLEANUPINTERVAL
-      # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
-      # Log entries are held in memory until one of the conditions MinFrequency or MaxBulkSize meets.
-      Debounce:
-        MinFrequency: 0s # ZITADEL_LOGSTORE_EXECUTION_DATABASE_DEBOUNCE_MINFREQUENCY
-        MaxBulkSize: 0 # ZITADEL_LOGSTORE_EXECUTION_DATABASE_DEBOUNCE_MAXBULKSIZE
     Stdout:
       # If enabled, all execution logs are printed to the binary's standard output
       Enabled: true # ZITADEL_LOGSTORE_EXECUTION_STDOUT_ENABLED
-      # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
-      # Log entries are held in memory until one of the conditions MinFrequency or MaxBulkSize meets.
-      Debounce:
-        MinFrequency: 0s # ZITADEL_LOGSTORE_EXECUTION_STDOUT_DEBOUNCE_MINFREQUENCY
-        MaxBulkSize: 0 # ZITADEL_LOGSTORE_EXECUTION_STDOUT_DEBOUNCE_MAXBULKSIZE
 
 Quotas:
   Access:
+    # If enabled, authenticated requests are counted and potentially limited depending on the configured quota of the instance
+    Enabled: false # ZITADEL_QUOTAS_ACCESS_ENABLED
+    Debounce:
+      MinFrequency: 0s # ZITADEL_QUOTAS_ACCESS_DEBOUNCE_MINFREQUENCY
+      MaxBulkSize: 0 # ZITADEL_QUOTAS_ACCESS_DEBOUNCE_MAXBULKSIZE
     ExhaustedCookieKey: "zitadel.quota.exhausted" # ZITADEL_QUOTAS_ACCESS_EXHAUSTEDCOOKIEKEY
     ExhaustedCookieMaxAge: "300s" # ZITADEL_QUOTAS_ACCESS_EXHAUSTEDCOOKIEMAXAGE
+  Execution:
+    # If enabled, all action executions are counted and potentially limited depending on the configured quota of the instance
+    Enabled: false # ZITADEL_QUOTAS_EXECUTION_DATABASE_ENABLED
+    Debounce:
+      MinFrequency: 0s # ZITADEL_QUOTAS_EXECUTION_DEBOUNCE_MINFREQUENCY
+      MaxBulkSize: 0 # ZITADEL_QUOTAS_EXECUTION_DEBOUNCE_MAXBULKSIZE
 
 Eventstore:
   PushTimeout: 15s
