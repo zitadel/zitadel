@@ -195,10 +195,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/cdk@^16.2.0":
-  version "16.2.0"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-16.2.0.tgz#30931dbe1cfca2764f9e4b63d2b9d20029008db8"
-  integrity sha512-pOIXP15uQkl3bf7t0i25+0uBjkHkVmBgwOMlqE9imY4gGq7UswbZRYHaGudJITin2ASFqKDgKvwNRCBqfmjO4A==
+"@angular/cdk@^16.2.4":
+  version "16.2.4"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-16.2.4.tgz#dded7507e12f292fcf9bb04427b1dfe7545d59be"
+  integrity sha512-Hnh7Gs+gAkBnRYIMkDXRElEPAmBFas37isIfOtiqEmkgmSPFxsPpDOXK1soXeDk8U+yNmDWnO0fcHPp/pobHCw==
   dependencies:
     tslib "^2.3.0"
   optionalDependencies:
@@ -285,17 +285,17 @@
   resolved "https://registry.yarnpkg.com/@angular/language-service/-/language-service-16.2.5.tgz#2c7854c37e9b8483d8ca4d192a238145c9d71770"
   integrity sha512-lYNRN4+iavDuAs86lRHuiTUxtVtsarCZPeoG6K1TEvrXrvmIbTtAbvONNMMnteO9ltCTduyREF9/sefE2Qw/Rg==
 
-"@angular/material-moment-adapter@^16.2.0":
-  version "16.2.0"
-  resolved "https://registry.yarnpkg.com/@angular/material-moment-adapter/-/material-moment-adapter-16.2.0.tgz#ee49bdd69767c588ffce8b71ff9ce46813208f71"
-  integrity sha512-XmL6Jw0dN0D0erPXerSJrAqWZgqCW4tk8dyDjqFKYAsuyRXYdezYMlevgwPa5Ow+1Ia9Y5WBZthmWmMb2/TB0Q==
+"@angular/material-moment-adapter@^16.2.4":
+  version "16.2.4"
+  resolved "https://registry.yarnpkg.com/@angular/material-moment-adapter/-/material-moment-adapter-16.2.4.tgz#b001419381a773f22fa3608288d5fd06b1dadd06"
+  integrity sha512-2kmSsgrSOzWf7B8lU6xJYYdvr0h++/BbyPWODK8g3cC9odtvIDxxZYnixmgBSgpnproLKwW/XGvbLlMUVzqc7Q==
   dependencies:
     tslib "^2.3.0"
 
-"@angular/material@^16.2.0":
-  version "16.2.0"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-16.2.0.tgz#e3427d2fee2381397b7e1541bf5a3545c7e4f5ba"
-  integrity sha512-TMcg7zDZy3Q9KA2tCiBqXsjDMO+V7IWmFewPruX9NH5BTT6aZwfKxbFbJgRzhJgok4wJA4IIN5Jt4pPOKQ9LzA==
+"@angular/material@^16.2.4":
+  version "16.2.4"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-16.2.4.tgz#8325c79799910190c02c5874cac9061246728604"
+  integrity sha512-TIZ/0MKObn5YU9n/VReghJJKqgkqyzrWVNEJ8UgOP6MV5o+kAbqLSmlDJEyjLIwJF0vPnJ3UP6qbEOfEi1OLaA==
   dependencies:
     "@material/animation" "15.0.0-canary.bc9ae6c9c.0"
     "@material/auto-init" "15.0.0-canary.bc9ae6c9c.0"
