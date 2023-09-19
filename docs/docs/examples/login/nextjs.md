@@ -1,5 +1,6 @@
 ---
-title: Next.js
+title: ZITADEL with Next.js
+sidebar_label: Next.js
 ---
 
 This is our Zitadel [Next.js](https://nextjs.org/) template. It shows how to authenticate as a user and retrieve user information from the OIDC endpoint.
