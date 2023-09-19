@@ -1,5 +1,6 @@
 ---
-title: Custom Domain
+title: Run ZITADEL on a Custom Domain
+sidebar: Custom Domain
 ---
 
 # Run ZITADEL on a (Sub)domain of Your Choice
