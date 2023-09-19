@@ -1,5 +1,6 @@
 ---
-title: Software
+title: ZITADEL's Software Architecture
+sidebar_label: Software Architecture
 ---
 
 ZITADEL is built with two essential patterns. Event Sourcing (ES) and Command and Query Responsibility Segregation (CQRS). 
@@ -14,7 +15,7 @@ Each ZITADEL binary contains all components necessary to serve traffic
 From serving the API, rendering GUI's, background processing of events and task.
 This All in One (AiO) approach makes operating ZITADEL simple. 
 
-## Software Structure
+## The Architecture
 
 ZITADELs software architecture is built around multiple components at different levels.
 This chapter should give you an idea of the components as well as the different layers.
