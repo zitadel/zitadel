@@ -426,7 +426,7 @@ Errors:
       Empty: Hasło jest puste
       Invalid: Hasło jest niepoprawne
       InvalidAndLocked: Hasło jest niepoprawne i użytkownik jest zablokowany, skontaktuj się z administratorem.
-      NotChanged: Hasło nie zostało zmienione
+      NotChanged: Nowe hasło nie może być takie samo jak Twoje obecne hasło
     UsernameOrPassword:
       Invalid: Nazwa użytkownika lub hasło jest niepoprawne
     PasswordComplexityPolicy:
