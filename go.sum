@@ -870,6 +870,8 @@ github.com/zitadel/passwap v0.3.0 h1:kC/vzN9xQlEQjUAZs0z2P5nKrZs9AuTqprteSQ2S4Ag
 github.com/zitadel/passwap v0.3.0/go.mod h1:sIpG6HfmnP28qwxu8kf+ot53ERbLwU9fOITstAwZSms=
 github.com/zitadel/saml v0.1.0 h1:FZKKFRCamoKmFH3kGOW0ObcDozaJz7NdHn+WPm8PcXc=
 github.com/zitadel/saml v0.1.0/go.mod h1:M+X+3vMUulpoLofKeH/W1/qjQQ3owitc2GuGDu3oYpM=
+github.com/zitadel/saml v0.1.2 h1:RICwNTuP2upX4A1sZ8iq1rv4/x3DhZHzFx1e5bTKoTo=
+github.com/zitadel/saml v0.1.2/go.mod h1:M+X+3vMUulpoLofKeH/W1/qjQQ3owitc2GuGDu3oYpM=
 go.etcd.io/bbolt v1.3.3/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/etcd v0.0.0-20191023171146-3cf2f69b5738/go.mod h1:dnLIgRNXwCJa5e+c6mIZCrds/GIG4ncV9HhK5PX7jPg=
 go.opencensus.io v0.20.1/go.mod h1:6WKK9ahsWS3RSO+PY9ZHZUfv2irvY6gN279GOPZjmmk=
