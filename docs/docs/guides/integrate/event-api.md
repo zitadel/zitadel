@@ -1,5 +1,6 @@
 ---
-title: Get events from ZITADEL
+title: Get Events from ZITADEL
+sidebar_label: Events
 ---
 
 ZITADEL leverages the power of eventsourcing, meaning every action and change within the system generates a corresponding event that is stored in the database. 
