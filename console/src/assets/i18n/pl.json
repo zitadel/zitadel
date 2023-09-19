@@ -741,6 +741,10 @@
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout w sekundach",
     "ALLOWEDTOFAIL": "Dozwolone na porażkę",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Ostrzeżenie",
+      "DESCRIPTION": "Jeśli wyłączysz tę opcję, może to spowodować, że użytkownicy Twojej organizacji nie będą mogli się zalogować. Ponadto nie będziesz już mógł uzyskać dostępu do konsoli, aby wyłączyć akcję. Zalecamy utworzenie administratora w oddzielnej organizacji lub przetestowanie skryptów najpierw w środowisku deweloperskim lub organizacji deweloperskiej."
+    },
     "SCRIPT": "Skrypt",
     "FLOWTYPE": "Typ Przepływu",
     "TRIGGERTYPE": "Typ Wyzwalacza",
@@ -962,8 +966,7 @@
     "STATE": {
       "0": "Nieokreślone",
       "1": "Aktywne",
-      "2": "Dezaktywowane",
-      "3": "Usunięte"
+      "2": "Dezaktywowane"
     },
     "MEMBER": {
       "TITLE": "Menadżerowie organizacji",

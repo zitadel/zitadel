@@ -1,0 +1,72 @@
+---
+title: Apache 2.0
+---
+
+This integration guide shows you the basic OpenID Connect integration with ZITADEL and an Apache 2.0 server.
+
+## Setup PKCE client in ZITADEL
+
+- Go to your organization and setup a new application with the type PKCE
+- When created go to the "Redirect Settings" and *enable Development Mode*
+- Add the Redirect Uri, f.e. `http://localhost:8080/secure/callback`
+- Add the Post Logout Uri, f.e. `http://localhost:8080/index.html`
+![Configuration](/img/guides/integrate/tools/apache-configuration.png)
+![Redirect Settings](/img/guides/integrate/tools/apache-redirect_settings.png)
+
+You can find the url to your discovery endpoint under "URLs":
+![Discovery Endpoint](/img/guides/integrate/tools/apache-urls.png)
+
+## Configure Apache2
+
+### Configure mod_auth_openidc
+
+We use the module `mod_auth_openidc` in this guide.
+You can find a minimal configuration in the [official documentation](https://github.com/OpenIDC/mod_auth_openidc/wiki#16-what-does-a-minimal-apache-configuration-file-look-like).
+
+The following parameters must be set with the values from ZITADEL.
+
+```yaml
+OIDCProviderMetadataURL https://<your_domain>.zitadel.cloud/.well-known/openid-configuration
+OIDCClientID <client_id, eg 227791....@apache_test>
+# OIDCRedirectURI is a vanity URL that must point to a path protected by this module but must NOT point to any content
+OIDCRedirectURI <redirect_uri, eg http://localhost:8080/secure/callback>
+OIDCCryptoPassphrase <very-secure-phrase>
+
+OIDCScope "openid profile"
+OIDCPKCEMethod S256
+```
+
+With the following parameters
+
+| Parameter | Description | Example value|
+|---|---|---|
+| OIDCProviderMetadataURL | Is the url to the discovery endpoint, which is typically located at {your-domain}/.well-known/openid-configuration| https://<your_domain>.zitadel.cloud/.well-known/openid-configuration |
+| OIDCClientID | Is the ID of the zitadel application. You can find it on the settings page of the application.  | 123456789123@apache_test |
+| OIDCRedirectURI | Users will be redirected to this page after successful login. If you are using localhost or any other non-https endpoint, make sure to enable development mode in ZITADEL. | https://mysecureapp.io/secure/callback |
+| OIDCCryptoPassphrase | Create a secure passphrase. Consult the module's documentation for more details. | ... |
+| OIDCScope | OpenID Connect scopes that should be included. You can find a list of [all scopes](/docs/apis/openidoauth/scopes) in our documentation. | "openid profile" |
+| OIDCPKCEMethod | The method should be set to `S256` | S256 |
+
+### Secure a route
+
+If you want to secure a route / path then add do so by adding the following Location functionality with the directives:
+
+```text
+<Location /secure/>
+   AuthType openid-connect
+   Require valid-user
+</Location>
+```
+
+With the same functionality you can also specify if roles / permissions must be present on the user, or limit access to specific users.
+Please consult the official documentation on more information.
+
+### Handling logout
+
+Consult the official documentation on how to [logout users](https://github.com/OpenIDC/mod_auth_openidc/wiki#9-how-do-i-logout-users).
+Or check out the [example code](#example-code) for a minimal  version.
+
+## Example code
+
+We provide a [minimum boilerplate example](https://github.com/zitadel/example-apache2) to test the integration of ZITADEL with an Apache server.
+Follow the instructions in the readme.

@@ -1,19 +1,25 @@
 ---
-title: SDKs
+title: ZITADEL SDKs
+sidebar_label: SDKs
 ---
 
-## ZITADEL SDK
+On this page you find our official SDKs, links to supporting frameworks and providers, and resources to help with SDKs.
+The SDKs wrap either our [gRPC or REST APIs](/docs/apis/introduction) to provide the client with User Authentication and Management for resources.
 
-| Language / Framework | Link Github | User Authentication | Manage resources | Notes |
-|--- | --- | --- | --- | --- |
-| .NET     | [zitadel-net](https://github.com/smartive/zitadel-net) | ✔️ | ✔️ | `community` |
-| Elixir   | [zitadel_api](https://github.com/jshmrtn/zitadel_api) | ✔️ | ✔️ | `community` |
-| Go       | [zitadel-go](https://github.com/zitadel/zitadel-go) | ❌ | ✔️ | `official` |
-| JVM      | 🚧 [WIP](https://github.com/zitadel/zitadel/discussions/3650) | ❓ | ❓ | TBD |
-| Python   | 🚧 [WIP](https://github.com/zitadel/zitadel/issues/3675) | ❓ | ❓ | TBD |
-| NodeJS   | [@zitadel/node](https://www.npmjs.com/package/@zitadel/node) | ❌ | ✔️ | `community` |
+## ZITADEL SDKs
 
-## Missing an SDK
+| Language / Framework | Link Github                                                   | User Authentication | Manage resources | Notes |
+|----------------------|---------------------------------------------------------------| --- | --- | --- |
+| .NET                 | [zitadel-net](https://github.com/smartive/zitadel-net)        | ✔️ | ✔️ | `community` |
+| Elixir               | [zitadel_api](https://github.com/jshmrtn/zitadel_api)         | ✔️ | ✔️ | `community` |
+| Go                   | [zitadel-go](https://github.com/zitadel/zitadel-go)           | ❌ | ✔️ | `official` |
+| JVM                  | 🚧 [WIP](https://github.com/zitadel/zitadel/discussions/3650) | ❓ | ❓ | TBD |
+| Python               | 🚧 [WIP](https://github.com/zitadel/zitadel/issues/3675)      | ❓ | ❓ | TBD |
+| NodeJS               | [@zitadel/node](https://www.npmjs.com/package/@zitadel/node)  | ❌ | ✔️ | `community` |
+| Dart                 | [zitadel-dart](https://github.com/smartive/zitadel-dart)      | ❌ | ✔️ | `community` |
+| Rust                 | [zitadel-rust](https://github.com/smartive/zitadel-rust)      | ✔️ | ✔️ | `community` |
+
+## Missing SDK
 
 Is your language/framework missing? Fear not, you can generate your gRPC API Client with ease.
 
@@ -83,7 +89,6 @@ Import these files into your project to start interacting with ZITADEL's APIs.
 While we are not actively maintaining the following projects, it is worth checking out if you're interested in exploring ZITADEL in different programming languages or frameworks.
 
 - [NodeJS passport](https://github.com/buehler/node-passport-zitadel) authentication helper
-- [Dart library for ZITADEL](https://github.com/smartive/zitadel-dart), contains gRPC and API access elements
 - [NextAuth Provider for ZITADEL](https://next-auth.js.org/providers/zitadel)
 
 If we do not provide an example, SDK or guide, we strongly recommend using existing authentication libraries for your language or framework instead of building your own.

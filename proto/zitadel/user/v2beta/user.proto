@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package zitadel.user.v2beta;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2beta;user";
+
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+message User {
+  string id = 1;
+}
+
+enum Gender {
+  GENDER_UNSPECIFIED = 0;
+  GENDER_FEMALE = 1;
+  GENDER_MALE = 2;
+  GENDER_DIVERSE = 3;
+}
+
+message SetHumanProfile {
+  string given_name = 1  [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"Minnie\"";
+    }
+  ];
+  string family_name = 2  [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"Mouse\"";
+    }
+  ];
+  optional string nick_name = 3 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"Mini\"";
+    }
+  ];
+  optional string display_name = 4 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"Minnie Mouse\"";
+    }
+  ];
+  optional string preferred_language = 5 [
+    (validate.rules).string = {max_len: 10},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 10;
+      example: "\"en\"";
+    }
+  ];
+  optional zitadel.user.v2beta.Gender gender = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"GENDER_FEMALE\"";
+    }
+  ];
+}
+
+
+message SetMetadataEntry {
+  string key = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"my-key\"";
+      min_length: 1,
+      max_length: 200;
+    }
+  ];
+  bytes value = 2 [
+    (validate.rules).bytes = {min_len: 1, max_len: 500000},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "The value has to be base64 encoded.";
+      example: "\"VGhpcyBpcyBteSB0ZXN0IHZhbHVl\"";
+      min_length: 1,
+      max_length: 500000;
+    }
+  ];
+}

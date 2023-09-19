@@ -741,6 +741,10 @@
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in Sekunden",
     "ALLOWEDTOFAIL": "Scheitern erlaubt",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Warnung",
+      "DESCRIPTION": "Wenn du diese Einstellung deaktivierst, kann es dazu führen, dass sich Benutzer deiner Organisation nicht mehr anmelden können. Ausserdem kannst du dann nicht mehr auf die Konsole zugreifen, um die Action zu deaktivieren. Wir empfehlen, einen Administratorbenutzer in einer separaten Organisation zu erstellen oder Skripte zuerst in einer Entwicklungsumgebung oder einer Entwicklungsorganisation zu testen."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Typ",
     "TRIGGERTYPE": "Trigger Typ",
@@ -962,8 +966,7 @@
     "STATE": {
       "0": "Nicht definiert",
       "1": "Aktiv",
-      "2": "Inaktiv",
-      "3": "Entfernt"
+      "2": "Inaktiv"
     },
     "MEMBER": {
       "TITLE": "Manager der Organisation verwalten",
@@ -1023,7 +1026,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Datenschutzrichtlinie",
       "OIDC": "OIDC Token Lifetime und Expiration",
-      "SECRETS": "Secret Erscheinungsbild",
+      "SECRETS": "Secret Generator",
       "SECURITY": "Sicherheitseinstellungen"
     },
     "GROUPS": {
@@ -1100,7 +1103,7 @@
       "INDAYS": "Tage"
     },
     "SECRETS": {
-      "TITLE": "Secret Erscheinungsbild",
+      "TITLE": "Passwort Generator",
       "TYPES": "Schlüsseltypen",
       "TYPE": {
         "1": "Email Initialisierungscode",
@@ -1112,7 +1115,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - Email"
       },
-      "ADDGENERATOR": "Secret Erscheinungsbild definieren",
+      "ADDGENERATOR": "Passwort Generator definieren",
       "GENERATORTYPE": "Typ",
       "EXPIRY": "Ablauf (in Stunden)",
       "INCLUDEDIGITS": "Enthält Zahlen",

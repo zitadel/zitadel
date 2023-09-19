@@ -1,7 +1,11 @@
 ---
-title: Passkeys
+title: Passkeys in ZITADEL
 sidebar_label: Passkeys
 ---
+
+import BrowserRegisterWebAuthN from './_browser_register_webauthn.mdx';
+import BrowserSigninWebAuthN from './_browser_signin_webauthn.mdx';
+import UpdateSessionWebAuthN from './_update_session_webauthn.mdx';
 
 Passkeys are a replacement for passwords that provide faster, easier, and more secure sign-ins to websites and apps even across multiple devices.
 Unlike passwords, passkeys are phishing-resistant and can improve the user experience and security at the same time.
@@ -30,7 +34,7 @@ Send either the sendLink or the returnCode (empty message) in the request body, 
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER_ID/passkeys/registration_link \
+  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER_ID/passkeys/registration_link \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -77,7 +81,7 @@ The code only has to be filled if the user did get a registration code.
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER_ID/passkeys \
+  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER_ID/passkeys \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -181,7 +185,7 @@ Example Request:
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/users/$USER_ID/passkeys/$PASSKEY_ID \
+  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER_ID/passkeys/$PASSKEY_ID \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -208,7 +212,6 @@ Next step is to authenticate the user with the new registered passkey.
 
 ![Passkey Login](/img/guides/login-ui/passkey-login-flow.png)
 
-
 ### Create Session
 
 First step is to ask the user for his username and create a new session with the ZITADEL API.
@@ -220,7 +223,7 @@ More detailed information about the API: [Create Session Documentation](/apis/re
 Example Request:
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/sessions \
+  --url https://$ZITADEL_DOMAIN/v2beta/sessions \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -273,43 +276,11 @@ Example Response:
 
 ### Signing in Browser
 
-After starting the passkey authentication on the side of ZITADEL you have to challenge the browser.
-To do this you need to call the browser API to get the credentials.
-Make sure to send the public key credential request options you got from ZITADEL.
+<BrowserSigninWebAuthN/>
 
-```javascript
-const credential = await navigator.credentials.get({
-    publicKey: publicKeyCredentialRequestOptions
-});
-```
+### Update Session with WebAuthN
 
-Read the [WebAuthN Guide](https://webauthn.guide/#authentication) for more information about "Authenticating with a WebAuthN Credential".
-
-### Update Session with Passkey
-
-Now that you have successfully authenticated in the browser, you can update the session of the user.
-Fill the passkey checks with the credential assertion data you get from the browser.
-
-More detailed information about the API: [Update Session Documentation](/apis/resources/session_service/session-service-set-session)
-
-Example Request:
-
-```bash
-curl --request PATCH \
-  --url https://$ZITADEL_DOMAIN/v2alpha/sessions/218480890961985793 \
-  --header 'Accept: application/json' \
-  --header 'Authorization: Bearer '"$TOKEN"''\
-  --header 'Content-Type: application/json' \
-  --data '{
-  "sessionToken": "yMDi6uVPJAcphbbz0LaxC07ihWkNTe7m0Xqch8SzfM5Cz3HSIQIDZ65x1f5Qal0jxz0MEyo-_zYcUg",
-  "checks": {
-    "webAuthN": {
-      "credentialAssertionData": {}
-    }
-  }
-}'
-```
-
+<UpdateSessionWebAuthN/>
 
 
 

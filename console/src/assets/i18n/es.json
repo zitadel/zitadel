@@ -742,6 +742,10 @@
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout en segundos",
     "ALLOWEDTOFAIL": "Permitido el fallo",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Advertencia",
+      "DESCRIPTION": "Si desactiva esta configuración, puede hacer que los usuarios de su organización no puedan iniciar sesión. Además, ya no podrá acceder a la consola para desactivar la acción. Recomendamos crear un usuario administrador en una organización separada o probar scripts primero en un entorno de desarrollo o una organización de desarrollo."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Tipo de flujo",
     "TRIGGERTYPE": "Tipo de disparador",
@@ -963,8 +967,7 @@
     "STATE": {
       "0": "No definida",
       "1": "Activa",
-      "2": "Desactivada",
-      "3": "Eliminada"
+      "2": "Desactivada"
     },
     "MEMBER": {
       "TITLE": "Mánagers de la organización",
@@ -1101,7 +1104,7 @@
       "INDAYS": "días"
     },
     "SECRETS": {
-      "TITLE": "Apariencia del secreto",
+      "TITLE": "Generador del secreto",
       "TYPES": "Tipos de secreto",
       "TYPE": {
         "1": "Correo de inicialización",
@@ -1113,7 +1116,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
-      "ADDGENERATOR": "Definir apariencia del secreto",
+      "ADDGENERATOR": "Configurar generador del secreto",
       "GENERATORTYPE": "Tipo",
       "EXPIRY": "Caducidad (en horas)",
       "INCLUDEDIGITS": "Incluir números",

@@ -427,20 +427,22 @@
 
             <div class="app-info-row">
               <div class="app-info-wrapper" *ngFor="let wellKnownV of wellKnownMap$ | async | keyvalue">
-                <p class="app-info-row-title cnsl-secondary-text">{{ wellKnownV.key }}</p>
-                <div class="app-copy-row">
-                  <div *ngIf="wellKnownV.value" class="environment">
-                    <button
-                      [disabled]="copied === wellKnownV.value"
-                      [matTooltip]="(copied !== wellKnownV.value ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
-                      cnslCopyToClipboard
-                      [valueToCopy]="wellKnownV.value"
-                      (copiedValue)="copied = wellKnownV.key"
-                    >
-                      {{ wellKnownV.value }}
-                    </button>
-                  </div>
-                </div>
+                <ng-container *ngIf="wellKnownV.key.endsWith('endpoint')">
+                  <p class="app-info-row-title cnsl-secondary-text">{{ wellKnownV.key }}</p>
+                  <div class="app-copy-row">
+                    <div *ngIf="wellKnownV.value" class="environment">
+                      <button
+                        [disabled]="copied === wellKnownV.value"
+                        [matTooltip]="(copied !== wellKnownV.value ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
+                        cnslCopyToClipboard
+                        [valueToCopy]="wellKnownV.value"
+                        (copiedValue)="copied = wellKnownV.key"
+                      >
+                        {{ wellKnownV.value }}
+                      </button>
+                    </div>
+                  </div></ng-container
+                >
               </div>
             </div>
           </cnsl-card>

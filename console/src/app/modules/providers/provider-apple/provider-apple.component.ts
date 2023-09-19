@@ -246,7 +246,8 @@ export class ProviderAppleComponent {
           return (e) => {
             const keyBase64 = e.target?.result;
             if (keyBase64 && typeof keyBase64 === 'string') {
-              const cropped = keyBase64.replace('data:application/octet-stream;base64,', '');
+              const contentType = file.type || 'application/octet-stream';
+              const cropped = keyBase64.replace(`data:${contentType};base64,`, '');
               this.privateKey?.setValue(cropped);
             }
           };

@@ -1,5 +1,6 @@
 ---
-title: Getting Started
+title: Getting Started with ZITADEL
+sidebar_label: Getting Started
 ---
 
 If you are new to ZITADEL your first action is to create your first ZITADEL instance and an account to access the ZITADEL Customer Portal.
