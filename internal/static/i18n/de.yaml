@@ -120,7 +120,7 @@ Errors:
       Empty: Passwort ist leer
       Invalid: Passwort ungültig
       NotSet: Benutzer hat kein Passwort gesetzt
-      NotChanged: Das neue Passwort darf nicht mit Ihrem aktuellen Passwort identisch sein
+      NotChanged: Das neue Passwort darf nicht mit deinem aktuellen Passwort übereinstimmen
       NotSupported: Passwort-Hash-Kodierung wird nicht unterstützt
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
