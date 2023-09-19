@@ -1,16 +1,17 @@
 ---
-title: Terraform Provider Basics
+title: ZITADEL Terraform Provider
+sidebar_label: Terraform Provider
 ---
 
 It covers how to:
 
-- manage ZITADEL resources through the ZITADEL Terraform provider
+- Manage ZITADEL resources through the ZITADEL Terraform provider
 
 Prerequisites:
 
-- existing ZITADEL Instance, if not present follow [this guide](../../start/quickstart)
-- existing user with enough authorization to manage the desired resources, if not present follow [this guide](../../integrate/serviceusers)
-- installed Terraform, if not present follow [this guide](https://learn.hashicorp.com/tutorials/terraform/install-cli)
+- A ZITADEL Instance, if not present follow [this guide](../../start/quickstart)
+- A user with enough authorization to manage the desired resources, if not present follow [this guide](../../integrate/serviceusers)
+- Installed Terraform, if not present follow [this guide](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 
 ## Manage ZITADEL resources through terraform
 

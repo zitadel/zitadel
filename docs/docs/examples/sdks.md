@@ -1,5 +1,6 @@
 ---
-title: SDKs
+title: ZITADEL SDKs
+sidebar_label: SDKs
 ---
 
 On this page you find our official SDKs, links to supporting frameworks and providers, and resources to help with SDKs.
