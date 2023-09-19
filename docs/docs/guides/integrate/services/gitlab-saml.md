@@ -1,5 +1,5 @@
 ---
-title: Connect with Gitlab through SAML 2.0 
+title: Log in with ZITADEL on Gitlab through SAML 2.0 
 sidebar_label: Gitlab
 ---
 

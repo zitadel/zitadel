@@ -1,11 +1,11 @@
 //go:build !integration
 
-package start
+package net
 
 import (
 	"net"
 )
 
-func listenConfig() *net.ListenConfig {
+func ListenConfig() *net.ListenConfig {
 	return &net.ListenConfig{}
 }
