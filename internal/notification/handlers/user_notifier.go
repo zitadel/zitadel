@@ -177,8 +177,7 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 	if err != nil {
 		return nil, err
 	}
-
-	ctx, origin, err := u.queries.Origin(ctx)
+	origin, err := u.queries.Origin(ctx, e)
 	if err != nil {
 		return nil, err
 	}
@@ -247,8 +246,7 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 	if err != nil {
 		return nil, err
 	}
-
-	ctx, origin, err := u.queries.Origin(ctx)
+	origin, err := u.queries.Origin(ctx, e)
 	if err != nil {
 		return nil, err
 	}
@@ -316,8 +314,7 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 	if err != nil {
 		return nil, err
 	}
-
-	ctx, origin, err := u.queries.Origin(ctx)
+	origin, err := u.queries.Origin(ctx, e)
 	if err != nil {
 		return nil, err
 	}
@@ -437,8 +434,7 @@ func (u *userNotifier) reduceOTPSMS(
 	if err != nil {
 		return nil, err
 	}
-
-	ctx, origin, err := u.queries.Origin(ctx)
+	origin, err := u.queries.Origin(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -568,8 +564,7 @@ func (u *userNotifier) reduceOTPEmail(
 	if err != nil {
 		return nil, err
 	}
-
-	ctx, origin, err := u.queries.Origin(ctx)
+	origin, err := u.queries.Origin(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -634,8 +629,7 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 	if err != nil {
 		return nil, err
 	}
-
-	ctx, origin, err := u.queries.Origin(ctx)
+	origin, err := u.queries.Origin(ctx, e)
 	if err != nil {
 		return nil, err
 	}
@@ -701,8 +695,7 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 	if err != nil {
 		return nil, err
 	}
-
-	ctx, origin, err := u.queries.Origin(ctx)
+	origin, err := u.queries.Origin(ctx, e)
 	if err != nil {
 		return nil, err
 	}
@@ -771,8 +764,7 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 		if err != nil {
 			return nil, err
 		}
-
-		ctx, origin, err := u.queries.Origin(ctx)
+		origin, err := u.queries.Origin(ctx, e)
 		if err != nil {
 			return nil, err
 		}
@@ -836,8 +828,7 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 	if err != nil {
 		return nil, err
 	}
-
-	ctx, origin, err := u.queries.Origin(ctx)
+	origin, err := u.queries.Origin(ctx, e)
 	if err != nil {
 		return nil, err
 	}
