@@ -314,7 +314,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	currentState, err := h.currentState(ctx, tx, config)
 	if err != nil {
 		if errors.Is(err, errJustUpdated) {
-			return false, nil
+			return true, nil
 		}
 		return additionalIteration, err
 	}
