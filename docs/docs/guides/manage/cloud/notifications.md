@@ -1,5 +1,6 @@
 ---
-title: Notifications
+title: ZITADEL Notifications
+sidebar_label: Notifications
 ---
 
 You can subscribe to different newsletters and notifications.

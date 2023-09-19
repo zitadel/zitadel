@@ -1,5 +1,5 @@
 ---
-title: Connect with Atlassian through SAML 2.0
+title: Log in with ZITADEL on Atlassian through SAML 2.0
 sidebar_label: Atlassian
 ---
 
