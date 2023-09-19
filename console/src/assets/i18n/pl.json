@@ -1984,6 +1984,8 @@
       "CLIENTSECRET_DESCRIPTION": "Trzymaj swój sekret klienta w bezpiecznym miejscu, ponieważ zniknie on po zamknięciu okna dialogowego.",
       "REGENERATESECRET": "Odtwórz sekret klienta",
       "DEVMODE": "Tryb rozwoju",
+      "DEVMODE_ENABLED": "Aktywowany",
+      "DEVMODE_DISABLED": "Dezaktywowane",
       "DEVMODEDESC": "Uwaga: przy włączonym trybie rozwoju adresy URI przekierowania nie będą sprawdzane.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Pomiń stronę sukcesu po zalogowaniu",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Pomiń stronę sukcesu po zalogowaniu dla tej Natywny aplikację",

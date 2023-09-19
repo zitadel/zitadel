@@ -28,6 +28,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { MatLegacySlideToggleChange } from '@angular/material/legacy-slide-toggle';
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
 import {
   BASIC_AUTH_METHOD,
@@ -51,7 +52,8 @@ const MAX_ALLOWED_SIZE = 1 * 1024 * 1024;
 export class AppCreateComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
   private destroyed$: Subject<void> = new Subject();
-  public devmode: boolean = false;
+  public pro: boolean = false;
+  public devMode: boolean = false;
   public projectId: string = '';
   public loading: boolean = false;
 
@@ -240,6 +242,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
+    this.devMode = false;
     this.subscription = this.route.params.subscribe((params) => this.getData(params));
 
     const projectId = this.route.snapshot.paramMap.get('projectid');
@@ -328,6 +331,11 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     }
   }
 
+  public onChangeDevMode(ob: MatLegacySlideToggleChange) {
+    this.devMode = ob.checked;
+    this.oidcAppRequest.setDevMode(this.devMode);
+  }
+
   private async getData({ projectid }: Params): Promise<void> {
     this.projectId = projectid;
     this.oidcAppRequest.setProjectId(projectid);
@@ -362,9 +370,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   }
 
   public createApp(): void {
-    const appOIDCCheck = this.devmode ? this.isDevOIDC : this.isStepperOIDC;
-    const appAPICheck = this.devmode ? this.isDevAPI : this.isStepperAPI;
-    const appSAMLCheck = this.devmode ? this.isDevSAML : this.isStepperSAML;
+    const appOIDCCheck = this.pro ? this.isDevOIDC : this.isStepperOIDC;
+    const appAPICheck = this.pro ? this.isDevAPI : this.isStepperAPI;
+    const appSAMLCheck = this.pro ? this.isDevSAML : this.isStepperSAML;
 
     if (appOIDCCheck) {
       this.requestRedirectValuesSubject$.next();

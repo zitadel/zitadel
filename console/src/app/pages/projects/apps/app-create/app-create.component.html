@@ -2,7 +2,7 @@
   title="{{ 'APP.PAGES.CREATE' | translate }}"
   class="app-create-wrapper"
   [createSteps]="
-    !devmode
+    !pro
       ? appType?.value?.createType === AppCreateType.OIDC
         ? appType?.value.oidcAppType !== OIDCAppType.OIDC_APP_TYPE_NATIVE
           ? 4
@@ -20,13 +20,13 @@
   <h1>{{ 'APP.PAGES.CREATE_DESC_TITLE' | translate }}</h1>
   <mat-progress-bar class="progress-bar" color="primary" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 
-  <mat-checkbox class="proswitch" color="primary" [(ngModel)]="devmode">
+  <mat-checkbox class="proswitch" color="primary" [(ngModel)]="pro">
     {{ 'APP.PROSWITCH' | translate }}
   </mat-checkbox>
 
   <mat-horizontal-stepper
     class="stepper {{ 'last-edited-step-' + stepper.selectedIndex }}"
-    *ngIf="!devmode"
+    *ngIf="!pro"
     linear
     #stepper
     labelPosition="bottom"
@@ -109,6 +109,15 @@
         {{ 'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate }}
       </p>
 
+      <mat-slide-toggle
+        color="primary"
+        name="devMode"
+        matTooltip="{{ 'APP.OIDC.DEVMODEDESC' | translate }}"
+        (change)="onChangeDevMode($event)"
+      >
+        {{ 'APP.OIDC.DEVMODE' | translate }}
+      </mat-slide-toggle>
+
       <cnsl-redirect-uris
         class="redirect-section"
         [disabled]="false"
@@ -116,6 +125,7 @@
         [(ngModel)]="redirectUris"
         [getValues]="requestRedirectValuesSubject$"
         title="{{ 'APP.OIDC.REDIRECT' | translate }}"
+        [devMode]="devMode"
         data-e2e="redirect-uris"
       >
       </cnsl-redirect-uris>
@@ -144,6 +154,7 @@
         [getValues]="requestRedirectValuesSubject$"
         title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
         [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+        [devMode]="devMode"
         data-e2e="postlogout-uris"
       >
       </cnsl-redirect-uris>
@@ -299,6 +310,19 @@
         </div>
       </ng-container>
 
+      <ng-container *ngIf="appType?.value?.createType === AppCreateType.OIDC">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
+            {{ 'APP.OIDC.DEVMODE' | translate }}
+          </span>
+          <span class="right">
+            <span>
+              {{ devMode ? ('APP.OIDC.DEVMODE_ENABLED' | translate) : ('APP.OIDC.DEVMODE_DISABLED' | translate) }}
+            </span>
+          </span>
+        </div>
+      </ng-container>
+
       <ng-container *ngIf="appType?.value?.createType === AppCreateType.API">
         <div class="row">
           <span class="left cnsl-secondary-text">
@@ -342,7 +366,7 @@
     </ng-template>
   </mat-horizontal-stepper>
 
-  <div *ngIf="devmode" class="dev">
+  <div *ngIf="pro" class="dev">
     <form [formGroup]="form" (ngSubmit)="createApp()" data-e2e="create-app-wizzard-3">
       <div class="content">
         <cnsl-form-field class="formfield">
@@ -439,6 +463,14 @@
         "
       >
         <div class="formfield full-width">
+          <mat-slide-toggle
+            color="primary"
+            name="devMode"
+            matTooltip="{{ 'APP.OIDC.DEVMODEDESC' | translate }}"
+            (change)="onChangeDevMode($event)"
+          >
+            {{ 'APP.OIDC.DEVMODE' | translate }}
+          </mat-slide-toggle>
           <cnsl-redirect-uris
             class="redirect-section"
             [disabled]="false"

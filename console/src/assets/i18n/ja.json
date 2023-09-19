@@ -1975,6 +1975,8 @@
       "CLIENTSECRET_DESCRIPTION": "クライアントシークレットは、ダイアログを閉じると消えてしまうので、安全な場所に保管してください。",
       "REGENERATESECRET": "クライアントシークレットを再生成する",
       "DEVMODE": "開発モード",
+      "DEVMODE_ENABLED": "アクティブ化された",
+      "DEVMODE_DISABLED": "無効化されました",
       "DEVMODEDESC": "注意：開発モードを有効にすると、URIが認証されません。",
       "SKIPNATIVEAPPSUCCESSPAGE": "ログイン後に成功ページをスキップする",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "このネイティブアプリのログイン後に成功ページをスキップする",

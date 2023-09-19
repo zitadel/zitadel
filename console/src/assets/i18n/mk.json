@@ -1981,6 +1981,8 @@
       "CLIENTSECRET_DESCRIPTION": "Чувајте ја вашата клиентска тајна на безбедно место, бидејќи ќе исчезне откако ќе се затвори дијалогот.",
       "REGENERATESECRET": "Генерирај нова клиентска тајна",
       "DEVMODE": "Development mode",
+      "DEVMODE_ENABLED": "Активиран",
+      "DEVMODE_DISABLED": "Деактивирано",
       "DEVMODEDESC": "Внимавајте: Со овозможен Development mode, URIs за пренасочување нема да бидат валидирани.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Прескокни страница за успешна најава",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Прескокнете ја страницата за успешна најава за оваа нативна апликација.",
