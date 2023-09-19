@@ -395,7 +395,7 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
 
 .light-theme {
   @include component-themes($caos-light-app-theme);
-  @include mat.all-component-themes($caos-light-app-theme);
+  @include mat.all-component-colors($caos-light-app-theme);
 
   $background: map-get($caos-light-app-theme, background);
   $foreground: map-get($caos-light-app-theme, foreground);
