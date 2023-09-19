@@ -6,6 +6,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 
 import { FormsModule } from '@angular/forms';
+import { MatDialogModule } from '@angular/material/dialog';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 import { ToObjectPipeModule } from 'src/app/pipes/to-object/to-object.module';
@@ -19,6 +20,7 @@ import { DisplayJsonDialogComponent } from './display-json-dialog.component';
     FormsModule,
     TranslateModule,
     MatButtonModule,
+    MatDialogModule,
     MatIconModule,
     CodemirrorModule,
     TimestampToDatePipeModule,

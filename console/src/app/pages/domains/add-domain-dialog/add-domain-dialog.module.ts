@@ -5,10 +5,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { TranslateModule } from '@ngx-translate/core';
 import { InputModule } from 'src/app/modules/input/input.module';
 
+import { MatDialogModule } from '@angular/material/dialog';
 import { AddDomainDialogComponent } from './add-domain-dialog.component';
 
 @NgModule({
   declarations: [AddDomainDialogComponent],
-  imports: [CommonModule, TranslateModule, MatButtonModule, InputModule, FormsModule],
+  imports: [CommonModule, TranslateModule, MatDialogModule, MatButtonModule, InputModule, FormsModule],
 })
 export class AddDomainDialogModule {}

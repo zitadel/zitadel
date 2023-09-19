@@ -10,6 +10,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 
+import { MatDialogModule } from '@angular/material/dialog';
 import { AddKeyDialogComponent } from './add-key-dialog.component';
 
 @NgModule({
@@ -22,6 +23,7 @@ import { AddKeyDialogComponent } from './add-key-dialog.component';
     MatSelectModule,
     MatIconModule,
     FormsModule,
+    MatDialogModule,
     MatDatepickerModule,
     MatMomentDateModule,
     ReactiveFormsModule,

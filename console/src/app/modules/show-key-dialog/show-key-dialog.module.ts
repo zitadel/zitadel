@@ -6,6 +6,7 @@ import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/local
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 import { InfoSectionModule } from '../info-section/info-section.module';
 
+import { MatDialogModule } from '@angular/material/dialog';
 import { ShowKeyDialogComponent } from './show-key-dialog.component';
 
 @NgModule({
@@ -15,6 +16,7 @@ import { ShowKeyDialogComponent } from './show-key-dialog.component';
     TranslateModule,
     MatButtonModule,
     LocalizedDatePipeModule,
+    MatDialogModule,
     InfoSectionModule,
     TimestampToDatePipeModule,
   ],

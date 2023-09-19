@@ -7,6 +7,7 @@ import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { MatDialogModule } from '@angular/material/dialog';
 import { InfoSectionModule } from '../info-section/info-section.module';
 import { ShowTokenDialogComponent } from './show-token-dialog.component';
 
@@ -15,6 +16,7 @@ import { ShowTokenDialogComponent } from './show-token-dialog.component';
   imports: [
     CommonModule,
     TranslateModule,
+    MatDialogModule,
     InfoSectionModule,
     CopyToClipboardModule,
     MatButtonModule,

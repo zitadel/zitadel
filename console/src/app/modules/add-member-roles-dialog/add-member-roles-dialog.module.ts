@@ -8,6 +8,7 @@ import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/local
 import { RoleTransformPipeModule } from 'src/app/pipes/role-transform/role-transform.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { MatDialogModule } from '@angular/material/dialog';
 import { AddMemberRolesDialogComponent } from './add-member-roles-dialog.component';
 
 @NgModule({
@@ -17,6 +18,7 @@ import { AddMemberRolesDialogComponent } from './add-member-roles-dialog.compone
     TranslateModule,
     MatCheckboxModule,
     MatButtonModule,
+    MatDialogModule,
     LocalizedDatePipeModule,
     MatTooltipModule,
     RoleTransformPipeModule,
