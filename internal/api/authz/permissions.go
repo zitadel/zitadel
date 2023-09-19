@@ -31,23 +31,17 @@ func getUserPermissions(ctx context.Context, resolver MembershipsResolver, requi
 	}
 
 	ctx = context.WithValue(ctx, dataKey, ctxData)
-	memberships, err := resolver.SearchMyMemberships(ctx, orgID)
+	memberships, err := resolver.SearchMyMemberships(ctx, orgID, false)
 	if err != nil {
 		return nil, nil, err
 	}
 	if len(memberships) == 0 {
-		err = retry(func() error {
-			memberships, err = resolver.SearchMyMemberships(ctx, orgID)
-			if err != nil {
-				return err
-			}
-			if len(memberships) == 0 {
-				return errors.ThrowNotFound(nil, "AUTHZ-cdgFk", "membership not found")
-			}
-			return nil
-		})
+		memberships, err = resolver.SearchMyMemberships(ctx, orgID, true)
+		if len(memberships) == 0 {
+			return nil, nil, errors.ThrowNotFound(nil, "AUTHZ-cdgFk", "membership not found")
+		}
 		if err != nil {
-			return nil, nil, nil
+			return nil, nil, err
 		}
 	}
 	requestedPermissions, allPermissions = mapMembershipsToPermissions(requiredPerm, memberships, roleMappings)

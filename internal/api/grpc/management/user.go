@@ -384,7 +384,7 @@ func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*
 	}
 	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
 		Queries: []query.SearchQuery{membershipsUserQuery},
-	}, true)
+	}, true, false)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -903,7 +903,7 @@ func (s *Server) ListUserMemberships(ctx context.Context, req *mgmt_pb.ListUserM
 	if err != nil {
 		return nil, err
 	}
-	response, err := s.query.Memberships(ctx, request, false)
+	response, err := s.query.Memberships(ctx, request, false, false)
 	if err != nil {
 		return nil, err
 	}

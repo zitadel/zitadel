@@ -44,7 +44,7 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 	}
 	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
 		Queries: []query.SearchQuery{userQuery},
-	}, false)
+	}, false, false)
 	if err != nil {
 		return nil, err
 	}
@@ -238,7 +238,7 @@ func (s *Server) myOrgsQuery(ctx context.Context, ctxData authz.CtxData) (*query
 	}
 	return s.query.Memberships(ctx, &query.MembershipSearchQuery{
 		Queries: []query.SearchQuery{userQuery},
-	}, false)
+	}, false, false)
 }
 
 func isIAMAdmin(memberships []*query.Membership) bool {

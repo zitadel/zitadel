@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
+	"sync"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -11,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -105,9 +107,40 @@ func (q *MembershipSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 	return query
 }
 
-func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuery, withOwnerRemoved bool) (memberships *Memberships, err error) {
+func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuery, withOwnerRemoved, shouldTrigger bool) (memberships *Memberships, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	if shouldTrigger {
+		wg := sync.WaitGroup{}
+		wg.Add(4)
+		go func() {
+			spanCtx, triggerSpan := tracing.NewNamedSpan(ctx, "TriggerOrgMemberProjection")
+			projection.OrgMemberProjection.Trigger(spanCtx, handler.WithAwaitRunning())
+			triggerSpan.End()
+			wg.Done()
+		}()
+		go func() {
+			spanCtx, triggerSpan := tracing.NewNamedSpan(ctx, "TriggerInstanceMemberProjection")
+			projection.InstanceMemberProjection.Trigger(spanCtx, handler.WithAwaitRunning())
+			triggerSpan.End()
+			wg.Done()
+		}()
+		go func() {
+			spanCtx, triggerSpan := tracing.NewNamedSpan(ctx, "TriggerProjectMemberProjection")
+			projection.ProjectMemberProjection.Trigger(spanCtx, handler.WithAwaitRunning())
+			triggerSpan.End()
+			wg.Done()
+		}()
+		go func() {
+			spanCtx, triggerSpan := tracing.NewNamedSpan(ctx, "TriggerProjectGrantMemberProjection")
+			projection.ProjectGrantMemberProjection.Trigger(spanCtx, handler.WithAwaitRunning())
+			triggerSpan.End()
+			wg.Done()
+		}()
+
+		wg.Wait()
+	}
 
 	query, queryArgs, scan := prepareMembershipsQuery(ctx, q.client, withOwnerRemoved, queries)
 	eq := sq.Eq{membershipInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
