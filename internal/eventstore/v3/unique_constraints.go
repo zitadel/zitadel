@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -43,12 +46,16 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventst
 	if len(deletePlaceholders) > 0 {
 		_, err := tx.ExecContext(ctx, fmt.Sprintf(deleteConstraintStmt, strings.Join(deletePlaceholders, " OR ")), deleteArgs...)
 		if err != nil {
-			return err
+			logging.WithError(err).Warn("delete unique constraint failed")
+			return errors.ThrowInternal(err, "V3-C8l3V", "Errors.Internal")
 		}
 	}
 	if len(addPlaceholders) > 0 {
 		_, err := tx.ExecContext(ctx, fmt.Sprintf(addConstraintStmt, strings.Join(addPlaceholders, ", ")), addArgs...)
-		return err
+		if err != nil {
+			logging.WithError(err).Warn("add unique constraint failed")
+			return errors.ThrowInternal(err, "V3-DKcYh", "Errors.Internal")
+		}
 	}
 	return nil
 }

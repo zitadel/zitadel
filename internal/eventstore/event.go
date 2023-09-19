@@ -91,7 +91,7 @@ func GenericEventMapper[T any, PT BaseEventSetter[T]](event Event) (Event, error
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "V2-Thai6", "unable to unmarshal event")
+		return nil, errors.ThrowInternal(err, "ES-Thai6", "unable to unmarshal event")
 	}
 
 	return e, nil

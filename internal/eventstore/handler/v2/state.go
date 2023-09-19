@@ -36,8 +36,6 @@ var (
 	errJustUpdated = errors.New("projection was just updated")
 )
 
-const lockOnRowCode = "55P03"
-
 func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, config *triggerConfig) (currentState *state, err error) {
 	currentState = &state{
 		instanceID: authz.GetInstance(ctx).InstanceID(),
@@ -56,9 +54,6 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, config *triggerC
 		stateQuery = currentStateAwaitStmt
 	}
 
-	if h.projection.Name() == "projections.users8" && currentState.instanceID == "232444576898540796" {
-		h.log().Debug("huhu")
-	}
 	row := tx.QueryRow(stateQuery, currentState.instanceID, h.projection.Name())
 	err = row.Scan(
 		aggregateID,

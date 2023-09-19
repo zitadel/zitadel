@@ -4,11 +4,14 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	errs "errors"
 	"fmt"
 	"strings"
 
+	"github.com/jackc/pgconn"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -60,12 +63,23 @@ func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, 
 	for i := 0; rows.Next(); i++ {
 		err = rows.Scan(&events[i].(*event).createdAt, &events[i].(*event).position)
 		if err != nil {
+			logging.WithError(err).Warn("failed to scan events")
 			return nil, err
 		}
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, err
+		pgErr := new(pgconn.PgError)
+		if errs.As(err, &pgErr) {
+			// Check if push tries to write an event just written
+			// by another transaction
+			if pgErr.Code == "40001" {
+				// TODO: @livio-a should we return the parent or not?
+				return nil, errors.ThrowInvalidArgument(err, "V3-p5xAn", "Errors.AlreadyExists")
+			}
+		}
+		logging.WithError(rows.Err()).Warn("failed to push events")
+		return nil, errors.ThrowInternal(err, "V3-VGnZY", "Errors.Internal")
 	}
 
 	return events, nil

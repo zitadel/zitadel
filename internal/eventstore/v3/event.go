@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -27,7 +30,8 @@ func commandToEvent(sequence *latestSequence, command eventstore.Command) (_ *ev
 	if command.Payload() != nil {
 		payload, err = json.Marshal(command.Payload())
 		if err != nil {
-			return nil, err
+			logging.WithError(err).Warn("marshal payload failed")
+			return nil, errors.ThrowInternal(err, "V3-MInPK", "Errors.Internal")
 		}
 	}
 	return &event{
@@ -90,7 +94,11 @@ func (e *event) Unmarshal(ptr any) error {
 	if len(e.payload) == 0 {
 		return nil
 	}
-	return json.Unmarshal(e.payload, ptr)
+	if err := json.Unmarshal(e.payload, ptr); err != nil {
+		return errors.ThrowInternal(err, "V3-u8qVo", "Errors.Internal")
+	}
+
+	return nil
 }
 
 // DataAsBytes implements [eventstore.Event]
