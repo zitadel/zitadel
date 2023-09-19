@@ -76,6 +76,10 @@ func NewHandler(
 		for i, eventReducer := range reducer.EventReducers {
 			eventTypes[i] = eventReducer.Event
 		}
+		if _, ok := aggregates[reducer.Aggregate]; ok {
+			aggregates[reducer.Aggregate] = append(aggregates[reducer.Aggregate], eventTypes...)
+			continue
+		}
 		aggregates[reducer.Aggregate] = eventTypes
 	}
 
@@ -146,7 +150,6 @@ func (h *Handler) schedule(ctx context.Context) {
 				h.log().OnError(err).Debug("unable to set succeeded once")
 				didInitialize = err == nil
 			}
-
 			t.Reset(h.requeueEvery)
 		}
 	}

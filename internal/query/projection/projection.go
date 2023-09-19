@@ -243,6 +243,6 @@ func newProjectionsList() {
 		SessionProjection,
 		AuthRequestProjection,
 		MilestoneProjection,
-		QuotaProjection.Handler,
+		QuotaProjection.handler,
 	}
 }

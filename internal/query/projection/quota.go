@@ -51,15 +51,15 @@ const (
 )
 
 type quotaProjection struct {
-	*handler.Handler
-	client *database.DB
+	handler *handler.Handler
+	client  *database.DB
 }
 
 func newQuotaProjection(ctx context.Context, config handler.Config) *quotaProjection {
 	p := &quotaProjection{
 		client: config.Client,
 	}
-	p.Handler = handler.NewHandler(ctx, &config, p)
+	p.handler = handler.NewHandler(ctx, &config, p)
 	return p
 }
 
@@ -126,29 +126,14 @@ func (q *quotaProjection) Reducers() []handler.AggregateReducer {
 					Event:  quota.AddedEventType,
 					Reduce: q.reduceQuotaAdded,
 				},
-			},
-		},
-		{
-			Aggregate: quota.AggregateType,
-			EventReducers: []handler.EventReducer{
 				{
 					Event:  quota.RemovedEventType,
 					Reduce: q.reduceQuotaRemoved,
 				},
-			},
-		},
-		{
-			Aggregate: quota.AggregateType,
-			EventReducers: []handler.EventReducer{
 				{
 					Event:  quota.NotificationDueEventType,
 					Reduce: q.reduceQuotaNotificationDue,
 				},
-			},
-		},
-		{
-			Aggregate: quota.AggregateType,
-			EventReducers: []handler.EventReducer{
 				{
 					Event:  quota.NotifiedEventType,
 					Reduce: q.reduceQuotaNotified,
