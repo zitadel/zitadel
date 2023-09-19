@@ -337,6 +337,7 @@ module.exports = {
           },
           collapsed: true,
           items: [
+            "guides/integrate/tools/apache2",
             "guides/integrate/authenticated-mongodb-charts",
             "examples/identity-proxy/oauth2-proxy"
           ],
