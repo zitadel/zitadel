@@ -116,7 +116,7 @@ func NewCRDB(client *database.DB) *CRDB {
 	case "cockroach":
 		awaitOpenTransactions = "AND creation_date::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = 'zitadel')"
 	case "postgres":
-		awaitOpenTransactions = `AND "position" < pg_snapshot_xmin(pg_current_snapshot())`
+		awaitOpenTransactions = `AND "position" < (SELECT EXTRACT(EPOCH FROM min(xact_start)) FROM pg_stat_activity WHERE datname = current_database() AND state <> 'idle')`
 	}
 
 	return &CRDB{client}

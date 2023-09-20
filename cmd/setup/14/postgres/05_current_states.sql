@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS projections.current_states (
     , aggregate_type TEXT
     , "sequence" INT8
     , event_date TIMESTAMPTZ
-    , "position" xid8
+    , "position" DECIMAL
 
     , PRIMARY KEY (projection_name, instance_id)
 );

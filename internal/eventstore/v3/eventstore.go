@@ -18,7 +18,7 @@ func NewEventstore(client *database.DB) *Eventstore {
 	case "cockroach":
 		pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, 'zitadel', $%d, $%d, $%d, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $%d)"
 	case "postgres":
-		pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, 'zitadel', $%d, $%d, $%d, now(), pg_current_xact_id(), $%d)"
+		pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, 'zitadel', $%d, $%d, $%d, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $%d)"
 	}
 
 	return &Eventstore{client: client}
