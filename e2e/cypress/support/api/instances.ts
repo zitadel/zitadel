@@ -11,6 +11,7 @@ export function instanceUnderTest(api: SystemAPI): Cypress.Chainable<string> {
     })
     .then((res) => {
       const instances = <Array<any>>res.body.result;
+      cy.log(JSON.stringify(res))
       expect(instances.length).to.equal(
         1,
         'instanceUnderTest just supports running against an API with exactly one instance, yet',
