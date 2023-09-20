@@ -34,7 +34,7 @@ func (s *Session) GetAuthURL() string {
 // call the userinfo endpoint and map the received information into an [idp.User].
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if s.Tokens == nil {
-		if err = s.authorize(ctx); err != nil {
+		if err = s.Authorize(ctx); err != nil {
 			return nil, err
 		}
 	}
@@ -54,7 +54,7 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	return u, nil
 }
 
-func (s *Session) authorize(ctx context.Context) (err error) {
+func (s *Session) Authorize(ctx context.Context) (err error) {
 	if s.Code == "" {
 		return ErrCodeMissing
 	}

@@ -8,8 +8,6 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
@@ -93,6 +91,10 @@ func NewUserGrantResourceOwnerSearchQuery(id string) (SearchQuery, error) {
 
 func NewUserGrantGrantIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantGrantID, id, TextEquals)
+}
+
+func NewUserGrantIDSearchQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(UserGrantID, id, TextEquals)
 }
 
 func NewUserGrantUserTypeQuery(typ domain.UserType) (SearchQuery, error) {
@@ -230,12 +232,12 @@ func addUserGrantWithoutOwnerRemoved(eq map[string]interface{}) {
 	addLoginNameWithoutOwnerRemoved(eq)
 }
 
-func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwnerRemoved bool, queries ...SearchQuery) (_ *UserGrant, err error) {
+func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwnerRemoved bool, queries ...SearchQuery) (grant *UserGrant, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.UserGrantProjection.Trigger(ctx)
+		ctx = projection.UserGrantProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareUserGrantQuery(ctx, q.client)
@@ -251,18 +253,19 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwn
 		return nil, errors.ThrowInternal(err, "QUERY-Fa1KW", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		grant, err = scan(row)
+		return err
+	}, stmt, args...)
+	return grant, err
 }
 
-func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, shouldTriggerBulk, withOwnerRemoved bool) (_ *UserGrants, err error) {
+func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, shouldTriggerBulk, withOwnerRemoved bool) (grants *UserGrants, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		logging.OnError(
-			projection.UserGrantProjection.Trigger(ctx),
-		).Debug("unable to trigger")
+		ctx = projection.UserGrantProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareUserGrantsQuery(ctx, q.client)
@@ -280,11 +283,10 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, sh
 		return nil, err
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil {
-		return nil, err
-	}
-	grants, err := scan(rows)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		grants, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, err
 	}

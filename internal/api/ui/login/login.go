@@ -47,6 +47,9 @@ type Config struct {
 	CSRFCookieName     string
 	Cache              middleware.CacheConfig
 	AssetCache         middleware.CacheConfig
+
+	// LoginV2
+	DefaultOTPEmailURLV2 string
 }
 
 const (
@@ -117,6 +120,12 @@ func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecu
 				handler.ServeHTTP(w, r)
 				return
 			}
+			// ignore form post callback
+			// it will redirect to the "normal" callback, where the cookie is set again
+			if r.URL.Path == EndpointExternalLoginCallbackFormPost && r.Method == http.MethodPost {
+				handler.ServeHTTP(w, r)
+				return
+			}
 			csrf.Protect(csrfCookieKey,
 				csrf.Secure(externalSecure),
 				csrf.CookieName(http_utils.SetCookiePrefix(cookieName, "", path, externalSecure)),
@@ -166,6 +175,14 @@ func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string
 func setContext(ctx context.Context, resourceOwner string) context.Context {
 	data := authz.CtxData{
 		UserID: login,
+		OrgID:  resourceOwner,
+	}
+	return authz.SetCtxData(ctx, data)
+}
+
+func setUserContext(ctx context.Context, userID, resourceOwner string) context.Context {
+	data := authz.CtxData{
+		UserID: userID,
 		OrgID:  resourceOwner,
 	}
 	return authz.SetCtxData(ctx, data)

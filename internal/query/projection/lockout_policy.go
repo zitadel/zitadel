@@ -179,13 +179,8 @@ func (p *lockoutPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*h
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-IoW0x", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(LockoutPolicyChangeDateCol, e.CreationDate()),
-			handler.NewCol(LockoutPolicySequenceCol, e.Sequence()),
-			handler.NewCol(LockoutPolicyOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(LockoutPolicyInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(LockoutPolicyResourceOwnerCol, e.Aggregate().ID),

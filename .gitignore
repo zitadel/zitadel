@@ -55,10 +55,16 @@ openapi/**/*.json
 /internal/api/assets/authz.go
 /internal/api/assets/router.go
 /internal/api/ui/console/static/*
+!/internal/api/ui/console/static/gitkeep
 docs/docs/apis/auth
 docs/docs/apis/admin
 docs/docs/apis/mgmt
 docs/docs/apis/system
+docs/docs/apis/proto
+**/.sass-cache
+/internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css
+/internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css.map
+zitadel-*-*
 
 # local
 build/local/*.env
@@ -67,6 +73,7 @@ migrations/cockroach/migrate_cloud.go
 /.artifacts/*
 !/.artifacts/zitadel
 /zitadel
+node_modules/
 
 go.work
 go.work.sum

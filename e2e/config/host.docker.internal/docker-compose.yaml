@@ -1,35 +1,28 @@
 version: '3.8'
 
 services:
-  zitadel:
-    extends:
-      file: '../localhost/docker-compose.yaml'
-      service: 'zitadel'
-    volumes:
-      - ./zitadel.yaml:/zitadel.yaml
 
   db:
     extends:
       file: '../localhost/docker-compose.yaml'
       service: 'db'
 
-  prepare:
-    image: node:18-alpine3.15
-    working_dir: /e2e
-    user: '$UID'
+  zitadel:
+    depends_on:
+      db:
+        condition: 'service_healthy'
+    extends:
+      file: '../localhost/docker-compose.yaml'
+      service: 'zitadel'
     volumes:
-      - ../../:/e2e
-    command: 'sh -c "npm ci --omit=dev && npm run lint && npx wait-on http://zitadel:8080/debug/ready"'
-
+      - ./zitadel.yaml:/zitadel.yaml
   e2e:
     image: cypress/included:12.2.0
     depends_on:
       zitadel:
-        condition: 'service_started'
+        condition: 'service_healthy'
       db:
         condition: 'service_healthy'
-      prepare:
-        condition: 'service_completed_successfully'
     working_dir: /e2e
     user: '$UID'
     volumes:

@@ -149,6 +149,8 @@ type authMethod string
 const (
 	authMethodPassword     authMethod = "password"
 	authMethodOTP          authMethod = "OTP"
+	authMethodOTPSMS       authMethod = "OTP SMS"
+	authMethodOTPEmail     authMethod = "OTP Email"
 	authMethodU2F          authMethod = "U2F"
 	authMethodPasswordless authMethod = "passwordless"
 )

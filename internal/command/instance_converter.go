@@ -34,6 +34,7 @@ func writeModelToLoginPolicy(wm *LoginPolicyWriteModel) *domain.LoginPolicy {
 		IgnoreUnknownUsernames:     wm.IgnoreUnknownUsernames,
 		AllowDomainDiscovery:       wm.AllowDomainDiscovery,
 		ForceMFA:                   wm.ForceMFA,
+		ForceMFALocalOnly:          wm.ForceMFALocalOnly,
 		PasswordlessType:           wm.PasswordlessType,
 		DefaultRedirectURI:         wm.DefaultRedirectURI,
 		PasswordCheckLifetime:      wm.PasswordCheckLifetime,
@@ -123,10 +124,10 @@ func writeModelToLockoutPolicy(wm *LockoutPolicyWriteModel) *domain.LockoutPolic
 
 func writeModelToPrivacyPolicy(wm *PrivacyPolicyWriteModel) *domain.PrivacyPolicy {
 	return &domain.PrivacyPolicy{
-		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
-		TOSLink:     wm.TOSLink,
-		PrivacyLink: wm.PrivacyLink,
-		HelpLink:    wm.HelpLink,
+		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
+		TOSLink:      wm.TOSLink,
+		PrivacyLink:  wm.PrivacyLink,
+		HelpLink:     wm.HelpLink,
 		SupportEmail: wm.SupportEmail,
 	}
 }

@@ -25,7 +25,7 @@ SelectAccount:
   DescriptionLinking: Wybierz swoje konto, aby połączyć je z twoim zewnętrznym użytkownikiem.
   OtherUser: Inny użytkownik
   SessionState0: aktywne
-  SessionState1: nieaktywne
+  SessionState1: Wylogowano
   MustBeMemberOfOrg: Użytkownik musi być członkiem organizacji {{.OrgName}}.
 
 Password:
@@ -89,6 +89,8 @@ InitMFAPrompt:
   Description: 2-etapowe uwierzytelnianie daje Ci dodatkową ochronę dla Twojego konta użytkownika. Dzięki temu masz pewność, że tylko Ty masz dostęp do swojego konta.
   Provider0: Aplikacja uwierzytelniająca (np. Google/Microsoft Authenticator, Authy)
   Provider1: Zależny od urządzenia (np. FaceID, Windows Hello, Odcisk palca)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   NextButtonText: dalej
   SkipButtonText: pomiń
 
@@ -100,6 +102,16 @@ InitMFAOTP:
   CodeLabel: Kod
   NextButtonText: dalej
   CancelButtonText: anuluj
+
+InitMFASMS:
+  Title: Weryfikacja 2-etapowa
+  DescriptionPhone: Utwórz uwierzytelnianie dwuskładnikowe. Wprowadź swój numer telefonu, aby go zweryfikować.
+  DescriptionCode: Utwórz uwierzytelnianie dwuskładnikowe. Wprowadź otrzymany kod, aby zweryfikować swój numer telefonu.
+  PhoneLabel: Numer telefonu
+  CodeLabel: Kod
+  EditButtonText: edytować
+  ResendButtonText: wyślij kod ponownie
+  NextButtonText: dalej
 
 InitMFAU2F:
   Title: Dodaj klucz zabezpieczeń
@@ -118,12 +130,21 @@ InitMFADone:
 MFAProvider:
   Provider0: Aplikacja uwierzytelniająca (np. Google/Microsoft Authenticator, Authy)
   Provider1: Zależny od urządzenia (np. FaceID, Windows Hello, Odcisk palca)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   ChooseOther: lub wybierz inną opcję
 
 VerifyMFAOTP:
   Title: Zweryfikuj 2-etapowe uwierzytelnianie
   Description: Zweryfikuj swój drugi czynnik
   CodeLabel: Kod
+  NextButtonText: dalej
+
+VerifyOTP:
+  Title: Zweryfikuj 2-etapowe uwierzytelnianie
+  Description: Zweryfikuj swój drugi czynnik
+  CodeLabel: Kod
+  ResendButtonText: wyślij kod ponownie
   NextButtonText: dalej
 
 VerifyMFAU2F:
@@ -223,6 +244,8 @@ RegistrationUser:
   Japanese: 日本語
   Spanish: Español
   Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   GenderLabel: Płeć
   Female: Kobieta
   Male: Mężczyzna
@@ -256,6 +279,9 @@ ExternalRegistrationUserOverview:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   TosAndPrivacyLabel: Warunki i zasady
   TosConfirm: Akceptuję
   TosLinkText: Warunki korzystania
@@ -317,6 +343,9 @@ ExternalNotFound:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
 
 DeviceAuth:
   Title: Autoryzacja urządzenia
@@ -342,6 +371,8 @@ Footer:
   PrivacyPolicy: Polityka prywatności
   Help: Pomoc
   SupportEmail: E-mail wsparcia
+
+SignIn: Zaloguj się, używając konta {{.Provider}}
 
 Errors:
   Internal: Wewnętrzny błąd
@@ -395,6 +426,7 @@ Errors:
       Empty: Hasło jest puste
       Invalid: Hasło jest niepoprawne
       InvalidAndLocked: Hasło jest niepoprawne i użytkownik jest zablokowany, skontaktuj się z administratorem.
+      NotChanged: Nowe hasło nie może być takie samo jak Twoje obecne hasło
     UsernameOrPassword:
       Invalid: Nazwa użytkownika lub hasło jest niepoprawne
     PasswordComplexityPolicy:

@@ -77,12 +77,12 @@ var (
 	}
 )
 
-func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bool, userID, key string, withOwnerRemoved bool, queries ...SearchQuery) (_ *UserMetadata, err error) {
+func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bool, userID, key string, withOwnerRemoved bool, queries ...SearchQuery) (metadata *UserMetadata, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.UserMetadataProjection.Trigger(ctx)
+		ctx = projection.UserMetadataProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareUserMetadataQuery(ctx, q.client)
@@ -102,16 +102,19 @@ func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bo
 		return nil, errors.ThrowInternal(err, "QUERY-aDGG2", "Errors.Query.SQLStatment")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		metadata, err = scan(row)
+		return err
+	}, stmt, args...)
+	return metadata, err
 }
 
-func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool, userID string, queries *UserMetadataSearchQueries, withOwnerRemoved bool) (_ *UserMetadataList, err error) {
+func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool, userID string, queries *UserMetadataSearchQueries, withOwnerRemoved bool) (metadata *UserMetadataList, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.UserMetadataProjection.Trigger(ctx)
+		ctx = projection.UserMetadataProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareUserMetadataListQuery(ctx, q.client)
@@ -127,11 +130,10 @@ func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool
 		return nil, errors.ThrowInternal(err, "QUERY-Egbgd", "Errors.Query.SQLStatment")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Hr2wf", "Errors.Internal")
-	}
-	metadata, err := scan(rows)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		metadata, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, err
 	}

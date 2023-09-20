@@ -29,7 +29,11 @@
                 <a href="{{ externalIDPRegisterURL $reqid $provider.IDPConfigID}}"
                     class="lgn-idp {{idpProviderClass $provider.IDPType}}">
                     <span class="logo"></span>
+                    {{if $provider.IDPType.IsSignInButton}}
+                    <span class="provider-name">{{t "SignIn" "Provider" $provider.DisplayName}}</span>
+                    {{else}}
                     <span class="provider-name">{{$provider.DisplayName}}</span>
+                    {{end}}
                 </a>
             {{end}}
         {{end}}

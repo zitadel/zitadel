@@ -42,9 +42,17 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(err, "COMMAND-38fnu", "Errors.Org.DomainPolicy.NotExisting")
 	}
-
-	if err := CheckDomainPolicyForUserName(userName, domainPolicy); err != nil {
-		return nil, err
+	if !domainPolicy.UserLoginMustBeDomain {
+		index := strings.LastIndex(userName, "@")
+		if index > 1 {
+			domainCheck := NewOrgDomainVerifiedWriteModel(userName[index+1:])
+			if err := c.eventstore.FilterToQueryReducer(ctx, domainCheck); err != nil {
+				return nil, err
+			}
+			if domainCheck.Verified && domainCheck.ResourceOwner != orgID {
+				return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Di2ei", "Errors.User.DomainNotAllowedAsUsername")
+			}
+		}
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 
@@ -439,8 +447,8 @@ func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id
 	return exists, nil
 }
 
-func newUserInitCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCodeWithExpiry, error) {
-	return newCryptoCodeWithExpiry(ctx, filter, domain.SecretGeneratorTypeInitCode, alg)
+func (c *Commands) newUserInitCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCode, error) {
+	return c.newCode(ctx, filter, domain.SecretGeneratorTypeInitCode, alg)
 }
 
 func userWriteModelByID(ctx context.Context, filter preparation.FilterToQueryReducer, userID, resourceOwner string) (*UserWriteModel, error) {

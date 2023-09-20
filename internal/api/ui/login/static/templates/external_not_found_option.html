@@ -1,8 +1,11 @@
 {{template "main-top" .}}
 
 <div class="lgn-head">
-    <h1>{{t "ExternalNotFound.Title"}}</h1>
+    <h1>{{.ProviderName}} - {{t "ExternalNotFound.Title"}}</h1>
+
+    {{ if or .IsLinkingAllowed .IsCreationAllowed }}
     <p>{{t "ExternalNotFound.Description"}}</p>
+    {{ end }}
 
 </div>
 
@@ -21,6 +24,7 @@
     <input type="hidden" id="external-phone-verified" name="external-phone-verified" value="{{ .ExternalPhoneVerified }}" />
 
     <div class="lgn-register">
+        {{ if or .IsCreationAllowed }}
         <div class="double-col">
             <div class="lgn-field">
                 <label class="lgn-label" for="firstname">{{t "ExternalRegistrationUserOverview.FirstnameLabel"}}</label>
@@ -78,11 +82,16 @@
                     </option>
                     <option value="bg" id="bg" {{if (selectedLanguage "bg")}} selected {{end}}>{{t "ExternalNotFound.Bulgarian"}}
                     </option>
+                    <option value="pt" id="pt" {{if (selectedLanguage "pt")}} selected {{end}}>{{t "ExternalNotFound.Portuguese"}}
+                    </option>                    
+                    <option value="mk" id="mk" {{if (selectedLanguage "mk")}} selected {{end}}>{{t "ExternalNotFound.Macedonian"}}
+                    </option>
                 </select>
             </div>
         </div>
+        {{end}}
 
-        {{ if or .TOSLink .PrivacyLink }}
+        {{ if and (or .IsLinkingAllowed .IsCreationAllowed) (or .TOSLink .PrivacyLink) }}
         <div class="lgn-field">
             <label class="lgn-label">{{t "ExternalNotFound.TosAndPrivacyLabel"}}</label>
             {{ if .TOSLink }}

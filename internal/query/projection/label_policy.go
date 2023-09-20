@@ -402,10 +402,10 @@ func (p *labelPolicyProjection) reduceActivated(event eventstore.Event) (*handle
 			handler.NewCol(LabelPolicyDarkLogoURLCol, nil),
 			handler.NewCol(LabelPolicyDarkIconURLCol, nil),
 		},
-		[]handler.Condition{
-			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
-			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
-			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
+		[]handler.NamespacedCondition{
+			handler.NewNamespacedCondition(LabelPolicyIDCol, event.Aggregate().ID),
+			handler.NewNamespacedCondition(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewNamespacedCondition(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -607,13 +607,8 @@ func (p *labelPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*han
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Su6pX", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(LabelPolicyChangeDateCol, e.CreationDate()),
-			handler.NewCol(LabelPolicySequenceCol, e.Sequence()),
-			handler.NewCol(LabelPolicyOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(LabelPolicyResourceOwnerCol, e.Aggregate().ID),

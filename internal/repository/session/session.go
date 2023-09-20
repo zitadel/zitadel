@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -12,16 +13,23 @@ import (
 )
 
 const (
-	sessionEventPrefix    = "session."
-	AddedType             = sessionEventPrefix + "added"
-	UserCheckedType       = sessionEventPrefix + "user.checked"
-	PasswordCheckedType   = sessionEventPrefix + "password.checked"
-	IntentCheckedType     = sessionEventPrefix + "intent.checked"
-	PasskeyChallengedType = sessionEventPrefix + "passkey.challenged"
-	PasskeyCheckedType    = sessionEventPrefix + "passkey.checked"
-	TokenSetType          = sessionEventPrefix + "token.set"
-	MetadataSetType       = sessionEventPrefix + "metadata.set"
-	TerminateType         = sessionEventPrefix + "terminated"
+	sessionEventPrefix     = "session."
+	AddedType              = sessionEventPrefix + "added"
+	UserCheckedType        = sessionEventPrefix + "user.checked"
+	PasswordCheckedType    = sessionEventPrefix + "password.checked"
+	IntentCheckedType      = sessionEventPrefix + "intent.checked"
+	WebAuthNChallengedType = sessionEventPrefix + "webAuthN.challenged"
+	WebAuthNCheckedType    = sessionEventPrefix + "webAuthN.checked"
+	TOTPCheckedType        = sessionEventPrefix + "totp.checked"
+	OTPSMSChallengedType   = sessionEventPrefix + "otp.sms.challenged"
+	OTPSMSSentType         = sessionEventPrefix + "otp.sms.sent"
+	OTPSMSCheckedType      = sessionEventPrefix + "otp.sms.checked"
+	OTPEmailChallengedType = sessionEventPrefix + "otp.email.challenged"
+	OTPEmailSentType       = sessionEventPrefix + "otp.email.sent"
+	OTPEmailCheckedType    = sessionEventPrefix + "otp.email.checked"
+	TokenSetType           = sessionEventPrefix + "token.set"
+	MetadataSetType        = sessionEventPrefix + "metadata.set"
+	TerminateType          = sessionEventPrefix + "terminated"
 )
 
 type AddedEvent struct {
@@ -186,73 +194,317 @@ func IntentCheckedEventMapper(event *repository.Event) (eventstore.Event, error)
 	return added, nil
 }
 
-type PasskeyChallengedEvent struct {
+type WebAuthNChallengedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Challenge          string                             `json:"challenge,omitempty"`
 	AllowedCrentialIDs [][]byte                           `json:"allowedCrentialIDs,omitempty"`
 	UserVerification   domain.UserVerificationRequirement `json:"userVerification,omitempty"`
+	RPID               string                             `json:"rpid,omitempty"`
 }
 
-func (e *PasskeyChallengedEvent) Data() interface{} {
+func (e *WebAuthNChallengedEvent) Data() interface{} {
 	return e
 }
 
-func (e *PasskeyChallengedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *WebAuthNChallengedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func (e *PasskeyChallengedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+func (e *WebAuthNChallengedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
 	e.BaseEvent = *base
 }
 
-func NewPasskeyChallengedEvent(
+func NewWebAuthNChallengedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	challenge string,
 	allowedCrentialIDs [][]byte,
 	userVerification domain.UserVerificationRequirement,
-) *PasskeyChallengedEvent {
-	return &PasskeyChallengedEvent{
+	rpid string,
+) *WebAuthNChallengedEvent {
+	return &WebAuthNChallengedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			PasskeyChallengedType,
+			WebAuthNChallengedType,
 		),
 		Challenge:          challenge,
 		AllowedCrentialIDs: allowedCrentialIDs,
 		UserVerification:   userVerification,
+		RPID:               rpid,
 	}
 }
 
-type PasskeyCheckedEvent struct {
+type WebAuthNCheckedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	CheckedAt    time.Time `json:"checkedAt"`
+	UserVerified bool      `json:"userVerified,omitempty"`
+}
+
+func (e *WebAuthNCheckedEvent) Data() interface{} {
+	return e
+}
+
+func (e *WebAuthNCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *WebAuthNCheckedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewWebAuthNCheckedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	checkedAt time.Time,
+	userVerified bool,
+) *WebAuthNCheckedEvent {
+	return &WebAuthNCheckedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			WebAuthNCheckedType,
+		),
+		CheckedAt:    checkedAt,
+		UserVerified: userVerified,
+	}
+}
+
+type TOTPCheckedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	CheckedAt time.Time `json:"checkedAt"`
 }
 
-func (e *PasskeyCheckedEvent) Data() interface{} {
+func (e *TOTPCheckedEvent) Data() interface{} {
 	return e
 }
 
-func (e *PasskeyCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *TOTPCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func (e *PasskeyCheckedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+func (e *TOTPCheckedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
 	e.BaseEvent = *base
 }
 
-func NewPasskeyCheckedEvent(
+func NewTOTPCheckedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	checkedAt time.Time,
-) *PasswordCheckedEvent {
-	return &PasswordCheckedEvent{
+) *TOTPCheckedEvent {
+	return &TOTPCheckedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			PasskeyCheckedType,
+			TOTPCheckedType,
+		),
+		CheckedAt: checkedAt,
+	}
+}
+
+type OTPSMSChallengedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Code         *crypto.CryptoValue `json:"code"`
+	Expiry       time.Duration       `json:"expiry"`
+	CodeReturned bool                `json:"codeReturned,omitempty"`
+}
+
+func (e *OTPSMSChallengedEvent) Data() interface{} {
+	return e
+}
+
+func (e *OTPSMSChallengedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *OTPSMSChallengedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewOTPSMSChallengedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	code *crypto.CryptoValue,
+	expiry time.Duration,
+	codeReturned bool,
+) *OTPSMSChallengedEvent {
+	return &OTPSMSChallengedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			OTPSMSChallengedType,
+		),
+		Code:         code,
+		Expiry:       expiry,
+		CodeReturned: codeReturned,
+	}
+}
+
+type OTPSMSSentEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *OTPSMSSentEvent) Data() interface{} {
+	return e
+}
+
+func (e *OTPSMSSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *OTPSMSSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewOTPSMSSentEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *OTPSMSSentEvent {
+	return &OTPSMSSentEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			OTPSMSSentType,
+		),
+	}
+}
+
+type OTPSMSCheckedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	CheckedAt time.Time `json:"checkedAt"`
+}
+
+func (e *OTPSMSCheckedEvent) Data() interface{} {
+	return e
+}
+
+func (e *OTPSMSCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *OTPSMSCheckedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewOTPSMSCheckedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	checkedAt time.Time,
+) *OTPSMSCheckedEvent {
+	return &OTPSMSCheckedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			OTPSMSCheckedType,
+		),
+		CheckedAt: checkedAt,
+	}
+}
+
+type OTPEmailChallengedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Code       *crypto.CryptoValue `json:"code"`
+	Expiry     time.Duration       `json:"expiry"`
+	ReturnCode bool                `json:"returnCode,omitempty"`
+	URLTmpl    string              `json:"urlTmpl,omitempty"`
+}
+
+func (e *OTPEmailChallengedEvent) Data() interface{} {
+	return e
+}
+
+func (e *OTPEmailChallengedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *OTPEmailChallengedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewOTPEmailChallengedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	code *crypto.CryptoValue,
+	expiry time.Duration,
+	returnCode bool,
+	urlTmpl string,
+) *OTPEmailChallengedEvent {
+	return &OTPEmailChallengedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			OTPEmailChallengedType,
+		),
+		Code:       code,
+		Expiry:     expiry,
+		ReturnCode: returnCode,
+		URLTmpl:    urlTmpl,
+	}
+}
+
+type OTPEmailSentEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *OTPEmailSentEvent) Data() interface{} {
+	return e
+}
+
+func (e *OTPEmailSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *OTPEmailSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewOTPEmailSentEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *OTPEmailSentEvent {
+	return &OTPEmailSentEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			OTPEmailSentType,
+		),
+	}
+}
+
+type OTPEmailCheckedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	CheckedAt time.Time `json:"checkedAt"`
+}
+
+func (e *OTPEmailCheckedEvent) Data() interface{} {
+	return e
+}
+
+func (e *OTPEmailCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func (e *OTPEmailCheckedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewOTPEmailCheckedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	checkedAt time.Time,
+) *OTPEmailCheckedEvent {
+	return &OTPEmailCheckedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			OTPEmailCheckedType,
 		),
 		CheckedAt: checkedAt,
 	}

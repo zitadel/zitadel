@@ -49,6 +49,8 @@ type HumanView struct {
 	Region                   string
 	StreetAddress            string
 	OTPState                 MFAState
+	OTPSMSAdded              bool
+	OTPEmailAdded            bool
 	U2FTokens                []*WebAuthNView
 	PasswordlessTokens       []*WebAuthNView
 	MFAMaxSetUp              domain.MFALevel
@@ -156,43 +158,57 @@ func (u *UserView) MFATypesSetupPossible(level domain.MFALevel, policy *domain.L
 		if policy.HasSecondFactors() {
 			for _, mfaType := range policy.SecondFactors {
 				switch mfaType {
-				case domain.SecondFactorTypeOTP:
+				case domain.SecondFactorTypeTOTP:
 					if u.OTPState != MFAStateReady {
-						types = append(types, domain.MFATypeOTP)
+						types = append(types, domain.MFATypeTOTP)
 					}
 				case domain.SecondFactorTypeU2F:
 					types = append(types, domain.MFATypeU2F)
+				case domain.SecondFactorTypeOTPSMS:
+					if !u.OTPSMSAdded {
+						types = append(types, domain.MFATypeOTPSMS)
+					}
+				case domain.SecondFactorTypeOTPEmail:
+					if !u.OTPEmailAdded {
+						types = append(types, domain.MFATypeOTPEmail)
+					}
 				}
 			}
 		}
-		//PLANNED: add sms
 	}
 	return types
 }
 
-func (u *UserView) MFATypesAllowed(level domain.MFALevel, policy *domain.LoginPolicy) ([]domain.MFAType, bool) {
+func (u *UserView) MFATypesAllowed(level domain.MFALevel, policy *domain.LoginPolicy, isInternalAuthentication bool) ([]domain.MFAType, bool) {
 	types := make([]domain.MFAType, 0)
 	required := true
 	switch level {
 	default:
-		required = policy.ForceMFA
+		required = domain.RequiresMFA(policy.ForceMFA, policy.ForceMFALocalOnly, isInternalAuthentication)
 		fallthrough
 	case domain.MFALevelSecondFactor:
 		if policy.HasSecondFactors() {
 			for _, mfaType := range policy.SecondFactors {
 				switch mfaType {
-				case domain.SecondFactorTypeOTP:
+				case domain.SecondFactorTypeTOTP:
 					if u.OTPState == MFAStateReady {
-						types = append(types, domain.MFATypeOTP)
+						types = append(types, domain.MFATypeTOTP)
 					}
 				case domain.SecondFactorTypeU2F:
 					if u.IsU2FReady() {
 						types = append(types, domain.MFATypeU2F)
 					}
+				case domain.SecondFactorTypeOTPSMS:
+					if u.OTPSMSAdded {
+						types = append(types, domain.MFATypeOTPSMS)
+					}
+				case domain.SecondFactorTypeOTPEmail:
+					if u.OTPEmailAdded {
+						types = append(types, domain.MFATypeOTPEmail)
+					}
 				}
 			}
 		}
-		//PLANNED: add sms
 	}
 	return types, required
 }

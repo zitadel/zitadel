@@ -552,7 +552,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 
 				if user.User.OtpCode != "" {
 					logging.Debugf("import user otp: %s", user.GetUserId())
-					if err := s.command.ImportHumanOTP(ctx, user.UserId, "", org.GetOrgId(), user.User.OtpCode); err != nil {
+					if err := s.command.ImportHumanTOTP(ctx, user.UserId, "", org.GetOrgId(), user.User.OtpCode); err != nil {
 						errors = append(errors, &admin_pb.ImportDataError{Type: "human_user_otp", Id: user.GetUserId(), Message: err.Error()})
 						if isCtxTimeout(ctx) {
 							return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
@@ -623,11 +623,10 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 		if org.UserLinks != nil {
 			for _, userLinks := range org.GetUserLinks() {
 				logging.Debugf("import userlink: %s", userLinks.GetUserId()+"_"+userLinks.GetIdpId()+"_"+userLinks.GetProvidedUserId()+"_"+userLinks.GetProvidedUserName())
-				externalIDP := &domain.UserIDPLink{
-					ObjectRoot:     models.ObjectRoot{AggregateID: userLinks.UserId},
-					IDPConfigID:    userLinks.IdpId,
-					ExternalUserID: userLinks.ProvidedUserId,
-					DisplayName:    userLinks.ProvidedUserName,
+				externalIDP := &command.AddLink{
+					IDPID:         userLinks.IdpId,
+					IDPExternalID: userLinks.ProvidedUserId,
+					DisplayName:   userLinks.ProvidedUserName,
 				}
 				if _, err := s.command.AddUserIDPLink(ctx, userLinks.UserId, org.GetOrgId(), externalIDP); err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "user_link", Id: userLinks.UserId + "_" + userLinks.IdpId, Message: err.Error()})

@@ -14,7 +14,9 @@ import (
 
 func TestConfig_serverFromContext(t *testing.T) {
 	type args struct {
-		ctx context.Context
+		ctx    context.Context
+		id     string
+		origin string
 	}
 	tests := []struct {
 		name    string
@@ -24,17 +26,28 @@ func TestConfig_serverFromContext(t *testing.T) {
 	}{
 		{
 			name:    "webauthn error",
-			args:    args{context.Background()},
+			args:    args{context.Background(), "", ""},
 			wantErr: caos_errs.ThrowInternal(nil, "WEBAU-UX9ta", "Errors.User.WebAuthN.ServerConfig"),
 		},
 		{
-			name: "success",
-			args: args{authz.WithRequestedDomain(context.Background(), "example.com")},
+			name: "success from ctx",
+			args: args{authz.WithRequestedDomain(context.Background(), "example.com"), "", ""},
 			want: &webauthn.WebAuthn{
 				Config: &webauthn.Config{
 					RPDisplayName: "DisplayName",
 					RPID:          "example.com",
 					RPOrigins:     []string{"https://example.com"},
+				},
+			},
+		},
+		{
+			name: "success from id",
+			args: args{authz.WithRequestedDomain(context.Background(), "example.com"), "external.com", "https://external.com"},
+			want: &webauthn.WebAuthn{
+				Config: &webauthn.Config{
+					RPDisplayName: "DisplayName",
+					RPID:          "external.com",
+					RPOrigins:     []string{"https://external.com"},
 				},
 			},
 		},
@@ -45,7 +58,7 @@ func TestConfig_serverFromContext(t *testing.T) {
 				DisplayName:    "DisplayName",
 				ExternalSecure: true,
 			}
-			got, err := w.serverFromContext(tt.args.ctx)
+			got, err := w.serverFromContext(tt.args.ctx, tt.args.id, tt.args.origin)
 			require.ErrorIs(t, err, tt.wantErr)
 			if tt.want != nil {
 				require.NotNil(t, got)

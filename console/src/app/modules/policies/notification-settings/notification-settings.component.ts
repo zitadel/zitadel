@@ -58,6 +58,7 @@ export class NotificationSettingsComponent implements OnInit {
     this.form = this.fb.group({
       senderAddress: [{ disabled: true, value: '' }, [requiredValidator]],
       senderName: [{ disabled: true, value: '' }, [requiredValidator]],
+      replyToAddress: [{ disabled: true, value: '' }],
       tls: [{ disabled: true, value: true }, [requiredValidator]],
       hostAndPort: [{ disabled: true, value: '' }, [requiredValidator]],
       user: [{ disabled: true, value: '' }, [requiredValidator]],
@@ -143,6 +144,7 @@ export class NotificationSettingsComponent implements OnInit {
       req.setHost(this.hostAndPort?.value ?? '');
       req.setSenderAddress(this.senderAddress?.value ?? '');
       req.setSenderName(this.senderName?.value ?? '');
+      req.setReplyToAddress(this.replyToAddress?.value ?? '');
       req.setTls(this.tls?.value ?? false);
       req.setUser(this.user?.value ?? '');
 
@@ -152,6 +154,7 @@ export class NotificationSettingsComponent implements OnInit {
       req.setHost(this.hostAndPort?.value ?? '');
       req.setSenderAddress(this.senderAddress?.value ?? '');
       req.setSenderName(this.senderName?.value ?? '');
+      req.setReplyToAddress(this.replyToAddress?.value ?? '');
       req.setTls(this.tls?.value ?? false);
       req.setUser(this.user?.value ?? '');
 
@@ -296,6 +299,10 @@ export class NotificationSettingsComponent implements OnInit {
 
   public get senderName(): AbstractControl | null {
     return this.form.get('senderName');
+  }
+
+  public get replyToAddress(): AbstractControl | null {
+    return this.form.get('replyToAddress');
   }
 
   public get tls(): AbstractControl | null {

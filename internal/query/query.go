@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"regexp"
 	"sync"
 	"time"
 
@@ -18,11 +19,14 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/action"
+	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
@@ -88,6 +92,9 @@ func StartQueries(
 	usergrant.RegisterEventMappers(repo.eventstore)
 	session.RegisterEventMappers(repo.eventstore)
 	idpintent.RegisterEventMappers(repo.eventstore)
+	authrequest.RegisterEventMappers(repo.eventstore)
+	oidcsession.RegisterEventMappers(repo.eventstore)
+	quota.RegisterEventMappers(repo.eventstore)
 
 	repo.idpConfigEncryption = idpConfigEncryption
 	repo.multifactors = domain.MultifactorConfigs{
@@ -114,4 +121,20 @@ func (q *Queries) Health(ctx context.Context) error {
 
 type prepareDatabase interface {
 	Timetravel(d time.Duration) string
+}
+
+// cleanStaticQueries removes whitespaces,
+// such as ` `, \t, \n, from queries to improve
+// readability in logs and errors.
+func cleanStaticQueries(qs ...*string) {
+	regex := regexp.MustCompile(`\s+`)
+	for _, q := range qs {
+		*q = regex.ReplaceAllString(*q, " ")
+	}
+}
+
+func init() {
+	cleanStaticQueries(
+		&authRequestByIDQuery,
+	)
 }

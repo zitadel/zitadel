@@ -1,9 +1,4 @@
-## Postgres
-
-:::caution
-PostgreSQL extension is currently in [Beta](/docs/support/software-release-cycles-support#beta).
-Beta state will be removed as soon as automated tests are implemented. [Github Issue](https://github.com/zitadel/zitadel/issues/5741)
-:::
+## ZITADEL with Postgres
 
 :::caution
 Be aware that PostgreSQL is only [Enterprise Supported](/docs/support/software-release-cycles-support#partially-supported).
@@ -56,7 +51,7 @@ CREATE DATABASE zitadel;
 GRANT CONNECT, CREATE ON DATABASE zitadel TO zitadel;
 ```
 
-Don't forget to adjust pg_hba.conf and set a password for the zitadel user.
+Don't forget to adjust `pg_hba.conf` and set a password for the zitadel user.
 
 With the setup done, follow the [phases guide](/docs/self-hosting/manage/updating_scaling#separating-init-and-setup-from-the-runtime)
 to run the init and then setup phase to get all necessary tables and data set up.

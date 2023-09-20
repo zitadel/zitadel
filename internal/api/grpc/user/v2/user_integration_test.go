@@ -19,8 +19,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/integration"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 var (
@@ -38,7 +38,7 @@ func TestMain(m *testing.M) {
 		Tester = integration.NewTester(ctx)
 		defer Tester.Done()
 
-		CTX, ErrCTX = Tester.WithSystemAuthorization(ctx, integration.OrgOwner), errCtx
+		CTX, ErrCTX = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
 		Client = Tester.Client.UserV2
 		return m.Run()
 	}())
@@ -67,14 +67,15 @@ func TestServer_AddHumanUser(t *testing.T) {
 						},
 					},
 					Profile: &user.SetHumanProfile{
-						FirstName:         "Donald",
-						LastName:          "Duck",
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
 						NickName:          gu.Ptr("Dukkie"),
 						DisplayName:       gu.Ptr("Donald Duck"),
 						PreferredLanguage: gu.Ptr("en"),
 						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
 					},
 					Email: &user.SetHumanEmail{},
+					Phone: &user.SetHumanPhone{},
 					Metadata: []*user.SetMetadataEntry{
 						{
 							Key:   "somekey",
@@ -97,7 +98,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 			},
 		},
 		{
-			name: "return verification code",
+			name: "return email verification code",
 			args: args{
 				CTX,
 				&user.AddHumanUserRequest{
@@ -107,8 +108,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 						},
 					},
 					Profile: &user.SetHumanProfile{
-						FirstName:         "Donald",
-						LastName:          "Duck",
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
 						NickName:          gu.Ptr("Dukkie"),
 						DisplayName:       gu.Ptr("Donald Duck"),
 						PreferredLanguage: gu.Ptr("en"),
@@ -152,8 +153,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 						},
 					},
 					Profile: &user.SetHumanProfile{
-						FirstName:         "Donald",
-						LastName:          "Duck",
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
 						NickName:          gu.Ptr("Dukkie"),
 						DisplayName:       gu.Ptr("Donald Duck"),
 						PreferredLanguage: gu.Ptr("en"),
@@ -188,6 +189,53 @@ func TestServer_AddHumanUser(t *testing.T) {
 			},
 		},
 		{
+			name: "return phone verification code",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organisation: &object.Organisation{
+						Org: &object.Organisation_OrgId{
+							OrgId: Tester.Organisation.ID,
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Phone: &user.SetHumanPhone{
+						Phone: "+41791234567",
+						Verification: &user.SetHumanPhone_ReturnCode{
+							ReturnCode: &user.ReturnPhoneVerificationCode{},
+						},
+					},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_Password{
+						Password: &user.Password{
+							Password:       "DifficultPW666!",
+							ChangeRequired: true,
+						},
+					},
+				},
+			},
+			want: &user.AddHumanUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+				PhoneCode: gu.Ptr("something"),
+			},
+		},
+		{
 			name: "custom template error",
 			args: args{
 				CTX,
@@ -198,8 +246,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 						},
 					},
 					Profile: &user.SetHumanProfile{
-						FirstName:         "Donald",
-						LastName:          "Duck",
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
 						NickName:          gu.Ptr("Dukkie"),
 						DisplayName:       gu.Ptr("Donald Duck"),
 						PreferredLanguage: gu.Ptr("en"),
@@ -270,8 +318,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 						},
 					},
 					Profile: &user.SetHumanProfile{
-						FirstName:         "Donald",
-						LastName:          "Duck",
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
 						NickName:          gu.Ptr("Dukkie"),
 						DisplayName:       gu.Ptr("Donald Duck"),
 						PreferredLanguage: gu.Ptr("en"),
@@ -304,8 +352,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 						},
 					},
 					Profile: &user.SetHumanProfile{
-						FirstName:         "Donald",
-						LastName:          "Duck",
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
 						NickName:          gu.Ptr("Dukkie"),
 						DisplayName:       gu.Ptr("Donald Duck"),
 						PreferredLanguage: gu.Ptr("en"),
@@ -351,8 +399,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 						},
 					},
 					Profile: &user.SetHumanProfile{
-						FirstName:         "Donald",
-						LastName:          "Duck",
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
 						NickName:          gu.Ptr("Dukkie"),
 						DisplayName:       gu.Ptr("Donald Duck"),
 						PreferredLanguage: gu.Ptr("en"),
@@ -391,6 +439,79 @@ func TestServer_AddHumanUser(t *testing.T) {
 					ResourceOwner: Tester.Organisation.ID,
 				},
 			},
+		},
+		{
+			name: "hashed password",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organisation: &object.Organisation{
+						Org: &object.Organisation_OrgId{
+							OrgId: Tester.Organisation.ID,
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_HashedPassword{
+						HashedPassword: &user.HashedPassword{
+							Hash: "$2y$12$hXUrnqdq1RIIYZ2HPytIIe5lXdIvbhqrTvdPsSF7o.jFh817Z6lwm",
+						},
+					},
+				},
+			},
+			want: &user.AddHumanUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+		{
+			name: "unsupported hashed password",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organisation: &object.Organisation{
+						Org: &object.Organisation_OrgId{
+							OrgId: Tester.Organisation.ID,
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_HashedPassword{
+						HashedPassword: &user.HashedPassword{
+							Hash: "$scrypt$ln=16,r=8,p=1$cmFuZG9tc2FsdGlzaGFyZA$Rh+NnJNo1I6nRwaNqbDm6kmADswD1+7FTKZ7Ln9D8nQ",
+						},
+					},
+				},
+			},
+			wantErr: true,
 		},
 	}
 	for i, tt := range tests {
@@ -454,7 +575,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddIDPLinkRequest{
-					UserId: Tester.Users[integration.OrgOwner].ID,
+					UserId: Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID,
 					IdpLink: &user.IDPLink{
 						IdpId:    "idpID",
 						UserId:   "userID",
@@ -470,7 +591,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddIDPLinkRequest{
-					UserId: Tester.Users[integration.OrgOwner].ID,
+					UserId: Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID,
 					IdpLink: &user.IDPLink{
 						IdpId:    idpID,
 						UserId:   "userID",
@@ -501,23 +622,23 @@ func TestServer_AddIDPLink(t *testing.T) {
 	}
 }
 
-func TestServer_StartIdentityProviderFlow(t *testing.T) {
+func TestServer_StartIdentityProviderIntent(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t)
 	type args struct {
 		ctx context.Context
-		req *user.StartIdentityProviderFlowRequest
+		req *user.StartIdentityProviderIntentRequest
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *user.StartIdentityProviderFlowResponse
+		want    *user.StartIdentityProviderIntentResponse
 		wantErr bool
 	}{
 		{
 			name: "missing urls",
 			args: args{
 				CTX,
-				&user.StartIdentityProviderFlowRequest{
+				&user.StartIdentityProviderIntentRequest{
 					IdpId: idpID,
 				},
 			},
@@ -528,19 +649,23 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 			name: "next step auth url",
 			args: args{
 				CTX,
-				&user.StartIdentityProviderFlowRequest{
-					IdpId:      idpID,
-					SuccessUrl: "https://example.com/success",
-					FailureUrl: "https://example.com/failure",
+				&user.StartIdentityProviderIntentRequest{
+					IdpId: idpID,
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
+						Urls: &user.RedirectURLs{
+							SuccessUrl: "https://example.com/success",
+							FailureUrl: "https://example.com/failure",
+						},
+					},
 				},
 			},
-			want: &user.StartIdentityProviderFlowResponse{
+			want: &user.StartIdentityProviderIntentResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
-				NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{
-					AuthUrl: "https://example.com/oauth/v2/authorize?client_id=clientID&prompt=select_account&redirect_uri=https%3A%2F%2Flocalhost%3A8080%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=",
+				NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{
+					AuthUrl: "https://example.com/oauth/v2/authorize?client_id=clientID&prompt=select_account&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=",
 				},
 			},
 			wantErr: false,
@@ -548,7 +673,7 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.StartIdentityProviderFlow(tt.args.ctx, tt.args.req)
+			got, err := Client.StartIdentityProviderIntent(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -565,27 +690,28 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 	}
 }
 
-func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
+func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t)
 	intentID := Tester.CreateIntent(t, idpID)
-	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulIntent(t, idpID, "", "id")
+	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulOAuthIntent(t, idpID, "", "id")
+	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Tester.CreateSuccessfulLDAPIntent(t, idpID, "", "id")
 	type args struct {
 		ctx context.Context
-		req *user.RetrieveIdentityProviderInformationRequest
+		req *user.RetrieveIdentityProviderIntentRequest
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *user.RetrieveIdentityProviderInformationResponse
+		want    *user.RetrieveIdentityProviderIntentResponse
 		wantErr bool
 	}{
 		{
 			name: "failed intent",
 			args: args{
 				CTX,
-				&user.RetrieveIdentityProviderInformationRequest{
-					IntentId: intentID,
-					Token:    "",
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    intentID,
+					IdpIntentToken: "",
 				},
 			},
 			wantErr: true,
@@ -594,9 +720,9 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 			name: "wrong token",
 			args: args{
 				CTX,
-				&user.RetrieveIdentityProviderInformationRequest{
-					IntentId: successfulID,
-					Token:    "wrong token",
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    successfulID,
+					IdpIntentToken: "wrong token",
 				},
 			},
 			wantErr: true,
@@ -605,12 +731,12 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 			name: "retrieve successful intent",
 			args: args{
 				CTX,
-				&user.RetrieveIdentityProviderInformationRequest{
-					IntentId: successfulID,
-					Token:    token,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    successfulID,
+					IdpIntentToken: token,
 				},
 			},
-			want: &user.RetrieveIdentityProviderInformationResponse{
+			want: &user.RetrieveIdentityProviderIntentResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.New(changeDate),
 					ResourceOwner: Tester.Organisation.ID,
@@ -638,17 +764,62 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "retrieve successful ldap intent",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    ldapSuccessfulID,
+					IdpIntentToken: ldapToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(ldapChangeDate),
+					ResourceOwner: Tester.Organisation.ID,
+					Sequence:      ldapSequence,
+				},
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Ldap{
+						Ldap: &user.IDPLDAPAccessInformation{
+							Attributes: func() *structpb.Struct {
+								s, err := structpb.NewStruct(map[string]interface{}{
+									"id":       []interface{}{"id"},
+									"username": []interface{}{"username"},
+									"language": []interface{}{"en"},
+								})
+								require.NoError(t, err)
+								return s
+							}(),
+						},
+					},
+					IdpId:    idpID,
+					UserId:   "id",
+					UserName: "username",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"id":                "id",
+							"preferredUsername": "username",
+							"preferredLanguage": "en",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.RetrieveIdentityProviderInformation(tt.args.ctx, tt.args.req)
+			got, err := Client.RetrieveIdentityProviderIntent(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
 			}
 
-			grpc.AllFieldsEqual(t, got.ProtoReflect(), tt.want.ProtoReflect(), grpc.CustomMappers)
+			grpc.AllFieldsEqual(t, tt.want.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
 		})
 	}
 }

@@ -77,6 +77,10 @@ func (p *idpUserLinkProjection) reducers() []handler.AggregateReducer {
 					Event:  user.UserRemovedType,
 					Reduce: p.reduceUserRemoved,
 				},
+				{
+					Event:  user.UserIDPExternalIDMigratedType,
+					Reduce: p.reduceExternalIDMigrated,
+				},
 			},
 		},
 		{
@@ -167,13 +171,8 @@ func (p *idpUserLinkProjection) reduceOwnerRemoved(event eventstore.Event) (*han
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-PGiAY", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(IDPUserLinkChangeDateCol, e.CreationDate()),
-			handler.NewCol(IDPUserLinkSequenceCol, e.Sequence()),
-			handler.NewCol(IDPUserLinkOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(IDPUserLinkResourceOwnerCol, e.Aggregate().ID),
 			handler.NewCond(IDPUserLinkInstanceIDCol, e.Aggregate().InstanceID),
@@ -190,6 +189,27 @@ func (p *idpUserLinkProjection) reduceUserRemoved(event eventstore.Event) (*hand
 	return crdb.NewDeleteStatement(e,
 		[]handler.Condition{
 			handler.NewCond(IDPUserLinkUserIDCol, e.Aggregate().ID),
+			handler.NewCond(IDPUserLinkInstanceIDCol, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *idpUserLinkProjection) reduceExternalIDMigrated(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*user.UserIDPExternalIDMigratedEvent](event)
+	if err != nil {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AS3th", "reduce.wrong.event.type %s", user.UserIDPExternalIDMigratedType)
+	}
+
+	return crdb.NewUpdateStatement(e,
+		[]handler.Column{
+			handler.NewCol(IDPUserLinkChangeDateCol, e.CreationDate()),
+			handler.NewCol(IDPUserLinkSequenceCol, e.Sequence()),
+			handler.NewCol(IDPUserLinkExternalUserIDCol, e.NewID),
+		},
+		[]handler.Condition{
+			handler.NewCond(IDPUserLinkIDPIDCol, e.IDPConfigID),
+			handler.NewCond(IDPUserLinkUserIDCol, e.Aggregate().ID),
+			handler.NewCond(IDPUserLinkExternalUserIDCol, e.PreviousID),
 			handler.NewCond(IDPUserLinkInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil

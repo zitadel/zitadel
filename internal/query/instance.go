@@ -166,23 +166,22 @@ func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQu
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-M9fow", "Errors.Query.SQLStatement")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		instances, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-3j98f", "Errors.Internal")
-	}
-	instances, err = scan(rows)
-	if err != nil {
-		return nil, err
 	}
 	return instances, err
 }
 
-func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (_ *Instance, err error) {
+func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (instance *Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.InstanceProjection.Trigger(ctx)
+		ctx = projection.InstanceProjection.Trigger(ctx)
 	}
 
 	stmt, scan := prepareInstanceDomainQuery(ctx, q.client, authz.GetInstance(ctx).RequestedDomain())
@@ -193,14 +192,14 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (_ *Inst
 		return nil, errors.ThrowInternal(err, "QUERY-d9ngs", "Errors.Query.SQLStatement")
 	}
 
-	row, err := q.client.QueryContext(ctx, query, args...)
-	if err != nil {
-		return nil, err
-	}
-	return scan(row)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		instance, err = scan(rows)
+		return err
+	}, query, args...)
+	return instance, err
 }
 
-func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Instance, err error) {
+func (q *Queries) InstanceByHost(ctx context.Context, host string) (instance authz.Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -213,11 +212,11 @@ func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Inst
 		return nil, errors.ThrowInternal(err, "QUERY-SAfg2", "Errors.Query.SQLStatement")
 	}
 
-	row, err := q.client.QueryContext(ctx, query, args...)
-	if err != nil {
-		return nil, err
-	}
-	return scan(row)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		instance, err = scan(rows)
+		return err
+	}, query, args...)
+	return instance, err
 }
 
 func (q *Queries) InstanceByID(ctx context.Context) (_ authz.Instance, err error) {

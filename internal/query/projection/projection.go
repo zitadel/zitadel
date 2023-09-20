@@ -64,8 +64,12 @@ var (
 	NotificationPolicyProjection        *notificationPolicyProjection
 	NotificationsProjection             interface{}
 	NotificationsQuotaProjection        interface{}
+	TelemetryPusherProjection           interface{}
 	DeviceAuthProjection                *deviceAuthProjection
 	SessionProjection                   *sessionProjection
+	AuthRequestProjection               *authRequestProjection
+	MilestoneProjection                 *milestoneProjection
+	QuotaProjection                     *quotaProjection
 )
 
 type projection interface {
@@ -143,6 +147,9 @@ func Create(ctx context.Context, sqlClient *database.DB, es *eventstore.Eventsto
 	NotificationPolicyProjection = newNotificationPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["notification_policies"]))
 	DeviceAuthProjection = newDeviceAuthProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["device_auth"]))
 	SessionProjection = newSessionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["sessions"]))
+	AuthRequestProjection = newAuthRequestProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["auth_requests"]))
+	MilestoneProjection = newMilestoneProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["milestones"]))
+	QuotaProjection = newQuotaProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["quotas"]))
 	newProjectionsList()
 	return nil
 }
@@ -191,7 +198,7 @@ func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomCo
 // as setup and start currently create them individually, we make sure we get the right one
 // will be refactored when changing to new id based projections
 //
-// NotificationsProjection is not added here, because it does not statement based / has no proprietary projection table
+// Event handlers NotificationsProjection, NotificationsQuotaProjection and NotificationsProjection are not added here, because they do not reduce to database statements
 func newProjectionsList() {
 	projections = []projection{
 		OrgProjection,
@@ -240,5 +247,8 @@ func newProjectionsList() {
 		NotificationPolicyProjection,
 		DeviceAuthProjection,
 		SessionProjection,
+		AuthRequestProjection,
+		MilestoneProjection,
+		QuotaProjection,
 	}
 }

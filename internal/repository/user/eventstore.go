@@ -62,10 +62,12 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, HumanPasswordChangeSentType, HumanPasswordChangeSentEventMapper).
 		RegisterFilterEventMapper(AggregateType, HumanPasswordCheckSucceededType, HumanPasswordCheckSucceededEventMapper).
 		RegisterFilterEventMapper(AggregateType, HumanPasswordCheckFailedType, HumanPasswordCheckFailedEventMapper).
+		RegisterFilterEventMapper(AggregateType, HumanPasswordHashUpdatedType, eventstore.GenericEventMapper[HumanPasswordHashUpdatedEvent]).
 		RegisterFilterEventMapper(AggregateType, UserIDPLinkAddedType, UserIDPLinkAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, UserIDPLinkRemovedType, UserIDPLinkRemovedEventMapper).
 		RegisterFilterEventMapper(AggregateType, UserIDPLinkCascadeRemovedType, UserIDPLinkCascadeRemovedEventMapper).
 		RegisterFilterEventMapper(AggregateType, UserIDPLoginCheckSucceededType, UserIDPCheckSucceededEventMapper).
+		RegisterFilterEventMapper(AggregateType, UserIDPExternalIDMigratedType, eventstore.GenericEventMapper[UserIDPExternalIDMigratedEvent]).
 		RegisterFilterEventMapper(AggregateType, HumanEmailChangedType, HumanEmailChangedEventMapper).
 		RegisterFilterEventMapper(AggregateType, HumanEmailVerifiedType, HumanEmailVerifiedEventMapper).
 		RegisterFilterEventMapper(AggregateType, HumanEmailVerificationFailedType, HumanEmailVerificationFailedEventMapper).
@@ -87,6 +89,18 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, HumanMFAOTPRemovedType, HumanOTPRemovedEventMapper).
 		RegisterFilterEventMapper(AggregateType, HumanMFAOTPCheckSucceededType, HumanOTPCheckSucceededEventMapper).
 		RegisterFilterEventMapper(AggregateType, HumanMFAOTPCheckFailedType, HumanOTPCheckFailedEventMapper).
+		RegisterFilterEventMapper(AggregateType, HumanOTPSMSAddedType, eventstore.GenericEventMapper[HumanOTPSMSAddedEvent]).
+		RegisterFilterEventMapper(AggregateType, HumanOTPSMSRemovedType, eventstore.GenericEventMapper[HumanOTPSMSRemovedEvent]).
+		RegisterFilterEventMapper(AggregateType, HumanOTPSMSCodeAddedType, eventstore.GenericEventMapper[HumanOTPSMSCodeAddedEvent]).
+		RegisterFilterEventMapper(AggregateType, HumanOTPSMSCodeSentType, eventstore.GenericEventMapper[HumanOTPSMSCodeSentEvent]).
+		RegisterFilterEventMapper(AggregateType, HumanOTPSMSCheckSucceededType, eventstore.GenericEventMapper[HumanOTPSMSCheckSucceededEvent]).
+		RegisterFilterEventMapper(AggregateType, HumanOTPSMSCheckFailedType, eventstore.GenericEventMapper[HumanOTPSMSCheckFailedEvent]).
+		RegisterFilterEventMapper(AggregateType, HumanOTPEmailAddedType, eventstore.GenericEventMapper[HumanOTPEmailAddedEvent]).
+		RegisterFilterEventMapper(AggregateType, HumanOTPEmailRemovedType, eventstore.GenericEventMapper[HumanOTPEmailRemovedEvent]).
+		RegisterFilterEventMapper(AggregateType, HumanOTPEmailCodeAddedType, eventstore.GenericEventMapper[HumanOTPEmailCodeAddedEvent]).
+		RegisterFilterEventMapper(AggregateType, HumanOTPEmailCodeSentType, eventstore.GenericEventMapper[HumanOTPEmailCodeSentEvent]).
+		RegisterFilterEventMapper(AggregateType, HumanOTPEmailCheckSucceededType, eventstore.GenericEventMapper[HumanOTPEmailCheckSucceededEvent]).
+		RegisterFilterEventMapper(AggregateType, HumanOTPEmailCheckFailedType, eventstore.GenericEventMapper[HumanOTPEmailCheckFailedEvent]).
 		RegisterFilterEventMapper(AggregateType, HumanU2FTokenAddedType, HumanU2FAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, HumanU2FTokenVerifiedType, HumanU2FVerifiedEventMapper).
 		RegisterFilterEventMapper(AggregateType, HumanU2FTokenSignCountChangedType, HumanU2FSignCountChangedEventMapper).

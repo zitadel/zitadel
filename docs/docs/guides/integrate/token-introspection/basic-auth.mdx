@@ -1,0 +1,104 @@
+---
+title: Basic Authentication in ZITADEL
+sidebar_label: Basic Authentication
+---
+
+import IntrospectionResponse from './_introspection-response.mdx';
+
+This is a guide on how to secure your API using [Basic Authentication](https://zitadel.com/docs/apis/openidoauth/authn-methods#client-secret-basic).
+
+## Register the API in ZITADEL
+
+1. Go to your project and click on the **New** button as shown below. 
+
+<img
+    src="/docs/img/guides/integrate/token-introspection-basic-auth-1.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+2.  Give a name to your application (Test API 2 is the name given below) and select type **API**. 
+
+<img
+    src="/docs/img/guides/integrate/token-introspection-basic-auth-2.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+3. Select **Basic** as the authentication method and click **Continue**.  
+
+<img
+     src="/docs/img/guides/integrate/token-introspection-basic-auth-3.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+4. Now review your configuration and click **Create**.   
+
+<img
+     src="/docs/img/guides/integrate/token-introspection-basic-auth-4.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+5. You will now see the API’s **Client ID** and the **Client Secret**. Copy them and click **Close**.    
+
+<img
+     src="/docs/img/guides/integrate/token-introspection-basic-auth-5.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+6. When you click **URLs** on the left, you will see the relevant OIDC URLs. Note down the **issuer** URL, **token_endpoint** and **introspection_endpoint**.  
+
+<img
+    src="/docs/img/guides/integrate/token-introspection-basic-auth-6.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+7. Also note down the **Resource ID** of your project.   
+
+<img
+     src="/docs/img/guides/integrate/token-introspection-basic-auth-7.png"
+    width="75%"
+    alt="Register the API"
+/>
+
+## Token introspection 
+
+With Basic Authentication, you will receive a Client ID and Client Secret for your API. Send your client_id and client_secret as a Basic Auth Header in the following format: 
+
+```
+Authorization: "Basic " + base64( formUrlEncode(client_id) + ":" + formUrlEncode(client_secret) )
+
+```
+
+The request from the API to the introspection endpoint should be in the following format:
+
+```bash
+curl --request POST \
+ --url {your_domain}/oauth/v2/introspect \
+ --header 'Content-Type: application/x-www-form-urlencoded' \
+ --header 'Authorization: Basic {your_basic_auth_header}' \
+ --data token=VjVxyCZmRmWYqd3_F5db9Pb9mHR5fqzhn...
+ ```
+
+Here's an example of how this is done in Python code:
+
+```python
+def introspect_token(self, token_string):
+    url = ZITADEL_INTROSPECTION_URL
+    data = {'token': token_string, 'token_type_hint': 'access_token', 'scope': 'openid'}
+    auth = HTTPBasicAuth(API_CLIENT_ID, API_CLIENT_SECRET)
+    resp = requests.post(url, data=data, auth=auth)
+    resp.raise_for_status()
+    return resp.json()
+```
+
+## Introspection response
+
+<IntrospectionResponse/>
+
+Follow this [tutorial](https://github.com/zitadel/examples-api-access-and-token-introspection/tree/main/api-basic-authentication) to learn how to register an API application using Basic Auth with ZITADEL and test it. 
+

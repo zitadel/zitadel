@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -19,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
@@ -198,9 +200,13 @@ func TestCommands_CreateIntent(t *testing.T) {
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			intentID, details, err := c.CreateIntent(tt.args.ctx, tt.args.idpID, tt.args.successURL, tt.args.failureURL, tt.args.resourceOwner)
+			intentWriteModel, details, err := c.CreateIntent(tt.args.ctx, tt.args.idpID, tt.args.successURL, tt.args.failureURL, tt.args.resourceOwner)
 			require.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.intentID, intentID)
+			if intentWriteModel != nil {
+				assert.Equal(t, tt.res.intentID, intentWriteModel.AggregateID)
+			} else {
+				assert.Equal(t, tt.res.intentID, "")
+			}
 			assert.Equal(t, tt.res.details, details)
 		})
 	}
@@ -348,6 +354,95 @@ func TestCommands_AuthURLFromProvider(t *testing.T) {
 				authURL: "auth?client_id=clientID&prompt=select_account&redirect_uri=url&response_type=code&state=state",
 			},
 		},
+		{
+			"migrated and push",
+			fields{
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"instance",
+							instance.NewOIDCIDPAddedEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
+								"idp",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{"openid", "profile", "User.Read"},
+								false,
+								rep_idp.Options{},
+							)),
+						eventFromEventPusherWithInstanceID(
+							"instance",
+							instance.NewOIDCIDPMigratedAzureADEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
+								"idp",
+								"name",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{"openid", "profile", "User.Read"},
+								"tenant",
+								true,
+								rep_idp.Options{},
+							)),
+					),
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"instance",
+							instance.NewOIDCIDPAddedEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
+								"idp",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{"openid", "profile", "User.Read"},
+								false,
+								rep_idp.Options{},
+							)),
+						eventFromEventPusherWithInstanceID(
+							"instance",
+							instance.NewOIDCIDPMigratedAzureADEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
+								"idp",
+								"name",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{"openid", "profile", "User.Read"},
+								"tenant",
+								true,
+								rep_idp.Options{},
+							)),
+					),
+				),
+			},
+			args{
+				ctx:         authz.SetCtxData(context.Background(), authz.CtxData{OrgID: "ro"}),
+				idpID:       "idp",
+				state:       "state",
+				callbackURL: "url",
+			},
+			res{
+				authURL: "https://login.microsoftonline.com/tenant/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=url&response_type=code&scope=openid+profile+User.Read&state=state",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -484,6 +579,103 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 				idpConfigEncryption: tt.fields.idpConfigEncryption,
 			}
 			got, err := c.SucceedIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.idpSession, tt.args.userID)
+			require.ErrorIs(t, err, tt.res.err)
+			assert.Equal(t, tt.res.token, got)
+		})
+	}
+}
+
+func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
+	type fields struct {
+		eventstore          *eventstore.Eventstore
+		idpConfigEncryption crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx        context.Context
+		writeModel *IDPIntentWriteModel
+		idpUser    idp.User
+		userID     string
+		attributes map[string][]string
+	}
+	type res struct {
+		token string
+		err   error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"encryption fails",
+			fields{
+				idpConfigEncryption: func() crypto.EncryptionAlgorithm {
+					m := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
+					m.EXPECT().Encrypt(gomock.Any()).Return(nil, z_errors.ThrowInternal(nil, "id", "encryption failed"))
+					return m
+				}(),
+			},
+			args{
+				ctx:        context.Background(),
+				writeModel: NewIDPIntentWriteModel("id", "ro"),
+			},
+			res{
+				err: z_errors.ThrowInternal(nil, "id", "encryption failed"),
+			},
+		},
+		{
+			"push",
+			fields{
+				idpConfigEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				eventstore: eventstoreExpect(t,
+					expectPush(
+						eventPusherToEvents(
+							idpintent.NewLDAPSucceededEvent(
+								context.Background(),
+								&idpintent.NewAggregate("id", "ro").Aggregate,
+								[]byte(`{"id":"id","preferredUsername":"username","preferredLanguage":"und"}`),
+								"id",
+								"username",
+								"",
+								map[string][]string{"id": {"id"}},
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx:        context.Background(),
+				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				attributes: map[string][]string{"id": {"id"}},
+				idpUser: ldap.NewUser(
+					"id",
+					"",
+					"",
+					"",
+					"",
+					"username",
+					"",
+					false,
+					"",
+					false,
+					language.Tag{},
+					"",
+					"",
+				),
+			},
+			res{
+				token: "aWQ",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:          tt.fields.eventstore,
+				idpConfigEncryption: tt.fields.idpConfigEncryption,
+			}
+			got, err := c.SucceedLDAPIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.userID, tt.args.attributes)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.token, got)
 		})
@@ -654,6 +846,31 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 				accessToken: nil,
 				idToken:     "idToken",
 				err:         nil,
+			},
+		},
+		{
+			"azure tokens",
+			args{
+				&azuread.Session{
+					Session: &oauth.Session{
+						Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+							Token: &oauth2.Token{
+								AccessToken: "accessToken",
+							},
+						},
+					},
+				},
+				crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			res{
+				accessToken: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("accessToken"),
+				},
+				idToken: "",
+				err:     nil,
 			},
 		},
 	}

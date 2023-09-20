@@ -172,7 +172,7 @@ func Test_OrgDomainPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Domains)(nil),
 		},
 	}
 	for _, tt := range tests {

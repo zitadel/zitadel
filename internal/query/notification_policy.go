@@ -76,12 +76,13 @@ var (
 	}
 )
 
-func (q *Queries) NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (_ *NotificationPolicy, err error) {
+func (q *Queries) NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (policy *NotificationPolicy, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		if err := projection.NotificationPolicyProjection.Trigger(ctx); err != nil {
+		ctx, err = projection.NotificationPolicyProjection.TriggerErr(ctx)
+		if err != nil {
 			return nil, err
 		}
 	}
@@ -103,16 +104,20 @@ func (q *Queries) NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk
 		return nil, errors.ThrowInternal(err, "QUERY-Xuoapqm", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		policy, err = scan(row)
+		return err
+	}, query, args...)
+	return policy, err
 }
 
-func (q *Queries) DefaultNotificationPolicy(ctx context.Context, shouldTriggerBulk bool) (_ *NotificationPolicy, err error) {
+func (q *Queries) DefaultNotificationPolicy(ctx context.Context, shouldTriggerBulk bool) (policy *NotificationPolicy, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		if err := projection.NotificationPolicyProjection.Trigger(ctx); err != nil {
+		ctx, err = projection.NotificationPolicyProjection.TriggerErr(ctx)
+		if err != nil {
 			return nil, err
 		}
 	}
@@ -128,8 +133,11 @@ func (q *Queries) DefaultNotificationPolicy(ctx context.Context, shouldTriggerBu
 		return nil, errors.ThrowInternal(err, "QUERY-xlqp209", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		policy, err = scan(row)
+		return err
+	}, query, args...)
+	return policy, err
 }
 
 func prepareNotificationPolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*NotificationPolicy, error)) {

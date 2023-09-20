@@ -66,7 +66,7 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
 	}
-	_, _, err = l.command.SetUpOrg(ctx, data.toCommandOrg(), userIDs...)
+	_, err = l.command.SetUpOrg(ctx, data.toCommandOrg(), true, userIDs...)
 	if err != nil {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
@@ -144,15 +144,19 @@ func (d registerOrgFormData) toCommandOrg() *command.OrgSetup {
 	}
 	return &command.OrgSetup{
 		Name: d.RegisterOrgName,
-		Human: &command.AddHuman{
-			Username:  d.Username,
-			FirstName: d.Firstname,
-			LastName:  d.Lastname,
-			Email: command.Email{
-				Address: d.Email,
+		Admins: []*command.OrgSetupAdmin{
+			{
+				Human: &command.AddHuman{
+					Username:  d.Username,
+					FirstName: d.Firstname,
+					LastName:  d.Lastname,
+					Email: command.Email{
+						Address: d.Email,
+					},
+					Password: d.Password,
+					Register: true,
+				},
 			},
-			Password: d.Password,
-			Register: true,
 		},
 	}
 }

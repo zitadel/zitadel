@@ -100,12 +100,12 @@ type ProjectSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool) (_ *Project, err error) {
+func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool) (project *Project, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.ProjectProjection.Trigger(ctx)
+		ctx = projection.ProjectProjection.Trigger(ctx)
 	}
 
 	stmt, scan := prepareProjectQuery(ctx, q.client)
@@ -121,8 +121,11 @@ func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id st
 		return nil, errors.ThrowInternal(err, "QUERY-2m00Q", "Errors.Query.SQLStatment")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		project, err = scan(row)
+		return err
+	}, query, args...)
+	return project, err
 }
 
 func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQueries, withOwnerRemoved bool) (projects *Projects, err error) {
@@ -139,13 +142,12 @@ func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQuer
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-fn9ew", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		projects, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-2j00f", "Errors.Internal")
-	}
-	projects, err = scan(rows)
-	if err != nil {
-		return nil, err
 	}
 	projects.LatestSequence, err = q.latestSequence(ctx, projectsTable)
 	return projects, err

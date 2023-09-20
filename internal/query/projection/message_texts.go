@@ -253,13 +253,8 @@ func (p *messageTextProjection) reduceOwnerRemoved(event eventstore.Event) (*han
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-mLsQw", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(MessageTextChangeDateCol, e.CreationDate()),
-			handler.NewCol(MessageTextSequenceCol, e.Sequence()),
-			handler.NewCol(MessageTextOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(MessageTextInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(MessageTextAggregateIDCol, e.Aggregate().ID),
@@ -272,6 +267,8 @@ func isMessageTemplate(template string) bool {
 		template == domain.PasswordResetMessageType ||
 		template == domain.VerifyEmailMessageType ||
 		template == domain.VerifyPhoneMessageType ||
+		template == domain.VerifySMSOTPMessageType ||
+		template == domain.VerifyEmailOTPMessageType ||
 		template == domain.DomainClaimedMessageType ||
 		template == domain.PasswordlessRegistrationMessageType ||
 		template == domain.PasswordChangeMessageType

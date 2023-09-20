@@ -1,6 +1,7 @@
 package command
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"fmt"
@@ -13,31 +14,41 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/session"
+	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type SessionCommand func(ctx context.Context, cmd *SessionCommands) error
 
 type SessionCommands struct {
-	cmds []SessionCommand
+	sessionCommands []SessionCommand
 
 	sessionWriteModel  *SessionWriteModel
 	passwordWriteModel *HumanPasswordWriteModel
 	intentWriteModel   *IDPIntentWriteModel
+	totpWriteModel     *HumanTOTPWriteModel
 	eventstore         *eventstore.Eventstore
-	userPasswordAlg    crypto.HashAlgorithm
-	intentAlg          crypto.EncryptionAlgorithm
-	createToken        func(sessionID string) (id string, token string, err error)
-	now                func() time.Time
+	eventCommands      []eventstore.Command
+
+	hasher      *crypto.PasswordHasher
+	intentAlg   crypto.EncryptionAlgorithm
+	totpAlg     crypto.EncryptionAlgorithm
+	otpAlg      crypto.EncryptionAlgorithm
+	createCode  cryptoCodeWithDefaultFunc
+	createToken func(sessionID string) (id string, token string, err error)
+	now         func() time.Time
 }
 
 func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWriteModel) *SessionCommands {
 	return &SessionCommands{
-		cmds:              cmds,
+		sessionCommands:   cmds,
 		sessionWriteModel: session,
 		eventstore:        c.eventstore,
-		userPasswordAlg:   c.userPasswordAlg,
+		hasher:            c.userPasswordHasher,
 		intentAlg:         c.idpConfigEncryption,
+		totpAlg:           c.multifactors.OTP.CryptoMFA,
+		otpAlg:            c.userEncryption,
+		createCode:        c.newCodeWithDefault,
 		createToken:       c.sessionTokenCreator,
 		now:               time.Now,
 	}
@@ -49,7 +60,7 @@ func CheckUser(id string) SessionCommand {
 		if cmd.sessionWriteModel.UserID != "" && id != "" && cmd.sessionWriteModel.UserID != id {
 			return caos_errs.ThrowInvalidArgument(nil, "", "user change not possible")
 		}
-		return cmd.sessionWriteModel.UserChecked(ctx, id, cmd.now())
+		return cmd.UserChecked(ctx, id, cmd.now())
 	}
 }
 
@@ -68,17 +79,21 @@ func CheckPassword(password string) SessionCommand {
 			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.User.NotFound")
 		}
 
-		if cmd.passwordWriteModel.Secret == nil {
+		if cmd.passwordWriteModel.EncodedHash == "" {
 			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-WEf3t", "Errors.User.Password.NotSet")
 		}
-		ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
-		err = crypto.CompareHash(cmd.passwordWriteModel.Secret, []byte(password), cmd.userPasswordAlg)
+		ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
+		updated, err := cmd.hasher.Verify(cmd.passwordWriteModel.EncodedHash, password)
 		spanPasswordComparison.EndWithError(err)
 		if err != nil {
 			//TODO: maybe we want to reset the session in the future https://github.com/zitadel/zitadel/issues/5807
 			return caos_errs.ThrowInvalidArgument(err, "COMMAND-SAF3g", "Errors.User.Password.Invalid")
 		}
-		cmd.sessionWriteModel.PasswordChecked(ctx, cmd.now())
+		if updated != "" {
+			cmd.eventCommands = append(cmd.eventCommands, user.NewHumanPasswordHashUpdatedEvent(ctx, UserAggregateFromWriteModel(&cmd.passwordWriteModel.WriteModel), updated))
+		}
+
+		cmd.PasswordChecked(ctx, cmd.now())
 		return nil
 	}
 }
@@ -114,19 +129,127 @@ func CheckIntent(intentID, token string) SessionCommand {
 				return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser")
 			}
 		}
-		cmd.sessionWriteModel.IntentChecked(ctx, cmd.now())
+		cmd.IntentChecked(ctx, cmd.now())
+		return nil
+	}
+}
+
+func CheckTOTP(code string) SessionCommand {
+	return func(ctx context.Context, cmd *SessionCommands) (err error) {
+		if cmd.sessionWriteModel.UserID == "" {
+			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Neil7", "Errors.User.UserIDMissing")
+		}
+		cmd.totpWriteModel = NewHumanTOTPWriteModel(cmd.sessionWriteModel.UserID, "")
+		err = cmd.eventstore.FilterToQueryReducer(ctx, cmd.totpWriteModel)
+		if err != nil {
+			return err
+		}
+		if cmd.totpWriteModel.State != domain.MFAStateReady {
+			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-eej1U", "Errors.User.MFA.OTP.NotReady")
+		}
+		err = domain.VerifyTOTP(code, cmd.totpWriteModel.Secret, cmd.totpAlg)
+		if err != nil {
+			return err
+		}
+		cmd.TOTPChecked(ctx, cmd.now())
 		return nil
 	}
 }
 
 // Exec will execute the commands specified and returns an error on the first occurrence
 func (s *SessionCommands) Exec(ctx context.Context) error {
-	for _, cmd := range s.cmds {
+	for _, cmd := range s.sessionCommands {
 		if err := cmd(ctx, s); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func (s *SessionCommands) Start(ctx context.Context) {
+	s.eventCommands = append(s.eventCommands, session.NewAddedEvent(ctx, s.sessionWriteModel.aggregate))
+}
+
+func (s *SessionCommands) UserChecked(ctx context.Context, userID string, checkedAt time.Time) error {
+	s.eventCommands = append(s.eventCommands, session.NewUserCheckedEvent(ctx, s.sessionWriteModel.aggregate, userID, checkedAt))
+	// set the userID so other checks can use it
+	s.sessionWriteModel.UserID = userID
+	return nil
+}
+
+func (s *SessionCommands) PasswordChecked(ctx context.Context, checkedAt time.Time) {
+	s.eventCommands = append(s.eventCommands, session.NewPasswordCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
+}
+
+func (s *SessionCommands) IntentChecked(ctx context.Context, checkedAt time.Time) {
+	s.eventCommands = append(s.eventCommands, session.NewIntentCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
+}
+
+func (s *SessionCommands) WebAuthNChallenged(ctx context.Context, challenge string, allowedCrentialIDs [][]byte, userVerification domain.UserVerificationRequirement, rpid string) {
+	s.eventCommands = append(s.eventCommands, session.NewWebAuthNChallengedEvent(ctx, s.sessionWriteModel.aggregate, challenge, allowedCrentialIDs, userVerification, rpid))
+}
+
+func (s *SessionCommands) WebAuthNChecked(ctx context.Context, checkedAt time.Time, tokenID string, signCount uint32, userVerified bool) {
+	s.eventCommands = append(s.eventCommands,
+		session.NewWebAuthNCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt, userVerified),
+	)
+	if s.sessionWriteModel.WebAuthNChallenge.UserVerification == domain.UserVerificationRequirementRequired {
+		s.eventCommands = append(s.eventCommands,
+			user.NewHumanPasswordlessSignCountChangedEvent(ctx, s.sessionWriteModel.aggregate, tokenID, signCount),
+		)
+	} else {
+		s.eventCommands = append(s.eventCommands,
+			user.NewHumanU2FSignCountChangedEvent(ctx, s.sessionWriteModel.aggregate, tokenID, signCount),
+		)
+	}
+}
+
+func (s *SessionCommands) TOTPChecked(ctx context.Context, checkedAt time.Time) {
+	s.eventCommands = append(s.eventCommands, session.NewTOTPCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
+}
+
+func (s *SessionCommands) OTPSMSChallenged(ctx context.Context, code *crypto.CryptoValue, expiry time.Duration, returnCode bool) {
+	s.eventCommands = append(s.eventCommands, session.NewOTPSMSChallengedEvent(ctx, s.sessionWriteModel.aggregate, code, expiry, returnCode))
+}
+
+func (s *SessionCommands) OTPSMSChecked(ctx context.Context, checkedAt time.Time) {
+	s.eventCommands = append(s.eventCommands, session.NewOTPSMSCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
+}
+
+func (s *SessionCommands) OTPEmailChallenged(ctx context.Context, code *crypto.CryptoValue, expiry time.Duration, returnCode bool, urlTmpl string) {
+	s.eventCommands = append(s.eventCommands, session.NewOTPEmailChallengedEvent(ctx, s.sessionWriteModel.aggregate, code, expiry, returnCode, urlTmpl))
+}
+
+func (s *SessionCommands) OTPEmailChecked(ctx context.Context, checkedAt time.Time) {
+	s.eventCommands = append(s.eventCommands, session.NewOTPEmailCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
+}
+
+func (s *SessionCommands) SetToken(ctx context.Context, tokenID string) {
+	s.eventCommands = append(s.eventCommands, session.NewTokenSetEvent(ctx, s.sessionWriteModel.aggregate, tokenID))
+}
+
+func (s *SessionCommands) ChangeMetadata(ctx context.Context, metadata map[string][]byte) {
+	var changed bool
+	for key, value := range metadata {
+		currentValue, exists := s.sessionWriteModel.Metadata[key]
+
+		if len(value) != 0 {
+			// if a value is provided, and it's not equal, change it
+			if !bytes.Equal(currentValue, value) {
+				s.sessionWriteModel.Metadata[key] = value
+				changed = true
+			}
+		} else {
+			// if there's no / an empty value, we only need to remove it on existing entries
+			if exists {
+				delete(s.sessionWriteModel.Metadata, key)
+				changed = true
+			}
+		}
+	}
+	if changed {
+		s.eventCommands = append(s.eventCommands, session.NewMetadataSetEvent(ctx, s.sessionWriteModel.aggregate, s.sessionWriteModel.Metadata))
+	}
 }
 
 func (s *SessionCommands) gethumanWriteModel(ctx context.Context) (*HumanWriteModel, error) {
@@ -145,7 +268,7 @@ func (s *SessionCommands) gethumanWriteModel(ctx context.Context) (*HumanWriteMo
 }
 
 func (s *SessionCommands) commands(ctx context.Context) (string, []eventstore.Command, error) {
-	if len(s.sessionWriteModel.commands) == 0 {
+	if len(s.eventCommands) == 0 {
 		return "", nil, nil
 	}
 
@@ -153,8 +276,8 @@ func (s *SessionCommands) commands(ctx context.Context) (string, []eventstore.Co
 	if err != nil {
 		return "", nil, err
 	}
-	s.sessionWriteModel.SetToken(ctx, tokenID)
-	return token, s.sessionWriteModel.commands, nil
+	s.SetToken(ctx, tokenID)
+	return token, s.eventCommands, nil
 }
 
 func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, metadata map[string][]byte) (set *SessionChanged, err error) {
@@ -168,7 +291,7 @@ func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, met
 		return nil, err
 	}
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
-	cmd.sessionWriteModel.Start(ctx)
+	cmd.Start(ctx)
 	return c.updateSession(ctx, cmd, metadata)
 }
 
@@ -185,13 +308,23 @@ func (c *Commands) UpdateSession(ctx context.Context, sessionID, sessionToken st
 	return c.updateSession(ctx, cmd, metadata)
 }
 
-func (c *Commands) TerminateSession(ctx context.Context, sessionID, sessionToken string) (*domain.ObjectDetails, error) {
+func (c *Commands) TerminateSession(ctx context.Context, sessionID string, sessionToken string) (*domain.ObjectDetails, error) {
+	return c.terminateSession(ctx, sessionID, sessionToken, true)
+}
+
+func (c *Commands) TerminateSessionWithoutTokenCheck(ctx context.Context, sessionID string) (*domain.ObjectDetails, error) {
+	return c.terminateSession(ctx, sessionID, "", false)
+}
+
+func (c *Commands) terminateSession(ctx context.Context, sessionID, sessionToken string, mustCheckToken bool) (*domain.ObjectDetails, error) {
 	sessionWriteModel := NewSessionWriteModel(sessionID, "")
 	if err := c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}
-	if err := c.sessionPermission(ctx, sessionWriteModel, sessionToken, domain.PermissionSessionDelete); err != nil {
-		return nil, err
+	if mustCheckToken {
+		if err := c.sessionPermission(ctx, sessionWriteModel, sessionToken, domain.PermissionSessionDelete); err != nil {
+			return nil, err
+		}
 	}
 	if sessionWriteModel.State != domain.SessionStateActive {
 		return writeModelToObjectDetails(&sessionWriteModel.WriteModel), nil
@@ -217,7 +350,7 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, m
 		// TODO: how to handle failed checks (e.g. pw wrong) https://github.com/zitadel/zitadel/issues/5807
 		return nil, err
 	}
-	checks.sessionWriteModel.ChangeMetadata(ctx, metadata)
+	checks.ChangeMetadata(ctx, metadata)
 	sessionToken, cmds, err := checks.commands(ctx)
 	if err != nil {
 		return nil, err

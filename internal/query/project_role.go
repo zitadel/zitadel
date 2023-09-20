@@ -83,12 +83,12 @@ type ProjectRoleSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool, queries *ProjectRoleSearchQueries, withOwnerRemoved bool) (projects *ProjectRoles, err error) {
+func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool, queries *ProjectRoleSearchQueries, withOwnerRemoved bool) (roles *ProjectRoles, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.ProjectRoleProjection.Trigger(ctx)
+		ctx = projection.ProjectRoleProjection.Trigger(ctx)
 	}
 
 	eq := sq.Eq{ProjectRoleColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
@@ -102,19 +102,18 @@ func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		roles, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-5Ngd9", "Errors.Internal")
 	}
-	projects, err = scan(rows)
-	if err != nil {
-		return nil, err
-	}
-	projects.LatestSequence, err = q.latestSequence(ctx, projectRolesTable)
-	return projects, err
+	roles.LatestSequence, err = q.latestSequence(ctx, projectRolesTable)
+	return roles, err
 }
 
-func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grantedOrg string, queries *ProjectRoleSearchQueries, withOwnerRemoved bool) (projects *ProjectRoles, err error) {
+func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grantedOrg string, queries *ProjectRoleSearchQueries, withOwnerRemoved bool) (roles *ProjectRoles, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -138,16 +137,16 @@ func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grante
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		roles, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-5Ngd9", "Errors.Internal")
 	}
-	projects, err = scan(rows)
-	if err != nil {
-		return nil, err
-	}
-	projects.LatestSequence, err = q.latestSequence(ctx, projectRolesTable)
-	return projects, err
+
+	roles.LatestSequence, err = q.latestSequence(ctx, projectRolesTable)
+	return roles, err
 }
 
 func NewProjectRoleProjectIDSearchQuery(value string) (SearchQuery, error) {

@@ -1,7 +1,6 @@
 package user
 
 import (
-	"errors"
 	"testing"
 	"time"
 
@@ -19,81 +18,13 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 var ignoreTypes = []protoreflect.FullName{"google.protobuf.Duration", "google.protobuf.Struct"}
 
-func Test_hashedPasswordToCommand(t *testing.T) {
-	type args struct {
-		hashed *user.HashedPassword
-	}
-	type res struct {
-		want string
-		err  func(error) bool
-	}
-	tests := []struct {
-		name string
-		args args
-		res  res
-	}{
-		{
-			"not hashed",
-			args{
-				hashed: nil,
-			},
-			res{
-				"",
-				nil,
-			},
-		},
-		{
-			"hashed, not bcrypt",
-			args{
-				hashed: &user.HashedPassword{
-					Hash:      "hash",
-					Algorithm: "custom",
-				},
-			},
-			res{
-				"",
-				func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.InvalidArgument"))
-				},
-			},
-		},
-		{
-			"hashed, bcrypt",
-			args{
-				hashed: &user.HashedPassword{
-					Hash:      "hash",
-					Algorithm: "bcrypt",
-				},
-			},
-			res{
-				"hash",
-				nil,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := hashedPasswordToCommand(tt.args.hashed)
-			if tt.res.err == nil {
-				require.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
-			}
-		})
-	}
-}
-
-func Test_intentToIDPInformationPb(t *testing.T) {
+func Test_idpIntentToIDPIntentPb(t *testing.T) {
 	decryption := func(err error) crypto.EncryptionAlgorithm {
 		mCrypto := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
 		mCrypto.EXPECT().Algorithm().Return("enc")
@@ -113,7 +44,7 @@ func Test_intentToIDPInformationPb(t *testing.T) {
 		alg    crypto.EncryptionAlgorithm
 	}
 	type res struct {
-		resp *user.RetrieveIdentityProviderInformationResponse
+		resp *user.RetrieveIdentityProviderIntentResponse
 		err  error
 	}
 	tests := []struct {
@@ -142,9 +73,10 @@ func Test_intentToIDPInformationPb(t *testing.T) {
 						KeyID:      "id",
 						Crypted:    []byte("accessToken"),
 					},
-					IDPIDToken: "idToken",
-					UserID:     "userID",
-					State:      domain.IDPIntentStateSucceeded,
+					IDPIDToken:         "idToken",
+					IDPEntryAttributes: map[string][]string{},
+					UserID:             "userID",
+					State:              domain.IDPIntentStateSucceeded,
 				},
 				alg: decryption(caos_errs.ThrowInternal(nil, "id", "invalid key id")),
 			},
@@ -154,7 +86,7 @@ func Test_intentToIDPInformationPb(t *testing.T) {
 			},
 		},
 		{
-			"successful",
+			"successful oauth",
 			args{
 				intent: &command.IDPIntentWriteModel{
 					WriteModel: eventstore.WriteModel{
@@ -181,7 +113,7 @@ func Test_intentToIDPInformationPb(t *testing.T) {
 				alg: decryption(nil),
 			},
 			res{
-				resp: &user.RetrieveIdentityProviderInformationResponse{
+				resp: &user.RetrieveIdentityProviderIntentResponse{
 					Details: &object_pb.Details{
 						Sequence:      123,
 						ChangeDate:    timestamppb.New(time.Date(2019, 4, 1, 1, 1, 1, 1, time.Local)),
@@ -209,16 +141,73 @@ func Test_intentToIDPInformationPb(t *testing.T) {
 				},
 				err: nil,
 			},
+		}, {
+			"successful ldap",
+			args{
+				intent: &command.IDPIntentWriteModel{
+					WriteModel: eventstore.WriteModel{
+						AggregateID:       "intentID",
+						ProcessedSequence: 123,
+						ResourceOwner:     "ro",
+						InstanceID:        "instanceID",
+						ChangeDate:        time.Date(2019, 4, 1, 1, 1, 1, 1, time.Local),
+					},
+					IDPID:       "idpID",
+					IDPUser:     []byte(`{"userID": "idpUserID", "username": "username"}`),
+					IDPUserID:   "idpUserID",
+					IDPUserName: "username",
+					IDPEntryAttributes: map[string][]string{
+						"id":        {"idpUserID"},
+						"firstName": {"firstname1", "firstname2"},
+						"lastName":  {"lastname"},
+					},
+					UserID: "userID",
+					State:  domain.IDPIntentStateSucceeded,
+				},
+			},
+			res{
+				resp: &user.RetrieveIdentityProviderIntentResponse{
+					Details: &object_pb.Details{
+						Sequence:      123,
+						ChangeDate:    timestamppb.New(time.Date(2019, 4, 1, 1, 1, 1, 1, time.Local)),
+						ResourceOwner: "ro",
+					},
+					IdpInformation: &user.IDPInformation{
+						Access: &user.IDPInformation_Ldap{
+							Ldap: &user.IDPLDAPAccessInformation{
+								Attributes: func() *structpb.Struct {
+									s, err := structpb.NewStruct(map[string]interface{}{
+										"id":        []interface{}{"idpUserID"},
+										"firstName": []interface{}{"firstname1", "firstname2"},
+										"lastName":  []interface{}{"lastname"},
+									})
+									require.NoError(t, err)
+									return s
+								}(),
+							},
+						},
+						IdpId:    "idpID",
+						UserId:   "idpUserID",
+						UserName: "username",
+						RawInformation: func() *structpb.Struct {
+							s, err := structpb.NewStruct(map[string]interface{}{
+								"userID":   "idpUserID",
+								"username": "username",
+							})
+							require.NoError(t, err)
+							return s
+						}(),
+					},
+				},
+				err: nil,
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := intentToIDPInformationPb(tt.args.intent, tt.args.alg)
+			got, err := idpIntentToIDPIntentPb(tt.args.intent, tt.args.alg)
 			require.ErrorIs(t, err, tt.res.err)
-			grpc.AllFieldsEqual(t, got.ProtoReflect(), tt.res.resp.ProtoReflect(), grpc.CustomMappers)
-			if tt.res.resp != nil {
-				grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
-			}
+			grpc.AllFieldsEqual(t, tt.res.resp.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
 		})
 	}
 }
@@ -263,8 +252,8 @@ func Test_authMethodTypeToPb(t *testing.T) {
 			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED,
 		},
 		{
-			"(t)otp",
-			domain.UserAuthMethodTypeOTP,
+			"totp",
+			domain.UserAuthMethodTypeTOTP,
 			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_TOTP,
 		},
 		{
@@ -286,6 +275,16 @@ func Test_authMethodTypeToPb(t *testing.T) {
 			"idp",
 			domain.UserAuthMethodTypeIDP,
 			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP,
+		},
+		{
+			"otp sms",
+			domain.UserAuthMethodTypeOTPSMS,
+			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_SMS,
+		},
+		{
+			"otp email",
+			domain.UserAuthMethodTypeOTPEmail,
+			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_EMAIL,
 		},
 	}
 	for _, tt := range tests {

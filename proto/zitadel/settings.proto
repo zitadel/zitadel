@@ -48,6 +48,8 @@ enum SecretGeneratorType {
   SECRET_GENERATOR_TYPE_PASSWORD_RESET_CODE = 4;
   SECRET_GENERATOR_TYPE_PASSWORDLESS_INIT_CODE = 5;
   SECRET_GENERATOR_TYPE_APP_SECRET = 6;
+  SECRET_GENERATOR_TYPE_OTP_SMS = 7;
+  SECRET_GENERATOR_TYPE_OTP_EMAIL = 8;
 }
 
 message SMTPConfig {
@@ -71,6 +73,11 @@ message SMTPConfig {
   string user = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+    }
+  ];
+  string reply_to_address = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"replyto@m.zitadel.cloud\"";
     }
   ];
 }

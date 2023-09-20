@@ -85,12 +85,12 @@ type PersonalAccessTokenSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, queries ...SearchQuery) (_ *PersonalAccessToken, err error) {
+func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, queries ...SearchQuery) (pat *PersonalAccessToken, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.PersonalAccessTokenProjection.Trigger(ctx)
+		ctx = projection.PersonalAccessTokenProjection.Trigger(ctx)
 	}
 
 	query, scan := preparePersonalAccessTokenQuery(ctx, q.client)
@@ -109,8 +109,14 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk
 		return nil, errors.ThrowInternal(err, "QUERY-Dgfb4", "Errors.Query.SQLStatment")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		pat, err = scan(row)
+		return err
+	}, stmt, args...)
+	if err != nil {
+		return nil, err
+	}
+	return pat, nil
 }
 
 func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *PersonalAccessTokenSearchQueries, withOwnerRemoved bool) (personalAccessTokens *PersonalAccessTokens, err error) {
@@ -129,14 +135,15 @@ func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *Perso
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-Hjw2w", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		personalAccessTokens, err = scan(rows)
+		return err
+
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Bmz63", "Errors.Internal")
 	}
-	personalAccessTokens, err = scan(rows)
-	if err != nil {
-		return nil, err
-	}
+
 	personalAccessTokens.LatestSequence, err = q.latestSequence(ctx, personalAccessTokensTable)
 	return personalAccessTokens, err
 }

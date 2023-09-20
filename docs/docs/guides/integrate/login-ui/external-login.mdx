@@ -1,12 +1,12 @@
 ---
-title: Handle External Login
+title: Handle External Logins in ZITADEL
 sidebar_label: External Identity Provider
 ---
 
 ## Flow
 
 The prerequisite for adding an external login (social and enterprise) to your user account is a registered identity provider on your ZITADEL instance or the organization of the user.
-If you haven’t added a provider yet, have a look at the following guide first: [Identity Providers](https://zitadel.com/docs/guides/integrate/identity-providers)
+If you haven’t added a provider yet, have a look at the following guide first: [Identity Providers](/docs/guides/integrate/identity-providers)
 
 ![Identity Provider Flow](/img/guides/login-ui/external-login-flow.png)
 
@@ -20,17 +20,18 @@ Send the following two URLs in the request body:
 2. ErrorURL: Page that should be shown when an error happens during the authentication
 
 In the response, you will get an authentication URL of the provider you like.
-[Start Identity Provider Flow Documentation](https://zitadel.com/docs/apis/resources/user_service/user-service-start-identity-provider-flow)
+[Start Identity Provider Intent Documentation](/docs/apis/resources/user_service/user-service-start-identity-provider-intent)
 
 ### Request
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/users/idps/$IDP_ID/start \
+  --url https://$ZITADEL_DOMAIN/v2beta/idp_intents \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
   --data '{
+  "idp_id": "$IDP_ID",
   "successUrl": "https://custom.com/login/idp/success",
   "failureUrl": "https://custom.com/login/idp/fail"
 }'
@@ -62,15 +63,15 @@ After the user has successfully authenticated, a redirect to the ZITADEL backend
 
 ## Get Provider Information
 
-ZITADEL will take the information of the provider. After this, a redirect will be made to either the success page in case of a successful login or to the error page in case of a failure will be performed. In the parameters, you will provide the intentID, a token, and optionally, if a user could be found, a user ID.
+ZITADEL will take the information of the provider. After this, a redirect will be made to either the success page in case of a successful login or to the error page in case of a failure will be performed. In the parameters, you will provide the IDP intentID, a token, and optionally, if a user could be found, a user ID.
 
 To get the information of the provider, make a request to ZITADEL.
-[Get Identity Provider Information Documentation](https://zitadel.com/docs/apis/resources/user_service/user-service-retrieve-identity-provider-information)
+[Retrieve Identity Provider Intent Documentation](/docs/apis/resources/user_service/user-service-retrieve-identity-provider-intent)
 
 ### Request
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/users/intents/$INTENT_ID/information \
+  --url https://$ZITADEL_DOMAIN/v2beta/idp_intents/$INTENT_ID \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -90,20 +91,20 @@ curl --request POST \
 	},
 	"idpInformation": {
 		"oauth": {
-			"accessToken": "ya29.a0AWY7CknrOORopcJK2XX2fQXV9NQpp8JdkKYx-mQZNrR-wktWWhc3QsepT6kloSCgFPS9N0beEBlEYoY5oYUhfc7VlLHTQz5iECE386pyx5YmTueyeQ9GXk1dAw89gi8KRyjNlJApFsfLJaoiLIvKJLf23eAyXgaCgYKAUMSARESFQG1tDrpnTJ2su8BBO24zfmzgneARw0165",
-			"idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg1YmE5MzEzZmQ3YTdkNGFmYTg0ODg0YWJjYzg0MDMwMDQzNjMxODAiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiIxODI5MDIwMjY1MDgtdW1taXQ3dHZjbHBnM2NxZmM4b2ljdGE1czI1aGtudWwuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiIxODI5MDIwMjY1MDgtdW1taXQ3dHZjbHBnM2NxZmM4b2ljdGE1czI1aGtudWwuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTEzOTI4MDU5NzU3MTU4NTY2MzciLCJoZCI6InJvb3RkLmNoIiwiZW1haWwiOiJmYWJpZW5uZUByb290ZC5jaCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoidGN5X25JTkZHNnFhRTBZTWFsQzZGdyIsIm5hbWUiOiJGYWJpZW5uZSBCw7xobGVyIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FBY0hUdGY5NzNRNk5IOEt6S1RNRVpFTFBVOWx4NDVXcFE5RlJCdXhGZFBiPXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkZhYmllbm5lIiwiZmFtaWx5X25hbWUiOiJCw7xobGVyIiwibG9jYWxlIjoiZGUiLCJpYXQiOjE2ODY4MTE0NjUsImV4cCI6MTY4NjgxNTA2NX0.PwlAHRM44e8eYyHzdfotOrcq5GZc4D15mWvN3rGdoDmu2RRgb4T0nDgkY6AVq2vNJxPfbiB1jFtNP6dgX-OgLIxNXg_tJJhwFh-eFPA37cIiv1CEcgEC-q1zXFIa3HrwHLreeU6i7C9JkDrKpkS-AKat1krf27QXxrxHLrWehi5F2l1OZuAKFWYaYmJOd0sVTDBA2o5SDcAiQs_D4-Q-kSl5f0gh607YVHLv7zjyfHtAOs7xPEkNEUVcqGBke2Zy9kAYIgiMriNxLA2EDxFtSyWnf-bCXKnuVX2hwEY0T0lUPrOAVkz7MEOKiacE2xAOczoQvl-wECU0UofLi8XZqg"
+			"accessToken": "ya29...",
+			"idToken": "ey..."
 		},
 		"idpId": "218528353504723201",
 		"rawInformation": {
 			"User": {
-				"email": "fabienne@rootd.ch",
+				"email": "minni@mouse.com",
 				"email_verified": true,
-				"family_name": "Bühler",
-				"given_name": "Fabienne",
-				"hd": "rootd.ch",
+				"family_name": "Mouse",
+				"given_name": "Minnie",
+				"hd": "mouse.com",
 				"locale": "de",
-				"name": "Fabienne Bühler",
-				"picture": "https://lh3.googleusercontent.com/a/AAcKTtf973Q6NH8KzKTMEZELPU9lx45WpQ9FRBuxFdPb=s96-c",
+				"name": "Minnie Mouse",
+				"picture": "https://lh3.googleusercontent.com/a/AAcKTtf973Q7NH8KzKTMEZELPU9lx45WpQ9FRBuxFdPb=s96-c",
 				"sub": "111392805975715856637"
 			}
 		}
@@ -120,13 +121,13 @@ After successfully authenticating using your identity provider, you have three p
 ### Login
 
 If you did get a user ID in the parameters when calling your success page, you know that a user is already linked with the used identity provider and you are ready to perform the login.
-Create a new session and include the intent ID and the token in the checks.
+Create a new session and include the IDP intent ID and the token in the checks.
 This check requires that the previous step ended on the successful page and didn't’t result in an error.
 
 #### Request
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/sessions \
+  --url https://$ZITADEL_DOMAIN/v2beta/sessions \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
 
@@ -136,9 +137,9 @@ curl --request POST \
 	"user": {
       		"userId": "218662596918640897"
     	},
-	"intent": {
-      		"intentId": "219647325729980673",
-      		"token": "k86ihn-VLMMUGKy1q1b5i_foECspKYqei1l4mS8LT7Xzjw"
+	"idpIntent": {
+      		"idpIntentId": "219647325729980673",
+      		"idpIntentToken": "k86ihn-VLMMUGKy1q1b5i_foECspKYqei1l4mS8LT7Xzjw"
     	}
   }
 }'
@@ -152,20 +153,20 @@ Fill the IdP links in the create user request to add a user with an external log
 The idpId is the ID of the provider in ZITADEL, the idpExternalId is the ID of the user in the external identity provider; usually, this is sent in the “sub”.
 The display name is used to list the linkings on the users.
 
-[Create User API Documentation](https://zitadel.com/docs/apis/resources/user_service/user-service-add-human-user)
+[Create User API Documentation](/docs/apis/resources/user_service/user-service-add-human-user)
 
 #### Request
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/users/human \
+  --url https://$ZITADEL_DOMAIN/v2beta/users/human \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
   --data '{
   "username": "minni-mouse@mouse.com",
   "profile": {
-    "firstName": "Minnie",
-    "lastName": "Mouse",
+    "givenName": "Minnie",
+    "familyName": "Mouse",
     "nickName": "Mini",
     "displayName": "Minnie Mouse",
     "preferredLanguage": "en",
@@ -190,12 +191,12 @@ curl --request POST \
 If you didn't get a user ID in the parameters to your success page, you know that there is no existing user in ZITADEL with that provider and you can register a new user (read previous section), or link it to an existing account.
 
 If you want to link/connect to an existing account you can perform the add identity provider link request.
-[Add IDP Link to existing user documentation](https://zitadel.com/docs/apis/resources/user_service/user-service-add-idp-link)
+[Add IDP Link to existing user documentation](/docs/apis/resources/user_service/user-service-add-idp-link)
 
 #### Request
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/users/users/218385419895570689/links \
+  --url https://$ZITADEL_DOMAIN/v2beta/users/users/218385419895570689/links \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \

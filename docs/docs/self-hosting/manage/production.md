@@ -1,5 +1,6 @@
 ---
-title: Production Setup
+title: ZITADEL Production Setup
+sidebar_lable: Production Setup
 ---
 
 As soon as you successfully deployed ZITADEL as a proof of concept using one of our [deployment guides](/docs/self-hosting/deploy/overview),
@@ -21,6 +22,9 @@ Read more about separating the init and setup phases on the [Updating and Scalin
 ## Configuration
 
 Read [on the configure page](/docs/self-hosting/manage/configure) about the available options you have to configure ZITADEL.
+Prefer passing .yaml files to the ZITADEL binary instead of environment variables.
+Restricting access to these files to avoid leaking sensitive information is easier than restricting access to environment variables.
+Also, not all configuration options are available as environment variables.
 
 ## Networking
 
@@ -60,6 +64,26 @@ Log file management should not be in each business apps responsibility.
 Instead, your execution environment should provide tooling for managing logs in a generic way.
 This includes tasks like rotating files, routing, collecting, archiving and cleaning-up.
 For example, systemd has journald and kubernetes has fluentd and fluentbit.
+
+## Telemetry
+
+If you want to have some data about reached usage milestones pushed to external systems, enable telemetry in the ZITADEL configuration.
+
+The following table describes the milestones that are sent to the endpoints:
+
+| Trigger                                                                           | Description                                                                                                                                        |
+|-----------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| A virtual instance is created.                                                    | This data point is also sent when the first instance is automatically created during the ZITADEL binaries setup phase in a self-hosting scenario.  |
+| An authentication succeeded for the first time on an instance.                    | This is the first authentication with the instances automatically created admin user during the instance setup, which can be a human or a machine. |
+| A project is created for the first time in a virtual instance.                    | The ZITADEL project that is automatically created during the instance setup is omitted.                                                            |
+| An application is created for the first time in a virtual instance.               | The applications in the ZITADEL project that are automatically created during the instance setup are omitted.                                      |
+| An authentication succeeded for the first time in a virtal instances application. | This is the first authentication using a ZITADEL application that is not created during the instance setup phase.                                  |
+| A virtual instance is deleted.                                                    | This data point is sent when a virtual instance is deleted via ZITADELs system API                                                                 |
+
+
+ZITADEL pushes the metrics by projecting certain events.
+Therefore, you can configure delivery guarantees not in the Telemetry section of the ZITADEL configuration,
+but in the Projections.Customizations.Telemetry section
 
 ## Database
 
@@ -177,6 +201,7 @@ DefaultInstance:
     # if the host of the sender is different from ExternalDomain set DefaultInstance.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain to false
     From:
     FromName:
+    ReplyToAddress:
 ```
 
 - If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/self-hosting/manage/configure#database-initialization), you can provide a FirstInstance YAML section using the --steps argument.

@@ -180,7 +180,7 @@ func Test_CustomTextPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*CustomText)(nil),
 		},
 	}
 	for _, tt := range tests {

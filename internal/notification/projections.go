@@ -27,18 +27,18 @@ const (
 
 func Start(
 	ctx context.Context,
-	userHandlerCustomConfig projection.CustomConfig,
-	quotaHandlerCustomConfig projection.CustomConfig,
+	userHandlerCustomConfig, quotaHandlerCustomConfig, telemetryHandlerCustomConfig projection.CustomConfig,
+	telemetryCfg handlers.TelemetryPusherConfig,
+	externalDomain string,
 	externalPort uint16,
 	externalSecure bool,
 	commands *command.Commands,
 	queries *query.Queries,
 	es *eventstore.Eventstore,
 	assetsPrefix func(context.Context) string,
+	otpEmailTmpl string,
 	fileSystemPath string,
-	userEncryption,
-	smtpEncryption,
-	smsEncryption crypto.EncryptionAlgorithm,
+	userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm,
 ) {
 	statikFS, err := statik_fs.NewWithNamespace("notification")
 	logging.OnError(err).Panic("unable to start listener")
@@ -54,13 +54,14 @@ func Start(
 	logging.WithFields("metric", metricSuccessfulDeliveriesJSON).OnError(err).Panic("unable to register counter")
 	err = metrics.RegisterCounter(metricFailedDeliveriesJSON, "Failed JSON message deliveries")
 	logging.WithFields("metric", metricFailedDeliveriesJSON).OnError(err).Panic("unable to register counter")
-	q := handlers.NewNotificationQueries(queries, es, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption, statikFS)
+	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption, statikFS)
 	handlers.NewUserNotifier(
 		ctx,
 		projection.ApplyCustomConfig(userHandlerCustomConfig),
 		commands,
 		q,
 		assetsPrefix,
+		otpEmailTmpl,
 		metricSuccessfulDeliveriesEmail,
 		metricFailedDeliveriesEmail,
 		metricSuccessfulDeliveriesSMS,
@@ -74,4 +75,15 @@ func Start(
 		metricSuccessfulDeliveriesJSON,
 		metricFailedDeliveriesJSON,
 	).Start()
+	if telemetryCfg.Enabled {
+		handlers.NewTelemetryPusher(
+			ctx,
+			telemetryCfg,
+			projection.ApplyCustomConfig(telemetryHandlerCustomConfig),
+			commands,
+			q,
+			metricSuccessfulDeliveriesJSON,
+			metricFailedDeliveriesJSON,
+		).Start()
+	}
 }

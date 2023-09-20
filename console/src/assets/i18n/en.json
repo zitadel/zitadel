@@ -412,7 +412,7 @@
       "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
       "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
       "ADD": "Add Factor",
-      "OTP": "Authenticator App for OTP (One-Time Password)",
+      "OTP": "Authenticator App for TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "Add OTP",
       "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
       "U2F": "Fingerprint, Security Keys, Face ID and other",
@@ -421,6 +421,12 @@
       "U2F_SUCCESS": "Factor added successfully!",
       "U2F_ERROR": "An error during setup occurred!",
       "U2F_NAME": "Authenticator Name",
+      "OTPSMS": "OTP (One-Time Password) with SMS",
+      "OTPEMAIL": "OTP (One-Time Password) with Email",
+      "SETUPOTPSMSDESCRIPTION": "Do you want to setup this phonenumber as OTP (One-Time password) second factor?",
+      "OTPSMSSUCCESS": "OTP factor set up with success.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Your phone must be verified in order to use this method.",
+      "OTPEMAILSUCCESS": "OTP factor set up with success.",
       "TYPE": {
         "0": "No MFA defined",
         "1": "One Time Password (OTP)",
@@ -486,8 +492,8 @@
       "CHANGEUSERNAME": "modify",
       "CHANGEUSERNAME_TITLE": "Change username",
       "CHANGEUSERNAME_DESC": "Enter the new name in the field below.",
-      "FIRSTNAME": "First Name",
-      "LASTNAME": "Last Name",
+      "FIRSTNAME": "Given Name",
+      "LASTNAME": "Family Name",
       "NICKNAME": "Nickname",
       "DISPLAYNAME": "Display Name",
       "PREFERRED_LANGUAGE": "Language",
@@ -587,7 +593,8 @@
         "EDITVALUE": "Phone number",
         "EDITDESC": "Enter the new phone number in the field below.",
         "DELETETITLE": "Delete phone number",
-        "DELETEDESC": "Do you really want to delete the phone number"
+        "DELETEDESC": "Do you really want to delete the phone number",
+        "OTPSMSREMOVALWARNING": "This account uses this phone number as second factor. You won't be able to use it after you proceed."
       },
       "RESENDCODE": "Resend Code",
       "ENTERCODE": "Verify",
@@ -736,6 +743,10 @@
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in seconds",
     "ALLOWEDTOFAIL": "Allowed To Fail",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Warning",
+      "DESCRIPTION": "If you disable this setting, it may cause users in your organization to be unable to sign in. Additionally, you will no longer be able to access the console to disable the action. We recommend creating an administrator user in a separate organization or testing scripts first in a development environment or a development organization."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Type",
     "TRIGGERTYPE": "Trigger Type",
@@ -785,7 +796,7 @@
     },
     "PAGES": {
       "STATE": "Status",
-      "DOMAINLIST": "Domains"
+      "DOMAINLIST": "Custom Domains"
     },
     "STATE": {
       "0": "Unspecified",
@@ -943,22 +954,21 @@
     "DOMAINS": {
       "NEW": "Add Domain",
       "TITLE": "Domains",
-      "DESCRIPTION": "Configure your domains. This domain can be used to log in with your users.",
+      "DESCRIPTION": "Configure your organization domains. This domain can be used for domain discovery and username suffixing.",
       "SETPRIMARY": "Set as Primary",
       "DELETE": {
         "TITLE": "Delete Domain",
-        "DESCRIPTION": "You are about to delete one of your domains. Note that your users can no longer use this domain for their login."
+        "DESCRIPTION": "You are about to delete one of your domains."
       },
       "ADD": {
         "TITLE": "Add Domain",
-        "DESCRIPTION": "You are about to add a domain for your organization. After successful process, you users will be able to use the domain for their login."
+        "DESCRIPTION": "You are about to add a domain for your organization. After successful process, the domain can be used for domain discovery and as suffix for your users."
       }
     },
     "STATE": {
       "0": "Not defined",
       "1": "Active",
-      "2": "Deactivated",
-      "3": "Removed"
+      "2": "Deactivated"
     },
     "MEMBER": {
       "TITLE": "Organization Managers",
@@ -1018,7 +1028,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Privacy Policy",
       "OIDC": "OIDC Token lifetime and expiration",
-      "SECRETS": "Secret Appearance",
+      "SECRETS": "Secret Generator",
       "SECURITY": "Security settings"
     },
     "GROUPS": {
@@ -1041,12 +1051,15 @@
       "ja": "日本語",
       "pl": "Polski",
       "zh": "简体中文",
-      "bg": "Български"
+      "bg": "Български",
+      "pt": "Portuguese",
+      "mk": "Македонски"
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
       "SENDERADDRESS": "Sender Email Address",
       "SENDERNAME": "Sender Name",
+      "REPLYTOADDRESS": "Reply-to Address",
       "HOSTANDPORT": "Host And Port",
       "USER": "User",
       "PASSWORD": "Password",
@@ -1092,7 +1105,7 @@
       "INDAYS": "Days"
     },
     "SECRETS": {
-      "TITLE": "Secret Appearance",
+      "TITLE": "Secret Generator",
       "TYPES": "Secret Types",
       "TYPE": {
         "1": "Initialization Mail",
@@ -1100,9 +1113,11 @@
         "3": "Phone verification",
         "4": "Password Reset",
         "5": "Passwordless Initialization",
-        "6": "App Secret"
+        "6": "App Secret",
+        "7": "One Time Password (OTP) - SMS",
+        "8": "One Time Password (OTP) - Email"
       },
-      "ADDGENERATOR": "Define Secret Appearance",
+      "ADDGENERATOR": "Define Secret Generator",
       "GENERATORTYPE": "Type",
       "EXPIRY": "Expiration (in hours)",
       "INCLUDEDIGITS": "Include Numbers",
@@ -1241,7 +1256,9 @@
         "ja": "日本語",
         "pl": "Polski",
         "zh": "简体中文",
-        "bg": "Български"
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1288,14 +1305,16 @@
         "INIT": "Initialization",
         "VE": "Verify Email",
         "VP": "Verify Phone",
+        "VSO": "Verify SMS OTP",
+        "VEO": "Verify Email OTP",
         "PR": "Password Reset",
         "DC": "Domain Claim",
         "PL": "Passwordless",
         "PC": "Password Change"
       },
       "CHIPS": {
-        "firstname": "Firstname",
-        "lastname": "Lastname",
+        "firstname": "Given name",
+        "lastname": "Family name",
         "code": "Code",
         "preferredLoginName": "Preferred Login Name",
         "displayName": "Displayname",
@@ -1308,7 +1327,9 @@
         "verifiedPhone": "Verified phone",
         "changedate": "Change date",
         "username": "Username",
-        "tempUsername": "Temp username"
+        "tempUsername": "Temp username",
+        "otp": "One-time password",
+        "verifyUrl": "Verify One-time-password URL"
       },
       "TOAST": {
         "UPDATED": "Custom Texts saved."
@@ -1330,7 +1351,7 @@
       "MAXAGEDAYS": "Max Age in days",
       "USERLOGINMUSTBEDOMAIN": "Add organization domain as suffix to loginnames",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
-      "VALIDATEORGDOMAINS": "Validate Org domains",
+      "VALIDATEORGDOMAINS": "Organization domain verification required (DNS or HTTP challenge)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
       "ALLOWUSERNAMEPASSWORD": "Username Password allowed",
       "ALLOWEXTERNALIDP": "External IDP allowed",
@@ -1340,6 +1361,8 @@
       "ALLOWREGISTER_DESC": "If the option is selected, an additional step for registering a user appears in the login.",
       "FORCEMFA": "Force MFA",
       "FORCEMFA_DESC": "If the option is selected, users have to configure a second factor for login.",
+      "FORCEMFALOCALONLY": "Force MFA for local authenticated users",
+      "FORCEMFALOCALONLY_DESC": "If the option is selected, local authenticated users have to configure a second factor for login.",
       "HIDEPASSWORDRESET": "Hide Password reset",
       "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process.",
       "HIDELOGINNAMESUFFIX": "Hide Loginname suffix",
@@ -1499,7 +1522,7 @@
     "GRANT": {
       "EMPTY": "No granted organization.",
       "TITLE": "Project Grants",
-      "DESCRIPTION": "Allow an other organization to use your project.",
+      "DESCRIPTION": "Allow another organization to use your project.",
       "EDITTITLE": "Edit roles",
       "CREATE": {
         "TITLE": "Create Organization Grant",
@@ -1507,13 +1530,11 @@
         "SEL_PROJECT": "Search for a project",
         "SEL_ROLES": "Select the roles you want to be added to the grant",
         "SEL_USER": "Select users",
-        "SEL_ORG": "Set the domain",
-        "SEL_ORG_DESC": "Enter the complete domain to specify the organization to grant.",
-        "ORG_TITLE": "Organization",
+        "SEL_ORG": "Search an organization",
+        "SEL_ORG_DESC": "Search the organization to grant.",
         "ORG_DESCRIPTION": "You are about to grant a user for the organization {{name}}.",
         "ORG_DESCRIPTION_DESC": "Switch the context in the header above to grant a user for another organization.",
-        "SEL_ORG_FORMFIELD": "Complete Domain",
-        "SEL_ORG_BUTTON": "Search Organization",
+        "SEL_ORG_FORMFIELD": "Organization",
         "FOR_ORG": "The grant is created for:"
       },
       "DETAIL": {
@@ -1688,6 +1709,10 @@
       "LDAP": {
         "TITLE": "Active Directory / LDAP",
         "DESCRIPTION": "Enter the credentials for your LDAP Provider"
+      },
+      "APPLE": {
+        "TITLE": "Sign in with Apple",
+        "DESCRIPTION": "Enter the credentials for your Apple Provider"
       }
     },
     "DETAIL": {
@@ -1766,8 +1791,8 @@
     "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
     "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
     "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
-    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
-    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "FIRSTNAMEATTRIBUTE": "Given name attribute",
+    "LASTNAMEATTRIBUTE": "Family name attribute",
     "NICKNAMEATTRIBUTE": "Nickname attribute",
     "PHONEATTRIBUTE": "Phone attribute",
     "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
@@ -1784,6 +1809,8 @@
     "DELETE": "Delete",
     "DELETE_TITLE": "Delete IDP",
     "DELETE_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
+    "REMOVE_WARN_TITLE": "Remove IDP",
+    "REMOVE_WARN_DESCRIPTION": "You are about to remove an identity provider. This will remove the selection of the available IDP for your users and already registered users won't be able to login again. Are you sure to continue?",
     "DELETE_SELECTION_TITLE": "Delete IDP",
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
     "EMPTY": "No IDP available",
@@ -1799,6 +1826,14 @@
       "JWTENDPOINT": "JWT Endpoint",
       "JWTKEYSENDPOINT": "JWT Keys Endpoint"
     },
+    "APPLE": {
+      "TEAMID": "Team ID",
+      "KEYID": "Key ID",
+      "PRIVATEKEY": "Private Key",
+      "UPDATEPRIVATEKEY": "Update Private Key",
+      "UPLOADPRIVATEKEY": "Upload Private Key",
+      "KEYMAXSIZEEXCEEDED": "Maximum size of 5kB exceeded."
+    },
     "TOAST": {
       "SAVED": "Successfully saved.",
       "REACTIVATED": "Idp reactivated.",
@@ -1809,7 +1844,9 @@
       "DELETED": "Idp removed successfully!",
       "ADDED": "Added successfully.",
       "REMOVED": "Removed successfully."
-    }
+    },
+    "ISIDTOKENMAPPING": "Map from the ID token",
+    "ISIDTOKENMAPPING_DESC": "If selected, provider information gets mapped from the ID token, not from the userinfo endpoint."
   },
   "MFA": {
     "LIST": {
@@ -1838,8 +1875,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
-      "1": "One Time Password (OTP)",
-      "2": "Fingerprint, Security Keys, Face ID and other"
+      "1": "One Time Password by Authenticator App (TOTP)",
+      "2": "Fingerprint, Security Keys, Face ID and other",
+      "3": "One Time Password by Email (Email OTP)",
+      "4": "One Time Password by SMS (SMS OTP)"
     }
   },
   "LOGINPOLICY": {
@@ -2106,7 +2145,9 @@
     "ja": "日本語",
     "pl": "Polski",
     "zh": "简体中文",
-    "bg": "Български"
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски"
   },
   "MEMBER": {
     "ADD": "Add a Manager",

@@ -24,11 +24,11 @@ func (c *Commands) getHumanU2FTokens(ctx context.Context, userID, resourceowner 
 	if tokenReadModel.UserState == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-4M0ds", "Errors.User.NotFound")
 	}
-	return readModelToU2FTokens(tokenReadModel), nil
+	return readModelToWebAuthNTokens(tokenReadModel), nil
 }
 
-func (c *Commands) getHumanPasswordlessTokens(ctx context.Context, userID, resourceowner string) ([]*domain.WebAuthNToken, error) {
-	tokenReadModel := NewHumanPasswordlessTokensReadModel(userID, resourceowner)
+func (c *Commands) getHumanPasswordlessTokens(ctx context.Context, userID, resourceOwner string) ([]*domain.WebAuthNToken, error) {
+	tokenReadModel := NewHumanPasswordlessTokensReadModel(userID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, tokenReadModel)
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func (c *Commands) getHumanPasswordlessTokens(ctx context.Context, userID, resou
 	if tokenReadModel.UserState == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Mv9sd", "Errors.User.NotFound")
 	}
-	return readModelToPasswordlessTokens(tokenReadModel), nil
+	return readModelToWebAuthNTokens(tokenReadModel), nil
 }
 
 func (c *Commands) getHumanU2FLogin(ctx context.Context, userID, authReqID, resourceowner string) (*domain.WebAuthNLogin, error) {
@@ -82,12 +82,12 @@ func (c *Commands) HumanAddU2FSetup(ctx context.Context, userID, resourceowner s
 	if err != nil {
 		return nil, err
 	}
-	addWebAuthN, userAgg, webAuthN, err := c.addHumanWebAuthN(ctx, userID, resourceowner, isLoginUI, u2fTokens, domain.AuthenticatorAttachmentUnspecified, domain.UserVerificationRequirementDiscouraged)
+	addWebAuthN, userAgg, webAuthN, err := c.addHumanWebAuthN(ctx, userID, resourceowner, "", u2fTokens, domain.AuthenticatorAttachmentUnspecified, domain.UserVerificationRequirementDiscouraged)
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, usr_repo.NewHumanU2FAddedEvent(ctx, userAgg, addWebAuthN.WebauthNTokenID, webAuthN.Challenge))
+	events, err := c.eventstore.Push(ctx, usr_repo.NewHumanU2FAddedEvent(ctx, userAgg, addWebAuthN.WebauthNTokenID, webAuthN.Challenge, ""))
 	if err != nil {
 		return nil, err
 	}
@@ -108,12 +108,12 @@ func (c *Commands) HumanAddPasswordlessSetup(ctx context.Context, userID, resour
 	if err != nil {
 		return nil, err
 	}
-	addWebAuthN, userAgg, webAuthN, err := c.addHumanWebAuthN(ctx, userID, resourceowner, isLoginUI, passwordlessTokens, authenticatorPlatform, domain.UserVerificationRequirementRequired)
+	addWebAuthN, userAgg, webAuthN, err := c.addHumanWebAuthN(ctx, userID, resourceowner, "", passwordlessTokens, authenticatorPlatform, domain.UserVerificationRequirementRequired)
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, usr_repo.NewHumanPasswordlessAddedEvent(ctx, userAgg, addWebAuthN.WebauthNTokenID, webAuthN.Challenge))
+	events, err := c.eventstore.Push(ctx, usr_repo.NewHumanPasswordlessAddedEvent(ctx, userAgg, addWebAuthN.WebauthNTokenID, webAuthN.Challenge, ""))
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +137,7 @@ func (c *Commands) HumanAddPasswordlessSetupInitCode(ctx context.Context, userID
 	return c.HumanAddPasswordlessSetup(ctx, userID, resourceowner, true, preferredPlatformType)
 }
 
-func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner string, isLoginUI bool, tokens []*domain.WebAuthNToken, authenticatorPlatform domain.AuthenticatorAttachment, userVerification domain.UserVerificationRequirement) (*HumanWebAuthNWriteModel, *eventstore.Aggregate, *domain.WebAuthNToken, error) {
+func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner, rpID string, tokens []*domain.WebAuthNToken, authenticatorPlatform domain.AuthenticatorAttachment, userVerification domain.UserVerificationRequirement) (*HumanWebAuthNWriteModel, *eventstore.Aggregate, *domain.WebAuthNToken, error) {
 	if userID == "" {
 		return nil, nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M0od", "Errors.IDMissing")
 	}
@@ -157,7 +157,7 @@ func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner s
 	if accountName == "" {
 		accountName = string(user.EmailAddress)
 	}
-	webAuthN, err := c.webauthnConfig.BeginRegistration(ctx, user, accountName, authenticatorPlatform, userVerification, isLoginUI, tokens...)
+	webAuthN, err := c.webauthnConfig.BeginRegistration(ctx, user, accountName, authenticatorPlatform, userVerification, rpID, tokens...)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -343,7 +343,7 @@ func (c *Commands) beginWebAuthNLogin(ctx context.Context, userID, resourceOwner
 	if err != nil {
 		return nil, nil, err
 	}
-	webAuthNLogin, err := c.webauthnConfig.BeginLogin(ctx, human, userVerification, tokens...)
+	webAuthNLogin, err := c.webauthnConfig.BeginLogin(ctx, human, userVerification, "", tokens...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -454,12 +454,12 @@ func (c *Commands) finishWebAuthNLogin(ctx context.Context, userID, resourceOwne
 	if err != nil {
 		return nil, nil, 0, err
 	}
-	keyID, signCount, err := c.webauthnConfig.FinishLogin(ctx, human, webAuthN, credentialData, tokens...)
-	if err != nil && keyID == nil {
+	credential, err := c.webauthnConfig.FinishLogin(ctx, human, webAuthN, credentialData, tokens...)
+	if err != nil && (credential == nil || credential.ID == nil) {
 		return nil, nil, 0, err
 	}
 
-	_, token := domain.GetTokenByKeyID(tokens, keyID)
+	_, token := domain.GetTokenByKeyID(tokens, credential.ID)
 	if token == nil {
 		return nil, nil, 0, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3b7zs", "Errors.User.WebAuthN.NotFound")
 	}
@@ -470,7 +470,7 @@ func (c *Commands) finishWebAuthNLogin(ctx context.Context, userID, resourceOwne
 	}
 	userAgg := UserAggregateFromWriteModel(&writeModel.WriteModel)
 
-	return userAgg, token, signCount, nil
+	return userAgg, token, credential.Authenticator.SignCount, nil
 }
 
 func (c *Commands) HumanRemoveU2F(ctx context.Context, userID, webAuthNID, resourceOwner string) (*domain.ObjectDetails, error) {

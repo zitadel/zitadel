@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/repository/pseudo"
 )
 
 var (
@@ -35,13 +36,14 @@ type StatementHandler struct {
 	*handler.ProjectionHandler
 	Locker
 
-	client                  *database.DB
-	sequenceTable           string
-	currentSequenceStmt     string
-	updateSequencesBaseStmt string
-	maxFailureCount         uint
-	failureCountStmt        string
-	setFailureCountStmt     string
+	client                         *database.DB
+	sequenceTable                  string
+	currentSequenceStmt            string
+	currentSequenceWithoutLockStmt string
+	updateSequencesBaseStmt        string
+	maxFailureCount                uint
+	failureCountStmt               string
+	setFailureCountStmt            string
 
 	aggregates  []eventstore.AggregateType
 	reduces     map[eventstore.EventType]handler.Reduce
@@ -49,6 +51,8 @@ type StatementHandler struct {
 	initialized chan bool
 
 	bulkLimit uint64
+
+	reduceScheduledPseudoEvent bool
 }
 
 func NewStatementHandler(
@@ -57,30 +61,41 @@ func NewStatementHandler(
 ) StatementHandler {
 	aggregateTypes := make([]eventstore.AggregateType, 0, len(config.Reducers))
 	reduces := make(map[eventstore.EventType]handler.Reduce, len(config.Reducers))
+	reduceScheduledPseudoEvent := false
 	for _, aggReducer := range config.Reducers {
 		aggregateTypes = append(aggregateTypes, aggReducer.Aggregate)
+		if aggReducer.Aggregate == pseudo.AggregateType {
+			reduceScheduledPseudoEvent = true
+			if len(config.Reducers) != 1 ||
+				len(aggReducer.EventRedusers) != 1 ||
+				aggReducer.EventRedusers[0].Event != pseudo.ScheduledEventType {
+				panic("if a pseudo.AggregateType is reduced, exactly one event reducer for pseudo.ScheduledEventType is supported and no other aggregate can be reduced")
+			}
+		}
 		for _, eventReducer := range aggReducer.EventRedusers {
 			reduces[eventReducer.Event] = eventReducer.Reduce
 		}
 	}
 
 	h := StatementHandler{
-		client:                  config.Client,
-		sequenceTable:           config.SequenceTable,
-		maxFailureCount:         config.MaxFailureCount,
-		currentSequenceStmt:     fmt.Sprintf(currentSequenceStmtFormat, config.SequenceTable),
-		updateSequencesBaseStmt: fmt.Sprintf(updateCurrentSequencesStmtFormat, config.SequenceTable),
-		failureCountStmt:        fmt.Sprintf(failureCountStmtFormat, config.FailedEventsTable),
-		setFailureCountStmt:     fmt.Sprintf(setFailureCountStmtFormat, config.FailedEventsTable),
-		aggregates:              aggregateTypes,
-		reduces:                 reduces,
-		bulkLimit:               config.BulkLimit,
-		Locker:                  NewLocker(config.Client.DB, config.LockTable, config.ProjectionName),
-		initCheck:               config.InitCheck,
-		initialized:             make(chan bool),
+		client:                         config.Client,
+		sequenceTable:                  config.SequenceTable,
+		maxFailureCount:                config.MaxFailureCount,
+		currentSequenceStmt:            fmt.Sprintf(currentSequenceStmtFormat, config.SequenceTable),
+		currentSequenceWithoutLockStmt: fmt.Sprintf(currentSequenceStmtWithoutLockFormat, config.SequenceTable),
+		updateSequencesBaseStmt:        fmt.Sprintf(updateCurrentSequencesStmtFormat, config.SequenceTable),
+		failureCountStmt:               fmt.Sprintf(failureCountStmtFormat, config.FailedEventsTable),
+		setFailureCountStmt:            fmt.Sprintf(setFailureCountStmtFormat, config.FailedEventsTable),
+		aggregates:                     aggregateTypes,
+		reduces:                        reduces,
+		bulkLimit:                      config.BulkLimit,
+		Locker:                         NewLocker(config.Client.DB, config.LockTable, config.ProjectionName),
+		initCheck:                      config.InitCheck,
+		initialized:                    make(chan bool),
+		reduceScheduledPseudoEvent:     reduceScheduledPseudoEvent,
 	}
 
-	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock, h.initialized)
+	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.searchQuery, h.Lock, h.Unlock, h.initialized, reduceScheduledPseudoEvent)
 
 	return h
 }
@@ -88,11 +103,20 @@ func NewStatementHandler(
 func (h *StatementHandler) Start() {
 	h.initialized <- true
 	close(h.initialized)
-	h.Subscribe(h.aggregates...)
+	if !h.reduceScheduledPseudoEvent {
+		h.Subscribe(h.aggregates...)
+	}
 }
 
-func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string) (*eventstore.SearchQueryBuilder, uint64, error) {
-	sequences, err := h.currentSequences(ctx, h.client.QueryContext, instanceIDs)
+func (h *StatementHandler) searchQuery(ctx context.Context, instanceIDs []string) (*eventstore.SearchQueryBuilder, uint64, error) {
+	if h.reduceScheduledPseudoEvent {
+		return nil, 1, nil
+	}
+	return h.dbSearchQuery(ctx, instanceIDs)
+}
+
+func (h *StatementHandler) dbSearchQuery(ctx context.Context, instanceIDs []string) (*eventstore.SearchQueryBuilder, uint64, error) {
+	sequences, err := h.currentSequences(ctx, false, h.client.QueryContext, instanceIDs)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -115,8 +139,27 @@ func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string
 				InstanceID(instanceID)
 		}
 	}
-
 	return queryBuilder, h.bulkLimit, nil
+}
+
+type transaction struct {
+	*sql.Tx
+}
+
+func (t *transaction) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, query string, args ...any) error {
+	rows, err := t.Tx.QueryContext(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		closeErr := rows.Close()
+		logging.OnError(closeErr).Info("rows.Close failed")
+	}()
+
+	if err = scan(rows); err != nil {
+		return err
+	}
+	return rows.Err()
 }
 
 // Update implements handler.Update
@@ -133,7 +176,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 		return -1, errors.ThrowInternal(err, "CRDB-e89Gq", "begin failed")
 	}
 
-	sequences, err := h.currentSequences(ctx, tx.QueryContext, instanceIDs)
+	sequences, err := h.currentSequences(ctx, true, (&transaction{Tx: tx}).QueryContext, instanceIDs)
 	if err != nil {
 		tx.Rollback()
 		return -1, err

@@ -15,11 +15,25 @@ func testEvent(
 	aggregateType repository.AggregateType,
 	data []byte,
 ) *repository.Event {
+	return timedTestEvent(eventType, aggregateType, data, time.Now())
+}
+
+func toSystemEvent(event *repository.Event) *repository.Event {
+	event.EditorService = "SYSTEM"
+	return event
+}
+
+func timedTestEvent(
+	eventType repository.EventType,
+	aggregateType repository.AggregateType,
+	data []byte,
+	creationDate time.Time,
+) *repository.Event {
 	return &repository.Event{
 		Sequence:                      15,
 		PreviousAggregateSequence:     10,
 		PreviousAggregateTypeSequence: 10,
-		CreationDate:                  time.Now(),
+		CreationDate:                  creationDate,
 		Type:                          eventType,
 		AggregateType:                 aggregateType,
 		Data:                          data,

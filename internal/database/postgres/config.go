@@ -8,11 +8,15 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
 const (
 	sslDisabledMode = "disable"
+	sslRequireMode  = "require"
+	sslAllowMode    = "allow"
+	sslPreferMode   = "prefer"
 )
 
 type Config struct {
@@ -59,7 +63,6 @@ func (c *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 }
 
 func (c *Config) Connect(useAdmin bool) (*sql.DB, error) {
-	logging.Warn("postgres is currently in beta")
 	db, err := sql.Open("pgx", c.String(useAdmin))
 	if err != nil {
 		return nil, err
@@ -113,6 +116,19 @@ type SSL struct {
 func (s *Config) checkSSL(user User) {
 	if user.SSL.Mode == sslDisabledMode || user.SSL.Mode == "" {
 		user.SSL = SSL{Mode: sslDisabledMode}
+		return
+	}
+
+	if user.SSL.Mode == sslRequireMode || user.SSL.Mode == sslAllowMode || user.SSL.Mode == sslPreferMode {
+		return
+	}
+
+	if user.SSL.RootCert == "" {
+		logging.WithFields(
+			"cert set", user.SSL.Cert != "",
+			"key set", user.SSL.Key != "",
+			"rootCert set", user.SSL.RootCert != "",
+		).Fatal("at least ssl root cert has to be set")
 	}
 }
 

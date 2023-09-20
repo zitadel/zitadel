@@ -28,7 +28,7 @@ var (
 			", memberships.grant_id" +
 			", projections.project_grants3.granted_org_id" +
 			", projections.projects3.name" +
-			", projections.orgs.name" +
+			", projections.orgs1.name" +
 			", COUNT(*) OVER ()" +
 			" FROM (" +
 			"SELECT members.user_id" +
@@ -88,7 +88,7 @@ var (
 			" WHERE members.granted_org_removed = $7 AND members.owner_removed = $8 AND members.user_owner_removed = $9" +
 			") AS memberships" +
 			" LEFT JOIN projections.projects3 ON memberships.project_id = projections.projects3.id AND memberships.instance_id = projections.projects3.instance_id" +
-			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id AND memberships.instance_id = projections.orgs.instance_id" +
+			" LEFT JOIN projections.orgs1 ON memberships.org_id = projections.orgs1.id AND memberships.instance_id = projections.orgs1.instance_id" +
 			" LEFT JOIN projections.project_grants3 ON memberships.grant_id = projections.project_grants3.grant_id AND memberships.instance_id = projections.project_grants3.instance_id" +
 			` AS OF SYSTEM TIME '-1 ms'`)
 	membershipCols = []string{
@@ -444,7 +444,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Memberships)(nil),
 		},
 	}
 	for _, tt := range tests {

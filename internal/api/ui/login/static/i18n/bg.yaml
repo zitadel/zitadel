@@ -25,7 +25,7 @@ SelectAccount:
   DescriptionLinking: 'Изберете своя акаунт, който да свържете с вашия външен потребител.'
   OtherUser: Друг потребител
   SessionState0: активен
-  SessionState1: неактивен
+  SessionState1: Не сте в профила си
   MustBeMemberOfOrg: 'Потребителят трябва да е член на {{.OrgName}} организация.'
 Password:
   Title: Парола
@@ -85,6 +85,8 @@ InitMFAPrompt:
     потребителски акаунт.
   Provider0: 'Приложение за удостоверяване (напр. Google/Microsoft Authenticator, Authy)'
   Provider1: 'Зависи от устройството (напр. FaceID, Windows Hello, пръстов отпечатък)'
+  Provider3: OTP SMS
+  Provider4: OTP имейл
   NextButtonText: следващия
   SkipButtonText: пропуснете
 InitMFAOTP:
@@ -98,6 +100,15 @@ InitMFAOTP:
   CodeLabel: Код
   NextButtonText: следващия
   CancelButtonText: анулиране
+InitMFAOTPSMS:
+  Title: 2-факторна проверка
+  DescriptionPhone: Създайте своя 2-фактор. Въведете телефонния си номер, за да го потвърдите.
+  DescriptionCode: Създайте своя 2-фактор. Въведете получения код, за да потвърдите своя телефонен номер.
+  PhoneLabel: Тайна
+  CodeLabel: Код
+  EditButtonText: редактиране
+  ResendButtonText: код за препращане
+  NextButtonText: следващия
 InitMFAU2F:
   Title: Добавете ключ за сигурност
   Description: >-
@@ -118,11 +129,19 @@ InitMFADone:
 MFAProvider:
   Provider0: 'Приложение за удостоверяване (напр. Google/Microsoft Authenticator, Authy)'
   Provider1: 'Зависи от устройството (напр. FaceID, Windows Hello, пръстов отпечатък)'
+  Provider3: OTP SMS
+  Provider4: OTP имейл
   ChooseOther: или изберете друга опция
 VerifyMFAOTP:
   Title: Проверете 2-фактора
   Description: Проверете вашия втори фактор
   CodeLabel: Код
+  NextButtonText: следващия
+VerifyOTP:
+  Title: Проверете 2-фактора
+  Description: Проверете вашия втори фактор
+  CodeLabel: Код
+  ResendButtonText: код за препращане
   NextButtonText: следващия
 VerifyMFAU2F:
   Title: 2-факторна проверка
@@ -213,14 +232,16 @@ RegistrationUser:
   LastnameLabel: Фамилия
   LanguageLabel: език
   German: Deutsch
-  English: Английски
-  Italian: Италиано
+  English: English
+  Italian: Italiano
   French: Français
   Chinese: 简体中文
-  Polish: Полски
+  Polish: Polski
   Japanese: 日本語
   Spanish: Español
   Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   GenderLabel: Пол
   Female: Женски пол
   Male: Мъжки
@@ -246,13 +267,16 @@ ExternalRegistrationUserOverview:
   PhoneLabel: Телефонен номер
   LanguageLabel: език
   German: Deutsch
-  English: Английски
-  Italian: Италиано
+  English: English
+  Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
   Japanese: 日本語
-  Polish: Полски
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   TosAndPrivacyLabel: Правила и условия
   TosConfirm: Приемам
   TosLinkText: TOS
@@ -302,13 +326,17 @@ ExternalNotFound:
   PrivacyConfirm: Приемам
   PrivacyLinkText: политика за поверителност
   German: Deutsch
-  English: Английски
-  Italian: Италиано
+  English: English
+  Italian: Italiano
   French: Français
   Chinese: 简体中文
-  Polish: Полски
+  Polish: Polski
   Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  
 DeviceAuth:
   Title: Упълномощаване на устройството
   UserCode:
@@ -332,6 +360,7 @@ Footer:
   PrivacyPolicy: Политика за поверителност
   Help: Помогне
   SupportEmail: Поддръжка на имейл
+SignIn: Влезте с {{.Provider}}
 Errors:
   Internal: Възникна вътрешна грешка
   AuthRequest:
@@ -386,6 +415,7 @@ Errors:
       InvalidAndLocked: >-
         Паролата е невалидна и потребителят е заключен, свържете се с вашия
         администратор.
+      NotChanged: Новата парола не може да съвпада с текущата парола
     UsernameOrPassword:
       Invalid: Потребителското име или паролата са невалидни
     PasswordComplexityPolicy:

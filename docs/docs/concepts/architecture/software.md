@@ -1,5 +1,6 @@
 ---
-title: Software
+title: ZITADEL's Software Architecture
+sidebar_label: Software Architecture
 ---
 
 ZITADEL is built with two essential patterns. Event Sourcing (ES) and Command and Query Responsibility Segregation (CQRS). 
@@ -14,7 +15,7 @@ Each ZITADEL binary contains all components necessary to serve traffic
 From serving the API, rendering GUI's, background processing of events and task.
 This All in One (AiO) approach makes operating ZITADEL simple. 
 
-## Software Structure
+## The Architecture
 
 ZITADELs software architecture is built around multiple components at different levels.
 This chapter should give you an idea of the components as well as the different layers.
@@ -145,7 +146,6 @@ The storage layer of ZITADEL is responsible for multiple things. For example:
 - Backup and restore operation for disaster recovery purpose
 
 ZITADEL currently supports CockroachDB as first choice of storage due to its perfect match for ZITADELs needs.
-Postgres is currently in [Beta](/docs/support/software-release-cycles-support#beta) and will be [Enterprise Supported](/docs/support/software-release-cycles-support#partially-supported) afterwards.
-Beta state will be removed as soon as [automated tests](https://github.com/zitadel/zitadel/issues/5741) are implemented.
+Alternatively you can run ZITADEL also with Postgres which is [Enterprise Supported](/docs/support/software-release-cycles-support#partially-supported).
 Make sure to read our [Production Guide](/docs/self-hosting/manage/production#prefer-cockroachdb) before you decide to use it.
 

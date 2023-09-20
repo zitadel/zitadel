@@ -2,7 +2,7 @@ Login:
   Title: ¡Hola de nuevo!
   Description: Introduce tus datos de inicio de sesión.
   TitleLinking: Inicio de sesión para vincular un usuario
-  DescriptionLinking: Introduce tus datos de inicio de sesión para vincular tu usuario externo con un usuario ZITADEL.
+  DescriptionLinking: Introduce tus datos de inicio de sesión para vincular tu usuario externo con un usuario.
   LoginNameLabel: Nombre de inicio de sesión
   UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@dominio
@@ -20,12 +20,12 @@ LDAP:
 
 SelectAccount:
   Title: Seleccionar cuenta
-  Description: Utiliza tu cuenta ZITADEL
+  Description: Utiliza tu cuenta
   TitleLinking: Selecciona tu cuenta para vincular el usuario
   DescriptionLinking: Selecciona tu cuenta para vincular con tu usuario externo.
   OtherUser: Otro Usuario
   SessionState0: activo
-  SessionState1: inactivo
+  SessionState1: Se ha cerrado la sesión
   MustBeMemberOfOrg: El usuario debe ser miembro de la organización {{.OrgName}}.
 
 Password:
@@ -89,6 +89,8 @@ InitMFAPrompt:
   Description: La autenticación de doble factor te proporciona seguridad adicional para tu cuenta de usuario. Ésta asegura que solo tú tienes acceso a tu cuenta.
   Provider0: App autenticadora (p.e Google/Microsoft Authenticator, Authy)
   Provider1: Dependiente de un dispositivo (p.e FaceID, Windows Hello, Huella dactilar)
+  Provider3: OTP SMS
+  Provider4: OTP email
   NextButtonText: siguiente
   SkipButtonText: saltar
 
@@ -100,6 +102,16 @@ InitMFAOTP:
   CodeLabel: Código
   NextButtonText: siguiente
   CancelButtonText: cancelar
+
+InitMFASMS:
+  Title: Verificación de doble factor
+  DescriptionPhone: Crea tu doble factor de autenticación. Introduce tu número de teléfono para verificarlo.
+  DescriptionCode: Crea tu doble factor de autenticación. Ingrese el código recibido para verificar su número de teléfono.
+  PhoneLabel: Número de teléfono
+  CodeLabel: Código
+  EditButtonText: editar
+  ResendButtonText: reenviar código
+  NextButtonText: siguiente
 
 InitMFAU2F:
   Title: Añadir clave de seguridad
@@ -118,12 +130,21 @@ InitMFADone:
 MFAProvider:
   Provider0: App autenticadora (p.e Google/Microsoft Authenticator, Authy)
   Provider1: Dependiente de un dispositivo (p.e FaceID, Windows Hello, Huella dactilar)
+  Provider3: OTP SMS
+  Provider4: OTP email
   ChooseOther: o elige otra opción
 
 VerifyMFAOTP:
   Title: Verificar doble factor
   Description: Verifica tu doble factor
   CodeLabel: Código
+  NextButtonText: siguiente
+
+VerifyOTP:
+  Title: Verificar doble factor
+  Description: Verifica tu doble factor
+  CodeLabel: Código
+  ResendButtonText: reenviar código
   NextButtonText: siguiente
 
 VerifyMFAU2F:
@@ -223,6 +244,8 @@ RegistrationUser:
   Japanese: 日本語
   Spanish: Español
   Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   GenderLabel: Género
   Female: Mujer
   Male: Hombre
@@ -253,9 +276,12 @@ ExternalRegistrationUserOverview:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
-  Japanese: 日本語
   Polish: Polski
+  Japanese: 日本語
   Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   TosAndPrivacyLabel: Términos y condiciones
   TosConfirm: Acepto los
   TosLinkText: TDS
@@ -317,13 +343,18 @@ ExternalNotFound:
   Polish: Polski
   Japanese: 日本語
   Spanish: Español
-
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  
 Footer:
   PoweredBy: Powered By
   Tos: TDS
   PrivacyPolicy: Política de privacidad
   Help: Ayuda
   SupportEmail: Email de soporte
+
+SignIn: Iniciar sesión con {{.Provider}}
 
 Errors:
   Internal: Se produjo un error interno
@@ -377,6 +408,7 @@ Errors:
       Empty: La contraseña está vacía
       Invalid: La contraseña no es válida
       InvalidAndLocked: La contraseña no es válida y el usuario está bloqueado, contacta con tu administrador.
+      NotChanged: La nueva contraseña no puede coincidir con la contraseña actual
     UsernameOrPassword:
       Invalid: El nombre de usuario o la contraseña no son válidos
     PasswordComplexityPolicy:

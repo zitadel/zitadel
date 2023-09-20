@@ -3,6 +3,7 @@ import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Human, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { CodeDialogComponent } from '../auth-user-detail/code-dialog/code-dialog.component';
 import { EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 
@@ -25,15 +26,19 @@ export class ContactComponent {
   public UserState: any = UserState;
 
   public EditDialogType: any = EditDialogType;
-  constructor(private dialog: MatDialog) {}
+  constructor(private dialog: MatDialog, private authService: GrpcAuthService) {}
 
-  emitDeletePhone(): void {
+  async emitDeletePhone(): Promise<void> {
+    const { resultList } = await this.authService.listMyMultiFactors();
+    const hasSMSOTP = !!resultList.find((mfa) => mfa.otpSms);
+
     const dialogRef = this.dialog.open(WarnDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.DELETE',
         cancelKey: 'ACTIONS.CANCEL',
         titleKey: 'USER.LOGINMETHODS.PHONE.DELETETITLE',
         descriptionKey: 'USER.LOGINMETHODS.PHONE.DELETEDESC',
+        warnSectionKey: hasSMSOTP ? 'USER.LOGINMETHODS.PHONE.OTPSMSREMOVALWARNING' : '',
       },
       width: '400px',
     });

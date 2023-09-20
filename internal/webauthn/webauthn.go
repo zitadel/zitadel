@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
@@ -52,12 +53,12 @@ func (u *webUser) WebAuthnCredentials() []webauthn.Credential {
 	return u.credentials
 }
 
-func (w *Config) BeginRegistration(ctx context.Context, user *domain.Human, accountName string, authType domain.AuthenticatorAttachment, userVerification domain.UserVerificationRequirement, isLoginUI bool, webAuthNs ...*domain.WebAuthNToken) (*domain.WebAuthNToken, error) {
-	webAuthNServer, err := w.serverFromContext(ctx)
+func (w *Config) BeginRegistration(ctx context.Context, user *domain.Human, accountName string, authType domain.AuthenticatorAttachment, userVerification domain.UserVerificationRequirement, rpID string, webAuthNs ...*domain.WebAuthNToken) (*domain.WebAuthNToken, error) {
+	webAuthNServer, err := w.serverFromContext(ctx, rpID, "")
 	if err != nil {
 		return nil, err
 	}
-	creds := WebAuthNsToCredentials(webAuthNs)
+	creds := WebAuthNsToCredentials(webAuthNs, rpID)
 	existing := make([]protocol.CredentialDescriptor, len(creds))
 	for i, cred := range creds {
 		existing[i] = protocol.CredentialDescriptor{
@@ -90,6 +91,7 @@ func (w *Config) BeginRegistration(ctx context.Context, user *domain.Human, acco
 		CredentialCreationData: cred,
 		AllowedCredentialIDs:   sessionData.AllowedCredentialIDs,
 		UserVerification:       UserVerificationToDomain(sessionData.UserVerification),
+		RPID:                   webAuthNServer.Config.RPID,
 	}, nil
 }
 
@@ -99,12 +101,11 @@ func (w *Config) FinishRegistration(ctx context.Context, user *domain.Human, web
 	}
 	credentialData, err := protocol.ParseCredentialCreationResponseBody(bytes.NewReader(credData))
 	if err != nil {
-		e := *err.(*protocol.Error)
-		logging.WithFields("error", e).Error("webauthn credential could not be parsed")
+		logging.WithFields("error", tryExtractProtocolErrMsg(err)).Debug("webauthn credential could not be parsed")
 		return nil, caos_errs.ThrowInternal(err, "WEBAU-sEr8c", "Errors.User.WebAuthN.ErrorOnParseCredential")
 	}
 	sessionData := WebAuthNToSessionData(webAuthN)
-	webAuthNServer, err := w.serverFromContext(ctx)
+	webAuthNServer, err := w.serverFromContext(ctx, webAuthN.RPID, credentialData.Response.CollectedClientData.Origin)
 	if err != nil {
 		return nil, err
 	}
@@ -115,6 +116,7 @@ func (w *Config) FinishRegistration(ctx context.Context, user *domain.Human, web
 		sessionData,
 		credentialData)
 	if err != nil {
+		logging.WithFields("error", tryExtractProtocolErrMsg(err)).Debug("webauthn credential could not be created")
 		return nil, caos_errs.ThrowInternal(err, "WEBAU-3Vb9s", "Errors.User.WebAuthN.CreateCredentialFailed")
 	}
 
@@ -124,19 +126,21 @@ func (w *Config) FinishRegistration(ctx context.Context, user *domain.Human, web
 	webAuthN.AAGUID = credential.Authenticator.AAGUID
 	webAuthN.SignCount = credential.Authenticator.SignCount
 	webAuthN.WebAuthNTokenName = tokenName
+	webAuthN.RPID = webAuthNServer.Config.RPID
 	return webAuthN, nil
 }
 
-func (w *Config) BeginLogin(ctx context.Context, user *domain.Human, userVerification domain.UserVerificationRequirement, webAuthNs ...*domain.WebAuthNToken) (*domain.WebAuthNLogin, error) {
-	webAuthNServer, err := w.serverFromContext(ctx)
+func (w *Config) BeginLogin(ctx context.Context, user *domain.Human, userVerification domain.UserVerificationRequirement, rpID string, webAuthNs ...*domain.WebAuthNToken) (*domain.WebAuthNLogin, error) {
+	webAuthNServer, err := w.serverFromContext(ctx, rpID, "")
 	if err != nil {
 		return nil, err
 	}
 	assertion, sessionData, err := webAuthNServer.BeginLogin(&webUser{
 		Human:       user,
-		credentials: WebAuthNsToCredentials(webAuthNs),
+		credentials: WebAuthNsToCredentials(webAuthNs, rpID),
 	}, webauthn.WithUserVerification(UserVerificationFromDomain(userVerification)))
 	if err != nil {
+		logging.WithFields("error", tryExtractProtocolErrMsg(err)).Debug("webauthn login could not be started")
 		return nil, caos_errs.ThrowInternal(err, "WEBAU-4G8sw", "Errors.User.WebAuthN.BeginLoginFailed")
 	}
 	cred, err := json.Marshal(assertion)
@@ -148,42 +152,69 @@ func (w *Config) BeginLogin(ctx context.Context, user *domain.Human, userVerific
 		CredentialAssertionData: cred,
 		AllowedCredentialIDs:    sessionData.AllowedCredentialIDs,
 		UserVerification:        userVerification,
+		RPID:                    webAuthNServer.Config.RPID,
 	}, nil
 }
 
-func (w *Config) FinishLogin(ctx context.Context, user *domain.Human, webAuthN *domain.WebAuthNLogin, credData []byte, webAuthNs ...*domain.WebAuthNToken) ([]byte, uint32, error) {
+func (w *Config) FinishLogin(ctx context.Context, user *domain.Human, webAuthN *domain.WebAuthNLogin, credData []byte, webAuthNs ...*domain.WebAuthNToken) (*webauthn.Credential, error) {
 	assertionData, err := protocol.ParseCredentialRequestResponseBody(bytes.NewReader(credData))
 	if err != nil {
-		return nil, 0, caos_errs.ThrowInternal(err, "WEBAU-ADgv4", "Errors.User.WebAuthN.ValidateLoginFailed")
+		logging.WithFields("error", tryExtractProtocolErrMsg(err)).Debug("webauthn assertion could not be parsed")
+		return nil, caos_errs.ThrowInternal(err, "WEBAU-ADgv4", "Errors.User.WebAuthN.ValidateLoginFailed")
 	}
 	webUser := &webUser{
 		Human:       user,
-		credentials: WebAuthNsToCredentials(webAuthNs),
+		credentials: WebAuthNsToCredentials(webAuthNs, webAuthN.RPID),
 	}
-	webAuthNServer, err := w.serverFromContext(ctx)
+	webAuthNServer, err := w.serverFromContext(ctx, webAuthN.RPID, assertionData.Response.CollectedClientData.Origin)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 	credential, err := webAuthNServer.ValidateLogin(webUser, WebAuthNLoginToSessionData(webAuthN), assertionData)
 	if err != nil {
-		return nil, 0, caos_errs.ThrowInternal(err, "WEBAU-3M9si", "Errors.User.WebAuthN.ValidateLoginFailed")
+		logging.WithFields("error", tryExtractProtocolErrMsg(err)).Debug("webauthn assertion failed")
+		return nil, caos_errs.ThrowInternal(err, "WEBAU-3M9si", "Errors.User.WebAuthN.ValidateLoginFailed")
 	}
 
 	if credential.Authenticator.CloneWarning {
-		return credential.ID, credential.Authenticator.SignCount, caos_errs.ThrowInternal(err, "WEBAU-4M90s", "Errors.User.WebAuthN.CloneWarning")
+		return credential, caos_errs.ThrowInternal(nil, "WEBAU-4M90s", "Errors.User.WebAuthN.CloneWarning")
 	}
-	return credential.ID, credential.Authenticator.SignCount, nil
+	return credential, nil
 }
 
-func (w *Config) serverFromContext(ctx context.Context) (*webauthn.WebAuthn, error) {
-	instance := authz.GetInstance(ctx)
-	webAuthn, err := webauthn.New(&webauthn.Config{
-		RPDisplayName: w.DisplayName,
-		RPID:          instance.RequestedDomain(),
-		RPOrigins:     []string{http.BuildOrigin(instance.RequestedHost(), w.ExternalSecure)},
-	})
+func (w *Config) serverFromContext(ctx context.Context, id, origin string) (*webauthn.WebAuthn, error) {
+	config := w.config(id, origin)
+	if id == "" {
+		config = w.configFromContext(ctx)
+	}
+	webAuthn, err := webauthn.New(config)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "WEBAU-UX9ta", "Errors.User.WebAuthN.ServerConfig")
 	}
 	return webAuthn, nil
+}
+
+func (w *Config) configFromContext(ctx context.Context) *webauthn.Config {
+	instance := authz.GetInstance(ctx)
+	return &webauthn.Config{
+		RPDisplayName: w.DisplayName,
+		RPID:          instance.RequestedDomain(),
+		RPOrigins:     []string{http.BuildOrigin(instance.RequestedHost(), w.ExternalSecure)},
+	}
+}
+
+func (w *Config) config(id, origin string) *webauthn.Config {
+	return &webauthn.Config{
+		RPDisplayName: w.DisplayName,
+		RPID:          id,
+		RPOrigins:     []string{origin},
+	}
+}
+
+func tryExtractProtocolErrMsg(err error) string {
+	var e *protocol.Error
+	if errors.As(err, &e) {
+		return e.Details + ": " + e.DevInfo
+	}
+	return e.Error()
 }

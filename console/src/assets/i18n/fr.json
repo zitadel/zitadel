@@ -411,8 +411,8 @@
       "DESCRIPTION": "Ajoutez un second facteur pour garantir une sécurité optimale de votre compte.",
       "MANAGE_DESCRIPTION": "Gérez les méthodes de second facteur de vos utilisateurs.",
       "ADD": "Ajouter un facteur",
-      "OTP": "Application d'authentification pour OTP (One-time password)",
-      "OTP_DIALOG_TITLE": "Ajouter un OTP",
+      "OTP": "Application d'authentification pour TOTP (Time-based One-time password)",
+      "OTP_DIALOG_TITLE": "Ajouter un TOTP",
       "OTP_DIALOG_DESCRIPTION": "Scannez le code QR avec une application d'authentification et saisissez le code ci-dessous pour vérifier et activer la méthode OTP.",
       "U2F": "Empreinte digitale, clés de sécurité, Face ID et autres",
       "U2F_DIALOG_TITLE": "Vérifier le facteur",
@@ -420,6 +420,12 @@
       "U2F_SUCCESS": "Facteur ajouté avec succès !",
       "U2F_ERROR": "Une erreur s'est produite pendant l'installation !",
       "U2F_NAME": "Nom de l'authentificateur",
+      "OTPSMS": "OTP (One-Time Password) avec SMS",
+      "OTPEMAIL": "OTP (password monouso) con e-mail",
+      "SETUPOTPSMSDESCRIPTION": "Voulez-vous configurer ce numéro de téléphone comme deuxième facteur OTP (mot de passe à usage unique) ?",
+      "OTPSMSSUCCESS": "OTP Factor mis en place avec succès.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Votre téléphone doit être vérifié pour pouvoir utiliser cette méthode.",
+      "OTPEMAILSUCCESS": "OTP Factor mis en place avec succès.",
       "TYPE": {
         "0": "Pas de MFA défini",
         "1": "Mot de passe à usage unique (OTP)",
@@ -586,7 +592,8 @@
         "EDITVALUE": "Numéro de téléphone",
         "EDITDESC": "Entrez le nouveau numéro de téléphone dans le champ ci-dessous.",
         "DELETETITLE": "Supprimer le numéro de téléphone",
-        "DELETEDESC": "Voulez-vous vraiment supprimer le numéro de téléphone ?"
+        "DELETEDESC": "Voulez-vous vraiment supprimer le numéro de téléphone ?",
+        "OTPSMSREMOVALWARNING": "Ce compte utilise ce numéro de téléphone comme deuxième facteur. Vous ne pourrez plus l'utiliser après avoir continué."
       },
       "RESENDCODE": "Renvoyer le code",
       "ENTERCODE": "Vérifier",
@@ -735,6 +742,10 @@
     "TIMEOUT": "Délai d'attente",
     "TIMEOUTINSEC": "Délai en secondes",
     "ALLOWEDTOFAIL": "Autorisé à échouer",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Avertissement",
+      "DESCRIPTION": "Si vous désactivez ce paramètre, cela peut empêcher les utilisateurs de votre organisation de se connecter. De plus, vous ne pourrez plus accéder à la console pour désactiver l'action. Nous vous recommandons de créer un utilisateur administrateur dans une organisation distincte ou de tester les scripts d'abord dans un environnement de développement ou une organisation de développement."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Type de flux",
     "TRIGGERTYPE": "Type de déclencheur",
@@ -784,7 +795,7 @@
     },
     "PAGES": {
       "STATE": "Statut",
-      "DOMAINLIST": "Domaines"
+      "DOMAINLIST": "Domaines personnalisés"
     },
     "STATE": {
       "0": "Inconnu",
@@ -956,8 +967,7 @@
     "STATE": {
       "0": "Non défini",
       "1": "Actif",
-      "2": "Désactivé",
-      "3": "Supprimé"
+      "2": "Désactivé"
     },
     "MEMBER": {
       "TITLE": "Gestionnaires de l'organisation",
@@ -1040,12 +1050,15 @@
       "ja": "日本語",
       "pl": "Polski",
       "zh": "简体中文",
-      "bg": "Български"
+      "bg": "Български",
+      "pt": "Portuguese",
+      "mk": "Македонски"
     },
     "SMTP": {
       "TITLE": "Paramètres SMTP",
       "SENDERADDRESS": "Adresse e-mail de l'expéditeur",
       "SENDERNAME": "Nom de l'expéditeur",
+      "REPLYTOADDRESS": "Adresse Reply-to",
       "HOSTANDPORT": "Hôte et port",
       "USER": "Utilisateur",
       "PASSWORD": "Mot de passe",
@@ -1091,7 +1104,7 @@
       "INDAYS": "Jours"
     },
     "SECRETS": {
-      "TITLE": "Apparence du secret",
+      "TITLE": "Générateur du secret",
       "TYPES": "Types de secret",
       "TYPE": {
         "1": "Courrier d'initialisation",
@@ -1099,9 +1112,11 @@
         "3": "Vérification par téléphone",
         "4": "Réinitialisation du mot de passe",
         "5": "Initialisation sans mot de passe",
-        "6": "Secret de l'application"
+        "6": "Secret de l'application",
+        "7": "Mot de passe à usage unique (OTP) - SMS",
+        "8": "Mot de passe à usage unique (OTP) - e-mail"
       },
-      "ADDGENERATOR": "Définir l'apparence du secret",
+      "ADDGENERATOR": "Configurer générateur de mot de passe",
       "GENERATORTYPE": "Type",
       "EXPIRY": "Expiration (en heures)",
       "INCLUDEDIGITS": "Inclure les chiffres",
@@ -1240,7 +1255,9 @@
         "ja": "日本語",
         "pl": "Polski",
         "zh": "简体中文",
-        "bg": "Български"
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'email effectuée",
@@ -1287,6 +1304,8 @@
         "INIT": "Initialisation",
         "VE": "Vérifier l'email",
         "VP": "Vérifier le téléphone",
+        "VSO": "Vérifier SMS OTP",
+        "VEO": "Vérifier l'OTP par courrier électronique",
         "PR": "Réinitialisation du mot de passe",
         "DC": "Réclamation de domaine",
         "PL": "Sans mot de passe",
@@ -1307,7 +1326,9 @@
         "verifiedPhone": "Téléphone vérifié",
         "changedate": "Date de changement",
         "username": "Nom d'utilisateur",
-        "tempUsername": "Nom d'utilisateur temporaire"
+        "tempUsername": "Nom d'utilisateur temporaire",
+        "otp": "Mot de passe à usage unique",
+        "verifyUrl": "URL pour vérifier le mot de passe à usage unique"
       },
       "TOAST": {
         "UPDATED": "Textes personnalisés enregistrés."
@@ -1329,7 +1350,7 @@
       "MAXAGEDAYS": "Âge maximum en jours",
       "USERLOGINMUSTBEDOMAIN": "Le nom de connexion de l'utilisateur doit contenir le nom de domaine de l'organisation",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Si vous activez ce paramètre, tous les noms de connexion seront suffixés avec le domaine de l'organisation. Si ce paramètre est désactivé, vous devez vous assurer que les noms d'utilisateur sont uniques pour toutes les organisations.",
-      "VALIDATEORGDOMAINS": "Valider les domaines d'Org",
+      "VALIDATEORGDOMAINS": "Vérification du domaine de l'organisation requise (challenge DNS ou HTTP)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "L'adresse de l'expéditeur SMTP correspond au domaine de l'instance",
       "ALLOWUSERNAMEPASSWORD": "Nom d'utilisateur Mot de passe autorisé",
       "ALLOWEXTERNALIDP": "IDP externe autorisé",
@@ -1339,6 +1360,8 @@
       "ALLOWREGISTER_DESC": "Si l'option est sélectionnée, une étape supplémentaire pour l'enregistrement d'un utilisateur apparaît dans la connexion.",
       "FORCEMFA": "Forcer MFA",
       "FORCEMFA_DESC": "Si l'option est sélectionnée, les utilisateurs doivent configurer un deuxième facteur pour la connexion.",
+      "FORCEMFALOCALONLY": "Forcer MFA pour les utilisateurs locaux",
+      "FORCEMFALOCALONLY_DESC": "Si l'option est sélectionnée, les utilisateurs locaux authentifiés doivent configurer un deuxième facteur pour la connexion.",
       "HIDEPASSWORDRESET": "Masquer la réinitialisation du mot de passe",
       "HIDEPASSWORDRESET_DESC": "Si l'option est sélectionnée, l'utilisateur ne peut pas réinitialiser son mot de passe lors du processus de connexion.",
       "HIDELOGINNAMESUFFIX": "Masquer le suffixe du nom de connexion",
@@ -1506,13 +1529,11 @@
         "SEL_PROJECT": "Rechercher un projet",
         "SEL_ROLES": "Sélectionnez les rôles que vous souhaitez ajouter à l'autorisation.",
         "SEL_USER": "Sélectionnez les utilisateurs",
-        "SEL_ORG": "Définir le domaine",
-        "SEL_ORG_DESC": "Entrez le domaine complet pour spécifier l'organisation à accorder.",
-        "ORG_TITLE": "Organisation",
+        "SEL_ORG": "Rechercher une organisation",
+        "SEL_ORG_DESC": "Rechercher l'organisme à accorder",
         "ORG_DESCRIPTION": "Vous êtes sur le point d'accorder un utilisateur pour l'organisation{{name}}.",
         "ORG_DESCRIPTION_DESC": "Changez le contexte dans l'en-tête ci-dessus pour accorder un utilisateur pour une autre organisation.",
-        "SEL_ORG_FORMFIELD": "Domaine complet",
-        "SEL_ORG_BUTTON": "Rechercher une organisation",
+        "SEL_ORG_FORMFIELD": "Organisation",
         "FOR_ORG": "L'autorisation est créée pour"
       },
       "DETAIL": {
@@ -1788,6 +1809,8 @@
     "DELETE": "Supprimer",
     "DELETE_TITLE": "Supprimer Idp",
     "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer un fournisseur d'identité. Les changements qui en résultent sont irrévocables. Voulez-vous vraiment le faire ?",
+    "REMOVE_WARN_TITLE": "Supprimer le fournisseur d'identité",
+    "REMOVE_WARN_DESCRIPTION": "Vous êtes sur le point de supprimer un fournisseur d'identité. Cela supprimera la sélection de l'IDP disponible pour vos utilisateurs et les utilisateurs déjà enregistrés ne pourront plus se reconnecter. Êtes-vous sûr de continuer ?",
     "DELETE_SELECTION_TITLE": "Supprimer Idp",
     "DELETE_SELECTION_DESCRIPTION": "Vous êtes sur le point de supprimer un fournisseur d'identité. Les changements qui en résultent sont irrévocables. Voulez-vous vraiment le faire ?",
     "EMPTY": "Aucun IDP disponible",
@@ -1813,7 +1836,9 @@
       "DELETED": "Idp supprimé avec succès !",
       "ADDED": "Ajouté avec succès.",
       "REMOVED": "Suppression réussie."
-    }
+    },
+    "ISIDTOKENMAPPING": "Mappage depuis le jeton ID",
+    "ISIDTOKENMAPPING_DESC": "Si sélectionné, les informations du fournisseur sont mappées à partir du jeton ID, et non à partir du point d'extrémité userinfo."
   },
   "MFA": {
     "LIST": {
@@ -1842,8 +1867,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "Inconnu",
-      "1": "Mot de passe à usage unique (OTP)",
-      "2": "Empreinte digitale, clés de sécurité, Face ID et autres"
+      "1": "One Time Password par authenticator app (TOTP)",
+      "2": "Empreinte digitale, clés de sécurité, Face ID et autres",
+      "3": "One Time Password par email (Email OTP)",
+      "4": "One Time Password par SMS (SMS OTP)"
     }
   },
   "LOGINPOLICY": {
@@ -2098,7 +2125,9 @@
     "ja": "日本語",
     "pl": "Polski",
     "zh": "简体中文",
-    "bg": "Български"
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски"
   },
   "MEMBER": {
     "ADD": "Ajouter un manager",

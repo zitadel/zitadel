@@ -39,6 +39,7 @@ func NewHumanPasswordlessAddedEvent(
 	aggregate *eventstore.Aggregate,
 	webAuthNTokenID,
 	challenge string,
+	rpID string,
 ) *HumanPasswordlessAddedEvent {
 	return &HumanPasswordlessAddedEvent{
 		HumanWebAuthNAddedEvent: *NewHumanWebAuthNAddedEvent(
@@ -49,6 +50,7 @@ func NewHumanPasswordlessAddedEvent(
 			),
 			webAuthNTokenID,
 			challenge,
+			rpID,
 		),
 	}
 }

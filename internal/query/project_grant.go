@@ -111,12 +111,12 @@ type ProjectGrantSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool) (_ *ProjectGrant, err error) {
+func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool) (grant *ProjectGrant, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.ProjectGrantProjection.Trigger(ctx)
+		ctx = projection.ProjectGrantProjection.Trigger(ctx)
 	}
 
 	stmt, scan := prepareProjectGrantQuery(ctx, q.client)
@@ -133,11 +133,14 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, 
 		return nil, errors.ThrowInternal(err, "QUERY-Nf93d", "Errors.Query.SQLStatment")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		grant, err = scan(row)
+		return err
+	}, query, args...)
+	return grant, err
 }
 
-func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, grantedOrg string, withOwnerRemoved bool) (_ *ProjectGrant, err error) {
+func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, grantedOrg string, withOwnerRemoved bool) (grant *ProjectGrant, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -156,11 +159,14 @@ func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, granted
 		return nil, errors.ThrowInternal(err, "QUERY-MO9fs", "Errors.Query.SQLStatment")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		grant, err = scan(row)
+		return err
+	}, query, args...)
+	return grant, err
 }
 
-func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrantSearchQueries, withOwnerRemoved bool) (projects *ProjectGrants, err error) {
+func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrantSearchQueries, withOwnerRemoved bool) (grants *ProjectGrants, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -177,16 +183,16 @@ func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrant
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-N9fsg", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		grants, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-PP02n", "Errors.Internal")
 	}
-	projects, err = scan(rows)
-	if err != nil {
-		return nil, err
-	}
-	projects.LatestSequence, err = q.latestSequence(ctx, projectGrantsTable)
-	return projects, err
+
+	grants.LatestSequence, err = q.latestSequence(ctx, projectGrantsTable)
+	return grants, err
 }
 
 func (q *Queries) SearchProjectGrantsByProjectIDAndRoleKey(ctx context.Context, projectID, roleKey string, withOwnerRemoved bool) (projects *ProjectGrants, err error) {

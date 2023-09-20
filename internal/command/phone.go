@@ -11,8 +11,11 @@ import (
 type Phone struct {
 	Number   domain.PhoneNumber
 	Verified bool
+
+	// ReturnCode is used if the Verified field is false
+	ReturnCode bool
 }
 
-func newPhoneCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCodeWithExpiry, error) {
-	return newCryptoCodeWithExpiry(ctx, filter, domain.SecretGeneratorTypeVerifyPhoneCode, alg)
+func (c *Commands) newPhoneCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCode, error) {
+	return c.newCode(ctx, filter, domain.SecretGeneratorTypeVerifyPhoneCode, alg)
 }
