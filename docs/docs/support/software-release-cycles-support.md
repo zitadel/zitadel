@@ -1,5 +1,6 @@
 ---
-title: Support states & software release cycle
+title: ZITADEL Support States and Software Release Cycle
+sidebar_label: Support States/Software Release Cycle
 ---
 
 ## Support states
