@@ -195,6 +195,7 @@ export class UserTableComponent implements OnInit {
           sortingField = UserFieldName.USER_FIELD_NAME_USER_NAME;
           break;
         case 'preferredLoginName':
+          // TODO: replace with preferred username sorting once implemented
           sortingField = UserFieldName.USER_FIELD_NAME_USER_NAME;
           break;
         case 'email':
