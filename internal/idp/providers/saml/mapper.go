@@ -16,6 +16,10 @@ type UserMapper struct {
 	Attributes map[string][]string
 }
 
+func NewUser() *UserMapper {
+	return &UserMapper{Attributes: map[string][]string{}}
+}
+
 func (u *UserMapper) SetID(id *saml.NameID) {
 	u.ID = id.Value
 }

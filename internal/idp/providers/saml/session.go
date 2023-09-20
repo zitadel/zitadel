@@ -53,11 +53,11 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 		return nil, err
 	}
 
-	userMapper := &UserMapper{}
+	userMapper := NewUser()
 	userMapper.SetID(assertion.Subject.NameID)
 	for _, statement := range assertion.AttributeStatements {
 		for _, attribute := range statement.Attributes {
-			values := make([]string, len(statement.Attributes))
+			values := make([]string, len(attribute.Values))
 			for i := range attribute.Values {
 				values[i] = attribute.Values[i].Value
 			}
