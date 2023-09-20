@@ -19,7 +19,7 @@ export interface SignInWithIDPProps {
 }
 
 const START_IDP_FLOW_PATH = (idpId: string) =>
-  `/v2alpha/users/idps/${idpId}/start`;
+  `/v2beta/users/idps/${idpId}/start`;
 
 export function SignInWithIDP({
   host,

@@ -3,7 +3,7 @@ import { CompatServiceDefinition } from "nice-grpc/lib/service-definitions";
 import {
   UserServiceClient,
   UserServiceDefinition,
-} from "../../proto/server/zitadel/user/v2alpha/user_service";
+} from "../../proto/server/zitadel/user/v2beta/user_service";
 
 import { ZitadelServer, createClient, getServers } from "../../server";
 

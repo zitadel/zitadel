@@ -4,47 +4,47 @@ import * as user from "./v2/user";
 import * as oidc from "./v2/oidc";
 import * as management from "./management";
 
-import * as login from "./proto/server/zitadel/settings/v2alpha/login_settings";
-import * as password from "./proto/server/zitadel/settings/v2alpha/password_settings";
-import * as legal from "./proto/server/zitadel/settings/v2alpha/legal_settings";
+import * as login from "./proto/server/zitadel/settings/v2beta/login_settings";
+import * as password from "./proto/server/zitadel/settings/v2beta/password_settings";
+import * as legal from "./proto/server/zitadel/settings/v2beta/legal_settings";
 
 export {
   BrandingSettings,
   Theme,
-} from "./proto/server/zitadel/settings/v2alpha/branding_settings";
+} from "./proto/server/zitadel/settings/v2beta/branding_settings";
 
 export {
   LoginSettings,
   IdentityProvider,
   IdentityProviderType,
-} from "./proto/server/zitadel/settings/v2alpha/login_settings";
+} from "./proto/server/zitadel/settings/v2beta/login_settings";
 
 export {
   RequestChallenges,
   Challenges,
   Challenges_WebAuthN,
-} from "./proto/server/zitadel/session/v2alpha/challenge";
+} from "./proto/server/zitadel/session/v2beta/challenge";
 
 export {
   GetAuthRequestRequest,
   GetAuthRequestResponse,
   CreateCallbackRequest,
   CreateCallbackResponse,
-} from "./proto/server/zitadel/oidc/v2alpha/oidc_service";
+} from "./proto/server/zitadel/oidc/v2beta/oidc_service";
 
 export {
   AuthRequest,
   Prompt,
-} from "./proto/server/zitadel/oidc/v2alpha/authorization";
+} from "./proto/server/zitadel/oidc/v2beta/authorization";
 
 export {
   Session,
   Factors,
-} from "./proto/server/zitadel/session/v2alpha/session";
+} from "./proto/server/zitadel/session/v2beta/session";
 export {
   IDPInformation,
   IDPLink,
-} from "./proto/server/zitadel/user/v2alpha/idp";
+} from "./proto/server/zitadel/user/v2beta/idp";
 export {
   ListSessionsResponse,
   GetSessionResponse,
@@ -52,7 +52,7 @@ export {
   SetSessionResponse,
   SetSessionRequest,
   DeleteSessionResponse,
-} from "./proto/server/zitadel/session/v2alpha/session_service";
+} from "./proto/server/zitadel/session/v2beta/session_service";
 export {
   GetPasswordComplexitySettingsResponse,
   GetBrandingSettingsResponse,
@@ -62,7 +62,7 @@ export {
   GetLoginSettingsRequest,
   GetActiveIdentityProvidersResponse,
   GetActiveIdentityProvidersRequest,
-} from "./proto/server/zitadel/settings/v2alpha/settings_service";
+} from "./proto/server/zitadel/settings/v2beta/settings_service";
 export {
   AddHumanUserResponse,
   AddHumanUserRequest,
@@ -80,15 +80,15 @@ export {
   StartIdentityProviderIntentResponse,
   RetrieveIdentityProviderIntentRequest,
   RetrieveIdentityProviderIntentResponse,
-} from "./proto/server/zitadel/user/v2alpha/user_service";
+} from "./proto/server/zitadel/user/v2beta/user_service";
 export {
   SetHumanPasswordResponse,
   SetHumanPasswordRequest,
 } from "./proto/server/zitadel/management";
 export * from "./proto/server/zitadel/idp";
-export { type LegalAndSupportSettings } from "./proto/server/zitadel/settings/v2alpha/legal_settings";
-export { type PasswordComplexitySettings } from "./proto/server/zitadel/settings/v2alpha/password_settings";
-export { type ResourceOwnerType } from "./proto/server/zitadel/settings/v2alpha/settings";
+export { type LegalAndSupportSettings } from "./proto/server/zitadel/settings/v2beta/legal_settings";
+export { type PasswordComplexitySettings } from "./proto/server/zitadel/settings/v2beta/password_settings";
+export { type ResourceOwnerType } from "./proto/server/zitadel/settings/v2beta/settings";
 
 import {
   getServers,
