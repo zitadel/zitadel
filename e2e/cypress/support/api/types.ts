@@ -18,8 +18,8 @@ export interface SystemAPI extends Token {
 
 export type SearchResult = {
   entity: Entity | null;
+  sequence: number;
   id: string;
-  viewTimeStamp: number;
 };
 
 // Entity is an object but not a function

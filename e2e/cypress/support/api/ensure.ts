@@ -59,14 +59,28 @@ export function ensureSetting(
   );
 }
 
-function awaitDesired(trials: number, eventTimestamp: number, search: () => Cypress.Chainable<SearchResult>) {
+function awaitDesired(
+  trials: number,
+  expectEntity: (entity: Entity) => boolean,
+  search: () => Cypress.Chainable<SearchResult>,
+  initialSequence?: number,
+) {
   return search().then((resp) => {
-    if (resp.viewTimeStamp < eventTimestamp) {
+    const foundExpectedEntity = expectEntity(resp.entity);
+    const foundExpectedSequence = !initialSequence || resp.sequence >= initialSequence;
+
+    const check = !foundExpectedEntity || !foundExpectedSequence;
+    if (check) {
       expect(trials, `trying ${trials} more times`).to.be.greaterThan(0);
       cy.wait(1000);
-      return awaitDesired(trials - 1, eventTimestamp, search);
+      return awaitDesired(trials - 1, expectEntity, search, initialSequence);
     }
   });
+}
+
+interface EnsuredResult {
+  id: string;
+  sequence: number;
 }
 
 export function ensureSomething(
@@ -79,24 +93,32 @@ export function ensureSomething(
   mapId?: (body: any) => string,
   orgId?: string,
 ): Cypress.Chainable<string> {
-  return search().then((sRes) => {
-    if (expectEntity(sRes.entity)) {
-      return cy.wrap(sRes.id);
-    }
-    return cy
-      .request({
-        method: ensureMethod,
-        url: apiPath(sRes.entity),
-        headers: requestHeaders(token, orgId),
-        body: body,
-        followRedirect: false,
-      })
-      .then((cRes) => {
-        expect(cRes.status).to.equal(200);
-        const id = mapId ? mapId(cRes.body) : undefined;
-        return awaitDesired(90, cRes.body.details.changeDate || cRes.body.details.creationDate, search).then(() => {
-          return cy.wrap(id);
+  return search()
+    .then((sRes) => {
+      if (expectEntity(sRes.entity)) {
+        return cy.wrap(<EnsuredResult>{ id: sRes.id, sequence: sRes.sequence });
+      }
+
+      return cy
+        .request({
+          method: ensureMethod,
+          url: apiPath(sRes.entity),
+          headers: requestHeaders(token, orgId),
+          body: body,
+          failOnStatusCode: false,
+          followRedirect: false,
+        })
+        .then((cRes) => {
+          expect(cRes.status).to.equal(200);
+          return <EnsuredResult>{
+            id: mapId ? mapId(cRes.body) : undefined,
+            sequence: sRes.sequence,
+          };
         });
+    })
+    .then((data) => {
+      return awaitDesired(90, expectEntity, search, data.sequence).then(() => {
+        return cy.wrap(data.id);
       });
-  });
+    });
 }
