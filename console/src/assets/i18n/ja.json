@@ -796,7 +796,7 @@
     },
     "PAGES": {
       "STATE": "ステータス",
-      "DOMAINLIST": "ドメイン"
+      "DOMAINLIST": "カスタムドメイン"
     },
     "STATE": {
       "0": "未定義",
@@ -1346,7 +1346,7 @@
       "MAXAGEDAYS": "最大有効期限",
       "USERLOGINMUSTBEDOMAIN": "ログイン名の接尾辞として組織ドメインを追加する",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "この設定を有効にすると、すべてのログイン名が組織ドメインで接尾辞が付けられます。この設定が無効になっている場合、ユーザー名がすべての組織で一意であることを確認する必要があります。",
-      "VALIDATEORGDOMAINS": "組織ドメインを認証する",
+      "VALIDATEORGDOMAINS": "組織のドメイン検証が必要です (DNSまたはHTTPチャレンジ)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP送信者アドレスはインスタンスドメインに一致しています",
       "ALLOWUSERNAMEPASSWORD": "ユーザー名とパスワードを許可",
       "ALLOWEXTERNALIDP": "外部IDPを許可",
