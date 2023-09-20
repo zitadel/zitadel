@@ -87,8 +87,17 @@ func (db *DB) QueryRowContext(ctx context.Context, scan func(row *sql.Row) error
 	return row.Err()
 }
 
-func Connect(config Config, useAdmin bool) (*DB, error) {
-	client, err := config.connector.Connect(useAdmin)
+const (
+	zitadelAppName          = "zitadel"
+	EventstorePusherAppName = "zitadel_es_pusher"
+)
+
+func Connect(config Config, useAdmin, isEventPusher bool) (*DB, error) {
+	appName := zitadelAppName
+	if isEventPusher {
+		appName = EventstorePusherAppName
+	}
+	client, err := config.connector.Connect(useAdmin, isEventPusher, appName)
 	if err != nil {
 		return nil, err
 	}

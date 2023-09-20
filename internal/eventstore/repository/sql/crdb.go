@@ -114,9 +114,9 @@ type CRDB struct {
 func NewCRDB(client *database.DB) *CRDB {
 	switch client.Type() {
 	case "cockroach":
-		awaitOpenTransactions = "AND creation_date::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = 'zitadel')"
+		awaitOpenTransactions = "AND creation_date::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = '" + database.EventstorePusherAppName + "')"
 	case "postgres":
-		awaitOpenTransactions = `AND "position" < (SELECT EXTRACT(EPOCH FROM min(xact_start)) FROM pg_stat_activity WHERE datname = current_database() AND state <> 'idle')`
+		awaitOpenTransactions = `AND "position" < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = '` + database.EventstorePusherAppName + `' AND state <> 'idle')`
 	}
 
 	return &CRDB{client}

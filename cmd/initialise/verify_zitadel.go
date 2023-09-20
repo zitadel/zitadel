@@ -83,7 +83,7 @@ func VerifyZitadel(db *database.DB, config database.Config) error {
 func verifyZitadel(config database.Config) error {
 	logging.WithFields("database", config.DatabaseName()).Info("verify zitadel")
 
-	db, err := database.Connect(config, false)
+	db, err := database.Connect(config, false, false)
 	if err != nil {
 		return err
 	}

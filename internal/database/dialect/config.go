@@ -29,7 +29,7 @@ type Matcher interface {
 }
 
 type Connector interface {
-	Connect(useAdmin bool) (*sql.DB, error)
+	Connect(useAdmin, isEventPusher bool, appName string) (*sql.DB, error)
 	Password() string
 	Database
 }

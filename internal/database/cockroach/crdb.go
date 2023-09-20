@@ -26,15 +26,18 @@ const (
 )
 
 type Config struct {
-	Host            string
-	Port            uint16
-	Database        string
-	MaxOpenConns    uint32
-	MaxIdleConns    uint32
-	MaxConnLifetime time.Duration
-	MaxConnIdleTime time.Duration
-	User            User
-	Admin           User
+	Host               string
+	Port               uint16
+	Database           string
+	EventPushConnRatio float64
+	MaxOpenConns       uint32
+	MaxIdleConns       uint32
+	MaxConnLifetime    time.Duration
+	MaxConnIdleTime    time.Duration
+	User               User
+	Admin              User
+
+	connInfo *dialect.ConnectionInfo
 
 	// Additional options to be appended as options=<Options>
 	// The value will be taken as is. Multiple options are space separated.
@@ -65,17 +68,31 @@ func (c *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 			return nil, err
 		}
 	}
-	return c, nil
-}
 
-func (c *Config) Connect(useAdmin bool) (*sql.DB, error) {
-	client, err := sql.Open("pgx", c.String(useAdmin))
+	c.connInfo, err = dialect.NewConnectionInfo(c.MaxOpenConns, c.MaxIdleConns, c.EventPushConnRatio)
 	if err != nil {
 		return nil, err
 	}
 
-	client.SetMaxOpenConns(int(c.MaxOpenConns))
-	client.SetMaxIdleConns(int(c.MaxIdleConns))
+	return c, nil
+}
+
+func (c *Config) Connect(useAdmin, isEventPusher bool, appName string) (*sql.DB, error) {
+	client, err := sql.Open("pgx", c.String(useAdmin, appName))
+	if err != nil {
+		return nil, err
+	}
+
+	var maxConns, maxIdleConns uint32
+	if isEventPusher {
+		maxConns = c.connInfo.EventstorePusher.MaxOpenConns
+		maxIdleConns = c.connInfo.EventstorePusher.MaxIdleConns
+	} else {
+		maxConns = c.connInfo.ZITADEL.MaxOpenConns
+		maxIdleConns = c.connInfo.ZITADEL.MaxIdleConns
+	}
+	client.SetMaxOpenConns(int(maxConns))
+	client.SetMaxIdleConns(int(maxIdleConns))
 	client.SetConnMaxLifetime(c.MaxConnLifetime)
 	client.SetConnMaxIdleTime(c.MaxConnIdleTime)
 
@@ -138,7 +155,7 @@ func (c *Config) checkSSL(user User) {
 	}
 }
 
-func (c Config) String(useAdmin bool) string {
+func (c Config) String(useAdmin bool, appName string) string {
 	user := c.User
 	if useAdmin {
 		user = c.Admin
@@ -149,7 +166,7 @@ func (c Config) String(useAdmin bool) string {
 		"port=" + strconv.Itoa(int(c.Port)),
 		"user=" + user.Username,
 		"dbname=" + c.Database,
-		"application_name=zitadel",
+		"application_name=" + appName,
 		"sslmode=" + user.SSL.Mode,
 	}
 	if c.Options != "" {

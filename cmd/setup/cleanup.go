@@ -31,11 +31,13 @@ func Cleanup(config *Config) {
 
 	logging.Info("cleanup started")
 
-	dbClient, err := database.Connect(config.Database, false)
+	zitadelDBClient, err := database.Connect(config.Database, false, false)
+	logging.OnError(err).Fatal("unable to connect to database")
+	esPusherDBClient, err := database.Connect(config.Database, false, true)
 	logging.OnError(err).Fatal("unable to connect to database")
 
-	config.Eventstore.Pusher = new_es.NewEventstore(dbClient)
-	config.Eventstore.Querier = old_es.NewCRDB(dbClient)
+	config.Eventstore.Pusher = new_es.NewEventstore(esPusherDBClient)
+	config.Eventstore.Querier = old_es.NewCRDB(zitadelDBClient)
 	es := eventstore.NewEventstore(config.Eventstore)
 	migration.RegisterMappers(es)
 

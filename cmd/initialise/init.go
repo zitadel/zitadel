@@ -76,7 +76,7 @@ func initialise(config database.Config, steps ...func(*database.DB) error) error
 		return err
 	}
 
-	db, err := database.Connect(config, true)
+	db, err := database.Connect(config, true, false)
 	if err != nil {
 		return err
 	}
