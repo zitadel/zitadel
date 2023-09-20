@@ -83,7 +83,10 @@ Database:
     Host: localhost # ZITADEL_DATABASE_COCKROACH_HOST
     Port: 26257 # ZITADEL_DATABASE_COCKROACH_PORT
     Database: zitadel # ZITADEL_DATABASE_COCKROACH_DATABASE
-    EventPushConnRatio: 0.2
+    # This setting defines the ratio of how many connections defined below
+    # are used to push events. ZITADEL manages two database connection pools
+    # one to push events and one for the remaining queries. 
+    EventPushConnRatio: 0.2 # ZITADEL_DATABASE_COCKROACH_EVENTPUSHCONNRATIO
     MaxOpenConns: 40 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
     MaxIdleConns: 20 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
     MaxConnLifetime: 30m # ZITADEL_DATABASE_COCKROACH_MAXCONNLIFETIME
@@ -111,7 +114,10 @@ Database:
     Host: # ZITADEL_DATABASE_POSTGRES_HOST
     Port: # ZITADEL_DATABASE_POSTGRES_PORT
     Database: # ZITADEL_DATABASE_POSTGRES_DATABASE
-    EventPushConnRatio:
+    # This setting defines the ratio of how many connections defined below
+    # are used to push events. ZITADEL manages two database connection pools
+    # one to push events and one for the remaining queries. 
+    EventPushConnRatio: # ZITADEL_DATABASE_POSTGRES_EVENTPUSHCONNRATIO
     MaxOpenConns: # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
     MaxIdleConns: # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
     MaxConnLifetime: # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
