@@ -29,7 +29,7 @@ Configure ZITADEL as your _Custom JWT Provider_ following the [MongoDB docs](htt
 Configure the following values:
 - Signing Algorithm: RS256
 - Signing Key: JWK or JWKS URL
-- JWKS: https://{your_domain}.zitadel.cloud/oauth/v2/keys
+- JWKS: https://$CUSTOM-DOMAIN/oauth/v2/keys
 - Audience: Your app's client ID which you copied when you created the ZITADEL app
 
 Your configuration should look similar to this:
