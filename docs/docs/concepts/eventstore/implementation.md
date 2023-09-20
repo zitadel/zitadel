@@ -1,5 +1,6 @@
 ---
-title: Implementation
+title: ZITADEL Database Structure
+sidebar_label: Database Structure
 ---
 
 This documentation gives you an insight into the structure of the ZITADEL database.

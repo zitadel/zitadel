@@ -1,5 +1,6 @@
 ---
-title: Users
+title: Customer Portal Users in ZITADEL
+sidebar_label: Customer Portal Users
 ---
 
 Manage all your users who are allowed to access the Customer Portal.

@@ -1,5 +1,6 @@
 ---
-title: Deployment
+title: ZITADEL's Deployment Architecture
+sidebar_label: Deployment Architecture
 ---
 
 ## High Availability

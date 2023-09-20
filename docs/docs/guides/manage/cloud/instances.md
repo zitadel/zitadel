@@ -1,8 +1,9 @@
 ---
-title: Instances
+title: ZITADEL Instances
+sidebar_label: Instances
 ---
 
-The ZITADEL customer Portal is used to manage all your different ZITADEL instances.
+The ZITADEL Customer Portal is used to manage all your different ZITADEL instances.
 You can also manage your subscriptions, billing, newsletters and support requests.
 
 ## Overview
