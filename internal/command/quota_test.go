@@ -44,7 +44,7 @@ func TestQuota_AddQuota(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							quota.NewAddedEvent(context.Background(),
+							quota.NewSetEvent(context.Background(),
 								&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
 								QuotaRequestsAllAuthenticated.Enum(),
 								time.Now(),
@@ -108,7 +108,7 @@ func TestQuota_AddQuota(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
-								quota.NewAddedEvent(context.Background(),
+								quota.NewSetEvent(context.Background(),
 									&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
 									QuotaRequestsAllAuthenticated.Enum(),
 									time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
@@ -149,7 +149,7 @@ func TestQuota_AddQuota(t *testing.T) {
 					expectFilter(
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
-							quota.NewAddedEvent(context.Background(),
+							quota.NewSetEvent(context.Background(),
 								&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
 								QuotaRequestsAllAuthenticated.Enum(),
 								time.Now(),
@@ -171,7 +171,7 @@ func TestQuota_AddQuota(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
-								quota.NewAddedEvent(context.Background(),
+								quota.NewSetEvent(context.Background(),
 									&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
 									QuotaRequestsAllAuthenticated.Enum(),
 									time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
@@ -214,7 +214,7 @@ func TestQuota_AddQuota(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
-								quota.NewAddedEvent(context.Background(),
+								quota.NewSetEvent(context.Background(),
 									&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
 									QuotaRequestsAllAuthenticated.Enum(),
 									time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
@@ -325,7 +325,7 @@ func TestQuota_RemoveQuota(t *testing.T) {
 					expectFilter(
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
-							quota.NewAddedEvent(context.Background(),
+							quota.NewSetEvent(context.Background(),
 								&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
 								QuotaRequestsAllAuthenticated.Enum(),
 								time.Now(),
@@ -363,7 +363,7 @@ func TestQuota_RemoveQuota(t *testing.T) {
 					expectFilter(
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
-							quota.NewAddedEvent(context.Background(),
+							quota.NewSetEvent(context.Background(),
 								&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
 								QuotaRequestsAllAuthenticated.Enum(),
 								time.Now(),
