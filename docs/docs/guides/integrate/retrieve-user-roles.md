@@ -1,5 +1,6 @@
 ---
-title: Retrieve user roles
+title: Retrieve User Roles in ZITADEL
+sidebar_label: Retrieve User Roles
 ---
 
 This guide explains all the possible ways of retrieving user roles across different organizations and projects using ZITADEL's APIs. 

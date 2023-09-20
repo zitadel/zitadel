@@ -1,5 +1,6 @@
 ---
-title: Private Key JWT
+title: Service Users in ZITADEL
+sidebar_label: Service Users
 ---
 
 This is a guide on how to create service users in ZITADEL. You can read more about users [here](/concepts/structure/users.md).

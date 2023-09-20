@@ -1,5 +1,6 @@
 ---
-title: Grant Types
+title: Grant Types in ZITADEL
+sidebar_label: Grant Types
 ---
 
 For a list of supported or unsupported `Grant Types` please have a look at the table below.

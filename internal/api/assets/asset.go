@@ -146,7 +146,7 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 			return
 		}
 		if size > uploader.MaxFileSize() {
-			s.ErrorHandler()(w, r, fmt.Errorf("file to big, max file size is %vKB", uploader.MaxFileSize()/1024), http.StatusBadRequest)
+			s.ErrorHandler()(w, r, fmt.Errorf("file too big, max file size is %vKB", uploader.MaxFileSize()/1024), http.StatusBadRequest)
 			return
 		}
 

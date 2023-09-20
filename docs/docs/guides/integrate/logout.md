@@ -1,5 +1,6 @@
 ---
-title: Logout
+title: Log Out Users from an Application with ZITADEL
+sidebar_label: Logout
 ---
 
 This guide shows you the different concepts and use cases of the logout process and how to use it in ZITADEL.

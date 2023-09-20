@@ -1,5 +1,6 @@
 ---
-title: Claims
+title: Claims in ZITADEL
+sidebar_label: Claims
 ---
 
 ZITADEL asserts claims on different places according to the corresponding specifications or project and clients settings.

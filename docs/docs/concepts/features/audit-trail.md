@@ -1,5 +1,6 @@
 ---
-title: Audit Trail
+title: ZITADEL's In-built Audit Trail
+sidebar_label: Audit Trail
 ---
 
 ZITADEL provides you with an built-in audit trail to track all changes and events over an unlimited period of time.

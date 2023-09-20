@@ -1,5 +1,5 @@
 ---
-title: SAML endpoints
+title: SAML Endpoints in ZITADEL
 ---
 
 ## SAML 2.0 metadata
@@ -35,10 +35,10 @@ spec.** [Bindings for the OASIS Security Assertion Markup Language (SAML) V2.0 â
 
 | Parameter | Description                                                                                                                                                                         |
 |---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| RelayState | ID to associate the exchange with the original request.                                                                                                                             |
+| RelayState | (Optional) ID to associate the exchange with the original request.                                                                                                                  |
 | SAMLRequest | The request made to the SAML IDP.  (base64 encoded)                                                                                                                                 |
 | SigAlg | Algorithm used to sign the request, only if binding is 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' as signature has to be provided es separate parameter. (base64 encoded) |
-| Signature | Signature of the request as parameter with 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' binding.  (base64 encoded)                                                                            |
+| Signature | Signature of the request as parameter with 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' binding.  (base64 encoded)                                                          |
 
 ### Successful response
 

@@ -1,5 +1,6 @@
 ---
-title: .NET
+title: Integrate ZITADEL into a .NET Application
+sidebar_label: .NET
 ---
 
 This integration guide shows you how to integrate **ZITADEL** into your .NET application.

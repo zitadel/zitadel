@@ -120,7 +120,7 @@ Errors:
       Empty: Password is empty
       Invalid: Password is invalid
       NotSet: User has not set a password
-      NotChanged: Password not changed
+      NotChanged: New password cannot be the same as your current password
       NotSupported: Password hash encoding not supported
     PasswordComplexityPolicy:
       NotFound: Password policy not found
