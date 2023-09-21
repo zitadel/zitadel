@@ -131,6 +131,108 @@ func TestQuotasProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "reduceQuotaSet with set type",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(quota.SetEventType),
+					quota.AggregateType,
+					[]byte(`{
+							"unit": 1,
+							"amount": 10,
+							"limit": true,
+							"from": "2023-01-01T00:00:00Z",
+							"interval": 300000000000
+					}`),
+				), quota.SetEventMapper),
+			},
+			reduce: (&quotaProjection{}).reduceQuotaSet,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("quota"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.quotas (limit_usage, amount, from_anchor, interval, id, instance_id, unit) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, unit) DO UPDATE SET (limit_usage, amount, from_anchor, interval, id) = (EXCLUDED.limit_usage, EXCLUDED.amount, EXCLUDED.from_anchor, EXCLUDED.interval, EXCLUDED.id)",
+							expectedArgs: []interface{}{
+								true,
+								uint64(10),
+								time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
+								time.Minute * 5,
+								"agg-id",
+								"instance-id",
+								quota.RequestsAllAuthenticated,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceQuotaAdded with set type and notification",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(quota.SetEventType),
+					quota.AggregateType,
+					[]byte(`{
+							"unit": 1,
+							"amount": 10,
+							"limit": true,
+							"from": "2023-01-01T00:00:00Z",
+							"interval": 300000000000,
+							"notifications": [
+								{
+									"id": "id",
+									"percent": 100,
+									"repeat": true,
+									"callURL": "url"
+								}
+							]
+					}`),
+				), quota.SetEventMapper),
+			},
+			reduce: (&quotaProjection{}).reduceQuotaSet,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("quota"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.quotas (limit_usage, amount, from_anchor, interval, id, instance_id, unit) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, unit) DO UPDATE SET (limit_usage, amount, from_anchor, interval, id) = (EXCLUDED.limit_usage, EXCLUDED.amount, EXCLUDED.from_anchor, EXCLUDED.interval, EXCLUDED.id)",
+							expectedArgs: []interface{}{
+								true,
+								uint64(10),
+								time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
+								time.Minute * 5,
+								"agg-id",
+								"instance-id",
+								quota.RequestsAllAuthenticated,
+							},
+						},
+						{
+							expectedStmt: "DELETE FROM projections.quotas_notifications WHERE (instance_id = $1) AND (unit = $2)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								quota.RequestsAllAuthenticated,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.quotas_notifications (instance_id, unit, id, call_url, percent, repeat) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								quota.RequestsAllAuthenticated,
+								"id",
+								"url",
+								uint16(100),
+								true,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "reduceQuotaNotificationDue",
 			args: args{
 				event: getEvent(testEvent(
