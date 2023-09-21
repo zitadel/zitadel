@@ -47,12 +47,12 @@ func NewRemoveQuotaNameUniqueConstraint(unit Unit) *eventstore.EventUniqueConstr
 // SetEvent describes that a quota is added or modified and contains only changed properties
 type SetEvent struct {
 	eventstore.BaseEvent `json:"-"`
-	Unit                 Unit                    `json:"unit"`
-	From                 *time.Time              `json:"from,omitempty"`
-	ResetInterval        *time.Duration          `json:"interval,omitempty"`
-	Amount               *uint64                 `json:"amount,omitempty"`
-	Limit                *bool                   `json:"limit,omitempty"`
-	Notifications        []*SetEventNotification `json:"notifications,omitempty"`
+	Unit                 Unit                     `json:"unit"`
+	From                 *time.Time               `json:"from,omitempty"`
+	ResetInterval        *time.Duration           `json:"interval,omitempty"`
+	Amount               *uint64                  `json:"amount,omitempty"`
+	Limit                *bool                    `json:"limit,omitempty"`
+	Notifications        *[]*SetEventNotification `json:"notifications,omitempty"`
 }
 
 type SetEventNotification struct {
@@ -113,7 +113,7 @@ func ChangeResetInterval(interval time.Duration) QuotaChange {
 
 func ChangeNotifications(notifications []*SetEventNotification) QuotaChange {
 	return func(event *SetEvent) {
-		event.Notifications = notifications
+		event.Notifications = &notifications
 	}
 }
 

@@ -2,8 +2,6 @@ package projection
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"time"
 
 	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
@@ -68,10 +66,10 @@ func newQuotaProjection(ctx context.Context, config crdb.StatementHandlerConfig)
 				crdb.NewColumn(QuotaColumnID, crdb.ColumnTypeText),
 				crdb.NewColumn(QuotaColumnInstanceID, crdb.ColumnTypeText),
 				crdb.NewColumn(QuotaColumnUnit, crdb.ColumnTypeEnum),
-				crdb.NewColumn(QuotaColumnAmount, crdb.ColumnTypeInt64, crdb.Nullable()),
-				crdb.NewColumn(QuotaColumnFrom, crdb.ColumnTypeTimestamp, crdb.Nullable()),
-				crdb.NewColumn(QuotaColumnInterval, crdb.ColumnTypeInterval, crdb.Nullable()),
-				crdb.NewColumn(QuotaColumnLimit, crdb.ColumnTypeBool, crdb.Nullable()),
+				crdb.NewColumn(QuotaColumnAmount, crdb.ColumnTypeInt64),
+				crdb.NewColumn(QuotaColumnFrom, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(QuotaColumnInterval, crdb.ColumnTypeInterval),
+				crdb.NewColumn(QuotaColumnLimit, crdb.ColumnTypeBool),
 			},
 			crdb.NewPrimaryKey(QuotaColumnInstanceID, QuotaColumnUnit),
 		),
@@ -153,8 +151,7 @@ func (q *quotaProjection) reduceQuotaSet(event eventstore.Event) (*handler.State
 	if err != nil {
 		return nil, err
 	}
-
-	statements := make([]func(e eventstore.Event) crdb.Exec, 0, len(e.Notifications)+2)
+	var statements []func(e eventstore.Event) crdb.Exec
 
 	// 1. Insert or update quota if the event has not only notification changes
 	quotaConflictColumns := []handler.Column{
@@ -181,40 +178,32 @@ func (q *quotaProjection) reduceQuotaSet(event eventstore.Event) (*handler.State
 		statements = append(statements, crdb.AddUpsertStatement(quotaConflictColumns, quotaUpdateCols))
 	}
 
-	// 2. Delete all notifications with unknown IDs
-	notificationIDs := make([]interface{}, len(e.Notifications))
-	for i := range e.Notifications {
-		notificationIDs[i] = e.Notifications[i].ID
+	// 2. Delete existing notifications
+	if e.Notifications == nil {
+		return crdb.NewMultiStatement(e, statements...), nil
 	}
 	statements = append(statements, crdb.AddDeleteStatement(
 		[]handler.Condition{
 			handler.NewCond(QuotaNotificationColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(QuotaNotificationColumnUnit, e.Unit),
-
-			crdb.Not(crdb.NewInCond(QuotaNotificationColumnID, notificationIDs)),
 		},
 		crdb.WithTableSuffix(quotaNotificationsTableSuffix),
 	))
-
-	// 3. Upsert notifications with the given IDs
-	for i := range e.Notifications {
-		notification := e.Notifications[i]
-		notificationConflictColumns := []handler.Column{
-			handler.NewCol(QuotaNotificationColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCol(QuotaNotificationColumnUnit, e.Unit),
-			handler.NewCol(QuotaNotificationColumnID, notification.ID),
-		}
-		statements = append(statements, crdb.AddUpsertStatement(
-			notificationConflictColumns,
-			append(notificationConflictColumns,
+	notifications := *e.Notifications
+	for i := range notifications {
+		notification := notifications[i]
+		statements = append(statements, crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(QuotaNotificationColumnInstanceID, e.Aggregate().InstanceID),
+				handler.NewCol(QuotaNotificationColumnUnit, e.Unit),
+				handler.NewCol(QuotaNotificationColumnID, notification.ID),
 				handler.NewCol(QuotaNotificationColumnCallURL, notification.CallURL),
 				handler.NewCol(QuotaNotificationColumnPercent, notification.Percent),
 				handler.NewCol(QuotaNotificationColumnRepeat, notification.Repeat),
-			),
+			},
 			crdb.WithTableSuffix(quotaNotificationsTableSuffix),
 		))
 	}
-
 	return crdb.NewMultiStatement(e, statements...), nil
 }
 
@@ -235,9 +224,7 @@ func (q *quotaProjection) reduceQuotaNotificationDue(event eventstore.Event) (*h
 		},
 		crdb.WithTableSuffix(quotaNotificationsTableSuffix),
 		// The notification could have been removed in the meantime
-		crdb.WithIgnoreExecErr(func(err error) bool {
-			return errors.Is(err, sql.ErrNoRows)
-		}),
+		crdb.WithIgnoreNotFound(),
 	), nil
 }
 

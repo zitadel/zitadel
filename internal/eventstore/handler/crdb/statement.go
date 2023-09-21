@@ -1,13 +1,15 @@
 package crdb
 
 import (
+	"database/sql"
+	"errors"
 	"strconv"
 	"strings"
 
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 )
@@ -16,9 +18,9 @@ type execOption func(*execConfig)
 type execConfig struct {
 	tableName string
 
-	args          []interface{}
-	err           error
-	ignoreExecErr func(error) bool
+	args           []interface{}
+	err            error
+	ignoreNotFound bool
 }
 
 func WithTableSuffix(name string) func(*execConfig) {
@@ -27,9 +29,9 @@ func WithTableSuffix(name string) func(*execConfig) {
 	}
 }
 
-func WithIgnoreExecErr(ignore func(error) bool) func(*execConfig) {
+func WithIgnoreNotFound() func(*execConfig) {
 	return func(o *execConfig) {
-		o.ignoreExecErr = ignore
+		o.ignoreNotFound = true
 	}
 }
 
@@ -289,47 +291,30 @@ func NewCopyCol(column, from string) handler.Column {
 }
 
 func NewLessThanCond(column string, value interface{}) handler.Condition {
-	return func() ([]interface{}, func(params []string) string) {
-		return []interface{}{value}, func(params []string) string {
-			return column + " < " + params[0]
-		}
+	return func(param string) (string, interface{}) {
+		return column + " < " + param, value
 	}
 }
 
 func NewIsNullCond(column string) handler.Condition {
-	return func() ([]interface{}, func(params []string) string) {
-		return nil, func([]string) string {
-			return column + " IS NULL"
-		}
+	return func(param string) (string, interface{}) {
+		return column + " IS NULL", nil
 	}
 }
 
 // NewTextArrayContainsCond returns a handler.Condition that checks if the column that stores an array of text contains the given value
 func NewTextArrayContainsCond(column string, value string) handler.Condition {
-	return func() ([]interface{}, func(params []string) string) {
-		return []interface{}{database.StringArray{value}}, func(params []string) string {
-			return column + " @> " + params[0]
-		}
+	return func(param string) (string, interface{}) {
+		return column + " @> " + param, database.StringArray{value}
 	}
 }
 
-// NewInCond returns an IN condition that matches multiple values
-func NewInCond(column string, values []interface{}) handler.Condition {
-	return func() ([]interface{}, func(params []string) string) {
-		return values, func(params []string) string {
-			return column + " IN ( " + strings.Join(params, ", ") + " )"
-		}
-	}
-}
-
-// Not negates a condition
+// Not is a function and not a method, so that calling it is well readable
 // For example conditions := []handler.Condition{ Not(NewTextArrayContainsCond())}
 func Not(condition handler.Condition) handler.Condition {
-	return func() ([]interface{}, func(params []string) string) {
-		values, condFunc := condition()
-		return values, func(params []string) string {
-			return "NOT (" + condFunc(params) + ")"
-		}
+	return func(param string) (string, interface{}) {
+		cond, value := condition(param)
+		return "NOT (" + cond + ")", value
 	}
 }
 
@@ -433,15 +418,13 @@ func columnsToQuery(cols []handler.Column) (names []string, parameters []string,
 
 func conditionsToWhere(conditions []handler.Condition, paramOffset int) (wheres []string, values []interface{}) {
 	wheres = make([]string, len(conditions))
-	for i, condition := range conditions {
-		conditionValues, conditionFunc := condition()
-		values = append(values, conditionValues...)
-		params := make([]string, len(conditionValues))
-		for j := range conditionValues {
-			paramOffset++
-			params[j] = "$" + strconv.Itoa(paramOffset)
+	values = make([]interface{}, 0, len(conditions))
+	for i, conditionFunc := range conditions {
+		condition, value := conditionFunc("$" + strconv.Itoa(i+1+paramOffset))
+		wheres[i] = "(" + condition + ")"
+		if value != nil {
+			values = append(values, value)
 		}
-		wheres[i] = "(" + conditionFunc(params) + ")"
 	}
 	return wheres, values
 }
@@ -464,12 +447,11 @@ func exec(config execConfig, q query, opts []execOption) Exec {
 		}
 
 		if _, err := ex.Exec(q(config), config.args...); err != nil {
-			execErr := caos_errs.ThrowInternal(err, "CRDB-pKtsr", "exec failed")
-			if config.ignoreExecErr != nil && config.ignoreExecErr(err) {
-				logging.Debugf("CRDB-4M9fs", "exec failed, but ignored: %v", err)
+			if config.ignoreNotFound && errors.Is(err, sql.ErrNoRows) {
+				logging.WithError(err).Debugf("CRDB-4M9fs", "ignored not found: %v", err)
 				return nil
 			}
-			return execErr
+			return zitadel_errors.ThrowInternal(err, "CRDB-pKtsr", "exec failed")
 		}
 
 		return nil
