@@ -596,24 +596,6 @@ func TestQuota_SetQuota_validate(t *testing.T) {
 			},
 		},
 		{
-			name: "amount 0",
-			args: args{
-				addQuota: &SetQuota{
-					Unit:          QuotaRequestsAllAuthenticated,
-					From:          time.Now(),
-					ResetInterval: time.Minute * 10,
-					Amount:        0,
-					Limit:         true,
-					Notifications: nil,
-				},
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "QUOTA-hOKSJ", ""))
-				},
-			},
-		},
-		{
 			name: "reset interval under 1 min",
 			args: args{
 				addQuota: &SetQuota{

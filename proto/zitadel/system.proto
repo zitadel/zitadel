@@ -639,7 +639,6 @@ message SetQuotaRequest {
   ];
   // the quota amount of units
   uint64 amount = 5 [
-    (validate.rules).uint64.gt = 0,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "the quota amount of units";
     }
