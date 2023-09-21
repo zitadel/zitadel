@@ -185,15 +185,16 @@ AssetStorage:
 
 # The Projections section defines the behavior for the scheduled and synchronous events projections.
 Projections:
-  TransactionDuration: 5s
+  # The maximum duration a transaction remains open 
+  # before it spots left folding additional events
+  # and updates the table.
+  TransactionDuration: 5s # ZITADEL_PROJECTIONS_TRANSACTIONDURATION
   # Time interval between scheduled projections
   RequeueEvery: 60s # ZITADEL_PROJECTIONS_REQUEUEEVERY
   # Time between retried database statements resulting from projected events
   RetryFailedAfter: 1s # ZITADEL_PROJECTIONS_RETRYFAILED
   # Retried execution number of database statements resulting from projected events
   MaxFailureCount: 5 # ZITADEL_PROJECTIONS_MAXFAILURECOUNT
-  # Number of concurrent projection routines. Values of 0 and below are overwritten to 1
-  ConcurrentInstances: 1 # ZITADEL_PROJECTIONS_CONCURRENTINSTANCES
   # Limit of returned events per query
   BulkLimit: 200 # ZITADEL_PROJECTIONS_BULKLIMIT
   # Only instances are projected, for which at least a projection-relevant event exists within the timeframe
@@ -207,7 +208,7 @@ Projections:
     # The Notifications projection is used for sending emails and SMS to users
     Notifications:
       # As notification projections don't result in database statements, retries don't have an effect
-      MaxFailureCount: 0 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONS_MAXFAILURECOUNT
+      MaxFailureCount: 10 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONS_MAXFAILURECOUNT
     # The NotificationsQuotas projection is used for calling quota webhooks
     NotificationsQuotas:
       # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
@@ -216,7 +217,7 @@ Projections:
       # Defaults to 45 days
       HandleActiveInstances: 1080h # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_HANDLEACTIVEINSTANCES
       # As quota notification projections don't result in database statements, retries don't have an effect
-      MaxFailureCount: 0 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_MAXFAILURECOUNT
+      MaxFailureCount: 10 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_MAXFAILURECOUNT
       # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the db too much.
       RequeueEvery: 300s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_REQUEUEEVERY
     # The Telemetry projection is used for calling telemetry webhooks
@@ -232,21 +233,29 @@ Projections:
       RequeueEvery: 3300s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_REQUEUEEVERY
 
 Auth:
+  # See Projections.BulkLimit
   SearchLimit: 1000 # ZITADEL_AUTH_SEARCHLIMIT
   Spooler:
-    TransactionDuration: 10s
-    BulkLimit: 100
-    FailureCountUntilSkip: 5
+  # See Projections.TransationDuration
+    TransactionDuration: 10s #ZITADEL_AUTH_SPOOLER_TRANSACTIONDURATION
+    # See Projections.BulkLimit
+    BulkLimit: 100 #ZITADEL_AUTH_SPOOLER_BULKLIMIT
+    # See Projections.MaxFailureCount
+    FailureCountUntilSkip: 5 #ZITADEL_AUTH_SPOOLER_FAILURECOUNTUNTILSKIP
     # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
     # from HandleActiveInstances duration in the past until the projections current time
     # Defaults to twice the RequeueEvery duration
-    HandleActiveInstances: 120s
+    HandleActiveInstances: 120s #ZITADEL_AUTH_SPOOLER_HANDLEACTIVEINSTANCES
 
 Admin:
+  # See Projections.BulkLimit
   SearchLimit: 1000 # ZITADEL_ADMIN_SEARCHLIMIT
   Spooler:
+    # See Projections.TransationDuration
     TransactionDuration: 10s
+    # See Projections.BulkLimit
     BulkLimit: 200
+    # See Projections.MaxFailureCount
     FailureCountUntilSkip: 5
     # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
     # from HandleActiveInstances duration in the past until the projections current time
@@ -337,11 +346,12 @@ Console:
 Notification:
   Repository:
     Spooler:
-      TransactionDuration: 10s
-      ConcurrentWorkers: 1
-      ConcurrentInstances: 10
-      BulkLimit: 200
-      FailureCountUntilSkip: 5
+      # See Projections.TransactionDuration
+      TransactionDuration: 10s #ZITADEL_NOTIFICATION_REPOSITORY_SPOOLER_TRANSACTIONDURATION
+      # See Projections.BulkLimit
+      BulkLimit: 200 #ZITADEL_NOTIFICATION_REPOSITORY_SPOOLER_BULKLIMIT
+      # See Projections.MaxFailureCount
+      FailureCountUntilSkip: 5 #ZITADEL_NOTIFICATION_REPOSITORY_SPOOLER_FAILURECOUNTUNTILSKIP
       Handlers:
 
 EncryptionKeys:
@@ -493,7 +503,8 @@ Quotas:
       MaxBulkSize: 0 # ZITADEL_QUOTAS_EXECUTION_DEBOUNCE_MAXBULKSIZE
 
 Eventstore:
-  PushTimeout: 15s
+  # Sets the maximum duration of transactions pushing events
+  PushTimeout: 15s #ZITADEL_EVENTSTORE_PUSHTIMEOUT
 
 DefaultInstance:
   InstanceName: ZITADEL # ZITADEL_DEFAULTINSTANCE_INSTANCENAME
