@@ -495,6 +495,7 @@
       "LASTNAME": "姓",
       "NICKNAME": "昵称",
       "DISPLAYNAME": "展示名称",
+      "PREFERREDLOGINNAME": "首选登录名",
       "PREFERRED_LANGUAGE": "语言",
       "GENDER": "性别",
       "PASSWORD": "密码",
