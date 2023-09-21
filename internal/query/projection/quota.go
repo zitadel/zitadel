@@ -70,7 +70,7 @@ func newQuotaProjection(ctx context.Context, config crdb.StatementHandlerConfig)
 				crdb.NewColumn(QuotaColumnInterval, crdb.ColumnTypeInterval, crdb.Nullable()),
 				crdb.NewColumn(QuotaColumnLimit, crdb.ColumnTypeBool, crdb.Nullable()),
 			},
-			crdb.NewPrimaryKey(QuotaColumnInstanceID, QuotaColumnUnit),
+			crdb.NewPrimaryKey(QuotaColumnInstanceID, QuotaColumnUnit, QuotaColumnID),
 		),
 		crdb.NewSuffixedTable(
 			[]*crdb.Column{
@@ -156,8 +156,9 @@ func (q *quotaProjection) reduceQuotaSet(event eventstore.Event) (*handler.State
 	quotaConflictColumns := []handler.Column{
 		handler.NewCol(QuotaColumnInstanceID, e.Aggregate().InstanceID),
 		handler.NewCol(QuotaColumnUnit, e.Unit),
+		handler.NewCol(QuotaColumnID, e.Aggregate().ID),
 	}
-	quotaUpdateCols := make([]handler.Column, 0, 4+1+len(quotaConflictColumns))
+	quotaUpdateCols := make([]handler.Column, 0, 4+len(quotaConflictColumns))
 	if e.Limit != nil {
 		quotaUpdateCols = append(quotaUpdateCols, handler.NewCol(QuotaColumnLimit, *e.Limit))
 	}
@@ -172,7 +173,6 @@ func (q *quotaProjection) reduceQuotaSet(event eventstore.Event) (*handler.State
 	}
 	if len(quotaUpdateCols) > 0 {
 		// TODO: Add the quota ID to the primary key in a migration?
-		quotaUpdateCols = append(quotaUpdateCols, handler.NewCol(QuotaColumnID, e.Aggregate().ID))
 		quotaUpdateCols = append(quotaUpdateCols, quotaConflictColumns...)
 		statements = append(statements, crdb.AddUpsertStatement(quotaConflictColumns, quotaUpdateCols))
 	}
