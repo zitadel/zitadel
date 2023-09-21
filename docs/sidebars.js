@@ -362,6 +362,7 @@ module.exports = {
         "guides/solution-scenarios/domain-discovery",
         "guides/solution-scenarios/configurations",
         "guides/solution-scenarios/frontend-calling-backend-API",
+        "guides/solution-scenarios/device-authorization",
       ],
     },
     {
