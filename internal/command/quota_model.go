@@ -87,9 +87,9 @@ func (wm *quotaWriteModel) NewChanges(
 	from time.Time,
 	resetInterval time.Duration,
 	limit bool,
-	notifications QuotaNotifications,
+	notifications ...*QuotaNotification,
 ) (changes []quota.QuotaChange, err error) {
-	setEventNotifications, err := notifications.newSetEventNotifications(idGenerator)
+	setEventNotifications, err := QuotaNotifications(notifications).newSetEventNotifications(idGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -141,12 +141,12 @@ func (wm *quotaWriteModel) NewChanges(
 }
 
 // newSetEventNotifications returns quota.SetEventNotification elements with generated IDs.
-func (q *QuotaNotifications) newSetEventNotifications(idGenerator id.Generator) (setNotifications []*quota.SetEventNotification, err error) {
+func (q QuotaNotifications) newSetEventNotifications(idGenerator id.Generator) (setNotifications []*quota.SetEventNotification, err error) {
 	if q == nil {
-		return nil, nil
+		return make([]*quota.SetEventNotification, 0), nil
 	}
-	notifications := make([]*quota.SetEventNotification, len(*q))
-	for idx, notification := range *q {
+	notifications := make([]*quota.SetEventNotification, len(q))
+	for idx, notification := range q {
 		notifications[idx] = &quota.SetEventNotification{
 			Percent: notification.Percent,
 			Repeat:  notification.Repeat,

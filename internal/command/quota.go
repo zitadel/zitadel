@@ -183,7 +183,7 @@ func (c *Commands) SetQuotaCommand(a *quota.Aggregate, wm *quotaWriteModel, q *S
 			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (cmd []eventstore.Command, err error) {
-				changes, err := wm.NewChanges(c.idGenerator, q.Amount, q.From, q.ResetInterval, q.Limit, q.Notifications)
+				changes, err := wm.NewChanges(c.idGenerator, q.Amount, q.From, q.ResetInterval, q.Limit, q.Notifications...)
 				if len(changes) == 0 {
 					return nil, err
 				}
@@ -194,7 +194,7 @@ func (c *Commands) SetQuotaCommand(a *quota.Aggregate, wm *quotaWriteModel, q *S
 						quota.SetEventType,
 					),
 					q.Unit.Enum(),
-					changes,
+					changes...,
 				)}, err
 			},
 			nil

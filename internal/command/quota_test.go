@@ -25,7 +25,7 @@ func TestQuota_AddQuota(t *testing.T) {
 	}
 	type args struct {
 		ctx      context.Context
-		addQuota *AddQuota
+		setQuota *SetQuota
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -44,14 +44,17 @@ func TestQuota_AddQuota(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							quota.NewSetEvent(context.Background(),
-								&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+							quota.NewSetEvent(
+								eventstore.NewBaseEventForPush(
+									context.Background(),
+									&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+									quota.SetEventType,
+								),
 								QuotaRequestsAllAuthenticated.Enum(),
-								time.Now(),
-								30*24*time.Hour,
-								1000,
-								false,
-								nil,
+								quota.ChangeFrom(time.Now()),
+								quota.ChangeResetInterval(30*24*time.Hour),
+								quota.ChangeAmount(1000),
+								quota.ChangeLimit(false),
 							),
 						),
 					),
@@ -59,7 +62,7 @@ func TestQuota_AddQuota(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				addQuota: &AddQuota{
+				setQuota: &SetQuota{
 					Unit:          QuotaRequestsAllAuthenticated,
 					From:          time.Time{},
 					ResetInterval: 0,
@@ -83,7 +86,7 @@ func TestQuota_AddQuota(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				addQuota: &AddQuota{
+				setQuota: &SetQuota{
 					Unit:          "unimplemented",
 					From:          time.Time{},
 					ResetInterval: 0,
@@ -108,25 +111,29 @@ func TestQuota_AddQuota(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
-								quota.NewSetEvent(context.Background(),
-									&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+								quota.NewSetEvent(
+									eventstore.NewBaseEventForPush(
+										context.Background(),
+										&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+										quota.SetEventType,
+									),
 									QuotaRequestsAllAuthenticated.Enum(),
-									time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
-									30*24*time.Hour,
-									1000,
-									true,
-									nil,
+									quota.ChangeFrom(time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC)),
+									quota.ChangeResetInterval(30*24*time.Hour),
+									quota.ChangeAmount(1000),
+									quota.ChangeLimit(true),
+									quota.ChangeNotifications(make([]*quota.SetEventNotification, 0)),
 								),
 							),
 						},
-						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", quota.NewAddQuotaUnitUniqueConstraint(quota.RequestsAllAuthenticated)),
+						//						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", quota.NewAddQuotaUnitUniqueConstraint(quota.RequestsAllAuthenticated)),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "quota1"),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				addQuota: &AddQuota{
+				setQuota: &SetQuota{
 					Unit:          QuotaRequestsAllAuthenticated,
 					From:          time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
 					ResetInterval: 30 * 24 * time.Hour,
@@ -142,21 +149,24 @@ func TestQuota_AddQuota(t *testing.T) {
 			},
 		},
 		{
-			name: "removed, ok",
+			name: "recreate quota, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
-							quota.NewSetEvent(context.Background(),
-								&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+							quota.NewSetEvent(
+								eventstore.NewBaseEventForPush(
+									context.Background(),
+									&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+									quota.SetEventType,
+								),
 								QuotaRequestsAllAuthenticated.Enum(),
-								time.Now(),
-								30*24*time.Hour,
-								1000,
-								true,
-								nil,
+								quota.ChangeFrom(time.Now()),
+								quota.ChangeResetInterval(30*24*time.Hour),
+								quota.ChangeAmount(1000),
+								quota.ChangeLimit(true),
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -171,25 +181,29 @@ func TestQuota_AddQuota(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
-								quota.NewSetEvent(context.Background(),
-									&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+								quota.NewSetEvent(
+									eventstore.NewBaseEventForPush(
+										context.Background(),
+										&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+										quota.SetEventType,
+									),
 									QuotaRequestsAllAuthenticated.Enum(),
-									time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
-									30*24*time.Hour,
-									1000,
-									true,
-									nil,
+									quota.ChangeFrom(time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC)),
+									quota.ChangeResetInterval(30*24*time.Hour),
+									quota.ChangeAmount(1000),
+									quota.ChangeLimit(true),
+									quota.ChangeNotifications(make([]*quota.SetEventNotification, 0)),
 								),
 							),
 						},
-						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", quota.NewAddQuotaUnitUniqueConstraint(quota.RequestsAllAuthenticated)),
+						//						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", quota.NewAddQuotaUnitUniqueConstraint(quota.RequestsAllAuthenticated)),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "quota1"),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				addQuota: &AddQuota{
+				setQuota: &SetQuota{
 					Unit:          QuotaRequestsAllAuthenticated,
 					From:          time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
 					ResetInterval: 30 * 24 * time.Hour,
@@ -214,32 +228,36 @@ func TestQuota_AddQuota(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
-								quota.NewSetEvent(context.Background(),
-									&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+								quota.NewSetEvent(
+									eventstore.NewBaseEventForPush(
+										context.Background(),
+										&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+										quota.SetEventType,
+									),
 									QuotaRequestsAllAuthenticated.Enum(),
-									time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
-									30*24*time.Hour,
-									1000,
-									true,
-									[]*quota.AddedEventNotification{
-										{
+									quota.ChangeFrom(time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC)),
+									quota.ChangeResetInterval(30*24*time.Hour),
+									quota.ChangeAmount(1000),
+									quota.ChangeLimit(true),
+									quota.ChangeNotifications(
+										[]*quota.SetEventNotification{{
 											ID:      "notification1",
 											Percent: 20,
 											Repeat:  false,
 											CallURL: "https://url.com",
-										},
-									},
+										}},
+									),
 								),
 							),
 						},
-						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", quota.NewAddQuotaUnitUniqueConstraint(quota.RequestsAllAuthenticated)),
+						//						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", quota.NewAddQuotaUnitUniqueConstraint(quota.RequestsAllAuthenticated)),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "quota1", "notification1"),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				addQuota: &AddQuota{
+				setQuota: &SetQuota{
 					Unit:          QuotaRequestsAllAuthenticated,
 					From:          time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
 					ResetInterval: 30 * 24 * time.Hour,
@@ -267,7 +285,7 @@ func TestQuota_AddQuota(t *testing.T) {
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			got, err := r.AddQuota(tt.args.ctx, tt.args.addQuota)
+			got, err := r.AddQuota(tt.args.ctx, tt.args.setQuota)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -325,14 +343,17 @@ func TestQuota_RemoveQuota(t *testing.T) {
 					expectFilter(
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
-							quota.NewSetEvent(context.Background(),
-								&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+							quota.NewSetEvent(
+								eventstore.NewBaseEventForPush(
+									context.Background(),
+									&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+									quota.SetEventType,
+								),
 								QuotaRequestsAllAuthenticated.Enum(),
-								time.Now(),
-								30*24*time.Hour,
-								1000,
-								true,
-								nil,
+								quota.ChangeFrom(time.Now()),
+								quota.ChangeResetInterval(30*24*time.Hour),
+								quota.ChangeAmount(1000),
+								quota.ChangeLimit(true),
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -363,14 +384,17 @@ func TestQuota_RemoveQuota(t *testing.T) {
 					expectFilter(
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
-							quota.NewSetEvent(context.Background(),
-								&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+							quota.NewSetEvent(
+								eventstore.NewBaseEventForPush(
+									context.Background(),
+									&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+									quota.SetEventType,
+								),
 								QuotaRequestsAllAuthenticated.Enum(),
-								time.Now(),
-								30*24*time.Hour,
-								1000,
-								false,
-								nil,
+								quota.ChangeFrom(time.Now()),
+								quota.ChangeResetInterval(30*24*time.Hour),
+								quota.ChangeAmount(1000),
+								quota.ChangeLimit(false),
 							),
 						),
 					),
@@ -517,9 +541,9 @@ func TestQuota_QuotaNotification_validate(t *testing.T) {
 	}
 }
 
-func TestQuota_AddQuota_validate(t *testing.T) {
+func TestQuota_SetQuota_validate(t *testing.T) {
 	type args struct {
-		addQuota *AddQuota
+		addQuota *SetQuota
 	}
 	type res struct {
 		err func(error) bool
@@ -532,7 +556,7 @@ func TestQuota_AddQuota_validate(t *testing.T) {
 		{
 			name: "notification url parse failed",
 			args: args{
-				addQuota: &AddQuota{
+				addQuota: &SetQuota{
 					Unit:          QuotaRequestsAllAuthenticated,
 					From:          time.Now(),
 					ResetInterval: time.Minute * 10,
@@ -556,7 +580,7 @@ func TestQuota_AddQuota_validate(t *testing.T) {
 		{
 			name: "unit unimplemented",
 			args: args{
-				addQuota: &AddQuota{
+				addQuota: &SetQuota{
 					Unit:          "unimplemented",
 					From:          time.Now(),
 					ResetInterval: time.Minute * 10,
@@ -574,7 +598,7 @@ func TestQuota_AddQuota_validate(t *testing.T) {
 		{
 			name: "amount 0",
 			args: args{
-				addQuota: &AddQuota{
+				addQuota: &SetQuota{
 					Unit:          QuotaRequestsAllAuthenticated,
 					From:          time.Now(),
 					ResetInterval: time.Minute * 10,
@@ -592,7 +616,7 @@ func TestQuota_AddQuota_validate(t *testing.T) {
 		{
 			name: "reset interval under 1 min",
 			args: args{
-				addQuota: &AddQuota{
+				addQuota: &SetQuota{
 					Unit:          QuotaRequestsAllAuthenticated,
 					From:          time.Now(),
 					ResetInterval: time.Second * 10,
@@ -610,7 +634,7 @@ func TestQuota_AddQuota_validate(t *testing.T) {
 		{
 			name: "validate, ok",
 			args: args{
-				addQuota: &AddQuota{
+				addQuota: &SetQuota{
 					Unit:          QuotaRequestsAllAuthenticated,
 					From:          time.Now(),
 					ResetInterval: time.Minute * 10,

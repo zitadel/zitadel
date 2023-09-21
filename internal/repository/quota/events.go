@@ -73,7 +73,7 @@ func (e *SetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 func NewSetEvent(
 	base *eventstore.BaseEvent,
 	unit Unit,
-	changes []QuotaChange,
+	changes ...QuotaChange,
 ) *SetEvent {
 	changedEvent := &SetEvent{
 		BaseEvent: *base,
