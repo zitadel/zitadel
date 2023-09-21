@@ -86,13 +86,15 @@ func (c *Commands) SetQuota(
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(wm, events...)
-	if err != nil {
-		return nil, err
+	if len(cmds) > 0 {
+		events, err := c.eventstore.Push(ctx, cmds...)
+		if err != nil {
+			return nil, err
+		}
+		err = AppendAndReduce(wm, events...)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
