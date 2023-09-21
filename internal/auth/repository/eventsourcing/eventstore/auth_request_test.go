@@ -36,6 +36,10 @@ func (m *mockViewNoUserSession) UserSessionsByAgentID(string, string) ([]*user_v
 	return nil, nil
 }
 
+func (m *mockViewNoUserSession) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*query.CurrentState, error) {
+	return &query.CurrentState{State: query.State{Sequence: 0}}, nil
+}
+
 type mockViewErrUserSession struct{}
 
 func (m *mockViewErrUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
@@ -44,6 +48,10 @@ func (m *mockViewErrUserSession) UserSessionByIDs(string, string, string) (*user
 
 func (m *mockViewErrUserSession) UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
+}
+
+func (m *mockViewErrUserSession) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*query.CurrentState, error) {
+	return &query.CurrentState{State: query.State{Sequence: 0}}, nil
 }
 
 type mockViewUserSession struct {
@@ -83,6 +91,10 @@ func (m *mockViewUserSession) UserSessionsByAgentID(string, string) ([]*user_vie
 	return sessions, nil
 }
 
+func (m *mockViewUserSession) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*query.CurrentState, error) {
+	return &query.CurrentState{State: query.State{Sequence: 0}}, nil
+}
+
 type mockViewNoUser struct{}
 
 func (m *mockViewNoUser) UserByID(string, string) (*user_view_model.UserView, error) {
@@ -93,11 +105,15 @@ type mockEventUser struct {
 	Event eventstore.Event
 }
 
-func (m *mockEventUser) UserEventsByID(ctx context.Context, id string, changeDate time.Time, types []eventstore.EventType) ([]eventstore.Event, error) {
+func (m *mockEventUser) UserEventsByID(ctx context.Context, id string, sequence uint64, types []eventstore.EventType) ([]eventstore.Event, error) {
 	if m.Event != nil {
 		return []eventstore.Event{m.Event}, nil
 	}
 	return nil, nil
+}
+
+func (m *mockEventUser) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*query.CurrentState, error) {
+	return &query.CurrentState{State: query.State{Sequence: 0}}, nil
 }
 
 func (m *mockEventUser) BulkAddExternalIDPs(ctx context.Context, userID string, externalIDPs []*user_model.ExternalIDP) error {
@@ -106,7 +122,7 @@ func (m *mockEventUser) BulkAddExternalIDPs(ctx context.Context, userID string, 
 
 type mockEventErrUser struct{}
 
-func (m *mockEventErrUser) UserEventsByID(ctx context.Context, id string, changeDate time.Time, types []eventstore.EventType) ([]eventstore.Event, error) {
+func (m *mockEventErrUser) UserEventsByID(ctx context.Context, id string, sequence uint64, types []eventstore.EventType) ([]eventstore.Event, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
 }
 
