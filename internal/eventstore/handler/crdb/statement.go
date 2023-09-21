@@ -448,7 +448,7 @@ func exec(config execConfig, q query, opts []execOption) Exec {
 
 		if _, err := ex.Exec(q(config), config.args...); err != nil {
 			if config.ignoreNotFound && errors.Is(err, sql.ErrNoRows) {
-				logging.WithError(err).Debugf("CRDB-4M9fs", "ignored not found: %v", err)
+				logging.WithError(err).Debugf("ignored not found: %v", err)
 				return nil
 			}
 			return zitadel_errors.ThrowInternal(err, "CRDB-pKtsr", "exec failed")
