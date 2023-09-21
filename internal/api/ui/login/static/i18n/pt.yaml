@@ -25,7 +25,7 @@ SelectAccount:
   DescriptionLinking: Selecione sua conta para vincular com seu usuário externo.
   OtherUser: Outro usuário
   SessionState0: ativo
-  SessionState1: inativo
+  SessionState1: Sem sessão iniciada
   MustBeMemberOfOrg: O usuário deve ser membro da organização {{.OrgName}}.
 
 Password:
@@ -138,6 +138,13 @@ VerifyMFAOTP:
   Title: Verificar 2 fatores
   Description: Verifique seu segundo fator
   CodeLabel: Código
+  NextButtonText: próximo
+
+VerifyOTP:
+  Title: Verificar 2 fatores
+  Description: Verifique seu segundo fator
+  CodeLabel: Código
+  ResendButtonText: reenviar código
   NextButtonText: próximo
 
 VerifyMFAU2F:
@@ -359,6 +366,8 @@ Footer:
   Help: Ajuda
   SupportEmail: E-mail de suporte
 
+SignIn: Iniciar sessão com a {{.Provider}}
+
 Errors:
   Internal: Ocorreu um erro interno
   AuthRequest:
@@ -411,7 +420,7 @@ Errors:
       Empty: A senha está vazia
       Invalid: A senha é inválida
       InvalidAndLocked: A senha é inválida e o usuário está bloqueado, entre em contato com o administrador.
-      NotChanged: Senha não alterada
+      NotChanged: A nova senha não pode ser igual à sua senha atual
     UsernameOrPassword:
       Invalid: Nome de usuário ou senha inválidos
     PasswordComplexityPolicy:

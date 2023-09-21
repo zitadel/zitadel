@@ -70,7 +70,7 @@ var (
 	}
 )
 
-func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType) (_ *DebugNotificationProvider, err error) {
+func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType) (provider *DebugNotificationProvider, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -90,8 +90,11 @@ func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID str
 		return nil, errors.ThrowInternal(err, "QUERY-f9jSf", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		provider, err = scan(row)
+		return err
+	}, stmt, args...)
+	return provider, err
 }
 
 func prepareDebugNotificationProviderQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*DebugNotificationProvider, error)) {

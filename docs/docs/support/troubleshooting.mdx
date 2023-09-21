@@ -1,5 +1,6 @@
 ---
-title: Troubleshoot
+title: Troubleshoot ZITADEL
+sidebar_label: Troubleshoot
 ---
 
 You will find some possible error messages here, what the problem is and what some possible solutions can be.
@@ -38,7 +39,7 @@ This claim identifies the audience, i.e. the resource server, that this token is
 If a resource server does not identify itself with a value in the "aud" claim when this claim is present, then the must be rejected (see [RFC7519](https://www.rfc-editor.org/rfc/rfc7519#section-4.1.3) for more details).
 
 You might encounter this error message from ZITADEL, typically when you authenticated with a client in one project and trying to access an application in another project.
-You need add a specific [reserved scope](http://localhost:3000/docs/apis/openidoauth/scopes#reserved-scopes) to add the projectID to the audience of the access token.
+You need add a specific [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) to add the projectID to the audience of the access token.
 
 The two scenarios should help you troubleshoot this issue:
 

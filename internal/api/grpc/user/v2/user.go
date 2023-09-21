@@ -18,8 +18,8 @@ import (
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/query"
-	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest) (_ *user.AddHumanUserResponse, err error) {
@@ -72,8 +72,8 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 	return &command.AddHuman{
 		ID:          req.GetUserId(),
 		Username:    username,
-		FirstName:   req.GetProfile().GetFirstName(),
-		LastName:    req.GetProfile().GetLastName(),
+		FirstName:   req.GetProfile().GetGivenName(),
+		LastName:    req.GetProfile().GetFamilyName(),
 		NickName:    req.GetProfile().GetNickName(),
 		DisplayName: req.GetProfile().GetDisplayName(),
 		Email: command.Email{
@@ -116,10 +116,10 @@ func genderToDomain(gender user.Gender) domain.Gender {
 
 func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_ *user.AddIDPLinkResponse, err error) {
 	orgID := authz.GetCtxData(ctx).OrgID
-	details, err := s.command.AddUserIDPLink(ctx, req.UserId, orgID, &domain.UserIDPLink{
-		IDPConfigID:    req.GetIdpLink().GetIdpId(),
-		ExternalUserID: req.GetIdpLink().GetUserId(),
-		DisplayName:    req.GetIdpLink().GetUserName(),
+	details, err := s.command.AddUserIDPLink(ctx, req.UserId, orgID, &command.AddLink{
+		IDPID:         req.GetIdpLink().GetIdpId(),
+		DisplayName:   req.GetIdpLink().GetUserName(),
+		IDPExternalID: req.GetIdpLink().GetUserId(),
 	})
 	if err != nil {
 		return nil, err
@@ -129,18 +129,18 @@ func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_
 	}, nil
 }
 
-func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartIdentityProviderFlowRequest) (_ *user.StartIdentityProviderFlowResponse, err error) {
+func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *user.StartIdentityProviderIntentRequest) (_ *user.StartIdentityProviderIntentResponse, err error) {
 	switch t := req.GetContent().(type) {
-	case *user.StartIdentityProviderFlowRequest_Urls:
+	case *user.StartIdentityProviderIntentRequest_Urls:
 		return s.startIDPIntent(ctx, req.GetIdpId(), t.Urls)
-	case *user.StartIdentityProviderFlowRequest_Ldap:
+	case *user.StartIdentityProviderIntentRequest_Ldap:
 		return s.startLDAPIntent(ctx, req.GetIdpId(), t.Ldap)
 	default:
-		return nil, errors.ThrowUnimplementedf(nil, "USERv2-S2g21", "type oneOf %T in method StartIdentityProviderFlow not implemented", t)
+		return nil, errors.ThrowUnimplementedf(nil, "USERv2-S2g21", "type oneOf %T in method StartIdentityProviderIntent not implemented", t)
 	}
 }
 
-func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*user.StartIdentityProviderFlowResponse, error) {
+func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*user.StartIdentityProviderIntentResponse, error) {
 	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
@@ -150,21 +150,21 @@ func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.Re
 		return nil, err
 	}
 	if redirect {
-		return &user.StartIdentityProviderFlowResponse{
+		return &user.StartIdentityProviderIntentResponse{
 			Details:  object.DomainToDetailsPb(details),
-			NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: content},
+			NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: content},
 		}, nil
 	} else {
-		return &user.StartIdentityProviderFlowResponse{
+		return &user.StartIdentityProviderIntentResponse{
 			Details: object.DomainToDetailsPb(details),
-			NextStep: &user.StartIdentityProviderFlowResponse_PostForm{
+			NextStep: &user.StartIdentityProviderIntentResponse_PostForm{
 				PostForm: []byte(content),
 			},
 		}, nil
 	}
 }
 
-func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderFlowResponse, error) {
+func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderIntentResponse, error) {
 	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, "", "", authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
@@ -180,9 +180,9 @@ func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredenti
 	if err != nil {
 		return nil, err
 	}
-	return &user.StartIdentityProviderFlowResponse{
+	return &user.StartIdentityProviderIntentResponse{
 		Details:  object.DomainToDetailsPb(details),
-		NextStep: &user.StartIdentityProviderFlowResponse_Intent{Intent: &user.Intent{IntentId: intentWriteModel.AggregateID, Token: token}},
+		NextStep: &user.StartIdentityProviderIntentResponse_IdpIntent{IdpIntent: &user.IDPIntent{IdpIntentId: intentWriteModel.AggregateID, IdpIntentToken: token}},
 	}, nil
 }
 
@@ -237,27 +237,27 @@ func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string
 	return externalUser, userID, attributes, nil
 }
 
-func (s *Server) RetrieveIdentityProviderInformation(ctx context.Context, req *user.RetrieveIdentityProviderInformationRequest) (_ *user.RetrieveIdentityProviderInformationResponse, err error) {
-	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIntentId(), authz.GetCtxData(ctx).OrgID)
+func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.RetrieveIdentityProviderIntentRequest) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
+	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIdpIntentId(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	if err := s.checkIntentToken(req.GetToken(), intent.AggregateID); err != nil {
+	if err := s.checkIntentToken(req.GetIdpIntentToken(), intent.AggregateID); err != nil {
 		return nil, err
 	}
 	if intent.State != domain.IDPIntentStateSucceeded {
 		return nil, errors.ThrowPreconditionFailed(nil, "IDP-Hk38e", "Errors.Intent.NotSucceeded")
 	}
-	return intentToIDPInformationPb(intent, s.idpAlg)
+	return idpIntentToIDPIntentPb(intent, s.idpAlg)
 }
 
-func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.EncryptionAlgorithm) (_ *user.RetrieveIdentityProviderInformationResponse, err error) {
+func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.EncryptionAlgorithm) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
 	rawInformation := new(structpb.Struct)
 	err = rawInformation.UnmarshalJSON(intent.IDPUser)
 	if err != nil {
 		return nil, err
 	}
-	information := &user.RetrieveIdentityProviderInformationResponse{
+	information := &user.RetrieveIdentityProviderIntentResponse{
 		Details: intentToDetailsPb(intent),
 		IdpInformation: &user.IDPInformation{
 			IdpId:          intent.IDPID,

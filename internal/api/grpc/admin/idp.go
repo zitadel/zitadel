@@ -405,6 +405,27 @@ func (s *Server) UpdateLDAPProvider(ctx context.Context, req *admin_pb.UpdateLDA
 	}, nil
 }
 
+func (s *Server) AddAppleProvider(ctx context.Context, req *admin_pb.AddAppleProviderRequest) (*admin_pb.AddAppleProviderResponse, error) {
+	id, details, err := s.command.AddInstanceAppleProvider(ctx, addAppleProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddAppleProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateAppleProvider(ctx context.Context, req *admin_pb.UpdateAppleProviderRequest) (*admin_pb.UpdateAppleProviderResponse, error) {
+	details, err := s.command.UpdateInstanceAppleProvider(ctx, req.Id, updateAppleProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateAppleProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
 func (s *Server) AddSAMLProvider(ctx context.Context, req *admin_pb.AddSAMLProviderRequest) (*admin_pb.AddSAMLProviderResponse, error) {
 	id, details, err := s.command.AddInstanceSAMLProvider(ctx, addSAMLProviderToCommand(req))
 	if err != nil {

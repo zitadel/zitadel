@@ -25,7 +25,7 @@ SelectAccount:
   DescriptionLinking: Изберете ја вашата корисничка сметка за да ја поврзете со вашиот надворешен корисник.
   OtherUser: Друг корисник
   SessionState0: активна
-  SessionState1: неактивна
+  SessionState1: Одјавени
   MustBeMemberOfOrg: Корисникот мора да биде член на организацијата {{.OrgName}}.
 
 Password:
@@ -138,6 +138,13 @@ VerifyMFAOTP:
   Title: Потврда на 2-факторска автентикација
   Description: Потврдете ја 2-факторска автентикација
   CodeLabel: Код
+  NextButtonText: следно
+
+VerifyOTP:
+  Title: Потврда на 2-факторска автентикација
+  Description: Потврдете ја 2-факторска автентикација
+  CodeLabel: Код
+  ResendButtonText: повторно испрати код
   NextButtonText: следно
 
 VerifyMFAU2F:
@@ -365,6 +372,8 @@ Footer:
   Help: Помош
   SupportEmail: Е-пошта за поддршка
 
+SignIn: Пријавете се со {{.Provider}}
+
 Errors:
   Internal: Се појави внатрешна грешка
   AuthRequest:
@@ -417,7 +426,7 @@ Errors:
       Empty: Лозинката е празна
       Invalid: Лозинката не е валидна
       InvalidAndLocked: Лозинката не е валидна и корисникот е заклучен, контактирајте со вашиот администратор.
-      NotChanged: Лозинката не е променета
+      NotChanged: Новата лозинка не може да биде иста со вашата тековна лозинка
     UsernameOrPassword:
       Invalid: Корисничкото име и/или лозинката не се валидни
     PasswordComplexityPolicy:

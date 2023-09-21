@@ -22,12 +22,12 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	organisation "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
+	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 type Client struct {
@@ -88,8 +88,8 @@ func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse
 			},
 		},
 		Profile: &user.SetHumanProfile{
-			FirstName: "Mickey",
-			LastName:  "Mouse",
+			GivenName:  "Mickey",
+			FamilyName: "Mouse",
 		},
 		Email: &user.SetHumanEmail{
 			Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),

@@ -57,7 +57,7 @@ type SecurityPolicy struct {
 	AllowedOrigins database.StringArray
 }
 
-func (q *Queries) SecurityPolicy(ctx context.Context) (*SecurityPolicy, error) {
+func (q *Queries) SecurityPolicy(ctx context.Context) (policy *SecurityPolicy, err error) {
 	stmt, scan := prepareSecurityPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		SecurityPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -66,8 +66,11 @@ func (q *Queries) SecurityPolicy(ctx context.Context) (*SecurityPolicy, error) {
 		return nil, errors.ThrowInternal(err, "QUERY-Sf6d1", "Errors.Query.SQLStatment")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		policy, err = scan(row)
+		return err
+	}, query, args...)
+	return policy, err
 }
 
 func prepareSecurityPolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*SecurityPolicy, error)) {

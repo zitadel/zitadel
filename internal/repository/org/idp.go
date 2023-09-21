@@ -33,6 +33,8 @@ const (
 	GoogleIDPChangedEventType           eventstore.EventType = "org.idp.google.changed"
 	LDAPIDPAddedEventType               eventstore.EventType = "org.idp.ldap.added"
 	LDAPIDPChangedEventType             eventstore.EventType = "org.idp.ldap.changed"
+	AppleIDPAddedEventType              eventstore.EventType = "org.idp.apple.added"
+	AppleIDPChangedEventType            eventstore.EventType = "org.idp.apple.changed"
 	SAMLIDPAddedEventType               eventstore.EventType = "org.idp.saml.added"
 	SAMLIDPChangedEventType             eventstore.EventType = "org.idp.saml.changed"
 	IDPRemovedEventType                 eventstore.EventType = "org.idp.removed"
@@ -920,6 +922,86 @@ func LDAPIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error
 	}
 
 	return &LDAPIDPChangedEvent{LDAPIDPChangedEvent: *e.(*idp.LDAPIDPChangedEvent)}, nil
+}
+
+type AppleIDPAddedEvent struct {
+	idp.AppleIDPAddedEvent
+}
+
+func NewAppleIDPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID,
+	teamID,
+	keyID string,
+	privateKey *crypto.CryptoValue,
+	scopes []string,
+	options idp.Options,
+) *AppleIDPAddedEvent {
+
+	return &AppleIDPAddedEvent{
+		AppleIDPAddedEvent: *idp.NewAppleIDPAddedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				AppleIDPAddedEventType,
+			),
+			id,
+			name,
+			clientID,
+			teamID,
+			keyID,
+			privateKey,
+			scopes,
+			options,
+		),
+	}
+}
+
+func AppleIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.AppleIDPAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &AppleIDPAddedEvent{AppleIDPAddedEvent: *e.(*idp.AppleIDPAddedEvent)}, nil
+}
+
+type AppleIDPChangedEvent struct {
+	idp.AppleIDPChangedEvent
+}
+
+func NewAppleIDPChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+	changes []idp.AppleIDPChanges,
+) (*AppleIDPChangedEvent, error) {
+
+	changedEvent, err := idp.NewAppleIDPChangedEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			AppleIDPChangedEventType,
+		),
+		id,
+		changes,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &AppleIDPChangedEvent{AppleIDPChangedEvent: *changedEvent}, nil
+}
+
+func AppleIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.AppleIDPChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &AppleIDPChangedEvent{AppleIDPChangedEvent: *e.(*idp.AppleIDPChangedEvent)}, nil
 }
 
 type SAMLIDPAddedEvent struct {

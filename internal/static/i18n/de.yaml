@@ -120,7 +120,7 @@ Errors:
       Empty: Passwort ist leer
       Invalid: Passwort ungültig
       NotSet: Benutzer hat kein Passwort gesetzt
-      NotChanged: Passwort nicht geändert
+      NotChanged: Das neue Passwort darf nicht mit deinem aktuellen Passwort übereinstimmen
       NotSupported: Passwort-Hash-Kodierung wird nicht unterstützt
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
@@ -199,6 +199,10 @@ Errors:
       InvalidCharacter: Nur alphanumerische Zeichen, . und - sind für eine Domäne erlaubt
     IDP:
       InvalidSearchQuery: Ungültiger Suchparameter
+      ClientIDMissing: ClientID fehlt
+      TeamIDMissing: TeamID fehlt
+      KeyIDMissing: KeyID fehlt
+      PrivateKeyMissing: Private Key fehlt
     LoginPolicy:
       NotFound: Login Policy konnte nicht gefunden werden
       Invalid: Login Policy ist ungültig

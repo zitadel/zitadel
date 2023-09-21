@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 )
 
 type DetailsMsg interface {
@@ -24,8 +24,8 @@ type DetailsMsg interface {
 //
 // The resource owner is compared with expected and is
 // therefore the only value that has to be set.
-func AssertDetails[D DetailsMsg](t testing.TB, exptected, actual D) {
-	wantDetails, gotDetails := exptected.GetDetails(), actual.GetDetails()
+func AssertDetails[D DetailsMsg](t testing.TB, expected, actual D) {
+	wantDetails, gotDetails := expected.GetDetails(), actual.GetDetails()
 	if wantDetails == nil {
 		assert.Nil(t, gotDetails)
 		return

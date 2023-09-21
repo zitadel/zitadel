@@ -126,7 +126,7 @@ var (
 	}
 )
 
-func (q *Queries) DefaultMessageText(ctx context.Context) (_ *MessageText, err error) {
+func (q *Queries) DefaultMessageText(ctx context.Context) (text *MessageText, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -140,8 +140,11 @@ func (q *Queries) DefaultMessageText(ctx context.Context) (_ *MessageText, err e
 		return nil, errors.ThrowInternal(err, "QUERY-1b9mf", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		text, err = scan(row)
+		return err
+	}, query, args...)
+	return text, err
 }
 
 func (q *Queries) DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx context.Context, messageType, language string) (_ *MessageText, err error) {
@@ -159,7 +162,7 @@ func (q *Queries) DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx context.
 	return messageTexts.GetMessageTextByType(messageType), nil
 }
 
-func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggregateID, messageType, language string, withOwnerRemoved bool) (_ *MessageText, err error) {
+func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggregateID, messageType, language string, withOwnerRemoved bool) (msg *MessageText, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -179,8 +182,10 @@ func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggreg
 		return nil, errors.ThrowInternal(err, "QUERY-1b9mf", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	msg, err := scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		msg, err = scan(row)
+		return err
+	}, query, args...)
 	if errors.IsNotFound(err) {
 		return q.IAMMessageTextByTypeAndLanguage(ctx, messageType, language)
 	}

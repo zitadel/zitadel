@@ -112,7 +112,7 @@ Errors:
       Empty: パスワードは空です
       Invalid: 無効なパスワードです
       NotSet: パスワードが未設置です
-      NotChanged: パスワードは変更されていません
+      NotChanged: 新しいパスワードは現在のパスワードと同じにすることはできません
       NotSupported: パスワードハッシュエンコードはサポートされていません
     PasswordComplexityPolicy:
       NotFound: パスワードポリシーが見つかりません
@@ -191,6 +191,10 @@ Errors:
       InvalidCharacter: ドメインは英数字、'.'、'-'のみ使用可能です。
     IDP:
       InvalidSearchQuery: 無効な検索クエリです
+      ClientIDMissing: クライアントIDがありません
+      TeamIDMissing: チームIDがありません
+      KeyIDMissing: キーIDがありません
+      PrivateKeyMissing: 秘密キーがありません
     LoginPolicy:
       NotFound: ログインポリシーが見つかりません
       Invalid: 無効なログインポリシーです

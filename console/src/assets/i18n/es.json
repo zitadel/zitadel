@@ -743,6 +743,10 @@
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout en segundos",
     "ALLOWEDTOFAIL": "Permitido el fallo",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Advertencia",
+      "DESCRIPTION": "Si desactiva esta configuración, puede hacer que los usuarios de su organización no puedan iniciar sesión. Además, ya no podrá acceder a la consola para desactivar la acción. Recomendamos crear un usuario administrador en una organización separada o probar scripts primero en un entorno de desarrollo o una organización de desarrollo."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Tipo de flujo",
     "TRIGGERTYPE": "Tipo de disparador",
@@ -792,7 +796,7 @@
     },
     "PAGES": {
       "STATE": "Estado",
-      "DOMAINLIST": "Dominios"
+      "DOMAINLIST": "Dominios personalizados"
     },
     "STATE": {
       "0": "No especificado",
@@ -964,8 +968,7 @@
     "STATE": {
       "0": "No definida",
       "1": "Activa",
-      "2": "Desactivada",
-      "3": "Eliminada"
+      "2": "Desactivada"
     },
     "MEMBER": {
       "TITLE": "Mánagers de la organización",
@@ -1056,6 +1059,7 @@
       "TITLE": "Ajustes SMTP",
       "SENDERADDRESS": "Dirección email del emisor",
       "SENDERNAME": "Nombre del emisor",
+      "REPLYTOADDRESS": "Dirección Reply-To",
       "HOSTANDPORT": "Servidor y puerto",
       "USER": "Usuario",
       "PASSWORD": "Contraseña",
@@ -1101,7 +1105,7 @@
       "INDAYS": "días"
     },
     "SECRETS": {
-      "TITLE": "Apariencia del secreto",
+      "TITLE": "Generador del secreto",
       "TYPES": "Tipos de secreto",
       "TYPE": {
         "1": "Correo de inicialización",
@@ -1113,7 +1117,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
-      "ADDGENERATOR": "Definir apariencia del secreto",
+      "ADDGENERATOR": "Configurar generador del secreto",
       "GENERATORTYPE": "Tipo",
       "EXPIRY": "Caducidad (en horas)",
       "INCLUDEDIGITS": "Incluir números",
@@ -1347,7 +1351,7 @@
       "MAXAGEDAYS": "Antigüedad máxima en días",
       "USERLOGINMUSTBEDOMAIN": "Añadir el dominio de la organización como sufijo de los nombres de inicio de sesión",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Si activas esta opción, todos los nombres de inicio de sesión tendrán como sufijo el dominio de esta organización. Si esta opción está desactivada, tendrás que asegurarte de que los nombres de usuario son únicos para todas las organizaciones.",
-      "VALIDATEORGDOMAINS": "Validar los dominios de la organización",
+      "VALIDATEORGDOMAINS": "Verificación de dominio de la organización requerida (desafío DNS o HTTP)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "La dirección del remitente SMTP coincide con el dominio de la instancia",
       "ALLOWUSERNAMEPASSWORD": "Nombre de usuario y contraseña permitido",
       "ALLOWEXTERNALIDP": "Permitido IDP externo",
@@ -1828,7 +1832,9 @@
       "DELETED": "¡IDP eliminado con éxito!",
       "ADDED": "Añadido con éxito.",
       "REMOVED": "Eliminado con éxito."
-    }
+    },
+    "ISIDTOKENMAPPING": "Asignación del ID token",
+    "ISIDTOKENMAPPING_DESC": "Si se selecciona, la información del proveedor se asigna desde el ID token, no desde el punto final de userinfo."
   },
   "MFA": {
     "LIST": {

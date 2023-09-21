@@ -1,5 +1,6 @@
 ---
-title: Grant Types
+title: Grant Types in ZITADEL
+sidebar_label: Grant Types
 ---
 
 For a list of supported or unsupported `Grant Types` please have a look at the table below.
@@ -75,19 +76,19 @@ Key JSON
 
 JWT
 
-| Claim | Example                   | Description                                                                                                   |
-|:------|:--------------------------|:--------------------------------------------------------------------------------------------------------------|
-| aud   | `"https://{your_domain}"` | String or Array of intended audiences MUST include ZITADEL's issuing domain                                   |
-| exp   | `1605183582`              | Unix timestamp of the expiry                                                                                  |
-| iat   | `1605179982`              | Unix timestamp of the creation singing time of the JWT, MUST NOT be older than 1h                             |
-| iss   | `"77479219772321307"`     | String which represents the requesting party (owner of the key), normally the `userId` from the json key file |
-| sub   | `"77479219772321307"`     | The subject ID of the service user, normally the `userId` from the json key file                              |
+| Claim | Example                  | Description                                                                                                   |
+|:------|:-------------------------|:--------------------------------------------------------------------------------------------------------------|
+| aud   | `"https://$CUSTOM-DOMAIN"`            | String or Array of intended audiences MUST include ZITADEL's issuing domain                                   |
+| exp   | `1605183582`             | Unix timestamp of the expiry                                                                                  |
+| iat   | `1605179982`             | Unix timestamp of the creation singing time of the JWT, MUST NOT be older than 1h                             |
+| iss   | `"77479219772321307"`    | String which represents the requesting party (owner of the key), normally the `userId` from the json key file |
+| sub   | `"77479219772321307"`    | The subject ID of the service user, normally the `userId` from the json key file                              |
 
 ```JSON
 {
 	"iss": "77479219772321307",
 	"sub": "77479219772321307",
-	"aud": "https://{your_domain}",
+	"aud": "https://$CUSTOM-DOMAIN",
 	"exp": 1605183582,
 	"iat": 1605179982
 }

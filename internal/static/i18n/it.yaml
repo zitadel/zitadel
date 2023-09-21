@@ -120,7 +120,7 @@ Errors:
       Empty: La password è vuota
       Invalid: La password non è valida
       NotSet: L'utente non ha impostato una password
-      NotChanged: Password non modificata
+      NotChanged: La nuova password non può essere uguale alla password attuale
       NotSupported: Codifica hash password non supportata
     PasswordComplexityPolicy:
       NotFound: Impostazioni di complessità password non trovati
@@ -199,6 +199,10 @@ Errors:
     IDP:
       InvalidSearchQuery: Parametro di ricerca non valido
       InvalidCharacter: Per un dominio sono ammessi solo caratteri alfanumerici, . e -
+      ClientIDMissing: ClientID mancante
+      TeamIDMissing: TeamID mancante
+      KeyIDMissing: ID chiave mancante
+      PrivateKeyMissing: Chiave privata mancante
     LoginPolicy:
       NotFound: Impostazioni di accesso non trovati
       Invalid: Impostazioni di accesso non sono validi

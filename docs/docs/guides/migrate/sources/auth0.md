@@ -1,5 +1,5 @@
 ---
-title: Migrate from Auth0
+title: Migrate from Auth0 to ZITADEL
 sidebar_label: From Auth0
 ---
 

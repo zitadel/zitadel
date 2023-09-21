@@ -234,23 +234,25 @@ func updateGenericOAuthProviderToCommand(req *admin_pb.UpdateGenericOAuthProvide
 
 func addGenericOIDCProviderToCommand(req *admin_pb.AddGenericOIDCProviderRequest) command.GenericOIDCProvider {
 	return command.GenericOIDCProvider{
-		Name:         req.Name,
-		Issuer:       req.Issuer,
-		ClientID:     req.ClientId,
-		ClientSecret: req.ClientSecret,
-		Scopes:       req.Scopes,
-		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:             req.Name,
+		Issuer:           req.Issuer,
+		ClientID:         req.ClientId,
+		ClientSecret:     req.ClientSecret,
+		Scopes:           req.Scopes,
+		IsIDTokenMapping: req.IsIdTokenMapping,
+		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
 func updateGenericOIDCProviderToCommand(req *admin_pb.UpdateGenericOIDCProviderRequest) command.GenericOIDCProvider {
 	return command.GenericOIDCProvider{
-		Name:         req.Name,
-		Issuer:       req.Issuer,
-		ClientID:     req.ClientId,
-		ClientSecret: req.ClientSecret,
-		Scopes:       req.Scopes,
-		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:             req.Name,
+		Issuer:           req.Issuer,
+		ClientID:         req.ClientId,
+		ClientSecret:     req.ClientSecret,
+		Scopes:           req.Scopes,
+		IsIDTokenMapping: req.IsIdTokenMapping,
+		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
@@ -439,6 +441,30 @@ func updateLDAPProviderToCommand(req *admin_pb.UpdateLDAPProviderRequest) comman
 		Timeout:           req.Timeout.AsDuration(),
 		LDAPAttributes:    idp_grpc.LDAPAttributesToCommand(req.Attributes),
 		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addAppleProviderToCommand(req *admin_pb.AddAppleProviderRequest) command.AppleProvider {
+	return command.AppleProvider{
+		Name:       req.Name,
+		ClientID:   req.ClientId,
+		TeamID:     req.TeamId,
+		KeyID:      req.KeyId,
+		PrivateKey: req.PrivateKey,
+		Scopes:     req.Scopes,
+		IDPOptions: idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateAppleProviderToCommand(req *admin_pb.UpdateAppleProviderRequest) command.AppleProvider {
+	return command.AppleProvider{
+		Name:       req.Name,
+		ClientID:   req.ClientId,
+		TeamID:     req.TeamId,
+		KeyID:      req.KeyId,
+		PrivateKey: req.PrivateKey,
+		Scopes:     req.Scopes,
+		IDPOptions: idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 

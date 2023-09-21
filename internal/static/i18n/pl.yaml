@@ -120,7 +120,7 @@ Errors:
       Empty: Hasło jest puste
       Invalid: Hasło jest nieprawidłowe
       NotSet: Użytkownik nie ustawił hasła
-      NotChanged: Hasło nie zostało zmienione
+      NotChanged: Nowe hasło nie może być takie samo jak Twoje obecne hasło
       NotSupported: Kodowanie skrótu hasła nie jest obsługiwane
     PasswordComplexityPolicy:
       NotFound: Polityka hasła nie znaleziona
@@ -199,6 +199,10 @@ Errors:
       InvalidCharacter: Tylko znaki alfanumeryczne, . i - są dozwolone dla domeny
     IDP:
       InvalidSearchQuery: Nieprawidłowe zapytanie wyszukiwania
+      ClientIDMissing: Brak ClientID
+      TeamIDMissing: Brak TeamID
+      KeyIDMissing: Brak KeyID
+      PrivateKeyMissing: Brak klucza prywatnego
     LoginPolicy:
       NotFound: Polityka logowania nie znaleziona
       Invalid: Polityka logowania jest nieprawidłowa

@@ -89,7 +89,7 @@ func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (_ *Org, err error) {
+func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (org *Org, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -106,11 +106,14 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 		return nil, errors.ThrowInternal(err, "QUERY-AWx52", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		org, err = scan(row)
+		return err
+	}, query, args...)
+	return org, err
 }
 
-func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (_ *Org, err error) {
+func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (org *Org, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -124,11 +127,14 @@ func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (_ *Org
 		return nil, errors.ThrowInternal(err, "QUERY-TYUCE", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		org, err = scan(row)
+		return err
+	}, query, args...)
+	return org, err
 }
 
-func (q *Queries) OrgByVerifiedDomain(ctx context.Context, domain string) (_ *Org, err error) {
+func (q *Queries) OrgByVerifiedDomain(ctx context.Context, domain string) (org *Org, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -142,8 +148,11 @@ func (q *Queries) OrgByVerifiedDomain(ctx context.Context, domain string) (_ *Or
 		return nil, errors.ThrowInternal(err, "QUERY-TYUCE", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		org, err = scan(row)
+		return err
+	}, query, args...)
+	return org, err
 }
 
 func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
@@ -176,8 +185,11 @@ func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUniqu
 		return false, errors.ThrowInternal(err, "QUERY-Dgbe2", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		isUnique, err = scan(row)
+		return err
+	}, stmt, args...)
+	return isUnique, err
 }
 
 func (q *Queries) ExistsOrg(ctx context.Context, id, domain string) (verifiedID string, err error) {
@@ -202,21 +214,23 @@ func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (or
 
 	query, scan := prepareOrgsQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		Where(sq.And{
+			sq.Eq{
+				OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+			},
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-wQ3by", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		orgs, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-M6mYN", "Errors.Internal")
 	}
-	orgs, err = scan(rows)
-	if err != nil {
-		return nil, err
-	}
+
 	orgs.LatestSequence, err = q.latestSequence(ctx, orgsTable)
 	return orgs, err
 }

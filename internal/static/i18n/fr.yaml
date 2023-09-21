@@ -120,7 +120,7 @@ Errors:
       Empty: Le mot de passe est vide
       Invalid: Le mot de passe n'est pas valide
       NotSet: L'utilisateur n'a pas défini de mot de passe
-      NotChanged: Mot de passe non modifié
+      NotChanged: Le nouveau mot de passe ne peut pas être le même que votre mot de passe actuel
       NotSupported: Encodage de hachage de mot de passe non pris en charge
     PasswordComplexityPolicy:
       NotFound: Politique de mot de passe non trouvée
@@ -199,6 +199,10 @@ Errors:
       InvalidCharacter: Seuls les caractères alphanumériques, . et - sont autorisés pour un domaine
     IDP:
       InvalidSearchQuery: Paramètre de recherche non valide
+      ClientIDMissing: ID client manquant
+      TeamIDMissing: TeamID manquant
+      KeyIDMissing: ID de clé manquant
+      PrivateKeyMissing: clé privée manquante
     LoginPolicy:
       NotFound: Politique de connexion non trouvée
       Invalid: La politique de connexion n'est pas valide

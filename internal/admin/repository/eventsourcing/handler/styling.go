@@ -207,6 +207,7 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 		}
 	}
 	if policy.FontColor != "" {
+		cssContent += fmt.Sprintf("--zitadel-color-label: %s;", policy.FontColor)
 		palette := m.generateColorPaletteRGBA255(policy.FontColor)
 		for i, color := range palette {
 			cssContent += fmt.Sprintf("--zitadel-color-text-%v: %s;", i, color)
@@ -242,6 +243,7 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 		}
 	}
 	if policy.FontColorDark != "" {
+		cssContent += fmt.Sprintf("--zitadel-color-label: %s;", policy.FontColorDark)
 		palette := m.generateColorPaletteRGBA255(policy.FontColorDark)
 		for i, color := range palette {
 			cssContent += fmt.Sprintf("--zitadel-color-text-%v: %s;", i, color)

@@ -147,7 +147,7 @@ func Test_KeyPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*PublicKeys)(nil),
 		},
 		{
 			name:    "preparePrivateKeysQuery no result",
@@ -230,7 +230,7 @@ func Test_KeyPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*PrivateKeys)(nil),
 		},
 	}
 	for _, tt := range tests {

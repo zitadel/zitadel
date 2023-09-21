@@ -120,7 +120,7 @@ Errors:
       Empty: Senha está vazia
       Invalid: Senha é inválida
       NotSet: O usuário não definiu uma senha
-      NotChanged: Senha não alterada
+      NotChanged: A nova senha não pode ser igual à sua senha atual
     PasswordComplexityPolicy:
       NotFound: Política de complexidade de senha não encontrada
       MinLength: A senha é muito curta
@@ -197,6 +197,10 @@ Errors:
       InvalidCharacter: Apenas caracteres alfanuméricos, . e - são permitidos para um domínio
     IDP:
       InvalidSearchQuery: Consulta de pesquisa inválida
+      ClientIDMissing: ClientID ausente
+      TeamIDMissing: TeamID ausente
+      KeyIDMissing: KeyID ausente
+      PrivateKeyMissing: Chave privada ausente
     LoginPolicy:
       NotFound: Política de login não encontrada
       Invalid: Política de login é inválida

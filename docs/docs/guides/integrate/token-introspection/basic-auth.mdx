@@ -1,5 +1,6 @@
 ---
-title: Basic authentication
+title: Basic Authentication in ZITADEL
+sidebar_label: Basic Authentication
 ---
 
 import IntrospectionResponse from './_introspection-response.mdx';
@@ -75,7 +76,7 @@ Authorization: "Basic " + base64( formUrlEncode(client_id) + ":" + formUrlEncode
 
 The request from the API to the introspection endpoint should be in the following format:
 
-```
+```bash
 curl --request POST \
  --url {your_domain}/oauth/v2/introspect \
  --header 'Content-Type: application/x-www-form-urlencoded' \
@@ -85,7 +86,7 @@ curl --request POST \
 
 Here's an example of how this is done in Python code:
 
-```
+```python
 def introspect_token(self, token_string):
     url = ZITADEL_INTROSPECTION_URL
     data = {'token': token_string, 'token_type_hint': 'access_token', 'scope': 'openid'}

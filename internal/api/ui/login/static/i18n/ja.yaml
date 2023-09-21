@@ -18,7 +18,7 @@ SelectAccount:
   DescriptionLinking: アカウントを選択して、外部ユーザーにリンクします。
   OtherUser: その他のユーザー
   SessionState0: アクティブ
-  SessionState1: 非アクティブ
+  SessionState1: ログアウトしました
   MustBeMemberOfOrg: ユーザーは組織 {{.OrgName}} のメンバーである必要があります。
 
 Password:
@@ -131,6 +131,13 @@ VerifyMFAOTP:
   Title: 二要素認証の検証
   Description: 二要素認証を検証します。
   CodeLabel: コード
+  NextButtonText: 次へ
+
+VerifyOTP:
+  Title: 二要素認証の検証
+  Description: 二要素認証を検証します。
+  CodeLabel: コード
+  ResendButtonText: コードを再送信
   NextButtonText: 次へ
 
 VerifyMFAU2F:
@@ -356,6 +363,8 @@ Footer:
   PrivacyPolicy: プライバシーポリシー
   Help: ヘルプ
 
+SignIn: '{{.Provider}} でサインイン'
+
 Errors:
   Internal: 内部でエラーが発生しました
   AuthRequest:
@@ -380,7 +389,7 @@ Errors:
       Empty: パスワードが空です
       Invalid: 無効なパスワードです
       InvalidAndLocked: パスワードが無効かつユーザーがロックされているため、管理者に連絡してください。
-      NotChanged: パスワードは変更されていません
+      NotChanged: 新しいパスワードは現在のパスワードと同じにすることはできません
     UsernameOrPassword:
       Invalid: ユーザー名またはパスワードは無効です
     PasswordComplexityPolicy:

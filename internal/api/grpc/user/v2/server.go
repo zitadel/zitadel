@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 var _ user.UserServiceServer = (*Server)(nil)

@@ -25,7 +25,7 @@ SelectAccount:
   DescriptionLinking: Wybierz swoje konto, aby połączyć je z twoim zewnętrznym użytkownikiem.
   OtherUser: Inny użytkownik
   SessionState0: aktywne
-  SessionState1: nieaktywne
+  SessionState1: Wylogowano
   MustBeMemberOfOrg: Użytkownik musi być członkiem organizacji {{.OrgName}}.
 
 Password:
@@ -138,6 +138,13 @@ VerifyMFAOTP:
   Title: Zweryfikuj 2-etapowe uwierzytelnianie
   Description: Zweryfikuj swój drugi czynnik
   CodeLabel: Kod
+  NextButtonText: dalej
+
+VerifyOTP:
+  Title: Zweryfikuj 2-etapowe uwierzytelnianie
+  Description: Zweryfikuj swój drugi czynnik
+  CodeLabel: Kod
+  ResendButtonText: wyślij kod ponownie
   NextButtonText: dalej
 
 VerifyMFAU2F:
@@ -365,6 +372,8 @@ Footer:
   Help: Pomoc
   SupportEmail: E-mail wsparcia
 
+SignIn: Zaloguj się, używając konta {{.Provider}}
+
 Errors:
   Internal: Wewnętrzny błąd
   AuthRequest:
@@ -417,7 +426,7 @@ Errors:
       Empty: Hasło jest puste
       Invalid: Hasło jest niepoprawne
       InvalidAndLocked: Hasło jest niepoprawne i użytkownik jest zablokowany, skontaktuj się z administratorem.
-      NotChanged: Hasło nie zostało zmienione
+      NotChanged: Nowe hasło nie może być takie samo jak Twoje obecne hasło
     UsernameOrPassword:
       Invalid: Nazwa użytkownika lub hasło jest niepoprawne
     PasswordComplexityPolicy:

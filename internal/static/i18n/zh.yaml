@@ -120,7 +120,7 @@ Errors:
       Empty: 密码为空
       Invalid: 密码无效
       NotSet: 用户未设置密码
-      NotChanged: 密码未更改
+      NotChanged: 新密码不能与您当前的密码相同
       NotSupported: 不支持密码哈希编码
     PasswordComplexityPolicy:
       NotFound: 未找到密码策略
@@ -199,6 +199,10 @@ Errors:
       InvalidCharacter: 只有字母数字字符，.和 - 允许用于域名中
     IDP:
       InvalidSearchQuery: 无效的搜索查询
+      ClientIDMissing: 客户端 ID 丢失
+      TeamIDMissing: 团队 ID 丢失
+      KeyIDMissing: 密钥 ID 丢失
+      PrivateKeyMissing: 私钥丢失
     LoginPolicy:
       NotFound: 未找到登录策略
       Invalid: 登录策略无效

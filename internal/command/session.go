@@ -33,6 +33,8 @@ type SessionCommands struct {
 	hasher      *crypto.PasswordHasher
 	intentAlg   crypto.EncryptionAlgorithm
 	totpAlg     crypto.EncryptionAlgorithm
+	otpAlg      crypto.EncryptionAlgorithm
+	createCode  cryptoCodeWithDefaultFunc
 	createToken func(sessionID string) (id string, token string, err error)
 	now         func() time.Time
 }
@@ -45,6 +47,8 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 		hasher:            c.userPasswordHasher,
 		intentAlg:         c.idpConfigEncryption,
 		totpAlg:           c.multifactors.OTP.CryptoMFA,
+		otpAlg:            c.userEncryption,
+		createCode:        c.newCodeWithDefault,
 		createToken:       c.sessionTokenCreator,
 		now:               time.Now,
 	}
@@ -202,6 +206,22 @@ func (s *SessionCommands) WebAuthNChecked(ctx context.Context, checkedAt time.Ti
 
 func (s *SessionCommands) TOTPChecked(ctx context.Context, checkedAt time.Time) {
 	s.eventCommands = append(s.eventCommands, session.NewTOTPCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
+}
+
+func (s *SessionCommands) OTPSMSChallenged(ctx context.Context, code *crypto.CryptoValue, expiry time.Duration, returnCode bool) {
+	s.eventCommands = append(s.eventCommands, session.NewOTPSMSChallengedEvent(ctx, s.sessionWriteModel.aggregate, code, expiry, returnCode))
+}
+
+func (s *SessionCommands) OTPSMSChecked(ctx context.Context, checkedAt time.Time) {
+	s.eventCommands = append(s.eventCommands, session.NewOTPSMSCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
+}
+
+func (s *SessionCommands) OTPEmailChallenged(ctx context.Context, code *crypto.CryptoValue, expiry time.Duration, returnCode bool, urlTmpl string) {
+	s.eventCommands = append(s.eventCommands, session.NewOTPEmailChallengedEvent(ctx, s.sessionWriteModel.aggregate, code, expiry, returnCode, urlTmpl))
+}
+
+func (s *SessionCommands) OTPEmailChecked(ctx context.Context, checkedAt time.Time) {
+	s.eventCommands = append(s.eventCommands, session.NewOTPEmailCheckedEvent(ctx, s.sessionWriteModel.aggregate, checkedAt))
 }
 
 func (s *SessionCommands) SetToken(ctx context.Context, tokenID string) {

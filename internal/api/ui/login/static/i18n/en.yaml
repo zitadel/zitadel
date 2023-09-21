@@ -1,31 +1,31 @@
 Login:
-  Title: Welcome back!
+  Title: Welcome Back!
   Description: Enter your login data.
   TitleLinking: Login for user linking
-  DescriptionLinking: Enter your login data to link your external user with a ZITADEL user.
-  LoginNameLabel: Loginname
+  DescriptionLinking: Enter your login data to link your external user.
+  LoginNameLabel: Login Name
   UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@domain
   ExternalUserDescription: Login with an external user.
   MustBeMemberOfOrg: The user must be member of the {{.OrgName}} organization.
-  RegisterButtonText: register
-  NextButtonText: next
+  RegisterButtonText: Register
+  NextButtonText: Next
 
 LDAP:
   Title: Login
   Description: Enter your login data.
-  LoginNameLabel: Loginname
+  LoginNameLabel: Login Name
   PasswordLabel: Password
-  NextButtonText: next
+  NextButtonText: Next
 
 SelectAccount:
-  Title: Select account
-  Description: Use your ZITADEL-Account
+  Title: Select Account
+  Description: Use your account
   TitleLinking: Select account for user linking
   DescriptionLinking: Select your account to link with your external user.
   OtherUser: Other User
   SessionState0: active
-  SessionState1: inactive
+  SessionState1: Signed out
   MustBeMemberOfOrg: The user must be member of the {{.OrgName}} organization.
 
 Password:
@@ -38,21 +38,21 @@ Password:
   HasNumber: Number
   HasSymbol: Symbol
   Confirmation: Confirmation match
-  ResetLinkText: reset password
-  BackButtonText: back
-  NextButtonText: next
+  ResetLinkText: Reset Password
+  BackButtonText: Back
+  NextButtonText: Next
 
 UsernameChange:
   Title: Change Username
   Description: Set your new username
   UsernameLabel: Username
-  CancelButtonText: cancel
-  NextButtonText: next
+  CancelButtonText: Cancel
+  NextButtonText: Next
 
 UsernameChangeDone:
-  Title: Username changed
+  Title: Username Changed
   Description: Your username was changed successfully.
-  NextButtonText: next
+  NextButtonText: Next
 
 InitPassword:
   Title: Set Password
@@ -60,14 +60,14 @@ InitPassword:
   CodeLabel: Code
   NewPasswordLabel: New Password
   NewPasswordConfirmLabel: Confirm Password
-  ResendButtonText: resend code
-  NextButtonText: next
+  ResendButtonText: Resend Code
+  NextButtonText: Next
 
 InitPasswordDone:
-  Title: Password set
+  Title: Password Set
   Description: Password successfully set
-  NextButtonText: next
-  CancelButtonText: cancel
+  NextButtonText: Next
+  CancelButtonText: Cancel
 
 InitUser:
   Title: Activate User
@@ -75,14 +75,14 @@ InitUser:
   CodeLabel: Code
   NewPasswordLabel: New Password
   NewPasswordConfirm: Confirm Password
-  NextButtonText: next
-  ResendButtonText: resend code
+  NextButtonText: Next
+  ResendButtonText: Resend Code
 
 InitUserDone:
-  Title: User activated
+  Title: User Activated
   Description: Email verified and Password successfully set
-  NextButtonText: next
-  CancelButtonText: cancel
+  NextButtonText: Next
+  CancelButtonText: Cancel
 
 InitMFAPrompt:
   Title: 2-Factor Setup
@@ -91,8 +91,8 @@ InitMFAPrompt:
   Provider1: Device dependent (e.g FaceID, Windows Hello, Fingerprint)
   Provider3: OTP SMS
   Provider4: OTP Email
-  NextButtonText: next
-  SkipButtonText: skip
+  NextButtonText: Next
+  SkipButtonText: Skip
 
 InitMFAOTP:
   Title: 2-Factor Verification
@@ -100,8 +100,8 @@ InitMFAOTP:
   OTPDescription: Scan the code with your authenticator app (e.g Google/Microsoft Authenticator, Authy) or copy the secret and insert the generated code below.
   SecretLabel: Secret
   CodeLabel: Code
-  NextButtonText: next
-  CancelButtonText: cancel
+  NextButtonText: Next
+  CancelButtonText: Cancel
 
 InitMFAOTPSMS:
   Title: 2-Factor Verification
@@ -109,12 +109,12 @@ InitMFAOTPSMS:
   DescriptionCode: Create your 2-factor. Enter the received code to verify your phone number.
   PhoneLabel: Phone
   CodeLabel: Code
-  EditButtonText: edit
-  ResendButtonText: resend code
-  NextButtonText: next
+  EditButtonText: Edit
+  ResendButtonText: Resend Code
+  NextButtonText: Next
 
 InitMFAU2F:
-  Title: Add security key
+  Title: Add Security Key
   Description: A security key is a verification method that can be built into your phone, use Bluetooth, or plug directly into your computer's USB port.
   TokenNameLabel: Name of the security key / device
   NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
@@ -122,10 +122,10 @@ InitMFAU2F:
   ErrorRetry: Retry, create a new challenge or choose a different method.
 
 InitMFADone:
-  Title: 2-factor verified
+  Title: 2-factor Verified
   Description: Awesome! You just successfully set up your 2-factor and made your account way more secure. The Factor has to be entered on each login.
-  NextButtonText: next
-  CancelButtonText: cancel
+  NextButtonText: Next
+  CancelButtonText: Cancel
 
 MFAProvider:
   Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
@@ -138,14 +138,14 @@ VerifyMFAOTP:
   Title: Verify 2-Factor
   Description: Verify your second factor
   CodeLabel: Code
-  NextButtonText: next
+  NextButtonText: Next
 
 VerifyOTP:
   Title: Verify 2-Factor
   Description: Verify your second factor
   CodeLabel: Code
-  ResendButtonText: resend code
-  NextButtonText: next
+  ResendButtonText: Resend Code
+  NextButtonText: Next
 
 VerifyMFAU2F:
   Title: 2-Factor Verification
@@ -155,7 +155,7 @@ VerifyMFAU2F:
   ValidateTokenButtonText: Verify 2-Factor
 
 Passwordless:
-  Title: Login passwordless
+  Title: Login Passwordless
   Description: Login with authentication methods provided by your device like FaceID, Windows Hello or Fingerprint.
   NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
   ErrorRetry: Retry, create a new challenge or choose a different method.
@@ -163,15 +163,15 @@ Passwordless:
   ValidateTokenButtonText: Login with passwordless
 
 PasswordlessPrompt:
-  Title: Passwordless setup
+  Title: Passwordless Setup
   Description: Would you like to setup passwordless login? (Authentication methods of your device like FaceID, Windows Hello or Fingerprint)
   DescriptionInit: You need to set up passwordless login. Use the link you were given to register your device.
   PasswordlessButtonText: Go passwordless
-  NextButtonText: next
-  SkipButtonText: skip
+  NextButtonText: Next
+  SkipButtonText: Skip
 
 PasswordlessRegistration:
-  Title: Passwordless setup
+  Title: Passwordless Setup
   Description: Add your authentication by providing a name (e.g MyMobilePhone, MacBook, etc) and then clicking on the 'Register passwordless' button below.
   TokenNameLabel: Name of the device
   NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
@@ -179,11 +179,11 @@ PasswordlessRegistration:
   ErrorRetry: Retry, create a new challenge or choose a different method.
 
 PasswordlessRegistrationDone:
-  Title: Passwordless set up
+  Title: Passwordless Set Up
   Description: Device for passwordless successfully added.
-  DescriptionClose: You can now close this window.
-  NextButtonText: next
-  CancelButtonText: cancel
+  DescriptionClose: You may now close this window.
+  NextButtonText: Next
+  CancelButtonText: Cancel
 
 PasswordChange:
   Title: Change Password
@@ -191,44 +191,44 @@ PasswordChange:
   OldPasswordLabel: Old Password
   NewPasswordLabel: New Password
   NewPasswordConfirmLabel: Password confirmation
-  CancelButtonText: cancel
-  NextButtonText: next
+  CancelButtonText: Cancel
+  NextButtonText: Next
   Footer: Footer
 
 PasswordChangeDone:
   Title: Change Password
   Description: Your password was changed successfully.
-  NextButtonText: next
+  NextButtonText: Next
 
 PasswordResetDone:
-  Title: Password reset link sent
+  Title: Password Reset Link Sent
   Description: Check your email to reset your password.
-  NextButtonText: next
+  NextButtonText: Next
 
 EmailVerification:
   Title: E-Mail Verification
   Description: We have sent you an email to verify your address. Please enter the code in the form below.
   CodeLabel: Code
-  NextButtonText: next
-  ResendButtonText: resend code
+  NextButtonText: Next
+  ResendButtonText: Resend Code
 
 EmailVerificationDone:
   Title: E-Mail Verification
   Description: Your email address has been successfully verified.
-  NextButtonText: next
-  CancelButtonText: cancel
-  LoginButtonText: login
+  NextButtonText: Next
+  CancelButtonText: Cancel
+  LoginButtonText: Login
 
 RegisterOption:
   Title: Registration Options
   Description: Choose how you'd like to register
-  RegisterUsernamePasswordButtonText: With username password
+  RegisterUsernamePasswordButtonText: With username and password
   ExternalLoginDescription: or register with an external user
-  LoginButtonText: login
+  LoginButtonText: Login
 
 RegistrationUser:
   Title: Registration
-  Description: Enter your Userdata. Your email address will be used as loginname.
+  Description: Enter your Userdata. Your email address will be used as your login name.
   DescriptionOrgRegister: Enter your Userdata.
   EmailLabel: E-Mail
   UsernameLabel: Username
@@ -258,18 +258,18 @@ RegistrationUser:
   PrivacyConfirm: I accept the
   PrivacyLinkText: privacy policy
   ExternalLogin: or register with an external user
-  BackButtonText: login
-  NextButtonText: next
+  BackButtonText: Login
+  NextButtonText: Next
 
 ExternalRegistrationUserOverview:
   Title: External User Registration
-  Description: We have taken your user details from the selected provider. You can now change or complete them.
+  Description: We have taken your user details from the selected provider. You may now change or complete them.
   EmailLabel: E-Mail
   UsernameLabel: Username
   FirstnameLabel: Given name
   LastnameLabel: Family name
   NicknameLabel: Nickname
-  PhoneLabel: Phonenumber
+  PhoneLabel: Phone number
   LanguageLabel: Language
   German: Deutsch
   English: English
@@ -288,8 +288,8 @@ ExternalRegistrationUserOverview:
   PrivacyConfirm: I accept the
   PrivacyLinkText: privacy policy
   ExternalLogin: or register with an external user
-  BackButtonText: back
-  NextButtonText: save
+  BackButtonText: Nack
+  NextButtonText: Save
 
 RegistrationOrg:
   Title: Organization Registration
@@ -309,27 +309,27 @@ RegistrationOrg:
   SaveButtonText: Create organization
 
 LoginSuccess:
-  Title: Login successful
-  AutoRedirectDescription: You will be directed back to your application automatically. If not, click on the button below. You can close the window afterwards.
-  RedirectedDescription: You can now close this window.
-  NextButtonText: next
+  Title: Login Successful
+  AutoRedirectDescription: You will be directed back to your application automatically. If not, click on the button below. You may close the window afterwards.
+  RedirectedDescription: You may now close this window.
+  NextButtonText: Next
 
 LogoutDone:
-  Title: Logged out
+  Title: Logged Out
   Description: You have logged out successfully.
-  LoginButtonText: login
+  LoginButtonText: Login
 
 LinkingUsersDone:
-  Title: Userlinking
-  Description: Userlinking done.
-  CancelButtonText: cancel
-  NextButtonText: next
+  Title: Linking User
+  Description: User linked.
+  CancelButtonText: Cancel
+  NextButtonText: Next
 
 ExternalNotFound:
-  Title: External User not found
+  Title: External User Not Found
   Description: External user not found. Do you want to link your user or auto register a new one.
   LinkButtonText: Link
-  AutoRegisterButtonText: register
+  AutoRegisterButtonText: Register
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
@@ -352,18 +352,18 @@ DeviceAuth:
   UserCode:
     Label: User Code
     Description: Enter the user code presented on the device.
-    ButtonNext: next
+    ButtonNext: Next
   Action:
     Description: Grant device access.
     GrantDevice: you are about to grant device
     AccessToScopes: access to the following scopes
     Button:
-      Allow: allow
-      Deny: deny
+      Allow: Allow
+      Deny: Deny
   Done:
     Description: Done.
-    Approved: Device authorization approved. You can now return to the device.
-    Denied: Device authorization denied. You can now return to the device.
+    Approved: Device authorization approved. You may now return to the device.
+    Denied: Device authorization denied. You may now return to the device.
 
 Footer:
   PoweredBy: Powered By
@@ -371,6 +371,8 @@ Footer:
   PrivacyPolicy: Privacy policy
   Help: Help
   SupportEmail: Support E-mail
+
+SignIn: Sign in with {{.Provider}}
 
 Errors:
   Internal: An internal error occurred
@@ -424,7 +426,7 @@ Errors:
       Empty: Password is empty
       Invalid: Password is invalid
       InvalidAndLocked: Password is invalid and user is locked, contact your administrator.
-      NotChanged: Password not changed
+      NotChanged: New password cannot be the same as your current password
     UsernameOrPassword:
       Invalid: Username or Password is invalid
     PasswordComplexityPolicy:

@@ -179,13 +179,8 @@ func (p *passwordAgeProjection) reduceOwnerRemoved(event eventstore.Event) (*han
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-edLs2", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(AgePolicyChangeDateCol, e.CreationDate()),
-			handler.NewCol(AgePolicySequenceCol, e.Sequence()),
-			handler.NewCol(AgePolicyOwnerRemovedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(AgePolicyInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(AgePolicyResourceOwnerCol, e.Aggregate().ID),

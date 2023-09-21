@@ -63,7 +63,7 @@ func Test_OrgMetadataPrepares(t *testing.T) {
 			name:    "prepareOrgMetadataQuery no result",
 			prepare: prepareOrgMetadataQuery,
 			want: want{
-				sqlExpectations: mockQuery(
+				sqlExpectations: mockQueryScanErr(
 					regexp.QuoteMeta(orgMetadataQuery),
 					nil,
 					nil,
@@ -118,7 +118,7 @@ func Test_OrgMetadataPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*OrgMetadata)(nil),
 		},
 		{
 			name:    "prepareOrgMetadataListQuery no result",
@@ -239,7 +239,7 @@ func Test_OrgMetadataPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*OrgMetadataList)(nil),
 		},
 	}
 	for _, tt := range tests {

@@ -67,7 +67,7 @@ type Flow struct {
 	TriggerActions map[domain.TriggerType][]*Action
 }
 
-func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID string, withOwnerRemoved bool) (_ *Flow, err error) {
+func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID string, withOwnerRemoved bool) (flow *Flow, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -85,14 +85,14 @@ func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID s
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-HBRh3", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Gg42f", "Errors.Internal")
-	}
-	return scan(rows)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		flow, err = scan(rows)
+		return err
+	}, stmt, args...)
+	return flow, err
 }
 
-func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flowType domain.FlowType, triggerType domain.TriggerType, orgID string, withOwnerRemoved bool) (_ []*Action, err error) {
+func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flowType domain.FlowType, triggerType domain.TriggerType, orgID string, withOwnerRemoved bool) (actions []*Action, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -112,14 +112,14 @@ func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flow
 		return nil, errors.ThrowInternal(err, "QUERY-Dgff3", "Errors.Query.SQLStatement")
 	}
 
-	rows, err := q.client.QueryContext(ctx, query, args...)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SDf52", "Errors.Internal")
-	}
-	return scan(rows)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		actions, err = scan(rows)
+		return err
+	}, query, args...)
+	return actions, err
 }
 
-func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string, withOwnerRemoved bool) (_ []domain.FlowType, err error) {
+func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string, withOwnerRemoved bool) (types []domain.FlowType, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -136,12 +136,11 @@ func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string, w
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-Dh311", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, query, args...)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Bhj4w", "Errors.Internal")
-	}
-
-	return scan(rows)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		types, err = scan(rows)
+		return err
+	}, query, args...)
+	return types, err
 }
 
 func prepareFlowTypesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) ([]domain.FlowType, error)) {
