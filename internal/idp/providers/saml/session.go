@@ -80,9 +80,7 @@ func (w *TempResponseWriter) Write(content []byte) (int, error) {
 	return w.content.Write(content)
 }
 
-func (w *TempResponseWriter) WriteHeader(statusCode int) {
-	return
-}
+func (w *TempResponseWriter) WriteHeader(statusCode int) {}
 
 func NewTempResponseWriter() *TempResponseWriter {
 	return &TempResponseWriter{

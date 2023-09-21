@@ -212,20 +212,3 @@ func httpPostFormRequest(t *testing.T, callbackURL, relayState, response string)
 	assert.NoError(t, req.ParseForm())
 	return req
 }
-
-func httpGETRequest(t *testing.T, callbackURL string, relayState, response, sig, sigAlg string) *http.Request {
-	req, err := http.NewRequest("GET", callbackURL, nil)
-	require.NoError(t, err)
-
-	q := req.URL.Query()
-	q.Add("RelayState", relayState)
-	q.Add("SAMLResponse", response)
-	if sig != "" {
-		q.Add("Sig", sig)
-	}
-	if sigAlg != "" {
-		q.Add("SigAlg", sigAlg)
-	}
-	req.URL.RawQuery = q.Encode()
-	return req
-}

@@ -26,8 +26,6 @@ type Provider struct {
 
 	spOptions *samlsp.Options
 
-	rootURL *url.URL
-	keypair *tls.Certificate
 	binding string
 
 	isLinkingAllowed  bool
