@@ -164,6 +164,9 @@ func (q *Queries) checkAndLock(tx *sql.Tx, projectionName string) (name string, 
 
 func tablesForReset(ctx context.Context, tx *sql.Tx, projectionName string) (tables []string, err error) {
 	names := strings.Split(projectionName, ".")
+	if len(names) != 2 {
+		return nil, errors.ThrowInvalidArgument(nil, "QUERY-wk1jr", "Errors.InvalidArgument")
+	}
 	schema := names[0]
 	tablePrefix := names[1]
 

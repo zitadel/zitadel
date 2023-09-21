@@ -374,7 +374,7 @@ func prepareOrgMember(withOwnerRemoved bool, query *MembershipSearchQuery) (stri
 	).From(orgMemberTable.identifier())
 
 	for _, q := range query.Queries {
-		if q.Col().table.name == membershipAlias.name || q.Col().table.name == memberTableAlias.name {
+		if q.Col().table.name == membershipAlias.name {
 			builder = q.toQuery(builder)
 		}
 	}
@@ -404,7 +404,7 @@ func prepareIAMMember(withOwnerRemoved bool, query *MembershipSearchQuery) (stri
 	).From(instanceMemberTable.identifier())
 
 	for _, q := range query.Queries {
-		if q.Col().table.name == membershipAlias.name || q.Col().table.name == memberTableAlias.name {
+		if q.Col().table.name == membershipAlias.name {
 			builder = q.toQuery(builder)
 		}
 	}
@@ -433,7 +433,7 @@ func prepareProjectMember(withOwnerRemoved bool, query *MembershipSearchQuery) (
 	).From(projectMemberTable.identifier())
 
 	for _, q := range query.Queries {
-		if q.Col().table.name == membershipAlias.name || q.Col().table.name == memberTableAlias.name {
+		if q.Col().table.name == membershipAlias.name {
 			builder = q.toQuery(builder)
 		}
 	}
@@ -462,7 +462,7 @@ func prepareProjectGrantMember(withOwnerRemoved bool, query *MembershipSearchQue
 	).From(projectGrantMemberTable.identifier())
 
 	for _, q := range query.Queries {
-		if q.Col().table.name == membershipAlias.name || q.Col().table.name == memberTableAlias.name {
+		if q.Col().table.name == membershipAlias.name {
 			builder = q.toQuery(builder)
 		}
 	}
