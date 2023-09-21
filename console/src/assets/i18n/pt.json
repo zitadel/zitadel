@@ -797,7 +797,7 @@
     },
     "PAGES": {
       "STATE": "Status",
-      "DOMAINLIST": "Domínios"
+      "DOMAINLIST": "Domínios personalizados"
     },
     "STATE": {
       "0": "Não especificado",
@@ -1353,7 +1353,7 @@
       "MAXAGEDAYS": "Idade máxima em dias",
       "USERLOGINMUSTBEDOMAIN": "Adicionar domínio da organização como sufixo aos nomes de login",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Se você habilitar essa configuração, todos os nomes de login serão sufixados com o domínio da organização. Se essa configuração estiver desabilitada, você deve garantir que os nomes de usuário sejam exclusivos em todas as organizações.",
-      "VALIDATEORGDOMAINS": "Validar domínios da organização",
+      "VALIDATEORGDOMAINS": "Verificação de domínio da organização necessária (desafio DNS ou HTTP)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "O endereço do remetente do SMTP corresponde ao domínio da Instância",
       "ALLOWUSERNAMEPASSWORD": "Permitir usuário e senha",
       "ALLOWEXTERNALIDP": "Permitir provedor de ID externo",

@@ -796,7 +796,7 @@
     },
     "PAGES": {
       "STATE": "Status",
-      "DOMAINLIST": "Domains"
+      "DOMAINLIST": "Custom Domains"
     },
     "STATE": {
       "0": "Unspezifisch",
@@ -954,15 +954,15 @@
     "DOMAINS": {
       "NEW": "Domain hinzufügen",
       "TITLE": "Domänen",
-      "DESCRIPTION": "Konfiguriere die Domains, mit denen sich Deine Benutzer anmelden können.",
+      "DESCRIPTION": "Konfiguriere die Domains, die für Domain discovery und als Suffix für die Benutzer verwendet werden können.",
       "SETPRIMARY": "Primäre Domain setzen",
       "DELETE": {
         "TITLE": "Domain löschen?",
-        "DESCRIPTION": "Du bist im Begriff, eine Domain aus Deiner Organisation zu löschen. Deine Benutzer können diese nach dem Löschen nicht mehr für den Login nutzen."
+        "DESCRIPTION": "Du bist im Begriff, eine Domain aus deiner Organisation zu löschen."
       },
       "ADD": {
         "TITLE": "Domain hinzufügen",
-        "DESCRIPTION": "Du bist im Begriff, Deiner Organisation eine Domain hinzuzufügen. Deine Benutzer können diese nach der erfolgreichen Ausführung für den Login nutzen."
+        "DESCRIPTION": "Du bist im Begriff, Deiner Organisation eine Domain hinzuzufügen. Die Domain kann für Domain discovery genutzt werden und als Suffix für deine Benutzernamen."
       }
     },
     "STATE": {
@@ -1351,7 +1351,7 @@
       "MAXAGEDAYS": "Maximale Gültigkeit in Tagen",
       "USERLOGINMUSTBEDOMAIN": "Organisationsdomain dem Loginname hinzufügen",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
-      "VALIDATEORGDOMAINS": "Org Domains validieren",
+      "VALIDATEORGDOMAINS": "Verifizierung des Organisations Domain erforderlich (DNS- oder HTTP-Herausforderung)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Adresse entspricht Instanzdomain",
       "ALLOWUSERNAMEPASSWORD": "Benutzername Passwort erlaubt",
       "ALLOWEXTERNALIDP": "Externer IDP erlaubt",

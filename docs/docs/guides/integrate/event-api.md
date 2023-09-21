@@ -24,7 +24,7 @@ To further restrict your result you can add the following filters:
 
 ```bash
 curl --request POST \
-  --url $YOUR-DOMAIN/admin/v1/events/_search \
+  --url $CUSTOM-DOMAIN/admin/v1/events/_search \
   --header "Authorization: Bearer $TOKEN"
 ```
 
@@ -34,7 +34,7 @@ To be able to filter for the different event types ZITADEL knows, you can reques
 
 ```bash
 curl --request POST \
---url $YOUR-DOMAIN/admin/v1/events/types/_search \
+--url $CUSTOM-DOMAIN/admin/v1/events/types/_search \
 --header "Authorization: Bearer $TOKEN" \
 --header 'Content-Type: application/json' \
 '
@@ -70,7 +70,7 @@ To be able to filter for the different aggregate types (resources) ZITADEL knows
 
 ```bash
 curl --request POST \
-  --url $YOUR-DOMAIN/admin/v1/aggregates/types/_search \
+  --url $CUSTOM-DOMAIN/admin/v1/aggregates/types/_search \
   --header "Authorization: Bearer $TOKEN" \
   --header 'Content-Type: application/json'
 ```
@@ -101,7 +101,7 @@ This example shows you how to get all events from users, filtered with the creat
 
 ```bash
 curl --request POST \
-  --url $YOUR-DOMAIN/admin/v1/events/_search \
+  --url $CUSTOM-DOMAIN/admin/v1/events/_search \
   --header "Authorization: Bearer $TOKEN" \
   --header 'Content-Type: application/json' \
   --data '{
@@ -121,7 +121,7 @@ Also we include the refresh tokens in this example to know when the user has bec
 
 ```bash
 curl --request POST \
-  --url $YOUR-DOMAIN/admin/v1/events/_search \
+  --url $CUSTOM-DOMAIN/admin/v1/events/_search \
   --header "Authorization: Bearer $TOKEN" \
   --header 'Content-Type: application/json' \
   --data '{
@@ -147,7 +147,7 @@ In this case this are the following events:
 
 ```bash
 curl --request POST \
-  --url $YOUR-DOMAIN/admin/v1/events/_search \
+  --url $CUSTOM-DOMAIN/admin/v1/events/_search \
   --header "Authorization: Bearer $TOKEN" \
   --header 'Content-Type: application/json' \
   --data '{
