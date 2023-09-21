@@ -151,7 +151,7 @@ func (p *Provider) IsAutoUpdate() bool {
 func (p *Provider) GetSP() (*samlsp.Middleware, error) {
 	sp, err := samlsp.New(*p.spOptions)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "SAML-x1v0hlrcjd", "Errors.Intent.IDPInvalid")
+		return nil, errors.ThrowInternal(err, "SAML-qee09ffuq5", "Errors.Intent.IDPInvalid")
 	}
 	if p.requestTracker != nil {
 		sp.RequestTracker = p.requestTracker

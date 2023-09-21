@@ -4965,7 +4965,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SAfdd", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-957lr0f8u3", ""))
 				},
 			},
 		},
@@ -4984,7 +4984,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-D2gj8", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-78isv6m53a", ""))
 				},
 			},
 		},
@@ -5005,7 +5005,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-x8720s2j1", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-l8kkdopzx7", ""))
 				},
 			},
 		},
@@ -5026,7 +5026,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-x8720s2j1", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-l8kkdopzx7", ""))
 				},
 			},
 		},
@@ -5192,7 +5192,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Dgdbs", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-wwdwdlaya0", ""))
 				},
 			},
 		},
@@ -5209,7 +5209,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Sffgd", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-egixaofgyl", ""))
 				},
 			},
 		},
@@ -5228,7 +5228,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-D2gj8", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-k59dnfcib7", ""))
 				},
 			},
 		},
@@ -5249,7 +5249,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-x8720s2j1", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-iznhflb60d", ""))
 				},
 			},
 		},
@@ -5270,7 +5270,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-x8720s2j1", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-iznhflb60d", ""))
 				},
 			},
 		},

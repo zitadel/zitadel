@@ -61,7 +61,7 @@ func SAMLIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) 
 
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-Et1dq", "unable to unmarshal event")
+		return nil, errors.ThrowInternal(err, "IDP-v9uajo3k71", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -86,7 +86,7 @@ func NewSAMLIDPChangedEvent(
 	changes []SAMLIDPChanges,
 ) (*SAMLIDPChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDP-BH3dl", "Errors.NoChangesFound")
+		return nil, errors.ThrowPreconditionFailed(nil, "IDP-cz6mnf860t", "Errors.NoChangesFound")
 	}
 	changedEvent := &SAMLIDPChangedEvent{
 		BaseEvent: *base,
@@ -157,7 +157,7 @@ func SAMLIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error
 
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-SAf3gw", "unable to unmarshal event")
+		return nil, errors.ThrowInternal(err, "IDP-w1t1824tw5", "unable to unmarshal event")
 	}
 
 	return e, nil

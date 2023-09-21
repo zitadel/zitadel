@@ -2043,14 +2043,14 @@ func (wm *AllIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 
 func (wm *AllIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
 	if wm.model == nil {
-		return nil, errors.ThrowInternal(nil, "COMMAND-i7cnu3", "ErrorsIDPConfig.NotExisting")
+		return nil, errors.ThrowInternal(nil, "COMMAND-afvf0gc9sa", "ErrorsIDPConfig.NotExisting")
 	}
 	return wm.model.ToProvider(callbackURL, idpAlg)
 }
 
 func (wm *AllIDPWriteModel) ToSAMLProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, getRequest requesttracker.GetRequest, addRequest requesttracker.AddRequest) (providers.Provider, error) {
 	if wm.samlModel == nil {
-		return nil, errors.ThrowInternal(nil, "COMMAND-i7xnu3", "ErrorsIDPConfig.NotExisting")
+		return nil, errors.ThrowInternal(nil, "COMMAND-csi30hdscv", "ErrorsIDPConfig.NotExisting")
 	}
 	return wm.samlModel.ToProvider(callbackURL, idpAlg, getRequest, addRequest)
 }

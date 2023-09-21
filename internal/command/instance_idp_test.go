@@ -4891,7 +4891,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D32ef", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-o07zjotgnd", ""))
 				},
 			},
 		},
@@ -4909,7 +4909,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D2gj8", "Errors.Invalid.Argument"))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-3bi3esi16t", "Errors.Invalid.Argument"))
 				},
 			},
 		},
@@ -4929,7 +4929,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-x8720s2j1", "Errors.Invalid.Argument"))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-htrq9hqg31", "Errors.Invalid.Argument"))
 				},
 			},
 		},
@@ -4949,7 +4949,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-x8720s2j1", "Errors.Invalid.Argument"))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-htrq9hqg31", "Errors.Invalid.Argument"))
 				},
 			},
 		},
@@ -5116,7 +5116,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAffg", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-7o3rq1owpm", ""))
 				},
 			},
 		},
@@ -5132,7 +5132,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Sf3gh", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-q2s9rak7o9", ""))
 				},
 			},
 		},
@@ -5150,7 +5150,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D2gj8", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-iw1rxnf4sf", ""))
 				},
 			},
 		},
@@ -5170,7 +5170,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-x8720s2j1", "Errors.Invalid.Argument"))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-tel39wh7oy", "Errors.Invalid.Argument"))
 				},
 			},
 		},
@@ -5190,7 +5190,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-x8720s2j1", "Errors.Invalid.Argument"))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-tel39wh7oy", "Errors.Invalid.Argument"))
 				},
 			},
 		},

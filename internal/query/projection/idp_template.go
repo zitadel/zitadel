@@ -1955,7 +1955,7 @@ func (p *idpTemplateProjection) reduceSAMLIDPChanged(event eventstore.Event) (*h
 	case *instance.SAMLIDPChangedEvent:
 		idpEvent = e.SAMLIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPChangedEventType, instance.SAMLIDPChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-o7c0fii4ad", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPChangedEventType, instance.SAMLIDPChangedEventType})
 	}
 
 	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
@@ -1996,7 +1996,7 @@ func (p *idpTemplateProjection) reduceIDPConfigRemoved(event eventstore.Event) (
 	case *instance.IDPConfigRemovedEvent:
 		idpEvent = e.IDPConfigRemovedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAFet", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-menq56oe7s", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
 	}
 
 	return crdb.NewDeleteStatement(

@@ -175,7 +175,7 @@ func SAMLSucceededEventMapper(event *repository.Event) (eventstore.Event, error)
 
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-HBreq", "unable to unmarshal event")
+		return nil, errors.ThrowInternal(err, "IDP-l4tw23y6lq", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -217,7 +217,7 @@ func SAMLRequestEventMapper(event *repository.Event) (eventstore.Event, error) {
 
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-HBreq", "unable to unmarshal event")
+		return nil, errors.ThrowInternal(err, "IDP-l85678vwlf", "unable to unmarshal event")
 	}
 
 	return e, nil

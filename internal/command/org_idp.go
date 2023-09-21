@@ -1552,20 +1552,20 @@ func (c *Commands) prepareUpdateOrgLDAPProvider(a *org.Aggregate, writeModel *Or
 func (c *Commands) prepareAddOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSAMLIDPWriteModel, provider SAMLProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-SAfdd", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-957lr0f8u3", "Errors.Invalid.Argument")
 		}
 		if provider.Metadata == nil && provider.MetadataURL == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-D2gj8", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-78isv6m53a", "Errors.Invalid.Argument")
 		}
 		if provider.Metadata == nil && provider.MetadataURL != "" {
 			data, err := xml.ReadMetadataFromURL(c.httpClient, provider.MetadataURL)
 			if err != nil {
-				return nil, caos_errs.ThrowInvalidArgument(err, "ORG-x8101m", "Errors.Project.App.SAMLMetadataMissing")
+				return nil, caos_errs.ThrowInvalidArgument(err, "ORG-ipzxvf3cv2", "Errors.Project.App.SAMLMetadataMissing")
 			}
 			provider.Metadata = data
 		}
 		if (provider.Key != nil && provider.Certificate == nil) || (provider.Key == nil && provider.Certificate != nil) {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-x8720s2j1", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-l8kkdopzx7", "Errors.Invalid.Argument")
 		}
 		if provider.Key == nil && provider.Certificate == nil {
 			key, cert, err := generateSAMLCertAndKey(writeModel.ID, c.keySize)
@@ -1613,23 +1613,23 @@ func (c *Commands) prepareAddOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSA
 func (c *Commands) prepareUpdateOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSAMLIDPWriteModel, provider SAMLProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Dgdbs", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-wwdwdlaya0", "Errors.Invalid.Argument")
 		}
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Sffgd", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-egixaofgyl", "Errors.Invalid.Argument")
 		}
 		if provider.Metadata == nil && provider.MetadataURL == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-D2gj8", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-k59dnfcib7", "Errors.Invalid.Argument")
 		}
 		if provider.Metadata == nil && provider.MetadataURL != "" {
 			data, err := xml.ReadMetadataFromURL(c.httpClient, provider.MetadataURL)
 			if err != nil {
-				return nil, caos_errs.ThrowInvalidArgument(err, "ORG-xx82101m", "Errors.Project.App.SAMLMetadataMissing")
+				return nil, caos_errs.ThrowInvalidArgument(err, "ORG-bkaiyd3rfo", "Errors.Project.App.SAMLMetadataMissing")
 			}
 			provider.Metadata = data
 		}
 		if (provider.Key != nil && provider.Certificate == nil) || (provider.Key == nil && provider.Certificate != nil) {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-x8720s2j1", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-iznhflb60d", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())

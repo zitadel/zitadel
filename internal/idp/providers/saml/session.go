@@ -45,12 +45,12 @@ func (s *Session) GetAuth(ctx context.Context) (string, bool) {
 // FetchUser implements the [idp.Session] interface.
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if s.RequestID == "" && s.Request == nil {
-		return nil, errors.ThrowInvalidArgument(nil, "SAML-tzb2sj", "Errors.Intent.ResponseInvalid")
+		return nil, errors.ThrowInvalidArgument(nil, "SAML-d09hy0wkex", "Errors.Intent.ResponseInvalid")
 	}
 
 	assertion, err := s.ServiceProvider.ServiceProvider.ParseResponse(s.Request, []string{s.RequestID})
 	if err != nil {
-		return nil, err
+		return nil, errors.ThrowInvalidArgument(err, "SAML-nuo0vphhh9", "Errors.Intent.ResponseInvalid")
 	}
 
 	userMapper := NewUser()
