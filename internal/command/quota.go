@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"net/url"
 	"time"
 
@@ -43,14 +42,14 @@ func (c *Commands) AddQuota(
 	if err != nil {
 		return nil, err
 	}
-	if wm.active {
+	if wm.AggregateID != "" {
 		return nil, errors.ThrowAlreadyExists(nil, "COMMAND-WDfFf", "Errors.Quota.AlreadyExists")
 	}
 	aggregateId, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.SetQuotaCommand(quota.NewAggregate(aggregateId, instanceId), wm, q))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.SetQuotaCommand(quota.NewAggregate(aggregateId, instanceId), wm, true, q))
 	if err != nil {
 		return nil, err
 	}
@@ -75,17 +74,15 @@ func (c *Commands) SetQuota(
 	if err != nil {
 		return nil, err
 	}
-	if wm.AggregateID == "" && wm.active {
-		return nil, errors.ThrowInternal(fmt.Errorf("quota is active but has no id"), "COMMAND-3M9ds", "Errors.Internal")
-	}
 	aggregateId := wm.AggregateID
+	createNewQuota := aggregateId == ""
 	if aggregateId == "" {
 		aggregateId, err = c.idGenerator.Next()
 		if err != nil {
 			return nil, err
 		}
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.SetQuotaCommand(quota.NewAggregate(aggregateId, instanceId), wm, q))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.SetQuotaCommand(quota.NewAggregate(aggregateId, instanceId), wm, createNewQuota, q))
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +103,7 @@ func (c *Commands) RemoveQuota(ctx context.Context, unit QuotaUnit) (*domain.Obj
 	if err != nil {
 		return nil, err
 	}
-	if !wm.active {
+	if wm.AggregateID == "" {
 		return nil, errors.ThrowNotFound(nil, "COMMAND-WDfFf", "Errors.Quota.NotFound")
 	}
 	aggregate := quota.NewAggregate(wm.AggregateID, instanceId)
@@ -177,13 +174,13 @@ func (q *SetQuota) validate() error {
 	return nil
 }
 
-func (c *Commands) SetQuotaCommand(a *quota.Aggregate, wm *quotaWriteModel, q *SetQuota) preparation.Validation {
+func (c *Commands) SetQuotaCommand(a *quota.Aggregate, wm *quotaWriteModel, createNew bool, q *SetQuota) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if err := q.validate(); err != nil {
 			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (cmd []eventstore.Command, err error) {
-				changes, err := wm.NewChanges(c.idGenerator, q.Amount, q.From, q.ResetInterval, q.Limit, q.Notifications...)
+				changes, err := wm.NewChanges(c.idGenerator, createNew, q.Amount, q.From, q.ResetInterval, q.Limit, q.Notifications...)
 				if len(changes) == 0 {
 					return nil, err
 				}

@@ -283,7 +283,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			if err != nil {
 				return "", "", nil, nil, err
 			}
-			validations = append(validations, c.SetQuotaCommand(quota.NewAggregate(quotaId, instanceID), nil, q))
+			validations = append(validations, c.SetQuotaCommand(quota.NewAggregate(quotaId, instanceID), nil, true, q))
 		}
 	}
 

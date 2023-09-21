@@ -14,7 +14,6 @@ import (
 
 type quotaWriteModel struct {
 	eventstore.WriteModel
-	active        bool
 	unit          quota.Unit
 	from          time.Time
 	resetInterval time.Duration
@@ -54,7 +53,6 @@ func (wm *quotaWriteModel) Reduce() error {
 		wm.ChangeDate = event.CreationDate()
 		switch e := event.(type) {
 		case *quota.SetEvent:
-			wm.active = true
 			wm.AggregateID = event.Aggregate().ID
 			if e.Amount != nil {
 				wm.amount = *e.Amount
@@ -72,7 +70,6 @@ func (wm *quotaWriteModel) Reduce() error {
 				wm.notifications = *e.Notifications
 			}
 		case *quota.RemovedEvent:
-			wm.active = false
 			wm.AggregateID = ""
 		}
 	}
@@ -83,6 +80,7 @@ func (wm *quotaWriteModel) Reduce() error {
 // If wm is nil or inactive, all quota properties are set.
 func (wm *quotaWriteModel) NewChanges(
 	idGenerator id.Generator,
+	createNew bool,
 	amount uint64,
 	from time.Time,
 	resetInterval time.Duration,
@@ -98,7 +96,7 @@ func (wm *quotaWriteModel) NewChanges(
 	if err != nil {
 		return nil, err
 	}
-	if wm == nil || wm.active == false {
+	if createNew {
 		return []quota.QuotaChange{
 			quota.ChangeAmount(amount),
 			quota.ChangeFrom(from),
