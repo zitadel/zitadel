@@ -689,9 +689,9 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			name: "next step saml default",
 			args: args{
 				CTX,
-				&user.StartIdentityProviderFlowRequest{
+				&user.StartIdentityProviderIntentRequest{
 					IdpId: samlIdpID,
-					Content: &user.StartIdentityProviderFlowRequest_Urls{
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
 						Urls: &user.RedirectURLs{
 							SuccessUrl: "https://example.com/success",
 							FailureUrl: "https://example.com/failure",
@@ -713,9 +713,9 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			name: "next step saml auth url",
 			args: args{
 				CTX,
-				&user.StartIdentityProviderFlowRequest{
+				&user.StartIdentityProviderIntentRequest{
 					IdpId: samlRedirectIdpID,
-					Content: &user.StartIdentityProviderFlowRequest_Urls{
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
 						Urls: &user.RedirectURLs{
 							SuccessUrl: "https://example.com/success",
 							FailureUrl: "https://example.com/failure",
@@ -737,9 +737,9 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			name: "next step saml form",
 			args: args{
 				CTX,
-				&user.StartIdentityProviderFlowRequest{
+				&user.StartIdentityProviderIntentRequest{
 					IdpId: samlPostIdpID,
-					Content: &user.StartIdentityProviderFlowRequest_Urls{
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
 						Urls: &user.RedirectURLs{
 							SuccessUrl: "https://example.com/success",
 							FailureUrl: "https://example.com/failure",
@@ -782,7 +782,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			if tt.want.postForm {
 				assert.NotEmpty(t, got.GetPostForm())
 			}
-			integration.AssertDetails(t, &user.StartIdentityProviderFlowResponse{
+			integration.AssertDetails(t, &user.StartIdentityProviderIntentResponse{
 				Details: tt.want.details,
 			}, got)
 		})
@@ -913,12 +913,12 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			name: "retrieve successful saml intent",
 			args: args{
 				CTX,
-				&user.RetrieveIdentityProviderInformationRequest{
-					IntentId: samlSuccessfulID,
-					Token:    samlToken,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    samlSuccessfulID,
+					IdpIntentToken: samlToken,
 				},
 			},
-			want: &user.RetrieveIdentityProviderInformationResponse{
+			want: &user.RetrieveIdentityProviderIntentResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.New(samlChangeDate),
 					ResourceOwner: Tester.Organisation.ID,

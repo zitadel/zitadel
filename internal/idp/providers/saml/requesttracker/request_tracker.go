@@ -23,7 +23,7 @@ func New(addRequestF AddRequest, getRequestF GetRequest) samlsp.RequestTracker {
 }
 
 func (rt *RequestTracker) TrackRequest(w http.ResponseWriter, r *http.Request, samlRequestID string) (index string, err error) {
-	//intentID is stored in r.URL
+	// intentID is stored in r.URL
 	intentID := r.URL.String()
 	if err := rt.addRequest(r.Context(), intentID, samlRequestID); err != nil {
 		return "", err
@@ -37,7 +37,7 @@ func (rt *RequestTracker) StopTrackingRequest(w http.ResponseWriter, r *http.Req
 }
 
 func (rt *RequestTracker) GetTrackedRequests(r *http.Request) []samlsp.TrackedRequest {
-	//RelayState is the context of the auth flow and as such contains the intentID
+	// RelayState is the context of the auth flow and as such contains the intentID
 	intentID := r.FormValue("RelayState")
 
 	request, err := rt.getRequest(r.Context(), intentID)

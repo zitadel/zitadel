@@ -25,7 +25,6 @@ type Provider struct {
 	Certificate    []byte
 
 	spOptions *samlsp.Options
-	metadata  *saml.EntityDescriptor
 
 	rootURL *url.URL
 	keypair *tls.Certificate
