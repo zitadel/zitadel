@@ -1,8 +1,11 @@
 package view
 
 import (
+	"context"
+
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/query"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
@@ -81,4 +84,23 @@ func (v *View) DeleteOrgTokens(event eventstore.Event) error {
 		return err
 	}
 	return nil
+}
+
+func (v *View) GetLatestTokenSequence(ctx context.Context, instanceID string) (_ *query.CurrentState, err error) {
+	q := &query.CurrentStateSearchQueries{
+		Queries: make([]query.SearchQuery, 2),
+	}
+	q.Queries[0], err = query.NewCurrentStatesInstanceIDSearchQuery(instanceID)
+	if err != nil {
+		return nil, err
+	}
+	q.Queries[1], err = query.NewCurrentStatesProjectionSearchQuery(tokenTable)
+	if err != nil {
+		return nil, err
+	}
+	states, err := v.query.SearchCurrentStates(ctx, q)
+	if err != nil || states.SearchResponse.Count == 0 {
+		return nil, err
+	}
+	return states.CurrentStates[0], nil
 }

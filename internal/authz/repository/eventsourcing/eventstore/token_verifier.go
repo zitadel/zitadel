@@ -60,11 +60,10 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 		token.UserID = userID
 		if sequence != nil {
 			token.Sequence = sequence.Sequence
-			token.ChangeDate = sequence.EventCreatedAt
 		}
 	}
 
-	events, esErr := repo.getUserEvents(ctx, userID, instanceID, token.ChangeDate, token.GetRelevantEventTypes())
+	events, esErr := repo.getUserEvents(ctx, userID, instanceID, token.Sequence, token.GetRelevantEventTypes())
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
 	}
@@ -243,10 +242,10 @@ func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName str
 	return clientID, app.ProjectID, nil
 }
 
-func (repo *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instanceID string, creationDate time.Time, eventTypes []eventstore.EventType) (_ []eventstore.Event, err error) {
+func (repo *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64, eventTypes []eventstore.EventType) (_ []eventstore.Event, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	query, err := usr_view.UserByIDQuery(userID, instanceID, creationDate, eventTypes)
+	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence, eventTypes)
 	if err != nil {
 		return nil, err
 	}

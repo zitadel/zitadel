@@ -3,6 +3,7 @@ package view
 import (
 	"context"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
@@ -95,10 +96,17 @@ func (v *View) userByID(ctx context.Context, instanceID string, queries ...query
 	}
 
 	if err != nil {
+		sequence, err := v.GetLatestUserSequence(ctx, instanceID)
+		logging.WithFields("instanceID", instanceID).
+			OnError(err).
+			Errorf("could not get current sequence for userByID")
 		user = new(model.UserView)
+		if sequence != nil {
+			user.Sequence = sequence.Sequence
+		}
 	}
 
-	query, err := view.UserByIDQuery(queriedUser.ID, instanceID, user.ChangeDate, user.EventTypes())
+	query, err := view.UserByIDQuery(queriedUser.ID, instanceID, user.Sequence, user.EventTypes())
 	if err != nil {
 		return nil, err
 	}
@@ -158,4 +166,23 @@ func (v *View) UpdateOrgOwnerRemovedUsers(event eventstore.Event) error {
 		return err
 	}
 	return nil
+}
+
+func (v *View) GetLatestUserSequence(ctx context.Context, instanceID string) (_ *query.CurrentState, err error) {
+	q := &query.CurrentStateSearchQueries{
+		Queries: make([]query.SearchQuery, 2),
+	}
+	q.Queries[0], err = query.NewCurrentStatesInstanceIDSearchQuery(instanceID)
+	if err != nil {
+		return nil, err
+	}
+	q.Queries[1], err = query.NewCurrentStatesProjectionSearchQuery(userTable)
+	if err != nil {
+		return nil, err
+	}
+	states, err := v.query.SearchCurrentStates(ctx, q)
+	if err != nil || states.SearchResponse.Count == 0 {
+		return nil, err
+	}
+	return states.CurrentStates[0], nil
 }

@@ -85,7 +85,7 @@ func (v *View) GetLatestRefreshTokenSequence(ctx context.Context) (_ *query.Curr
 	if err != nil {
 		return nil, err
 	}
-	q.Queries[1], err = query.NewCurrentStatesProjectionSearchQuery(tokenTable)
+	q.Queries[1], err = query.NewCurrentStatesProjectionSearchQuery(refreshTokenTable)
 	if err != nil {
 		return nil, err
 	}

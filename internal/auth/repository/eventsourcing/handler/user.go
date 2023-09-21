@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
@@ -543,7 +542,7 @@ func (u *User) loginNameInformation(ctx context.Context, orgID string, instanceI
 }
 
 func (u *User) userFromEventstore(agg *eventstore.Aggregate, eventTypes []eventstore.EventType) (*view_model.UserView, error) {
-	query, err := usr_view.UserByIDQuery(agg.ID, agg.InstanceID, time.Time{}, eventTypes)
+	query, err := usr_view.UserByIDQuery(agg.ID, agg.InstanceID, 0, eventTypes)
 	if err != nil {
 		return nil, err
 	}
