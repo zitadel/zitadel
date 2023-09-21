@@ -494,6 +494,7 @@
       "LASTNAME": "Cognome",
       "NICKNAME": "Soprannome",
       "DISPLAYNAME": "DisplayName",
+      "PREFERREDLOGINNAME": "Nome di accesso preferito",
       "PREFERRED_LANGUAGE": "Lingua",
       "GENDER": "Genere",
       "PASSWORD": "Password",

@@ -489,6 +489,7 @@
       "LASTNAME": "Фамилия",
       "NICKNAME": "Псевдоним",
       "DISPLAYNAME": "Екранно име",
+      "PREFERREDLOGINNAME": "Предпочитано име за вход",
       "PREFERRED_LANGUAGE": "език",
       "GENDER": "Пол",
       "PASSWORD": "Парола",
