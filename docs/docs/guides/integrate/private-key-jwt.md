@@ -1,5 +1,6 @@
 ---
-title: Private Key JWT
+title: Service Users in ZITADEL
+sidebar_label: Service Users
 ---
 
 This is a guide on how to create service users in ZITADEL. You can read more about users [here](/concepts/structure/users.md).
@@ -67,7 +68,7 @@ Payload
 {
     "iss": "100507859606888466",
     "sub": "100507859606888466",
-    "aud": "https://{your_domain}.zitadel.cloud",
+    "aud": "https://$CUSTOM-DOMAIN",
     "iat": [Current UTC timestamp, e.g. 1605179982, max. 1 hour ago],
     "exp": [UTC timestamp, e.g. 1605183582]
 }
@@ -89,7 +90,7 @@ With the encoded JWT from the prior step, you will need to craft a POST request 
 
 ```bash
 curl --request POST \
-  --url https://{your_domain}.zitadel.cloud/oauth/v2/token \
+  --url https:/$CUSTOM-DOMAIN/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
   --data scope='openid profile email' \
@@ -121,7 +122,7 @@ For this example let's call the userinfo endpoint to verify that our access toke
 
 ```bash
 curl --request POST \
-  --url https://{your_domain}.zitadel.cloud/oidc/v1/userinfo \
+  --url $CUSTOM-DOMAIN/oidc/v1/userinfo \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header 'Authorization: Bearer MtjHodGy4zxKylDOhg6kW90WeEQs2q...'
 ```
@@ -134,7 +135,7 @@ Content-Type: application/json
 
 {
   "name": "MyServiceUser",
-  "preferred_username": "service_user@{your_domain}.zitadel.cloud",
+  "preferred_username": "service_user@$CUSTOM-DOMAIN",
   "updated_at": 1616417938
 }
 ```

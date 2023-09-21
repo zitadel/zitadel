@@ -1,5 +1,6 @@
 ---
-title: Actions
+title: ZITADEL Actions
+sidebar_label: Actions
 ---
 
 By using ZITADEL actions, you can manipulate ZITADELs behavior on specific Events.
