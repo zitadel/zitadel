@@ -14,12 +14,13 @@ import (
 
 type quotaWriteModel struct {
 	eventstore.WriteModel
-	unit          quota.Unit
-	from          time.Time
-	resetInterval time.Duration
-	amount        uint64
-	limit         bool
-	notifications []*quota.SetEventNotification
+	rollingAggregateID string
+	unit               quota.Unit
+	from               time.Time
+	resetInterval      time.Duration
+	amount             uint64
+	limit              bool
+	notifications      []*quota.SetEventNotification
 }
 
 // newQuotaWriteModel aggregateId is filled by reducing unit matching events
@@ -53,7 +54,7 @@ func (wm *quotaWriteModel) Reduce() error {
 		wm.ChangeDate = event.CreationDate()
 		switch e := event.(type) {
 		case *quota.SetEvent:
-			wm.AggregateID = event.Aggregate().ID
+			wm.rollingAggregateID = e.Aggregate().ID
 			if e.Amount != nil {
 				wm.amount = *e.Amount
 			}
@@ -70,10 +71,15 @@ func (wm *quotaWriteModel) Reduce() error {
 				wm.notifications = *e.Notifications
 			}
 		case *quota.RemovedEvent:
-			wm.AggregateID = ""
+			wm.rollingAggregateID = ""
 		}
 	}
-	return wm.WriteModel.Reduce()
+	if err := wm.WriteModel.Reduce(); err != nil {
+		return err
+	}
+	// wm.WriteModel.Reduce() sets the aggregateID to the first event's aggregateID, but we need the last one
+	wm.AggregateID = wm.rollingAggregateID
+	return nil
 }
 
 // NewChanges returns all changes that need to be applied to the aggregate.
