@@ -1,11 +1,11 @@
 [
   {
-    "service": "zitadel.settings.v2alpha.SettingsService",
+    "service": "zitadel.settings.v2beta.SettingsService",
     "method": "GetBrandingSettings",
     "out": {}
   },
   {
-    "service": "zitadel.settings.v2alpha.SettingsService",
+    "service": "zitadel.settings.v2beta.SettingsService",
     "method": "GetLegalAndSupportSettings",
     "out": {
       "data": {
@@ -18,7 +18,7 @@
     }
   },
   {
-    "service": "zitadel.settings.v2alpha.SettingsService",
+    "service": "zitadel.settings.v2beta.SettingsService",
     "method": "GetActiveIdentityProviders",
     "out": {
       "data": {
@@ -33,7 +33,7 @@
     }
   },
   {
-    "service": "zitadel.settings.v2alpha.SettingsService",
+    "service": "zitadel.settings.v2beta.SettingsService",
     "method": "GetPasswordComplexitySettings",
     "out": {
       "data": {

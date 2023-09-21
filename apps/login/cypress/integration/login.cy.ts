@@ -2,7 +2,7 @@ import { stub } from "../support/mock";
 
 describe("login", () => {
   beforeEach(() => {
-    stub("zitadel.session.v2alpha.SessionService", "CreateSession", {
+    stub("zitadel.session.v2beta.SessionService", "CreateSession", {
       data: {
         details: {
           sequence: 859,
@@ -16,7 +16,7 @@ describe("login", () => {
       },
     });
 
-    stub("zitadel.session.v2alpha.SessionService", "GetSession", {
+    stub("zitadel.session.v2beta.SessionService", "GetSession", {
       data: {
         session: {
           id: "221394658884845598",
@@ -37,7 +37,7 @@ describe("login", () => {
       },
     });
 
-    stub("zitadel.settings.v2alpha.SettingsService", "GetLoginSettings", {
+    stub("zitadel.settings.v2beta.SettingsService", "GetLoginSettings", {
       data: {
         settings: {
           passkeysType: 1,
@@ -47,15 +47,11 @@ describe("login", () => {
   });
   describe("password login", () => {
     beforeEach(() => {
-      stub(
-        "zitadel.user.v2alpha.UserService",
-        "ListAuthenticationMethodTypes",
-        {
-          data: {
-            authMethodTypes: [1], // 1 for password authentication
-          },
-        }
-      );
+      stub("zitadel.user.v2beta.UserService", "ListAuthenticationMethodTypes", {
+        data: {
+          authMethodTypes: [1], // 1 for password authentication
+        },
+      });
     });
     it("should redirect a user with password authentication to /password", () => {
       cy.visit("/loginname?loginName=john%40zitadel.com&submit=true");
@@ -63,7 +59,7 @@ describe("login", () => {
     });
     describe("with passkey prompt", () => {
       beforeEach(() => {
-        stub("zitadel.session.v2alpha.SessionService", "SetSession", {
+        stub("zitadel.session.v2beta.SessionService", "SetSession", {
           data: {
             details: {
               sequence: 859,
@@ -90,15 +86,11 @@ describe("login", () => {
   });
   describe("passkey login", () => {
     beforeEach(() => {
-      stub(
-        "zitadel.user.v2alpha.UserService",
-        "ListAuthenticationMethodTypes",
-        {
-          data: {
-            authMethodTypes: [2], // 2 for passwordless authentication
-          },
-        }
-      );
+      stub("zitadel.user.v2beta.UserService", "ListAuthenticationMethodTypes", {
+        data: {
+          authMethodTypes: [2], // 2 for passwordless authentication
+        },
+      });
     });
     it("should redirect a user with passwordless authentication to /passkey/login", () => {
       cy.visit("/loginname?loginName=john%40zitadel.com&submit=true");

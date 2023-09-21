@@ -40,7 +40,6 @@
     "@zitadel/react": "workspace:*",
     "@zitadel/server": "workspace:*",
     "clsx": "1.2.1",
-    "date-fns": "2.29.3",
     "moment": "^2.29.4",
     "next": "13.4.12",
     "next-themes": "^0.2.1",
