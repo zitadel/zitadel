@@ -120,7 +120,7 @@ Errors:
       Empty: La password è vuota
       Invalid: La password non è valida
       NotSet: L'utente non ha impostato una password
-      NotChanged: Password non modificata
+      NotChanged: La nuova password non può essere uguale alla password attuale
       NotSupported: Codifica hash password non supportata
     PasswordComplexityPolicy:
       NotFound: Impostazioni di complessità password non trovati
