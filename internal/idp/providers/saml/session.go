@@ -44,7 +44,7 @@ func (s *Session) GetAuth(ctx context.Context) (string, bool) {
 
 // FetchUser implements the [idp.Session] interface.
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
-	if s.RequestID == "" && s.Request == nil {
+	if s.RequestID == "" || s.Request == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "SAML-d09hy0wkex", "Errors.Intent.ResponseInvalid")
 	}
 

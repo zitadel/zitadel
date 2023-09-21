@@ -483,5 +483,6 @@ func httpPostFormRequest(t *testing.T, callbackURL, relayState, response string)
 	req, err := http.NewRequest("POST", callbackURL, strings.NewReader(body.Encode()))
 	assert.NoError(t, err)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.ParseForm()
 	return req
 }
