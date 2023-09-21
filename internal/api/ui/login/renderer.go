@@ -506,25 +506,13 @@ func (l *Login) getOrgID(r *http.Request, authReq *domain.AuthRequest) string {
 }
 
 func (l *Login) getPrivateLabelingID(r *http.Request, authReq *domain.AuthRequest) string {
-	privateLabelingOrgID := authz.GetInstance(r.Context()).InstanceID()
 	if authReq == nil {
 		if id := r.FormValue(queryOrgID); id != "" {
 			return id
 		}
-		return privateLabelingOrgID
+		return authz.GetInstance(r.Context()).DefaultOrganisationID()
 	}
-	if authReq.PrivateLabelingSetting != domain.PrivateLabelingSettingUnspecified {
-		privateLabelingOrgID = authReq.ApplicationResourceOwner
-	}
-	if authReq.PrivateLabelingSetting == domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy || authReq.PrivateLabelingSetting == domain.PrivateLabelingSettingUnspecified {
-		if authReq.UserOrgID != "" {
-			privateLabelingOrgID = authReq.UserOrgID
-		}
-	}
-	if authReq.RequestedOrgID != "" {
-		privateLabelingOrgID = authReq.RequestedOrgID
-	}
-	return privateLabelingOrgID
+	return authReq.PrivateLabelingOrgID(r.Context())
 }
 
 func (l *Login) getOrgName(authReq *domain.AuthRequest) string {

@@ -650,7 +650,10 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		orgID = request.UserOrgID
 	}
 	if orgID == "" {
-		orgID = authz.GetInstance(ctx).InstanceID()
+		orgID = authz.GetInstance(ctx).DefaultOrganisationID()
+		if featureClient.has(ctx, "backward") {
+			orgID = authz.GetInstance(ctx).InstanceID()
+		}
 	}
 
 	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
@@ -671,19 +674,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		return err
 	}
 	request.PrivacyPolicy = privacyPolicy
-	privateLabelingOrgID := authz.GetInstance(ctx).InstanceID()
-	if request.PrivateLabelingSetting != domain.PrivateLabelingSettingUnspecified {
-		privateLabelingOrgID = request.ApplicationResourceOwner
-	}
-	if request.PrivateLabelingSetting == domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy || request.PrivateLabelingSetting == domain.PrivateLabelingSettingUnspecified {
-		if request.UserOrgID != "" {
-			privateLabelingOrgID = request.UserOrgID
-		}
-	}
-	if request.RequestedOrgID != "" {
-		privateLabelingOrgID = request.RequestedOrgID
-	}
-	labelPolicy, err := repo.getLabelPolicy(ctx, privateLabelingOrgID)
+	labelPolicy, err := repo.getLabelPolicy(ctx, request.PrivateLabelingOrgID(ctx))
 	if err != nil {
 		return err
 	}
