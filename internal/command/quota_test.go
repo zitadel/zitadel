@@ -339,7 +339,6 @@ func TestQuota_SetQuota(t *testing.T) {
 						),
 					),
 				),
-				idGenerator: id_mock.NewIDGenerator(t),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
