@@ -14,11 +14,13 @@ type InstanceDebugNotificationLogWriteModel struct {
 }
 
 func NewInstanceDebugNotificationLogWriteModel(ctx context.Context) *InstanceDebugNotificationLogWriteModel {
+	instanceID := authz.GetInstance(ctx).InstanceID()
 	return &InstanceDebugNotificationLogWriteModel{
 		DebugNotificationWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   authz.GetInstance(ctx).InstanceID(),
-				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
+				InstanceID:    instanceID,
 			},
 		},
 	}

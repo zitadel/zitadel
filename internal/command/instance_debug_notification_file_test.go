@@ -27,6 +27,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderFile(t *testing.T) {
 		want *domain.ObjectDetails
 		err  func(error) bool
 	}
+	ctx := authz.WithInstanceID(context.Background(), "INSTANCE")
 	tests := []struct {
 		name   string
 		fields fields
@@ -40,7 +41,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderFile(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewDebugNotificationProviderFileAddedEvent(context.Background(),
+							instance.NewDebugNotificationProviderFileAddedEvent(ctx,
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
@@ -49,7 +50,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderFile(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: ctx,
 				provider: &fs.Config{
 					Compact: true,
 					Enabled: true,
@@ -66,7 +67,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderFile(t *testing.T) {
 					t,
 					expectFilter(),
 					expectPush(
-						instance.NewDebugNotificationProviderFileAddedEvent(context.Background(),
+						instance.NewDebugNotificationProviderFileAddedEvent(ctx,
 							&instance.NewAggregate("INSTANCE").Aggregate,
 							true,
 						),
@@ -74,7 +75,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderFile(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				ctx: authz.WithInstanceID(ctx, "INSTANCE"),
 				provider: &fs.Config{
 					Compact: true,
 				},
