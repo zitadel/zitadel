@@ -1113,8 +1113,18 @@ func (repo *AuthRequestRepo) nextStepsUser(ctx context.Context, request *domain.
 		if len(steps) > 0 {
 			return steps, nil
 		}
-		// a single user session was found, use that automatically
+		// the single user session was inactive
+		if users[0].UserSessionState != domain.UserSessionStateActive {
+			return append(steps, &domain.SelectUserStep{Users: users}), nil
+		}
+		// a single active user session was found, use that automatically
 		request.SetUserInfo(users[0].UserID, users[0].UserName, users[0].LoginName, users[0].DisplayName, users[0].AvatarKey, users[0].ResourceOwner)
+		if err = repo.fillPolicies(ctx, request); err != nil {
+			return nil, err
+		}
+		if err = repo.AuthRequests.UpdateAuthRequest(ctx, request); err != nil {
+			return nil, err
+		}
 	}
 	return steps, nil
 }
