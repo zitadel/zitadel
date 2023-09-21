@@ -83,7 +83,7 @@ func (wm *quotaWriteModel) Reduce() error {
 }
 
 // NewChanges returns all changes that need to be applied to the aggregate.
-// If wm is nil or inactive, all quota properties are set.
+// If createNew is true, all quota properties are set.
 func (wm *quotaWriteModel) NewChanges(
 	idGenerator id.Generator,
 	createNew bool,
