@@ -215,7 +215,6 @@ func (s *UserSession) Reducers() []handler.AggregateReducer {
 	}
 }
 
-
 func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err error) {
 	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
 		var session *view_model.UserSessionView
@@ -275,13 +274,8 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			if err != nil || len(sessions) == 0 {
 				return err
 			}
-			for _, session := range sessions {
-				if err := session.AppendEvent(event); err != nil {
-					return err
-				}
-				if err := u.fillUserInfo(session); err != nil {
-					return err
-				}
+			if err = u.appendEventOnSessions(sessions, event); err != nil {
+				return err
 			}
 			if err = u.view.PutUserSessions(sessions); err != nil {
 				return err
@@ -299,6 +293,18 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			return nil
 		}
 	}), nil
+}
+
+func (u *UserSession) appendEventOnSessions(sessions []*view_model.UserSessionView, event eventstore.Event) error {
+	for _, session := range sessions {
+		if err := session.AppendEvent(event); err != nil {
+			return err
+		}
+		if err := u.fillUserInfo(session); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (u *UserSession) updateSession(session *view_model.UserSessionView, event eventstore.Event) error {
