@@ -2,7 +2,7 @@ module.exports = {
   branches: [
     { name: "next" },
     { name: "next-rc", prerelease: "rc" },
-    { name: "update-quotas", prerelease: "2.37.2-ignore-me" },
+    { name: "update-quotas", prerelease: "set-quotas" },
   ],
   plugins: [
     "@semantic-release/commit-analyzer",
@@ -10,6 +10,7 @@ module.exports = {
     [
       "@semantic-release/github",
       {
+        successComment: false,
         assets: [
           {
             path: ".artifacts/zitadel-linux-amd64/zitadel-linux-amd64.tar.gz",
