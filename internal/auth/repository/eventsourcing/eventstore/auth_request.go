@@ -50,6 +50,7 @@ type AuthRequestRepo struct {
 	UserGrantProvider         userGrantProvider
 	ProjectProvider           projectProvider
 	ApplicationProvider       applicationProvider
+	CustomTextProvider        customTextProvider
 
 	IdGenerator id.Generator
 }
@@ -113,6 +114,10 @@ type projectProvider interface {
 
 type applicationProvider interface {
 	AppByOIDCClientID(context.Context, string, bool) (*query.App, error)
+}
+
+type customTextProvider interface {
+	CustomTextListByTemplate(ctx context.Context, aggregateID string, text string, withOwnerRemoved bool) (texts *query.CustomTexts, err error)
 }
 
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
@@ -1325,7 +1330,7 @@ func labelPolicyToDomain(p *query.LabelPolicy) *domain.LabelPolicy {
 }
 
 func (repo *AuthRequestRepo) getLoginTexts(ctx context.Context, aggregateID string) ([]*domain.CustomText, error) {
-	loginTexts, err := repo.Query.CustomTextListByTemplate(ctx, aggregateID, domain.LoginCustomText, false)
+	loginTexts, err := repo.CustomTextProvider.CustomTextListByTemplate(ctx, aggregateID, domain.LoginCustomText, false)
 	if err != nil {
 		return nil, err
 	}
