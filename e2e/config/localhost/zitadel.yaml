@@ -17,19 +17,6 @@ FirstInstance:
     Human:
       PasswordChangeRequired: false
 
-LogStore:
-  Access:
-    Database:
-      Enabled: true
-      Debounce:
-        MinFrequency: 0s
-        MaxBulkSize: 0
-  Execution:
-    Database:
-      Enabled: true
-    Stdout:
-      Enabled: true
-
 Console:
   InstanceManagementURL: "https://example.com/instances/{{.InstanceID}}"
 
@@ -40,6 +27,10 @@ Projections:
 
 Quotas:
   Access:
+    Enabled: true
+    Debounce:
+      MinFrequency: 0s
+      MaxBulkSize: 0
     ExhaustedCookieKey: "zitadel.quota.limiting"
     ExhaustedCookieMaxAge: "600s"
 
