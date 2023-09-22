@@ -203,7 +203,7 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 		wantEventPayloadJSON: `{"unit":0}`,
 		wantErr:              assert.NoError,
 	}, {
-		name: "change notification order",
+		name: "change nothing but notification order",
 		fields: fields{
 			amount:        5,
 			from:          time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
