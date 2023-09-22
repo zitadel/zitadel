@@ -203,6 +203,43 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 		wantEventPayloadJSON: `{"unit":0}`,
 		wantErr:              assert.NoError,
 	}, {
+		name: "change notification order",
+		fields: fields{
+			amount:        5,
+			from:          time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+			resetInterval: time.Hour,
+			limit:         true,
+			notifications: []*quota.SetEventNotification{{
+				ID:      "notification1",
+				Percent: 10,
+				Repeat:  true,
+				CallURL: "https://call.url",
+			}, {
+				ID:      "notification2",
+				Percent: 10,
+				Repeat:  false,
+				CallURL: "https://call.url",
+			}},
+		},
+		args: args{
+			amount:        5,
+			from:          time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+			resetInterval: time.Hour,
+			limit:         true,
+			notifications: []*QuotaNotification{{
+				Percent: 10,
+				Repeat:  false,
+				CallURL: "https://call.url",
+			}, {
+				Percent: 10,
+				Repeat:  true,
+				CallURL: "https://call.url",
+			}},
+			idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "newnotification1", "newnotification2"),
+		},
+		wantEventPayloadJSON: `{"unit":0}`,
+		wantErr:              assert.NoError,
+	}, {
 		name: "change notification to zero value",
 		fields: fields{
 			amount:        5,
