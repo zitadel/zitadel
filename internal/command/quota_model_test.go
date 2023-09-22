@@ -331,7 +331,7 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 			ResetInterval: durationPtr(0),
 			Amount:        uint64Ptr(0),
 			Limit:         boolPtr(false),
-			//			Notifications: &[]*quota.SetEventNotification{},
+			Notifications: &[]*quota.SetEventNotification{},
 		},
 		wantErr: assert.NoError,
 	},
