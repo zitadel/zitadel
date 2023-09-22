@@ -54,9 +54,11 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplPasswordlessRegistration:     "passwordless_registration.html",
 		tmplPasswordlessRegistrationDone: "passwordless_registration_done.html",
 		tmplPasswordlessPrompt:           "passwordless_prompt.html",
-		tmplMFAVerify:                    "mfa_verify_otp.html",
+		tmplMFAVerify:                    "mfa_verify_totp.html",
 		tmplMFAPrompt:                    "mfa_prompt.html",
 		tmplMFAInitVerify:                "mfa_init_otp.html",
+		tmplMFASMSInit:                   "mfa_init_otp_sms.html",
+		tmplOTPVerification:              "mfa_verify_otp.html",
 		tmplMFAU2FInit:                   "mfa_init_u2f.html",
 		tmplU2FVerification:              "mfa_verification_u2f.html",
 		tmplMFAInitDone:                  "mfa_init_done.html",
@@ -169,6 +171,12 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		},
 		"mfaInitVerifyUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMFAInitVerify)
+		},
+		"mfaInitSMSVerifyUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointMFASMSInitVerify)
+		},
+		"mfaOTPVerifyUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointMFAOTPVerify)
 		},
 		"mfaInitU2FVerifyUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMFAInitU2FVerify)

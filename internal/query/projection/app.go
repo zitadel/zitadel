@@ -598,13 +598,8 @@ func (p *appProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Sta
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Hyd1f", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(AppColumnChangeDate, e.CreationDate()),
-			handler.NewCol(AppColumnSequence, e.Sequence()),
-			handler.NewCol(AppColumnOwnerRemoved, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(AppColumnResourceOwner, e.Aggregate().ID),

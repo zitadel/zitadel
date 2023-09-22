@@ -18,9 +18,9 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
+	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 var (
@@ -57,7 +57,7 @@ func TestMain(m *testing.M) {
 func Test_ZITADEL_API_missing_audience_scope(t *testing.T) {
 	clientID := createClient(t)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -92,7 +92,6 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 				Search: &session.CheckUser_UserId{UserId: User.GetUserId()},
 			},
 		},
-		Domain: Tester.Config.ExternalDomain,
 	})
 	require.NoError(t, err)
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -149,7 +148,7 @@ func Test_ZITADEL_API_missing_mfa(t *testing.T) {
 func Test_ZITADEL_API_success(t *testing.T) {
 	clientID := createClient(t)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, zitadelAudienceScope)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -178,7 +177,7 @@ func Test_ZITADEL_API_success(t *testing.T) {
 func Test_ZITADEL_API_inactive_access_token(t *testing.T) {
 	clientID := createClient(t)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess, zitadelAudienceScope)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -220,7 +219,7 @@ func Test_ZITADEL_API_terminated_session(t *testing.T) {
 	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess, zitadelAudienceScope)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{

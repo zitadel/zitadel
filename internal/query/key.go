@@ -177,7 +177,7 @@ var (
 	}
 )
 
-func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time) (_ *PublicKeys, err error) {
+func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time) (keys *PublicKeys, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -194,14 +194,14 @@ func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time) (_ *PublicK
 		return nil, errors.ThrowInternal(err, "QUERY-SDFfg", "Errors.Query.SQLStatement")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		keys, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Sghn4", "Errors.Internal")
 	}
-	keys, err := scan(rows)
-	if err != nil {
-		return nil, err
-	}
+
 	keys.LatestSequence, err = q.latestSequence(ctx, keyTable)
 	if !errors.IsNotFound(err) {
 		return keys, err
@@ -209,7 +209,7 @@ func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time) (_ *PublicK
 	return keys, nil
 }
 
-func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (_ *PrivateKeys, err error) {
+func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (keys *PrivateKeys, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -229,13 +229,12 @@ func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (_ *
 		return nil, errors.ThrowInternal(err, "QUERY-SDff2", "Errors.Query.SQLStatement")
 	}
 
-	rows, err := q.client.QueryContext(ctx, query, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		keys, err = scan(rows)
+		return err
+	}, query, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-WRFG4", "Errors.Internal")
-	}
-	keys, err := scan(rows)
-	if err != nil {
-		return nil, err
 	}
 	keys.LatestSequence, err = q.latestSequence(ctx, keyTable)
 	if !errors.IsNotFound(err) {

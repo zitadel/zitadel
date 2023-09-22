@@ -163,13 +163,8 @@ func (p *userMetadataProjection) reduceOwnerRemoved(event eventstore.Event) (*ha
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-oqwul", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(UserMetadataColumnChangeDate, e.CreationDate()),
-			handler.NewCol(UserMetadataColumnSequence, e.Sequence()),
-			handler.NewCol(UserMetadataColumnOwnerRemoved, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(UserMetadataColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(UserMetadataColumnResourceOwner, e.Aggregate().ID),

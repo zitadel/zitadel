@@ -132,7 +132,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*CurrentSequences)(nil),
 		},
 	}
 	for _, tt := range tests {

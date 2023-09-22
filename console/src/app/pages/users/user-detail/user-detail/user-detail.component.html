@@ -78,7 +78,7 @@
 
         <ng-container *ngIf="currentSetting === 'general'">
           <ng-template cnslHasRole [hasRole]="['user.read$', 'user.read:' + user.id]">
-            <cnsl-card *ngIf="user.human" title="{{ 'USER.PROFILE.TITLE' | translate }}">
+            <cnsl-card *ngIf="user.human" title="{{ user.preferredLoginName }} - {{ 'USER.PROFILE.TITLE' | translate }}">
               <cnsl-detail-form
                 [preferredLoginName]="user.preferredLoginName"
                 [disabled]="(canWrite$ | async) === false"

@@ -1,16 +1,15 @@
 ---
-title: Quick start guide 
+title: The ZITADEL Quick Start Guide
+sidebar_label: Quick Start Guide
 ---
 
-import VSCodeFolderView from "../../../static/img/guides/quickstart/vscode1.png"; 
-
+import VSCodeFolderView from "../../../static/img/guides/quickstart/vscode1.png";
 
 ## Introduction
 
-In this quick start guide, we will be learning some fundamentals on how to set up ZITADEL for user management and application security. Thereafter, we will secure a React-based Single Page Application (SPA) using ZITADEL. 
+In this quick start guide, we will be learning some fundamentals on how to set up ZITADEL for user management and application security. Thereafter, we will secure a React-based Single Page Application (SPA) using ZITADEL.
 
-The sample application allows users to securely log in to ZITADEL using the OIDC Proof Key for Code Exchange (PKCE)  flow. This flow ensures that the authentication process is secure by using a code verifier and a code challenge, which are sent to ZITADEL to obtain an access token. The access token is then used by the app to access the userinfo endpoint to retrieve and display information about the logged-in user. The app also has a logout feature that allows users to end their session and clear their access token. Overall, the app provides a simple and secure way for users to authenticate and access protected resources within ZITADEL.
-
+The sample application allows users to securely log in to ZITADEL using the OIDC Proof Key for Code Exchange (PKCE) flow. This flow ensures that the authentication process is secure by using a code verifier and a code challenge, which are sent to ZITADEL to obtain an access token. The access token is then used by the app to access the userinfo endpoint to retrieve and display information about the logged-in user. The app also has a logout feature that allows users to end their session and clear their access token. Overall, the app provides a simple and secure way for users to authenticate and access protected resources within ZITADEL.
 
 ## ZITADEL terminology: instances, organizations, projects, users, roles, authorizations and apps
 
@@ -18,15 +17,48 @@ In ZITADEL, instances, organizations, projects, users, roles, and apps are the m
 
 The order of creation for the above components would typically be as follows:
 
-
 <ul>
-<li><b>Instance</b>: An instance is a top-level entity in ZITADEL that represents a deployment of ZITADEL for a registered account.  An instance can have one or more organizations.</li> 
-<li><b>Organization</b>: An organization is a logical separation within an instance that represents a company/organization and can have one or more projects. The default organization is the one that is provided at the start of the account registration process. Typically, an instance would have one organization, but in B2B scenarios, an instance would have more than one.</li>  
-<li><b>Project</b>: A project is a logical separation within an organization and is a container for apps, roles and authorization policies for the resources it contains.</li> 
-<li><b>Users</b>: Users are created at the organizational level and are granted access to the resources within projects. They can be assigned different roles, which define the permissions and privileges they have within the project.</li> 
-<li><b>Roles</b>: Roles are the sets of permissions and privileges that are assigned to users within a project.</li> 
-<li><b>Authorizations</b>: Authorization policies in ZITADEL are defined at the project level, which means that they apply to all the resources within the project. These policies are based on the roles that are assigned to users, and they determine the actions that users are allowed to perform within the project.</li> 
-<li><b>Apps</b>: Apps are the applications that are developed and managed within a project. They can be client apps that use the resources within the project, or they can be backend apps that provide the resources for other apps to use. The apps can use the OIDC or SAML protocol to authenticate users to access protected resources.</li> 
+  <li>
+    <b>Instance</b>: An instance is a top-level entity in ZITADEL that
+    represents a deployment of ZITADEL for a registered account. An instance can
+    have one or more organizations.
+  </li>
+  <li>
+    <b>Organization</b>: An organization is a logical separation within an
+    instance that represents a company/organization and can have one or more
+    projects. The default organization is the one that is provided at the start
+    of the account registration process. Typically, an instance would have one
+    organization, but in B2B scenarios, an instance would have more than one.
+  </li>
+  <li>
+    <b>Project</b>: A project is a logical separation within an organization and
+    is a container for apps, roles and authorization policies for the resources
+    it contains.
+  </li>
+  <li>
+    <b>Users</b>: Users are created at the organizational level and are granted
+    access to the resources within projects. They can be assigned different
+    roles, which define the permissions and privileges they have within the
+    project.
+  </li>
+  <li>
+    <b>Roles</b>: Roles are the sets of permissions and privileges that are
+    assigned to users within a project.
+  </li>
+  <li>
+    <b>Authorizations</b>: Authorization policies in ZITADEL are defined at the
+    project level, which means that they apply to all the resources within the
+    project. These policies are based on the roles that are assigned to users,
+    and they determine the actions that users are allowed to perform within the
+    project.
+  </li>
+  <li>
+    <b>Apps</b>: Apps are the applications that are developed and managed within
+    a project. They can be client apps that use the resources within the
+    project, or they can be backend apps that provide the resources for other
+    apps to use. The apps can use the OIDC or SAML protocol to authenticate
+    users to access protected resources.
+  </li>
 </ul>
 
 The order of creation for the above components may vary depending on the specific needs and requirements of the organization.
@@ -35,87 +67,107 @@ The order of creation for the above components may vary depending on the specifi
 
 ### 1. Sign up for the ZITADEL Cloud customer portal and register your organization
 
-1. Go to [zitadel.com](http://zitadel.com) and click on “Start for FREE”.
+1. Go to [zitadel.com](http://zitadel.com) and click “Start for FREE”.
 
-![Home Page](/img/guides/quickstart/1.png)
+![Home Page](/img/guides/quickstart/v3_1.png)
 
-2. Enter your details as shown below and click the "Let's go" button.
 
-![Registration Page](/img/guides/quickstart/2.png)
+2. You can sign up by entering your email address or via social login, e.g., Google. Let's sign up using an email address. Enter your email address and click "Sign in with Email".
 
-3. You will receive a verification email to verify the user for the Customer Portal. Click the “Sign in” button. 
+![Registration Page](/img/guides/quickstart/v3_2.png)
 
-![Congratulations Page](/img/guides/quickstart/3.png)
 
-4. You will be prompted for a code, which has been emailed to you. 
+3. Next, complete your details and click "Continue".
 
-![Code](/img/guides/quickstart/4.png)
+![Congratulations Page](/img/guides/quickstart/v3_3.png)
 
-5.  Check your inbox for the code. You can either click the “Finish initialization” button in the email itself or copy the code and return to the previous page. In this guide, we will copy the code and then continue from where we left off.
 
-![Inbox](/img/guides/quickstart/5.png)
+4. Add a password as shown below. Adhere to the password requirements, agree to the terms of service and privacy policy by selecting the checkbox, and click the "Get started" button.
 
-6. Paste the code and add a password as shown below. Click on the “next” button. 
+![Code](/img/guides/quickstart/v3_4.png)
 
-![Code](/img/guides/quickstart/6.png)
 
-7. The user is now activated. Click on “next” to log in.
+5. Enter your login data. Provide the password you just created. Click "next". 
 
-![User Activated](/img/guides/quickstart/7.png)
+![Inbox](/img/guides/quickstart/v3_5.png)
 
-8. Login with the username and password that you provided. Click “next”. 
 
-![Login](/img/guides/quickstart/8.png)
+6. You will now have to verify your email address.
 
-9. You should set up 2-factor authentication. However, we will skip this step for now.  Click on “skip”. 
+![Verify Email](/img/guides/quickstart/v3_17.png)
 
-![2-factor Authentication](/img/guides/quickstart/9.png)
 
-10. You will now be asked to create an instance.
+6. Go to your inbox and open the email from ZITADEL and click the "Verify email" button.
 
-![Create Instance](/img/guides/quickstart/10.png)
+![Code](/img/guides/quickstart/v3_6.png)
+
+
+7. The user is now activated. Click the "login" button.
+
+![User Activated](/img/guides/quickstart/v3_7.png)
+
+
+8. Now you will have to log in with the username and password that you provided. Click “Sign in with Email”.
+
+![Login](/img/guides/quickstart/v3_8.png)
+
+
+9. You will now be asked to create an instance. 
+
+![2-factor Authentication](/img/guides/quickstart/v3_9.png)
+
 
 ### 2. Create your first instance
 
-As a user of the ZITADEL Cloud Customer Portal, you now can create multiple instances to suit your specific needs. This includes instances for development, production, or user acceptance testing, as well as instances for different clients or applications. For example, you might create an instance for each product in a B2C scenario, or an instance for each tenant or customer in a B2B scenario. The possibilities are endless. You can create a pay-as-you-go instance for production purposes. 
+As a user of the ZITADEL Cloud Customer Portal, you now can create multiple instances to suit your specific needs. This includes instances for development, production, or user acceptance testing, as well as instances for different clients or applications. For example, you might create an instance for each product in a B2C scenario, or an instance for each tenant or customer in a B2B scenario. The possibilities are endless. You can create a pay-as-you-go instance for production purposes.
 
 1. Let’s create an instance. Click on “Create new instance”.
 
-![Create Instance](/img/guides/quickstart/10.png)
+![2-factor Authentication](/img/guides/quickstart/v3_9.png)
 
-2. Provide a name for your instance, select the “Free” plan and click on the “Continue” button at the bottom of this screen.  
 
-![Select Tier](/img/guides/quickstart/v2_1.png)
+
+2. Provide a name for your instance, select the “Free” plan and click on the “Continue” button at the bottom of this screen.
+
+![Select Tier](/img/guides/quickstart/v3_10.png)
+
 
 3. Next, you should see the following screen. Add a username and password for the instance manager and click "Create".
 
-![Instance Details](/img/guides/quickstart/v2_2.png)
 
-4. The instance creation process will take a few seconds.  
+![Instance Details](/img/guides/quickstart/v3_11.png)
 
-![Instance Details](/img/guides/quickstart/v2_3.png)
 
-5. Now you will see the details of your first instance. You can click on "Visit" at the top right to go to your instance. 
+4. The instance creation process will take a few seconds.
 
-![Instance Details](/img/guides/quickstart/v2_4.png)
+![Instance Details](/img/guides/quickstart/v3_12.png)
 
-6. To log in to your instance, provide the username and password, and click “next”. 
 
-![Instance Details](/img/guides/quickstart/v2_5.png)
+5. Now you will see the details of your first instance. You can click on "Visit" at the top right to go to your instance.
 
-7. Skip the 2-factor authentication for now by clicking “skip”. 
+![Instance Details](/img/guides/quickstart/v3_13.png)
 
-![Instance Details](/img/guides/quickstart/v2_6.png)
 
-10. And there you go! You now have access to your instance.
+6. To log in to your instance, provide the username and password, and click “next”.
 
-![Access Instance](/img/guides/quickstart/v2_7.png)
+![Instance Details](/img/guides/quickstart/v3_14.png)
+
+
+7. Skip the 2-factor authentication for now by clicking “skip”.
+
+![Instance Details](/img/guides/quickstart/v3_15.png)
+
+8. And there you go! You now have access to your instance.
+
+![Instance Details](/img/guides/quickstart/v3_16.png)
+
 
 ### 3. Create your first project
 
-1. To create a project in the instance you just created, click on “Create Project”. 
+1. To create a project in the instance you just created, click on “Create a project”.
 
-![Create Project](/img/guides/quickstart/19.png)
+![Create Project](/img/guides/quickstart/v3_16.png)
+
 
 2. Insert “Project1” (or any name of your choice) as the project’s name and click the “Continue” button.
 
@@ -129,19 +181,19 @@ As a user of the ZITADEL Cloud Customer Portal, you now can create multiple inst
 
 [Skip optional steps](quickstart/#7-create-an-application-in-your-project) and jump directly to the create application step.
 
-1. To add users, click on “Users” at the top menu. You will see that the user you already created is listed as a user here.  Click on the “New” button to create a new user.
+1. To add users, click on “Users” at the top menu. You will see that the user you already created is listed as a user here. Click on the “New” button to create a new user.
 
 ![Add User](/img/guides/quickstart/26.png)
 
-2. Let’s add another user as shown below. Fill in the user details as shown below and click on the “Create” button when you are done. 
+2. Let’s add another user as shown below. Fill in the user details as shown below and click on the “Create” button when you are done.
 
 ![Add User](/img/guides/quickstart/27.png)
 
-3. The newly created user details will be displayed as shown below. 
+3. The newly created user details will be displayed as shown below.
 
 ![User Info](/img/guides/quickstart/28.png)
 
-4. Once you navigate back to the "Users" view, you will see a list of all the users that have been added to your instance. If you need to add more users, you can do so. 
+4. Once you navigate back to the "Users" view, you will see a list of all the users that have been added to your instance. If you need to add more users, you can do so.
 
 ![User Info](/img/guides/quickstart/29.png)
 
@@ -177,7 +229,7 @@ As a user of the ZITADEL Cloud Customer Portal, you now can create multiple inst
 
 ![Add Authorization](/img/guides/quickstart/32.png)
 
-4. Let’s select the role “sales”.  Click on “Save”.
+4. Let’s select the role “sales”. Click on “Save”.
 
 ![Add Authorization](/img/guides/quickstart/33.png)
 
@@ -195,9 +247,9 @@ As a user of the ZITADEL Cloud Customer Portal, you now can create multiple inst
 
 ### 7. Create an application in your project
 
-We will now create an application in the project, which will allow our React client application to access protected resources through the use of the OpenID Connect (OIDC) protocol. 
+We will now create an application in the project, which will allow our React client application to access protected resources through the use of the OpenID Connect (OIDC) protocol.
 
-1. Go to “Projects” and click on “Project1”. 
+1. Go to “Projects” and click on “Project1”.
 
 ![Add Application](/img/guides/quickstart/38.png)
 
@@ -209,15 +261,15 @@ We will now create an application in the project, which will allow our React cli
 
 ![Add Application](/img/guides/quickstart/41.png)
 
-4. Select “PKCE” because we recommend the use of [Authorization Code](https://zitadel.com/docs/apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](https://zitadel.com/docs/apis/openidoauth/grant-types#authorization-code) for all web applications. More about the different app types can be found [here](https://zitadel.com/docs/guides/integrate/oauth-recommended-flows#different-client-profiles). Click on "Continue". 
+4. Select “PKCE” because we recommend the use of [Authorization Code](https://zitadel.com/docs/apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](https://zitadel.com/docs/apis/openidoauth/grant-types#authorization-code) for all web applications. More about the different app types can be found [here](https://zitadel.com/docs/guides/integrate/oauth-recommended-flows#different-client-profiles). Click on "Continue".
 
 ![Add Application](/img/guides/quickstart/42.png)
 
-5. The Redirect URL in your application is where the ZITADEL authorization server redirects the user after they have been authenticated. Set your “Redirect URI” to [http://localhost:3000/callback](http://localhost:3000/callback) and “Post Logout URI” to [http://localhost:3000/](http://localhost:3000/). Click on “Continue”. 
+5. The Redirect URL in your application is where the ZITADEL authorization server redirects the user after they have been authenticated. Set your “Redirect URI” to [http://localhost:3000/callback](http://localhost:3000/callback) and “Post Logout URI” to [http://localhost:3000/](http://localhost:3000/). Click on “Continue”.
 
 ![Add Application](/img/guides/quickstart/43.png)
 
-6. Now you will be presented with the details of your application for review. Click on “Create”. 
+6. Now you will be presented with the details of your application for review. Click on “Create”.
 
 ![Add Application](/img/guides/quickstart/44.png)
 
@@ -229,7 +281,7 @@ We will now create an application in the project, which will allow our React cli
 
 ![Add Application](/img/guides/quickstart/46.png)
 
-9. To proceed with HTTP, go to “Redirect Settings” on the left. 
+9. To proceed with HTTP, go to “Redirect Settings” on the left.
 
 ![Add Application](/img/guides/quickstart/47.png)
 
@@ -242,11 +294,12 @@ We will now create an application in the project, which will allow our React cli
 ![Add Application](/img/guides/quickstart/50.png)
 
 ### 8. Obtain ClientId and OIDC endpoints for your application {#referred1}
-You will need the ClientId and the OIDC endpoints (issuer and userinfo) when building your React application. The issuer URL is the base URL for the OIDC provider and includes the path to the OIDC discovery document, which contains information about the OIDC provider, including the authorization and token endpoints. By providing the issuer URL, you can use the OIDC library to automatically determine the endpoints for these requests. 
 
-The authorization endpoint is used to initiate the authorization process, the token endpoint is used to exchange authorization codes for access tokens, and the userinfo endpoint is used to retrieve information about the user. You need an access token to access the userinfo endpoint and other protected resources. 
+You will need the ClientId and the OIDC endpoints (issuer and userinfo) when building your React application. The issuer URL is the base URL for the OIDC provider and includes the path to the OIDC discovery document, which contains information about the OIDC provider, including the authorization and token endpoints. By providing the issuer URL, you can use the OIDC library to automatically determine the endpoints for these requests.
 
-1. Click on “Configurations” to access the Client ID as shown below: 
+The authorization endpoint is used to initiate the authorization process, the token endpoint is used to exchange authorization codes for access tokens, and the userinfo endpoint is used to retrieve information about the user. You need an access token to access the userinfo endpoint and other protected resources.
+
+1. Click on “Configurations” to access the Client ID as shown below:
 
 ![Get URLs](/img/guides/quickstart/51.png)
 
@@ -260,19 +313,19 @@ And with that, configuring ZITADEL for our application is complete. Now we can m
 
 ### 1. Functional requirements of the application
 
-1. The user navigates to the React app (client)  and clicks the "login" button.
+1. The user navigates to the React app (client) and clicks the "login" button.
 2. The app initiates the authorization process by redirecting the user’s browser to the authorization endpoint of the ZITADEL instance, along with the PKCE parameters (code challenge, and code challenge method).
 3. The user will see the ZITADEL login page, where the user can enter their credentials.
 4. After successful authentication, ZITADEL generates an authorization code and redirects the user back to the React app.
 5. The React app sends a request to the ZITADEL token endpoint, along with the authorization code and code verifier.
-6. ZITADEL verifies the code verifier to ensure that the authorization request is coming from the same client that initiated it.  If it is valid, ZITADEL returns an access token to the React app. 
+6. ZITADEL verifies the code verifier to ensure that the authorization request is coming from the same client that initiated it. If it is valid, ZITADEL returns an access token to the React app.
 7. The React app uses the access token to make a request to the userinfo endpoint, which is protected by the OIDC protocol.
 8. The userinfo endpoint returns information about the logged-in user, such as their name and email address.
 9. The React app displays this information to the user.
 10. When the user wants to log out, the React app sends a request to the ZITADEL logout endpoint, which clears the access token and ends the user's session.
-11. The user will be redirected to the login page of the app. 
+11. The user will be redirected to the login page of the app.
 
-***The scope of this application for this quick start guide is limited to user authentication and doesn't include role-based authentication, even though we previously discussed adding roles and users.***
+**_The scope of this application for this quick start guide is limited to user authentication and doesn't include role-based authentication, even though we previously discussed adding roles and users._**
 
 ### 2. Prerequisites
 
@@ -282,37 +335,37 @@ To install React, you will need to have Node.js installed on your system. You ca
 
 To install Visual Studio Code, go to their [website](https://code.visualstudio.com/) and download and install the version for your operating system.
 
-
 ### 3. Development
+
 #### 1. Create project
+
 1. Open a new terminal window in Visual Studio Code.
-2. Navigate to the folder where you want to create the React app. 
+2. Navigate to the folder where you want to create the React app.
 3. Run the following command to create a new React app named "react-oidc-zitadel":
 
-   ``` npx create-react-app react-oidc-zitadel ```
+   `npx create-react-app react-oidc-zitadel`
 
 4. Navigate to the "react-oidc-zitadel" folder:
 
-   ``` cd react-oidc-zitadel ```
+   `cd react-oidc-zitadel`
 
-This will create the following files in your project: 
+This will create the following files in your project:
 
 <img src={VSCodeFolderView} width="40%" height="40%" />
 
 5. The dependencies for this project include react-router-dom and oidc-client-ts. To include them in your React application, you will need to run the following command in your terminal:
 
-   ``` npm install react-router-dom oidc-client-ts ```
+   `npm install react-router-dom oidc-client-ts`
 
-
-#### 2. Add source files 
+#### 2. Add source files
 
 The code needed to run this project can be found [here](https://github.com/zitadel/react-user-authentication).
 
-1. Replace the content in your App.js file with the one provided below: 
+1. Replace the content in your App.js file with the one provided below:
 
-  [src/App.js](https://github.com/zitadel/react-user-authentication/blob/main/src/App.js): 
+[src/App.js](https://github.com/zitadel/react-user-authentication/blob/main/src/App.js):
 
-``` 
+```
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./components/Login";
@@ -372,23 +425,23 @@ function App() {
   );
 }
 
-export default App; 
+export default App;
 ```
 
 The App.js file is the root component of the React app that initializes the OIDC flow and manages the user's session. It does this by:
 
-- Importing the necessary libraries and components from the dependencies, including the ```oidc-client-ts``` library, the ```authConfig``` file with the OIDC configuration values, and the Login and Callback components.
-- Initializing a new ``UserManager`` instance with the OIDC configuration values from the authConfig file. The ``` UserManager``` instance manages the OIDC flow and stores the user's session information.
-- Defining two functions: ```authorize``` and ```clearAuth```. The ```authorize``` function initiates the OIDC flow when the user clicks the ```login``` button, while the ```clearAuth``` function ends the user's session when the user clicks the ```logout``` button.
-- Defining two state variables: ```authenticated``` and ```userInfo```. The authenticated variable is a boolean that indicates whether the user is authenticated or not, while the ```userInfo``` variable stores the user's information when they are authenticated.
-- Using the ```useEffect``` hook to retrieve the user's session information from the ```UserManager``` instance and updating the ```authenticated``` and ```userInfo``` state variables accordingly.
-- Defining the routes for the app using the ```react-router-dom``` library, including the ```/``` and ```/callback``` routes for the login and callback pages, respectively. The ```Login``` and ```Callback``` components handle the login and callback processes, respectively.
+- Importing the necessary libraries and components from the dependencies, including the `oidc-client-ts` library, the `authConfig` file with the OIDC configuration values, and the Login and Callback components.
+- Initializing a new `UserManager` instance with the OIDC configuration values from the authConfig file. The ` UserManager` instance manages the OIDC flow and stores the user's session information.
+- Defining two functions: `authorize` and `clearAuth`. The `authorize` function initiates the OIDC flow when the user clicks the `login` button, while the `clearAuth` function ends the user's session when the user clicks the `logout` button.
+- Defining two state variables: `authenticated` and `userInfo`. The authenticated variable is a boolean that indicates whether the user is authenticated or not, while the `userInfo` variable stores the user's information when they are authenticated.
+- Using the `useEffect` hook to retrieve the user's session information from the `UserManager` instance and updating the `authenticated` and `userInfo` state variables accordingly.
+- Defining the routes for the app using the `react-router-dom` library, including the `/` and `/callback` routes for the login and callback pages, respectively. The `Login` and `Callback` components handle the login and callback processes, respectively.
 
 2. Create a folder named components in the src directory. Create two files named Login.js and Callback.js.
 
-3. Paste the following code to Login.js. 
+3. Paste the following code to Login.js.
 
-  [src/components/Login.js](https://github.com/zitadel/react-user-authentication/blob/main/src/components/Login.js)
+[src/components/Login.js](https://github.com/zitadel/react-user-authentication/blob/main/src/components/Login.js)
 
 ```
 import { Navigate } from "react-router-dom";
@@ -417,11 +470,12 @@ const Login = ({ auth, handleLogin, userManager }) => {
 
 export default Login;
 ```
-The ```/``` route corresponds to the login page, which is rendered by the Login component. The Login(Login.js) component is a functional component that displays the login button and calls the ```handleLogin``` function (which corresponds to the ```authorize``` function defined in the App component) when the button is clicked. This initiates the OIDC flow by redirecting the user to the authorization endpoint. 
 
-4. Paste the following code to Callback.js. 
+The `/` route corresponds to the login page, which is rendered by the Login component. The Login(Login.js) component is a functional component that displays the login button and calls the `handleLogin` function (which corresponds to the `authorize` function defined in the App component) when the button is clicked. This initiates the OIDC flow by redirecting the user to the authorization endpoint.
 
-  [src/components/Callback.js](https://github.com/zitadel/react-user-authentication/blob/main/src/components/Callback.js)
+4. Paste the following code to Callback.js.
+
+[src/components/Callback.js](https://github.com/zitadel/react-user-authentication/blob/main/src/components/Callback.js)
 
 ```
 import React, { useEffect } from 'react';
@@ -451,6 +505,20 @@ const Callback = ({ auth, setAuth, userManager, userInfo, setUserInfo, handleLog
       }).catch((error) => {
         setAuth(false);
       });
+    } else if (auth === true && !userInfo) {
+      userManager.getUser().then((user) => {
+        const access_token = user.access_token;
+
+        fetch(authConfig.userinfo_endpoint, {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        })
+          .then((response) => response.json())
+          .then((userInfo) => {
+            setUserInfo(userInfo);
+          });
+      });
     }
   }, [auth, userManager, setAuth]);
 
@@ -478,11 +546,11 @@ const Callback = ({ auth, setAuth, userManager, userInfo, setUserInfo, handleLog
 export default Callback;
 ```
 
-The ```/callback``` route corresponds to the callback page, which is rendered by the Callback(Callback.js) component. The Callback component is also a functional component that handles the callback from the authorization server after the user logs in. It retrieves the authorization code from the URL, exchanges it for an access token and id token, and retrieves the user's information from the userinfo endpoint. It also sets the ```authenticated``` and ```userInfo``` state variables in the App(App.js) component and displays the ```logout``` button. When the ```logout``` button is clicked, the ```clearAuth``` function is called and the user's session is ended. The ```clearAuth``` function is defined in the App component and is called with no arguments. It initiates the end session flow by redirecting the user to the end session endpoint.
+The `/callback` route corresponds to the callback page, which is rendered by the Callback(Callback.js) component. The Callback component is also a functional component that handles the callback from the authorization server after the user logs in. It retrieves the authorization code from the URL, exchanges it for an access token and id token, and retrieves the user's information from the userinfo endpoint. It also sets the `authenticated` and `userInfo` state variables in the App(App.js) component and displays the `logout` button. When the `logout` button is clicked, the `clearAuth` function is called and the user's session is ended. The `clearAuth` function is defined in the App component and is called with no arguments. It initiates the end session flow by redirecting the user to the end session endpoint.
 
-5.  Create a new file in the src folder named authConfig.js and paste the following code to it. 
+5.  Create a new file in the src folder named authConfig.js and paste the following code to it.
 
-  [src/authConfig.js](https://github.com/zitadel/react-user-authentication/blob/main/src/authConfig.js)
+[src/authConfig.js](https://github.com/zitadel/react-user-authentication/blob/main/src/authConfig.js)
 
 ```
 const authConfig = {
@@ -498,26 +566,27 @@ const authConfig = {
   };
 
  export default authConfig;
- ```
+```
 
- The authConfig.js file exports an object with configuration values for the OIDC flow. These values are used to initialize the ```UserManager``` instance in the App component. The configuration values include the: 
-- authority (the URL of the authorization server). ***Don’t forget to replace the ```authority``` value with the “issuer URL” that you obtained from this [step](#referred1).*** 
-- client_id (the unique identifier for the client application). ***Don’t forget to replace the ```client_id``` with your “ClientId” that you obtained from this [step](#referred1).***  
+The authConfig.js file exports an object with configuration values for the OIDC flow. These values are used to initialize the `UserManager` instance in the App component. The configuration values include the:
+
+- authority (the URL of the authorization server). **_Don’t forget to replace the `authority` value with the “issuer URL” that you obtained from this [step](#referred1)._**
+- client_id (the unique identifier for the client application). **_Don’t forget to replace the `client_id` with your “ClientId” that you obtained from this [step](#referred1)._**
 - redirect_uri (the URL to redirect to after the authorization flow is complete)
 - response_type (the type of response expected from the authorization server)
 - scope (the permissions requested from the user)
 - post_logout_redirect_uri (the URL to redirect to after the user logs out)
-- userinfo_endpoint (the URL of the endpoint to retrieve the user's information). ***Don’t forget to replace the ```userinfo_endoint``` with your “userinfo_endpoint” that you obtained from this [step](#referred1).***  
+- userinfo_endpoint (the URL of the endpoint to retrieve the user's information). **_Don’t forget to replace the `userinfo_endoint` with your “userinfo_endpoint” that you obtained from this [step](#referred1)._**
 - response_mode (the method to use to send the authorization response)
-- code_challenge_method (the method to use to generate the code challenge). 
+- code_challenge_method (the method to use to generate the code challenge).
 
 Note that the oidc-client-ts library automatically handles the generation of the code verifier and code challenge when the user clicks on the login button, eliminating the need for the application to manually generate and include these values in the requests.
 
-In the PKCE flow, the code verifier is a random string generated by the client application, and the code challenge is a transformed version of the code verifier using the SHA-256 hashing algorithm. 
+In the PKCE flow, the code verifier is a random string generated by the client application, and the code challenge is a transformed version of the code verifier using the SHA-256 hashing algorithm.
 
 6.  Add a file called style.css to the src folder to apply CSS styling to the pages.
 
-  [src/style.css](https://github.com/zitadel/react-user-authentication/blob/main/src/style.css)
+[src/style.css](https://github.com/zitadel/react-user-authentication/blob/main/src/style.css)
 
 ```
 /* The body element covers the entire page, so setting the background color here
@@ -529,14 +598,14 @@ In the PKCE flow, the code verifier is a random string generated by the client a
     /* Center the text in the body element */
     text-align: center;
   }
-  
+
   /* The h1, h2, and h3 elements are used for headings */
   h1, h2, h3 {
     /* The hex code for the dark blue color from the image is #2c3e50 */
     color: #2c3e50;
     text-align: center;
   }
-  
+
   /* The button element represents a clickable button */
   button {
     /* The hex code for the light purple color from the image is #9b59b6 */
@@ -549,17 +618,16 @@ In the PKCE flow, the code verifier is a random string generated by the client a
     /* Add some hover effect to the button */
     cursor: pointer;
   }
-  
+
   button:hover {
     /* The hex code for the dark purple color from the image is #8e44ad */
     background-color: #8e44ad;
   }
-  ```
+```
 
+7. Go to index.js and replace `import './index.css';` with `import './style.css'`. Your index.js file should look like this:
 
-7. Go to index.js and replace ```import './index.css';``` with ```import './style.css'```. Your index.js file should look like this:
-
-  [src/index.js](https://github.com/zitadel/react-user-authentication/blob/main/src/index.js)
+[src/index.js](https://github.com/zitadel/react-user-authentication/blob/main/src/index.js)
 
 ```
 import React from 'react';
@@ -583,13 +651,13 @@ reportWebVitals();
 
 ### 4. Running the application
 
-1. Run ```npm start``` to start the development server.
-2. Open your browser and navigate to ```http://localhost:3000/``` to view the app.
-3. You will see the login page, which is the landing page of the app, when you run the application. Click on the “Please log in” button. 
+1. Run `npm start` to start the development server.
+2. Open your browser and navigate to `http://localhost:3000/` to view the app.
+3. You will see the login page, which is the landing page of the app, when you run the application. Click on the “Please log in” button.
 
 ![Login](/img/guides/quickstart/login1.png)
 
-4. You will be redirected to the ZITADEL login page. Add your username/email and click on “next”. 
+4. You will be redirected to the ZITADEL login page. Add your username/email and click on “next”.
 
 ![Redirect](/img/guides/quickstart/login2.png)
 
@@ -601,22 +669,20 @@ reportWebVitals();
 
 ![Redirect](/img/guides/quickstart/login4.png)
 
-7. You can click on “Log out” to log out of the application and you will be taken to the landing page. 
+7. You can click on “Log out” to log out of the application and you will be taken to the landing page.
 
 ![Redirect](/img/guides/quickstart/login1.png)
 
-8. To see if the user has been successfully logged out and the user session has been terminated,  click on “Please log in”, which brings you to the following page. Select the same user you logged in with earlier. 
+8. To see if the user has been successfully logged out and the user session has been terminated, click on “Please log in”, which brings you to the following page. Select the same user you logged in with earlier.
 
 ![Redirect](/img/guides/quickstart/login5.png)
 
-9. You will see that since the login session was terminated after logging out, the user has to enter his password again. 
+9. You will see that since the login session was terminated after logging out, the user has to enter his password again.
 
 ![Redirect](/img/guides/quickstart/login6.png)
 
+And this brings us to the end of this quick start guide!
 
-And this brings us to the end of this quick start guide! 
-
-This tutorial covered how to configure ZITADEL and how to use React to build an app that communicates with ZITADEL to access secured resources. 
+This tutorial covered how to configure ZITADEL and how to use React to build an app that communicates with ZITADEL to access secured resources.
 
 We hope you enjoyed the tutorial and encourage you to check out the ZITADEL [documentation](https://zitadel.com/docs) for more information on how to use the ZITADEL platform to its full potential. Thanks for joining us!
-

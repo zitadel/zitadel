@@ -17,8 +17,8 @@ import (
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
+	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 )
 
 var (
@@ -36,7 +36,7 @@ func TestOPStorage_CreateAuthRequest(t *testing.T) {
 func TestOPStorage_CreateAccessToken_code(t *testing.T) {
 	clientID := createClient(t)
 	authRequestID := createAuthRequest(t, clientID, redirectURI)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -75,7 +75,7 @@ func TestOPStorage_CreateAccessToken_code(t *testing.T) {
 func TestOPStorage_CreateAccessToken_implicit(t *testing.T) {
 	clientID := createImplicitClient(t)
 	authRequestID := createAuthRequestImplicit(t, clientID, redirectURIImplicit)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -125,7 +125,7 @@ func TestOPStorage_CreateAccessToken_implicit(t *testing.T) {
 func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
 	clientID := createClient(t)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -150,7 +150,7 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -186,7 +186,7 @@ func TestOPStorage_RevokeToken_access_token(t *testing.T) {
 	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -229,7 +229,7 @@ func TestOPStorage_RevokeToken_access_token_invalid_token_hint_type(t *testing.T
 	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -266,7 +266,7 @@ func TestOPStorage_RevokeToken_refresh_token(t *testing.T) {
 	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -309,7 +309,7 @@ func TestOPStorage_RevokeToken_refresh_token_invalid_token_type_hint(t *testing.
 	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -344,7 +344,7 @@ func TestOPStorage_RevokeToken_refresh_token_invalid_token_type_hint(t *testing.
 func TestOPStorage_RevokeToken_invalid_client(t *testing.T) {
 	clientID := createClient(t)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -376,7 +376,7 @@ func TestOPStorage_TerminateSession(t *testing.T) {
 	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -413,7 +413,7 @@ func TestOPStorage_TerminateSession_refresh_grant(t *testing.T) {
 	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -457,7 +457,7 @@ func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
 	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{

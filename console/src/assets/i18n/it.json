@@ -410,8 +410,8 @@
       "DESCRIPTION": "Aggiungi un secondo fattore per garantire la sicurezza ottimale del tuo account.",
       "MANAGE_DESCRIPTION": "Gestite i metodi del secondo fattore dei vostri utenti.",
       "ADD": "Aggiungi fattore",
-      "OTP": "App di autenticazione per OTP (One-Time Password)",
-      "OTP_DIALOG_TITLE": "Aggiungi OTP",
+      "OTP": "App di autenticazione per TOTP (Time-based One-Time Password)",
+      "OTP_DIALOG_TITLE": "Aggiungi TOTP",
       "OTP_DIALOG_DESCRIPTION": "Scansiona il codice QR con un'app di autenticazione e inserisci il codice nel campo sottostante per verificare e attivare il metodo OTP.",
       "U2F": "Impronta digitale, chiave di sicurezza, Face ID e altri",
       "U2F_DIALOG_TITLE": "Verifica Fattore",
@@ -419,6 +419,12 @@
       "U2F_SUCCESS": "Fattore aggiunto con successo!",
       "U2F_ERROR": "Si \u00e8 verificato un errore durante la configurazione!",
       "U2F_NAME": "Nome dell'autenticatore",
+      "OTPSMS": "OTP (One-Time Password) con SMS",
+      "OTPEMAIL": "OTP (One-Time Password) with Email",
+      "SETUPOTPSMSDESCRIPTION": "Vuoi impostare questo numero di telefono come secondo fattore OTP (One-Time password)?",
+      "OTPSMSSUCCESS": "Fattore OTP impostato con successo.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Il tuo telefono deve essere verificato per utilizzare questo metodo.",
+      "OTPEMAILSUCCESS": "Fattore OTP impostato con successo.",
       "TYPE": {
         "0": "Nessun altro fattore definito",
         "1": "One Time Password (OTP)",
@@ -488,6 +494,7 @@
       "LASTNAME": "Cognome",
       "NICKNAME": "Soprannome",
       "DISPLAYNAME": "DisplayName",
+      "PREFERREDLOGINNAME": "Nome di accesso preferito",
       "PREFERRED_LANGUAGE": "Lingua",
       "GENDER": "Genere",
       "PASSWORD": "Password",
@@ -585,7 +592,8 @@
         "EDITVALUE": "Numero di telefono",
         "EDITDESC": "Inserisci il nuovo numero di telefono nel campo sottostante.",
         "DELETETITLE": "Rimuovi il numero di telefono",
-        "DELETEDESC": "Vuoi davvero rimuovere il numero di telefono"
+        "DELETEDESC": "Vuoi davvero rimuovere il numero di telefono",
+        "OTPSMSREMOVALWARNING": "Questo account utilizza questo numero di telefono come secondo fattore. Non sarai in grado di usarlo dopo aver proceduto."
       },
       "RESENDCODE": "Reinvia il codice",
       "ENTERCODE": "Verifica",
@@ -734,6 +742,10 @@
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in secondi",
     "ALLOWEDTOFAIL": "Può fallire",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Attenzione",
+      "DESCRIPTION": "Se disabiliti questa impostazione, potrebbe impedire agli utenti della tua organizzazione di accedere. Inoltre, non sarai più in grado di accedere alla console per disabilitare l'azione. Ti consigliamo di creare un utente amministratore in un'organizzazione separata o di testare gli script prima in un ambiente di sviluppo o in un'organizzazione di sviluppo."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Tipo processo",
     "TRIGGERTYPE": "Tipo trigger",
@@ -783,7 +795,7 @@
     },
     "PAGES": {
       "STATE": "Stato",
-      "DOMAINLIST": "Domini"
+      "DOMAINLIST": "Domini personalizzati"
     },
     "STATE": {
       "0": "Non specifico",
@@ -956,8 +968,7 @@
     "STATE": {
       "0": "Non definito",
       "1": "Attivo",
-      "2": "Disattivato",
-      "3": "Rimosso"
+      "2": "Disattivato"
     },
     "MEMBER": {
       "TITLE": "Manager dell'organizzazione",
@@ -1048,6 +1059,7 @@
       "TITLE": "Impostazioni SMTP",
       "SENDERADDRESS": "Indirizzo email del mittente",
       "SENDERNAME": "Nome del mittente",
+      "REPLYTOADDRESS": "Indirizzo Reply-to",
       "HOSTANDPORT": "Host e porta",
       "USER": "Utente",
       "PASSWORD": "Password",
@@ -1093,7 +1105,7 @@
       "INDAYS": "giorni"
     },
     "SECRETS": {
-      "TITLE": "Aspetto dei segreti",
+      "TITLE": "Generatore di password",
       "TYPES": "Tipi di segreti",
       "TYPE": {
         "1": "Initializzazione email",
@@ -1105,7 +1117,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
-      "ADDGENERATOR": "Definisci aspetto",
+      "ADDGENERATOR": "Imposta il generatore di password",
       "GENERATORTYPE": "Tipo",
       "EXPIRY": "Scadenza (in ore)",
       "INCLUDEDIGITS": "Contiene numeri",
@@ -1339,7 +1351,7 @@
       "MAXAGEDAYS": "Lunghezza massima in giorni",
       "USERLOGINMUSTBEDOMAIN": "Nome utente deve contenere il dominio dell' organizzazione",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Se abiliti questa impostazione, a tutti i nomi di accesso verrà aggiunto il suffisso del dominio dell'organizzazione. Se questa impostazione è disabilitata, devi assicurarti che i nomi utente siano univoci per tutte le organizzazioni.",
-      "VALIDATEORGDOMAINS": "Verifica domini dell' organizzazione",
+      "VALIDATEORGDOMAINS": "Verifica del dominio dell'organizzazione richiesta (challenge DNS o HTTP)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "L'indirizzo mittente SMTP corrisponde al dominio dell'istanza",
       "ALLOWUSERNAMEPASSWORD": "Autenticazione classica con password consentita",
       "ALLOWEXTERNALIDP": "IDP esterno consentito",
@@ -1825,7 +1837,9 @@
       "DELETED": "IDP rimosso con successo!",
       "ADDED": "Aggiunto con successo.",
       "REMOVED": "Rimosso con successo."
-    }
+    },
+    "ISIDTOKENMAPPING": "Mappatura dal token ID",
+    "ISIDTOKENMAPPING_DESC": "Se selezionato, le informazioni del provider vengono mappate dal token ID, non dal punto finale userinfo."
   },
   "MFA": {
     "LIST": {

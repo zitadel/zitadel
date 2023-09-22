@@ -21,8 +21,8 @@ const (
 	QuotaActionsAllRunsSeconds    QuotaUnit = "actions.all.runs.seconds"
 )
 
-func (q *QuotaUnit) Enum() quota.Unit {
-	switch *q {
+func (q QuotaUnit) Enum() quota.Unit {
+	switch q {
 	case QuotaRequestsAllAuthenticated:
 		return quota.RequestsAllAuthenticated
 	case QuotaActionsAllRunsSeconds:
@@ -46,14 +46,11 @@ func (c *Commands) AddQuota(
 	if wm.active {
 		return nil, errors.ThrowAlreadyExists(nil, "COMMAND-WDfFf", "Errors.Quota.AlreadyExists")
 	}
-
 	aggregateId, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	aggregate := quota.NewAggregate(aggregateId, instanceId, instanceId)
-
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddQuotaCommand(aggregate, q))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddQuotaCommand(quota.NewAggregate(aggregateId, instanceId), q))
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +77,7 @@ func (c *Commands) RemoveQuota(ctx context.Context, unit QuotaUnit) (*domain.Obj
 		return nil, errors.ThrowNotFound(nil, "COMMAND-WDfFf", "Errors.Quota.NotFound")
 	}
 
-	aggregate := quota.NewAggregate(wm.AggregateID, instanceId, instanceId)
+	aggregate := quota.NewAggregate(wm.AggregateID, instanceId)
 
 	events := []eventstore.Command{
 		quota.NewRemovedEvent(ctx, &aggregate.Aggregate, unit.Enum()),
@@ -108,6 +105,22 @@ type QuotaNotification struct {
 }
 
 type QuotaNotifications []*QuotaNotification
+
+func (q *QuotaNotification) validate() error {
+	u, err := url.Parse(q.CallURL)
+	if err != nil {
+		return errors.ThrowInvalidArgument(err, "QUOTA-bZ0Fj", "Errors.Quota.Invalid.CallURL")
+	}
+
+	if !u.IsAbs() || u.Host == "" {
+		return errors.ThrowInvalidArgument(nil, "QUOTA-HAYmN", "Errors.Quota.Invalid.CallURL")
+	}
+
+	if q.Percent < 1 {
+		return errors.ThrowInvalidArgument(nil, "QUOTA-pBfjq", "Errors.Quota.Invalid.Percent")
+	}
+	return nil
+}
 
 func (q *QuotaNotifications) toAddedEventNotifications(idGenerator id.Generator) ([]*quota.AddedEventNotification, error) {
 	if q == nil {
@@ -144,17 +157,8 @@ type AddQuota struct {
 
 func (q *AddQuota) validate() error {
 	for _, notification := range q.Notifications {
-		u, err := url.Parse(notification.CallURL)
-		if err != nil {
-			return errors.ThrowInvalidArgument(err, "QUOTA-bZ0Fj", "Errors.Quota.Invalid.CallURL")
-		}
-
-		if !u.IsAbs() || u.Host == "" {
-			return errors.ThrowInvalidArgument(nil, "QUOTA-HAYmN", "Errors.Quota.Invalid.CallURL")
-		}
-
-		if notification.Percent < 1 {
-			return errors.ThrowInvalidArgument(nil, "QUOTA-pBfjq", "Errors.Quota.Invalid.Percent")
+		if err := notification.validate(); err != nil {
+			return err
 		}
 	}
 
@@ -169,11 +173,6 @@ func (q *AddQuota) validate() error {
 	if q.ResetInterval < time.Minute {
 		return errors.ThrowInvalidArgument(nil, "QUOTA-R5otd", "Errors.Quota.Invalid.ResetInterval")
 	}
-
-	if !q.Limit && len(q.Notifications) == 0 {
-		return errors.ThrowInvalidArgument(nil, "QUOTA-4Nv68", "Errors.Quota.Invalid.Noop")
-	}
-
 	return nil
 }
 

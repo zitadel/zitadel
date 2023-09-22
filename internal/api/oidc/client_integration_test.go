@@ -15,13 +15,13 @@ import (
 
 	"github.com/zitadel/zitadel/pkg/grpc/authn"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 )
 
 func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
 	clientID := createClient(t)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -67,7 +67,7 @@ func TestOPStorage_SetIntrospectionFromToken(t *testing.T) {
 
 	scope := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess}
 	authRequestID := createAuthRequest(t, app.GetClientId(), redirectURI, scope...)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasskeySession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{

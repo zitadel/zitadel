@@ -1,5 +1,7 @@
 ---
-title: Flutter
+title: ZITADEL with Flutter
+sidebar_label: Flutter
+
 ---
 
 This guide demonstrates how you integrate **ZITADEL** into a Flutter app. It refers to our example on [GitHub](https://github.com/zitadel/zitadel_flutter)

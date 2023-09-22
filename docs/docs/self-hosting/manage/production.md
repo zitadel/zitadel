@@ -1,5 +1,6 @@
 ---
-title: Production Setup
+title: ZITADEL Production Setup
+sidebar_lable: Production Setup
 ---
 
 As soon as you successfully deployed ZITADEL as a proof of concept using one of our [deployment guides](/docs/self-hosting/deploy/overview),
@@ -200,6 +201,7 @@ DefaultInstance:
     # if the host of the sender is different from ExternalDomain set DefaultInstance.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain to false
     From:
     FromName:
+    ReplyToAddress:
 ```
 
 - If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/self-hosting/manage/configure#database-initialization), you can provide a FirstInstance YAML section using the --steps argument.

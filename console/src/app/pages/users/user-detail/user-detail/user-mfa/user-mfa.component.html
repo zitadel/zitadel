@@ -18,8 +18,10 @@
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef>{{ 'USER.MFA.TABLETYPE' | translate }}</th>
         <td mat-cell *matCellDef="let mfa">
-          <span *ngIf="mfa.otp !== undefined">OTP (One-Time Password)</span>
+          <span *ngIf="mfa.otp !== undefined">TOTP (Time-based One-Time Password)</span>
           <span *ngIf="mfa.u2f !== undefined">U2F (Universal 2nd Factor)</span>
+          <span *ngIf="mfa.otpSms !== undefined">One-Time Password SMS</span>
+          <span *ngIf="mfa.otpEmail !== undefined">One-Time Password Email</span>
         </td>
       </ng-container>
 

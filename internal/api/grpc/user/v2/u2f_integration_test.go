@@ -11,7 +11,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func TestServer_RegisterU2F(t *testing.T) {

@@ -412,7 +412,7 @@
       "DESCRIPTION": "Adicione um segundo fator para garantir a segurança ideal da sua conta.",
       "MANAGE_DESCRIPTION": "Gerencie os métodos de segundo fator dos seus usuários.",
       "ADD": "Adicionar Fator",
-      "OTP": "Aplicativo de Autenticação para OTP (One-Time Password)",
+      "OTP": "Aplicativo de Autenticação para TOTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "Adicionar OTP",
       "OTP_DIALOG_DESCRIPTION": "Digitalize o código QR com um aplicativo autenticador e insira o código abaixo para verificar e ativar o método OTP.",
       "U2F": "Impressão digital, Chaves de Segurança, Face ID e outros",
@@ -421,6 +421,12 @@
       "U2F_SUCCESS": "Fator adicionado com sucesso!",
       "U2F_ERROR": "Ocorreu um erro durante a configuração!",
       "U2F_NAME": "Nome do Autenticador",
+      "OTPSMS": "OTP (senha de uso único) com SMS",
+      "OTPEMAIL": "OTP (senha de uso único) com e-mail",
+      "SETUPOTPSMSDESCRIPTION": "Deseja configurar este número de telefone como segundo fator OTP (senha de uso único)?",
+      "OTPSMSSUCCESS": "Fator OTP configurado com sucesso.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Seu telefone deve ser verificado para usar este método.",
+      "OTPEMAILSUCCESS": "Fator OTP configurado com sucesso.",
       "TYPE": {
         "0": "Nenhum MFA definido",
         "1": "One Time Password (OTP)",
@@ -490,6 +496,7 @@
       "LASTNAME": "Sobrenome",
       "NICKNAME": "Apelido",
       "DISPLAYNAME": "Nome de Exibição",
+      "PREFERREDLOGINNAME": "Nome de login preferido",
       "PREFERRED_LANGUAGE": "Idioma",
       "GENDER": "Gênero",
       "SENHA": "Senha",
@@ -587,7 +594,8 @@
         "EDITVALUE": "Número de Telefone",
         "EDITDESC": "Digite o novo número de telefone no campo abaixo.",
         "DELETETITLE": "Excluir número de telefone",
-        "DELETEDESC": "Você realmente deseja excluir o número de telefone?"
+        "DELETEDESC": "Você realmente deseja excluir o número de telefone?",
+        "OTPSMSREMOVALWARNING": "Esta conta usa este número de telefone como segundo fator. Você não poderá usá-lo depois de continuar."
       },
       "RESENDCODE": "Reenviar Código",
       "ENTERCODE": "Verificar",
@@ -736,6 +744,10 @@
     "TIMEOUT": "Tempo Limite",
     "TIMEOUTINSEC": "Tempo Limite em segundos",
     "ALLOWEDTOFAIL": "Permitido Falhar",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Aviso",
+      "DESCRIPTION": "Se você desabilitar esta configuração, pode fazer com que os usuários da sua organização não possam fazer login. Além disso, você não poderá mais acessar a console para desabilitar a ação. Recomendamos criar um usuário administrador em uma organização separada ou testar scripts primeiro em um ambiente de desenvolvimento ou uma organização de desenvolvimento."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Tipo de Fluxo",
     "TRIGGERTYPE": "Tipo de Gatilho",
@@ -785,7 +797,7 @@
     },
     "PAGES": {
       "STATE": "Status",
-      "DOMAINLIST": "Domínios"
+      "DOMAINLIST": "Domínios personalizados"
     },
     "STATE": {
       "0": "Não especificado",
@@ -1049,6 +1061,7 @@
       "TITLE": "Configurações SMTP",
       "SENDERADDRESS": "Endereço de e-mail do remetente",
       "SENDERNAME": "Nome do remetente",
+      "REPLYTOADDRESS": "Endereço Reply-To",
       "HOSTANDPORT": "Host e porta",
       "USER": "Usuário",
       "PASSWORD": "Senha",
@@ -1340,7 +1353,7 @@
       "MAXAGEDAYS": "Idade máxima em dias",
       "USERLOGINMUSTBEDOMAIN": "Adicionar domínio da organização como sufixo aos nomes de login",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Se você habilitar essa configuração, todos os nomes de login serão sufixados com o domínio da organização. Se essa configuração estiver desabilitada, você deve garantir que os nomes de usuário sejam exclusivos em todas as organizações.",
-      "VALIDATEORGDOMAINS": "Validar domínios da organização",
+      "VALIDATEORGDOMAINS": "Verificação de domínio da organização necessária (desafio DNS ou HTTP)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "O endereço do remetente do SMTP corresponde ao domínio da Instância",
       "ALLOWUSERNAMEPASSWORD": "Permitir usuário e senha",
       "ALLOWEXTERNALIDP": "Permitir provedor de ID externo",
@@ -1819,7 +1832,9 @@
       "DELETED": "Provedor de identidade removido com sucesso!",
       "ADDED": "Adicionado com sucesso.",
       "REMOVED": "Removido com sucesso."
-    }
+    },
+    "ISIDTOKENMAPPING": "Mapeamento do token ID",
+    "ISIDTOKENMAPPING_DESC": "Se selecionado, as informações do provedor são mapeadas a partir do token ID, e não do ponto final userinfo."
   },
   "MFA": {
     "LIST": {

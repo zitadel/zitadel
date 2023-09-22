@@ -28,12 +28,7 @@ LogStore:
     Database:
       Enabled: true
     Stdout:
-      Enabled: false
-
-Quotas:
-  Access:
-    ExhaustedCookieKey: "zitadel.quota.limiting"
-    ExhaustedCookieMaxAge: "600s"
+      Enabled: true
 
 Console:
   InstanceManagementURL: "https://example.com/instances/{{.InstanceID}}"
@@ -43,9 +38,25 @@ Projections:
     NotificationsQuotas:
       RequeueEvery: 1s
 
+Quotas:
+  Access:
+    ExhaustedCookieKey: "zitadel.quota.limiting"
+    ExhaustedCookieMaxAge: "600s"
+
 DefaultInstance:
   LoginPolicy:
     MfaInitSkipLifetime: "0"
+  Quotas:
+    Items:
+      - Unit: "actions.all.runs.seconds"
+        From: "2023-01-01T00:00:00Z"
+        ResetInterval: 5m
+        Amount: 20
+        Limit: false
+        Notifications:
+          - Percent: 100
+            Repeat: true
+            CallURL: "https://httpbin.org/post"
 
 SystemAPIUsers:
 - cypress:

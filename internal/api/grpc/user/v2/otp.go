@@ -5,7 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func (s *Server) AddOTPSMS(ctx context.Context, req *user.AddOTPSMSRequest) (*user.AddOTPSMSResponse, error) {

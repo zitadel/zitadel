@@ -412,7 +412,7 @@
       "DESCRIPTION": "二要素認証を追加して、アカウントに最適なセキュリティを確保します。",
       "MANAGE_DESCRIPTION": "ユーザーの二要素認証を管理する。",
       "ADD": "二要素認証を追加する",
-      "OTP": "OTP用認証アプリ（ワンタイム・パスワード）",
+      "OTP": "TOTP用認証アプリ（ワンタイム・パスワード）",
       "OTP_DIALOG_TITLE": "OTPの追加",
       "OTP_DIALOG_DESCRIPTION": "認証アプリでQRコードを読み取り、下記のコードを入力することで、OTP方式の確認と有効化ができます。",
       "U2F": "指紋、セキュリティキー、フェイスIDなど",
@@ -421,6 +421,12 @@
       "U2F_SUCCESS": "二要素認証が正常に追加されました！",
       "U2F_ERROR": "セットアップ中にエラーが発生しました！",
       "U2F_NAME": "認証者名",
+      "OTPSMS": "OTP（ワンタイムパスワード）とSMS",
+      "OTPEMAIL": "電子メールによる OTP (ワンタイム パスワード)",
+      "SETUPOTPSMSDESCRIPTION": "この電話番号を OTP (ワンタイム パスワード) の第 2 要素として設定しますか?",
+      "OTPSMSSUCCESS": "OTP 係数の設定が成功しました。",
+      "OTPSMSPHONEMUSTBEVERIFIED": "この方法を使用するには、電話を認証する必要があります。",
+      "OTPEMAILSUCCESS": "OTP 係数の設定が成功しました。",
       "TYPE": {
         "0": "MFAは定義されていません",
         "1": "ワンタイムパスワード（OTP）",
@@ -490,6 +496,7 @@
       "LASTNAME": "姓",
       "NICKNAME": "ニックネーム",
       "DISPLAYNAME": "表示名",
+      "PREFERREDLOGINNAME": "優先ログイン名",
       "PREFERRED_LANGUAGE": "言語",
       "GENDER": "性別",
       "PASSWORD": "パスワード",
@@ -587,7 +594,8 @@
         "EDITVALUE": "電話番号",
         "EDITDESC": "下のフィールドに新しい電話番号を入力してください。",
         "DELETETITLE": "電話番号の削除",
-        "DELETEDESC": "本当に電話番号を削除してよろしいですか？"
+        "DELETEDESC": "本当に電話番号を削除してよろしいですか？",
+        "OTPSMSREMOVALWARNING": "このアカウントは、この電話番号を 2 番目の要素として使用します。続行すると使用できなくなります。"
       },
       "RESENDCODE": "再送信コード",
       "ENTERCODE": "認証",
@@ -736,6 +744,10 @@
     "TIMEOUT": "タイムアウト",
     "TIMEOUTINSEC": "数秒でタイムアウト",
     "ALLOWEDTOFAIL": "失敗を許可",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "警告",
+      "DESCRIPTION": "この設定を無効にすると、組織のユーザーがログインできなくなる可能性があります。さらに、アクションを無効にするためにコンソールにアクセスできなくなります。開発環境または開発組織でスクリプトを最初にテストするか、別の組織で管理者ユーザーを作成することをお勧めします。"
+    },
     "SCRIPT": "スクリプトp",
     "FLOWTYPE": "フロータイプ",
     "TRIGGERTYPE": "トリガータイプ",
@@ -785,7 +797,7 @@
     },
     "PAGES": {
       "STATE": "ステータス",
-      "DOMAINLIST": "ドメイン"
+      "DOMAINLIST": "カスタムドメイン"
     },
     "STATE": {
       "0": "未定義",
@@ -957,8 +969,7 @@
     "STATE": {
       "0": "未定義",
       "1": "アクティブ",
-      "2": "非アクティブ",
-      "3": "削除"
+      "2": "非アクティブ"
     },
     "MEMBER": {
       "TITLE": "組織マネージャー",
@@ -1049,6 +1060,7 @@
       "TITLE": "SMTP設定",
       "SENDERADDRESS": "送信者のメールアドレス",
       "SENDERNAME": "送信者名",
+      "REPLYTOADDRESS": "返信先アドレス",
       "HOSTANDPORT": "ホストとポート",
       "USER": "ユーザー",
       "PASSWORD": "パスワード",
@@ -1335,7 +1347,7 @@
       "MAXAGEDAYS": "最大有効期限",
       "USERLOGINMUSTBEDOMAIN": "ログイン名の接尾辞として組織ドメインを追加する",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "この設定を有効にすると、すべてのログイン名が組織ドメインで接尾辞が付けられます。この設定が無効になっている場合、ユーザー名がすべての組織で一意であることを確認する必要があります。",
-      "VALIDATEORGDOMAINS": "組織ドメインを認証する",
+      "VALIDATEORGDOMAINS": "組織のドメイン検証が必要です (DNSまたはHTTPチャレンジ)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP送信者アドレスはインスタンスドメインに一致しています",
       "ALLOWUSERNAMEPASSWORD": "ユーザー名とパスワードを許可",
       "ALLOWEXTERNALIDP": "外部IDPを許可",
@@ -1816,7 +1828,9 @@
       "DELETED": "IDPは正常に削除されました！",
       "ADDED": "正常に追加されました。",
       "REMOVED": "正常に削除されました。"
-    }
+    },
+    "ISIDTOKENMAPPING": "IDトークンからのマッピング",
+    "ISIDTOKENMAPPING_DESC": "選択された場合、プロバイダ情報はIDトークンからマッピングされ、userinfoエンドポイントからではありません。"
   },
   "MFA": {
     "LIST": {

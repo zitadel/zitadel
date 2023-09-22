@@ -412,7 +412,7 @@
       "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
       "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
       "ADD": "Add Factor",
-      "OTP": "Authenticator App for OTP (One-Time Password)",
+      "OTP": "Authenticator App for TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "Add OTP",
       "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
       "U2F": "Fingerprint, Security Keys, Face ID and other",
@@ -421,6 +421,12 @@
       "U2F_SUCCESS": "Factor added successfully!",
       "U2F_ERROR": "An error during setup occurred!",
       "U2F_NAME": "Authenticator Name",
+      "OTPSMS": "OTP (One-Time Password) with SMS",
+      "OTPEMAIL": "OTP (One-Time Password) with Email",
+      "SETUPOTPSMSDESCRIPTION": "Do you want to setup this phonenumber as OTP (One-Time password) second factor?",
+      "OTPSMSSUCCESS": "OTP factor set up with success.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Your phone must be verified in order to use this method.",
+      "OTPEMAILSUCCESS": "OTP factor set up with success.",
       "TYPE": {
         "0": "No MFA defined",
         "1": "One Time Password (OTP)",
@@ -490,6 +496,7 @@
       "LASTNAME": "Family Name",
       "NICKNAME": "Nickname",
       "DISPLAYNAME": "Display Name",
+      "PREFERREDLOGINNAME": "Preferred login name",
       "PREFERRED_LANGUAGE": "Language",
       "GENDER": "Gender",
       "PASSWORD": "Password",
@@ -587,7 +594,8 @@
         "EDITVALUE": "Phone number",
         "EDITDESC": "Enter the new phone number in the field below.",
         "DELETETITLE": "Delete phone number",
-        "DELETEDESC": "Do you really want to delete the phone number"
+        "DELETEDESC": "Do you really want to delete the phone number",
+        "OTPSMSREMOVALWARNING": "This account uses this phone number as second factor. You won't be able to use it after you proceed."
       },
       "RESENDCODE": "Resend Code",
       "ENTERCODE": "Verify",
@@ -736,6 +744,10 @@
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in seconds",
     "ALLOWEDTOFAIL": "Allowed To Fail",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Warning",
+      "DESCRIPTION": "If you disable this setting, it may cause users in your organization to be unable to sign in. Additionally, you will no longer be able to access the console to disable the action. We recommend creating an administrator user in a separate organization or testing scripts first in a development environment or a development organization."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Type",
     "TRIGGERTYPE": "Trigger Type",
@@ -785,7 +797,7 @@
     },
     "PAGES": {
       "STATE": "Status",
-      "DOMAINLIST": "Domains"
+      "DOMAINLIST": "Custom Domains"
     },
     "STATE": {
       "0": "Unspecified",
@@ -943,22 +955,21 @@
     "DOMAINS": {
       "NEW": "Add Domain",
       "TITLE": "Domains",
-      "DESCRIPTION": "Configure your domains. This domain can be used to log in with your users.",
+      "DESCRIPTION": "Configure your organization domains. This domain can be used for domain discovery and username suffixing.",
       "SETPRIMARY": "Set as Primary",
       "DELETE": {
         "TITLE": "Delete Domain",
-        "DESCRIPTION": "You are about to delete one of your domains. Note that your users can no longer use this domain for their login."
+        "DESCRIPTION": "You are about to delete one of your domains."
       },
       "ADD": {
         "TITLE": "Add Domain",
-        "DESCRIPTION": "You are about to add a domain for your organization. After successful process, you users will be able to use the domain for their login."
+        "DESCRIPTION": "You are about to add a domain for your organization. After successful process, the domain can be used for domain discovery and as suffix for your users."
       }
     },
     "STATE": {
       "0": "Not defined",
       "1": "Active",
-      "2": "Deactivated",
-      "3": "Removed"
+      "2": "Deactivated"
     },
     "MEMBER": {
       "TITLE": "Organization Managers",
@@ -1018,7 +1029,7 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Privacy Policy",
       "OIDC": "OIDC Token lifetime and expiration",
-      "SECRETS": "Secret Appearance",
+      "SECRETS": "Secret Generator",
       "SECURITY": "Security settings"
     },
     "GROUPS": {
@@ -1049,6 +1060,7 @@
       "TITLE": "SMTP Settings",
       "SENDERADDRESS": "Sender Email Address",
       "SENDERNAME": "Sender Name",
+      "REPLYTOADDRESS": "Reply-to Address",
       "HOSTANDPORT": "Host And Port",
       "USER": "User",
       "PASSWORD": "Password",
@@ -1094,7 +1106,7 @@
       "INDAYS": "Days"
     },
     "SECRETS": {
-      "TITLE": "Secret Appearance",
+      "TITLE": "Secret Generator",
       "TYPES": "Secret Types",
       "TYPE": {
         "1": "Initialization Mail",
@@ -1106,7 +1118,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - Email"
       },
-      "ADDGENERATOR": "Define Secret Appearance",
+      "ADDGENERATOR": "Define Secret Generator",
       "GENERATORTYPE": "Type",
       "EXPIRY": "Expiration (in hours)",
       "INCLUDEDIGITS": "Include Numbers",
@@ -1340,7 +1352,7 @@
       "MAXAGEDAYS": "Max Age in days",
       "USERLOGINMUSTBEDOMAIN": "Add organization domain as suffix to loginnames",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
-      "VALIDATEORGDOMAINS": "Validate Org domains",
+      "VALIDATEORGDOMAINS": "Organization domain verification required (DNS or HTTP challenge)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
       "ALLOWUSERNAMEPASSWORD": "Username Password allowed",
       "ALLOWEXTERNALIDP": "External IDP allowed",
@@ -1698,6 +1710,10 @@
       "LDAP": {
         "TITLE": "Active Directory / LDAP",
         "DESCRIPTION": "Enter the credentials for your LDAP Provider"
+      },
+      "APPLE": {
+        "TITLE": "Sign in with Apple",
+        "DESCRIPTION": "Enter the credentials for your Apple Provider"
       }
     },
     "DETAIL": {
@@ -1811,6 +1827,14 @@
       "JWTENDPOINT": "JWT Endpoint",
       "JWTKEYSENDPOINT": "JWT Keys Endpoint"
     },
+    "APPLE": {
+      "TEAMID": "Team ID",
+      "KEYID": "Key ID",
+      "PRIVATEKEY": "Private Key",
+      "UPDATEPRIVATEKEY": "Update Private Key",
+      "UPLOADPRIVATEKEY": "Upload Private Key",
+      "KEYMAXSIZEEXCEEDED": "Maximum size of 5kB exceeded."
+    },
     "TOAST": {
       "SAVED": "Successfully saved.",
       "REACTIVATED": "Idp reactivated.",
@@ -1821,7 +1845,9 @@
       "DELETED": "Idp removed successfully!",
       "ADDED": "Added successfully.",
       "REMOVED": "Removed successfully."
-    }
+    },
+    "ISIDTOKENMAPPING": "Map from the ID token",
+    "ISIDTOKENMAPPING_DESC": "If selected, provider information gets mapped from the ID token, not from the userinfo endpoint."
   },
   "MFA": {
     "LIST": {

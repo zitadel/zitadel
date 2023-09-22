@@ -122,7 +122,7 @@ Errors:
       Empty: Паролата е празна
       Invalid: Паролата е невалидна
       NotSet: Потребителят не е задал парола
-      NotChanged: Паролата не е променена
+      NotChanged: Новата парола не може да съвпада с текущата парола
       NotSupported: Хеш кодирането на паролата не се поддържа
     PasswordComplexityPolicy:
       NotFound: Политиката за парола не е намерена
@@ -139,6 +139,7 @@ Errors:
       MinimumExternalIDPNeeded: Трябва да се добави поне един IDP
       AlreadyExists: Външен IDP вече е зает
       NotFound: Външен IDP не е намерен
+      LoginFailed: Влизането във Външен IDP е неуспешно
     MFA:
       OTP:
         AlreadyReady: Многофакторният OTP (OneTimePassword) вече е настроен
@@ -200,6 +201,10 @@ Errors:
       InvalidCharacter: 'Само буквено-цифрови знаци, . '
     IDP:
       InvalidSearchQuery: Невалидна заявка за търсене
+      ClientIDMissing: Липсва ClientID
+      TeamIDMissing: TeamID липсва
+      KeyIDMissing: Липсва KeyID
+      PrivateKeyMissing: Липсва частен ключ
     LoginPolicy:
       NotFound: Правилата за влизане не са намерени
       Invalid: Правилата за влизане са невалидни
@@ -496,8 +501,8 @@ Errors:
     Terminated: Сесията вече е прекратена
     Token:
       Invalid: Токенът на сесията е невалиден
-    Passkey:
-      NoChallenge: Сесия без предизвикателство за парола
+    WebAuthN:
+      NoChallenge: Сесия без WebAuthN предизвикателство
   Intent:
     IDPMissing: IDP липсва в заявката
     SuccessURLMissing: В заявката липсва URL адрес за успех
@@ -630,6 +635,24 @@ EventTypes:
           check:
             succeeded: Многофакторната OTP проверка е успешна
             failed: Многофакторната OTP проверка е неуспешна
+          sms:
+            added: Добавен Многофакторната OTP SMS
+            removed: Премахнато многофакторно OTP SMS
+            code:
+              added: Добавен многофакторен OTP SMS код
+              sent: Многофакторната OTP SMS код е изпратен
+            check:
+              succeeded: Успешна многофакторна OTP SMS проверка
+              failed: Многофакторната OTP проверка на SMS не бе успешна
+          email:
+            added: Добавен Многофакторната OTP имейл
+            removed: Премахнат многофакторен OTP имейл
+            code:
+              added: Добавен многофакторен OTP имейл код
+              sent: Многофакторният OTP имейл код е изпратен
+            check:
+              succeeded: Многофакторната еднократна имейл потвърждение е успешна
+              failed: Многофакторната OTP проверка на имейл не бе успешна
         u2f:
           token:
             added: Добавен е многофакторен U2F токен
@@ -1248,6 +1271,7 @@ Action:
       ExternalAuthentication: Външно удостоверяване
       CustomiseToken: Токен за допълнение
       InternalAuthentication: Вътрешно удостоверяване
+      CustomizeSAMLResponse: Допълнение на SAMLResponse
   TriggerType:
     Unspecified: Неуточнено
     PostAuthentication: Публикуване на автентификация
@@ -1255,3 +1279,4 @@ Action:
     PostCreation: Създаване на публикации
     PreUserinfoCreation: Предварително създаване на потребителска информация
     PreAccessTokenCreation: Създаване на маркер за предварителен достъп
+    PreSAMLResponseCreation: Предварително създаване на SAMLResponse

@@ -62,11 +62,7 @@ func (s *Server) VerifyMyPhone(ctx context.Context, req *auth_pb.VerifyMyPhoneRe
 
 func (s *Server) ResendMyPhoneVerification(ctx context.Context, _ *auth_pb.ResendMyPhoneVerificationRequest) (*auth_pb.ResendMyPhoneVerificationResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, s.userCodeAlg)
-	if err != nil {
-		return nil, err
-	}
-	objectDetails, err := s.command.CreateHumanPhoneVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner, phoneCodeGenerator)
+	objectDetails, err := s.command.CreateHumanPhoneVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
