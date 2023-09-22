@@ -1190,16 +1190,18 @@ func (repo *AuthRequestRepo) usersForUserSelection(ctx context.Context, request 
 func (repo *AuthRequestRepo) userLoginAsPossibleMap(instanceID, requestedOrgID string, userSessions []*user_model.UserSessionView) (map[string]bool, error) {
 	ctx := authz.WithInstanceID(context.Background(), instanceID)
 
-	i, err := repo.Query.Instance(ctx, false)
-	if err != nil {
-		return nil, err
-	}
-
 	m := make(map[string]bool)
-	for _, userSession := range userSessions {
-		um, _ := repo.Query.GetUserMetadataByKey(ctx, false, userSession.UserID, "LOGIN_AS", false)
-		if um != nil && strings.ToUpper(string(um.Value)) == "ON" && (um.ResourceOwner == requestedOrgID || um.ResourceOwner == i.DefaultOrgID) {
-			m[userSession.UserID] = true
+	if repo.Query != nil {
+		i, err := repo.Query.Instance(ctx, false)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, userSession := range userSessions {
+			um, _ := repo.Query.GetUserMetadataByKey(ctx, false, userSession.UserID, "LOGIN_AS", false)
+			if um != nil && strings.ToUpper(string(um.Value)) == "ON" && (um.ResourceOwner == requestedOrgID || um.ResourceOwner == i.DefaultOrgID) {
+				m[userSession.UserID] = true
+			}
 		}
 	}
 	return m, nil
