@@ -1,9 +1,8 @@
 ---
-title: Support Services
+title: Support service description for ZITADEL
+sidebar_label: Support service
 custom_edit_url: null
 --- 
-
-## Introduction
 
 This annex of the [Framework Agreement](terms-of-service) and the [Support Service Terms and Conditions](terms-support-service) describes the support services offered by us for our Services.
 

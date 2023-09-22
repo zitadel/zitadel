@@ -1,9 +1,8 @@
 ---
-title: Service Level
+title: Service level description for ZITADEL Cloud
+sidebar_label: Service Level
 custom_edit_url: null
 --- 
-
-## Introduction
 
 This annex of the [Framework Agreement](terms-of-service) describes the service levels offered by us for our Services (ZITADEL Cloud).
 
