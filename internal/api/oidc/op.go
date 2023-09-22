@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/rakyll/statik/fs"
+	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"github.com/zitadel/oidc/v2/pkg/op"
 	"golang.org/x/text/language"
 
@@ -79,17 +80,36 @@ type OPStorage struct {
 	assetAPIPrefix                    func(ctx context.Context) string
 }
 
-func NewProvider(config Config, defaultLogoutRedirectURI string, externalSecure bool, command *command.Commands, query *query.Queries, repo repository.Repository, encryptionAlg crypto.EncryptionAlgorithm, cryptoKey []byte, es *eventstore.Eventstore, projections *database.DB, userAgentCookie, instanceHandler, accessHandler func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
+func NewProvider(
+	config Config,
+	defaultLogoutRedirectURI string,
+	externalSecure bool,
+	command *command.Commands,
+	query *query.Queries,
+	repo repository.Repository,
+	encryptionAlg crypto.EncryptionAlgorithm,
+	cryptoKey []byte,
+	es *eventstore.Eventstore,
+	projections *database.DB,
+	userAgentCookie, instanceHandler func(http.Handler) http.Handler,
+	accessHandler *middleware.AccessInterceptor,
+) (op.OpenIDProvider, error) {
 	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
 	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections, externalSecure)
-	options, err := createOptions(config, externalSecure, userAgentCookie, instanceHandler, accessHandler)
+	options, err := createOptions(
+		config,
+		externalSecure,
+		userAgentCookie,
+		instanceHandler,
+		accessHandler.HandleIgnorePathPrefixes(ignoredQuotaLimitEndpoint(config.CustomEndpoints)),
+	)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "OIDC-D3gq1", "cannot create options: %w")
 	}
-	provider, err := op.NewDynamicOpenIDProvider(
+	provider, err := op.NewForwardedOpenIDProvider(
 		"",
 		opConfig,
 		storage,
@@ -99,6 +119,21 @@ func NewProvider(config Config, defaultLogoutRedirectURI string, externalSecure 
 		return nil, caos_errs.ThrowInternal(err, "OIDC-DAtg3", "cannot create provider")
 	}
 	return provider, nil
+}
+
+func ignoredQuotaLimitEndpoint(endpoints *EndpointConfig) []string {
+	authURL := op.DefaultEndpoints.Authorization.Relative()
+	keysURL := op.DefaultEndpoints.JwksURI.Relative()
+	if endpoints == nil {
+		return []string{oidc.DiscoveryEndpoint, authURL, keysURL}
+	}
+	if endpoints.Auth != nil && endpoints.Auth.Path != "" {
+		authURL = endpoints.Auth.Path
+	}
+	if endpoints.Keys != nil && endpoints.Keys.Path != "" {
+		keysURL = endpoints.Keys.Path
+	}
+	return []string{oidc.DiscoveryEndpoint, authURL, keysURL}
 }
 
 func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []byte) (*op.Config, error) {

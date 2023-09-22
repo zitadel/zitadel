@@ -1,5 +1,5 @@
 ---
-title: SaaS Product with Authentication and Authorization
+title: Set up a SaaS Product with Authentication and Authorization using ZITADEL
 sidebar_label: Software-as-a-Service
 ---
 

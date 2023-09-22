@@ -494,6 +494,7 @@
       "LASTNAME": "Cognome",
       "NICKNAME": "Soprannome",
       "DISPLAYNAME": "DisplayName",
+      "PREFERREDLOGINNAME": "Nome di accesso preferito",
       "PREFERRED_LANGUAGE": "Lingua",
       "GENDER": "Genere",
       "PASSWORD": "Password",
@@ -794,7 +795,7 @@
     },
     "PAGES": {
       "STATE": "Stato",
-      "DOMAINLIST": "Domini"
+      "DOMAINLIST": "Domini personalizzati"
     },
     "STATE": {
       "0": "Non specifico",
@@ -1104,7 +1105,7 @@
       "INDAYS": "giorni"
     },
     "SECRETS": {
-      "TITLE": "Aspetto dei segreti",
+      "TITLE": "Generatore di password",
       "TYPES": "Tipi di segreti",
       "TYPE": {
         "1": "Initializzazione email",
@@ -1116,7 +1117,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
-      "ADDGENERATOR": "Definisci aspetto",
+      "ADDGENERATOR": "Imposta il generatore di password",
       "GENERATORTYPE": "Tipo",
       "EXPIRY": "Scadenza (in ore)",
       "INCLUDEDIGITS": "Contiene numeri",
@@ -1350,7 +1351,7 @@
       "MAXAGEDAYS": "Lunghezza massima in giorni",
       "USERLOGINMUSTBEDOMAIN": "Nome utente deve contenere il dominio dell' organizzazione",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Se abiliti questa impostazione, a tutti i nomi di accesso verrà aggiunto il suffisso del dominio dell'organizzazione. Se questa impostazione è disabilitata, devi assicurarti che i nomi utente siano univoci per tutte le organizzazioni.",
-      "VALIDATEORGDOMAINS": "Verifica domini dell' organizzazione",
+      "VALIDATEORGDOMAINS": "Verifica del dominio dell'organizzazione richiesta (challenge DNS o HTTP)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "L'indirizzo mittente SMTP corrisponde al dominio dell'istanza",
       "ALLOWUSERNAMEPASSWORD": "Autenticazione classica con password consentita",
       "ALLOWEXTERNALIDP": "IDP esterno consentito",

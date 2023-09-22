@@ -1,11 +1,15 @@
 package crdb
 
 import (
+	"database/sql"
+	"errors"
 	"strconv"
 	"strings"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/database"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 )
@@ -14,13 +18,20 @@ type execOption func(*execConfig)
 type execConfig struct {
 	tableName string
 
-	args []interface{}
-	err  error
+	args           []interface{}
+	err            error
+	ignoreNotFound bool
 }
 
 func WithTableSuffix(name string) func(*execConfig) {
 	return func(o *execConfig) {
 		o.tableName += "_" + name
+	}
+}
+
+func WithIgnoreNotFound() func(*execConfig) {
+	return func(o *execConfig) {
+		o.ignoreNotFound = true
 	}
 }
 
@@ -436,7 +447,11 @@ func exec(config execConfig, q query, opts []execOption) Exec {
 		}
 
 		if _, err := ex.Exec(q(config), config.args...); err != nil {
-			return caos_errs.ThrowInternal(err, "CRDB-pKtsr", "exec failed")
+			if config.ignoreNotFound && errors.Is(err, sql.ErrNoRows) {
+				logging.WithError(err).Debugf("ignored not found: %v", err)
+				return nil
+			}
+			return zitadel_errors.ThrowInternal(err, "CRDB-pKtsr", "exec failed")
 		}
 
 		return nil

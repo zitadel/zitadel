@@ -14,13 +14,13 @@ import (
 type Unit uint
 
 const (
-	UniqueQuotaNameType           = "quota_units"
-	UniqueQuotaNotificationIDType = "quota_notification"
-	eventTypePrefix               = eventstore.EventType("quota.")
-	AddedEventType                = eventTypePrefix + "added"
-	NotifiedEventType             = eventTypePrefix + "notified"
-	NotificationDueEventType      = eventTypePrefix + "notificationdue"
-	RemovedEventType              = eventTypePrefix + "removed"
+	UniqueQuotaNameType      = "quota_units"
+	eventTypePrefix          = eventstore.EventType("quota.")
+	AddedEventType           = eventTypePrefix + "added"
+	SetEventType             = eventTypePrefix + "set"
+	NotifiedEventType        = eventTypePrefix + "notified"
+	NotificationDueEventType = eventTypePrefix + "notificationdue"
+	RemovedEventType         = eventTypePrefix + "removed"
 )
 
 const (
@@ -44,65 +44,87 @@ func NewRemoveQuotaNameUniqueConstraint(unit Unit) *eventstore.EventUniqueConstr
 	)
 }
 
-type AddedEvent struct {
+// SetEvent describes that a quota is added or modified and contains only changed properties
+type SetEvent struct {
 	eventstore.BaseEvent `json:"-"`
-
-	Unit          Unit                      `json:"unit"`
-	From          time.Time                 `json:"from"`
-	ResetInterval time.Duration             `json:"interval,omitempty"`
-	Amount        uint64                    `json:"amount"`
-	Limit         bool                      `json:"limit"`
-	Notifications []*AddedEventNotification `json:"notifications,omitempty"`
+	Unit                 Unit                     `json:"unit"`
+	From                 *time.Time               `json:"from,omitempty"`
+	ResetInterval        *time.Duration           `json:"interval,omitempty"`
+	Amount               *uint64                  `json:"amount,omitempty"`
+	Limit                *bool                    `json:"limit,omitempty"`
+	Notifications        *[]*SetEventNotification `json:"notifications,omitempty"`
 }
 
-type AddedEventNotification struct {
+type SetEventNotification struct {
 	ID      string `json:"id"`
 	Percent uint16 `json:"percent"`
-	Repeat  bool   `json:"repeat,omitempty"`
+	Repeat  bool   `json:"repeat"`
 	CallURL string `json:"callUrl"`
 }
 
-func (e *AddedEvent) Data() interface{} {
+func (e *SetEvent) Data() interface{} {
 	return e
 }
 
-func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddQuotaUnitUniqueConstraint(e.Unit)}
+func (e *SetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
-func NewAddedEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
+func NewSetEvent(
+	base *eventstore.BaseEvent,
 	unit Unit,
-	from time.Time,
-	resetInterval time.Duration,
-	amount uint64,
-	limit bool,
-	notifications []*AddedEventNotification,
-) *AddedEvent {
-	return &AddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			AddedEventType,
-		),
-		Unit:          unit,
-		From:          from,
-		ResetInterval: resetInterval,
-		Amount:        amount,
-		Limit:         limit,
-		Notifications: notifications,
+	changes ...QuotaChange,
+) *SetEvent {
+	changedEvent := &SetEvent{
+		BaseEvent: *base,
+		Unit:      unit,
+	}
+	for _, change := range changes {
+		change(changedEvent)
+	}
+	return changedEvent
+}
+
+type QuotaChange func(*SetEvent)
+
+func ChangeAmount(amount uint64) QuotaChange {
+	return func(e *SetEvent) {
+		e.Amount = &amount
 	}
 }
 
-func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	e := &AddedEvent{
+func ChangeLimit(limit bool) QuotaChange {
+	return func(e *SetEvent) {
+		e.Limit = &limit
+	}
+}
+
+func ChangeFrom(from time.Time) QuotaChange {
+	return func(event *SetEvent) {
+		event.From = &from
+	}
+}
+
+func ChangeResetInterval(interval time.Duration) QuotaChange {
+	return func(event *SetEvent) {
+		event.ResetInterval = &interval
+	}
+}
+
+func ChangeNotifications(notifications []*SetEventNotification) QuotaChange {
+	return func(event *SetEvent) {
+		event.Notifications = &notifications
+	}
+}
+
+func SetEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e := &SetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUOTA-4n8vs", "unable to unmarshal quota added")
+		return nil, errors.ThrowInternal(err, "QUOTA-kmIpI", "unable to unmarshal quota set")
 	}
 
 	return e, nil

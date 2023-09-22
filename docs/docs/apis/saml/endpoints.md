@@ -1,10 +1,10 @@
 ---
-title: SAML endpoints
+title: SAML Endpoints in ZITADEL
 ---
 
 ## SAML 2.0 metadata
 
-The SAML Metadata is located within the issuer domain. This would give us {your_domain}/saml/v2/metadata.
+The SAML Metadata is located within the issuer domain. This would give us $CUSTOM-DOMAIN/saml/v2/metadata.
 
 This metadata contains all the information defined in the spec.
 
@@ -13,14 +13,14 @@ spec.** [Metadata for the OASIS Security Assertion Markup Language (SAML) V2.0 â
 
 ## Certificate endpoint
 
-{your_domain}/saml/v2/certificate
+$CUSTOM-DOMAIN/saml/v2/certificate
 
 The certificate endpoint provides the certificate which is used to sign the responses for download, for easier use with
 different service providers which want the certificate separately instead of inside the metadata.
 
 ## SSO endpoint
 
-{your_domain}/saml/v2/SSO
+$CUSTOM-DOMAIN/saml/v2/SSO
 
 The SSO endpoint is the starting point for all initial user authentications. The user agent (browser) will be redirected
 to this endpoint to authenticate the user.
@@ -35,10 +35,10 @@ spec.** [Bindings for the OASIS Security Assertion Markup Language (SAML) V2.0 â
 
 | Parameter | Description                                                                                                                                                                         |
 |---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| RelayState | ID to associate the exchange with the original request.                                                                                                                             |
+| RelayState | (Optional) ID to associate the exchange with the original request.                                                                                                                  |
 | SAMLRequest | The request made to the SAML IDP.  (base64 encoded)                                                                                                                                 |
 | SigAlg | Algorithm used to sign the request, only if binding is 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' as signature has to be provided es separate parameter. (base64 encoded) |
-| Signature | Signature of the request as parameter with 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' binding.  (base64 encoded)                                                                            |
+| Signature | Signature of the request as parameter with 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' binding.  (base64 encoded)                                                          |
 
 ### Successful response
 
