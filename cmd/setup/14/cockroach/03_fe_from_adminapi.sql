@@ -8,7 +8,7 @@ INSERT INTO projections.failed_events2 (
     , failure_count
     , error
     , last_failed
-) (SELECT 
+) SELECT 
     fe.view_name
     , fe.instance_id
     , e.aggregate_type
@@ -23,5 +23,4 @@ FROM
 JOIN eventstore.events e ON
     e.instance_id = fe.instance_id 
     AND e.event_sequence = fe.failed_sequence 
-)
 ON CONFLICT DO NOTHING;
