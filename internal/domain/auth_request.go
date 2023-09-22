@@ -26,9 +26,6 @@ type AuthRequest struct {
 	InstanceID    string
 	Request       Request
 
-	LoginAs    bool
-	UserOrigID string
-
 	levelOfAssurance         LevelOfAssurance
 	UserID                   string
 	UserName                 string
@@ -59,6 +56,9 @@ type AuthRequest struct {
 	DefaultTranslations      []*CustomText
 	OrgTranslations          []*CustomText
 	SAMLRequestID            string
+
+	LoginAs    bool
+	UserOrigID string
 }
 
 type ExternalUser struct {

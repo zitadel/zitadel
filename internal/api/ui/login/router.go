@@ -11,7 +11,7 @@ const (
 	EndpointHealthz                       = "/healthz"
 	EndpointReadiness                     = "/ready"
 	EndpointLogin                         = "/login"
-	EndpointLoginAs                  = "/login-as"
+	EndpointLoginAs                       = "/login-as"
 	EndpointExternalLogin                 = "/login/externalidp"
 	EndpointExternalLoginCallback         = "/login/externalidp/callback"
 	EndpointExternalLoginCallbackFormPost = "/login/externalidp/callback/form"
