@@ -87,6 +87,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 			UserGrantProvider:         queryView,
 			ProjectProvider:           queryView,
 			ApplicationProvider:       queries,
+			CustomTextProvider:        queries,
 			IdGenerator:               idGenerator,
 		},
 		eventstore.TokenRepo{
