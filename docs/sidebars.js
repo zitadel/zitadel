@@ -630,7 +630,7 @@ module.exports = {
     {
       type: 'link',
       label: 'Rate Limits (Cloud)', // The link label
-      href: '/legal/rate-limit-policy', // The internal path
+      href: '/legal/policies/rate-limit-policy', // The internal path
     },
   ],
   selfHosting: [
@@ -689,7 +689,7 @@ module.exports = {
           link: {
             type: "generated-index",
             title: "Service description",
-            slug: "/legal/policies",
+            slug: "/legal/servicedescription",
             description: "Description of services and service levels for ZITADEL Cloud and Enterprise subscriptions.",
           },
           items: [

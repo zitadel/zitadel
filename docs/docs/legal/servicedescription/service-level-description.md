@@ -4,7 +4,7 @@ sidebar_label: Service Level
 custom_edit_url: null
 --- 
 
-This annex of the [Framework Agreement](terms-of-service) describes the service levels offered by us for our Services (ZITADEL Cloud).
+This annex of the [Framework Agreement](../terms-of-service) describes the service levels offered by us for our Services (ZITADEL Cloud).
 
 Last revised: June 14, 2022
 

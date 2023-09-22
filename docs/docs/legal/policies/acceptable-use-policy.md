@@ -3,7 +3,7 @@ title: Acceptable Use Policy
 custom_edit_url: null
 --- 
 
-This policy is an annex to the [Terms of Service](terms-of-service) and clarifies your obligations while using our Services.
+This policy is an annex to the [Terms of Service](../terms-of-service) and clarifies your obligations while using our Services.
 
 ## Use
 

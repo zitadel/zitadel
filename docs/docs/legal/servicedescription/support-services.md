@@ -4,7 +4,7 @@ sidebar_label: Support service
 custom_edit_url: null
 --- 
 
-This annex of the [Framework Agreement](terms-of-service) and the [Support Service Terms and Conditions](terms-support-service) describes the support services offered by us for our Services.
+This annex of the [Framework Agreement](../terms-of-service) and the [Support Service Terms and Conditions](../terms-support-service) describes the support services offered by us for our Services.
 
 Support Services for products and services provided by ZITADEL is offered to customers according to the terms and conditions outlined in this document.
 The customer may purchase support services from ZITADEL (CAOS Ltd.) directly.

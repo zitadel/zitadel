@@ -15,15 +15,11 @@ The terms of service (**"TOS"**) outlined in this document establish the most im
 This Agreement has the following appendices. When you enter the Agreement with us, you accept these agreements.
 
 * [**Data Processing Agreement**](data-processing-agreement) - How we process personal data on behalf of you
-* [**Service Description**](cloud-service-description) - What service we offer under this agreement
-* [**Service Level Description**](service-level-description) - What service levels do we guarantee you
-* [**Support Service Descriptions**](support-services) - How we provide support services to you
+* [**Service Descriptions**](./servicedescription/) - How we provide services to yo
+* [**Policies**](./policies/) - Policies that apply for use of our services
 
-The following policies complement the TOS. When accepting the TOS, you accept these policies.
-
-* [**Privacy Policy**](privacy-policy) - How we process personal data on our websites and products
-* [**Acceptable Use Policy**](acceptable-use-policy) - What we understand as acceptable and fair use of our Services
-* [**Rate Limit Policy**](rate-limit-policy) - How we avoid overloads of our services
+The outlined policies complement these terms of service.
+When accepting the TOS, you accept these policies.
 
 ### Alterations
 
@@ -55,7 +51,7 @@ The [Annex of the data processing agreement](data-processing-agreement#annex-reg
 
 ### Support
 
-We offer Support Services directly related to the use of our Services. The Description of Support Services is available as [Annex](support-services) to this document.
+We offer Support Services directly related to the use of our Services. The Description of Support Services is available as [Annex](./servicedescription/support-services) to this document.
 
 Customers without a subscription can contact us via the official [communication channels](https://zitadel.com/contact).
 
@@ -65,11 +61,11 @@ Be advised that the scope of our influence is limited. For example, the actual a
 
 ### Service level
 
-Customers with a Subscription may be eligible for a SLA as outlined in our [Service Level Description](service-level-description).
+Customers with a Subscription may be eligible for a SLA as outlined in our [Service Level Description](./servicedescription/service-level-description).
 
 ### Inclusion of third parties
 
-We may include third parties in the provision of our services. See our [Privacy Policy](privacy-policy) and our [Data Processing Agreement](data-processing-agreement) for more information.
+We may include third parties in the provision of our services. See our [Privacy Policy](./policies/privacy-policy) and our [Data Processing Agreement](data-processing-agreement) for more information.
 
 ## Your obligations
 
@@ -79,7 +75,7 @@ At our request you will provide your truthful contact information and keep it up
 
 ### Use
 
-You will ensure that the use of our Websites and Services by you or third parties complies with all applicable legislation, these these TOS, and our [Acceptable Use Policy](acceptable-use-policy) at all times.
+You will ensure that the use of our Websites and Services by you or third parties complies with all applicable legislation, these these TOS, and our [Acceptable Use Policy](./policies/acceptable-use-policy) at all times.
 
 ### Security
 
@@ -157,7 +153,7 @@ In the event of the termination of the contract, we reserve the right to irrevoc
 
 ## Data protection
 
-Please consult the annex to this Framework Agreement, specifically our [Privacy Policy](privacy-policy) and [Data Processing Agreement](data-processing-agreement), or our [Trust Site](https://zitadel.com/trust/) for more information about how we process and protect your data.
+Please consult the annex to this Framework Agreement, specifically our [Privacy Policy](./policies/privacy-policy), [Data Processing Agreement](data-processing-agreement), [Third Party Sub-Processors](subprocessors), and or our [Trust Site](https://zitadel.com/trust/) for more information about how we process and protect your data.
 
 ## Liability
 

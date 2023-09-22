@@ -4,7 +4,7 @@ sidebar_label: Cloud service
 custom_edit_url: null
 --- 
 
-This annex of the [Framework Agreement](terms-of-service) describes the service levels offered by us for our Services.
+This annex of the [Framework Agreement](../terms-of-service) describes the service levels offered by us for our Services.
 
 Last revised: June 21, 2023
 
@@ -28,7 +28,7 @@ means execution time, rounded up to 1 second, of custom code execution via a cus
 
 Data location refers to a region, consisting of one or many countries or territories, where the customer's data is stored in our database and processed by our systems.
 
-We can not guarantee that during transit the data will only remain within this region. We take measures, as outlined in our [privacy policy](privacy-policy), to protect your data in transit and in rest.
+We can not guarantee that during transit the data will only remain within this region. We take measures, as outlined in our [privacy policy](../policies/privacy-policy), to protect your data in transit and in rest.
 
 The following regions will be available when using our cloud service. This list is for informational purposes and will be updated in due course, please refer to our website for all available regions at this time.
 
@@ -43,4 +43,4 @@ In a disaster recovery scenario, our goal is to guarantee a recovery point objec
 Under normal operations, RPO and RTO goals are below 1 minute.
 
 If you you have different requirements we provide you with a flexible approach to backup, restore, and transfer data (f.e. to a self-hosted setup) through our APIs.
-Please consult the [migration guides](../guides/migrate/introduction.md) for more information.
+Please consult the [migration guides](/docs/guides/migrate/introduction.md) for more information.

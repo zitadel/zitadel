@@ -13,8 +13,11 @@ The customer relationship (**Framework Agreement** or **The Agreement**) is crea
 This Agreement has the following appendices. When you enter the Agreement with us, you accept these agreements.
 
 * [**Data Processing Agreement**](data-processing-agreement) - How we process personal data on behalf of you
-* [**Support Service Descriptions**](support-services) - How we provide support services to you
-* [**Acceptable Use Policy**](acceptable-use-policy) - What we understand as acceptable and fair use of our Services
+* [**Service Descriptions**](./servicedescription/) - How we provide services to yo
+* [**Policies**](./policies/) - Policies that apply for use of our services
+
+The outlined policies complement these terms of service.
+When accepting the TOS, you accept these policies.
 
 ### Alterations
 
@@ -52,13 +55,13 @@ The [Annex of the data processing agreement](data-processing-agreement#annex-reg
 
 ### Support Service
 
-The Description of Support Services is available as [Annex](support-services) to this document.
+The Description of Support Services is available as [Annex](./servicedescription/support-services) to this document.
 
-The parties may enter a service level agreement, as specified in our [Support Service Description](support-services), for booked Support Services. Only named persons in the Purchase Order, or as agreed in writing (email is sufficient) may use the Support Services to interact with CAOS.
+The parties may enter a service level agreement, as specified in our [Support Service Description](./servicedescription/support-services), for booked Support Services. Only named persons in the Purchase Order, or as agreed in writing (email is sufficient) may use the Support Services to interact with CAOS.
 
 ### Service credit
 
-Failure to provide the agreed service level objectives during the term of the Agreement results in compensation via service credits, as outlined in the [Annex](support-services) per service level objective.
+Failure to provide the agreed service level objectives during the term of the Agreement results in compensation via service credits, as outlined in the [Annex](./servicedescription/support-services) per service level objective.
 
 Customer must request service credit and must notify CAOS in writing (email sufficient) within 30 days of becoming eligible for service credit and must prove failure of CAOS to meet the stated objective. CAOS will confirm or reject the claim with reasons for a refusal within 10 days. Service credit will in no case be paid as a cash equivalent. No further guarantees are provided.
 
@@ -72,7 +75,7 @@ Be advised that the scope of our influence is limited. For example, the actual a
 
 ### Inclusion of third parties
 
-We may include third parties in the provision of our services. See our [Privacy Policy](privacy-policy) and our [Data Processing Agreement](data-processing-agreement) for more information.
+We may include third parties in the provision of our services. See our [Privacy Policy](./policies/privacy-policy), [Third Party Sub-Processor List](subprocessors), and our [Data Processing Agreement](data-processing-agreement) for more information.
 
 ## Your obligations
 
@@ -82,7 +85,7 @@ At our request you will provide your truthful contact information and keep it up
 
 ### Use
 
-You will ensure that the use of our Websites and Services by you or third parties complies with all applicable legislation, these TOS, and our [Acceptable Use Policy](acceptable-use-policy) at all times.
+You will ensure that the use of our Websites and Services by you or third parties complies with all applicable legislation, these TOS, and our [Acceptable Use Policy](./policies/acceptable-use-policy) at all times.
 
 ### Maintenance of units
 
@@ -90,7 +93,7 @@ You will ensure that units eligible for Support Service are maintained and upgra
 
 ### Support Process
 
-You will ensure to follow the support process, especially provide all required initial information to the issue, as outlined in the [Annex](support-services) to this document.
+You will ensure to follow the support process, especially provide all required initial information to the issue, as outlined in the [Annex](./servicedescription/support-services) to this document.
 
 ### Training of support staff
 
@@ -181,7 +184,7 @@ In the event of the termination of the contract, we reserve the right to irrevoc
 
 ## Data protection
 
-Please consult the annex to this Framework Agreement, specifically our [Privacy Policy](privacy-policy) and [Data Processing Agreement](data-processing-agreement), or our [Trust Site](https://zitadel.com/trust/) for more information about how we process and protect your data.
+Please consult the annex to this Framework Agreement, specifically our [Privacy Policy](./policies/privacy-policy), [Data Processing Agreement](data-processing-agreement), [Third Party Sub-Processors](subprocessors), and or our [Trust Site](https://zitadel.com/trust/) for more information about how we process and protect your data.
 
 ## Liability
 
