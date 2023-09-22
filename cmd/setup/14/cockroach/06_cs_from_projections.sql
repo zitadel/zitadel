@@ -4,7 +4,7 @@ INSERT INTO projections.current_states (
     , event_date
     , "position"
     , last_updated
-) SELECT 
+) (SELECT 
     cs.projection_name
     , cs.instance_id
     , e.creation_date
@@ -25,4 +25,5 @@ JOIN eventstore.events e ON
             cs.projection_name = cs2.projection_name
             AND cs.instance_id = cs2.instance_id
     )
-;
+)
+ON CONFLICT DO NOTHING;
