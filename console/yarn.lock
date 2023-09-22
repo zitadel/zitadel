@@ -3274,15 +3274,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/jasmine@*":
-  version "4.3.1"
-  resolved "https://registry.npmjs.org/@types/jasmine/-/jasmine-4.3.1.tgz"
-  integrity sha512-Vu8l+UGcshYmV1VWwULgnV/2RDbBaO6i2Ptx7nd//oJPIZGhoI1YLST4VKagD2Pq/Bc2/7zvtvhM7F3p4SN7kQ==
-
-"@types/jasmine@~4.3.3":
-  version "4.3.5"
-  resolved "https://registry.npmjs.org/@types/jasmine/-/jasmine-4.3.5.tgz"
-  integrity sha512-9YHUdvuNDDRJYXZwHqSsO72Ok0vmqoJbNn73ttyITQp/VA60SarnZ+MPLD37rJAhVoKp+9BWOvJP5tHIRfZylQ==
+"@types/jasmine@*", "@types/jasmine@~4.3.6":
+  version "4.3.6"
+  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-4.3.6.tgz#d9855fa9f808138488784610f888046bb9a59aff"
+  integrity sha512-3N0FpQTeiWjm+Oo1WUYWguUS7E6JLceiGTriFrG8k5PU7zRLJCzLcWURU3wjMbZGS//a2/LgjsnO3QxIlwxt9g==
 
 "@types/jasminewd2@~2.0.10":
   version "2.0.10"

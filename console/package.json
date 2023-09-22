@@ -62,7 +62,7 @@
     "@bufbuild/buf": "^1.23.1",
     "@types/file-saver": "^2.0.2",
     "@types/google-protobuf": "^3.15.3",
-    "@types/jasmine": "~4.3.3",
+    "@types/jasmine": "~4.3.6",
     "@types/jasminewd2": "~2.0.10",
     "@types/jsonwebtoken": "^9.0.1",
     "@types/node": "^18.15.11",
