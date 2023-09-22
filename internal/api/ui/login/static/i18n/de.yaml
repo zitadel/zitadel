@@ -12,8 +12,8 @@ Login:
   NextButtonText: Weiter
 
 LoginAs:
-  Title: Login as
-  SelectUserLogin: Select user login.
+  Title: Anmelden als
+  SelectUserLogin: Wählen Sie Benutzeranmeldung.
 
 LDAP:
   Title: Anmeldung

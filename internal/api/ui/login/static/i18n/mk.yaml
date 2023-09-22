@@ -11,6 +11,10 @@ Login:
   RegisterButtonText: регистрирај се
   NextButtonText: следно
 
+LoginAs:
+  Title: Најавете се како
+  SelectUserLogin: Изберете корисничко најавување.
+
 LDAP:
   Title: Најава
   Description: Внесете ги вашите податоци за најава.

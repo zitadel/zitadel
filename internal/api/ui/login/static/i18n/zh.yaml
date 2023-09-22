@@ -12,8 +12,8 @@ Login:
   NextButtonText: 继续
 
 LoginAs:
-  Title: Login as
-  SelectUserLogin: Select user login.
+  Title: 登录身份
+  SelectUserLogin: 选择用户登录。
 
 LDAP:
   Title: 注册

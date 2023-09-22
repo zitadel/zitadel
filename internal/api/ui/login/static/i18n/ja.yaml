@@ -12,8 +12,8 @@ Login:
   NextButtonText: 次へ
 
 LoginAs:
-  Title: Login as
-  SelectUserLogin: Select user login.
+  Title: としてログイン
+  SelectUserLogin: ユーザーログインを選択します。
 
 SelectAccount:
   Title: アカウントの選択
