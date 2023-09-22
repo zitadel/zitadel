@@ -26,19 +26,15 @@ const (
 )
 
 type Config struct {
-	Host               string
-	Port               uint16
-	Database           string
-	EventPushConnRatio float64
-	MaxOpenConns       uint32
-	MaxIdleConns       uint32
-	MaxConnLifetime    time.Duration
-	MaxConnIdleTime    time.Duration
-	User               User
-	Admin              User
-
-	connInfo *dialect.ConnectionInfo
-
+	Host            string
+	Port            uint16
+	Database        string
+	MaxOpenConns    uint32
+	MaxIdleConns    uint32
+	MaxConnLifetime time.Duration
+	MaxConnIdleTime time.Duration
+	User            User
+	Admin           User
 	// Additional options to be appended as options=<Options>
 	// The value will be taken as is. Multiple options are space separated.
 	Options string
@@ -69,28 +65,29 @@ func (c *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 		}
 	}
 
-	c.connInfo, err = dialect.NewConnectionInfo(c.MaxOpenConns, c.MaxIdleConns, c.EventPushConnRatio)
+	return c, nil
+}
+
+func (c *Config) Connect(useAdmin, isEventPusher bool, pusherRatio float32, appName string) (*sql.DB, error) {
+	client, err := sql.Open("pgx", c.String(useAdmin, appName))
 	if err != nil {
 		return nil, err
 	}
 
-	return c, nil
-}
-
-func (c *Config) Connect(useAdmin, isEventPusher bool, appName string) (*sql.DB, error) {
-	client, err := sql.Open("pgx", c.String(useAdmin, appName))
+	connInfo, err := dialect.NewConnectionInfo(c.MaxOpenConns, c.MaxIdleConns, float64(pusherRatio))
 	if err != nil {
 		return nil, err
 	}
 
 	var maxConns, maxIdleConns uint32
 	if isEventPusher {
-		maxConns = c.connInfo.EventstorePusher.MaxOpenConns
-		maxIdleConns = c.connInfo.EventstorePusher.MaxIdleConns
+		maxConns = connInfo.EventstorePusher.MaxOpenConns
+		maxIdleConns = connInfo.EventstorePusher.MaxIdleConns
 	} else {
-		maxConns = c.connInfo.ZITADEL.MaxOpenConns
-		maxIdleConns = c.connInfo.ZITADEL.MaxIdleConns
+		maxConns = connInfo.ZITADEL.MaxOpenConns
+		maxIdleConns = connInfo.ZITADEL.MaxIdleConns
 	}
+
 	client.SetMaxOpenConns(int(maxConns))
 	client.SetMaxIdleConns(int(maxIdleConns))
 	client.SetConnMaxLifetime(c.MaxConnLifetime)

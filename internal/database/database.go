@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"reflect"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
 
 	_ "github.com/zitadel/zitadel/internal/database/cockroach"
@@ -14,8 +15,9 @@ import (
 )
 
 type Config struct {
-	Dialects  map[string]interface{} `mapstructure:",remain"`
-	connector dialect.Connector
+	Dialects           map[string]interface{} `mapstructure:",remain"`
+	EventPushConnRatio float32
+	connector          dialect.Connector
 }
 
 func (c *Config) SetConnector(connector dialect.Connector) {
@@ -97,7 +99,8 @@ func Connect(config Config, useAdmin, isEventPusher bool) (*DB, error) {
 	if isEventPusher {
 		appName = EventstorePusherAppName
 	}
-	client, err := config.connector.Connect(useAdmin, isEventPusher, appName)
+
+	client, err := config.connector.Connect(useAdmin, isEventPusher, config.EventPushConnRatio, appName)
 	if err != nil {
 		return nil, err
 	}
@@ -112,20 +115,20 @@ func Connect(config Config, useAdmin, isEventPusher bool) (*DB, error) {
 	}, nil
 }
 
-func DecodeHook(from, to reflect.Value) (interface{}, error) {
+func DecodeHook(from, to reflect.Value) (_ interface{}, err error) {
 	if to.Type() != reflect.TypeOf(Config{}) {
 		return from.Interface(), nil
 	}
 
-	configuredDialects, ok := from.Interface().(map[string]interface{})
-	if !ok {
-		return from.Interface(), nil
+	config := new(Config)
+	if err = mapstructure.Decode(from.Interface(), config); err != nil {
+		return nil, err
 	}
 
-	configuredDialect := dialect.SelectByConfig(configuredDialects)
-	configs := make([]interface{}, 0, len(configuredDialects)-1)
+	configuredDialect := dialect.SelectByConfig(config.Dialects)
+	configs := make([]interface{}, 0, len(config.Dialects)-1)
 
-	for name, dialectConfig := range configuredDialects {
+	for name, dialectConfig := range config.Dialects {
 		if !configuredDialect.Matcher.MatchName(name) {
 			continue
 		}
@@ -133,12 +136,12 @@ func DecodeHook(from, to reflect.Value) (interface{}, error) {
 		configs = append(configs, dialectConfig)
 	}
 
-	connector, err := configuredDialect.Matcher.Decode(configs)
+	config.connector, err = configuredDialect.Matcher.Decode(configs)
 	if err != nil {
 		return nil, err
 	}
 
-	return Config{connector: connector}, nil
+	return config, nil
 }
 
 func (c Config) DatabaseName() string {
