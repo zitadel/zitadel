@@ -50,7 +50,7 @@ Request the user information by calling the [userinfo endpoint](/docs/apis/openi
 
 ```bash
 curl --request GET \
-  --url "https://$ZITADEL_DOMAIN/oidc/v1/userinfo" \
+  --url "https://$CUSTOM-DOMAIN/oidc/v1/userinfo" \
   --header "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -166,7 +166,7 @@ If you get the error "invalid audience (APP-Zxfako)", then you need to add the r
 You can request the user's metadata with the [List My Metadata](/docs/apis/resources/auth/auth-service-list-my-metadata) method:
 
 ```bash
-curl -L -X POST "https://$ZITADEL_DOMAIN/auth/v1/users/me/metadata/_search" \
+curl -L -X POST "https://$CUSTOM-DOMAIN/auth/v1/users/me/metadata/_search" \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H "Authorization: Bearer $ACCESS_TOKEN" \
@@ -188,7 +188,7 @@ curl -L -X POST "https://$ZITADEL_DOMAIN/auth/v1/users/me/metadata/_search" \
 ```
 
 Replace `$ACCESS_TOKEN` with your user's access token.  
-Replace `$ZITADEL_DOMAIN` with your ZITADEL instance's url.  
+Replace `$CUSTOM-DOMAIN` with your ZITADEL instance's url.  
 Replace `$METADATA_KEY` with they key you want to search for (f.e. "ContractNumber")
 
 :::info Get all metadata

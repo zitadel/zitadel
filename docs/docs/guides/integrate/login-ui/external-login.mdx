@@ -1,5 +1,5 @@
 ---
-title: Handle External Login
+title: Handle External Logins in ZITADEL
 sidebar_label: External Identity Provider
 ---
 
@@ -26,7 +26,7 @@ In the response, you will get an authentication URL of the provider you like.
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/idp_intents \
+  --url https://$ZITADEL_DOMAIN/v2beta/idp_intents \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -71,7 +71,7 @@ To get the information of the provider, make a request to ZITADEL.
 ### Request
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/idp_intents/$INTENT_ID \
+  --url https://$ZITADEL_DOMAIN/v2beta/idp_intents/$INTENT_ID \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -127,7 +127,7 @@ This check requires that the previous step ended on the successful page and didn
 #### Request
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/sessions \
+  --url https://$ZITADEL_DOMAIN/v2beta/sessions \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
 
@@ -158,7 +158,7 @@ The display name is used to list the linkings on the users.
 #### Request
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/users/human \
+  --url https://$ZITADEL_DOMAIN/v2beta/users/human \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -196,7 +196,7 @@ If you want to link/connect to an existing account you can perform the add ident
 #### Request
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2alpha/users/users/218385419895570689/links \
+  --url https://$ZITADEL_DOMAIN/v2beta/users/users/218385419895570689/links \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \

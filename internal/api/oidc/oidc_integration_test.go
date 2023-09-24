@@ -18,9 +18,9 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2alpha"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
+	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 var (

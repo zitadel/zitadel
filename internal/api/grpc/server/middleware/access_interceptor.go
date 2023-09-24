@@ -10,11 +10,11 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/logstore"
-	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
+	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func AccessStorageInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor {
+func AccessStorageInterceptor(svc *logstore.Service[*record.AccessLog]) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ interface{}, err error) {
 		if !svc.Enabled() {
 			return handler(ctx, req)
@@ -36,9 +36,9 @@ func AccessStorageInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor
 		resMd, _ := metadata.FromOutgoingContext(ctx)
 		instance := authz.GetInstance(ctx)
 
-		record := &access.Record{
+		r := &record.AccessLog{
 			LogDate:         time.Now(),
-			Protocol:        access.GRPC,
+			Protocol:        record.GRPC,
 			RequestURL:      info.FullMethod,
 			ResponseStatus:  respStatus,
 			RequestHeaders:  reqMd,
@@ -49,7 +49,7 @@ func AccessStorageInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor
 			RequestedHost:   instance.RequestedHost(),
 		}
 
-		svc.Handle(interceptorCtx, record)
+		svc.Handle(interceptorCtx, r)
 		return resp, handlerErr
 	}
 }

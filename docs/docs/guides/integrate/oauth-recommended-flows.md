@@ -1,5 +1,5 @@
 ---
-title: Recommended authorization flows
+title: Recommended Authorization Flows
 ---
 
 <table className="table-wrapper">
