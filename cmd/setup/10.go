@@ -35,7 +35,8 @@ func (mig *CorrectCreationDate) Execute(ctx context.Context) (err error) {
 	ctx, cancel := context.WithTimeout(ctx, mig.FailAfter)
 	defer cancel()
 
-	for {
+	for i := 0; ; i++ {
+		logging.WithFields("mig", mig.String(), "iteration", i).Debug("start iteration")
 		var affected int64
 		err = crdb.ExecuteTx(ctx, mig.dbClient.DB, nil, func(tx *sql.Tx) error {
 			if mig.dbClient.Type() == "cockroach" {
@@ -47,6 +48,7 @@ func (mig *CorrectCreationDate) Execute(ctx context.Context) (err error) {
 			if err != nil {
 				return err
 			}
+			logging.WithFields("mig", mig.String(), "iteration", i).Debug("temp table created")
 
 			_, err = tx.ExecContext(ctx, correctCreationDate10Truncate)
 			if err != nil {
@@ -56,6 +58,7 @@ func (mig *CorrectCreationDate) Execute(ctx context.Context) (err error) {
 			if err != nil {
 				return err
 			}
+			logging.WithFields("mig", mig.String(), "iteration", i).Debug("temp table filled")
 
 			res := tx.QueryRowContext(ctx, correctCreationDate10CountWrongEvents)
 			if err := res.Scan(&affected); err != nil || affected == 0 {
@@ -66,14 +69,14 @@ func (mig *CorrectCreationDate) Execute(ctx context.Context) (err error) {
 			if err != nil {
 				return err
 			}
-			_, err = mig.dbClient.ExecContext(ctx, updateStmt)
+			_, err = tx.ExecContext(ctx, updateStmt)
 			if err != nil {
 				return err
 			}
-
-			logging.WithFields("count", affected).Info("creation dates changed")
+			logging.WithFields("mig", mig.String(), "iteration", i, "count", affected).Debug("creation dates updated")
 			return nil
 		})
+		logging.WithFields("mig", mig.String(), "iteration", i).Debug("end iteration")
 		if affected == 0 || err != nil {
 			return err
 		}
