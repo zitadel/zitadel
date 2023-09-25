@@ -49,7 +49,8 @@ func (q *Queries) GetRemainingQuotaUsage(ctx context.Context, instanceID string,
 				QuotaColumnLimit.identifier():            true,
 			},
 			sq.Expr("age(" + QuotaPeriodColumnStart.identifier() + ") < " + QuotaColumnInterval.identifier()),
-			sq.Expr(QuotaPeriodColumnStart.identifier() + " < now()"),
+			sq.Expr(QuotaPeriodColumnStart.identifier() + " <= now()"),
+			sq.Expr(QuotaPeriodColumnStart.identifier() + " >= " + QuotaColumnFrom.identifier()),
 		}).
 		ToSql()
 	if err != nil {
@@ -73,14 +74,14 @@ func prepareRemainingQuotaUsageQuery(ctx context.Context, db prepareDatabase) (s
 			From(quotaPeriodsTable.identifier()).
 			Join(join(QuotaColumnUnit, QuotaPeriodColumnUnit) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*uint64, error) {
-			usage := new(uint64)
-			err := row.Scan(usage)
+			remaining := new(uint64)
+			err := row.Scan(remaining)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
 					return nil, zitadel_errors.ThrowNotFound(err, "QUERY-quiowi2", "Errors.Internal")
 				}
 				return nil, zitadel_errors.ThrowInternal(err, "QUERY-81j1jn2", "Errors.Internal")
 			}
-			return usage, nil
+			return remaining, nil
 		}
 }

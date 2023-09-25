@@ -1,5 +1,6 @@
 ---
-title: Projects
+title: ZITADEL Projects
+sidebar_label: Projects
 ---
 
 # Project
