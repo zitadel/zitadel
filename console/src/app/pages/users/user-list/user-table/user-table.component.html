@@ -29,7 +29,7 @@
       class="bg-state inactive"
       mat-raised-button
       *ngIf="selection.hasValue() && multipleDeactivatePossible"
-      [disabled]="!canWrite"
+      [disabled]="(canWrite$ | async) === false"
       color="primary"
     >
       <div class="cnsl-action-button">
@@ -43,7 +43,7 @@
       class="bg-state active margin-left"
       mat-raised-button
       *ngIf="selection.hasValue() && multipleActivatePossible"
-      [disabled]="!canWrite"
+      [disabled]="(canWrite$ | async) === false"
       color="primary"
     >
       <div class="cnsl-action-button">
@@ -61,7 +61,7 @@
       (click)="gotoRouterLink(['/users', type === Type.TYPE_HUMAN ? 'create' : 'create-machine'])"
       color="primary"
       mat-raised-button
-      [disabled]="!canWrite"
+      [disabled]="(canWrite$ | async) === false"
       *ngIf="!selection.hasValue()"
       data-e2e="create-user-button"
     >
@@ -84,7 +84,7 @@
           <div class="selection">
             <mat-checkbox
               class="checkbox"
-              [disabled]="!canWrite"
+              [disabled]="(canWrite$ | async) === false"
               color="primary"
               (change)="$event ? masterToggle() : null"
               [checked]="selection.hasValue() && isAllSelected()"
@@ -100,7 +100,7 @@
           <div class="selection">
             <mat-checkbox
               class="checkbox"
-              [disabled]="!canWrite"
+              [disabled]="(canWrite$ | async) === false"
               color="primary"
               (click)="$event.stopPropagation()"
               (change)="$event ? selection.toggle(user) : null"
@@ -206,8 +206,12 @@
               matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
               color="warn"
               (click)="deleteUser(user)"
-              [disabled]="!canWrite || !canDelete"
-              [attr.data-e2e]="!canWrite || !canDelete ? 'disabled-delete-button' : 'enabled-delete-button'"
+              [disabled]="(canWrite$ | async) === false || (canDelete$ | async) === false"
+              [attr.data-e2e]="
+                (canWrite$ | async) === false || (canDelete$ | async) === false
+                  ? 'disabled-delete-button'
+                  : 'enabled-delete-button'
+              "
               mat-icon-button
             >
               <i class="las la-trash"></i>

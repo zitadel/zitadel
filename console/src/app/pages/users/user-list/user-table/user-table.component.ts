@@ -6,7 +6,7 @@ import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
 import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
@@ -37,7 +37,9 @@ export class UserTableComponent implements OnInit {
   public Type: any = Type;
   @Input() public type: Type = Type.TYPE_HUMAN;
   @Input() refreshOnPreviousRoutes: string[] = [];
-  @Input() canWrite: boolean = false;
+  @Input() public canWrite$: Observable<boolean> = of(false);
+  @Input() public canDelete$: Observable<boolean> = of(false);
+
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   @ViewChild(MatSort) public sort!: MatSort;
   public INITIAL_PAGE_SIZE: number = 20;
@@ -77,7 +79,6 @@ export class UserTableComponent implements OnInit {
   public filterOpen: boolean = false;
 
   private searchQueries: SearchQuery[] = [];
-  @Input() public canDelete: boolean = false;
   constructor(
     private router: Router,
     public translate: TranslateService,

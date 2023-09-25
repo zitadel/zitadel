@@ -11,8 +11,8 @@
 
       <cnsl-user-table
         [type]="Type.TYPE_HUMAN"
-        [canWrite]="!!(['user.write$'] | hasRole | async)"
-        [canDelete]="!!(['user.delete$'] | hasRole | async)"
+        [canWrite$]="['user.write$'] | hasRole"
+        [canDelete$]="['user.delete$'] | hasRole"
       >
       </cnsl-user-table>
     </ng-container>
@@ -23,8 +23,8 @@
 
       <cnsl-user-table
         [type]="Type.TYPE_MACHINE"
-        [canWrite]="!!(['user.write$'] | hasRole | async)"
-        [canDelete]="!!(['user.delete$'] | hasRole | async)"
+        [canWrite$]="['user.write$'] | hasRole"
+        [canDelete$]="['user.delete$'] | hasRole"
       >
       </cnsl-user-table>
     </ng-container>
