@@ -229,15 +229,6 @@ func prepareTestScan(err error, res []interface{}) scan {
 	}
 }
 
-// if dest.Kind() != reflect.Struct{
-// 	reflect.ValueOf(dests[i]).Elem().Set(val)
-// 	continue
-// }
-// if _, ok := dest.Type().FieldByName("Float64"); ok {
-// 	reflect.ValueOf(dests[i]).Elem().Set(val)
-// 	continue
-// }
-
 func Test_prepareCondition(t *testing.T) {
 	type args struct {
 		query *repository.SearchQuery
