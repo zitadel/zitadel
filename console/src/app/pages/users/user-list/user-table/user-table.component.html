@@ -57,8 +57,8 @@
       (filterChanged)="applySearchQuery($any($event))"
       (filterOpen)="filterOpen = $event"
     ></cnsl-filter-user>
-    <a
-      [routerLink]="['/users', type === Type.TYPE_HUMAN ? 'create' : 'create-machine']"
+    <button
+      (click)="gotoRouterLink(['/users', type === Type.TYPE_HUMAN ? 'create' : 'create-machine'])"
       color="primary"
       mat-raised-button
       [disabled]="!canWrite"
@@ -74,7 +74,7 @@
         >
         </cnsl-action-keys>
       </div>
-    </a>
+    </button>
   </ng-template>
 
   <div class="table-wrapper">
