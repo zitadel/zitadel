@@ -1,7 +1,6 @@
 package command
 
 import (
-	"bytes"
 	"context"
 	"crypto/rand"
 	"crypto/x509"
@@ -1718,17 +1717,6 @@ func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeMo
 			}
 			provider.Metadata = data
 		}
-		if (provider.Key != nil && provider.Certificate == nil) || (provider.Key == nil && provider.Certificate != nil) {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-htrq9hqg31", "Errors.Invalid.Argument")
-		}
-		if provider.Key == nil && provider.Certificate == nil {
-			key, cert, err := generateSAMLCertAndKey(writeModel.ID, c.keySize)
-			if err != nil {
-				return nil, err
-			}
-			provider.Key = key
-			provider.Certificate = cert
-		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -1739,11 +1727,11 @@ func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeMo
 				return nil, err
 			}
 
-			keyEnc, err := crypto.Encrypt(provider.Key, c.idpConfigEncryption)
+			key, cert, err := generateSAMLCertAndKey(writeModel.ID, c.keySize)
 			if err != nil {
 				return nil, err
 			}
-			certificateEnc, err := crypto.Encrypt(provider.Certificate, c.idpConfigEncryption)
+			keyEnc, err := crypto.Encrypt(key, c.idpConfigEncryption)
 			if err != nil {
 				return nil, err
 			}
@@ -1755,7 +1743,7 @@ func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeMo
 					provider.Name,
 					provider.Metadata,
 					keyEnc,
-					certificateEnc,
+					cert,
 					provider.Binding,
 					provider.WithSignedRequest,
 					provider.IDPOptions,
@@ -1783,9 +1771,6 @@ func (c *Commands) prepareUpdateInstanceSAMLProvider(a *instance.Aggregate, writ
 			}
 			provider.Metadata = data
 		}
-		if (provider.Key != nil && provider.Certificate == nil) || (provider.Key == nil && provider.Certificate != nil) {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-tel39wh7oy", "Errors.Invalid.Argument")
-		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -1804,8 +1789,8 @@ func (c *Commands) prepareUpdateInstanceSAMLProvider(a *instance.Aggregate, writ
 				writeModel.ID,
 				provider.Name,
 				provider.Metadata,
-				provider.Key,
-				provider.Certificate,
+				nil,
+				nil,
 				c.idpConfigEncryption,
 				provider.Binding,
 				provider.WithSignedRequest,
@@ -1865,17 +1850,7 @@ func generateSAMLCertAndKey(id string, keySize int) ([]byte, []byte, error) {
 		return nil, nil, caos_errs.ThrowInternalf(err, "COMMAND-x92u101j", "failed to create certificate")
 	}
 
-	certBuff := &bytes.Buffer{}
-	defer certBuff.Reset()
-	if err := pem.Encode(certBuff, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes}); err != nil {
-		return nil, nil, err
-	}
-
-	keyBuff := &bytes.Buffer{}
-	defer keyBuff.Reset()
-	if err := pem.Encode(keyBuff, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(priv)}); err != nil {
-		return nil, nil, err
-	}
-
-	return keyBuff.Bytes(), certBuff.Bytes(), nil
+	keyBlock := &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(priv)}
+	certBlock := &pem.Block{Type: "CERTIFICATE", Bytes: derBytes}
+	return pem.EncodeToMemory(keyBlock), pem.EncodeToMemory(certBlock), nil
 }

@@ -23,7 +23,7 @@ type Session struct {
 	Request   *http.Request
 }
 
-// GetAuthURL implements the [idp.Session] interface.
+// GetAuth implements the [idp.Session] interface.
 func (s *Session) GetAuth(ctx context.Context) (string, bool) {
 	url, _ := url.Parse(s.state)
 	resp := NewTempResponseWriter()
@@ -39,7 +39,7 @@ func (s *Session) GetAuth(ctx context.Context) (string, bool) {
 	if location := resp.Header().Get("Location"); location != "" {
 		return idp.Redirect(location)
 	}
-	return idp.Form(string(resp.content.Bytes()))
+	return idp.Form(resp.content.String())
 }
 
 // FetchUser implements the [idp.Session] interface.

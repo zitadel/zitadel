@@ -1696,17 +1696,6 @@ func (c *Commands) prepareAddOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSA
 			}
 			provider.Metadata = data
 		}
-		if (provider.Key != nil && provider.Certificate == nil) || (provider.Key == nil && provider.Certificate != nil) {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-l8kkdopzx7", "Errors.Invalid.Argument")
-		}
-		if provider.Key == nil && provider.Certificate == nil {
-			key, cert, err := generateSAMLCertAndKey(writeModel.ID, c.keySize)
-			if err != nil {
-				return nil, err
-			}
-			provider.Key = key
-			provider.Certificate = cert
-		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -1716,11 +1705,11 @@ func (c *Commands) prepareAddOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSA
 			if err = writeModel.Reduce(); err != nil {
 				return nil, err
 			}
-			keyEnc, err := crypto.Encrypt(provider.Key, c.idpConfigEncryption)
+			key, cert, err := generateSAMLCertAndKey(writeModel.ID, c.keySize)
 			if err != nil {
 				return nil, err
 			}
-			certificateEnc, err := crypto.Encrypt(provider.Certificate, c.idpConfigEncryption)
+			keyEnc, err := crypto.Encrypt(key, c.idpConfigEncryption)
 			if err != nil {
 				return nil, err
 			}
@@ -1732,7 +1721,7 @@ func (c *Commands) prepareAddOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSA
 					provider.Name,
 					provider.Metadata,
 					keyEnc,
-					certificateEnc,
+					cert,
 					provider.Binding,
 					provider.WithSignedRequest,
 					provider.IDPOptions,
@@ -1750,18 +1739,12 @@ func (c *Commands) prepareUpdateOrgSAMLProvider(a *org.Aggregate, writeModel *Or
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-egixaofgyl", "Errors.Invalid.Argument")
 		}
-		if provider.Metadata == nil && provider.MetadataURL == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-k59dnfcib7", "Errors.Invalid.Argument")
-		}
 		if provider.Metadata == nil && provider.MetadataURL != "" {
 			data, err := xml.ReadMetadataFromURL(c.httpClient, provider.MetadataURL)
 			if err != nil {
 				return nil, caos_errs.ThrowInvalidArgument(err, "ORG-bkaiyd3rfo", "Errors.Project.App.SAMLMetadataMissing")
 			}
 			provider.Metadata = data
-		}
-		if (provider.Key != nil && provider.Certificate == nil) || (provider.Key == nil && provider.Certificate != nil) {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-iznhflb60d", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
@@ -1781,8 +1764,8 @@ func (c *Commands) prepareUpdateOrgSAMLProvider(a *org.Aggregate, writeModel *Or
 				writeModel.ID,
 				provider.Name,
 				provider.Metadata,
-				provider.Key,
-				provider.Certificate,
+				nil,
+				nil,
 				c.idpConfigEncryption,
 				provider.Binding,
 				provider.WithSignedRequest,

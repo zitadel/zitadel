@@ -114,8 +114,6 @@ type SAMLProvider struct {
 	Name              string
 	Metadata          []byte
 	MetadataURL       string
-	Key               []byte
-	Certificate       []byte
 	Binding           string
 	WithSignedRequest bool
 	IDPOptions        idp.Options

@@ -5782,7 +5782,7 @@ message AddSAMLProviderRequest {
             }
         ];
     }
-    zitadel.idp.v1.Binding binding = 4 [
+    zitadel.idp.v1.SAMLBinding binding = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Binding which defines the type of communication with the identity provider";
         }
@@ -5818,7 +5818,7 @@ message UpdateSAMLProviderRequest {
             }
         ];
     }
-    zitadel.idp.v1.Binding binding = 5 [
+    zitadel.idp.v1.SAMLBinding binding = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Binding which defines the type of communication with the identity provider";
         }

@@ -16,9 +16,9 @@ type SAMLIDPAddedEvent struct {
 	Name              string              `json:"name,omitempty"`
 	Metadata          []byte              `json:"metadata,omitempty"`
 	Key               *crypto.CryptoValue `json:"key,omitempty"`
-	Certificate       *crypto.CryptoValue `json:"certificate,omitempty"`
+	Certificate       []byte              `json:"certificate,omitempty"`
 	Binding           string              `json:"binding,omitempty"`
-	WithSignedRequest bool                `json:"withSignedRequest"`
+	WithSignedRequest bool                `json:"withSignedRequest,omitempty"`
 	Options
 }
 
@@ -28,7 +28,7 @@ func NewSAMLIDPAddedEvent(
 	name string,
 	metadata []byte,
 	key *crypto.CryptoValue,
-	certificate *crypto.CryptoValue,
+	certificate []byte,
 	binding string,
 	withSignedRequest bool,
 	options Options,
@@ -74,9 +74,9 @@ type SAMLIDPChangedEvent struct {
 	Name              *string             `json:"name,omitempty"`
 	Metadata          []byte              `json:"metadata,omitempty"`
 	Key               *crypto.CryptoValue `json:"key,omitempty"`
-	Certificate       *crypto.CryptoValue `json:"certificate,omitempty"`
+	Certificate       []byte              `json:"certificate,omitempty"`
 	Binding           *string             `json:"binding,omitempty"`
-	WithSignedRequest *bool               `json:"withSignedRequest"`
+	WithSignedRequest *bool               `json:"withSignedRequest,omitempty"`
 	OptionChanges
 }
 
@@ -118,7 +118,7 @@ func ChangeSAMLKey(key *crypto.CryptoValue) func(*SAMLIDPChangedEvent) {
 	}
 }
 
-func ChangeSAMLCertificate(certificate *crypto.CryptoValue) func(*SAMLIDPChangedEvent) {
+func ChangeSAMLCertificate(certificate []byte) func(*SAMLIDPChangedEvent) {
 	return func(e *SAMLIDPChangedEvent) {
 		e.Certificate = certificate
 	}

@@ -1015,7 +1015,7 @@ func NewSAMLIDPAddedEvent(
 	name string,
 	metadata []byte,
 	key *crypto.CryptoValue,
-	certificate *crypto.CryptoValue,
+	certificate []byte,
 	binding string,
 	withSignedRequest bool,
 	options idp.Options,

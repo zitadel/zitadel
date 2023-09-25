@@ -269,11 +269,11 @@ enum ProviderType {
     PROVIDER_TYPE_SAML = 12;
 }
 
-enum Binding {
-    BINDING_UNSPECIFIED = 0;
-    BINDING_POST = 1;
-    BINDING_REDIRECT = 2;
-    BINDING_ARTIFACT = 3;
+enum SAMLBinding {
+    SAML_BINDING_UNSPECIFIED = 0;
+    SAML_BINDING_POST = 1;
+    SAML_BINDING_REDIRECT = 2;
+    SAML_BINDING_ARTIFACT = 3;
 }
 
 message ProviderConfig {
@@ -453,7 +453,6 @@ message LDAPConfig {
 
 message SAMLConfig {
     bytes metadata_xml = 1 [
-        (validate.rules).bytes.max_len = 500000,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Metadata of the SAML identity provider";
         }
