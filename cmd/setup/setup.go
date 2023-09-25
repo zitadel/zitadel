@@ -103,6 +103,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s13FixQuotaProjection = &FixQuotaConstraints{dbClient: zitadelDBClient}
 	steps.s14ChangeEvents = &ChangeEvents{dbClient: esPusherDBClient}
 	steps.s15CurrentStates = &CurrentProjectionState{dbClient: zitadelDBClient}
+	steps.s16repeatStep10 = &RepeatStep10{step10: steps.CorrectCreationDate}
 
 	err = projection.Create(ctx, zitadelDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -149,6 +150,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.WithFields("name", steps.s13FixQuotaProjection.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s15CurrentStates)
 	logging.WithFields("name", steps.s15CurrentStates.String()).OnError(err).Fatal("migration failed")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s16repeatStep10)
+	logging.WithFields("name", steps.s16repeatStep10.String()).OnError(err).Fatal("migration failed")
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)
