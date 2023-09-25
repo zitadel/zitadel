@@ -195,7 +195,7 @@ func TestCommands_pushUserU2F(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:     eventstoreExpect(t, toExpecters(prep...)...),
+				eventstore:     eventstoreExpect(t, prep...),
 				webauthnConfig: webauthnConfig,
 				idGenerator:    id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			}

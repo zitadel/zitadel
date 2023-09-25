@@ -225,7 +225,7 @@ func TestCommands_CreateSession(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          eventstoreExpect(t, toExpecters(tt.expect...)...),
+				eventstore:          eventstoreExpect(t, tt.expect...),
 				idGenerator:         tt.fields.idGenerator,
 				sessionTokenCreator: tt.fields.tokenCreator,
 			}
