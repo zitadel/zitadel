@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"math"
 	"sync"
 	"time"
 
@@ -131,17 +132,19 @@ func (h *Handler) schedule(ctx context.Context) {
 			scheduledCtx := call.WithTimestamp(ctx)
 			for _, instance := range instances {
 				instanceCtx := authz.WithInstanceID(scheduledCtx, instance)
+
+				// simple implementation of do while
 				_, err = h.Trigger(instanceCtx)
 				instanceFailed = instanceFailed || err != nil
 				h.log().WithField("instance", instance).OnError(err).Info("scheduled trigger failed")
-
+				// retry if trigger failed
 				for ; err != nil; _, err = h.Trigger(instanceCtx) {
+					time.Sleep(h.retryFailedAfter)
 					instanceFailed = instanceFailed || err != nil
 					h.log().WithField("instance", instance).OnError(err).Info("scheduled trigger failed")
 					if err == nil {
 						break
 					}
-					time.Sleep(h.retryFailedAfter)
 				}
 			}
 
@@ -444,7 +447,7 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		InstanceID(currentState.instanceID)
 
 	if currentState.position > 0 {
-		builder = builder.PositionAfter(currentState.position - 1)
+		builder = builder.PositionAfter(math.Float64frombits(math.Float64bits(currentState.position) - 1))
 	}
 
 	for aggregateType, eventTypes := range h.eventTypes {
