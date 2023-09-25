@@ -17,6 +17,7 @@ import {
   MESSAGETEXTS,
   NOTIFICATION_POLICY,
   PRIVACYPOLICY,
+  VERIFIED_DOMAINS,
 } from '../../modules/settings-list/settings';
 
 @Component({
@@ -34,6 +35,7 @@ export class OrgSettingsComponent implements OnInit {
     COMPLEXITY,
     LOCKOUT,
     NOTIFICATION_POLICY,
+    VERIFIED_DOMAINS,
     DOMAIN,
     BRANDING,
     MESSAGETEXTS,

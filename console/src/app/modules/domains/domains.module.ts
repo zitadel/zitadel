@@ -14,13 +14,11 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 
 import { AddDomainDialogModule } from './add-domain-dialog/add-domain-dialog.module';
 import { DomainVerificationComponent } from './domain-verification/domain-verification.component';
-import { DomainsRoutingModule } from './domains-routing.module';
 import { DomainsComponent } from './domains.component';
 
 @NgModule({
   declarations: [DomainsComponent, DomainVerificationComponent],
   imports: [
-    DomainsRoutingModule,
     AddDomainDialogModule,
     CommonModule,
     MatIconModule,
@@ -36,5 +34,6 @@ import { DomainsComponent } from './domains.component';
     InfoSectionModule,
     MatProgressSpinnerModule,
   ],
+  exports: [DomainsComponent],
 })
 export default class DomainsModule {}
