@@ -1,7 +1,5 @@
 -- not used anymore
-ALTER TABLE eventstore.events DROP CONSTRAINT IF EXISTS previous_sequence_unique;
 DROP INDEX IF EXISTS eventstore.previous_sequence_unique CASCADE;
-ALTER TABLE eventstore.events DROP CONSTRAINT IF EXISTS prev_agg_type_seq_unique;
 DROP INDEX IF EXISTS eventstore.events@prev_agg_type_seq_unique CASCADE;
 -- dropped because equal to the PK new
 DROP INDEX IF EXISTS eventstore.events@agg_type CASCADE;

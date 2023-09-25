@@ -173,11 +173,13 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 	data := make(Data, 0)
 	event := new(repository.Event)
 
+	position := new(sql.NullFloat64)
+
 	err = scanner(
 		&event.CreationDate,
 		&event.Typ,
 		&event.Seq,
-		&event.Pos,
+		position,
 		&data,
 		&event.EditorUser,
 		&event.ResourceOwner,
@@ -194,6 +196,7 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 
 	event.Data = make([]byte, len(data))
 	copy(event.Data, data)
+	event.Pos = position.Float64
 
 	*events = append(*events, event)
 
