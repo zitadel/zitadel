@@ -72,7 +72,7 @@ type Steps struct {
 	s13FixQuotaProjection *FixQuotaConstraints
 	s14ChangeEvents       *ChangeEvents
 	s15CurrentStates      *CurrentProjectionState
-	s16repeatStep10       *RepeatStep10
+	fillPosition          *FillPosition
 }
 
 type encryptionKeyConfig struct {
