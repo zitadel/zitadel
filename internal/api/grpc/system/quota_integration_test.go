@@ -15,7 +15,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/repository/quota"
-	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	// "github.com/zitadel/zitadel/pkg/grpc/admin"
 	quota_pb "github.com/zitadel/zitadel/pkg/grpc/quota"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
