@@ -138,7 +138,23 @@ func Test_prepareColumns(t *testing.T) {
 				},
 			},
 			fields: fields{
-				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), float64(43), Data(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", eventstore.Version("")},
+				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), sql.NullFloat64{Float64: 43, Valid: true}, Data(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", eventstore.Version("")},
+			},
+		},
+		{
+			name: "event null position",
+			args: args{
+				columns: eventstore.ColumnsEvent,
+				dest:    &[]eventstore.Event{},
+			},
+			res: res{
+				query: `SELECT creation_date, event_type, event_sequence, "position", event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events`,
+				expected: []eventstore.Event{
+					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Pos: 0, Data: make(Data, 0)},
+				},
+			},
+			fields: fields{
+				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), sql.NullFloat64{Float64: 0, Valid: false}, Data(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", eventstore.Version("")},
 			},
 		},
 		{
@@ -212,6 +228,15 @@ func prepareTestScan(err error, res []interface{}) scan {
 		return nil
 	}
 }
+
+// if dest.Kind() != reflect.Struct{
+// 	reflect.ValueOf(dests[i]).Elem().Set(val)
+// 	continue
+// }
+// if _, ok := dest.Type().FieldByName("Float64"); ok {
+// 	reflect.ValueOf(dests[i]).Elem().Set(val)
+// 	continue
+// }
 
 func Test_prepareCondition(t *testing.T) {
 	type args struct {
