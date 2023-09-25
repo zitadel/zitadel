@@ -150,9 +150,14 @@ func (q *NotQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (notQ NotQuery) ToSql() (sql string, args []interface{}, err error) {
-	querySql, args, err := notQ.query.comp().ToSql()
+	querySql, queryArgs, queryErr := notQ.query.comp().ToSql()
+	// Handle the error from the query's ToSql() function.
+	if queryErr != nil {
+		return "", queryArgs, queryErr
+	}
+	// Construct the SQL statement.
 	sql = fmt.Sprintf("NOT (%s)", querySql)
-	return
+	return sql, queryArgs, nil
 }
 
 func (q *NotQuery) comp() sq.Sqlizer {
