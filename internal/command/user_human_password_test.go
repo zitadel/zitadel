@@ -780,7 +780,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         eventstoreExpect(t, tt.expect...),
+				eventstore:         eventstoreExpect(t, toExpecters(tt.expect...)...),
 				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
 			got, err := r.ChangePassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.oldPassword, tt.args.newPassword, tt.args.agentID)

@@ -438,7 +438,7 @@ func TestCommands_pushUserPasskey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:     eventstoreExpect(t, prep...),
+				eventstore:     eventstoreExpect(t, toExpecters(prep...)...),
 				webauthnConfig: webauthnConfig,
 				idGenerator:    id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			}
