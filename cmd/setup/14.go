@@ -25,11 +25,13 @@ func (mig *ChangeEvents) Execute(ctx context.Context) error {
 		return err
 	}
 	for _, migration := range migrations {
-		logging.WithFields("migration", mig.String(), "file", migration.Name()).Debug("execute statement")
 		stmt, err := readStmt(changeEvents, "14", mig.dbClient.Type(), migration.Name())
 		if err != nil {
 			return err
 		}
+
+		logging.WithFields("migration", mig.String(), "file", migration.Name()).Debug("execute statement")
+
 		_, err = mig.dbClient.ExecContext(ctx, stmt)
 		if err != nil {
 			return err

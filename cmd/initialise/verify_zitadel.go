@@ -1,9 +1,7 @@
 package initialise
 
 import (
-	"database/sql"
 	_ "embed"
-	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -36,47 +34,46 @@ func VerifyZitadel(db *database.DB, config database.Config) error {
 		return err
 	}
 
+	logging.WithFields().Info("verify system")
 	if err := exec(db, fmt.Sprintf(createSystemStmt, config.Username()), nil); err != nil {
 		return err
 	}
 
+	logging.WithFields().Info("verify encryption keys")
 	if err := createEncryptionKeys(db); err != nil {
 		return err
 	}
 
+	logging.WithFields().Info("verify projections")
 	if err := exec(db, fmt.Sprintf(createProjectionsStmt, config.Username()), nil); err != nil {
 		return err
 	}
 
+	logging.WithFields().Info("verify eventstore")
 	if err := exec(db, fmt.Sprintf(createEventstoreStmt, config.Username()), nil); err != nil {
 		return err
 	}
 
+	logging.WithFields().Info("verify events tables")
 	if err := createEvents(db); err != nil {
 		return err
 	}
 
+	logging.WithFields().Info("verify system sequence")
 	if err := exec(db, createSystemSequenceStmt, nil); err != nil {
 		return err
 	}
 
+	logging.WithFields().Info("verify unique constraints")
 	if err := exec(db, createUniqueConstraints, nil); err != nil {
 		return err
 	}
 
-	var existsPosition bool
+	logging.WithFields().Info("verify position and in_tx_order columns in events table")
+	if err := exec(db, eventsColumns, nil); err != nil {
+		return err
+	}
 
-	if db.Type() == "cockroach" {
-		existsPosition, err = existsPositionColumn(db)
-		if err != nil {
-			return err
-		}
-	}
-	if !existsPosition {
-		if err := exec(db, eventsColumns, nil); err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
@@ -120,20 +117,4 @@ func createEvents(db *database.DB) error {
 	}
 
 	return tx.Commit()
-}
-
-func existsPositionColumn(db *database.DB) (bool, error) {
-	var count int8
-
-	err := db.QueryRow(
-		func(r *sql.Row) error {
-			return r.Scan(&count)
-		},
-		"SELECT COUNT(*) FROM [SHOW COLUMNS FROM eventstore.events] WHERE column_name = 'position'",
-	)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return false, err
-	}
-
-	return count == 1, nil
 }

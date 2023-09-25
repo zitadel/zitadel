@@ -4,6 +4,8 @@ import (
 	"context"
 	"embed"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/database"
 )
 
@@ -27,6 +29,9 @@ func (mig *CurrentProjectionState) Execute(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
+
+		logging.WithFields("file", migration.Name(), "migration", mig.String()).Info("execute statement")
+
 		_, err = mig.dbClient.ExecContext(ctx, stmt)
 		if err != nil {
 			return err

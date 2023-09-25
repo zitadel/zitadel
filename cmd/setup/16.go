@@ -4,6 +4,8 @@ import (
 	"context"
 	"embed"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/database"
 )
 
@@ -25,12 +27,24 @@ func (mig *FillPosition) Execute(ctx context.Context) error {
 		return err
 	}
 
-	stmt, err := readStmt(fillNewEventCols, "16", mig.dbClient.Type(), "eventstore_columns.sql")
+	migrations, err := fillNewEventCols.ReadDir("16/" + mig.dbClient.Type())
 	if err != nil {
 		return err
 	}
-	_, err = mig.dbClient.ExecContext(ctx, stmt)
-	return err
+	for _, migration := range migrations {
+		stmt, err := readStmt(fillNewEventCols, "16", mig.dbClient.Type(), migration.Name())
+		if err != nil {
+			return err
+		}
+
+		logging.WithFields("file", migration.Name(), "migration", mig.String()).Info("execute statement")
+
+		_, err = mig.dbClient.ExecContext(ctx, stmt)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (mig *FillPosition) String() string {

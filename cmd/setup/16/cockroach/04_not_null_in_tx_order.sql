@@ -1,0 +1,1 @@
+ALTER TABLE eventstore.events ALTER COLUMN in_tx_order SET NOT NULL;
