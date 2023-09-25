@@ -17,6 +17,8 @@ import {
   LOGINTEXTS,
   MESSAGETEXTS,
   NOTIFICATIONS,
+  SMS_PROVIDER,
+  SMTP_PROVIDER,
   OIDC,
   PRIVACYPOLICY,
   SECRETS,
@@ -37,6 +39,8 @@ export class InstanceSettingsComponent implements OnInit, OnDestroy {
     // notifications
     // { showWarn: true, ...NOTIFICATIONS },
     NOTIFICATIONS,
+    SMTP_PROVIDER,
+    SMS_PROVIDER,
     // login
     LOGIN,
     IDP,

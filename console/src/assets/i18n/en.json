@@ -1020,7 +1020,9 @@
       "LOGIN": "Login Behavior and Security",
       "LOCKOUT": "Lockout",
       "COMPLEXITY": "Password complexity",
-      "NOTIFICATIONS": "Notification settings",
+      "NOTIFICATIONS": "Notifications",
+      "SMTP_PROVIDER": "SMTP Provider",
+      "SMS_PROVIDER": "SMS/Phone Provider",
       "NOTIFICATIONS_DESC": "SMTP and SMS Settings",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
@@ -1068,7 +1070,13 @@
       "PASSWORDSET": "SMTP Password was set successfully.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "Saved successfully!",
-      "REQUIREDWARN": "To send notifications from your domain, you have to enter your SMTP data."
+      "REQUIREDWARN": "To send notifications from your domain, you have to enter your SMTP data.",
+      "LIST": {
+        "TITLE": "SMTP Provider",
+        "DESCRIPTION": "Manage your SMTP Provider configuration, which can then be activated/deactivated and tested."
+      },
+      "EMPTY": "No SMTP provider available"
+      
     },
     "SMS": {
       "TITLE": "SMS Settings",

@@ -22,6 +22,7 @@ import { SecretGeneratorModule } from '../policies/secret-generator/secret-gener
 import { SecurityPolicyModule } from '../policies/security-policy/security-policy.module';
 import { SidenavModule } from '../sidenav/sidenav.module';
 import { SettingsListComponent } from './settings-list.component';
+import { SMTPSettingsModule } from '../policies/smtp-settings/smtp-settings.module';
 
 @NgModule({
   declarations: [SettingsListComponent],
@@ -37,6 +38,7 @@ import { SettingsListComponent } from './settings-list.component';
     GeneralSettingsModule,
     NotificationPolicyModule,
     IdpSettingsModule,
+    SMTPSettingsModule,
     PrivacyPolicyModule,
     MessageTextsPolicyModule,
     SecurityPolicyModule,

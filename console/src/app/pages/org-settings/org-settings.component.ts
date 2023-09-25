@@ -15,7 +15,7 @@ import {
   LOGIN,
   LOGINTEXTS,
   MESSAGETEXTS,
-  NOTIFICATION_POLICY,
+  NOTIFICATIONS,
   PRIVACYPOLICY,
 } from '../../modules/settings-list/settings';
 
@@ -33,7 +33,7 @@ export class OrgSettingsComponent implements OnInit {
     IDP,
     COMPLEXITY,
     LOCKOUT,
-    NOTIFICATION_POLICY,
+    NOTIFICATIONS,
     DOMAIN,
     BRANDING,
     MESSAGETEXTS,
