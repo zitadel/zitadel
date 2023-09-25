@@ -47,6 +47,7 @@ type AuthRequestRepo struct {
 	UserGrantProvider         userGrantProvider
 	ProjectProvider           projectProvider
 	ApplicationProvider       applicationProvider
+	CustomTextProvider        customTextProvider
 
 	IdGenerator id.Generator
 }
@@ -110,6 +111,10 @@ type projectProvider interface {
 
 type applicationProvider interface {
 	AppByOIDCClientID(context.Context, string, bool) (*query.App, error)
+}
+
+type customTextProvider interface {
+	CustomTextListByTemplate(ctx context.Context, aggregateID string, text string, withOwnerRemoved bool) (texts *query.CustomTexts, err error)
 }
 
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
@@ -1110,8 +1115,18 @@ func (repo *AuthRequestRepo) nextStepsUser(ctx context.Context, request *domain.
 		if len(steps) > 0 {
 			return steps, nil
 		}
-		// a single user session was found, use that automatically
+		// the single user session was inactive
+		if users[0].UserSessionState != domain.UserSessionStateActive {
+			return append(steps, &domain.SelectUserStep{Users: users}), nil
+		}
+		// a single active user session was found, use that automatically
 		request.SetUserInfo(users[0].UserID, users[0].UserName, users[0].LoginName, users[0].DisplayName, users[0].AvatarKey, users[0].ResourceOwner)
+		if err = repo.fillPolicies(ctx, request); err != nil {
+			return nil, err
+		}
+		if err = repo.AuthRequests.UpdateAuthRequest(ctx, request); err != nil {
+			return nil, err
+		}
 	}
 	return steps, nil
 }
@@ -1312,7 +1327,7 @@ func labelPolicyToDomain(p *query.LabelPolicy) *domain.LabelPolicy {
 }
 
 func (repo *AuthRequestRepo) getLoginTexts(ctx context.Context, aggregateID string) ([]*domain.CustomText, error) {
-	loginTexts, err := repo.Query.CustomTextListByTemplate(ctx, aggregateID, domain.LoginCustomText, false)
+	loginTexts, err := repo.CustomTextProvider.CustomTextListByTemplate(ctx, aggregateID, domain.LoginCustomText, false)
 	if err != nil {
 		return nil, err
 	}

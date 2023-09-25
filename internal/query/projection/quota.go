@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/errors"
+	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -74,10 +74,10 @@ func (*quotaProjection) Init() *old_handler.Check {
 				handler.NewColumn(QuotaColumnID, handler.ColumnTypeText),
 				handler.NewColumn(QuotaColumnInstanceID, handler.ColumnTypeText),
 				handler.NewColumn(QuotaColumnUnit, handler.ColumnTypeEnum),
-				handler.NewColumn(QuotaColumnAmount, handler.ColumnTypeInt64),
-				handler.NewColumn(QuotaColumnFrom, handler.ColumnTypeTimestamp),
-				handler.NewColumn(QuotaColumnInterval, handler.ColumnTypeInterval),
-				handler.NewColumn(QuotaColumnLimit, handler.ColumnTypeBool),
+				handler.NewColumn(QuotaColumnAmount, handler.ColumnTypeInt64, handler.Nullable()),
+				handler.NewColumn(QuotaColumnFrom, handler.ColumnTypeTimestamp, handler.Nullable()),
+				handler.NewColumn(QuotaColumnInterval, handler.ColumnTypeInterval, handler.Nullable()),
+				handler.NewColumn(QuotaColumnLimit, handler.ColumnTypeBool, handler.Nullable()),
 			},
 			handler.NewPrimaryKey(QuotaColumnInstanceID, QuotaColumnUnit),
 		),
@@ -124,7 +124,11 @@ func (q *quotaProjection) Reducers() []handler.AggregateReducer {
 			EventReducers: []handler.EventReducer{
 				{
 					Event:  quota.AddedEventType,
-					Reduce: q.reduceQuotaAdded,
+					Reduce: q.reduceQuotaSet,
+				},
+				{
+					Event:  quota.SetEventType,
+					Reduce: q.reduceQuotaSet,
 				},
 				{
 					Event:  quota.RemovedEventType,
@@ -147,26 +151,53 @@ func (q *quotaProjection) reduceQuotaNotified(event eventstore.Event) (*handler.
 	return handler.NewNoOpStatement(event), nil
 }
 
-func (q *quotaProjection) reduceQuotaAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, err := assertEvent[*quota.AddedEvent](event)
+func (q *quotaProjection) reduceQuotaSet(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*quota.SetEvent](event)
 	if err != nil {
 		return nil, err
 	}
+	var statements []func(e eventstore.Event) handler.Exec
 
-	createStatements := make([]func(e eventstore.Event) handler.Exec, len(e.Notifications)+1)
-	createStatements[0] = handler.AddCreateStatement(
-		[]handler.Column{
-			handler.NewCol(QuotaColumnID, e.Aggregate().ID),
-			handler.NewCol(QuotaColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCol(QuotaColumnUnit, e.Unit),
-			handler.NewCol(QuotaColumnAmount, e.Amount),
-			handler.NewCol(QuotaColumnFrom, e.From),
-			handler.NewCol(QuotaColumnInterval, e.ResetInterval),
-			handler.NewCol(QuotaColumnLimit, e.Limit),
-		})
-	for i := range e.Notifications {
-		notification := e.Notifications[i]
-		createStatements[i+1] = handler.AddCreateStatement(
+	// 1. Insert or update quota if the event has not only notification changes
+	quotaConflictColumns := []handler.Column{
+		handler.NewCol(QuotaColumnInstanceID, e.Aggregate().InstanceID),
+		handler.NewCol(QuotaColumnUnit, e.Unit),
+	}
+	quotaUpdateCols := make([]handler.Column, 0, 4+1+len(quotaConflictColumns))
+	if e.Limit != nil {
+		quotaUpdateCols = append(quotaUpdateCols, handler.NewCol(QuotaColumnLimit, *e.Limit))
+	}
+	if e.Amount != nil {
+		quotaUpdateCols = append(quotaUpdateCols, handler.NewCol(QuotaColumnAmount, *e.Amount))
+	}
+	if e.From != nil {
+		quotaUpdateCols = append(quotaUpdateCols, handler.NewCol(QuotaColumnFrom, *e.From))
+	}
+	if e.ResetInterval != nil {
+		quotaUpdateCols = append(quotaUpdateCols, handler.NewCol(QuotaColumnInterval, *e.ResetInterval))
+	}
+	if len(quotaUpdateCols) > 0 {
+		// TODO: Add the quota ID to the primary key in a migration?
+		quotaUpdateCols = append(quotaUpdateCols, handler.NewCol(QuotaColumnID, e.Aggregate().ID))
+		quotaUpdateCols = append(quotaUpdateCols, quotaConflictColumns...)
+		statements = append(statements, handler.AddUpsertStatement(quotaConflictColumns, quotaUpdateCols))
+	}
+
+	// 2. Delete existing notifications
+	if e.Notifications == nil {
+		return handler.NewMultiStatement(e, statements...), nil
+	}
+	statements = append(statements, handler.AddDeleteStatement(
+		[]handler.Condition{
+			handler.NewCond(QuotaNotificationColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(QuotaNotificationColumnUnit, e.Unit),
+		},
+		handler.WithTableSuffix(quotaNotificationsTableSuffix),
+	))
+	notifications := *e.Notifications
+	for i := range notifications {
+		notification := notifications[i]
+		statements = append(statements, handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(QuotaNotificationColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(QuotaNotificationColumnUnit, e.Unit),
@@ -176,10 +207,9 @@ func (q *quotaProjection) reduceQuotaAdded(event eventstore.Event) (*handler.Sta
 				handler.NewCol(QuotaNotificationColumnRepeat, notification.Repeat),
 			},
 			handler.WithTableSuffix(quotaNotificationsTableSuffix),
-		)
+		))
 	}
-
-	return handler.NewMultiStatement(e, createStatements...), nil
+	return handler.NewMultiStatement(e, statements...), nil
 }
 
 func (q *quotaProjection) reduceQuotaNotificationDue(event eventstore.Event) (*handler.Statement, error) {
@@ -270,7 +300,7 @@ func (q *quotaProjection) IncrementUsage(ctx context.Context, unit quota.Unit, i
 		instanceID, unit, periodStart, count,
 	).Scan(&sum)
 	if err != nil {
-		return 0, errors.ThrowInternalf(err, "PROJ-SJL3h", "incrementing usage for unit %d failed for at least one quota period", unit)
+		return 0, zitadel_errors.ThrowInternalf(err, "PROJ-SJL3h", "incrementing usage for unit %d failed for at least one quota period", unit)
 	}
 	return sum, err
 }

@@ -2,42 +2,25 @@ package setup
 
 import (
 	"context"
-	"embed"
-
-	"github.com/zitadel/logging"
+	_ "embed"
 
 	"github.com/zitadel/zitadel/internal/database"
 )
 
 var (
-	//go:embed 13/cockroach/*.sql
-	//go:embed 13/postgres/*.sql
-	changeEvents embed.FS
+	//go:embed 13/13_fix_quota_constraints.sql
+	fixQuotaConstraints string
 )
 
-type ChangeEvents struct {
+type FixQuotaConstraints struct {
 	dbClient *database.DB
 }
 
-func (mig *ChangeEvents) Execute(ctx context.Context) error {
-	migrations, err := changeEvents.ReadDir("13/" + mig.dbClient.Type())
-	if err != nil {
-		return err
-	}
-	for _, migration := range migrations {
-		logging.WithFields("migration", mig.String(), "file", migration.Name()).Debug("execute statement")
-		stmt, err := readStmt(changeEvents, "13", mig.dbClient.Type(), migration.Name())
-		if err != nil {
-			return err
-		}
-		_, err = mig.dbClient.ExecContext(ctx, stmt)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+func (mig *FixQuotaConstraints) Execute(ctx context.Context) error {
+	_, err := mig.dbClient.ExecContext(ctx, fixQuotaConstraints)
+	return err
 }
 
-func (mig *ChangeEvents) String() string {
-	return "13_events_push"
+func (mig *FixQuotaConstraints) String() string {
+	return "13_fix_quota_constraints"
 }
