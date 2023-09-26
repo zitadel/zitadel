@@ -486,6 +486,28 @@ func (c *Commands) UpdateOrgSAMLProvider(ctx context.Context, resourceOwner, id 
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
+func (c *Commands) GenerateOrgSAMLProvider(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
+	orgAgg := org.NewAggregate(resourceOwner)
+	writeModel := NewSAMLOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareGenerateOrgSAMLProvider(orgAgg, writeModel))
+	if err != nil {
+		return nil, err
+	}
+	if len(cmds) == 0 {
+		// no change, so return directly
+		return &domain.ObjectDetails{
+			Sequence:      writeModel.ProcessedSequence,
+			EventDate:     writeModel.ChangeDate,
+			ResourceOwner: writeModel.ResourceOwner,
+		}, nil
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return pushedEventsToObjectDetails(pushedEvents), nil
+}
+
 func (c *Commands) AddOrgAppleProvider(ctx context.Context, resourceOwner string, provider AppleProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
 	id, err := c.idGenerator.Next()
@@ -1705,7 +1727,7 @@ func (c *Commands) prepareAddOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSA
 			if err = writeModel.Reduce(); err != nil {
 				return nil, err
 			}
-			key, cert, err := generateSAMLCertAndKey(writeModel.ID, c.keySize)
+			key, cert, err := c.samlCertificateAndKeyGenerator(writeModel.ID)
 			if err != nil {
 				return nil, err
 			}
@@ -1756,7 +1778,7 @@ func (c *Commands) prepareUpdateOrgSAMLProvider(a *org.Aggregate, writeModel *Or
 				return nil, err
 			}
 			if !writeModel.State.Exists() {
-				return nil, caos_errs.ThrowNotFound(nil, "ORG-ASF3F", "Errors.Org.IDPConfig.NotExisting")
+				return nil, caos_errs.ThrowNotFound(nil, "ORG-z82dddndql", "Errors.Org.IDPConfig.NotExisting")
 			}
 			event, err := writeModel.NewChangedEvent(
 				ctx,
@@ -1770,6 +1792,49 @@ func (c *Commands) prepareUpdateOrgSAMLProvider(a *org.Aggregate, writeModel *Or
 				provider.Binding,
 				provider.WithSignedRequest,
 				provider.IDPOptions,
+			)
+			if err != nil || event == nil {
+				return nil, err
+			}
+			return []eventstore.Command{event}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareGenerateOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSAMLIDPWriteModel) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-arv4vdrb6c", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, caos_errs.ThrowNotFound(nil, "ORG-4dw21ch9o9", "Errors.Org.IDPConfig.NotExisting")
+			}
+
+			key, cert, err := c.samlCertificateAndKeyGenerator(writeModel.ID)
+			if err != nil {
+				return nil, err
+			}
+			event, err := writeModel.NewChangedEvent(
+				ctx,
+				&a.Aggregate,
+				writeModel.ID,
+				writeModel.Name,
+				writeModel.Metadata,
+				key,
+				cert,
+				c.idpConfigEncryption,
+				writeModel.Binding,
+				writeModel.WithSignedRequest,
+				writeModel.Options,
 			)
 			if err != nil || event == nil {
 				return nil, err

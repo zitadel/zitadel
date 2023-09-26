@@ -2722,11 +2722,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
         "algorithm": "RSA-265",
         "keyId": "key-id"
     },
-	"certificate": {
-        "cryptoType": 0,
-        "algorithm": "RSA-265",
-        "keyId": "key-id"
-    },
+	"certificate": `+stringToJSONByte("certificate")+`,
 	"binding": "binding",
 	"withSignedRequest": true,
 	"isCreationAllowed": true,
@@ -2793,11 +2789,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
         "algorithm": "RSA-265",
         "keyId": "key-id"
     },
-	"certificate": {
-        "cryptoType": 0,
-        "algorithm": "RSA-265",
-        "keyId": "key-id"
-    },
+	"certificate": `+stringToJSONByte("certificate")+`,
 	"binding": "binding",
 	"withSignedRequest": true,
 	"isCreationAllowed": true,
@@ -2906,11 +2898,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
         "algorithm": "RSA-265",
         "keyId": "key-id"
     },
-	"certificate": {
-        "cryptoType": 0,
-        "algorithm": "RSA-265",
-        "keyId": "key-id"
-    },
+	"certificate": `+stringToJSONByte("certificate")+`,
 	"binding": "binding",
 	"withSignedRequest": true,
 	"isCreationAllowed": true,

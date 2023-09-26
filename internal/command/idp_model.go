@@ -1730,7 +1730,7 @@ type SAMLIDPWriteModel struct {
 	ID                string
 	Metadata          []byte
 	Key               *crypto.CryptoValue
-	Certificate       *crypto.CryptoValue
+	Certificate       []byte
 	Binding           string
 	WithSignedRequest bool
 	idp.Options
@@ -1804,11 +1804,7 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 		changes = append(changes, idp.ChangeSAMLKey(keyEnc))
 	}
 	if certificate != nil {
-		certificateEnc, err := crypto.Crypt(certificate, secretCrypto)
-		if err != nil {
-			return nil, err
-		}
-		changes = append(changes, idp.ChangeSAMLCertificate(certificateEnc))
+		changes = append(changes, idp.ChangeSAMLCertificate(certificate))
 	}
 	if wm.Name != name {
 		changes = append(changes, idp.ChangeSAMLName(name))
@@ -1831,10 +1827,6 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 
 func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, getRequest requesttracker.GetRequest, addRequest requesttracker.AddRequest) (providers.Provider, error) {
 	key, err := crypto.Decrypt(wm.Key, idpAlg)
-	if err != nil {
-		return nil, err
-	}
-	cert, err := crypto.Decrypt(wm.Certificate, idpAlg)
 	if err != nil {
 		return nil, err
 	}
@@ -1868,7 +1860,7 @@ func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 		wm.Name,
 		callbackURL,
 		wm.Metadata,
-		cert,
+		wm.Certificate,
 		key,
 		opts...,
 	)

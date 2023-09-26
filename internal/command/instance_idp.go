@@ -2,12 +2,6 @@ package command
 
 import (
 	"context"
-	"crypto/rand"
-	"crypto/x509"
-	"crypto/x509/pkix"
-	"encoding/pem"
-	"math/big"
-	"strconv"
 	"strings"
 
 	"github.com/zitadel/saml/pkg/provider/xml"
@@ -541,6 +535,29 @@ func (c *Commands) UpdateInstanceSAMLProvider(ctx context.Context, id string, pr
 	instanceAgg := instance.NewAggregate(instanceID)
 	writeModel := NewSAMLInstanceIDPWriteModel(instanceID, id)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceSAMLProvider(instanceAgg, writeModel, provider))
+	if err != nil {
+		return nil, err
+	}
+	if len(cmds) == 0 {
+		// no change, so return directly
+		return &domain.ObjectDetails{
+			Sequence:      writeModel.ProcessedSequence,
+			EventDate:     writeModel.ChangeDate,
+			ResourceOwner: writeModel.ResourceOwner,
+		}, nil
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+func (c *Commands) GenerateInstanceSAMLProvider(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceAgg := instance.NewAggregate(instanceID)
+	writeModel := NewSAMLInstanceIDPWriteModel(instanceID, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareGenerateInstanceSAMLProvider(instanceAgg, writeModel))
 	if err != nil {
 		return nil, err
 	}
@@ -1727,7 +1744,7 @@ func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeMo
 				return nil, err
 			}
 
-			key, cert, err := generateSAMLCertAndKey(writeModel.ID, c.keySize)
+			key, cert, err := c.samlCertificateAndKeyGenerator(writeModel.ID)
 			if err != nil {
 				return nil, err
 			}
@@ -1804,6 +1821,49 @@ func (c *Commands) prepareUpdateInstanceSAMLProvider(a *instance.Aggregate, writ
 	}
 }
 
+func (c *Commands) prepareGenerateInstanceSAMLProvider(a *instance.Aggregate, writeModel *InstanceSAMLIDPWriteModel) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-7de108gqya", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, caos_errs.ThrowNotFound(nil, "INST-76dbwsv9vm", "Errors.IDPConfig.NotExisting")
+			}
+
+			key, cert, err := c.samlCertificateAndKeyGenerator(writeModel.ID)
+			if err != nil {
+				return nil, err
+			}
+			event, err := writeModel.NewChangedEvent(
+				ctx,
+				&a.Aggregate,
+				writeModel.ID,
+				writeModel.Name,
+				writeModel.Metadata,
+				key,
+				cert,
+				c.idpConfigEncryption,
+				writeModel.Binding,
+				writeModel.WithSignedRequest,
+				writeModel.Options,
+			)
+			if err != nil || event == nil {
+				return nil, err
+			}
+			return []eventstore.Command{event}, nil
+		}, nil
+	}
+}
+
 func (c *Commands) prepareDeleteInstanceProvider(a *instance.Aggregate, id string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -1822,35 +1882,4 @@ func (c *Commands) prepareDeleteInstanceProvider(a *instance.Aggregate, id strin
 			return []eventstore.Command{instance.NewIDPRemovedEvent(ctx, &a.Aggregate, id)}, nil
 		}, nil
 	}
-}
-
-func generateSAMLCertAndKey(id string, keySize int) ([]byte, []byte, error) {
-	priv, pub, err := crypto.GenerateKeyPair(keySize)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	serial, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, nil, err
-	}
-	template := x509.Certificate{
-		SerialNumber: big.NewInt(int64(serial)),
-		Subject: pkix.Name{
-			Organization: []string{"ZITADEL"},
-			SerialNumber: id,
-		},
-		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-		BasicConstraintsValid: true,
-	}
-
-	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, pub, priv)
-	if err != nil {
-		return nil, nil, caos_errs.ThrowInternalf(err, "COMMAND-x92u101j", "failed to create certificate")
-	}
-
-	keyBlock := &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(priv)}
-	certBlock := &pem.Block{Type: "CERTIFICATE", Bytes: derBytes}
-	return pem.EncodeToMemory(keyBlock), pem.EncodeToMemory(certBlock), nil
 }
