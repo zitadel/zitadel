@@ -40,6 +40,7 @@ const (
 	externalDomain        = "external.domain"
 	externalPort          = 3000
 	externalSecure        = false
+	externalProtocol      = "http"
 	lastEmail             = "last@email.com"
 )
 
@@ -107,7 +108,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 		name: "asset url without event trigger url",
 		test: func() (f fields, a args, w want) {
 			givenTemplate := "{{.LogoURL}}"
-			expectContent := fmt.Sprintf("http://%s:%d%s/%s/%s", instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
+			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
 			w.message = messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    "Verify email",
@@ -144,6 +145,135 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 						Expiry:       time.Hour,
 						URLTemplate:  "",
 						CodeReturned: false,
+					},
+				}, w
+		},
+	}, {
+		name: "button url with event trigger url",
+		test: func() (f fields, a args, w want) {
+			givenTemplate := "{{.URL}}"
+			testCode := "testcode"
+			expectContent := fmt.Sprintf("%s/ui/login/mail/verification?userID=%s&code=%s&orgID=%s", eventOrigin, userID, testCode, orgID)
+			w.message = messages.Email{
+				Recipients: []string{lastEmail},
+				Subject:    "Verify email",
+				Content:    expectContent,
+			}
+			codeAlg, code := cryptoValue(t, testCode)
+			smtpAlg, _ := cryptoValue(t, "smtppw")
+			queries.EXPECT().NotificationProviderByIDAndType(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(&query.DebugNotificationProvider{}, nil)
+			expectTemplateQueries(queries, givenTemplate)
+			commands := mock.NewMockCommands(gomock.NewController(t))
+			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(eventstore.TestConfig(
+						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+					)),
+					userDataCrypto:     codeAlg,
+					SMTPPasswordCrypto: smtpAlg,
+					SMSTokenCrypto:     nil,
+				}, args{
+					event: &user.HumanEmailCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       "",
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+		},
+	}, {
+		name: "button url without event trigger url",
+		test: func() (f fields, a args, w want) {
+			givenTemplate := "{{.URL}}"
+			testCode := "testcode"
+			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/mail/verification?userID=%s&code=%s&orgID=%s", externalProtocol, instancePrimaryDomain, externalPort, userID, testCode, orgID)
+			w.message = messages.Email{
+				Recipients: []string{lastEmail},
+				Subject:    "Verify email",
+				Content:    expectContent,
+			}
+			codeAlg, code := cryptoValue(t, testCode)
+			smtpAlg, _ := cryptoValue(t, "smtppw")
+			queries.EXPECT().NotificationProviderByIDAndType(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(&query.DebugNotificationProvider{}, nil)
+			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
+				Domains: []*query.InstanceDomain{{
+					Domain:    instancePrimaryDomain,
+					IsPrimary: true,
+				}},
+			}, nil)
+			expectTemplateQueries(queries, givenTemplate)
+			commands := mock.NewMockCommands(gomock.NewController(t))
+			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(eventstore.TestConfig(
+						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+					)),
+					userDataCrypto:     codeAlg,
+					SMTPPasswordCrypto: smtpAlg,
+					SMSTokenCrypto:     nil,
+				}, args{
+					event: &user.HumanEmailCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:         code,
+						Expiry:       time.Hour,
+						URLTemplate:  "",
+						CodeReturned: false,
+					},
+				}, w
+		},
+	}, {
+		name: "button url with url template and event trigger url",
+		test: func() (f fields, a args, w want) {
+			givenTemplate := "{{.URL}}"
+			urlTemplate := "https://my.custom.url/org/{{.OrgID}}/user/{{.UserID}}/verify/{{.Code}}"
+			testCode := "testcode"
+			expectContent := fmt.Sprintf("https://my.custom.url/org/%s/user/%s/verify/%s", orgID, userID, testCode)
+			w.message = messages.Email{
+				Recipients: []string{lastEmail},
+				Subject:    "Verify email",
+				Content:    expectContent,
+			}
+			codeAlg, code := cryptoValue(t, testCode)
+			smtpAlg, _ := cryptoValue(t, "smtppw")
+			queries.EXPECT().NotificationProviderByIDAndType(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(&query.DebugNotificationProvider{}, nil)
+			expectTemplateQueries(queries, givenTemplate)
+			commands := mock.NewMockCommands(gomock.NewController(t))
+			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(eventstore.TestConfig(
+						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+					)),
+					userDataCrypto:     codeAlg,
+					SMTPPasswordCrypto: smtpAlg,
+					SMSTokenCrypto:     nil,
+				}, args{
+					event: &user.HumanEmailCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       urlTemplate,
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
 					},
 				}, w
 		},
@@ -210,7 +340,7 @@ func expectTemplateQueries(queries *mock.MockQueries, template string) {
 		},
 	}, nil)
 	queries.EXPECT().MailTemplateByOrg(gomock.Any(), gomock.Any(), gomock.Any()).Return(&query.MailTemplate{Template: []byte(template)}, nil)
-	queries.EXPECT().GetNotifyUserByID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(&query.NotifyUser{LastEmail: lastEmail}, nil)
+	queries.EXPECT().GetNotifyUserByID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(&query.NotifyUser{ID: userID, ResourceOwner: orgID, LastEmail: lastEmail}, nil)
 	queries.EXPECT().GetDefaultLanguage(gomock.Any()).Return(language.English)
 	queries.EXPECT().CustomTextListByTemplate(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(2).Return(&query.CustomTexts{}, nil)
 }
