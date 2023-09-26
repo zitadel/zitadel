@@ -457,7 +457,7 @@ message SAMLConfig {
             description: "Metadata of the SAML identity provider";
         }
     ];
-    zitadel.idp.v1.Binding binding = 2 [
+    zitadel.idp.v1.SAMLBinding binding = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Binding which defines the type of communication with the identity provider";
         }
