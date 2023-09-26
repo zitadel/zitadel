@@ -82,11 +82,12 @@ func HumanPasswordChangedEventMapper(event *repository.Event) (eventstore.Event,
 type HumanPasswordCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Code             *crypto.CryptoValue     `json:"code,omitempty"`
-	Expiry           time.Duration           `json:"expiry,omitempty"`
-	NotificationType domain.NotificationType `json:"notificationType,omitempty"`
-	URLTemplate      string                  `json:"url_template,omitempty"`
-	CodeReturned     bool                    `json:"code_returned,omitempty"`
+	Code              *crypto.CryptoValue     `json:"code,omitempty"`
+	Expiry            time.Duration           `json:"expiry,omitempty"`
+	NotificationType  domain.NotificationType `json:"notificationType,omitempty"`
+	URLTemplate       string                  `json:"url_template,omitempty"`
+	CodeReturned      bool                    `json:"code_returned,omitempty"`
+	TriggeredAtOrigin string                  `json:"base_url,omitempty"`
 }
 
 func (e *HumanPasswordCodeAddedEvent) Data() interface{} {
@@ -95,6 +96,10 @@ func (e *HumanPasswordCodeAddedEvent) Data() interface{} {
 
 func (e *HumanPasswordCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
+}
+
+func (e *HumanPasswordCodeAddedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewHumanPasswordCodeAddedEvent(

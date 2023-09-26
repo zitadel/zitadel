@@ -523,6 +523,221 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 	}
 }
 
+func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
+	expectMailSubject := "Reset password"
+	tests := []struct {
+		name string
+		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, want)
+	}{{
+		name: "asset url with event trigger url",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			givenTemplate := "{{.LogoURL}}"
+			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
+			w.message = messages.Email{
+				Recipients: []string{lastEmail},
+				Subject:    expectMailSubject,
+				Content:    expectContent,
+			}
+			codeAlg, code := cryptoValue(t, ctrl, "testcode")
+			expectTemplateQueries(queries, givenTemplate)
+			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(eventstore.TestConfig(
+						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+					)),
+					userDataCrypto: codeAlg,
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       "",
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+		},
+	}, {
+		name: "asset url without event trigger url",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			givenTemplate := "{{.LogoURL}}"
+			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
+			w.message = messages.Email{
+				Recipients: []string{lastEmail},
+				Subject:    expectMailSubject,
+				Content:    expectContent,
+			}
+			codeAlg, code := cryptoValue(t, ctrl, "testcode")
+			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
+				Domains: []*query.InstanceDomain{{
+					Domain:    instancePrimaryDomain,
+					IsPrimary: true,
+				}},
+			}, nil)
+			expectTemplateQueries(queries, givenTemplate)
+			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(eventstore.TestConfig(
+						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+					)),
+					userDataCrypto: codeAlg,
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:         code,
+						Expiry:       time.Hour,
+						URLTemplate:  "",
+						CodeReturned: false,
+					},
+				}, w
+		},
+	}, {
+		name: "button url with event trigger url",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			givenTemplate := "{{.URL}}"
+			testCode := "testcode"
+			expectContent := fmt.Sprintf("%s/ui/login/password/init?userID=%s&code=%s&orgID=%s", eventOrigin, userID, testCode, orgID)
+			w.message = messages.Email{
+				Recipients: []string{lastEmail},
+				Subject:    expectMailSubject,
+				Content:    expectContent,
+			}
+			codeAlg, code := cryptoValue(t, ctrl, testCode)
+			expectTemplateQueries(queries, givenTemplate)
+			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(eventstore.TestConfig(
+						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+					)),
+					userDataCrypto: codeAlg,
+					SMSTokenCrypto: nil,
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       "",
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+		},
+	}, {
+		name: "button url without event trigger url",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			givenTemplate := "{{.URL}}"
+			testCode := "testcode"
+			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/password/init?userID=%s&code=%s&orgID=%s", externalProtocol, instancePrimaryDomain, externalPort, userID, testCode, orgID)
+			w.message = messages.Email{
+				Recipients: []string{lastEmail},
+				Subject:    expectMailSubject,
+				Content:    expectContent,
+			}
+			codeAlg, code := cryptoValue(t, ctrl, testCode)
+			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
+				Domains: []*query.InstanceDomain{{
+					Domain:    instancePrimaryDomain,
+					IsPrimary: true,
+				}},
+			}, nil)
+			expectTemplateQueries(queries, givenTemplate)
+			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(eventstore.TestConfig(
+						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+					)),
+					userDataCrypto: codeAlg,
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:         code,
+						Expiry:       time.Hour,
+						URLTemplate:  "",
+						CodeReturned: false,
+					},
+				}, w
+		},
+	}, {
+		name: "button url with url template and event trigger url",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			givenTemplate := "{{.URL}}"
+			urlTemplate := "https://my.custom.url/org/{{.OrgID}}/user/{{.UserID}}/verify/{{.Code}}"
+			testCode := "testcode"
+			expectContent := fmt.Sprintf("https://my.custom.url/org/%s/user/%s/verify/%s", orgID, userID, testCode)
+			w.message = messages.Email{
+				Recipients: []string{lastEmail},
+				Subject:    expectMailSubject,
+				Content:    expectContent,
+			}
+			codeAlg, code := cryptoValue(t, ctrl, testCode)
+			expectTemplateQueries(queries, givenTemplate)
+			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(eventstore.TestConfig(
+						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+					)),
+					userDataCrypto: codeAlg,
+					SMSTokenCrypto: nil,
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       urlTemplate,
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+		},
+	}}
+	fs, err := statik_fs.NewWithNamespace("notification")
+	assert.NoError(t, err)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			queries := mock.NewMockQueries(ctrl)
+			commands := mock.NewMockCommands(ctrl)
+			f, a, w := tt.test(ctrl, queries, commands)
+			_, err = newUserNotifier(t, ctrl, queries, fs, f, a, w).reducePasswordCodeAdded(a.event)
+			if w.err != nil {
+				w.err(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
 type fields struct {
 	queries        *mock.MockQueries
 	commands       *mock.MockCommands
