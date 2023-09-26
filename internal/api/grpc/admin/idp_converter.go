@@ -490,15 +490,15 @@ func updateSAMLProviderToCommand(req *admin_pb.UpdateSAMLProviderRequest) comman
 	}
 }
 
-func bindingToCommand(binding idp_pb.Binding) string {
+func bindingToCommand(binding idp_pb.SAMLBinding) string {
 	switch binding {
-	case idp_pb.Binding_BINDING_UNSPECIFIED:
+	case idp_pb.SAMLBinding_SAML_BINDING_UNSPECIFIED:
 		return ""
-	case idp_pb.Binding_BINDING_POST:
+	case idp_pb.SAMLBinding_SAML_BINDING_POST:
 		return saml.HTTPPostBinding
-	case idp_pb.Binding_BINDING_REDIRECT:
+	case idp_pb.SAMLBinding_SAML_BINDING_REDIRECT:
 		return saml.HTTPRedirectBinding
-	case idp_pb.Binding_BINDING_ARTIFACT:
+	case idp_pb.SAMLBinding_SAML_BINDING_ARTIFACT:
 		return saml.HTTPArtifactBinding
 	default:
 		return ""
