@@ -315,6 +315,7 @@ type DomainClaimedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName              string `json:"userName"`
+	TriggeredAtOrigin     string `json:"base_url,omitempty"`
 	oldUserName           string
 	userLoginMustBeDomain bool
 }
@@ -328,6 +329,10 @@ func (e *DomainClaimedEvent) UniqueConstraints() []*eventstore.EventUniqueConstr
 		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
 		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
 	}
+}
+
+func (e *DomainClaimedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewDomainClaimedEvent(
