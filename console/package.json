@@ -25,7 +25,7 @@
     "@angular/router": "^16.2.0",
     "@angular/service-worker": "^16.2.0",
     "@ctrl/ngx-codemirror": "^6.1.0",
-    "@grpc/grpc-js": "^1.8.14",
+    "@grpc/grpc-js": "^1.9.3",
     "@ngx-translate/core": "^14.0.0",
     "angular-oauth2-oidc": "^15.0.1",
     "angularx-qrcode": "^16.0.0",
