@@ -1164,6 +1164,12 @@ message RetrieveIdentityProviderIntentRequest{
 message RetrieveIdentityProviderIntentResponse{
   zitadel.object.v2beta.Details details = 1;
   IDPInformation idp_information = 2;
+  string user_id = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the user in ZITADEL if external user is linked"
+      example: "\"163840776835432345\"";
+    }
+  ];
 }
 
 message AddIDPLinkRequest{

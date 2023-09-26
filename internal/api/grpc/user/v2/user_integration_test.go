@@ -793,7 +793,9 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t)
 	intentID := Tester.CreateIntent(t, idpID)
 	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulOAuthIntent(t, idpID, "", "id")
+	successfulWithUserID, WithUsertoken, WithUserchangeDate, WithUsersequence := Tester.CreateSuccessfulOAuthIntent(t, idpID, "user", "id")
 	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Tester.CreateSuccessfulLDAPIntent(t, idpID, "", "id")
+	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence := Tester.CreateSuccessfulLDAPIntent(t, idpID, "user", "id")
 	samlSuccessfulID, samlToken, samlChangeDate, samlSequence := Tester.CreateSuccessfulSAMLIntent(t, idpID, "", "id")
 	type args struct {
 		ctx context.Context
@@ -865,6 +867,44 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "retrieve successful intent with linked user",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    successfulWithUserID,
+					IdpIntentToken: WithUsertoken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(WithUserchangeDate),
+					ResourceOwner: Tester.Organisation.ID,
+					Sequence:      WithUsersequence,
+				},
+				UserId: "user",
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Oauth{
+						Oauth: &user.IDPOAuthAccessInformation{
+							AccessToken: "accessToken",
+							IdToken:     gu.Ptr("idToken"),
+						},
+					},
+					IdpId:    idpID,
+					UserId:   "id",
+					UserName: "username",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"sub":                "id",
+							"preferred_username": "username",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+			},
+			wantErr: false,
+		},
+		{
 			name: "retrieve successful ldap intent",
 			args: args{
 				CTX,
@@ -879,6 +919,52 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 					ResourceOwner: Tester.Organisation.ID,
 					Sequence:      ldapSequence,
 				},
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Ldap{
+						Ldap: &user.IDPLDAPAccessInformation{
+							Attributes: func() *structpb.Struct {
+								s, err := structpb.NewStruct(map[string]interface{}{
+									"id":       []interface{}{"id"},
+									"username": []interface{}{"username"},
+									"language": []interface{}{"en"},
+								})
+								require.NoError(t, err)
+								return s
+							}(),
+						},
+					},
+					IdpId:    idpID,
+					UserId:   "id",
+					UserName: "username",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"id":                "id",
+							"preferredUsername": "username",
+							"preferredLanguage": "en",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "retrieve successful ldap intent with linked user",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    ldapSuccessfulWithUserID,
+					IdpIntentToken: ldapWithUserToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(ldapWithUserChangeDate),
+					ResourceOwner: Tester.Organisation.ID,
+					Sequence:      ldapWithUserSequence,
+				},
+				UserId: "user",
 				IdpInformation: &user.IDPInformation{
 					Access: &user.IDPInformation_Ldap{
 						Ldap: &user.IDPLDAPAccessInformation{

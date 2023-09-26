@@ -181,8 +181,14 @@ func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredenti
 		return nil, err
 	}
 	return &user.StartIdentityProviderIntentResponse{
-		Details:  object.DomainToDetailsPb(details),
-		NextStep: &user.StartIdentityProviderIntentResponse_IdpIntent{IdpIntent: &user.IDPIntent{IdpIntentId: intentWriteModel.AggregateID, IdpIntentToken: token}},
+		Details: object.DomainToDetailsPb(details),
+		NextStep: &user.StartIdentityProviderIntentResponse_IdpIntent{
+			IdpIntent: &user.IDPIntent{
+				IdpIntentId:    intentWriteModel.AggregateID,
+				IdpIntentToken: token,
+				UserId:         userID,
+			},
+		},
 	}, nil
 }
 
@@ -265,6 +271,7 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 			UserName:       intent.IDPUserName,
 			RawInformation: rawInformation,
 		},
+		UserId: intent.UserID,
 	}
 	if intent.IDPIDToken != "" || intent.IDPAccessToken != nil {
 		information.IdpInformation.Access, err = idpOAuthTokensToPb(intent.IDPIDToken, intent.IDPAccessToken, alg)
