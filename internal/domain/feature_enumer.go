@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _FeatureName = "FeatureUnspecifiedFeatureLoginDefaultOrgfeatureCount"
+const _FeatureName = "FeatureUnspecifiedFeatureLoginDefaultOrg"
 
-var _FeatureIndex = [...]uint8{0, 18, 40, 52}
+var _FeatureIndex = [...]uint8{0, 18, 40}
 
-const _FeatureLowerName = "featureunspecifiedfeaturelogindefaultorgfeaturecount"
+const _FeatureLowerName = "featureunspecifiedfeaturelogindefaultorg"
 
 func (i Feature) String() string {
 	if i < 0 || i >= Feature(len(_FeatureIndex)-1) {
@@ -26,24 +26,20 @@ func _FeatureNoOp() {
 	var x [1]struct{}
 	_ = x[FeatureUnspecified-(0)]
 	_ = x[FeatureLoginDefaultOrg-(1)]
-	_ = x[featureCount-(2)]
 }
 
-var _FeatureValues = []Feature{FeatureUnspecified, FeatureLoginDefaultOrg, featureCount}
+var _FeatureValues = []Feature{FeatureUnspecified, FeatureLoginDefaultOrg}
 
 var _FeatureNameToValueMap = map[string]Feature{
 	_FeatureName[0:18]:       FeatureUnspecified,
 	_FeatureLowerName[0:18]:  FeatureUnspecified,
 	_FeatureName[18:40]:      FeatureLoginDefaultOrg,
 	_FeatureLowerName[18:40]: FeatureLoginDefaultOrg,
-	_FeatureName[40:52]:      featureCount,
-	_FeatureLowerName[40:52]: featureCount,
 }
 
 var _FeatureNames = []string{
 	_FeatureName[0:18],
 	_FeatureName[18:40],
-	_FeatureName[40:52],
 }
 
 // FeatureString retrieves an enum value from the enum constants string name.

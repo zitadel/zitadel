@@ -1,7 +1,10 @@
 package command
 
 import (
+	"github.com/hashicorp/go.net/context"
+
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/feature"
 )
@@ -12,6 +15,18 @@ type FeatureWriteModel[T feature.SetEventType] struct {
 	feature domain.Feature
 
 	Type T
+}
+
+func (wm *FeatureWriteModel[T]) Set(ctx context.Context, value T) (event *feature.SetEvent[T], err error) {
+	if wm.Type == value {
+		return nil, nil
+	}
+	return feature.NewSetEvent[T](
+		ctx,
+		&feature.NewAggregate(wm.AggregateID).Aggregate,
+		wm.eventType(),
+		value,
+	), nil
 }
 
 func (wm *FeatureWriteModel[T]) Query() *eventstore.SearchQueryBuilder {
@@ -27,6 +42,8 @@ func (wm *FeatureWriteModel[T]) Reduce() error {
 		switch e := event.(type) {
 		case *feature.SetEvent[T]:
 			wm.Type = e.T
+		default:
+			return errors.ThrowInternal(nil, "FEAT-SDfjk", "Errors.Feature.UnknownType")
 		}
 	}
 	return wm.WriteModel.Reduce()

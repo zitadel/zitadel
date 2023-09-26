@@ -438,7 +438,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		switch v := value.(type) {
 		case bool:
 			validations = append(validations,
-				prepareSetFeature(NewInstanceFeatureWriteModel[feature.Boolean](instanceID, f), feature.Boolean{Boolean: v}, c.idGenerator, false))
+				prepareSetFeature(NewInstanceFeatureWriteModel[feature.Boolean](instanceID, f), feature.Boolean{Boolean: v}, c.idGenerator))
 		default:
 			return "", "", nil, nil, errors.ThrowInvalidArgument(nil, "INST-GE4tg", "Errors.Feature.UnknownType")
 		}

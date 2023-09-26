@@ -821,6 +821,7 @@ InternalAuthZ:
         - "iam.flow.read"
         - "iam.flow.write"
         - "iam.flow.delete"
+        - "iam.feature.write"
         - "org.read"
         - "org.global.read"
         - "org.create"
