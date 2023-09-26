@@ -244,6 +244,7 @@ type HumanInitialCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	Code                 *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry               time.Duration       `json:"expiry,omitempty"`
+	TriggeredAtOrigin    string              `json:"base_url,omitempty"`
 }
 
 func (e *HumanInitialCodeAddedEvent) Data() interface{} {
@@ -252,6 +253,10 @@ func (e *HumanInitialCodeAddedEvent) Data() interface{} {
 
 func (e *HumanInitialCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
+}
+
+func (e *HumanInitialCodeAddedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewHumanInitialCodeAddedEvent(
