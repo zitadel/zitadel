@@ -2,14 +2,13 @@ package handlers
 
 import (
 	"context"
-	"golang.org/x/text/language"
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/domain"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/query"
 )
 

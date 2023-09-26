@@ -2,9 +2,9 @@ package types
 
 import (
 	"fmt"
-	"github.com/zitadel/zitadel/internal/api/assets"
 	"strings"
 
+	"github.com/zitadel/zitadel/internal/api/assets"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/notification/templates"
 	"github.com/zitadel/zitadel/internal/query"

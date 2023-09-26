@@ -5,11 +5,9 @@ import (
 	"fmt"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
