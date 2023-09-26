@@ -48,8 +48,8 @@ export const DOMAIN: SidenavSetting = {
   i18nKey: 'SETTINGS.LIST.DOMAIN',
   groupI18nKey: 'SETTINGS.GROUPS.DOMAIN',
   requiredRoles: {
-    [PolicyComponentServiceType.MGMT]: ['policy.read'],
-    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+    [PolicyComponentServiceType.MGMT]: ['iam.policy.write'],
+    [PolicyComponentServiceType.ADMIN]: ['iam.policy.write'],
   },
 };
 
