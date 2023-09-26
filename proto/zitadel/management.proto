@@ -12561,6 +12561,7 @@ message UpdateSAMLProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     oneof metadata {
+        option (validate.required) = true;
         bytes metadata_xml = 3 [
             (validate.rules).bytes.max_len = 500000,
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
