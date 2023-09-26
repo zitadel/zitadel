@@ -149,10 +149,9 @@ func HumanPhoneVerificationFailedEventMapper(event *repository.Event) (eventstor
 type HumanPhoneCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Code              *crypto.CryptoValue `json:"code,omitempty"`
-	Expiry            time.Duration       `json:"expiry,omitempty"`
-	CodeReturned      bool                `json:"code_returned,omitempty"`
-	TriggeredAtOrigin string              `json:"base_url,omitempty"`
+	Code         *crypto.CryptoValue `json:"code,omitempty"`
+	Expiry       time.Duration       `json:"expiry,omitempty"`
+	CodeReturned bool                `json:"code_returned,omitempty"`
 }
 
 func (e *HumanPhoneCodeAddedEvent) Data() interface{} {
@@ -161,10 +160,6 @@ func (e *HumanPhoneCodeAddedEvent) Data() interface{} {
 
 func (e *HumanPhoneCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
-}
-
-func (e *HumanPhoneCodeAddedEvent) TriggerOrigin() string {
-	return e.TriggeredAtOrigin
 }
 
 func NewHumanPhoneCodeAddedEvent(
