@@ -1,7 +1,11 @@
 package handlers
 
 import (
+	"context"
+	"golang.org/x/text/language"
 	"net/http"
+
+	"github.com/zitadel/zitadel/internal/domain"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -9,8 +13,23 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
+type Queries interface {
+	ActiveLabelPolicyByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (policy *query.LabelPolicy, err error)
+	MailTemplateByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (template *query.MailTemplate, err error)
+	GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string, withOwnerRemoved bool, queries ...query.SearchQuery) (user *query.NotifyUser, err error)
+	CustomTextListByTemplate(ctx context.Context, aggregateID, template string, withOwnerRemoved bool) (texts *query.CustomTexts, err error)
+	SearchInstanceDomains(ctx context.Context, queries *query.InstanceDomainSearchQueries) (domains *query.InstanceDomains, err error)
+	SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string) (session *query.Session, err error)
+	NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (policy *query.NotificationPolicy, err error)
+	SearchMilestones(ctx context.Context, instanceIDs []string, queries *query.MilestonesSearchQueries) (milestones *query.Milestones, err error)
+	NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType) (provider *query.DebugNotificationProvider, err error)
+	SMSProviderConfig(ctx context.Context, queries ...query.SearchQuery) (config *query.SMSConfig, err error)
+	SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (config *query.SMTPConfig, err error)
+	GetDefaultLanguage(ctx context.Context) language.Tag
+}
+
 type NotificationQueries struct {
-	*query.Queries
+	Queries
 	es                 *eventstore.Eventstore
 	externalDomain     string
 	externalPort       uint16
@@ -23,7 +42,7 @@ type NotificationQueries struct {
 }
 
 func NewNotificationQueries(
-	baseQueries *query.Queries,
+	baseQueries Queries,
 	es *eventstore.Eventstore,
 	externalDomain string,
 	externalPort uint16,

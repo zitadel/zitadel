@@ -7,7 +7,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
-	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -27,27 +26,21 @@ const (
 
 type userNotifier struct {
 	crdb.StatementHandler
-	commands     *command.Commands
+	commands     Commands
 	queries      *NotificationQueries
+	channels     types.ChannelChains
 	assetsPrefix func(context.Context) string
 	otpEmailTmpl string
-	metricSuccessfulDeliveriesEmail,
-	metricFailedDeliveriesEmail,
-	metricSuccessfulDeliveriesSMS,
-	metricFailedDeliveriesSMS string
 }
 
 func NewUserNotifier(
 	ctx context.Context,
 	config crdb.StatementHandlerConfig,
-	commands *command.Commands,
+	commands Commands,
 	queries *NotificationQueries,
+	channels types.ChannelChains,
 	assetsPrefix func(context.Context) string,
 	otpEmailTmpl string,
-	metricSuccessfulDeliveriesEmail,
-	metricFailedDeliveriesEmail,
-	metricSuccessfulDeliveriesSMS,
-	metricFailedDeliveriesSMS string,
 ) *userNotifier {
 	p := new(userNotifier)
 	config.ProjectionName = UserNotificationsProjectionTable
@@ -55,12 +48,9 @@ func NewUserNotifier(
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	p.commands = commands
 	p.queries = queries
+	p.channels = channels
 	p.assetsPrefix = assetsPrefix
 	p.otpEmailTmpl = otpEmailTmpl
-	p.metricSuccessfulDeliveriesEmail = metricSuccessfulDeliveriesEmail
-	p.metricFailedDeliveriesEmail = metricFailedDeliveriesEmail
-	p.metricSuccessfulDeliveriesSMS = metricSuccessfulDeliveriesSMS
-	p.metricFailedDeliveriesSMS = metricFailedDeliveriesSMS
 	projection.NotificationsProjection = p
 	return p
 }
@@ -181,20 +171,8 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 	if err != nil {
 		return nil, err
 	}
-	err = types.SendEmail(
-		ctx,
-		string(template.Template),
-		translator,
-		notifyUser,
-		u.queries.GetSMTPConfig,
-		u.queries.GetFileSystemProvider,
-		u.queries.GetLogProvider,
-		colors,
-		u.assetsPrefix(ctx),
-		e,
-		u.metricSuccessfulDeliveriesEmail,
-		u.metricFailedDeliveriesEmail,
-	).SendUserInitCode(notifyUser, origin, code)
+	err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, u.assetsPrefix(ctx), e).
+		SendUserInitCode(notifyUser, origin, code)
 	if err != nil {
 		return nil, err
 	}
@@ -250,20 +228,8 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 	if err != nil {
 		return nil, err
 	}
-	err = types.SendEmail(
-		ctx,
-		string(template.Template),
-		translator,
-		notifyUser,
-		u.queries.GetSMTPConfig,
-		u.queries.GetFileSystemProvider,
-		u.queries.GetLogProvider,
-		colors,
-		u.assetsPrefix(ctx),
-		e,
-		u.metricSuccessfulDeliveriesEmail,
-		u.metricFailedDeliveriesEmail,
-	).SendEmailVerificationCode(notifyUser, origin, code, e.URLTemplate)
+	err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, u.assetsPrefix(ctx), e).
+		SendEmailVerificationCode(notifyUser, origin, code, e.URLTemplate)
 	if err != nil {
 		return nil, err
 	}
@@ -318,34 +284,9 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 	if err != nil {
 		return nil, err
 	}
-	notify := types.SendEmail(
-		ctx,
-		string(template.Template),
-		translator,
-		notifyUser,
-		u.queries.GetSMTPConfig,
-		u.queries.GetFileSystemProvider,
-		u.queries.GetLogProvider,
-		colors,
-		u.assetsPrefix(ctx),
-		e,
-		u.metricSuccessfulDeliveriesEmail,
-		u.metricFailedDeliveriesEmail,
-	)
+	notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, u.assetsPrefix(ctx), e)
 	if e.NotificationType == domain.NotificationTypeSms {
-		notify = types.SendSMSTwilio(
-			ctx,
-			translator,
-			notifyUser,
-			u.queries.GetTwilioConfig,
-			u.queries.GetFileSystemProvider,
-			u.queries.GetLogProvider,
-			colors,
-			u.assetsPrefix(ctx),
-			e,
-			u.metricSuccessfulDeliveriesSMS,
-			u.metricFailedDeliveriesSMS,
-		)
+		notify = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, u.assetsPrefix(ctx), e)
 	}
 	err = notify.SendPasswordCode(notifyUser, origin, code, e.URLTemplate)
 	if err != nil {
@@ -438,19 +379,7 @@ func (u *userNotifier) reduceOTPSMS(
 	if err != nil {
 		return nil, err
 	}
-	notify := types.SendSMSTwilio(
-		ctx,
-		translator,
-		notifyUser,
-		u.queries.GetTwilioConfig,
-		u.queries.GetFileSystemProvider,
-		u.queries.GetLogProvider,
-		colors,
-		u.assetsPrefix(ctx),
-		event,
-		u.metricSuccessfulDeliveriesSMS,
-		u.metricFailedDeliveriesSMS,
-	)
+	notify := types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, u.assetsPrefix(ctx), event)
 	err = notify.SendOTPSMSCode(authz.GetInstance(ctx).RequestedDomain(), origin, plainCode, expiry)
 	if err != nil {
 		return nil, err
@@ -572,20 +501,7 @@ func (u *userNotifier) reduceOTPEmail(
 	if err != nil {
 		return nil, err
 	}
-	notify := types.SendEmail(
-		ctx,
-		string(template.Template),
-		translator,
-		notifyUser,
-		u.queries.GetSMTPConfig,
-		u.queries.GetFileSystemProvider,
-		u.queries.GetLogProvider,
-		colors,
-		u.assetsPrefix(ctx),
-		event,
-		u.metricSuccessfulDeliveriesEmail,
-		u.metricFailedDeliveriesEmail,
-	)
+	notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, u.assetsPrefix(ctx), event)
 	err = notify.SendOTPEmailCode(notifyUser, url, authz.GetInstance(ctx).RequestedDomain(), origin, plainCode, expiry)
 	if err != nil {
 		return nil, err
@@ -633,20 +549,8 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 	if err != nil {
 		return nil, err
 	}
-	err = types.SendEmail(
-		ctx,
-		string(template.Template),
-		translator,
-		notifyUser,
-		u.queries.GetSMTPConfig,
-		u.queries.GetFileSystemProvider,
-		u.queries.GetLogProvider,
-		colors,
-		u.assetsPrefix(ctx),
-		e,
-		u.metricSuccessfulDeliveriesEmail,
-		u.metricFailedDeliveriesEmail,
-	).SendDomainClaimed(notifyUser, origin, e.UserName)
+	err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, u.assetsPrefix(ctx), e).
+		SendDomainClaimed(notifyUser, origin, e.UserName)
 	if err != nil {
 		return nil, err
 	}
@@ -699,20 +603,8 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 	if err != nil {
 		return nil, err
 	}
-	err = types.SendEmail(
-		ctx,
-		string(template.Template),
-		translator,
-		notifyUser,
-		u.queries.GetSMTPConfig,
-		u.queries.GetFileSystemProvider,
-		u.queries.GetLogProvider,
-		colors,
-		u.assetsPrefix(ctx),
-		e,
-		u.metricSuccessfulDeliveriesEmail,
-		u.metricFailedDeliveriesEmail,
-	).SendPasswordlessRegistrationLink(notifyUser, origin, code, e.ID, e.URLTemplate)
+	err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, u.assetsPrefix(ctx), e).
+		SendPasswordlessRegistrationLink(notifyUser, origin, code, e.ID, e.URLTemplate)
 	if err != nil {
 		return nil, err
 	}
@@ -768,20 +660,8 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 		if err != nil {
 			return nil, err
 		}
-		err = types.SendEmail(
-			ctx,
-			string(template.Template),
-			translator,
-			notifyUser,
-			u.queries.GetSMTPConfig,
-			u.queries.GetFileSystemProvider,
-			u.queries.GetLogProvider,
-			colors,
-			u.assetsPrefix(ctx),
-			e,
-			u.metricSuccessfulDeliveriesEmail,
-			u.metricFailedDeliveriesEmail,
-		).SendPasswordChange(notifyUser, origin)
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, u.assetsPrefix(ctx), e).
+			SendPasswordChange(notifyUser, origin)
 		if err != nil {
 			return nil, err
 		}
@@ -832,19 +712,8 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 	if err != nil {
 		return nil, err
 	}
-	err = types.SendSMSTwilio(
-		ctx,
-		translator,
-		notifyUser,
-		u.queries.GetTwilioConfig,
-		u.queries.GetFileSystemProvider,
-		u.queries.GetLogProvider,
-		colors,
-		u.assetsPrefix(ctx),
-		e,
-		u.metricSuccessfulDeliveriesSMS,
-		u.metricFailedDeliveriesSMS,
-	).SendPhoneVerificationCode(notifyUser, origin, code, authz.GetInstance(ctx).RequestedDomain())
+	err = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, u.assetsPrefix(ctx), e).
+		SendPhoneVerificationCode(notifyUser, origin, code, authz.GetInstance(ctx).RequestedDomain())
 	if err != nil {
 		return nil, err
 	}

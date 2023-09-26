@@ -15,7 +15,7 @@ import (
 
 const webhookSpanName = "webhook.NotificationChannel"
 
-func JSONChannels(
+func WebhookChannels(
 	ctx context.Context,
 	webhookConfig webhook.Config,
 	getFileSystemProvider func(ctx context.Context) (*fs.Config, error),

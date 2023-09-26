@@ -55,35 +55,10 @@ func Start(
 	err = metrics.RegisterCounter(metricFailedDeliveriesJSON, "Failed JSON message deliveries")
 	logging.WithFields("metric", metricFailedDeliveriesJSON).OnError(err).Panic("unable to register counter")
 	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption, statikFS)
-	handlers.NewUserNotifier(
-		ctx,
-		projection.ApplyCustomConfig(userHandlerCustomConfig),
-		commands,
-		q,
-		assetsPrefix,
-		otpEmailTmpl,
-		metricSuccessfulDeliveriesEmail,
-		metricFailedDeliveriesEmail,
-		metricSuccessfulDeliveriesSMS,
-		metricFailedDeliveriesSMS,
-	).Start()
-	handlers.NewQuotaNotifier(
-		ctx,
-		projection.ApplyCustomConfig(quotaHandlerCustomConfig),
-		commands,
-		q,
-		metricSuccessfulDeliveriesJSON,
-		metricFailedDeliveriesJSON,
-	).Start()
+	c := &channels{q: q}
+	handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, assetsPrefix, otpEmailTmpl).Start()
+	handlers.NewQuotaNotifier(ctx, projection.ApplyCustomConfig(quotaHandlerCustomConfig), commands, q, c).Start()
 	if telemetryCfg.Enabled {
-		handlers.NewTelemetryPusher(
-			ctx,
-			telemetryCfg,
-			projection.ApplyCustomConfig(telemetryHandlerCustomConfig),
-			commands,
-			q,
-			metricSuccessfulDeliveriesJSON,
-			metricFailedDeliveriesJSON,
-		).Start()
+		handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c).Start()
 	}
 }

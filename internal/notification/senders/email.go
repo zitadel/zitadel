@@ -17,14 +17,14 @@ const smtpSpanName = "smtp.NotificationChannel"
 
 func EmailChannels(
 	ctx context.Context,
-	emailConfig func(ctx context.Context) (*smtp.Config, error),
+	emailConfig *smtp.Config,
 	getFileSystemProvider func(ctx context.Context) (*fs.Config, error),
 	getLogProvider func(ctx context.Context) (*log.Config, error),
 	successMetricName,
 	failureMetricName string,
 ) (chain *Chain, err error) {
 	channels := make([]channels.NotificationChannel, 0, 3)
-	p, err := smtp.InitChannel(ctx, emailConfig)
+	p, err := smtp.InitChannel(emailConfig)
 	logging.WithFields(
 		"instance", authz.GetInstance(ctx).InstanceID(),
 	).OnError(err).Debug("initializing SMTP channel failed")

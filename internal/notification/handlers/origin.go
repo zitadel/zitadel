@@ -15,7 +15,7 @@ import (
 
 type BaseURLEvent interface {
 	eventstore.Event
-	GetBaseURL() string
+	TriggerBaseURL() string
 }
 
 func (n *NotificationQueries) Origin(ctx context.Context, e eventstore.Event) (string, error) {
@@ -23,7 +23,7 @@ func (n *NotificationQueries) Origin(ctx context.Context, e eventstore.Event) (s
 	if !ok {
 		return "", errors.ThrowInternal(fmt.Errorf("event of type %T doesn't implement BaseURLEvent", e), "NOTIF-3m9fs", "Errors.Internal")
 	}
-	baseURL := baseURLEvent.GetBaseURL()
+	baseURL := baseURLEvent.TriggerBaseURL()
 	if baseURL != "" {
 		return baseURL, nil
 	}

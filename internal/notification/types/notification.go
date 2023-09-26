@@ -3,10 +3,10 @@ package types
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/notification/senders"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/i18n"
-	"github.com/zitadel/zitadel/internal/notification/channels/fs"
-	"github.com/zitadel/zitadel/internal/notification/channels/log"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
@@ -21,19 +21,21 @@ type Notify func(
 	allowUnverifiedNotificationChannel bool,
 ) error
 
+type ChannelChains interface {
+	Email(context.Context) (*senders.Chain, *smtp.Config, error)
+	SMS(context.Context) (*senders.Chain, *twilio.Config, error)
+	Webhook(context.Context, webhook.Config) (*senders.Chain, error)
+}
+
 func SendEmail(
 	ctx context.Context,
+	channels ChannelChains,
 	mailhtml string,
 	translator *i18n.Translator,
 	user *query.NotifyUser,
-	emailConfig func(ctx context.Context) (*smtp.Config, error),
-	getFileSystemProvider func(ctx context.Context) (*fs.Config, error),
-	getLogProvider func(ctx context.Context) (*log.Config, error),
 	colors *query.LabelPolicy,
 	assetsPrefix string,
 	triggeringEvent eventstore.Event,
-	successMetricName,
-	failureMetricName string,
 ) Notify {
 	return func(
 		url string,
@@ -49,32 +51,24 @@ func SendEmail(
 		}
 		return generateEmail(
 			ctx,
+			channels,
 			user,
 			data.Subject,
 			template,
-			emailConfig,
-			getFileSystemProvider,
-			getLogProvider,
 			allowUnverifiedNotificationChannel,
 			triggeringEvent,
-			successMetricName,
-			failureMetricName,
 		)
 	}
 }
 
 func SendSMSTwilio(
 	ctx context.Context,
+	channels ChannelChains,
 	translator *i18n.Translator,
 	user *query.NotifyUser,
-	twilioConfig func(ctx context.Context) (*twilio.Config, error),
-	getFileSystemProvider func(ctx context.Context) (*fs.Config, error),
-	getLogProvider func(ctx context.Context) (*log.Config, error),
 	colors *query.LabelPolicy,
 	assetsPrefix string,
 	triggeringEvent eventstore.Event,
-	successMetricName,
-	failureMetricName string,
 ) Notify {
 	return func(
 		url string,
@@ -86,15 +80,11 @@ func SendSMSTwilio(
 		data := GetTemplateData(translator, args, assetsPrefix, url, messageType, user.PreferredLanguage.String(), colors)
 		return generateSms(
 			ctx,
+			channels,
 			user,
 			data.Text,
-			twilioConfig,
-			getFileSystemProvider,
-			getLogProvider,
 			allowUnverifiedNotificationChannel,
 			triggeringEvent,
-			successMetricName,
-			failureMetricName,
 		)
 	}
 }
@@ -102,23 +92,17 @@ func SendSMSTwilio(
 func SendJSON(
 	ctx context.Context,
 	webhookConfig webhook.Config,
-	getFileSystemProvider func(ctx context.Context) (*fs.Config, error),
-	getLogProvider func(ctx context.Context) (*log.Config, error),
+	channels ChannelChains,
 	serializable interface{},
 	triggeringEvent eventstore.Event,
-	successMetricName,
-	failureMetricName string,
 ) Notify {
 	return func(_ string, _ map[string]interface{}, _ string, _ bool) error {
-		return handleJSON(
+		return handleWebhook(
 			ctx,
 			webhookConfig,
-			getFileSystemProvider,
-			getLogProvider,
+			channels,
 			serializable,
 			triggeringEvent,
-			successMetricName,
-			failureMetricName,
 		)
 	}
 }
