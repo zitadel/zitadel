@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/hashicorp/go.net/context"
+	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
