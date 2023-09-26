@@ -1724,15 +1724,15 @@ func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeMo
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-o07zjotgnd", "Errors.Invalid.Argument")
 		}
-		if provider.Metadata == nil && provider.MetadataURL == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-3bi3esi16t", "Errors.Invalid.Argument")
-		}
 		if provider.Metadata == nil && provider.MetadataURL != "" {
 			data, err := xml.ReadMetadataFromURL(c.httpClient, provider.MetadataURL)
 			if err != nil {
 				return nil, caos_errs.ThrowInvalidArgument(err, "INST-8vam1khq22", "Errors.Project.App.SAMLMetadataMissing")
 			}
 			provider.Metadata = data
+		}
+		if provider.Metadata == nil {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-3bi3esi16t", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())

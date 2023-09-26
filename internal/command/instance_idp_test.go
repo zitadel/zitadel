@@ -5478,9 +5478,10 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
-				idGenerator:         tt.fields.idGenerator,
-				idpConfigEncryption: tt.fields.secretCrypto,
+				eventstore:                     tt.fields.eventstore,
+				idGenerator:                    tt.fields.idGenerator,
+				idpConfigEncryption:            tt.fields.secretCrypto,
+				samlCertificateAndKeyGenerator: tt.fields.certificateAndKeyGenerator,
 			}
 			id, got, err := c.AddInstanceSAMLProvider(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {

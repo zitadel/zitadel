@@ -1768,6 +1768,9 @@ func (c *Commands) prepareUpdateOrgSAMLProvider(a *org.Aggregate, writeModel *Or
 			}
 			provider.Metadata = data
 		}
+		if provider.Metadata == nil {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-j6spncd74m", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {

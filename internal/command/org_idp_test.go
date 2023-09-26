@@ -5554,9 +5554,10 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
-				idGenerator:         tt.fields.idGenerator,
-				idpConfigEncryption: tt.fields.secretCrypto,
+				eventstore:                     tt.fields.eventstore,
+				idGenerator:                    tt.fields.idGenerator,
+				idpConfigEncryption:            tt.fields.secretCrypto,
+				samlCertificateAndKeyGenerator: tt.fields.certificateAndKeyGenerator,
 			}
 			id, got, err := c.AddOrgSAMLProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
@@ -5642,7 +5643,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-k59dnfcib7", ""))
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-j6spncd74m", ""))
 				},
 			},
 		},
@@ -5664,7 +5665,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowNotFound(nil, "ORG-ASF3F", ""))
+					return errors.Is(err, caos_errors.ThrowNotFound(nil, "ORG-z82dddndql", ""))
 				},
 			},
 		},
