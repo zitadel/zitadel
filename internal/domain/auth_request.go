@@ -1,13 +1,11 @@
 package domain
 
 import (
-	"context"
 	"strings"
 	"time"
 
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
 )
 
@@ -211,18 +209,16 @@ func (a *AuthRequest) Done() bool {
 	return false
 }
 
-func (a *AuthRequest) PrivateLabelingOrgID(ctx context.Context) string {
-	privateLabelingOrgID := authz.GetInstance(ctx).DefaultOrganisationID()
-	if a.PrivateLabelingSetting != PrivateLabelingSettingUnspecified {
-		privateLabelingOrgID = a.ApplicationResourceOwner
-	}
-	if a.PrivateLabelingSetting == PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy || a.PrivateLabelingSetting == PrivateLabelingSettingUnspecified {
-		if a.UserOrgID != "" {
-			privateLabelingOrgID = a.UserOrgID
-		}
-	}
+func (a *AuthRequest) PrivateLabelingOrgID(defaultID string) string {
 	if a.RequestedOrgID != "" {
-		privateLabelingOrgID = a.RequestedOrgID
+		return a.RequestedOrgID
 	}
-	return privateLabelingOrgID
+	if (a.PrivateLabelingSetting == PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy || a.PrivateLabelingSetting == PrivateLabelingSettingUnspecified) &&
+		a.UserOrgID != "" {
+		return a.UserOrgID
+	}
+	if a.PrivateLabelingSetting != PrivateLabelingSettingUnspecified {
+		return a.ApplicationResourceOwner
+	}
+	return defaultID
 }

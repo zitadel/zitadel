@@ -506,13 +506,19 @@ func (l *Login) getOrgID(r *http.Request, authReq *domain.AuthRequest) string {
 }
 
 func (l *Login) getPrivateLabelingID(r *http.Request, authReq *domain.AuthRequest) string {
-	if authReq == nil {
-		if id := r.FormValue(queryOrgID); id != "" {
-			return id
-		}
-		return authz.GetInstance(r.Context()).DefaultOrganisationID()
+	defaultID := authz.GetInstance(r.Context()).DefaultOrganisationID()
+	f, err := l.featureCheck.CheckInstanceBooleanFeature(r.Context(), domain.FeatureLoginDefaultOrg)
+	logging.OnError(err).Warnf("could not check feature %s", domain.FeatureLoginDefaultOrg)
+	if !f.Boolean {
+		defaultID = authz.GetInstance(r.Context()).InstanceID()
 	}
-	return authReq.PrivateLabelingOrgID(r.Context())
+	if authReq != nil {
+		return authReq.PrivateLabelingOrgID(defaultID)
+	}
+	if id := r.FormValue(queryOrgID); id != "" {
+		return id
+	}
+	return defaultID
 }
 
 func (l *Login) getOrgName(authReq *domain.AuthRequest) string {
