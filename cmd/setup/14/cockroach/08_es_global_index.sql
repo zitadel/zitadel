@@ -1,1 +1,0 @@
-CREATE INDEX IF NOT EXISTS es_global ON eventstore.events (aggregate_type, aggregate_id) INCLUDE (creation_date, event_type, event_data, editor_user, resource_owner, aggregate_version, "position", in_tx_order);
