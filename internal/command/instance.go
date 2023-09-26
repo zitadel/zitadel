@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
+	"github.com/zitadel/zitadel/internal/repository/feature"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -112,6 +113,7 @@ type InstanceSetup struct {
 	Quotas *struct {
 		Items []*SetQuota
 	}
+	Features map[domain.Feature]any
 }
 
 type SecretGenerators struct {
@@ -430,6 +432,16 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 				setup.OIDCSettings.RefreshTokenExpiration,
 			),
 		)
+	}
+
+	for f, value := range setup.Features {
+		switch v := value.(type) {
+		case bool:
+			validations = append(validations,
+				prepareSetFeature(NewInstanceFeatureWriteModel[feature.Boolean](instanceID, f), feature.Boolean{Boolean: v}, c.idGenerator, false))
+		default:
+			return "", "", nil, nil, errors.ThrowInvalidArgument(nil, "INST-GE4tg", "Errors.Feature.UnknownType")
+		}
 	}
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
