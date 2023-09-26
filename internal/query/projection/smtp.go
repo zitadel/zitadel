@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	SMTPConfigProjectionTable = "projections.smtp_configs1"
+	SMTPConfigProjectionTable = "projections.smtp_configs2"
 
 	SMTPConfigColumnAggregateID    = "aggregate_id"
 	SMTPConfigColumnCreationDate   = "creation_date"
@@ -26,6 +26,8 @@ const (
 	SMTPConfigColumnSMTPHost       = "host"
 	SMTPConfigColumnSMTPUser       = "username"
 	SMTPConfigColumnSMTPPassword   = "password"
+	SMTPConfigColumnIsActive       = "is_active"
+	SMTPConfigColumnProviderType   = "provider_type"
 )
 
 type smtpConfigProjection struct {
@@ -51,6 +53,8 @@ func newSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerCo
 			crdb.NewColumn(SMTPConfigColumnSMTPHost, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnSMTPUser, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnSMTPPassword, crdb.ColumnTypeJSONB, crdb.Nullable()),
+			crdb.NewColumn(SMTPConfigColumnIsActive, crdb.ColumnTypeBool),
+			crdb.NewColumn(SMTPConfigColumnProviderType, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(SMTPConfigColumnInstanceID, SMTPConfigColumnAggregateID),
 		),
@@ -110,6 +114,8 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 			handler.NewCol(SMTPConfigColumnSMTPHost, e.Host),
 			handler.NewCol(SMTPConfigColumnSMTPUser, e.User),
 			handler.NewCol(SMTPConfigColumnSMTPPassword, e.Password),
+			handler.NewCol(SMTPConfigColumnIsActive, e.IsActive),
+			handler.NewCol(SMTPConfigColumnProviderType, e.ProviderType),
 		},
 	), nil
 }

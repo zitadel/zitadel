@@ -13,19 +13,21 @@ import (
 )
 
 var (
-	prepareSMTPConfigStmt = `SELECT projections.smtp_configs1.aggregate_id,` +
-		` projections.smtp_configs1.creation_date,` +
-		` projections.smtp_configs1.change_date,` +
-		` projections.smtp_configs1.resource_owner,` +
-		` projections.smtp_configs1.sequence,` +
-		` projections.smtp_configs1.tls,` +
-		` projections.smtp_configs1.sender_address,` +
-		` projections.smtp_configs1.sender_name,` +
-		` projections.smtp_configs1.reply_to_address,` +
-		` projections.smtp_configs1.host,` +
-		` projections.smtp_configs1.username,` +
-		` projections.smtp_configs1.password` +
-		` FROM projections.smtp_configs1` +
+	prepareSMTPConfigStmt = `SELECT projections.smtp_configs2.aggregate_id,` +
+		` projections.smtp_configs2.creation_date,` +
+		` projections.smtp_configs2.change_date,` +
+		` projections.smtp_configs2.resource_owner,` +
+		` projections.smtp_configs2.sequence,` +
+		` projections.smtp_configs2.tls,` +
+		` projections.smtp_configs2.sender_address,` +
+		` projections.smtp_configs2.sender_name,` +
+		` projections.smtp_configs2.reply_to_address,` +
+		` projections.smtp_configs2.host,` +
+		` projections.smtp_configs2.username,` +
+		` projections.smtp_configs2.password` +
+		` projections.smtp_configs2.is_active` +
+		` projections.smtp_configs2.provider_type` +
+		` FROM projections.smtp_configs2` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	prepareSMTPConfigCols = []string{
 		"aggregate_id",
@@ -40,6 +42,8 @@ var (
 		"smtp_host",
 		"smtp_user",
 		"smtp_password",
+		"is_active",
+		"provider_type",
 	}
 )
 
@@ -92,6 +96,8 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 						"host",
 						"user",
 						&crypto.CryptoValue{},
+						false,
+						"generic",
 					},
 				),
 			},
@@ -108,6 +114,8 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 				Host:           "host",
 				User:           "user",
 				Password:       &crypto.CryptoValue{},
+				IsActive:       false,
+				ProviderType:   "generic",
 			},
 		},
 		{

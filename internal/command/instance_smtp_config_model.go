@@ -20,6 +20,8 @@ type InstanceSMTPConfigWriteModel struct {
 	User           string
 	Password       *crypto.CryptoValue
 	State          domain.SMTPConfigState
+	IsActive       bool
+	ProviderType   string
 
 	domain                                 string
 	domainState                            domain.InstanceDomainState
@@ -68,6 +70,8 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 			wm.User = e.User
 			wm.Password = e.Password
 			wm.State = domain.SMTPConfigStateActive
+			wm.IsActive = e.IsActive
+			wm.ProviderType = e.ProviderType
 		case *instance.SMTPConfigChangedEvent:
 			if e.TLS != nil {
 				wm.TLS = *e.TLS
@@ -86,6 +90,12 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 			}
 			if e.User != nil {
 				wm.User = *e.User
+			}
+			if e.IsActive != nil {
+				wm.IsActive = *e.IsActive
+			}
+			if e.ProviderType != nil {
+				wm.ProviderType = *e.ProviderType
 			}
 		case *instance.SMTPConfigRemovedEvent:
 			wm.State = domain.SMTPConfigStateRemoved
@@ -128,7 +138,7 @@ func (wm *InstanceSMTPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (wm *InstanceSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, tls bool, fromAddress, fromName, replyToAddress, smtpHost, smtpUser string) (*instance.SMTPConfigChangedEvent, bool, error) {
+func (wm *InstanceSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, tls bool, fromAddress, fromName, replyToAddress, smtpHost, smtpUser string, isActive bool, providerType string) (*instance.SMTPConfigChangedEvent, bool, error) {
 	changes := make([]instance.SMTPConfigChanges, 0)
 	var err error
 
@@ -149,6 +159,12 @@ func (wm *InstanceSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, agg
 	}
 	if wm.User != smtpUser {
 		changes = append(changes, instance.ChangeSMTPConfigSMTPUser(smtpUser))
+	}
+	if wm.IsActive != isActive {
+		changes = append(changes, instance.ChangeSMTPConfigIsActive(isActive))
+	}
+	if wm.ProviderType != providerType {
+		changes = append(changes, instance.ChangeSMTPConfigProviderType(providerType))
 	}
 
 	if len(changes) == 0 {

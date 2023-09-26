@@ -80,6 +80,12 @@ message SMTPConfig {
       example: "\"replyto@m.zitadel.cloud\"";
     }
   ];
+  bool is_active = 8;
+  string provider_type = 9 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"google\"";
+    }
+  ];
 }
 
 message SMSProvider {

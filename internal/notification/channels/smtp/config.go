@@ -6,6 +6,8 @@ type Config struct {
 	From           string
 	FromName       string
 	ReplyToAddress string
+	IsActive       bool
+	ProviderType   string
 }
 
 type SMTP struct {

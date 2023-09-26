@@ -73,6 +73,14 @@ var (
 		name:  projection.SMTPConfigColumnSMTPPassword,
 		table: smtpConfigsTable,
 	}
+	SMTPConfigColumnIsActive = Column{
+		name:  projection.SMTPConfigColumnIsActive,
+		table: smtpConfigsTable,
+	}
+	SMTPConfigColumnProviderType = Column{
+		name:  projection.SMTPConfigColumnProviderType,
+		table: smtpConfigsTable,
+	}
 )
 
 type SMTPConfigs struct {
@@ -94,6 +102,8 @@ type SMTPConfig struct {
 	Host           string
 	User           string
 	Password       *crypto.CryptoValue
+	IsActive       bool
+	ProviderType   string
 }
 
 func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (config *SMTPConfig, err error) {
@@ -131,7 +141,9 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			SMTPConfigColumnReplyToAddress.identifier(),
 			SMTPConfigColumnSMTPHost.identifier(),
 			SMTPConfigColumnSMTPUser.identifier(),
-			SMTPConfigColumnSMTPPassword.identifier()).
+			SMTPConfigColumnSMTPPassword.identifier(),
+			SMTPConfigColumnIsActive.identifier(),
+			SMTPConfigColumnProviderType.identifier()).
 			From(smtpConfigsTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SMTPConfig, error) {

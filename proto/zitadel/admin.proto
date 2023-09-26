@@ -3886,6 +3886,12 @@ message AddSMTPConfigRequest {
             max_length: 200;
         }
     ];
+    bool is_active = 8;
+    string provider_type = 9 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"google\"";
+        }
+    ];
 }
 
 message AddSMTPConfigResponse {
@@ -3933,6 +3939,12 @@ message UpdateSMTPConfigRequest {
             example: "\"replyto@m.zitadel.cloud\"";
             min_length: 1;
             max_length: 200;
+        }
+    ];
+    bool is_active = 7;
+    string provider_type = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"google\"";
         }
     ];
 }
