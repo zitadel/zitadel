@@ -13,17 +13,17 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
-type BaseURLEvent interface {
+type OriginEvent interface {
 	eventstore.Event
-	TriggerBaseURL() string
+	TriggerOrigin() string
 }
 
 func (n *NotificationQueries) Origin(ctx context.Context, e eventstore.Event) (string, error) {
-	baseURLEvent, ok := e.(BaseURLEvent)
+	baseURLEvent, ok := e.(OriginEvent)
 	if !ok {
-		return "", errors.ThrowInternal(fmt.Errorf("event of type %T doesn't implement BaseURLEvent", e), "NOTIF-3m9fs", "Errors.Internal")
+		return "", errors.ThrowInternal(fmt.Errorf("event of type %T doesn't implement OriginEvent", e), "NOTIF-3m9fs", "Errors.Internal")
 	}
-	baseURL := baseURLEvent.TriggerBaseURL()
+	baseURL := baseURLEvent.TriggerOrigin()
 	if baseURL != "" {
 		return baseURL, nil
 	}

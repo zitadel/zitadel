@@ -34,7 +34,7 @@ func SendEmail(
 	translator *i18n.Translator,
 	user *query.NotifyUser,
 	colors *query.LabelPolicy,
-	assetsPrefix string,
+	origin string,
 	triggeringEvent eventstore.Event,
 ) Notify {
 	return func(
@@ -44,7 +44,7 @@ func SendEmail(
 		allowUnverifiedNotificationChannel bool,
 	) error {
 		args = mapNotifyUserToArgs(user, args)
-		data := GetTemplateData(translator, args, assetsPrefix, url, messageType, user.PreferredLanguage.String(), colors)
+		data := GetTemplateData(translator, args, origin, url, messageType, user.PreferredLanguage.String(), colors)
 		template, err := templates.GetParsedTemplate(mailhtml, data)
 		if err != nil {
 			return err
@@ -67,7 +67,7 @@ func SendSMSTwilio(
 	translator *i18n.Translator,
 	user *query.NotifyUser,
 	colors *query.LabelPolicy,
-	assetsPrefix string,
+	origin string,
 	triggeringEvent eventstore.Event,
 ) Notify {
 	return func(
@@ -77,7 +77,7 @@ func SendSMSTwilio(
 		allowUnverifiedNotificationChannel bool,
 	) error {
 		args = mapNotifyUserToArgs(user, args)
-		data := GetTemplateData(translator, args, assetsPrefix, url, messageType, user.PreferredLanguage.String(), colors)
+		data := GetTemplateData(translator, args, origin, url, messageType, user.PreferredLanguage.String(), colors)
 		return generateSms(
 			ctx,
 			channels,

@@ -35,7 +35,6 @@ func Start(
 	commands *command.Commands,
 	queries *query.Queries,
 	es *eventstore.Eventstore,
-	assetsPrefix func(context.Context) string,
 	otpEmailTmpl string,
 	fileSystemPath string,
 	userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm,
@@ -56,7 +55,7 @@ func Start(
 	logging.WithFields("metric", metricFailedDeliveriesJSON).OnError(err).Panic("unable to register counter")
 	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption, statikFS)
 	c := &channels{q: q}
-	handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, assetsPrefix, otpEmailTmpl).Start()
+	handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl).Start()
 	handlers.NewQuotaNotifier(ctx, projection.ApplyCustomConfig(quotaHandlerCustomConfig), commands, q, c).Start()
 	if telemetryCfg.Enabled {
 		handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c).Start()

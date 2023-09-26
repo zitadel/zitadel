@@ -41,5 +41,5 @@ func EmailChannels(
 		)
 	}
 	channels = append(channels, debugChannels(ctx, getFileSystemProvider, getLogProvider)...)
-	return chainChannels(channels...), nil
+	return ChainChannels(channels...), nil
 }

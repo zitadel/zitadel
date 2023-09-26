@@ -234,7 +234,6 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		commands,
 		queries,
 		eventstoreClient,
-		assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort),
 		config.Login.DefaultOTPEmailURLV2,
 		config.SystemDefaults.Notifications.FileSystemPath,
 		keys.User,

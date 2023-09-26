@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"github.com/zitadel/zitadel/internal/api/assets"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/i18n"
@@ -9,7 +10,8 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
-func GetTemplateData(translator *i18n.Translator, translateArgs map[string]interface{}, assetsPrefix, href, msgType, lang string, policy *query.LabelPolicy) templates.TemplateData {
+func GetTemplateData(translator *i18n.Translator, translateArgs map[string]interface{}, origin, href, msgType, lang string, policy *query.LabelPolicy) templates.TemplateData {
+	assetsPrefix := origin + assets.HandlerPrefix
 	templateData := templates.TemplateData{
 		URL:             href,
 		PrimaryColor:    templates.DefaultPrimaryColor,
@@ -27,9 +29,6 @@ func GetTemplateData(translator *i18n.Translator, translateArgs map[string]inter
 	}
 	if policy.Light.FontColor != "" {
 		templateData.FontColor = policy.Light.FontColor
-	}
-	if assetsPrefix == "" {
-		return templateData
 	}
 	if policy.Light.LogoURL != "" {
 		templateData.LogoURL = fmt.Sprintf("%s/%s/%s", assetsPrefix, policy.ID, policy.Light.LogoURL)
