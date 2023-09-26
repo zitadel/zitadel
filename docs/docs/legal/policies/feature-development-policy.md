@@ -12,7 +12,7 @@ You are welcome to give feedback on the [roadmap](https://zitadel.com/roadmap) a
 
 In case you can't contribute directly to the open source version of ZITADEL, but want to accelerate development, we may develop the feature on request, under the conditions layed out in this policy.
 
-In are features that would go directly into our product, any of the publicly available ZITADEL [repositories](https://github.com/zitadel/), our cloud service, or optional components to our products that might be available only under a commercial license.
+Features that will be part of the publicly available ZITADEL [repositories](https://github.com/zitadel/), ZITADEL Cloud, or optional components to our products that might be available only under a commercial license.
 
 ### Conditions
 
