@@ -2,18 +2,24 @@ package feature
 
 import (
 	"context"
+	"strings"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-const (
-	DefaultLoginInstanceEventType = eventTypePrefix + "default_login_instance" + setSuffix
+var (
+	DefaultLoginInstanceEventType = EventTypeFromFeature(domain.FeatureLoginDefaultOrg)
 )
+
+func EventTypeFromFeature(feature domain.Feature) eventstore.EventType {
+	return eventTypePrefix + eventstore.EventType(strings.ToLower(feature.String())) + setSuffix
+}
 
 type SetEvent[T SetEventType] struct {
 	*eventstore.BaseEvent
 
-	Type T
+	T T
 }
 
 func (e *SetEvent[T]) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -33,7 +39,7 @@ type SetEventType interface {
 }
 
 type Boolean struct {
-	B bool
+	Boolean bool
 }
 
 func NewSetEvent[T SetEventType](
