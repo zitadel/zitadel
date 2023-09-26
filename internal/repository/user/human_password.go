@@ -29,10 +29,11 @@ type HumanPasswordChangedEvent struct {
 
 	// New events only use EncodedHash. However, the secret field
 	// is preserved to handle events older than the switch to Passwap.
-	Secret         *crypto.CryptoValue `json:"secret,omitempty"`
-	EncodedHash    string              `json:"encodedHash,omitempty"`
-	ChangeRequired bool                `json:"changeRequired"`
-	UserAgentID    string              `json:"userAgentID,omitempty"`
+	Secret            *crypto.CryptoValue `json:"secret,omitempty"`
+	EncodedHash       string              `json:"encodedHash,omitempty"`
+	ChangeRequired    bool                `json:"changeRequired"`
+	UserAgentID       string              `json:"userAgentID,omitempty"`
+	TriggeredAtOrigin string              `json:"base_url,omitempty"`
 }
 
 func (e *HumanPasswordChangedEvent) Data() interface{} {
@@ -41,6 +42,10 @@ func (e *HumanPasswordChangedEvent) Data() interface{} {
 
 func (e *HumanPasswordChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
+}
+
+func (e *HumanPasswordChangedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewHumanPasswordChangedEvent(
