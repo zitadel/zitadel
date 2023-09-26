@@ -13,7 +13,10 @@ export class GeneralSettingsComponent implements OnInit {
   public defaultLanguageOptions: string[] = [];
 
   public loading: boolean = false;
-  constructor(private service: AdminService, private toast: ToastService) {}
+  constructor(
+    private service: AdminService,
+    private toast: ToastService,
+  ) {}
 
   ngOnInit(): void {
     this.fetchData();

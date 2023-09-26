@@ -1,7 +1,7 @@
 <div class="title-row">
   <h1 class="metadata-title">{{ 'METADATA.TITLE' | translate }}</h1>
   <span class="fill-space"></span>
-  <p *ngIf="ts" class="ts cnsl-secondary-text">{{ ts | timestampToDate | localizedDate : 'dd. MMM, HH:mm' }}</p>
+  <p *ngIf="ts" class="ts cnsl-secondary-text">{{ ts | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</p>
   <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
 </div>
 <p class="desc">{{ 'METADATA.DESCRIPTION' | translate }}</p>
