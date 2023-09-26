@@ -953,6 +953,179 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 	}
 }
 
+func Test_userNotifier_reducePhoneCodeAdded(t *testing.T) {
+	expectMailSubject := "Verify phone"
+	tests := []struct {
+		name string
+		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, want)
+	}{{
+		name: "asset url with event trigger url",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			givenTemplate := "{{.LogoURL}}"
+			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
+			w.message = messages.Email{
+				Recipients: []string{lastEmail},
+				Subject:    expectMailSubject,
+				Content:    expectContent,
+			}
+			codeAlg, code := cryptoValue(t, ctrl, "testcode")
+			expectTemplateQueries(queries, givenTemplate)
+			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(eventstore.TestConfig(
+						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+					)),
+					userDataCrypto: codeAlg,
+				}, args{
+					event: &user.HumanPhoneCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:              code,
+						Expiry:            time.Hour,
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+		},
+	}, {
+		name: "asset url without event trigger url",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			givenTemplate := "{{.LogoURL}}"
+			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
+			w.message = messages.Email{
+				Recipients: []string{lastEmail},
+				Subject:    expectMailSubject,
+				Content:    expectContent,
+			}
+			codeAlg, code := cryptoValue(t, ctrl, "testcode")
+			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
+				Domains: []*query.InstanceDomain{{
+					Domain:    instancePrimaryDomain,
+					IsPrimary: true,
+				}},
+			}, nil)
+			expectTemplateQueries(queries, givenTemplate)
+			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(eventstore.TestConfig(
+						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+					)),
+					userDataCrypto: codeAlg,
+				}, args{
+					event: &user.HumanPhoneCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:         code,
+						Expiry:       time.Hour,
+						CodeReturned: false,
+					},
+				}, w
+		},
+	}, {
+		name: "button url with event trigger url",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			givenTemplate := "{{.URL}}"
+			testCode := "testcode"
+			expectContent := fmt.Sprintf("%s/ui/login/mail/verification?userID=%s&code=%s&orgID=%s", eventOrigin, userID, testCode, orgID)
+			w.message = messages.Email{
+				Recipients: []string{lastEmail},
+				Subject:    expectMailSubject,
+				Content:    expectContent,
+			}
+			codeAlg, code := cryptoValue(t, ctrl, testCode)
+			expectTemplateQueries(queries, givenTemplate)
+			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(eventstore.TestConfig(
+						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+					)),
+					userDataCrypto: codeAlg,
+					SMSTokenCrypto: nil,
+				}, args{
+					event: &user.HumanPhoneCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:              code,
+						Expiry:            time.Hour,
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+		},
+	}, {
+		name: "button url without event trigger url",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			givenTemplate := "{{.URL}}"
+			testCode := "testcode"
+			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/mail/verification?userID=%s&code=%s&orgID=%s", externalProtocol, instancePrimaryDomain, externalPort, userID, testCode, orgID)
+			w.message = messages.Email{
+				Recipients: []string{lastEmail},
+				Subject:    expectMailSubject,
+				Content:    expectContent,
+			}
+			codeAlg, code := cryptoValue(t, ctrl, testCode)
+			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
+				Domains: []*query.InstanceDomain{{
+					Domain:    instancePrimaryDomain,
+					IsPrimary: true,
+				}},
+			}, nil)
+			expectTemplateQueries(queries, givenTemplate)
+			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(eventstore.TestConfig(
+						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+					)),
+					userDataCrypto: codeAlg,
+				}, args{
+					event: &user.HumanPhoneCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:         code,
+						Expiry:       time.Hour,
+						CodeReturned: false,
+					},
+				}, w
+		},
+	}}
+	fs, err := statik_fs.NewWithNamespace("notification")
+	assert.NoError(t, err)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			queries := mock.NewMockQueries(ctrl)
+			commands := mock.NewMockCommands(ctrl)
+			f, a, w := tt.test(ctrl, queries, commands)
+			_, err = newUserNotifier(t, ctrl, queries, fs, f, a, w).reducePhoneCodeAdded(a.event)
+			if w.err != nil {
+				w.err(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
 func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 	expectMailSubject := "Password of user has changed"
 	tests := []struct {
