@@ -23,7 +23,7 @@ func (wm *FeatureWriteModel[T]) Set(ctx context.Context, value T) (event *featur
 	}
 	return feature.NewSetEvent[T](
 		ctx,
-		&feature.NewAggregate(wm.AggregateID).Aggregate,
+		&feature.NewAggregate(wm.AggregateID, wm.ResourceOwner).Aggregate,
 		wm.eventType(),
 		value,
 	), nil
