@@ -19,10 +19,7 @@ export function middleware(request: NextRequest) {
   );
 
   requestHeaders.set("Access-Control-Allow-Origin", "*");
-  requestHeaders.set(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
+  requestHeaders.set("Access-Control-Allow-Headers", "*");
 
   console.log(
     "intercept",
