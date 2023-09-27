@@ -17,13 +17,13 @@ type OriginEvent interface {
 }
 
 func (n *NotificationQueries) Origin(ctx context.Context, e eventstore.Event) (string, error) {
-	baseURLEvent, ok := e.(OriginEvent)
+	originEvent, ok := e.(OriginEvent)
 	if !ok {
 		return "", errors.ThrowInternal(fmt.Errorf("event of type %T doesn't implement OriginEvent", e), "NOTIF-3m9fs", "Errors.Internal")
 	}
-	baseURL := baseURLEvent.TriggerOrigin()
-	if baseURL != "" {
-		return baseURL, nil
+	origin := originEvent.TriggerOrigin()
+	if origin != "" {
+		return origin, nil
 	}
 	primary, err := query.NewInstanceDomainPrimarySearchQuery(true)
 	if err != nil {
