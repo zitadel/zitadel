@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/http"
+
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -244,7 +246,7 @@ type HumanInitialCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	Code                 *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry               time.Duration       `json:"expiry,omitempty"`
-	TriggeredAtOrigin    string              `json:"base_url,omitempty"`
+	TriggeredAtOrigin    string              `json:"trigger_origin,omitempty"`
 }
 
 func (e *HumanInitialCodeAddedEvent) Data() interface{} {
@@ -271,8 +273,9 @@ func NewHumanInitialCodeAddedEvent(
 			aggregate,
 			HumanInitialCodeAddedType,
 		),
-		Code:   code,
-		Expiry: expiry,
+		Code:              code,
+		Expiry:            expiry,
+		TriggeredAtOrigin: http.OriginFromCtx(ctx),
 	}
 }
 

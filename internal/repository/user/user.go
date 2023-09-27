@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/http"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 
@@ -315,7 +317,7 @@ type DomainClaimedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName              string `json:"userName"`
-	TriggeredAtOrigin     string `json:"base_url,omitempty"`
+	TriggeredAtOrigin     string `json:"trigger_origin,omitempty"`
 	oldUserName           string
 	userLoginMustBeDomain bool
 }
@@ -351,6 +353,7 @@ func NewDomainClaimedEvent(
 		UserName:              userName,
 		oldUserName:           oldUserName,
 		userLoginMustBeDomain: userLoginMustBeDomain,
+		TriggeredAtOrigin:     http.OriginFromCtx(ctx),
 	}
 }
 

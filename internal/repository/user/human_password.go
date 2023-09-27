@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/http"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -33,7 +35,7 @@ type HumanPasswordChangedEvent struct {
 	EncodedHash       string              `json:"encodedHash,omitempty"`
 	ChangeRequired    bool                `json:"changeRequired"`
 	UserAgentID       string              `json:"userAgentID,omitempty"`
-	TriggeredAtOrigin string              `json:"base_url,omitempty"`
+	TriggeredAtOrigin string              `json:"trigger_origin,omitempty"`
 }
 
 func (e *HumanPasswordChangedEvent) Data() interface{} {
@@ -61,9 +63,10 @@ func NewHumanPasswordChangedEvent(
 			aggregate,
 			HumanPasswordChangedType,
 		),
-		EncodedHash:    encodeHash,
-		ChangeRequired: changeRequired,
-		UserAgentID:    userAgentID,
+		EncodedHash:       encodeHash,
+		ChangeRequired:    changeRequired,
+		UserAgentID:       userAgentID,
+		TriggeredAtOrigin: http.OriginFromCtx(ctx),
 	}
 }
 
@@ -87,7 +90,7 @@ type HumanPasswordCodeAddedEvent struct {
 	NotificationType  domain.NotificationType `json:"notificationType,omitempty"`
 	URLTemplate       string                  `json:"url_template,omitempty"`
 	CodeReturned      bool                    `json:"code_returned,omitempty"`
-	TriggeredAtOrigin string                  `json:"base_url,omitempty"`
+	TriggeredAtOrigin string                  `json:"trigger_origin,omitempty"`
 }
 
 func (e *HumanPasswordCodeAddedEvent) Data() interface{} {
@@ -127,11 +130,12 @@ func NewHumanPasswordCodeAddedEventV2(
 			aggregate,
 			HumanPasswordCodeAddedType,
 		),
-		Code:             code,
-		Expiry:           expiry,
-		NotificationType: notificationType,
-		URLTemplate:      urlTemplate,
-		CodeReturned:     codeReturned,
+		Code:              code,
+		Expiry:            expiry,
+		NotificationType:  notificationType,
+		URLTemplate:       urlTemplate,
+		CodeReturned:      codeReturned,
+		TriggeredAtOrigin: http.OriginFromCtx(ctx),
 	}
 }
 
