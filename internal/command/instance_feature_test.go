@@ -47,7 +47,7 @@ func TestCommands_SetBooleanInstanceFeature(t *testing.T) {
 				value: true,
 			},
 			res{
-				err: errors.ThrowPreconditionFailed(nil, "FEAT-JK3td", "Errors.Feature.UnknownFeature"),
+				err: errors.ThrowPreconditionFailed(nil, "FEAT-JK3td", "Errors.Feature.NotExisting"),
 			},
 		},
 		{

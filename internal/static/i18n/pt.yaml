@@ -499,6 +499,9 @@ Errors:
     WrongLoginClient: A solicitação de autenticação foi criada por outro cliente de login
   OIDCSession:
     RefreshTokenInvalid: O Refresh Token é inválido
+  Feature:
+    NotExisting: O recurso não existe
+    TypeNotSupported: O tipo de recurso não é compatível
 
 AggregateTypes:
   action: Ação
@@ -509,6 +512,7 @@ AggregateTypes:
   user: Usuário
   usergrant: Concessão de usuário
   quota: Cota
+  feature: Recurso
 
 EventTypes:
   user:

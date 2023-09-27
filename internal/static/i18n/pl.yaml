@@ -505,6 +505,9 @@ Errors:
       Invalid: Token jest nieprawidłowy
       Expired: Token wygasł
     InvalidClient: Token nie został wydany dla tego klienta
+  Feature:
+    NotExisting: Funkcja nie istnieje
+    TypeNotSupported: Typ funkcji nie jest obsługiwany
 
 AggregateTypes:
   action: Działanie
@@ -515,6 +518,7 @@ AggregateTypes:
   user: Użytkownik
   usergrant: Uprawnienie użytkownika
   quota: Limit
+  feature: Funkcja
 
 EventTypes:
   user:

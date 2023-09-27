@@ -43,7 +43,7 @@ func (wm *FeatureWriteModel[T]) Reduce() error {
 		case *feature.SetEvent[T]:
 			wm.Type = e.T
 		default:
-			return errors.ThrowInternal(nil, "FEAT-SDfjk", "Errors.Feature.UnknownType")
+			return errors.ThrowInternal(nil, "FEAT-SDfjk", "Errors.Feature.TypeNotSupported")
 		}
 	}
 	return wm.WriteModel.Reduce()

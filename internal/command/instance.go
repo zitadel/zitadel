@@ -440,7 +440,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			validations = append(validations,
 				prepareSetFeature(NewInstanceFeatureWriteModel[feature.Boolean](instanceID, f), feature.Boolean{Boolean: v}, c.idGenerator))
 		default:
-			return "", "", nil, nil, errors.ThrowInvalidArgument(nil, "INST-GE4tg", "Errors.Feature.UnknownType")
+			return "", "", nil, nil, errors.ThrowInvalidArgument(nil, "INST-GE4tg", "Errors.Feature.TypeNotSupported")
 		}
 	}
 

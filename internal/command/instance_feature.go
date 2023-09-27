@@ -33,7 +33,7 @@ func (c *Commands) SetBooleanInstanceFeature(ctx context.Context, f domain.Featu
 func prepareSetFeature[T feature.SetEventType](writeModel *InstanceFeatureWriteModel[T], value T, idGenerator id.Generator) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if !writeModel.feature.IsAFeature() || writeModel.feature == domain.FeatureUnspecified {
-			return nil, errors.ThrowPreconditionFailed(nil, "FEAT-JK3td", "Errors.Feature.UnknownFeature")
+			return nil, errors.ThrowPreconditionFailed(nil, "FEAT-JK3td", "Errors.Feature.NotExisting")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())

@@ -505,6 +505,9 @@ Errors:
       Invalid: токенот е неважечки
       Expired: токенот е истечен
     InvalidClient: Токен не беше издаден на овој клиент
+  Feature:
+    NotExisting: Функцијата не постои
+    TypeNotSupported: Типот на функција не е поддржан
 
 AggregateTypes:
   action: Акција
@@ -515,6 +518,7 @@ AggregateTypes:
   user: Корисник
   usergrant: Овластување на корисник
   quota: Квота
+  feature: Карактеристика
 
 EventTypes:
   user:

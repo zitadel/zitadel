@@ -505,6 +505,9 @@ Errors:
       Invalid: 令牌无效
       Expired: 令牌已过期
     InvalidClient: 没有为该客户发放令牌
+  Feature:
+    NotExisting: 功能不存在
+    TypeNotSupported: 不支持功能类型
 
 AggregateTypes:
   action: 动作
@@ -515,6 +518,7 @@ AggregateTypes:
   user: 用户
   usergrant: 用户授权
   quota: 配额
+  feature: 特征
 
 EventTypes:
   user:

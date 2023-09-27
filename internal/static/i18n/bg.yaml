@@ -522,6 +522,9 @@ Errors:
     Token:
       Invalid: Токенът е невалиден
       Expired: Токенът е изтекъл
+  Feature:
+    NotExisting: Функцията не съществува
+    TypeNotSupported: Типът функция не се поддържа
 
 AggregateTypes:
   action: Действие
@@ -532,6 +535,8 @@ AggregateTypes:
   user: Потребител
   usergrant: Предоставяне на потребител
   quota: Квота
+  feature: Особеност
+
 EventTypes:
   user:
     added: Добавен потребител

@@ -23,12 +23,12 @@ func (s *Server) SetInstanceFeature(ctx context.Context, req *system_pb.SetInsta
 func (s *Server) setInstanceFeature(ctx context.Context, req *system_pb.SetInstanceFeatureRequest) (*domain.ObjectDetails, error) {
 	feat := domain.Feature(req.FeatureId)
 	if !feat.IsAFeature() {
-		return nil, errors.ThrowInvalidArgument(nil, "SYST-SGV45", "Errors.Feature.UnknownFeature")
+		return nil, errors.ThrowInvalidArgument(nil, "SYST-SGV45", "Errors.Feature.NotExisting")
 	}
 	switch t := req.Value.(type) {
 	case *system_pb.SetInstanceFeatureRequest_Bool:
 		return s.command.SetBooleanInstanceFeature(ctx, feat, t.Bool)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "SYST-dag5g", "Errors.Feature.UnknownType")
+		return nil, errors.ThrowInvalidArgument(nil, "SYST-dag5g", "Errors.Feature.TypeNotSupported")
 	}
 }
