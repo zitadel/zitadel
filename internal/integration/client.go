@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	crewjam_saml "github.com/crewjam/saml"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
@@ -28,8 +29,6 @@ import (
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
-
-	crewjam_saml "github.com/crewjam/saml"
 )
 
 type Client struct {
