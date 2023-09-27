@@ -19,13 +19,6 @@ export function middleware(request: NextRequest) {
   responseHeaders.set("Access-Control-Allow-Origin", "*");
   responseHeaders.set("Access-Control-Allow-Headers", "*");
 
-  console.log(
-    "intercept",
-    request.nextUrl.basePath,
-    request.nextUrl.host,
-    proto
-  );
-
   request.nextUrl.href = `${INSTANCE}${request.nextUrl.pathname}${request.nextUrl.search}`;
   return NextResponse.rewrite(request.nextUrl, {
     request: {
