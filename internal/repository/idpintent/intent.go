@@ -134,7 +134,7 @@ type SAMLSucceededEvent struct {
 	IDPUserName string `json:"idpUserName,omitempty"`
 	UserID      string `json:"userId,omitempty"`
 
-	Assertion *crypto.CryptoValue `json:"response"`
+	Assertion *crypto.CryptoValue `json:"assertion,omitempty"`
 }
 
 func NewSAMLSucceededEvent(
