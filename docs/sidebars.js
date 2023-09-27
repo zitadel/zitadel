@@ -715,6 +715,7 @@ module.exports = {
             "legal/acceptable-use-policy",
             "legal/rate-limit-policy",
             "legal/policies/account-lockout-policy",
+            "legal/policies/feature-development-policy",
             "legal/vulnerability-disclosure-policy",
           ],
         },
