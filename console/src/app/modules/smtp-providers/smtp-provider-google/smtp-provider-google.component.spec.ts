@@ -1,19 +1,18 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { SMTPProviderGoogleComponent } from './smtp-provider-google.component';
 
-import { SMTPProviderComponent } from './smtp-provider.component';
-
-describe('ProviderGoogleComponent', () => {
-  let component: SMTPProviderComponent;
-  let fixture: ComponentFixture<SMTPProviderComponent>;
+describe('SMTPProviderGoogleComponent', () => {
+  let component: SMTPProviderGoogleComponent;
+  let fixture: ComponentFixture<SMTPProviderGoogleComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [SMTPProviderComponent],
+      declarations: [SMTPProviderGoogleComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SMTPProviderComponent);
+    fixture = TestBed.createComponent(SMTPProviderGoogleComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

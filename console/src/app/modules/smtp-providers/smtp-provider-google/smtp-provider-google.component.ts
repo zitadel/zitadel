@@ -21,15 +21,16 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { requiredValidator } from '../form-field/validators/validators';
+import { requiredValidator } from '../../form-field/validators/validators';
 
-import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
+import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 @Component({
   selector: 'cnsl-provider-google',
-  templateUrl: './provider-google.component.html',
+  templateUrl: './smtp-provider-google.component.html',
 })
-export class SMTPProviderComponent {
+export class SMTPProviderGoogleComponent {
+  // private const supportedProviders = { google: { hostAndPort: 'localhost:25', hostAndPortTLS: 'localhost:587'}}
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
   public id: string | null = '';
