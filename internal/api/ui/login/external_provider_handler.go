@@ -13,6 +13,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -45,6 +46,9 @@ type externalIDPData struct {
 type externalIDPCallbackData struct {
 	State string `schema:"state"`
 	Code  string `schema:"code"`
+
+	RelayState string `schema:"RelayState"`
+	Method     string `schema:"Method"`
 
 	// Apple returns a user on first registration
 	User string `schema:"user"`
@@ -206,6 +210,7 @@ func (l *Login) handleExternalLoginCallbackForm(w http.ResponseWriter, r *http.R
 		l.renderLogin(w, r, nil, err)
 		return
 	}
+	r.Form.Add("Method", http.MethodPost)
 	http.Redirect(w, r, HandlerPrefix+EndpointExternalLoginCallback+"?"+r.Form.Encode(), 302)
 }
 
@@ -218,6 +223,15 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		l.renderLogin(w, r, nil, err)
 		return
 	}
+	if data.State == "" {
+		data.State = data.RelayState
+	}
+	// workaround because of CSRF on external identity provider flows
+	if data.Method == http.MethodPost {
+		r.Method = http.MethodPost
+		r.PostForm = r.Form
+	}
+
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID)
 	if err != nil {
@@ -295,6 +309,18 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			return
 		}
 		session = &apple.Session{Session: &openid.Session{Provider: provider.(*apple.Provider).Provider, Code: data.Code}, UserFormValue: data.User}
+	case domain.IDPTypeSAML:
+		provider, err = l.samlProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		sp, err := provider.(*saml.Provider).GetSP()
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = &saml.Session{ServiceProvider: sp, RequestID: authReq.SAMLRequestID, Request: r}
 	case domain.IDPTypeJWT,
 		domain.IDPTypeLDAP,
 		domain.IDPTypeUnspecified:
@@ -897,10 +923,6 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 	if err != nil {
 		return nil, err
 	}
-	certificate, err := crypto.Decrypt(identityProvider.SAMLIDPTemplate.Certificate, l.idpConfigAlg)
-	if err != nil {
-		return nil, err
-	}
 	opts := make([]saml.ProviderOpts, 0, 2)
 	if identityProvider.SAMLIDPTemplate.WithSignedRequest {
 		opts = append(opts, saml.WithSignedRequest())
@@ -908,33 +930,32 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 	if identityProvider.SAMLIDPTemplate.Binding != "" {
 		opts = append(opts, saml.WithBinding(identityProvider.SAMLIDPTemplate.Binding))
 	}
-	opts = append(opts, saml.WithCustomRequestTracker(
-		requesttracker.New(
-			func(ctx context.Context, intentID, samlRequestID string) error {
-				intent, err := l.command.GetActiveIntent(ctx, intentID)
-				if err != nil {
-					return err
-				}
-				return l.command.RequestSAMLIDPIntent(ctx, intent, samlRequestID)
-			},
-			func(ctx context.Context, intentID string) (*samlsp.TrackedRequest, error) {
-				intent, err := l.command.GetActiveIntent(ctx, intentID)
-				if err != nil {
-					return nil, err
-				}
-				return &samlsp.TrackedRequest{
-					SAMLRequestID: intent.RequestID,
-					Index:         intentID,
-					URI:           intent.SuccessURL.String(),
-				}, nil
-			},
-		),
-	))
+	opts = append(opts,
+		saml.WithEntityID(http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), l.externalSecure)+"/idps/"+identityProvider.ID+"/saml/metadata"),
+		saml.WithCustomRequestTracker(
+			requesttracker.New(
+				func(ctx context.Context, authRequestID, samlRequestID string) error {
+					useragent, _ := http_mw.UserAgentIDFromCtx(ctx)
+					return l.authRepo.SaveSAMLRequestID(ctx, authRequestID, samlRequestID, useragent)
+				},
+				func(ctx context.Context, authRequestID string) (*samlsp.TrackedRequest, error) {
+					useragent, _ := http_mw.UserAgentIDFromCtx(ctx)
+					auhRequest, err := l.authRepo.AuthRequestByID(ctx, authRequestID, useragent)
+					if err != nil {
+						return nil, err
+					}
+					return &samlsp.TrackedRequest{
+						SAMLRequestID: auhRequest.SAMLRequestID,
+						Index:         authRequestID,
+					}, nil
+				},
+			),
+		))
 	return saml.New(
 		identityProvider.Name,
-		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		l.baseURL(ctx)+EndpointExternalLogin+"/",
 		identityProvider.SAMLIDPTemplate.Metadata,
-		certificate,
+		identityProvider.SAMLIDPTemplate.Certificate,
 		key,
 		opts...,
 	)

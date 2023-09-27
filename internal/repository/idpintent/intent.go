@@ -134,7 +134,7 @@ type SAMLSucceededEvent struct {
 	IDPUserName string `json:"idpUserName,omitempty"`
 	UserID      string `json:"userId,omitempty"`
 
-	Response string `json:"response"`
+	Assertion *crypto.CryptoValue `json:"response"`
 }
 
 func NewSAMLSucceededEvent(
@@ -144,7 +144,7 @@ func NewSAMLSucceededEvent(
 	idpUserID,
 	idpUserName,
 	userID string,
-	response string,
+	assertion *crypto.CryptoValue,
 ) *SAMLSucceededEvent {
 	return &SAMLSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -156,7 +156,7 @@ func NewSAMLSucceededEvent(
 		IDPUserID:   idpUserID,
 		IDPUserName: idpUserName,
 		UserID:      userID,
-		Response:    response,
+		Assertion:   assertion,
 	}
 }
 

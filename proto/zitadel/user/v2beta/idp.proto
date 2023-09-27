@@ -130,7 +130,7 @@ message IDPLDAPAccessInformation{
 }
 
 message IDPSAMLAccessInformation{
-  string response = 1;
+  bytes assertion = 1;
 }
 
 message IDPLink {

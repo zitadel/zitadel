@@ -29,6 +29,7 @@ func TestProvider_Options(t *testing.T) {
 		binding           string
 		withSignedRequest bool
 		requesttracker    samlsp.RequestTracker
+		entityID          string
 	}
 	tests := []struct {
 		name   string
@@ -119,6 +120,7 @@ func TestProvider_Options(t *testing.T) {
 					WithBinding("binding"),
 					WithSignedRequest(),
 					WithCustomRequestTracker(&requesttracker.RequestTracker{}),
+					WithEntityID("entityID"),
 				},
 			},
 			want: want{
@@ -130,6 +132,7 @@ func TestProvider_Options(t *testing.T) {
 				binding:           "binding",
 				withSignedRequest: true,
 				requesttracker:    &requesttracker.RequestTracker{},
+				entityID:          "entityID",
 			},
 		},
 	}
@@ -151,6 +154,7 @@ func TestProvider_Options(t *testing.T) {
 				a.Equal(tt.want.binding, provider.binding)
 				a.Equal(tt.want.withSignedRequest, provider.spOptions.SignRequest)
 				a.Equal(tt.want.requesttracker, provider.requestTracker)
+				a.Equal(tt.want.entityID, provider.spOptions.EntityID)
 			}
 		})
 	}

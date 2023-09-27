@@ -359,7 +359,7 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(SAMLInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(SAMLMetadataCol, crdb.ColumnTypeBytes),
 			crdb.NewColumn(SAMLKeyCol, crdb.ColumnTypeJSONB),
-			crdb.NewColumn(SAMLCertificateCol, crdb.ColumnTypeJSONB),
+			crdb.NewColumn(SAMLCertificateCol, crdb.ColumnTypeBytes),
 			crdb.NewColumn(SAMLBindingCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(SAMLWithSignedRequestCol, crdb.ColumnTypeBool, crdb.Nullable()),
 		},

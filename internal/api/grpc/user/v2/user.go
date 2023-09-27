@@ -288,8 +288,12 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 		information.IdpInformation.Access = access
 	}
 
-	if intent.Response != "" {
-		information.IdpInformation.Access = IDPSAMLResponseToPb(intent.Response)
+	if intent.Assertion != nil {
+		assertion, err := crypto.Decrypt(intent.Assertion, alg)
+		if err != nil {
+			return nil, err
+		}
+		information.IdpInformation.Access = IDPSAMLResponseToPb(assertion)
 	}
 
 	return information, nil
@@ -343,10 +347,10 @@ func IDPEntryAttributesToPb(entryAttributes map[string][]string) (*user.IDPInfor
 	}, nil
 }
 
-func IDPSAMLResponseToPb(response string) *user.IDPInformation_Saml {
+func IDPSAMLResponseToPb(assertion []byte) *user.IDPInformation_Saml {
 	return &user.IDPInformation_Saml{
 		Saml: &user.IDPSAMLAccessInformation{
-			Response: response,
+			Assertion: assertion,
 		},
 	}
 }

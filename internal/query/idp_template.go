@@ -155,7 +155,7 @@ type SAMLIDPTemplate struct {
 	IDPID             string
 	Metadata          []byte
 	Key               *crypto.CryptoValue
-	Certificate       *crypto.CryptoValue
+	Certificate       []byte
 	Binding           string
 	WithSignedRequest bool
 }
@@ -983,7 +983,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			samlID := sql.NullString{}
 			samlMetadata := make([]byte, 0)
 			samlKey := new(crypto.CryptoValue)
-			samlCertificate := new(crypto.CryptoValue)
+			samlCertificate := make([]byte, 0)
 			samlBinding := sql.NullString{}
 			samlWithSignedRequest := sql.NullBool{}
 
@@ -1473,7 +1473,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				samlID := sql.NullString{}
 				samlMetadata := make([]byte, 0)
 				samlKey := new(crypto.CryptoValue)
-				samlCertificate := new(crypto.CryptoValue)
+				samlCertificate := make([]byte, 0)
 				samlBinding := sql.NullString{}
 				samlWithSignedRequest := sql.NullBool{}
 

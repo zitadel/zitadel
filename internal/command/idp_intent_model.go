@@ -26,7 +26,7 @@ type IDPIntentWriteModel struct {
 	IDPEntryAttributes map[string][]string
 
 	RequestID string
-	Response  string
+	Assertion *crypto.CryptoValue
 
 	State     domain.IDPIntentState
 	aggregate *eventstore.Aggregate
@@ -91,7 +91,7 @@ func (wm *IDPIntentWriteModel) reduceSAMLSucceededEvent(e *idpintent.SAMLSucceed
 	wm.IDPUser = e.IDPUser
 	wm.IDPUserID = e.IDPUserID
 	wm.IDPUserName = e.IDPUserName
-	wm.Response = e.Response
+	wm.Assertion = e.Assertion
 	wm.State = domain.IDPIntentStateSucceeded
 }
 

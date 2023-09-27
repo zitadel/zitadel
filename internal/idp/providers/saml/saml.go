@@ -83,6 +83,12 @@ func WithCustomRequestTracker(tracker samlsp.RequestTracker) ProviderOpts {
 	}
 }
 
+func WithEntityID(entityID string) ProviderOpts {
+	return func(p *Provider) {
+		p.spOptions.EntityID = entityID
+	}
+}
+
 func New(
 	name string,
 	rootURLStr string,

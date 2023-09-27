@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/crewjam/saml"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -745,7 +746,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 		ctx        context.Context
 		writeModel *IDPIntentWriteModel
 		idpUser    idp.User
-		response   string
+		assertion  *saml.Assertion
 		userID     string
 	}
 	type res struct {
@@ -789,7 +790,12 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 								"id",
 								"username",
 								"",
-								"response",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
+								},
 							),
 						),
 					),
@@ -798,7 +804,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				writeModel: NewIDPIntentWriteModel("id", "ro"),
-				response:   "response",
+				assertion:  &saml.Assertion{ID: "id"},
 				idpUser: openid.NewUser(&oidc.UserInfo{
 					Subject: "id",
 					UserInfoProfile: oidc.UserInfoProfile{
@@ -824,7 +830,12 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 								"id",
 								"username",
 								"user",
-								"response",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
+								},
 							),
 						),
 					),
@@ -833,7 +844,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				writeModel: NewIDPIntentWriteModel("id", "ro"),
-				response:   "response",
+				assertion:  &saml.Assertion{ID: "id"},
 				idpUser: openid.NewUser(&oidc.UserInfo{
 					Subject: "id",
 					UserInfoProfile: oidc.UserInfoProfile{
@@ -853,7 +864,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 				eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.idpConfigEncryption,
 			}
-			got, err := c.SucceedSAMLIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.userID, tt.args.response)
+			got, err := c.SucceedSAMLIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.userID, tt.args.assertion)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.token, got)
 		})

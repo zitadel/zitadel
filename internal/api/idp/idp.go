@@ -3,16 +3,19 @@ package idp
 import (
 	"bytes"
 	"context"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 
+	"github.com/crewjam/saml"
 	"github.com/gorilla/mux"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	z_errs "github.com/zitadel/zitadel/internal/errors"
@@ -56,6 +59,7 @@ type Handler struct {
 	encryptionAlgorithm crypto.EncryptionAlgorithm
 	callbackURL         func(ctx context.Context) string
 	samlRootURL         func(ctx context.Context, idpID string) string
+	loginSAMLRootURL    func(ctx context.Context) string
 }
 
 type externalIDPCallbackData struct {
@@ -87,6 +91,12 @@ func SAMLRootURL(externalSecure bool) func(ctx context.Context, idpID string) st
 	}
 }
 
+func LoginSAMLRootURL(externalSecure bool) func(ctx context.Context) string {
+	return func(ctx context.Context) string {
+		return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + login.HandlerPrefix + login.EndpointSAMLACS
+	}
+}
+
 func NewHandler(
 	commands *command.Commands,
 	queries *query.Queries,
@@ -101,6 +111,7 @@ func NewHandler(
 		encryptionAlgorithm: encryptionAlgorithm,
 		callbackURL:         CallbackURL(externalSecure),
 		samlRootURL:         SAMLRootURL(externalSecure),
+		loginSAMLRootURL:    LoginSAMLRootURL(externalSecure),
 	}
 
 	router := mux.NewRouter()
@@ -176,8 +187,27 @@ func (h *Handler) handleMetadata(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	metadata := sp.ServiceProvider.Metadata()
 
-	sp.ServeMetadata(w, r)
+	for i, spDesc := range metadata.SPSSODescriptors {
+		spDesc.AssertionConsumerServices = append(
+			spDesc.AssertionConsumerServices,
+			saml.IndexedEndpoint{
+				Binding:  saml.HTTPPostBinding,
+				Location: h.loginSAMLRootURL(ctx),
+				Index:    len(spDesc.AssertionConsumerServices) + 1,
+			}, saml.IndexedEndpoint{
+				Binding:  saml.HTTPArtifactBinding,
+				Location: h.loginSAMLRootURL(ctx),
+				Index:    len(spDesc.AssertionConsumerServices) + 2,
+			},
+		)
+		metadata.SPSSODescriptors[i] = spDesc
+	}
+
+	buf, _ := xml.MarshalIndent(metadata, "", "  ")
+	w.Header().Set("Content-Type", "application/samlmetadata+xml")
+	w.Write(buf)
 }
 
 func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
@@ -228,7 +258,7 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 	userID, err := h.checkExternalUser(ctx, intent.IDPID, idpUser.GetID())
 	logging.WithFields("intent", intent.AggregateID).OnError(err).Error("could not check if idp user already exists")
 
-	token, err := h.commands.SucceedSAMLIDPIntent(ctx, intent, idpUser, userID, data.Response)
+	token, err := h.commands.SucceedSAMLIDPIntent(ctx, intent, idpUser, userID, session.Assertion)
 	if err != nil {
 		redirectToFailureURLErr(w, r, intent, z_errs.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
 		return

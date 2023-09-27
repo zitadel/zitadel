@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 
 	"github.com/zitadel/zitadel/internal/errors"
@@ -21,6 +22,8 @@ type Session struct {
 
 	RequestID string
 	Request   *http.Request
+
+	Assertion *saml.Assertion
 }
 
 // GetAuth implements the [idp.Session] interface.
@@ -48,14 +51,14 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 		return nil, errors.ThrowInvalidArgument(nil, "SAML-d09hy0wkex", "Errors.Intent.ResponseInvalid")
 	}
 
-	assertion, err := s.ServiceProvider.ServiceProvider.ParseResponse(s.Request, []string{s.RequestID})
+	s.Assertion, err = s.ServiceProvider.ServiceProvider.ParseResponse(s.Request, []string{s.RequestID})
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "SAML-nuo0vphhh9", "Errors.Intent.ResponseInvalid")
 	}
 
 	userMapper := NewUser()
-	userMapper.SetID(assertion.Subject.NameID)
-	for _, statement := range assertion.AttributeStatements {
+	userMapper.SetID(s.Assertion.Subject.NameID)
+	for _, statement := range s.Assertion.AttributeStatements {
 		for _, attribute := range statement.Attributes {
 			values := make([]string, len(attribute.Values))
 			for i := range attribute.Values {

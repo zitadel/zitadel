@@ -28,6 +28,8 @@ import (
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+
+	crewjam_saml "github.com/crewjam/saml"
 )
 
 type Client struct {
@@ -316,9 +318,9 @@ func (s *Tester) CreateSuccessfulSAMLIntent(t *testing.T, idpID, userID, idpUser
 		ID:         idpUserID,
 		Attributes: map[string][]string{"attribute1": {"value1"}},
 	}
-	response := "response"
+	assertion := &crewjam_saml.Assertion{ID: "id"}
 
-	token, err := s.Commands.SucceedSAMLIDPIntent(ctx, writeModel, idpUser, userID, response)
+	token, err := s.Commands.SucceedSAMLIDPIntent(ctx, writeModel, idpUser, userID, assertion)
 	require.NoError(t, err)
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
 }

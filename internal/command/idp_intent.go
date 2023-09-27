@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"encoding/xml"
 	"net/url"
 
+	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 
@@ -179,12 +181,20 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 	return token, nil
 }
 
-func (c *Commands) SucceedSAMLIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, userID string, response string) (string, error) {
+func (c *Commands) SucceedSAMLIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, userID string, assertion *saml.Assertion) (string, error) {
 	token, err := c.generateIntentToken(writeModel.AggregateID)
 	if err != nil {
 		return "", err
 	}
 	idpInfo, err := json.Marshal(idpUser)
+	if err != nil {
+		return "", err
+	}
+	assertionData, err := xml.Marshal(assertion)
+	if err != nil {
+		return "", err
+	}
+	assertionEnc, err := crypto.Encrypt(assertionData, c.idpConfigEncryption)
 	if err != nil {
 		return "", err
 	}
@@ -195,7 +205,7 @@ func (c *Commands) SucceedSAMLIDPIntent(ctx context.Context, writeModel *IDPInte
 		idpUser.GetID(),
 		idpUser.GetPreferredUsername(),
 		userID,
-		response,
+		assertionEnc,
 	)
 	err = c.pushAppendAndReduce(ctx, writeModel, cmd)
 	if err != nil {
