@@ -12,9 +12,9 @@
     class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'smtpprovider', 'sendgrid', 'create']
+        ? ['/instance', 'smtp-provider', 'sendgrid', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'smtpprovider', 'sendgrid', 'create']
+        ? ['/org', 'smtp-provider', 'sendgrid', 'create']
         : []
     "
   >
@@ -28,9 +28,9 @@
     class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'smtpprovider', 'aws-ses', 'create']
+        ? ['/instance', 'smtp-provider', 'aws-ses', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'smtpprovider', 'aws-ses', 'create']
+        ? ['/org', 'smtp-provider', 'aws-ses', 'create']
         : []
     "
   >
@@ -44,9 +44,9 @@
     class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'smtpprovider', 'mailgun', 'create']
+        ? ['/instance', 'smtp-provider', 'mailgun', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'smtpprovider', 'mailgun', 'create']
+        ? ['/org', 'smtp-provider', 'mailgun', 'create']
         : []
     "
   >
@@ -60,9 +60,9 @@
     class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'smtpprovider', 'postmark', 'create']
+        ? ['/instance', 'smtp-provider', 'postmark', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'smtpprovider', 'postmark', 'create']
+        ? ['/org', 'smtp-provider', 'postmark', 'create']
         : []
     "
   >
@@ -76,9 +76,9 @@
     class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'smtpprovider', 'google', 'create']
+        ? ['/instance', 'smtp-provider', 'google', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'smtpprovider', 'google', 'create']
+        ? ['/org', 'smtp-provider', 'google', 'create']
         : []
     "
   >
@@ -92,9 +92,9 @@
     class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'smtpprovider', 'mailjet', 'create']
+        ? ['/instance', 'smtp-provider', 'mailjet', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'smtpprovider', 'mailjet', 'create']
+        ? ['/org', 'smtp-provider', 'mailjet', 'create']
         : []
     "
   >
@@ -108,9 +108,9 @@
     class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'smtpprovider', 'generic', 'create']
+        ? ['/instance', 'smtp-provider', 'generic', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'smtpprovider', 'generic', 'create']
+        ? ['/org', 'smtp-provider', 'generic', 'create']
         : []
     "
   >
