@@ -981,9 +981,9 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			googleScopes := database.StringArray{}
 
 			samlID := sql.NullString{}
-			samlMetadata := make([]byte, 0)
+			var samlMetadata []byte
 			samlKey := new(crypto.CryptoValue)
-			samlCertificate := make([]byte, 0)
+			var samlCertificate []byte
 			samlBinding := sql.NullString{}
 			samlWithSignedRequest := sql.NullBool{}
 
@@ -1471,9 +1471,9 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				googleScopes := database.StringArray{}
 
 				samlID := sql.NullString{}
-				samlMetadata := make([]byte, 0)
+				var samlMetadata []byte
 				samlKey := new(crypto.CryptoValue)
-				samlCertificate := make([]byte, 0)
+				var samlCertificate []byte
 				samlBinding := sql.NullString{}
 				samlWithSignedRequest := sql.NullBool{}
 
