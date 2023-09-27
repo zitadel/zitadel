@@ -25,7 +25,7 @@ SelectAccount:
   DescriptionLinking: 选择您的帐户以与您的外部用户关联。
   OtherUser: 其他用户
   SessionState0: 启用
-  SessionState1: 停用
+  SessionState1: 未登入
   MustBeMemberOfOrg: 用户必须是 {{.OrgName}} 组织的成员。
 
 Password:
@@ -426,7 +426,7 @@ Errors:
       Empty: 密码为空
       Invalid: 密码无效
       InvalidAndLocked: 密码无效且用户被锁定，请联系您的管理员。
-      NotChanged: 密码未更改
+      NotChanged: 新密码不能与您当前的密码相同
     UsernameOrPassword:
       Invalid: 用户名或密码无效
     PasswordComplexityPolicy:

@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2alpha"
+	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 )
 
 var ignoreTypes = []protoreflect.FullName{"google.protobuf.Duration"}

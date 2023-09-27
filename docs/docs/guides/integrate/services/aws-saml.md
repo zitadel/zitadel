@@ -1,5 +1,5 @@
 ---
-title: Connect with AWS through SAML 2.0
+title: Log in with ZITADEL on AWS through SAML 2.0
 sidebar_label: Amazon Web Services
 ---
 

@@ -3,17 +3,27 @@ package system
 import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/pkg/grpc/quota"
-	"github.com/zitadel/zitadel/pkg/grpc/system"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func instanceQuotaPbToCommand(req *system.AddQuotaRequest) *command.AddQuota {
-	return &command.AddQuota{
-		Unit:          instanceQuotaUnitPbToCommand(req.Unit),
-		From:          req.From.AsTime(),
-		ResetInterval: req.ResetInterval.AsDuration(),
-		Amount:        req.Amount,
-		Limit:         req.Limit,
-		Notifications: instanceQuotaNotificationsPbToCommand(req.Notifications),
+type setQuotaRequest interface {
+	GetUnit() quota.Unit
+	GetFrom() *timestamppb.Timestamp
+	GetResetInterval() *durationpb.Duration
+	GetAmount() uint64
+	GetLimit() bool
+	GetNotifications() []*quota.Notification
+}
+
+func instanceQuotaPbToCommand(req setQuotaRequest) *command.SetQuota {
+	return &command.SetQuota{
+		Unit:          instanceQuotaUnitPbToCommand(req.GetUnit()),
+		From:          req.GetFrom().AsTime(),
+		ResetInterval: req.GetResetInterval().AsDuration(),
+		Amount:        req.GetAmount(),
+		Limit:         req.GetLimit(),
+		Notifications: instanceQuotaNotificationsPbToCommand(req.GetNotifications()),
 	}
 }
 

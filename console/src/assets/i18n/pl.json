@@ -495,6 +495,7 @@
       "LASTNAME": "Nazwisko",
       "NICKNAME": "Przezwisko",
       "DISPLAYNAME": "Nazwa wyświetlana",
+      "PREFERREDLOGINNAME": "Preferowana nazwa logowania",
       "PREFERRED_LANGUAGE": "Język",
       "GENDER": "Płeć",
       "PASSWORD": "Hasło",
@@ -795,7 +796,7 @@
     },
     "PAGES": {
       "STATE": "Status",
-      "DOMAINLIST": "Domeny"
+      "DOMAINLIST": "Własne domeny"
     },
     "STATE": {
       "0": "Nieokreślony",
@@ -1350,7 +1351,7 @@
       "MAXAGEDAYS": "Maksymalny wiek w dniach",
       "USERLOGINMUSTBEDOMAIN": "Dodaj domenę organizacji jako przyrostek do nazw logowania",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Jeśli włączysz to ustawienie, wszystkie nazwy logowania będą miały przyrostek z domeną organizacji. Jeśli to ustawienie jest wyłączone, musisz zapewnić unikalność nazw użytkowników we wszystkich organizacjach.",
-      "VALIDATEORGDOMAINS": "Sprawdzanie ważności domen organizacji",
+      "VALIDATEORGDOMAINS": "Weryfikacja domeny organizacji jest wymagana (wyzwanie DNS lub HTTP)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "Adres nadawcy SMTP pasuje do domeny instancji",
       "ALLOWUSERNAMEPASSWORD": "Zezwól na użycie nazwy użytkownika i hasła",
       "ALLOWEXTERNALIDP": "Zezwól na zewnętrznego dostawcę tożsamości",

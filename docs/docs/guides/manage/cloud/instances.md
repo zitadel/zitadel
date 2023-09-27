@@ -1,8 +1,9 @@
 ---
-title: Instances
+title: ZITADEL Instances
+sidebar_label: Instances
 ---
 
-The ZITADEL customer Portal is used to manage all your different ZITADEL instances.
+The ZITADEL Customer Portal is used to manage all your different ZITADEL instances.
 You can also manage your subscriptions, billing, newsletters and support requests.
 
 ## Overview
@@ -55,7 +56,7 @@ A free instance can be upgraded to a "pay as you go" instance. By upgrading your
 ### Add Custom Domain
 
 We recommend register a custom domain to access your ZITADEL instance.
-The primary domain of your ZITADEL instance will be the issuer of the instance. All other domains can be used to access the instance itself
+The primary custom domain of your ZITADEL instance will be the issuer of the instance. All other custom domains can be used to access the instance itself
 
 1. Browse to your instance
 2. Click **Add custom domain**
@@ -72,7 +73,7 @@ Be aware that it has some impacts if you change the primary domain of your insta
 
 ![Add custom domain](/img/manuals/portal/portal_add_domain.png)
 
-#### Verify Domain
+#### Verify Custom Domain
 
 If you need a custom domain for your ZITADEL instance, you need to verify the domain.
 

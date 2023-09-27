@@ -1,0 +1,87 @@
+---
+title: Configure Apple as an Identity Provider in ZITADEL
+sidebar_label: Apple
+---
+
+import GeneralConfigDescription from './_general_config_description.mdx';
+import Intro from './_intro.mdx';
+import CustomLoginPolicy from './_custom_login_policy.mdx';
+import IDPsOverview from './_idps_overview.mdx';
+import Activate from './_activate.mdx';
+import TestSetup from './_test_setup.mdx';
+
+<Intro provider="Apple"/>
+
+## Apple Configuration
+
+### Register a new App
+
+1. Go to the Identifiers of your Apple Developer Account
+2. Click the add button "+" on the top left
+3. Choose App IDs and click "continue"
+4. Add a description and a unique identifier
+5. Enable "Sign in with Apple" and click "continue"
+
+### Register a new service
+
+1. Go to the Identifiers of your Apple Developer Account: [https://developer.apple.com/account/resources/identifiers/list](https://developer.apple.com/account/resources/identifiers/list)
+2. Click the add button "+" on the top left
+3. Choose Services IDs and click "continue"
+4. Add a description and a unique identifier and click "register"
+5. Select your registered service from the list and enable sign in with Apple, then click "configure"
+6. Choose the previously created App in the Primary App ID List
+7. Add your custom domain in the domains and subdomains field
+ - Example domain for `https://acme-gzoe4x.zitadel.cloud` would look like this:  `acme-gzoe4x.zitadel.cloud`
+8. Add the redirect uri in the Return URLs
+ - {your-domain}/ui/login/login/externalidp/callback/form
+ - Example redirect url for the domain `https://acme-gzoe4x.zitadel.cloud` would look like this:  `https://acme-gzoe4x.zitadel.cloud/ui/login/login/externalidp/callback/form`
+
+![Apple Service](/img/guides/apple_service_create.png)
+
+
+### Register a new key
+
+1. Go to the keys list of your Apple Developer Account: [https://developer.apple.com/account/resources/authkeys/list](https://developer.apple.com/account/resources/authkeys/list)
+2. Click the add button "+" on the top left
+3. Give your key a name
+4. Enable "Sign in with Apple" and click configure
+5. Choose your app from the list
+6. Register the key and download it
+
+## ZITADEL Configuration
+
+### Add custom login policy
+
+<CustomLoginPolicy/>
+
+### Go to the IdP Providers Overview
+
+<IDPsOverview templates="Apple"/>
+
+### Create a new Apple Provider
+
+1. Add the Client ID, this is the identifier of the service you created in your Apple Account
+2. Fill the Team ID, you can find it when you login to your Apple Developer account, in your membership
+3. Enter the Key ID and upload the Private Key you previously created
+
+You can configure the following settings if you like, a useful default will be filled if you don't change anything:
+
+**Scopes**: The scopes define which scopes will be sent to the provider, `name` and `email` are prefilled. This information will be taken to create/update the user within ZITADEL.
+
+<GeneralConfigDescription provider_account="Apple account" />
+
+![Apple Provider](/img/guides/zitadel_apple_create_provider.png)
+
+### Activate IdP
+
+<Activate/>
+
+![Activate the Apple Provider](/img/guides/zitadel_activate_apple.png)
+
+## Test the setup
+
+<TestSetup loginscreen="your Apple login"/>
+
+![Apple Button](/img/guides/zitadel_login_apple.png)
+
+![Apple Login](/img/guides/apple_login.png)

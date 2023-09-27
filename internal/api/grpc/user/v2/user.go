@@ -18,8 +18,8 @@ import (
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/query"
-	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest) (_ *user.AddHumanUserResponse, err error) {
@@ -172,8 +172,14 @@ func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredenti
 		return nil, err
 	}
 	return &user.StartIdentityProviderIntentResponse{
-		Details:  object.DomainToDetailsPb(details),
-		NextStep: &user.StartIdentityProviderIntentResponse_IdpIntent{IdpIntent: &user.IDPIntent{IdpIntentId: intentWriteModel.AggregateID, IdpIntentToken: token}},
+		Details: object.DomainToDetailsPb(details),
+		NextStep: &user.StartIdentityProviderIntentResponse_IdpIntent{
+			IdpIntent: &user.IDPIntent{
+				IdpIntentId:    intentWriteModel.AggregateID,
+				IdpIntentToken: token,
+				UserId:         userID,
+			},
+		},
 	}, nil
 }
 
@@ -256,6 +262,7 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 			UserName:       intent.IDPUserName,
 			RawInformation: rawInformation,
 		},
+		UserId: intent.UserID,
 	}
 	if intent.IDPIDToken != "" || intent.IDPAccessToken != nil {
 		information.IdpInformation.Access, err = idpOAuthTokensToPb(intent.IDPIDToken, intent.IDPAccessToken, alg)

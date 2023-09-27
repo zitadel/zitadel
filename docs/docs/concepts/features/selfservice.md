@@ -1,5 +1,6 @@
 ---
-title: Self-Service
+title: Self Service in ZITADEL
+sidebar_label: Self Service
 ---
 
 ZITADEL allows users to perform many tasks themselves.
@@ -138,7 +139,7 @@ A client can also implement this, by calling the [specific endpoint](/apis/openi
 ## Profile
 
 These actions are available for authenticated users only.
-ZITADEL provides a self-service UI for the user profile out-of-the box under the path _{your_domain}/ui/console/users/me_.
+ZITADEL provides a self-service UI for the user profile out-of-the box under the path _$CUSTOM-DOMAIN/ui/console/users/me_.
 You can also implement your own version in your application by using our APIs.
 
 ### Change password

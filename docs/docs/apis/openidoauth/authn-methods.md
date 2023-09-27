@@ -1,5 +1,6 @@
 ---
-title: Authentication Methods
+title: Authentication Methods in ZITADEL
+sidebar_label: Authentication Methods
 ---
 
 ## Client Secret Basic
@@ -45,7 +46,7 @@ JWT
 
 | Claim | Example                    | Description                                                                                                     |
 |:------|:---------------------------|:----------------------------------------------------------------------------------------------------------------|
-| aud   | `"https://{your_domain}"`  | String or Array of intended audiences MUST include ZITADEL's issuing domain                                     |
+| aud   | `"https://$CUSTOM-DOMAIN"`  | String or Array of intended audiences MUST include ZITADEL's issuing domain                                     |
 | exp   | `1605183582`               | Unix timestamp of the expiry                                                                                    |
 | iat   | `1605179982`               | Unix timestamp of the creation singing time of the JWT, MUST NOT be older than 1h                               |
 | iss   | `"78366401571920522@acme"` | String which represents the requesting party (owner of the key), normally the `clientID` from the json key file |
@@ -55,7 +56,7 @@ JWT
 {
 	"iss": "78366401571920522@acme",
 	"sub": "78366401571920522@acme",
-	"aud": "https://{your_domain}",
+	"aud": "https://$CUSTOM-DOMAIN",
 	"exp": 1605183582,
 	"iat": 1605179982
 }
