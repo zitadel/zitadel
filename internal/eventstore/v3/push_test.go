@@ -65,14 +65,14 @@ func Test_mapCommands(t *testing.T) {
 					),
 				},
 				placeHolders: []string{
-					"($1, $2, $3, $4, $5, $6, 'zitadel', $7, $8, $9, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $10)",
+					"($1, $2, $3, $4, $5, $6, $7, $8, $9, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $10)",
 				},
 				args: []any{
 					"instance",
 					"ro",
 					eventstore.AggregateType("type"),
 					"V3-VEIvq",
-					eventstore.Version("v1"),
+					1,
 					"creator",
 					eventstore.EventType("event.type"),
 					Payload(nil),
@@ -114,8 +114,8 @@ func Test_mapCommands(t *testing.T) {
 					),
 				},
 				placeHolders: []string{
-					"($1, $2, $3, $4, $5, $6, 'zitadel', $7, $8, $9, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $10)",
-					"($11, $12, $13, $14, $15, $16, 'zitadel', $17, $18, $19, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $20)",
+					"($1, $2, $3, $4, $5, $6, $7, $8, $9, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $10)",
+					"($11, $12, $13, $14, $15, $16, $17, $18, $19, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $20)",
 				},
 				args: []any{
 					// first event
@@ -123,7 +123,7 @@ func Test_mapCommands(t *testing.T) {
 					"ro",
 					eventstore.AggregateType("type"),
 					"V3-VEIvq",
-					eventstore.Version("v1"),
+					1,
 					"creator",
 					eventstore.EventType("event.type"),
 					Payload(nil),
@@ -134,7 +134,7 @@ func Test_mapCommands(t *testing.T) {
 					"ro",
 					eventstore.AggregateType("type"),
 					"V3-VEIvq",
-					eventstore.Version("v1"),
+					1,
 					"creator",
 					eventstore.EventType("event.type"),
 					Payload(nil),
@@ -180,8 +180,8 @@ func Test_mapCommands(t *testing.T) {
 					),
 				},
 				placeHolders: []string{
-					"($1, $2, $3, $4, $5, $6, 'zitadel', $7, $8, $9, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $10)",
-					"($11, $12, $13, $14, $15, $16, 'zitadel', $17, $18, $19, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $20)",
+					"($1, $2, $3, $4, $5, $6, $7, $8, $9, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $10)",
+					"($11, $12, $13, $14, $15, $16, $17, $18, $19, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $20)",
 				},
 				args: []any{
 					// first event
@@ -189,7 +189,7 @@ func Test_mapCommands(t *testing.T) {
 					"ro",
 					eventstore.AggregateType("type"),
 					"V3-VEIvq",
-					eventstore.Version("v1"),
+					1,
 					"creator",
 					eventstore.EventType("event.type"),
 					Payload(nil),
@@ -200,7 +200,7 @@ func Test_mapCommands(t *testing.T) {
 					"ro",
 					eventstore.AggregateType("type"),
 					"V3-IT6VN",
-					eventstore.Version("v1"),
+					1,
 					"creator",
 					eventstore.EventType("event.type"),
 					Payload(nil),

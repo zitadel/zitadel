@@ -105,7 +105,17 @@ const (
 )
 
 // awaitOpenTransactions ensures event ordering, so we don't events younger that open transactions
-var awaitOpenTransactions string
+var (
+	awaitOpenTransactionsV1 string
+	awaitOpenTransactionsV2 string
+)
+
+func awaitOpenTransactions(useV1 bool) string {
+	if useV1 {
+		return awaitOpenTransactionsV1
+	}
+	return awaitOpenTransactionsV2
+}
 
 type CRDB struct {
 	*database.DB
@@ -114,9 +124,11 @@ type CRDB struct {
 func NewCRDB(client *database.DB) *CRDB {
 	switch client.Type() {
 	case "cockroach":
-		awaitOpenTransactions = "AND creation_date::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = '" + database.EventstorePusherAppName + "')"
+		awaitOpenTransactionsV1 = "AND creation_date::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = '" + database.EventstorePusherAppName + "')"
+		awaitOpenTransactionsV2 = "AND created_at::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = '" + database.EventstorePusherAppName + "')"
 	case "postgres":
-		awaitOpenTransactions = `AND "position" < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = '` + database.EventstorePusherAppName + `' AND state <> 'idle')`
+		awaitOpenTransactionsV1 = `AND "position" < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = '` + database.EventstorePusherAppName + `' AND state <> 'idle')`
+		awaitOpenTransactionsV2 = awaitOpenTransactionsV1
 	}
 
 	return &CRDB{client}
@@ -238,7 +250,14 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 // Filter returns all events matching the given search query
 func (crdb *CRDB) Filter(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (events []eventstore.Event, err error) {
 	events = make([]eventstore.Event, 0, searchQuery.GetLimit())
-	err = query(ctx, crdb, searchQuery, &events)
+	err = query(ctx, crdb, searchQuery, &events, false)
+	pgErr := new(pgconn.PgError)
+	// check events2 not exists
+	if err != nil && errors.As(err, &pgErr) {
+		if pgErr.Code == "42P01" {
+			err = query(ctx, crdb, searchQuery, &events, true)
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -249,14 +268,16 @@ func (crdb *CRDB) Filter(ctx context.Context, searchQuery *eventstore.SearchQuer
 // LatestSequence returns the latest sequence found by the search query
 func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (float64, error) {
 	var position sql.NullFloat64
-	err := query(ctx, db, searchQuery, &position)
+	// TODO: if 42P01 use events instead of events2 needed?
+	err := query(ctx, db, searchQuery, &position, false)
 	return position.Float64, err
 }
 
 // InstanceIDs returns the instance ids found by the search query
 func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) ([]string, error) {
 	var ids []string
-	err := query(ctx, db, searchQuery, &ids)
+	// TODO: if 42P01 use events instead of events2 needed?
+	err := query(ctx, db, searchQuery, &ids, false)
 	if err != nil {
 		return nil, err
 	}
@@ -267,7 +288,13 @@ func (db *CRDB) db() *database.DB {
 	return db.DB
 }
 
-func (db *CRDB) orderByEventSequence(desc bool) string {
+func (db *CRDB) orderByEventSequence(desc, useV1 bool) string {
+	if useV1 {
+		if desc {
+			return ` ORDER BY event_sequence DESC`
+		}
+		return ` ORDER BY event_sequence`
+	}
 	if desc {
 		return ` ORDER BY "position" DESC, in_tx_order DESC`
 	}
@@ -275,52 +302,91 @@ func (db *CRDB) orderByEventSequence(desc bool) string {
 	return ` ORDER BY "position", in_tx_order`
 }
 
-func (db *CRDB) eventQuery() string {
+func (db *CRDB) eventQuery(useV1 bool) string {
+	if useV1 {
+		return "SELECT" +
+			" creation_date" +
+			", event_type" +
+			", event_sequence" +
+			", event_data" +
+			", editor_user" +
+			", resource_owner" +
+			", instance_id" +
+			", aggregate_type" +
+			", aggregate_id" +
+			", aggregate_version" +
+			" FROM eventstore.events"
+	}
 	return "SELECT" +
-		" creation_date" +
+		" created_at" +
 		", event_type" +
-		", event_sequence" +
+		`, "sequence"` +
 		`, "position"` +
-		", event_data" +
-		", editor_user" +
-		", resource_owner" +
+		", payload" +
+		", creator" +
+		`, "owner"` +
 		", instance_id" +
 		", aggregate_type" +
 		", aggregate_id" +
-		", aggregate_version" +
-		" FROM eventstore.events"
+		", revision" +
+		" FROM eventstore.events2"
 }
 
-func (db *CRDB) maxSequenceQuery() string {
-	return `SELECT "position" FROM eventstore.events`
+func (db *CRDB) maxSequenceQuery(useV1 bool) string {
+	if useV1 {
+		return `SELECT event_sequence FROM eventstore.events`
+	}
+	return `SELECT "position" FROM eventstore.events2`
 }
 
-func (db *CRDB) instanceIDsQuery() string {
-	return "SELECT DISTINCT instance_id FROM eventstore.events"
+func (db *CRDB) instanceIDsQuery(useV1 bool) string {
+	table := "eventstore.events2"
+	if useV1 {
+		table = "eventstore.events"
+	}
+	return "SELECT DISTINCT instance_id FROM " + table
 }
 
-func (db *CRDB) columnName(col repository.Field) string {
+func (db *CRDB) columnName(col repository.Field, useV1 bool) string {
 	switch col {
 	case repository.FieldAggregateID:
 		return "aggregate_id"
 	case repository.FieldAggregateType:
 		return "aggregate_type"
 	case repository.FieldSequence:
-		return "event_sequence"
+		if useV1 {
+			return "event_sequence"
+		}
+		return `"sequence"`
 	case repository.FieldResourceOwner:
-		return "resource_owner"
+		if useV1 {
+			return "resource_owner"
+		}
+		return `"owner"`
 	case repository.FieldInstanceID:
 		return "instance_id"
 	case repository.FieldEditorService:
-		return "editor_service"
+		if useV1 {
+			return "editor_service"
+		}
+		return ""
 	case repository.FieldEditorUser:
-		return "editor_user"
+		if useV1 {
+			return "editor_user"
+		}
+		return "creator"
 	case repository.FieldEventType:
 		return "event_type"
 	case repository.FieldEventData:
-		return "event_data"
+		if useV1 {
+			return "event_data"
+		}
+		return "payload"
 	case repository.FieldCreationDate:
-		return "creation_date"
+		if useV1 {
+			return "creation_date"
+		}
+		return "created_at"
 	case repository.FieldPosition:
 		return `"position"`
 	default:

@@ -6,8 +6,11 @@ import (
 	_ "embed"
 	errs "errors"
 	"fmt"
+	"strconv"
 	"strings"
+	"sync"
 
+	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/jackc/pgconn"
 	"github.com/zitadel/logging"
 
@@ -15,30 +18,30 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (_ []eventstore.Event, err error) {
+func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
 	tx, err := es.client.Begin()
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
+	var sequences []*latestSequence
+	querySequences := sync.OnceFunc(func() {
+		sequences, err = latestSequences(ctx, tx, commands)
+	})
+	err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() (err error) {
+		querySequences()
 		if err != nil {
-			txErr := tx.Rollback()
-			logging.OnError(txErr).Debug("unable to rollback transaction")
-			return
+			return err
 		}
-		err = tx.Commit()
-	}()
-	sequences, err := latestSequences(ctx, tx, commands)
-	if err != nil {
-		return nil, err
-	}
 
-	events, err := insertEvents(ctx, tx, sequences, commands)
-	if err != nil {
-		return nil, err
-	}
+		events, err = insertEvents(ctx, tx, sequences, commands)
+		if err != nil {
+			return err
+		}
 
-	if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
+		return handleUniqueConstraints(ctx, tx, commands)
+	})
+
+	if err != nil {
 		return nil, err
 	}
 
@@ -122,12 +125,17 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 			i*argsPerCommand+9,
 			i*argsPerCommand+10,
 		)
+
+		revision, err := strconv.Atoi(strings.TrimPrefix(string(events[i].(*event).aggregate.Version), "v"))
+		if err != nil {
+			return nil, nil, nil, errors.ThrowInternal(err, "V3-JoZEp", "Errors.Internal")
+		}
 		args = append(args,
 			events[i].(*event).aggregate.InstanceID,
 			events[i].(*event).aggregate.ResourceOwner,
 			events[i].(*event).aggregate.Type,
 			events[i].(*event).aggregate.ID,
-			events[i].(*event).aggregate.Version,
+			revision,
 			events[i].(*event).creator,
 			events[i].(*event).typ,
 			events[i].(*event).payload,
@@ -137,4 +145,23 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 	}
 
 	return events, placeholders, args, nil
+}
+
+type transaction struct {
+	*sql.Tx
+}
+
+var _ crdb.Tx = (*transaction)(nil)
+
+func (t *transaction) Exec(ctx context.Context, query string, args ...interface{}) error {
+	_, err := t.Tx.ExecContext(ctx, query, args...)
+	return err
+}
+
+func (t *transaction) Commit(ctx context.Context) error {
+	return t.Tx.Commit()
+}
+
+func (t *transaction) Rollback(ctx context.Context) error {
+	return t.Tx.Rollback()
 }

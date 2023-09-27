@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/zitadel/logging"
@@ -19,15 +20,15 @@ import (
 )
 
 type querier interface {
-	columnName(repository.Field) string
+	columnName(field repository.Field, useV1 bool) string
 	operation(repository.Operation) string
 	conditionFormat(repository.Operation) string
 	placeholder(query string) string
-	eventQuery() string
-	maxSequenceQuery() string
-	instanceIDsQuery() string
+	eventQuery(useV1 bool) string
+	maxSequenceQuery(useV1 bool) string
+	instanceIDsQuery(useV1 bool) string
 	db() *database.DB
-	orderByEventSequence(desc bool) string
+	orderByEventSequence(desc, useV1 bool) string
 	dialect.Database
 }
 
@@ -53,13 +54,13 @@ func (t *tx) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, 
 	return rows.Err()
 }
 
-func query(ctx context.Context, criteria querier, searchQuery *eventstore.SearchQueryBuilder, dest interface{}) error {
+func query(ctx context.Context, criteria querier, searchQuery *eventstore.SearchQueryBuilder, dest interface{}, useV1 bool) error {
 	q, err := repository.QueryFromBuilder(searchQuery)
 	if err != nil {
 		return err
 	}
-	query, rowScanner := prepareColumns(criteria, q.Columns)
-	where, values := prepareCondition(criteria, q)
+	query, rowScanner := prepareColumns(criteria, q.Columns, useV1)
+	where, values := prepareCondition(criteria, q, useV1)
 	if where == "" || query == "" {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
@@ -80,7 +81,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	switch q.Columns {
 	case eventstore.ColumnsEvent,
 		eventstore.ColumnsMaxSequence:
-		query += criteria.orderByEventSequence(q.Desc)
+		query += criteria.orderByEventSequence(q.Desc, useV1)
 	}
 
 	if q.Limit > 0 {
@@ -116,14 +117,14 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	return nil
 }
 
-func prepareColumns(criteria querier, columns eventstore.Columns) (string, func(s scan, dest interface{}) error) {
+func prepareColumns(criteria querier, columns eventstore.Columns, useV1 bool) (string, func(s scan, dest interface{}) error) {
 	switch columns {
 	case eventstore.ColumnsMaxSequence:
-		return criteria.maxSequenceQuery(), maxSequenceScanner
+		return criteria.maxSequenceQuery(useV1), maxSequenceScanner
 	case eventstore.ColumnsInstanceIDs:
-		return criteria.instanceIDsQuery(), instanceIDsScanner
+		return criteria.instanceIDsQuery(useV1), instanceIDsScanner
 	case eventstore.ColumnsEvent:
-		return criteria.eventQuery(), eventsScanner
+		return criteria.eventQuery(useV1), eventsScanner(useV1)
 	default:
 		return "", nil
 	}
@@ -165,45 +166,64 @@ func instanceIDsScanner(scanner scan, dest interface{}) (err error) {
 	return nil
 }
 
-func eventsScanner(scanner scan, dest interface{}) (err error) {
-	events, ok := dest.(*[]eventstore.Event)
-	if !ok {
-		return z_errors.ThrowInvalidArgument(nil, "SQL-4GP6F", "type must be event")
+func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) {
+	return func(scanner scan, dest interface{}) (err error) {
+		events, ok := dest.(*[]eventstore.Event)
+		if !ok {
+			return z_errors.ThrowInvalidArgument(nil, "SQL-4GP6F", "type must be event")
+		}
+		data := make(Data, 0)
+		event := new(repository.Event)
+
+		position := new(sql.NullFloat64)
+
+		if useV1 {
+			err = scanner(
+				&event.CreationDate,
+				&event.Typ,
+				&event.Seq,
+				&data,
+				&event.EditorUser,
+				&event.ResourceOwner,
+				&event.InstanceID,
+				&event.AggregateType,
+				&event.AggregateID,
+				&event.Version,
+			)
+		} else {
+			var revision uint8
+			err = scanner(
+				&event.CreationDate,
+				&event.Typ,
+				&event.Seq,
+				position,
+				&data,
+				&event.EditorUser,
+				&event.ResourceOwner,
+				&event.InstanceID,
+				&event.AggregateType,
+				&event.AggregateID,
+				&revision,
+			)
+			event.Version = eventstore.Version("v" + strconv.Itoa(int(revision)))
+		}
+
+		if err != nil {
+			logging.New().WithError(err).Warn("unable to scan row")
+			return z_errors.ThrowInternal(err, "SQL-M0dsf", "unable to scan row")
+		}
+
+		event.Data = make([]byte, len(data))
+		copy(event.Data, data)
+		event.Pos = position.Float64
+
+		*events = append(*events, event)
+
+		return nil
 	}
-	data := make(Data, 0)
-	event := new(repository.Event)
-
-	position := new(sql.NullFloat64)
-
-	err = scanner(
-		&event.CreationDate,
-		&event.Typ,
-		&event.Seq,
-		position,
-		&data,
-		&event.EditorUser,
-		&event.ResourceOwner,
-		&event.InstanceID,
-		&event.AggregateType,
-		&event.AggregateID,
-		&event.Version,
-	)
-
-	if err != nil {
-		logging.New().WithError(err).Warn("unable to scan row")
-		return z_errors.ThrowInternal(err, "SQL-M0dsf", "unable to scan row")
-	}
-
-	event.Data = make([]byte, len(data))
-	copy(event.Data, data)
-	event.Pos = position.Float64
-
-	*events = append(*events, event)
-
-	return nil
 }
 
-func prepareCondition(criteria querier, query *repository.SearchQuery) (clause string, values []interface{}) {
+func prepareCondition(criteria querier, query *repository.SearchQuery, useV1 bool) (clause string, values []interface{}) {
 	values = make([]interface{}, 0, len(query.Filters))
 
 	if len(query.Filters) == 0 {
@@ -225,7 +245,7 @@ func prepareCondition(criteria querier, query *repository.SearchQuery) (clause s
 				}
 			}
 
-			subClauses = append(subClauses, getCondition(criteria, f))
+			subClauses = append(subClauses, getCondition(criteria, f, useV1))
 			if subClauses[len(subClauses)-1] == "" {
 				return "", nil
 			}
@@ -236,14 +256,14 @@ func prepareCondition(criteria querier, query *repository.SearchQuery) (clause s
 
 	where := " WHERE (" + strings.Join(clauses, " OR ") + ") "
 	if query.AwaitOpenTransactions {
-		where += awaitOpenTransactions
+		where += awaitOpenTransactions(useV1)
 	}
 
 	return where, values
 }
 
-func getCondition(cond querier, filter *repository.Filter) (condition string) {
-	field := cond.columnName(filter.Field)
+func getCondition(cond querier, filter *repository.Filter, useV1 bool) (condition string) {
+	field := cond.columnName(filter.Field, useV1)
 	operation := cond.operation(filter.Operation)
 	if field == "" || operation == "" {
 		return ""

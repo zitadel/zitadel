@@ -2,7 +2,9 @@ package setup
 
 import (
 	"context"
+	"database/sql"
 	"embed"
+	"strings"
 
 	"github.com/zitadel/logging"
 
@@ -12,23 +14,43 @@ import (
 var (
 	//go:embed 14/cockroach/*.sql
 	//go:embed 14/postgres/*.sql
-	changeEvents embed.FS
+	newEventsTable embed.FS
 )
 
-type ChangeEvents struct {
+type NewEventsTable struct {
 	dbClient *database.DB
 }
 
-func (mig *ChangeEvents) Execute(ctx context.Context) error {
-	migrations, err := changeEvents.ReadDir("14/" + mig.dbClient.Type())
+func (mig *NewEventsTable) Execute(ctx context.Context) error {
+	migrations, err := newEventsTable.ReadDir("14/" + mig.dbClient.Type())
 	if err != nil {
 		return err
 	}
-	for _, migration := range migrations {
-		stmt, err := readStmt(changeEvents, "14", mig.dbClient.Type(), migration.Name())
+	// check if events2 table was already created from init
+	if mig.dbClient.Type() == "cockroach" {
+		var count int
+		err := mig.dbClient.QueryRowContext(
+			ctx,
+			func(r *sql.Row) error {
+				return r.Scan(&count)
+			},
+			"SELECT count(*) FROM [show tables from eventstore] WHERE table_name = 'events2'",
+		)
 		if err != nil {
 			return err
 		}
+		if count == 1 {
+			return nil
+		}
+	} else if mig.dbClient.Type() == "postgres" {
+		// TODO: check for events2 table
+	}
+	for _, migration := range migrations {
+		stmt, err := readStmt(newEventsTable, "14", mig.dbClient.Type(), migration.Name())
+		if err != nil {
+			return err
+		}
+		stmt = strings.ReplaceAll(stmt, "{{.username}}", mig.dbClient.Username())
 
 		logging.WithFields("migration", mig.String(), "file", migration.Name()).Debug("execute statement")
 
@@ -40,6 +62,6 @@ func (mig *ChangeEvents) Execute(ctx context.Context) error {
 	return nil
 }
 
-func (mig *ChangeEvents) String() string {
+func (mig *NewEventsTable) String() string {
 	return "14_events_push"
 }

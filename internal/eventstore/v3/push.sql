@@ -1,19 +1,18 @@
-INSERT INTO eventstore.events (
+INSERT INTO eventstore.events2 (
     instance_id
-    , resource_owner
+    , "owner"
     , aggregate_type
     , aggregate_id
-    , aggregate_version
+    , revision
 
-    , editor_user
-    , editor_service
+    , creator
     , event_type
-    , event_data
-    , event_sequence
+    , payload
+    , "sequence"
+    , created_at
 
-    , creation_date
     , "position"
     , in_tx_order
 ) VALUES
     %s
-RETURNING creation_date, "position";
+RETURNING created_at, "position";

@@ -3,9 +3,9 @@ with existing as (
         instance_id
         , aggregate_type
         , aggregate_id
-        , MAX(event_sequence) event_sequence
+        , MAX("sequence") "sequence"
     FROM 
-        eventstore.events existing
+        eventstore.events2 existing
     WHERE 
         %s
     GROUP BY 
@@ -14,17 +14,17 @@ with existing as (
         , aggregate_id
 ) SELECT 
     e.instance_id
-    , e.resource_owner
+    , e.owner
     , e.aggregate_type
     , e.aggregate_id
-    , e.event_sequence
+    , e.sequence
 FROM 
-    eventstore.events e
+    eventstore.events2 e
 JOIN 
     existing 
 ON 
         e.instance_id = existing.instance_id
         AND e.aggregate_type = existing.aggregate_type
         AND e.aggregate_id = existing.aggregate_id
-        AND e.event_sequence = existing.event_sequence
+        AND e.sequence = existing.sequence
 FOR UPDATE;

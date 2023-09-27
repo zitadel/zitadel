@@ -1,0 +1,1 @@
+REVOKE INSERT ON eventstore.events FROM zitadel;

@@ -23,28 +23,28 @@ func TestCRDB_placeholder(t *testing.T) {
 		{
 			name: "no placeholders",
 			args: args{
-				query: "SELECT * FROM eventstore.events",
+				query: "SELECT * FROM eventstore.events2",
 			},
 			res: res{
-				query: "SELECT * FROM eventstore.events",
+				query: "SELECT * FROM eventstore.events2",
 			},
 		},
 		{
 			name: "one placeholder",
 			args: args{
-				query: "SELECT * FROM eventstore.events WHERE aggregate_type = ?",
+				query: "SELECT * FROM eventstore.events2 WHERE aggregate_type = ?",
 			},
 			res: res{
-				query: "SELECT * FROM eventstore.events WHERE aggregate_type = $1",
+				query: "SELECT * FROM eventstore.events2 WHERE aggregate_type = $1",
 			},
 		},
 		{
 			name: "multiple placeholders",
 			args: args{
-				query: "SELECT * FROM eventstore.events WHERE aggregate_type = ? AND aggregate_id = ? LIMIT ?",
+				query: "SELECT * FROM eventstore.events2 WHERE aggregate_type = ? AND aggregate_id = ? LIMIT ?",
 			},
 			res: res{
-				query: "SELECT * FROM eventstore.events WHERE aggregate_type = $1 AND aggregate_id = $2 LIMIT $3",
+				query: "SELECT * FROM eventstore.events2 WHERE aggregate_type = $1 AND aggregate_id = $2 LIMIT $3",
 			},
 		},
 	}
@@ -173,6 +173,7 @@ func TestCRDB_columnName(t *testing.T) {
 	}
 	type args struct {
 		field repository.Field
+		useV1 bool
 	}
 	tests := []struct {
 		name string
@@ -210,18 +211,38 @@ func TestCRDB_columnName(t *testing.T) {
 			name: "editor service",
 			args: args{
 				field: repository.FieldEditorService,
+				useV1: true,
 			},
 			res: res{
 				name: "editor_service",
 			},
 		},
 		{
+			name: "editor service v2",
+			args: args{
+				field: repository.FieldEditorService,
+			},
+			res: res{
+				name: "",
+			},
+		},
+		{
 			name: "editor user",
+			args: args{
+				field: repository.FieldEditorUser,
+				useV1: true,
+			},
+			res: res{
+				name: "editor_user",
+			},
+		},
+		{
+			name: "editor user v2",
 			args: args{
 				field: repository.FieldEditorUser,
 			},
 			res: res{
-				name: "editor_user",
+				name: "creator",
 			},
 		},
 		{
@@ -237,25 +258,45 @@ func TestCRDB_columnName(t *testing.T) {
 			name: "latest sequence",
 			args: args{
 				field: repository.FieldSequence,
+				useV1: true,
 			},
 			res: res{
 				name: "event_sequence",
 			},
 		},
 		{
+			name: "latest sequence v2",
+			args: args{
+				field: repository.FieldSequence,
+			},
+			res: res{
+				name: `"sequence"`,
+			},
+		},
+		{
 			name: "resource owner",
+			args: args{
+				field: repository.FieldResourceOwner,
+				useV1: true,
+			},
+			res: res{
+				name: "resource_owner",
+			},
+		},
+		{
+			name: "resource owner v2",
 			args: args{
 				field: repository.FieldResourceOwner,
 			},
 			res: res{
-				name: "resource_owner",
+				name: `"owner"`,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{}
-			if got := db.columnName(tt.args.field); got != tt.res.name {
+			if got := db.columnName(tt.args.field, tt.args.useV1); got != tt.res.name {
 				t.Errorf("CRDB.operation() = %v, want %v", got, tt.res.name)
 			}
 		})

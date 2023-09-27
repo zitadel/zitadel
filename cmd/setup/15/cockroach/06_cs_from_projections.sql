@@ -7,15 +7,15 @@ INSERT INTO projections.current_states (
 ) (SELECT 
     cs.projection_name
     , cs.instance_id
-    , e.creation_date
+    , e.created_at
     , e.position
     , cs.timestamp
 FROM 
     projections.current_sequences cs
-JOIN eventstore.events e ON
+JOIN eventstore.events2 e ON
     e.instance_id = cs.instance_id 
     AND e.aggregate_type = cs.aggregate_type
-    AND e.event_sequence = cs.current_sequence 
+    AND e.sequence = cs.current_sequence 
     AND cs.current_sequence = (
         SELECT 
             MAX(cs2.current_sequence)

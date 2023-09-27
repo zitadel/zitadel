@@ -646,7 +646,7 @@ func assertResourceOwners(t *testing.T, db *database.DB, resourceOwners, aggrega
 			eventCount++
 		}
 		return nil
-	}, "SELECT resource_owner FROM eventstore.events WHERE aggregate_type = $1 AND aggregate_id = ANY($2) ORDER BY creation_date", aggregateType, aggregateIDs)
+	}, "SELECT owner FROM eventstore.events2 WHERE aggregate_type = $1 AND aggregate_id = ANY($2) ORDER BY position, in_tx_order", aggregateType, aggregateIDs)
 	if err != nil {
 		t.Error("query failed: ", err)
 		return
@@ -663,7 +663,7 @@ func assertEventCount(t *testing.T, db *database.DB, aggTypes database.TextArray
 	var count int
 	err := db.QueryRow(func(row *sql.Row) error {
 		return row.Scan(&count)
-	}, "SELECT count(*) FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2)", aggTypes, aggIDs)
+	}, "SELECT count(*) FROM eventstore.events2 where aggregate_type = ANY($1) AND aggregate_id = ANY($2)", aggTypes, aggIDs)
 
 	if err != nil {
 		t.Errorf("unexpected err in row.Scan: %v", err)

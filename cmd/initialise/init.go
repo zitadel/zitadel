@@ -25,7 +25,6 @@ var (
 	createEventsStmt         string
 	createSystemSequenceStmt string
 	createUniqueConstraints  string
-	eventsColumns            string
 
 	roleAlreadyExistsCode = "42710"
 	dbAlreadyExistsCode   = "42P04"
@@ -142,11 +141,6 @@ func ReadStmts(typ string) (err error) {
 	}
 
 	createUniqueConstraints, err = readStmt(typ, "10_unique_constraints_table")
-	if err != nil {
-		return err
-	}
-
-	eventsColumns, err = readStmt(typ, "11_eventstore_columns")
 	if err != nil {
 		return err
 	}

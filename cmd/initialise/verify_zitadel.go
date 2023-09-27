@@ -69,11 +69,6 @@ func VerifyZitadel(db *database.DB, config database.Config) error {
 		return err
 	}
 
-	logging.WithFields().Info("verify position and in_tx_order columns in events table")
-	if err := exec(db, eventsColumns, nil); err != nil {
-		return err
-	}
-
 	return nil
 }
 
