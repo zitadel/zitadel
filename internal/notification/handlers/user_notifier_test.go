@@ -1051,7 +1051,7 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 }
 
 func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
-	expectMailSubject := "VerifyEmailOTP.Subject"
+	expectMailSubject := "Verify One-Time Password"
 	tests := []struct {
 		name string
 		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, want)
