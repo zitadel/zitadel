@@ -9,7 +9,7 @@ const INSTANCE = process.env.ZITADEL_API_URL;
 const SERVICE_USER_ID = process.env.ZITADEL_SERVICE_USER_ID as string;
 
 export function middleware(request: NextRequest) {
-  const requestHeaders = new Headers(request.headers);
+  const requestHeaders = new Headers();
   requestHeaders.set("x-zitadel-login-client", SERVICE_USER_ID);
 
   const proto = request.nextUrl.protocol.replace(":", "");
