@@ -1,6 +1,7 @@
 package initialise
 
 import (
+	"database/sql"
 	_ "embed"
 	"fmt"
 
@@ -104,6 +105,25 @@ func createEvents(db *database.DB) error {
 	tx, err := db.Begin()
 	if err != nil {
 		return err
+	}
+
+	// if events already exists events2 is created during a setup job
+	if db.Type() == "cockroach" {
+		var count int
+		err := db.QueryRow(
+			func(r *sql.Row) error {
+				return r.Scan(&count)
+			},
+			"SELECT count(*) FROM [show tables from eventstore] WHERE table_name like 'events%'",
+		)
+		if err != nil {
+			return err
+		}
+		if count >= 1 {
+			return nil
+		}
+	} else if db.Type() == "postgres" {
+		// TODO: check for events2 table
 	}
 
 	if _, err = tx.Exec(createEventsStmt); err != nil {

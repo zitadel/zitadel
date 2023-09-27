@@ -29,6 +29,11 @@ type Migration interface {
 	Execute(context.Context) error
 }
 
+type errCheckerMigration interface {
+	Migration
+	ContinueOnErr(err error) bool
+}
+
 type RepeatableMigration interface {
 	Migration
 	SetLastExecution(lastRun map[string]interface{})
@@ -38,11 +43,24 @@ type RepeatableMigration interface {
 func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration) (err error) {
 	logging.WithFields("name", migration.String()).Info("verify migration")
 
-	if should, err := checkExec(ctx, es, migration); !should || err != nil {
-		return err
+	continueOnErr := func(err error) bool {
+		return false
+	}
+	errChecker, ok := migration.(errCheckerMigration)
+	if ok {
+		continueOnErr = errChecker.ContinueOnErr
 	}
 
-	if _, err = es.Push(ctx, setupStartedCmd(migration)); err != nil {
+	// if should, err := checkExec(ctx, es, migration); !should || err != nil {
+	should, err := checkExec(ctx, es, migration)
+	if err != nil && !continueOnErr(err) {
+		return err
+	}
+	if !should {
+		return nil
+	}
+
+	if _, err = es.Push(ctx, setupStartedCmd(ctx, migration)); err != nil && !continueOnErr(err) {
 		return err
 	}
 

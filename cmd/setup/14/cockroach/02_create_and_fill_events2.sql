@@ -22,12 +22,12 @@ CREATE TABLE eventstore.events2 (
 
     event_type,
     event_sequence,
-    aggregate_version,
+    substr(aggregate_version, 2)::SMALLINT,
     creation_date,
     event_data,
     editor_user,
     resource_owner,
 
-    COALESCE("position", creation_date::DECIMAL),
-    COALESCE(in_tx_order, event_sequence)
-FROM eventstore.events;
+    creation_date::DECIMAL,
+    event_sequence
+FROM eventstore.events_old;

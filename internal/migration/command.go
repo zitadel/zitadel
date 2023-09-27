@@ -34,8 +34,8 @@ func (s *SetupStep) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func setupStartedCmd(migration Migration) eventstore.Command {
-	ctx := authz.SetCtxData(service.WithService(context.Background(), "system"), authz.CtxData{UserID: "system", OrgID: "SYSTEM", ResourceOwner: "SYSTEM"})
+func setupStartedCmd(ctx context.Context, migration Migration) eventstore.Command {
+	ctx = authz.SetCtxData(service.WithService(ctx, "system"), authz.CtxData{UserID: "system", OrgID: "SYSTEM", ResourceOwner: "SYSTEM"})
 	return &SetupStep{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,

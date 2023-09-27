@@ -4,8 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"embed"
+	"errors"
 	"strings"
 
+	"github.com/jackc/pgconn"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
@@ -64,4 +66,12 @@ func (mig *NewEventsTable) Execute(ctx context.Context) error {
 
 func (mig *NewEventsTable) String() string {
 	return "14_events_push"
+}
+
+func (mig *NewEventsTable) ContinueOnErr(err error) bool {
+	pgErr := new(pgconn.PgError)
+	if errors.As(err, &pgErr) {
+		return pgErr.Code == "42P01"
+	}
+	return false
 }
