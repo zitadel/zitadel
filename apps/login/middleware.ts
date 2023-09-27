@@ -12,7 +12,18 @@ export function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-zitadel-login-client", SERVICE_USER_ID);
 
-  console.log("intercept", request.nextUrl.pathname);
+  const proto = request.nextUrl.protocol.replace(":", "");
+  requestHeaders.set(
+    "Forwarded",
+    `host=${request.nextUrl.host};proto=${proto}`
+  );
+
+  console.log(
+    "intercept",
+    request.nextUrl.basePath,
+    request.nextUrl.host,
+    proto
+  );
 
   request.nextUrl.href = `${INSTANCE}${request.nextUrl.pathname}${request.nextUrl.search}`;
   return NextResponse.rewrite(request.nextUrl, {
