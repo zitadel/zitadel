@@ -207,7 +207,11 @@ func (h *Handler) handleMetadata(w http.ResponseWriter, r *http.Request) {
 
 	buf, _ := xml.MarshalIndent(metadata, "", "  ")
 	w.Header().Set("Content-Type", "application/samlmetadata+xml")
-	w.Write(buf)
+	_, err = w.Write(buf)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 }
 
 func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {

@@ -198,7 +198,11 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		http.Redirect(w, r, content, http.StatusFound)
 		return
 	}
-	w.Write([]byte(content))
+	_, err = w.Write([]byte(content))
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
 }
 
 // handleExternalLoginCallbackForm handles the callback from a IDP with form_post.

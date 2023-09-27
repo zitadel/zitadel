@@ -5500,9 +5500,8 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 
 func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 	type fields struct {
-		eventstore                 *eventstore.Eventstore
-		secretCrypto               crypto.EncryptionAlgorithm
-		certificateAndKeyGenerator func(id string) ([]byte, []byte, error)
+		eventstore   *eventstore.Eventstore
+		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
