@@ -109,7 +109,7 @@ func NewProvider(
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "OIDC-D3gq1", "cannot create options: %w")
 	}
-	provider, err := op.NewDynamicOpenIDProvider(
+	provider, err := op.NewForwardedOpenIDProvider(
 		"",
 		opConfig,
 		storage,

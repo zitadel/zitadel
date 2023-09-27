@@ -1,10 +1,11 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import {
   BRANDING,
   COMPLEXITY,
@@ -21,16 +22,17 @@ import {
   SECRETS,
   SECURITY,
 } from '../../modules/settings-list/settings';
+import { checkSettingsPermissions } from '../org-settings/org-settings.component';
 
 @Component({
   selector: 'cnsl-instance-settings',
   templateUrl: './instance-settings.component.html',
   styleUrls: ['./instance-settings.component.scss'],
 })
-export class InstanceSettingsComponent implements OnDestroy {
+export class InstanceSettingsComponent implements OnInit, OnDestroy {
   public id: string = '';
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
-  public settingsList: SidenavSetting[] = [
+  public defaultSettingsList: SidenavSetting[] = [
     GENERAL,
     // notifications
     // { showWarn: true, ...NOTIFICATIONS },
@@ -53,8 +55,10 @@ export class InstanceSettingsComponent implements OnDestroy {
     SECURITY,
   ];
 
+  public settingsList: SidenavSetting[] = [];
+
   private destroy$: Subject<void> = new Subject();
-  constructor(breadcrumbService: BreadcrumbService, activatedRoute: ActivatedRoute) {
+  constructor(breadcrumbService: BreadcrumbService, activatedRoute: ActivatedRoute, public authService: GrpcAuthService) {
     const breadcrumbs = [
       new Breadcrumb({
         type: BreadcrumbType.INSTANCE,
@@ -70,6 +74,16 @@ export class InstanceSettingsComponent implements OnDestroy {
         this.id = id;
       }
     });
+  }
+
+  ngOnInit(): void {
+    checkSettingsPermissions(this.defaultSettingsList, PolicyComponentServiceType.ADMIN, this.authService).subscribe(
+      (allowed) => {
+        this.settingsList = this.defaultSettingsList.filter((setting, index) => {
+          return allowed[index];
+        });
+      },
+    );
   }
 
   ngOnDestroy(): void {
