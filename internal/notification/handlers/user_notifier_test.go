@@ -48,7 +48,7 @@ const (
 	externalPort            = 3000
 	externalSecure          = false
 	externalProtocol        = "http"
-	defaultOTPEmailTemplate = "/otp/verify?loginName={{.LoginName}}&code={{.Code}}"
+	defaultOTPEmailTemplate = "/ui/login/mfa/otp/verify?loginName={{.LoginName}}&code={{.Code}}"
 )
 
 func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
@@ -1137,7 +1137,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
-			expectContent := fmt.Sprintf("%s/ui/login/otp/verify?loginName=%s&code=%s", eventOrigin, preferredLoginName, testCode)
+			expectContent := fmt.Sprintf("%s/ui/login/mfa/otp/verify?loginName=%s&code=%s", eventOrigin, preferredLoginName, testCode)
 			w.message = messages.Email{
 				Recipients: []string{verifiedEmail},
 				Subject:    expectMailSubject,
@@ -1175,7 +1175,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
-			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/otp/verify?loginName=%s&code=%s", externalProtocol, instancePrimaryDomain, externalPort, preferredLoginName, testCode)
+			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/mfa/otp/verify?loginName=%s&code=%s", externalProtocol, instancePrimaryDomain, externalPort, preferredLoginName, testCode)
 			w.message = messages.Email{
 				Recipients: []string{verifiedEmail},
 				Subject:    expectMailSubject,
@@ -1219,14 +1219,14 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("https://my.custom.url/user/%s/verify", preferredLoginName)
 			w.message = messages.Email{
-				Recipients: []string{lastEmail},
+				Recipients: []string{verifiedEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateQueries(queries, givenTemplate)
 			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any()).Return(&query.Session{}, nil)
-			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID).Return(nil)
+			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
