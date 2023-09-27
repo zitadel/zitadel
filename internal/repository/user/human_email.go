@@ -3,9 +3,9 @@ package user
 import (
 	"context"
 	"encoding/json"
-	"github.com/zitadel/zitadel/internal/api/http"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -127,7 +127,7 @@ type HumanEmailCodeAddedEvent struct {
 	Expiry            time.Duration       `json:"expiry,omitempty"`
 	URLTemplate       string              `json:"url_template,omitempty"`
 	CodeReturned      bool                `json:"code_returned,omitempty"`
-	TriggeredAtOrigin string              `json:"trigger_origin,omitempty"`
+	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
 func (e *HumanEmailCodeAddedEvent) Data() interface{} {

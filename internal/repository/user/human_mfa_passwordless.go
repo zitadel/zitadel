@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/http"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -324,7 +323,7 @@ type HumanPasswordlessInitCodeRequestedEvent struct {
 	Expiry            time.Duration       `json:"expiry"`
 	URLTemplate       string              `json:"url_template,omitempty"`
 	CodeReturned      bool                `json:"code_returned,omitempty"`
-	TriggeredAtOrigin string              `json:"trigger_origin,omitempty"`
+	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
 func (e *HumanPasswordlessInitCodeRequestedEvent) Data() interface{} {

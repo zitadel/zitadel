@@ -6,12 +6,10 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/http"
-
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
@@ -35,7 +33,7 @@ type HumanPasswordChangedEvent struct {
 	EncodedHash       string              `json:"encodedHash,omitempty"`
 	ChangeRequired    bool                `json:"changeRequired"`
 	UserAgentID       string              `json:"userAgentID,omitempty"`
-	TriggeredAtOrigin string              `json:"trigger_origin,omitempty"`
+	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
 func (e *HumanPasswordChangedEvent) Data() interface{} {
@@ -90,7 +88,7 @@ type HumanPasswordCodeAddedEvent struct {
 	NotificationType  domain.NotificationType `json:"notificationType,omitempty"`
 	URLTemplate       string                  `json:"url_template,omitempty"`
 	CodeReturned      bool                    `json:"code_returned,omitempty"`
-	TriggeredAtOrigin string                  `json:"trigger_origin,omitempty"`
+	TriggeredAtOrigin string                  `json:"triggerOrigin,omitempty"`
 }
 
 func (e *HumanPasswordCodeAddedEvent) Data() interface{} {

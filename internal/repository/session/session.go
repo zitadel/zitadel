@@ -3,9 +3,9 @@ package session
 import (
 	"context"
 	"encoding/json"
-	"github.com/zitadel/zitadel/internal/api/http"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -414,7 +414,7 @@ type OTPEmailChallengedEvent struct {
 	Expiry            time.Duration       `json:"expiry"`
 	ReturnCode        bool                `json:"returnCode,omitempty"`
 	URLTmpl           string              `json:"urlTmpl,omitempty"`
-	TriggeredAtOrigin string              `json:"trigger_origin,omitempty"`
+	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
 func (e *OTPEmailChallengedEvent) Data() interface{} {

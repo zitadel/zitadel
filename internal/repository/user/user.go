@@ -6,11 +6,9 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/http"
-
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
@@ -317,7 +315,7 @@ type DomainClaimedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName              string `json:"userName"`
-	TriggeredAtOrigin     string `json:"trigger_origin,omitempty"`
+	TriggeredAtOrigin     string `json:"triggerOrigin,omitempty"`
 	oldUserName           string
 	userLoginMustBeDomain bool
 }
