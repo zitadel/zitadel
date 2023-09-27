@@ -17,10 +17,11 @@ import { InfoSectionModule } from '../info-section/info-section.module';
 import { ProviderOptionsModule } from '../provider-options/provider-options.module';
 import { StringListModule } from '../string-list/string-list.module';
 import { SMTPProviderGoogleComponent } from './smtp-provider-google/smtp-provider-google.component';
+import { SMTPProviderSendgridComponent } from './smtp-provider-sendgrid/smtp-provider-sendgrid.component';
 import { SMTPProvidersRoutingModule } from './smtp-provider-routing.module';
 
 @NgModule({
-  declarations: [SMTPProviderGoogleComponent],
+  declarations: [SMTPProviderGoogleComponent, SMTPProviderSendgridComponent],
   imports: [
     SMTPProvidersRoutingModule,
     CommonModule,

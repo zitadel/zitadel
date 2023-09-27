@@ -10,10 +10,14 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { CardModule } from '../../card/card.module';
 import { IdpTableModule } from '../../idp-table/idp-table.module';
 import { SMTPSettingsComponent } from './smtp-settings.component';
+import { InputModule } from '../../input/input.module';
+import { FormFieldModule } from '../../form-field/form-field.module';
 
 @NgModule({
   declarations: [SMTPSettingsComponent],
   imports: [
+    InputModule,
+    FormFieldModule,
     CommonModule,
     MatLegacyButtonModule,
     CardModule,

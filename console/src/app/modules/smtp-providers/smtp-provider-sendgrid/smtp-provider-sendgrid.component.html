@@ -1,0 +1,70 @@
+<cnsl-create-layout
+  title="{{ id ? ('IDP.DETAIL.TITLE' | translate) : ('IDP.CREATE.TITLE' | translate) }}"
+  (closed)="close()"
+>
+  <div class="identity-provider-create-content">
+    <div class="title-row">
+      <img class="idp-logo" src="./assets/images/smtp/sendgrid.png" alt="sendgrid" />
+      <h1>{{ 'SETTING.SMTP.CREATE.SENDGRID.TITLE' | translate }}</h1>
+      <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
+    </div>
+
+    <p class="identity-provider-desc cnsl-secondary-text">
+      {{ !provider ? ('SETTING.SMTP.CREATE.SENDGRID.DESCRIPTION' | translate) : ('IDP.DETAIL.DESCRIPTION' | translate) }}
+    </p>
+
+    <form autocomplete="off" [formGroup]="form" (ngSubmit)="submitForm()">
+      <cnsl-form-field class="smtp-form-field" label="Sender Address" required="true">
+        <cnsl-label>{{ 'SETTING.SMTP.SENDERADDRESS' | translate }}</cnsl-label>
+        <input cnslInput name="senderAddress" formControlName="senderAddress" required />
+      </cnsl-form-field>
+    
+      <cnsl-form-field class="smtp-form-field" label="Sender Name" required="true">
+        <cnsl-label>{{ 'SETTING.SMTP.SENDERNAME' | translate }}</cnsl-label>
+        <input cnslInput name="senderName" formControlName="senderName" required />
+      </cnsl-form-field>
+    
+      <cnsl-form-field class="smtp-form-field" label="Reply-To Address">
+        <cnsl-label>{{ 'SETTING.SMTP.REPLYTOADDRESS' | translate }}</cnsl-label>
+        <input cnslInput name="senderReplyToAddress" formControlName="replyToAddress" />
+      </cnsl-form-field>
+      
+      <cnsl-form-field class="smtp-form-field" label="Host And Port" required="true">
+        <cnsl-label>{{ 'SETTING.SMTP.HOST' | translate }}</cnsl-label>
+        <input cnslInput name="host" formControlName="host" placeholder="smtp.mailtrap.io" required />
+      </cnsl-form-field>
+
+      <mat-checkbox class="smtp-checkbox" formControlName="tls">
+        {{ 'SETTING.SMTP.TLS' | translate }}
+      </mat-checkbox>
+
+      <cnsl-form-field class="smtp-form-field" label="Host And Port" required="true">
+        <cnsl-label>{{ 'SETTING.SMTP.PORT' | translate }}</cnsl-label>
+        <input cnslInput name="port" formControlName="port" placeholder="2525" required type="number"/>
+      </cnsl-form-field>
+    
+      <cnsl-form-field class="smtp-form-field" label="User" required="true">
+        <cnsl-label>{{ 'SETTING.SMTP.USER' | translate }}</cnsl-label>
+        <input id="smtp-user" cnslInput name="smtp-user" autocomplete="smtp-user" formControlName="user" required />
+      </cnsl-form-field>
+
+      <cnsl-form-field class="smtp-form-field" label="Password" required="true">
+        <cnsl-label>{{ 'SETTING.SMTP.PASSWORD' | translate }}</cnsl-label>
+        <input id="smtp-password" cnslInput name="smtp-password" autocomplete="smtp-password" formControlName="password" type="password" autocomplete="new-password" placeholder="Sendgrid API Key" required />
+      </cnsl-form-field>
+
+      <div class="identity-provider-create-actions">
+        <button
+          color="primary"
+          mat-raised-button
+          class="continue-button"
+          [disabled]="form.invalid || form.disabled"
+          type="submit"
+        >
+          <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
+          <span *ngIf="!id">{{ 'ACTIONS.CREATE' | translate }}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</cnsl-create-layout>

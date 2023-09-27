@@ -92,9 +92,9 @@ export const NOTIFICATIONS: SidenavSetting = {
   },
 };
 
-export const SMTP_PROVIDER: SidenavSetting = {
+export const SMTP_SETTINGS: SidenavSetting = {
   id: 'smtpprovider',
-  i18nKey: 'SETTINGS.LIST.SMTP_PROVIDER',
+  i18nKey: 'SETTINGS.LIST.SMTP_SETTINGS',
   groupI18nKey: 'SETTINGS.GROUPS.NOTIFICATIONS',
   requiredRoles: {
     [PolicyComponentServiceType.MGMT]: ['policy.read'],

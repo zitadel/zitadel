@@ -1021,6 +1021,7 @@
       "LOCKOUT": "Lockout",
       "COMPLEXITY": "Password complexity",
       "NOTIFICATIONS": "Notifications",
+      "SMTP_SETTINGS": "SMTP Settings",
       "SMTP_PROVIDER": "SMTP Provider",
       "SMS_PROVIDER": "SMS/Phone Provider",
       "NOTIFICATIONS_DESC": "SMTP and SMS Settings",
@@ -1060,9 +1061,12 @@
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
+      "DESCRIPTION": "",
       "SENDERADDRESS": "Sender Email Address",
       "SENDERNAME": "Sender Name",
       "REPLYTOADDRESS": "Reply-to Address",
+      "HOST": "Host",
+      "PORT": "Port",
       "HOSTANDPORT": "Host And Port",
       "USER": "User",
       "PASSWORD": "Password",
@@ -1074,6 +1078,19 @@
       "LIST": {
         "TITLE": "SMTP Provider",
         "DESCRIPTION": "Manage your SMTP Provider configuration, which can then be activated/deactivated and tested."
+      },
+      "CREATE": {
+        "TITLE": "Add provider",
+        "DESCRIPTION": "Select one ore more of the following providers.",
+        "STEPPERTITLE": "Create Provider",
+        "GOOGLE": {
+          "TITLE": "Google Provider",
+          "DESCRIPTION": "Enter the credentials for your Google SMTP Provider"
+        },
+        "SENDGRID": {
+          "TITLE": "Sendgrid Provider",
+          "DESCRIPTION": "Enter the configuration for your Sendgrid SMTP Provider"
+        }
       },
       "EMPTY": "No SMTP provider available"
       
