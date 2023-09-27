@@ -18,6 +18,12 @@ export function middleware(request: NextRequest) {
     `host=${request.nextUrl.host};proto=${proto}`
   );
 
+  requestHeaders.set("Access-Control-Allow-Origin", "*");
+  requestHeaders.set(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+
   console.log(
     "intercept",
     request.nextUrl.basePath,
