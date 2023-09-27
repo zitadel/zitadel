@@ -1013,7 +1013,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				IdpInformation: &user.IDPInformation{
 					Access: &user.IDPInformation_Saml{
 						Saml: &user.IDPSAMLAccessInformation{
-							Response: "response",
+							Assertion: []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
 						},
 					},
 					IdpId:    idpID,
