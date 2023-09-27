@@ -103,7 +103,7 @@ type SMTPConfig struct {
 	User           string
 	Password       *crypto.CryptoValue
 	IsActive       bool
-	ProviderType   string
+	ProviderType   uint32
 }
 
 func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (config *SMTPConfig, err error) {
@@ -114,6 +114,7 @@ func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID strin
 	query, args, err := stmt.Where(sq.Eq{
 		SMTPConfigColumnAggregateID.identifier(): aggregateID,
 		SMTPConfigColumnInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
+		SMTPConfigColumnIsActive.identifier():    true,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-3m9sl", "Errors.Query.SQLStatment")
@@ -161,6 +162,8 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				&config.Host,
 				&config.User,
 				&password,
+				&config.IsActive,
+				&config.ProviderType,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {

@@ -54,7 +54,7 @@ func newSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerCo
 			crdb.NewColumn(SMTPConfigColumnSMTPUser, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnSMTPPassword, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(SMTPConfigColumnIsActive, crdb.ColumnTypeBool),
-			crdb.NewColumn(SMTPConfigColumnProviderType, crdb.ColumnTypeText),
+			crdb.NewColumn(SMTPConfigColumnProviderType, crdb.ColumnTypeEnum),
 		},
 			crdb.NewPrimaryKey(SMTPConfigColumnInstanceID, SMTPConfigColumnAggregateID),
 		),
@@ -146,6 +146,12 @@ func (p *smtpConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 	}
 	if e.User != nil {
 		columns = append(columns, handler.NewCol(SMTPConfigColumnSMTPUser, *e.User))
+	}
+	if e.IsActive != nil {
+		columns = append(columns, handler.NewCol(SMTPConfigColumnIsActive, *e.IsActive))
+	}
+	if e.ProviderType != nil {
+		columns = append(columns, handler.NewCol(SMTPConfigColumnProviderType, *e.ProviderType))
 	}
 	return crdb.NewUpdateStatement(
 		e,

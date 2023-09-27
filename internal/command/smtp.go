@@ -17,7 +17,7 @@ import (
 
 func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.Config) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareAddSMTPConfig(instanceAgg, config.From, config.FromName, config.ReplyToAddress, config.SMTP.Host, config.SMTP.User, []byte(config.SMTP.Password), config.Tls, config.IsActive, config.ProviderType)
+	validation := c.prepareAddSMTPConfig(instanceAgg, config.From, config.FromName, config.ReplyToAddress, config.SMTP.Host, config.SMTP.User, []byte(config.SMTP.Password), config.Tls, config.SMTP.IsActive, config.SMTP.ProviderType)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.Config) (*dom
 
 func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *smtp.Config) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareChangeSMTPConfig(instanceAgg, config.From, config.FromName, config.ReplyToAddress, config.SMTP.Host, config.SMTP.User, config.Tls, config.IsActive, config.ProviderType)
+	validation := c.prepareChangeSMTPConfig(instanceAgg, config.From, config.FromName, config.ReplyToAddress, config.SMTP.Host, config.SMTP.User, config.Tls, config.SMTP.IsActive, config.SMTP.ProviderType)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -99,7 +99,7 @@ func (c *Commands) RemoveSMTPConfig(ctx context.Context) (*domain.ObjectDetails,
 	}, nil
 }
 
-func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, replyTo, hostAndPort, user string, password []byte, tls, isActive bool, providerType string) preparation.Validation {
+func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, replyTo, hostAndPort, user string, password []byte, tls, isActive bool, providerType uint32) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if from = strings.TrimSpace(from); from == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-mruNY", "Errors.Invalid.Argument")
@@ -151,7 +151,7 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, reply
 	}
 }
 
-func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, replyTo, hostAndPort, user string, tls, isActive bool, providerType string) preparation.Validation {
+func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, replyTo, hostAndPort, user string, tls, isActive bool, providerType uint32) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if from = strings.TrimSpace(from); from == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-ASv2d", "Errors.Invalid.Argument")

@@ -32,7 +32,9 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						"senderName": "name",
 						"replyToAddress": "reply-to",
 						"host": "host",
-						"user": "user"
+						"user": "user",
+						"isActive": true,
+						"providerType": 2
 					}`,
 					),
 				), instance.SMTPConfigChangedEventMapper),
@@ -45,7 +47,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.smtp_configs2 SET (change_date, sequence, tls, sender_address, sender_name, reply_to_address, host, username, is_active, provider_type) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) WHERE (aggregate_id = $10) AND (instance_id = $11)",
+							expectedStmt: "UPDATE projections.smtp_configs2 SET (change_date, sequence, tls, sender_address, sender_name, reply_to_address, host, username, is_active, provider_type) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) WHERE (aggregate_id = $11) AND (instance_id = $12)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -56,7 +58,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 								"host",
 								"user",
 								true,
-								"google",
+								uint32(2),
 								"agg-id",
 								"instance-id",
 							},
@@ -84,7 +86,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 							"keyId": "key-id"
 						},
 						"isActive": true,
-						"providerType": "generic"
+						"providerType": 1
 					}`),
 				), instance.SMTPConfigAddedEventMapper),
 			},
@@ -110,9 +112,9 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 								"reply-to",
 								"host",
 								"user",
-								true,
-								"generic",
 								anyArg{},
+								true,
+								uint32(1),
 							},
 						},
 					},

@@ -40,6 +40,17 @@ message SecretGeneratorTypeQuery {
   SecretGeneratorType generator_type = 1;
 }
 
+enum SMTPProviderType {
+  SMTP_PROVIDER_TYPE_UNKNOWN = 0;
+  SMTP_PROVIDER_TYPE_SENDGRID = 1;
+  SMTP_PROVIDER_TYPE_AMAZONSES = 2;
+  SMTP_PROVIDER_TYPE_MAILGUN = 3;
+  SMTP_PROVIDER_TYPE_POSTMARK = 4;
+  SMTP_PROVIDER_TYPE_GOOGLE = 5;
+  SMTP_PROVIDER_TYPE_MAILJET = 6;
+  SMTP_PROVIDER_TYPE_GENERIC = 7;
+}
+
 enum SecretGeneratorType {
   SECRET_GENERATOR_TYPE_UNSPECIFIED = 0;
   SECRET_GENERATOR_TYPE_INIT_CODE = 1;
@@ -81,11 +92,7 @@ message SMTPConfig {
     }
   ];
   bool is_active = 8;
-  string provider_type = 9 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"google\"";
-    }
-  ];
+  SMTPProviderType provider_type = 9;
 }
 
 message SMSProvider {

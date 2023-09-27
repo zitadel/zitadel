@@ -29,7 +29,7 @@ type SMTPConfigAddedEvent struct {
 	User           string              `json:"user,omitempty"`
 	Password       *crypto.CryptoValue `json:"password,omitempty"`
 	IsActive       bool                `json:"isActive,omitempty"`
-	ProviderType   string              `json:"providerType,omitempty"`
+	ProviderType   uint32              `json:"providerType,omitempty"`
 }
 
 func NewSMTPConfigAddedEvent(
@@ -43,7 +43,7 @@ func NewSMTPConfigAddedEvent(
 	user string,
 	password *crypto.CryptoValue,
 	isActive bool,
-	providerType string,
+	providerType uint32,
 ) *SMTPConfigAddedEvent {
 	return &SMTPConfigAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -93,7 +93,7 @@ type SMTPConfigChangedEvent struct {
 	Host           *string `json:"host,omitempty"`
 	User           *string `json:"user,omitempty"`
 	IsActive       *bool   `json:"isActive,omitempty"`
-	ProviderType   *string `json:"providerType,omitempty"`
+	ProviderType   *uint32 `json:"providerType,omitempty"`
 }
 
 func (e *SMTPConfigChangedEvent) Data() interface{} {
@@ -169,7 +169,7 @@ func ChangeSMTPConfigIsActive(isActive bool) func(event *SMTPConfigChangedEvent)
 	}
 }
 
-func ChangeSMTPConfigProviderType(providerType string) func(event *SMTPConfigChangedEvent) {
+func ChangeSMTPConfigProviderType(providerType uint32) func(event *SMTPConfigChangedEvent) {
 	return func(e *SMTPConfigChangedEvent) {
 		e.ProviderType = &providerType
 	}

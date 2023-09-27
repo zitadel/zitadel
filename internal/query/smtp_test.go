@@ -24,8 +24,8 @@ var (
 		` projections.smtp_configs2.reply_to_address,` +
 		` projections.smtp_configs2.host,` +
 		` projections.smtp_configs2.username,` +
-		` projections.smtp_configs2.password` +
-		` projections.smtp_configs2.is_active` +
+		` projections.smtp_configs2.password,` +
+		` projections.smtp_configs2.is_active,` +
 		` projections.smtp_configs2.provider_type` +
 		` FROM projections.smtp_configs2` +
 		` AS OF SYSTEM TIME '-1 ms'`
@@ -97,7 +97,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 						"user",
 						&crypto.CryptoValue{},
 						false,
-						"generic",
+						1,
 					},
 				),
 			},
@@ -115,7 +115,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 				User:           "user",
 				Password:       &crypto.CryptoValue{},
 				IsActive:       false,
-				ProviderType:   "generic",
+				ProviderType:   1,
 			},
 		},
 		{

@@ -21,7 +21,7 @@ type InstanceSMTPConfigWriteModel struct {
 	Password       *crypto.CryptoValue
 	State          domain.SMTPConfigState
 	IsActive       bool
-	ProviderType   string
+	ProviderType   uint32
 
 	domain                                 string
 	domainState                            domain.InstanceDomainState
@@ -106,6 +106,8 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 			wm.Host = ""
 			wm.User = ""
 			wm.Password = nil
+			wm.IsActive = false
+			wm.ProviderType = 0
 		case *instance.DomainAddedEvent:
 			wm.domainState = domain.InstanceDomainStateActive
 		case *instance.DomainRemovedEvent:
@@ -138,7 +140,7 @@ func (wm *InstanceSMTPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (wm *InstanceSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, tls bool, fromAddress, fromName, replyToAddress, smtpHost, smtpUser string, isActive bool, providerType string) (*instance.SMTPConfigChangedEvent, bool, error) {
+func (wm *InstanceSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, tls bool, fromAddress, fromName, replyToAddress, smtpHost, smtpUser string, isActive bool, providerType uint32) (*instance.SMTPConfigChangedEvent, bool, error) {
 	changes := make([]instance.SMTPConfigChanges, 0)
 	var err error
 
