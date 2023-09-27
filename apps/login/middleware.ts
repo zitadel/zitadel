@@ -18,8 +18,9 @@ export function middleware(request: NextRequest) {
     `host=${request.nextUrl.host};proto=${proto}`
   );
 
-  requestHeaders.set("Access-Control-Allow-Origin", "*");
-  requestHeaders.set("Access-Control-Allow-Headers", "*");
+  const responseHeaders = new Headers();
+  responseHeaders.set("Access-Control-Allow-Origin", "*");
+  responseHeaders.set("Access-Control-Allow-Headers", "*");
 
   console.log(
     "intercept",
@@ -33,5 +34,6 @@ export function middleware(request: NextRequest) {
     request: {
       headers: requestHeaders,
     },
+    headers: responseHeaders,
   });
 }
