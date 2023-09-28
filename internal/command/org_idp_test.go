@@ -5796,7 +5796,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 	}
 }
 
-func TestCommandSide_GenerateOrgSAMLIDP(t *testing.T) {
+func TestCommandSide_RegenerateOrgSAMLProviderCertificate(t *testing.T) {
 	type fields struct {
 		eventstore                 *eventstore.Eventstore
 		secretCrypto               crypto.EncryptionAlgorithm
@@ -5914,7 +5914,7 @@ func TestCommandSide_GenerateOrgSAMLIDP(t *testing.T) {
 				idpConfigEncryption:            tt.fields.secretCrypto,
 				samlCertificateAndKeyGenerator: tt.fields.certificateAndKeyGenerator,
 			}
-			got, err := c.GenerateOrgSAMLProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id)
+			got, err := c.RegenerateOrgSAMLProviderCertificate(tt.args.ctx, tt.args.resourceOwner, tt.args.id)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

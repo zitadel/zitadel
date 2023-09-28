@@ -553,11 +553,11 @@ func (c *Commands) UpdateInstanceSAMLProvider(ctx context.Context, id string, pr
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) GenerateInstanceSAMLProvider(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) RegenerateInstanceSAMLProviderCertificate(ctx context.Context, id string) (*domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
 	writeModel := NewSAMLInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareGenerateInstanceSAMLProvider(instanceAgg, writeModel))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRegenerateInstanceSAMLProviderCertificate(instanceAgg, writeModel))
 	if err != nil {
 		return nil, err
 	}
@@ -1821,7 +1821,7 @@ func (c *Commands) prepareUpdateInstanceSAMLProvider(a *instance.Aggregate, writ
 	}
 }
 
-func (c *Commands) prepareGenerateInstanceSAMLProvider(a *instance.Aggregate, writeModel *InstanceSAMLIDPWriteModel) preparation.Validation {
+func (c *Commands) prepareRegenerateInstanceSAMLProviderCertificate(a *instance.Aggregate, writeModel *InstanceSAMLIDPWriteModel) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-7de108gqya", "Errors.Invalid.Argument")

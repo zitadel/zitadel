@@ -5714,7 +5714,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 	}
 }
 
-func TestCommandSide_GenerateInstanceGenericSAMLIDP(t *testing.T) {
+func TestCommandSide_RegenerateInstanceSAMLProviderCertificate(t *testing.T) {
 	type fields struct {
 		eventstore                 *eventstore.Eventstore
 		secretCrypto               crypto.EncryptionAlgorithm
@@ -5829,7 +5829,7 @@ func TestCommandSide_GenerateInstanceGenericSAMLIDP(t *testing.T) {
 				idpConfigEncryption:            tt.fields.secretCrypto,
 				samlCertificateAndKeyGenerator: tt.fields.certificateAndKeyGenerator,
 			}
-			got, err := c.GenerateInstanceSAMLProvider(tt.args.ctx, tt.args.id)
+			got, err := c.RegenerateInstanceSAMLProviderCertificate(tt.args.ctx, tt.args.id)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

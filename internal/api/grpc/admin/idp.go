@@ -447,6 +447,16 @@ func (s *Server) UpdateSAMLProvider(ctx context.Context, req *admin_pb.UpdateSAM
 	}, nil
 }
 
+func (s *Server) RegenerateSAMLProviderCertificate(ctx context.Context, req *admin_pb.RegenerateSAMLProviderCertificateRequest) (*admin_pb.RegenerateSAMLProviderCertificateResponse, error) {
+	details, err := s.command.RegenerateInstanceSAMLProviderCertificate(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.RegenerateSAMLProviderCertificateResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
 func (s *Server) DeleteProvider(ctx context.Context, req *admin_pb.DeleteProviderRequest) (*admin_pb.DeleteProviderResponse, error) {
 	details, err := s.command.DeleteInstanceProvider(ctx, req.Id)
 	if err != nil {

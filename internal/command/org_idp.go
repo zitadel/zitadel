@@ -486,10 +486,10 @@ func (c *Commands) UpdateOrgSAMLProvider(ctx context.Context, resourceOwner, id 
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) GenerateOrgSAMLProvider(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) RegenerateOrgSAMLProviderCertificate(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
 	writeModel := NewSAMLOrgIDPWriteModel(resourceOwner, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareGenerateOrgSAMLProvider(orgAgg, writeModel))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRegenerateOrgSAMLProviderCertificate(orgAgg, writeModel))
 	if err != nil {
 		return nil, err
 	}
@@ -1804,7 +1804,7 @@ func (c *Commands) prepareUpdateOrgSAMLProvider(a *org.Aggregate, writeModel *Or
 	}
 }
 
-func (c *Commands) prepareGenerateOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSAMLIDPWriteModel) preparation.Validation {
+func (c *Commands) prepareRegenerateOrgSAMLProviderCertificate(a *org.Aggregate, writeModel *OrgSAMLIDPWriteModel) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-arv4vdrb6c", "Errors.Invalid.Argument")

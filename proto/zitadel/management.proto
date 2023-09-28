@@ -7130,6 +7130,24 @@ service ManagementService {
         };
     }
 
+    // Regenerate certificate for an existing SAML identity provider in the organization
+    rpc RegenerateSAMLProviderCertificate(RegenerateSAMLProviderCertificateRequest) returns (RegenerateSAMLProviderCertificateResponse) {
+        option (google.api.http) = {
+            post: "/idps/saml/{id}/_generate_certificate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Regenerate SAML Identity Provider Certificate";
+            description: "";
+        };
+    }
+
     // Remove an identity provider
     // Will remove all linked providers of this configuration on the users
     rpc DeleteProvider(DeleteProviderRequest) returns (DeleteProviderResponse) {
@@ -12590,6 +12608,14 @@ message UpdateSAMLProviderRequest {
 }
 
 message UpdateSAMLProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RegenerateSAMLProviderCertificateRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RegenerateSAMLProviderCertificateResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
