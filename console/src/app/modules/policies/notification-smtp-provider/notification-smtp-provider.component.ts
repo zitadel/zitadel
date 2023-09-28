@@ -9,7 +9,6 @@ import {
   UpdateSMTPConfigRequest,
   UpdateSMTPConfigResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { DebugNotificationProvider } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -26,12 +25,8 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
 })
 export class NotificationSMTPProviderComponent implements OnInit {
   @Input() public serviceType!: PolicyComponentServiceType;
-  public logNotificationProvider!: DebugNotificationProvider.AsObject;
-  public fileNotificationProvider!: DebugNotificationProvider.AsObject;
 
   public smtpLoading: boolean = false;
-  public logProviderLoading: boolean = false;
-  public fileProviderLoading: boolean = false;
 
   public form!: UntypedFormGroup;
 
@@ -88,32 +83,6 @@ export class NotificationSMTPProviderComponent implements OnInit {
           console.log(error);
           this.hasSMTPConfig = false;
         }
-      });
-
-    this.logProviderLoading = true;
-    this.service
-      .getLogNotificationProvider()
-      .then((logNotificationProvider) => {
-        this.logProviderLoading = false;
-        if (logNotificationProvider.provider) {
-          this.logNotificationProvider = logNotificationProvider.provider;
-        }
-      })
-      .catch(() => {
-        this.logProviderLoading = false;
-      });
-
-    this.fileProviderLoading = true;
-    this.service
-      .getFileSystemNotificationProvider()
-      .then((fileNotificationProvider) => {
-        this.fileProviderLoading = false;
-        if (fileNotificationProvider.provider) {
-          this.fileNotificationProvider = fileNotificationProvider.provider;
-        }
-      })
-      .catch(() => {
-        this.fileProviderLoading = false;
       });
   }
 

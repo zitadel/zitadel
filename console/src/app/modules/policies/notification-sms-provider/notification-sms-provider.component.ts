@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { AddSMSProviderTwilioRequest, UpdateSMSProviderTwilioRequest } from 'src/app/proto/generated/zitadel/admin_pb';
-import { DebugNotificationProvider, SMSProvider, SMSProviderConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
+import { SMSProvider, SMSProviderConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
 
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { AdminService } from 'src/app/services/admin.service';
@@ -18,12 +18,8 @@ import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-
 export class NotificationSMSProviderComponent {
   @Input() public serviceType!: PolicyComponentServiceType;
   public smsProviders: SMSProvider.AsObject[] = [];
-  public logNotificationProvider!: DebugNotificationProvider.AsObject;
-  public fileNotificationProvider!: DebugNotificationProvider.AsObject;
 
   public smsProvidersLoading: boolean = false;
-  public logProviderLoading: boolean = false;
-  public fileProviderLoading: boolean = false;
 
   public SMSProviderConfigState: any = SMSProviderConfigState;
   public InfoSectionType: any = InfoSectionType;
@@ -43,32 +39,6 @@ export class NotificationSMSProviderComponent {
       .catch((error) => {
         this.smsProvidersLoading = false;
         this.toast.showError(error);
-      });
-
-    this.logProviderLoading = true;
-    this.service
-      .getLogNotificationProvider()
-      .then((logNotificationProvider) => {
-        this.logProviderLoading = false;
-        if (logNotificationProvider.provider) {
-          this.logNotificationProvider = logNotificationProvider.provider;
-        }
-      })
-      .catch(() => {
-        this.logProviderLoading = false;
-      });
-
-    this.fileProviderLoading = true;
-    this.service
-      .getFileSystemNotificationProvider()
-      .then((fileNotificationProvider) => {
-        this.fileProviderLoading = false;
-        if (fileNotificationProvider.provider) {
-          this.fileNotificationProvider = fileNotificationProvider.provider;
-        }
-      })
-      .catch(() => {
-        this.fileProviderLoading = false;
       });
   }
 
