@@ -486,7 +486,7 @@ Errors:
     WebAuthN:
       NoChallenge: Сесија без предизвик WebAuthN
   Intent:
-    IDPMissing: ID на IDP недостасува во барањето6bg ttttzht
+    IDPMissing: ID на IDP недостасува во барањето6bg
     IDPInvalid: ВРЛ неважечки за барањето
     ResponseInvalid: Одговорот на ВРЛ е неважечки
     SuccessURLMissing: URL за успех недостасува во барањето
