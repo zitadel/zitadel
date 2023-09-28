@@ -135,7 +135,7 @@ export async function getSessionCookieByLoginName(
   }
 }
 
-export async function getAllSessionIds(): Promise<any> {
+export async function getAllSessionCookieIds(): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 

@@ -1,12 +1,12 @@
 import { Session } from "@zitadel/server";
 import { listSessions, server } from "#/lib/zitadel";
-import { getAllSessionIds } from "#/utils/cookies";
+import { getAllSessionCookieIds } from "#/utils/cookies";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import SessionsList from "#/ui/SessionsList";
 
 async function loadSessions(): Promise<Session[]> {
-  const ids = await getAllSessionIds();
+  const ids = await getAllSessionCookieIds();
 
   if (ids && ids.length) {
     const response = await listSessions(
