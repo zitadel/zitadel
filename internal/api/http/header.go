@@ -45,6 +45,7 @@ type key int
 const (
 	httpHeaders key = iota
 	remoteAddr
+	origin
 )
 
 func CopyHeadersToContext(h http.Handler) http.Handler {
@@ -61,12 +62,17 @@ func HeadersFromCtx(ctx context.Context) (http.Header, bool) {
 	return headers, ok
 }
 
+func WithOrigin(ctx context.Context, originValue string) context.Context {
+	return context.WithValue(ctx, origin, originValue)
+}
+
 func OriginFromCtx(ctx context.Context) string {
 	headers, ok := ctx.Value(httpHeaders).(http.Header)
-	if !ok {
-		return ""
+	if ok {
+		return headers.Get(Origin)
 	}
-	return headers.Get(Origin)
+	o, _ := ctx.Value(origin).(string)
+	return o
 }
 
 func RemoteIPFromCtx(ctx context.Context) string {

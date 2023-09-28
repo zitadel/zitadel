@@ -132,6 +132,7 @@ func checkOrigin(ctx context.Context, origins []string) error {
 	if origin == "" {
 		origin = http_util.OriginFromCtx(ctx)
 		if origin == "" {
+			// TODO: Don't we want to enforce an origin header?
 			return nil
 		}
 	}
