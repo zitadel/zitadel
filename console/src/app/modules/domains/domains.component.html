@@ -47,7 +47,7 @@
       <button
         mat-icon-button
         [disabled]="(canwrite$ | async) === false || domain.isVerified"
-        *ngIf="(canwrite$ | async) && verifyOrgDomains"
+        *ngIf="verifyOrgDomains"
         (click)="verifyDomain(domain)"
       >
         <i class="las la-pen"></i>
