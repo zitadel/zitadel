@@ -375,7 +375,7 @@ func startAPIs(
 
 	apis.RegisterHandlerOnPrefix(idp.HandlerPrefix, idp.NewHandler(commands, queries, keys.IDPConfig, config.ExternalSecure, instanceInterceptor.Handler))
 
-	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator(), config.ExternalSecure, login.EndpointResources, login.EndpointExternalLoginCallbackFormPost)
+	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator(), config.ExternalSecure, login.EndpointResources, login.EndpointExternalLoginCallbackFormPost, login.EndpointSAMLACS)
 	if err != nil {
 		return err
 	}
