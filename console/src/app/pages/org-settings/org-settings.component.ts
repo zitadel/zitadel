@@ -43,7 +43,11 @@ export class OrgSettingsComponent implements OnInit {
 
   public settingsList: SidenavSetting[] = [];
 
-  constructor(breadcrumbService: BreadcrumbService, activatedRoute: ActivatedRoute, public authService: GrpcAuthService) {
+  constructor(
+    breadcrumbService: BreadcrumbService,
+    activatedRoute: ActivatedRoute,
+    public authService: GrpcAuthService,
+  ) {
     const breadcrumbs = [
       new Breadcrumb({
         type: BreadcrumbType.ORG,
