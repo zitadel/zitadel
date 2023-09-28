@@ -12,9 +12,7 @@ CREATE TABLE eventstore.events2 (
     "owner",
     
     "position",
-    in_tx_order,
-
-    PRIMARY KEY (instance_id, aggregate_type, aggregate_id, "sequence")
+    in_tx_order
 ) AS SELECT
     instance_id,
     aggregate_type,
@@ -28,6 +26,6 @@ CREATE TABLE eventstore.events2 (
     editor_user,
     resource_owner,
 
-    creation_date::DECIMAL,
+    EXTRACT(EPOCH FROM creation_date),
     event_sequence
 FROM eventstore.events_old;

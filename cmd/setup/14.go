@@ -37,9 +37,9 @@ func (mig *NewEventsTable) Execute(ctx context.Context) error {
 			}
 			return row.Err()
 		},
-		"SELECT count(*) FROM information_schema.tables WHERE table_schema = 'eventstore' AND table_name like 'events%'",
+		"SELECT count(*) FROM information_schema.tables WHERE table_schema = 'eventstore' AND table_name like 'events2'",
 	)
-	if err != nil || count >= 1 {
+	if err != nil || count == 1 {
 		return err
 	}
 	for _, migration := range migrations {
