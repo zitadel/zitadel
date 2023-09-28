@@ -487,6 +487,8 @@ Errors:
       NoChallenge: 没有 WebAuthN 质询的会话
   Intent:
     IDPMissing: 请求中缺少IDP ID
+    IDPInvalid: 请求的 IDP 无效
+    ResponseInvalid: IDP 响应无效
     SuccessURLMissing: 请求中缺少成功URL
     FailureURLMissing: 请求中缺少失败的URL
     StateMissing: 请求中缺少状态参数

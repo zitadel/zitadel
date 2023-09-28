@@ -485,6 +485,8 @@ Errors:
       NoChallenge: Sessão sem desafio WebAuthN
   Intent:
     IDPMissing: O ID do IDP está faltando na solicitação
+    IDPInvalid: IDP inválido para o pedido
+    ResponseInvalid: A resposta da PDI é inválida
     SuccessURLMissing: A URL de sucesso está faltando na solicitação
     FailureURLMissing: A URL de falha está faltando na solicitação
     StateMissing: O parâmetro de estado está faltando na solicitação
