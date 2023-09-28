@@ -58,7 +58,6 @@ func CreateServer(
 				middleware.TranslationHandler(),
 				middleware.ValidationHandler(),
 				middleware.ServiceHandler(),
-				middleware.OriginHandler(),
 			),
 		),
 	}

@@ -171,7 +171,6 @@ func addInterceptors(
 	// only if it follows the http_mw.DefaultTelemetryHandler
 	handler = exhaustedCookieInterceptor(handler, accessInterceptor, queries)
 	handler = http_mw.DefaultMetricsHandler(handler)
-	handler = http_mw.OriginHandler(handler)
 	return handler
 }
 
