@@ -23,12 +23,15 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 	if err != nil {
 		return nil, err
 	}
-	var sequences []*latestSequence
-	querySequences := sync.OnceFunc(func() {
-		sequences, err = latestSequences(ctx, tx, commands)
-	})
+	var (
+		sequences []*latestSequence
+		once      sync.Once
+	)
+
 	err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() error {
-		querySequences()
+		once.Do(func() {
+			sequences, err = latestSequences(ctx, tx, commands)
+		})
 		if err != nil {
 			return err
 		}
