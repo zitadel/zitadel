@@ -1,18 +1,18 @@
-<span class="title" mat-dialog-title>{{ data.titleKey | translate : data.titleParam }}</span>
+<span class="title" mat-dialog-title>{{ data.titleKey | translate: data.titleParam }}</span>
 <div mat-dialog-content>
   <div class="icon-wrapper" *ngIf="data.icon">
     <i class="icon {{ data.icon }}"></i>
   </div>
-  <p class="desc cnsl-secondary-text">{{ data.descriptionKey | translate : data.descriptionParam }}</p>
+  <p class="desc cnsl-secondary-text">{{ data.descriptionKey | translate: data.descriptionParam }}</p>
 
   <cnsl-info-section *ngIf="data.infoSectionKey" [type]="InfoSectionType.INFO">{{
     data.warnSectionKey | translate
   }}</cnsl-info-section>
 
-  <p *ngIf="data.hintKey" class="desc cnsl-secondary-text">{{ data.hintKey | translate : { value: data.confirmation } }}</p>
+  <p *ngIf="data.hintKey" class="desc cnsl-secondary-text">{{ data.hintKey | translate: { value: data.confirmation } }}</p>
 
   <cnsl-form-field *ngIf="data.confirmation && data.confirmationKey" class="formfield">
-    <cnsl-label>{{ data.confirmationKey | translate : { value: data.confirmation } }}</cnsl-label>
+    <cnsl-label>{{ data.confirmationKey | translate: { value: data.confirmation } }}</cnsl-label>
     <input cnslInput [(ngModel)]="confirm" data-e2e="confirm-dialog-input" />
   </cnsl-form-field>
 </div>

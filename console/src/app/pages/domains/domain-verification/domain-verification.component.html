@@ -10,7 +10,7 @@
     *ngIf="domain?.validationType !== DomainValidationType.DOMAIN_VALIDATION_TYPE_UNSPECIFIED && !(dns || http)"
     class="desc"
   >
-    {{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_VALIDATION_ONGOING' | translate : domain }}
+    {{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_VALIDATION_ONGOING' | translate: domain }}
     {{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_VALIDATION_ONGOING_TYPE' | translate }}
     {{ 'ORG.PAGES.ORGDOMAIN.TYPES.' + domain?.validationType | translate }}
   </p>

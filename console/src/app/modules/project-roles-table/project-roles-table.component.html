@@ -71,7 +71,7 @@
             [ngClass]="{ 'no-selection': !selectionAllowed }"
             *ngIf="role.group"
             (click)="selectionAllowed ? selectAllOfGroup(role.group) : openDetailDialog(role)"
-            [matTooltip]="selectionAllowed ? ('PROJECT.ROLE.SELECTGROUPTOOLTIP' | translate : role) : null"
+            [matTooltip]="selectionAllowed ? ('PROJECT.ROLE.SELECTGROUPTOOLTIP' | translate: role) : null"
             >{{ role.group }}</span
           >
         </td>
@@ -81,7 +81,7 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.ROLE.CREATIONDATE' | translate }}</th>
         <td class="pointer" (click)="openDetailDialog(role)" mat-cell *matCellDef="let role">
           <span *ngIf="role?.details?.creationDate">{{
-            role.details.creationDate | timestampToDate | localizedDate : 'dd. MMM, HH:mm'
+            role.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm'
           }}</span>
         </td>
       </ng-container>
@@ -90,7 +90,7 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.ROLE.CHANGEDATE' | translate }}</th>
         <td class="pointer" (click)="openDetailDialog(role)" mat-cell *matCellDef="let role">
           <span *ngIf="role?.details?.changeDate">{{
-            role.details.changeDate | timestampToDate | localizedDate : 'dd. MMM, HH:mm'
+            role.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm'
           }}</span>
         </td>
       </ng-container>
