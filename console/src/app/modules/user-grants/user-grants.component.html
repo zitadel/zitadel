@@ -30,7 +30,7 @@
 
   <a
     actions
-    *ngIf="disableWrite === false && selection.hasValue() === false && showAddButton"
+    *ngIf="disableWrite === false && selection.hasValue() === false && routerLink"
     matTooltip="{{ 'GRANTS.ADD' | translate }}"
     color="primary"
     class="cnsl-action-button"
