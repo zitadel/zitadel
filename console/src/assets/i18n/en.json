@@ -1021,7 +1021,6 @@
       "LOCKOUT": "Lockout",
       "COMPLEXITY": "Password complexity",
       "NOTIFICATIONS": "Notifications",
-      "SMTP_SETTINGS": "SMTP Settings",
       "SMTP_PROVIDER": "SMTP Provider",
       "SMS_PROVIDER": "SMS/Phone Provider",
       "NOTIFICATIONS_DESC": "SMTP and SMS Settings",
@@ -1060,13 +1059,11 @@
       "mk": "Македонски"
     },
     "SMTP": {
-      "TITLE": "SMTP Settings",
+      "TITLE": "SMTP Provider",
       "DESCRIPTION": "",
       "SENDERADDRESS": "Sender Email Address",
       "SENDERNAME": "Sender Name",
       "REPLYTOADDRESS": "Reply-to Address",
-      "HOST": "Host",
-      "PORT": "Port",
       "HOSTANDPORT": "Host And Port",
       "USER": "User",
       "PASSWORD": "Password",
@@ -1074,26 +1071,7 @@
       "PASSWORDSET": "SMTP Password was set successfully.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "Saved successfully!",
-      "REQUIREDWARN": "To send notifications from your domain, you have to enter your SMTP data.",
-      "LIST": {
-        "TITLE": "SMTP Provider",
-        "DESCRIPTION": "Manage your SMTP Provider configuration, which can then be activated/deactivated and tested."
-      },
-      "CREATE": {
-        "TITLE": "Add provider",
-        "DESCRIPTION": "Select one ore more of the following providers.",
-        "STEPPERTITLE": "Create Provider",
-        "GOOGLE": {
-          "TITLE": "Google Provider",
-          "DESCRIPTION": "Enter the credentials for your Google SMTP Provider"
-        },
-        "SENDGRID": {
-          "TITLE": "Sendgrid Provider",
-          "DESCRIPTION": "Enter the configuration for your Sendgrid SMTP Provider"
-        }
-      },
-      "EMPTY": "No SMTP provider available"
-      
+      "REQUIREDWARN": "To send notifications from your domain, you have to enter your SMTP data."
     },
     "SMS": {
       "TITLE": "SMS Settings",
@@ -1922,6 +1900,38 @@
     "PASSWORDLESSTYPE": {
       "0": "Not allowed",
       "1": "Allowed"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "SMTP Provider",
+      "DESCRIPTION": "Manage your SMTP Provider configuration, which can then be activated/deactivated and tested."
+    },
+    "CREATE": {
+      "TITLE": "Add SMTP provider",
+      "DESCRIPTION": "Select one ore more of the following providers.",
+      "STEPS": {
+        "PROVIDER_SETTINGS": "SMTP Provider Settings",
+        "SENDER_SETTINGS": "Sender Settings",
+        "TEST_SETTINGS": "Test"
+      },
+      "GOOGLE": {
+        "TITLE": "Google Provider",
+        "DESCRIPTION": "Enter the credentials for your Google SMTP Provider"
+      },
+      "SENDGRID": {
+        "TITLE": "Add Sendgrid SMTP Provider",
+        "DESCRIPTION": "Enter the configuration for your Sendgrid SMTP Provider"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "SMTP Provider"
+    },
+    "EMPTY": "No SMTP provider available",
+    "STEPS": {
+      "SENDGRID": {
+        "CREATE_DESC_TITLE": "Enter Your SMTP Provider Details Step by Step"
+      }
     }
   },
   "APP": {

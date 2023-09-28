@@ -11,14 +11,16 @@ import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/le
 import { TranslateModule } from '@ngx-translate/core';
 import { InputModule } from 'src/app/modules/input/input.module';
 
+import { MatLegacyProgressBarModule as MatProgressBarModule } from '@angular/material/legacy-progress-bar';
+import { MatStepperModule } from '@angular/material/stepper';
 import { CardModule } from '../card/card.module';
 import { CreateLayoutModule } from '../create-layout/create-layout.module';
 import { InfoSectionModule } from '../info-section/info-section.module';
 import { ProviderOptionsModule } from '../provider-options/provider-options.module';
 import { StringListModule } from '../string-list/string-list.module';
 import { SMTPProviderGoogleComponent } from './smtp-provider-google/smtp-provider-google.component';
-import { SMTPProviderSendgridComponent } from './smtp-provider-sendgrid/smtp-provider-sendgrid.component';
 import { SMTPProvidersRoutingModule } from './smtp-provider-routing.module';
+import { SMTPProviderSendgridComponent } from './smtp-provider-sendgrid/smtp-provider-sendgrid.component';
 
 @NgModule({
   declarations: [SMTPProviderGoogleComponent, SMTPProviderSendgridComponent],
@@ -32,12 +34,14 @@ import { SMTPProvidersRoutingModule } from './smtp-provider-routing.module';
     InfoSectionModule,
     InputModule,
     MatButtonModule,
+    MatProgressBarModule,
     MatSelectModule,
     MatIconModule,
     MatChipsModule,
     CardModule,
     MatCheckboxModule,
     MatTooltipModule,
+    MatStepperModule,
     TranslateModule,
     ProviderOptionsModule,
     MatLegacyProgressSpinnerModule,

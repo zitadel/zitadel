@@ -28,6 +28,7 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 @Component({
   selector: 'cnsl-provider-sendgrid',
   templateUrl: './smtp-provider-sendgrid.component.html',
+  styleUrls: ['./smtp-provider-sendgrid-component.scss'],
 })
 export class SMTPProviderSendgridComponent {
   // private const supportedProviders = { google: { hostAndPort: 'localhost:25', hostAndPortTLS: 'localhost:587'}}
