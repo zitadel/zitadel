@@ -99,6 +99,6 @@ jobs:
       with:
         version: ${{ inputs.go_lint_version }}
         github-token: ${{ github.token }}
-        only-new-issues: false
+        only-new-issues: true
         skip-pkg-cache: true
         skip-build-cache: true
