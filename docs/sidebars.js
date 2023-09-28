@@ -682,6 +682,7 @@ module.exports = {
       items: [
         "legal/terms-of-service",
         "legal/data-processing-agreement",
+        "legal/subprocessors",
         {
           type: "category",
           label: "Service Description",
