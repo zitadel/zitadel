@@ -31,7 +31,10 @@ export class UserGrantsDataSource extends DataSource<UserGrantAsObject> {
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-  constructor(private authService: GrpcAuthService, private userService: ManagementService) {
+  constructor(
+    private authService: GrpcAuthService,
+    private userService: ManagementService,
+  ) {
     super();
   }
 

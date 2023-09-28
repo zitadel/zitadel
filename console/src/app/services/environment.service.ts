@@ -36,7 +36,10 @@ export class EnvironmentService {
   private environment$: Observable<Environment>;
   private wellKnown$: Observable<WellKnown>;
 
-  constructor(private http: HttpClient, private exhaustedSvc: ExhaustedService) {
+  constructor(
+    private http: HttpClient,
+    private exhaustedSvc: ExhaustedService,
+  ) {
     this.environment$ = this.createEnvironment();
     this.wellKnown$ = this.createWellKnown(this.environment$);
   }
