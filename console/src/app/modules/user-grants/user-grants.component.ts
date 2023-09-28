@@ -61,6 +61,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   public loadedId: string = '';
   public loadedProjectId: string = '';
   public grantToEdit: string = '';
+  public showAddButton: boolean = false;
 
   public UserGrantContext: any = UserGrantContext;
   public Type: any = Type;
@@ -93,25 +94,30 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
       case UserGrantContext.OWNED_PROJECT:
         if (this.projectId) {
           this.routerLink = ['/grant-create', 'project', this.projectId];
+          this.showAddButton = true;
         }
         break;
       case UserGrantContext.GRANTED_PROJECT:
         if (this.grantId) {
           this.routerLink = ['/grant-create', 'project', this.projectId, 'grant', this.grantId];
+          this.showAddButton = true;
         }
         break;
       case UserGrantContext.USER:
         if (this.userId) {
           this.routerLink = ['/grant-create', 'user', this.userId];
+          this.showAddButton = true;
         }
         break;
       case UserGrantContext.AUTHUSER:
         if (this.grantId) {
           this.routerLink = ['/grant-create', 'user', this.userId];
+          this.showAddButton = true;
         }
         break;
       case UserGrantContext.NONE:
         this.routerLink = ['/grant-create'];
+        this.showAddButton = true;
     }
 
     this.loadGrantsPage(this.type);
