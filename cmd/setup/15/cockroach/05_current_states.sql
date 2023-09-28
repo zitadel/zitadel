@@ -12,3 +12,4 @@ CREATE TABLE IF NOT EXISTS projections.current_states (
 
     , PRIMARY KEY (projection_name, instance_id)
 );
+CREATE INDEX IF NOT EXISTS cs_instance_id_idx ON projections.current_states (instance_id);
