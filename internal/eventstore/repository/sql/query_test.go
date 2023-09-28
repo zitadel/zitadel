@@ -397,7 +397,7 @@ func Test_prepareCondition(t *testing.T) {
 				},
 			},
 			res: res{
-				clause: " WHERE (( aggregate_type = ANY(?) )) AND created_at::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = 'zitadel_es_pusher')",
+				clause: ` WHERE (( aggregate_type = ANY(?) )) AND hlc_to_timestamp("position") < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = 'zitadel_es_pusher')`,
 				values: []interface{}{[]eventstore.AggregateType{"user", "org"}},
 			},
 		},
@@ -436,7 +436,7 @@ func Test_prepareCondition(t *testing.T) {
 				},
 			},
 			res: res{
-				clause: " WHERE (( aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?) )) AND created_at::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = 'zitadel_es_pusher')",
+				clause: ` WHERE (( aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?) )) AND hlc_to_timestamp("position") < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = 'zitadel_es_pusher')`,
 				values: []interface{}{[]eventstore.AggregateType{"user", "org"}, "1234", []eventstore.EventType{"user.created", "org.created"}},
 			},
 		},
