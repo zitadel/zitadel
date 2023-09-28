@@ -1,1 +1,0 @@
-ALTER TABLE eventstore.events ALTER COLUMN editor_service DROP NOT NULL;

@@ -42,6 +42,20 @@ func expectExec(stmt string, err error, args ...driver.Value) expectation {
 	}
 }
 
+func expectQuery(stmt string, err error, columns []string, rows [][]driver.Value, args ...driver.Value) expectation {
+	return func(m sqlmock.Sqlmock) {
+		res := sqlmock.NewRows(columns)
+		for _, row := range rows {
+			res.AddRow(row...)
+		}
+		query := m.ExpectQuery(regexp.QuoteMeta(stmt)).WithArgs(args...).WillReturnRows(res)
+		if err != nil {
+			query.WillReturnError(err)
+			return
+		}
+	}
+}
+
 func expectBegin(err error) expectation {
 	return func(m sqlmock.Sqlmock) {
 		query := m.ExpectBegin()

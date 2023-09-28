@@ -28,24 +28,19 @@ func (mig *NewEventsTable) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	// check if events2 table was already created from init
-	if mig.dbClient.Type() == "cockroach" {
-		var count int
-		err := mig.dbClient.QueryRowContext(
-			ctx,
-			func(r *sql.Row) error {
-				return r.Scan(&count)
-			},
-			"SELECT count(*) FROM [show tables from eventstore] WHERE table_name = 'events2'",
-		)
-		if err != nil {
-			return err
-		}
-		if count == 1 {
-			return nil
-		}
-	} else if mig.dbClient.Type() == "postgres" {
-		// TODO: check for events2 table
+	// if events already exists events2 is created during a setup job
+	var count int
+	err = mig.dbClient.QueryRow(
+		func(row *sql.Row) error {
+			if err = row.Scan(&count); err != nil {
+				return err
+			}
+			return row.Err()
+		},
+		"SELECT count(*) FROM information_schema.tables WHERE table_schema = 'eventstore' AND table_name like 'events%'",
+	)
+	if err != nil || count >= 1 {
+		return err
 	}
 	for _, migration := range migrations {
 		stmt, err := readStmt(newEventsTable, "14", mig.dbClient.Type(), migration.Name())

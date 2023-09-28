@@ -7,14 +7,14 @@ INSERT INTO projections.current_states (
 ) SELECT 
     cs.view_name
     , cs.instance_id
-    , e.creation_date
+    , e.created_at
     , e.position
     , cs.last_successful_spooler_run
 FROM 
     auth.current_sequences cs
-JOIN eventstore.events e ON
+JOIN eventstore.events2 e ON
     e.instance_id = cs.instance_id 
-    AND e.event_sequence = cs.current_sequence 
+    AND e.sequence = cs.current_sequence 
     AND cs.current_sequence = (
         SELECT 
             MAX(cs2.current_sequence)
@@ -24,4 +24,4 @@ JOIN eventstore.events e ON
             cs.view_name = cs2.view_name
             AND cs.instance_id = cs2.instance_id
     )
-;
+ON CONFLICT DO NOTHING;

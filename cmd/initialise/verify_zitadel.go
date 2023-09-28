@@ -1,7 +1,6 @@
 package initialise
 
 import (
-	"database/sql"
 	_ "embed"
 	"fmt"
 
@@ -101,35 +100,29 @@ func createEncryptionKeys(db *database.DB) error {
 	return tx.Commit()
 }
 
-func createEvents(db *database.DB) error {
+func createEvents(db *database.DB) (err error) {
 	tx, err := db.Begin()
 	if err != nil {
 		return err
 	}
+	defer func() {
+		if err != nil {
+			rollbackErr := tx.Rollback()
+			logging.OnError(rollbackErr).Debug("rollback failed")
+			return
+		}
+		err = tx.Commit()
+	}()
 
 	// if events already exists events2 is created during a setup job
-	if db.Type() == "cockroach" {
-		var count int
-		err := db.QueryRow(
-			func(r *sql.Row) error {
-				return r.Scan(&count)
-			},
-			"SELECT count(*) FROM [show tables from eventstore] WHERE table_name like 'events%'",
-		)
-		if err != nil {
-			return err
-		}
-		if count >= 1 {
-			return nil
-		}
-	} else if db.Type() == "postgres" {
-		// TODO: check for events2 table
-	}
-
-	if _, err = tx.Exec(createEventsStmt); err != nil {
-		tx.Rollback()
+	var count int
+	row := tx.QueryRow("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'eventstore' AND table_name like 'events%'")
+	if err = row.Scan(&count); err != nil {
 		return err
 	}
-
-	return tx.Commit()
+	if row.Err() != nil || count >= 1 {
+		return row.Err()
+	}
+	_, err = tx.Exec(createEventsStmt)
+	return err
 }
