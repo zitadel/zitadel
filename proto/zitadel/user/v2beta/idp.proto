@@ -89,6 +89,11 @@ message IDPInformation{
         description: "LDAP entity attributes returned by the identity provider"
       }
     ];
+    IDPSAMLAccessInformation saml = 7 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "SAMLResponse returned by the identity provider"
+      }
+    ];
   }
   string idp_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -122,6 +127,10 @@ message IDPOAuthAccessInformation{
 
 message IDPLDAPAccessInformation{
   google.protobuf.Struct attributes = 1;
+}
+
+message IDPSAMLAccessInformation{
+  bytes assertion = 1;
 }
 
 message IDPLink {

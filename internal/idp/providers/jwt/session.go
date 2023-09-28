@@ -30,9 +30,9 @@ type Session struct {
 	Tokens  *oidc.Tokens[*oidc.IDTokenClaims]
 }
 
-// GetAuthURL implements the [idp.Session] interface
-func (s *Session) GetAuthURL() string {
-	return s.AuthURL
+// GetAuth implements the [idp.Session] interface.
+func (s *Session) GetAuth(ctx context.Context) (string, bool) {
+	return idp.Redirect(s.AuthURL)
 }
 
 // FetchUser implements the [idp.Session] interface.

@@ -167,9 +167,6 @@ func (q *SetQuota) validate() error {
 	if q.Unit.Enum() == quota.Unimplemented {
 		return errors.ThrowInvalidArgument(nil, "QUOTA-OTeSh", "Errors.Quota.Invalid.Unimplemented")
 	}
-	if q.Amount < 0 {
-		return errors.ThrowInvalidArgument(nil, "QUOTA-hOKSJ", "Errors.Quota.Invalid.Amount")
-	}
 	if q.ResetInterval < time.Minute {
 		return errors.ThrowInvalidArgument(nil, "QUOTA-R5otd", "Errors.Quota.Invalid.ResetInterval")
 	}
