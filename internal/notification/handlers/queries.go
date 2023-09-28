@@ -13,17 +13,17 @@ import (
 )
 
 type Queries interface {
-	ActiveLabelPolicyByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (policy *query.LabelPolicy, err error)
-	MailTemplateByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (template *query.MailTemplate, err error)
-	GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string, withOwnerRemoved bool, queries ...query.SearchQuery) (user *query.NotifyUser, err error)
-	CustomTextListByTemplate(ctx context.Context, aggregateID, template string, withOwnerRemoved bool) (texts *query.CustomTexts, err error)
-	SearchInstanceDomains(ctx context.Context, queries *query.InstanceDomainSearchQueries) (domains *query.InstanceDomains, err error)
-	SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string) (session *query.Session, err error)
-	NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (policy *query.NotificationPolicy, err error)
-	SearchMilestones(ctx context.Context, instanceIDs []string, queries *query.MilestonesSearchQueries) (milestones *query.Milestones, err error)
-	NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType) (provider *query.DebugNotificationProvider, err error)
-	SMSProviderConfig(ctx context.Context, queries ...query.SearchQuery) (config *query.SMSConfig, err error)
-	SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (config *query.SMTPConfig, err error)
+	ActiveLabelPolicyByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (*query.LabelPolicy, error)
+	MailTemplateByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (*query.MailTemplate, error)
+	GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string, withOwnerRemoved bool, queries ...query.SearchQuery) (*query.NotifyUser, error)
+	CustomTextListByTemplate(ctx context.Context, aggregateID, template string, withOwnerRemoved bool) (*query.CustomTexts, error)
+	SearchInstanceDomains(ctx context.Context, queries *query.InstanceDomainSearchQueries) (*query.InstanceDomains, error)
+	SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string) (*query.Session, error)
+	NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (*query.NotificationPolicy, error)
+	SearchMilestones(ctx context.Context, instanceIDs []string, queries *query.MilestonesSearchQueries) (*query.Milestones, error)
+	NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType) (*query.DebugNotificationProvider, error)
+	SMSProviderConfig(ctx context.Context, queries ...query.SearchQuery) (*query.SMSConfig, error)
+	SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (*query.SMTPConfig, error)
 	GetDefaultLanguage(ctx context.Context) language.Tag
 }
 
