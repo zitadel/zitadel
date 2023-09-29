@@ -120,7 +120,7 @@ Errors:
       Empty: La contraseña está vacía
       Invalid: La contraseña no es válida
       NotSet: El usuario no ha establecido una contraseña
-      NotChanged: Contraseña no modificada
+      NotChanged: La nueva contraseña no puede coincidir con la contraseña actual
       NotSupported: No se admite la codificación hash de contraseña
     PasswordComplexityPolicy:
       NotFound: Política de contraseñas no encontrada
@@ -487,6 +487,8 @@ Errors:
       NoChallenge: Sesión sin desafío WebAuthN
   Intent:
     IDPMissing: Falta IDP en la solicitud
+    IDPInvalid: IDP no válido para la solicitud
+    ResponseInvalid: La respuesta del IDP no es válida
     SuccessURLMissing: Falta la URL de éxito en la solicitud
     FailureURLMissing: Falta la URL de error en la solicitud
     StateMissing: Falta un parámetro de estado en la solicitud
@@ -505,6 +507,10 @@ Errors:
       Invalid: El token no es válido
       Expired: El token ha caducado
     InvalidClient: El token no ha sido emitido para este cliente
+  Feature:
+    NotExisting: La característica no existe
+    TypeNotSupported: El tipo de característica no es compatible
+    InvalidValue: Valor no válido para esta característica
 
 AggregateTypes:
   action: Acción
@@ -515,6 +521,7 @@ AggregateTypes:
   user: Usuario
   usergrant: Concesión de usuario
   quota: Cuota
+  feature: Característica
 
 EventTypes:
   user:

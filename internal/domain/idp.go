@@ -37,6 +37,7 @@ const (
 	IDPTypeGitLabSelfHosted
 	IDPTypeGoogle
 	IDPTypeApple
+	IDPTypeSAML
 )
 
 func (t IDPType) GetCSSClass() string {
@@ -57,7 +58,8 @@ func (t IDPType) GetCSSClass() string {
 		IDPTypeOIDC,
 		IDPTypeJWT,
 		IDPTypeOAuth,
-		IDPTypeLDAP:
+		IDPTypeLDAP,
+		IDPTypeSAML:
 		fallthrough
 	default:
 		return ""
@@ -90,7 +92,8 @@ func (t IDPType) DisplayName() string {
 		IDPTypeLDAP,
 		IDPTypeAzureAD,
 		IDPTypeGitHubEnterprise,
-		IDPTypeGitLabSelfHosted:
+		IDPTypeGitLabSelfHosted,
+		IDPTypeSAML:
 		fallthrough
 	default:
 		// we should never get here, so log it

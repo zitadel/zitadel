@@ -506,25 +506,19 @@ func (l *Login) getOrgID(r *http.Request, authReq *domain.AuthRequest) string {
 }
 
 func (l *Login) getPrivateLabelingID(r *http.Request, authReq *domain.AuthRequest) string {
-	privateLabelingOrgID := authz.GetInstance(r.Context()).InstanceID()
-	if authReq == nil {
-		if id := r.FormValue(queryOrgID); id != "" {
-			return id
-		}
-		return privateLabelingOrgID
+	defaultID := authz.GetInstance(r.Context()).DefaultOrganisationID()
+	f, err := l.featureCheck.CheckInstanceBooleanFeature(r.Context(), domain.FeatureLoginDefaultOrg)
+	logging.OnError(err).Warnf("could not check feature %s", domain.FeatureLoginDefaultOrg)
+	if !f.Boolean {
+		defaultID = authz.GetInstance(r.Context()).InstanceID()
 	}
-	if authReq.PrivateLabelingSetting != domain.PrivateLabelingSettingUnspecified {
-		privateLabelingOrgID = authReq.ApplicationResourceOwner
+	if authReq != nil {
+		return authReq.PrivateLabelingOrgID(defaultID)
 	}
-	if authReq.PrivateLabelingSetting == domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy || authReq.PrivateLabelingSetting == domain.PrivateLabelingSettingUnspecified {
-		if authReq.UserOrgID != "" {
-			privateLabelingOrgID = authReq.UserOrgID
-		}
+	if id := r.FormValue(queryOrgID); id != "" {
+		return id
 	}
-	if authReq.RequestedOrgID != "" {
-		privateLabelingOrgID = authReq.RequestedOrgID
-	}
-	return privateLabelingOrgID
+	return defaultID
 }
 
 func (l *Login) getOrgName(authReq *domain.AuthRequest) string {

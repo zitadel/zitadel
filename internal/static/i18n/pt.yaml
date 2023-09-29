@@ -120,7 +120,7 @@ Errors:
       Empty: Senha está vazia
       Invalid: Senha é inválida
       NotSet: O usuário não definiu uma senha
-      NotChanged: Senha não alterada
+      NotChanged: A nova senha não pode ser igual à sua senha atual
     PasswordComplexityPolicy:
       NotFound: Política de complexidade de senha não encontrada
       MinLength: A senha é muito curta
@@ -485,6 +485,8 @@ Errors:
       NoChallenge: Sessão sem desafio WebAuthN
   Intent:
     IDPMissing: O ID do IDP está faltando na solicitação
+    IDPInvalid: IDP inválido para o pedido
+    ResponseInvalid: A resposta da PDI é inválida
     SuccessURLMissing: A URL de sucesso está faltando na solicitação
     FailureURLMissing: A URL de falha está faltando na solicitação
     StateMissing: O parâmetro de estado está faltando na solicitação
@@ -499,6 +501,10 @@ Errors:
     WrongLoginClient: A solicitação de autenticação foi criada por outro cliente de login
   OIDCSession:
     RefreshTokenInvalid: O Refresh Token é inválido
+  Feature:
+    NotExisting: O recurso não existe
+    TypeNotSupported: O tipo de recurso não é compatível
+    InvalidValue: Valor inválido para este recurso
 
 AggregateTypes:
   action: Ação
@@ -509,6 +515,7 @@ AggregateTypes:
   user: Usuário
   usergrant: Concessão de usuário
   quota: Cota
+  feature: Recurso
 
 EventTypes:
   user:

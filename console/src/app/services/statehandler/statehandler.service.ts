@@ -16,7 +16,11 @@ export class StatehandlerServiceImpl implements StatehandlerService, OnDestroy {
   private events?: Observable<string>;
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(oauthService: OAuthService, private injector: Injector, private processor: StatehandlerProcessorService) {
+  constructor(
+    oauthService: OAuthService,
+    private injector: Injector,
+    private processor: StatehandlerProcessorService,
+  ) {
     oauthService.events
       .pipe(
         filter((event) => event.type === 'token_received'),

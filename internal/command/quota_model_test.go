@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
@@ -33,11 +34,12 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 		notifications []*QuotaNotification
 	}
 	tests := []struct {
-		name      string
-		fields    fields
-		args      args
-		wantEvent quota.SetEvent
-		wantErr   assert.ErrorAssertionFunc
+		name        string
+		fields      fields
+		args        args
+		wantEvent   quota.SetEvent
+		wantChanges int
+		wantErr     assert.ErrorAssertionFunc
 	}{{
 		name: "change reset interval",
 		fields: fields{
@@ -54,10 +56,10 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 			limit:         true,
 			notifications: make([]*QuotaNotification, 0),
 		},
+		wantChanges: 1,
 		wantEvent: quota.SetEvent{
 			ResetInterval: durationPtr(time.Minute),
 		},
-		wantErr: assert.NoError,
 	}, {
 		name: "change reset interval and amount",
 		fields: fields{
@@ -74,11 +76,11 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 			limit:         true,
 			notifications: make([]*QuotaNotification, 0),
 		},
+		wantChanges: 2,
 		wantEvent: quota.SetEvent{
 			ResetInterval: durationPtr(time.Minute),
 			Amount:        uint64Ptr(10),
 		},
-		wantErr: assert.NoError,
 	}, {
 		name: "change nothing",
 		fields: fields{
@@ -95,8 +97,6 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 			limit:         true,
 			notifications: []*QuotaNotification{},
 		},
-		wantEvent: quota.SetEvent{},
-		wantErr:   assert.NoError,
 	}, {
 		name: "change limit to zero value",
 		fields: fields{
@@ -113,8 +113,8 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 			limit:         false,
 			notifications: make([]*QuotaNotification, 0),
 		},
-		wantEvent: quota.SetEvent{Limit: boolPtr(false)},
-		wantErr:   assert.NoError,
+		wantChanges: 1,
+		wantEvent:   quota.SetEvent{Limit: boolPtr(false)},
 	}, {
 		name: "change amount to zero value",
 		fields: fields{
@@ -131,8 +131,8 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 			limit:         true,
 			notifications: make([]*QuotaNotification, 0),
 		},
-		wantEvent: quota.SetEvent{Amount: uint64Ptr(0)},
-		wantErr:   assert.NoError,
+		wantChanges: 1,
+		wantEvent:   quota.SetEvent{Amount: uint64Ptr(0)},
 	}, {
 		name: "change from to zero value",
 		fields: fields{
@@ -149,8 +149,8 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 			limit:         true,
 			notifications: make([]*QuotaNotification, 0),
 		},
-		wantEvent: quota.SetEvent{From: &time.Time{}},
-		wantErr:   assert.NoError,
+		wantChanges: 1,
+		wantEvent:   quota.SetEvent{From: &time.Time{}},
 	}, {
 		name: "add notification",
 		fields: fields{
@@ -158,12 +158,6 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 			from:          time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
 			resetInterval: time.Hour,
 			limit:         true,
-			notifications: []*quota.SetEventNotification{{
-				ID:      "notification1",
-				Percent: 10,
-				Repeat:  true,
-				CallURL: "https://call.url",
-			}},
 		},
 		args: args{
 			amount:        5,
@@ -171,19 +165,19 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 			resetInterval: time.Hour,
 			limit:         true,
 			notifications: []*QuotaNotification{{
-				Percent: 20,
-				Repeat:  true,
+				Percent: 10,
+				Repeat:  false,
 				CallURL: "https://call.url",
 			}},
 			idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "notification1"),
 		},
+		wantChanges: 1,
 		wantEvent: quota.SetEvent{Notifications: &[]*quota.SetEventNotification{{
 			ID:      "notification1",
-			Percent: 20,
-			Repeat:  true,
+			Percent: 10,
+			Repeat:  false,
 			CallURL: "https://call.url",
 		}}},
-		wantErr: assert.NoError,
 	}, {
 		name: "change nothing with notification",
 		fields: fields{
@@ -210,10 +204,8 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 			}},
 			idGenerator: id_mock.NewIDGenerator(t),
 		},
-		wantEvent: quota.SetEvent{},
-		wantErr:   assert.NoError,
 	}, {
-		name: "change nothing but notification order",
+		name: "don't change notification order",
 		fields: fields{
 			amount:        5,
 			from:          time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
@@ -247,8 +239,6 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 			}},
 			idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "newnotification1", "newnotification2"),
 		},
-		wantEvent: quota.SetEvent{},
-		wantErr:   assert.NoError,
 	}, {
 		name: "change notification to zero value",
 		fields: fields{
@@ -270,33 +260,72 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 			limit:         true,
 			notifications: []*QuotaNotification{},
 		},
-		wantEvent: quota.SetEvent{Notifications: &[]*quota.SetEventNotification{}},
-		wantErr:   assert.NoError,
+		wantChanges: 1,
+		wantEvent:   quota.SetEvent{Notifications: &[]*quota.SetEventNotification{}},
 	}, {
-		name: "create new without notification",
+		name: "validate no duplicate notifications",
+		args: args{
+			notifications: []*QuotaNotification{{
+				Percent: 10,
+				Repeat:  false,
+				CallURL: "https://call.url",
+			}, {
+				Percent: 10,
+				Repeat:  false,
+				CallURL: "https://call.url",
+			}},
+			idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "notification1", "notification2"),
+		},
+		wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+			return zitadel_errors.IsErrorInvalidArgument(err)
+		},
+	}, {
+		name: "deduplicate existing notifications",
 		fields: fields{
-			amount:        5,
-			from:          time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
-			resetInterval: time.Hour,
-			limit:         true,
 			notifications: []*quota.SetEventNotification{{
-				ID:      "notification1",
+				ID:      "existingnotification1",
+				Percent: 10,
+				Repeat:  false,
+				CallURL: "https://call.url",
+			}, {
+				ID:      "existingnotification2",
+				Percent: 10,
+				Repeat:  true,
+				CallURL: "https://call.url",
+			}, {
+				ID:      "existingnotification3",
 				Percent: 10,
 				Repeat:  true,
 				CallURL: "https://call.url",
 			}},
 		},
 		args: args{
-			amount:        5,
-			from:          time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
-			resetInterval: time.Hour,
-			limit:         true,
-			notifications: []*QuotaNotification{},
+			notifications: []*QuotaNotification{{
+				Percent: 10,
+				Repeat:  false,
+				CallURL: "https://call.url",
+			}, {
+				Percent: 10,
+				Repeat:  true,
+				CallURL: "https://call.url",
+			}},
+			idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "notification1", "notification2"),
 		},
-		wantEvent: quota.SetEvent{Notifications: &[]*quota.SetEventNotification{}},
-		wantErr:   assert.NoError,
+		wantChanges: 1,
+		wantEvent: quota.SetEvent{
+			Notifications: &[]*quota.SetEventNotification{{
+				ID:      "notification1",
+				Percent: 10,
+				Repeat:  false,
+				CallURL: "https://call.url",
+			}, {
+				ID:      "notification2",
+				Percent: 10,
+				Repeat:  true,
+				CallURL: "https://call.url",
+			}}},
 	}, {
-		name: "create new with all values values",
+		name: "create new with all values",
 		args: args{
 			amount:        5,
 			from:          time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
@@ -310,6 +339,7 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 			idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "notification1"),
 			createNew:   true,
 		},
+		wantChanges: 5,
 		wantEvent: quota.SetEvent{
 			From:          timePtr(time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)),
 			ResetInterval: durationPtr(time.Hour),
@@ -322,10 +352,10 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 				CallURL: "https://call.url",
 			}},
 		},
-		wantErr: assert.NoError,
 	}, {
-		name: "create new with zero values",
-		args: args{createNew: true},
+		name:        "create new with zero values",
+		args:        args{createNew: true},
+		wantChanges: 5,
 		wantEvent: quota.SetEvent{
 			From:          &time.Time{},
 			ResetInterval: durationPtr(0),
@@ -333,10 +363,7 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 			Limit:         boolPtr(false),
 			Notifications: &[]*quota.SetEventNotification{},
 		},
-		wantErr: assert.NoError,
-	},
-	}
-
+	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			wm := &quotaWriteModel{
@@ -347,9 +374,12 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 				notifications: tt.fields.notifications,
 			}
 			gotChanges, err := wm.NewChanges(tt.args.idGenerator, tt.args.createNew, tt.args.amount, tt.args.from, tt.args.resetInterval, tt.args.limit, tt.args.notifications...)
-			if !tt.wantErr(t, err, fmt.Sprintf("NewChanges(%v, %v, %v, %v, %v, %v)", tt.args.createNew, tt.args.amount, tt.args.from, tt.args.resetInterval, tt.args.limit, tt.args.notifications)) {
+			assert.Len(t, gotChanges, tt.wantChanges)
+			if tt.wantErr != nil {
+				tt.wantErr(t, err, fmt.Sprintf("NewChanges(%v, %v, %v, %v, %v, %v)", tt.args.createNew, tt.args.amount, tt.args.from, tt.args.resetInterval, tt.args.limit, tt.args.notifications))
 				return
 			}
+			assert.NoError(t, err)
 			marshalled, err := json.Marshal(quota.NewSetEvent(
 				eventstore.NewBaseEventForPush(
 					context.Background(),

@@ -1,5 +1,6 @@
 ---
-title: Logout
+title: Log Out Users from an Application with ZITADEL
+sidebar_label: Logout
 ---
 
 This guide shows you the different concepts and use cases of the logout process and how to use it in ZITADEL.
@@ -36,7 +37,7 @@ If you have specified some post_logout_redirect_uris on your client you have to 
 So ZITADEL is able to read the configured redirect uris.
 
 ```
-GET {your_domain}/oidc/v1/end_session
+GET $CUSTOM-DOMAIN/oidc/v1/end_session
     ?id_token_hint={id_token}
     &post_logout_redirect_uri=https://rp.example.com/logged_out
     &state=random_string

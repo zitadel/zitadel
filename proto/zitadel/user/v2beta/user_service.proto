@@ -46,7 +46,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$ZITADEL_DOMAIN";
+  host: "$CUSTOM-DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -59,8 +59,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$ZITADEL_DOMAIN/oauth/v2/authorize";
-        token_url: "$ZITADEL_DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -1132,6 +1132,11 @@ message StartIdentityProviderIntentResponse{
         description: "IDP Intent information"
       }
     ];
+    bytes post_form = 4 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "POST call information"
+      }
+    ];
   }
 }
 
@@ -1159,6 +1164,12 @@ message RetrieveIdentityProviderIntentRequest{
 message RetrieveIdentityProviderIntentResponse{
   zitadel.object.v2beta.Details details = 1;
   IDPInformation idp_information = 2;
+  string user_id = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the user in ZITADEL if external user is linked"
+      example: "\"163840776835432345\"";
+    }
+  ];
 }
 
 message AddIDPLinkRequest{

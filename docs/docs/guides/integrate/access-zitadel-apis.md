@@ -44,7 +44,7 @@ Use the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to include the ZITADE
 
 ```bash
 curl --request POST \
-  --url {your_domain}/oauth/v2/token \
+  --url $CUSTOM-DOMAIN/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
   --data scope='openid profile email urn:zitadel:iam:org:project:id:zitadel:aud' \

@@ -408,7 +408,7 @@ Errors:
       Empty: La contraseña está vacía
       Invalid: La contraseña no es válida
       InvalidAndLocked: La contraseña no es válida y el usuario está bloqueado, contacta con tu administrador.
-      NotChanged: Contraseña no modificada
+      NotChanged: La nueva contraseña no puede coincidir con la contraseña actual
     UsernameOrPassword:
       Invalid: El nombre de usuario o la contraseña no son válidos
     PasswordComplexityPolicy:
