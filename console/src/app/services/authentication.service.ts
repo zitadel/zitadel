@@ -12,7 +12,10 @@ export class AuthenticationService {
   private _authenticated: boolean = false;
   private readonly _authenticationChanged: BehaviorSubject<boolean> = new BehaviorSubject(this.authenticated);
 
-  constructor(private oauthService: OAuthService, private statehandler: StatehandlerService) {}
+  constructor(
+    private oauthService: OAuthService,
+    private statehandler: StatehandlerService,
+  ) {}
 
   public initConfig(data: AuthConfig): void {
     this.authConfig = data;

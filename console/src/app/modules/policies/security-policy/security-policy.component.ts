@@ -20,7 +20,10 @@ export class SecurityPolicyComponent implements OnInit {
 
   @Input() public originsControl: UntypedFormControl = new UntypedFormControl({ value: [], disabled: true });
 
-  constructor(private service: AdminService, private toast: ToastService) {}
+  constructor(
+    private service: AdminService,
+    private toast: ToastService,
+  ) {}
 
   ngOnInit(): void {
     this.fetchData();

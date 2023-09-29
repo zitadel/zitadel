@@ -11,7 +11,10 @@ import {
 })
 export class MachineSecretDialogComponent {
   public copied: string = '';
-  constructor(public dialogRef: MatDialogRef<MachineSecretDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {}
+  constructor(
+    public dialogRef: MatDialogRef<MachineSecretDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+  ) {}
 
   public closeDialog(): void {
     this.dialogRef.close(false);

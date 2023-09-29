@@ -505,6 +505,10 @@ Errors:
       Invalid: El token no es válido
       Expired: El token ha caducado
     InvalidClient: El token no ha sido emitido para este cliente
+  Feature:
+    NotExisting: La característica no existe
+    TypeNotSupported: El tipo de característica no es compatible
+    InvalidValue: Valor no válido para esta característica
 
 AggregateTypes:
   action: Acción
@@ -515,6 +519,7 @@ AggregateTypes:
   user: Usuario
   usergrant: Concesión de usuario
   quota: Cuota
+  feature: Característica
 
 EventTypes:
   user:

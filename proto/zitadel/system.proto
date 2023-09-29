@@ -361,9 +361,24 @@ service SystemService {
   }
 
   // Creates a new quota
+  // Returns an error if the quota already exists for the specified unit
+  // Deprecated: use SetQuota instead
   rpc AddQuota(AddQuotaRequest) returns (AddQuotaResponse) {
     option (google.api.http) = {
       post: "/instances/{instance_id}/quotas"
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated";
+    };
+  }
+
+  // Sets quota configuration properties
+  // Creates a new quota if it doesn't exist for the specified unit
+  rpc SetQuota(SetQuotaRequest) returns (SetQuotaResponse) {
+    option (google.api.http) = {
+      put: "/instances/{instance_id}/quotas"
       body: "*"
     };
 
@@ -376,6 +391,18 @@ service SystemService {
   rpc RemoveQuota(RemoveQuotaRequest) returns (RemoveQuotaResponse) {
     option (google.api.http) = {
       delete: "/instances/{instance_id}/quotas/{unit}"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated";
+    };
+  }
+
+  // Set a feature flag on an instance
+  rpc SetInstanceFeature(SetInstanceFeatureRequest) returns (SetInstanceFeatureResponse) {
+    option (google.api.http) = {
+      put: "/instances/{instance_id}/features/{feature_id}"
+      body: "*"
     };
 
     option (zitadel.v1.auth_option) = {
@@ -598,6 +625,54 @@ message AddQuotaResponse {
   zitadel.v1.ObjectDetails details = 1;
 }
 
+message SetQuotaRequest {
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // the unit a quota should be imposed on
+  zitadel.quota.v1.Unit unit = 2 [
+    (validate.rules).enum = {defined_only: true, not_in: [0]},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the unit a quota should be imposed on";
+    }
+  ];
+  // the starting time from which the current quota period is calculated from. This is relevant for querying the current usage.
+  google.protobuf.Timestamp from = 3 [
+    (validate.rules).timestamp.required = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2019-04-01T08:45:00.000000Z\"";
+      description: "the starting time from which the current quota period is calculated from. This is relevant for querying the current usage.";
+    }
+  ];
+  // the quota periods duration
+  google.protobuf.Duration reset_interval = 4 [
+    (validate.rules).duration.required = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the quota periods duration";
+    }
+  ];
+  // the quota amount of units
+  uint64 amount = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the quota amount of units";
+    }
+  ];
+  // whether ZITADEL should block further usage when the configured amount is used
+  bool limit = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "whether ZITADEL should block further usage when the configured amount is used";
+    }
+  ];
+  // the handlers, ZITADEL executes when certain quota percentages are reached
+  repeated zitadel.quota.v1.Notification notifications = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the handlers, ZITADEL executes when certain quota percentages are reached";
+    }
+  ];
+}
+
+message SetQuotaResponse {
+  zitadel.v1.ObjectDetails details = 1;
+}
+
 message RemoveQuotaRequest {
   string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
   zitadel.quota.v1.Unit unit = 2;
@@ -815,4 +890,20 @@ message FailedEvent {
       description: "The timestamp the failure last occurred";
     }
   ];
+}
+
+message SetInstanceFeatureRequest {
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // the feature (id) according to [internal/domain/feature.go]
+  int32 feature_id = 2 [(validate.rules).int32 = {gt: 0}];
+  // value based on the feature type
+  oneof value {
+    option (validate.required) = true;
+
+    bool bool = 3;
+  }
+}
+
+message SetInstanceFeatureResponse {
+  zitadel.v1.ObjectDetails details = 1;
 }

@@ -3706,6 +3706,19 @@ service AdminService {
             description: "Returns a list of the possible aggregate types in ZITADEL. This is used to filter the aggregate types in the list events request."
         };
     }
+
+    // Activates the "LoginDefaultOrg" feature by setting the flag to "true"
+    // This is irreversible!
+    // Once activated, the login UI will use the settings of the default org (and not from the instance) if not organisation context is set
+    rpc ActivateFeatureLoginDefaultOrg(ActivateFeatureLoginDefaultOrgRequest) returns (ActivateFeatureLoginDefaultOrgResponse) {
+        option (google.api.http) = {
+            put: "/features/login_default_org"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.feature.write";
+        };
+    }
 }
 
 
@@ -7739,4 +7752,10 @@ message ListAggregateTypesRequest {}
 
 message ListAggregateTypesResponse {
     repeated zitadel.event.v1.AggregateType aggregate_types = 1;
+}
+
+message ActivateFeatureLoginDefaultOrgRequest {}
+
+message ActivateFeatureLoginDefaultOrgResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
