@@ -11,7 +11,10 @@ import {
 })
 export class CodeDialogComponent {
   public code: string = '';
-  constructor(public dialogRef: MatDialogRef<CodeDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {}
+  constructor(
+    public dialogRef: MatDialogRef<CodeDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+  ) {}
 
   closeDialog(code: string = ''): void {
     this.dialogRef.close(code);

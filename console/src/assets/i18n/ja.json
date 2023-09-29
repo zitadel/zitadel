@@ -95,7 +95,6 @@
     "EVENTS": "イベント",
     "FAILEDEVENTS": "失敗したイベント",
     "ORGANIZATION": "組織",
-    "DOMAINS": "ドメイン",
     "PROJECT": "プロジェクト",
     "PROJECTOVERVIEW": "概要",
     "PROJECTGRANTS": "グラント",
@@ -496,6 +495,7 @@
       "LASTNAME": "姓",
       "NICKNAME": "ニックネーム",
       "DISPLAYNAME": "表示名",
+      "PREFERREDLOGINNAME": "優先ログイン名",
       "PREFERRED_LANGUAGE": "言語",
       "GENDER": "性別",
       "PASSWORD": "パスワード",
@@ -796,7 +796,7 @@
     },
     "PAGES": {
       "STATE": "ステータス",
-      "DOMAINLIST": "ドメイン"
+      "DOMAINLIST": "カスタムドメイン"
     },
     "STATE": {
       "0": "未定義",
@@ -953,7 +953,7 @@
     },
     "DOMAINS": {
       "NEW": "ドメインを追加する",
-      "TITLE": "ドメイン",
+      "TITLE": "検証済みドメイン",
       "DESCRIPTION": "ドメインを設定します。このドメインは、ユーザーのログインで使用できます。",
       "SETPRIMARY": "プライマリとして設定する",
       "DELETE": {
@@ -1025,6 +1025,7 @@
       "NOTIFICATIONS_DESC": "SMTPおよびSMS設定",
       "MESSAGETEXTS": "メッセージテキスト",
       "IDP": "IDプロバイダー",
+      "VERIFIED_DAMAINS": "検証済みドメイン",
       "DOMAIN": "ドメイン設定",
       "LOGINTEXTS": "ログイン画面のテキスト",
       "BRANDING": "ブランディング",
@@ -1348,7 +1349,7 @@
       "MAXAGEDAYS": "最大有効期限",
       "USERLOGINMUSTBEDOMAIN": "ログイン名の接尾辞として組織ドメインを追加する",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "この設定を有効にすると、すべてのログイン名が組織ドメインで接尾辞が付けられます。この設定が無効になっている場合、ユーザー名がすべての組織で一意であることを確認する必要があります。",
-      "VALIDATEORGDOMAINS": "組織ドメインを認証する",
+      "VALIDATEORGDOMAINS": "組織のドメイン検証が必要です (DNSまたはHTTPチャレンジ)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP送信者アドレスはインスタンスドメインに一致しています",
       "ALLOWUSERNAMEPASSWORD": "ユーザー名とパスワードを許可",
       "ALLOWEXTERNALIDP": "外部IDPを許可",

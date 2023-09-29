@@ -1,5 +1,6 @@
 ---
-title: Production Setup
+title: ZITADEL Production Setup
+sidebar_lable: Production Setup
 ---
 
 As soon as you successfully deployed ZITADEL as a proof of concept using one of our [deployment guides](/docs/self-hosting/deploy/overview),

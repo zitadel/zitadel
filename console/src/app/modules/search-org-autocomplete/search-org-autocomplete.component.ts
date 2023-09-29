@@ -22,7 +22,10 @@ export class SearchOrgAutocompleteComponent implements OnInit, OnDestroy {
   @Output() public selectionChanged: EventEmitter<Org.AsObject> = new EventEmitter();
 
   private unsubscribed$: Subject<void> = new Subject();
-  constructor(public authService: AuthenticationService, private auth: GrpcAuthService) {
+  constructor(
+    public authService: AuthenticationService,
+    private auth: GrpcAuthService,
+  ) {
     this.myControl.valueChanges
       .pipe(
         takeUntil(this.unsubscribed$),

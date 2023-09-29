@@ -11,7 +11,10 @@ import {
 })
 export class AuthMethodDialogComponent {
   public authmethod: string = '';
-  constructor(public dialogRef: MatDialogRef<AuthMethodDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor(
+    public dialogRef: MatDialogRef<AuthMethodDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+  ) {
     this.authmethod = data.initialAuthMethod;
   }
 
