@@ -2,6 +2,7 @@ import {
   ZitadelServer,
   ZitadelServerOptions,
   user,
+  oidc,
   settings,
   getServers,
   initializeServer,
@@ -19,16 +20,22 @@ import {
   GetSessionResponse,
   VerifyEmailResponse,
   SetSessionResponse,
+  SetSessionRequest,
   DeleteSessionResponse,
   VerifyPasskeyRegistrationResponse,
-  ChallengeKind,
   LoginSettings,
   GetLoginSettingsResponse,
   ListAuthenticationMethodTypesResponse,
-  StartIdentityProviderFlowRequest,
-  StartIdentityProviderFlowResponse,
-  RetrieveIdentityProviderInformationRequest,
-  RetrieveIdentityProviderInformationResponse,
+  StartIdentityProviderIntentRequest,
+  StartIdentityProviderIntentResponse,
+  RetrieveIdentityProviderIntentRequest,
+  RetrieveIdentityProviderIntentResponse,
+  GetAuthRequestResponse,
+  GetAuthRequestRequest,
+  CreateCallbackRequest,
+  CreateCallbackResponse,
+  RequestChallenges,
+  AddHumanUserRequest,
 } from "@zitadel/server";
 
 export const zitadelConfig: ZitadelServerOptions = {
@@ -95,9 +102,8 @@ export async function getPasswordComplexitySettings(
 export async function createSession(
   server: ZitadelServer,
   loginName: string,
-  domain: string,
   password: string | undefined,
-  challenges: ChallengeKind[] | undefined
+  challenges: RequestChallenges | undefined
 ): Promise<CreateSessionResponse | undefined> {
   const sessionService = session.getSession(server);
   return password
@@ -105,12 +111,12 @@ export async function createSession(
         {
           checks: { user: { loginName }, password: { password } },
           challenges,
-          domain,
         },
         {}
       )
     : sessionService.createSession(
-        { checks: { user: { loginName } }, domain },
+        { checks: { user: { loginName } }, challenges },
+
         {}
       );
 }
@@ -119,23 +125,29 @@ export async function setSession(
   server: ZitadelServer,
   sessionId: string,
   sessionToken: string,
-  domain: string | undefined,
   password: string | undefined,
-  passkey: { credentialAssertionData: any } | undefined,
-  challenges: ChallengeKind[] | undefined
+  webAuthN: { credentialAssertionData: any } | undefined,
+  challenges: RequestChallenges | undefined
 ): Promise<SetSessionResponse | undefined> {
   const sessionService = session.getSession(server);
 
-  const payload = { sessionId, sessionToken, challenges, domain };
-  return password
-    ? sessionService.setSession(
-        {
-          ...payload,
-          checks: { password: { password }, passkey },
-        },
-        {}
-      )
-    : sessionService.setSession(payload, {});
+  const payload: SetSessionRequest = {
+    sessionId,
+    sessionToken,
+    challenges,
+    checks: {},
+    metadata: {},
+  };
+
+  if (password && payload.checks) {
+    payload.checks.password = { password };
+  }
+
+  if (webAuthN && payload.checks) {
+    payload.checks.webAuthN = webAuthN;
+  }
+
+  return sessionService.setSession(payload, {});
 }
 
 export async function getSession(
@@ -179,10 +191,10 @@ export async function addHumanUser(
 ): Promise<string> {
   const userService = user.getUser(server);
 
-  const payload = {
+  const payload: Partial<AddHumanUserRequest> = {
     email: { email },
     username: email,
-    profile: { firstName, lastName },
+    profile: { givenName: firstName, familyName: lastName },
   };
   return userService
     .addHumanUser(
@@ -201,27 +213,46 @@ export async function addHumanUser(
 
 export async function startIdentityProviderFlow(
   server: ZitadelServer,
-  { idpId, successUrl, failureUrl }: StartIdentityProviderFlowRequest
-): Promise<StartIdentityProviderFlowResponse> {
+  { idpId, urls }: StartIdentityProviderIntentRequest
+): Promise<StartIdentityProviderIntentResponse> {
   const userService = user.getUser(server);
 
-  return userService.startIdentityProviderFlow({
+  return userService.startIdentityProviderIntent({
     idpId,
-    successUrl,
-    failureUrl,
+    urls,
   });
 }
 
 export async function retrieveIdentityProviderInformation(
   server: ZitadelServer,
-  { intentId, token }: RetrieveIdentityProviderInformationRequest
-): Promise<RetrieveIdentityProviderInformationResponse> {
+  { idpIntentId, idpIntentToken }: RetrieveIdentityProviderIntentRequest
+): Promise<RetrieveIdentityProviderIntentResponse> {
   const userService = user.getUser(server);
 
-  return userService.retrieveIdentityProviderInformation({
-    intentId,
-    token,
+  return userService.retrieveIdentityProviderIntent({
+    idpIntentId,
+    idpIntentToken,
   });
+}
+
+export async function getAuthRequest(
+  server: ZitadelServer,
+  { authRequestId }: GetAuthRequestRequest
+): Promise<GetAuthRequestResponse> {
+  const oidcService = oidc.getOidc(server);
+
+  return oidcService.getAuthRequest({
+    authRequestId,
+  });
+}
+
+export async function createCallback(
+  server: ZitadelServer,
+  req: CreateCallbackRequest
+): Promise<CreateCallbackResponse> {
+  const oidcService = oidc.getOidc(server);
+
+  return oidcService.createCallback(req);
 }
 
 export async function verifyEmail(

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Challenges_Passkey } from "@zitadel/server";
 import { coerceToArrayBuffer, coerceToBase64Url } from "#/utils/base64";
 import { Button, ButtonVariants } from "./Button";
 import Alert from "./Alert";
@@ -10,10 +9,15 @@ import { Spinner } from "./Spinner";
 
 type Props = {
   loginName: string;
+  authRequestId?: string;
   altPassword: boolean;
 };
 
-export default function LoginPasskey({ loginName, altPassword }: Props) {
+export default function LoginPasskey({
+  loginName,
+  authRequestId,
+  altPassword,
+}: Props) {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -28,7 +32,7 @@ export default function LoginPasskey({ loginName, altPassword }: Props) {
       updateSessionForChallenge()
         .then((response) => {
           const pK =
-            response.challenges.passkey.publicKeyCredentialRequestOptions
+            response.challenges.webAuthN.publicKeyCredentialRequestOptions
               .publicKey;
           if (pK) {
             submitLoginAndContinue(pK)
@@ -60,7 +64,13 @@ export default function LoginPasskey({ loginName, altPassword }: Props) {
       },
       body: JSON.stringify({
         loginName,
-        challenges: [1], // request passkey challenge
+        challenges: {
+          webAuthN: {
+            domain: "",
+            userVerificationRequirement: 1,
+          },
+        },
+        authRequestId,
       }),
     });
 
@@ -81,7 +91,8 @@ export default function LoginPasskey({ loginName, altPassword }: Props) {
       },
       body: JSON.stringify({
         loginName,
-        passkey: data,
+        webAuthN: { credentialAssertionData: data },
+        authRequestId,
       }),
     });
 
@@ -115,18 +126,18 @@ export default function LoginPasskey({ loginName, altPassword }: Props) {
       })
       .then((assertedCredential: any) => {
         if (assertedCredential) {
-          let authData = new Uint8Array(
+          const authData = new Uint8Array(
             assertedCredential.response.authenticatorData
           );
-          let clientDataJSON = new Uint8Array(
+          const clientDataJSON = new Uint8Array(
             assertedCredential.response.clientDataJSON
           );
-          let rawId = new Uint8Array(assertedCredential.rawId);
-          let sig = new Uint8Array(assertedCredential.response.signature);
-          let userHandle = new Uint8Array(
+          const rawId = new Uint8Array(assertedCredential.rawId);
+          const sig = new Uint8Array(assertedCredential.response.signature);
+          const userHandle = new Uint8Array(
             assertedCredential.response.userHandle
           );
-          let data = JSON.stringify({
+          const data = {
             id: assertedCredential.id,
             rawId: coerceToBase64Url(rawId, "rawId"),
             type: assertedCredential.type,
@@ -139,9 +150,21 @@ export default function LoginPasskey({ loginName, altPassword }: Props) {
               signature: coerceToBase64Url(sig, "sig"),
               userHandle: coerceToBase64Url(userHandle, "userHandle"),
             },
-          });
-          return submitLogin(data).then(() => {
-            return router.push(`/accounts`);
+          };
+          return submitLogin(data).then((resp) => {
+            return router.push(
+              `/signedin?` +
+                new URLSearchParams(
+                  authRequestId
+                    ? {
+                        loginName: resp.factors.user.loginName,
+                        authRequestId,
+                      }
+                    : {
+                        loginName: resp.factors.user.loginName,
+                      }
+                )
+            );
           });
         } else {
           setLoading(false);
@@ -169,11 +192,16 @@ export default function LoginPasskey({ loginName, altPassword }: Props) {
           <Button
             type="button"
             variant={ButtonVariants.Secondary}
-            onClick={() =>
-              router.push(
-                "/password?" + new URLSearchParams({ loginName, alt: "true" }) // alt is set because password is requested as alternative auth method, so passwordless prompt can be escaped
-              )
-            }
+            onClick={() => {
+              const params = { loginName, alt: "true" };
+
+              return router.push(
+                "/password?" +
+                  new URLSearchParams(
+                    authRequestId ? { ...params, authRequestId } : params
+                  ) // alt is set because password is requested as alternative auth method, so passwordless prompt can be escaped
+              );
+            }}
           >
             use password
           </Button>

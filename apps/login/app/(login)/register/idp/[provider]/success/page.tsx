@@ -1,10 +1,10 @@
 import { ProviderSlug } from "#/lib/demos";
-import { addHumanUser, server } from "#/lib/zitadel";
+import { server } from "#/lib/zitadel";
 import Alert, { AlertType } from "#/ui/Alert";
 import {
   AddHumanUserRequest,
   IDPInformation,
-  RetrieveIdentityProviderInformationResponse,
+  RetrieveIdentityProviderIntentResponse,
   user,
   IDPLink,
 } from "@zitadel/server";
@@ -27,8 +27,8 @@ const PROVIDER_MAPPING: {
       // organisation: Organisation | undefined;
       profile: {
         displayName: idp.rawInformation?.User?.name ?? "",
-        firstName: idp.rawInformation?.User?.given_name ?? "",
-        lastName: idp.rawInformation?.User?.family_name ?? "",
+        givenName: idp.rawInformation?.User?.given_name ?? "",
+        familyName: idp.rawInformation?.User?.family_name ?? "",
       },
       idpLinks: [idpLink],
     };
@@ -49,8 +49,8 @@ const PROVIDER_MAPPING: {
       // organisation: Organisation | undefined;
       profile: {
         displayName: idp.rawInformation?.name ?? "",
-        firstName: idp.rawInformation?.name ?? "",
-        lastName: idp.rawInformation?.name ?? "",
+        givenName: idp.rawInformation?.name ?? "",
+        familyName: idp.rawInformation?.name ?? "",
       },
       idpLinks: [idpLink],
     };
@@ -64,8 +64,11 @@ function retrieveIDP(
 ): Promise<IDPInformation | undefined> {
   const userService = user.getUser(server);
   return userService
-    .retrieveIdentityProviderInformation({ intentId: id, token: token }, {})
-    .then((resp: RetrieveIdentityProviderInformationResponse) => {
+    .retrieveIdentityProviderIntent(
+      { idpIntentId: id, idpIntentToken: token },
+      {}
+    )
+    .then((resp: RetrieveIdentityProviderIntentResponse) => {
       return resp.idpInformation;
     });
 }

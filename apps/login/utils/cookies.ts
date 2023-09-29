@@ -7,6 +7,7 @@ export type SessionCookie = {
   token: string;
   loginName: string;
   changeDate: string;
+  authRequestId?: string; // if its linked to an OIDC flow
 };
 
 function setSessionHttpOnlyCookie(sessions: SessionCookie[]) {
@@ -134,13 +135,25 @@ export async function getSessionCookieByLoginName(
   }
 }
 
-export async function getAllSessionIds(): Promise<any> {
+export async function getAllSessionCookieIds(): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
     return sessions.map((session) => session.id);
+  } else {
+    return [];
+  }
+}
+
+export async function getAllSessions(): Promise<SessionCookie[]> {
+  const cookiesList = cookies();
+  const stringifiedCookie = cookiesList.get("sessions");
+
+  if (stringifiedCookie?.value) {
+    const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
+    return sessions;
   } else {
     return [];
   }

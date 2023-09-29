@@ -19,7 +19,7 @@
     "test:unit:watch": "jest --watch",
     "dev": "tsup --dts --watch",
     "lint": "eslint \"src/**/*.ts*\"",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf src/proto"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.14.0",

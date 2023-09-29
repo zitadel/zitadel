@@ -14,12 +14,14 @@ type Inputs = {
 
 type Props = {
   loginName?: string;
+  authRequestId?: string;
   isAlternative?: boolean; // whether password was requested as alternative auth method
   promptPasswordless?: boolean;
 };
 
 export default function PasswordForm({
   loginName,
+  authRequestId,
   promptPasswordless,
   isAlternative,
 }: Props) {
@@ -44,6 +46,7 @@ export default function PasswordForm({
       body: JSON.stringify({
         loginName,
         password: values.password,
+        authRequestId,
       }),
     });
 
@@ -73,7 +76,19 @@ export default function PasswordForm({
             })
         );
       } else {
-        return router.push(`/accounts`);
+        return router.push(
+          `/signedin?` +
+            new URLSearchParams(
+              authRequestId
+                ? {
+                    loginName: resp.factors.user.loginName,
+                    authRequestId,
+                  }
+                : {
+                    loginName: resp.factors.user.loginName,
+                  }
+            )
+        );
       }
     });
   }

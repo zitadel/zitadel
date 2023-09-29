@@ -1,13 +1,9 @@
 import { CompatServiceDefinition } from "nice-grpc/lib/service-definitions";
 
-import {
-  SettingsServiceClient,
-  SettingsServiceDefinition,
-} from "../../proto/server/zitadel/settings/v2beta/settings_service";
-
 import { ZitadelServer, createClient, getServers } from "../../server";
+import { OIDCServiceClient, OIDCServiceDefinition } from ".";
 
-export const getSettings = (server?: string | ZitadelServer) => {
+export const getOidc = (server?: string | ZitadelServer) => {
   let config;
   if (server && typeof server === "string") {
     const apps = getServers();
@@ -20,8 +16,8 @@ export const getSettings = (server?: string | ZitadelServer) => {
     throw Error("No ZITADEL server found");
   }
 
-  return createClient<SettingsServiceClient>(
-    SettingsServiceDefinition as CompatServiceDefinition,
+  return createClient<OIDCServiceClient>(
+    OIDCServiceDefinition as CompatServiceDefinition,
     config.apiUrl,
     config.token
   );

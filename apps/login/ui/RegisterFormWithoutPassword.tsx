@@ -66,6 +66,7 @@ export default function RegisterFormWithoutPassword({ legal }: Props) {
       },
       body: JSON.stringify({
         loginName: loginName,
+        // authRequestId, register does not need an oidc callback at the end
       }),
     });
 

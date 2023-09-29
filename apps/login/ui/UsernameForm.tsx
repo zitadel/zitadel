@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import { LoginSettings } from "@zitadel/server";
+import Alert from "./Alert";
 
 type Inputs = {
   loginName: string;
@@ -15,12 +16,14 @@ type Inputs = {
 type Props = {
   loginSettings: LoginSettings | undefined;
   loginName: string | undefined;
+  authRequestId: string | undefined;
   submit: boolean;
 };
 
 export default function UsernameForm({
   loginSettings,
   loginName,
+  authRequestId,
   submit,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
@@ -37,19 +40,25 @@ export default function UsernameForm({
 
   async function submitLoginName(values: Inputs) {
     setLoading(true);
+
+    const body = {
+      loginName: values.loginName,
+    };
+
     const res = await fetch("/api/loginname", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        loginName: values.loginName,
-      }),
+      body: JSON.stringify(authRequestId ? { ...body, authRequestId } : body),
     });
 
     setLoading(false);
     if (!res.ok) {
-      throw new Error("Failed to load authentication methods");
+      const response = await res.json();
+
+      setError(response.details);
+      return Promise.reject(response.details);
     }
     return res.json();
   }
@@ -60,33 +69,40 @@ export default function UsernameForm({
         const method = response.authMethodTypes[0];
         switch (method) {
           case 1: //AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSWORD:
+            const paramsPassword: any = { loginName: values.loginName };
+
+            if (loginSettings?.passkeysType === 1) {
+              paramsPassword.promptPasswordless = `true`; // PasskeysType.PASSKEYS_TYPE_ALLOWED,
+            }
+
+            if (authRequestId) {
+              paramsPassword.authRequestId = authRequestId;
+            }
+
             return router.push(
-              "/password?" +
-                new URLSearchParams(
-                  loginSettings?.passkeysType === 1
-                    ? {
-                        loginName: values.loginName,
-                        promptPasswordless: `true`, // PasskeysType.PASSKEYS_TYPE_ALLOWED,
-                      }
-                    : { loginName: values.loginName }
-                )
+              "/password?" + new URLSearchParams(paramsPassword)
             );
           case 2: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
+            const paramsPasskey: any = { loginName: values.loginName };
+            if (authRequestId) {
+              paramsPasskey.authRequestId = authRequestId;
+            }
+
             return router.push(
-              "/passkey/login?" +
-                new URLSearchParams({ loginName: values.loginName })
+              "/passkey/login?" + new URLSearchParams(paramsPasskey)
             );
           default:
+            const paramsPasskeyDefault: any = { loginName: values.loginName };
+
+            if (loginSettings?.passkeysType === 1) {
+              paramsPasskeyDefault.promptPasswordless = `true`; // PasskeysType.PASSKEYS_TYPE_ALLOWED,
+            }
+
+            if (authRequestId) {
+              paramsPasskeyDefault.authRequestId = authRequestId;
+            }
             return router.push(
-              "/password?" +
-                new URLSearchParams(
-                  loginSettings?.passkeysType === 1
-                    ? {
-                        loginName: values.loginName,
-                        promptPasswordless: `true`, // PasskeysType.PASSKEYS_TYPE_ALLOWED,
-                      }
-                    : { loginName: values.loginName }
-                )
+              "/password?" + new URLSearchParams(paramsPasskeyDefault)
             );
         }
       } else if (
@@ -99,12 +115,17 @@ export default function UsernameForm({
       } else {
         // prefer passkey in favor of other methods
         if (response.authMethodTypes.includes(2)) {
+          const passkeyParams: any = {
+            loginName: values.loginName,
+            altPassword: `${response.authMethodTypes.includes(1)}`, // show alternative password option
+          };
+
+          if (authRequestId) {
+            passkeyParams.authRequestId = authRequestId;
+          }
+
           return router.push(
-            "/passkey/login?" +
-              new URLSearchParams({
-                loginName: values.loginName,
-                altPassword: `${response.authMethodTypes.includes(1)}`, // show alternative password option
-              })
+            "/passkey/login?" + new URLSearchParams(passkeyParams)
           );
         }
       }
@@ -128,14 +149,16 @@ export default function UsernameForm({
           autoComplete="username"
           {...register("loginName", { required: "This field is required" })}
           label="Loginname"
-          //   error={errors.username?.message as string}
         />
       </div>
 
+      {error && (
+        <div className="py-4">
+          <Alert>{error}</Alert>
+        </div>
+      )}
+
       <div className="mt-8 flex w-full flex-row items-center">
-        {/* <Button type="button" variant={ButtonVariants.Secondary}>
-          back
-        </Button> */}
         <span className="flex-grow"></span>
         <Button
           type="submit"

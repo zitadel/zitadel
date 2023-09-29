@@ -7,9 +7,10 @@ import { useEffect, useState } from "react";
 
 type Props = {
   sessions: Session[];
+  authRequestId?: string;
 };
 
-export default function SessionsList({ sessions }: Props) {
+export default function SessionsList({ sessions, authRequestId }: Props) {
   const [list, setList] = useState<Session[]>(sessions);
   return sessions ? (
     <div className="flex flex-col space-y-2">
@@ -19,6 +20,7 @@ export default function SessionsList({ sessions }: Props) {
           return (
             <SessionItem
               session={session}
+              authRequestId={authRequestId}
               reload={() => {
                 setList(list.filter((s) => s.id !== session.id));
               }}

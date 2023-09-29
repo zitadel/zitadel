@@ -1,12 +1,12 @@
 import { Session } from "@zitadel/server";
 import { listSessions, server } from "#/lib/zitadel";
-import { getAllSessionIds } from "#/utils/cookies";
+import { getAllSessionCookieIds } from "#/utils/cookies";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import SessionsList from "#/ui/SessionsList";
 
 async function loadSessions(): Promise<Session[]> {
-  const ids = await getAllSessionIds();
+  const ids = await getAllSessionCookieIds();
 
   if (ids && ids.length) {
     const response = await listSessions(
@@ -20,7 +20,13 @@ async function loadSessions(): Promise<Session[]> {
   }
 }
 
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Record<string | number | symbol, string | undefined>;
+}) {
+  const authRequestId = searchParams?.authRequestId;
+
   let sessions = await loadSessions();
 
   return (
@@ -29,7 +35,7 @@ export default async function Page() {
       <p className="ztdl-p mb-6 block">Use your ZITADEL Account</p>
 
       <div className="flex flex-col w-full space-y-2">
-        <SessionsList sessions={sessions} />
+        <SessionsList sessions={sessions} authRequestId={authRequestId} />
         <Link href="/loginname">
           <div className="flex flex-row items-center py-3 px-4 hover:bg-black/10 dark:hover:bg-white/10 rounded-md transition-all">
             <div className="w-8 h-8 mr-4 flex flex-row justify-center items-center rounded-full bg-black/5 dark:bg-white/5">
