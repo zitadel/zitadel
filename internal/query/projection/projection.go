@@ -67,8 +67,8 @@ var (
 	DeviceAuthProjection                *handler.Handler
 	SessionProjection                   *handler.Handler
 	AuthRequestProjection               *handler.Handler
-	MilestoneProjection                 *handler.Handler
-	QuotaProjection                     *quotaProjection
+	// MilestoneProjection                 *handler.Handler
+	QuotaProjection *quotaProjection
 )
 
 type projection interface {
@@ -139,7 +139,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	DeviceAuthProjection = newDeviceAuthProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["device_auth"]))
 	SessionProjection = newSessionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["sessions"]))
 	AuthRequestProjection = newAuthRequestProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["auth_requests"]))
-	MilestoneProjection = newMilestoneProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["milestones"]), systemUsers)
+	// MilestoneProjection = newMilestoneProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["milestones"]), systemUsers)
 	QuotaProjection = newQuotaProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["quotas"]))
 	newProjectionsList()
 	return nil
@@ -242,7 +242,7 @@ func newProjectionsList() {
 		DeviceAuthProjection,
 		SessionProjection,
 		AuthRequestProjection,
-		MilestoneProjection,
+		// MilestoneProjection,
 		QuotaProjection.handler,
 	}
 }
