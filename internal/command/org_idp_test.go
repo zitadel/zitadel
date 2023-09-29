@@ -5402,22 +5402,21 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						eventPusherToEvents(
-							org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
-								"id1",
-								"name",
-								[]byte("metadata"),
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("key"),
-								},
-								[]byte("certificate"),
-								"",
-								false,
-								idp.Options{},
-							)),
+						org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+							"id1",
+							"name",
+							[]byte("metadata"),
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("key"),
+							},
+							[]byte("certificate"),
+							"",
+							false,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -5442,27 +5441,26 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						eventPusherToEvents(
-							org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
-								"id1",
-								"name",
-								[]byte("metadata"),
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("key"),
-								},
-								[]byte("certificate"),
-								"binding",
-								true,
-								idp.Options{
-									IsCreationAllowed: true,
-									IsLinkingAllowed:  true,
-									IsAutoCreation:    true,
-									IsAutoUpdate:      true,
-								},
-							)),
+						org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+							"id1",
+							"name",
+							[]byte("metadata"),
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("key"),
+							},
+							[]byte("certificate"),
+							"binding",
+							true,
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:                id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -5669,27 +5667,25 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						eventPusherToEvents(
-							func() eventstore.Command {
-								t := true
-								event, _ := org.NewSAMLIDPChangedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
-									"id1",
-									[]idp.SAMLIDPChanges{
-										idp.ChangeSAMLName("new name"),
-										idp.ChangeSAMLMetadata([]byte("new metadata")),
-										idp.ChangeSAMLBinding("new binding"),
-										idp.ChangeSAMLWithSignedRequest(true),
-										idp.ChangeSAMLOptions(idp.OptionChanges{
-											IsCreationAllowed: &t,
-											IsLinkingAllowed:  &t,
-											IsAutoCreation:    &t,
-											IsAutoUpdate:      &t,
-										}),
-									},
-								)
-								return event
-							}(),
-						),
+						func() eventstore.Command {
+							t := true
+							event, _ := org.NewSAMLIDPChangedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								[]idp.SAMLIDPChanges{
+									idp.ChangeSAMLName("new name"),
+									idp.ChangeSAMLMetadata([]byte("new metadata")),
+									idp.ChangeSAMLBinding("new binding"),
+									idp.ChangeSAMLWithSignedRequest(true),
+									idp.ChangeSAMLOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -5813,23 +5809,21 @@ func TestCommandSide_RegenerateOrgSAMLProviderCertificate(t *testing.T) {
 							)),
 					),
 					expectPush(
-						eventPusherToEvents(
-							func() eventstore.Command {
-								event, _ := org.NewSAMLIDPChangedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
-									"id1",
-									[]idp.SAMLIDPChanges{
-										idp.ChangeSAMLKey(&crypto.CryptoValue{
-											CryptoType: crypto.TypeEncryption,
-											Algorithm:  "enc",
-											KeyID:      "id",
-											Crypted:    []byte("new key"),
-										}),
-										idp.ChangeSAMLCertificate([]byte("new certificate")),
-									},
-								)
-								return event
-							}(),
-						),
+						func() eventstore.Command {
+							event, _ := org.NewSAMLIDPChangedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								[]idp.SAMLIDPChanges{
+									idp.ChangeSAMLKey(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("new key"),
+									}),
+									idp.ChangeSAMLCertificate([]byte("new certificate")),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),

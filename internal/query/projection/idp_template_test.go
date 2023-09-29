@@ -2706,7 +2706,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			name: "instance reduceSAMLIDPAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.SAMLIDPAddedEventType),
+					instance.SAMLIDPAddedEventType,
 					instance.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
@@ -2729,9 +2729,8 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceSAMLIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2773,7 +2772,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			name: "org reduceSAMLIDPAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.SAMLIDPAddedEventType),
+					org.SAMLIDPAddedEventType,
 					org.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
@@ -2796,9 +2795,8 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceSAMLIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2840,7 +2838,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			name: "instance reduceSAMLIDPChanged minimal",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.SAMLIDPChangedEventType),
+					instance.SAMLIDPChangedEventType,
 					instance.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
@@ -2851,9 +2849,8 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceSAMLIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2882,7 +2879,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			name: "instance reduceSAMLIDPChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.SAMLIDPChangedEventType),
+					instance.SAMLIDPChangedEventType,
 					instance.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
@@ -2905,9 +2902,8 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceSAMLIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2945,15 +2941,14 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			reduce: (&idpProjection{}).reduceOwnerRemoved,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
+					org.OrgRemovedEventType,
 					org.AggregateType,
 					nil,
 				), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

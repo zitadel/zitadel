@@ -1037,7 +1037,7 @@ func NewSAMLIDPAddedEvent(
 	}
 }
 
-func SAMLIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SAMLIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.SAMLIDPAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -1072,7 +1072,7 @@ func NewSAMLIDPChangedEvent(
 	return &SAMLIDPChangedEvent{SAMLIDPChangedEvent: *changedEvent}, nil
 }
 
-func SAMLIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SAMLIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.SAMLIDPChangedEventMapper(event)
 	if err != nil {
 		return nil, err

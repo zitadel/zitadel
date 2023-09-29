@@ -357,18 +357,18 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			IDPTemplateAppleSuffix,
 			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(SAMLIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(SAMLInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(SAMLMetadataCol, crdb.ColumnTypeBytes),
-			crdb.NewColumn(SAMLKeyCol, crdb.ColumnTypeJSONB),
-			crdb.NewColumn(SAMLCertificateCol, crdb.ColumnTypeBytes),
-			crdb.NewColumn(SAMLBindingCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(SAMLWithSignedRequestCol, crdb.ColumnTypeBool, crdb.Nullable()),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(SAMLIDCol, handler.ColumnTypeText),
+			handler.NewColumn(SAMLInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(SAMLMetadataCol, handler.ColumnTypeBytes),
+			handler.NewColumn(SAMLKeyCol, handler.ColumnTypeJSONB),
+			handler.NewColumn(SAMLCertificateCol, handler.ColumnTypeBytes),
+			handler.NewColumn(SAMLBindingCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(SAMLWithSignedRequestCol, handler.ColumnTypeBool, handler.Nullable()),
 		},
-			crdb.NewPrimaryKey(SAMLInstanceIDCol, SAMLIDCol),
+			handler.NewPrimaryKey(SAMLInstanceIDCol, SAMLIDCol),
 			IDPTemplateSAMLSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
 	)
 }
@@ -1952,9 +1952,9 @@ func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*han
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPAddedEventType, instance.SAMLIDPAddedEventType})
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
@@ -1972,7 +1972,7 @@ func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
 			},
 		),
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(SAMLIDCol, idpEvent.ID),
 				handler.NewCol(SAMLInstanceIDCol, idpEvent.Aggregate().InstanceID),
@@ -1982,7 +1982,7 @@ func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(SAMLBindingCol, idpEvent.Binding),
 				handler.NewCol(SAMLWithSignedRequestCol, idpEvent.WithSignedRequest),
 			},
-			crdb.WithTableSuffix(IDPTemplateSAMLSuffix),
+			handler.WithTableSuffix(IDPTemplateSAMLSuffix),
 		),
 	), nil
 }
@@ -1998,9 +1998,9 @@ func (p *idpTemplateProjection) reduceSAMLIDPChanged(event eventstore.Event) (*h
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-o7c0fii4ad", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPChangedEventType, instance.SAMLIDPChangedEventType})
 	}
 
-	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
 	ops = append(ops,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -2012,18 +2012,18 @@ func (p *idpTemplateProjection) reduceSAMLIDPChanged(event eventstore.Event) (*h
 	SAMLCols := reduceSAMLIDPChangedColumns(idpEvent)
 	if len(SAMLCols) > 0 {
 		ops = append(ops,
-			crdb.AddUpdateStatement(
+			handler.AddUpdateStatement(
 				SAMLCols,
 				[]handler.Condition{
 					handler.NewCond(SAMLIDCol, idpEvent.ID),
 					handler.NewCond(SAMLInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
-				crdb.WithTableSuffix(IDPTemplateSAMLSuffix),
+				handler.WithTableSuffix(IDPTemplateSAMLSuffix),
 			),
 		)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
 		ops...,
 	), nil

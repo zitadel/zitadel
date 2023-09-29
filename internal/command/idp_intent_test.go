@@ -543,13 +543,13 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 						),
 					),
 					expectRandomPush(
-						eventPusherToEvents(
+						[]eventstore.Command{
 							idpintent.NewSAMLRequestEvent(
 								context.Background(),
 								&idpintent.NewAggregate("id", "ro").Aggregate,
 								"request",
 							),
-						),
+						},
 					),
 				),
 			},
@@ -767,21 +767,19 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 				idpConfigEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						eventPusherToEvents(
-							idpintent.NewSAMLSucceededEvent(
-								context.Background(),
-								&idpintent.NewAggregate("id", "ro").Aggregate,
-								[]byte(`{"sub":"id","preferred_username":"username"}`),
-								"id",
-								"username",
-								"",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
-								},
-							),
+						idpintent.NewSAMLSucceededEvent(
+							context.Background(),
+							&idpintent.NewAggregate("id", "ro").Aggregate,
+							[]byte(`{"sub":"id","preferred_username":"username"}`),
+							"id",
+							"username",
+							"",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
+							},
 						),
 					),
 				),
@@ -807,21 +805,19 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 				idpConfigEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						eventPusherToEvents(
-							idpintent.NewSAMLSucceededEvent(
-								context.Background(),
-								&idpintent.NewAggregate("id", "ro").Aggregate,
-								[]byte(`{"sub":"id","preferred_username":"username"}`),
-								"id",
-								"username",
-								"user",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
-								},
-							),
+						idpintent.NewSAMLSucceededEvent(
+							context.Background(),
+							&idpintent.NewAggregate("id", "ro").Aggregate,
+							[]byte(`{"sub":"id","preferred_username":"username"}`),
+							"id",
+							"username",
+							"user",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
+							},
 						),
 					),
 				),
@@ -879,12 +875,10 @@ func TestCommands_RequestSAMLIDPIntent(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						eventPusherToEvents(
-							idpintent.NewSAMLRequestEvent(
-								context.Background(),
-								&idpintent.NewAggregate("id", "ro").Aggregate,
-								"request",
-							),
+						idpintent.NewSAMLRequestEvent(
+							context.Background(),
+							&idpintent.NewAggregate("id", "ro").Aggregate,
+							"request",
 						),
 					),
 				),
