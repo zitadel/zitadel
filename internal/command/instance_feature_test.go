@@ -48,7 +48,7 @@ func TestCommands_SetBooleanInstanceFeature(t *testing.T) {
 				value: true,
 			},
 			res{
-				err: errors.ThrowPreconditionFailed(nil, "FEAT-AS4k1", "Errors.Feature.InvalidType"),
+				err: errors.ThrowPreconditionFailed(nil, "FEAT-AS4k1", "Errors.Feature.InvalidValue"),
 			},
 		},
 		{
