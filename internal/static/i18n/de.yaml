@@ -505,6 +505,10 @@ Errors:
       Invalid: Token ist ungültig
       Expired: Token ist abgelaufen
     InvalidClient: Token wurde nicht für diesen Client ausgestellt
+  Feature:
+    NotExisting: Feature existiert nicht
+    TypeNotSupported: Feature Typ wird nicht unterstützt
+    InvalidValue: Ungültiger Wert für dieses Feature
 
 AggregateTypes:
   action: Action
@@ -515,6 +519,7 @@ AggregateTypes:
   user: Benutzer
   usergrant: Benutzerberechtigung
   quota: Kontingent
+  feature: Feature
 
 EventTypes:
   user:
