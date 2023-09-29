@@ -58,7 +58,11 @@ export class InstanceSettingsComponent implements OnInit, OnDestroy {
   public settingsList: SidenavSetting[] = [];
 
   private destroy$: Subject<void> = new Subject();
-  constructor(breadcrumbService: BreadcrumbService, activatedRoute: ActivatedRoute, public authService: GrpcAuthService) {
+  constructor(
+    breadcrumbService: BreadcrumbService,
+    activatedRoute: ActivatedRoute,
+    public authService: GrpcAuthService,
+  ) {
     const breadcrumbs = [
       new Breadcrumb({
         type: BreadcrumbType.INSTANCE,
