@@ -24,7 +24,11 @@ export class NotificationSMSProviderComponent {
   public SMSProviderConfigState: any = SMSProviderConfigState;
   public InfoSectionType: any = InfoSectionType;
 
-  constructor(private service: AdminService, private dialog: MatDialog, private toast: ToastService) {}
+  constructor(
+    private service: AdminService,
+    private dialog: MatDialog,
+    private toast: ToastService,
+  ) {}
 
   private fetchData(): void {
     this.smsProvidersLoading = true;

@@ -107,7 +107,7 @@ export const SMTP_PROVIDER: SidenavSetting = {
   i18nKey: 'SETTINGS.LIST.SMTP_PROVIDER',
   groupI18nKey: 'SETTINGS.GROUPS.NOTIFICATIONS',
   requiredRoles: {
-    [PolicyComponentServiceType.MGMT]: ['policy.read'],
+    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
   },
 };
 
@@ -116,7 +116,7 @@ export const SMS_PROVIDER: SidenavSetting = {
   i18nKey: 'SETTINGS.LIST.SMS_PROVIDER',
   groupI18nKey: 'SETTINGS.GROUPS.NOTIFICATIONS',
   requiredRoles: {
-    [PolicyComponentServiceType.MGMT]: ['policy.read'],
+    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
   },
 };
 

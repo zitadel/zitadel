@@ -84,7 +84,10 @@ export class InstanceSettingsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.settingsList = this.authService.isAllowedMapper(this.defaultSettingsList, (setting) => setting.requiredRoles.admin);
+    this.settingsList = this.authService.isAllowedMapper(
+      this.defaultSettingsList,
+      (setting) => setting.requiredRoles.admin || [],
+    );
   }
 
   ngOnDestroy(): void {
