@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	cache "github.com/zitadel/zitadel/internal/auth_request/repository"
@@ -51,6 +52,8 @@ type AuthRequestRepo struct {
 	ProjectProvider           projectProvider
 	ApplicationProvider       applicationProvider
 	CustomTextProvider        customTextProvider
+
+	FeatureCheck feature.Checker
 
 	IdGenerator id.Generator
 }
@@ -650,7 +653,12 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		orgID = request.UserOrgID
 	}
 	if orgID == "" {
-		orgID = authz.GetInstance(ctx).InstanceID()
+		orgID = authz.GetInstance(ctx).DefaultOrganisationID()
+		f, err := repo.FeatureCheck.CheckInstanceBooleanFeature(ctx, domain.FeatureLoginDefaultOrg)
+		logging.WithFields("authReq", request.ID).OnError(err).Warnf("could not check feature %s", domain.FeatureLoginDefaultOrg)
+		if !f.Boolean {
+			orgID = authz.GetInstance(ctx).InstanceID()
+		}
 	}
 
 	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
@@ -671,19 +679,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		return err
 	}
 	request.PrivacyPolicy = privacyPolicy
-	privateLabelingOrgID := authz.GetInstance(ctx).InstanceID()
-	if request.PrivateLabelingSetting != domain.PrivateLabelingSettingUnspecified {
-		privateLabelingOrgID = request.ApplicationResourceOwner
-	}
-	if request.PrivateLabelingSetting == domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy || request.PrivateLabelingSetting == domain.PrivateLabelingSettingUnspecified {
-		if request.UserOrgID != "" {
-			privateLabelingOrgID = request.UserOrgID
-		}
-	}
-	if request.RequestedOrgID != "" {
-		privateLabelingOrgID = request.RequestedOrgID
-	}
-	labelPolicy, err := repo.getLabelPolicy(ctx, privateLabelingOrgID)
+	labelPolicy, err := repo.getLabelPolicy(ctx, request.PrivateLabelingOrgID(orgID))
 	if err != nil {
 		return err
 	}
@@ -749,8 +745,9 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	}
 	// the user was either not found or not active
 	// so check if the loginname suffix matches a verified org domain
-	if repo.checkDomainDiscovery(ctx, request, loginName) {
-		return nil
+	ok, err := repo.checkDomainDiscovery(ctx, request, loginName)
+	if err != nil || ok {
+		return err
 	}
 	// let's once again check if the user was just inactive
 	if user != nil && user.State == int32(domain.UserStateInactive) {
@@ -782,30 +779,34 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	return errors.ThrowInternal(nil, "AUTH-asf3df", "Errors.Internal")
 }
 
-func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *domain.AuthRequest, loginName string) bool {
+func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *domain.AuthRequest, loginName string) (bool, error) {
 	// check if there's a suffix in the loginname
 	loginName = strings.TrimSpace(strings.ToLower(loginName))
 	index := strings.LastIndex(loginName, "@")
 	if index < 0 {
-		return false
+		return false, nil
 	}
 	// check if the suffix matches a verified domain
 	org, err := repo.Query.OrgByVerifiedDomain(ctx, loginName[index+1:])
 	if err != nil {
-		return false
+		return false, nil
 	}
 	// and if the login policy allows domain discovery
 	policy, err := repo.Query.LoginPolicyByID(ctx, true, org.ID, false)
 	if err != nil || !policy.AllowDomainDiscovery {
-		return false
+		return false, nil
 	}
 	// discovery was allowed, so set the org as requested org
 	// and clear all potentially existing user information and only set the loginname as hint (for registration)
+	// also ensure that the policies are read from the org
 	request.SetOrgInformation(org.ID, org.Name, org.Domain, false)
 	request.SetUserInfo("", "", "", "", "", org.ID)
+	if err = repo.fillPolicies(ctx, request); err != nil {
+		return false, err
+	}
 	request.LoginHint = loginName
 	request.Prompt = append(request.Prompt, domain.PromptCreate) // to trigger registration
-	return true
+	return true, nil
 }
 
 func (repo *AuthRequestRepo) checkLoginNameInput(ctx context.Context, request *domain.AuthRequest, loginNameInput string) (*user_view_model.UserView, error) {
