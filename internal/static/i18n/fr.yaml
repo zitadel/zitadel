@@ -487,6 +487,8 @@ Errors:
       NoChallenge: Session sans challenge WebAuthN
   Intent:
     IDPMissing: IDP manquant dans la requête
+    IDPInvalid: IDP non valide pour la demande
+    ResponseInvalid: La réponse de l'IDP n'est pas valide
     SuccessURLMissing: Success URL absent de la requête
     FailureURLMissing: Failure URL absent de la requête
     StateMissing: Paramètre d'état manquant dans la requête

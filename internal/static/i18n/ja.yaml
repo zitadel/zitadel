@@ -476,6 +476,8 @@ Errors:
       NoChallenge: WebAuthN チャレンジを使用しないセッション
   Intent:
     IDPMissing: リクエストにIDP IDが含まれていません
+    IDPInvalid: リクエストのIDPが無効
+    ResponseInvalid: IDPの回答は無効
     SuccessURLMissing: リクエストに成功時の URL がありません
     FailureURLMissing: リクエストに失敗の URL がありません
     StateMissing: リクエストに State パラメータがありません

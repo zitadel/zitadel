@@ -49,10 +49,14 @@ func TestProvider_BeginAuth(t *testing.T) {
 			provider, err := New(tt.fields.config, tt.fields.name, tt.fields.userEndpoint, tt.fields.userMapper)
 			r.NoError(err)
 
-			session, err := provider.BeginAuth(context.Background(), "testState")
+			ctx := context.Background()
+			session, err := provider.BeginAuth(ctx, "testState")
 			r.NoError(err)
 
-			a.Equal(tt.want.GetAuthURL(), session.GetAuthURL())
+			wantHeaders, wantContent := tt.want.GetAuth(ctx)
+			gotHeaders, gotContent := session.GetAuth(ctx)
+			a.Equal(wantHeaders, gotHeaders)
+			a.Equal(wantContent, gotContent)
 		})
 	}
 }

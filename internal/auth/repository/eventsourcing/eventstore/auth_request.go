@@ -193,6 +193,17 @@ func (repo *AuthRequestRepo) SaveAuthCode(ctx context.Context, id, code, userAge
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
+func (repo *AuthRequestRepo) SaveSAMLRequestID(ctx context.Context, id, requestID, userAgentID string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	request, err := repo.getAuthRequest(ctx, id, userAgentID)
+	if err != nil {
+		return err
+	}
+	request.SAMLRequestID = requestID
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
 func (repo *AuthRequestRepo) AuthRequestByCode(ctx context.Context, code string) (_ *domain.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
