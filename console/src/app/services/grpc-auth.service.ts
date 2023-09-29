@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
+import { BehaviorSubject, forkJoin, from, merge, Observable, of, Subject } from 'rxjs';
 import {
   catchError,
   distinctUntilChanged,
@@ -11,6 +11,7 @@ import {
   mergeMap,
   switchMap,
   take,
+  tap,
   timeout,
   withLatestFrom,
 } from 'rxjs/operators';
@@ -184,34 +185,31 @@ export class GrpcAuthService {
       },
     });
 
-    this.user = merge(
-      of(this.oauthService.getAccessToken()).pipe(filter((token) => (token ? true : false))),
+    console.log('init')
+    forkJoin([
+      of(this.oauthService.getAccessToken()),
       this.oauthService.events.pipe(
         filter((e) => e.type === 'token_received'),
         timeout(this.oauthService.waitForTokenInMsec || 0),
         catchError((_) => of(null)), // timeout is not an error
         map((_) => this.oauthService.getAccessToken()),
       ),
-    ).pipe(
-      take(1),
-      mergeMap(() => {
+    ]).pipe(
+      filter((token) => (token ? true : false)),
+      distinctUntilChanged(),
+      tap(console.log),
+      switchMap(() => {
+        console.log('load user')
         return from(
           this.getMyUser().then((resp) => {
-            const user = resp.user;
-            if (user) {
-              return user;
-            } else {
-              return undefined;
-            }
+            return resp.user
           }),
         );
       }),
       finalize(() => {
         this.loadPermissions();
       }),
-    );
-
-    this.user.subscribe(this.userSubject);
+    ).subscribe(this.userSubject);
 
     this.activeOrgChanged.subscribe(() => {
       this.loadPermissions();

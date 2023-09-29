@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
-import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { Observable, from, of } from 'rxjs';
+import { map, switchMap, take, tap } from 'rxjs/operators';
 
 import { GrpcAuthService } from '../services/grpc-auth.service';
 
@@ -18,13 +18,12 @@ export class UserGuard {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot,
   ): Observable<boolean> | Promise<boolean> | boolean {
-    return this.authService.user.pipe(
-      map((user) => user?.id !== route.params['id']),
-      tap((isNotMe) => {
-        if (!isNotMe) {
-          this.router.navigate(['/users', 'me']);
-        }
-      }),
-    );
+    const user = this.authService.userSubject.getValue();
+    const isMe = user?.id === route.params['id']
+    if (isMe) {
+      this.router.navigate(['/users', 'me']);
+
+    }
+    return !isMe;
   }
 }
