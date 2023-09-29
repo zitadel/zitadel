@@ -1021,8 +1021,8 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 					UserName: "",
 					RawInformation: func() *structpb.Struct {
 						s, err := structpb.NewStruct(map[string]interface{}{
-							"ID": "id",
-							"Attributes": map[string]interface{}{
+							"id": "id",
+							"attributes": map[string]interface{}{
 								"attribute1": []interface{}{"value1"},
 							},
 						})
