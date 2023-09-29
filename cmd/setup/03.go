@@ -24,6 +24,7 @@ type FirstInstance struct {
 	Org             command.InstanceOrgSetup
 	MachineKeyPath  string
 	PatPath         string
+	Features        map[domain.Feature]any
 
 	instanceSetup     command.InstanceSetup
 	userEncryptionKey *crypto.KeyConfig

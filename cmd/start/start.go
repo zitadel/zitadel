@@ -27,6 +27,7 @@ import (
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/key"
 	cmd_tls "github.com/zitadel/zitadel/cmd/tls"
+	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/api"
@@ -412,7 +413,27 @@ func startAPIs(
 	}
 	apis.RegisterHandlerOnPrefix(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), provider.AuthCallbackURL(samlProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.WithoutLimiting().Handle, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
+	l, err := login.CreateLogin(
+		config.Login,
+		commands,
+		queries,
+		authRepo,
+		store,
+		console.HandlerPrefix+"/",
+		op.AuthCallbackURL(oidcProvider),
+		provider.AuthCallbackURL(samlProvider),
+		config.ExternalSecure,
+		userAgentInterceptor,
+		op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler,
+		provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler,
+		instanceInterceptor.Handler,
+		assetsCache.Handler,
+		limitingAccessInterceptor.WithoutLimiting().Handle,
+		keys.User,
+		keys.IDPConfig,
+		keys.CSRFCookieKey,
+		feature.NewCheck(eventstore),
+	)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}

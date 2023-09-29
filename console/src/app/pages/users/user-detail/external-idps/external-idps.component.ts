@@ -35,7 +35,10 @@ export class ExternalIdpsComponent implements OnInit, OnDestroy {
     'actions',
   ];
 
-  constructor(private toast: ToastService, private dialog: MatDialog) {}
+  constructor(
+    private toast: ToastService,
+    private dialog: MatDialog,
+  ) {}
 
   ngOnInit(): void {
     this.getData(10, 0);

@@ -70,7 +70,10 @@ export class ChangesComponent implements OnInit, OnDestroy {
   );
   public changes!: ListChanges;
   private destroyed$: Subject<void> = new Subject();
-  constructor(private mgmtUserService: ManagementService, private authUserService: GrpcAuthService) {}
+  constructor(
+    private mgmtUserService: ManagementService,
+    private authUserService: GrpcAuthService,
+  ) {}
 
   ngOnInit(): void {
     this.init();
