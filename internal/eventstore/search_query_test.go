@@ -3,7 +3,6 @@ package eventstore
 import (
 	"reflect"
 	"testing"
-	"time"
 )
 
 func testSetQuery(queryFuncs ...func(*SearchQueryBuilder) *SearchQueryBuilder) func(*SearchQueryBuilder) *SearchQueryBuilder {
@@ -42,13 +41,6 @@ func testSetColumns(columns Columns) func(factory *SearchQueryBuilder) *SearchQu
 func testSetLimit(limit uint64) func(builder *SearchQueryBuilder) *SearchQueryBuilder {
 	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
 		builder = builder.Limit(limit)
-		return builder
-	}
-}
-
-func testSetCreationDateAfter(date time.Time) func(*SearchQueryBuilder) *SearchQueryBuilder {
-	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
-		builder = builder.CreationDateAfter(date)
 		return builder
 	}
 }
