@@ -54,7 +54,7 @@ func (msg *Email) GetContent() (string, error) {
 	if !isHTML(msg.Content) {
 		mime = "MIME-version: 1.0;" + lineBreak + "Content-Type: text/plain; charset=\"UTF-8\";" + lineBreak + lineBreak
 	}
-	subject := "Subject: " + msg.Subject + lineBreak
+	subject := "Subject: " + qEncodeSubject(msg.Subject) + lineBreak
 	message += subject + mime + lineBreak + msg.Content
 
 	return message, nil
@@ -66,4 +66,9 @@ func (msg *Email) GetTriggeringEvent() eventstore.Event {
 
 func isHTML(input string) bool {
 	return isHTMLRgx.MatchString(input)
+}
+
+// returns a RFC1342 "Q" encoded string to allow non-ascii characters
+func qEncodeSubject(subject string) string {
+	return "=?utf-8?q?" + subject + "?="
 }
