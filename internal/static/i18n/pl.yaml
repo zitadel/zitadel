@@ -508,6 +508,7 @@ Errors:
   Feature:
     NotExisting: Funkcja nie istnieje
     TypeNotSupported: Typ funkcji nie jest obsługiwany
+    InvalidValue: Nieprawidłowa wartość dla tej funkcji
 
 AggregateTypes:
   action: Działanie

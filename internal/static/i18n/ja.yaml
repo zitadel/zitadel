@@ -497,6 +497,7 @@ Errors:
   Feature:
     NotExisting: 機能が存在しません
     TypeNotSupported: 機能タイプはサポートされていません
+    InvalidValue: この機能には無効な値です
 
 AggregateTypes:
   action: アクション

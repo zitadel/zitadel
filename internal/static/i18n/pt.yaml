@@ -502,6 +502,7 @@ Errors:
   Feature:
     NotExisting: O recurso não existe
     TypeNotSupported: O tipo de recurso não é compatível
+    InvalidValue: Valor inválido para este recurso
 
 AggregateTypes:
   action: Ação

@@ -29,7 +29,10 @@ func (c *Check) CheckInstanceBooleanFeature(ctx context.Context, f domain.Featur
 
 func getInstanceFeature[T feature.SetEventType](ctx context.Context, f domain.Feature, filter preparation.FilterToQueryReducer) (T, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	writeModel := command.NewInstanceFeatureWriteModel[T](instanceID, f)
+	writeModel, err := command.NewInstanceFeatureWriteModel[T](instanceID, f)
+	if err != nil {
+		return writeModel.Value, err
+	}
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
 		return writeModel.Value, err

@@ -508,6 +508,7 @@ Errors:
   Feature:
     NotExisting: Функцијата не постои
     TypeNotSupported: Типот на функција не е поддржан
+    InvalidValue: Неважечка вредност за оваа функција
 
 AggregateTypes:
   action: Акција

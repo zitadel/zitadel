@@ -508,6 +508,7 @@ Errors:
   Feature:
     NotExisting: La característica no existe
     TypeNotSupported: El tipo de característica no es compatible
+    InvalidValue: Valor no válido para esta característica
 
 AggregateTypes:
   action: Acción

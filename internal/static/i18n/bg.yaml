@@ -525,6 +525,7 @@ Errors:
   Feature:
     NotExisting: Функцията не съществува
     TypeNotSupported: Типът функция не се поддържа
+    InvalidValue: Невалидна стойност за тази функция
 
 AggregateTypes:
   action: Действие

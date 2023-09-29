@@ -508,6 +508,7 @@ Errors:
   Feature:
     NotExisting: 功能不存在
     TypeNotSupported: 不支持功能类型
+    InvalidValue: 此功能的值无效
 
 AggregateTypes:
   action: 动作

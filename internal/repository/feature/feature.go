@@ -36,10 +36,19 @@ func (e *SetEvent[T]) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 
 type SetEventType interface {
 	Boolean
+	FeatureType() domain.FeatureType
+}
+
+type EventType[T SetEventType] struct {
+	eventstore.EventType
 }
 
 type Boolean struct {
 	Boolean bool
+}
+
+func (b Boolean) FeatureType() domain.FeatureType {
+	return domain.FeatureTypeBoolean
 }
 
 func NewSetEvent[T SetEventType](

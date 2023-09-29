@@ -14,9 +14,12 @@ import (
 
 func (c *Commands) SetBooleanInstanceFeature(ctx context.Context, f domain.Feature, value bool) (*domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	writeModel := NewInstanceFeatureWriteModel[feature.Boolean](instanceID, f)
+	writeModel, err := NewInstanceFeatureWriteModel[feature.Boolean](instanceID, f)
+	if err != nil {
+		return nil, err
+	}
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter,
-		prepareSetFeature[feature.Boolean](writeModel, feature.Boolean{Boolean: value}, c.idGenerator))
+		prepareSetFeature(writeModel, feature.Boolean{Boolean: value}, c.idGenerator))
 	if err != nil {
 		return nil, err
 	}

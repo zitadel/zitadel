@@ -17,6 +17,19 @@ type FeatureWriteModel[T feature.SetEventType] struct {
 	Value T
 }
 
+func NewFeatureWriteModel[T feature.SetEventType](instanceID, resourceOwner string, feature domain.Feature) (*FeatureWriteModel[T], error) {
+	wm := &FeatureWriteModel[T]{
+		WriteModel: eventstore.WriteModel{
+			InstanceID:    instanceID,
+			ResourceOwner: resourceOwner,
+		},
+		feature: feature,
+	}
+	if wm.Value.FeatureType() != feature.Type() {
+		return nil, errors.ThrowPreconditionFailed(nil, "FEAT-AS4k1", "Errors.Feature.InvalidValue")
+	}
+	return wm, nil
+}
 func (wm *FeatureWriteModel[T]) Set(ctx context.Context, value T) (event *feature.SetEvent[T], err error) {
 	if wm.Value == value {
 		return nil, nil
@@ -57,14 +70,12 @@ type InstanceFeatureWriteModel[T feature.SetEventType] struct {
 	FeatureWriteModel[T]
 }
 
-func NewInstanceFeatureWriteModel[T feature.SetEventType](instanceID string, feature domain.Feature) *InstanceFeatureWriteModel[T] {
-	return &InstanceFeatureWriteModel[T]{
-		FeatureWriteModel[T]{
-			WriteModel: eventstore.WriteModel{
-				InstanceID:    instanceID,
-				ResourceOwner: instanceID,
-			},
-			feature: feature,
-		},
+func NewInstanceFeatureWriteModel[T feature.SetEventType](instanceID string, feature domain.Feature) (*InstanceFeatureWriteModel[T], error) {
+	wm, err := NewFeatureWriteModel[T](instanceID, instanceID, feature)
+	if err != nil {
+		return nil, err
 	}
+	return &InstanceFeatureWriteModel[T]{
+		FeatureWriteModel: *wm,
+	}, nil
 }
