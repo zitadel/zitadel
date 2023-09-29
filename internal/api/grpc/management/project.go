@@ -75,8 +75,8 @@ func (s *Server) ListProjectGrantChanges(ctx context.Context, req *mgmt_pb.ListP
 		OrderDesc().
 		ResourceOwner(authz.GetCtxData(ctx).OrgID).
 		AwaitOpenTransactions().
-		AddQuery().
 		SequenceGreater(sequence).
+		AddQuery().
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(req.ProjectId).
 		EventData(map[string]interface{}{
@@ -157,8 +157,8 @@ func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjec
 		AwaitOpenTransactions().
 		OrderDesc().
 		ResourceOwner(authz.GetCtxData(ctx).OrgID).
-		AddQuery().
 		SequenceGreater(sequence).
+		AddQuery().
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(req.ProjectId).
 		Builder()

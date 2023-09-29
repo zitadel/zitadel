@@ -136,13 +136,13 @@ func (q *Queries) checkSessionNotTerminatedAfter(ctx context.Context, sessionID 
 	events, err := q.eventstore.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AwaitOpenTransactions().
 		AllowTimeTravel().
+		CreationDateAfter(creation).
 		AddQuery().
 		AggregateTypes(session.AggregateType).
 		AggregateIDs(sessionID).
 		EventTypes(
 			session.TerminateType,
 		).
-		CreationDateAfter(creation).
 		Builder())
 	if err != nil {
 		return caos_errs.ThrowPermissionDenied(err, "QUERY-SJ642", "Errors.Internal")

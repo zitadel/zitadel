@@ -13,10 +13,10 @@ func ProjectByIDQuery(id, instanceID string, latestSequence uint64) (*eventstore
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		InstanceID(instanceID).
 		AwaitOpenTransactions().
+		SequenceGreater(latestSequence).
 		AddQuery().
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(id).
-		SequenceGreater(latestSequence).
 		EventTypes(
 			project.ProjectAddedType,
 			project.ProjectChangedType,

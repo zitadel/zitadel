@@ -54,8 +54,8 @@ func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChanges
 		OrderDesc().
 		AwaitOpenTransactions().
 		ResourceOwner(authz.GetCtxData(ctx).OrgID).
-		AddQuery().
 		SequenceGreater(sequence).
+		AddQuery().
 		AggregateTypes(org.AggregateType).
 		AggregateIDs(authz.GetCtxData(ctx).OrgID).
 		Builder()

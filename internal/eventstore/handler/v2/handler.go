@@ -213,13 +213,12 @@ func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]str
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).
 		AwaitOpenTransactions().
 		AllowTimeTravel().
-		AddQuery().
 		ExcludedInstanceID("")
 	if didInitialize {
 		query = query.
 			CreationDateAfter(h.now().Add(-1 * h.handleActiveInstances))
 	}
-	return h.es.InstanceIDs(ctx, h.requeueEvery, !didInitialize, query.Builder())
+	return h.es.InstanceIDs(ctx, h.requeueEvery, !didInitialize, query)
 }
 
 type triggerConfig struct {

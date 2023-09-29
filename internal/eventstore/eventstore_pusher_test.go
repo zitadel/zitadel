@@ -474,8 +474,8 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "two events of same aggregate same resource owner",
 			args: args{
 				commands: []eventstore.Command{
-					generateCommand(eventstore.AggregateType(t.Name()), "500", func(e *testEvent) { e.Agg.ResourceOwner = "caos" }),
-					generateCommand(eventstore.AggregateType(t.Name()), "500", func(e *testEvent) { e.Agg.ResourceOwner = "caos" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "500", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "caos" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "500", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "caos" }),
 				},
 			},
 			fields: fields{
@@ -490,8 +490,8 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "two events of different aggregate same resource owner",
 			args: args{
 				commands: []eventstore.Command{
-					generateCommand(eventstore.AggregateType(t.Name()), "501", func(e *testEvent) { e.Agg.ResourceOwner = "caos" }),
-					generateCommand(eventstore.AggregateType(t.Name()), "502", func(e *testEvent) { e.Agg.ResourceOwner = "caos" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "501", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "caos" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "502", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "caos" }),
 				},
 			},
 			fields: fields{
@@ -506,8 +506,8 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "two events of different aggregate different resource owner",
 			args: args{
 				commands: []eventstore.Command{
-					generateCommand(eventstore.AggregateType(t.Name()), "503", func(e *testEvent) { e.Agg.ResourceOwner = "caos" }),
-					generateCommand(eventstore.AggregateType(t.Name()), "504", func(e *testEvent) { e.Agg.ResourceOwner = "zitadel" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "503", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "caos" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "504", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "zitadel" }),
 				},
 			},
 			fields: fields{
@@ -522,10 +522,10 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "events of different aggregate different resource owner",
 			args: args{
 				commands: []eventstore.Command{
-					generateCommand(eventstore.AggregateType(t.Name()), "505", func(e *testEvent) { e.Agg.ResourceOwner = "caos" }),
-					generateCommand(eventstore.AggregateType(t.Name()), "505", func(e *testEvent) { e.Agg.ResourceOwner = "caos" }),
-					generateCommand(eventstore.AggregateType(t.Name()), "506", func(e *testEvent) { e.Agg.ResourceOwner = "zitadel" }),
-					generateCommand(eventstore.AggregateType(t.Name()), "506", func(e *testEvent) { e.Agg.ResourceOwner = "zitadel" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "505", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "caos" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "505", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "caos" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "506", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "zitadel" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "506", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "zitadel" }),
 				},
 			},
 			fields: fields{
@@ -540,10 +540,10 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "events of different aggregate different resource owner per event",
 			args: args{
 				commands: []eventstore.Command{
-					generateCommand(eventstore.AggregateType(t.Name()), "507", func(e *testEvent) { e.Agg.ResourceOwner = "caos" }),
-					generateCommand(eventstore.AggregateType(t.Name()), "507", func(e *testEvent) { e.Agg.ResourceOwner = "ignored" }),
-					generateCommand(eventstore.AggregateType(t.Name()), "508", func(e *testEvent) { e.Agg.ResourceOwner = "zitadel" }),
-					generateCommand(eventstore.AggregateType(t.Name()), "508", func(e *testEvent) { e.Agg.ResourceOwner = "ignored" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "507", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "caos" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "507", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "ignored" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "508", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "zitadel" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "508", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "ignored" }),
 				},
 			},
 			fields: fields{
@@ -558,10 +558,10 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "events of one aggregate different resource owner per event",
 			args: args{
 				commands: []eventstore.Command{
-					generateCommand(eventstore.AggregateType(t.Name()), "509", func(e *testEvent) { e.Agg.ResourceOwner = "caos" }),
-					generateCommand(eventstore.AggregateType(t.Name()), "509", func(e *testEvent) { e.Agg.ResourceOwner = "ignored" }),
-					generateCommand(eventstore.AggregateType(t.Name()), "509", func(e *testEvent) { e.Agg.ResourceOwner = "ignored" }),
-					generateCommand(eventstore.AggregateType(t.Name()), "509", func(e *testEvent) { e.Agg.ResourceOwner = "ignored" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "509", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "caos" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "509", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "ignored" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "509", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "ignored" }),
+					generateCommand(eventstore.AggregateType(t.Name()), "509", func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "ignored" }),
 				},
 			},
 			fields: fields{

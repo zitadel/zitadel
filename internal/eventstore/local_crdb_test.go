@@ -149,7 +149,7 @@ type testEvent struct {
 }
 
 func (e *testEvent) Payload() any {
-	return e.Data
+	return e.BaseEvent.Data
 }
 
 func (e *testEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
@@ -197,7 +197,7 @@ func withTestData(data any) func(e *testEvent) {
 		if err != nil {
 			panic("marshal data failed")
 		}
-		e.Data = d
+		e.BaseEvent.Data = d
 	}
 }
 

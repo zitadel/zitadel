@@ -37,8 +37,8 @@ func newQuotaWriteModel(instanceId, resourceOwner string, unit quota.Unit) *quot
 func (wm *quotaWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
-		AddQuery().
 		InstanceID(wm.InstanceID).
+		AddQuery().
 		AggregateTypes(quota.AggregateType).
 		EventTypes(
 			quota.AddedEventType,

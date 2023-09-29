@@ -13,10 +13,10 @@ func OrgByIDQuery(id, instanceID string, latestSequence uint64) (*eventstore.Sea
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		InstanceID(instanceID).
 		AwaitOpenTransactions().
+		SequenceGreater(latestSequence).
 		AddQuery().
 		AggregateTypes(org.AggregateType).
 		AggregateIDs(id).
-		SequenceGreater(latestSequence).
 		EventTypes(
 			org.OrgAddedEventType,
 			org.OrgChangedEventType,

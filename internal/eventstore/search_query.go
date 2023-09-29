@@ -14,13 +14,16 @@ type SearchQueryBuilder struct {
 	limit                 uint64
 	desc                  bool
 	resourceOwner         string
-	instanceID            string
+	instanceID            *string
+	excludedInstanceIDs   []string
 	editorUser            string
 	queries               []*SearchQuery
 	tx                    *sql.Tx
 	allowTimeTravel       bool
 	positionAfter         float64
 	awaitOpenTransactions bool
+	creationDateAfter     time.Time
+	eventSequenceGreater  uint64
 }
 
 func (b *SearchQueryBuilder) GetColumns() Columns {
@@ -39,7 +42,7 @@ func (b *SearchQueryBuilder) GetResourceOwner() string {
 	return b.resourceOwner
 }
 
-func (b *SearchQueryBuilder) GetInstanceID() string {
+func (b *SearchQueryBuilder) GetInstanceID() *string {
 	return b.instanceID
 }
 
@@ -67,17 +70,24 @@ func (b SearchQueryBuilder) GetAwaitOpenTransactions() bool {
 	return b.awaitOpenTransactions
 }
 
+func (q SearchQueryBuilder) GetExcludedInstanceIDs() []string {
+	return q.excludedInstanceIDs
+}
+
+func (q SearchQueryBuilder) GetEventSequenceGreater() uint64 {
+	return q.eventSequenceGreater
+}
+
+func (q SearchQueryBuilder) GetCreationDateAfter() time.Time {
+	return q.creationDateAfter
+}
+
 type SearchQuery struct {
-	builder              *SearchQueryBuilder
-	aggregateTypes       []AggregateType
-	aggregateIDs         []string
-	instanceID           string
-	excludedInstanceIDs  []string
-	eventSequenceGreater uint64
-	eventSequenceLess    uint64
-	eventTypes           []EventType
-	eventData            map[string]interface{}
-	creationDateAfter    time.Time
+	builder        *SearchQueryBuilder
+	aggregateTypes []AggregateType
+	aggregateIDs   []string
+	eventTypes     []EventType
+	eventData      map[string]interface{}
 }
 
 func (q SearchQuery) GetAggregateTypes() []AggregateType {
@@ -88,32 +98,12 @@ func (q SearchQuery) GetAggregateIDs() []string {
 	return q.aggregateIDs
 }
 
-func (q SearchQuery) GetInstanceID() string {
-	return q.instanceID
-}
-
-func (q SearchQuery) GetExcludedInstanceIDs() []string {
-	return q.excludedInstanceIDs
-}
-
-func (q SearchQuery) GetEventSequenceGreater() uint64 {
-	return q.eventSequenceGreater
-}
-
-func (q SearchQuery) GetEventSequenceLess() uint64 {
-	return q.eventSequenceLess
-}
-
 func (q SearchQuery) GetEventTypes() []EventType {
 	return q.eventTypes
 }
 
 func (q SearchQuery) GetEventData() map[string]interface{} {
 	return q.eventData
-}
-
-func (q SearchQuery) GetCreationDateAfter() time.Time {
-	return q.creationDateAfter
 }
 
 // Columns defines which fields of the event are needed for the query
@@ -152,7 +142,13 @@ func (builder *SearchQueryBuilder) Matches(event Event, existingLen int) (matche
 	if builder.resourceOwner != "" && event.Aggregate().ResourceOwner != builder.resourceOwner {
 		return false
 	}
-	if event.Aggregate().InstanceID != "" && builder.instanceID != "" && event.Aggregate().InstanceID != builder.instanceID {
+	if event.Aggregate().InstanceID != "" && builder.instanceID != nil && *builder.instanceID != "" && event.Aggregate().InstanceID != *builder.instanceID {
+		return false
+	}
+	if builder.eventSequenceGreater > 0 && event.Sequence() <= builder.eventSequenceGreater {
+		return false
+	}
+	if event.Aggregate().InstanceID != "" && builder.instanceID != nil && *builder.instanceID != "" && event.Aggregate().InstanceID != *builder.instanceID {
 		return false
 	}
 
@@ -187,7 +183,7 @@ func (builder *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQu
 
 // InstanceID defines the instanceID (system) of the events
 func (builder *SearchQueryBuilder) InstanceID(instanceID string) *SearchQueryBuilder {
-	builder.instanceID = instanceID
+	builder.instanceID = &instanceID
 	return builder
 }
 
@@ -233,6 +229,24 @@ func (builder *SearchQueryBuilder) AwaitOpenTransactions() *SearchQueryBuilder {
 	return builder
 }
 
+// SequenceGreater filters for events with sequence greater the requested sequence
+func (query *SearchQueryBuilder) SequenceGreater(sequence uint64) *SearchQueryBuilder {
+	query.eventSequenceGreater = sequence
+	return query
+}
+
+// ExcludedInstanceID filters for events not having the given instanceIDs
+func (query *SearchQueryBuilder) ExcludedInstanceID(instanceIDs ...string) *SearchQueryBuilder {
+	query.excludedInstanceIDs = instanceIDs
+	return query
+}
+
+// CreationDateAfter filters for events which happened after the specified time
+func (query *SearchQueryBuilder) CreationDateAfter(time time.Time) *SearchQueryBuilder {
+	query.creationDateAfter = time
+	return query
+}
+
 // AddQuery creates a new sub query.
 // All fields in the sub query are AND-connected in the storage request.
 // Multiple sub queries are OR-connected in the storage request.
@@ -256,39 +270,9 @@ func (query *SearchQuery) AggregateTypes(types ...AggregateType) *SearchQuery {
 	return query
 }
 
-// SequenceGreater filters for events with sequence greater the requested sequence
-func (query *SearchQuery) SequenceGreater(sequence uint64) *SearchQuery {
-	query.eventSequenceGreater = sequence
-	return query
-}
-
-// SequenceLess filters for events with sequence less the requested sequence
-func (query *SearchQuery) SequenceLess(sequence uint64) *SearchQuery {
-	query.eventSequenceLess = sequence
-	return query
-}
-
 // AggregateIDs filters for events with the given aggregate id's
 func (query *SearchQuery) AggregateIDs(ids ...string) *SearchQuery {
 	query.aggregateIDs = ids
-	return query
-}
-
-// InstanceID filters for events with the given instanceID
-func (query *SearchQuery) InstanceID(instanceID string) *SearchQuery {
-	query.instanceID = instanceID
-	return query
-}
-
-// ExcludedInstanceID filters for events not having the given instanceIDs
-func (query *SearchQuery) ExcludedInstanceID(instanceIDs ...string) *SearchQuery {
-	query.excludedInstanceIDs = instanceIDs
-	return query
-}
-
-// CreationDateAfter filters for events which happened after the specified time
-func (query *SearchQuery) CreationDateAfter(time time.Time) *SearchQuery {
-	query.creationDateAfter = time
 	return query
 }
 
@@ -311,19 +295,10 @@ func (query *SearchQuery) Builder() *SearchQueryBuilder {
 }
 
 func (query *SearchQuery) matches(event Event) bool {
-	if query.eventSequenceLess > 0 && event.Sequence() >= query.eventSequenceLess {
-		return false
-	}
-	if query.eventSequenceGreater > 0 && event.Sequence() <= query.eventSequenceGreater {
-		return false
-	}
 	if ok := isAggreagteTypes(event.Aggregate(), query.aggregateTypes...); len(query.aggregateTypes) > 0 && !ok {
 		return false
 	}
 	if ok := isAggregateIDs(event.Aggregate(), query.aggregateIDs...); len(query.aggregateIDs) > 0 && !ok {
-		return false
-	}
-	if event.Aggregate().InstanceID != "" && query.instanceID != "" && event.Aggregate().InstanceID != query.instanceID {
 		return false
 	}
 	if ok := isEventTypes(event, query.eventTypes...); len(query.eventTypes) > 0 && !ok {

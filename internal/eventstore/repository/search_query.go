@@ -10,13 +10,15 @@ import (
 
 // SearchQuery defines the which and how data are queried
 type SearchQuery struct {
-	Columns               eventstore.Columns
-	Limit                 uint64
-	Desc                  bool
-	Filters               [][]*Filter
+	Columns eventstore.Columns
+
+	Queries               []*Filter
+	SubQueries            [][]*Filter
 	Tx                    *sql.Tx
 	AllowTimeTravel       bool
 	AwaitOpenTransactions bool
+	Limit                 uint64
+	Desc                  bool
 }
 
 // Filter represents all fields needed to compare a field of an event with a value
@@ -108,14 +110,25 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "builder invalid")
 	}
 
-	filters := make([][]*Filter, len(builder.GetQueries()))
+	query := &SearchQuery{
+		Columns:               builder.GetColumns(),
+		Limit:                 builder.GetLimit(),
+		Desc:                  builder.GetDesc(),
+		Tx:                    builder.GetTx(),
+		AllowTimeTravel:       builder.GetAllowTimeTravel(),
+		AwaitOpenTransactions: builder.GetAwaitOpenTransactions(),
+		Queries:               make([]*Filter, 0, 7),
+		SubQueries:            make([][]*Filter, len(builder.GetQueries())),
+	}
 
-	var builderFilters []*Filter
 	for _, f := range []func(builder *eventstore.SearchQueryBuilder) *Filter{
-		instanceIDFilterFromBuilder,
+		instanceIDFilter,
 		editorUserFilter,
 		resourceOwnerFilter,
 		positionAfterFilter,
+		eventSequenceGreaterFilter,
+		excludedInstanceIDFilter,
+		creationDateAfterFilter,
 	} {
 		filter := f(builder)
 		if filter == nil {
@@ -124,46 +137,81 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 		if err := filter.Validate(); err != nil {
 			return nil, err
 		}
-		builderFilters = append(builderFilters, filter)
+		query.Queries = append(query.Queries, filter)
 	}
 
-	for i, query := range builder.GetQueries() {
+	for i, q := range builder.GetQueries() {
 		for _, f := range []func(query *eventstore.SearchQuery) *Filter{
-			instanceIDFilterFromQuery,
 			aggregateTypeFilter,
 			aggregateIDFilter,
 			eventTypeFilter,
 			eventDataFilter,
-			eventSequenceGreaterFilter,
-			eventSequenceLessFilter,
-			excludedInstanceIDFilter,
-			creationDateAfterFilter,
 		} {
-			filter := f(query)
+			filter := f(q)
 			if filter == nil {
 				continue
 			}
 			if err := filter.Validate(); err != nil {
 				return nil, err
 			}
-			filters[i] = append(filters[i], filter)
+			query.SubQueries[i] = append(query.SubQueries[i], filter)
 		}
-		filters[i] = append(builderFilters, filters[i]...)
 	}
 
-	if len(filters) == 0 {
-		filters = append(filters, builderFilters)
-	}
+	return query, nil
+}
 
-	return &SearchQuery{
-		Columns:               builder.GetColumns(),
-		Limit:                 builder.GetLimit(),
-		Desc:                  builder.GetDesc(),
-		Filters:               filters,
-		Tx:                    builder.GetTx(),
-		AllowTimeTravel:       builder.GetAllowTimeTravel(),
-		AwaitOpenTransactions: builder.GetAwaitOpenTransactions(),
-	}, nil
+func eventSequenceGreaterFilter(builder *eventstore.SearchQueryBuilder) *Filter {
+	if builder.GetEventSequenceGreater() == 0 {
+		return nil
+	}
+	sortOrder := OperationGreater
+	if builder.GetDesc() {
+		sortOrder = OperationLess
+	}
+	return NewFilter(FieldSequence, builder.GetEventSequenceGreater(), sortOrder)
+}
+
+func excludedInstanceIDFilter(builder *eventstore.SearchQueryBuilder) *Filter {
+	if len(builder.GetExcludedInstanceIDs()) == 0 {
+		return nil
+	}
+	return NewFilter(FieldInstanceID, database.TextArray[string](builder.GetExcludedInstanceIDs()), OperationNotIn)
+}
+
+func creationDateAfterFilter(builder *eventstore.SearchQueryBuilder) *Filter {
+	if builder.GetCreationDateAfter().IsZero() {
+		return nil
+	}
+	return NewFilter(FieldCreationDate, builder.GetCreationDateAfter(), OperationGreater)
+}
+
+func resourceOwnerFilter(builder *eventstore.SearchQueryBuilder) *Filter {
+	if builder.GetResourceOwner() == "" {
+		return nil
+	}
+	return NewFilter(FieldResourceOwner, builder.GetResourceOwner(), OperationEquals)
+}
+
+func editorUserFilter(builder *eventstore.SearchQueryBuilder) *Filter {
+	if builder.GetEditorUser() == "" {
+		return nil
+	}
+	return NewFilter(FieldEditorUser, builder.GetEditorUser(), OperationEquals)
+}
+
+func instanceIDFilter(builder *eventstore.SearchQueryBuilder) *Filter {
+	if builder.GetInstanceID() == nil {
+		return nil
+	}
+	return NewFilter(FieldInstanceID, builder.GetInstanceID(), OperationEquals)
+}
+
+func positionAfterFilter(builder *eventstore.SearchQueryBuilder) *Filter {
+	if builder.GetPositionAfter() == 0 {
+		return nil
+	}
+	return NewFilter(FieldPosition, builder.GetPositionAfter(), OperationGreater)
 }
 
 func aggregateIDFilter(query *eventstore.SearchQuery) *Filter {
@@ -202,80 +250,6 @@ func aggregateTypeFilter(query *eventstore.SearchQuery) *Filter {
 		aggregateTypes[i] = aggregateType
 	}
 	return NewFilter(FieldAggregateType, aggregateTypes, OperationIn)
-}
-
-func eventSequenceGreaterFilter(query *eventstore.SearchQuery) *Filter {
-	if query.GetEventSequenceGreater() == 0 {
-		return nil
-	}
-	sortOrder := OperationGreater
-	if query.Builder().GetDesc() {
-		sortOrder = OperationLess
-	}
-	return NewFilter(FieldSequence, query.GetEventSequenceGreater(), sortOrder)
-}
-
-func eventSequenceLessFilter(query *eventstore.SearchQuery) *Filter {
-	if query.GetEventSequenceLess() == 0 {
-		return nil
-	}
-	sortOrder := OperationLess
-	if query.Builder().GetDesc() {
-		sortOrder = OperationGreater
-	}
-	return NewFilter(FieldSequence, query.GetEventSequenceLess(), sortOrder)
-}
-
-func instanceIDFilterFromQuery(query *eventstore.SearchQuery) *Filter {
-	if query.GetInstanceID() != "" {
-		return NewFilter(FieldInstanceID, query.GetInstanceID(), OperationEquals)
-	}
-	if query.Builder().GetInstanceID() != "" {
-		NewFilter(FieldInstanceID, query.Builder().GetInstanceID(), OperationEquals)
-	}
-	return nil
-}
-
-func excludedInstanceIDFilter(query *eventstore.SearchQuery) *Filter {
-	if len(query.GetExcludedInstanceIDs()) == 0 {
-		return nil
-	}
-	return NewFilter(FieldInstanceID, database.TextArray[string](query.GetExcludedInstanceIDs()), OperationNotIn)
-}
-
-func resourceOwnerFilter(builder *eventstore.SearchQueryBuilder) *Filter {
-	if builder.GetResourceOwner() == "" {
-		return nil
-	}
-	return NewFilter(FieldResourceOwner, builder.GetResourceOwner(), OperationEquals)
-}
-
-func editorUserFilter(builder *eventstore.SearchQueryBuilder) *Filter {
-	if builder.GetEditorUser() == "" {
-		return nil
-	}
-	return NewFilter(FieldEditorUser, builder.GetEditorUser(), OperationEquals)
-}
-
-func instanceIDFilterFromBuilder(builder *eventstore.SearchQueryBuilder) *Filter {
-	if builder.GetInstanceID() == "" {
-		return nil
-	}
-	return NewFilter(FieldInstanceID, builder.GetInstanceID(), OperationEquals)
-}
-
-func positionAfterFilter(query *eventstore.SearchQueryBuilder) *Filter {
-	if query.GetPositionAfter() == 0 {
-		return nil
-	}
-	return NewFilter(FieldPosition, query.GetPositionAfter(), OperationGreater)
-}
-
-func creationDateAfterFilter(query *eventstore.SearchQuery) *Filter {
-	if query.GetCreationDateAfter().IsZero() {
-		return nil
-	}
-	return NewFilter(FieldCreationDate, query.GetCreationDateAfter(), OperationGreater)
 }
 
 func eventDataFilter(query *eventstore.SearchQuery) *Filter {

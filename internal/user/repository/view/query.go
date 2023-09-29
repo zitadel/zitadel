@@ -13,10 +13,10 @@ func UserByIDQuery(id, instanceID string, sequence uint64, eventTypes []eventsto
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AwaitOpenTransactions().
 		InstanceID(instanceID).
+		SequenceGreater(sequence).
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(id).
 		EventTypes(eventTypes...).
-		SequenceGreater(sequence).
 		Builder(), nil
 }

@@ -53,7 +53,7 @@ func (m *MockRepository) ExpectInstanceIDs(hasFilters []*repository.Filter, inst
 
 	matcher := gomock.Any()
 	if len(hasFilters) > 0 {
-		matcher = &filterQueryMatcher{Filters: [][]*repository.Filter{hasFilters}}
+		matcher = &filterQueryMatcher{SubQueries: [][]*repository.Filter{hasFilters}}
 	}
 	m.MockQuerier.EXPECT().InstanceIDs(gomock.Any(), matcher).Return(instanceIDs, nil)
 	return m

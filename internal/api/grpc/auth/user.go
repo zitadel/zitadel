@@ -75,8 +75,8 @@ func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserC
 		OrderDesc().
 		AwaitOpenTransactions().
 		ResourceOwner(authz.GetCtxData(ctx).ResourceOwner).
-		AddQuery().
 		SequenceGreater(sequence).
+		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(authz.GetCtxData(ctx).UserID).
 		Builder()

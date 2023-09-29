@@ -60,7 +60,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		return err
 	}
 	query, rowScanner := prepareColumns(criteria, q.Columns, useV1)
-	where, values := prepareCondition(criteria, q, useV1)
+	where, values := prepareConditions(criteria, q, useV1)
 	if where == "" || query == "" {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
@@ -223,43 +223,67 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 	}
 }
 
-func prepareCondition(criteria querier, query *repository.SearchQuery, useV1 bool) (clause string, values []interface{}) {
-	values = make([]interface{}, 0, len(query.Filters))
-
-	if len(query.Filters) == 0 {
-		return clause, values
+func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bool) (string, []any) {
+	clauses, args := prepareQuery(criteria, query.Queries, useV1)
+	if clauses != "" && len(query.SubQueries) > 0 {
+		clauses += " AND "
 	}
-
-	clauses := make([]string, len(query.Filters))
-	for idx, filter := range query.Filters {
-		subClauses := make([]string, 0, len(filter))
-		for _, f := range filter {
-			value := f.Value
-			switch value.(type) {
-			case map[string]interface{}:
-				var err error
-				value, err = json.Marshal(value)
-				if err != nil {
-					logging.WithError(err).Warn("unable to marshal search value")
-					continue
-				}
-			}
-
-			subClauses = append(subClauses, getCondition(criteria, f, useV1))
-			if subClauses[len(subClauses)-1] == "" {
-				return "", nil
-			}
-			values = append(values, value)
+	subClauses := make([]string, len(query.SubQueries))
+	for i, filters := range query.SubQueries {
+		var subArgs []any
+		subClauses[i], subArgs = prepareQuery(criteria, filters, useV1)
+		// an error is thrown in [query]
+		if subClauses[i] == "" {
+			return "", nil
 		}
-		clauses[idx] = "( " + strings.Join(subClauses, " AND ") + " )"
+		if len(query.SubQueries) > 1 && len(subArgs) > 1 {
+			subClauses[i] = "(" + subClauses[i] + ")"
+		}
+		args = append(args, subArgs...)
+	}
+	if len(subClauses) == 1 {
+		clauses += subClauses[0]
+	} else if len(subClauses) > 1 {
+		clauses += "(" + strings.Join(subClauses, " OR ") + ")"
 	}
 
-	where := " WHERE (" + strings.Join(clauses, " OR ") + ") "
 	if query.AwaitOpenTransactions {
-		where += awaitOpenTransactions(useV1)
+		clauses += awaitOpenTransactions(useV1)
 	}
 
-	return where, values
+	if clauses == "" {
+		return "", nil
+	}
+
+	return " WHERE " + clauses, args
+}
+
+func prepareQuery(criteria querier, filters []*repository.Filter, useV1 bool) (_ string, args []any) {
+	clauses := make([]string, 0, len(filters))
+	args = make([]any, 0, len(filters))
+	for _, filter := range filters {
+		arg := filter.Value
+
+		// marshal if payload filter
+		if filter.Field == repository.FieldEventData {
+			var err error
+			arg, err = json.Marshal(arg)
+			if err != nil {
+				logging.WithError(err).Warn("unable to marshal search value")
+				continue
+			}
+
+		}
+
+		clauses = append(clauses, getCondition(criteria, filter, useV1))
+		// if mapping failed an error is thrown in [query]
+		if clauses[len(clauses)-1] == "" {
+			return "", nil
+		}
+		args = append(args, arg)
+	}
+
+	return strings.Join(clauses, " AND "), args
 }
 
 func getCondition(cond querier, filter *repository.Filter, useV1 bool) (condition string) {

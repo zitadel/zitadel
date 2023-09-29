@@ -60,12 +60,12 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 		AwaitOpenTransactions().
 		ResourceOwner(req.ResourceOwner).
 		EditorUser(req.EditorUserId).
+		CreationDateAfter(req.CreationDate.AsTime()).
+		SequenceGreater(req.Sequence).
 		AddQuery().
 		AggregateIDs(aggregateIDs...).
 		AggregateTypes(aggregateTypes...).
 		EventTypes(eventTypes...).
-		CreationDateAfter(req.CreationDate.AsTime()).
-		SequenceGreater(req.Sequence).
 		Builder()
 
 	if req.Asc {

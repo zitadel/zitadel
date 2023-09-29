@@ -6,7 +6,23 @@ import (
 	"time"
 )
 
-func testAddQuery(queryFuncs ...func(*SearchQuery) *SearchQuery) func(*SearchQueryBuilder) *SearchQueryBuilder {
+func testSetQuery(queryFuncs ...func(*SearchQueryBuilder) *SearchQueryBuilder) func(*SearchQueryBuilder) *SearchQueryBuilder {
+	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+		for _, queryFunc := range queryFuncs {
+			queryFunc(builder)
+		}
+		return builder
+	}
+}
+
+func testSetSequenceGreater(sequence uint64) func(*SearchQueryBuilder) *SearchQueryBuilder {
+	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+		builder = builder.SequenceGreater(sequence)
+		return builder
+	}
+}
+
+func testAddSubQuery(queryFuncs ...func(*SearchQuery) *SearchQuery) func(*SearchQueryBuilder) *SearchQueryBuilder {
 	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
 		query := builder.AddQuery()
 		for _, queryFunc := range queryFuncs {
@@ -30,6 +46,13 @@ func testSetLimit(limit uint64) func(builder *SearchQueryBuilder) *SearchQueryBu
 	}
 }
 
+func testSetCreationDateAfter(date time.Time) func(*SearchQueryBuilder) *SearchQueryBuilder {
+	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
+		builder = builder.CreationDateAfter(date)
+		return builder
+	}
+}
+
 func testOr(queryFuncs ...func(*SearchQuery) *SearchQuery) func(*SearchQuery) *SearchQuery {
 	return func(query *SearchQuery) *SearchQuery {
 		subQuery := query.Or()
@@ -43,20 +66,6 @@ func testOr(queryFuncs ...func(*SearchQuery) *SearchQuery) func(*SearchQuery) *S
 func testSetAggregateTypes(types ...AggregateType) func(*SearchQuery) *SearchQuery {
 	return func(query *SearchQuery) *SearchQuery {
 		query = query.AggregateTypes(types...)
-		return query
-	}
-}
-
-func testSetSequenceGreater(sequence uint64) func(*SearchQuery) *SearchQuery {
-	return func(query *SearchQuery) *SearchQuery {
-		query = query.SequenceGreater(sequence)
-		return query
-	}
-}
-
-func testSetSequenceLess(sequence uint64) func(*SearchQuery) *SearchQuery {
-	return func(query *SearchQuery) *SearchQuery {
-		query = query.SequenceLess(sequence)
 		return query
 	}
 }
@@ -79,13 +88,6 @@ func testSetResourceOwner(resourceOwner string) func(*SearchQueryBuilder) *Searc
 	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
 		builder = builder.ResourceOwner(resourceOwner)
 		return builder
-	}
-}
-
-func testSetCreationDateAfter(date time.Time) func(*SearchQuery) *SearchQuery {
-	return func(query *SearchQuery) *SearchQuery {
-		query = query.CreationDateAfter(date)
-		return query
 	}
 }
 
@@ -140,33 +142,18 @@ func TestSearchQuerybuilderSetters(t *testing.T) {
 		{
 			name: "set sequence greater",
 			args: args{
-				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testAddQuery(testSetSequenceGreater(90))},
-			},
-			res: &SearchQueryBuilder{
-				queries: []*SearchQuery{
-					{
-						eventSequenceGreater: 90,
-					},
+				setters: []func(b *SearchQueryBuilder) *SearchQueryBuilder{
+					testSetQuery(testSetSequenceGreater(90)),
 				},
 			},
-		},
-		{
-			name: "set sequence less",
-			args: args{
-				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testAddQuery(testSetSequenceLess(90))},
-			},
 			res: &SearchQueryBuilder{
-				queries: []*SearchQuery{
-					{
-						eventSequenceLess: 90,
-					},
-				},
+				eventSequenceGreater: 90,
 			},
 		},
 		{
 			name: "set aggregateIDs",
 			args: args{
-				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testAddQuery(testSetAggregateIDs("1235", "09824"))},
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testAddSubQuery(testSetAggregateIDs("1235", "09824"))},
 			},
 			res: &SearchQueryBuilder{
 				queries: []*SearchQuery{
@@ -179,7 +166,7 @@ func TestSearchQuerybuilderSetters(t *testing.T) {
 		{
 			name: "set eventTypes",
 			args: args{
-				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testAddQuery(testSetEventTypes("user.created", "user.updated"))},
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testAddSubQuery(testSetEventTypes("user.created", "user.updated"))},
 			},
 			res: &SearchQueryBuilder{
 				queries: []*SearchQuery{
@@ -201,7 +188,7 @@ func TestSearchQuerybuilderSetters(t *testing.T) {
 		{
 			name: "default search query",
 			args: args{
-				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testAddQuery(testSetAggregateTypes("user"), testSetAggregateIDs("1235", "024")), testSetSortOrder(false)},
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testAddSubQuery(testSetAggregateTypes("user"), testSetAggregateIDs("1235", "024")), testSetSortOrder(false)},
 			},
 			res: &SearchQueryBuilder{
 				desc: true,
@@ -262,12 +249,9 @@ func assertQuery(t *testing.T, i int, want, got *SearchQuery) {
 	if !reflect.DeepEqual(got.eventData, want.eventData) {
 		t.Errorf("wrong eventData in query %d : got: %v want: %v", i, got.eventData, want.eventData)
 	}
-	if got.eventSequenceLess != want.eventSequenceLess {
-		t.Errorf("wrong eventSequenceLess in query %d : got: %v want: %v", i, got.eventSequenceLess, want.eventSequenceLess)
-	}
-	if got.eventSequenceGreater != want.eventSequenceGreater {
-		t.Errorf("wrong eventSequenceGreater in query %d : got: %v want: %v", i, got.eventSequenceGreater, want.eventSequenceGreater)
-	}
+	// if got.eventSequenceGreater != want.eventSequenceGreater {
+	// 	t.Errorf("wrong eventSequenceGreater in query %d : got: %v want: %v", i, got.eventSequenceGreater, want.eventSequenceGreater)
+	// }
 	if !reflect.DeepEqual(got.eventTypes, want.eventTypes) {
 		t.Errorf("wrong eventTypes in query %d : got: %v want: %v", i, got.eventTypes, want.eventTypes)
 	}
@@ -283,22 +267,6 @@ func TestSearchQuery_matches(t *testing.T) {
 		event Event
 		want  bool
 	}{
-		{
-			name:  "sequence too low",
-			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().SequenceLess(10),
-			event: &BaseEvent{
-				Seq: 10,
-			},
-			want: false,
-		},
-		{
-			name:  "sequence too high",
-			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().SequenceGreater(60),
-			event: &BaseEvent{
-				Seq: 60,
-			},
-			want: false,
-		},
 		{
 			name:  "wrong aggregate type",
 			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().AggregateTypes("searched"),
@@ -330,8 +298,11 @@ func TestSearchQuery_matches(t *testing.T) {
 		},
 		{
 			name: "matching",
-			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().
-				SequenceLess(100).SequenceGreater(50).AggregateIDs("2").AggregateTypes("actual").EventTypes("event.actual.type"),
+			query: NewSearchQueryBuilder(ColumnsEvent).
+				AddQuery().
+				AggregateIDs("2").
+				AggregateTypes("actual").
+				EventTypes("event.actual.type"),
 			event: &BaseEvent{
 				Seq: 55,
 				Agg: &Aggregate{
@@ -359,12 +330,10 @@ func TestSearchQuery_matches(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			query := &SearchQuery{
-				aggregateTypes:       tt.query.aggregateTypes,
-				aggregateIDs:         tt.query.aggregateIDs,
-				eventSequenceGreater: tt.query.eventSequenceGreater,
-				eventSequenceLess:    tt.query.eventSequenceLess,
-				eventTypes:           tt.query.eventTypes,
-				eventData:            tt.query.eventData,
+				aggregateTypes: tt.query.aggregateTypes,
+				aggregateIDs:   tt.query.aggregateIDs,
+				eventTypes:     tt.query.eventTypes,
+				eventData:      tt.query.eventData,
 			}
 			if got := query.matches(tt.event); got != tt.want {
 				t.Errorf("SearchQuery.matches() = %v, want %v", got, tt.want)
@@ -384,6 +353,19 @@ func TestSearchQueryBuilder_Matches(t *testing.T) {
 		args    args
 		want    bool
 	}{
+		{
+			name:    "sequence too high",
+			builder: NewSearchQueryBuilder(ColumnsEvent).SequenceGreater(60),
+			args: args{
+				event: &BaseEvent{
+					Agg: &Aggregate{
+						InstanceID: "instance",
+					},
+					Seq: 60,
+				},
+			},
+			want: false,
+		},
 		{
 			name:    "limit exeeded",
 			builder: NewSearchQueryBuilder(ColumnsEvent).Limit(100),
@@ -420,11 +402,8 @@ func TestSearchQueryBuilder_Matches(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "query failed",
-			builder: NewSearchQueryBuilder(ColumnsEvent).
-				AddQuery().
-				SequenceGreater(1000).
-				Builder(),
+			name:    "query failed",
+			builder: NewSearchQueryBuilder(ColumnsEvent).SequenceGreater(1000),
 			args: args{
 				event: &BaseEvent{
 					Seq: 999,
@@ -440,9 +419,7 @@ func TestSearchQueryBuilder_Matches(t *testing.T) {
 				Limit(1000).
 				ResourceOwner("ro").
 				InstanceID("instance").
-				AddQuery().
-				SequenceGreater(1000).
-				Builder(),
+				SequenceGreater(1000),
 			args: args{
 				event: &BaseEvent{
 					Agg: &Aggregate{

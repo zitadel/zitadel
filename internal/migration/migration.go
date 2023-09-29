@@ -145,6 +145,7 @@ func checkExec(ctx context.Context, es *eventstore.Eventstore, migration Migrati
 func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migration) (should bool, err error) {
 	events, err := es.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		OrderAsc().
+		InstanceID("").
 		AddQuery().
 		AggregateTypes(aggregateType).
 		AggregateIDs(aggregateID).
