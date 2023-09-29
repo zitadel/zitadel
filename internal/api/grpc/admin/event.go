@@ -61,12 +61,15 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 		ResourceOwner(req.ResourceOwner).
 		EditorUser(req.EditorUserId).
 		CreationDateAfter(req.CreationDate.AsTime()).
-		SequenceGreater(req.Sequence).
-		AddQuery().
-		AggregateIDs(aggregateIDs...).
-		AggregateTypes(aggregateTypes...).
-		EventTypes(eventTypes...).
-		Builder()
+		SequenceGreater(req.Sequence)
+
+	if len(aggregateIDs) > 0 || len(aggregateTypes) > 0 || len(eventTypes) > 0 {
+		builder.AddQuery().
+			AggregateIDs(aggregateIDs...).
+			AggregateTypes(aggregateTypes...).
+			EventTypes(eventTypes...).
+			Builder()
+	}
 
 	if req.Asc {
 		builder.OrderAsc()

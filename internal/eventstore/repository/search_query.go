@@ -204,7 +204,7 @@ func instanceIDFilter(builder *eventstore.SearchQueryBuilder) *Filter {
 	if builder.GetInstanceID() == nil {
 		return nil
 	}
-	return NewFilter(FieldInstanceID, builder.GetInstanceID(), OperationEquals)
+	return NewFilter(FieldInstanceID, *builder.GetInstanceID(), OperationEquals)
 }
 
 func positionAfterFilter(builder *eventstore.SearchQueryBuilder) *Filter {
