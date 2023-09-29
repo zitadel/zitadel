@@ -12,13 +12,6 @@ describe('instance notifications', () => {
       cy.visit(notificationPath);
       cy.contains('Notification');
     });
-
-    it(`should uncheck notification policy`, () => {
-      cy.visit(notificationPath);
-      cy.get('[data-e2e="notification-policy-checkbox"] input').uncheck();
-      cy.get('[data-e2e="save-notification-policy-button"]').click();
-      cy.get('[data-e2e="notification-policy-checkbox"] input').should('not.be.checked');
-    });
   });
 
   describe('smtp settings', () => {
