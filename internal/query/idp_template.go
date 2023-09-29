@@ -47,6 +47,7 @@ type IDPTemplate struct {
 	*GoogleIDPTemplate
 	*LDAPIDPTemplate
 	*AppleIDPTemplate
+	*SAMLIDPTemplate
 }
 
 type IDPTemplates struct {
@@ -151,6 +152,15 @@ type AppleIDPTemplate struct {
 	KeyID      string
 	PrivateKey *crypto.CryptoValue
 	Scopes     database.TextArray[string]
+}
+
+type SAMLIDPTemplate struct {
+	IDPID             string
+	Metadata          []byte
+	Key               *crypto.CryptoValue
+	Certificate       []byte
+	Binding           string
+	WithSignedRequest bool
 }
 
 var (
@@ -653,6 +663,41 @@ var (
 	}
 )
 
+var (
+	samlIdpTemplateTable = table{
+		name:          projection.IDPTemplateSAMLTable,
+		instanceIDCol: projection.IDPTemplateInstanceIDCol,
+	}
+	SAMLIDCol = Column{
+		name:  projection.SAMLIDCol,
+		table: samlIdpTemplateTable,
+	}
+	SAMLInstanceCol = Column{
+		name:  projection.SAMLInstanceIDCol,
+		table: samlIdpTemplateTable,
+	}
+	SAMLMetadataCol = Column{
+		name:  projection.SAMLMetadataCol,
+		table: samlIdpTemplateTable,
+	}
+	SAMLKeyCol = Column{
+		name:  projection.SAMLKeyCol,
+		table: samlIdpTemplateTable,
+	}
+	SAMLCertificateCol = Column{
+		name:  projection.SAMLCertificateCol,
+		table: samlIdpTemplateTable,
+	}
+	SAMLBindingCol = Column{
+		name:  projection.SAMLBindingCol,
+		table: samlIdpTemplateTable,
+	}
+	SAMLWithSignedRequestCol = Column{
+		name:  projection.SAMLWithSignedRequestCol,
+		table: samlIdpTemplateTable,
+	}
+)
+
 // IDPTemplateByID searches for the requested id
 func (q *Queries) IDPTemplateByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, queries ...SearchQuery) (template *IDPTemplate, err error) {
 	ctx, span := tracing.NewSpan(ctx)
@@ -824,6 +869,13 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			GoogleClientIDCol.identifier(),
 			GoogleClientSecretCol.identifier(),
 			GoogleScopesCol.identifier(),
+			// saml
+			SAMLIDCol.identifier(),
+			SAMLMetadataCol.identifier(),
+			SAMLKeyCol.identifier(),
+			SAMLCertificateCol.identifier(),
+			SAMLBindingCol.identifier(),
+			SAMLWithSignedRequestCol.identifier(),
 			// ldap
 			LDAPIDCol.identifier(),
 			LDAPServersCol.identifier(),
@@ -865,6 +917,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			LeftJoin(join(GitLabIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GitLabSelfHostedIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(SAMLIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(AppleIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
@@ -930,6 +983,13 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			googleClientID := sql.NullString{}
 			googleClientSecret := new(crypto.CryptoValue)
 			googleScopes := database.TextArray[string]{}
+
+			samlID := sql.NullString{}
+			var samlMetadata []byte
+			samlKey := new(crypto.CryptoValue)
+			var samlCertificate []byte
+			samlBinding := sql.NullString{}
+			samlWithSignedRequest := sql.NullBool{}
 
 			ldapID := sql.NullString{}
 			ldapServers := database.TextArray[string]{}
@@ -1034,6 +1094,13 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&googleClientID,
 				&googleClientSecret,
 				&googleScopes,
+				// saml
+				&samlID,
+				&samlMetadata,
+				&samlKey,
+				&samlCertificate,
+				&samlBinding,
+				&samlWithSignedRequest,
 				// ldap
 				&ldapID,
 				&ldapServers,
@@ -1160,6 +1227,16 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					Scopes:       googleScopes,
 				}
 			}
+			if samlID.Valid {
+				idpTemplate.SAMLIDPTemplate = &SAMLIDPTemplate{
+					IDPID:             samlID.String,
+					Metadata:          samlMetadata,
+					Key:               samlKey,
+					Certificate:       samlCertificate,
+					Binding:           samlBinding.String,
+					WithSignedRequest: samlWithSignedRequest.Bool,
+				}
+			}
 			if ldapID.Valid {
 				idpTemplate.LDAPIDPTemplate = &LDAPIDPTemplate{
 					IDPID:             ldapID.String,
@@ -1277,6 +1354,13 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			GoogleClientIDCol.identifier(),
 			GoogleClientSecretCol.identifier(),
 			GoogleScopesCol.identifier(),
+			// saml
+			SAMLIDCol.identifier(),
+			SAMLMetadataCol.identifier(),
+			SAMLKeyCol.identifier(),
+			SAMLCertificateCol.identifier(),
+			SAMLBindingCol.identifier(),
+			SAMLWithSignedRequestCol.identifier(),
 			// ldap
 			LDAPIDCol.identifier(),
 			LDAPServersCol.identifier(),
@@ -1320,6 +1404,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			LeftJoin(join(GitLabIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GitLabSelfHostedIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(SAMLIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(AppleIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
@@ -1388,6 +1473,13 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				googleClientID := sql.NullString{}
 				googleClientSecret := new(crypto.CryptoValue)
 				googleScopes := database.TextArray[string]{}
+
+				samlID := sql.NullString{}
+				var samlMetadata []byte
+				samlKey := new(crypto.CryptoValue)
+				var samlCertificate []byte
+				samlBinding := sql.NullString{}
+				samlWithSignedRequest := sql.NullBool{}
 
 				ldapID := sql.NullString{}
 				ldapServers := database.TextArray[string]{}
@@ -1492,6 +1584,13 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&googleClientID,
 					&googleClientSecret,
 					&googleScopes,
+					// saml
+					&samlID,
+					&samlMetadata,
+					&samlKey,
+					&samlCertificate,
+					&samlBinding,
+					&samlWithSignedRequest,
 					// ldap
 					&ldapID,
 					&ldapServers,
@@ -1615,6 +1714,16 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						ClientID:     googleClientID.String,
 						ClientSecret: googleClientSecret,
 						Scopes:       googleScopes,
+					}
+				}
+				if samlID.Valid {
+					idpTemplate.SAMLIDPTemplate = &SAMLIDPTemplate{
+						IDPID:             samlID.String,
+						Metadata:          samlMetadata,
+						Key:               samlKey,
+						Certificate:       samlCertificate,
+						Binding:           samlBinding.String,
+						WithSignedRequest: samlWithSignedRequest.Bool,
 					}
 				}
 				if ldapID.Valid {

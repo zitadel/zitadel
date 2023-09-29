@@ -95,7 +95,6 @@
     "EVENTS": "Eventos",
     "FAILEDEVENTS": "Eventos com Falha",
     "ORGANIZATION": "Organização",
-    "DOMAINS": "Domínios",
     "PROJECT": "Projetos",
     "PROJECTOVERVIEW": "Visão Geral",
     "PROJECTGRANTS": "Autorizações",
@@ -954,7 +953,7 @@
     },
     "DOMAINS": {
       "NEW": "Adicionar Domínio",
-      "TITLE": "Domínios",
+      "TITLE": "Domínios verificados",
       "DESCRIPTION": "Configure seus domínios. Este domínio pode ser usado para o login dos seus usuários.",
       "SETPRIMARY": "Definir como Principal",
       "DELETE": {
@@ -1025,6 +1024,7 @@
       "NOTIFICATIONS_DESC": "Configurações de SMTP e SMS",
       "MESSAGETEXTS": "Textos de Mensagem",
       "IDP": "Provedores de Identidade",
+      "VERIFIED_DAMAINS": "Domínios verificados",
       "DOMAIN": "Configurações de Domínio",
       "LOGINTEXTS": "Textos da Interface de Login",
       "BRANDING": "Marca",

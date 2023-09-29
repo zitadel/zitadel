@@ -6,7 +6,7 @@ import (
 
 // Session is the minimal implementation for a session of a 3rd party authentication [Provider]
 type Session interface {
-	GetAuthURL() string
+	GetAuth(ctx context.Context) (content string, redirect bool)
 	FetchUser(ctx context.Context) (User, error)
 }
 
@@ -17,4 +17,12 @@ type Session interface {
 // The RetrievePreviousID will return the `sub` claim again, so that the user can be matched and safely migrated to the new id.
 type SessionSupportsMigration interface {
 	RetrievePreviousID() (previousID string, err error)
+}
+
+func Redirect(redirectURL string) (string, bool) {
+	return redirectURL, true
+}
+
+func Form(html string) (string, bool) {
+	return html, false
 }

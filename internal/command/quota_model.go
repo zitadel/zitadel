@@ -178,7 +178,7 @@ func sortSetEventNotifications(notifications []*quota.SetEventNotification) (err
 		}
 		if i.Percent < j.Percent ||
 			i.Percent == j.Percent && i.CallURL < j.CallURL ||
-			i.Percent == j.Percent && i.CallURL == j.CallURL && i.Repeat == false && j.Repeat == true {
+			i.Percent == j.Percent && i.CallURL == j.CallURL && !i.Repeat && j.Repeat {
 			return -1
 		}
 		return +1

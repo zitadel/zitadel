@@ -29,6 +29,7 @@ const (
 	IDPTemplateGoogleTable           = IDPTemplateTable + "_" + IDPTemplateGoogleSuffix
 	IDPTemplateLDAPTable             = IDPTemplateTable + "_" + IDPTemplateLDAPSuffix
 	IDPTemplateAppleTable            = IDPTemplateTable + "_" + IDPTemplateAppleSuffix
+	IDPTemplateSAMLTable             = IDPTemplateTable + "_" + IDPTemplateSAMLSuffix
 
 	IDPTemplateOAuthSuffix            = "oauth2"
 	IDPTemplateOIDCSuffix             = "oidc"
@@ -41,6 +42,7 @@ const (
 	IDPTemplateGoogleSuffix           = "google"
 	IDPTemplateLDAPSuffix             = "ldap2"
 	IDPTemplateAppleSuffix            = "apple"
+	IDPTemplateSAMLSuffix             = "saml"
 
 	IDPTemplateIDCol                = "id"
 	IDPTemplateCreationDateCol      = "creation_date"
@@ -157,6 +159,14 @@ const (
 	AppleKeyIDCol      = "key_id"
 	ApplePrivateKeyCol = "private_key"
 	AppleScopesCol     = "scopes"
+
+	SAMLIDCol                = "idp_id"
+	SAMLInstanceIDCol        = "instance_id"
+	SAMLMetadataCol          = "metadata"
+	SAMLKeyCol               = "key"
+	SAMLCertificateCol       = "certificate"
+	SAMLBindingCol           = "binding"
+	SAMLWithSignedRequestCol = "with_signed_request"
 )
 
 type idpTemplateProjection struct{}
@@ -347,6 +357,19 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			IDPTemplateAppleSuffix,
 			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(SAMLIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(SAMLInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(SAMLMetadataCol, crdb.ColumnTypeBytes),
+			crdb.NewColumn(SAMLKeyCol, crdb.ColumnTypeJSONB),
+			crdb.NewColumn(SAMLCertificateCol, crdb.ColumnTypeBytes),
+			crdb.NewColumn(SAMLBindingCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(SAMLWithSignedRequestCol, crdb.ColumnTypeBool, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(SAMLInstanceIDCol, SAMLIDCol),
+			IDPTemplateSAMLSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+		),
 	)
 }
 
@@ -474,6 +497,14 @@ func (p *idpTemplateProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.AppleIDPChangedEventType,
 					Reduce: p.reduceAppleIDPChanged,
+				},
+				{
+					Event:  instance.SAMLIDPAddedEventType,
+					Reduce: p.reduceSAMLIDPAdded,
+				},
+				{
+					Event:  instance.SAMLIDPChangedEventType,
+					Reduce: p.reduceSAMLIDPChanged,
 				},
 				{
 					Event:  instance.IDPConfigRemovedEventType,
@@ -611,6 +642,14 @@ func (p *idpTemplateProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  org.AppleIDPChangedEventType,
 					Reduce: p.reduceAppleIDPChanged,
+				},
+				{
+					Event:  org.SAMLIDPAddedEventType,
+					Reduce: p.reduceSAMLIDPAdded,
+				},
+				{
+					Event:  org.SAMLIDPChangedEventType,
+					Reduce: p.reduceSAMLIDPChanged,
 				},
 				{
 					Event:  org.IDPConfigRemovedEventType,
@@ -1899,6 +1938,97 @@ func (p *idpTemplateProjection) reduceLDAPIDPChanged(event eventstore.Event) (*h
 	), nil
 }
 
+func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.SAMLIDPAddedEvent
+	var idpOwnerType domain.IdentityProviderType
+	switch e := event.(type) {
+	case *org.SAMLIDPAddedEvent:
+		idpEvent = e.SAMLIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeOrg
+	case *instance.SAMLIDPAddedEvent:
+		idpEvent = e.SAMLIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeSystem
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPAddedEventType, instance.SAMLIDPAddedEventType})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
+				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeSAML),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+			},
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(SAMLIDCol, idpEvent.ID),
+				handler.NewCol(SAMLInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(SAMLMetadataCol, idpEvent.Metadata),
+				handler.NewCol(SAMLKeyCol, idpEvent.Key),
+				handler.NewCol(SAMLCertificateCol, idpEvent.Certificate),
+				handler.NewCol(SAMLBindingCol, idpEvent.Binding),
+				handler.NewCol(SAMLWithSignedRequestCol, idpEvent.WithSignedRequest),
+			},
+			crdb.WithTableSuffix(IDPTemplateSAMLSuffix),
+		),
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceSAMLIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.SAMLIDPChangedEvent
+	switch e := event.(type) {
+	case *org.SAMLIDPChangedEvent:
+		idpEvent = e.SAMLIDPChangedEvent
+	case *instance.SAMLIDPChangedEvent:
+		idpEvent = e.SAMLIDPChangedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-o7c0fii4ad", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPChangedEventType, instance.SAMLIDPChangedEventType})
+	}
+
+	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops = append(ops,
+		crdb.AddUpdateStatement(
+			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+	)
+
+	SAMLCols := reduceSAMLIDPChangedColumns(idpEvent)
+	if len(SAMLCols) > 0 {
+		ops = append(ops,
+			crdb.AddUpdateStatement(
+				SAMLCols,
+				[]handler.Condition{
+					handler.NewCond(SAMLIDCol, idpEvent.ID),
+					handler.NewCond(SAMLInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				},
+				crdb.WithTableSuffix(IDPTemplateSAMLSuffix),
+			),
+		)
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		ops...,
+	), nil
+}
+
 func (p *idpTemplateProjection) reduceAppleIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var idpEvent idp.AppleIDPAddedEvent
 	var idpOwnerType domain.IdentityProviderType
@@ -2068,7 +2198,7 @@ func reduceIDPChangedTemplateColumns(name *string, creationDate time.Time, seque
 }
 
 func reduceOAuthIDPChangedColumns(idpEvent idp.OAuthIDPChangedEvent) []handler.Column {
-	oauthCols := make([]handler.Column, 0, 6)
+	oauthCols := make([]handler.Column, 0, 7)
 	if idpEvent.ClientID != nil {
 		oauthCols = append(oauthCols, handler.NewCol(OAuthClientIDCol, *idpEvent.ClientID))
 	}
@@ -2094,7 +2224,7 @@ func reduceOAuthIDPChangedColumns(idpEvent idp.OAuthIDPChangedEvent) []handler.C
 }
 
 func reduceOIDCIDPChangedColumns(idpEvent idp.OIDCIDPChangedEvent) []handler.Column {
-	oidcCols := make([]handler.Column, 0, 4)
+	oidcCols := make([]handler.Column, 0, 5)
 	if idpEvent.ClientID != nil {
 		oidcCols = append(oidcCols, handler.NewCol(OIDCClientIDCol, *idpEvent.ClientID))
 	}
@@ -2233,7 +2363,7 @@ func reduceGoogleIDPChangedColumns(idpEvent idp.GoogleIDPChangedEvent) []handler
 }
 
 func reduceLDAPIDPChangedColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Column {
-	ldapCols := make([]handler.Column, 0, 4)
+	ldapCols := make([]handler.Column, 0, 22)
 	if idpEvent.Servers != nil {
 		ldapCols = append(ldapCols, handler.NewCol(LDAPServersCol, database.TextArray[string](idpEvent.Servers)))
 	}
@@ -2321,4 +2451,24 @@ func reduceAppleIDPChangedColumns(idpEvent idp.AppleIDPChangedEvent) []handler.C
 		appleCols = append(appleCols, handler.NewCol(AppleScopesCol, database.TextArray[string](idpEvent.Scopes)))
 	}
 	return appleCols
+}
+
+func reduceSAMLIDPChangedColumns(idpEvent idp.SAMLIDPChangedEvent) []handler.Column {
+	SAMLCols := make([]handler.Column, 0, 5)
+	if idpEvent.Metadata != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLMetadataCol, idpEvent.Metadata))
+	}
+	if idpEvent.Key != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLKeyCol, idpEvent.Key))
+	}
+	if idpEvent.Certificate != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLCertificateCol, idpEvent.Certificate))
+	}
+	if idpEvent.Binding != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLBindingCol, *idpEvent.Binding))
+	}
+	if idpEvent.WithSignedRequest != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLWithSignedRequestCol, *idpEvent.WithSignedRequest))
+	}
+	return SAMLCols
 }

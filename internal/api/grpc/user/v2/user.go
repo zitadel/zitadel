@@ -145,14 +145,23 @@ func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.Re
 	if err != nil {
 		return nil, err
 	}
-	authURL, err := s.command.AuthURLFromProvider(ctx, idpID, intentWriteModel.AggregateID, s.idpCallback(ctx))
+	content, redirect, err := s.command.AuthFromProvider(ctx, idpID, intentWriteModel.AggregateID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID))
 	if err != nil {
 		return nil, err
 	}
-	return &user.StartIdentityProviderIntentResponse{
-		Details:  object.DomainToDetailsPb(details),
-		NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: authURL},
-	}, nil
+	if redirect {
+		return &user.StartIdentityProviderIntentResponse{
+			Details:  object.DomainToDetailsPb(details),
+			NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: content},
+		}, nil
+	} else {
+		return &user.StartIdentityProviderIntentResponse{
+			Details: object.DomainToDetailsPb(details),
+			NextStep: &user.StartIdentityProviderIntentResponse_PostForm{
+				PostForm: []byte(content),
+			},
+		}, nil
+	}
 }
 
 func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderIntentResponse, error) {
@@ -206,7 +215,7 @@ func (s *Server) checkLinkedExternalUser(ctx context.Context, idpID, externalUse
 }
 
 func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string) (idp.User, string, map[string][]string, error) {
-	provider, err := s.command.GetProvider(ctx, idpID, "")
+	provider, err := s.command.GetProvider(ctx, idpID, "", "")
 	if err != nil {
 		return nil, "", nil, err
 	}
@@ -279,6 +288,14 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 		information.IdpInformation.Access = access
 	}
 
+	if intent.Assertion != nil {
+		assertion, err := crypto.Decrypt(intent.Assertion, alg)
+		if err != nil {
+			return nil, err
+		}
+		information.IdpInformation.Access = IDPSAMLResponseToPb(assertion)
+	}
+
 	return information, nil
 }
 
@@ -328,6 +345,14 @@ func IDPEntryAttributesToPb(entryAttributes map[string][]string) (*user.IDPInfor
 			Attributes: attributes,
 		},
 	}, nil
+}
+
+func IDPSAMLResponseToPb(assertion []byte) *user.IDPInformation_Saml {
+	return &user.IDPInformation_Saml{
+		Saml: &user.IDPSAMLAccessInformation{
+			Assertion: assertion,
+		},
+	}
 }
 
 func (s *Server) checkIntentToken(token string, intentID string) error {
