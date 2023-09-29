@@ -224,14 +224,14 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 }
 
 func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bool) (string, []any) {
-	clauses, args := prepareQuery(criteria, query.Queries, useV1)
+	clauses, args := prepareQuery(criteria, useV1, query.InstanceID, query.ExcludedInstances)
 	if clauses != "" && len(query.SubQueries) > 0 {
 		clauses += " AND "
 	}
 	subClauses := make([]string, len(query.SubQueries))
 	for i, filters := range query.SubQueries {
 		var subArgs []any
-		subClauses[i], subArgs = prepareQuery(criteria, filters, useV1)
+		subClauses[i], subArgs = prepareQuery(criteria, useV1, filters...)
 		// an error is thrown in [query]
 		if subClauses[i] == "" {
 			return "", nil
@@ -247,6 +247,15 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		clauses += "(" + strings.Join(subClauses, " OR ") + ")"
 	}
 
+	additionalClauses, additionalArgs := prepareQuery(criteria, useV1, query.Position, query.Owner, query.Sequence, query.CreatedAt, query.Creator)
+	if additionalClauses != "" {
+		if clauses != "" {
+			clauses += " AND "
+		}
+		clauses += additionalClauses
+		args = append(args, additionalArgs...)
+	}
+
 	if query.AwaitOpenTransactions {
 		clauses += awaitOpenTransactions(useV1)
 	}
@@ -258,10 +267,13 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 	return " WHERE " + clauses, args
 }
 
-func prepareQuery(criteria querier, filters []*repository.Filter, useV1 bool) (_ string, args []any) {
+func prepareQuery(criteria querier, useV1 bool, filters ...*repository.Filter) (_ string, args []any) {
 	clauses := make([]string, 0, len(filters))
 	args = make([]any, 0, len(filters))
 	for _, filter := range filters {
+		if filter == nil {
+			continue
+		}
 		arg := filter.Value
 
 		// marshal if payload filter
