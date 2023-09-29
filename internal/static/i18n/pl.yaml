@@ -487,6 +487,8 @@ Errors:
       NoChallenge: Sesja bez wyzwania WebAuthN
   Intent:
     IDPMissing: Brak identyfikatora IDP w żądaniu
+    IDPInvalid: IDP nieprawidłowe dla żądania
+    ResponseInvalid: Odpowiedź IDP jest nieprawidłowa
     SuccessURLMissing: Brak adresu URL powodzenia w żądaniu
     FailureURLMissing: Brak adresu URL niepowodzenia w żądaniu
     StateMissing: Brak parametru stanu w żądaniu
@@ -505,6 +507,10 @@ Errors:
       Invalid: Token jest nieprawidłowy
       Expired: Token wygasł
     InvalidClient: Token nie został wydany dla tego klienta
+  Feature:
+    NotExisting: Funkcja nie istnieje
+    TypeNotSupported: Typ funkcji nie jest obsługiwany
+    InvalidValue: Nieprawidłowa wartość dla tej funkcji
 
 AggregateTypes:
   action: Działanie
@@ -515,6 +521,7 @@ AggregateTypes:
   user: Użytkownik
   usergrant: Uprawnienie użytkownika
   quota: Limit
+  feature: Funkcja
 
 EventTypes:
   user:
