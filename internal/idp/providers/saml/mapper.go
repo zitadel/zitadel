@@ -12,8 +12,8 @@ var _ idp.User = (*UserMapper)(nil)
 
 // UserMapper is an implementation of [idp.User].
 type UserMapper struct {
-	ID         string
-	Attributes map[string][]string
+	ID         string              `json:"id,omitempty"`
+	Attributes map[string][]string `json:"attributes,omitempty"`
 }
 
 func NewUser() *UserMapper {
