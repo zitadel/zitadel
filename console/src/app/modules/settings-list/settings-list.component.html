@@ -18,7 +18,10 @@
   <ng-container *ngIf="currentSetting === 'login'">
     <cnsl-login-policy [serviceType]="serviceType"></cnsl-login-policy>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'domain'">
+  <ng-container *ngIf="currentSetting === 'verified_domains'">
+    <cnsl-domains></cnsl-domains>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'domain' && (['iam.policy.write'] | hasRole | async) === true">
     <cnsl-domain-policy [serviceType]="serviceType"></cnsl-domain-policy>
   </ng-container>
   <ng-container *ngIf="currentSetting === 'idp'">

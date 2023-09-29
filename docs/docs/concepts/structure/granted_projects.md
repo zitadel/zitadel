@@ -1,5 +1,6 @@
 ---
-title: Granted Projects
+title: ZITADEL's Granted Projects
+sidebar_label: Granted Projects
 ---
 
 # Granted Project

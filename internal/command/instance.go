@@ -110,7 +110,7 @@ type InstanceSetup struct {
 		RefreshTokenExpiration     time.Duration
 	}
 	Quotas *struct {
-		Items []*AddQuota
+		Items []*SetQuota
 	}
 }
 
@@ -283,10 +283,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			if err != nil {
 				return "", "", nil, nil, err
 			}
-
-			quotaAggregate := quota.NewAggregate(quotaId, instanceID, instanceID)
-
-			validations = append(validations, c.AddQuotaCommand(quotaAggregate, q))
+			validations = append(validations, c.SetQuotaCommand(quota.NewAggregate(quotaId, instanceID), nil, true, q))
 		}
 	}
 

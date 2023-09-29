@@ -95,7 +95,6 @@
     "EVENTS": "Eventos",
     "FAILEDEVENTS": "Eventos fallidos",
     "ORGANIZATION": "Organización",
-    "DOMAINS": "Dominios",
     "PROJECT": "Proyectos",
     "PROJECTOVERVIEW": "Resumen",
     "PROJECTGRANTS": "Concesiones",
@@ -496,6 +495,7 @@
       "LASTNAME": "Apellidos",
       "NICKNAME": "Apodo",
       "DISPLAYNAME": "Nombre mostrado",
+      "PREFERREDLOGINNAME": "Nombre de inicio de sesión preferido",
       "PREFERRED_LANGUAGE": "Idioma",
       "GENDER": "Género",
       "PASSWORD": "Contraseña",
@@ -796,7 +796,7 @@
     },
     "PAGES": {
       "STATE": "Estado",
-      "DOMAINLIST": "Dominios"
+      "DOMAINLIST": "Dominios personalizados"
     },
     "STATE": {
       "0": "No especificado",
@@ -953,7 +953,7 @@
     },
     "DOMAINS": {
       "NEW": "Añadir dominio",
-      "TITLE": "Dominios",
+      "TITLE": "Dominios verificados",
       "DESCRIPTION": "Configura tus dominios. Este dominio puede usarse para iniciar sesión con tus usuarios.",
       "SETPRIMARY": "Establecer como primario",
       "DELETE": {
@@ -1025,6 +1025,7 @@
       "NOTIFICATIONS_DESC": "Ajustes SMTP y SMS",
       "MESSAGETEXTS": "Mensajes de texto",
       "IDP": "Proveedores de identidad",
+      "VERIFIED_DOMAINS": "Dominios verificados",
       "DOMAIN": "Ajustes de dominio",
       "LOGINTEXTS": "Textos de interfaz de inicio de sesión",
       "BRANDING": "Imagen de marca",
@@ -1107,7 +1108,7 @@
       "INDAYS": "días"
     },
     "SECRETS": {
-      "TITLE": "Apariencia del secreto",
+      "TITLE": "Generador del secreto",
       "TYPES": "Tipos de secreto",
       "TYPE": {
         "1": "Correo de inicialización",
@@ -1119,7 +1120,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
-      "ADDGENERATOR": "Definir apariencia del secreto",
+      "ADDGENERATOR": "Configurar generador del secreto",
       "GENERATORTYPE": "Tipo",
       "EXPIRY": "Caducidad (en horas)",
       "INCLUDEDIGITS": "Incluir números",
@@ -1353,7 +1354,7 @@
       "MAXAGEDAYS": "Antigüedad máxima en días",
       "USERLOGINMUSTBEDOMAIN": "Añadir el dominio de la organización como sufijo de los nombres de inicio de sesión",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Si activas esta opción, todos los nombres de inicio de sesión tendrán como sufijo el dominio de esta organización. Si esta opción está desactivada, tendrás que asegurarte de que los nombres de usuario son únicos para todas las organizaciones.",
-      "VALIDATEORGDOMAINS": "Validar los dominios de la organización",
+      "VALIDATEORGDOMAINS": "Verificación de dominio de la organización requerida (desafío DNS o HTTP)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "La dirección del remitente SMTP coincide con el dominio de la instancia",
       "ALLOWUSERNAMEPASSWORD": "Nombre de usuario y contraseña permitido",
       "ALLOWEXTERNALIDP": "Permitido IDP externo",

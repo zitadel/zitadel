@@ -159,14 +159,6 @@ const routes: Routes = [
     },
   },
   {
-    path: 'domains',
-    loadChildren: () => import('./pages/domains/domains.module'),
-    canActivate: [AuthGuard, RoleGuard],
-    data: {
-      roles: ['org.read'],
-    },
-  },
-  {
     path: 'org-settings',
     loadChildren: () => import('./pages/org-settings/org-settings.module'),
     canActivate: [AuthGuard, RoleGuard],

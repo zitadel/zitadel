@@ -5,7 +5,6 @@
 <h2>{{ 'POLICY.DOMAIN_POLICY.TITLE' | translate }}</h2>
 <cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
 
-<!-- <ng-template cnslHasRole [hasRole]="['domain.policy.delete']"> -->
 <button
   *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
   matTooltip="{{ 'POLICY.RESET' | translate }}"
@@ -26,7 +25,6 @@
 >
   {{ 'POLICY.RESET' | translate }}
 </button>
-<!-- </ng-template> -->
 
 <div class="domain-policy-content" *ngIf="domainData">
   <div class="row">

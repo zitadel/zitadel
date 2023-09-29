@@ -1,5 +1,6 @@
 ---
-title: Domain Discovery
+title: Domain Discovery in ZITADEL
+sidebar_label: Domain Discovery
 ---
 
 This guide should explain how domain discovery works and how to configure it in ZITADEL.
@@ -87,7 +88,7 @@ Make sure to [Force MFA](/docs/guides/manage/console/instance-settings#multifact
 
 ### Verify domains
 
-Switch to the organization **Alpha** and select the tab "Domains". 
+Switch to the organization **Alpha** and navigate to the settings and "Verified domains".
 Verify the domain alpha.com following the [organization guide](/docs/guides/manage/console/organizations#domain-verification-and-primary-domain).
 
 Do the same for the **Beta** organization.
@@ -100,7 +101,7 @@ You can also disable domain verification with acme challenge in the [instance se
 
 You should be all setup to try out domain discovery.
 
-The user journeys for the different users would look as follows: 
+The user journeys for the different users would look as follows:
 
 - User (Alice, Bob, Chuck) clicks a login button in your application
 - Redirected to `login.mycompany.com` (ZITADEL running under a custom domain)

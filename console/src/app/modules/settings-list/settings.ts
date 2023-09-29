@@ -43,13 +43,22 @@ export const LOGIN: SidenavSetting = {
   },
 };
 
+export const VERIFIED_DOMAINS: SidenavSetting = {
+  id: 'verified_domains',
+  i18nKey: 'SETTINGS.LIST.VERIFIED_DOMAINS',
+  groupI18nKey: 'SETTINGS.GROUPS.DOMAIN',
+  requiredRoles: {
+    [PolicyComponentServiceType.MGMT]: ['org.read'],
+  },
+};
+
 export const DOMAIN: SidenavSetting = {
   id: 'domain',
   i18nKey: 'SETTINGS.LIST.DOMAIN',
   groupI18nKey: 'SETTINGS.GROUPS.DOMAIN',
   requiredRoles: {
-    [PolicyComponentServiceType.MGMT]: ['policy.read'],
-    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+    [PolicyComponentServiceType.MGMT]: ['iam.policy.write'],
+    [PolicyComponentServiceType.ADMIN]: ['iam.policy.write'],
   },
 };
 
