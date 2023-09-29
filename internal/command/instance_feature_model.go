@@ -14,11 +14,11 @@ type FeatureWriteModel[T feature.SetEventType] struct {
 
 	feature domain.Feature
 
-	Type T
+	Value T
 }
 
 func (wm *FeatureWriteModel[T]) Set(ctx context.Context, value T) (event *feature.SetEvent[T], err error) {
-	if wm.Type == value {
+	if wm.Value == value {
 		return nil, nil
 	}
 	return feature.NewSetEvent[T](
@@ -41,9 +41,9 @@ func (wm *FeatureWriteModel[T]) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *feature.SetEvent[T]:
-			wm.Type = e.T
+			wm.Value = e.Value
 		default:
-			return errors.ThrowInternal(nil, "FEAT-SDfjk", "Errors.Feature.TypeNotSupported")
+			return errors.ThrowPreconditionFailed(nil, "FEAT-SDfjk", "Errors.Feature.TypeNotSupported")
 		}
 	}
 	return wm.WriteModel.Reduce()

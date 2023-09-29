@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/feature"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
 func TestCommands_SetBooleanInstanceFeature(t *testing.T) {
@@ -48,6 +49,30 @@ func TestCommands_SetBooleanInstanceFeature(t *testing.T) {
 			},
 			res{
 				err: errors.ThrowPreconditionFailed(nil, "FEAT-JK3td", "Errors.Feature.NotExisting"),
+			},
+		},
+		{
+			"wrong type",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusherWithInstanceID("instanceID",
+							// as there's currently no other [feature.SetEventType] than [feature.Boolean],
+							// we need to use a completely other event type to demonstrate the behaviour
+							instance.NewInstanceAddedEvent(context.Background(), &instance.NewAggregate("instanceID").Aggregate,
+								"instance",
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx:   authz.WithInstanceID(context.Background(), "instanceID"),
+				f:     domain.FeatureLoginDefaultOrg,
+				value: true,
+			},
+			res{
+				err: errors.ThrowPreconditionFailed(nil, "FEAT-SDfjk", "Errors.Feature.TypeNotSupported"),
 			},
 		},
 		{

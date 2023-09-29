@@ -32,11 +32,11 @@ func getInstanceFeature[T feature.SetEventType](ctx context.Context, f domain.Fe
 	writeModel := command.NewInstanceFeatureWriteModel[T](instanceID, f)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
-		return writeModel.Type, err
+		return writeModel.Value, err
 	}
 	writeModel.AppendEvents(events...)
 	if err = writeModel.Reduce(); err != nil {
-		return writeModel.Type, err
+		return writeModel.Value, err
 	}
-	return writeModel.Type, nil
+	return writeModel.Value, nil
 }

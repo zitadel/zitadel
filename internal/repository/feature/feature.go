@@ -19,7 +19,7 @@ func EventTypeFromFeature(feature domain.Feature) eventstore.EventType {
 type SetEvent[T SetEventType] struct {
 	*eventstore.BaseEvent
 
-	T T
+	Value T
 }
 
 func (e *SetEvent[T]) SetBaseEvent(b *eventstore.BaseEvent) {

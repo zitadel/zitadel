@@ -898,6 +898,8 @@ message SetInstanceFeatureRequest {
   int32 feature_id = 2 [(validate.rules).int32 = {gt: 0}];
   // value based on the feature type
   oneof value {
+    option (validate.required) = true;
+
     bool bool = 3;
   }
 }
