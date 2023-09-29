@@ -13,9 +13,9 @@ import (
 
 func OriginHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		origin, err := buildOrigin(r)
-		if err != nil || !http_util.IsOrigin(origin) {
-			logging.OnError(err).Debug("failed to build origin from request")
+		origin := buildOrigin(r)
+		if !http_util.IsOrigin(origin) {
+			logging.Debugf("extracted origin is not valid: %s", origin)
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -23,32 +23,57 @@ func OriginHandler(next http.Handler) http.Handler {
 	})
 }
 
-func buildOrigin(r *http.Request) (string, error) {
+func buildOrigin(r *http.Request) string {
+	if origin, err := originFromForwardedHeader(r); err != nil {
+		logging.OnError(err).Debug("failed to build origin from forwarded header, trying x-forwarded-* headers")
+	} else {
+		return origin
+	}
+	if origin, err := originFromXForwardedHeaders(r); err != nil {
+		logging.OnError(err).Debug("failed to build origin from x-forwarded-* headers, using host header")
+	} else {
+		return origin
+	}
 	scheme := "https"
 	if r.TLS == nil {
 		scheme = "http"
 	}
-	origin := fmt.Sprintf("%s://%s", scheme, r.Host)
+	return fmt.Sprintf("%s://%s", scheme, r.Host)
+}
+
+func originFromForwardedHeader(r *http.Request) (string, error) {
 	fwd, err := httpforwarded.ParseFromRequest(r)
 	if err != nil {
-		return origin, err
+		return "", err
 	}
 	var fwdProto, fwdHost, fwdPort string
 	if fwdProto = mostRecentValue(fwd, "proto"); fwdProto == "" {
-		return origin, nil
+		return "", fmt.Errorf("no proto in forwarded header")
 	}
 	if fwdHost = mostRecentValue(fwd, "host"); fwdHost == "" {
-		return origin, nil
+		return "", fmt.Errorf("no host in forwarded header")
 	}
 	fwdPort, foundFwdFor := extractPort(mostRecentValue(fwd, "for"))
 	if !foundFwdFor {
-		return origin, nil
+		return "", fmt.Errorf("no for in forwarded header")
 	}
 	o := fmt.Sprintf("%s://%s", fwdProto, fwdHost)
 	if fwdPort != "" {
 		o += ":" + fwdPort
 	}
 	return o, nil
+}
+
+func originFromXForwardedHeaders(r *http.Request) (string, error) {
+	scheme := r.Header.Get("X-Forwarded-Proto")
+	if scheme == "" {
+		return "", fmt.Errorf("no X-Forwarded-Proto header")
+	}
+	host := r.Header.Get("X-Forwarded-Host")
+	if host == "" {
+		return "", fmt.Errorf("no X-Forwarded-Host header")
+	}
+	return fmt.Sprintf("%s://%s", scheme, host), nil
 }
 
 func extractPort(raw string) (string, bool) {
