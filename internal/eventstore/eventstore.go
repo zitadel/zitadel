@@ -85,7 +85,9 @@ func (es *Eventstore) AggregateTypes() []string {
 // and maps the events to the defined event structs
 func (es *Eventstore) Filter(ctx context.Context, queryFactory *SearchQueryBuilder) ([]Event, error) {
 	// make sure that the instance id is always set
-	queryFactory.InstanceID(authz.GetInstance(ctx).InstanceID())
+	if queryFactory.instanceID == nil {
+		queryFactory.InstanceID(authz.GetInstance(ctx).InstanceID())
+	}
 
 	events, err := es.querier.Filter(ctx, queryFactory)
 	if err != nil {
