@@ -94,6 +94,8 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, LDAPIDPChangedEventType, LDAPIDPChangedEventMapper).
 		RegisterFilterEventMapper(AggregateType, AppleIDPAddedEventType, AppleIDPAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, AppleIDPChangedEventType, AppleIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, SAMLIDPAddedEventType, SAMLIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, SAMLIDPChangedEventType, SAMLIDPChangedEventMapper).
 		RegisterFilterEventMapper(AggregateType, IDPRemovedEventType, IDPRemovedEventMapper).
 		RegisterFilterEventMapper(AggregateType, LoginPolicyIDPProviderAddedEventType, IdentityProviderAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, LoginPolicyIDPProviderRemovedEventType, IdentityProviderRemovedEventMapper).

@@ -110,6 +110,15 @@ type LDAPProvider struct {
 	IDPOptions        idp.Options
 }
 
+type SAMLProvider struct {
+	Name              string
+	Metadata          []byte
+	MetadataURL       string
+	Binding           string
+	WithSignedRequest bool
+	IDPOptions        idp.Options
+}
+
 type AppleProvider struct {
 	Name       string
 	ClientID   string
