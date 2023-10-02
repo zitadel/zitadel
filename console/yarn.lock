@@ -138,6 +138,11 @@
   resolved "https://registry.yarnpkg.com/@angular-eslint/bundled-angular-compiler/-/bundled-angular-compiler-16.1.0.tgz#59fd1ff6423b02d6fa7eeb9ea30581a839471f2c"
   integrity sha512-5EFAWXuFJADr3imo/ZYshY8s0K7U7wyysnE2LXnpT9PAi5rmkzt70UNZNRuamCbXr4tdIiu+fXWOj7tUuJKnnw==
 
+"@angular-eslint/bundled-angular-compiler@16.2.0":
+  version "16.2.0"
+  resolved "https://registry.yarnpkg.com/@angular-eslint/bundled-angular-compiler/-/bundled-angular-compiler-16.2.0.tgz#09d0637d738850a2c6f0523f19632e992f790102"
+  integrity sha512-ct9orDYxkMl2+uvM7UBfgV28Dq57V4dEs+Drh7cD673JIMa6sXbgmd0QEtm8W3cmyK/jcTzmuoufxbH7hOxd6g==
+
 "@angular-eslint/eslint-plugin-template@16.1.0":
   version "16.1.0"
   resolved "https://registry.yarnpkg.com/@angular-eslint/eslint-plugin-template/-/eslint-plugin-template-16.1.0.tgz#3d88fba2baff4debf2d332fc3d2eea53a32b4efe"
@@ -150,6 +155,18 @@
     aria-query "5.3.0"
     axobject-query "3.1.1"
 
+"@angular-eslint/eslint-plugin-template@16.2.0":
+  version "16.2.0"
+  resolved "https://registry.yarnpkg.com/@angular-eslint/eslint-plugin-template/-/eslint-plugin-template-16.2.0.tgz#5d1dd0f450020c9bc8d9cbd5fcbf173b15ff3bd3"
+  integrity sha512-YFdQ6hHX6NlQj0lfogZwfyKjU8pqkJU+Zsk0ehjlXP8VfKFVmDeQT5/Xr6Df9C8pveC3hvq6Jgd8vo67S9Enxg==
+  dependencies:
+    "@angular-eslint/bundled-angular-compiler" "16.2.0"
+    "@angular-eslint/utils" "16.2.0"
+    "@typescript-eslint/type-utils" "5.62.0"
+    "@typescript-eslint/utils" "5.62.0"
+    aria-query "5.3.0"
+    axobject-query "3.2.1"
+
 "@angular-eslint/eslint-plugin@16.1.0":
   version "16.1.0"
   resolved "https://registry.yarnpkg.com/@angular-eslint/eslint-plugin/-/eslint-plugin-16.1.0.tgz#23492eaad1d44dd90793cf0534c7177a028af226"
@@ -158,13 +175,21 @@
     "@angular-eslint/utils" "16.1.0"
     "@typescript-eslint/utils" "5.62.0"
 
-"@angular-eslint/schematics@16.1.0":
-  version "16.1.0"
-  resolved "https://registry.yarnpkg.com/@angular-eslint/schematics/-/schematics-16.1.0.tgz#ea6c7634fc781ff49217ffd0e391b3ee2c40be50"
-  integrity sha512-L1tmP3R2krHyveaRXAvn/SeDoBFNpS1VtPPrzZm1NYr1qPcAxf3NtG2nnoyVFu6WZGt59ZGHNQ/dZxnXvm0UGg==
+"@angular-eslint/eslint-plugin@16.2.0":
+  version "16.2.0"
+  resolved "https://registry.yarnpkg.com/@angular-eslint/eslint-plugin/-/eslint-plugin-16.2.0.tgz#2d61d087d208f347c9c472ecd9b0eee1fae1b21b"
+  integrity sha512-zdiAIox1T+B71HL+A8m+1jWdU34nvPGLhCRw/uZNwHzknsF4tYzNQ9W7T/SC/g/2s1yT2yNosEVNJSGSFvunJg==
   dependencies:
-    "@angular-eslint/eslint-plugin" "16.1.0"
-    "@angular-eslint/eslint-plugin-template" "16.1.0"
+    "@angular-eslint/utils" "16.2.0"
+    "@typescript-eslint/utils" "5.62.0"
+
+"@angular-eslint/schematics@16.2.0":
+  version "16.2.0"
+  resolved "https://registry.yarnpkg.com/@angular-eslint/schematics/-/schematics-16.2.0.tgz#587321a0813beede1ec7fe50413ca089bb4f6bb7"
+  integrity sha512-2JUVR7hAKx37mgWeDjvyWEMH5uSeeksYuaQT5wwlgIzgrO4BNFuqs6Rgyp2jiYa7BFMX/qHULSa+bSq5J5ceEA==
+  dependencies:
+    "@angular-eslint/eslint-plugin" "16.2.0"
+    "@angular-eslint/eslint-plugin-template" "16.2.0"
     "@nx/devkit" "16.5.1"
     ignore "5.2.4"
     nx "16.5.1"
@@ -185,6 +210,14 @@
   integrity sha512-u5XscYUq1F/7RuwyVIV2a280QL27lyQz434VYR+Np/oO21NGj5jxoRKb55xhXT9EFVs5Sy4JYeEUp6S75J/cUw==
   dependencies:
     "@angular-eslint/bundled-angular-compiler" "16.1.0"
+    "@typescript-eslint/utils" "5.62.0"
+
+"@angular-eslint/utils@16.2.0":
+  version "16.2.0"
+  resolved "https://registry.yarnpkg.com/@angular-eslint/utils/-/utils-16.2.0.tgz#8e6f0c372200049b22bca37e5537034b6f8618d2"
+  integrity sha512-NxMRwnlIgzmbJQfWkfd9y3Sz0hzjFdK5LH44i+3D5NhpPdZ6SzwHAjMYWoYsmmNQX5tlDXoicYF9Mz9Wz8DJ/A==
+  dependencies:
+    "@angular-eslint/bundled-angular-compiler" "16.2.0"
     "@typescript-eslint/utils" "5.62.0"
 
 "@angular/animations@^16.2.0":
@@ -4098,6 +4131,13 @@ axobject-query@3.1.1:
   integrity sha512-goKlv8DZrK9hUh975fnHzhNIO4jUnFCfv/dszV5VwUGDFjI6vQ2VwoyjYjYNEbBE8AH87TduWP5uyDR1D+Iteg==
   dependencies:
     deep-equal "^2.0.5"
+
+axobject-query@3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/axobject-query/-/axobject-query-3.2.1.tgz#39c378a6e3b06ca679f29138151e45b2b32da62a"
+  integrity sha512-jsyHu61e6N4Vbz/v18DHwWYKK0bSWLqn47eeDSKPB7m8tqMHF9YJ+mhIk2lVteyZrY8tnSj/jHOv4YiTCuCJgg==
+  dependencies:
+    dequal "^2.0.3"
 
 babel-loader@9.1.3:
   version "9.1.3"
