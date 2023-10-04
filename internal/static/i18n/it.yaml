@@ -487,6 +487,8 @@ Errors:
       NoChallenge: Sessione senza sfida WebAuthN
   Intent:
     IDPMissing: IDP mancante nella richiesta
+    IDPInvalid: IDP non valido per la richiesta
+    ResponseInvalid: La risposta dell'IDP non è valida
     SuccessURLMissing: URL di successo mancante nella richiesta
     FailureURLMissing: URL di errore mancante nella richiesta
     StateMissing: parametro di stato mancante nella richiesta
@@ -505,6 +507,10 @@ Errors:
       Invalid: Token non è valido
       Expired: Token è scaduto
     InvalidClient: Il token non è stato emesso per questo cliente
+  Feature:
+    NotExisting: La funzionalità non esiste
+    TypeNotSupported: Il tipo di funzionalità non è supportato
+    InvalidValue: Valore non valido per questa funzionalità
 
 AggregateTypes:
   action: Azione
@@ -515,6 +521,7 @@ AggregateTypes:
   user: Utente
   usergrant: Sovvenzione utente
   quota: Quota
+  feature: Funzionalità
 
 EventTypes:
   user:

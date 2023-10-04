@@ -95,7 +95,6 @@
     "EVENTS": "Events",
     "FAILEDEVENTS": "Failed Events",
     "ORGANIZATION": "Organization",
-    "DOMAINS": "Domains",
     "PROJECT": "Projects",
     "PROJECTOVERVIEW": "Overview",
     "PROJECTGRANTS": "Grants",
@@ -954,7 +953,7 @@
     },
     "DOMAINS": {
       "NEW": "Add Domain",
-      "TITLE": "Domains",
+      "TITLE": "Verified domains",
       "DESCRIPTION": "Configure your organization domains. This domain can be used for domain discovery and username suffixing.",
       "SETPRIMARY": "Set as Primary",
       "DELETE": {
@@ -1026,6 +1025,7 @@
       "NOTIFICATIONS_DESC": "SMTP and SMS Settings",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
+      "VERIFIED_DOMAINS": "Verified domains",
       "DOMAIN": "Domain settings",
       "LOGINTEXTS": "Login Interface Texts",
       "BRANDING": "Branding",

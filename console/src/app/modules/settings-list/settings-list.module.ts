@@ -5,6 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { CardModule } from '../card/card.module';
+import DomainsModule from '../domains/domains.module';
 import { DomainPolicyModule } from '../policies/domain-policy/domain-policy.module';
 import { GeneralSettingsModule } from '../policies/general-settings/general-settings.module';
 import { IdpSettingsModule } from '../policies/idp-settings/idp-settings.module';
@@ -42,6 +43,7 @@ import { SMTPSettingsModule } from '../policies/smtp-settings/smtp-settings.modu
     PrivacyPolicyModule,
     MessageTextsPolicyModule,
     SecurityPolicyModule,
+    DomainsModule,
     LoginTextsPolicyModule,
     DomainPolicyModule,
     TranslateModule,

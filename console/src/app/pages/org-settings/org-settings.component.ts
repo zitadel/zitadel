@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { forkJoin, of, take } from 'rxjs';
+import { Observable, of, take } from 'rxjs';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -17,6 +17,7 @@ import {
   MESSAGETEXTS,
   NOTIFICATIONS,
   PRIVACYPOLICY,
+  VERIFIED_DOMAINS,
 } from '../../modules/settings-list/settings';
 
 @Component({
@@ -34,6 +35,7 @@ export class OrgSettingsComponent implements OnInit {
     COMPLEXITY,
     LOCKOUT,
     NOTIFICATIONS,
+    VERIFIED_DOMAINS,
     DOMAIN,
     BRANDING,
     MESSAGETEXTS,
@@ -41,9 +43,13 @@ export class OrgSettingsComponent implements OnInit {
     PRIVACYPOLICY,
   ];
 
-  public settingsList: SidenavSetting[] = [];
+  public settingsList: Observable<Array<SidenavSetting>> = of([]);
 
-  constructor(breadcrumbService: BreadcrumbService, activatedRoute: ActivatedRoute, public authService: GrpcAuthService) {
+  constructor(
+    breadcrumbService: BreadcrumbService,
+    activatedRoute: ActivatedRoute,
+    public authService: GrpcAuthService,
+  ) {
     const breadcrumbs = [
       new Breadcrumb({
         type: BreadcrumbType.ORG,
@@ -61,40 +67,8 @@ export class OrgSettingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    checkSettingsPermissions(this.defaultSettingsList, PolicyComponentServiceType.MGMT, this.authService).subscribe(
-      (allowed) => {
-        this.settingsList = this.defaultSettingsList.filter((setting, index) => {
-          return allowed[index];
-        });
-      },
-    );
+    this.settingsList = this.authService
+      .isAllowedMapper(this.defaultSettingsList, (setting) => setting.requiredRoles.mgmt)
+      .pipe(take(1));
   }
-}
-
-// Return a Observables<boolean>[] that will wait till all service calls are finished to then check if user is allowed to see a setting
-export function checkSettingsPermissions(settings: SidenavSetting[], serviceType: string, authService: GrpcAuthService) {
-  return forkJoin(
-    settings
-      .filter((setting) => {
-        if (serviceType === PolicyComponentServiceType.ADMIN) {
-          return setting.requiredRoles && setting.requiredRoles.admin;
-        } else {
-          return setting.requiredRoles && setting.requiredRoles.mgmt;
-        }
-      })
-      .map((setting) => {
-        if (!setting.requiredRoles) {
-          return of(true);
-        }
-
-        if (!setting.requiredRoles.mgmt) {
-          return of(true);
-        }
-
-        if (setting.requiredRoles.mgmt) {
-          return authService.isAllowed(setting.requiredRoles.mgmt).pipe(take(1));
-        }
-        return of(false);
-      }),
-  );
 }

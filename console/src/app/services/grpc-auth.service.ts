@@ -309,15 +309,37 @@ export class GrpcAuthService {
         filter(([hL, p]) => {
           return hL === true && !!p.length;
         }),
-        map(([_, zroles]) => {
-          const what = this.hasRoles(zroles, roles, requiresAll);
-          return what;
-        }),
+        map(([_, zroles]) => this.hasRoles(zroles, roles, requiresAll)),
         distinctUntilChanged(),
       );
     } else {
       return of(false);
     }
+  }
+
+  /**
+   * filters objects based on roles
+   * @param objects array of objects
+   * @param mapper mapping function which maps to a string[] or Regexp[] of roles
+   * @param requiresAll wheter all, or just a single roles is required to fulfill
+   */
+  public isAllowedMapper<T>(
+    objects: T[],
+    mapper: (attr: any) => string[] | RegExp[],
+    requiresAll: boolean = false,
+  ): Observable<T[]> {
+    return this.fetchedZitadelPermissions.pipe(
+      withLatestFrom(this.zitadelPermissions),
+      filter(([hL, p]) => {
+        return hL === true && !!p.length;
+      }),
+      map(([_, zroles]) => {
+        return objects.filter((obj) => {
+          const roles = mapper(obj);
+          return this.hasRoles(zroles, roles, requiresAll);
+        });
+      }),
+    );
   }
 
   /**

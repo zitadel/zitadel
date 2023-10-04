@@ -14,7 +14,10 @@ import { InfoSectionType } from '../info-section/info-section.component';
 export class InfoDialogComponent {
   public confirm: string = '';
   InfoSectionType: any = InfoSectionType;
-  constructor(public dialogRef: MatDialogRef<InfoDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {}
+  constructor(
+    public dialogRef: MatDialogRef<InfoDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+  ) {}
 
   public closeDialog(): void {
     this.dialogRef.close(false);

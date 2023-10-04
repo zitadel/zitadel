@@ -21,7 +21,11 @@ export class HomeComponent {
 
   public dark: boolean = true;
 
-  constructor(public authService: GrpcAuthService, breadcrumbService: BreadcrumbService, public themeService: ThemeService) {
+  constructor(
+    public authService: GrpcAuthService,
+    breadcrumbService: BreadcrumbService,
+    public themeService: ThemeService,
+  ) {
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
       routerLink: ['/org'],

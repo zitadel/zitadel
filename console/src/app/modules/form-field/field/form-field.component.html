@@ -20,7 +20,7 @@
       </div>
       <div *ngSwitchCase="'errors'" class="cnsl-form-field-error-wrapper" [@transitionMessages]="_subscriptAnimationState">
         <span cnslError *ngFor="let err of help.validationErrors">
-          {{ err.i18nKey | translate : err.params }}
+          {{ err.i18nKey | translate: err.params }}
         </span>
         <ng-content select="cnsl-error"></ng-content>
       </div>

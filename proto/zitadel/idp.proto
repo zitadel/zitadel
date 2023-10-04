@@ -117,7 +117,6 @@ enum IDPStylingType {
 enum IDPType {
     IDP_TYPE_UNSPECIFIED = 0;
     IDP_TYPE_OIDC = 1;
-    //PLANNED: IDP_TYPE_SAML
     IDP_TYPE_JWT = 3;
 }
 
@@ -267,6 +266,14 @@ enum ProviderType {
     PROVIDER_TYPE_GITLAB_SELF_HOSTED = 9;
     PROVIDER_TYPE_GOOGLE = 10;
     PROVIDER_TYPE_APPLE = 11;
+    PROVIDER_TYPE_SAML = 12;
+}
+
+enum SAMLBinding {
+    SAML_BINDING_UNSPECIFIED = 0;
+    SAML_BINDING_POST = 1;
+    SAML_BINDING_REDIRECT = 2;
+    SAML_BINDING_ARTIFACT = 3;
 }
 
 message ProviderConfig {
@@ -283,6 +290,7 @@ message ProviderConfig {
         GitLabSelfHostedConfig gitlab_self_hosted = 10;
         AzureADConfig azure_ad = 11;
         AppleConfig apple = 12;
+        SAMLConfig saml = 13;
     }
 }
 
@@ -441,6 +449,24 @@ message LDAPConfig {
     repeated string user_filters = 7;
     google.protobuf.Duration timeout = 8;
     LDAPAttributes attributes = 9;
+}
+
+message SAMLConfig {
+    bytes metadata_xml = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Metadata of the SAML identity provider";
+        }
+    ];
+    zitadel.idp.v1.SAMLBinding binding = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Binding which defines the type of communication with the identity provider";
+        }
+    ];
+    bool with_signed_request = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Boolean which defines if the authentication requests are signed";
+        }
+    ];
 }
 
 message AzureADConfig {

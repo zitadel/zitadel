@@ -8,7 +8,10 @@ import { ExhaustedService } from '../exhausted.service';
  */
 @Injectable({ providedIn: 'root' })
 export class ExhaustedGrpcInterceptor<TReq = unknown, TResp = unknown> implements UnaryInterceptor<TReq, TResp> {
-  constructor(private exhaustedSvc: ExhaustedService, private envSvc: EnvironmentService) {}
+  constructor(
+    private exhaustedSvc: ExhaustedService,
+    private envSvc: EnvironmentService,
+  ) {}
 
   public async intercept(
     request: Request<TReq, TResp>,
