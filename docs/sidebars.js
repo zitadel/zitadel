@@ -335,7 +335,7 @@ module.exports = {
             {
               type: 'link',
               label: 'Argo CD',
-              href: 'https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/zitadel/',
+              href: 'https://argo-cd.readthedocs.io/en/latest/operator-manual/user-management/zitadel/',
             },
             "guides/integrate/authenticated-mongodb-charts",
             "examples/identity-proxy/oauth2-proxy"
