@@ -288,11 +288,6 @@ module.exports = {
             },
             {
               type: 'link',
-              label: 'Nextcloud',
-              href: 'https://zitadel.com/blog/zitadel-as-sso-provider-for-selfhosting',
-            },
-            {
-              type: 'link',
               label: 'Bold BI (boldbi.com)',
               href: 'https://support.boldbi.com/kb/article/13708/how-to-configure-zitadel-oauth-login-in-bold-bi',
             },
@@ -315,6 +310,11 @@ module.exports = {
               type: 'link',
               label: 'Netbird (netbird.io)',
               href: 'https://docs.netbird.io/selfhosted/identity-providers',
+            },
+            {
+              type: 'link',
+              label: 'Psono (psono.com)',
+              href: 'https://doc.psono.com/admin/configuration/oidc-zitadel.html',
             },
             {
               type: 'link',
