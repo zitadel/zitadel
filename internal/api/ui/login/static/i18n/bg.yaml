@@ -25,7 +25,7 @@ SelectAccount:
   DescriptionLinking: 'Изберете своя акаунт, който да свържете с вашия външен потребител.'
   OtherUser: Друг потребител
   SessionState0: активен
-  SessionState1: неактивен
+  SessionState1: Не сте в профила си
   MustBeMemberOfOrg: 'Потребителят трябва да е член на {{.OrgName}} организация.'
 Password:
   Title: Парола
@@ -415,7 +415,7 @@ Errors:
       InvalidAndLocked: >-
         Паролата е невалидна и потребителят е заключен, свържете се с вашия
         администратор.
-      NotChanged: Паролата не е променена
+      NotChanged: Новата парола не може да съвпада с текущата парола
     UsernameOrPassword:
       Invalid: Потребителското име или паролата са невалидни
     PasswordComplexityPolicy:

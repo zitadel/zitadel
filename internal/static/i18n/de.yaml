@@ -120,7 +120,7 @@ Errors:
       Empty: Passwort ist leer
       Invalid: Passwort ungültig
       NotSet: Benutzer hat kein Passwort gesetzt
-      NotChanged: Passwort nicht geändert
+      NotChanged: Das neue Passwort darf nicht mit deinem aktuellen Passwort übereinstimmen
       NotSupported: Passwort-Hash-Kodierung wird nicht unterstützt
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
@@ -487,6 +487,8 @@ Errors:
       NoChallenge: Sitzung ohne WebAuthN-Challenge
   Intent:
     IDPMissing: IDP ID fehlt im Request
+    IDPInvalid: IDP ungültig für die Anfrage
+    ResponseInvalid: IDP-Antwort ist ungültig
     SuccessURLMissing: Success URL fehlt im Request
     FailureURLMissing: Failure URL fehlt im Request
     StateMissing: State parameter fehlt im Request
@@ -505,6 +507,10 @@ Errors:
       Invalid: Token ist ungültig
       Expired: Token ist abgelaufen
     InvalidClient: Token wurde nicht für diesen Client ausgestellt
+  Feature:
+    NotExisting: Feature existiert nicht
+    TypeNotSupported: Feature Typ wird nicht unterstützt
+    InvalidValue: Ungültiger Wert für dieses Feature
 
 AggregateTypes:
   action: Action
@@ -515,6 +521,7 @@ AggregateTypes:
   user: Benutzer
   usergrant: Benutzerberechtigung
   quota: Kontingent
+  feature: Feature
 
 EventTypes:
   user:

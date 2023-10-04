@@ -1,5 +1,6 @@
 ---
-title: Audit Trail
+title: ZITADEL's In-built Audit Trail
+sidebar_label: Audit Trail
 ---
 
 ZITADEL provides you with an built-in audit trail to track all changes and events over an unlimited period of time.
@@ -26,7 +27,7 @@ The same view is available on several other objects such as organization or proj
 ### Event View
 
 Administrators can see all events across an instance and filter them directly in [Console](/docs/guides/manage/console/overview).
-Go to your instance settings and then click on the Tab **Events** to open the Event Viewer or browse to $YOUR_DOMAIN/ui/console/events  
+Go to your instance settings and then click on the Tab **Events** to open the Event Viewer or browse to $CUSTOM-DOMAIN/ui/console/events  
 
 ![Event viewer](/img/concepts/audit-trail/event-viewer.png)
 

@@ -146,7 +146,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     consumes: "application/grpc-web+proto";
     produces: "application/grpc-web+proto";
 
-    host: "$ZITADEL_DOMAIN";
+    host: "$CUSTOM-DOMAIN";
     base_path: "/management/v1";
 
     external_docs: {
@@ -166,8 +166,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             value: {
                 type: TYPE_OAUTH2;
                 flow: FLOW_ACCESS_CODE;
-                authorization_url: "$ZITADEL_DOMAIN/oauth/v2/authorize";
-                token_url: "$ZITADEL_DOMAIN/oauth/v2/token";
+                authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+                token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
                 scopes: {
                     scope: {
                         key: "openid";
@@ -7094,6 +7094,60 @@ service ManagementService {
         };
     }
 
+    // Add a new SAML identity provider in the organization
+    rpc AddSAMLProvider(AddSAMLProviderRequest) returns (AddSAMLProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/saml"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add SAML Identity Provider";
+            description: "";
+        };
+    }
+
+    // Change an existing SAML identity provider in the organization
+    rpc UpdateSAMLProvider(UpdateSAMLProviderRequest) returns (UpdateSAMLProviderResponse) {
+        option (google.api.http) = {
+            put: "/idps/saml/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update SAML Identity Provider";
+            description: "";
+        };
+    }
+
+    // Regenerate certificate for an existing SAML identity provider in the organization
+    rpc RegenerateSAMLProviderCertificate(RegenerateSAMLProviderCertificateRequest) returns (RegenerateSAMLProviderCertificateResponse) {
+        option (google.api.http) = {
+            post: "/idps/saml/{id}/_generate_certificate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Regenerate SAML Identity Provider Certificate";
+            description: "";
+        };
+    }
+
     // Remove an identity provider
     // Will remove all linked providers of this configuration on the users
     rpc DeleteProvider(DeleteProviderRequest) returns (DeleteProviderResponse) {
@@ -8006,6 +8060,7 @@ message UpdateHumanProfileRequest {
     ];
     string display_name = 5 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             min_length: 1;
             max_length: 200;
@@ -12484,6 +12539,86 @@ message UpdateLDAPProviderResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message AddSAMLProviderRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    oneof metadata {
+        option (validate.required) = true;
+        bytes metadata_xml = 2 [
+            (validate.rules).bytes.max_len = 500000,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "Metadata of the SAML identity provider";
+            }
+        ];
+        string metadata_url = 3 [
+            (validate.rules).string.max_len = 200,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"https://test.com/saml/metadata\""
+                description: "Url to the metadata of the SAML identity provider";
+            }
+        ];
+    }
+    zitadel.idp.v1.SAMLBinding binding = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Binding which defines the type of communication with the identity provider";
+        }
+    ];
+    bool with_signed_request = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Boolean which defines if the authentication requests are signed";
+        }
+    ];
+    zitadel.idp.v1.Options provider_options = 6;
+}
+
+message AddSAMLProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateSAMLProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    oneof metadata {
+        option (validate.required) = true;
+        bytes metadata_xml = 3 [
+            (validate.rules).bytes.max_len = 500000,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "Metadata of the SAML identity provider";
+            }
+        ];
+        string metadata_url = 4 [
+            (validate.rules).string.max_len = 200,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"https://test.com/saml/metadata\""
+                description: "Url to the metadata of the SAML identity provider";
+            }
+        ];
+    }
+    zitadel.idp.v1.SAMLBinding binding = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Binding which defines the type of communication with the identity provider";
+        }
+    ];
+    bool with_signed_request = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Boolean which defines if the authentication requests are signed";
+        }
+    ];
+    zitadel.idp.v1.Options provider_options = 7;
+}
+
+message UpdateSAMLProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RegenerateSAMLProviderCertificateRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RegenerateSAMLProviderCertificateResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message AddAppleProviderRequest {
     // Apple will be used as default, if no name is provided
     string name = 1 [
@@ -12656,13 +12791,13 @@ message CreateActionRequest {
         }
     ];
     string script = 2 [
-        (validate.rules).string = {min_len: 1, max_len: 2000},
+        (validate.rules).string = {min_len: 1, max_bytes: 40000},
         (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"function log(context, calls){console.log(context)}\"";
             description: "Javascript code that should be executed"
             min_length: 1;
-            max_length: 2000;
+            max_length: 10000;
         }
     ];
     google.protobuf.Duration timeout = 3 [
@@ -12705,9 +12840,12 @@ message UpdateActionRequest {
         }
     ];
     string script = 3 [
-        (validate.rules).string = {min_len: 1, max_len: 2000},
+        (validate.rules).string = {min_len: 1, max_bytes: 40000},
          (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
              example: "\"function log(context, calls){console.log(context)}\"";
+             description: "Javascript code that should be executed"
+             min_length: 1;
+             max_length: 10000;
          }
     ];
     google.protobuf.Duration timeout = 4 [

@@ -1,5 +1,5 @@
 ---
-title: Connect with Gitlab through SAML 2.0 
+title: Log in with ZITADEL on Gitlab through SAML 2.0 
 sidebar_label: Gitlab
 ---
 
@@ -51,7 +51,7 @@ Check your application, if everything is correct, press "Create".
 
 Complete the configuration as follows:
 
-- `Identity provider single sign-on URL`: {your_instance_domain}/saml/v2/SSO
+- `Identity provider single sign-on URL`: $CUSTOM-DOMAIN/saml/v2/SSO
 - `Certificate fingerprint`: You need to download the certificate from {your_instance_domain}/saml/v2/certificate and create a SHA1 fingerprint
 
 Save the changes.

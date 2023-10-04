@@ -95,7 +95,6 @@
     "EVENTS": "Eventos",
     "FAILEDEVENTS": "Eventos com Falha",
     "ORGANIZATION": "Organização",
-    "DOMAINS": "Domínios",
     "PROJECT": "Projetos",
     "PROJECTOVERVIEW": "Visão Geral",
     "PROJECTGRANTS": "Autorizações",
@@ -496,6 +495,7 @@
       "LASTNAME": "Sobrenome",
       "NICKNAME": "Apelido",
       "DISPLAYNAME": "Nome de Exibição",
+      "PREFERREDLOGINNAME": "Nome de login preferido",
       "PREFERRED_LANGUAGE": "Idioma",
       "GENDER": "Gênero",
       "SENHA": "Senha",
@@ -743,6 +743,10 @@
     "TIMEOUT": "Tempo Limite",
     "TIMEOUTINSEC": "Tempo Limite em segundos",
     "ALLOWEDTOFAIL": "Permitido Falhar",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Aviso",
+      "DESCRIPTION": "Se você desabilitar esta configuração, pode fazer com que os usuários da sua organização não possam fazer login. Além disso, você não poderá mais acessar a console para desabilitar a ação. Recomendamos criar um usuário administrador em uma organização separada ou testar scripts primeiro em um ambiente de desenvolvimento ou uma organização de desenvolvimento."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Tipo de Fluxo",
     "TRIGGERTYPE": "Tipo de Gatilho",
@@ -792,7 +796,7 @@
     },
     "PAGES": {
       "STATE": "Status",
-      "DOMAINLIST": "Domínios"
+      "DOMAINLIST": "Domínios personalizados"
     },
     "STATE": {
       "0": "Não especificado",
@@ -949,7 +953,7 @@
     },
     "DOMAINS": {
       "NEW": "Adicionar Domínio",
-      "TITLE": "Domínios",
+      "TITLE": "Domínios verificados",
       "DESCRIPTION": "Configure seus domínios. Este domínio pode ser usado para o login dos seus usuários.",
       "SETPRIMARY": "Definir como Principal",
       "DELETE": {
@@ -1020,6 +1024,7 @@
       "NOTIFICATIONS_DESC": "Configurações de SMTP e SMS",
       "MESSAGETEXTS": "Textos de Mensagem",
       "IDP": "Provedores de Identidade",
+      "VERIFIED_DAMAINS": "Domínios verificados",
       "DOMAIN": "Configurações de Domínio",
       "LOGINTEXTS": "Textos da Interface de Login",
       "BRANDING": "Marca",
@@ -1348,7 +1353,7 @@
       "MAXAGEDAYS": "Idade máxima em dias",
       "USERLOGINMUSTBEDOMAIN": "Adicionar domínio da organização como sufixo aos nomes de login",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Se você habilitar essa configuração, todos os nomes de login serão sufixados com o domínio da organização. Se essa configuração estiver desabilitada, você deve garantir que os nomes de usuário sejam exclusivos em todas as organizações.",
-      "VALIDATEORGDOMAINS": "Validar domínios da organização",
+      "VALIDATEORGDOMAINS": "Verificação de domínio da organização necessária (desafio DNS ou HTTP)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "O endereço do remetente do SMTP corresponde ao domínio da Instância",
       "ALLOWUSERNAMEPASSWORD": "Permitir usuário e senha",
       "ALLOWEXTERNALIDP": "Permitir provedor de ID externo",

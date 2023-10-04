@@ -41,7 +41,7 @@ You will need to craft a POST request to ZITADEL's token endpoint:
 
 ```bash
 curl --request POST \
-  --url https://{your_domain}.zitadel.cloud/oauth/v2/token \
+  --url https://$CUSTOM-DOMAIN/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header 'Authorization: Basic ${BASIC_AUTH}' \
   --data grant_type=client_credentials \
@@ -72,7 +72,7 @@ In this example we read the organization of the service user.
 
 ```bash
 curl --request GET \
-  --url {your-domain}/management/v1/orgs/me \
+  --url $CUSTOM-DOMAIN/management/v1/orgs/me \
   --header 'Authorization: Bearer ${TOKEN}' 
 ```
 

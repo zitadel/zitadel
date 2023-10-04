@@ -3,15 +3,15 @@ syntax = "proto3";
 
 package zitadel.org.v2beta;
 
-import "zitadel/object/v2alpha/object.proto";
+import "zitadel/object/v2beta/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
-import "zitadel/user/v2alpha/auth.proto";
-import "zitadel/user/v2alpha/email.proto";
-import "zitadel/user/v2alpha/phone.proto";
-import "zitadel/user/v2alpha/idp.proto";
-import "zitadel/user/v2alpha/password.proto";
-import "zitadel/user/v2alpha/user.proto";
-import "zitadel/user/v2alpha/user_service.proto";
+import "zitadel/user/v2beta/auth.proto";
+import "zitadel/user/v2beta/email.proto";
+import "zitadel/user/v2beta/phone.proto";
+import "zitadel/user/v2beta/idp.proto";
+import "zitadel/user/v2beta/password.proto";
+import "zitadel/user/v2beta/user.proto";
+import "zitadel/user/v2beta/user_service.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/duration.proto";
@@ -24,7 +24,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/org/v2beta;org";
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "User Service";
-    version: "2.0-alpha";
+    version: "2.0-beta";
     description: "This API is intended to manage organizations in a ZITADEL instance. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
     contact:{
       name: "ZITADEL"
@@ -48,7 +48,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$ZITADEL_DOMAIN";
+  host: "$CUSTOM-DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -61,8 +61,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$ZITADEL_DOMAIN/oauth/v2/authorize";
-        token_url: "$ZITADEL_DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -144,7 +144,7 @@ message AddOrganizationRequest{
   message Admin {
     oneof user_type{
       string user_id = 1;
-      zitadel.user.v2alpha.AddHumanUserRequest human = 2;
+      zitadel.user.v2beta.AddHumanUserRequest human = 2;
     }
     // specify Org Member Roles for the provided user (default is ORG_OWNER if roles are empty)
     repeated string roles = 3;
@@ -168,7 +168,7 @@ message AddOrganizationResponse{
     optional string email_code = 2;
     optional string phone_code = 3;
   }
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   string organization_id = 2;
   repeated CreatedAdmin created_admins = 3;
 }

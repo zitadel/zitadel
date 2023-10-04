@@ -25,7 +25,7 @@ SelectAccount:
   DescriptionLinking: Wähle dein Konto, um dieses mit deinem externen Benutzerkonto zu verbinden.
   OtherUser: Anderer Benutzer
   SessionState0: aktiv
-  SessionState1: inaktiv
+  SessionState1: Abgemeldet
   MustBeMemberOfOrg: Der Benutzer muss der Organisation {{.OrgName}} angehören.
 
 Password:
@@ -425,7 +425,7 @@ Errors:
       Empty: Passwort ist leer
       Invalid: Passwort ungültig
       InvalidAndLocked: Passwort ist ungültig und Benutzer wurde gesperrt, wende dich an einen Administrator.
-      NotChanged: Passwort nicht geändert
+      NotChanged: Das neue Passwort darf nicht mit deinem aktuellen Passwort übereinstimmen
     UsernameOrPassword:
       Invalid: Benutzername oder Passwort ist ungültig
     PasswordComplexityPolicy:

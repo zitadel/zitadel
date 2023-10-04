@@ -1,5 +1,6 @@
 ---
-title: Self-Service
+title: Self Service in ZITADEL
+sidebar_label: Self Service
 ---
 
 ZITADEL allows users to perform many tasks themselves.
@@ -138,7 +139,7 @@ A client can also implement this, by calling the [specific endpoint](/apis/openi
 ## Profile
 
 These actions are available for authenticated users only.
-ZITADEL provides a self-service UI for the user profile out-of-the box under the path _{your_domain}/ui/console/users/me_.
+ZITADEL provides a self-service UI for the user profile out-of-the box under the path _$CUSTOM-DOMAIN/ui/console/users/me_.
 You can also implement your own version in your application by using our APIs.
 
 ### Change password
@@ -151,7 +152,9 @@ The current password must be entered first.
 Users can setup and delete a second factor and FIDO Passkeys (Passwordless).
 Available authenticators are:
 
-- Mobile one-time password (OTP) (Authenticator Apps)
+- Time-based one-time password (TOTP) (Which are Authenticator Apps like Google/Microsoft Authenticator, Authy, etc.)
+- One-time password sent as E-Mail
+- One-time password sent as SMS
 - FIDO Universal Second Factor (U2F) (Security Keys, Device, etc.)
 - FIDO2 WebAuthN (Passkeys)
 

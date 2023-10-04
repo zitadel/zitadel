@@ -43,6 +43,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
+			hook.StringToFeatureHookFunc(),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")
@@ -56,18 +57,19 @@ func MustNewConfig(v *viper.Viper) *Config {
 }
 
 type Steps struct {
-	s1ProjectionTable    *ProjectionTable
-	s2AssetsTable        *AssetTable
-	FirstInstance        *FirstInstance
-	s4EventstoreIndexes  *EventstoreIndexesNew
-	s5LastFailed         *LastFailed
-	s6OwnerRemoveColumns *OwnerRemoveColumns
-	s7LogstoreTables     *LogstoreTables
-	s8AuthTokens         *AuthTokenIndexes
-	s9EventstoreIndexes2 *EventstoreIndexesNew
-	CorrectCreationDate  *CorrectCreationDate
-	AddEventCreatedAt    *AddEventCreatedAt
-	s12AddOTPColumns     *AddOTPColumns
+	s1ProjectionTable     *ProjectionTable
+	s2AssetsTable         *AssetTable
+	FirstInstance         *FirstInstance
+	s4EventstoreIndexes   *EventstoreIndexesNew
+	s5LastFailed          *LastFailed
+	s6OwnerRemoveColumns  *OwnerRemoveColumns
+	s7LogstoreTables      *LogstoreTables
+	s8AuthTokens          *AuthTokenIndexes
+	s9EventstoreIndexes2  *EventstoreIndexesNew
+	CorrectCreationDate   *CorrectCreationDate
+	AddEventCreatedAt     *AddEventCreatedAt
+	s12AddOTPColumns      *AddOTPColumns
+	s13FixQuotaProjection *FixQuotaConstraints
 }
 
 type encryptionKeyConfig struct {
@@ -98,6 +100,7 @@ func MustNewSteps(v *viper.Viper) *Steps {
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
+			hook.StringToFeatureHookFunc(),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read steps")
