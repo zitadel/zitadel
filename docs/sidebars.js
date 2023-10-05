@@ -690,6 +690,7 @@ module.exports = {
             "legal/cloud-service-description",
             "legal/service-level-description",
             "legal/support-services",
+            "legal/onboarding-support",
           ],
         },
         {
