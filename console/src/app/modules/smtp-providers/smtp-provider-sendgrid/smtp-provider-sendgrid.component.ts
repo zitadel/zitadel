@@ -1,10 +1,11 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
 import { ActivatedRoute } from '@angular/router';
-import { take } from 'rxjs';
+import { Subject, take } from 'rxjs';
+import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import {
   AddGoogleProviderRequest as AdminAddGoogleProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -28,7 +29,7 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 @Component({
   selector: 'cnsl-provider-sendgrid',
   templateUrl: './smtp-provider-sendgrid.component.html',
-  styleUrls: ['./smtp-provider-sendgrid-component.scss'],
+  styleUrls: ['./smtp-provider-sendgrid.component.scss'],
 })
 export class SMTPProviderSendgridComponent {
   // private const supportedProviders = { google: { hostAndPort: 'localhost:25', hostAndPortTLS: 'localhost:587'}}
@@ -46,6 +47,12 @@ export class SMTPProviderSendgridComponent {
 
   public provider?: Provider.AsObject;
   public updateClientSecret: boolean = false;
+
+  // stepper
+  public currentCreateStep: number = 1;
+  public requestRedirectValuesSubject$: Subject<void> = new Subject();
+  public firstFormGroup!: UntypedFormGroup;
+  public secondFormGroup!: UntypedFormGroup;
 
   constructor(
     private authService: GrpcAuthService,
@@ -111,6 +118,14 @@ export class SMTPProviderSendgridComponent {
         this.getData(this.id);
       }
     });
+  }
+
+  public changeStep(event: StepperSelectionEvent): void {
+    this.currentCreateStep = event.selectedIndex + 1;
+
+    if (event.selectedIndex >= 2) {
+      this.requestRedirectValuesSubject$.next();
+    }
   }
 
   private getData(id: string): void {

@@ -1,6 +1,6 @@
 <cnsl-create-layout
   title="{{ id ? ('SMTP.DETAIL.TITLE' | translate) : ('SMTP.CREATE.SENDGRID.TITLE' | translate) }}"
-  [createSteps]="2"
+  [createSteps]="3"
   (closed)="close()"
 >
   <h2>{{ 'SMTP.STEPS.SENDGRID.CREATE_DESC_TITLE' | translate }}</h2>
@@ -11,17 +11,42 @@
     linear
     #stepper
     labelPosition="bottom"
+    (selectionChange)="changeStep($event)"
   >
     <mat-step [editable]="true">
       <form>
         <ng-template matStepLabel>{{ 'SMTP.CREATE.STEPS.PROVIDER_SETTINGS' | translate }}</ng-template>
       </form>
+
+      <div class="smtp-create-actions">
+        <button
+          mat-raised-button
+          [disabled]="firstFormGroup.invalid"
+          color="primary"
+          matStepperNext
+          data-e2e="continue-button-nameandtype"
+        >
+          {{ 'ACTIONS.CONTINUE' | translate }}
+        </button>
+      </div>
     </mat-step>
 
     <mat-step [editable]="true">
       <form>
         <ng-template matStepLabel>{{ 'SMTP.CREATE.STEPS.SENDER_SETTINGS' | translate }}</ng-template>
       </form>
+
+      <div class="smtp-create-actions">
+        <button
+          mat-raised-button
+          [disabled]="secondFormGroup.invalid"
+          color="primary"
+          matStepperNext
+          data-e2e="continue-button-nameandtype"
+        >
+          {{ 'ACTIONS.CONTINUE' | translate }}
+        </button>
+      </div>
     </mat-step>
 
     <mat-step [editable]="true">
@@ -29,5 +54,10 @@
         <ng-template matStepLabel>{{ 'SMTP.CREATE.STEPS.TEST_SETTINGS' | translate }}</ng-template>
       </form>
     </mat-step>
+
+    <!-- Icon override -->
+    <ng-template matStepperIcon="edit">
+      <mat-icon>check</mat-icon>
+    </ng-template>
   </mat-horizontal-stepper>
 </cnsl-create-layout>

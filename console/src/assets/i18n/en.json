@@ -1913,7 +1913,7 @@
       "STEPS": {
         "PROVIDER_SETTINGS": "SMTP Provider Settings",
         "SENDER_SETTINGS": "Sender Settings",
-        "TEST_SETTINGS": "Test"
+        "TEST_SETTINGS": "Test SMTP Settings"
       },
       "GOOGLE": {
         "TITLE": "Google Provider",
@@ -1930,7 +1930,7 @@
     "EMPTY": "No SMTP provider available",
     "STEPS": {
       "SENDGRID": {
-        "CREATE_DESC_TITLE": "Enter Your SMTP Provider Details Step by Step"
+        "CREATE_DESC_TITLE": "Enter your Sendgrid SMTP settings step by step"
       }
     }
   },

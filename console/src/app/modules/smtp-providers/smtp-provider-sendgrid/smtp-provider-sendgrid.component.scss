@@ -1,0 +1,19 @@
+.stepper {
+  background: inherit !important;
+  margin: 0 -1.5rem;
+}
+
+.smtp-create-actions {
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .bck-button {
+    margin-right: 1rem;
+  }
+
+  .create-button {
+    padding: 0.5rem 4rem;
+  }
+}
