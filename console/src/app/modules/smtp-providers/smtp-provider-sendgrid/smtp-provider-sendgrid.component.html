@@ -102,6 +102,20 @@
         <ng-template matStepLabel>{{ 'SMTP.CREATE.STEPS.TEST_SETTINGS' | translate }}</ng-template>
       </form>
 
+      <ng-container>
+        <div class="row">
+          <span class="left">
+            {{ 'APP.SAML.METADATA' | translate }}
+          </span>
+          <span class="right">
+            <span> test </span>
+            <span>
+              {{ 'APP.SAML.METADATAFROMFILE' | translate }}
+            </span>
+          </span>
+        </div>
+      </ng-container>
+
       <div class="smtp-create-actions">
         <button mat-stroked-button matStepperPrevious class="bck-button">{{ 'ACTIONS.BACK' | translate }}</button>
         <button mat-raised-button class="create-button" color="primary" data-e2e="create-button">
