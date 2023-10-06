@@ -17,3 +17,23 @@
     padding: 0.5rem 4rem;
   }
 }
+
+.smtp-form-field,
+.info-section-warn {
+  max-width: 400px;
+  display: block;
+}
+
+.wizard-header {
+  display: flex;
+  align-items: center;
+  
+  .idp-logo {
+    margin-right: 1rem;
+    height: 48px;
+    width: 48px;
+    flex-shrink: 0;
+  }
+}
+
+

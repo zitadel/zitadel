@@ -3,7 +3,12 @@
   [createSteps]="3"
   (closed)="close()"
 >
-  <h2>{{ 'SMTP.STEPS.SENDGRID.CREATE_DESC_TITLE' | translate }}</h2>
+  <div class="wizard-header">
+    <img class="idp-logo" src="./assets/images/smtp/sendgrid.png" alt="sendgrid" />
+    <h2>
+      {{ 'SMTP.STEPS.SENDGRID.CREATE_DESC_TITLE' | translate }}
+    </h2>
+  </div>
   <mat-progress-bar class="progress-bar" color="primary" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 
   <mat-horizontal-stepper
@@ -14,8 +19,35 @@
     (selectionChange)="changeStep($event)"
   >
     <mat-step [editable]="true">
-      <form>
-        <ng-template matStepLabel>{{ 'SMTP.CREATE.STEPS.PROVIDER_SETTINGS' | translate }}</ng-template>
+      <ng-template matStepLabel>{{ 'SMTP.CREATE.STEPS.PROVIDER_SETTINGS' | translate }}</ng-template>
+      <form [formGroup]="firstFormGroup" autocomplete="off">
+        <mat-checkbox class="smtp-checkbox" formControlName="tls">
+          {{ 'SETTING.SMTP.TLS' | translate }}
+        </mat-checkbox>
+
+        <cnsl-form-field class="smtp-form-field" label="Host And Port" required="true">
+          <cnsl-label>{{ 'SETTING.SMTP.HOSTANDPORT' | translate }}</cnsl-label>
+          <input cnslInput name="hostAndPort" formControlName="hostAndPort" placeholder="smtp.mailtrap.io:2525" required />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="smtp-form-field" label="User" required="true">
+          <cnsl-label>{{ 'SETTING.SMTP.USER' | translate }}</cnsl-label>
+          <input id="smtp-user" cnslInput name="smtp-user" autocomplete="smtp-user" formControlName="user" required />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="smtp-form-field" label="Password" required="true">
+          <cnsl-label>{{ 'SETTING.SMTP.PASSWORD' | translate }}</cnsl-label>
+          <input
+            id="smtp-password"
+            cnslInput
+            name="smtp-password"
+            autocomplete="off webauthn"
+            formControlName="password"
+            placeholder="Your SendGrid API Key"
+            type="password"
+            required
+          />
+        </cnsl-form-field>
       </form>
 
       <div class="smtp-create-actions">
@@ -32,11 +64,27 @@
     </mat-step>
 
     <mat-step [editable]="true">
-      <form>
+      <form [formGroup]="secondFormGroup">
         <ng-template matStepLabel>{{ 'SMTP.CREATE.STEPS.SENDER_SETTINGS' | translate }}</ng-template>
+
+        <cnsl-form-field class="smtp-form-field" label="Sender Address" required="true">
+          <cnsl-label>{{ 'SETTING.SMTP.SENDERADDRESS' | translate }}</cnsl-label>
+          <input cnslInput name="senderAddress" formControlName="senderAddress" placeholder="sender@example.com" required />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="smtp-form-field" label="Sender Name" required="true">
+          <cnsl-label>{{ 'SETTING.SMTP.SENDERNAME' | translate }}</cnsl-label>
+          <input cnslInput name="senderName" formControlName="senderName" placeholder="Zitadel" required />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="smtp-form-field" label="Reply-To Address">
+          <cnsl-label>{{ 'SETTING.SMTP.REPLYTOADDRESS' | translate }}</cnsl-label>
+          <input cnslInput name="senderReplyToAddress" formControlName="replyToAddress" placeholder="replyto@example.com" />
+        </cnsl-form-field>
       </form>
 
       <div class="smtp-create-actions">
+        <button mat-stroked-button matStepperPrevious class="bck-button">{{ 'ACTIONS.BACK' | translate }}</button>
         <button
           mat-raised-button
           [disabled]="secondFormGroup.invalid"
@@ -53,6 +101,13 @@
       <form>
         <ng-template matStepLabel>{{ 'SMTP.CREATE.STEPS.TEST_SETTINGS' | translate }}</ng-template>
       </form>
+
+      <div class="smtp-create-actions">
+        <button mat-stroked-button matStepperPrevious class="bck-button">{{ 'ACTIONS.BACK' | translate }}</button>
+        <button mat-raised-button class="create-button" color="primary" data-e2e="create-button">
+          {{ 'ACTIONS.CREATE' | translate }}
+        </button>
+      </div>
     </mat-step>
 
     <!-- Icon override -->

@@ -1,7 +1,7 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, UntypedFormGroup } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, take } from 'rxjs';
@@ -61,12 +61,26 @@ export class SMTPProviderSendgridComponent {
     private injector: Injector,
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
+    private fb: UntypedFormBuilder,
   ) {
     this.form = new FormGroup({
       name: new FormControl('', []),
       clientId: new FormControl('', [requiredValidator]),
       clientSecret: new FormControl('', [requiredValidator]),
       scopesList: new FormControl(['openid', 'profile', 'email'], []),
+    });
+
+    this.firstFormGroup = this.fb.group({
+      tls: [''],
+      hostAndPort: ['smtp.sendgrid.net:587'],
+      user: ['apiKey'],
+      password: [''],
+    });
+
+    this.secondFormGroup = this.fb.group({
+      senderAddress: ['', [requiredValidator]],
+      senderName: ['', [requiredValidator]],
+      replyToAddress: [''],
     });
 
     this.authService
