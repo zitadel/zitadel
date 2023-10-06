@@ -433,17 +433,6 @@ module.exports = {
               },
           ],
         },
-        {
-          type: "category",
-          label: "Trainings",
-          collapsed: true,
-          items: [
-            "support/trainings/introduction",
-            "support/trainings/application",
-            "support/trainings/recurring",
-            "support/trainings/project",
-          ],
-        },
       ]
     },
   ],
