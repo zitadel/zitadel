@@ -2070,11 +2070,16 @@
         "DESCRIPTION": "Applicazioni SAMML"
       },
       "CONFIGSECTION": "Configurazione SAML",
-      "URL": "URL in cui si trova il file di metadati",
-      "OR": "o",
-      "XML": "Carica Metadata XML",
+      "CHOOSEMETADATASOURCE": "Fornisci la tua configurazione SAML utilizzando una delle seguenti opzioni:",
+      "METADATAOPT1": "Opzione 1. Specificare l'URL in cui si trova il file di metadati",
+      "METADATAOPT2": "Opzione 2. Carica un file contenente il tuo XML di metadati",
+      "METADATAOPT3": "Opzione 3. Crea al volo un file di metadati minimo fornendo ENTITYID e URL ACS",
+      "UPLOAD": "Carica il file XML",
       "METADATA": "Metadata",
-      "METADATAFROMFILE": "Metadati dal file"
+      "METADATAFROMFILE": "Metadati dal file",
+      "CREATEMETADATA": "Crea metadati",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {

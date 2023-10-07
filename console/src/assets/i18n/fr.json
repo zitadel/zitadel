@@ -2064,6 +2064,23 @@
         "1": "Clé privée JWT"
       }
     },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "Applications SAML"
+      },
+      "CONFIGSECTION": "Configuration SAML",
+      "CHOOSEMETADATASOURCE": "Fournissez votre configuration SAML à l'aide de l'une des options suivantes :",
+      "METADATAOPT1": "Option 1. Spécifiez l'URL où se trouve le fichier de métadonnées",
+      "METADATAOPT2": "Option 2. Téléchargez un fichier contenant vos métadonnées XML",
+      "METADATAOPT3": "Option 3. Créer un fichier de métadonnées minimal à la volée fournissant l'ENTITYID et l'URL ACS",
+      "UPLOAD": "Télécharger le fichier XML",
+      "METADATA": "Métadonnées",
+      "METADATAFROMFILE": "Métadonnées du fichier",
+      "CREATEMETADATA": "Créer des métadonnées",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
+    },
     "AUTHMETHODS": {
       "CODE": {
         "TITLE": "Code",

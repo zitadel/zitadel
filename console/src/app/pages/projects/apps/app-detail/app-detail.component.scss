@@ -10,6 +10,23 @@
   $button-disabled-text-color: map-get($foreground, disabled-button);
   $divider-color: map-get($foreground, dividers);
 
+  .title {
+    margin-bottom: 1rem;
+  }
+
+  .metadata-option {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    flex-direction: column;
+
+    .upload-button {
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      width: 25%;
+    }
+  }
+
   .app-zitadel-warning {
     font-size: 14px;
     color: $warn-color;

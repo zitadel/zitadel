@@ -2061,11 +2061,16 @@
         "DESCRIPTION": "SAMLアプリケーション"
       },
       "CONFIGSECTION": "SAML構成",
-      "URL": "メタデータファイルが配置されているURL",
-      "OR": "または",
-      "XML": "メタデータXMLをアップロードする",
+      "CHOOSEMETADATASOURCE": "次のオプションのいずれかを使用して SAML 構成を指定します。",
+      "METADATAOPT1": "オプション 1. メタデータ ファイルが存在する URL を指定する",
+      "METADATAOPT2": "オプション 2. メタデータ XML を含むファイルをアップロードする",
+      "METADATAOPT3": "オプション 3. ENTITYID と ACS URL を指定して最小限のメタデータ ファイルをオンザフライで作成する",
+      "UPLOAD": "XMLファイルをアップロードする",
       "METADATA": "メタデータ",
-      "METADATAFROMFILE": "ファイルからのメタデータ"
+      "METADATAFROMFILE": "ファイルからのメタデータ",
+      "CREATEMETADATA": "メタデータの作成",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {

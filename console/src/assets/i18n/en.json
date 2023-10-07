@@ -2079,16 +2079,15 @@
       },
       "CONFIGSECTION": "SAML Configuration",
       "CHOOSEMETADATASOURCE": "Provide your SAML configuration using one of the following options:",
-      "METADATAOPT1": "Option 1. Specify the url where Metadata file is located",
-      "METADATAOPT2": "Option 2. Upload a file containing your Metadata XML",
-      "METADATAOPT3": "Option 3. Create a minimal metadata file on-the-fly providing your ENTITYID and your ACS URL",
-      "UPLOAD": "Upload file",
+      "METADATAOPT1": "Option 1. Specify the url where metadata file is located",
+      "METADATAOPT2": "Option 2. Upload a file containing your metadata XML",
+      "METADATAOPT3": "Option 3. Create a minimal metadata file on the fly providing ENTITYID and ACS URL",
+      "UPLOAD": "Upload XML file",
       "METADATA": "Metadata",
-      "METADATAFROMFILE": "Metadata from File",
+      "METADATAFROMFILE": "Metadata from file",
       "CREATEMETADATA": "Create metadata",
-      "ENTITYID": "Your Entity ID",
-      "ACSURL": "Your ACS endpoint URL ",
-      "MINIMALMETADATA": "Proposed metadata file content"
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {

@@ -2070,11 +2070,16 @@
         "DESCRIPTION": "Aplikacje SAML"
       },
       "CONFIGSECTION": "Konfiguracja SAML",
-      "URL": "Adres URL, gdzie znajduje się plik metadanych",
-      "OR": "lub",
-      "XML": "Prześlij plik XML metadanych",
+      "CHOOSEMETADATASOURCE": "Podaj konfigurację SAML, korzystając z jednej z następujących opcji:",
+      "METADATAOPT1": "Opcja 1. Podaj adres URL, pod którym znajduje się plik metadanych",
+      "METADATAOPT2": "Opcja 2. Prześlij plik zawierający metadane XML",
+      "METADATAOPT3": "Opcja 3. Utwórz na bieżąco minimalny plik metadanych, podając ENTITYID i adres URL ACS",
+      "UPLOAD": "Prześlij plik XML",
       "METADATA": "Metadane",
-      "METADATAFROMFILE": "Metadane z pliku"
+      "METADATAFROMFILE": "Metadane z pliku",
+      "CREATEMETADATA": "Utwórz metadane",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {

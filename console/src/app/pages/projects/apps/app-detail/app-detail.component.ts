@@ -1,6 +1,6 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
@@ -183,6 +183,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     this.samlForm = this.fb.group({
       metadataUrl: [{ value: '', disabled: true }],
+      entityId: ['', []],
+      acsURL: ['', []],
       metadataXml: [{ value: '', disabled: true }],
     });
   }
@@ -779,6 +781,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     return this.samlForm.get('metadataUrl');
   }
 
+  public get entityId(): AbstractControl | null {
+    return this.samlForm.get('entityId');
+  }
+
+  public get acsURL(): AbstractControl | null {
+    return this.samlForm.get('acsURL');
+  }
+
   get decodedBase64(): string {
     if (
       this.app &&
@@ -797,6 +807,24 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       const base64 = Buffer.from(xmlString, 'utf-8').toString('base64');
 
       if (this.app.samlConfig) {
+        this.app.samlConfig.metadataXml = base64;
+      }
+    }
+  }
+
+  public changeEntitityIdOrAcsURL() {
+    let minimalMetadata =
+      this.entityId?.value && this.acsURL?.value
+        ? `<?xml version="1.0"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="${this.entityId?.value}">
+    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol">
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${this.acsURL?.value}" index="0"/>
+    </md:SPSSODescriptor>
+</md:EntityDescriptor>`
+        : '';
+    if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml && minimalMetadata) {
+      if (this.app.samlConfig) {
+        const base64 = Buffer.from(minimalMetadata, 'utf-8').toString('base64');
         this.app.samlConfig.metadataXml = base64;
       }
     }
