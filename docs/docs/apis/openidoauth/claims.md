@@ -1,5 +1,6 @@
 ---
-title: Claims
+title: Claims in ZITADEL
+sidebar_label: Claims
 ---
 
 ZITADEL asserts claims on different places according to the corresponding specifications or project and clients settings.
@@ -42,7 +43,7 @@ Please check below the matrix for an overview where which scope is asserted.
 | Claims             | Example                                  | Description                                                                                                                                            |
 |:-------------------|:-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
 | acr                | TBA                                      | TBA                                                                                                                                                    |
-| address            | `Lerchenfeldstrasse 3, 9014 St. Gallen`   | TBA                                                                                                                                                    |
+| address            | `Lerchenfeldstrasse 3, 9014 St. Gallen`  | TBA                                                                                                                                                    |
 | amr                | `pwd mfa`                                | Authentication Method References as defined in [RFC8176](https://tools.ietf.org/html/rfc8176) <br/> `password` value is deprecated, please check `pwd` |
 | aud                | `69234237810729019`                      | The audience of the token, by default all client id's and the project id are included                                                                  |
 | auth_time          | `1311280969`                             | Unix time of the authentication                                                                                                                        |
@@ -54,7 +55,7 @@ Please check below the matrix for an overview where which scope is asserted.
 | gender             | `other`                                  | Gender of the subject                                                                                                                                  |
 | given_name         | `Road`                                   | Given name of the subject                                                                                                                              |
 | iat                | `1311280970`                             | Time of the token was issued at (as unix time)                                                                                                         |
-| iss                | `{your_domain}`                          | Issuing domain of a token                                                                                                                              |
+| iss                | `$CUSTOM-DOMAIN`                                      | Issuing domain of a token                                                                                                                              |
 | jti                | `69234237813329048`                      | Unique id of the token                                                                                                                                 |
 | locale             | `en`                                     | Language from the subject                                                                                                                              |
 | name               | `Road Runner`                            | The subjects full name                                                                                                                                 |

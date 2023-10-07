@@ -5,8 +5,8 @@ package user_test
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"os"
-	"strings"
 	"testing"
 	"time"
 
@@ -19,8 +19,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/integration"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 var (
@@ -624,14 +624,24 @@ func TestServer_AddIDPLink(t *testing.T) {
 
 func TestServer_StartIdentityProviderIntent(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t)
+	samlIdpID := Tester.AddSAMLProvider(t)
+	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t)
+	samlPostIdpID := Tester.AddSAMLPostProvider(t)
 	type args struct {
 		ctx context.Context
 		req *user.StartIdentityProviderIntentRequest
 	}
+	type want struct {
+		details            *object.Details
+		url                string
+		parametersExisting []string
+		parametersEqual    map[string]string
+		postForm           bool
+	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *user.StartIdentityProviderIntentResponse
+		want    want
 		wantErr bool
 	}{
 		{
@@ -642,11 +652,10 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					IdpId: idpID,
 				},
 			},
-			want:    nil,
 			wantErr: true,
 		},
 		{
-			name: "next step auth url",
+			name: "next step oauth auth url",
 			args: args{
 				CTX,
 				&user.StartIdentityProviderIntentRequest{
@@ -659,14 +668,91 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					},
 				},
 			},
-			want: &user.StartIdentityProviderIntentResponse{
-				Details: &object.Details{
+			want: want{
+				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
-				NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{
-					AuthUrl: "https://example.com/oauth/v2/authorize?client_id=clientID&prompt=select_account&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=",
+				url: "https://example.com/oauth/v2/authorize",
+				parametersEqual: map[string]string{
+					"client_id":     "clientID",
+					"prompt":        "select_account",
+					"redirect_uri":  "http://localhost:8080/idps/callback",
+					"response_type": "code",
+					"scope":         "openid profile email",
 				},
+				parametersExisting: []string{"state"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "next step saml default",
+			args: args{
+				CTX,
+				&user.StartIdentityProviderIntentRequest{
+					IdpId: samlIdpID,
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
+						Urls: &user.RedirectURLs{
+							SuccessUrl: "https://example.com/success",
+							FailureUrl: "https://example.com/failure",
+						},
+					},
+				},
+			},
+			want: want{
+				details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+				url:                "http://localhost:8000/sso",
+				parametersExisting: []string{"RelayState", "SAMLRequest"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "next step saml auth url",
+			args: args{
+				CTX,
+				&user.StartIdentityProviderIntentRequest{
+					IdpId: samlRedirectIdpID,
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
+						Urls: &user.RedirectURLs{
+							SuccessUrl: "https://example.com/success",
+							FailureUrl: "https://example.com/failure",
+						},
+					},
+				},
+			},
+			want: want{
+				details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+				url:                "http://localhost:8000/sso",
+				parametersExisting: []string{"RelayState", "SAMLRequest"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "next step saml form",
+			args: args{
+				CTX,
+				&user.StartIdentityProviderIntentRequest{
+					IdpId: samlPostIdpID,
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
+						Urls: &user.RedirectURLs{
+							SuccessUrl: "https://example.com/success",
+							FailureUrl: "https://example.com/failure",
+						},
+					},
+				},
+			},
+			want: want{
+				details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+				postForm: true,
 			},
 			wantErr: false,
 		},
@@ -680,12 +766,25 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			if nextStep := tt.want.GetNextStep(); nextStep != nil {
-				if !strings.HasPrefix(got.GetAuthUrl(), tt.want.GetAuthUrl()) {
-					assert.Failf(t, "auth url does not match", "expected: %s, but got: %s", tt.want.GetAuthUrl(), got.GetAuthUrl())
+			if tt.want.url != "" {
+				authUrl, err := url.Parse(got.GetAuthUrl())
+				assert.NoError(t, err)
+
+				assert.Len(t, authUrl.Query(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
+
+				for _, existing := range tt.want.parametersExisting {
+					assert.True(t, authUrl.Query().Has(existing))
+				}
+				for key, equal := range tt.want.parametersEqual {
+					assert.Equal(t, equal, authUrl.Query().Get(key))
 				}
 			}
-			integration.AssertDetails(t, tt.want, got)
+			if tt.want.postForm {
+				assert.NotEmpty(t, got.GetPostForm())
+			}
+			integration.AssertDetails(t, &user.StartIdentityProviderIntentResponse{
+				Details: tt.want.details,
+			}, got)
 		})
 	}
 }
@@ -694,7 +793,10 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t)
 	intentID := Tester.CreateIntent(t, idpID)
 	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulOAuthIntent(t, idpID, "", "id")
+	successfulWithUserID, WithUsertoken, WithUserchangeDate, WithUsersequence := Tester.CreateSuccessfulOAuthIntent(t, idpID, "user", "id")
 	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Tester.CreateSuccessfulLDAPIntent(t, idpID, "", "id")
+	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence := Tester.CreateSuccessfulLDAPIntent(t, idpID, "user", "id")
+	samlSuccessfulID, samlToken, samlChangeDate, samlSequence := Tester.CreateSuccessfulSAMLIntent(t, idpID, "", "id")
 	type args struct {
 		ctx context.Context
 		req *user.RetrieveIdentityProviderIntentRequest
@@ -765,6 +867,44 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "retrieve successful intent with linked user",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    successfulWithUserID,
+					IdpIntentToken: WithUsertoken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(WithUserchangeDate),
+					ResourceOwner: Tester.Organisation.ID,
+					Sequence:      WithUsersequence,
+				},
+				UserId: "user",
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Oauth{
+						Oauth: &user.IDPOAuthAccessInformation{
+							AccessToken: "accessToken",
+							IdToken:     gu.Ptr("idToken"),
+						},
+					},
+					IdpId:    idpID,
+					UserId:   "id",
+					UserName: "username",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"sub":                "id",
+							"preferred_username": "username",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+			},
+			wantErr: false,
+		},
+		{
 			name: "retrieve successful ldap intent",
 			args: args{
 				CTX,
@@ -801,6 +941,90 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							"id":                "id",
 							"preferredUsername": "username",
 							"preferredLanguage": "en",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "retrieve successful ldap intent with linked user",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    ldapSuccessfulWithUserID,
+					IdpIntentToken: ldapWithUserToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(ldapWithUserChangeDate),
+					ResourceOwner: Tester.Organisation.ID,
+					Sequence:      ldapWithUserSequence,
+				},
+				UserId: "user",
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Ldap{
+						Ldap: &user.IDPLDAPAccessInformation{
+							Attributes: func() *structpb.Struct {
+								s, err := structpb.NewStruct(map[string]interface{}{
+									"id":       []interface{}{"id"},
+									"username": []interface{}{"username"},
+									"language": []interface{}{"en"},
+								})
+								require.NoError(t, err)
+								return s
+							}(),
+						},
+					},
+					IdpId:    idpID,
+					UserId:   "id",
+					UserName: "username",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"id":                "id",
+							"preferredUsername": "username",
+							"preferredLanguage": "en",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "retrieve successful saml intent",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    samlSuccessfulID,
+					IdpIntentToken: samlToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(samlChangeDate),
+					ResourceOwner: Tester.Organisation.ID,
+					Sequence:      samlSequence,
+				},
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Saml{
+						Saml: &user.IDPSAMLAccessInformation{
+							Assertion: []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
+						},
+					},
+					IdpId:    idpID,
+					UserId:   "id",
+					UserName: "",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"id": "id",
+							"attributes": map[string]interface{}{
+								"attribute1": []interface{}{"value1"},
+							},
 						})
 						require.NoError(t, err)
 						return s

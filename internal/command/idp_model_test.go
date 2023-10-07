@@ -18,8 +18,9 @@ func TestCommands_AllIDPWriteModel(t *testing.T) {
 		idpType       domain.IDPType
 	}
 	type res struct {
-		writeModelType interface{}
-		err            error
+		writeModelType     interface{}
+		samlWriteModelType interface{}
+		err                error
 	}
 	tests := []struct {
 		name string
@@ -154,6 +155,19 @@ func TestCommands_AllIDPWriteModel(t *testing.T) {
 			res: res{
 				writeModelType: &InstanceGoogleIDPWriteModel{},
 				err:            nil,
+			},
+		},
+		{
+			name: "writemodel instance saml",
+			args: args{
+				resourceOwner: "owner",
+				instanceBool:  true,
+				id:            "id",
+				idpType:       domain.IDPTypeSAML,
+			},
+			res: res{
+				samlWriteModelType: &InstanceSAMLIDPWriteModel{},
+				err:                nil,
 			},
 		},
 		{
@@ -299,6 +313,19 @@ func TestCommands_AllIDPWriteModel(t *testing.T) {
 			},
 		},
 		{
+			name: "writemodel org saml",
+			args: args{
+				resourceOwner: "owner",
+				instanceBool:  false,
+				id:            "id",
+				idpType:       domain.IDPTypeSAML,
+			},
+			res: res{
+				samlWriteModelType: &OrgSAMLIDPWriteModel{},
+				err:                nil,
+			},
+		},
+		{
 			name: "writemodel org unspecified",
 			args: args{
 				resourceOwner: "owner",
@@ -316,7 +343,12 @@ func TestCommands_AllIDPWriteModel(t *testing.T) {
 			wm, err := NewAllIDPWriteModel(tt.args.resourceOwner, tt.args.instanceBool, tt.args.id, tt.args.idpType)
 			require.ErrorIs(t, err, tt.res.err)
 			if wm != nil {
-				assert.IsType(t, tt.res.writeModelType, wm.model)
+				if tt.res.writeModelType != nil {
+					assert.IsType(t, tt.res.writeModelType, wm.model)
+				}
+				if tt.res.samlWriteModelType != nil {
+					assert.IsType(t, tt.res.samlWriteModelType, wm.samlModel)
+				}
 			}
 		})
 	}

@@ -87,6 +87,13 @@ var (
 		` projections.idp_templates5_google.client_id,` +
 		` projections.idp_templates5_google.client_secret,` +
 		` projections.idp_templates5_google.scopes,` +
+		// saml
+		` projections.idp_templates5_saml.idp_id,` +
+		` projections.idp_templates5_saml.metadata,` +
+		` projections.idp_templates5_saml.key,` +
+		` projections.idp_templates5_saml.certificate,` +
+		` projections.idp_templates5_saml.binding,` +
+		` projections.idp_templates5_saml.with_signed_request,` +
 		// ldap
 		` projections.idp_templates5_ldap2.idp_id,` +
 		` projections.idp_templates5_ldap2.servers,` +
@@ -128,6 +135,7 @@ var (
 		` LEFT JOIN projections.idp_templates5_gitlab ON projections.idp_templates5.id = projections.idp_templates5_gitlab.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_gitlab.instance_id` +
 		` LEFT JOIN projections.idp_templates5_gitlab_self_hosted ON projections.idp_templates5.id = projections.idp_templates5_gitlab_self_hosted.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_gitlab_self_hosted.instance_id` +
 		` LEFT JOIN projections.idp_templates5_google ON projections.idp_templates5.id = projections.idp_templates5_google.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_google.instance_id` +
+		` LEFT JOIN projections.idp_templates5_saml ON projections.idp_templates5.id = projections.idp_templates5_saml.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_saml.instance_id` +
 		` LEFT JOIN projections.idp_templates5_ldap2 ON projections.idp_templates5.id = projections.idp_templates5_ldap2.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_ldap2.instance_id` +
 		` LEFT JOIN projections.idp_templates5_apple ON projections.idp_templates5.id = projections.idp_templates5_apple.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_apple.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
@@ -203,6 +211,13 @@ var (
 		"client_id",
 		"client_secret",
 		"scopes",
+		// saml config
+		"idp_id",
+		"metadata",
+		"key",
+		"certificate",
+		"binding",
+		"with_signed_request",
 		// ldap config
 		"idp_id",
 		"servers",
@@ -306,6 +321,13 @@ var (
 		` projections.idp_templates5_google.client_id,` +
 		` projections.idp_templates5_google.client_secret,` +
 		` projections.idp_templates5_google.scopes,` +
+		// saml
+		` projections.idp_templates5_saml.idp_id,` +
+		` projections.idp_templates5_saml.metadata,` +
+		` projections.idp_templates5_saml.key,` +
+		` projections.idp_templates5_saml.certificate,` +
+		` projections.idp_templates5_saml.binding,` +
+		` projections.idp_templates5_saml.with_signed_request,` +
 		// ldap
 		` projections.idp_templates5_ldap2.idp_id,` +
 		` projections.idp_templates5_ldap2.servers,` +
@@ -348,6 +370,7 @@ var (
 		` LEFT JOIN projections.idp_templates5_gitlab ON projections.idp_templates5.id = projections.idp_templates5_gitlab.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_gitlab.instance_id` +
 		` LEFT JOIN projections.idp_templates5_gitlab_self_hosted ON projections.idp_templates5.id = projections.idp_templates5_gitlab_self_hosted.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_gitlab_self_hosted.instance_id` +
 		` LEFT JOIN projections.idp_templates5_google ON projections.idp_templates5.id = projections.idp_templates5_google.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_google.instance_id` +
+		` LEFT JOIN projections.idp_templates5_saml ON projections.idp_templates5.id = projections.idp_templates5_saml.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_saml.instance_id` +
 		` LEFT JOIN projections.idp_templates5_ldap2 ON projections.idp_templates5.id = projections.idp_templates5_ldap2.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_ldap2.instance_id` +
 		` LEFT JOIN projections.idp_templates5_apple ON projections.idp_templates5.id = projections.idp_templates5_apple.idp_id AND projections.idp_templates5.instance_id = projections.idp_templates5_apple.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
@@ -423,6 +446,13 @@ var (
 		"client_id",
 		"client_secret",
 		"scopes",
+		// saml config
+		"idp_id",
+		"metadata",
+		"key",
+		"certificate",
+		"binding",
+		"with_signed_request",
 		// ldap config
 		"idp_id",
 		"servers",
@@ -566,6 +596,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// saml
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -701,6 +738,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// google
+						nil,
+						nil,
+						nil,
+						nil,
+						// saml
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -842,6 +886,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// saml
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -974,6 +1025,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// google
+						nil,
+						nil,
+						nil,
+						nil,
+						// saml
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1113,6 +1171,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// saml
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -1244,6 +1309,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						database.StringArray{"profile"},
 						// google
+						nil,
+						nil,
+						nil,
+						nil,
+						// saml
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1384,6 +1456,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						"client_id",
 						nil,
 						database.StringArray{"profile"},
+						// saml
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -1437,6 +1516,150 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 					ClientID:     "client_id",
 					ClientSecret: nil,
 					Scopes:       []string{"profile"},
+				},
+			},
+		},
+		{
+			name:    "prepareIDPTemplateByIDQuery saml idp",
+			prepare: prepareIDPTemplateByIDQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(idpTemplateQuery),
+					idpTemplateCols,
+					[]driver.Value{
+						"idp-id",
+						"ro",
+						testNow,
+						testNow,
+						uint64(20211109),
+						domain.IDPConfigStateActive,
+						"idp-name",
+						domain.IDPTypeSAML,
+						domain.IdentityProviderTypeOrg,
+						true,
+						true,
+						true,
+						true,
+						// oauth
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// oidc
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// azure
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// github
+						nil,
+						nil,
+						nil,
+						nil,
+						// github enterprise
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab self hosted
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// google
+						nil,
+						nil,
+						nil,
+						nil,
+						// saml
+						"idp-id",
+						[]byte("metadata"),
+						nil,
+						nil,
+						"binding",
+						false,
+						// ldap config
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+					},
+				),
+			},
+			object: &IDPTemplate{
+				CreationDate:      testNow,
+				ChangeDate:        testNow,
+				Sequence:          20211109,
+				ResourceOwner:     "ro",
+				ID:                "idp-id",
+				State:             domain.IDPStateActive,
+				Name:              "idp-name",
+				Type:              domain.IDPTypeSAML,
+				OwnerType:         domain.IdentityProviderTypeOrg,
+				IsCreationAllowed: true,
+				IsLinkingAllowed:  true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				SAMLIDPTemplate: &SAMLIDPTemplate{
+					IDPID:             "idp-id",
+					Metadata:          []byte("metadata"),
+					Key:               nil,
+					Certificate:       nil,
+					Binding:           "binding",
+					WithSignedRequest: false,
 				},
 			},
 		},
@@ -1515,6 +1738,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// google
+						nil,
+						nil,
+						nil,
+						nil,
+						// saml
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1674,6 +1904,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// saml
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -1807,6 +2044,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// google config
+						nil,
+						nil,
+						nil,
+						nil,
+						// saml
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1976,6 +2220,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// saml
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// ldap config
 							"idp-id",
 							database.StringArray{"server"},
@@ -2140,6 +2391,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// saml
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// ldap config
 							nil,
 							nil,
@@ -2278,6 +2536,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// saml
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// ldap config
 							"idp-id-ldap",
 							database.StringArray{"server"},
@@ -2302,6 +2567,117 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							"lang",
 							"avatar",
 							"profile",
+							// apple
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+						},
+						{
+							"idp-id-saml",
+							"ro",
+							testNow,
+							testNow,
+							uint64(20211109),
+							domain.IDPConfigStateActive,
+							"idp-name",
+							domain.IDPTypeSAML,
+							domain.IdentityProviderTypeOrg,
+							true,
+							true,
+							true,
+							true,
+							// oauth
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// oidc
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// jwt
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// azure
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// github
+							nil,
+							nil,
+							nil,
+							nil,
+							// github enterprise
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// gitlab
+							nil,
+							nil,
+							nil,
+							nil,
+							// gitlab self hosted
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// google
+							nil,
+							nil,
+							nil,
+							nil,
+							// saml
+							"idp-id-saml",
+							[]byte("metadata"),
+							nil,
+							nil,
+							"binding",
+							false,
+							// ldap config
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// apple
 							nil,
 							nil,
@@ -2382,6 +2758,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							"client_id",
 							nil,
 							database.StringArray{"profile"},
+							// saml
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// ldap config
 							nil,
 							nil,
@@ -2482,6 +2865,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// google
+							nil,
+							nil,
+							nil,
+							nil,
+							// saml
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2590,6 +2980,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// saml
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// ldap config
 							nil,
 							nil,
@@ -2694,6 +3091,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// saml
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// ldap config
 							nil,
 							nil,
@@ -2731,7 +3135,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 			},
 			object: &IDPTemplates{
 				SearchResponse: SearchResponse{
-					Count: 5,
+					Count: 6,
 				},
 				Templates: []*IDPTemplate{
 					{
@@ -2773,6 +3177,29 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 								AvatarURLAttribute:         "avatar",
 								ProfileAttribute:           "profile",
 							},
+						},
+					},
+					{
+						CreationDate:      testNow,
+						ChangeDate:        testNow,
+						Sequence:          20211109,
+						ResourceOwner:     "ro",
+						ID:                "idp-id-saml",
+						State:             domain.IDPStateActive,
+						Name:              "idp-name",
+						Type:              domain.IDPTypeSAML,
+						OwnerType:         domain.IdentityProviderTypeOrg,
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+						SAMLIDPTemplate: &SAMLIDPTemplate{
+							IDPID:             "idp-id-saml",
+							Metadata:          []byte("metadata"),
+							Key:               nil,
+							Certificate:       nil,
+							Binding:           "binding",
+							WithSignedRequest: false,
 						},
 					},
 					{

@@ -6,6 +6,9 @@ type Configs struct {
 }
 
 type Config struct {
-	Database *EmitterConfig
-	Stdout   *EmitterConfig
+	Stdout *StdConfig
+}
+
+type StdConfig struct {
+	Enabled bool
 }

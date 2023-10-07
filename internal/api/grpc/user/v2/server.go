@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 var _ user.UserServiceServer = (*Server)(nil)
@@ -22,6 +22,7 @@ type Server struct {
 	userCodeAlg crypto.EncryptionAlgorithm
 	idpAlg      crypto.EncryptionAlgorithm
 	idpCallback func(ctx context.Context) string
+	samlRootURL func(ctx context.Context, idpID string) string
 }
 
 type Config struct{}
@@ -32,6 +33,7 @@ func CreateServer(
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpAlg crypto.EncryptionAlgorithm,
 	idpCallback func(ctx context.Context) string,
+	samlRootURL func(ctx context.Context, idpID string) string,
 ) *Server {
 	return &Server{
 		command:     command,
@@ -39,6 +41,7 @@ func CreateServer(
 		userCodeAlg: userCodeAlg,
 		idpAlg:      idpAlg,
 		idpCallback: idpCallback,
+		samlRootURL: samlRootURL,
 	}
 }
 

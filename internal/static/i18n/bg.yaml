@@ -122,7 +122,7 @@ Errors:
       Empty: Паролата е празна
       Invalid: Паролата е невалидна
       NotSet: Потребителят не е задал парола
-      NotChanged: Паролата не е променена
+      NotChanged: Новата парола не може да съвпада с текущата парола
       NotSupported: Хеш кодирането на паролата не се поддържа
     PasswordComplexityPolicy:
       NotFound: Политиката за парола не е намерена
@@ -505,6 +505,8 @@ Errors:
       NoChallenge: Сесия без WebAuthN предизвикателство
   Intent:
     IDPMissing: IDP липсва в заявката
+    IDPInvalid: IDP невалиден за заявката
+    ResponseInvalid: Отговорът на IDP е невалиден
     SuccessURLMissing: В заявката липсва URL адрес за успех
     FailureURLMissing: В заявката липсва URL адрес за грешка
     StateMissing: В заявката липсва параметър състояние
@@ -522,6 +524,10 @@ Errors:
     Token:
       Invalid: Токенът е невалиден
       Expired: Токенът е изтекъл
+  Feature:
+    NotExisting: Функцията не съществува
+    TypeNotSupported: Типът функция не се поддържа
+    InvalidValue: Невалидна стойност за тази функция
 
 AggregateTypes:
   action: Действие
@@ -532,6 +538,8 @@ AggregateTypes:
   user: Потребител
   usergrant: Предоставяне на потребител
   quota: Квота
+  feature: Особеност
+
 EventTypes:
   user:
     added: Добавен потребител

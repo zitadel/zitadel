@@ -1,5 +1,5 @@
 ---
-title: Trainings
+title: ZITADEL Trainings
 sidebar_label: Introduction
 ---
 
