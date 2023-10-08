@@ -196,6 +196,8 @@ Errors:
     IdpIsNotOIDC: La configurazione IDP non è di tipo oidc
     Domain:
       AlreadyExists: Il dominio già esistente
+      InvalidCharacter: Solo caratteri alfanumerici, . e - sono consentiti per un dominio
+      EmptyString: I caratteri non numerici e alfabetici non validi sono stati sostituiti con spazi vuoti e il dominio risultante è una stringa vuota
     IDP:
       InvalidSearchQuery: Parametro di ricerca non valido
       InvalidCharacter: Per un dominio sono ammessi solo caratteri alfanumerici, . e -

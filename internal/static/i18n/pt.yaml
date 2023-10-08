@@ -195,6 +195,7 @@ Errors:
     Domain:
       AlreadyExists: Domínio já existe
       InvalidCharacter: Apenas caracteres alfanuméricos, . e - são permitidos para um domínio
+      EmptyString: Caracteres não numéricos e alfabéticos inválidos foram substituídos por espaços vazios e o domínio resultante é uma string vazia
     IDP:
       InvalidSearchQuery: Consulta de pesquisa inválida
       ClientIDMissing: ClientID ausente

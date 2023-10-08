@@ -307,13 +307,16 @@ func (c *Commands) changeDefaultDomain(ctx context.Context, orgID, newName strin
 		return nil, err
 	}
 	iamDomain := authz.GetInstance(ctx).RequestedDomain()
-	defaultDomain := domain.NewIAMDomainName(orgDomains.OrgName, iamDomain)
+	defaultDomain, _ := domain.NewIAMDomainName(orgDomains.OrgName, iamDomain)
 	isPrimary := defaultDomain == orgDomains.PrimaryDomain
 	orgAgg := OrgAggregateFromWriteModel(&orgDomains.WriteModel)
 	for _, orgDomain := range orgDomains.Domains {
 		if orgDomain.State == domain.OrgDomainStateActive {
 			if orgDomain.Domain == defaultDomain {
-				newDefaultDomain := domain.NewIAMDomainName(newName, iamDomain)
+				newDefaultDomain, err := domain.NewIAMDomainName(newName, iamDomain)
+				if err != nil {
+					return nil, err
+				}
 				events := []eventstore.Command{
 					org.NewDomainAddedEvent(ctx, orgAgg, newDefaultDomain),
 					org.NewDomainVerifiedEvent(ctx, orgAgg, newDefaultDomain),
@@ -336,7 +339,7 @@ func (c *Commands) removeCustomDomains(ctx context.Context, orgID string) ([]eve
 		return nil, err
 	}
 	hasDefault := false
-	defaultDomain := domain.NewIAMDomainName(orgDomains.OrgName, authz.GetInstance(ctx).RequestedDomain())
+	defaultDomain, _ := domain.NewIAMDomainName(orgDomains.OrgName, authz.GetInstance(ctx).RequestedDomain())
 	isPrimary := defaultDomain == orgDomains.PrimaryDomain
 	orgAgg := OrgAggregateFromWriteModel(&orgDomains.WriteModel)
 	events := make([]eventstore.Command, 0, len(orgDomains.Domains))

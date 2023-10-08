@@ -197,6 +197,7 @@ Errors:
     Domain:
       AlreadyExists: Domäne existiert bereits
       InvalidCharacter: Nur alphanumerische Zeichen, . und - sind für eine Domäne erlaubt
+      EmptyString: Ungültige nicht numerische und alphabetische Zeichen wurden durch Leerzeichen ersetzt und die resultierende Domäne ist eine leere Zeichenfolge
     IDP:
       InvalidSearchQuery: Ungültiger Suchparameter
       ClientIDMissing: ClientID fehlt
@@ -527,7 +528,7 @@ EventTypes:
   user:
     added: Benutzer hinzugefügt
     selfregistered: Benutzer hat sich selbst registriert
-    initialization: 
+    initialization:
       code:
         added: Initialisierungscode generiert
         sent: Initialisierungscode versendet
@@ -569,7 +570,7 @@ EventTypes:
       avatar:
         added: Avatar hinzugefügt
         removed: Avatar entfernt
-      initialization: 
+      initialization:
         code:
           added: Initialisierungscode generiert
           sent: Initialisierungscode versendet
@@ -1225,9 +1226,9 @@ Action:
   Flow:
     Type:
       Unspecified: Unspezifiziert
-      ExternalAuthentication:  Externe Authentifizierung
+      ExternalAuthentication: Externe Authentifizierung
       CustomiseToken: Token ergänzen
-      InternalAuthentication:  Interne Authentifizierung
+      InternalAuthentication: Interne Authentifizierung
       CustomizeSAMLResponse: SAMLResponse ergänzen
   TriggerType:
     Unspecified: Unspezifiziert

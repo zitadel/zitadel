@@ -197,6 +197,7 @@ Errors:
     Domain:
       AlreadyExists: Domain already exists
       InvalidCharacter: Only alphanumeric characters, . and - are allowed for a domain
+      EmptyString: Invalid non numeric and alphabetical characters were replaced with empty spaces and resulting domain is an empty string
     IDP:
       InvalidSearchQuery: Invalid search query
       ClientIDMissing: ClientID missing

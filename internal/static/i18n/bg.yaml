@@ -62,7 +62,7 @@ Errors:
     DomainNotAllowedAsUsername: Домейнът вече е резервиран и не може да се използва
     AlreadyInactive: Потребителят вече е неактивен
     NotInactive: Потребителят не е неактивен
-    CantDeactivateInitial: 'Потребител с начално състояние може да бъде изтрит, но не и деактивиран'
+    CantDeactivateInitial: "Потребител с начално състояние може да бъде изтрит, но не и деактивиран"
     ShouldBeActiveOrInitial: Потребителят не е активен или начален
     AlreadyInitialised: Потребителят вече е инициализиран
     NotInitialised: Потребителят все още не е инициализиран
@@ -198,7 +198,8 @@ Errors:
     IdpIsNotOIDC: IDP конфигурацията не е от тип oidc
     Domain:
       AlreadyExists: Домейнът вече съществува
-      InvalidCharacter: 'Само буквено-цифрови знаци, . '
+      InvalidCharacter: "Само буквено-цифрови знаци, . "
+      EmptyString: Невалидни нецифрови и азбучни знаци бяха заменени с празни интервали и полученият домейн е празен низ
     IDP:
       InvalidSearchQuery: Невалидна заявка за търсене
       ClientIDMissing: Липсва ClientID
@@ -838,7 +839,7 @@ EventTypes:
           added: Вторият фактор е добавен към правилата за влизане
           removed: Вторият фактор е премахнат от правилата за влизане
         multifactor:
-          added: 'Много фактор, добавен към правилата за влизане'
+          added: "Много фактор, добавен към правилата за влизане"
           removed: Мултифакторът е премахнат от правилата за влизане
       password:
         complexity:

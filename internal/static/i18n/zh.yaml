@@ -197,6 +197,7 @@ Errors:
     Domain:
       AlreadyExists: 域名已存在
       InvalidCharacter: 只有字母数字字符，.和 - 允许用于域名中
+      EmptyString: 无效的非数字和字母字符被替换为空格，结果域是空字符串
     IDP:
       InvalidSearchQuery: 无效的搜索查询
       ClientIDMissing: 客户端 ID 丢失
@@ -623,7 +624,7 @@ EventTypes:
           removed: 删除 MFA OTP
           check:
             succeeded: 验证 MFA OTP 成功
-            failed:  验证 MFA OTP 失败
+            failed: 验证 MFA OTP 失败
           sms:
             added: 添加了多因素 OTP 短信
             removed: 删除了多因素 OTP 短信
