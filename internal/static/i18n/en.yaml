@@ -182,6 +182,11 @@ Errors:
     DomainVerificationTypeInvalid: Domain verification type is invalid
     DomainVerificationMissing: Domain verification not yet started
     DomainVerificationFailed: Domain verification failed
+    DomainVerificationTXTNotFound: The _zitadel-challenge TXT record was not found for your domain. Check that you've added it to your DNS server or wait till the new record is propagated
+    DomainVerificationTXTNoMatch: The _zitadel-challenge TXT record has been found for your domain but it doesn't contain the right token text. Check that you've added the right token to your DNS server or wait till the new record is propagated
+    DomainVerificationHTTPNotFound: The file containing the challenge was not found in the expected URL. Check that you've uploaded the file in the right place with read permissions
+    DomainVerificationHTTPNoMatch: The file containing the challenge has been found in the expected URL but it doesn't contain the right token text. Check its content
+    DomainVerificationTimeout: There was a timeout querying the DNS server
     PrimaryDomainNotDeletable: Primary domain must not be deleted
     DomainNotFound: Domain not found
     MemberIDMissing: Member ID missing
