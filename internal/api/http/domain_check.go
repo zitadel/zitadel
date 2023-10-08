@@ -38,7 +38,7 @@ func ValidateDomainHTTP(domain, token, verifier string) error {
 	}
 	if resp.StatusCode != 200 {
 		if resp.StatusCode == 404 {
-			return errors.ThrowNotFound(err, "HTTP-F4zhw", "Errors.Org.DomainVerificationHTTPNotFound")
+			return errors.ThrowNotFound(err, "ORG-F4zhw", "Errors.Org.DomainVerificationHTTPNotFound")
 		}
 		return errors.ThrowInternal(err, "HTTP-G2zsw", "Errors.Internal")
 	}
@@ -50,7 +50,7 @@ func ValidateDomainHTTP(domain, token, verifier string) error {
 	if string(body) == verifier {
 		return nil
 	}
-	return errors.ThrowNotFound(err, "HTTP-GH422", "Errors.Org.DomainVerificationHTTPNoMatch")
+	return errors.ThrowNotFound(err, "ORG-GH422", "Errors.Org.DomainVerificationHTTPNoMatch")
 }
 
 func ValidateDomainDNS(domain, verifier string) error {
@@ -62,7 +62,7 @@ func ValidateDomainDNS(domain, verifier string) error {
 				return errors.ThrowNotFound(err, "ORG-G241f", "Errors.Org.DomainVerificationTXTNotFound")
 			}
 			if dnsError.IsTimeout {
-				return errors.ThrowNotFound(err, "ORG-G241f", "Errors.Org.DomainVerificationTimeout")
+				return errors.ThrowNotFound(err, "ORG-K563l", "Errors.Org.DomainVerificationTimeout")
 			}
 		}
 		return errors.ThrowInternal(err, "HTTP-Hwsw2", "Errors.Internal")
