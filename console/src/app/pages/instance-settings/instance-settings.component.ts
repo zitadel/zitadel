@@ -21,6 +21,8 @@ import {
   PRIVACYPOLICY,
   SECRETS,
   SECURITY,
+  SMS_PROVIDER,
+  SMTP_PROVIDER,
 } from '../../modules/settings-list/settings';
 
 @Component({
@@ -36,6 +38,8 @@ export class InstanceSettingsComponent implements OnInit, OnDestroy {
     // notifications
     // { showWarn: true, ...NOTIFICATIONS },
     NOTIFICATIONS,
+    SMTP_PROVIDER,
+    SMS_PROVIDER,
     // login
     LOGIN,
     IDP,
@@ -80,7 +84,10 @@ export class InstanceSettingsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.settingsList = this.authService.isAllowedMapper(this.defaultSettingsList, (setting) => setting.requiredRoles.admin);
+    this.settingsList = this.authService.isAllowedMapper(
+      this.defaultSettingsList,
+      (setting) => setting.requiredRoles.admin || [],
+    );
   }
 
   ngOnDestroy(): void {
