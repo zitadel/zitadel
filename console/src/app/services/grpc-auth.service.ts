@@ -1,20 +1,8 @@
 import { Injectable } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { BehaviorSubject, forkJoin, from, merge, Observable, of, Subject } from 'rxjs';
-import {
-  catchError,
-  distinctUntilChanged,
-  filter,
-  finalize,
-  map,
-  mergeMap,
-  switchMap,
-  take,
-  tap,
-  timeout,
-  withLatestFrom,
-} from 'rxjs/operators';
+import { BehaviorSubject, forkJoin, from, Observable, of, Subject } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, finalize, map, switchMap, timeout, withLatestFrom } from 'rxjs/operators';
 
 import {
   AddMyAuthFactorOTPEmailRequest,
@@ -185,8 +173,7 @@ export class GrpcAuthService {
       },
     });
 
-    console.log('init')
-    forkJoin([
+    this.user = forkJoin([
       of(this.oauthService.getAccessToken()),
       this.oauthService.events.pipe(
         filter((e) => e.type === 'token_received'),
@@ -197,19 +184,19 @@ export class GrpcAuthService {
     ]).pipe(
       filter((token) => (token ? true : false)),
       distinctUntilChanged(),
-      tap(console.log),
       switchMap(() => {
-        console.log('load user')
         return from(
           this.getMyUser().then((resp) => {
-            return resp.user
+            return resp.user;
           }),
         );
       }),
       finalize(() => {
         this.loadPermissions();
       }),
-    ).subscribe(this.userSubject);
+    );
+
+    this.user.subscribe(this.userSubject);
 
     this.activeOrgChanged.subscribe(() => {
       this.loadPermissions();

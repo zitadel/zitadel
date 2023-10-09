@@ -3,6 +3,7 @@ import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, lastValueFrom, Observable } from 'rxjs';
 
 import { StatehandlerService } from './statehandler/statehandler.service';
+import { ToastService } from './toast.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,10 +13,7 @@ export class AuthenticationService {
   private _authenticated: boolean = false;
   private readonly _authenticationChanged: BehaviorSubject<boolean> = new BehaviorSubject(this.authenticated);
 
-  constructor(
-    private oauthService: OAuthService,
-    private statehandler: StatehandlerService,
-  ) {}
+  constructor(private oauthService: OAuthService, private statehandler: StatehandlerService, private toast: ToastService) {}
 
   public initConfig(data: AuthConfig): void {
     this.authConfig = data;
@@ -39,7 +37,10 @@ export class AuthenticationService {
     }
     this.oauthService.configure(this.authConfig);
     this.oauthService.strictDiscoveryDocumentValidation = false;
-    await this.oauthService.loadDiscoveryDocumentAndTryLogin();
+    await this.oauthService.loadDiscoveryDocumentAndTryLogin().catch((error) => {
+      this.toast.showError(error, false, false);
+    });
+
     this._authenticated = this.oauthService.hasValidAccessToken();
     if (!this.oauthService.hasValidIdToken() || !this.authenticated || partialConfig || force) {
       const newState = await lastValueFrom(this.statehandler.createState());
