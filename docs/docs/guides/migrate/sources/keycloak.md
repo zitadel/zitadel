@@ -74,61 +74,6 @@ docker exec  <keycloak container ID>  /opt/keycloak/bin/kc.sh export --dir /tmp
 docker cp <keycloak container ID>:/tmp/my-realm-users-0.json .
 ```
 
-## Configure the web application
-
-Now that you have fully configured Keycloak, you need to configure an application to use Keycloak as its user management interface.
-
-This stage focuses on ZITADEL's [sample Angular application](https://github.com/zitadel/zitadel-angular) (client-side application) as a sample application that requires a user login. This application uses [OAuth Authorization Code flow with PKCE](https://zitadel.com/docs/guides/integrate/login-users#code-flow) for its authentication, which is supported by both Keycloak and ZITADEL.
-
-In order to set up the ZITADEL sample Angular application, ensure you have [Node.js](https://nodejs.org/en/) installed and clone the example repository:
-
-```bash
-git clone https://github.com/zitadel/zitadel-angular.git
-npm install -g @angular/cli
-npm install
-```
-
-In this tutorial, the Keycloak realm is named `my-realm`, and the client ID is `test-client`. Edit the [src/app/app.module.ts file](https://github.com/zitadel/zitadel-angular/blob/main/src/app/app.module.ts) and update the `client ID` and `issuer`:
-
-```js 
-const authConfig: AuthConfig = {
-   scope: 'openid profile email',
-   responseType: 'code',
-   oidc: true,
-   clientId: 'test-client',
-   issuer: 'http://localhost:8081/realms/my-realm',
-   redirectUri: 'http://localhost:4200/auth/callback',
-   postLogoutRedirectUri: 'http://localhost:4200/signedout',
-   requireHttps: false, // required for running locally
-   disableAtHashCheck: true
-};
-```
-
-The landing page of the application will be as follows: 
-
-
-Per the sample [documentation](https://github.com/zitadel/zitadel-angular#readme), running the development server will serve the browser-side application at [http://localhost:4200/](http://localhost:4200/):
-
-```bash
-npm start
-```
-
-<img src="/docs/img/guides/migrate/keycloak-17.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-After clicking the **Authenticate** button, users will be redirected to the login page hosted in Keycloak:
-
-<img src="/docs/img/guides/migrate/keycloak-18.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-After successfully logging into Keycloak, users are redirected back to the sample application:
-
-<img src="/docs/img/guides/migrate/keycloak-19.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-<img src="/docs/img/guides/migrate/keycloak-20.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-<img src="/docs/img/guides/migrate/keycloak-21.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-Now, you have successfully created a sample application that uses Keycloak for user and session management.
-
 ## Set up ZITADEL
 
 After creating a sample application that connects to Keycloak, you need to set up ZITADEL in order to migrate the application and users from Keycloak to ZITADEL. For this, ZITADEL offers a [Docker Compose](https://zitadel.com/docs/self-hosting/deploy/compose) installation guide. Follow the instructions under the [Docker compose](https://zitadel.com/docs/self-hosting/deploy/compose#docker-compose) section to run a ZITADEL instance locally. 
