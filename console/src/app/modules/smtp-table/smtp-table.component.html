@@ -11,7 +11,7 @@
     <table class="table" mat-table [dataSource]="dataSource">
       <ng-container matColumnDef="availability">
         <th class="availability" mat-header-cell *matHeaderCellDef>
-          <span>{{ 'IDP.AVAILABILITY' | translate }}</span>
+          <span>{{ 'SMTP.LIST.ACTIVATED' | translate }}</span>
         </th>
         <td class="pointer availability" mat-cell *matCellDef="let idp">
           <i
@@ -107,14 +107,14 @@
       <ng-container matColumnDef="creationDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.CREATIONDATE' | translate }}</th>
         <td class="pointer" mat-cell *matCellDef="let idp">
-          <span>{{ idp.details.creationDate | timestampToDate | localizedDate : 'dd. MMM, HH:mm' }}</span>
+          <span>{{ idp.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="changeDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.CHANGEDATE' | translate }}</th>
         <td class="pointer" mat-cell *matCellDef="let idp">
-          <span>{{ idp.details.changeDate | timestampToDate | localizedDate : 'dd. MMM, HH:mm' }}</span>
+          <span>{{ idp.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
         </td>
       </ng-container>
 
@@ -205,7 +205,7 @@
 
   <div *ngIf="(loading$ | async) === false && !dataSource?.data?.length" class="no-content-row">
     <i class="las la-exclamation"></i>
-    <span>{{ 'IDP.EMPTY' | translate }}</span>
+    <span>{{ 'SMTP.LIST.EMPTY' | translate }}</span>
   </div>
 
   <cnsl-paginator

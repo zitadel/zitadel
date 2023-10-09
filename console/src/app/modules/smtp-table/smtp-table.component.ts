@@ -38,11 +38,11 @@ import { PolicyComponentServiceType } from '../policies/policy-component-types.e
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 
 @Component({
-  selector: 'cnsl-idp-table',
-  templateUrl: './idp-table.component.html',
-  styleUrls: ['./idp-table.component.scss'],
+  selector: 'cnsl-smtp-table',
+  templateUrl: './smtp-table.component.html',
+  styleUrls: ['./smtp-table.component.scss'],
 })
-export class IdpTableComponent implements OnInit, OnDestroy {
+export class SMTPTableComponent implements OnInit, OnDestroy {
   @Input() public serviceType!: PolicyComponentServiceType;
   @Input() service!: AdminService | ManagementService;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;

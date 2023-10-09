@@ -3905,6 +3905,17 @@ message GetSMTPConfigResponse {
     zitadel.settings.v1.SMTPConfig smtp_config = 1;
 }
 
+enum SMTPProviderType {
+    SMTP_PROVIDER_TYPE_UNKNOWN = 0;
+    SMTP_PROVIDER_TYPE_SENDGRID = 1;
+    SMTP_PROVIDER_TYPE_AMAZONSES = 2;
+    SMTP_PROVIDER_TYPE_MAILGUN = 3;
+    SMTP_PROVIDER_TYPE_POSTMARK = 4;
+    SMTP_PROVIDER_TYPE_GOOGLE = 5;
+    SMTP_PROVIDER_TYPE_MAILJET = 6;
+    SMTP_PROVIDER_TYPE_GENERIC = 7;
+}
+
 message AddSMTPConfigRequest {
     string sender_address = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -3954,11 +3965,7 @@ message AddSMTPConfigRequest {
         }
     ];
     bool is_active = 8;
-    string provider_type = 9 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        example: "\"google\"";
-        }
-    ];
+    SMTPProviderType provider_type = 9;
 }
 
 message AddSMTPConfigResponse {
@@ -4009,11 +4016,7 @@ message UpdateSMTPConfigRequest {
         }
     ];
     bool is_active = 7;
-    string provider_type = 8 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        example: "\"google\"";
-        }
-    ];
+    SMTPProviderType provider_type = 8;
 }
 
 message UpdateSMTPConfigResponse {

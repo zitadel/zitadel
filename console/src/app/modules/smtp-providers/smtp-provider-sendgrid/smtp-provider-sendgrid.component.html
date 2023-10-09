@@ -9,7 +9,7 @@
       {{ 'SMTP.STEPS.SENDGRID.CREATE_DESC_TITLE' | translate }}
     </h2>
   </div>
-  <mat-progress-bar class="progress-bar" color="primary" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+  <mat-progress-bar class="progress-bar" color="primary" *ngIf="smtpLoading" mode="indeterminate"></mat-progress-bar>
 
   <mat-horizontal-stepper
     class="stepper {{ 'last-edited-step-' + stepper.selectedIndex }}"
@@ -85,7 +85,7 @@
 
       <div class="smtp-create-actions">
         <button mat-stroked-button matStepperPrevious class="bck-button">{{ 'ACTIONS.BACK' | translate }}</button>
-        <button mat-raised-button class="create-button" color="primary" data-e2e="create-button">
+        <button mat-raised-button class="create-button" color="primary" data-e2e="create-button" (click)="savePolicy()">
           {{ 'ACTIONS.CREATE' | translate }}
         </button>
       </div>

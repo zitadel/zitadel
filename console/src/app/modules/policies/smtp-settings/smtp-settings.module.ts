@@ -8,10 +8,10 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { CardModule } from '../../card/card.module';
-import { IdpTableModule } from '../../idp-table/idp-table.module';
 import { SMTPSettingsComponent } from './smtp-settings.component';
 import { InputModule } from '../../input/input.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
+import { SMTPTableModule } from '../../smtp-table/smtp-table.module';
 
 @NgModule({
   declarations: [SMTPSettingsComponent],
@@ -22,7 +22,7 @@ import { FormFieldModule } from '../../form-field/form-field.module';
     MatLegacyButtonModule,
     CardModule,
     MatIconModule,
-    IdpTableModule,
+    SMTPTableModule,
     RouterModule,
     HasRolePipeModule,
     MatProgressSpinnerModule,

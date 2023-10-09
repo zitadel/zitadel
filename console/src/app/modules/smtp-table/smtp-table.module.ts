@@ -17,10 +17,10 @@ import { TruncatePipeModule } from 'src/app/pipes/truncate-pipe/truncate-pipe.mo
 
 import { PaginatorModule } from '../paginator/paginator.module';
 import { TableActionsModule } from '../table-actions/table-actions.module';
-import { IdpTableComponent } from './smtp-table.component';
+import { SMTPTableComponent } from './smtp-table.component';
 
 @NgModule({
-  declarations: [IdpTableComponent],
+  declarations: [SMTPTableComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -41,6 +41,6 @@ import { IdpTableComponent } from './smtp-table.component';
     HasRolePipeModule,
     TruncatePipeModule,
   ],
-  exports: [IdpTableComponent],
+  exports: [SMTPTableComponent],
 })
-export class IdpTableModule {}
+export class SMTPTableModule {}

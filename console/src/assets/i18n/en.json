@@ -1905,7 +1905,9 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP Provider",
-      "DESCRIPTION": "Manage your SMTP Provider configuration, which can then be activated/deactivated."
+      "DESCRIPTION": "Manage your SMTP Provider configuration, which can then be activated/deactivated.",
+      "EMPTY": "No SMTP Provider available",
+      "ACTIVATED": "Activated"
     },
     "CREATE": {
       "TITLE": "Add SMTP provider",

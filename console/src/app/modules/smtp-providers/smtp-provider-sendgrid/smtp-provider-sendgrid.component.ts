@@ -1,47 +1,40 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component, Injector, Type } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Subject, take } from 'rxjs';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
-import {
-  AddGoogleProviderRequest as AdminAddGoogleProviderRequest,
-  GetProviderByIDRequest as AdminGetProviderByIDRequest,
-  UpdateGoogleProviderRequest as AdminUpdateGoogleProviderRequest,
-} from 'src/app/proto/generated/zitadel/admin_pb';
 import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
-import {
-  AddGoogleProviderRequest as MgmtAddGoogleProviderRequest,
-  GetProviderByIDRequest as MgmtGetProviderByIDRequest,
-  UpdateGoogleProviderRequest as MgmtUpdateGoogleProviderRequest,
-} from 'src/app/proto/generated/zitadel/management_pb';
-import { AdminService } from 'src/app/services/admin.service';
-import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
-import { ManagementService } from 'src/app/services/mgmt.service';
-import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 import { MatLegacyCheckboxChange } from '@angular/material/legacy-checkbox';
+import {
+  AddSMTPConfigRequest,
+  AddSMTPConfigResponse,
+  UpdateSMTPConfigRequest,
+  UpdateSMTPConfigResponse,
+} from 'src/app/proto/generated/zitadel/admin_pb';
+import { AdminService } from 'src/app/services/admin.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { SMTPProviderType } from 'src/app/proto/generated/zitadel/settings_pb';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
   selector: 'cnsl-provider-sendgrid',
   templateUrl: './smtp-provider-sendgrid.component.html',
   styleUrls: ['./smtp-provider-sendgrid.component.scss'],
 })
-export class SMTPProviderSendgridComponent {
+export class SMTPProviderSendgridComponent implements OnInit {
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
   public id: string | null = '';
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
-  // private service!: ManagementService | AdminService;
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
-  public loading: boolean = false;
+  public smtpLoading: boolean = false;
+  public hasSMTPConfig: boolean = false;
 
   public provider?: Provider.AsObject;
   public updateClientSecret: boolean = false;
@@ -55,16 +48,13 @@ export class SMTPProviderSendgridComponent {
   private host: string = 'smtp.sendgrid.net';
   private unencryptedPort: number = 587;
   private encryptedPort: number = 465;
-  private tls: boolean = false;
 
   constructor(
-    private authService: GrpcAuthService,
-    private route: ActivatedRoute,
-    private toast: ToastService,
-    private injector: Injector,
+    private service: AdminService,
     private _location: Location,
-    private breadcrumbService: BreadcrumbService,
     private fb: UntypedFormBuilder,
+    private authService: GrpcAuthService,
+    private toast: ToastService,
   ) {
     this.firstFormGroup = this.fb.group({
       tls: [false],
@@ -78,56 +68,19 @@ export class SMTPProviderSendgridComponent {
       senderName: ['', [requiredValidator]],
       replyToAddress: [''],
     });
+  }
 
-    // this.authService
-    //   .isAllowed(
-    //     this.serviceType === PolicyComponentServiceType.ADMIN
-    //       ? ['iam.idp.write']
-    //       : this.serviceType === PolicyComponentServiceType.MGMT
-    //       ? ['org.idp.write']
-    //       : [],
-    //   )
-    //   .pipe(take(1))
-    //   .subscribe((allowed) => {
-    //     if (allowed) {
-    //       this.form.enable();
-    //     } else {
-    //       this.form.disable();
-    //     }
-    //   });
-
-    // this.route.data.pipe(take(1)).subscribe((data) => {
-    //   this.serviceType = data['serviceType'];
-
-    //   switch (this.serviceType) {
-    //     case PolicyComponentServiceType.MGMT:
-    //       this.service = this.injector.get(ManagementService as Type<ManagementService>);
-
-    //       const bread: Breadcrumb = {
-    //         type: BreadcrumbType.ORG,
-    //         routerLink: ['/org'],
-    //       };
-
-    //       this.breadcrumbService.setBreadcrumb([bread]);
-    //       break;
-    //     case PolicyComponentServiceType.ADMIN:
-    //       this.service = this.injector.get(AdminService as Type<AdminService>);
-
-    //       const iamBread = new Breadcrumb({
-    //         type: BreadcrumbType.ORG,
-    //         name: 'Instance',
-    //         routerLink: ['/instance'],
-    //       });
-    //       this.breadcrumbService.setBreadcrumb([iamBread]);
-    //       break;
-    //   }
-
-    //   this.id = this.route.snapshot.paramMap.get('id');
-    //   if (this.id) {
-    //     this.clientSecret?.setValidators([]);
-    //     this.getData(this.id);
-    //   }
-    // });
+  ngOnInit(): void {
+    this.fetchData();
+    this.authService
+      .isAllowed(['iam.write'])
+      .pipe(take(1))
+      .subscribe((allowed) => {
+        if (allowed) {
+          this.firstFormGroup.enable();
+          this.secondFormGroup.enable();
+        }
+      });
   }
 
   public changeStep(event: StepperSelectionEvent): void {
@@ -138,124 +91,107 @@ export class SMTPProviderSendgridComponent {
     }
   }
 
+  public close(): void {
+    this._location.back();
+  }
+
   public toggleTLS(event: MatLegacyCheckboxChange) {
     this.hostAndPort?.setValue(`${this.host}:${event.checked ? this.encryptedPort : this.unencryptedPort}`);
+  }
+
+  private fetchData(): void {
+    this.smtpLoading = true;
+    this.service
+      .getSMTPConfig()
+      .then((smtpConfig) => {
+        this.smtpLoading = false;
+        if (smtpConfig.smtpConfig) {
+          this.hasSMTPConfig = true;
+          this.firstFormGroup.patchValue({
+            ['tls']: smtpConfig.smtpConfig.tls,
+            ['hostAndPort']: smtpConfig.smtpConfig.host,
+            ['user']: smtpConfig.smtpConfig.user,
+          });
+          this.secondFormGroup.patchValue({
+            ['senderAddress']: smtpConfig.smtpConfig.senderAddress,
+            ['senderName']: smtpConfig.smtpConfig.senderName,
+            ['replyToAddress']: smtpConfig.smtpConfig.replyToAddress,
+          });
+        }
+      })
+      .catch((error) => {
+        this.smtpLoading = false;
+        if (error && error.code === 5) {
+          console.log(error);
+          this.hasSMTPConfig = false;
+        }
+      });
+  }
+
+  private updateData(): Promise<UpdateSMTPConfigResponse.AsObject | AddSMTPConfigResponse> {
+    if (this.hasSMTPConfig) {
+      const req = new UpdateSMTPConfigRequest();
+      req.setProviderType(SMTPProviderType.SMTP_PROVIDER_TYPE_SENDGRID);
+      req.setHost(this.hostAndPort?.value ?? '');
+      req.setSenderAddress(this.senderAddress?.value ?? '');
+      req.setSenderName(this.senderName?.value ?? '');
+      req.setReplyToAddress(this.replyToAddress?.value ?? '');
+      req.setTls(this.tls?.value ?? false);
+      req.setUser(this.user?.value ?? '');
+      return this.service.updateSMTPConfig(req);
+    } else {
+      const req = new AddSMTPConfigRequest();
+      req.setProviderType(SMTPProviderType.SMTP_PROVIDER_TYPE_SENDGRID);
+      req.setHost(this.hostAndPort?.value ?? '');
+      req.setSenderAddress(this.senderAddress?.value ?? '');
+      req.setSenderName(this.senderName?.value ?? '');
+      req.setReplyToAddress(this.replyToAddress?.value ?? '');
+      req.setTls(this.tls?.value ?? false);
+      req.setUser(this.user?.value ?? '');
+      req.setPassword(this.password?.value ?? '');
+      req.setIsActive(true);
+      return this.service.addSMTPConfig(req);
+    }
+  }
+
+  public savePolicy(): void {
+    this.updateData()
+      .then(() => {
+        this.toast.showInfo('SETTING.SMTP.SAVED', true);
+        setTimeout(() => {
+          this.fetchData();
+        }, 2000);
+      })
+      .catch((error: unknown) => {
+        this.toast.showError(error);
+      });
+  }
+
+  public get tls(): AbstractControl | null {
+    return this.firstFormGroup.get('tls');
+  }
+
+  public get user(): AbstractControl | null {
+    return this.firstFormGroup.get('user');
   }
 
   public get hostAndPort(): AbstractControl | null {
     return this.firstFormGroup.get('hostAndPort');
   }
 
-  // private getData(id: string): void {
-  //   const req =
-  //     this.serviceType === PolicyComponentServiceType.ADMIN
-  //       ? new AdminGetProviderByIDRequest()
-  //       : new MgmtGetProviderByIDRequest();
-  //   req.setId(id);
-  //   this.service
-  //     .getProviderByID(req)
-  //     .then((resp) => {
-  //       this.provider = resp.idp;
-  //       this.loading = false;
-  //       if (this.provider?.config?.google) {
-  //         this.form.patchValue(this.provider.config.google);
-  //         this.name?.setValue(this.provider.name);
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       this.toast.showError(error);
-  //       this.loading = false;
-  //     });
-  // }
+  public get password(): AbstractControl | null {
+    return this.firstFormGroup.get('password');
+  }
 
-  // public submitForm(): void {
-  //   this.provider ? this.updateGoogleProvider() : this.addGoogleProvider();
-  // }
+  public get senderAddress(): AbstractControl | null {
+    return this.secondFormGroup.get('senderAddress');
+  }
 
-  // public addGoogleProvider(): void {
-  //   const req =
-  //     this.serviceType === PolicyComponentServiceType.MGMT
-  //       ? new MgmtAddGoogleProviderRequest()
-  //       : new AdminAddGoogleProviderRequest();
+  public get senderName(): AbstractControl | null {
+    return this.secondFormGroup.get('senderName');
+  }
 
-  //   req.setName(this.name?.value);
-  //   req.setClientId(this.clientId?.value);
-  //   req.setClientSecret(this.clientSecret?.value);
-  //   req.setScopesList(this.scopesList?.value);
-  //   req.setProviderOptions(this.options);
-
-  //   this.loading = true;
-  //   this.service
-  //     .addGoogleProvider(req)
-  //     .then((idp) => {
-  //       setTimeout(() => {
-  //         this.loading = false;
-  //         this.close();
-  //       }, 2000);
-  //     })
-  //     .catch((error) => {
-  //       this.toast.showError(error);
-  //       this.loading = false;
-  //     });
-  // }
-
-  // public updateGoogleProvider(): void {
-  //   if (this.provider) {
-  //     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-  //       const req = new MgmtUpdateGoogleProviderRequest();
-  //       req.setId(this.provider.id);
-  //       req.setName(this.name?.value);
-  //       req.setClientId(this.clientId?.value);
-  //       req.setScopesList(this.scopesList?.value);
-  //       req.setProviderOptions(this.options);
-
-  //       if (this.updateClientSecret) {
-  //         req.setClientSecret(this.clientSecret?.value);
-  //       }
-
-  //       this.loading = true;
-  //       (this.service as ManagementService)
-  //         .updateGoogleProvider(req)
-  //         .then((idp) => {
-  //           setTimeout(() => {
-  //             this.loading = false;
-  //             this.close();
-  //           }, 2000);
-  //         })
-  //         .catch((error) => {
-  //           this.toast.showError(error);
-  //           this.loading = false;
-  //         });
-  //     } else if (PolicyComponentServiceType.ADMIN) {
-  //       const req = new AdminUpdateGoogleProviderRequest();
-  //       req.setId(this.provider.id);
-  //       req.setName(this.name?.value);
-  //       req.setClientId(this.clientId?.value);
-  //       req.setScopesList(this.scopesList?.value);
-  //       req.setProviderOptions(this.options);
-
-  //       if (this.updateClientSecret) {
-  //         req.setClientSecret(this.clientSecret?.value);
-  //       }
-
-  //       this.loading = true;
-  //       (this.service as AdminService)
-  //         .updateGoogleProvider(req)
-  //         .then((idp) => {
-  //           setTimeout(() => {
-  //             this.loading = false;
-  //             this.close();
-  //           }, 2000);
-  //         })
-  //         .catch((error) => {
-  //           this.loading = false;
-  //           this.toast.showError(error);
-  //         });
-  //     }
-  //   }
-  // }
-
-  public close(): void {
-    this._location.back();
+  public get replyToAddress(): AbstractControl | null {
+    return this.secondFormGroup.get('replyToAddress');
   }
 }
