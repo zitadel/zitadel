@@ -25,6 +25,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
+import { MatLegacyCheckboxChange } from '@angular/material/legacy-checkbox';
 
 @Component({
   selector: 'cnsl-provider-sendgrid',
@@ -32,16 +33,13 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
   styleUrls: ['./smtp-provider-sendgrid.component.scss'],
 })
 export class SMTPProviderSendgridComponent {
-  // private const supportedProviders = { google: { hostAndPort: 'localhost:25', hostAndPortTLS: 'localhost:587'}}
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
   public id: string | null = '';
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
-  private service!: ManagementService | AdminService;
+  // private service!: ManagementService | AdminService;
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
-
-  public form!: FormGroup;
 
   public loading: boolean = false;
 
@@ -54,6 +52,11 @@ export class SMTPProviderSendgridComponent {
   public firstFormGroup!: UntypedFormGroup;
   public secondFormGroup!: UntypedFormGroup;
 
+  private host: string = 'smtp.sendgrid.net';
+  private unencryptedPort: number = 587;
+  private encryptedPort: number = 465;
+  private tls: boolean = false;
+
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
@@ -63,16 +66,9 @@ export class SMTPProviderSendgridComponent {
     private breadcrumbService: BreadcrumbService,
     private fb: UntypedFormBuilder,
   ) {
-    this.form = new FormGroup({
-      name: new FormControl('', []),
-      clientId: new FormControl('', [requiredValidator]),
-      clientSecret: new FormControl('', [requiredValidator]),
-      scopesList: new FormControl(['openid', 'profile', 'email'], []),
-    });
-
     this.firstFormGroup = this.fb.group({
-      tls: [''],
-      hostAndPort: ['smtp.sendgrid.net:587'],
+      tls: [false],
+      hostAndPort: [`${this.host}:${this.unencryptedPort}`],
       user: ['apiKey'],
       password: [''],
     });
@@ -83,55 +79,55 @@ export class SMTPProviderSendgridComponent {
       replyToAddress: [''],
     });
 
-    this.authService
-      .isAllowed(
-        this.serviceType === PolicyComponentServiceType.ADMIN
-          ? ['iam.idp.write']
-          : this.serviceType === PolicyComponentServiceType.MGMT
-          ? ['org.idp.write']
-          : [],
-      )
-      .pipe(take(1))
-      .subscribe((allowed) => {
-        if (allowed) {
-          this.form.enable();
-        } else {
-          this.form.disable();
-        }
-      });
+    // this.authService
+    //   .isAllowed(
+    //     this.serviceType === PolicyComponentServiceType.ADMIN
+    //       ? ['iam.idp.write']
+    //       : this.serviceType === PolicyComponentServiceType.MGMT
+    //       ? ['org.idp.write']
+    //       : [],
+    //   )
+    //   .pipe(take(1))
+    //   .subscribe((allowed) => {
+    //     if (allowed) {
+    //       this.form.enable();
+    //     } else {
+    //       this.form.disable();
+    //     }
+    //   });
 
-    this.route.data.pipe(take(1)).subscribe((data) => {
-      this.serviceType = data['serviceType'];
+    // this.route.data.pipe(take(1)).subscribe((data) => {
+    //   this.serviceType = data['serviceType'];
 
-      switch (this.serviceType) {
-        case PolicyComponentServiceType.MGMT:
-          this.service = this.injector.get(ManagementService as Type<ManagementService>);
+    //   switch (this.serviceType) {
+    //     case PolicyComponentServiceType.MGMT:
+    //       this.service = this.injector.get(ManagementService as Type<ManagementService>);
 
-          const bread: Breadcrumb = {
-            type: BreadcrumbType.ORG,
-            routerLink: ['/org'],
-          };
+    //       const bread: Breadcrumb = {
+    //         type: BreadcrumbType.ORG,
+    //         routerLink: ['/org'],
+    //       };
 
-          this.breadcrumbService.setBreadcrumb([bread]);
-          break;
-        case PolicyComponentServiceType.ADMIN:
-          this.service = this.injector.get(AdminService as Type<AdminService>);
+    //       this.breadcrumbService.setBreadcrumb([bread]);
+    //       break;
+    //     case PolicyComponentServiceType.ADMIN:
+    //       this.service = this.injector.get(AdminService as Type<AdminService>);
 
-          const iamBread = new Breadcrumb({
-            type: BreadcrumbType.ORG,
-            name: 'Instance',
-            routerLink: ['/instance'],
-          });
-          this.breadcrumbService.setBreadcrumb([iamBread]);
-          break;
-      }
+    //       const iamBread = new Breadcrumb({
+    //         type: BreadcrumbType.ORG,
+    //         name: 'Instance',
+    //         routerLink: ['/instance'],
+    //       });
+    //       this.breadcrumbService.setBreadcrumb([iamBread]);
+    //       break;
+    //   }
 
-      this.id = this.route.snapshot.paramMap.get('id');
-      if (this.id) {
-        this.clientSecret?.setValidators([]);
-        this.getData(this.id);
-      }
-    });
+    //   this.id = this.route.snapshot.paramMap.get('id');
+    //   if (this.id) {
+    //     this.clientSecret?.setValidators([]);
+    //     this.getData(this.id);
+    //   }
+    // });
   }
 
   public changeStep(event: StepperSelectionEvent): void {
@@ -142,156 +138,124 @@ export class SMTPProviderSendgridComponent {
     }
   }
 
-  private getData(id: string): void {
-    const req =
-      this.serviceType === PolicyComponentServiceType.ADMIN
-        ? new AdminGetProviderByIDRequest()
-        : new MgmtGetProviderByIDRequest();
-    req.setId(id);
-    this.service
-      .getProviderByID(req)
-      .then((resp) => {
-        this.provider = resp.idp;
-        this.loading = false;
-        if (this.provider?.config?.google) {
-          this.form.patchValue(this.provider.config.google);
-          this.name?.setValue(this.provider.name);
-        }
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-        this.loading = false;
-      });
+  public toggleTLS(event: MatLegacyCheckboxChange) {
+    this.hostAndPort?.setValue(`${this.host}:${event.checked ? this.encryptedPort : this.unencryptedPort}`);
   }
 
-  public submitForm(): void {
-    this.provider ? this.updateGoogleProvider() : this.addGoogleProvider();
+  public get hostAndPort(): AbstractControl | null {
+    return this.firstFormGroup.get('hostAndPort');
   }
 
-  public addGoogleProvider(): void {
-    const req =
-      this.serviceType === PolicyComponentServiceType.MGMT
-        ? new MgmtAddGoogleProviderRequest()
-        : new AdminAddGoogleProviderRequest();
+  // private getData(id: string): void {
+  //   const req =
+  //     this.serviceType === PolicyComponentServiceType.ADMIN
+  //       ? new AdminGetProviderByIDRequest()
+  //       : new MgmtGetProviderByIDRequest();
+  //   req.setId(id);
+  //   this.service
+  //     .getProviderByID(req)
+  //     .then((resp) => {
+  //       this.provider = resp.idp;
+  //       this.loading = false;
+  //       if (this.provider?.config?.google) {
+  //         this.form.patchValue(this.provider.config.google);
+  //         this.name?.setValue(this.provider.name);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       this.toast.showError(error);
+  //       this.loading = false;
+  //     });
+  // }
 
-    req.setName(this.name?.value);
-    req.setClientId(this.clientId?.value);
-    req.setClientSecret(this.clientSecret?.value);
-    req.setScopesList(this.scopesList?.value);
-    req.setProviderOptions(this.options);
+  // public submitForm(): void {
+  //   this.provider ? this.updateGoogleProvider() : this.addGoogleProvider();
+  // }
 
-    this.loading = true;
-    this.service
-      .addGoogleProvider(req)
-      .then((idp) => {
-        setTimeout(() => {
-          this.loading = false;
-          this.close();
-        }, 2000);
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-        this.loading = false;
-      });
-  }
+  // public addGoogleProvider(): void {
+  //   const req =
+  //     this.serviceType === PolicyComponentServiceType.MGMT
+  //       ? new MgmtAddGoogleProviderRequest()
+  //       : new AdminAddGoogleProviderRequest();
 
-  public updateGoogleProvider(): void {
-    if (this.provider) {
-      if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        const req = new MgmtUpdateGoogleProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setClientId(this.clientId?.value);
-        req.setScopesList(this.scopesList?.value);
-        req.setProviderOptions(this.options);
+  //   req.setName(this.name?.value);
+  //   req.setClientId(this.clientId?.value);
+  //   req.setClientSecret(this.clientSecret?.value);
+  //   req.setScopesList(this.scopesList?.value);
+  //   req.setProviderOptions(this.options);
 
-        if (this.updateClientSecret) {
-          req.setClientSecret(this.clientSecret?.value);
-        }
+  //   this.loading = true;
+  //   this.service
+  //     .addGoogleProvider(req)
+  //     .then((idp) => {
+  //       setTimeout(() => {
+  //         this.loading = false;
+  //         this.close();
+  //       }, 2000);
+  //     })
+  //     .catch((error) => {
+  //       this.toast.showError(error);
+  //       this.loading = false;
+  //     });
+  // }
 
-        this.loading = true;
-        (this.service as ManagementService)
-          .updateGoogleProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-            this.loading = false;
-          });
-      } else if (PolicyComponentServiceType.ADMIN) {
-        const req = new AdminUpdateGoogleProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setClientId(this.clientId?.value);
-        req.setScopesList(this.scopesList?.value);
-        req.setProviderOptions(this.options);
+  // public updateGoogleProvider(): void {
+  //   if (this.provider) {
+  //     if (this.serviceType === PolicyComponentServiceType.MGMT) {
+  //       const req = new MgmtUpdateGoogleProviderRequest();
+  //       req.setId(this.provider.id);
+  //       req.setName(this.name?.value);
+  //       req.setClientId(this.clientId?.value);
+  //       req.setScopesList(this.scopesList?.value);
+  //       req.setProviderOptions(this.options);
 
-        if (this.updateClientSecret) {
-          req.setClientSecret(this.clientSecret?.value);
-        }
+  //       if (this.updateClientSecret) {
+  //         req.setClientSecret(this.clientSecret?.value);
+  //       }
 
-        this.loading = true;
-        (this.service as AdminService)
-          .updateGoogleProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.loading = false;
-            this.toast.showError(error);
-          });
-      }
-    }
-  }
+  //       this.loading = true;
+  //       (this.service as ManagementService)
+  //         .updateGoogleProvider(req)
+  //         .then((idp) => {
+  //           setTimeout(() => {
+  //             this.loading = false;
+  //             this.close();
+  //           }, 2000);
+  //         })
+  //         .catch((error) => {
+  //           this.toast.showError(error);
+  //           this.loading = false;
+  //         });
+  //     } else if (PolicyComponentServiceType.ADMIN) {
+  //       const req = new AdminUpdateGoogleProviderRequest();
+  //       req.setId(this.provider.id);
+  //       req.setName(this.name?.value);
+  //       req.setClientId(this.clientId?.value);
+  //       req.setScopesList(this.scopesList?.value);
+  //       req.setProviderOptions(this.options);
+
+  //       if (this.updateClientSecret) {
+  //         req.setClientSecret(this.clientSecret?.value);
+  //       }
+
+  //       this.loading = true;
+  //       (this.service as AdminService)
+  //         .updateGoogleProvider(req)
+  //         .then((idp) => {
+  //           setTimeout(() => {
+  //             this.loading = false;
+  //             this.close();
+  //           }, 2000);
+  //         })
+  //         .catch((error) => {
+  //           this.loading = false;
+  //           this.toast.showError(error);
+  //         });
+  //     }
+  //   }
+  // }
 
   public close(): void {
     this._location.back();
-  }
-
-  public addScope(event: MatChipInputEvent): void {
-    const input = event.chipInput?.inputElement;
-    const value = event.value.trim();
-
-    if (value !== '') {
-      if (this.scopesList?.value) {
-        this.scopesList.value.push(value);
-        if (input) {
-          input.value = '';
-        }
-      }
-    }
-  }
-
-  public removeScope(uri: string): void {
-    if (this.scopesList?.value) {
-      const index = this.scopesList.value.indexOf(uri);
-
-      if (index !== undefined && index >= 0) {
-        this.scopesList.value.splice(index, 1);
-      }
-    }
-  }
-
-  public get name(): AbstractControl | null {
-    return this.form.get('name');
-  }
-
-  public get clientId(): AbstractControl | null {
-    return this.form.get('clientId');
-  }
-
-  public get clientSecret(): AbstractControl | null {
-    return this.form.get('clientSecret');
-  }
-
-  public get scopesList(): AbstractControl | null {
-    return this.form.get('scopesList');
   }
 }

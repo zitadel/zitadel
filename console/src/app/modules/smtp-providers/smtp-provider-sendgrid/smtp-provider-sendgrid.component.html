@@ -21,7 +21,7 @@
     <mat-step [editable]="true">
       <ng-template matStepLabel>{{ 'SMTP.CREATE.STEPS.PROVIDER_SETTINGS' | translate }}</ng-template>
       <form [formGroup]="firstFormGroup" autocomplete="off">
-        <mat-checkbox class="smtp-checkbox" formControlName="tls">
+        <mat-checkbox class="smtp-checkbox" formControlName="tls" (change)="toggleTLS($event)">
           {{ 'SETTING.SMTP.TLS' | translate }}
         </mat-checkbox>
 

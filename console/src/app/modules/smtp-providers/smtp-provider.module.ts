@@ -18,12 +18,11 @@ import { CreateLayoutModule } from '../create-layout/create-layout.module';
 import { InfoSectionModule } from '../info-section/info-section.module';
 import { ProviderOptionsModule } from '../provider-options/provider-options.module';
 import { StringListModule } from '../string-list/string-list.module';
-import { SMTPProviderGoogleComponent } from './smtp-provider-google/smtp-provider-google.component';
 import { SMTPProvidersRoutingModule } from './smtp-provider-routing.module';
 import { SMTPProviderSendgridComponent } from './smtp-provider-sendgrid/smtp-provider-sendgrid.component';
 
 @NgModule({
-  declarations: [SMTPProviderGoogleComponent, SMTPProviderSendgridComponent],
+  declarations: [SMTPProviderSendgridComponent],
   imports: [
     SMTPProvidersRoutingModule,
     CommonModule,
