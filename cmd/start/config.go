@@ -92,6 +92,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			database.DecodeHook,
 			actions.HTTPConfigDecodeHook,
 			systemAPIUsersDecodeHook,
+			hook.StringToFeatureHookFunc(),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read config")

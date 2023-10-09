@@ -120,7 +120,7 @@ Errors:
       Empty: Le mot de passe est vide
       Invalid: Le mot de passe n'est pas valide
       NotSet: L'utilisateur n'a pas défini de mot de passe
-      NotChanged: Mot de passe non modifié
+      NotChanged: Le nouveau mot de passe ne peut pas être le même que votre mot de passe actuel
       NotSupported: Encodage de hachage de mot de passe non pris en charge
     PasswordComplexityPolicy:
       NotFound: Politique de mot de passe non trouvée
@@ -487,6 +487,8 @@ Errors:
       NoChallenge: Session sans challenge WebAuthN
   Intent:
     IDPMissing: IDP manquant dans la requête
+    IDPInvalid: IDP non valide pour la demande
+    ResponseInvalid: La réponse de l'IDP n'est pas valide
     SuccessURLMissing: Success URL absent de la requête
     FailureURLMissing: Failure URL absent de la requête
     StateMissing: Paramètre d'état manquant dans la requête
@@ -505,6 +507,10 @@ Errors:
       Invalid: Le jeton n'est pas valide
       Expired: Le jeton est expiré
     InvalidClient: Le token n'a pas été émis pour ce client
+  Feature:
+    NotExisting: La fonctionnalité n'existe pas
+    TypeNotSupported: Le type de fonctionnalité n'est pas pris en charge
+    InvalidValue: Valeur non valide pour cette fonctionnalité
 
 AggregateTypes:
   action: Action
@@ -515,6 +521,7 @@ AggregateTypes:
   user: Utilisateur
   usergrant: Subvention de l'utilisateur
   quota: Contingent
+  feature: Fonctionnalité
 
 EventTypes:
   user:

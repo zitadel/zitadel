@@ -6,6 +6,7 @@ import "zitadel/instance.proto";
 import "zitadel/member.proto";
 import "zitadel/quota.proto";
 import "zitadel/auth_n_key.proto";
+import "zitadel/feature.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -49,7 +50,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$ZITADEL_DOMAIN";
+  host: "$CUSTOM-DOMAIN";
   base_path: "/system/v1";
 
   external_docs: {
@@ -391,6 +392,18 @@ service SystemService {
   rpc RemoveQuota(RemoveQuotaRequest) returns (RemoveQuotaResponse) {
     option (google.api.http) = {
       delete: "/instances/{instance_id}/quotas/{unit}"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated";
+    };
+  }
+
+  // Set a feature flag on an instance
+  rpc SetInstanceFeature(SetInstanceFeatureRequest) returns (SetInstanceFeatureResponse) {
+    option (google.api.http) = {
+      put: "/instances/{instance_id}/features/{feature_id}"
+      body: "*"
     };
 
     option (zitadel.v1.auth_option) = {
@@ -878,4 +891,19 @@ message FailedEvent {
       description: "The timestamp the failure last occurred";
     }
   ];
+}
+
+message SetInstanceFeatureRequest {
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  zitadel.feature.v1.InstanceFeature feature_id = 2 [(validate.rules).enum = {not_in: 0, defined_only: true}];
+  // value based on the feature type
+  oneof value {
+    option (validate.required) = true;
+
+    bool bool = 3;
+  }
+}
+
+message SetInstanceFeatureResponse {
+  zitadel.v1.ObjectDetails details = 1;
 }

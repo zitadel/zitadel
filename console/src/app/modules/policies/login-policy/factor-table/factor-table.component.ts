@@ -51,7 +51,11 @@ export class FactorTableComponent {
 
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
-  constructor(public translate: TranslateService, private toast: ToastService, private dialog: MatDialog) {}
+  constructor(
+    public translate: TranslateService,
+    private toast: ToastService,
+    private dialog: MatDialog,
+  ) {}
 
   public removeMfa(type: MultiFactorType | SecondFactorType): void {
     const dialogRef = this.dialog.open(WarnDialogComponent, {

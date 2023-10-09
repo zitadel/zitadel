@@ -595,7 +595,7 @@ DefaultInstance:
     MaxAgeDays: 0 # ZITADEL_DEFAULTINSTANCE_PASSWORDAGEPOLICY_MAXAGEDAYS
   DomainPolicy:
     UserLoginMustBeDomain: false # ZITADEL_DEFAULTINSTANCE_DOMAINPOLICY_USERLOGINMUSTBEDOMAIN
-    ValidateOrgDomains: true # ZITADEL_DEFAULTINSTANCE_DOMAINPOLICY_VALIDATEORGDOMAINS
+    ValidateOrgDomains: false # ZITADEL_DEFAULTINSTANCE_DOMAINPOLICY_VALIDATEORGDOMAINS
     SMTPSenderAddressMatchesInstanceDomain: false # ZITADEL_DEFAULTINSTANCE_DOMAINPOLICY_SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN
   LoginPolicy:
     AllowUsernamePassword: true # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_ALLOWUSERNAMEPASSWORD
@@ -604,7 +604,7 @@ DefaultInstance:
     ForceMFA: false # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_FORCEMFA
     HidePasswordReset: false # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_HIDEPASSWORDRESET
     IgnoreUnknownUsernames: false # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_IGNOREUNKNOWNUSERNAMES
-    AllowDomainDiscovery: false # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_ALLOWDOMAINDISCOVERY
+    AllowDomainDiscovery: true # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_ALLOWDOMAINDISCOVERY
     # 1 is allowed, 0 is not allowed
     PasswordlessType: 1 # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_PASSWORDLESSTYPE
     # DefaultRedirectURL is empty by default because we use the Console UI
@@ -761,6 +761,8 @@ DefaultInstance:
       Greeting: Hello {{.DisplayName}},
       Text: The password of your user has changed. If this change was not done by you, please be advised to immediately reset your password.
       ButtonText: Login
+  Features:
+    - FeatureLoginDefaultOrg: true
 
   Quotas:
     # Items take a slice of quota configurations, whereas, for each unit type and instance, one or zero quotas may exist.
@@ -819,6 +821,7 @@ InternalAuthZ:
         - "iam.flow.read"
         - "iam.flow.write"
         - "iam.flow.delete"
+        - "iam.feature.write"
         - "org.read"
         - "org.global.read"
         - "org.create"

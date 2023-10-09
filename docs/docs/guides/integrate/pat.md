@@ -1,5 +1,6 @@
 ---
-title: PAT (Personal Access Token)
+title: ZITADEL's Personal Access Tokens(PATs)
+sidebar_label: Personal Access Tokens(PATs)
 ---
 
 
@@ -40,6 +41,6 @@ In this example we read the organization of the service user.
 
 ```bash
 curl --request GET \
-  --url {your-domain}/management/v1/orgs/me \
+  --url $CUSTOM-DOMAIN/management/v1/orgs/me \
   --header 'Authorization: Bearer {PAT}' 
 ```

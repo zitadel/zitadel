@@ -10,7 +10,10 @@ export abstract class StatehandlerProcessorService {
 
 @Injectable()
 export class StatehandlerProcessorServiceImpl implements StatehandlerProcessorService {
-  constructor(private location: Location, private router: Router) {}
+  constructor(
+    private location: Location,
+    private router: Router,
+  ) {}
 
   public createState(url: string): string {
     const externalUrl = url;

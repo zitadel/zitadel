@@ -95,7 +95,6 @@
     "EVENTS": "Événements",
     "FAILEDEVENTS": "Événements échoués",
     "ORGANIZATION": "Organisation",
-    "DOMAINS": "Domaines",
     "PROJECT": "Projets",
     "PROJECTOVERVIEW": "Vue d'ensemble",
     "PROJECTGRANTS": "Subventions",
@@ -495,6 +494,7 @@
       "LASTNAME": "Nom de famille",
       "NICKNAME": "Surnom",
       "DISPLAYNAME": "Nom d'affichage",
+      "PREFERREDLOGINNAME": "Nom de connexion préféré",
       "PREFERRED_LANGUAGE": "Langue",
       "GENDER": "Sexe",
       "PASSWORD": "Mot de passe",
@@ -795,7 +795,7 @@
     },
     "PAGES": {
       "STATE": "Statut",
-      "DOMAINLIST": "Domaines"
+      "DOMAINLIST": "Domaines personnalisés"
     },
     "STATE": {
       "0": "Inconnu",
@@ -952,7 +952,7 @@
     },
     "DOMAINS": {
       "NEW": "Ajouter un domaine",
-      "TITLE": "Domaines",
+      "TITLE": "Domaines vérifiés",
       "DESCRIPTION": "Configurez vos domaines. Ce domaine peut être utilisé pour se connecter avec vos utilisateurs.",
       "SETPRIMARY": "Définir comme primaire",
       "DELETE": {
@@ -1022,6 +1022,7 @@
       "NOTIFICATIONS_DESC": "Paramètres SMTP et SMS",
       "MESSAGETEXTS": "Textes des messages",
       "IDP": "Fournisseurs d'identité",
+      "VERIFIED_DAMAINS": "Domaines vérifiés",
       "DOMAIN": "Paramètres du domaine",
       "LOGINTEXTS": "Textes de l'interface de connexion",
       "BRANDING": "Image de marque",
@@ -1104,7 +1105,7 @@
       "INDAYS": "Jours"
     },
     "SECRETS": {
-      "TITLE": "Apparence du secret",
+      "TITLE": "Générateur du secret",
       "TYPES": "Types de secret",
       "TYPE": {
         "1": "Courrier d'initialisation",
@@ -1116,7 +1117,7 @@
         "7": "Mot de passe à usage unique (OTP) - SMS",
         "8": "Mot de passe à usage unique (OTP) - e-mail"
       },
-      "ADDGENERATOR": "Définir l'apparence du secret",
+      "ADDGENERATOR": "Configurer générateur de mot de passe",
       "GENERATORTYPE": "Type",
       "EXPIRY": "Expiration (en heures)",
       "INCLUDEDIGITS": "Inclure les chiffres",
@@ -1350,7 +1351,7 @@
       "MAXAGEDAYS": "Âge maximum en jours",
       "USERLOGINMUSTBEDOMAIN": "Le nom de connexion de l'utilisateur doit contenir le nom de domaine de l'organisation",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Si vous activez ce paramètre, tous les noms de connexion seront suffixés avec le domaine de l'organisation. Si ce paramètre est désactivé, vous devez vous assurer que les noms d'utilisateur sont uniques pour toutes les organisations.",
-      "VALIDATEORGDOMAINS": "Valider les domaines d'Org",
+      "VALIDATEORGDOMAINS": "Vérification du domaine de l'organisation requise (challenge DNS ou HTTP)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "L'adresse de l'expéditeur SMTP correspond au domaine de l'instance",
       "ALLOWUSERNAMEPASSWORD": "Nom d'utilisateur Mot de passe autorisé",
       "ALLOWEXTERNALIDP": "IDP externe autorisé",

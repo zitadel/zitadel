@@ -93,7 +93,12 @@ func (s *Tester) CreateOIDCAuthRequest(clientID, loginClient, redirectURI string
 	codeChallenge := oidc.NewSHACodeChallenge(codeVerifier)
 	authURL := rp.AuthURL("state", provider, rp.WithCodeChallenge(codeChallenge))
 
-	loc, err := CheckRedirect(authURL, map[string]string{oidc_internal.LoginClientHeader: loginClient})
+	req, err := GetRequest(authURL, map[string]string{oidc_internal.LoginClientHeader: loginClient})
+	if err != nil {
+		return "", err
+	}
+
+	loc, err := CheckRedirect(req)
 	if err != nil {
 		return "", err
 	}
@@ -120,7 +125,12 @@ func (s *Tester) CreateOIDCAuthRequestImplicit(clientID, loginClient, redirectUR
 	parsed.RawQuery = queries.Encode()
 	authURL = parsed.String()
 
-	loc, err := CheckRedirect(authURL, map[string]string{oidc_internal.LoginClientHeader: loginClient})
+	req, err := GetRequest(authURL, map[string]string{oidc_internal.LoginClientHeader: loginClient})
+	if err != nil {
+		return "", err
+	}
+
+	loc, err := CheckRedirect(req)
 	if err != nil {
 		return "", err
 	}
@@ -161,7 +171,7 @@ func (s *Tester) CreateResourceServer(keyFileData []byte) (rs.ResourceServer, er
 	return rs.NewResourceServerJWTProfile(s.OIDCIssuer(), keyFile.ClientID, keyFile.KeyID, []byte(keyFile.Key))
 }
 
-func CheckRedirect(url string, headers map[string]string) (*url.URL, error) {
+func GetRequest(url string, headers map[string]string) (*http.Request, error) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
@@ -169,7 +179,10 @@ func CheckRedirect(url string, headers map[string]string) (*url.URL, error) {
 	for key, value := range headers {
 		req.Header.Set(key, value)
 	}
+	return req, nil
+}
 
+func CheckRedirect(req *http.Request) (*url.URL, error) {
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
