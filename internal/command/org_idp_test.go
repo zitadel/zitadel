@@ -5396,3 +5396,534 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 func stringPointer(s string) *string {
 	return &s
 }
+
+func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
+	type fields struct {
+		eventstore                 *eventstore.Eventstore
+		idGenerator                id.Generator
+		secretCrypto               crypto.EncryptionAlgorithm
+		certificateAndKeyGenerator func(id string) ([]byte, []byte, error)
+	}
+	type args struct {
+		ctx           context.Context
+		resourceOwner string
+		provider      SAMLProvider
+	}
+	type res struct {
+		id   string
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid name",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider:      SAMLProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-957lr0f8u3", ""))
+				},
+			},
+		},
+		{
+			"invalid metadata",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: SAMLProvider{
+					Name: "name",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-78isv6m53a", ""))
+				},
+			},
+		},
+		{
+			name: "ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectPush(
+						eventPusherToEvents(
+							org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								[]byte("metadata"),
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("key"),
+								},
+								[]byte("certificate"),
+								"",
+								false,
+								idp.Options{},
+							)),
+					),
+				),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)), certificateAndKeyGenerator: func(id string) ([]byte, []byte, error) { return []byte("key"), []byte("certificate"), nil },
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: SAMLProvider{
+					Name:     "name",
+					Metadata: []byte("metadata"),
+				},
+			},
+			res: res{
+				id:   "id1",
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+		{
+			name: "ok all set",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectPush(
+						eventPusherToEvents(
+							org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								[]byte("metadata"),
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("key"),
+								},
+								[]byte("certificate"),
+								"binding",
+								true,
+								idp.Options{
+									IsCreationAllowed: true,
+									IsLinkingAllowed:  true,
+									IsAutoCreation:    true,
+									IsAutoUpdate:      true,
+								},
+							)),
+					),
+				),
+				idGenerator:                id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+				secretCrypto:               crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				certificateAndKeyGenerator: func(id string) ([]byte, []byte, error) { return []byte("key"), []byte("certificate"), nil },
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: SAMLProvider{
+					Name:              "name",
+					Metadata:          []byte("metadata"),
+					Binding:           "binding",
+					WithSignedRequest: true,
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+				},
+			},
+			res: res{
+				id:   "id1",
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:                     tt.fields.eventstore,
+				idGenerator:                    tt.fields.idGenerator,
+				idpConfigEncryption:            tt.fields.secretCrypto,
+				samlCertificateAndKeyGenerator: tt.fields.certificateAndKeyGenerator,
+			}
+			id, got, err := c.AddOrgSAMLProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.id, id)
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
+	type fields struct {
+		eventstore   *eventstore.Eventstore
+		secretCrypto crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx           context.Context
+		resourceOwner string
+		id            string
+		provider      SAMLProvider
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid id",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider:      SAMLProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-wwdwdlaya0", ""))
+				},
+			},
+		},
+		{
+			"invalid name",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider:      SAMLProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-egixaofgyl", ""))
+				},
+			},
+		},
+		{
+			"invalid metadata",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: SAMLProvider{
+					Name: "name",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-j6spncd74m", ""))
+				},
+			},
+		},
+		{
+			name: "not found",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: SAMLProvider{
+					Name:     "name",
+					Metadata: []byte("metadata"),
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowNotFound(nil, "ORG-z82dddndql", ""))
+				},
+			},
+		},
+		{
+			name: "no changes",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								[]byte("metadata"),
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("key"),
+								},
+								[]byte("certificate"),
+								"",
+								false,
+								idp.Options{},
+							)),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: SAMLProvider{
+					Name:     "name",
+					Metadata: []byte("metadata"),
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+		{
+			name: "change ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								[]byte("metadata"),
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("key"),
+								},
+								[]byte("certificate"),
+								"binding",
+								false,
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						eventPusherToEvents(
+							func() eventstore.Command {
+								t := true
+								event, _ := org.NewSAMLIDPChangedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+									"id1",
+									[]idp.SAMLIDPChanges{
+										idp.ChangeSAMLName("new name"),
+										idp.ChangeSAMLMetadata([]byte("new metadata")),
+										idp.ChangeSAMLBinding("new binding"),
+										idp.ChangeSAMLWithSignedRequest(true),
+										idp.ChangeSAMLOptions(idp.OptionChanges{
+											IsCreationAllowed: &t,
+											IsLinkingAllowed:  &t,
+											IsAutoCreation:    &t,
+											IsAutoUpdate:      &t,
+										}),
+									},
+								)
+								return event
+							}(),
+						),
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: SAMLProvider{
+					Name:              "new name",
+					Metadata:          []byte("new metadata"),
+					Binding:           "new binding",
+					WithSignedRequest: true,
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:          tt.fields.eventstore,
+				idpConfigEncryption: tt.fields.secretCrypto,
+			}
+			got, err := c.UpdateOrgSAMLProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_RegenerateOrgSAMLProviderCertificate(t *testing.T) {
+	type fields struct {
+		eventstore                 *eventstore.Eventstore
+		secretCrypto               crypto.EncryptionAlgorithm
+		certificateAndKeyGenerator func(id string) ([]byte, []byte, error)
+	}
+	type args struct {
+		ctx           context.Context
+		resourceOwner string
+		id            string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid id",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-arv4vdrb6c", ""))
+				},
+			},
+		},
+		{
+			name: "not found",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowNotFound(nil, "ORG-4dw21ch9o9", ""))
+				},
+			},
+		},
+		{
+			name: "change ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								[]byte("metadata"),
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("key"),
+								},
+								[]byte("certificate"),
+								"binding",
+								false,
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						eventPusherToEvents(
+							func() eventstore.Command {
+								event, _ := org.NewSAMLIDPChangedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+									"id1",
+									[]idp.SAMLIDPChanges{
+										idp.ChangeSAMLKey(&crypto.CryptoValue{
+											CryptoType: crypto.TypeEncryption,
+											Algorithm:  "enc",
+											KeyID:      "id",
+											Crypted:    []byte("new key"),
+										}),
+										idp.ChangeSAMLCertificate([]byte("new certificate")),
+									},
+								)
+								return event
+							}(),
+						),
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				certificateAndKeyGenerator: func(id string) ([]byte, []byte, error) {
+					return []byte("new key"), []byte("new certificate"), nil
+				},
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:                     tt.fields.eventstore,
+				idpConfigEncryption:            tt.fields.secretCrypto,
+				samlCertificateAndKeyGenerator: tt.fields.certificateAndKeyGenerator,
+			}
+			got, err := c.RegenerateOrgSAMLProviderCertificate(tt.args.ctx, tt.args.resourceOwner, tt.args.id)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}

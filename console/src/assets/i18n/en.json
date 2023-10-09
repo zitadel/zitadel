@@ -95,7 +95,6 @@
     "EVENTS": "Events",
     "FAILEDEVENTS": "Failed Events",
     "ORGANIZATION": "Organization",
-    "DOMAINS": "Domains",
     "PROJECT": "Projects",
     "PROJECTOVERVIEW": "Overview",
     "PROJECTGRANTS": "Grants",
@@ -496,6 +495,7 @@
       "LASTNAME": "Family Name",
       "NICKNAME": "Nickname",
       "DISPLAYNAME": "Display Name",
+      "PREFERREDLOGINNAME": "Preferred login name",
       "PREFERRED_LANGUAGE": "Language",
       "GENDER": "Gender",
       "PASSWORD": "Password",
@@ -796,7 +796,7 @@
     },
     "PAGES": {
       "STATE": "Status",
-      "DOMAINLIST": "Domains"
+      "DOMAINLIST": "Custom Domains"
     },
     "STATE": {
       "0": "Unspecified",
@@ -953,16 +953,16 @@
     },
     "DOMAINS": {
       "NEW": "Add Domain",
-      "TITLE": "Domains",
-      "DESCRIPTION": "Configure your domains. This domain can be used to log in with your users.",
+      "TITLE": "Verified domains",
+      "DESCRIPTION": "Configure your organization domains. This domain can be used for domain discovery and username suffixing.",
       "SETPRIMARY": "Set as Primary",
       "DELETE": {
         "TITLE": "Delete Domain",
-        "DESCRIPTION": "You are about to delete one of your domains. Note that your users can no longer use this domain for their login."
+        "DESCRIPTION": "You are about to delete one of your domains."
       },
       "ADD": {
         "TITLE": "Add Domain",
-        "DESCRIPTION": "You are about to add a domain for your organization. After successful process, you users will be able to use the domain for their login."
+        "DESCRIPTION": "You are about to add a domain for your organization. After successful process, the domain can be used for domain discovery and as suffix for your users."
       }
     },
     "STATE": {
@@ -1023,6 +1023,7 @@
       "NOTIFICATIONS_DESC": "SMTP and SMS Settings",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
+      "VERIFIED_DOMAINS": "Verified domains",
       "DOMAIN": "Domain settings",
       "LOGINTEXTS": "Login Interface Texts",
       "BRANDING": "Branding",
@@ -1351,7 +1352,7 @@
       "MAXAGEDAYS": "Max Age in days",
       "USERLOGINMUSTBEDOMAIN": "Add organization domain as suffix to loginnames",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
-      "VALIDATEORGDOMAINS": "Validate Org domains",
+      "VALIDATEORGDOMAINS": "Organization domain verification required (DNS or HTTP challenge)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
       "ALLOWUSERNAMEPASSWORD": "Username Password allowed",
       "ALLOWEXTERNALIDP": "External IDP allowed",

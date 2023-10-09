@@ -362,6 +362,7 @@ module.exports = {
         "guides/solution-scenarios/domain-discovery",
         "guides/solution-scenarios/configurations",
         "guides/solution-scenarios/frontend-calling-backend-API",
+        "guides/solution-scenarios/device-authorization",
       ],
     },
     {
@@ -715,6 +716,7 @@ module.exports = {
             "legal/acceptable-use-policy",
             "legal/rate-limit-policy",
             "legal/policies/account-lockout-policy",
+            "legal/policies/feature-development-policy",
             "legal/vulnerability-disclosure-policy",
           ],
         },
