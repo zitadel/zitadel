@@ -14,10 +14,7 @@ export class AddTokenDialogComponent {
   public startDate: Date = new Date();
   public dateControl: UntypedFormControl = new UntypedFormControl('', []);
 
-  constructor(
-    public dialogRef: MatDialogRef<AddTokenDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-  ) {
+  constructor(public dialogRef: MatDialogRef<AddTokenDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
     const today = new Date();
     this.startDate.setDate(today.getDate() + 1);
   }

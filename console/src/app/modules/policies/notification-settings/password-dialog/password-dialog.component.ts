@@ -11,10 +11,7 @@ import {
 })
 export class PasswordDialogComponent {
   public password: string = '';
-  constructor(
-    public dialogRef: MatDialogRef<PasswordDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-  ) {}
+  constructor(public dialogRef: MatDialogRef<PasswordDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {}
 
   closeDialog(password: string = ''): void {
     this.dialogRef.close(password);

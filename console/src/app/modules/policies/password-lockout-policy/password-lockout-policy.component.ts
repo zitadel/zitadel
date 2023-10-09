@@ -26,11 +26,7 @@ export class PasswordLockoutPolicyComponent implements OnInit {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public InfoSectionType: any = InfoSectionType;
 
-  constructor(
-    private toast: ToastService,
-    private injector: Injector,
-    private dialog: MatDialog,
-  ) {}
+  constructor(private toast: ToastService, private injector: Injector, private dialog: MatDialog) {}
 
   public ngOnInit(): void {
     switch (this.serviceType) {

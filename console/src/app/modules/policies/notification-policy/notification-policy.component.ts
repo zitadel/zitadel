@@ -36,11 +36,7 @@ export class NotificationPolicyComponent implements OnInit {
 
   public isDefault: boolean = false;
   private hasNotificationPolicy: boolean = false;
-  constructor(
-    private toast: ToastService,
-    private injector: Injector,
-    private dialog: MatDialog,
-  ) {}
+  constructor(private toast: ToastService, private injector: Injector, private dialog: MatDialog) {}
 
   public ngOnInit(): void {
     switch (this.serviceType) {

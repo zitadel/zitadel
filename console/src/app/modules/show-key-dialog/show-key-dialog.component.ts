@@ -16,10 +16,7 @@ export class ShowKeyDialogComponent {
   public keyResponse!: AddMachineKeyResponse.AsObject | AddAppKeyResponse.AsObject;
   public InfoSectionType: any = InfoSectionType;
 
-  constructor(
-    public dialogRef: MatDialogRef<ShowKeyDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-  ) {
+  constructor(public dialogRef: MatDialogRef<ShowKeyDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
     this.keyResponse = data.key;
   }
 

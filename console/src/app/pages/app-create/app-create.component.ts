@@ -13,10 +13,7 @@ export class AppCreateComponent {
   public projectId: string = '';
   public ProjectAutocompleteType: any = ProjectAutocompleteType;
 
-  constructor(
-    private router: Router,
-    breadcrumbService: BreadcrumbService,
-  ) {
+  constructor(private router: Router, breadcrumbService: BreadcrumbService) {
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
       routerLink: ['/org'],

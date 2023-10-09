@@ -18,11 +18,7 @@ export class AccountsCardComponent implements OnInit {
   public sessions: Session.AsObject[] = [];
   public loadingUsers: boolean = false;
   public UserState: any = UserState;
-  constructor(
-    public authService: AuthenticationService,
-    private router: Router,
-    private userService: GrpcAuthService,
-  ) {
+  constructor(public authService: AuthenticationService, private router: Router, private userService: GrpcAuthService) {
     this.userService
       .listMyUserSessions()
       .then((sessions) => {

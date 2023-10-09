@@ -37,11 +37,7 @@ export class PasswordlessComponent implements OnInit, OnDestroy {
   public AuthFactorState: any = AuthFactorState;
   public error: string = '';
 
-  constructor(
-    private service: ManagementService,
-    private toast: ToastService,
-    private dialog: MatDialog,
-  ) {}
+  constructor(private service: ManagementService, private toast: ToastService, private dialog: MatDialog) {}
 
   public ngOnInit(): void {
     this.getPasswordless();

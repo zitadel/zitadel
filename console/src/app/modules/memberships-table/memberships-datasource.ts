@@ -13,10 +13,7 @@ export class MembershipsDataSource extends DataSource<Membership.AsObject> {
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-  constructor(
-    private auth: GrpcAuthService,
-    private service: ManagementService,
-  ) {
+  constructor(private auth: GrpcAuthService, private service: ManagementService) {
     super();
   }
 

@@ -107,14 +107,14 @@
       <ng-container matColumnDef="creationDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.CREATIONDATE' | translate }}</th>
         <td class="pointer" mat-cell *matCellDef="let idp">
-          <span>{{ idp.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+          <span>{{ idp.details.creationDate | timestampToDate | localizedDate : 'dd. MMM, HH:mm' }}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="changeDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.CHANGEDATE' | translate }}</th>
         <td class="pointer" mat-cell *matCellDef="let idp">
-          <span>{{ idp.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+          <span>{{ idp.details.changeDate | timestampToDate | localizedDate : 'dd. MMM, HH:mm' }}</span>
         </td>
       </ng-container>
 

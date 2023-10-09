@@ -14,10 +14,7 @@ export class AddMemberRolesDialogComponent {
   public allRoles: string[] = [];
   public selectedRoles: string[] = [];
 
-  constructor(
-    public dialogRef: MatDialogRef<AddMemberRolesDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-  ) {
+  constructor(public dialogRef: MatDialogRef<AddMemberRolesDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
     this.allRoles = Object.assign([], data.allRoles);
     this.selectedRoles = Object.assign([], data.selectedRoles);
   }

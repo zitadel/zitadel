@@ -32,11 +32,7 @@ export class UserMfaComponent implements OnInit, OnDestroy {
   public AuthFactorState: any = AuthFactorState;
 
   public error: string = '';
-  constructor(
-    private mgmtUserService: ManagementService,
-    private dialog: MatDialog,
-    private toast: ToastService,
-  ) {}
+  constructor(private mgmtUserService: ManagementService, private dialog: MatDialog, private toast: ToastService) {}
 
   public ngOnInit(): void {
     this.getMFAs();

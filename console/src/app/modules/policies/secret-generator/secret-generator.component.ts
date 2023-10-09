@@ -29,11 +29,7 @@ export class SecretGeneratorComponent implements OnInit {
     SecretGeneratorType.SECRET_GENERATOR_TYPE_OTP_EMAIL,
   ];
 
-  constructor(
-    private service: AdminService,
-    private toast: ToastService,
-    private dialog: MatDialog,
-  ) {}
+  constructor(private service: AdminService, private toast: ToastService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.fetchData();

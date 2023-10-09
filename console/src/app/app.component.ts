@@ -225,7 +225,9 @@ export class AppComponent implements OnDestroy {
     });
 
     this.isDarkTheme = this.themeService.isDarkTheme;
-    this.isDarkTheme.pipe(takeUntil(this.destroy$)).subscribe((dark) => this.onSetTheme(dark ? 'dark-theme' : 'light-theme'));
+    this.isDarkTheme
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((dark) => this.onSetTheme(dark ? 'dark-theme' : 'light-theme'));
 
     this.translate.onLangChange.pipe(takeUntil(this.destroy$)).subscribe((language: LangChangeEvent) => {
       this.document.documentElement.lang = language.lang;

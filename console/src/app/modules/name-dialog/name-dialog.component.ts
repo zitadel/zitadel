@@ -11,10 +11,7 @@ import {
 })
 export class NameDialogComponent {
   public name: string = '';
-  constructor(
-    public dialogRef: MatDialogRef<NameDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-  ) {
+  constructor(public dialogRef: MatDialogRef<NameDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
     this.name = data.name ?? '';
   }
 

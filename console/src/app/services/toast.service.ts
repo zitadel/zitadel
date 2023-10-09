@@ -15,10 +15,7 @@ export class ToastService {
   horizontalPosition: MatSnackBarHorizontalPosition = 'end';
   verticalPosition: MatSnackBarVerticalPosition = 'top';
 
-  constructor(
-    private snackBar: MatSnackBar,
-    private translate: TranslateService,
-  ) {}
+  constructor(private snackBar: MatSnackBar, private translate: TranslateService) {}
 
   public showInfo(message: string, i18nkey: boolean = false): void {
     if (i18nkey) {

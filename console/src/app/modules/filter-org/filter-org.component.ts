@@ -24,10 +24,7 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
 
   public states: OrgState[] = [OrgState.ORG_STATE_ACTIVE, OrgState.ORG_STATE_INACTIVE, OrgState.ORG_STATE_REMOVED];
 
-  constructor(
-    router: Router,
-    protected override route: ActivatedRoute,
-  ) {
+  constructor(router: Router, protected override route: ActivatedRoute) {
     super(router, route);
   }
 

@@ -27,11 +27,7 @@ export class PasswordComplexityPolicyComponent implements OnInit {
   public loading: boolean = false;
   public InfoSectionType: any = InfoSectionType;
 
-  constructor(
-    private toast: ToastService,
-    private injector: Injector,
-    private dialog: MatDialog,
-  ) {}
+  constructor(private toast: ToastService, private injector: Injector, private dialog: MatDialog) {}
 
   public ngOnInit(): void {
     switch (this.serviceType) {

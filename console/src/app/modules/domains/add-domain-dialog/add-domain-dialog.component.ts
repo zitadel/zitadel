@@ -11,10 +11,7 @@ import {
 })
 export class AddDomainDialogComponent {
   public newdomain: string = '';
-  constructor(
-    public dialogRef: MatDialogRef<AddDomainDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-  ) {}
+  constructor(public dialogRef: MatDialogRef<AddDomainDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {}
 
   public closeDialog(): void {
     this.dialogRef.close(false);

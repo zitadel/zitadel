@@ -11,10 +11,7 @@ import { ONBOARDING_EVENTS } from 'src/app/utils/onboarding';
 export class OnboardingComponent {
   public actions = this.adminService.progressEvents;
 
-  constructor(
-    public adminService: AdminService,
-    public themeService: ThemeService,
-  ) {
+  constructor(public adminService: AdminService, public themeService: ThemeService) {
     this.adminService.loadEvents.next(ONBOARDING_EVENTS);
   }
 }

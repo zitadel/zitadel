@@ -390,10 +390,7 @@ export class AdminService {
   public progressTotal: BehaviorSubject<number> = new BehaviorSubject(0);
   public progressAllDone: BehaviorSubject<boolean> = new BehaviorSubject(true);
 
-  constructor(
-    private readonly grpcService: GrpcService,
-    private storageService: StorageService,
-  ) {
+  constructor(private readonly grpcService: GrpcService, private storageService: StorageService) {
     this.progressEvents$.subscribe(this.progressEvents);
 
     this.hideOnboarding =

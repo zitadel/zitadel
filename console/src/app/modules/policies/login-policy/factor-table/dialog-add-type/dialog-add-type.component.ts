@@ -20,10 +20,7 @@ export class DialogAddTypeComponent {
   public availableMfaTypes: Array<MultiFactorType | SecondFactorType> = [];
   public newMfaType!: MultiFactorType | SecondFactorType;
 
-  constructor(
-    public dialogRef: MatDialogRef<DialogAddTypeComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-  ) {
+  constructor(public dialogRef: MatDialogRef<DialogAddTypeComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
     this.availableMfaTypes = data.types;
     this.newMfaType = data.types && data.types[0] ? data.types[0] : undefined;
   }

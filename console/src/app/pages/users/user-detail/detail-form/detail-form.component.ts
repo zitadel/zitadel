@@ -29,10 +29,7 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
 
   private sub: Subscription = new Subscription();
 
-  constructor(
-    private fb: UntypedFormBuilder,
-    private dialog: MatDialog,
-  ) {
+  constructor(private fb: UntypedFormBuilder, private dialog: MatDialog) {
     this.profileForm = this.fb.group({
       userName: [{ value: '', disabled: true }, [requiredValidator]],
       firstName: [{ value: '', disabled: this.disabled }, requiredValidator],

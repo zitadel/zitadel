@@ -9,8 +9,5 @@ export const OVERLAY_DATA = new InjectionToken<any>('OVERLAY_DATA');
   styleUrls: ['./info-overlay.component.scss'],
 })
 export class InfoOverlayComponent {
-  constructor(
-    public workflowService: OverlayWorkflowService,
-    @Inject(OVERLAY_DATA) public data: any,
-  ) {}
+  constructor(public workflowService: OverlayWorkflowService, @Inject(OVERLAY_DATA) public data: any) {}
 }

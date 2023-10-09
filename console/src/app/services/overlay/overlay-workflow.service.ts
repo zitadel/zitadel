@@ -39,11 +39,7 @@ export class OverlayWorkflowService implements OnDestroy {
   public openRef: CnslOverlayRef | null = null;
   public highlightedIds: { [id: string]: number } = {};
   public callback: Function | null = null;
-  constructor(
-    private mediaMatcher: MediaMatcher,
-    overlayService: OverlayService,
-    private authService: GrpcAuthService,
-  ) {
+  constructor(private mediaMatcher: MediaMatcher, overlayService: OverlayService, private authService: GrpcAuthService) {
     this.currentWorkflow$.pipe(takeUntil(this.destroy$)).subscribe((workflow) => {
       if (this.openRef) {
         this.openRef.close();
