@@ -65,11 +65,11 @@ func originFromForwardedHeader(r *http.Request) (string, error) {
 }
 
 func originFromXForwardedHeaders(r *http.Request) (string, error) {
-	scheme := r.Header.Get(http.CanonicalHeaderKey("X-Forwarded-Proto"))
+	scheme := r.Header.Get("X-Forwarded-Proto")
 	if scheme == "" {
 		return "", fmt.Errorf("no X-Forwarded-Proto header")
 	}
-	host := r.Header.Get(http.CanonicalHeaderKey("X-Forwarded-Host"))
+	host := r.Header.Get("X-Forwarded-Host")
 	if host == "" {
 		return "", fmt.Errorf("no X-Forwarded-Host header")
 	}
