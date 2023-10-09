@@ -1,6 +1,6 @@
 <cnsl-create-layout
   title="{{ id ? ('SMTP.DETAIL.TITLE' | translate) : ('SMTP.CREATE.SENDGRID.TITLE' | translate) }}"
-  [createSteps]="3"
+  [createSteps]="2"
   (closed)="close()"
 >
   <div class="wizard-header">
@@ -85,24 +85,19 @@
 
       <div class="smtp-create-actions">
         <button mat-stroked-button matStepperPrevious class="bck-button">{{ 'ACTIONS.BACK' | translate }}</button>
-        <button
-          mat-raised-button
-          [disabled]="secondFormGroup.invalid"
-          color="primary"
-          matStepperNext
-          data-e2e="continue-button-nameandtype"
-        >
-          {{ 'ACTIONS.CONTINUE' | translate }}
+        <button mat-raised-button class="create-button" color="primary" data-e2e="create-button">
+          {{ 'ACTIONS.CREATE' | translate }}
         </button>
       </div>
     </mat-step>
 
-    <mat-step [editable]="true">
+    <!-- Future code for testing option -->
+    <!--<mat-step [editable]="true">
       <form>
         <ng-template matStepLabel>{{ 'SMTP.CREATE.STEPS.TEST_SETTINGS' | translate }}</ng-template>
       </form>
-
-      <ng-container>
+      
+       <ng-container>
         <div class="row">
           <span class="left">
             {{ 'APP.SAML.METADATA' | translate }}
@@ -122,7 +117,7 @@
           {{ 'ACTIONS.CREATE' | translate }}
         </button>
       </div>
-    </mat-step>
+    </mat-step> -->
 
     <!-- Icon override -->
     <ng-template matStepperIcon="edit">
