@@ -8,7 +8,7 @@
 
     <div class="data-row" *ngIf="event && event.creationDate">
       <span class="label cnsl-secondary-text">{{ 'IAM.EVENTS.CREATIONDATE' | translate }}</span>
-      <span>{{ event.creationDate | timestampToDate | localizedDate : 'EEE dd. MMM, HH:mm' }}</span>
+      <span>{{ event.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
     </div>
 
     <div class="data-row" *ngIf="event && event.aggregate && event.aggregate.id">

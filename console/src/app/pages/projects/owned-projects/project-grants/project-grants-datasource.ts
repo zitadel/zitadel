@@ -17,7 +17,10 @@ export class ProjectGrantsDataSource extends DataSource<GrantedProject.AsObject>
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-  constructor(private mgmtService: ManagementService, private toast: ToastService) {
+  constructor(
+    private mgmtService: ManagementService,
+    private toast: ToastService,
+  ) {
     super();
   }
 

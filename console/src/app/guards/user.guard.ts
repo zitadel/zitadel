@@ -8,7 +8,10 @@ import { GrpcAuthService } from '../services/grpc-auth.service';
   providedIn: 'root',
 })
 export class UserGuard {
-  constructor(private authService: GrpcAuthService, private router: Router) {}
+  constructor(
+    private authService: GrpcAuthService,
+    private router: Router,
+  ) {}
 
   public canActivate(
     route: ActivatedRouteSnapshot,
