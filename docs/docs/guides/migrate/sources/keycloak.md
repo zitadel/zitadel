@@ -34,33 +34,6 @@ In order to configure Keycloak as the identity provider for your application, yo
 
 <img src="/docs/img/guides/migrate/keycloak-05.png" alt="Migrating users from Keycloak to ZITADEL"/>
 
-
-### Create an OAuth2/OIDC client in Keycloak
-
-After you create the new realm, you need to set up a new client. A client is a core concept in the [OAuth 2 protocol](https://oauth.net/2/grant-types/) used in all flows. Here, it will be used by your application to connect to Keycloak and complete authentication lookups.
-
-On the menu on the left, select **Clients** and click the button **Create client**. 
-
-<img src="/docs/img/guides/migrate/keycloak-06.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-Leave the client type as **OpenID Connect**, fill in the desired **Client ID** and **Name**, then click on **Next**:
-
-<img src="/docs/img/guides/migrate/keycloak-07.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-You don't need to make any changes to the **Capability config**. Go ahead and click **Next**.
-
-<img src="/docs/img/guides/migrate/keycloak-08.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-The web application used for this demo will run on [http://localhost:4200/](http://localhost:4200/). In order to allow login and logout from the application, this client needs to be configured to accept your application URL in **Login settings**. Edit **Root URL**, **Valid redirect URI**, and **Valid post logout redirect URIs** to point to your application URLs. Without this configuration, Keycloak will refuse login and logout from your application due to security concerns.
- 
-Additionally, **Web origins** needs to be configured to support required cross-domain requests; otherwise, the request will be blocked on all browsers due to security concerns. To make this application work, fill in all the fields as shown below. 
-
-<img src="/docs/img/guides/migrate/keycloak-09.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-Finally, create the client by clicking **Save**.
-
-<img src="/docs/img/guides/migrate/keycloak-10.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
 ### Create user in Keycloak
 
 The last thing you need to do in Keycloak is to create at least one new user. This user will be able to log into your application.
