@@ -66,15 +66,9 @@ For example, in order to generate the export files with Keycloak, you will need 
 # Recover the Container ID for Keycloak
 docker ps
 
-# Starting a bash command inside the Keycloak container
+# Run the export command inside the Keycloak container
 # use the container ID of Keycloak
-docker exec -it <keycloak container ID> bash 
-
-# And run the export command
- /opt/keycloak/bin/kc.sh export --dir /tmp
-
-#exit
-exit
+docker exec  <keycloak container ID>  /opt/keycloak/bin/kc.sh export --dir /tmp
 
 # copy generated files from docker container to local machine
 docker cp <keycloak container ID>:/tmp/my-realm-users-0.json .
