@@ -15,11 +15,10 @@ import { InfoSectionModule } from '../../info-section/info-section.module';
 import { InputModule } from '../../input/input.module';
 import { WarnDialogModule } from '../../warn-dialog/warn-dialog.module';
 import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-add-sms-provider.component';
-import { NotificationSettingsComponent } from './notification-settings.component';
-import { PasswordDialogComponent } from './password-dialog/password-dialog.component';
+import { NotificationSMSProviderComponent } from './notification-sms-provider.component';
 
 @NgModule({
-  declarations: [NotificationSettingsComponent, DialogAddSMSProviderComponent, PasswordDialogComponent],
+  declarations: [NotificationSMSProviderComponent, DialogAddSMSProviderComponent],
   imports: [
     CommonModule,
     CardModule,
@@ -38,6 +37,6 @@ import { PasswordDialogComponent } from './password-dialog/password-dialog.compo
     MatSelectModule,
     TranslateModule,
   ],
-  exports: [NotificationSettingsComponent],
+  exports: [NotificationSMSProviderComponent],
 })
-export class NotificationSettingsModule {}
+export class NotificationSMSProviderModule {}
