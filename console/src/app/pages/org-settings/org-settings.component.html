@@ -8,9 +8,11 @@
     </div>
     <span class="fill-space"></span>
   </div>
-  <cnsl-settings-list
-    [selectedId]="id"
-    [serviceType]="PolicyComponentServiceType.MGMT"
-    [settingsList]="settingsList"
-  ></cnsl-settings-list>
+  <ng-container *ngIf="settingsList | async as list">
+    <cnsl-settings-list
+      [selectedId]="id"
+      [serviceType]="PolicyComponentServiceType.MGMT"
+      [settingsList]="list"
+    ></cnsl-settings-list>
+  </ng-container>
 </div>

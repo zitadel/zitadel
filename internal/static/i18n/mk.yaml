@@ -486,7 +486,9 @@ Errors:
     WebAuthN:
       NoChallenge: Сесија без предизвик WebAuthN
   Intent:
-    IDPMissing: ID на IDP недостасува во барањето
+    IDPMissing: ID на IDP недостасува во барањето6bg
+    IDPInvalid: ВРЛ неважечки за барањето
+    ResponseInvalid: Одговорот на ВРЛ е неважечки
     SuccessURLMissing: URL за успех недостасува во барањето
     FailureURLMissing: URL за неуспех недостасува во барањето
     StateMissing: Параметарот State недостасува во барањето
@@ -505,6 +507,10 @@ Errors:
       Invalid: токенот е неважечки
       Expired: токенот е истечен
     InvalidClient: Токен не беше издаден на овој клиент
+  Feature:
+    NotExisting: Функцијата не постои
+    TypeNotSupported: Типот на функција не е поддржан
+    InvalidValue: Неважечка вредност за оваа функција
 
 AggregateTypes:
   action: Акција
@@ -515,6 +521,7 @@ AggregateTypes:
   user: Корисник
   usergrant: Овластување на корисник
   quota: Квота
+  feature: Карактеристика
 
 EventTypes:
   user:
