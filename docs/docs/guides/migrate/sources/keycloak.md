@@ -5,7 +5,7 @@ sidebar_label: From Keycloak
 
 ## Migrating from Keycloak to ZITADEL
 
-This tutorial will use [Docker installation](https://www.docker.com/) for the prerequisites. However, both Keycloak and ZITADEL offer different installation methods. As a result, this guide won't include any required production tuning or security hardening for either system. However, it's advised you follow [recommended guidelines](https://zitadel.com/docs/guides/manage/self-hosted/production) before putting those systems into production.
+This guide will use [Docker installation](https://www.docker.com/) to run Keycloak and ZITADEL. However, both Keycloak and ZITADEL offer different installation methods. As a result, this guide won't include any required production tuning or security hardening for either system. However, it's advised you follow [recommended guidelines](https://zitadel.com/docs/guides/manage/self-hosted/production) before putting those systems into production. You can skip setting up Keycloak and ZITADEL if you already have running instances.  
 
 ## Set up Keycloak
 ### Run Keycloak
@@ -33,6 +33,7 @@ In order to configure Keycloak as the identity provider for your application, yo
 <img src="/docs/img/guides/migrate/keycloak-04.png" alt="Migrating users from Keycloak to ZITADEL"/>
 
 <img src="/docs/img/guides/migrate/keycloak-05.png" alt="Migrating users from Keycloak to ZITADEL"/>
+
 
 ### Create user in Keycloak
 
@@ -87,90 +88,10 @@ Now you can access the console with the following default credentials:
 * **Username**: `zitadel-admin@zitadel.localhost`
 * **Password**: `Password1!`
 
-<img src="/docs/img/guides/migrate/keycloak-23.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-<img src="/docs/img/guides/migrate/keycloak-24.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-Skip the 2-factor set up.
-
-<img src="/docs/img/guides/migrate/keycloak-25.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-<img src="/docs/img/guides/migrate/keycloak-26.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-<img src="/docs/img/guides/migrate/keycloak-27.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-
-Next, you need to create a new project and a new application in ZITADEL. ZITADEL projects are a similar concept to Keycloak realms, and an application is equivalent to Keycloak clients.
-
-To create a new project, select the **Projects** tab and click **Create New Project**. Fill in the desired name of the project and click **Continue**:
-
-<img src="/docs/img/guides/migrate/keycloak-28.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-<img src="/docs/img/guides/migrate/keycloak-29.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-Within a project, click on the **+** button to create a new application. Fill in the desired name, and select **Web** for the type of application and click on **Continue**.
-
-<img src="/docs/img/guides/migrate/keycloak-30.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-Select **PKCE** and click **Continue**.
-
-<img src="/docs/img/guides/migrate/keycloak-31.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-Now configure **Redirect URIs** (http://localhost:4200/auth/callback
-) and **Post Logout URIs** (http://localhost:4200/signedout
-) to the sample application URL, and click **Continue**. 
-
-<img src="/docs/img/guides/migrate/keycloak-32.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-Click on **Create** to create the new PKCE application in ZITADEL. You will now have access to the randomly generated Client ID, which will be used later on to configure your application:
-
-<img src="/docs/img/guides/migrate/keycloak-33.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-You ClientId will be displayed after you click **Create**. Make a note of it. 
-
-<img src="/docs/img/guides/migrate/keycloak-34.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-Click on Redirect Settings and select **Development Mode** via the toggle button. 
-
-<img src="/docs/img/guides/migrate/keycloak-35.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-
-Now that you've finalized the ZITADEL configuration for the project and application, your last required change is to modify the sample application to now use ZITADEL instead of Keycloak. Since both tools implement the same authentication flows, all you need to do is change the `issuer` URL and the `clientId`:
-
-```js
-const authConfig: AuthConfig = {
-   scope: 'openid profile email',
-   responseType: 'code',
-   oidc: true,
-   clientId: '<your_cliend_id>` // e.g. 230518162431475715@testproject
-,
-   issuer: 'http://localhost:8080', 
-   redirectUri: 'http://localhost:4200/auth/callback',
-   postLogoutRedirectUri: 'http://localhost:4200/signedout',
-   requireHttps: false, // required for running locally
-   disableAtHashCheck: true
-};
-```
-
-After you change the sample configuration, when attempting to authenticate, the login page will be served by ZITADEL:
-
-```bash
-npm start
-```
-Access [http://localhost:4200/](http://localhost:4200/). Now, you should have the sample application with ZITADEL for user access management. However, ZITADEL doesn't have any users other than the admin user yet. Try out the application with the ZITADEL admin user for now. 
-
-<img src="/docs/img/guides/migrate/keycloak-36.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-<img src="/docs/img/guides/migrate/keycloak-37.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-<img src="/docs/img/guides/migrate/keycloak-38.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
 
 ## Import Keycloak users into ZITADEL
 
-While moving the functionality from Keycloak to ZITADEL might require only minimal changes, it's important to note that you may also want to move the users that already exist in Keycloak to ZITADEL.
-
-As explained in this [ZITADEL user migration guide](https://zitadel.com/docs/guides/migrate/users), you can import users individually or in bulk. Since we are looking at importing a single user from Keycloak, migrating that  individual user to ZITADEL can be done with the [ImportHumanUser](https://zitadel.com/docs/apis/resources/mgmt/management-service-import-human-user) endpoint. 
+As explained in this [ZITADEL user migration guide](https://zitadel.com/docs/guides/migrate/users), you can import users individually or in bulk. Since we are looking at importing a single user from Keycloak, migrating that individual user to ZITADEL can be done with the [ImportHumanUser](https://zitadel.com/docs/apis/resources/mgmt/management-service-import-human-user) endpoint. 
 
 > With this endpoint, an email will only be sent to the user if the email is marked as not verified or if there's no password set.
 
@@ -206,7 +127,7 @@ Next, select your service user that you created and select the **Org Owner** che
 
 ### Generate an access token for the service user
 
-In order for the service user to access the API, they must be able to authenticate themselves. To authenticate the user, you can use either [JWT with Private Key](/docs/guides/integrate/serviceusers#authenticating-a-service-user) flow (recommended for production) or [Personal Access Tokens](/docs/guides/integrate/pat)(PAT). In this tutorial we will choose the latter. 
+In order for the service user to access the API, they must be able to authenticate themselves. To authenticate the user, you can use either [JWT with Private Key](/docs/guides/integrate/serviceusers#authenticating-a-service-user) flow (recommended for production) or [Personal Access Tokens](/docs/guides/integrate/pat)(PAT). In this guide, we will choose the latter. 
 
 Go to **Users** -> **Service Users** again and click on the service user, then select **Personal Access Tokens** on the left and click the **+ New** button. Copy the generated personal access token to use it later.  Click **Close** after copying the PAT. 
 
@@ -382,6 +303,4 @@ Now you have imported the Keycloak user into ZITADEL. To view your user go to [h
 <img src="/docs/img/guides/migrate/keycloak-47.png" alt="Migrating users from Keycloak to ZITADEL"/>
 
 
-You can now view the user's details in ZITADEL. You can see that a password is available too. Additionally, you can log into the web application, set up with ZITADEL as the IdP, using the test user's credentials previously configured in Keycloak.
-
-> Parts of this documentation were informed by the insights of [Sadequl Hussain](https://www.linkedin.com/in/sadequlhussain/?originalSubdomain=au).
+You can now view the Keycloak user's details in ZITADEL. You can see that the password is available too. 
