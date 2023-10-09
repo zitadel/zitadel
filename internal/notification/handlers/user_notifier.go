@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -164,12 +164,12 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 	if err != nil {
 		return nil, err
 	}
-	origin, err := u.queries.Origin(ctx, e)
+	ctx, err = u.queries.Origin(ctx, e)
 	if err != nil {
 		return nil, err
 	}
-	err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, origin, e).
-		SendUserInitCode(notifyUser, origin, code)
+	err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		SendUserInitCode(ctx, notifyUser, code)
 	if err != nil {
 		return nil, err
 	}
@@ -221,12 +221,12 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 	if err != nil {
 		return nil, err
 	}
-	origin, err := u.queries.Origin(ctx, e)
+	ctx, err = u.queries.Origin(ctx, e)
 	if err != nil {
 		return nil, err
 	}
-	err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, origin, e).
-		SendEmailVerificationCode(notifyUser, origin, code, e.URLTemplate)
+	err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		SendEmailVerificationCode(ctx, notifyUser, code, e.URLTemplate)
 	if err != nil {
 		return nil, err
 	}
@@ -277,15 +277,15 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 	if err != nil {
 		return nil, err
 	}
-	origin, err := u.queries.Origin(ctx, e)
+	ctx, err = u.queries.Origin(ctx, e)
 	if err != nil {
 		return nil, err
 	}
-	notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, origin, e)
+	notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e)
 	if e.NotificationType == domain.NotificationTypeSms {
-		notify = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, origin, e)
+		notify = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, e)
 	}
-	err = notify.SendPasswordCode(notifyUser, origin, code, e.URLTemplate)
+	err = notify.SendPasswordCode(ctx, notifyUser, code, e.URLTemplate)
 	if err != nil {
 		return nil, err
 	}
@@ -372,12 +372,12 @@ func (u *userNotifier) reduceOTPSMS(
 	if err != nil {
 		return nil, err
 	}
-	origin, err := u.queries.Origin(ctx, event)
+	ctx, err = u.queries.Origin(ctx, event)
 	if err != nil {
 		return nil, err
 	}
-	notify := types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, origin, event)
-	err = notify.SendOTPSMSCode(authz.GetInstance(ctx).RequestedDomain(), origin, plainCode, expiry)
+	notify := types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, event)
+	err = notify.SendOTPSMSCode(ctx, plainCode, expiry)
 	if err != nil {
 		return nil, err
 	}
@@ -490,16 +490,16 @@ func (u *userNotifier) reduceOTPEmail(
 	if err != nil {
 		return nil, err
 	}
-	origin, err := u.queries.Origin(ctx, event)
+	ctx, err = u.queries.Origin(ctx, event)
 	if err != nil {
 		return nil, err
 	}
-	url, err := urlTmpl(plainCode, origin, notifyUser)
+	url, err := urlTmpl(plainCode, http_util.ComposedOrigin(ctx), notifyUser)
 	if err != nil {
 		return nil, err
 	}
-	notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, origin, event)
-	err = notify.SendOTPEmailCode(notifyUser, url, authz.GetInstance(ctx).RequestedDomain(), origin, plainCode, expiry)
+	notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event)
+	err = notify.SendOTPEmailCode(ctx, url, plainCode, expiry)
 	if err != nil {
 		return nil, err
 	}
@@ -542,12 +542,12 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 	if err != nil {
 		return nil, err
 	}
-	origin, err := u.queries.Origin(ctx, e)
+	ctx, err = u.queries.Origin(ctx, e)
 	if err != nil {
 		return nil, err
 	}
-	err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, origin, e).
-		SendDomainClaimed(notifyUser, origin, e.UserName)
+	err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		SendDomainClaimed(ctx, notifyUser, e.UserName)
 	if err != nil {
 		return nil, err
 	}
@@ -596,12 +596,12 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 	if err != nil {
 		return nil, err
 	}
-	origin, err := u.queries.Origin(ctx, e)
+	ctx, err = u.queries.Origin(ctx, e)
 	if err != nil {
 		return nil, err
 	}
-	err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, origin, e).
-		SendPasswordlessRegistrationLink(notifyUser, origin, code, e.ID, e.URLTemplate)
+	err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		SendPasswordlessRegistrationLink(ctx, notifyUser, code, e.ID, e.URLTemplate)
 	if err != nil {
 		return nil, err
 	}
@@ -653,12 +653,12 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 		if err != nil {
 			return nil, err
 		}
-		origin, err := u.queries.Origin(ctx, e)
+		ctx, err = u.queries.Origin(ctx, e)
 		if err != nil {
 			return nil, err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, origin, e).
-			SendPasswordChange(notifyUser, origin)
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+			SendPasswordChange(ctx, notifyUser)
 		if err != nil {
 			return nil, err
 		}
@@ -705,12 +705,12 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 	if err != nil {
 		return nil, err
 	}
-	origin, err := u.queries.Origin(ctx, e)
+	ctx, err = u.queries.Origin(ctx, e)
 	if err != nil {
 		return nil, err
 	}
-	err = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, origin, e).
-		SendPhoneVerificationCode(notifyUser, origin, code, authz.GetInstance(ctx).RequestedDomain())
+	err = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, e).
+		SendPhoneVerificationCode(ctx, code)
 	if err != nil {
 		return nil, err
 	}

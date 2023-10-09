@@ -1,8 +1,11 @@
 package types
 
 import (
+	"context"
 	"fmt"
 	"strings"
+
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 
 	"github.com/zitadel/zitadel/internal/api/assets"
 	"github.com/zitadel/zitadel/internal/i18n"
@@ -10,8 +13,8 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
-func GetTemplateData(translator *i18n.Translator, translateArgs map[string]interface{}, origin, href, msgType, lang string, policy *query.LabelPolicy) templates.TemplateData {
-	assetsPrefix := origin + assets.HandlerPrefix
+func GetTemplateData(ctx context.Context, translator *i18n.Translator, translateArgs map[string]interface{}, href, msgType, lang string, policy *query.LabelPolicy) templates.TemplateData {
+	assetsPrefix := http_util.ComposedOrigin(ctx) + assets.HandlerPrefix
 	templateData := templates.TemplateData{
 		URL:             href,
 		PrimaryColor:    templates.DefaultPrimaryColor,

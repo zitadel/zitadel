@@ -358,7 +358,7 @@ func NewHumanPasswordlessInitCodeRequestedEvent(
 		Expiry:            expiry,
 		URLTemplate:       urlTmpl,
 		CodeReturned:      codeReturned,
-		TriggeredAtOrigin: http.OriginFromCtx(ctx),
+		TriggeredAtOrigin: http.ComposedOrigin(ctx),
 	}
 }
 

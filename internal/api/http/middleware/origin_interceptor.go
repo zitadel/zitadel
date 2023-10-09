@@ -13,17 +13,17 @@ import (
 
 func OriginHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		origin := buildOrigin(r)
+		origin := composeOrigin(r)
 		if !http_util.IsOrigin(origin) {
 			logging.Debugf("extracted origin is not valid: %s", origin)
 			next.ServeHTTP(w, r)
 			return
 		}
-		next.ServeHTTP(w, r.WithContext(http_util.WithOrigin(r.Context(), origin)))
+		next.ServeHTTP(w, r.WithContext(http_util.WithComposedOrigin(r.Context(), origin)))
 	})
 }
 
-func buildOrigin(r *http.Request) string {
+func composeOrigin(r *http.Request) string {
 	if origin, err := originFromForwardedHeader(r); err != nil {
 		logging.OnError(err).Debug("failed to build origin from forwarded header, trying x-forwarded-* headers")
 	} else {
@@ -65,11 +65,11 @@ func originFromForwardedHeader(r *http.Request) (string, error) {
 }
 
 func originFromXForwardedHeaders(r *http.Request) (string, error) {
-	scheme := r.Header.Get("X-Forwarded-Proto")
+	scheme := r.Header.Get(http.CanonicalHeaderKey("X-Forwarded-Proto"))
 	if scheme == "" {
 		return "", fmt.Errorf("no X-Forwarded-Proto header")
 	}
-	host := r.Header.Get("X-Forwarded-Host")
+	host := r.Header.Get(http.CanonicalHeaderKey("X-Forwarded-Host"))
 	if host == "" {
 		return "", fmt.Errorf("no X-Forwarded-Host header")
 	}

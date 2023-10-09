@@ -351,7 +351,7 @@ func NewDomainClaimedEvent(
 		UserName:              userName,
 		oldUserName:           oldUserName,
 		userLoginMustBeDomain: userLoginMustBeDomain,
-		TriggeredAtOrigin:     http.OriginFromCtx(ctx),
+		TriggeredAtOrigin:     http.ComposedOrigin(ctx),
 	}
 }
 

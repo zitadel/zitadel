@@ -62,17 +62,24 @@ func HeadersFromCtx(ctx context.Context) (http.Header, bool) {
 	return headers, ok
 }
 
-func WithOrigin(ctx context.Context, originValue string) context.Context {
-	return context.WithValue(ctx, origin, originValue)
+func OriginHeader(ctx context.Context) string {
+	headers, ok := ctx.Value(httpHeaders).(http.Header)
+	if !ok {
+		return ""
+	}
+	return headers.Get(Origin)
 }
 
-func OriginFromCtx(ctx context.Context) string {
-	headers, ok := ctx.Value(httpHeaders).(http.Header)
-	if ok {
-		return headers.Get(Origin)
+func ComposedOrigin(ctx context.Context) string {
+	o, ok := ctx.Value(origin).(string)
+	if !ok {
+		return ""
 	}
-	o, _ := ctx.Value(origin).(string)
 	return o
+}
+
+func WithComposedOrigin(ctx context.Context, composed string) context.Context {
+	return context.WithValue(ctx, origin, composed)
 }
 
 func RemoteIPFromCtx(ctx context.Context) string {

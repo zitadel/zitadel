@@ -451,7 +451,7 @@ func NewOTPEmailChallengedEvent(
 		Expiry:            expiry,
 		ReturnCode:        returnCode,
 		URLTmpl:           urlTmpl,
-		TriggeredAtOrigin: http.OriginFromCtx(ctx),
+		TriggeredAtOrigin: http.ComposedOrigin(ctx),
 	}
 }
 
