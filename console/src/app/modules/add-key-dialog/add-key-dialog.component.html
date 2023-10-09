@@ -18,7 +18,7 @@
     <mat-datepicker #picker [startAt]="startDate"></mat-datepicker>
     <span cnslError *ngIf="dateControl && dateControl.errors && dateControl.errors['matDatepickerMin']?.min">
       {{ 'USER.MACHINE.CHOOSEDATEAFTER' | translate }}:
-      {{ dateControl.errors['matDatepickerMin'].min.toDate() | localizedDate : 'EEE dd. MMM' }}
+      {{ dateControl.errors['matDatepickerMin'].min.toDate() | localizedDate: 'EEE dd. MMM' }}
     </span>
   </cnsl-form-field>
 </div>

@@ -71,7 +71,11 @@ export const ENDPOINT = {
 })
 export class AssetService {
   private accessToken: string = '';
-  constructor(private envService: EnvironmentService, private http: HttpClient, private storageService: StorageService) {
+  constructor(
+    private envService: EnvironmentService,
+    private http: HttpClient,
+    private storageService: StorageService,
+  ) {
     const aT = this.storageService.getItem(accessTokenStorageKey);
     if (aT) {
       this.accessToken = aT;

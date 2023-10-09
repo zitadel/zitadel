@@ -112,13 +112,17 @@ func TestProvider_BeginAuth(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			session, err := provider.BeginAuth(context.Background(), "testState", tt.args.params...)
+			ctx := context.Background()
+			session, err := provider.BeginAuth(ctx, "testState", tt.args.params...)
 			if tt.want.err != nil && !tt.want.err(err) {
 				a.Fail("invalid error", err)
 			}
 			if tt.want.err == nil {
 				a.NoError(err)
-				a.Equal(tt.want.session.GetAuthURL(), session.GetAuthURL())
+				wantHeaders, wantContent := tt.want.session.GetAuth(ctx)
+				gotHeaders, gotContent := session.GetAuth(ctx)
+				a.Equal(wantHeaders, gotHeaders)
+				a.Equal(wantContent, gotContent)
 			}
 		})
 	}

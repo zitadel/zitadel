@@ -30,7 +30,10 @@ export class SidenavComponent implements ControlValueAccessor, OnInit {
   @Input() public queryParam: string = '';
 
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
-  constructor(private router: Router, private route: ActivatedRoute) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+  ) {}
 
   ngOnInit(): void {
     if (!this.value) {

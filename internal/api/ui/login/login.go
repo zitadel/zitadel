@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 
+	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -40,6 +41,7 @@ type Login struct {
 	samlAuthCallbackURL func(context.Context, string) string
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
+	featureCheck        feature.Checker
 }
 
 type Config struct {
@@ -76,6 +78,7 @@ func CreateLogin(config Config,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpConfigAlg crypto.EncryptionAlgorithm,
 	csrfCookieKey []byte,
+	featureCheck feature.Checker,
 ) (*Login, error) {
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
@@ -88,6 +91,7 @@ func CreateLogin(config Config,
 		authRepo:            authRepo,
 		idpConfigAlg:        idpConfigAlg,
 		userCodeAlg:         userCodeAlg,
+		featureCheck:        featureCheck,
 	}
 	statikFS, err := fs.NewWithNamespace("login")
 	if err != nil {
@@ -122,7 +126,7 @@ func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecu
 			}
 			// ignore form post callback
 			// it will redirect to the "normal" callback, where the cookie is set again
-			if r.URL.Path == EndpointExternalLoginCallbackFormPost && r.Method == http.MethodPost {
+			if (r.URL.Path == EndpointExternalLoginCallbackFormPost || r.URL.Path == EndpointSAMLACS) && r.Method == http.MethodPost {
 				handler.ServeHTTP(w, r)
 				return
 			}

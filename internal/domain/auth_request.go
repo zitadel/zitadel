@@ -55,6 +55,7 @@ type AuthRequest struct {
 	LockoutPolicy            *LockoutPolicy
 	DefaultTranslations      []*CustomText
 	OrgTranslations          []*CustomText
+	SAMLRequestID            string
 }
 
 type ExternalUser struct {
@@ -207,4 +208,18 @@ func (a *AuthRequest) Done() bool {
 		}
 	}
 	return false
+}
+
+func (a *AuthRequest) PrivateLabelingOrgID(defaultID string) string {
+	if a.RequestedOrgID != "" {
+		return a.RequestedOrgID
+	}
+	if (a.PrivateLabelingSetting == PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy || a.PrivateLabelingSetting == PrivateLabelingSettingUnspecified) &&
+		a.UserOrgID != "" {
+		return a.UserOrgID
+	}
+	if a.PrivateLabelingSetting != PrivateLabelingSettingUnspecified {
+		return a.ApplicationResourceOwner
+	}
+	return defaultID
 }

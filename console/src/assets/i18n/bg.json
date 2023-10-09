@@ -95,7 +95,6 @@
     "EVENTS": "Събития",
     "FAILEDEVENTS": "Неуспешни събития",
     "ORGANIZATION": "Организация",
-    "DOMAINS": "Домейни",
     "PROJECT": "Проекти",
     "PROJECTOVERVIEW": "Преглед",
     "PROJECTGRANTS": "Грантове",
@@ -947,7 +946,7 @@
     },
     "DOMAINS": {
       "NEW": "Добавете домейн",
-      "TITLE": "Домейни",
+      "TITLE": "Проверени домейни",
       "DESCRIPTION": "Конфигурирайте вашите домейни. ",
       "SETPRIMARY": "Задайте като основен",
       "DELETE": {
@@ -1017,6 +1016,7 @@
       "NOTIFICATIONS_DESC": "Настройки за SMTP и SMS",
       "MESSAGETEXTS": "Текстове на съобщения",
       "IDP": "Доставчици на идентичност",
+      "VERIFIED_DOMAINS": "Проверени домейни",
       "DOMAIN": "Настройки на домейна",
       "LOGINTEXTS": "Текстове на интерфейса за влизане",
       "BRANDING": "Брандиране",
