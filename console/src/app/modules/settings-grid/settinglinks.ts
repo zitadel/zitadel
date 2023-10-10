@@ -51,7 +51,7 @@ export const NOTIFICATION_GROUP: SettingLinks = {
   i18nTitle: 'SETTINGS.GROUPS.NOTIFICATIONS',
   i18nDesc: 'SETTINGS.LIST.NOTIFICATIONS_DESC',
   iamRouterLink: ['/settings'],
-  queryParams: { id: 'notifications' },
+  queryParams: { id: 'smtpprovider' },
   iamWithRole: ['iam.policy.read'],
   icon: 'las la-bell',
   color: 'red',

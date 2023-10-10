@@ -45,16 +45,18 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 
 	instanceID := authz.GetInstance(ctx).InstanceID()
 
+	// always load the latest sequence first, so in case the token was not found by id,
+	// the sequence will be equal or lower than the actual projection and no events are lost
+	sequence, err := repo.View.GetLatestState(ctx)
+	logging.WithFields("instanceID", instanceID, "userID", userID, "tokenID", tokenID).
+		OnError(err).
+		Errorf("could not get current sequence for token check")
+
 	token, viewErr := repo.View.TokenByIDs(tokenID, userID, instanceID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
 	if caos_errs.IsNotFound(viewErr) {
-		sequence, err := repo.View.GetLatestState(ctx)
-		logging.WithFields("instanceID", instanceID, "userID", userID, "tokenID", tokenID).
-			OnError(err).
-			Errorf("could not get current sequence for token check")
-
 		token = new(model.TokenView)
 		token.ID = tokenID
 		token.UserID = userID
