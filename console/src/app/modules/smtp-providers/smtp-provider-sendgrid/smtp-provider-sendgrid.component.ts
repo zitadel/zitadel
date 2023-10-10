@@ -19,6 +19,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { SMTPProviderType } from 'src/app/proto/generated/zitadel/settings_pb';
 import { ToastService } from 'src/app/services/toast.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'cnsl-provider-sendgrid',
@@ -55,6 +56,7 @@ export class SMTPProviderSendgridComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private authService: GrpcAuthService,
     private toast: ToastService,
+    private router: Router,
   ) {
     this.firstFormGroup = this.fb.group({
       tls: [false],
@@ -71,16 +73,18 @@ export class SMTPProviderSendgridComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.fetchData();
-    this.authService
-      .isAllowed(['iam.write'])
-      .pipe(take(1))
-      .subscribe((allowed) => {
-        if (allowed) {
-          this.firstFormGroup.enable();
-          this.secondFormGroup.enable();
-        }
-      });
+    if (!this.router.url.endsWith('/create')) {
+      this.fetchData();
+      this.authService
+        .isAllowed(['iam.write'])
+        .pipe(take(1))
+        .subscribe((allowed) => {
+          if (allowed) {
+            this.firstFormGroup.enable();
+            this.secondFormGroup.enable();
+          }
+        });
+    }
   }
 
   public changeStep(event: StepperSelectionEvent): void {
@@ -122,7 +126,6 @@ export class SMTPProviderSendgridComponent implements OnInit {
       .catch((error) => {
         this.smtpLoading = false;
         if (error && error.code === 5) {
-          console.log(error);
           this.hasSMTPConfig = false;
         }
       });
@@ -131,17 +134,30 @@ export class SMTPProviderSendgridComponent implements OnInit {
   private updateData(): Promise<UpdateSMTPConfigResponse.AsObject | AddSMTPConfigResponse> {
     if (this.hasSMTPConfig) {
       const req = new UpdateSMTPConfigRequest();
-      req.setProviderType(SMTPProviderType.SMTP_PROVIDER_TYPE_SENDGRID);
-      req.setHost(this.hostAndPort?.value ?? '');
-      req.setSenderAddress(this.senderAddress?.value ?? '');
-      req.setSenderName(this.senderName?.value ?? '');
-      req.setReplyToAddress(this.replyToAddress?.value ?? '');
       req.setTls(this.tls?.value ?? false);
-      req.setUser(this.user?.value ?? '');
+
+      if (this.hostAndPort && this.hostAndPort.value) {
+        req.setHost(this.hostAndPort.value);
+      }
+      if (this.user && this.user.value) {
+        req.setUser(this.user.value);
+      }
+      if (this.password && this.password.value) {
+        req.setPassword(this.password.value);
+      }
+      if (this.senderAddress && this.senderAddress.value) {
+        req.setSenderAddress(this.senderAddress.value);
+      }
+      if (this.senderName && this.senderName.value) {
+        req.setSenderName(this.senderName.value);
+      }
+      if (this.replyToAddress && this.replyToAddress.value) {
+        req.setReplyToAddress(this.replyToAddress.value);
+      }
+      req.setProviderType(SMTPProviderType.SMTP_PROVIDER_TYPE_SENDGRID);
       return this.service.updateSMTPConfig(req);
     } else {
       const req = new AddSMTPConfigRequest();
-      req.setProviderType(SMTPProviderType.SMTP_PROVIDER_TYPE_SENDGRID);
       req.setHost(this.hostAndPort?.value ?? '');
       req.setSenderAddress(this.senderAddress?.value ?? '');
       req.setSenderName(this.senderName?.value ?? '');
@@ -150,6 +166,7 @@ export class SMTPProviderSendgridComponent implements OnInit {
       req.setUser(this.user?.value ?? '');
       req.setPassword(this.password?.value ?? '');
       req.setIsActive(true);
+      req.setProviderType(SMTPProviderType.SMTP_PROVIDER_TYPE_SENDGRID);
       return this.service.addSMTPConfig(req);
     }
   }
@@ -159,7 +176,7 @@ export class SMTPProviderSendgridComponent implements OnInit {
       .then(() => {
         this.toast.showInfo('SETTING.SMTP.SAVED', true);
         setTimeout(() => {
-          this.fetchData();
+          this.close();
         }, 2000);
       })
       .catch((error: unknown) => {

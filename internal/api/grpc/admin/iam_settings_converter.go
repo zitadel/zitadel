@@ -137,9 +137,11 @@ func AddSMTPToConfig(req *admin_pb.AddSMTPConfigRequest) *smtp.Config {
 		FromName:       req.SenderName,
 		ReplyToAddress: req.ReplyToAddress,
 		SMTP: smtp.SMTP{
-			Host:     req.Host,
-			User:     req.User,
-			Password: req.Password,
+			Host:         req.Host,
+			User:         req.User,
+			Password:     req.Password,
+			ProviderType: uint32(req.ProviderType),
+			IsActive:     req.IsActive,
 		},
 	}
 }
@@ -151,8 +153,11 @@ func UpdateSMTPToConfig(req *admin_pb.UpdateSMTPConfigRequest) *smtp.Config {
 		FromName:       req.SenderName,
 		ReplyToAddress: req.ReplyToAddress,
 		SMTP: smtp.SMTP{
-			Host: req.Host,
-			User: req.User,
+			Host:         req.Host,
+			User:         req.User,
+			Password:     req.Password,
+			ProviderType: uint32(req.ProviderType),
+			IsActive:     req.IsActive,
 		},
 	}
 }

@@ -85,7 +85,16 @@
 
       <div class="smtp-create-actions">
         <button mat-stroked-button matStepperPrevious class="bck-button">{{ 'ACTIONS.BACK' | translate }}</button>
-        <button mat-raised-button class="create-button" color="primary" data-e2e="create-button" (click)="savePolicy()">
+        <button
+          mat-raised-button
+          class="create-button"
+          color="primary"
+          data-e2e="create-button"
+          (click)="savePolicy()"
+          [disabled]="
+            firstFormGroup.invalid || secondFormGroup.invalid || (['iam.policy.write'] | hasRole | async) === false
+          "
+        >
           {{ 'ACTIONS.CREATE' | translate }}
         </button>
       </div>

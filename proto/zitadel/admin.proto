@@ -4015,8 +4015,13 @@ message UpdateSMTPConfigRequest {
             max_length: 200;
         }
     ];
-    bool is_active = 7;
-    SMTPProviderType provider_type = 8;
+    string password = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"this-is-my-password\"";
+        }
+    ];
+    bool is_active = 8;
+    SMTPProviderType provider_type = 9;
 }
 
 message UpdateSMTPConfigResponse {

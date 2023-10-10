@@ -86,14 +86,15 @@ func SMTPConfigAddedEventMapper(event *repository.Event) (eventstore.Event, erro
 type SMTPConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	FromAddress    *string `json:"senderAddress,omitempty"`
-	FromName       *string `json:"senderName,omitempty"`
-	ReplyToAddress *string `json:"replyToAddress,omitempty"`
-	TLS            *bool   `json:"tls,omitempty"`
-	Host           *string `json:"host,omitempty"`
-	User           *string `json:"user,omitempty"`
-	IsActive       *bool   `json:"isActive,omitempty"`
-	ProviderType   *uint32 `json:"providerType,omitempty"`
+	FromAddress    *string             `json:"senderAddress,omitempty"`
+	FromName       *string             `json:"senderName,omitempty"`
+	ReplyToAddress *string             `json:"replyToAddress,omitempty"`
+	TLS            *bool               `json:"tls,omitempty"`
+	Host           *string             `json:"host,omitempty"`
+	User           *string             `json:"user,omitempty"`
+	Password       *crypto.CryptoValue `json:"password,omitempty"`
+	IsActive       *bool               `json:"isActive,omitempty"`
+	ProviderType   *uint32             `json:"providerType,omitempty"`
 }
 
 func (e *SMTPConfigChangedEvent) Data() interface{} {

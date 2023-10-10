@@ -63,18 +63,27 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *instance.SMTPConfigAddedEvent:
 			wm.TLS = e.TLS
-			wm.SenderAddress = e.SenderAddress
-			wm.SenderName = e.SenderName
-			wm.ReplyToAddress = e.ReplyToAddress
 			wm.Host = e.Host
 			wm.User = e.User
 			wm.Password = e.Password
-			wm.State = domain.SMTPConfigStateActive
+			wm.SenderAddress = e.SenderAddress
+			wm.SenderName = e.SenderName
+			wm.ReplyToAddress = e.ReplyToAddress
 			wm.IsActive = e.IsActive
 			wm.ProviderType = e.ProviderType
+			wm.State = domain.SMTPConfigStateActive
 		case *instance.SMTPConfigChangedEvent:
 			if e.TLS != nil {
 				wm.TLS = *e.TLS
+			}
+			if e.Host != nil {
+				wm.Host = *e.Host
+			}
+			if e.User != nil {
+				wm.User = *e.User
+			}
+			if e.Password != nil {
+				wm.Password = e.Password
 			}
 			if e.FromAddress != nil {
 				wm.SenderAddress = *e.FromAddress
@@ -84,12 +93,6 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 			}
 			if e.ReplyToAddress != nil {
 				wm.ReplyToAddress = *e.ReplyToAddress
-			}
-			if e.Host != nil {
-				wm.Host = *e.Host
-			}
-			if e.User != nil {
-				wm.User = *e.User
 			}
 			if e.IsActive != nil {
 				wm.IsActive = *e.IsActive

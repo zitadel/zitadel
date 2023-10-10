@@ -19,6 +19,7 @@ const (
 	SMTPConfigColumnSequence       = "sequence"
 	SMTPConfigColumnResourceOwner  = "resource_owner"
 	SMTPConfigColumnInstanceID     = "instance_id"
+	SMTPConfigColumnProviderID     = "provider_id"
 	SMTPConfigColumnTLS            = "tls"
 	SMTPConfigColumnSenderAddress  = "sender_address"
 	SMTPConfigColumnSenderName     = "sender_name"
@@ -29,6 +30,8 @@ const (
 	SMTPConfigColumnIsActive       = "is_active"
 	SMTPConfigColumnProviderType   = "provider_type"
 )
+
+const SMTP_PROVIDER_TYPE_GENERIC = 7
 
 type smtpConfigProjection struct {
 	crdb.StatementHandler
@@ -46,6 +49,7 @@ func newSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerCo
 			crdb.NewColumn(SMTPConfigColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(SMTPConfigColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnInstanceID, crdb.ColumnTypeText),
+			crdb.NewColumn(SMTPConfigColumnProviderID, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnTLS, crdb.ColumnTypeBool),
 			crdb.NewColumn(SMTPConfigColumnSenderAddress, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnSenderName, crdb.ColumnTypeText),
@@ -53,10 +57,10 @@ func newSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerCo
 			crdb.NewColumn(SMTPConfigColumnSMTPHost, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnSMTPUser, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnSMTPPassword, crdb.ColumnTypeJSONB, crdb.Nullable()),
-			crdb.NewColumn(SMTPConfigColumnIsActive, crdb.ColumnTypeBool),
-			crdb.NewColumn(SMTPConfigColumnProviderType, crdb.ColumnTypeEnum),
+			crdb.NewColumn(SMTPConfigColumnIsActive, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(SMTPConfigColumnProviderType, crdb.ColumnTypeEnum, crdb.Default(SMTP_PROVIDER_TYPE_GENERIC)),
 		},
-			crdb.NewPrimaryKey(SMTPConfigColumnInstanceID, SMTPConfigColumnAggregateID),
+			crdb.NewPrimaryKey(SMTPConfigColumnInstanceID, SMTPConfigColumnAggregateID, SMTPConfigColumnProviderID),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

@@ -20,6 +20,7 @@ import { ProviderOptionsModule } from '../provider-options/provider-options.modu
 import { StringListModule } from '../string-list/string-list.module';
 import { SMTPProvidersRoutingModule } from './smtp-provider-routing.module';
 import { SMTPProviderSendgridComponent } from './smtp-provider-sendgrid/smtp-provider-sendgrid.component';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 @NgModule({
   declarations: [SMTPProviderSendgridComponent],
@@ -43,6 +44,7 @@ import { SMTPProviderSendgridComponent } from './smtp-provider-sendgrid/smtp-pro
     MatStepperModule,
     TranslateModule,
     ProviderOptionsModule,
+    HasRolePipeModule,
     MatLegacyProgressSpinnerModule,
   ],
 })

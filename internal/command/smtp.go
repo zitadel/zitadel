@@ -106,8 +106,8 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, reply
 		}
 
 		replyTo = strings.TrimSpace(replyTo)
-
 		hostAndPort = strings.TrimSpace(hostAndPort)
+
 		if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-9JdRe", "Errors.Invalid.Argument")
 		}
@@ -118,9 +118,10 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, reply
 			if err != nil {
 				return nil, err
 			}
-			if writeModel.State == domain.SMTPConfigStateActive {
-				return nil, errors.ThrowAlreadyExists(nil, "INST-W3VS2", "Errors.SMTPConfig.AlreadyExists")
-			}
+			// TODO: State not needed
+			// if writeModel.State == domain.SMTPConfigStateActive {
+			// 	return nil, errors.ThrowAlreadyExists(nil, "INST-W3VS2", "Errors.SMTPConfig.AlreadyExists")
+			// }
 			err = checkSenderAddress(writeModel)
 			if err != nil {
 				return nil, err
