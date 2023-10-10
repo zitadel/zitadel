@@ -9,7 +9,7 @@ import OrgDescription from "../../../concepts/structure/_org_description.mdx";
 import Column from "../../../../src/components/column";
 
 An Organization is where your projects and users live. Looking at a B2B use case, an organization represents a business partner who typically has its own branding and has different access settings like additional federated login providers.
-Users from one organization are seperated from others.
+Users from one organization are separated from others.
 
 ## Create a new organization
 
@@ -23,7 +23,7 @@ If you choose your logged in user as organization manager, a membership for the 
   alt="Select Organization"
 />
 
-If you want to enable your customers to create their organization by themselves, we provide a creation form for a organization. `<https://$CUSTOM-DOMAIN/ui/login/register/org`
+If you want to enable your customers to create their organization by themselves, we provide a creation form for an organization. `<https://$CUSTOM-DOMAIN/ui/login/register/org`
 The customer needs to fill in the form with the organization name and the contact details.
 
 <img
@@ -34,8 +34,8 @@ The customer needs to fill in the form with the organization name and the contac
 
 ## How ZITADEL handles usernames
 
-If you domain setting "user loginname must contain orgdomain" is disabled. Your username will be unique withing the whole instance.
-At the moment the username only allowes e-mail formatted input. (This will be changed soon)
+If your domain setting "user loginname must contain orgdomain" is disabled, your username will be unique within the whole instance.
+At the moment the username only allows e-mail formatted input. (This will be changed soon)
 
 ### User Loginname must contain orgdomain
 
@@ -46,9 +46,9 @@ Those loginnames consist of the format `{username}@{domainname}.{zitadeldomain}`
 If your user had the username `john.doe`, the generated loginname would be `john.doe@acme.zitadel.cloud`.
 This also means that only one user with the username `john.doe` can exist in your organization called `ACME`.
 
-If you verify your domain name or add additional domains, ZITADEL will generate those additional logonames for you.
+If you verify your domain name or add additional domains, ZITADEL will generate those additional login names for you.
 If the organization would own the domain `acme.ch` and verify it, then the resulting loginname would be `john.doe@acme.ch` in addition to the already generated `john.doe@acme.zitadel.cloud`.
-The user can now use either logonname to authenticate with your application.
+The user can now use either login name to authenticate with your application.
 
 > Note: You can set this setting on your instance as well as your organizations. All available usernames are shown on the top of the user pages.
 
@@ -59,12 +59,14 @@ Users that you create within your organization will be suffixed with this domain
 
 You can improve the user experience, by suffixing users with a domain name that is in your control.
 If the "validate org domains" settings in the [Domain Settings](./instance-settings#domain-settings) is set to true, you have to prove the ownership of your domain, by DNS or HTTP challenge.
-If the settings is set to false, the created domain will automatically be set to verifed.
+If the setting is set to false, the created domain will automatically be set to verifed.
 
 An organization can have multiple domain names, but only one domain can be primary.
 The primary domain defines which login name ZITADEL displays to the user, and what information gets asserted in access_tokens (`preferred_username`).
 
-Please note that domain verification also removes the logonname from all users, who might have used this combination in the global organization (ie. users not belonging to a specific organization). Relating to our example with acme.ch: If a user ‘coyote’ exists in the global organization with the logonname coyote@acme.ch, then after verification of acme.ch, this logonname will be replaced with `coyote@{randomvalue.tld}`. ZITADEL will notify users affected by this change.
+Please note that domain verification also removes the login name from all users, who might have used this combination in the global organization (ie. users not belonging to a specific organization).
+Relating to our example with acme.ch: If a user ‘coyote’ exists in the global organization with the login name coyote@acme.ch, then after verification of acme.ch, this login name will be replaced with `coyote@{randomvalue.tld}`.
+ZITADEL will notify users affected by this change.
 
 ## Verify your domain name
 
