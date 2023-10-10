@@ -1,7 +1,7 @@
 <h2>{{ 'SETTING.SMTP.TITLE' | translate }}</h2>
 
 <div class="spinner-wr">
-  <mat-spinner diameter="30" *ngIf="smtpLoading || smsProvidersLoading" color="primary"></mat-spinner>
+  <mat-spinner diameter="30" *ngIf="smtpLoading" color="primary"></mat-spinner>
 </div>
 
 <cnsl-info-section
@@ -48,6 +48,7 @@
     (click)="setSMTPPassword()"
     type="button"
     mat-stroked-button
+    data-e2e="add-smtp-password-button"
   >
     {{ 'SETTING.SMTP.SETPASSWORD' | translate }}
   </button>
@@ -60,55 +61,9 @@
       color="primary"
       type="submit"
       mat-raised-button
+      data-e2e="save-smtp-settings-button"
     >
       {{ 'ACTIONS.SAVE' | translate }}
     </button>
   </div>
 </form>
-
-<br />
-<h2>{{ 'SETTING.SMS.TITLE' | translate }}</h2>
-<div class="sms-providers">
-  <cnsl-card class="sms-card" [nomargin]="true">
-    <div class="sms-provider">
-      <h4 class="title">Twilio</h4>
-
-      <span
-        *ngIf="twilio"
-        class="state"
-        [ngClass]="{
-          active: twilio.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_ACTIVE,
-          inactive: twilio.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_INACTIVE
-        }"
-        >{{ 'SETTING.SMS.SMSPROVIDERSTATE.' + twilio.state | translate }}</span
-      >
-
-      <span class="fill-space"></span>
-      <button
-        *ngIf="twilio && twilio.id"
-        [disabled]="(['iam.write'] | hasRole | async) === false"
-        mat-stroked-button
-        (click)="toggleSMSProviderState(twilio.id)"
-      >
-        <span *ngIf="twilio.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_ACTIVE">{{
-          'ACTIONS.DEACTIVATE' | translate
-        }}</span>
-        <span *ngIf="twilio.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_INACTIVE">{{
-          'ACTIONS.ACTIVATE' | translate
-        }}</span>
-      </button>
-      <button
-        *ngIf="twilio && twilio.id"
-        color="warn"
-        [disabled]="(['iam.write'] | hasRole | async) === false"
-        mat-icon-button
-        (click)="removeSMSProvider(twilio.id)"
-      >
-        <i class="las la-trash"></i>
-      </button>
-      <button [disabled]="(['iam.write'] | hasRole | async) === false" mat-icon-button (click)="editSMSProvider()">
-        <i class="las la-pen"></i>
-      </button>
-    </div>
-  </cnsl-card>
-</div>

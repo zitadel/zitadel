@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package zitadel.feature.v1;
+
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/feature";
+
+enum InstanceFeature {
+  INSTANCE_FEATURE_UNSPECIFIED = 0;
+  INSTANCE_FEATURE_LOGIN_DEFAULT_ORG = 1;
+}
