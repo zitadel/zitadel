@@ -6,6 +6,7 @@ package mock
 
 import (
 	gomock "github.com/golang/mock/gomock"
+	eventstore "github.com/zitadel/zitadel/internal/eventstore"
 	reflect "reflect"
 )
 
@@ -33,15 +34,30 @@ func (m *MockMessage) EXPECT() *MockMessageMockRecorder {
 }
 
 // GetContent mocks base method
-func (m *MockMessage) GetContent() string {
+func (m *MockMessage) GetContent() (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetContent")
 	ret0, _ := ret[0].(string)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // GetContent indicates an expected call of GetContent
 func (mr *MockMessageMockRecorder) GetContent() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContent", reflect.TypeOf((*MockMessage)(nil).GetContent))
+}
+
+// GetTriggeringEvent mocks base method
+func (m *MockMessage) GetTriggeringEvent() eventstore.Event {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTriggeringEvent")
+	ret0, _ := ret[0].(eventstore.Event)
+	return ret0
+}
+
+// GetTriggeringEvent indicates an expected call of GetTriggeringEvent
+func (mr *MockMessageMockRecorder) GetTriggeringEvent() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTriggeringEvent", reflect.TypeOf((*MockMessage)(nil).GetTriggeringEvent))
 }
