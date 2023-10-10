@@ -86,7 +86,7 @@ We understand that these advisories may include breaking changes, and we aim to 
       Existing sequences remain untouched.
     </td>
     <td>2.39.0</td>
-      <td>2023-10-14</td>
+    <td>2023-10-14</td>
   </tr>
   <tr>
     <td>
@@ -95,13 +95,13 @@ We understand that these advisories may include breaking changes, and we aim to 
     <td>Expected downtime during upgrade</td>
     <td>Expected downtime during upgrade</td>
     <td>
-      Migrating to versions >= 2.39 from < 2.39 will cause down time during setup starts and the new version is started.
+      Migrating to versions &gt= 2.39 from &lt 2.39 will cause down time during setup starts and the new version is started.
       This is caused by storage optimisations which replace the `eventstore.events` database table with the new `eventstore.events2` table.
       All existing events are migrated during the execution of the `zitadel setup` command.
       New events will be inserted into the new `eventstore.events2` table. The old table `evetstore.events` is renamed to `eventstore.events_old` and will be dropped in a future release of ZITADEL.
     </td>
     <td>2.39.0</td>
-      <td>Calendar week 41/42 2023</td>
+    <td>Calendar week 41/42 2023</td>
   </tr>
 </table>
 
