@@ -19,6 +19,7 @@ lint:
     - zitadel/auth.proto
     - zitadel/change.proto
     - zitadel/event.proto
+    - zitadel/feature.proto
     - zitadel/idp.proto
     - zitadel/instance.proto
     - zitadel/management.proto
