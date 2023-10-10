@@ -184,8 +184,8 @@ Errors:
     DomainVerificationFailed: Verifikation der Domäne ist fehlgeschlagen
     DomainVerificationTXTNotFound: Der TXT-Eintrag _zitadel-challenge wurde für Ihre Domain nicht gefunden. Überprüfen Sie, ob Sie ihn zu Ihrem DNS-Server hinzugefügt haben, oder warten Sie, bis der neue Eintrag verbreitet wird
     DomainVerificationTXTNoMatch: Der TXT-Eintrag _zitadel-challenge wurde für Ihre Domain gefunden, enthält jedoch nicht den richtigen Token-Text. Überprüfen Sie, ob Sie das richtige Token zu Ihrem DNS-Server hinzugefügt haben, oder warten Sie, bis der neue Eintrag verbreitet wird
-    DomainVerificationHTTPNotFound: Die Datei mit der Herausforderung wurde unter der erwarteten URL nicht gefunden. Überprüfen Sie, ob Sie die Datei mit Leseberechtigungen an der richtigen Stelle hochgeladen haben
-    DomainVerificationHTTPNoMatch: Die Datei mit der Herausforderung wurde in der erwarteten URL gefunden, enthält jedoch nicht den richtigen Token-Text. Überprüfen Sie den Inhalt
+    DomainVerificationHTTPNotFound: Das File der Challenge wurde unter der erwarteten URL nicht gefunden. Überprüfen Sie, ob Sie die Datei mit Leseberechtigungen an der richtigen Stelle hochgeladen haben
+    DomainVerificationHTTPNoMatch: Das File der Challenge wurde in der erwarteten URL gefunden, enthält jedoch nicht den richtigen Token-Text. Überprüfen Sie den Inhalt
     DomainVerificationTimeout: There was a timeout querying the DNS server.
     PrimaryDomainNotDeletable: Primäre Domäne kann nicht gelöscht werden
     DomainNotFound: Domäne konnte nicht gefunden werden
