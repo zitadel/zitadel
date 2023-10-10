@@ -23,7 +23,10 @@ export class OrgContextComponent implements OnInit {
   @Output() public closedCard: EventEmitter<void> = new EventEmitter();
   @Output() public setOrg: EventEmitter<Org.AsObject> = new EventEmitter();
 
-  constructor(public authService: AuthenticationService, private auth: GrpcAuthService) {
+  constructor(
+    public authService: AuthenticationService,
+    private auth: GrpcAuthService,
+  ) {
     this.filterControl.valueChanges.pipe(debounceTime(500)).subscribe((value) => {
       this.loadOrgs(value.trim().toLowerCase());
     });

@@ -180,6 +180,11 @@ Errors:
     DomainVerificationTypeInvalid: O tipo de verificação do domínio é inválido
     DomainVerificationMissing: A verificação do domínio ainda não foi iniciada
     DomainVerificationFailed: Falha na verificação do domínio
+    DomainVerificationTXTNotFound: O registro TXT _zitadel-challenge não foi encontrado para seu domínio. Verifique se você o adicionou ao seu servidor DNS ou espere até que o novo registro seja propagado
+    DomainVerificationTXTNoMatch: O registro TXT _zitadel-challenge foi encontrado para seu domínio, mas não contém o texto do token correto. Verifique se você adicionou o token correto ao seu servidor DNS ou espere até que o novo registro seja propagado
+    DomainVerificationHTTPNotFound: O arquivo que contém o desafio não foi encontrado na URL esperada. Verifique se você carregou o arquivo no lugar certo com permissões de leitura
+    DomainVerificationHTTPNoMatch: O arquivo que contém o desafio foi encontrado na URL esperada, mas não contém o texto do token correto. Verifique seu conteúdo
+    DomainVerificationTimeout: Houve um tempo limite na consulta do servidor DNS
     PrimaryDomainNotDeletable: O domínio principal não pode ser excluído
     DomainNotFound: Domínio não encontrado
     MemberIDMissing: ID do membro ausente
@@ -485,6 +490,8 @@ Errors:
       NoChallenge: Sessão sem desafio WebAuthN
   Intent:
     IDPMissing: O ID do IDP está faltando na solicitação
+    IDPInvalid: IDP inválido para o pedido
+    ResponseInvalid: A resposta da PDI é inválida
     SuccessURLMissing: A URL de sucesso está faltando na solicitação
     FailureURLMissing: A URL de falha está faltando na solicitação
     StateMissing: O parâmetro de estado está faltando na solicitação
@@ -499,6 +506,10 @@ Errors:
     WrongLoginClient: A solicitação de autenticação foi criada por outro cliente de login
   OIDCSession:
     RefreshTokenInvalid: O Refresh Token é inválido
+  Feature:
+    NotExisting: O recurso não existe
+    TypeNotSupported: O tipo de recurso não é compatível
+    InvalidValue: Valor inválido para este recurso
 
 AggregateTypes:
   action: Ação
@@ -509,6 +520,7 @@ AggregateTypes:
   user: Usuário
   usergrant: Concessão de usuário
   quota: Cota
+  feature: Recurso
 
 EventTypes:
   user:

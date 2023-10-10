@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Observable, of, Subject, takeUntil } from 'rxjs';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -21,8 +21,9 @@ import {
   PRIVACYPOLICY,
   SECRETS,
   SECURITY,
+  SMS_PROVIDER,
+  SMTP_PROVIDER,
 } from '../../modules/settings-list/settings';
-import { checkSettingsPermissions } from '../org-settings/org-settings.component';
 
 @Component({
   selector: 'cnsl-instance-settings',
@@ -37,6 +38,8 @@ export class InstanceSettingsComponent implements OnInit, OnDestroy {
     // notifications
     // { showWarn: true, ...NOTIFICATIONS },
     NOTIFICATIONS,
+    SMTP_PROVIDER,
+    SMS_PROVIDER,
     // login
     LOGIN,
     IDP,
@@ -55,10 +58,14 @@ export class InstanceSettingsComponent implements OnInit, OnDestroy {
     SECURITY,
   ];
 
-  public settingsList: SidenavSetting[] = [];
+  public settingsList: Observable<SidenavSetting[]> = of([]);
 
   private destroy$: Subject<void> = new Subject();
-  constructor(breadcrumbService: BreadcrumbService, activatedRoute: ActivatedRoute, public authService: GrpcAuthService) {
+  constructor(
+    breadcrumbService: BreadcrumbService,
+    activatedRoute: ActivatedRoute,
+    public authService: GrpcAuthService,
+  ) {
     const breadcrumbs = [
       new Breadcrumb({
         type: BreadcrumbType.INSTANCE,
@@ -77,12 +84,9 @@ export class InstanceSettingsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    checkSettingsPermissions(this.defaultSettingsList, PolicyComponentServiceType.ADMIN, this.authService).subscribe(
-      (allowed) => {
-        this.settingsList = this.defaultSettingsList.filter((setting, index) => {
-          return allowed[index];
-        });
-      },
+    this.settingsList = this.authService.isAllowedMapper(
+      this.defaultSettingsList,
+      (setting) => setting.requiredRoles.admin || [],
     );
   }
 

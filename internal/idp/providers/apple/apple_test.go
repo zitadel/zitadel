@@ -59,11 +59,13 @@ func TestProvider_BeginAuth(t *testing.T) {
 
 			provider, err := New(tt.fields.clientID, tt.fields.teamID, tt.fields.keyID, tt.fields.redirectURI, tt.fields.privateKey, tt.fields.scopes)
 			r.NoError(err)
-
-			session, err := provider.BeginAuth(context.Background(), "testState")
+			ctx := context.Background()
+			session, err := provider.BeginAuth(ctx, "testState")
 			r.NoError(err)
-
-			a.Equal(tt.want.GetAuthURL(), session.GetAuthURL())
+			content, redirect := session.GetAuth(ctx)
+			contentExpected, redirectExpected := tt.want.GetAuth(ctx)
+			a.Equal(redirectExpected, redirect)
+			a.Equal(contentExpected, content)
 		})
 	}
 }

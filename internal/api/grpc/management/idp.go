@@ -418,6 +418,37 @@ func (s *Server) UpdateAppleProvider(ctx context.Context, req *mgmt_pb.UpdateApp
 	}, nil
 }
 
+func (s *Server) AddSAMLProvider(ctx context.Context, req *mgmt_pb.AddSAMLProviderRequest) (*mgmt_pb.AddSAMLProviderResponse, error) {
+	id, details, err := s.command.AddOrgSAMLProvider(ctx, authz.GetCtxData(ctx).OrgID, addSAMLProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddSAMLProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateSAMLProvider(ctx context.Context, req *mgmt_pb.UpdateSAMLProviderRequest) (*mgmt_pb.UpdateSAMLProviderResponse, error) {
+	details, err := s.command.UpdateOrgSAMLProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateSAMLProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateSAMLProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) RegenerateSAMLProviderCertificate(ctx context.Context, req *mgmt_pb.RegenerateSAMLProviderCertificateRequest) (*mgmt_pb.RegenerateSAMLProviderCertificateResponse, error) {
+	details, err := s.command.RegenerateOrgSAMLProviderCertificate(ctx, authz.GetCtxData(ctx).OrgID, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RegenerateSAMLProviderCertificateResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
 func (s *Server) DeleteProvider(ctx context.Context, req *mgmt_pb.DeleteProviderRequest) (*mgmt_pb.DeleteProviderResponse, error) {
 	details, err := s.command.DeleteOrgProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id)
 	if err != nil {
