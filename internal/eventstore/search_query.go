@@ -148,9 +148,6 @@ func (builder *SearchQueryBuilder) Matches(event Event, existingLen int) (matche
 	if builder.eventSequenceGreater > 0 && event.Sequence() <= builder.eventSequenceGreater {
 		return false
 	}
-	if event.Aggregate().InstanceID != "" && builder.instanceID != nil && *builder.instanceID != "" && event.Aggregate().InstanceID != *builder.instanceID {
-		return false
-	}
 
 	if len(builder.queries) == 0 {
 		return true
