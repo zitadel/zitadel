@@ -6,7 +6,12 @@ export function SubProcessorTable() {
     us: "USA",
     eu: "EU",
     ch: "Switzerland",
-    fr: "France"
+    fr: "France",
+    in: "India",
+    de: "Germany",
+    ee: "Estonia",
+    lk: "Sri Lanka",
+    ro: "Romania",
   }
   const processors = [
     {
@@ -59,7 +64,7 @@ export function SubProcessorTable() {
       enduserdata: false
     },
     {
-      entity: "AC PM LLC (Postmark)",
+      entity: "Postmark (AC PM LLC)",
       purpose: "Transactional mails, if no customer owned SMTP service is configured",
       hosting: country_list.us,
       country: country_list.us,
@@ -74,56 +79,57 @@ export function SubProcessorTable() {
     },
     {
       entity: "Agolia SAS",
-      purpose: "",
+      purpose: "Documentation search engine (zitadel.com/docs)",
       hosting: country_list.us,
-      country: undefined, // Not clear for OSS plan, sent a request to algolia
+      country: country_list.in,
       enduserdata: false
     },
     {
       entity: "Discord Netherlands BV",
-      purpose: "",
+      purpose: "Community chat (zitadel.com/chat)",
       hosting: country_list.us,
       country: country_list.us,
       enduserdata: false
     },
     {
       entity: "Statuspal",
-      purpose: "",
+      purpose: "ZITADEL Cloud service status announcements",
       hosting: country_list.us,
-      country: country_list.us,
+      country: country_list.de,
       enduserdata: false
     },
     {
-      entity: "Plausible",
-      purpose: "",
+      entity: "Plausible Insights OÜ",
+      purpose: "Privacy-friendly web analytics",
+      hosting: country_list.de,
+      country: country_list.ee,
+      enduserdata: false,
+      dpa: 'https://plausible.io/dpa'
+    },
+    {
+      entity: "Twillio Inc.",
+      purpose: "Messaging platform for SMS",
       hosting: country_list.us,
       country: country_list.us,
+      enduserdata: "Yes (opt-out)"
+    },
+    {
+      entity: "Mohlmann Solutions SRL",
+      purpose: "Global payroll",
+      hosting: undefined,
+      country: country_list.ro,
       enduserdata: false
     },
     {
-      entity: "Twillio",
-      purpose: "",
-      hosting: country_list.us,
-      country: country_list.us,
+      entity: "Remote Lanka (Pvt) Ltd",
+      purpose: "Global payroll",
+      hosting: undefined,
+      country: country_list.lk,
       enduserdata: false
     },
     {
-      entity: "Mohlmann Solutions",
-      purpose: "",
-      hosting: country_list.us,
-      country: country_list.us,
-      enduserdata: false
-    },
-    {
-      entity: "Remote Sri Lanka",
-      purpose: "",
-      hosting: country_list.us,
-      country: country_list.us,
-      enduserdata: false
-    },
-    {
-      entity: "Clickhouse",
-      purpose: "",
+      entity: "Clickhouse, Inc. ",
+      purpose: "Data warehouse services",
       hosting: country_list.us,
       country: country_list.us,
       enduserdata: false
@@ -152,7 +158,7 @@ export function SubProcessorTable() {
               <td key={rowID}>{processor.entity}</td>
               <td>{processor.purpose}</td>
               <td>{processor.enduserdata ? processor.enduserdata  : 'No'}</td>
-              <td>{processor.hosting}</td>
+              <td>{processor.hosting ? processor.hosting  : 'n/a'}</td>
               <td>{processor.country}</td>
             </tr>
           )
