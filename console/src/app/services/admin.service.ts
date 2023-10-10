@@ -40,6 +40,8 @@ import {
   AddNotificationPolicyResponse,
   AddOIDCSettingsRequest,
   AddOIDCSettingsResponse,
+  AddSAMLProviderRequest,
+  AddSAMLProviderResponse,
   AddSecondFactorToLoginPolicyRequest,
   AddSecondFactorToLoginPolicyResponse,
   AddSMSProviderTwilioRequest,
@@ -260,6 +262,8 @@ import {
   UpdatePasswordComplexityPolicyResponse,
   UpdatePrivacyPolicyRequest,
   UpdatePrivacyPolicyResponse,
+  UpdateSAMLProviderRequest,
+  UpdateSAMLProviderResponse,
   UpdateSecretGeneratorRequest,
   UpdateSecretGeneratorResponse,
   UpdateSMSProviderTwilioRequest,
@@ -1166,6 +1170,14 @@ export class AdminService {
 
   public updateJWTProvider(req: UpdateJWTProviderRequest): Promise<UpdateJWTProviderResponse.AsObject> {
     return this.grpcService.admin.updateJWTProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addSAMLProvider(req: AddSAMLProviderRequest): Promise<AddSAMLProviderResponse.AsObject> {
+    return this.grpcService.admin.addSAMLProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateSAMLProvider(req: UpdateSAMLProviderRequest): Promise<UpdateSAMLProviderResponse.AsObject> {
+    return this.grpcService.admin.updateSAMLProvider(req, null).then((resp) => resp.toObject());
   }
 
   public addGitHubEnterpriseServerProvider(

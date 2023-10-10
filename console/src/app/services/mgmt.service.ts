@@ -83,6 +83,8 @@ import {
   AddProjectRoleResponse,
   AddSAMLAppRequest,
   AddSAMLAppResponse,
+  AddSAMLProviderRequest,
+  AddSAMLProviderResponse,
   AddSecondFactorToLoginPolicyRequest,
   AddSecondFactorToLoginPolicyResponse,
   AddUserGrantRequest,
@@ -507,6 +509,8 @@ import {
   UpdateProjectRoleResponse,
   UpdateSAMLAppConfigRequest,
   UpdateSAMLAppConfigResponse,
+  UpdateSAMLProviderRequest,
+  UpdateSAMLProviderResponse,
   UpdateUserGrantRequest,
   UpdateUserGrantResponse,
   UpdateUserNameRequest,
@@ -1031,6 +1035,14 @@ export class ManagementService {
 
   public updateJWTProvider(req: UpdateJWTProviderRequest): Promise<UpdateJWTProviderResponse.AsObject> {
     return this.grpcService.mgmt.updateJWTProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addSAMLProvider(req: AddSAMLProviderRequest): Promise<AddSAMLProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addSAMLProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateSAMLProvider(req: UpdateSAMLProviderRequest): Promise<UpdateSAMLProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateSAMLProvider(req, null).then((resp) => resp.toObject());
   }
 
   public addGitHubEnterpriseServerProvider(
