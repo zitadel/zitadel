@@ -23,6 +23,8 @@ import {
   PRIVACYPOLICY,
   SECRETS,
   SECURITY,
+  SMS_PROVIDER,
+  SMTP_PROVIDER,
 } from '../../modules/settings-list/settings';
 
 @Component({

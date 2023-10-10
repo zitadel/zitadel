@@ -3,45 +3,33 @@ import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { take } from 'rxjs';
 import {
-  AddSMSProviderTwilioRequest,
   AddSMTPConfigRequest,
   AddSMTPConfigResponse,
-  UpdateSMSProviderTwilioRequest,
   UpdateSMTPConfigPasswordRequest,
   UpdateSMTPConfigRequest,
   UpdateSMTPConfigResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { DebugNotificationProvider, SMSProvider, SMSProviderConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
-import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
+import { PasswordDialogComponent } from '../notification-sms-provider/password-dialog/password-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
-import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-add-sms-provider.component';
-import { PasswordDialogComponent } from './password-dialog/password-dialog.component';
 
 @Component({
-  selector: 'cnsl-notification-settings',
-  templateUrl: './notification-settings.component.html',
-  styleUrls: ['./notification-settings.component.scss'],
+  selector: 'cnsl-notification-smtp-provider',
+  templateUrl: './notification-smtp-provider.component.html',
+  styleUrls: ['./notification-smtp-provider.component.scss'],
 })
-export class NotificationSettingsComponent implements OnInit {
+export class NotificationSMTPProviderComponent implements OnInit {
   @Input() public serviceType!: PolicyComponentServiceType;
-  public smsProviders: SMSProvider.AsObject[] = [];
-  public logNotificationProvider!: DebugNotificationProvider.AsObject;
-  public fileNotificationProvider!: DebugNotificationProvider.AsObject;
 
   public smtpLoading: boolean = false;
-  public smsProvidersLoading: boolean = false;
-  public logProviderLoading: boolean = false;
-  public fileProviderLoading: boolean = false;
 
   public form!: UntypedFormGroup;
 
-  public SMSProviderConfigState: any = SMSProviderConfigState;
   public InfoSectionType: any = InfoSectionType;
 
   public hasSMTPConfig: boolean = false;
@@ -96,46 +84,6 @@ export class NotificationSettingsComponent implements OnInit {
           this.hasSMTPConfig = false;
         }
       });
-
-    this.smsProvidersLoading = true;
-    this.service
-      .listSMSProviders()
-      .then((smsProviders) => {
-        this.smsProvidersLoading = false;
-        if (smsProviders.resultList) {
-          this.smsProviders = smsProviders.resultList;
-        }
-      })
-      .catch((error) => {
-        this.smsProvidersLoading = false;
-        this.toast.showError(error);
-      });
-
-    this.logProviderLoading = true;
-    this.service
-      .getLogNotificationProvider()
-      .then((logNotificationProvider) => {
-        this.logProviderLoading = false;
-        if (logNotificationProvider.provider) {
-          this.logNotificationProvider = logNotificationProvider.provider;
-        }
-      })
-      .catch(() => {
-        this.logProviderLoading = false;
-      });
-
-    this.fileProviderLoading = true;
-    this.service
-      .getFileSystemNotificationProvider()
-      .then((fileNotificationProvider) => {
-        this.fileProviderLoading = false;
-        if (fileNotificationProvider.provider) {
-          this.fileNotificationProvider = fileNotificationProvider.provider;
-        }
-      })
-      .catch(() => {
-        this.fileProviderLoading = false;
-      });
   }
 
   private updateData(): Promise<UpdateSMTPConfigResponse.AsObject | AddSMTPConfigResponse> {
@@ -175,41 +123,6 @@ export class NotificationSettingsComponent implements OnInit {
       });
   }
 
-  public editSMSProvider(): void {
-    const dialogRef = this.dialog.open(DialogAddSMSProviderComponent, {
-      width: '400px',
-      data: {
-        smsProviders: this.smsProviders,
-      },
-    });
-
-    dialogRef.afterClosed().subscribe((req: AddSMSProviderTwilioRequest | UpdateSMSProviderTwilioRequest) => {
-      if (req) {
-        if (!!this.twilio) {
-          this.service
-            .updateSMSProviderTwilio(req as UpdateSMSProviderTwilioRequest)
-            .then(() => {
-              this.toast.showInfo('SETTING.SMS.TWILIO.ADDED', true);
-              this.fetchData();
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
-        } else {
-          this.service
-            .addSMSProviderTwilio(req as AddSMSProviderTwilioRequest)
-            .then(() => {
-              this.toast.showInfo('SETTING.SMS.TWILIO.ADDED', true);
-              this.fetchData();
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
-        }
-      }
-    });
-  }
-
   public setSMTPPassword(): void {
     const dialogRef = this.dialog.open(PasswordDialogComponent, {
       width: '400px',
@@ -234,63 +147,6 @@ export class NotificationSettingsComponent implements OnInit {
           });
       }
     });
-  }
-
-  public toggleSMSProviderState(id: string): void {
-    const provider = this.smsProviders.find((p) => p.id === id);
-    if (provider) {
-      if (provider.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_ACTIVE) {
-        this.service
-          .deactivateSMSProvider(id)
-          .then(() => {
-            this.toast.showInfo('SETTING.SMS.DEACTIVATED', true);
-            this.fetchData();
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-      } else if (provider.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_INACTIVE) {
-        this.service
-          .activateSMSProvider(id)
-          .then(() => {
-            this.toast.showInfo('SETTING.SMS.ACTIVATED', true);
-            this.fetchData();
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-      }
-    }
-  }
-
-  public removeSMSProvider(id: string): void {
-    const dialogRef = this.dialog.open(WarnDialogComponent, {
-      data: {
-        confirmKey: 'ACTIONS.DELETE',
-        cancelKey: 'ACTIONS.CANCEL',
-        titleKey: 'SETTING.SMS.REMOVEPROVIDER',
-        descriptionKey: 'SETTING.SMS.REMOVEPROVIDER_DESC',
-      },
-      width: '400px',
-    });
-
-    dialogRef.afterClosed().subscribe((resp) => {
-      if (resp) {
-        this.service
-          .removeSMSProvider(id)
-          .then(() => {
-            this.toast.showInfo('SETTING.SMS.TWILIO.REMOVED', true);
-            this.fetchData();
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-      }
-    });
-  }
-
-  public get twilio(): SMSProvider.AsObject | undefined {
-    return this.smsProviders.find((p) => p.twilio);
   }
 
   public get senderAddress(): AbstractControl | null {

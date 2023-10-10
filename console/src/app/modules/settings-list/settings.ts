@@ -98,6 +98,7 @@ export const NOTIFICATIONS: SidenavSetting = {
   groupI18nKey: 'SETTINGS.GROUPS.NOTIFICATIONS',
   requiredRoles: {
     [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+    [PolicyComponentServiceType.MGMT]: ['policy.read'],
   },
 };
 

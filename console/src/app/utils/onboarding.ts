@@ -71,7 +71,7 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
     eventType: 'instance.smtp.config.added',
     oneof: ['instance.smtp.config.added', 'instance.smtp.config.changed'],
     link: ['/settings'],
-    fragment: 'smtpsettings',
+    fragment: 'smtpprovider',
     iconClasses: 'las la-envelope',
     darkcolor: yellowdark,
     lightcolor: yellowlight,
