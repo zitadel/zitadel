@@ -446,7 +446,7 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		InstanceID(currentState.instanceID)
 
 	if currentState.position > 0 {
-		builder = builder.PositionAfter(math.Float64frombits(math.Float64bits(currentState.position) - 1))
+		builder = builder.PositionAfter(math.Float64frombits(math.Float64bits(currentState.position) - 10))
 	}
 
 	for aggregateType, eventTypes := range h.eventTypes {

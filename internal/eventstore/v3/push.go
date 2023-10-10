@@ -23,6 +23,7 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 	if err != nil {
 		return nil, err
 	}
+	// tx is not closed because [crdb.ExecuteInTx] takes care of that
 	var (
 		sequences []*latestSequence
 		once      sync.Once
