@@ -260,10 +260,10 @@ func TestServer_SAMLACS(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.StartIdentityProviderFlow(tt.args.ctx,
-				&user.StartIdentityProviderFlowRequest{
+			got, err := Client.StartIdentityProviderIntent(tt.args.ctx,
+				&user.StartIdentityProviderIntentRequest{
 					IdpId: tt.args.idpID,
-					Content: &user.StartIdentityProviderFlowRequest_Urls{
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
 						Urls: &user.RedirectURLs{
 							SuccessUrl: tt.args.successURL,
 							FailureUrl: tt.args.failureURL,

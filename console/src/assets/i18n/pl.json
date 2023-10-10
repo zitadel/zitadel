@@ -1019,6 +1019,8 @@
       "LOCKOUT": "Blokada",
       "COMPLEXITY": "Złożoność hasła",
       "NOTIFICATIONS": "Ustawienia powiadomień",
+      "SMTP_PROVIDER": "Dostawca SMTP",
+      "SMS_PROVIDER": "Dostawca SMS-ów/telefonów",
       "NOTIFICATIONS_DESC": "Ustawienia SMTP i SMS",
       "MESSAGETEXTS": "Teksty wiadomości",
       "IDP": "Dostawcy tożsamości",
