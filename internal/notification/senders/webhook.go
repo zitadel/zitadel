@@ -14,7 +14,7 @@ import (
 
 const webhookSpanName = "webhook.NotificationChannel"
 
-func JSONChannels(
+func WebhookChannels(
 	ctx context.Context,
 	webhookConfig webhook.Config,
 	getFileSystemProvider func(ctx context.Context) (*fs.Config, error),
@@ -44,5 +44,5 @@ func JSONChannels(
 	// 		)
 	// 	}
 	channels = append(channels, debugChannels(ctx, getFileSystemProvider, getLogProvider)...)
-	return chainChannels(channels...), nil
+	return ChainChannels(channels...), nil
 }

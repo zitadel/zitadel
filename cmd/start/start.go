@@ -240,7 +240,6 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		commands,
 		queries,
 		eventstoreClient,
-		assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort),
 		config.Login.DefaultOTPEmailURLV2,
 		config.SystemDefaults.Notifications.FileSystemPath,
 		keys.User,
@@ -316,6 +315,8 @@ func startAPIs(
 		authZRepo,
 		queries,
 	}
+	// always set the origin in the context if available in the http headers, no matter for what protocol
+	router.Use(middleware.OriginHandler)
 	verifier := internal_authz.Start(repo, http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
 	tlsConfig, err := config.TLS.Config()
 	if err != nil {
@@ -456,7 +457,6 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, oidc_v2.CreateServer(commands, queries, oidcProvider, config.ExternalSecure)); err != nil {
 		return err
 	}
-
 	// handle grpc at last to be able to handle the root, because grpc and gateway require a lot of different prefixes
 	apis.RouteGRPC()
 	return nil

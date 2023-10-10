@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -312,6 +313,7 @@ type DomainClaimedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName              string `json:"userName"`
+	TriggeredAtOrigin     string `json:"triggerOrigin,omitempty"`
 	oldUserName           string
 	userLoginMustBeDomain bool
 }
@@ -325,6 +327,10 @@ func (e *DomainClaimedEvent) UniqueConstraints() []*eventstore.UniqueConstraint 
 		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
 		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
 	}
+}
+
+func (e *DomainClaimedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewDomainClaimedEvent(
@@ -343,6 +349,7 @@ func NewDomainClaimedEvent(
 		UserName:              userName,
 		oldUserName:           oldUserName,
 		userLoginMustBeDomain: userLoginMustBeDomain,
+		TriggeredAtOrigin:     http.ComposedOrigin(ctx),
 	}
 }
 

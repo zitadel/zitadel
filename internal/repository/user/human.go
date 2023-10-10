@@ -6,6 +6,7 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -242,6 +243,7 @@ type HumanInitialCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	Code                 *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry               time.Duration       `json:"expiry,omitempty"`
+	TriggeredAtOrigin    string              `json:"triggerOrigin,omitempty"`
 }
 
 func (e *HumanInitialCodeAddedEvent) Payload() interface{} {
@@ -250,6 +252,10 @@ func (e *HumanInitialCodeAddedEvent) Payload() interface{} {
 
 func (e *HumanInitialCodeAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+func (e *HumanInitialCodeAddedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewHumanInitialCodeAddedEvent(
@@ -264,8 +270,9 @@ func NewHumanInitialCodeAddedEvent(
 			aggregate,
 			HumanInitialCodeAddedType,
 		),
-		Code:   code,
-		Expiry: expiry,
+		Code:              code,
+		Expiry:            expiry,
+		TriggeredAtOrigin: http.ComposedOrigin(ctx),
 	}
 }
 

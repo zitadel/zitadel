@@ -34,11 +34,10 @@ type TelemetryPusherConfig struct {
 }
 
 type telemetryPusher struct {
-	cfg                            TelemetryPusherConfig
-	commands                       *command.Commands
-	queries                        *NotificationQueries
-	metricSuccessfulDeliveriesJSON string
-	metricFailedDeliveriesJSON     string
+	cfg      TelemetryPusherConfig
+	commands *command.Commands
+	queries  *NotificationQueries
+	channels types.ChannelChains
 }
 
 func NewTelemetryPusher(
@@ -47,15 +46,13 @@ func NewTelemetryPusher(
 	handlerCfg handler.Config,
 	commands *command.Commands,
 	queries *NotificationQueries,
-	metricSuccessfulDeliveriesJSON,
-	metricFailedDeliveriesJSON string,
+	channels types.ChannelChains,
 ) *handler.Handler {
 	pusher := &telemetryPusher{
-		cfg:                            telemetryCfg,
-		commands:                       commands,
-		queries:                        queries,
-		metricSuccessfulDeliveriesJSON: metricFailedDeliveriesJSON,
-		metricFailedDeliveriesJSON:     metricFailedDeliveriesJSON,
+		cfg:      telemetryCfg,
+		commands: commands,
+		queries:  queries,
+		channels: channels,
 	}
 	handlerCfg.TriggerWithoutEvents = pusher.pushMilestones
 	return handler.NewHandler(
@@ -134,8 +131,7 @@ func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.Sched
 				Method:  http.MethodPost,
 				Headers: t.cfg.Headers,
 			},
-			t.queries.GetFileSystemProvider,
-			t.queries.GetLogProvider,
+			t.channels,
 			&struct {
 				InstanceID     string         `json:"instanceId"`
 				ExternalDomain string         `json:"externalDomain"`
@@ -150,8 +146,6 @@ func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.Sched
 				ReachedDate:    ms.ReachedDate,
 			},
 			event,
-			t.metricSuccessfulDeliveriesJSON,
-			t.metricFailedDeliveriesJSON,
 		).WithoutTemplate(); err != nil {
 			return err
 		}

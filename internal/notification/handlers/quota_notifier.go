@@ -19,10 +19,9 @@ const (
 )
 
 type quotaNotifier struct {
-	commands                       *command.Commands
-	queries                        *NotificationQueries
-	metricSuccessfulDeliveriesJSON string
-	metricFailedDeliveriesJSON     string
+	commands *command.Commands
+	queries  *NotificationQueries
+	channels types.ChannelChains
 }
 
 func NewQuotaNotifier(
@@ -30,15 +29,14 @@ func NewQuotaNotifier(
 	config handler.Config,
 	commands *command.Commands,
 	queries *NotificationQueries,
-	metricSuccessfulDeliveriesJSON,
-	metricFailedDeliveriesJSON string,
+	channels types.ChannelChains,
 ) *handler.Handler {
 	return handler.NewHandler(ctx, &config, &quotaNotifier{
-		commands:                       commands,
-		queries:                        queries,
-		metricSuccessfulDeliveriesJSON: metricSuccessfulDeliveriesJSON,
-		metricFailedDeliveriesJSON:     metricFailedDeliveriesJSON,
+		commands: commands,
+		queries:  queries,
+		channels: channels,
 	})
+
 }
 
 func (*quotaNotifier) Name() string {
@@ -74,19 +72,7 @@ func (u *quotaNotifier) reduceNotificationDue(event eventstore.Event) (*handler.
 		if alreadyHandled {
 			return nil
 		}
-		err = types.SendJSON(
-			ctx,
-			webhook.Config{
-				CallURL: e.CallURL,
-				Method:  http.MethodPost,
-			},
-			u.queries.GetFileSystemProvider,
-			u.queries.GetLogProvider,
-			e,
-			e,
-			u.metricSuccessfulDeliveriesJSON,
-			u.metricFailedDeliveriesJSON,
-		).WithoutTemplate()
+		err = types.SendJSON(ctx, webhook.Config{CallURL: e.CallURL, Method: http.MethodPost}, u.channels, e, e).WithoutTemplate()
 		if err != nil {
 			return err
 		}

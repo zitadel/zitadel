@@ -174,6 +174,11 @@ Errors:
     DomainVerificationTypeInvalid: ドメイン認証タイプが無効です
     DomainVerificationMissing: ドメイン認証はまだ開始されていません
     DomainVerificationFailed: ドメイン認証に失敗しました
+    DomainVerificationTXTNotFound: _zitadel-challenge TXT レコードがドメインで見つかりませんでした。 DNS サーバーに追加したことを確認するか、新しいレコードが伝播されるまで待ちます
+    DomainVerificationTXTNoMatch: ドメインの _zitadel-challenge TXT レコードが見つかりましたが、正しいトークン テキストが含まれていません。 DNS サーバーに正しいトークンを追加したかどうかを確認するか、新しいレコードが伝播されるまで待ちます
+    DomainVerificationHTTPNotFound: チャレンジを含むファイルが予期された URL に見つかりませんでした。読み取り権限のある適切な場所にファイルがアップロードされていることを確認してください
+    DomainVerificationHTTPNoMatch: チャレンジを含むファイルが予期された URL で見つかりましたが、正しいトークン テキストが含まれていません。内容を確認してください
+    DomainVerificationTimeout: DNSサーバーへのクエリでタイムアウトが発生しました
     PrimaryDomainNotDeletable: プライマリドメインは削除できません
     DomainNotFound: ドメインが見つかりません
     MemberIDMissing: メンバーIDがありません

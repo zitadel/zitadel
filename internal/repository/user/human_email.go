@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -120,10 +121,11 @@ func HumanEmailVerificationFailedEventMapper(event eventstore.Event) (eventstore
 type HumanEmailCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Code         *crypto.CryptoValue `json:"code,omitempty"`
-	Expiry       time.Duration       `json:"expiry,omitempty"`
-	URLTemplate  string              `json:"url_template,omitempty"`
-	CodeReturned bool                `json:"code_returned,omitempty"`
+	Code              *crypto.CryptoValue `json:"code,omitempty"`
+	Expiry            time.Duration       `json:"expiry,omitempty"`
+	URLTemplate       string              `json:"url_template,omitempty"`
+	CodeReturned      bool                `json:"code_returned,omitempty"`
+	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
 func (e *HumanEmailCodeAddedEvent) Payload() interface{} {
@@ -132,6 +134,10 @@ func (e *HumanEmailCodeAddedEvent) Payload() interface{} {
 
 func (e *HumanEmailCodeAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+func (e *HumanEmailCodeAddedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewHumanEmailCodeAddedEvent(
@@ -157,10 +163,11 @@ func NewHumanEmailCodeAddedEventV2(
 			aggregate,
 			HumanEmailCodeAddedType,
 		),
-		Code:         code,
-		Expiry:       expiry,
-		URLTemplate:  urlTemplate,
-		CodeReturned: codeReturned,
+		Code:              code,
+		Expiry:            expiry,
+		URLTemplate:       urlTemplate,
+		CodeReturned:      codeReturned,
+		TriggeredAtOrigin: http.ComposedOrigin(ctx),
 	}
 }
 
