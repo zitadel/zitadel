@@ -3,11 +3,14 @@ package query
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	errs "errors"
+	"net"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
@@ -38,6 +41,7 @@ type Session struct {
 	OTPSMSFactor   SessionOTPFactor
 	OTPEmailFactor SessionOTPFactor
 	Metadata       map[string][]byte
+	UserAgent      domain.UserAgent
 }
 
 type SessionUserFactor struct {
@@ -163,6 +167,22 @@ var (
 		name:  projection.SessionColumnTokenID,
 		table: sessionsTable,
 	}
+	SessionColumnUserAgentFingerprintID = Column{
+		name:  projection.SessionColumnUserAgentFingerprintID,
+		table: sessionsTable,
+	}
+	SessionColumnUserAgentIP = Column{
+		name:  projection.SessionColumnUserAgentIP,
+		table: sessionsTable,
+	}
+	SessionColumnUserAgentDescription = Column{
+		name:  projection.SessionColumnUserAgentDescription,
+		table: sessionsTable,
+	}
+	SessionColumnUserAgentHeader = Column{
+		name:  projection.SessionColumnUserAgentHeader,
+		table: sessionsTable,
+	}
 )
 
 func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string) (session *Session, err error) {
@@ -261,6 +281,10 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			SessionColumnOTPEmailCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			SessionColumnToken.identifier(),
+			SessionColumnUserAgentFingerprintID.identifier(),
+			SessionColumnUserAgentIP.identifier(),
+			SessionColumnUserAgentDescription.identifier(),
+			SessionColumnUserAgentHeader.identifier(),
 		).From(sessionsTable.identifier()).
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
 			LeftJoin(join(HumanUserIDCol, SessionColumnUserID)).
@@ -283,6 +307,8 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				otpEmailCheckedAt   sql.NullTime
 				metadata            database.Map[[]byte]
 				token               sql.NullString
+				userAgentIP         sql.NullString
+				userAgentHeader     []byte
 			)
 
 			err := row.Scan(
@@ -307,6 +333,10 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&otpEmailCheckedAt,
 				&metadata,
 				&token,
+				&session.UserAgent.FingerprintID,
+				&userAgentIP,
+				&session.UserAgent.Description,
+				&userAgentHeader,
 			)
 
 			if err != nil {
@@ -329,6 +359,15 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session.OTPSMSFactor.OTPCheckedAt = otpSMSCheckedAt.Time
 			session.OTPEmailFactor.OTPCheckedAt = otpEmailCheckedAt.Time
 			session.Metadata = metadata
+
+			if userAgentIP.Valid {
+				session.UserAgent.IP = net.ParseIP(userAgentIP.String)
+			}
+			if userAgentHeader != nil {
+				if err = json.Unmarshal(userAgentHeader, &session.UserAgent.Header); err != nil {
+					logging.New().WithError(err).Error("user agent header scan")
+				}
+			}
 
 			return session, token.String, nil
 		}

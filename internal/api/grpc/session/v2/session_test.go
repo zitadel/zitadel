@@ -2,9 +2,12 @@ package session
 
 import (
 	"context"
+	"net"
+	"net/http"
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
@@ -506,6 +509,76 @@ func Test_userVerificationRequirementToDomain(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.args.req.String(), func(t *testing.T) {
 			got := userVerificationRequirementToDomain(tt.args.req)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func Test_userAgentToCommand(t *testing.T) {
+	type args struct {
+		userAgent *session.UserAgent
+	}
+	tests := []struct {
+		name string
+		args args
+		want *domain.UserAgent
+	}{
+		{
+			name: "nil",
+			args: args{nil},
+			want: nil,
+		},
+		{
+			name: "all fields",
+			args: args{&session.UserAgent{
+				FingerprintId: gu.Ptr("fp1"),
+				Ip:            gu.Ptr("1.2.3.4"),
+				Description:   gu.Ptr("firefox"),
+				Header: map[string]*session.UserAgent_HeaderValues{
+					"hello": {
+						Values: []string{"foo", "bar"},
+					},
+				},
+			}},
+			want: &domain.UserAgent{
+				FingerprintID: gu.Ptr("fp1"),
+				IP:            net.ParseIP("1.2.3.4"),
+				Description:   gu.Ptr("firefox"),
+				Header: http.Header{
+					"hello": []string{"foo", "bar"},
+				},
+			},
+		},
+		{
+			name: "invalid ip",
+			args: args{&session.UserAgent{
+				FingerprintId: gu.Ptr("fp1"),
+				Ip:            gu.Ptr("oops"),
+				Description:   gu.Ptr("firefox"),
+				Header: map[string]*session.UserAgent_HeaderValues{
+					"hello": {
+						Values: []string{"foo", "bar"},
+					},
+				},
+			}},
+			want: &domain.UserAgent{
+				FingerprintID: gu.Ptr("fp1"),
+				IP:            nil,
+				Description:   gu.Ptr("firefox"),
+				Header: http.Header{
+					"hello": []string{"foo", "bar"},
+				},
+			},
+		},
+		{
+			name: "nil fields",
+			args: args{&session.UserAgent{}},
+			want: &domain.UserAgent{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := userAgentToCommand(tt.args.userAgent)
 			assert.Equal(t, tt.want, got)
 		})
 	}

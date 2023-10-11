@@ -2,6 +2,8 @@ package session
 
 import (
 	"context"
+	"net"
+	"net/http"
 
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -41,7 +43,7 @@ func (s *Server) ListSessions(ctx context.Context, req *session.ListSessionsRequ
 }
 
 func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRequest) (*session.CreateSessionResponse, error) {
-	checks, metadata, err := s.createSessionRequestToCommand(ctx, req)
+	checks, metadata, userAgent, err := s.createSessionRequestToCommand(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +52,7 @@ func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRe
 		return nil, err
 	}
 
-	set, err := s.command.CreateSession(ctx, cmds, metadata)
+	set, err := s.command.CreateSession(ctx, cmds, metadata, userAgent)
 	if err != nil {
 		return nil, err
 	}
@@ -236,12 +238,30 @@ func idsQueryToQuery(q *session.IDsQuery) (query.SearchQuery, error) {
 	return query.NewSessionIDsSearchQuery(q.Ids)
 }
 
-func (s *Server) createSessionRequestToCommand(ctx context.Context, req *session.CreateSessionRequest) ([]command.SessionCommand, map[string][]byte, error) {
+func (s *Server) createSessionRequestToCommand(ctx context.Context, req *session.CreateSessionRequest) ([]command.SessionCommand, map[string][]byte, *domain.UserAgent, error) {
 	checks, err := s.checksToCommand(ctx, req.Checks)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-	return checks, req.GetMetadata(), nil
+	return checks, req.GetMetadata(), userAgentToCommand(req.GetUserAgent()), nil
+}
+
+func userAgentToCommand(userAgent *session.UserAgent) *domain.UserAgent {
+	if userAgent == nil {
+		return nil
+	}
+	out := &domain.UserAgent{
+		FingerprintID: userAgent.FingerprintId,
+		IP:            net.ParseIP(userAgent.GetIp()),
+		Description:   userAgent.Description,
+	}
+	if len(userAgent.Header) > 0 {
+		out.Header = make(http.Header, len(userAgent.Header))
+		for k, values := range userAgent.Header {
+			out.Header[k] = values.GetValues()
+		}
+	}
+	return out
 }
 
 func (s *Server) setSessionRequestToCommand(ctx context.Context, req *session.SetSessionRequest) ([]command.SessionCommand, error) {
