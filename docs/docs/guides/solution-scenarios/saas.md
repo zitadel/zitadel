@@ -20,7 +20,7 @@ This means that the users and also their authorizations will be managed within Z
 An organization is the ZITADEL resource which contains users, projects, applications, policies and so on.
 In an organization projects and users are managed by the organization.
 You need at least one organization for your own company in our case "The Timing Company".
-As next step grate an organization for each of your customers.
+Your next step is to create an organization for each of your customers.
 
 ## Project
 
