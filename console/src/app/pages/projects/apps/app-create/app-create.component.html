@@ -111,9 +111,9 @@
 
       <mat-slide-toggle
         color="primary"
-        name="devMode"
+        [(ngModel)]="devMode"
+        [ngModelOptions]="{ standalone: true }"
         matTooltip="{{ 'APP.OIDC.DEVMODEDESC' | translate }}"
-        (change)="onChangeDevMode($event)"
       >
         {{ 'APP.OIDC.DEVMODE' | translate }}
       </mat-slide-toggle>
@@ -465,9 +465,9 @@
         <div class="formfield full-width">
           <mat-slide-toggle
             color="primary"
-            name="devMode"
+            [(ngModel)]="devMode"
+            [ngModelOptions]="{ standalone: true }"
             matTooltip="{{ 'APP.OIDC.DEVMODEDESC' | translate }}"
-            (change)="onChangeDevMode($event)"
           >
             {{ 'APP.OIDC.DEVMODE' | translate }}
           </mat-slide-toggle>

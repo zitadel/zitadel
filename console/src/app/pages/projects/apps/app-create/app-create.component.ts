@@ -53,7 +53,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
   private destroyed$: Subject<void> = new Subject();
   public pro: boolean = false;
-  public devMode: boolean = false;
   public projectId: string = '';
   public loading: boolean = false;
 
@@ -241,6 +240,14 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     this.oidcAppRequest.setPostLogoutRedirectUrisList(value);
   }
 
+  public get devMode() {
+    return this.oidcAppRequest.toObject().devMode;
+  }
+
+  public set devMode(value: boolean) {
+    this.oidcAppRequest.setDevMode(value);
+  }
+
   public ngOnInit(): void {
     this.devMode = false;
     this.subscription = this.route.params.subscribe((params) => this.getData(params));
@@ -329,11 +336,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     if (event.selectedIndex >= 2) {
       this.requestRedirectValuesSubject$.next();
     }
-  }
-
-  public onChangeDevMode(ob: MatLegacySlideToggleChange) {
-    this.devMode = ob.checked;
-    this.oidcAppRequest.setDevMode(this.devMode);
   }
 
   private async getData({ projectid }: Params): Promise<void> {
