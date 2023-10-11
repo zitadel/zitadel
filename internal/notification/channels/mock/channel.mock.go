@@ -5,8 +5,8 @@
 package mock
 
 import (
-	channels "github.com/zitadel/zitadel/internal/notification/channels"
 	gomock "github.com/golang/mock/gomock"
+	channels "github.com/zitadel/zitadel/internal/notification/channels"
 	reflect "reflect"
 )
 
