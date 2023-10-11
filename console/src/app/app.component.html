@@ -1,5 +1,5 @@
 <div class="main-container">
-  <ng-container *ngIf="(authService.user | async) || {} as user">
+  <ng-container *ngIf="(authService.userSubject | async) || {} as user">
     <cnsl-header
       *ngIf="user && user !== {}"
       [org]="org"
