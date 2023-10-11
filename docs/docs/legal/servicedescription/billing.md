@@ -8,7 +8,15 @@ This annex of the [Framework Agreement](../terms-of-service) describes the prici
 
 Last revised: October 31, 2023
 
-## Billing
+## Pricing
+
+You can find pricing information on our [website](https://zitadel.com/pricing).
+
+### Enterprise pricing
+
+Customer and ZITADEL may agree on an individual per-customer pricing via an Enterprise Agreement.
+
+## Billing Metrics
 
 ### Monthly quota
 
