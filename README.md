@@ -34,10 +34,10 @@ Do you look for a user management that's quickly set up like Auth0 and open sour
 
 Do you have a project that requires multi-tenant user management with self-service for your customers?
 
-Look no further — ZITADEL combines the ease of Auth0 with the versatility of Keycloak.
+Look no further — ZITADEL is the identity infrastructure, simplified for you.
 
 We provide you with a wide range of out-of-the-box features to accelerate your project.
-Multi-tenancy with branding customization, secure login, self-service, OpenID Connect, OAuth2.x, SAML2, LDAP, Passwordless with FIDO2 (including Passkeys), OTP, U2F, and an unlimited audit trail is there for you, ready to use.
+Multi-tenancy with branding customization, secure login, self-service, OpenID Connect, OAuth2.x, SAML2, LDAP, Passkeys / FIDO2, OTP, U2F, and an unlimited audit trail is there for you, ready to use.
 
 With ZITADEL you can rely on a hardened and extensible turnkey solution to solve all of your authentication and authorization needs.
 
@@ -67,7 +67,7 @@ See all guides [here](https://zitadel.com/docs/self-hosting/deploy/overview)
 
 If you want to experience a hands-free ZITADEL, you should use [ZITADEL Cloud](https://zitadel.cloud).
 
-It is free for up to 25'000 authenticated requests and provides you all the features that make ZITADEL great.
+ZITADEL Cloud comes with a free tier and provides you all the features that you find in the open source version.
 Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
 
 ### Example applications
@@ -84,6 +84,7 @@ We built ZITADEL with a complex multi-tenancy architecture in mind and provide t
 Yet it offers everything you need for a customer identity ([CIAM](https://zitadel.com/docs/guides/solution-scenarios/b2c)) use case.
 
 - [API-first approach](https://zitadel.com/docs/apis/introduction)
+- [Multi-tenancy](https://zitadel.com/docs/guides/solution-scenarios/b2b) authentication and access management
 - Strong audit trail thanks to [event sourcing](https://zitadel.com/docs/concepts/eventstore/overview) as storage pattern
 - [Actions](https://zitadel.com/docs/apis/actions/introduction) to react on events with custom code and extended ZITADEL for you needs
 - [Branding](https://zitadel.com/docs/guides/manage/customize/branding) for a uniform user experience across multiple organizations
@@ -94,12 +95,15 @@ Yet it offers everything you need for a customer identity ([CIAM](https://zitade
 
 Authentication
 - Single Sign On (SSO)
-- Passwordless with FIDO2 support (Including Passkeys)
+- Passkeys support (FIDO2 / WebAuthN)
 - Username / Password
 - Multifactor authentication with OTP, U2F, Email OTP, SMS OTP
 - LDAP
+- External enterprise identity providers and social logins
+- [Device authorization](https://zitadel.com/docs/guides/solution-scenarios/device-authorization)
 - [OpenID Connect certified](https://openid.net/certification/#OPs) => [OIDC Endpoints](https://zitadel.com/docs/apis/openidoauth/endpoints)
 - [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html) => [SAML Endpoints](https://zitadel.com/docs/apis/saml/endpoints)
+- [Custom sessions](https://zitadel.com/docs/guides/integrate/login-ui/username-password) if you need to go beyond OIDC or SAML 
 - [Machine-to-machine](https://zitadel.com/docs/guides/integrate/serviceusers) with JWT profile, Personal Access Tokens (PAT), and Client Credentials
 
 Multi-Tenancy

@@ -184,6 +184,11 @@ Errors:
     DomainVerificationTypeInvalid: Типът проверка на домейна е невалиден
     DomainVerificationMissing: Проверката на домейна все още не е започнала
     DomainVerificationFailed: Неуспешна проверка на домейна
+    DomainVerificationTXTNotFound: TXT записът _zitadel-challenge не беше намерен за вашия домейн. Проверете дали сте го добавили към вашия DNS сървър или изчакайте, докато новият запис бъде разпространен
+    DomainVerificationTXTNoMatch: TXT записът _zitadel-challenge е намерен за вашия домейн, но не съдържа правилния текст на токена. Проверете дали сте добавили правилния токен към вашия DNS сървър или изчакайте, докато новият запис бъде разпространен
+    DomainVerificationHTTPNotFound: Файлът, съдържащ предизвикателството, не е намерен в очаквания URL адрес. Проверете дали сте качили файла на правилното място с разрешения за четене
+    DomainVerificationHTTPNoMatch: Файлът, съдържащ предизвикателството, е намерен в очаквания URL адрес, но не съдържа правилния текст на токена. Проверете съдържанието му
+    DomainVerificationTimeout: Имаше изчакване при запитване до DNS сървъра
     PrimaryDomainNotDeletable: Основният домейн не трябва да се изтрива
     DomainNotFound: Домейнът не е намерен
     MemberIDMissing: Липсва ID на член

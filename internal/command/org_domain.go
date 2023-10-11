@@ -213,9 +213,11 @@ func (c *Commands) ValidateOrgDomain(ctx context.Context, orgDomain *domain.OrgD
 		return writeModelToObjectDetails(&domainWriteModel.WriteModel), nil
 	}
 	events = append(events, org.NewDomainVerificationFailedEvent(ctx, orgAgg, orgDomain.Domain))
-	_, err = c.eventstore.Push(ctx, events...)
-	logging.LogWithFields("ORG-dhTE", "orgID", orgAgg.ID, "domain", orgDomain.Domain).OnError(err).Error("NewDomainVerificationFailedEvent push failed")
-	return nil, errors.ThrowInvalidArgument(err, "ORG-GH3s", "Errors.Org.DomainVerificationFailed")
+
+	_, errPush := c.eventstore.Push(ctx, events...)
+	logging.LogWithFields("ORG-dhTE", "orgID", orgAgg.ID, "domain", orgDomain.Domain).OnError(errPush).Error("NewDomainVerificationFailedEvent push failed")
+
+	return nil, err
 }
 
 func (c *Commands) SetPrimaryOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain) (*domain.ObjectDetails, error) {

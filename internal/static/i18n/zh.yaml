@@ -182,6 +182,11 @@ Errors:
     DomainVerificationTypeInvalid: 域名验证类型无效
     DomainVerificationMissing: 域名验证尚未开始
     DomainVerificationFailed: 域名验证失败
+    DomainVerificationTXTNotFound: 未找到您的域的 _zitadel-challenge TXT 记录。检查您是否已将其添加到 DNS 服务器或等待新记录传播
+    DomainVerificationTXTNoMatch: 已找到您的域的 _zitadel-challenge TXT 记录，但它不包含正确的令牌文本。检查您是否已将正确的令牌添加到 DNS 服务器或等待新记录传播
+    DomainVerificationHTTPNotFound: 在预期的 URL 中找不到包含质询的文件。检查您是否已将文件上传到正确的位置并具有读取权限
+    DomainVerificationHTTPNoMatch: 已在预期 URL 中找到包含质询的文件，但它不包含正确的标记文本。检查其内容
+    DomainVerificationTimeout: 查询 DNS 服务器超时
     PrimaryDomainNotDeletable: 不得删除主域名
     DomainNotFound: 未找到域名
     MemberIDMissing: 成员 ID 丢失

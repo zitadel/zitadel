@@ -1,0 +1,69 @@
+---
+title: Configure Keycloak as an Identity Provider in ZITADEL
+sidebar_label: Keycloak generic OIDC
+id: keycloak
+---
+
+import GeneralConfigDescription from './_general_config_description.mdx';
+import Intro from './_intro.mdx';
+import CustomLoginPolicy from './_custom_login_policy.mdx';
+import IDPsOverview from './_idps_overview.mdx';
+import GenericOIDC from './_generic_oidc.mdx';
+import Activate from './_activate.mdx';
+import TestSetup from './_test_setup.mdx';
+
+<Intro provider="Keycloak"/>
+
+## Keycloak Configuration
+
+### Register a new client
+
+1. Login to your Keycloak account and go to the clients list: <$KEYCLOAK-DOMAIN/auth/admin/$REALM/console/#/$REALM/clients>
+2. Click on "Create Client"
+3. Choose OpenID Connect as Client Type and give your client an ID
+4. Enable Client authentication and the standard flow and direct access grants as authentication flow
+5. Add the valid redirect URIs
+ - {your-domain}/ui/login/login/externalidp/callback
+ - Example redirect url for the domain `https://acme-gzoe4x.zitadel.cloud` would look like this:  `https://acme-gzoe4x.zitadel.cloud/ui/login/login/externalidp/callback`
+6. Go to the credentials tab and copy the secret
+
+![Add new OIDC Client in Keycloak](/img/guides/keycloak_add_client.png)
+![Get Client Secret](/img/guides/keycloak_client_secret.png)
+
+## ZITADEL configuration
+
+### Add custom login policy
+
+<CustomLoginPolicy/>
+
+### Go to the IdP providers overview
+
+<IDPsOverview templates="Generic OIDC"/>
+
+### Create a new generic OIDC provider
+
+<GenericOIDC
+    name=": e.g. Keycloak"
+    issuer=": The domain where your Keycloak can be reached with the path /auth/realms/$REALM, Example: https://lemur-0.cloud-iam.com/auth/realms/acme"
+    clientid=": Client id from the client previously created in your Keycloak account"
+/>
+
+
+<GeneralConfigDescription provider_account="Keycloak account" />
+
+![Keycloak Provider](/img/guides/zitadel_keycloak_create_provider.png)
+
+### Activate IdP
+
+<Activate/>
+
+![Activate the Keycloak Provider](/img/guides/zitadel_activate_keycloak.png)
+
+## Test the setup
+
+<TestSetup loginscreen="your Keycloak login"/>
+
+
+![Keycloak Button](/img/guides/zitadel_login_keycloak.png)
+
+![Keycloak Login](/img/guides/keycloak_login.png)

@@ -26,6 +26,7 @@
           color="primary"
           name="hasUppercase"
           ngDefaultControl
+          data-e2e="notification-policy-checkbox"
           [(ngModel)]="notificationData.passwordChange"
           [disabled]="(['policy.write'] | hasRole | async) === false"
         >
@@ -43,6 +44,7 @@
     color="primary"
     type="submit"
     mat-raised-button
+    data-e2e="save-notification-policy-button"
   >
     {{ 'ACTIONS.SAVE' | translate }}
   </button>
