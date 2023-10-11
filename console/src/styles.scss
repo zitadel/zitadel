@@ -433,19 +433,13 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
     }
   }
 
-  /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-  .mat-button-toggle-group-appearance-standard {
-    border-color: map-get($foreground, divider);
-  }
-  /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-  /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
   .mat-button-toggle {
     background-color: mat.get-color-from-palette($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     transition: border-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-    /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
+
     &.mat-button-toggle-checked {
-      background-color: #00000010;
+      background-color: mat.get-color-from-palette($background, background);
     }
   }
 
@@ -520,17 +514,12 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
       background-color: map-get($background, cardhovered);
     }
   }
-  /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-  .mat-button-toggle-group-appearance-standard {
-    border-color: map-get($foreground, divider);
-  }
-  /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-  /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
+
   .mat-button-toggle {
     background-color: mat.get-color-from-palette($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     transition: border-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-    /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
+
     &.mat-button-toggle-checked {
       background-color: mat.get-color-from-palette($background, background);
     }
@@ -636,21 +625,10 @@ i {
   font-size: 1.5rem;
 }
 
-/* TODO(mdc-migration): The following rule targets internal classes of checkbox that may no longer apply for the MDC version.*/
-.mat-checkbox-inner-container.mat-checkbox-inner-container-no-side-margin {
-  margin-right: 0.5rem !important;
-}
-
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
 .mat-button-toggle-button {
   display: flex;
   height: 36px;
   line-height: 36px !important;
   align-items: center;
   font-size: 14px !important;
-}
-
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-.mat-button-toggle-label-content {
-  line-height: 36px;
 }
