@@ -202,6 +202,7 @@ Errors:
     Domain:
       AlreadyExists: Le domaine existe déjà
       InvalidCharacter: Seuls les caractères alphanumériques, . et - sont autorisés pour un domaine
+      EmptyString: Les caractères non numériques et alphabétiques non valides ont été remplacés par des espaces vides et le domaine résultant est une chaîne vide
     IDP:
       InvalidSearchQuery: Paramètre de recherche non valide
       ClientIDMissing: ID client manquant
