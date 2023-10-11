@@ -1,32 +1,16 @@
 ---
-title: Service description ZITADEL Cloud
+title: Service description
 sidebar_label: Cloud service
 custom_edit_url: null
 --- 
 
-This annex of the [Framework Agreement](../terms-of-service) describes the service levels offered by us for our Services.
+This annex of the [Framework Agreement](../terms-of-service) describes the services offered by us.
 
-Last revised: June 21, 2023
-
-## Definitions
-
-**Monthly quota** means the available usage per measure for one billing period. The quota is reset to zero with the start of a new billing period.
-
-**Adequate Country** means a country or territory recognized as providing an adequate level of protection for Personal Data under an adequacy decision made, from time to time, by (as applicable) (i) the Information Commissioner's Office and/or under applicable UK law (including the UK GDPR), or (ii) the [European Commission under the GDPR](https://ec.europa.eu/info/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en).
-
-## Pricing metrics
-
-### Authenticated request
-
-means any request to our API endpoints requiring a valid authorization header. We exclude requests with a server error, discovery endpoints, and endpoints to load UI assets.
-
-### Action minutes
-
-means execution time, rounded up to 1 second, of custom code execution via a customer defined Action.
+Last revised: October 31, 2023
 
 ## Data location
 
-Data location refers to a region, consisting of one or many countries or territories, where the customer's data is stored in our database and processed by our systems.
+Data location refers to a region, consisting of one or many countries or territories, where the customer's data is being hosted.
 
 We can not guarantee that during transit the data will only remain within this region. We take measures, as outlined in our [privacy policy](../policies/privacy-policy), to protect your data in transit and in rest.
 
