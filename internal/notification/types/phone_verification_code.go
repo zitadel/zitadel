@@ -1,13 +1,15 @@
 package types
 
 import (
+	"context"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
 )
 
-func (notify Notify) SendPhoneVerificationCode(user *query.NotifyUser, origin, code, requestedDomain string) error {
+func (notify Notify) SendPhoneVerificationCode(ctx context.Context, code string) error {
 	args := make(map[string]interface{})
 	args["Code"] = code
-	args["Domain"] = requestedDomain
+	args["Domain"] = authz.GetInstance(ctx).RequestedDomain()
 	return notify("", args, domain.VerifyPhoneMessageType, true)
 }
