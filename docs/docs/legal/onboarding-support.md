@@ -1,23 +1,27 @@
 ---
-title: Description of onboarding support
+title: Description of onboarding support services for ZITADEL
 sidebar_label: Onboarding
 custom_edit_url: null
 --- 
 
 This annex of the [Framework Agreement](terms-of-service) describes the onboarding support services offered by us for our Services.
 
-Last revised: October 5, 2023
+Last revised: October 11, 2023
 
 TODO: - Introduction: overview of how we would tackle the migration/introduction
+
+## Scope
+
+Onboarding support services can be offered to customers that enter a ZITADEL Cloud or a ZITADEL Enterprise subscription.
+
+If you intend to use the open source version exclusively then please join our community chat or Github.
+Your questions might help other people in the community and will make our project better over time.
 
 ## Proof of value
 
 Within a short time-frame we can show the value of using our Services and have the ability to establish proof of working setup for your most critical use cases.
 We may offer to support you during an initial period to evaluate next steps.
 This period should be at most a few weeks where you will also commit to complete the proof of value.
-
-If you intend to use the open source version exclusively then please join our community chat or Github.
-Your questions might help other people in the community and will make our project better over time.
 
 ## Onboarding term
 
@@ -64,12 +68,13 @@ More details
     <li>Setting up or maintaining backup storage</li>
     <li>Running multiple ZITADEL instances on the same cluster</li>
     <li>Integration into internal monitoring and alerting</li>
-    <li>Multi-cluster architecture deployments/li>
+    <li>Multi-cluster architecture deployments</li>
     <li>DNS, Network and Firewall configuration</li>
     <li>Customer-specific Kubernetes configuration needs</li>
     <li>Non-production environments</li>
     <li>Production deployment</li>
     <li>Application-side coding, configuration, or tuning</li>
+
   </ul>
 </details>
 

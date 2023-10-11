@@ -419,6 +419,11 @@ module.exports = {
         "support/software-release-cycles-support",
         "support/troubleshooting",
         {
+          type: 'link',
+          label: 'Support Service Descriptions',
+          href: '/legal/support-services',
+        },
+        {
           type: 'category',
           label: "Technical Advisory",
           link: {
