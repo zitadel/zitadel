@@ -8,6 +8,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
@@ -115,7 +116,32 @@ func sessionToPb(s *query.Session) *session.Session {
 		Sequence:     s.Sequence,
 		Factors:      factorsToPb(s),
 		Metadata:     s.Metadata,
+		UserAgent:    userAgentToPb(s.UserAgent),
 	}
+}
+
+func userAgentToPb(ua domain.UserAgent) *session.UserAgent {
+	if ua.IsEmpty() {
+		return nil
+	}
+
+	out := &session.UserAgent{
+		FingerprintId: ua.FingerprintID,
+		Description:   ua.Description,
+	}
+	if ua.IP != nil {
+		out.Ip = gu.Ptr(ua.IP.String())
+	}
+	if ua.Header == nil {
+		return out
+	}
+	out.Header = make(map[string]*session.UserAgent_HeaderValues, len(ua.Header))
+	for k, v := range ua.Header {
+		out.Header[k] = &session.UserAgent_HeaderValues{
+			Values: v,
+		}
+	}
+	return out
 }
 
 func factorsToPb(s *query.Session) *session.Factors {

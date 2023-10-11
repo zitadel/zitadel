@@ -10,10 +10,10 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
@@ -26,7 +26,7 @@ func Test_sessionsToPb(t *testing.T) {
 	past := now.Add(-time.Hour)
 
 	sessions := []*query.Session{
-		{ // no factor
+		{ // no factor, with user agent
 			ID:            "999",
 			CreationDate:  now,
 			ChangeDate:    now,
@@ -35,6 +35,12 @@ func Test_sessionsToPb(t *testing.T) {
 			ResourceOwner: "me",
 			Creator:       "he",
 			Metadata:      map[string][]byte{"hello": []byte("world")},
+			UserAgent: domain.UserAgent{
+				FingerprintID: gu.Ptr("fingerprintID"),
+				Description:   gu.Ptr("description"),
+				IP:            net.IPv4(1, 2, 3, 4),
+				Header:        http.Header{"foo": []string{"foo", "bar"}},
+			},
 		},
 		{ // user factor
 			ID:            "999",
@@ -117,13 +123,21 @@ func Test_sessionsToPb(t *testing.T) {
 	}
 
 	want := []*session.Session{
-		{ // no factor
+		{ // no factor, with user agent
 			Id:           "999",
 			CreationDate: timestamppb.New(now),
 			ChangeDate:   timestamppb.New(now),
 			Sequence:     123,
 			Factors:      nil,
 			Metadata:     map[string][]byte{"hello": []byte("world")},
+			UserAgent: &session.UserAgent{
+				FingerprintId: gu.Ptr("fingerprintID"),
+				Description:   gu.Ptr("description"),
+				Ip:            gu.Ptr("1.2.3.4"),
+				Header: map[string]*session.UserAgent_HeaderValues{
+					"foo": {Values: []string{"foo", "bar"}},
+				},
+			},
 		},
 		{ // user factor
 			Id:           "999",
@@ -208,6 +222,71 @@ func Test_sessionsToPb(t *testing.T) {
 		if !proto.Equal(got, want[i]) {
 			t.Errorf("session %d got:\n%v\nwant:\n%v", i, got, want[i])
 		}
+	}
+}
+
+func Test_userAgentToPb(t *testing.T) {
+	type args struct {
+		ua domain.UserAgent
+	}
+	tests := []struct {
+		name string
+		args args
+		want *session.UserAgent
+	}{
+		{
+			name: "empty",
+			args: args{domain.UserAgent{}},
+		},
+		{
+			name: "fingerprint id and description",
+			args: args{domain.UserAgent{
+				FingerprintID: gu.Ptr("fingerPrintID"),
+				Description:   gu.Ptr("description"),
+			}},
+			want: &session.UserAgent{
+				FingerprintId: gu.Ptr("fingerPrintID"),
+				Description:   gu.Ptr("description"),
+			},
+		},
+		{
+			name: "with ip",
+			args: args{domain.UserAgent{
+				FingerprintID: gu.Ptr("fingerPrintID"),
+				Description:   gu.Ptr("description"),
+				IP:            net.IPv4(1, 2, 3, 4),
+			}},
+			want: &session.UserAgent{
+				FingerprintId: gu.Ptr("fingerPrintID"),
+				Description:   gu.Ptr("description"),
+				Ip:            gu.Ptr("1.2.3.4"),
+			},
+		},
+		{
+			name: "with header",
+			args: args{domain.UserAgent{
+				FingerprintID: gu.Ptr("fingerPrintID"),
+				Description:   gu.Ptr("description"),
+				Header: http.Header{
+					"foo":   []string{"foo", "bar"},
+					"hello": []string{"world"},
+				},
+			}},
+			want: &session.UserAgent{
+				FingerprintId: gu.Ptr("fingerPrintID"),
+				Description:   gu.Ptr("description"),
+				Header: map[string]*session.UserAgent_HeaderValues{
+					"foo":   {Values: []string{"foo", "bar"}},
+					"hello": {Values: []string{"world"}},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := userAgentToPb(tt.args.ua)
+			assert.Equal(t, tt.want, got)
+		})
 	}
 }
 

@@ -11,3 +11,7 @@ type UserAgent struct {
 	Description   *string        `json:"description,omitempty"`
 	Header        httplib.Header `json:"header,omitempty"`
 }
+
+func (ua UserAgent) IsEmpty() bool {
+	return ua.FingerprintID == nil && len(ua.IP) == 0 && ua.Description == nil && ua.Header == nil
+}
