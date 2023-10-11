@@ -16,6 +16,15 @@
   .cnsl-form-field-wrapper {
     width: 100%;
     margin: 10px 0;
+
+    .mat-datepicker-toggle button {
+      padding: 0;
+      height: 40px;
+      width: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 
   .cnsl-rel {

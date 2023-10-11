@@ -189,6 +189,7 @@ $cnsl-dark-theme-background: (
   footer: #00000020,
   metadata-section: #00000020,
   alert: #fbbf24,
+  toast: map_get($cnsl-dark-background, 400),
 );
 
 $cnsl-light-theme-background: (
@@ -222,6 +223,7 @@ $cnsl-light-theme-background: (
   footer: #00000008,
   metadata-section: #605f5f08,
   alert: rgb(251, 191, 36),
+  toast: map_get($cnsl-light-background, 400),
 );
 
 $cnsl-dark-theme-foreground: (
@@ -300,7 +302,6 @@ $custom-typography: mat.define-typography-config(
   $font-family: Lato,
   $button: $custom-level,
   $body-1: $custom-body-level,
-  $body-2: $custom-body-level,
   $caption: $custom-caption-level,
 );
 

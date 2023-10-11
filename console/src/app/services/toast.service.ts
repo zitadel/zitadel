@@ -64,7 +64,7 @@ export class ToastService {
       data: {
         message,
       },
-      duration: success ? 4000 : 5000,
+      duration: success ? 4000 : 50000,
       panelClass: ['data-e2e-message', success ? 'data-e2e-success' : 'data-e2e-failure'],
       horizontalPosition: this.horizontalPosition,
       verticalPosition: this.verticalPosition,
