@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
@@ -29,10 +29,11 @@ type HumanPasswordChangedEvent struct {
 
 	// New events only use EncodedHash. However, the secret field
 	// is preserved to handle events older than the switch to Passwap.
-	Secret         *crypto.CryptoValue `json:"secret,omitempty"`
-	EncodedHash    string              `json:"encodedHash,omitempty"`
-	ChangeRequired bool                `json:"changeRequired"`
-	UserAgentID    string              `json:"userAgentID,omitempty"`
+	Secret            *crypto.CryptoValue `json:"secret,omitempty"`
+	EncodedHash       string              `json:"encodedHash,omitempty"`
+	ChangeRequired    bool                `json:"changeRequired"`
+	UserAgentID       string              `json:"userAgentID,omitempty"`
+	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
 func (e *HumanPasswordChangedEvent) Data() interface{} {
@@ -41,6 +42,10 @@ func (e *HumanPasswordChangedEvent) Data() interface{} {
 
 func (e *HumanPasswordChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
+}
+
+func (e *HumanPasswordChangedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewHumanPasswordChangedEvent(
@@ -56,9 +61,10 @@ func NewHumanPasswordChangedEvent(
 			aggregate,
 			HumanPasswordChangedType,
 		),
-		EncodedHash:    encodeHash,
-		ChangeRequired: changeRequired,
-		UserAgentID:    userAgentID,
+		EncodedHash:       encodeHash,
+		ChangeRequired:    changeRequired,
+		UserAgentID:       userAgentID,
+		TriggeredAtOrigin: http.ComposedOrigin(ctx),
 	}
 }
 
@@ -77,11 +83,12 @@ func HumanPasswordChangedEventMapper(event *repository.Event) (eventstore.Event,
 type HumanPasswordCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Code             *crypto.CryptoValue     `json:"code,omitempty"`
-	Expiry           time.Duration           `json:"expiry,omitempty"`
-	NotificationType domain.NotificationType `json:"notificationType,omitempty"`
-	URLTemplate      string                  `json:"url_template,omitempty"`
-	CodeReturned     bool                    `json:"code_returned,omitempty"`
+	Code              *crypto.CryptoValue     `json:"code,omitempty"`
+	Expiry            time.Duration           `json:"expiry,omitempty"`
+	NotificationType  domain.NotificationType `json:"notificationType,omitempty"`
+	URLTemplate       string                  `json:"url_template,omitempty"`
+	CodeReturned      bool                    `json:"code_returned,omitempty"`
+	TriggeredAtOrigin string                  `json:"triggerOrigin,omitempty"`
 }
 
 func (e *HumanPasswordCodeAddedEvent) Data() interface{} {
@@ -90,6 +97,10 @@ func (e *HumanPasswordCodeAddedEvent) Data() interface{} {
 
 func (e *HumanPasswordCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
+}
+
+func (e *HumanPasswordCodeAddedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewHumanPasswordCodeAddedEvent(
@@ -117,11 +128,12 @@ func NewHumanPasswordCodeAddedEventV2(
 			aggregate,
 			HumanPasswordCodeAddedType,
 		),
-		Code:             code,
-		Expiry:           expiry,
-		NotificationType: notificationType,
-		URLTemplate:      urlTemplate,
-		CodeReturned:     codeReturned,
+		Code:              code,
+		Expiry:            expiry,
+		NotificationType:  notificationType,
+		URLTemplate:       urlTemplate,
+		CodeReturned:      codeReturned,
+		TriggeredAtOrigin: http.ComposedOrigin(ctx),
 	}
 }
 

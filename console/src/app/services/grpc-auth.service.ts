@@ -1,19 +1,8 @@
 import { Injectable } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
-import {
-  catchError,
-  distinctUntilChanged,
-  filter,
-  finalize,
-  map,
-  mergeMap,
-  switchMap,
-  take,
-  timeout,
-  withLatestFrom,
-} from 'rxjs/operators';
+import { BehaviorSubject, forkJoin, from, Observable, of, Subject } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, finalize, map, switchMap, timeout, withLatestFrom } from 'rxjs/operators';
 
 import {
   AddMyAuthFactorOTPEmailRequest,
@@ -184,25 +173,21 @@ export class GrpcAuthService {
       },
     });
 
-    this.user = merge(
-      of(this.oauthService.getAccessToken()).pipe(filter((token) => (token ? true : false))),
+    this.user = forkJoin([
+      of(this.oauthService.getAccessToken()),
       this.oauthService.events.pipe(
         filter((e) => e.type === 'token_received'),
         timeout(this.oauthService.waitForTokenInMsec || 0),
         catchError((_) => of(null)), // timeout is not an error
         map((_) => this.oauthService.getAccessToken()),
       ),
-    ).pipe(
-      take(1),
-      mergeMap(() => {
+    ]).pipe(
+      filter((token) => (token ? true : false)),
+      distinctUntilChanged(),
+      switchMap(() => {
         return from(
           this.getMyUser().then((resp) => {
-            const user = resp.user;
-            if (user) {
-              return user;
-            } else {
-              return undefined;
-            }
+            return resp.user;
           }),
         );
       }),
