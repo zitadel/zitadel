@@ -194,6 +194,7 @@ Errors:
     Domain:
       AlreadyExists: ドメインはすでに存在します
       InvalidCharacter: ドメインは英数字、'.'、'-'のみ使用可能です。
+      EmptyString: 無効な数字およびアルファベット以外の文字は空のスペースに置き換えられ、結果のドメインは空の文字列になります
     IDP:
       InvalidSearchQuery: 無効な検索クエリです
       ClientIDMissing: クライアントIDがありません

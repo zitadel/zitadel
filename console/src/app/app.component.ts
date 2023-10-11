@@ -225,9 +225,11 @@ export class AppComponent implements OnDestroy {
     });
 
     this.isDarkTheme = this.themeService.isDarkTheme;
-    this.isDarkTheme.subscribe((dark) => this.onSetTheme(dark ? 'dark-theme' : 'light-theme'));
+    this.isDarkTheme
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((dark) => this.onSetTheme(dark ? 'dark-theme' : 'light-theme'));
 
-    this.translate.onLangChange.subscribe((language: LangChangeEvent) => {
+    this.translate.onLangChange.pipe(takeUntil(this.destroy$)).subscribe((language: LangChangeEvent) => {
       this.document.documentElement.lang = language.lang;
       this.language = language.lang;
     });
@@ -271,7 +273,7 @@ export class AppComponent implements OnDestroy {
     this.translate.addLangs(supportedLanguages);
     this.translate.setDefaultLang(fallbackLanguage);
 
-    this.authService.user.subscribe((userprofile) => {
+    this.authService.userSubject.pipe(takeUntil(this.destroy$)).subscribe((userprofile) => {
       if (userprofile) {
         const cropped = navigator.language.split('-')[0] ?? fallbackLanguage;
         const fallbackLang = cropped.match(supportedLanguagesRegexp) ? cropped : fallbackLanguage;
