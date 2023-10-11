@@ -1019,6 +1019,8 @@
       "LOCKOUT": "安全锁策略",
       "COMPLEXITY": "密码复杂性",
       "NOTIFICATIONS": "通知设置",
+      "SMTP_PROVIDER": "SMTP 提供商",
+      "SMS_PROVIDER": "短信/电话提供商",
       "NOTIFICATIONS_DESC": "SMTP 和 SMS 设置",
       "MESSAGETEXTS": "消息文本",
       "IDP": "身份提供者",

@@ -1019,6 +1019,8 @@
       "LOCKOUT": "Verrouillage",
       "COMPLEXITY": "Complexité du mot de passe",
       "NOTIFICATIONS": "Paramètres de notification",
+      "SMTP_PROVIDER": "Fournisseur SMTP",
+      "SMS_PROVIDER": "SMS/Téléphone Fournisseur",
       "NOTIFICATIONS_DESC": "Paramètres SMTP et SMS",
       "MESSAGETEXTS": "Textes des messages",
       "IDP": "Fournisseurs d'identité",
