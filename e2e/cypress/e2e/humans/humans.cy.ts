@@ -26,7 +26,7 @@ describe('humans', () => {
       });
 
       it('should add a user', () => {
-        cy.get('[data-e2e="create-user-button"]').should('be.visible').click();
+        cy.get('[data-e2e="create-user-button"]').should('be.visible').click({ force: true });
         cy.url().should('contain', 'users/create');
         cy.get('[formcontrolname="email"]').type('dummy@dummy.com');
         //force needed due to the prefilled username prefix
