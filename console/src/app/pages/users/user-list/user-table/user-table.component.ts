@@ -53,7 +53,7 @@ export class UserTableComponent implements OnInit {
   @Input() public displayedColumnsHuman: string[] = [
     'select',
     'displayName',
-    'username',
+    'preferredLoginName',
     'email',
     'state',
     'creationDate',
@@ -193,6 +193,10 @@ export class UserTableComponent implements OnInit {
           sortingField = UserFieldName.USER_FIELD_NAME_DISPLAY_NAME;
           break;
         case 'username':
+          sortingField = UserFieldName.USER_FIELD_NAME_USER_NAME;
+          break;
+        case 'preferredLoginName':
+          // TODO: replace with preferred username sorting once implemented
           sortingField = UserFieldName.USER_FIELD_NAME_USER_NAME;
           break;
         case 'email':

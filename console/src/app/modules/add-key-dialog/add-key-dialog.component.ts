@@ -19,7 +19,10 @@ export class AddKeyDialogComponent {
   public type!: KeyType;
   public dateControl: UntypedFormControl = new UntypedFormControl('', []);
 
-  constructor(public dialogRef: MatDialogRef<AddKeyDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor(
+    public dialogRef: MatDialogRef<AddKeyDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+  ) {
     this.types = [KeyType.KEY_TYPE_JSON];
     this.type = KeyType.KEY_TYPE_JSON;
     const today = new Date();

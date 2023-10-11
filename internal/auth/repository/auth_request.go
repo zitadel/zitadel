@@ -12,6 +12,7 @@ type AuthRequestRepository interface {
 	AuthRequestByIDCheckLoggedIn(ctx context.Context, id, userAgentID string) (*domain.AuthRequest, error)
 	AuthRequestByCode(ctx context.Context, code string) (*domain.AuthRequest, error)
 	SaveAuthCode(ctx context.Context, id, code, userAgentID string) error
+	SaveSAMLRequestID(ctx context.Context, id, requestID, userAgentID string) error
 	DeleteAuthRequest(ctx context.Context, id string) error
 
 	CheckLoginName(ctx context.Context, id, loginName, userAgentID string) error

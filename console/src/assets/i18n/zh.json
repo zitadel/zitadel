@@ -95,7 +95,6 @@
     "EVENTS": "活动",
     "FAILEDEVENTS": "失败事件",
     "ORGANIZATION": "组织",
-    "DOMAINS": "域名",
     "PROJECT": "项目",
     "PROJECTOVERVIEW": "概览",
     "PROJECTGRANTS": "授予",
@@ -495,6 +494,7 @@
       "LASTNAME": "姓",
       "NICKNAME": "昵称",
       "DISPLAYNAME": "展示名称",
+      "PREFERREDLOGINNAME": "首选登录名",
       "PREFERRED_LANGUAGE": "语言",
       "GENDER": "性别",
       "PASSWORD": "密码",
@@ -794,7 +794,7 @@
     },
     "PAGES": {
       "STATE": "状态",
-      "DOMAINLIST": "域名"
+      "DOMAINLIST": "自定义域名"
     },
     "STATE": {
       "0": "未指定",
@@ -951,7 +951,7 @@
     },
     "DOMAINS": {
       "NEW": "添加域名",
-      "TITLE": "域名",
+      "TITLE": "已验证的域名",
       "DESCRIPTION": "配置您的域名。此域名可用于您的用户登录。",
       "SETPRIMARY": "设置为主域名",
       "DELETE": {
@@ -1018,9 +1018,12 @@
       "LOCKOUT": "安全锁策略",
       "COMPLEXITY": "密码复杂性",
       "NOTIFICATIONS": "通知设置",
+      "SMTP_PROVIDER": "SMTP 提供商",
+      "SMS_PROVIDER": "短信/电话提供商",
       "NOTIFICATIONS_DESC": "SMTP 和 SMS 设置",
       "MESSAGETEXTS": "消息文本",
       "IDP": "身份提供者",
+      "VERIFIED_DAMAINS": "已验证的域名",
       "DOMAIN": "域名设置",
       "LOGINTEXTS": "登录界面文本",
       "BRANDING": "品牌标识",
@@ -1348,7 +1351,7 @@
       "MAXAGEDAYS": "Max Age in days",
       "USERLOGINMUSTBEDOMAIN": "用户名必须包含组织域名",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "如果启用此设置，所有登录名都将以组织域为后缀。如果禁用此设置，您必须确保用户名在所有组织中都是唯一的。",
-      "VALIDATEORGDOMAINS": "验证组织域名",
+      "VALIDATEORGDOMAINS": "组织域名验证需要 (DNS 或 HTTP 挑战)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP 发件人地址与实例域名匹配",
       "ALLOWUSERNAMEPASSWORD": "允许用户名密码",
       "ALLOWEXTERNALIDP": "允许外部身份提供者",

@@ -76,7 +76,7 @@
                 *matCellDef="let grant"
                 [routerLink]="['/projects', grant.projectId, 'projectgrants', grant.grantId]"
               >
-                <span>{{ grant.details.creationDate | timestampToDate | localizedDate : 'dd. MMM, HH:mm' }}</span>
+                <span>{{ grant.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
               </td>
             </ng-container>
 
@@ -88,7 +88,7 @@
                 *matCellDef="let grant"
                 [routerLink]="['/projects', grant.projectId, 'projectgrants', grant.grantId]"
               >
-                <span>{{ grant.details.changeDate | timestampToDate | localizedDate : 'dd. MMM, HH:mm' }}</span>
+                <span>{{ grant.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
               </td>
             </ng-container>
 

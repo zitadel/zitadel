@@ -23,7 +23,10 @@ export class IamViewsComponent implements AfterViewInit {
 
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-  constructor(private adminService: AdminService, private breadcrumbService: BreadcrumbService) {
+  constructor(
+    private adminService: AdminService,
+    private breadcrumbService: BreadcrumbService,
+  ) {
     this.loadViews();
 
     const breadcrumbs = [

@@ -95,7 +95,6 @@
     "EVENTS": "Събития",
     "FAILEDEVENTS": "Неуспешни събития",
     "ORGANIZATION": "Организация",
-    "DOMAINS": "Домейни",
     "PROJECT": "Проекти",
     "PROJECTOVERVIEW": "Преглед",
     "PROJECTGRANTS": "Грантове",
@@ -489,6 +488,7 @@
       "LASTNAME": "Фамилия",
       "NICKNAME": "Псевдоним",
       "DISPLAYNAME": "Екранно име",
+      "PREFERREDLOGINNAME": "Предпочитано име за вход",
       "PREFERRED_LANGUAGE": "език",
       "GENDER": "Пол",
       "PASSWORD": "Парола",
@@ -788,7 +788,7 @@
     },
     "PAGES": {
       "STATE": "Статус",
-      "DOMAINLIST": "Домейни"
+      "DOMAINLIST": "Лични домейни"
     },
     "STATE": {
       "0": "Неуточнено",
@@ -945,7 +945,7 @@
     },
     "DOMAINS": {
       "NEW": "Добавете домейн",
-      "TITLE": "Домейни",
+      "TITLE": "Проверени домейни",
       "DESCRIPTION": "Конфигурирайте вашите домейни. ",
       "SETPRIMARY": "Задайте като основен",
       "DELETE": {
@@ -1012,9 +1012,12 @@
       "LOCKOUT": "Блокиране",
       "COMPLEXITY": "Сложност на паролата",
       "NOTIFICATIONS": "Настройки за известията",
+      "SMTP_PROVIDER": "SMTP доставчик",
+      "SMS_PROVIDER": "Доставчик на SMS/телефон",
       "NOTIFICATIONS_DESC": "Настройки за SMTP и SMS",
       "MESSAGETEXTS": "Текстове на съобщения",
       "IDP": "Доставчици на идентичност",
+      "VERIFIED_DOMAINS": "Проверени домейни",
       "DOMAIN": "Настройки на домейна",
       "LOGINTEXTS": "Текстове на интерфейса за влизане",
       "BRANDING": "Брандиране",
@@ -1343,7 +1346,7 @@
       "MAXAGEDAYS": "Максимална възраст в дни",
       "USERLOGINMUSTBEDOMAIN": "Добавяне на домейн на организация като суфикс към имената за вход",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Ако активирате тази настройка, всички имена за вход ще имат суфикс с домейна на организацията. ",
-      "VALIDATEORGDOMAINS": "Валидиране на организационни домейни",
+      "VALIDATEORGDOMAINS": "Верификация на домейна на организацията е необходима (DNS или HTTP предизвикателство)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP адресът на изпращача съвпада с домейна на екземпляра",
       "ALLOWUSERNAMEPASSWORD": "Потребителско име Паролата е разрешена",
       "ALLOWEXTERNALIDP": "Допуска се външен IDP",

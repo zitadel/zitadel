@@ -95,7 +95,6 @@
     "EVENTS": "Настани",
     "FAILEDEVENTS": "Неуспешни настани",
     "ORGANIZATION": "Организација",
-    "DOMAINS": "Домени",
     "PROJECT": "Проекти",
     "PROJECTOVERVIEW": "Преглед",
     "PROJECTGRANTS": "Овластувања",
@@ -496,6 +495,7 @@
       "LASTNAME": "Презиме",
       "NICKNAME": "Прекар",
       "DISPLAYNAME": "Име за приказ",
+      "PREFERREDLOGINNAME": "Претпочитано име за најава",
       "PREFERRED_LANGUAGE": "Јазик",
       "GENDER": "Пол",
       "PASSWORD": "Лозинка",
@@ -795,7 +795,7 @@
     },
     "PAGES": {
       "STATE": "Статус",
-      "DOMAINLIST": "Домени"
+      "DOMAINLIST": "Прилагодени домени"
     },
     "STATE": {
       "0": "Ненаведено",
@@ -952,7 +952,7 @@
     },
     "DOMAINS": {
       "NEW": "Додади домен",
-      "TITLE": "Домени",
+      "TITLE": "Потврдени домени",
       "DESCRIPTION": "Конфигурирајте ги вашите домени. Овој домен може да се користи за најава на вашите корисници.",
       "SETPRIMARY": "Постави како основен",
       "DELETE": {
@@ -1020,9 +1020,12 @@
       "LOCKOUT": "Забрана на пристап",
       "COMPLEXITY": "Сложеност на лозинката",
       "NOTIFICATIONS": "Подесувања за известувања",
+      "SMTP_PROVIDER": "SMTP провајдер",
+      "SMS_PROVIDER": "СМС/Провајдер на телефон",
       "NOTIFICATIONS_DESC": "Подесувања за SMTP и SMS",
       "MESSAGETEXTS": "Текстови на пораки",
       "IDP": "Identity Providers",
+      "VERIFIED_DAMAINS": "Потврдени домени",
       "DOMAIN": "Подесувања за домен",
       "LOGINTEXTS": "Текстови на интерфејс за најава",
       "BRANDING": "Брендирање",
@@ -1351,7 +1354,7 @@
       "MAXAGEDAYS": "Максимална возраст во денови",
       "USERLOGINMUSTBEDOMAIN": "Додади организациски домен како суфикс на корисничките имиња",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Ако го овозможите ова подесување, сите кориснички имиња ќе имаат суфикс на организацискиот домен. Доколку ова подесување е оневозможено, морате да се осигурате дека корисничките имиња се уникатни низ сите организации.",
-      "VALIDATEORGDOMAINS": "Валидирај организациски домени",
+      "VALIDATEORGDOMAINS": "Потврда на доменот на организацијата е неопходна (DNS или HTTP предизвик)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP адресата на испраќачот се поклопува со доменот на инстанцата",
       "ALLOWUSERNAMEPASSWORD": "Дозволено корисничко име и лозинка",
       "ALLOWEXTERNALIDP": "Дозволен надворешен IDP",

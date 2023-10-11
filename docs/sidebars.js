@@ -125,6 +125,7 @@ module.exports = {
           items: [
             "guides/migrate/sources/zitadel",
             "guides/migrate/sources/auth0",
+            "guides/migrate/sources/keycloak",
           ]
         },
       ]
@@ -243,6 +244,7 @@ module.exports = {
             "guides/integrate/identity-providers/openldap",
             "guides/integrate/identity-providers/migrate",
             "guides/integrate/identity-providers/okta",
+            "guides/integrate/identity-providers/keycloak",
           ],
         },
         {
@@ -288,11 +290,6 @@ module.exports = {
             },
             {
               type: 'link',
-              label: 'Nextcloud',
-              href: 'https://zitadel.com/blog/zitadel-as-sso-provider-for-selfhosting',
-            },
-            {
-              type: 'link',
               label: 'Bold BI (boldbi.com)',
               href: 'https://support.boldbi.com/kb/article/13708/how-to-configure-zitadel-oauth-login-in-bold-bi',
             },
@@ -308,13 +305,18 @@ module.exports = {
             },
             {
               type: 'link',
-              label: 'Psono (psono.com)',
-              href: 'https://doc.psono.com/admin/configuration/oidc-zitadel.html',
+              label: 'Nextcloud',
+              href: 'https://zitadel.com/blog/zitadel-as-sso-provider-for-selfhosting',
             },
             {
               type: 'link',
               label: 'Netbird (netbird.io)',
               href: 'https://docs.netbird.io/selfhosted/identity-providers',
+            },
+            {
+              type: 'link',
+              label: 'Psono (psono.com)',
+              href: 'https://doc.psono.com/admin/configuration/oidc-zitadel.html',
             },
             {
               type: 'link',
@@ -336,6 +338,11 @@ module.exports = {
           },
           collapsed: true,
           items: [
+            {
+              type: 'link',
+              label: 'Argo CD',
+              href: 'https://argo-cd.readthedocs.io/en/latest/operator-manual/user-management/zitadel/',
+            },
             "guides/integrate/tools/apache2",
             "guides/integrate/authenticated-mongodb-charts",
             "examples/identity-proxy/oauth2-proxy"
@@ -361,6 +368,7 @@ module.exports = {
         "guides/solution-scenarios/domain-discovery",
         "guides/solution-scenarios/configurations",
         "guides/solution-scenarios/frontend-calling-backend-API",
+        "guides/solution-scenarios/device-authorization",
       ],
     },
     {
@@ -714,6 +722,7 @@ module.exports = {
             "legal/acceptable-use-policy",
             "legal/rate-limit-policy",
             "legal/policies/account-lockout-policy",
+            "legal/policies/feature-development-policy",
             "legal/vulnerability-disclosure-policy",
           ],
         },

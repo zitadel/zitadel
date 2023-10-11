@@ -53,7 +53,11 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
   @Input() public singleOutput: boolean = false;
 
   private unsubscribed$: Subject<void> = new Subject();
-  constructor(private userService: ManagementService, private toast: ToastService, private cdref: ChangeDetectorRef) {}
+  constructor(
+    private userService: ManagementService,
+    private toast: ToastService,
+    private cdref: ChangeDetectorRef,
+  ) {}
 
   public ngOnInit(): void {
     if (this.target === UserTarget.EXTERNAL) {

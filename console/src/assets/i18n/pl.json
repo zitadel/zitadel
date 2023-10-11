@@ -95,7 +95,6 @@
     "EVENTS": "Zdarzenia",
     "FAILEDEVENTS": "Nieudane Zdarzenia",
     "ORGANIZATION": "Organizacja",
-    "DOMAINS": "Domeny",
     "PROJECT": "Projekty",
     "PROJECTOVERVIEW": "Przegląd",
     "PROJECTGRANTS": "Uprawnienia",
@@ -495,6 +494,7 @@
       "LASTNAME": "Nazwisko",
       "NICKNAME": "Przezwisko",
       "DISPLAYNAME": "Nazwa wyświetlana",
+      "PREFERREDLOGINNAME": "Preferowana nazwa logowania",
       "PREFERRED_LANGUAGE": "Język",
       "GENDER": "Płeć",
       "PASSWORD": "Hasło",
@@ -794,7 +794,7 @@
     },
     "PAGES": {
       "STATE": "Status",
-      "DOMAINLIST": "Domeny"
+      "DOMAINLIST": "Własne domeny"
     },
     "STATE": {
       "0": "Nieokreślony",
@@ -951,7 +951,7 @@
     },
     "DOMAINS": {
       "NEW": "Dodaj domenę",
-      "TITLE": "Domeny",
+      "TITLE": "Zweryfikowane domeny",
       "DESCRIPTION": "Skonfiguruj swoje domeny. Ta domena może być używana do logowania się z Twoimi użytkownikami.",
       "SETPRIMARY": "Ustaw jako główną",
       "DELETE": {
@@ -1018,9 +1018,12 @@
       "LOCKOUT": "Blokada",
       "COMPLEXITY": "Złożoność hasła",
       "NOTIFICATIONS": "Ustawienia powiadomień",
+      "SMTP_PROVIDER": "Dostawca SMTP",
+      "SMS_PROVIDER": "Dostawca SMS-ów/telefonów",
       "NOTIFICATIONS_DESC": "Ustawienia SMTP i SMS",
       "MESSAGETEXTS": "Teksty wiadomości",
       "IDP": "Dostawcy tożsamości",
+      "VERIFIED_DAMAINS": "Zweryfikowane domeny",
       "DOMAIN": "Ustawienia domeny",
       "LOGINTEXTS": "Teksty interfejsu logowania",
       "BRANDING": "Marka",
@@ -1349,7 +1352,7 @@
       "MAXAGEDAYS": "Maksymalny wiek w dniach",
       "USERLOGINMUSTBEDOMAIN": "Dodaj domenę organizacji jako przyrostek do nazw logowania",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Jeśli włączysz to ustawienie, wszystkie nazwy logowania będą miały przyrostek z domeną organizacji. Jeśli to ustawienie jest wyłączone, musisz zapewnić unikalność nazw użytkowników we wszystkich organizacjach.",
-      "VALIDATEORGDOMAINS": "Sprawdzanie ważności domen organizacji",
+      "VALIDATEORGDOMAINS": "Weryfikacja domeny organizacji jest wymagana (wyzwanie DNS lub HTTP)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "Adres nadawcy SMTP pasuje do domeny instancji",
       "ALLOWUSERNAMEPASSWORD": "Zezwól na użycie nazwy użytkownika i hasła",
       "ALLOWEXTERNALIDP": "Zezwól na zewnętrznego dostawcę tożsamości",

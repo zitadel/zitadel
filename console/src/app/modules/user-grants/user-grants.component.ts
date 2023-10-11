@@ -56,7 +56,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   @ViewChild('input') public filter!: MatInput;
 
   public projectRoleOptions: Role.AsObject[] = [];
-  public routerLink: any = [''];
+  public routerLink: any = undefined;
 
   public loadedId: string = '';
   public loadedProjectId: string = '';

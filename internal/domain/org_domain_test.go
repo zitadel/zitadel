@@ -41,10 +41,10 @@ func TestNewIAMDomainName(t *testing.T) {
 		{
 			name: "replace invalid characters [^a-zA-Z0-9-] with empty spaces",
 			args: args{
-				orgName:   "mí Örg name?",
+				orgName:   "mí >**name?",
 				iamDomain: "localhost",
 			},
-			result: "m-rg-name.localhost",
+			result: "mí-name.localhost",
 		},
 		{
 			name: "label created from org name size is not greater than 63 chars",
@@ -78,10 +78,18 @@ func TestNewIAMDomainName(t *testing.T) {
 			},
 			result: "my-super-long-organization-name-with-many-many-many-characters.localhost",
 		},
+		{
+			name: "string full with invalid characters returns empty",
+			args: args{
+				orgName:   "*¿=@^[])",
+				iamDomain: "localhost",
+			},
+			result: "",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			domain := NewIAMDomainName(tt.args.orgName, tt.args.iamDomain)
+			domain, _ := NewIAMDomainName(tt.args.orgName, tt.args.iamDomain)
 			if tt.result != domain {
 				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result, domain)
 			}

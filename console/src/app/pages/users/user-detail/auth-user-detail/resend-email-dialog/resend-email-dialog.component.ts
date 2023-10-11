@@ -8,7 +8,10 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 })
 export class ResendEmailDialogComponent {
   public email: string = '';
-  constructor(public dialogRef: MatDialogRef<ResendEmailDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor(
+    public dialogRef: MatDialogRef<ResendEmailDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+  ) {
     if (data.email) {
       this.email = data.email;
     }

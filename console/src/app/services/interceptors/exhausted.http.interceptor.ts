@@ -9,7 +9,10 @@ import { ExhaustedService } from '../exhausted.service';
  */
 @Injectable()
 export class ExhaustedHttpInterceptor implements HttpInterceptor {
-  constructor(private exhaustedSvc: ExhaustedService, private envSvc: EnvironmentService) {}
+  constructor(
+    private exhaustedSvc: ExhaustedService,
+    private envSvc: EnvironmentService,
+  ) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(

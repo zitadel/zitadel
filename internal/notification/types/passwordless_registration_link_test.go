@@ -1,11 +1,13 @@
 package types
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
@@ -80,7 +82,7 @@ func TestNotify_SendPasswordlessRegistrationLink(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, notify := mockNotify()
-			err := notify.SendPasswordlessRegistrationLink(tt.args.user, tt.args.origin, tt.args.code, tt.args.codeID, tt.args.urlTmpl)
+			err := notify.SendPasswordlessRegistrationLink(http_utils.WithComposedOrigin(context.Background(), tt.args.origin), tt.args.user, tt.args.code, tt.args.codeID, tt.args.urlTmpl)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})

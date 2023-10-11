@@ -77,7 +77,7 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.ROLE.CREATIONDATE' | translate }}</th>
         <td class="pointer" [routerLink]="['/projects', projectId, 'apps', app.id]" mat-cell *matCellDef="let app">
           <span *ngIf="app?.details?.creationDate">{{
-            app.details.creationDate | timestampToDate | localizedDate : 'dd. MMM, HH:mm'
+            app.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm'
           }}</span>
         </td>
       </ng-container>
@@ -86,7 +86,7 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.ROLE.CHANGEDATE' | translate }}</th>
         <td class="pointer" [routerLink]="['/projects', projectId, 'apps', app.id]" mat-cell *matCellDef="let app">
           <span *ngIf="app?.details?.changeDate">{{
-            app.details.changeDate | timestampToDate | localizedDate : 'dd. MMM, HH:mm'
+            app.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm'
           }}</span>
         </td>
       </ng-container>

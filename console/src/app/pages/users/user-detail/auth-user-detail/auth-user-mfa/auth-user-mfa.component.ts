@@ -42,7 +42,11 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   public otpSmsDisabled$ = new BehaviorSubject<boolean>(true);
   public otpEmailDisabled$ = new BehaviorSubject<boolean>(true);
 
-  constructor(private service: GrpcAuthService, private toast: ToastService, private dialog: MatDialog) {}
+  constructor(
+    private service: GrpcAuthService,
+    private toast: ToastService,
+    private dialog: MatDialog,
+  ) {}
 
   public ngOnInit(): void {
     this.getMFAs();

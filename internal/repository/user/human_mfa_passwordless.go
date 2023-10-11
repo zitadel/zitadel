@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -317,11 +318,12 @@ func HumanPasswordlessInitCodeAddedEventMapper(event *repository.Event) (eventst
 type HumanPasswordlessInitCodeRequestedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID           string              `json:"id"`
-	Code         *crypto.CryptoValue `json:"code"`
-	Expiry       time.Duration       `json:"expiry"`
-	URLTemplate  string              `json:"url_template,omitempty"`
-	CodeReturned bool                `json:"code_returned,omitempty"`
+	ID                string              `json:"id"`
+	Code              *crypto.CryptoValue `json:"code"`
+	Expiry            time.Duration       `json:"expiry"`
+	URLTemplate       string              `json:"url_template,omitempty"`
+	CodeReturned      bool                `json:"code_returned,omitempty"`
+	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
 func (e *HumanPasswordlessInitCodeRequestedEvent) Data() interface{} {
@@ -330,6 +332,10 @@ func (e *HumanPasswordlessInitCodeRequestedEvent) Data() interface{} {
 
 func (e *HumanPasswordlessInitCodeRequestedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
+}
+
+func (e *HumanPasswordlessInitCodeRequestedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewHumanPasswordlessInitCodeRequestedEvent(
@@ -347,11 +353,12 @@ func NewHumanPasswordlessInitCodeRequestedEvent(
 			aggregate,
 			HumanPasswordlessInitCodeRequestedType,
 		),
-		ID:           id,
-		Code:         code,
-		Expiry:       expiry,
-		URLTemplate:  urlTmpl,
-		CodeReturned: codeReturned,
+		ID:                id,
+		Code:              code,
+		Expiry:            expiry,
+		URLTemplate:       urlTmpl,
+		CodeReturned:      codeReturned,
+		TriggeredAtOrigin: http.ComposedOrigin(ctx),
 	}
 }
 

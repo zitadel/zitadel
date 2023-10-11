@@ -14,7 +14,10 @@ export class ShowTokenDialogComponent {
   public copied: string = '';
   InfoSectionType: any = InfoSectionType;
 
-  constructor(public dialogRef: MatDialogRef<ShowTokenDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor(
+    public dialogRef: MatDialogRef<ShowTokenDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+  ) {
     this.tokenResponse = data.token;
   }
 

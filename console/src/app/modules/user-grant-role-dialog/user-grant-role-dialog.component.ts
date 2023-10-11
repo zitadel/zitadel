@@ -13,7 +13,10 @@ export class UserGrantRoleDialogComponent {
 
   public selectedRoleKeys: string[] = [];
 
-  constructor(public dialogRef: MatDialogRef<UserGrantRoleDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor(
+    public dialogRef: MatDialogRef<UserGrantRoleDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+  ) {
     this.projectId = data.projectId;
     this.grantId = data.grantId;
     this.selectedRoleKeysList = data.selectedRoleKeysList;

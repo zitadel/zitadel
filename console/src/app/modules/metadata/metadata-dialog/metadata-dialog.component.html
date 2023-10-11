@@ -1,7 +1,7 @@
 <div class="title-row">
   <h1 class="metadata-title" mat-dialog-title>{{ 'METADATA.TITLE' | translate }}</h1>
   <span class="fill-space"></span>
-  <p *ngIf="ts" class="ts cnsl-secondary-text">{{ ts | timestampToDate | localizedDate : 'dd. MMM, HH:mm' }}</p>
+  <p *ngIf="ts" class="ts cnsl-secondary-text">{{ ts | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</p>
 </div>
 <div mat-dialog-content class="metadata-dialog-content">
   <form *ngFor="let md of metadata; index as i" (ngSubmit)="saveElement(i)">
