@@ -16,6 +16,7 @@ import { InputModule } from '../../input/input.module';
 import { WarnDialogModule } from '../../warn-dialog/warn-dialog.module';
 import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-add-sms-provider.component';
 import { NotificationSMSProviderComponent } from './notification-sms-provider.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [NotificationSMSProviderComponent, DialogAddSMSProviderComponent],
@@ -33,6 +34,7 @@ import { NotificationSMSProviderComponent } from './notification-sms-provider.co
     FormFieldModule,
     WarnDialogModule,
     MatSelectModule,
+    MatDialogModule,
     MatProgressSpinnerModule,
     MatSelectModule,
     TranslateModule,

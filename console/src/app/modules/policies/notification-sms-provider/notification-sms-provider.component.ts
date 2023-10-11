@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { AddSMSProviderTwilioRequest, UpdateSMSProviderTwilioRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { SMSProvider, SMSProviderConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
 
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { InfoSectionType } from '../../info-section/info-section.component';
