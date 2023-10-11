@@ -68,7 +68,23 @@ We understand that these advisories may include breaking changes, and we aim to 
       ZITADEL hosted Login-UI is not affected by this change.
     </td>
     <td>TBD</td>
-      <td>Calendar week 40/41</td>
+    <td>Calendar week 44</td>
+  </tr>
+  <tr>
+    <td>
+      <a href="./advisory/a10003">A-10003</a>
+    </td>
+    <td>Login-UI - Default Context</td>
+    <td>Breaking Behaviour Change</td>
+    <td>
+        When users are redirected to the ZITADEL Login-UI without any organizational context,
+        they're currently presented a login screen, based on the instance settings,
+        e.g. available IDPs and possible login mechanisms. If the user will then register himself,
+        by the registration form or through an IDP, the user will always be created on the default organization.
+        With the introduced change, the settings will no longer be loaded from the instance, but rather the default organization directly.
+    </td>
+    <td>2.38.0</td>
+    <td>Calendar week 41</td>
   </tr>
   <tr>
     <td>
