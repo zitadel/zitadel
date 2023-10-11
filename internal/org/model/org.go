@@ -46,5 +46,6 @@ func (o *Org) GetPrimaryDomain() *OrgDomain {
 }
 
 func (o *Org) AddIAMDomain(iamDomain string) {
-	o.Domains = append(o.Domains, &OrgDomain{Domain: domain.NewIAMDomainName(o.Name, iamDomain), Verified: true, Primary: true})
+	orgDomain, _ := domain.NewIAMDomainName(o.Name, iamDomain)
+	o.Domains = append(o.Domains, &OrgDomain{Domain: orgDomain, Verified: true, Primary: true})
 }
