@@ -371,7 +371,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, org.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return err
 	}
-	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)
+	instanceInterceptor := middleware.InstanceInterceptor(queries, config.VirtualInstances, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)
 	assetsCache := middleware.AssetsCacheInterceptor(config.AssetStorage.Cache.MaxAge, config.AssetStorage.Cache.SharedMaxAge)
 	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, middleware.CallDurationHandler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.Handle))
 

@@ -18,18 +18,20 @@ import (
 )
 
 type instanceInterceptor struct {
-	verifier        authz.InstanceVerifier
-	headerName      string
-	ignoredPrefixes []string
-	translator      *i18n.Translator
+	verifier         authz.InstanceVerifier
+	virtualInstances bool
+	headerName       string
+	ignoredPrefixes  []string
+	translator       *i18n.Translator
 }
 
-func InstanceInterceptor(verifier authz.InstanceVerifier, headerName string, ignoredPrefixes ...string) *instanceInterceptor {
+func InstanceInterceptor(verifier authz.InstanceVerifier, virtualInstances bool, headerName string, ignoredPrefixes ...string) *instanceInterceptor {
 	return &instanceInterceptor{
-		verifier:        verifier,
-		headerName:      headerName,
-		ignoredPrefixes: ignoredPrefixes,
-		translator:      newZitadelTranslator(),
+		verifier:         verifier,
+		virtualInstances: virtualInstances,
+		headerName:       headerName,
+		ignoredPrefixes:  ignoredPrefixes,
+		translator:       newZitadelTranslator(),
 	}
 }
 
@@ -52,7 +54,15 @@ func (a *instanceInterceptor) handleInstance(w http.ResponseWriter, r *http.Requ
 			return
 		}
 	}
-	ctx, err := setInstance(r, a.verifier, a.headerName)
+	var (
+		instance authz.Instance
+		err      error
+	)
+	if a.virtualInstances {
+		instance, err = queryInstanceByHost(r, a.verifier, a.headerName)
+	} else {
+		instance, err = queryFirstInstance(r, a.verifier)
+	}
 	if err != nil {
 		caosErr := new(caos_errors.NotFoundError)
 		if errors.As(err, &caosErr) {
@@ -61,8 +71,24 @@ func (a *instanceInterceptor) handleInstance(w http.ResponseWriter, r *http.Requ
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	r = r.WithContext(ctx)
+	r = r.WithContext(authz.WithInstance(r.Context(), instance))
 	next.ServeHTTP(w, r)
+}
+
+func queryFirstInstance(r *http.Request, verifier authz.InstanceVerifier) (instance authz.Instance, err error) {
+	ctx, span := tracing.NewServerInterceptorSpan(r.Context())
+	defer func() { span.EndWithError(err) }()
+	return verifier.FirstInstance(ctx)
+}
+
+func queryInstanceByHost(r *http.Request, verifier authz.InstanceVerifier, headerName string) (instance authz.Instance, err error) {
+	ctx, span := tracing.NewServerInterceptorSpan(r.Context())
+	defer func() { span.EndWithError(err) }()
+	host, err := HostFromRequest(r, headerName)
+	if err != nil {
+		return nil, err
+	}
+	return verifier.InstanceByHost(ctx, host)
 }
 
 func setInstance(r *http.Request, verifier authz.InstanceVerifier, headerName string) (_ context.Context, err error) {

@@ -199,6 +199,24 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (instanc
 	return instance, err
 }
 
+func (q *Queries) FirstInstance(ctx context.Context) (instance authz.Instance, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	// TODO: external domain?
+	stmt, scan := prepareAuthzInstanceQuery(ctx, q.client, "")
+	// TODO: Is this the most efficient query?
+	query, args, err := stmt.OrderBy(InstanceColumnChangeDate.identifier()).Limit(1).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-SAfg2", "Errors.Query.SQLStatement")
+	}
+
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		instance, err = scan(rows)
+		return err
+	}, query, args...)
+	return instance, err
+}
+
 func (q *Queries) InstanceByHost(ctx context.Context, host string) (instance authz.Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

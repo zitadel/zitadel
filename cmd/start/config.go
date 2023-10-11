@@ -41,6 +41,7 @@ type Config struct {
 	ExternalDomain    string
 	ExternalSecure    bool
 	TLS               network.TLS
+	VirtualInstances  bool
 	HTTP2HostHeader   string
 	HTTP1HostHeader   string
 	WebAuthNName      string

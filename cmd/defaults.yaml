@@ -40,16 +40,15 @@ Telemetry:
 # Port ZITADEL will listen on
 Port: 8080 # ZITADEL_PORT
 # Port ZITADEL is exposed on, it can differ from port e.g. if you proxy the traffic
-# !!! Changing this after the initial setup breaks your system !!!
 ExternalPort: 8080 # ZITADEL_EXTERNALPORT
 # Domain/hostname ZITADEL is exposed externally
-# !!! Changing this after the initial setup breaks your system !!!
+# Has no effect if VirtualInstances is set to false TODO: VALIDATE!
 ExternalDomain: localhost # ZITADEL_EXTERNALDOMAIN
 # specifies if ZITADEL is exposed externally through TLS
 # this must be set to true even if TLS is not enabled on ZITADEL itself
 # but TLS traffic is terminated on a reverse proxy
-# !!! Changing this after the initial setup breaks your system !!!
 ExternalSecure: true # ZITADEL_EXTERNALSECURE
+
 TLS:
   # If enabled, ZITADEL will serve all traffic over TLS (HTTPS and gRPC)
   # you must then also provide a private key and certificate to be used for the connection
@@ -69,6 +68,10 @@ TLS:
   # Certificate for the TLS connection (CertPath will this overwrite if specified)
   # base64 encoded content of a pem file
   Cert: # ZITADEL_TLS_CERT
+
+# If VirtualInstances is set to true, ZITADEL will allow to create multiple instances using the system API
+# Requests are mapped to instances by the Forwarded, X-Forwarded-Host or the Host header
+VirtualInstances: false # ZITADEL_VIRTUALINSTANCES
 
 # Header name of HTTP2 (incl. gRPC) calls from which the instance will be matched
 HTTP2HostHeader: ":authority" # ZITADEL_HTTP2HOSTHEADER
