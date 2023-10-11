@@ -1,7 +1,6 @@
 package smtp
 
 import (
-	"context"
 	"crypto/tls"
 	"net"
 	"net/smtp"
@@ -23,24 +22,18 @@ type Email struct {
 	replyToAddress string
 }
 
-func InitChannel(ctx context.Context, getSMTPConfig func(ctx context.Context) (*Config, error)) (*Email, error) {
-	smtpConfig, err := getSMTPConfig(ctx)
-	if err != nil {
-		return nil, err
-	}
-	client, err := smtpConfig.SMTP.connectToSMTP(smtpConfig.Tls)
+func InitChannel(cfg *Config) (*Email, error) {
+	client, err := cfg.SMTP.connectToSMTP(cfg.Tls)
 	if err != nil {
 		logging.New().WithError(err).Error("could not connect to smtp")
 		return nil, err
 	}
-
 	logging.New().Debug("successfully initialized smtp email channel")
-
 	return &Email{
 		smtpClient:     client,
-		senderName:     smtpConfig.FromName,
-		senderAddress:  smtpConfig.From,
-		replyToAddress: smtpConfig.ReplyToAddress,
+		senderName:     cfg.FromName,
+		senderAddress:  cfg.From,
+		replyToAddress: cfg.ReplyToAddress,
 	}, nil
 }
 

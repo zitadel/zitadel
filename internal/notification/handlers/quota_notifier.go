@@ -22,10 +22,9 @@ const (
 
 type quotaNotifier struct {
 	crdb.StatementHandler
-	commands                       *command.Commands
-	queries                        *NotificationQueries
-	metricSuccessfulDeliveriesJSON string
-	metricFailedDeliveriesJSON     string
+	commands *command.Commands
+	queries  *NotificationQueries
+	channels types.ChannelChains
 }
 
 func NewQuotaNotifier(
@@ -33,8 +32,7 @@ func NewQuotaNotifier(
 	config crdb.StatementHandlerConfig,
 	commands *command.Commands,
 	queries *NotificationQueries,
-	metricSuccessfulDeliveriesJSON,
-	metricFailedDeliveriesJSON string,
+	channels types.ChannelChains,
 ) *quotaNotifier {
 	p := new(quotaNotifier)
 	config.ProjectionName = QuotaNotificationsProjectionTable
@@ -42,8 +40,7 @@ func NewQuotaNotifier(
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	p.commands = commands
 	p.queries = queries
-	p.metricSuccessfulDeliveriesJSON = metricSuccessfulDeliveriesJSON
-	p.metricFailedDeliveriesJSON = metricFailedDeliveriesJSON
+	p.channels = channels
 	projection.NotificationsQuotaProjection = p
 	return p
 }
@@ -75,19 +72,7 @@ func (u *quotaNotifier) reduceNotificationDue(event eventstore.Event) (*handler.
 	if alreadyHandled {
 		return crdb.NewNoOpStatement(e), nil
 	}
-	err = types.SendJSON(
-		ctx,
-		webhook.Config{
-			CallURL: e.CallURL,
-			Method:  http.MethodPost,
-		},
-		u.queries.GetFileSystemProvider,
-		u.queries.GetLogProvider,
-		e,
-		e,
-		u.metricSuccessfulDeliveriesJSON,
-		u.metricFailedDeliveriesJSON,
-	).WithoutTemplate()
+	err = types.SendJSON(ctx, webhook.Config{CallURL: e.CallURL, Method: http.MethodPost}, u.channels, e, e).WithoutTemplate()
 	if err != nil {
 		return nil, err
 	}
