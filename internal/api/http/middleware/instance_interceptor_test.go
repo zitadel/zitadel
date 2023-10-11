@@ -68,8 +68,9 @@ func Test_instanceInterceptor_Handler(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			a := &instanceInterceptor{
-				verifier:   tt.fields.verifier,
-				headerName: tt.fields.headerName,
+				verifier:         tt.fields.verifier,
+				headerName:       tt.fields.headerName,
+				virtualInstances: true,
 			}
 			next := &testHandler{}
 			got := a.HandlerFunc(next.ServeHTTP)
@@ -135,8 +136,9 @@ func Test_instanceInterceptor_HandlerFunc(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			a := &instanceInterceptor{
-				verifier:   tt.fields.verifier,
-				headerName: tt.fields.headerName,
+				verifier:         tt.fields.verifier,
+				headerName:       tt.fields.headerName,
+				virtualInstances: true,
 			}
 			next := &testHandler{}
 			got := a.HandlerFunc(next.ServeHTTP)
@@ -148,14 +150,14 @@ func Test_instanceInterceptor_HandlerFunc(t *testing.T) {
 	}
 }
 
-func Test_setInstance(t *testing.T) {
+func Test_queryInstanceByHost(t *testing.T) {
 	type args struct {
 		r          *http.Request
 		verifier   authz.InstanceVerifier
 		headerName string
 	}
 	type res struct {
-		want context.Context
+		want *mockInstance
 		err  bool
 	}
 	tests := []struct {
@@ -206,19 +208,19 @@ func Test_setInstance(t *testing.T) {
 				headerName: "header",
 			},
 			res{
-				want: authz.WithInstance(context.Background(), &mockInstance{}),
+				want: &mockInstance{},
 				err:  false,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := setInstance(tt.args.r, tt.args.verifier, tt.args.headerName)
+			got, err := queryInstanceByHost(tt.args.r, tt.args.verifier, tt.args.headerName)
 			if (err != nil) != tt.res.err {
 				t.Errorf("setInstance() error = %v, wantErr %v", err, tt.res.err)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.res.want) {
+			if (got != nil || tt.res.want != nil) && !reflect.DeepEqual(got, tt.res.want) {
 				t.Errorf("setInstance() got = %v, want %v", got, tt.res.want)
 			}
 		})
@@ -242,6 +244,10 @@ func (m *mockInstanceVerifier) InstanceByHost(_ context.Context, host string) (a
 		return nil, fmt.Errorf("invalid host")
 	}
 	return &mockInstance{}, nil
+}
+
+func (m *mockInstanceVerifier) FirstInstance(_ context.Context) (authz.Instance, error) {
+	return nil, nil
 }
 
 func (m *mockInstanceVerifier) InstanceByID(context.Context) (authz.Instance, error) {

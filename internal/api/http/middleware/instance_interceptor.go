@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -89,25 +88,6 @@ func queryInstanceByHost(r *http.Request, verifier authz.InstanceVerifier, heade
 		return nil, err
 	}
 	return verifier.InstanceByHost(ctx, host)
-}
-
-func setInstance(r *http.Request, verifier authz.InstanceVerifier, headerName string) (_ context.Context, err error) {
-	ctx := r.Context()
-
-	authCtx, span := tracing.NewServerInterceptorSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	host, err := HostFromRequest(r, headerName)
-	if err != nil {
-		return nil, err
-	}
-
-	instance, err := verifier.InstanceByHost(authCtx, host)
-	if err != nil {
-		return nil, err
-	}
-	span.End()
-	return authz.WithInstance(ctx, instance), nil
 }
 
 func HostFromRequest(r *http.Request, headerName string) (string, error) {
