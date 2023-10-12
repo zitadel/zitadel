@@ -3,14 +3,13 @@ package query
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	errs "errors"
 	"net"
+	"net/http"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
@@ -308,7 +307,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				metadata            database.Map[[]byte]
 				token               sql.NullString
 				userAgentIP         sql.NullString
-				userAgentHeader     []byte
+				userAgentHeader     database.Map[[]string]
 			)
 
 			err := row.Scan(
@@ -359,16 +358,11 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session.OTPSMSFactor.OTPCheckedAt = otpSMSCheckedAt.Time
 			session.OTPEmailFactor.OTPCheckedAt = otpEmailCheckedAt.Time
 			session.Metadata = metadata
+			session.UserAgent.Header = http.Header(userAgentHeader)
 
 			if userAgentIP.Valid {
 				session.UserAgent.IP = net.ParseIP(userAgentIP.String)
 			}
-			if userAgentHeader != nil {
-				if err = json.Unmarshal(userAgentHeader, &session.UserAgent.Header); err != nil {
-					logging.New().WithError(err).Error("user agent header scan")
-				}
-			}
-
 			return session, token.String, nil
 		}
 }
