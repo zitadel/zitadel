@@ -274,6 +274,7 @@ message CreateSessionRequest{
     }
   ];
   RequestChallenges challenges = 3;
+  UserAgent user_agent = 4;
 }
 
 message CreateSessionResponse{
