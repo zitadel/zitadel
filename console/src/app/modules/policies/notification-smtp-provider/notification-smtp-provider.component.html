@@ -1,0 +1,69 @@
+<h2>{{ 'SETTING.SMTP.TITLE' | translate }}</h2>
+
+<div class="spinner-wr">
+  <mat-spinner diameter="30" *ngIf="smtpLoading" color="primary"></mat-spinner>
+</div>
+
+<cnsl-info-section
+  *ngIf="!smtpLoading && !form.valid"
+  class="info-section-warn"
+  [fitWidth]="true"
+  [type]="InfoSectionType.ALERT"
+  >{{ 'SETTING.SMTP.REQUIREDWARN' | translate }}</cnsl-info-section
+>
+
+<form (ngSubmit)="savePolicy()" [formGroup]="form" autocomplete="off">
+  <cnsl-form-field class="smtp-form-field" label="Sender Address" required="true">
+    <cnsl-label>{{ 'SETTING.SMTP.SENDERADDRESS' | translate }}</cnsl-label>
+    <input cnslInput name="senderAddress" formControlName="senderAddress" required />
+  </cnsl-form-field>
+
+  <cnsl-form-field class="smtp-form-field" label="Sender Name" required="true">
+    <cnsl-label>{{ 'SETTING.SMTP.SENDERNAME' | translate }}</cnsl-label>
+    <input cnslInput name="senderName" formControlName="senderName" required />
+  </cnsl-form-field>
+
+  <cnsl-form-field class="smtp-form-field" label="Reply-To Address">
+    <cnsl-label>{{ 'SETTING.SMTP.REPLYTOADDRESS' | translate }}</cnsl-label>
+    <input cnslInput name="senderReplyToAddress" formControlName="replyToAddress" />
+  </cnsl-form-field>
+
+  <mat-checkbox class="smtp-checkbox" formControlName="tls">
+    {{ 'SETTING.SMTP.TLS' | translate }}
+  </mat-checkbox>
+
+  <cnsl-form-field class="smtp-form-field" label="Host And Port" required="true">
+    <cnsl-label>{{ 'SETTING.SMTP.HOSTANDPORT' | translate }}</cnsl-label>
+    <input cnslInput name="hostAndPort" formControlName="hostAndPort" placeholder="smtp.mailtrap.io:2525" required />
+  </cnsl-form-field>
+
+  <cnsl-form-field class="smtp-form-field" label="User" required="true">
+    <cnsl-label>{{ 'SETTING.SMTP.USER' | translate }}</cnsl-label>
+    <input id="smtp-user" cnslInput name="smtp-user" autocomplete="smtp-user" formControlName="user" required />
+  </cnsl-form-field>
+
+  <button
+    class="set-password-btn"
+    [disabled]="(['iam.write'] | hasRole | async) === false || !hasSMTPConfig"
+    (click)="setSMTPPassword()"
+    type="button"
+    mat-stroked-button
+    data-e2e="add-smtp-password-button"
+  >
+    {{ 'SETTING.SMTP.SETPASSWORD' | translate }}
+  </button>
+
+  <div class="general-btn-container">
+    <button
+      class="save-button"
+      [disabled]="form.disabled"
+      (click)="savePolicy()"
+      color="primary"
+      type="submit"
+      mat-raised-button
+      data-e2e="save-smtp-settings-button"
+    >
+      {{ 'ACTIONS.SAVE' | translate }}
+    </button>
+  </div>
+</form>
