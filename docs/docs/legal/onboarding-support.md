@@ -1,16 +1,14 @@
 ---
 title: Description of onboarding support services for ZITADEL
-sidebar_label: Onboarding
+sidebar_label: Onboarding support
 custom_edit_url: null
 --- 
 
 This annex of the [Framework Agreement](terms-of-service) describes the onboarding support services offered by us for our Services.
 
-Last revised: October 11, 2023
+Last revised: October 12, 2023
 
-TODO: - Introduction: overview of how we would tackle the migration/introduction
-
-## Scope
+Our onboarding support should help you, as a new customer, to get a better understanding on how to integrate ZITADEL into your solution, how to tackle the migration, and ensure a highly-available day-to-day operation.
 
 Onboarding support services can be offered to customers that enter a ZITADEL Cloud or a ZITADEL Enterprise subscription.
 
@@ -19,16 +17,18 @@ Your questions might help other people in the community and will make our projec
 
 ## Proof of value
 
-Within a short time-frame we can show the value of using our Services and have the ability to establish proof of working setup for your most critical use cases.
+Within a short time-frame, f.e. 3 weeks, we can show the value of using our Services and have the ability to establish proof of working setup for your most critical use cases.
 We may offer to support you during an initial period to evaluate next steps.
-This period should be at most a few weeks where you will also commit to complete the proof of value.
+Before the start of the period we may ask you to provide a description of your critical use cases and a high-level overview of your planned integration architecture.
+During this period you should make sure that you have the necessary resources on your side to complete the proof of value.
 
 ## Onboarding term
 
 With the onboarding support we provide the initial knowledge transfer to configure and operate ZITADEL.
 During the term you will get direct access to our engineering team via [Technical Account Management](./support-services.md#technical-account-manager).
-We offer an onboarding term in combination with ZITADEL Enterprise subscriptions.
 Duration is typically 3 months but this could vary depending on your requirements.
+
+We offer an onboarding term in combination with ZITADEL Enterprise subscriptions.
 
 ### Topics covered
 
@@ -48,7 +48,7 @@ More details
 - IAM Configuration
 - Walk-though all features
 - Users / Manuals
-- APIs
+- Authentication & Management APIs
 - Validation of tokens
 - Client integration best-practices
 - Event types
@@ -80,5 +80,5 @@ More details
 
 ## Continuous support
 
-- Staff training
-- Technical account management
+After the onboarding phase has ended we will provide continuous support according to your subscription.
+We can provide you with continued access to the technical account management in our Enterprise subscriptions.
