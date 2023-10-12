@@ -15,6 +15,9 @@ Onboarding support services can be offered to customers that enter a ZITADEL Clo
 If you intend to use the open source version exclusively then please join our community chat or Github.
 Your questions might help other people in the community and will make our project better over time.
 
+Please [contact us](https://zitadel.com/contact) for a quote and to get started with onboarding support.
+Below you will find topics covered and scope of the offered services.
+
 ## Proof of value
 
 Within a short time-frame, f.e. 3 weeks, we can show the value of using our Services and have the ability to establish proof of working setup for your most critical use cases.
