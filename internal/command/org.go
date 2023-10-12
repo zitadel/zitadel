@@ -238,7 +238,10 @@ func AddOrgCommand(ctx context.Context, a *org.Aggregate, name string, userIDs .
 		if name = strings.TrimSpace(name); name == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument")
 		}
-		defaultDomain := domain.NewIAMDomainName(name, authz.GetInstance(ctx).RequestedDomain())
+		defaultDomain, err := domain.NewIAMDomainName(name, authz.GetInstance(ctx).RequestedDomain())
+		if err != nil {
+			return nil, err
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
 				org.NewOrgAddedEvent(ctx, &a.Aggregate, name),

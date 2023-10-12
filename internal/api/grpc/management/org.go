@@ -73,7 +73,11 @@ func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChanges
 }
 
 func (s *Server) AddOrg(ctx context.Context, req *mgmt_pb.AddOrgRequest) (*mgmt_pb.AddOrgResponse, error) {
-	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, domain.NewIAMDomainName(req.Name, authz.GetInstance(ctx).RequestedDomain()), "")
+	orgDomain, err := domain.NewIAMDomainName(req.Name, authz.GetInstance(ctx).RequestedDomain())
+	if err != nil {
+		return nil, err
+	}
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, orgDomain, "")
 	if err != nil {
 		return nil, err
 	}

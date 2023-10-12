@@ -1987,6 +1987,8 @@
       "CLIENTSECRET_DESCRIPTION": "Conservez votre secret client dans un endroit sûr car il disparaîtra une fois la boîte de dialogue fermée.",
       "REGENERATESECRET": "Régénérer le secret du client",
       "DEVMODE": "Mode développement",
+      "DEVMODE_ENABLED": "Activé",
+      "DEVMODE_DISABLED": "Désactivé",
       "DEVMODEDESC": "Attention",
       "SKIPNATIVEAPPSUCCESSPAGE": "Sauter la page de succès de connexion",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Sauter la page de succès après la connexion pour cette application native",

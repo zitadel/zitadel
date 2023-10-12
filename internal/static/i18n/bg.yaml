@@ -204,6 +204,7 @@ Errors:
     Domain:
       AlreadyExists: Домейнът вече съществува
       InvalidCharacter: "Само буквено-цифрови знаци, . "
+      EmptyString: Невалидни нецифрови и азбучни знаци бяха заменени с празни интервали и полученият домейн е празен низ
     IDP:
       InvalidSearchQuery: Невалидна заявка за търсене
       ClientIDMissing: Липсва ClientID

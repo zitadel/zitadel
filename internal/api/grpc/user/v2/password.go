@@ -48,7 +48,7 @@ func notificationTypeToDomain(notificationType user.NotificationType) domain.Not
 }
 
 func (s *Server) SetPassword(ctx context.Context, req *user.SetPasswordRequest) (_ *user.SetPasswordResponse, err error) {
-	var resourceOwner = authz.GetCtxData(ctx).ResourceOwner
+	var resourceOwner = authz.GetCtxData(ctx).OrgID
 	var details *domain.ObjectDetails
 
 	switch v := req.GetVerification().(type) {

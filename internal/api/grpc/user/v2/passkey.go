@@ -15,7 +15,7 @@ import (
 
 func (s *Server) RegisterPasskey(ctx context.Context, req *user.RegisterPasskeyRequest) (resp *user.RegisterPasskeyResponse, err error) {
 	var (
-		resourceOwner = authz.GetCtxData(ctx).ResourceOwner
+		resourceOwner = authz.GetCtxData(ctx).OrgID
 		authenticator = passkeyAuthenticatorToDomain(req.GetAuthenticator())
 	)
 	if code := req.GetCode(); code != nil {
@@ -65,7 +65,7 @@ func passkeyRegistrationDetailsToPb(details *domain.WebAuthNRegistrationDetails,
 }
 
 func (s *Server) VerifyPasskeyRegistration(ctx context.Context, req *user.VerifyPasskeyRegistrationRequest) (*user.VerifyPasskeyRegistrationResponse, error) {
-	resourceOwner := authz.GetCtxData(ctx).ResourceOwner
+	resourceOwner := authz.GetCtxData(ctx).OrgID
 	pkc, err := req.GetPublicKeyCredential().MarshalJSON()
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "USERv2-Pha2o", "Errors.Internal")
@@ -80,7 +80,7 @@ func (s *Server) VerifyPasskeyRegistration(ctx context.Context, req *user.Verify
 }
 
 func (s *Server) CreatePasskeyRegistrationLink(ctx context.Context, req *user.CreatePasskeyRegistrationLinkRequest) (resp *user.CreatePasskeyRegistrationLinkResponse, err error) {
-	resourceOwner := authz.GetCtxData(ctx).ResourceOwner
+	resourceOwner := authz.GetCtxData(ctx).OrgID
 
 	switch medium := req.Medium.(type) {
 	case nil:
