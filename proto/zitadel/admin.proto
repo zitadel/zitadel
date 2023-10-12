@@ -6837,7 +6837,7 @@ message SetDefaultVerifyEmailMessageTextRequest {
     string text = 6 [
         (validate.rules).string = {max_bytes: 40000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"A new email has been added. Please use the button below to verify your mail. (Code {{.Code}}) If you didn't add a new email, please ignore this email.\""
+            example: "\"A new email has been added. Please use the button below to verify your email. (Code {{.Code}}) If you didn't add a new email, please ignore this email.\""
             max_length: 10000;
         }
     ];

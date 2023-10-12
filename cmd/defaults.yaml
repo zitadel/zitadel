@@ -735,7 +735,7 @@ DefaultInstance:
       PreHeader: Verify email
       Subject: Verify email
       Greeting: Hello {{.DisplayName}},
-      Text: A new email has been added. Please use the button below to verify your mail. (Code {{.Code}}) If you din't add a new email, please ignore this email.
+      Text: A new email has been added. Please use the button below to verify your email. (Code {{.Code}}) If you din't add a new email, please ignore this email.
       ButtonText: Verify email
     - MessageTextType: VerifyPhone
       Language: en
