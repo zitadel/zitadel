@@ -1982,6 +1982,8 @@
       "CLIENTSECRET_DESCRIPTION": "Mantenha o segredo do cliente em um local seguro, pois ele desaparecerá assim que o diálogo for fechado.",
       "REGENERATESECRET": "Regenerar Segredo do Cliente",
       "DEVMODE": "Modo de Desenvolvimento",
+      "DEVMODE_ENABLED": "Ativado",
+      "DEVMODE_DISABLED": "Desativado",
       "DEVMODEDESC": "Atenção: Com o modo de desenvolvimento habilitado, as URIs de redirecionamento não serão validadas.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Pular Página de Sucesso de Login",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Pule a página de sucesso após o login para este aplicativo nativo.",
