@@ -38,11 +38,10 @@ type TelemetryPusherConfig struct {
 
 type telemetryPusher struct {
 	crdb.StatementHandler
-	cfg                            TelemetryPusherConfig
-	commands                       *command.Commands
-	queries                        *NotificationQueries
-	metricSuccessfulDeliveriesJSON string
-	metricFailedDeliveriesJSON     string
+	cfg      TelemetryPusherConfig
+	commands *command.Commands
+	queries  *NotificationQueries
+	channels types.ChannelChains
 }
 
 func NewTelemetryPusher(
@@ -51,8 +50,7 @@ func NewTelemetryPusher(
 	handlerCfg crdb.StatementHandlerConfig,
 	commands *command.Commands,
 	queries *NotificationQueries,
-	metricSuccessfulDeliveriesJSON,
-	metricFailedDeliveriesJSON string,
+	channels types.ChannelChains,
 ) *telemetryPusher {
 	p := new(telemetryPusher)
 	handlerCfg.ProjectionName = TelemetryProjectionTable
@@ -62,8 +60,7 @@ func NewTelemetryPusher(
 	p.StatementHandler = crdb.NewStatementHandler(ctx, handlerCfg)
 	p.commands = commands
 	p.queries = queries
-	p.metricSuccessfulDeliveriesJSON = metricSuccessfulDeliveriesJSON
-	p.metricFailedDeliveriesJSON = metricFailedDeliveriesJSON
+	p.channels = channels
 	projection.TelemetryPusherProjection = p
 	return p
 }
@@ -132,8 +129,7 @@ func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.Sched
 				Method:  http.MethodPost,
 				Headers: t.cfg.Headers,
 			},
-			t.queries.GetFileSystemProvider,
-			t.queries.GetLogProvider,
+			t.channels,
 			&struct {
 				InstanceID     string         `json:"instanceId"`
 				ExternalDomain string         `json:"externalDomain"`
@@ -148,8 +144,6 @@ func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.Sched
 				ReachedDate:    ms.ReachedDate,
 			},
 			event,
-			t.metricSuccessfulDeliveriesJSON,
-			t.metricFailedDeliveriesJSON,
 		).WithoutTemplate(); err != nil {
 			return err
 		}

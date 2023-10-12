@@ -1,0 +1,35 @@
+.spinner-wr {
+  margin: 0.5rem 0;
+}
+
+.sms-providers {
+  display: flex;
+  align-items: center;
+
+  .sms-card {
+    margin-right: 1rem;
+
+    &.add {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sms-provider {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      width: 350px;
+
+      .title {
+        font-size: 16px;
+        margin: 0 1rem 0 0;
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+    }
+  }
+}

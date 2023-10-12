@@ -1,0 +1,32 @@
+.spinner-wr {
+  margin: 0.5rem 0;
+}
+
+.smtp-form-field,
+.info-section-warn {
+  max-width: 400px;
+  display: block;
+}
+
+.info-section-warn {
+  margin-bottom: 0.5rem;
+}
+
+.smtp-checkbox {
+  max-width: 400px;
+  display: block;
+  margin: 1rem 0;
+}
+
+.set-password-btn {
+  margin-bottom: 1rem;
+}
+
+.general-btn-container {
+  display: flex;
+  justify-content: flex-start;
+
+  .save-button {
+    display: block;
+  }
+}

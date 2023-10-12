@@ -25,7 +25,8 @@ func (o *Org) IsValid() bool {
 }
 
 func (o *Org) AddIAMDomain(iamDomain string) {
-	o.Domains = append(o.Domains, &OrgDomain{Domain: NewIAMDomainName(o.Name, iamDomain), Verified: true, Primary: true})
+	orgDomain, _ := NewIAMDomainName(o.Name, iamDomain)
+	o.Domains = append(o.Domains, &OrgDomain{Domain: orgDomain, Verified: true, Primary: true})
 }
 
 type OrgState int32
