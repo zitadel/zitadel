@@ -47,7 +47,6 @@ type SessionWriteModel struct {
 	OTPEmailCheckedAt    time.Time
 	WebAuthNUserVerified bool
 	Metadata             map[string][]byte
-	UserAgent            *domain.UserAgent
 	State                domain.SessionState
 
 	WebAuthNChallenge     *WebAuthNChallengeModel
@@ -133,7 +132,6 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *SessionWriteModel) reduceAdded(e *session.AddedEvent) {
 	wm.State = domain.SessionStateActive
-	wm.UserAgent = e.UserAgent
 }
 
 func (wm *SessionWriteModel) reduceUserChecked(e *session.UserCheckedEvent) {
