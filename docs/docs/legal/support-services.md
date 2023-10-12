@@ -82,7 +82,7 @@ Phone Support | +41 43 215 27 34
 ZITADEL will enhance its support offering by providing eligible clients with a Technical Account Manager (TAM), who will perform the following tasks for up to the specified amount of time per week during the term of service:
 
 - Provide support and advice regarding best practices on platform, product and configuration covered by the applicable Support Services;
-- Participate in review calls every other week at mutually agreed times addressing customer’s operational issues or difficult support requests;
+- Participate in review calls every other week at mutually agreed times addressing customer’s operational challenges or complex support requests;
 - Walk-through of new features and customer feedback.
 
 We offer TAM services only bundled with specific subscription plans, and the option to add more TAM hours to these plans.

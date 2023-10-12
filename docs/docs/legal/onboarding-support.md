@@ -4,7 +4,7 @@ sidebar_label: Onboarding support
 custom_edit_url: null
 --- 
 
-This annex of the [Framework Agreement](terms-of-service) describes the onboarding support services offered by us for our Services.
+This annex of the [Framework Agreement](terms-of-service) describes the onboarding support services offered by us for our services.
 
 Last revised: October 12, 2023
 
@@ -20,7 +20,7 @@ Below you will find topics covered and scope of the offered services.
 
 ## Proof of value
 
-Within a short time-frame, f.e. 3 weeks, we can show the value of using our Services and have the ability to establish proof of working setup for your most critical use cases.
+Within a short time-frame, f.e. 3 weeks, we can show the value of using our services and have the ability to establish the proof a of working setup for your most critical use cases.
 We may offer to support you during an initial period to evaluate next steps.
 Before the start of the period we may ask you to provide a description of your critical use cases and a high-level overview of your planned integration architecture.
 During this period you should make sure that you have the necessary resources on your side to complete the proof of value.
@@ -38,7 +38,7 @@ We offer an onboarding term in combination with ZITADEL Enterprise subscriptions
 Topics of the onboarding term may include:
 
 - Administration
-- DevOps
+- DevOps (Operation)
 - Architecture
 - Integration
 - Migration
