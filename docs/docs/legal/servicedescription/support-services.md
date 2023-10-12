@@ -11,31 +11,42 @@ The customer may purchase support services from ZITADEL (CAOS Ltd.) directly.
 
 Last revised: March 15, 2023
 
-## Support Services
+## Service Level Agreement
 
-**Business hours** means 08:00-17:00 Monday - Friday Switzerland time (or as per agreement with the customer). All times exclude public holidays in Switzerland / Canton St. Gallen.
+### ZITADEL Cloud SLA
 
-**Extended hours** means 07:00-19:00 Monday - Friday Switzerland time (or as per agreement with the customer). All times exclude public holidays in Switzerland / Canton St. Gallen.
+Based on your subscription plan you may be eligible for the support services as outlined in this document.
+You may purchase additional premium support plans which replace the default support features.
 
-**Ticket** means a discrete technical or non-technical issue that was submitted by the customer and exists in the support portal. A ticket includes a record of all communication associated with the issue.
+#### Support in subscription plans
 
-## Description of Services
+Support features for ZITADEL Cloud subscriptions are as follows:
 
-### Cloud
-
-Support features for cloud subscriptions are as follows:
-
-Subscription Plans | Default | Extended SLA  | Custom
---- | --- | --- | ---
-Support hours | Business hours | Business hours | up to 24x7
-Response Time (Severity 1) | Best effort | 1 business hour | bespoke
-eMail Support | yes | yes | yes
-Phone Support | no | no | optional
-Chat Support |  no | no | optional
+Subscription Plans | Free | Production | Enterprise Cloud
+--- | --- | --- | --- | ---
+[Support hours](#support-hours) | Business hours | Business hours | up to 24x7
+[Response Time](#slo---initial-response-time) (Severity 1) | Best effort | 48 business hours | as low as 30min
+[Community support](#community-support) | yes | yes | yes
+[Professional support](#professional-support) | no | yes | yes
+[Enterprise supported features](/docs/support/software-release-cycles-support.md#enterprise-supported) |  no | no | yes
+[Technical Account Management](#technical-account-manager) | no | no | optional
 
 If you want to add a [Technical Account Manager](#technical-account-manager) or need assistance during onboarding, please [get in touch](https://zitadel.com/contact).
 
-### Self-hosting
+#### Premium support
+
+Support features for ZITADEL Cloud subscriptions and additional premium support are as follows:
+
+Premium support | Default
+--- | ---
+[Support hours](#support-hours) | [Extended hours](#extended-hours)
+[Response Time](#slo---initial-response-time) (Severity 1) | 1 business hour 
+[Community support](#community-support) | yes
+[Professional support](#professional-support) | yes
+[Enterprise supported features](/docs/support/software-release-cycles-support.md#enterprise-supported) |  no
+[Technical Account Management](#technical-account-manager) | no
+
+### ZITADEL Enterprise SLA
 
 Support plans for self-hosting according to your purchase order.
 
@@ -45,6 +56,22 @@ Customers can define the SLA and additional support options, such as
 - SLO [Initial response time](#slo---initial-response-time)
 - [Technical account manager](#technical-account-manager)
 - Communication channels
+
+## Description of support services
+
+### Support hours
+
+#### Business hours
+
+Business hours means 08:00-17:00 Monday - Friday Switzerland time (or as per agreement with the customer). All times exclude public holidays in Switzerland / Canton St. Gallen.
+
+#### Extended hours
+
+Extended hours means 07:00-19:00 Monday - Friday Switzerland time (or as per agreement with the customer). All times exclude public holidays in Switzerland / Canton St. Gallen.
+
+### Ticket
+
+Ticket means a discrete technical or non-technical issue that was submitted by the customer and exists in the support portal. A ticket includes a record of all communication associated with the issue.
 
 ### SLO - Initial response time
 
@@ -61,6 +88,12 @@ Severity 4| Best effort | 24 business hour | 24 business hours
 If we fail to provide the initial response time objective, you will be entitled to service credits. For every 15 minutes exceeding the state objective, 1 day will be added as extension to the current term.
 
 ### Communication
+
+#### Community support
+
+Community support for ZITADEL is available on our website, our [public chat](https://zitadel.com/chat), and [Github](https://github.com/zitadel/).
+
+#### Professional support
 
 - Support is available in Swiss-German, German, and English
 - Default contact: Whenever customers require support, Customers should consult the documentation of the service or product or post a question to our community.
