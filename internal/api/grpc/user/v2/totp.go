@@ -11,7 +11,7 @@ import (
 
 func (s *Server) RegisterTOTP(ctx context.Context, req *user.RegisterTOTPRequest) (*user.RegisterTOTPResponse, error) {
 	return totpDetailsToPb(
-		s.command.AddUserTOTP(ctx, req.GetUserId(), authz.GetCtxData(ctx).ResourceOwner),
+		s.command.AddUserTOTP(ctx, req.GetUserId(), authz.GetCtxData(ctx).OrgID),
 	)
 
 }
@@ -28,7 +28,7 @@ func totpDetailsToPb(totp *domain.TOTP, err error) (*user.RegisterTOTPResponse, 
 }
 
 func (s *Server) VerifyTOTPRegistration(ctx context.Context, req *user.VerifyTOTPRegistrationRequest) (*user.VerifyTOTPRegistrationResponse, error) {
-	objectDetails, err := s.command.CheckUserTOTP(ctx, req.GetUserId(), req.GetCode(), authz.GetCtxData(ctx).ResourceOwner)
+	objectDetails, err := s.command.CheckUserTOTP(ctx, req.GetUserId(), req.GetCode(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
