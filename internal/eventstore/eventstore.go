@@ -154,9 +154,9 @@ func (es *Eventstore) InstanceIDs(ctx context.Context, maxAge time.Duration, for
 	es.instancesMu.Lock()
 	defer es.instancesMu.Unlock()
 
-	if !forceDBCall && time.Since(es.lastInstanceQuery) <= maxAge {
-		return es.instances, nil
-	}
+	// if !forceDBCall && time.Since(es.lastInstanceQuery) <= maxAge {
+	// 	return es.instances, nil
+	// }
 
 	instances, err := es.querier.InstanceIDs(ctx, queryFactory)
 	if err != nil {
