@@ -118,10 +118,7 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, reply
 			if err != nil {
 				return nil, err
 			}
-			// TODO: State not needed
-			// if writeModel.State == domain.SMTPConfigStateActive {
-			// 	return nil, errors.ThrowAlreadyExists(nil, "INST-W3VS2", "Errors.SMTPConfig.AlreadyExists")
-			// }
+
 			err = checkSenderAddress(writeModel)
 			if err != nil {
 				return nil, err
@@ -133,10 +130,17 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, reply
 					return nil, err
 				}
 			}
+
+			configID, err := c.idGenerator.Next()
+			if err != nil {
+				return nil, err
+			}
+
 			return []eventstore.Command{
 				instance.NewSMTPConfigAddedEvent(
 					ctx,
 					&a.Aggregate,
+					configID,
 					tls,
 					from,
 					name,

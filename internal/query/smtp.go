@@ -45,6 +45,10 @@ var (
 		name:  projection.SMTPConfigColumnSequence,
 		table: smtpConfigsTable,
 	}
+	SMTPConfigColumnConfigID = Column{
+		name:  projection.SMTPConfigColumnConfigID,
+		table: smtpConfigsTable,
+	}
 	SMTPConfigColumnTLS = Column{
 		name:  projection.SMTPConfigColumnTLS,
 		table: smtpConfigsTable,
@@ -136,6 +140,7 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			SMTPConfigColumnChangeDate.identifier(),
 			SMTPConfigColumnResourceOwner.identifier(),
 			SMTPConfigColumnSequence.identifier(),
+			SMTPConfigColumnConfigID.identifier(),
 			SMTPConfigColumnTLS.identifier(),
 			SMTPConfigColumnSenderAddress.identifier(),
 			SMTPConfigColumnSenderName.identifier(),

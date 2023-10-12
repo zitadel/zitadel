@@ -21,6 +21,7 @@ const (
 type SMTPConfigAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
+	ConfigID       string              `json:"configID,omitempty"`
 	SenderAddress  string              `json:"senderAddress,omitempty"`
 	SenderName     string              `json:"senderName,omitempty"`
 	ReplyToAddress string              `json:"replyToAddress,omitempty"`
@@ -35,6 +36,7 @@ type SMTPConfigAddedEvent struct {
 func NewSMTPConfigAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	configID string,
 	tls bool,
 	senderAddress,
 	senderName,
@@ -51,6 +53,7 @@ func NewSMTPConfigAddedEvent(
 			aggregate,
 			SMTPConfigAddedEventType,
 		),
+		ConfigID:       configID,
 		TLS:            tls,
 		SenderAddress:  senderAddress,
 		SenderName:     senderName,

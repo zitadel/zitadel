@@ -19,7 +19,7 @@ const (
 	SMTPConfigColumnSequence       = "sequence"
 	SMTPConfigColumnResourceOwner  = "resource_owner"
 	SMTPConfigColumnInstanceID     = "instance_id"
-	SMTPConfigColumnProviderID     = "provider_id"
+	SMTPConfigColumnConfigID       = "config_id"
 	SMTPConfigColumnTLS            = "tls"
 	SMTPConfigColumnSenderAddress  = "sender_address"
 	SMTPConfigColumnSenderName     = "sender_name"
@@ -49,7 +49,7 @@ func newSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerCo
 			crdb.NewColumn(SMTPConfigColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(SMTPConfigColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(SMTPConfigColumnProviderID, crdb.ColumnTypeText),
+			crdb.NewColumn(SMTPConfigColumnConfigID, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnTLS, crdb.ColumnTypeBool),
 			crdb.NewColumn(SMTPConfigColumnSenderAddress, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnSenderName, crdb.ColumnTypeText),
@@ -60,7 +60,7 @@ func newSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerCo
 			crdb.NewColumn(SMTPConfigColumnIsActive, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(SMTPConfigColumnProviderType, crdb.ColumnTypeEnum, crdb.Default(SMTP_PROVIDER_TYPE_GENERIC)),
 		},
-			crdb.NewPrimaryKey(SMTPConfigColumnInstanceID, SMTPConfigColumnAggregateID, SMTPConfigColumnProviderID),
+			crdb.NewPrimaryKey(SMTPConfigColumnInstanceID, SMTPConfigColumnAggregateID, SMTPConfigColumnConfigID),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -111,6 +111,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 			handler.NewCol(SMTPConfigColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(SMTPConfigColumnSequence, e.Sequence()),
+			handler.NewCol(SMTPConfigColumnConfigID, e.ConfigID),
 			handler.NewCol(SMTPConfigColumnTLS, e.TLS),
 			handler.NewCol(SMTPConfigColumnSenderAddress, e.SenderAddress),
 			handler.NewCol(SMTPConfigColumnSenderName, e.SenderName),

@@ -165,7 +165,7 @@ export class SMTPProviderSendgridComponent implements OnInit {
       req.setTls(this.tls?.value ?? false);
       req.setUser(this.user?.value ?? '');
       req.setPassword(this.password?.value ?? '');
-      req.setIsActive(true);
+      req.setIsActive(false);
       req.setProviderType(SMTPProviderType.SMTP_PROVIDER_TYPE_SENDGRID);
       return this.service.addSMTPConfig(req);
     }
