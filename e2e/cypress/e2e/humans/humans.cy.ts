@@ -34,7 +34,7 @@ describe('humans', () => {
         cy.get('[formcontrolname="firstName"]').type('e2ehumanfirstname');
         cy.get('[formcontrolname="lastName"]').type('e2ehumanlastname');
         cy.get('mat-select[data-cy="country-calling-code"]').click();
-        cy.get('mat-option').contains('Switzerland').click(); // this is producing the issue
+        cy.contains('mat-option', 'Switzerland').scrollIntoView().click();
         cy.get('[formcontrolname="phone"]').type('123456789');
         cy.get('[data-e2e="create-button"]').click({ force: true });
         cy.shouldConfirmSuccess();
