@@ -401,7 +401,7 @@
             <cnsl-info-section *ngIf="environmentMap.issuer">
               <div
                 [innerHtml]="
-                  'APP.OIDC.WELLKNOWN' | translate : { url: environmentMap['issuer'] + '/.well-known/openid-configuration' }
+                  'APP.OIDC.WELLKNOWN' | translate: { url: environmentMap['issuer'] + '/.well-known/openid-configuration' }
                 "
               ></div>
             </cnsl-info-section>
@@ -427,7 +427,7 @@
 
             <div class="app-info-row">
               <div class="app-info-wrapper" *ngFor="let wellKnownV of wellKnownMap$ | async | keyvalue">
-                <ng-container *ngIf="wellKnownV.key.endsWith('endpoint')">
+                <ng-container *ngIf="wellKnownV.key.endsWith('endpoint') || wellKnownV.key.toString() === 'jwks_uri'">
                   <p class="app-info-row-title cnsl-secondary-text">{{ wellKnownV.key }}</p>
                   <div class="app-copy-row">
                     <div *ngIf="wellKnownV.value" class="environment">

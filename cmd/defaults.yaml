@@ -735,7 +735,7 @@ DefaultInstance:
       PreHeader: Verify email
       Subject: Verify email
       Greeting: Hello {{.DisplayName}},
-      Text: A new email has been added. Please use the button below to verify your mail. (Code {{.Code}}) If you din't add a new email, please ignore this email.
+      Text: A new email has been added. Please use the button below to verify your email. (Code {{.Code}}) If you din't add a new email, please ignore this email.
       ButtonText: Verify email
     - MessageTextType: VerifyPhone
       Language: en
@@ -761,6 +761,8 @@ DefaultInstance:
       Greeting: Hello {{.DisplayName}},
       Text: The password of your user has changed. If this change was not done by you, please be advised to immediately reset your password.
       ButtonText: Login
+  Features:
+    - FeatureLoginDefaultOrg: true
 
   Quotas:
     # Items take a slice of quota configurations, whereas, for each unit type and instance, one or zero quotas may exist.
@@ -819,6 +821,7 @@ InternalAuthZ:
         - "iam.flow.read"
         - "iam.flow.write"
         - "iam.flow.delete"
+        - "iam.feature.write"
         - "org.read"
         - "org.global.read"
         - "org.create"

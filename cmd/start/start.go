@@ -27,6 +27,7 @@ import (
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/key"
 	cmd_tls "github.com/zitadel/zitadel/cmd/tls"
+	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/api"
@@ -40,7 +41,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/session/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/settings/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/system"
-	"github.com/zitadel/zitadel/internal/api/grpc/user/v2"
+	user_v2 "github.com/zitadel/zitadel/internal/api/grpc/user/v2"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/idp"
@@ -234,7 +235,6 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		commands,
 		queries,
 		eventstoreClient,
-		assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort),
 		config.Login.DefaultOTPEmailURLV2,
 		config.SystemDefaults.Notifications.FileSystemPath,
 		keys.User,
@@ -310,6 +310,8 @@ func startAPIs(
 		authZRepo,
 		queries,
 	}
+	// always set the origin in the context if available in the http headers, no matter for what protocol
+	router.Use(middleware.OriginHandler)
 	verifier := internal_authz.Start(repo, http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
 	tlsConfig, err := config.TLS.Config()
 	if err != nil {
@@ -356,7 +358,7 @@ func startAPIs(
 	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
 		return err
 	}
-	if err := apis.RegisterService(ctx, user.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(config.ExternalSecure))); err != nil {
+	if err := apis.RegisterService(ctx, user_v2.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(config.ExternalSecure), idp.SAMLRootURL(config.ExternalSecure))); err != nil {
 		return err
 	}
 	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries, permissionCheck)); err != nil {
@@ -375,7 +377,7 @@ func startAPIs(
 
 	apis.RegisterHandlerOnPrefix(idp.HandlerPrefix, idp.NewHandler(commands, queries, keys.IDPConfig, config.ExternalSecure, instanceInterceptor.Handler))
 
-	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator(), config.ExternalSecure, login.EndpointResources, login.EndpointExternalLoginCallbackFormPost)
+	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator(), config.ExternalSecure, login.EndpointResources, login.EndpointExternalLoginCallbackFormPost, login.EndpointSAMLACS)
 	if err != nil {
 		return err
 	}
@@ -412,7 +414,27 @@ func startAPIs(
 	}
 	apis.RegisterHandlerOnPrefix(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), provider.AuthCallbackURL(samlProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.WithoutLimiting().Handle, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
+	l, err := login.CreateLogin(
+		config.Login,
+		commands,
+		queries,
+		authRepo,
+		store,
+		console.HandlerPrefix+"/",
+		op.AuthCallbackURL(oidcProvider),
+		provider.AuthCallbackURL(samlProvider),
+		config.ExternalSecure,
+		userAgentInterceptor,
+		op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler,
+		provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler,
+		instanceInterceptor.Handler,
+		assetsCache.Handler,
+		limitingAccessInterceptor.WithoutLimiting().Handle,
+		keys.User,
+		keys.IDPConfig,
+		keys.CSRFCookieKey,
+		feature.NewCheck(eventstore),
+	)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}
@@ -423,7 +445,6 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, oidc_v2.CreateServer(commands, queries, oidcProvider, config.ExternalSecure)); err != nil {
 		return err
 	}
-
 	// handle grpc at last to be able to handle the root, because grpc and gateway require a lot of different prefixes
 	apis.RouteGRPC()
 	return nil

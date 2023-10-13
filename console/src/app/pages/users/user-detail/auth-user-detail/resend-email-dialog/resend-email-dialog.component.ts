@@ -11,7 +11,10 @@ import {
 })
 export class ResendEmailDialogComponent {
   public email: string = '';
-  constructor(public dialogRef: MatDialogRef<ResendEmailDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor(
+    public dialogRef: MatDialogRef<ResendEmailDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+  ) {
     if (data.email) {
       this.email = data.email;
     }

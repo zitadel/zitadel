@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"net"
+	"net/http"
 	"testing"
 	"time"
 
@@ -358,7 +360,15 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate)),
+							session.NewAddedEvent(mockCtx,
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
 					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
@@ -401,7 +411,15 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate)),
+							session.NewAddedEvent(mockCtx,
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
 					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
@@ -444,8 +462,15 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate),
-						),
+							session.NewAddedEvent(mockCtx,
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
 								"userID", testNow),
@@ -523,8 +548,15 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate),
-						),
+							session.NewAddedEvent(mockCtx,
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
 								"userID", testNow),

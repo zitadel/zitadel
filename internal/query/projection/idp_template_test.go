@@ -1,6 +1,7 @@
 package projection
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -2696,6 +2697,297 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 	}
 }
 
+func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
+	type args struct {
+		event func(t *testing.T) eventstore.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		reduce func(event eventstore.Event) (*handler.Statement, error)
+		want   wantReduce
+	}{
+		{
+			name: "instance reduceSAMLIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.SAMLIDPAddedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"name": "custom-zitadel-instance",
+	"metadata": `+stringToJSONByte("metadata")+`,
+	"key": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"certificate": `+stringToJSONByte("certificate")+`,
+	"binding": "binding",
+	"withSignedRequest": true,
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.SAMLIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceSAMLIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateInsertStmt,
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"custom-zitadel-instance",
+								domain.IdentityProviderTypeSystem,
+								domain.IDPTypeSAML,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates5_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								[]byte("metadata"),
+								anyArg{},
+								anyArg{},
+								"binding",
+								true,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceSAMLIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.SAMLIDPAddedEventType),
+					org.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"name": "custom-zitadel-instance",
+	"metadata": `+stringToJSONByte("metadata")+`,
+	"key": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"certificate": `+stringToJSONByte("certificate")+`,
+	"binding": "binding",
+	"withSignedRequest": true,
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), org.SAMLIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceSAMLIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateInsertStmt,
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"custom-zitadel-instance",
+								domain.IdentityProviderTypeOrg,
+								domain.IDPTypeSAML,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates5_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								[]byte("metadata"),
+								anyArg{},
+								anyArg{},
+								"binding",
+								true,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceSAMLIDPChanged minimal",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.SAMLIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"name": "custom-zitadel-instance",
+	"binding": "binding"
+}`),
+				), instance.SAMLIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceSAMLIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates5 SET (name, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								"custom-zitadel-instance",
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates5_saml SET binding = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"binding",
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceSAMLIDPChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.SAMLIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"name": "custom-zitadel-instance",
+	"metadata": `+stringToJSONByte("metadata")+`,
+	"key": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"certificate": `+stringToJSONByte("certificate")+`,
+	"binding": "binding",
+	"withSignedRequest": true,
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.SAMLIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceSAMLIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateStmt,
+							expectedArgs: []interface{}{
+								"custom-zitadel-instance",
+								true,
+								true,
+								true,
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates5_saml SET (metadata, key, certificate, binding, with_signed_request) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
+							expectedArgs: []interface{}{
+								[]byte("metadata"),
+								anyArg{},
+								anyArg{},
+								"binding",
+								true,
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:   "org.reduceOwnerRemoved",
+			reduce: (&idpProjection{}).reduceOwnerRemoved,
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.idp_templates5 WHERE (instance_id = $1) AND (resource_owner = $2)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			event := baseEvent(t)
+			got, err := tt.reduce(event)
+			if !errors.IsErrorInvalidArgument(err) {
+				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
+			}
+
+			event = tt.args.event(t)
+			got, err = tt.reduce(event)
+			assertReduce(t, got, err, IDPTemplateTable, tt.want)
+		})
+	}
+}
+
 func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 	type args struct {
 		event func(t *testing.T) eventstore.Event
@@ -4057,4 +4349,9 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 			assertReduce(t, got, err, IDPTemplateTable, tt.want)
 		})
 	}
+}
+
+func stringToJSONByte(data string) string {
+	jsondata, _ := json.Marshal([]byte(data))
+	return string(jsondata)
 }

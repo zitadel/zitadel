@@ -39,6 +39,7 @@ message Session {
       description: "\"custom key value list\"";
     }
   ];
+  UserAgent user_agent = 7;
 }
 
 message Factors {
@@ -130,4 +131,19 @@ message SearchQuery {
 
 message IDsQuery {
   repeated string ids = 1;
+}
+
+message UserAgent {
+  optional string fingerprint_id = 1;
+  optional string ip  = 2;
+  optional string description = 3;
+
+  // A header may have multiple values.
+  // In Go, headers are defined
+  // as map[string][]string, but protobuf
+  // doesn't allow this scheme.
+  message HeaderValues {
+    repeated string values = 1;
+  }
+  map<string,HeaderValues> header = 4;
 }
