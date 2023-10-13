@@ -2,119 +2,56 @@
 <p class="cnsl-secondary-text">{{ 'SMTP.LIST.DESCRIPTION' | translate }}</p>
 
 <div class="cnsl-idp-table-wrapper">
-  <cnsl-smtp-table [service]="service" [serviceType]="serviceType"></cnsl-smtp-table>
+  <cnsl-smtp-table [service]="service"></cnsl-smtp-table>
 </div>
 
 <h2>{{ 'SMTP.CREATE.TITLE' | translate }}</h2>
 <p class="cnsl-secondary-text">{{ 'IDP.CREATE.DESCRIPTION' | translate }}</p>
 
 <div class="new-idp-wrapper">
-  <a
-    class="item card"
-    [routerLink]="
-      serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'smtpprovider', 'sendgrid', 'create']
-        : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'smtpprovider', 'sendgrid', 'create']
-        : []
-    "
-  >
+  <a class="item card" [routerLink]="['/instance', 'smtpprovider', 'sendgrid', 'create']">
     <img class="idp-logo" src="./assets/images/smtp/sendgrid.png" alt="sendgrid" />
     <div class="text-container">
       <span class="title">SendGrid</span>
     </div>
   </a>
 
-  <a
-    class="item card"
-    [routerLink]="
-      serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'smtpprovider', 'aws-ses', 'create']
-        : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'smtpprovider', 'aws-ses', 'create']
-        : []
-    "
-  >
+  <a class="item card" [routerLink]="['/instance', 'smtpprovider', 'aws-ses', 'create']">
     <img class="idp-logo" src="./assets/images/smtp/aws-ses.svg" alt="aws-ses" />
     <div class="text-container">
       <span class="title">Amazon SES</span>
     </div>
   </a>
 
-  <a
-    class="item card"
-    [routerLink]="
-      serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'smtpprovider', 'mailgun', 'create']
-        : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'smtpprovider', 'mailgun', 'create']
-        : []
-    "
-  >
+  <a class="item card" [routerLink]="['/instance', 'smtpprovider', 'mailgun', 'create']">
     <img class="idp-logo" src="./assets/images/smtp/mailgun.svg" alt="mailgun" />
     <div class="text-container">
       <span class="title">Mailgun</span>
     </div>
   </a>
 
-  <a
-    class="item card"
-    [routerLink]="
-      serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'smtpprovider', 'postmark', 'create']
-        : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'smtpprovider', 'postmark', 'create']
-        : []
-    "
-  >
+  <a class="item card" [routerLink]="['/instance', 'smtpprovider', 'postmark', 'create']">
     <img class="idp-logo" src="./assets/images/smtp/postmark.png" alt="postmark" />
     <div class="text-container">
       <span class="title">Postmark</span>
     </div>
   </a>
 
-  <a
-    class="item card"
-    [routerLink]="
-      serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'smtpprovider', 'google', 'create']
-        : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'smtpprovider', 'google', 'create']
-        : []
-    "
-  >
+  <a class="item card" [routerLink]="['/instance', 'smtpprovider', 'google', 'create']">
     <img class="idp-logo" src="./assets/images/smtp/google.png" alt="google" />
     <div class="text-container">
       <span class="title">Google</span>
     </div>
   </a>
 
-  <a
-    class="item card"
-    [routerLink]="
-      serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'smtpprovider', 'mailjet', 'create']
-        : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'smtpprovider', 'mailjet', 'create']
-        : []
-    "
-  >
+  <a class="item card" [routerLink]="['/instance', 'smtpprovider', 'mailjet', 'create']">
     <img class="idp-logo" src="./assets/images/smtp/mailjet.svg" alt="mailjet" />
     <div class="text-container">
       <span class="title">Mailjet</span>
     </div>
   </a>
 
-  <a
-    class="item card"
-    [routerLink]="
-      serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'smtpprovider', 'generic', 'create']
-        : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'smtpprovider', 'generic', 'create']
-        : []
-    "
-  >
+  <a class="item card" [routerLink]="['/instance', 'smtpprovider', 'generic', 'create']">
     <div class="idp-icon">
       <mat-icon class="icon" svgIcon="mdi_smtp" alt="mail" />
     </div>

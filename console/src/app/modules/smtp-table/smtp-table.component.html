@@ -129,17 +129,11 @@
         <th class="idp-table-actions" mat-header-cell *matHeaderCellDef></th>
         <td class="idp-table-actions" mat-cell *matCellDef="let idp">
           <cnsl-table-actions>
-            <button
+            <!-- <button
               actions
               *ngIf="!isEnabled(idp)"
               [disabled]="
-                ([
-                  serviceType === PolicyComponentServiceType.ADMIN
-                    ? 'iam.idp.write'
-                    : serviceType === PolicyComponentServiceType.MGMT
-                    ? 'org.idp.write'
-                    : ''
-                ]
+                (['iam.idp.write']
                   | hasRole
                   | async) === false
               "
@@ -148,18 +142,12 @@
               (click)="addIdp(idp); $event.stopPropagation()"
             >
               <i class="las la-check-circle"></i>
-            </button>
-            <button
+            </button> -->
+            <!-- <button
               actions
               *ngIf="isEnabled(idp)"
               [disabled]="
-                ([
-                  serviceType === PolicyComponentServiceType.ADMIN
-                    ? 'iam.idp.write'
-                    : serviceType === PolicyComponentServiceType.MGMT
-                    ? 'org.idp.write'
-                    : ''
-                ]
+                (['iam.idp.write']
                   | hasRole
                   | async) === false
               "
@@ -168,22 +156,11 @@
               (click)="removeIdp(idp); $event.stopPropagation()"
             >
               <i class="las la-times-circle"></i>
-            </button>
-            <button
+            </button> -->
+            <!-- <button
               actions
-              *ngIf="
-                (serviceType === PolicyComponentServiceType.MGMT && idp.owner === IDPOwnerType.IDP_OWNER_TYPE_ORG) ||
-                (serviceType === PolicyComponentServiceType.ADMIN && idp.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM)
-              "
-              [disabled]="
-                (serviceType === PolicyComponentServiceType.MGMT && idp?.providerType === IDPOwnerType.IDP_OWNER_TYPE_ORG) ||
-                ([
-                  serviceType === PolicyComponentServiceType.ADMIN
-                    ? 'iam.idp.write'
-                    : serviceType === PolicyComponentServiceType.MGMT
-                    ? 'org.idp.write'
-                    : ''
-                ]
+              *ngIf="idp.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM"
+              [disabled]="(['iam.idp.write']
                   | hasRole
                   | async) === false
               "
@@ -193,13 +170,13 @@
               (click)="deleteIdp(idp); $event.stopPropagation()"
             >
               <i class="las la-trash"></i>
-            </button>
+            </button> -->
           </cnsl-table-actions>
         </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr class="highlight" (click)="navigateToIDP(row)" mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <!-- <tr class="highlight" (click)="navigateToIDP(row)" mat-row *matRowDef="let row; columns: displayedColumns"></tr> -->
     </table>
   </div>
 
