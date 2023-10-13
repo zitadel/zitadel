@@ -219,8 +219,23 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     });
 
     this.samlConfigForm.valueChanges.subscribe((form) => {
+      let minimalMetadata =
+        this.entityId?.value && this.acsURL?.value
+          ? `<?xml version="1.0"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="${this.entityId?.value}">
+    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol">
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${this.acsURL?.value}" index="0"/>
+    </md:SPSSODescriptor>
+</md:EntityDescriptor>`
+          : '';
+
       if (form.metadataUrl && form.metadataUrl.length > 0) {
         this.samlAppRequest.setMetadataUrl(form.metadataUrl);
+      }
+
+      if (this.samlAppRequest) {
+        const base64 = Buffer.from(minimalMetadata, 'utf-8').toString('base64');
+        this.samlAppRequest.setMetadataXml(base64);
       }
     });
   }
@@ -440,22 +455,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(() => {
       this.router.navigate(['projects', this.projectId, 'apps', added.appId], { queryParams: { new: true } });
     });
-  }
-
-  public changeEntitityIdOrAcsURL() {
-    let minimalMetadata =
-      this.entityId?.value && this.acsURL?.value
-        ? `<?xml version="1.0"?>
-<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="${this.entityId?.value}">
-    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol">
-        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${this.acsURL?.value}" index="0"/>
-    </md:SPSSODescriptor>
-</md:EntityDescriptor>`
-        : '';
-    if (this.samlAppRequest) {
-      const base64 = Buffer.from(minimalMetadata, 'utf-8').toString('base64');
-      this.samlAppRequest.setMetadataXml(base64);
-    }
   }
 
   get name(): AbstractControl | null {

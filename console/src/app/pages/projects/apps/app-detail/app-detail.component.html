@@ -157,13 +157,13 @@
             </form>
           </cnsl-card>
 
-          <cnsl-card *ngIf="samlForm && app?.samlConfig">
-            <div class="title cnsl-secondary-text">
+          <cnsl-card *ngIf="samlForm && app?.samlConfig" title="{{ 'APP.SAML.CONFIGSECTION' | translate }}">
+            <h3 class="title cnsl-secondary-text">
               {{ 'APP.SAML.CHOOSEMETADATASOURCE' | translate }}
-            </div>
+            </h3>
 
             <div class="metadata-option">
-              <span>{{ 'APP.SAML.METADATAOPT1' | translate }}</span>
+              <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT1' | translate }}</span>
               <form [formGroup]="samlForm">
                 <cnsl-form-field class="formfield">
                   <input cnslInput formControlName="metadataUrl" placeholder="https://" />
@@ -172,7 +172,7 @@
             </div>
 
             <div class="metadata-option">
-              <span>{{ 'APP.SAML.METADATAOPT2' | translate }}</span>
+              <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT2' | translate }}</span>
               <input
                 #xmlFileInput
                 style="display: none"
@@ -187,7 +187,7 @@
             </div>
 
             <div class="metadata-option">
-              <span>{{ 'APP.SAML.METADATAOPT3' | translate }}</span>
+              <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT3' | translate }}</span>
               <form [formGroup]="samlForm">
                 <cnsl-form-field class="formfield">
                   <cnsl-label>{{ 'APP.SAML.ENTITYID' | translate }}</cnsl-label>

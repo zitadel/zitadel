@@ -159,12 +159,12 @@
     <mat-step *ngIf="appType?.value?.createType === AppCreateType.SAML" [editable]="true">
       <ng-template matStepLabel>{{ 'APP.SAML.CONFIGSECTION' | translate }}</ng-template>
 
-      <div class="cnsl-secondary-text">
+      <h3 class="title cnsl-secondary-text">
         {{ 'APP.SAML.CHOOSEMETADATASOURCE' | translate }}
-      </div>
+      </h3>
 
       <div class="cnsl-secondary-text metadata-option">
-        <span>{{ 'APP.SAML.METADATAOPT1' | translate }}</span>
+        <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT1' | translate }}</span>
         <form [formGroup]="samlConfigForm">
           <cnsl-form-field class="formfield">
             <cnsl-label></cnsl-label>
@@ -174,7 +174,7 @@
       </div>
 
       <div class="cnsl-secondary-text metadata-option">
-        <span>{{ 'APP.SAML.METADATAOPT2' | translate }}</span>
+        <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT2' | translate }}</span>
 
         <form>
           <input
@@ -197,15 +197,15 @@
       </div>
 
       <div class="cnsl-secondary-text metadata-option">
-        <span>{{ 'APP.SAML.METADATAOPT3' | translate }}</span>
+        <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT3' | translate }}</span>
         <form [formGroup]="samlConfigForm">
           <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'APP.SAML.ENTITYID' | translate }}</cnsl-label>
-            <input cnslInput formControlName="entityId" placeholder="https://" (change)="changeEntitityIdOrAcsURL()" />
+            <input cnslInput formControlName="entityId" placeholder="https://" />
           </cnsl-form-field>
           <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'APP.SAML.ACSURL' | translate }}</cnsl-label>
-            <input cnslInput formControlName="acsURL" placeholder="https://" (change)="changeEntitityIdOrAcsURL()" />
+            <input cnslInput formControlName="acsURL" placeholder="https://" />
           </cnsl-form-field>
         </form>
       </div>
@@ -426,8 +426,11 @@
       <div class="content">
         <ng-container *ngIf="formappType?.value?.createType === AppCreateType.SAML">
           <div class="saml">
+            <h3 class="title cnsl-secondary-text">
+              {{ 'APP.SAML.CHOOSEMETADATASOURCE' | translate }}
+            </h3>
             <div class="cnsl-secondary-text metadata-option">
-              <span>{{ 'APP.SAML.METADATAOPT1' | translate }}</span>
+              <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT1' | translate }}</span>
               <form [formGroup]="samlConfigForm">
                 <cnsl-form-field class="formfield">
                   <cnsl-label></cnsl-label>
@@ -437,7 +440,7 @@
             </div>
 
             <div class="cnsl-secondary-text metadata-option">
-              <span>{{ 'APP.SAML.METADATAOPT2' | translate }}</span>
+              <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT2' | translate }}</span>
 
               <form>
                 <input
@@ -460,15 +463,15 @@
             </div>
 
             <div class="cnsl-secondary-text metadata-option">
-              <span>{{ 'APP.SAML.METADATAOPT3' | translate }}</span>
+              <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT3' | translate }}</span>
               <form [formGroup]="samlConfigForm">
                 <cnsl-form-field class="formfield">
                   <cnsl-label>{{ 'APP.SAML.ENTITYID' | translate }}</cnsl-label>
-                  <input cnslInput formControlName="entityId" placeholder="https://" (change)="changeEntitityIdOrAcsURL()" />
+                  <input cnslInput formControlName="entityId" placeholder="https://" />
                 </cnsl-form-field>
                 <cnsl-form-field class="formfield">
                   <cnsl-label>{{ 'APP.SAML.ACSURL' | translate }}</cnsl-label>
-                  <input cnslInput formControlName="acsURL" placeholder="https://" (change)="changeEntitityIdOrAcsURL()" />
+                  <input cnslInput formControlName="acsURL" placeholder="https://" />
                 </cnsl-form-field>
               </form>
             </div>
