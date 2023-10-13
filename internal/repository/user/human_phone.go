@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -147,9 +148,10 @@ func HumanPhoneVerificationFailedEventMapper(event eventstore.Event) (eventstore
 type HumanPhoneCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Code         *crypto.CryptoValue `json:"code,omitempty"`
-	Expiry       time.Duration       `json:"expiry,omitempty"`
-	CodeReturned bool                `json:"code_returned,omitempty"`
+	Code              *crypto.CryptoValue `json:"code,omitempty"`
+	Expiry            time.Duration       `json:"expiry,omitempty"`
+	CodeReturned      bool                `json:"code_returned,omitempty"`
+	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
 func (e *HumanPhoneCodeAddedEvent) Payload() interface{} {
@@ -158,6 +160,10 @@ func (e *HumanPhoneCodeAddedEvent) Payload() interface{} {
 
 func (e *HumanPhoneCodeAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+func (e *HumanPhoneCodeAddedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewHumanPhoneCodeAddedEvent(
@@ -181,9 +187,10 @@ func NewHumanPhoneCodeAddedEventV2(
 			aggregate,
 			HumanPhoneCodeAddedType,
 		),
-		Code:         code,
-		Expiry:       expiry,
-		CodeReturned: codeReturned,
+		Code:              code,
+		Expiry:            expiry,
+		CodeReturned:      codeReturned,
+		TriggeredAtOrigin: http.ComposedOrigin(ctx),
 	}
 }
 

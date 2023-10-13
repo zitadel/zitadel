@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -276,8 +277,9 @@ func NewHumanOTPSMSRemovedEvent(
 type HumanOTPSMSCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Code   *crypto.CryptoValue `json:"code,omitempty"`
-	Expiry time.Duration       `json:"expiry,omitempty"`
+	Code              *crypto.CryptoValue `json:"code,omitempty"`
+	Expiry            time.Duration       `json:"expiry,omitempty"`
+	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 	*AuthRequestInfo
 }
 
@@ -293,6 +295,10 @@ func (e *HumanOTPSMSCodeAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = *event
 }
 
+func (e *HumanOTPSMSCodeAddedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
+}
+
 func NewHumanOTPSMSCodeAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -306,9 +312,10 @@ func NewHumanOTPSMSCodeAddedEvent(
 			aggregate,
 			HumanOTPSMSCodeAddedType,
 		),
-		Code:            code,
-		Expiry:          expiry,
-		AuthRequestInfo: info,
+		Code:              code,
+		Expiry:            expiry,
+		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		AuthRequestInfo:   info,
 	}
 }
 
@@ -470,8 +477,9 @@ func NewHumanOTPEmailRemovedEvent(
 type HumanOTPEmailCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Code   *crypto.CryptoValue `json:"code,omitempty"`
-	Expiry time.Duration       `json:"expiry,omitempty"`
+	Code              *crypto.CryptoValue `json:"code,omitempty"`
+	Expiry            time.Duration       `json:"expiry,omitempty"`
+	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 	*AuthRequestInfo
 }
 
@@ -487,6 +495,10 @@ func (e *HumanOTPEmailCodeAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) 
 	e.BaseEvent = *event
 }
 
+func (e *HumanOTPEmailCodeAddedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
+}
+
 func NewHumanOTPEmailCodeAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -500,9 +512,10 @@ func NewHumanOTPEmailCodeAddedEvent(
 			aggregate,
 			HumanOTPEmailCodeAddedType,
 		),
-		Code:            code,
-		Expiry:          expiry,
-		AuthRequestInfo: info,
+		Code:              code,
+		Expiry:            expiry,
+		AuthRequestInfo:   info,
+		TriggeredAtOrigin: http.ComposedOrigin(ctx),
 	}
 }
 
