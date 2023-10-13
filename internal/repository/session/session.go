@@ -309,9 +309,10 @@ func NewTOTPCheckedEvent(
 type OTPSMSChallengedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Code         *crypto.CryptoValue `json:"code"`
-	Expiry       time.Duration       `json:"expiry"`
-	CodeReturned bool                `json:"codeReturned,omitempty"`
+	Code              *crypto.CryptoValue `json:"code"`
+	Expiry            time.Duration       `json:"expiry"`
+	CodeReturned      bool                `json:"codeReturned,omitempty"`
+	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
 func (e *OTPSMSChallengedEvent) Data() interface{} {
@@ -324,6 +325,10 @@ func (e *OTPSMSChallengedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 
 func (e *OTPSMSChallengedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
 	e.BaseEvent = *base
+}
+
+func (e *OTPSMSChallengedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewOTPSMSChallengedEvent(
@@ -339,9 +344,10 @@ func NewOTPSMSChallengedEvent(
 			aggregate,
 			OTPSMSChallengedType,
 		),
-		Code:         code,
-		Expiry:       expiry,
-		CodeReturned: codeReturned,
+		Code:              code,
+		Expiry:            expiry,
+		CodeReturned:      codeReturned,
+		TriggeredAtOrigin: http.ComposedOrigin(ctx),
 	}
 }
 
