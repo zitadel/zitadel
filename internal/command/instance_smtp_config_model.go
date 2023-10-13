@@ -119,6 +119,7 @@ func (wm *InstanceSMTPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			instance.SMTPConfigAddedEventType,
+			instance.SMTPConfigRemovedEventType,
 			instance.SMTPConfigChangedEventType,
 			instance.SMTPConfigPasswordChangedEventType,
 			instance.InstanceDomainAddedEventType,

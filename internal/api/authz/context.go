@@ -78,9 +78,12 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 		if err != nil {
 			return CtxData{}, errors.ThrowPermissionDenied(err, "AUTH-GHpw2", "could not read projectid by clientid")
 		}
-	}
-	if err := checkOrigin(ctx, origins); err != nil {
-		return CtxData{}, err
+		// We used to check origins for every token, but service users shouldn't be used publicly (native app / SPA).
+		// Therefore, mostly won't send an origin and aren't able to configure them anyway.
+		// For the current time we will only check origins for tokens issued to users through apps (code / implicit flow).
+		if err := checkOrigin(ctx, origins); err != nil {
+			return CtxData{}, err
+		}
 	}
 	if orgID == "" && orgDomain == "" {
 		orgID = resourceOwner
@@ -130,7 +133,7 @@ func GetAllPermissionsFromCtx(ctx context.Context) []string {
 func checkOrigin(ctx context.Context, origins []string) error {
 	origin := grpc.GetGatewayHeader(ctx, http_util.Origin)
 	if origin == "" {
-		origin = http_util.OriginFromCtx(ctx)
+		origin = http_util.OriginHeader(ctx)
 		if origin == "" {
 			return nil
 		}

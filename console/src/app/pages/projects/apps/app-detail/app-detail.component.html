@@ -446,7 +446,7 @@
 
             <div class="app-info-row">
               <div class="app-info-wrapper" *ngFor="let wellKnownV of wellKnownMap$ | async | keyvalue">
-                <ng-container *ngIf="wellKnownV.key.endsWith('endpoint')">
+                <ng-container *ngIf="wellKnownV.key.endsWith('endpoint') || wellKnownV.key.toString() === 'jwks_uri'">
                   <p class="app-info-row-title cnsl-secondary-text">{{ wellKnownV.key }}</p>
                   <div class="app-copy-row">
                     <div *ngIf="wellKnownV.value" class="environment">

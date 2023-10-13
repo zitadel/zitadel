@@ -15,7 +15,7 @@ import {
   LOGIN,
   LOGINTEXTS,
   MESSAGETEXTS,
-  NOTIFICATION_POLICY,
+  NOTIFICATIONS,
   PRIVACYPOLICY,
   VERIFIED_DOMAINS,
 } from '../../modules/settings-list/settings';
@@ -34,7 +34,7 @@ export class OrgSettingsComponent implements OnInit {
     IDP,
     COMPLEXITY,
     LOCKOUT,
-    NOTIFICATION_POLICY,
+    NOTIFICATIONS,
     VERIFIED_DOMAINS,
     DOMAIN,
     BRANDING,
@@ -68,7 +68,7 @@ export class OrgSettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.settingsList = this.authService
-      .isAllowedMapper(this.defaultSettingsList, (setting) => setting.requiredRoles.mgmt)
+      .isAllowedMapper(this.defaultSettingsList, (setting) => setting.requiredRoles.mgmt || [])
       .pipe(take(1));
   }
 }
