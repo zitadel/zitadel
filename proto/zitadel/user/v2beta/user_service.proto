@@ -656,7 +656,12 @@ message AddHumanUserRequest{
     }
   ];
   // deprecated: use organization (if both are set, organization will take precedence)
-  zitadel.object.v2beta.Organisation organisation = 3;
+  zitadel.object.v2beta.Organisation organisation = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "deprecated: use organization (if both are set, organization will take precedence)"
+    }
+  ];
   zitadel.object.v2beta.Organization organization = 11;
   SetHumanProfile profile = 4 [
     (validate.rules).message.required = true,
