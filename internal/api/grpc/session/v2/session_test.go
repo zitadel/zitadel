@@ -10,9 +10,10 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -151,6 +152,7 @@ func Test_sessionsToPb(t *testing.T) {
 					LoginName:      "donald",
 					DisplayName:    "donald duck",
 					OrganisationId: "org1",
+					OrganizationId: "org1",
 				},
 			},
 			Metadata: map[string][]byte{"hello": []byte("world")},
@@ -167,6 +169,7 @@ func Test_sessionsToPb(t *testing.T) {
 					LoginName:      "donald",
 					DisplayName:    "donald duck",
 					OrganisationId: "org1",
+					OrganizationId: "org1",
 				},
 				Password: &session.PasswordFactor{
 					VerifiedAt: timestamppb.New(past),
@@ -186,6 +189,7 @@ func Test_sessionsToPb(t *testing.T) {
 					LoginName:      "donald",
 					DisplayName:    "donald duck",
 					OrganisationId: "org1",
+					OrganizationId: "org1",
 				},
 				WebAuthN: &session.WebAuthNFactor{
 					VerifiedAt:   timestamppb.New(past),
@@ -206,6 +210,7 @@ func Test_sessionsToPb(t *testing.T) {
 					LoginName:      "donald",
 					DisplayName:    "donald duck",
 					OrganisationId: "org1",
+					OrganizationId: "org1",
 				},
 				Totp: &session.TOTPFactor{
 					VerifiedAt: timestamppb.New(past),
