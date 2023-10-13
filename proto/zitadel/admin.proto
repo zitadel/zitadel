@@ -3763,7 +3763,7 @@ service AdminService {
 
     // Activates the "LoginDefaultOrg" feature by setting the flag to "true"
     // This is irreversible!
-    // Once activated, the login UI will use the settings of the default org (and not from the instance) if not organisation context is set
+    // Once activated, the login UI will use the settings of the default org (and not from the instance) if not organization context is set
     rpc ActivateFeatureLoginDefaultOrg(ActivateFeatureLoginDefaultOrgRequest) returns (ActivateFeatureLoginDefaultOrgResponse) {
         option (google.api.http) = {
             put: "/features/login_default_org"
