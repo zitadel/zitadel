@@ -15,106 +15,106 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/repository/quota"
-	// "github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	quota_pb "github.com/zitadel/zitadel/pkg/grpc/quota"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
 var callURL = "http://localhost:" + integration.PortQuotaServer
 
-// func TestServer_QuotaNotification_Limit(t *testing.T) {
-// 	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(CTX, SystemCTX)
-// 	amount := 10
-// 	percent := 50
-// 	percentAmount := amount * percent / 100
+func TestServer_QuotaNotification_Limit(t *testing.T) {
+	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(CTX, SystemCTX)
+	amount := 10
+	percent := 50
+	percentAmount := amount * percent / 100
 
-// 	_, err := Tester.Client.System.SetQuota(SystemCTX, &system.SetQuotaRequest{
-// 		InstanceId:    instanceID,
-// 		Unit:          quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
-// 		From:          timestamppb.Now(),
-// 		ResetInterval: durationpb.New(time.Minute * 5),
-// 		Amount:        uint64(amount),
-// 		Limit:         true,
-// 		Notifications: []*quota_pb.Notification{
-// 			{
-// 				Percent: uint32(percent),
-// 				Repeat:  true,
-// 				CallUrl: callURL,
-// 			},
-// 			{
-// 				Percent: 100,
-// 				Repeat:  true,
-// 				CallUrl: callURL,
-// 			},
-// 		},
-// 	})
-// 	require.NoError(t, err)
+	_, err := Tester.Client.System.SetQuota(SystemCTX, &system.SetQuotaRequest{
+		InstanceId:    instanceID,
+		Unit:          quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
+		From:          timestamppb.Now(),
+		ResetInterval: durationpb.New(time.Minute * 5),
+		Amount:        uint64(amount),
+		Limit:         true,
+		Notifications: []*quota_pb.Notification{
+			{
+				Percent: uint32(percent),
+				Repeat:  true,
+				CallUrl: callURL,
+			},
+			{
+				Percent: 100,
+				Repeat:  true,
+				CallUrl: callURL,
+			},
+		},
+	})
+	require.NoError(t, err)
 
-// 	for i := 0; i < percentAmount; i++ {
-// 		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
-// 		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
-// 	}
-// 	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, percent)
+	for i := 0; i < percentAmount; i++ {
+		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
+		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
+	}
+	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, percent)
 
-// 	for i := 0; i < (amount - percentAmount); i++ {
-// 		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
-// 		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
-// 	}
-// 	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, 100)
+	for i := 0; i < (amount - percentAmount); i++ {
+		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
+		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
+	}
+	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, 100)
 
-// 	_, limitErr := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
-// 	require.Error(t, limitErr)
-// }
+	_, limitErr := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
+	require.Error(t, limitErr)
+}
 
-// func TestServer_QuotaNotification_NoLimit(t *testing.T) {
-// 	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(CTX, SystemCTX)
-// 	amount := 10
-// 	percent := 50
-// 	percentAmount := amount * percent / 100
+func TestServer_QuotaNotification_NoLimit(t *testing.T) {
+	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(CTX, SystemCTX)
+	amount := 10
+	percent := 50
+	percentAmount := amount * percent / 100
 
-// 	_, err := Tester.Client.System.SetQuota(SystemCTX, &system.SetQuotaRequest{
-// 		InstanceId:    instanceID,
-// 		Unit:          quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
-// 		From:          timestamppb.Now(),
-// 		ResetInterval: durationpb.New(time.Minute * 5),
-// 		Amount:        uint64(amount),
-// 		Limit:         false,
-// 		Notifications: []*quota_pb.Notification{
-// 			{
-// 				Percent: uint32(percent),
-// 				Repeat:  false,
-// 				CallUrl: callURL,
-// 			},
-// 			{
-// 				Percent: 100,
-// 				Repeat:  true,
-// 				CallUrl: callURL,
-// 			},
-// 		},
-// 	})
-// 	require.NoError(t, err)
+	_, err := Tester.Client.System.SetQuota(SystemCTX, &system.SetQuotaRequest{
+		InstanceId:    instanceID,
+		Unit:          quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
+		From:          timestamppb.Now(),
+		ResetInterval: durationpb.New(time.Minute * 5),
+		Amount:        uint64(amount),
+		Limit:         false,
+		Notifications: []*quota_pb.Notification{
+			{
+				Percent: uint32(percent),
+				Repeat:  false,
+				CallUrl: callURL,
+			},
+			{
+				Percent: 100,
+				Repeat:  true,
+				CallUrl: callURL,
+			},
+		},
+	})
+	require.NoError(t, err)
 
-// 	for i := 0; i < percentAmount; i++ {
-// 		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
-// 		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
-// 	}
-// 	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, percent)
+	for i := 0; i < percentAmount; i++ {
+		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
+		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
+	}
+	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, percent)
 
-// 	for i := 0; i < (amount - percentAmount); i++ {
-// 		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
-// 		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
-// 	}
-// 	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, 100)
+	for i := 0; i < (amount - percentAmount); i++ {
+		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
+		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
+	}
+	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, 100)
 
-// 	for i := 0; i < amount; i++ {
-// 		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
-// 		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
-// 	}
-// 	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, 200)
+	for i := 0; i < amount; i++ {
+		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
+		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
+	}
+	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, 200)
 
-// 	_, limitErr := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
-// 	require.NoError(t, limitErr)
-// }
+	_, limitErr := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
+	require.NoError(t, limitErr)
+}
 
 func awaitNotification(t *testing.T, bodies chan []byte, unit quota.Unit, percent int) {
 	for {
