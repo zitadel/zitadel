@@ -187,6 +187,29 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       acsURL: ['', []],
       metadataXml: [{ value: '', disabled: true }],
     });
+
+    this.samlForm.valueChanges.subscribe((form) => {
+      let minimalMetadata =
+        this.entityId?.value && this.acsURL?.value
+          ? `<?xml version="1.0"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="${this.entityId?.value}">
+    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol">
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${this.acsURL?.value}" index="0"/>
+    </md:SPSSODescriptor>
+</md:EntityDescriptor>`
+          : '';
+
+      if (this.metadataUrl && this.metadataUrl.value.length > 0) {
+        if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml) {
+          this.app.samlConfig.metadataXml = '';
+        }
+      }
+
+      if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml && minimalMetadata) {
+        const base64 = Buffer.from(minimalMetadata, 'utf-8').toString('base64');
+        this.app.samlConfig.metadataXml = base64;
+      }
+    });
   }
 
   public formatClockSkewLabel(seconds: number): string {
@@ -408,6 +431,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.toast.showInfo('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', true);
       } else {
         this.metadataUrl?.setValue('');
+        this.entityId?.setValue('');
+        this.acsURL?.setValue('');
         const reader = new FileReader();
         reader.onload = ((aXML) => {
           return (e) => {
@@ -807,24 +832,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       const base64 = Buffer.from(xmlString, 'utf-8').toString('base64');
 
       if (this.app.samlConfig) {
-        this.app.samlConfig.metadataXml = base64;
-      }
-    }
-  }
-
-  public changeEntitityIdOrAcsURL() {
-    let minimalMetadata =
-      this.entityId?.value && this.acsURL?.value
-        ? `<?xml version="1.0"?>
-<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="${this.entityId?.value}">
-    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol">
-        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${this.acsURL?.value}" index="0"/>
-    </md:SPSSODescriptor>
-</md:EntityDescriptor>`
-        : '';
-    if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml && minimalMetadata) {
-      if (this.app.samlConfig) {
-        const base64 = Buffer.from(minimalMetadata, 'utf-8').toString('base64');
         this.app.samlConfig.metadataXml = base64;
       }
     }

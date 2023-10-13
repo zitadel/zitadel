@@ -369,6 +369,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   public onDropXML(filelist: FileList): void {
     const file = filelist.item(0);
     this.metadataUrl?.setValue('');
+    this.entityId?.setValue('');
+    this.acsURL?.setValue('');
     if (file) {
       if (file.size > MAX_ALLOWED_SIZE) {
         this.toast.showInfo('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', true);

@@ -191,11 +191,11 @@
               <form [formGroup]="samlForm">
                 <cnsl-form-field class="formfield">
                   <cnsl-label>{{ 'APP.SAML.ENTITYID' | translate }}</cnsl-label>
-                  <input cnslInput formControlName="entityId" placeholder="https://" (change)="changeEntitityIdOrAcsURL()" />
+                  <input cnslInput formControlName="entityId" placeholder="https://" />
                 </cnsl-form-field>
                 <cnsl-form-field class="formfield">
                   <cnsl-label>{{ 'APP.SAML.ACSURL' | translate }}</cnsl-label>
-                  <input cnslInput formControlName="acsURL" placeholder="https://" (change)="changeEntitityIdOrAcsURL()" />
+                  <input cnslInput formControlName="acsURL" placeholder="https://" />
                 </cnsl-form-field>
               </form>
             </div>
