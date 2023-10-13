@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/messages"
@@ -21,7 +22,7 @@ func generateSms(
 	number := ""
 	smsChannels, twilioConfig, err := channels.SMS(ctx)
 	logging.OnError(err).Error("could not create sms channel")
-	if smsChannels.Len() == 0 {
+	if smsChannels == nil || smsChannels.Len() == 0 {
 		return errors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent")
 	}
 	if err == nil {
