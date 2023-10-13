@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"net"
+	"net/http"
 	"testing"
 	"time"
 
@@ -164,7 +166,15 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate),
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							),
 						),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,
@@ -365,7 +375,15 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate),
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							),
 						),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,

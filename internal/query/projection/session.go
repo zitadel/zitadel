@@ -14,27 +14,31 @@ import (
 )
 
 const (
-	SessionsProjectionTable = "projections.sessions5"
+	SessionsProjectionTable = "projections.sessions6"
 
-	SessionColumnID                   = "id"
-	SessionColumnCreationDate         = "creation_date"
-	SessionColumnChangeDate           = "change_date"
-	SessionColumnSequence             = "sequence"
-	SessionColumnState                = "state"
-	SessionColumnResourceOwner        = "resource_owner"
-	SessionColumnInstanceID           = "instance_id"
-	SessionColumnCreator              = "creator"
-	SessionColumnUserID               = "user_id"
-	SessionColumnUserCheckedAt        = "user_checked_at"
-	SessionColumnPasswordCheckedAt    = "password_checked_at"
-	SessionColumnIntentCheckedAt      = "intent_checked_at"
-	SessionColumnWebAuthNCheckedAt    = "webauthn_checked_at"
-	SessionColumnWebAuthNUserVerified = "webauthn_user_verified"
-	SessionColumnTOTPCheckedAt        = "totp_checked_at"
-	SessionColumnOTPSMSCheckedAt      = "otp_sms_checked_at"
-	SessionColumnOTPEmailCheckedAt    = "otp_email_checked_at"
-	SessionColumnMetadata             = "metadata"
-	SessionColumnTokenID              = "token_id"
+	SessionColumnID                     = "id"
+	SessionColumnCreationDate           = "creation_date"
+	SessionColumnChangeDate             = "change_date"
+	SessionColumnSequence               = "sequence"
+	SessionColumnState                  = "state"
+	SessionColumnResourceOwner          = "resource_owner"
+	SessionColumnInstanceID             = "instance_id"
+	SessionColumnCreator                = "creator"
+	SessionColumnUserID                 = "user_id"
+	SessionColumnUserCheckedAt          = "user_checked_at"
+	SessionColumnPasswordCheckedAt      = "password_checked_at"
+	SessionColumnIntentCheckedAt        = "intent_checked_at"
+	SessionColumnWebAuthNCheckedAt      = "webauthn_checked_at"
+	SessionColumnWebAuthNUserVerified   = "webauthn_user_verified"
+	SessionColumnTOTPCheckedAt          = "totp_checked_at"
+	SessionColumnOTPSMSCheckedAt        = "otp_sms_checked_at"
+	SessionColumnOTPEmailCheckedAt      = "otp_email_checked_at"
+	SessionColumnMetadata               = "metadata"
+	SessionColumnTokenID                = "token_id"
+	SessionColumnUserAgentFingerprintID = "user_agent_fingerprint_id"
+	SessionColumnUserAgentIP            = "user_agent_ip"
+	SessionColumnUserAgentDescription   = "user_agent_description"
+	SessionColumnUserAgentHeader        = "user_agent_header"
 )
 
 type sessionProjection struct {
@@ -66,8 +70,16 @@ func newSessionProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(SessionColumnOTPEmailCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnMetadata, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnTokenID, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(SessionColumnUserAgentFingerprintID, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(SessionColumnUserAgentIP, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(SessionColumnUserAgentDescription, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(SessionColumnUserAgentHeader, crdb.ColumnTypeJSONB, crdb.Nullable()),
 		},
 			crdb.NewPrimaryKey(SessionColumnInstanceID, SessionColumnID),
+			crdb.WithIndex(crdb.NewIndex(
+				SessionColumnUserAgentFingerprintID+"_idx",
+				[]string{SessionColumnUserAgentFingerprintID},
+			)),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -152,19 +164,35 @@ func (p *sessionProjection) reduceSessionAdded(event eventstore.Event) (*handler
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Sfrgf", "reduce.wrong.event.type %s", session.AddedType)
 	}
 
-	return crdb.NewCreateStatement(
-		e,
-		[]handler.Column{
-			handler.NewCol(SessionColumnID, e.Aggregate().ID),
-			handler.NewCol(SessionColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCol(SessionColumnCreationDate, e.CreationDate()),
-			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
-			handler.NewCol(SessionColumnResourceOwner, e.Aggregate().ResourceOwner),
-			handler.NewCol(SessionColumnState, domain.SessionStateActive),
-			handler.NewCol(SessionColumnSequence, e.Sequence()),
-			handler.NewCol(SessionColumnCreator, e.User),
-		},
-	), nil
+	cols := make([]handler.Column, 0, 12)
+	cols = append(cols,
+		handler.NewCol(SessionColumnID, e.Aggregate().ID),
+		handler.NewCol(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		handler.NewCol(SessionColumnCreationDate, e.CreationDate()),
+		handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+		handler.NewCol(SessionColumnResourceOwner, e.Aggregate().ResourceOwner),
+		handler.NewCol(SessionColumnState, domain.SessionStateActive),
+		handler.NewCol(SessionColumnSequence, e.Sequence()),
+		handler.NewCol(SessionColumnCreator, e.User),
+	)
+	if e.UserAgent != nil {
+		cols = append(cols,
+			handler.NewCol(SessionColumnUserAgentFingerprintID, e.UserAgent.FingerprintID),
+			handler.NewCol(SessionColumnUserAgentDescription, e.UserAgent.Description),
+		)
+		if e.UserAgent.IP != nil {
+			cols = append(cols,
+				handler.NewCol(SessionColumnUserAgentIP, e.UserAgent.IP.String()),
+			)
+		}
+		if e.UserAgent.Header != nil {
+			cols = append(cols,
+				handler.NewJSONCol(SessionColumnUserAgentHeader, e.UserAgent.Header),
+			)
+		}
+	}
+
+	return crdb.NewCreateStatement(e, cols), nil
 }
 
 func (p *sessionProjection) reduceUserChecked(event eventstore.Event) (*handler.Statement, error) {
