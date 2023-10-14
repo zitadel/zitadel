@@ -103,7 +103,12 @@
         <div class="phone-grid">
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.COUNTRY' | translate }}</cnsl-label>
-            <mat-select [(value)]="selected" (selectionChange)="setCountryCallingCode()" data-cy="country-calling-code">
+            <mat-select
+              [(value)]="selected"
+              [compareWith]="compareCountries"
+              (selectionChange)="setCountryCallingCode()"
+              data-cy="country-calling-code"
+            >
               <mat-select-trigger> <span class="fi fi-{{ selected?.countryCode | lowercase }}"></span></mat-select-trigger>
               <mat-option *ngFor="let country of countryPhoneCodes" [value]="country">
                 <span class="fi fi-{{ country.countryCode | lowercase }}"></span>

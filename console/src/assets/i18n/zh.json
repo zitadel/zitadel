@@ -273,7 +273,7 @@
     "SYMBOLERROR": "密码必须包含符号或标点符号。",
     "NUMBERERROR": "密码必须包含数字。",
     "PWNOTEQUAL": "提供的密码不匹配。",
-    "PHONE": "电话号码必须以00或+开头。"
+    "PHONE": "电话号码必须以 + 开头。"
   },
   "USER": {
     "SETTINGS": {
@@ -485,7 +485,7 @@
       "TITLE": "信息",
       "EMAIL": "电子邮件",
       "PHONE": "手机号码",
-      "PHONE_HINT": "使用 00 或 + 符号后跟呼叫者的国家代码，或从下拉列表中选择国家，最后输入电话号码",
+      "PHONE_HINT": "使用+号，后跟呼叫者的国家/地区代码，或从下拉列表中选择国家/地区，最后输入电话号码",
       "USERNAME": "用户名",
       "CHANGEUSERNAME": "修改",
       "CHANGEUSERNAME_TITLE": "修改用户名称",

@@ -13,7 +13,7 @@ export class PhoneDetailComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['phone'].currentValue) {
       const phoneNumber = formatPhone(changes['phone'].currentValue);
-      if (this.phone !== phoneNumber.phone) {
+      if (phoneNumber && this.phone !== phoneNumber.phone) {
         this.phone = phoneNumber.phone;
         this.country = phoneNumber.country;
       }
