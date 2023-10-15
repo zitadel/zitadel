@@ -18,7 +18,7 @@
       <input cnslInput name="senderNumber" formControlName="senderNumber" />
     </cnsl-form-field>
 
-    <button *ngIf="twilio" type="button" mat-stroked-button (click)="changeToken()">
+    <button *ngIf="twilio" type="button" mat-stroked-button (click)="changeToken()" data-e2e="edit-sms-token-button">
       {{ 'SETTING.SMS.TWILIO.CHANGETOKEN' | translate }}
     </button>
   </form>

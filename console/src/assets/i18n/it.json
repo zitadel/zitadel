@@ -1091,6 +1091,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio aggiunto con successo.",
+        "UPDATED": "Twilio aggiornato correttamente.",
         "REMOVED": "Twilio rimosso con successo.",
         "CHANGETOKEN": "Cambia Token",
         "SETTOKEN": "Cambia Token",
