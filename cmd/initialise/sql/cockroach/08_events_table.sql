@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS eventstore.events2 (
     , in_tx_order INTEGER NOT NULL
 
     , PRIMARY KEY (instance_id, aggregate_type, aggregate_id, "sequence")
-	, INDEX es_active_instances ON eventstore.events2 (created_at DESC) STORING ("position")
-    , INDEX es_wm ON eventstore.events2 (instance_id, aggregate_type, aggregate_id, event_type)
-    , INDEX es_projection ON eventstore.events2 (instance_id, aggregate_type, event_type, "position" DESC)
+	, INDEX es_active_instances (created_at DESC) STORING ("position")
+    , INDEX es_wm (instance_id, aggregate_type, aggregate_id, event_type)
+    , INDEX es_projection (instance_id, aggregate_type, event_type, "position" DESC)
 );
