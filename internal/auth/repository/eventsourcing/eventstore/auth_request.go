@@ -1000,11 +1000,11 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 			return steps, err
 		}
 	}
-	requestUserId := request.UserID
-	if request.UserOrigID != "" {
-		requestUserId = request.UserOrigID
+	userId, err := repo.getUserIdFromRequest(ctx, request)
+	if err != nil {
+		return nil, err
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, requestUserId, request.LoginPolicy.IgnoreUnknownUsernames)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, userId, request.LoginPolicy.IgnoreUnknownUsernames)
 	if err != nil {
 		return nil, err
 	}
@@ -1205,6 +1205,45 @@ func (repo *AuthRequestRepo) userLoginAsPossibleMap(instanceID, requestedOrgID s
 		}
 	}
 	return m, nil
+}
+
+func (repo *AuthRequestRepo) getUserIdFromRequest(ctx context.Context, request *domain.AuthRequest) (string, error) {
+	if request.UserOrigID != "" {
+		return request.UserOrigID, nil
+	} else if request.LoginHint != "" && !request.LoginAs {
+		user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID, request.LoginPolicy.IgnoreUnknownUsernames)
+		if err != nil {
+			return "", err
+		}
+		userSession, err := userSessionByIDs(ctx, repo.UserSessionViewProvider, repo.UserEventProvider, request.AgentID, user)
+		if err != nil {
+			return "", err
+		}
+		if userSession.State == domain.UserSessionStateTerminated {
+			userSessions, err := userSessionsByUserAgentID(ctx, repo.UserSessionViewProvider, request.AgentID, request.InstanceID)
+			if err != nil {
+				return "", err
+			}
+			var activeUserSessions []*user_model.UserSessionView
+			for _, us := range userSessions {
+				if us.State == domain.UserSessionStateActive {
+					activeUserSessions = append(activeUserSessions, us)
+				}
+			}
+			loginAsPossibleMap, err := repo.userLoginAsPossibleMap(request.InstanceID, request.RequestedOrgID, activeUserSessions)
+			if err != nil {
+				return "", err
+			}
+			for userId, isLoginAs := range loginAsPossibleMap {
+				if isLoginAs {
+					request.UserOrigID = userId
+					request.LoginAs = true
+					return userId, nil
+				}
+			}
+		}
+	}
+	return request.UserID, nil
 }
 
 func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, user *user_model.UserView, userSession *user_model.UserSessionView) domain.NextStep {
