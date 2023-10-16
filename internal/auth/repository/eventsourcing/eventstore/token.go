@@ -21,17 +21,6 @@ type TokenRepo struct {
 	View       *view.View
 }
 
-func (repo *TokenRepo) IsTokenValid(ctx context.Context, userID, tokenID string) (bool, error) {
-	token, err := repo.TokenByIDs(ctx, userID, tokenID)
-	if err == nil {
-		return token.Expiration.After(time.Now().UTC()), nil
-	}
-	if errors.IsNotFound(err) {
-		return false, nil
-	}
-	return false, err
-}
-
 func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (*usr_model.TokenView, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 
