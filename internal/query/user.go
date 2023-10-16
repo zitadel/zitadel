@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	errs "errors"
 	"strings"
+	"sync"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -340,10 +341,7 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx, err = projection.UserProjection.Trigger(ctx, handler.WithAwaitRunning())
-		logging.OnError(err).Debug("trigger failed")
-		ctx, err = projection.LoginNameProjection.Trigger(ctx, handler.WithAwaitRunning())
-		logging.OnError(err).Debug("trigger failed")
+		triggerUserProjections(ctx)
 	}
 
 	query, scan := prepareUserQuery(ctx, q.client)
@@ -374,10 +372,7 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwner
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx, err = projection.UserProjection.Trigger(ctx, handler.WithAwaitRunning())
-		logging.OnError(err).Debug("trigger failed")
-		ctx, err = projection.LoginNameProjection.Trigger(ctx, handler.WithAwaitRunning())
-		logging.OnError(err).Debug("trigger failed")
+		triggerUserProjections(ctx)
 	}
 
 	query, scan := prepareUserQuery(ctx, q.client)
@@ -488,10 +483,7 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		ctx, err = projection.UserProjection.Trigger(ctx, handler.WithAwaitRunning())
-		logging.OnError(err).Debug("trigger failed")
-		ctx, err = projection.LoginNameProjection.Trigger(ctx, handler.WithAwaitRunning())
-		logging.OnError(err).Debug("trigger failed")
+		triggerUserProjections(ctx)
 	}
 
 	query, scan := prepareNotifyUserQuery(ctx, q.client)
@@ -522,10 +514,7 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		ctx, err = projection.UserProjection.Trigger(ctx, handler.WithAwaitRunning())
-		logging.OnError(err).Debug("trigger failed")
-		ctx, err = projection.LoginNameProjection.Trigger(ctx, handler.WithAwaitRunning())
-		logging.OnError(err).Debug("trigger failed")
+		triggerUserProjections(ctx)
 	}
 
 	query, scan := prepareNotifyUserQuery(ctx, q.client)
@@ -726,6 +715,22 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 		subSelect,
 		ListIn,
 	)
+}
+
+func triggerUserProjections(ctx context.Context) {
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+	func() {
+		_, err := projection.UserProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		wg.Done()
+	}()
+	func() {
+		_, err := projection.LoginNameProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		wg.Done()
+	}()
+	wg.Wait()
 }
 
 func prepareLoginNamesQuery() (string, []interface{}, error) {
