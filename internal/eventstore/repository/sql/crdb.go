@@ -150,16 +150,16 @@ func (db *CRDB) Push(ctx context.Context, commands ...eventstore.Command) (event
 				command.Aggregate().InstanceID = authz.GetInstance(ctx).InstanceID()
 			}
 
-			var data Data
+			var payload []byte
 			if command.Payload() != nil {
-				data, err = json.Marshal(command.Payload())
+				payload, err = json.Marshal(command.Payload())
 				if err != nil {
 					return err
 				}
 			}
 			e := &repository.Event{
 				Typ:           command.Type(),
-				Data:          data,
+				Data:          payload,
 				EditorUser:    command.Creator(),
 				Version:       command.Aggregate().Version,
 				AggregateID:   command.Aggregate().ID,
@@ -173,7 +173,7 @@ func (db *CRDB) Push(ctx context.Context, commands ...eventstore.Command) (event
 				e.Aggregate().Type,
 				e.Aggregate().ID,
 				e.Aggregate().Version,
-				data,
+				payload,
 				e.Creator(),
 				"zitadel",
 				e.Aggregate().ResourceOwner,
@@ -268,7 +268,6 @@ func (crdb *CRDB) Filter(ctx context.Context, searchQuery *eventstore.SearchQuer
 // LatestSequence returns the latest sequence found by the search query
 func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (float64, error) {
 	var position sql.NullFloat64
-	// TODO: if 42P01 use events instead of events2 needed?
 	err := query(ctx, db, searchQuery, &position, false)
 	return position.Float64, err
 }
@@ -276,7 +275,6 @@ func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *eventstore.Sear
 // InstanceIDs returns the instance ids found by the search query
 func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) ([]string, error) {
 	var ids []string
-	// TODO: if 42P01 use events instead of events2 needed?
 	err := query(ctx, db, searchQuery, &ids, false)
 	if err != nil {
 		return nil, err
