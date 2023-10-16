@@ -2,8 +2,9 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"net/url"
+
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
@@ -18,11 +19,13 @@ type OriginEvent interface {
 }
 
 func (n *NotificationQueries) Origin(ctx context.Context, e eventstore.Event) (context.Context, error) {
+	var origin string
 	originEvent, ok := e.(OriginEvent)
 	if !ok {
-		return ctx, errors.ThrowInternal(fmt.Errorf("event of type %T doesn't implement OriginEvent", e), "NOTIF-3m9fs", "Errors.Internal")
+		logging.Errorf("event of type %T doesn't implement OriginEvent", e)
+	} else {
+		origin = originEvent.TriggerOrigin()
 	}
-	origin := originEvent.TriggerOrigin()
 	if origin != "" {
 		originURL, err := url.Parse(origin)
 		if err != nil {

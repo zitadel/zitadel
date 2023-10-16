@@ -73,9 +73,15 @@ message UserFactor {
       description: "\"display name of the checked user\"";
     }
   ];
+  // deprecated: use organization_id, will be remove before GA (https://github.com/zitadel/zitadel/issues/6718)
   string organisation_id = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"organisation id of the checked user\"";
+      description: "\"organization id of the checked user; deprecated: use organization_id\"";
+    }
+  ];
+  string organization_id = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"organization id of the checked user\"";
     }
   ];
 }

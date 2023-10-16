@@ -646,6 +646,26 @@ func (s *Server) RemoveHumanAuthFactorU2F(ctx context.Context, req *mgmt_pb.Remo
 	}, nil
 }
 
+func (s *Server) RemoveHumanAuthFactorOTPSMS(ctx context.Context, req *mgmt_pb.RemoveHumanAuthFactorOTPSMSRequest) (*mgmt_pb.RemoveHumanAuthFactorOTPSMSResponse, error) {
+	objectDetails, err := s.command.RemoveHumanOTPSMS(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveHumanAuthFactorOTPSMSResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
+	}, nil
+}
+
+func (s *Server) RemoveHumanAuthFactorOTPEmail(ctx context.Context, req *mgmt_pb.RemoveHumanAuthFactorOTPEmailRequest) (*mgmt_pb.RemoveHumanAuthFactorOTPEmailResponse, error) {
+	objectDetails, err := s.command.RemoveHumanOTPEmail(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveHumanAuthFactorOTPEmailResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
+	}, nil
+}
+
 func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHumanPasswordlessRequest) (*mgmt_pb.ListHumanPasswordlessResponse, error) {
 	query := new(query.UserAuthMethodSearchQueries)
 	err := query.AppendUserIDQuery(req.UserId)
