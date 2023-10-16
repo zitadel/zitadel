@@ -157,7 +157,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
           this.service
             .removeMyAuthFactorOTPEmail()
             .then(() => {
-              this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
+              this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
 
               this.cleanupList();
               this.getMFAs();
@@ -169,7 +169,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
           this.service
             .removeMyAuthFactorOTPSMS()
             .then(() => {
-              this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
+              this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
 
               this.cleanupList();
               this.getMFAs();
