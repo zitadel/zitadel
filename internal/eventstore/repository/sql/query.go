@@ -172,9 +172,8 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 		if !ok {
 			return z_errors.ThrowInvalidArgument(nil, "SQL-4GP6F", "type must be event")
 		}
-		data := make(Data, 0)
 		event := new(repository.Event)
-
+		data := sql.RawBytes{}
 		position := new(sql.NullFloat64)
 
 		if useV1 {
