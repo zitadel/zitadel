@@ -14,6 +14,7 @@ const (
 
 func (h *Handler) didProjectionInitialize(ctx context.Context) bool {
 	events, err := h.es.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		InstanceID("").
 		AddQuery().
 		AggregateTypes(aggregateType).
 		AggregateIDs(aggregateID).

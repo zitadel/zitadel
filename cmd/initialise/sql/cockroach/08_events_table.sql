@@ -18,4 +18,5 @@ CREATE TABLE IF NOT EXISTS eventstore.events2 (
 	, INDEX es_active_instances (created_at DESC) STORING ("position")
     , INDEX es_wm (instance_id, aggregate_type, aggregate_id, event_type)
     , INDEX es_projection (instance_id, aggregate_type, event_type, "position" DESC)
+    , INDEX es_global (aggregate_type, aggregate_id, event_type)
 );
