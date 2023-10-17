@@ -54,7 +54,7 @@ func (t *tx) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, 
 
 func query(ctx context.Context, criteria querier, searchQuery *repository.SearchQuery, dest interface{}) error {
 	query, rowScanner := prepareColumns(criteria, searchQuery.Columns)
-	where, values := prepareCondition(criteria, searchQuery.Filters)
+	where, values := prepareCondition(criteria, searchQuery.Filters, searchQuery.ExclusiveFilters)
 	if where == "" || query == "" {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
@@ -194,17 +194,20 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 	return nil
 }
 
-func prepareCondition(criteria querier, inclusiveFilters [][]*repository.Filter, exclusiveFilters [][]*repository.Filter) (clause string, values []interface{}) {
-	values = make([]interface{}, 0, len(inclusiveFilters))
-
+func prepareCondition(criteria querier, inclusiveFilters [][]*repository.Filter, exclusiveFilters [][]*repository.Filter) (string, []interface{}) {
 	if len(inclusiveFilters) == 0 && len(exclusiveFilters) == 0 {
-		return clause, values
+		return "", nil
 	}
-
-	return " WHERE " + strings.Join(clauses, " OR "), values
+	inclusiveClauses, inclusiveValues := buildClauses(criteria, inclusiveFilters)
+	exclusiveClauses, exclusiveValues := buildClauses(criteria, exclusiveFilters)
+	inclusiveJoinedClauses := strings.Join(inclusiveClauses, " OR ")
+	if len(inclusiveJoinedClauses) > 1 && len(exclusiveClauses) > 0 {
+		inclusiveJoinedClauses = "( " + inclusiveJoinedClauses + " )"
+	}
+	return " WHERE " + strings.Join(append(exclusiveClauses, inclusiveJoinedClauses), " AND "), append(exclusiveValues, inclusiveValues...)
 }
 
-func buildClauses(filters [][]*repository.Filter) ([]string, []interface{}) {
+func buildClauses(criteria querier, filters [][]*repository.Filter) ([]string, []interface{}) {
 	clauses := make([]string, len(filters))
 	values := make([]interface{}, 0, len(filters))
 	for idx, filter := range filters {

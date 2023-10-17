@@ -37,8 +37,6 @@ type SearchQuery struct {
 	creationDateAfter    time.Time
 }
 
-func toFilters(queries []*SearchQuery) [][]
-
 // Columns defines which fields of the event are needed for the query
 type Columns repository.Columns
 
@@ -141,16 +139,16 @@ func (builder *SearchQueryBuilder) AllowTimeTravel() *SearchQueryBuilder {
 	return builder
 }
 
-// AddQuery is DEPRECATED: Use AddIncludingQuery instead
-// All fields in the sub query are AND-connected in the storage request.
+// AddQuery is DEPRECATED: Use AddInclusiveQuery instead
+// AddQuery just calls AddInclusiveQuery
 func (builder *SearchQueryBuilder) AddQuery() *SearchQuery {
-	return builder.AddIncludingQuery()
+	return builder.AddInclusiveQuery()
 }
 
-// AddIncludingQuery creates a new sub query.
-// The sub query results are included in the end result provided that they meet the sub queries added with AddExcludingQuery
+// AddInclusiveQuery creates a new sub query.
+// The sub query results are included in the end result provided that they meet the sub queries added with AddExclusiveQuery
 // All fields in the sub query are AND-connected in the storage request.
-func (builder *SearchQueryBuilder) AddIncludingQuery() *SearchQuery {
+func (builder *SearchQueryBuilder) AddInclusiveQuery() *SearchQuery {
 	query := &SearchQuery{
 		builder: builder,
 	}
@@ -158,10 +156,10 @@ func (builder *SearchQueryBuilder) AddIncludingQuery() *SearchQuery {
 	return query
 }
 
-// AddExcludingQuery creates a new sub query.
-// Rows that don't match the returned sub query are not returned in the result
+// AddExclusiveQuery creates a new sub query.
+// Events that don't match the returned sub query are not returned in the result
 // All fields in the sub query are AND-connected in the storage request.
-func (builder *SearchQueryBuilder) AddExcludingQuery() *SearchQuery {
+func (builder *SearchQueryBuilder) AddExclusiveQuery() *SearchQuery {
 	query := &SearchQuery{
 		builder: builder,
 	}
@@ -263,9 +261,31 @@ func (builder *SearchQueryBuilder) build(instanceID string) (*repository.SearchQ
 		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "builder invalid")
 	}
 	builder.instanceID = instanceID
-	filters := make([][]*repository.Filter, len(builder.queries))
 
-	for i, query := range builder.queries {
+	inclusiveFilters, err := toFilters(builder.queries)
+	if err != nil {
+		return nil, err
+	}
+
+	exclusiveFilters, err := toFilters(builder.excludingQueries)
+	if err != nil {
+		return nil, err
+	}
+
+	return &repository.SearchQuery{
+		Columns:          builder.columns,
+		Limit:            builder.limit,
+		Desc:             builder.desc,
+		Filters:          inclusiveFilters,
+		ExclusiveFilters: exclusiveFilters,
+		Tx:               builder.tx,
+		AllowTimeTravel:  builder.allowTimeTravel,
+	}, nil
+}
+
+func toFilters(queries []*SearchQuery) ([][]*repository.Filter, error) {
+	filters := make([][]*repository.Filter, len(queries))
+	for i, query := range queries {
 		for _, f := range []func() *repository.Filter{
 			query.aggregateTypeFilter,
 			query.aggregateIDFilter,
@@ -287,17 +307,8 @@ func (builder *SearchQueryBuilder) build(instanceID string) (*repository.SearchQ
 				filters[i] = append(filters[i], filter)
 			}
 		}
-
 	}
-
-	return &repository.SearchQuery{
-		Columns:         builder.columns,
-		Limit:           builder.limit,
-		Desc:            builder.desc,
-		Filters:         filters,
-		Tx:              builder.tx,
-		AllowTimeTravel: builder.allowTimeTravel,
-	}, nil
+	return filters, nil
 }
 
 func (query *SearchQuery) aggregateIDFilter() *repository.Filter {

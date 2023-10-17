@@ -56,7 +56,7 @@ func filterAuditLogRetention(ctx context.Context, auditLogRetention time.Duratio
 	if callTime.IsZero() {
 		callTime = time.Now()
 	}
-	return builder.AddExcludingQuery().
+	return builder.AddExclusiveQuery().
 		CreationDateAfter(time.Now().Add(-auditLogRetention)).
 		Builder()
 }
