@@ -9,7 +9,7 @@ import (
 	crewjam_saml "github.com/crewjam/saml"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 	"google.golang.org/grpc"

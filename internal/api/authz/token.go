@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zitadel/oidc/v2/pkg/op"
-	"gopkg.in/square/go-jose.v2"
+	"github.com/zitadel/oidc/v3/pkg/op"
+	"github.com/go-jose/go-jose/v3"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -28,7 +28,7 @@ type TokenVerifier struct {
 	authZRepo        authZRepo
 	clients          sync.Map
 	authMethods      MethodMapping
-	systemJWTProfile op.JWTProfileVerifier
+	systemJWTProfile *op.JWTProfileVerifier
 }
 
 type MembershipsResolver interface {

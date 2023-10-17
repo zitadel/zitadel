@@ -7,7 +7,7 @@ import (
 
 	"github.com/zitadel/logging"
 	"github.com/zitadel/saml/pkg/provider/key"
-	"gopkg.in/square/go-jose.v2"
+	"github.com/go-jose/go-jose/v3"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
