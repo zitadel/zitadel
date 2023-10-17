@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -34,6 +35,7 @@ const (
 
 type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+	UserAgent            *domain.UserAgent `json:"user_agent,omitempty"`
 }
 
 func (e *AddedEvent) Data() interface{} {
@@ -46,6 +48,7 @@ func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 
 func NewAddedEvent(ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	userAgent *domain.UserAgent,
 ) *AddedEvent {
 	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -53,6 +56,7 @@ func NewAddedEvent(ctx context.Context,
 			aggregate,
 			AddedType,
 		),
+		UserAgent: userAgent,
 	}
 }
 
@@ -308,9 +312,10 @@ func NewTOTPCheckedEvent(
 type OTPSMSChallengedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Code         *crypto.CryptoValue `json:"code"`
-	Expiry       time.Duration       `json:"expiry"`
-	CodeReturned bool                `json:"codeReturned,omitempty"`
+	Code              *crypto.CryptoValue `json:"code"`
+	Expiry            time.Duration       `json:"expiry"`
+	CodeReturned      bool                `json:"codeReturned,omitempty"`
+	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
 func (e *OTPSMSChallengedEvent) Data() interface{} {
@@ -323,6 +328,10 @@ func (e *OTPSMSChallengedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 
 func (e *OTPSMSChallengedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
 	e.BaseEvent = *base
+}
+
+func (e *OTPSMSChallengedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewOTPSMSChallengedEvent(
@@ -338,9 +347,10 @@ func NewOTPSMSChallengedEvent(
 			aggregate,
 			OTPSMSChallengedType,
 		),
-		Code:         code,
-		Expiry:       expiry,
-		CodeReturned: codeReturned,
+		Code:              code,
+		Expiry:            expiry,
+		CodeReturned:      codeReturned,
+		TriggeredAtOrigin: http.ComposedOrigin(ctx),
 	}
 }
 
@@ -409,10 +419,11 @@ func NewOTPSMSCheckedEvent(
 type OTPEmailChallengedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Code       *crypto.CryptoValue `json:"code"`
-	Expiry     time.Duration       `json:"expiry"`
-	ReturnCode bool                `json:"returnCode,omitempty"`
-	URLTmpl    string              `json:"urlTmpl,omitempty"`
+	Code              *crypto.CryptoValue `json:"code"`
+	Expiry            time.Duration       `json:"expiry"`
+	ReturnCode        bool                `json:"returnCode,omitempty"`
+	URLTmpl           string              `json:"urlTmpl,omitempty"`
+	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
 func (e *OTPEmailChallengedEvent) Data() interface{} {
@@ -425,6 +436,10 @@ func (e *OTPEmailChallengedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 
 func (e *OTPEmailChallengedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
 	e.BaseEvent = *base
+}
+
+func (e *OTPEmailChallengedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewOTPEmailChallengedEvent(
@@ -441,10 +456,11 @@ func NewOTPEmailChallengedEvent(
 			aggregate,
 			OTPEmailChallengedType,
 		),
-		Code:       code,
-		Expiry:     expiry,
-		ReturnCode: returnCode,
-		URLTmpl:    urlTmpl,
+		Code:              code,
+		Expiry:            expiry,
+		ReturnCode:        returnCode,
+		URLTmpl:           urlTmpl,
+		TriggeredAtOrigin: http.ComposedOrigin(ctx),
 	}
 }
 

@@ -119,7 +119,7 @@ service UserService {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "user.write"
-        org_field: "organisation"
+        org_field: "organization"
       }
       http_response: {
         success_code: 201
@@ -655,7 +655,13 @@ message AddHumanUserRequest{
       example: "\"minnie-mouse\"";
     }
   ];
-  zitadel.object.v2beta.Organisation organisation = 3;
+  // deprecated: use organization (if both are set, organization will take precedence)
+  zitadel.object.v2beta.Organisation organisation = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "deprecated: use organization (if both are set, organization will take precedence)"
+    }
+  ];
+  zitadel.object.v2beta.Organization organization = 11;
   SetHumanProfile profile = 4 [
     (validate.rules).message.required = true,
     (google.api.field_behavior) = REQUIRED

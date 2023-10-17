@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/rakyll/statik/fs"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
-	"github.com/zitadel/oidc/v2/pkg/op"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/op"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/assets"
