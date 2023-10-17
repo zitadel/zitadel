@@ -316,14 +316,14 @@ func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
 	case user.UserV1MFAOTPAddedType,
 		user.HumanMFAOTPAddedType:
 		if u.HumanView == nil {
-			logging.WithFields("sequence", event.Sequence, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
+			logging.WithFields("event_sequence", event.Sequence, "aggregate_id", event.Aggregate().ID, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
 			return errors.ThrowInvalidArgument(nil, "MODEL-p2BXx", "event ignored: human not exists")
 		}
 		u.OTPState = int32(model.MFAStateNotReady)
 	case user.UserV1MFAOTPVerifiedType,
 		user.HumanMFAOTPVerifiedType:
 		if u.HumanView == nil {
-			logging.WithFields("sequence", event.Sequence, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
+			logging.WithFields("event_sequence", event.Sequence, "aggregate_id", event.Aggregate().ID, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
 			return errors.ThrowInvalidArgument(nil, "MODEL-o6Lcq", "event ignored: human not exists")
 		}
 		u.OTPState = int32(model.MFAStateReady)
@@ -367,7 +367,7 @@ func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
 	case user.HumanPasswordlessInitCodeAddedType,
 		user.HumanPasswordlessInitCodeRequestedType:
 		if u.HumanView == nil {
-			logging.WithFields("sequence", event.Sequence, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
+			logging.WithFields("event_sequence", event.Sequence, "aggregate_id", event.Aggregate().ID, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
 			return errors.ThrowInvalidArgument(nil, "MODEL-MbyC0", "event ignored: human not exists")
 		}
 		if !u.PasswordSet {
