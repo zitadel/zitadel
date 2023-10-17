@@ -849,11 +849,9 @@ export class AdminService {
     return this.grpcService.admin.getSMTPConfig(req, null).then((resp) => resp.toObject());
   }
 
-  public listSMTPConfigs(req: ListSMTPConfigsRequest): Promise<ListSMTPConfigsResponse.AsObject> {
-    return this.grpcService.admin.listSMTPConfigs(req, null).then((resp) => {
-      console.log(resp);
-      return resp.toObject();
-    });
+  public listSMTPConfigs(): Promise<ListSMTPConfigsResponse.AsObject> {
+    const req = new ListSMTPConfigsRequest();
+    return this.grpcService.admin.listSMTPConfigs(req, null).then((resp) => resp.toObject());
   }
 
   public addSMTPConfig(req: AddSMTPConfigRequest): Promise<AddSMTPConfigResponse.AsObject> {

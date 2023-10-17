@@ -164,7 +164,7 @@ export class SMTPTableComponent implements OnInit, OnDestroy {
     lq.setLimit(limit);
     req.setQuery(lq);
     (this.service as AdminService)
-      .listSMTPConfigs(req)
+      .listSMTPConfigs()
       .then((resp) => {
         console.log(resp);
         // this.providersResult = resp;
