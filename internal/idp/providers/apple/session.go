@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	openid "github.com/zitadel/oidc/v2/pkg/oidc"
+	openid "github.com/zitadel/oidc/v3/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"

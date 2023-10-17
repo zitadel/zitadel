@@ -3,7 +3,7 @@ package system
 import (
 	"strings"
 
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/authn"
