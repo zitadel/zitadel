@@ -35,12 +35,13 @@ If you want to add a [Technical Account Manager](#technical-account-manager) or 
 
 #### Premium support
 
-Support features for ZITADEL Cloud subscriptions and additional premium support are as follows:
+Premium support can be booked for ZITADEL Cloud.
+Support features are as follows:
 
 Premium support | Default
 --- | ---
 [Support hours](#support-hours) | [Extended hours](#extended-hours)
-[Response Time](#slo---initial-response-time) (Severity 1) | 1 business hour 
+[Response Time](#slo---initial-response-time) (Severity 1) | 1 business hour
 [Community support](#community-support) | yes
 [Professional support](#professional-support) | yes
 [Enterprise supported features](/docs/support/software-release-cycles-support.md#enterprise-supported) |  no
