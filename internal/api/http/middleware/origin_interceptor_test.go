@@ -59,6 +59,14 @@ func Test_composeOrigin(t *testing.T) {
 		},
 		want: "https://forwarded.host",
 	}, {
+		name: "forwarded proto and host with incomplete entries in different values",
+		args: args{
+			h: http.Header{
+				"Forwarded": []string{"proto=http", "proto=https;host=forwarded.host", "proto=http"},
+			},
+		},
+		want: "http://forwarded.host",
+	}, {
 		name: "x-forwarded-proto",
 		args: args{
 			h: http.Header{
