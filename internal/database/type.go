@@ -107,6 +107,9 @@ func (d *Duration) Scan(src any) error {
 	return nil
 }
 
+// NullDuration can be used for NULL intervals.
+// If Valid is false, the scanned value was NULL
+// This behavior is similar to [database/sql.NullString]
 type NullDuration struct {
 	Valid    bool
 	Duration time.Duration
@@ -118,19 +121,10 @@ func (d *NullDuration) Scan(src any) error {
 		d.Duration, d.Valid = 0, false
 		return nil
 	}
-	d.Valid = true
 	duration := new(Duration)
 	if err := duration.Scan(src); err != nil {
 		return err
 	}
-	d.Duration = time.Duration(*duration)
+	d.Duration, d.Valid = time.Duration(*duration), true
 	return nil
-}
-
-// Value implements the [database/sql/driver.Valuer] interface.
-func (n NullDuration) Value() (driver.Value, error) {
-	if !n.Valid {
-		return nil, nil
-	}
-	return n.Duration, nil
 }

@@ -2,10 +2,10 @@ package database
 
 import (
 	"database/sql/driver"
-	"testing"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"testing"
+	"time"
 )
 
 func TestMap_Scan(t *testing.T) {
@@ -114,6 +114,62 @@ func TestMap_Value(t *testing.T) {
 				require.NoError(t, err)
 				assert.Equalf(t, tt.res.want, got, "Value()")
 			}
+		})
+	}
+}
+
+func TestNullDuration_Scan(t *testing.T) {
+	type args struct {
+		src any
+	}
+	type res struct {
+		want NullDuration
+		err  bool
+	}
+	type testCase struct {
+		name string
+		args args
+		res  res
+	}
+	tests := []testCase{
+		{
+			"invalid",
+			args{src: "invalid"},
+			res{
+				want: NullDuration{
+					Valid: false,
+				},
+				err: true,
+			},
+		},
+		{
+			"null",
+			args{src: nil},
+			res{
+				want: NullDuration{
+					Valid: false,
+				},
+				err: false,
+			},
+		},
+		{
+			"valid",
+			args{src: "1:0:0"},
+			res{
+				want: NullDuration{
+					Valid:    true,
+					Duration: time.Hour,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d := new(NullDuration)
+			if err := d.Scan(tt.args.src); (err != nil) != tt.res.err {
+				t.Errorf("Scan() error = %v, wantErr %v", err, tt.res.err)
+			}
+			assert.Equal(t, tt.res.want, *d)
 		})
 	}
 }
