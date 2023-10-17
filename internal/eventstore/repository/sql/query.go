@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"runtime/debug"
 	"strconv"
 	"strings"
 
@@ -97,6 +98,10 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	contextQuerier = criteria.db()
 	if q.Tx != nil {
 		contextQuerier = &tx{Tx: q.Tx}
+	}
+
+	if !strings.Contains(query, "instance_id =") && q.Columns != eventstore.ColumnsInstanceIDs {
+		logging.WithFields("sql_stmt", query, "stack", string(debug.Stack())).Info("missing instance_id clause")
 	}
 
 	err = contextQuerier.QueryContext(ctx,
