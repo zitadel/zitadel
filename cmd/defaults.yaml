@@ -184,7 +184,7 @@ Projections:
   # The maximum duration a transaction remains open 
   # before it spots left folding additional events
   # and updates the table.
-  TransactionDuration: 5s # ZITADEL_PROJECTIONS_TRANSACTIONDURATION
+  TransactionDuration: 500ms # ZITADEL_PROJECTIONS_TRANSACTIONDURATION
   # Time interval between scheduled projections
   RequeueEvery: 60s # ZITADEL_PROJECTIONS_REQUEUEEVERY
   # Time between retried database statements resulting from projected events
@@ -200,11 +200,17 @@ Projections:
   # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
     Projects:
-      BulkLimit: 200 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_PROJECTS_BULKLIMIT
+      TransactionDuration: 2s
     # The Notifications projection is used for sending emails and SMS to users
     Notifications:
       # As notification projections don't result in database statements, retries don't have an effect
       MaxFailureCount: 10 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONS_MAXFAILURECOUNT
+      # Sending emails can take longer than 500ms
+      TransactionDuration: 5s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONS_TRANSACTIONDURATION
+    password_complexities:
+      TransactionDuration: 2s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_PASSWORD_COMPLEXITIES_TRANSACTIONDURATION
+    lockout_policy:
+      TransactionDuration: 2s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_LOCKOUT_POLICY_TRANSACTIONDURATION
     # The NotificationsQuotas projection is used for calling quota webhooks
     NotificationsQuotas:
       # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
@@ -216,6 +222,10 @@ Projections:
       MaxFailureCount: 10 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_MAXFAILURECOUNT
       # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the db too much.
       RequeueEvery: 300s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_REQUEUEEVERY
+      # Sending emails can take longer than 500ms
+      TransactionDuration: 5s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONQUOTAS_TRANSACTIONDURATION
+    milestones:
+      BulkLimit: 50
     # The Telemetry projection is used for calling telemetry webhooks
     Telemetry:
       # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
