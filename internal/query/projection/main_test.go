@@ -11,6 +11,7 @@ import (
 	action_repo "github.com/zitadel/zitadel/internal/repository/action"
 	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
 	key_repo "github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/repository/limits"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	proj_repo "github.com/zitadel/zitadel/internal/repository/project"
 	quota_repo "github.com/zitadel/zitadel/internal/repository/quota"
@@ -31,6 +32,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	usr_repo.RegisterEventMappers(es)
 	proj_repo.RegisterEventMappers(es)
 	quota_repo.RegisterEventMappers(es)
+	limits.RegisterEventMappers(es)
 	usergrant.RegisterEventMappers(es)
 	key_repo.RegisterEventMappers(es)
 	action_repo.RegisterEventMappers(es)
