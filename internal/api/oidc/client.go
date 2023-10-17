@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"github.com/dop251/goja"
+	"github.com/go-jose/go-jose/v3"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
-	"github.com/go-jose/go-jose/v3"
 
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/actions/object"

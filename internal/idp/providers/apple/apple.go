@@ -5,9 +5,9 @@ import (
 	"encoding/pem"
 	"time"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/zitadel/oidc/v3/pkg/crypto"
 	openid "github.com/zitadel/oidc/v3/pkg/oidc"
-	"github.com/go-jose/go-jose/v3"
 
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"

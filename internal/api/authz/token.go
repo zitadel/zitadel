@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zitadel/oidc/v3/pkg/op"
 	"github.com/go-jose/go-jose/v3"
+	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
