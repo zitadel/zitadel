@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zitadel/oidc/v2/pkg/client"
-	"github.com/zitadel/oidc/v2/pkg/client/rp"
-	"github.com/zitadel/oidc/v2/pkg/client/rs"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/client"
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
+	"github.com/zitadel/oidc/v3/pkg/client/rs"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	oidc_internal "github.com/zitadel/zitadel/internal/api/oidc"
@@ -83,8 +83,8 @@ func (s *Tester) CreateAPIClient(ctx context.Context, projectID string) (*manage
 	})
 }
 
-func (s *Tester) CreateOIDCAuthRequest(clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
-	provider, err := s.CreateRelyingParty(clientID, redirectURI, scope...)
+func (s *Tester) CreateOIDCAuthRequest(ctx context.Context, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
+	provider, err := s.CreateRelyingParty(ctx, clientID, redirectURI, scope...)
 	if err != nil {
 		return "", err
 	}
@@ -110,8 +110,8 @@ func (s *Tester) CreateOIDCAuthRequest(clientID, loginClient, redirectURI string
 	return strings.TrimPrefix(loc.String(), prefixWithHost), nil
 }
 
-func (s *Tester) CreateOIDCAuthRequestImplicit(clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
-	provider, err := s.CreateRelyingParty(clientID, redirectURI, scope...)
+func (s *Tester) CreateOIDCAuthRequestImplicit(ctx context.Context, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
+	provider, err := s.CreateRelyingParty(ctx, clientID, redirectURI, scope...)
 	if err != nil {
 		return "", err
 	}
@@ -146,12 +146,12 @@ func (s *Tester) OIDCIssuer() string {
 	return http_util.BuildHTTP(s.Config.ExternalDomain, s.Config.Port, s.Config.ExternalSecure)
 }
 
-func (s *Tester) CreateRelyingParty(clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
+func (s *Tester) CreateRelyingParty(ctx context.Context, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
 	if len(scope) == 0 {
 		scope = []string{oidc.ScopeOpenID}
 	}
 	loginClient := &http.Client{Transport: &loginRoundTripper{http.DefaultTransport}}
-	return rp.NewRelyingPartyOIDC(s.OIDCIssuer(), clientID, "", redirectURI, scope, rp.WithHTTPClient(loginClient))
+	return rp.NewRelyingPartyOIDC(ctx, s.OIDCIssuer(), clientID, "", redirectURI, scope, rp.WithHTTPClient(loginClient))
 }
 
 type loginRoundTripper struct {
@@ -163,12 +163,12 @@ func (c *loginRoundTripper) RoundTrip(req *http.Request) (*http.Response, error)
 	return c.RoundTripper.RoundTrip(req)
 }
 
-func (s *Tester) CreateResourceServer(keyFileData []byte) (rs.ResourceServer, error) {
+func (s *Tester) CreateResourceServer(ctx context.Context, keyFileData []byte) (rs.ResourceServer, error) {
 	keyFile, err := client.ConfigFromKeyFileData(keyFileData)
 	if err != nil {
 		return nil, err
 	}
-	return rs.NewResourceServerJWTProfile(s.OIDCIssuer(), keyFile.ClientID, keyFile.KeyID, []byte(keyFile.Key))
+	return rs.NewResourceServerJWTProfile(ctx, s.OIDCIssuer(), keyFile.ClientID, keyFile.KeyID, []byte(keyFile.Key))
 }
 
 func GetRequest(url string, headers map[string]string) (*http.Request, error) {

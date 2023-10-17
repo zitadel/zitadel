@@ -54,7 +54,7 @@ func TestServer_GetAuthRequest(t *testing.T) {
 	require.NoError(t, err)
 	client, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
 	require.NoError(t, err)
-	authRequestID, err := Tester.CreateOIDCAuthRequest(client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
+	authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
 	require.NoError(t, err)
 	now := time.Now()
 
@@ -134,7 +134,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			name: "session not found",
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					authRequestID, err := Tester.CreateOIDCAuthRequest(client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
+					authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -151,7 +151,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			name: "session token invalid",
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					authRequestID, err := Tester.CreateOIDCAuthRequest(client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
+					authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -168,7 +168,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			name: "fail callback",
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					authRequestID, err := Tester.CreateOIDCAuthRequest(client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
+					authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -192,7 +192,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			name: "code callback",
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					authRequestID, err := Tester.CreateOIDCAuthRequest(client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
+					authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -217,7 +217,7 @@ func TestServer_CreateCallback(t *testing.T) {
 				AuthRequestId: func() string {
 					client, err := Tester.CreateOIDCImplicitFlowClient(CTX, redirectURIImplicit)
 					require.NoError(t, err)
-					authRequestID, err := Tester.CreateOIDCAuthRequestImplicit(client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURIImplicit)
+					authRequestID, err := Tester.CreateOIDCAuthRequestImplicit(CTX, client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURIImplicit)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
