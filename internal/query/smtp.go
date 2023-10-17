@@ -202,7 +202,8 @@ func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			SMTPConfigColumnSMTPUser.identifier(),
 			SMTPConfigColumnSMTPPassword.identifier(),
 			SMTPConfigColumnIsActive.identifier(),
-			SMTPConfigColumnProviderType.identifier()).
+			SMTPConfigColumnProviderType.identifier(),
+			countColumn.identifier()).
 			From(smtpConfigsTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*SMTPConfigs, error) {
@@ -225,6 +226,7 @@ func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 					&config.Password,
 					&config.IsActive,
 					&config.ProviderType,
+					&configs.Count,
 				)
 				if err != nil {
 					if errs.Is(err, sql.ErrNoRows) {
