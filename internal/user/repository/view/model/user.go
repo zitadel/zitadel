@@ -368,7 +368,7 @@ func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
 		user.HumanPasswordlessInitCodeRequestedType:
 		if u.HumanView == nil {
 			logging.WithFields("sequence", event.Sequence, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
-			return errors.ThrowInvalidArgument(nil, "MODEL-o6Lcq", "event ignored: human not exists")
+			return errors.ThrowInvalidArgument(nil, "MODEL-MbyC0", "event ignored: human not exists")
 		}
 		if !u.PasswordSet {
 			u.PasswordlessInitRequired = true
