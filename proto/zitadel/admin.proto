@@ -432,7 +432,7 @@ service AdminService {
         };
     }
 
-    rpc ListSMTPProviders(ListSMTPProvidersRequest) returns (ListSMTPProvidersResponse) {
+    rpc ListSMTPConfigs(ListSMTPConfigsRequest) returns (ListSMTPConfigsResponse) {
         option (google.api.http) = {
             post: "/smtp/_search"
             body: "*"
@@ -443,9 +443,9 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP Providers";
-            summary: "List SMTP Providers";
-            description: "Returns a list of configured SMTP providers."
+            tags: "SMTP Configs";
+            summary: "List SMTP Configs";
+            description: "Returns a list of SMTP configurations."
         };
     }
 
@@ -3922,23 +3922,13 @@ message GetSMTPConfigResponse {
     zitadel.settings.v1.SMTPConfig smtp_config = 1;
 }
 
-message ListSMTPProvidersRequest {
-    //list limitations and ordering
+message ListSMTPConfigsRequest {
     zitadel.v1.ListQuery query = 1;
-    //criteria the client is looking for
-    repeated SMTPProvidersQuery queries = 2;
 }
 
-message SMTPProvidersQuery {
-    oneof query {
-        zitadel.idp.v1.IDPIDQuery idp_id_query = 1;
-        zitadel.idp.v1.IDPNameQuery idp_name_query = 2;
-    }
-}
-
-message ListSMTPProvidersResponse {
+message ListSMTPConfigsResponse {
     zitadel.v1.ListDetails details = 1;
-    repeated zitadel.idp.v1.Provider result = 2;
+    repeated zitadel.settings.v1.SMTPConfig result = 2;
 }
 
 enum SMTPProviderType {

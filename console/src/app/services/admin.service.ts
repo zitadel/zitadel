@@ -158,6 +158,8 @@ import {
   ListSecretGeneratorsResponse,
   ListSMSProvidersRequest,
   ListSMSProvidersResponse,
+  ListSMTPConfigsRequest,
+  ListSMTPConfigsResponse,
   ListViewsRequest,
   ListViewsResponse,
   ReactivateIDPRequest,
@@ -845,6 +847,13 @@ export class AdminService {
   public getSMTPConfig(): Promise<GetSMTPConfigResponse.AsObject> {
     const req = new GetSMTPConfigRequest();
     return this.grpcService.admin.getSMTPConfig(req, null).then((resp) => resp.toObject());
+  }
+
+  public listSMTPConfigs(req: ListSMTPConfigsRequest): Promise<ListSMTPConfigsResponse.AsObject> {
+    return this.grpcService.admin.listSMTPConfigs(req, null).then((resp) => {
+      console.log(resp);
+      return resp.toObject();
+    });
   }
 
   public addSMTPConfig(req: AddSMTPConfigRequest): Promise<AddSMTPConfigResponse.AsObject> {

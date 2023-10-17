@@ -4,10 +4,8 @@ import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
 import { Router, RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import {
-  IDP,
   IDPLoginPolicyLink,
   IDPOwnerType,
   IDPState,
@@ -15,12 +13,6 @@ import {
   Provider,
   ProviderType,
 } from 'src/app/proto/generated/zitadel/idp_pb';
-import {
-  AddCustomLoginPolicyRequest,
-  AddCustomLoginPolicyResponse,
-  ListProvidersRequest as MgmtListProvidersRequest,
-  ListProvidersResponse as MgmtListProvidersResponse,
-} from 'src/app/proto/generated/zitadel/management_pb';
 import { ListQuery } from 'src/app/proto/generated/zitadel/object_pb';
 import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -28,15 +20,9 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { OverlayWorkflowService } from 'src/app/services/overlay/overlay-workflow.service';
-import { ContextChangedWorkflowOverlays } from 'src/app/services/overlay/workflows';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
-import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
-import {
-  ListSMSProvidersResponse,
-  ListSMTPProvidersRequest,
-  ListSMTPProvidersResponse,
-} from 'src/app/proto/generated/zitadel/admin_pb';
+import { ListSMTPConfigsRequest, ListSMTPConfigsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 
 @Component({
   selector: 'cnsl-smtp-table',
@@ -48,7 +34,7 @@ export class SMTPTableComponent implements OnInit, OnDestroy {
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   public dataSource: MatTableDataSource<Provider.AsObject> = new MatTableDataSource<Provider.AsObject>();
   public selection: SelectionModel<Provider.AsObject> = new SelectionModel<Provider.AsObject>(true, []);
-  public providersResult?: ListSMTPProvidersResponse.AsObject;
+  public providersResult?: ListSMTPConfigsResponse.AsObject;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
@@ -172,16 +158,17 @@ export class SMTPTableComponent implements OnInit, OnDestroy {
   private async getData(limit: number, offset: number): Promise<void> {
     this.loadingSubject.next(true);
 
-    const req = new ListSMTPProvidersRequest();
+    const req = new ListSMTPConfigsRequest();
     const lq = new ListQuery();
     lq.setOffset(offset);
     lq.setLimit(limit);
     req.setQuery(lq);
     (this.service as AdminService)
-      .listSMTPProviders(req)
+      .listSMTPConfigs(req)
       .then((resp) => {
-        this.providersResult = resp;
-        this.dataSource.data = resp.resultList;
+        console.log(resp);
+        // this.providersResult = resp;
+        // this.dataSource.data = resp.resultList;
         this.loadingSubject.next(false);
       })
       .catch((error) => {

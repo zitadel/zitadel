@@ -7,17 +7,17 @@ import (
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
-func (s *Server) ListSMTPProviders(ctx context.Context, req *admin_pb.ListSMSProvidersRequest) (*admin_pb.ListSMTPProvidersResponse, error) {
-	queries, err := listSMSConfigsToModel(req)
+func (s *Server) ListSMTPConfigs(ctx context.Context, req *admin_pb.ListSMTPConfigsRequest) (*admin_pb.ListSMTPConfigsResponse, error) {
+	queries, err := listSMTPConfigsToModel(req)
 	if err != nil {
 		return nil, err
 	}
-	result, err := s.query.SearchSMSConfigs(ctx, queries)
+	result, err := s.query.SearchSMTPConfigs(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.ListSMTPProvidersResponse{
+	return &admin_pb.ListSMTPConfigsResponse{
 		Details: object.ToListDetails(result.Count, result.Sequence, result.Timestamp),
-		Result:  SMSConfigsToPb(result.Configs),
+		Result:  SMTPConfigsToPb(result.Configs),
 	}, nil
 }

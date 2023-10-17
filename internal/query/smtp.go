@@ -16,6 +16,16 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
+type SMTPConfigsSearchQueries struct {
+	SearchRequest
+	Queries []SearchQuery
+}
+
+type SMTPConfigs struct {
+	SearchResponse
+	Configs []*SMTPConfig
+}
+
 var (
 	smtpConfigsTable = table{
 		name:          projection.SMTPConfigProjectionTable,
@@ -87,18 +97,13 @@ var (
 	}
 )
 
-type SMTPConfigs struct {
-	SearchResponse
-	SMTPConfigs []*SMTPConfig
-}
-
 type SMTPConfig struct {
-	AggregateID   string
-	CreationDate  time.Time
-	ChangeDate    time.Time
-	ResourceOwner string
-	Sequence      uint64
-
+	AggregateID    string
+	CreationDate   time.Time
+	ChangeDate     time.Time
+	ResourceOwner  string
+	Sequence       uint64
+	ConfigID       string
 	TLS            bool
 	SenderAddress  string
 	SenderName     string
@@ -179,4 +184,81 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			config.Password = password
 			return config, nil
 		}
+}
+
+func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*SMTPConfigs, error)) {
+	return sq.Select(
+			SMTPConfigColumnAggregateID.identifier(),
+			SMTPConfigColumnCreationDate.identifier(),
+			SMTPConfigColumnChangeDate.identifier(),
+			SMTPConfigColumnResourceOwner.identifier(),
+			SMTPConfigColumnSequence.identifier(),
+			SMTPConfigColumnConfigID.identifier(),
+			SMTPConfigColumnTLS.identifier(),
+			SMTPConfigColumnSenderAddress.identifier(),
+			SMTPConfigColumnSenderName.identifier(),
+			SMTPConfigColumnReplyToAddress.identifier(),
+			SMTPConfigColumnSMTPHost.identifier(),
+			SMTPConfigColumnSMTPUser.identifier(),
+			SMTPConfigColumnSMTPPassword.identifier(),
+			SMTPConfigColumnIsActive.identifier(),
+			SMTPConfigColumnProviderType.identifier()).
+			From(smtpConfigsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) (*SMTPConfigs, error) {
+			configs := &SMTPConfigs{Configs: []*SMTPConfig{}}
+			for rows.Next() {
+				config := new(SMTPConfig)
+				err := rows.Scan(
+					&config.AggregateID,
+					&config.CreationDate,
+					&config.ChangeDate,
+					&config.ResourceOwner,
+					&config.ConfigID,
+					&config.Sequence,
+					&config.TLS,
+					&config.SenderAddress,
+					&config.SenderName,
+					&config.ReplyToAddress,
+					&config.Host,
+					&config.User,
+					&config.Password,
+					&config.IsActive,
+					&config.ProviderType,
+				)
+				if err != nil {
+					if errs.Is(err, sql.ErrNoRows) {
+						return nil, errors.ThrowNotFound(err, "QUERY-fwofw", "Errors.SMTPConfig.NotFound")
+					}
+					return nil, errors.ThrowInternal(err, "QUERY-9k87F", "Errors.Internal")
+				}
+				configs.Configs = append(configs.Configs, config)
+			}
+			return configs, nil
+		}
+}
+
+func (q *Queries) SearchSMTPConfigs(ctx context.Context, queries *SMTPConfigsSearchQueries) (configs *SMTPConfigs, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareSMTPConfigsQuery(ctx, q.client)
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			SMTPConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		}).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-sZ7Cx", "Errors.Query.InvalidRequest")
+	}
+
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		configs, err = scan(rows)
+		return err
+	}, stmt, args...)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-tOpKN", "Errors.Internal")
+	}
+
+	configs.LatestSequence, err = q.latestSequence(ctx, smtpConfigsTable)
+	return configs, err
 }
