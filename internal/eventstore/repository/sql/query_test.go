@@ -288,7 +288,7 @@ func Test_prepareCondition(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			crdb := &CRDB{}
-			gotClause, gotValues := prepareCondition(crdb, tt.args.filters)
+			gotClause, gotValues := prepareCondition(crdb, tt.args.filters, nil)
 			if gotClause != tt.res.clause {
 				t.Errorf("prepareCondition() gotClause = %v, want %v", gotClause, tt.res.clause)
 			}

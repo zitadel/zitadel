@@ -200,6 +200,9 @@ func prepareCondition(criteria querier, inclusiveFilters [][]*repository.Filter,
 	}
 	inclusiveClauses, inclusiveValues := buildClauses(criteria, inclusiveFilters)
 	exclusiveClauses, exclusiveValues := buildClauses(criteria, exclusiveFilters)
+	if len(inclusiveClauses) == 0 && len(exclusiveClauses) == 0 {
+		return "", nil
+	}
 	inclusiveJoinedClauses := strings.Join(inclusiveClauses, " OR ")
 	if len(inclusiveJoinedClauses) > 1 && len(exclusiveClauses) > 0 {
 		inclusiveJoinedClauses = "( " + inclusiveJoinedClauses + " )"
