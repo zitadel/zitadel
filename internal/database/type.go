@@ -106,3 +106,31 @@ func (d *Duration) Scan(src any) error {
 	*d = Duration(time.Duration(interval.Microseconds*1000) + time.Duration(interval.Days)*24*time.Hour + time.Duration(interval.Months)*30*24*time.Hour)
 	return nil
 }
+
+type NullDuration struct {
+	Valid    bool
+	Duration time.Duration
+}
+
+// Scan implements the [database/sql.Scanner] interface.
+func (d *NullDuration) Scan(src any) error {
+	if src == nil {
+		d.Duration, d.Valid = 0, false
+		return nil
+	}
+	d.Valid = true
+	duration := new(Duration)
+	if err := duration.Scan(src); err != nil {
+		return err
+	}
+	d.Duration = time.Duration(*duration)
+	return nil
+}
+
+// Value implements the [database/sql/driver.Valuer] interface.
+func (n NullDuration) Value() (driver.Value, error) {
+	if !n.Valid {
+		return nil, nil
+	}
+	return n.Duration, nil
+}

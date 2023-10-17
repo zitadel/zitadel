@@ -399,6 +399,29 @@ service SystemService {
     };
   }
 
+  // Sets instance level limits
+  rpc SetLimits(SetLimitsRequest) returns (SetLimitsResponse) {
+    option (google.api.http) = {
+      put: "/instances/{instance_id}/limits"
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated";
+    };
+  }
+
+  // Resets instance level limits
+  rpc ResetLimits(ResetLimitsRequest) returns (ResetLimitsResponse) {
+    option (google.api.http) = {
+      delete: "/instances/{instance_id}/limits"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated";
+    };
+  }
+
   // Set a feature flag on an instance
   rpc SetInstanceFeature(SetInstanceFeatureRequest) returns (SetInstanceFeatureResponse) {
     option (google.api.http) = {
@@ -680,6 +703,28 @@ message RemoveQuotaRequest {
 }
 
 message RemoveQuotaResponse {
+  zitadel.v1.ObjectDetails details = 1;
+}
+
+message SetLimitsRequest {
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  google.protobuf.Duration audit_log_retention = 2 [
+    (validate.rules).duration.required = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the maximum lifetime of events returned by search events queries";
+    }
+  ];
+}
+
+message SetLimitsResponse {
+  zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetLimitsRequest {
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetLimitsResponse {
   zitadel.v1.ObjectDetails details = 1;
 }
 

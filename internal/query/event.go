@@ -4,6 +4,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
+
+	"github.com/zitadel/zitadel/internal/errors"
+
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -26,33 +30,35 @@ type EventEditor struct {
 	AvatarKey         string
 }
 
-func (q *Queries) SearchEvents(ctx context.Context, query *eventstore.SearchQueryBuilder, auditLogRetention time.Duration) (_ []*Event, err error) {
+func (q *Queries) SearchEvents(ctx context.Context, query *eventstore.SearchQueryBuilder) (_ []*Event, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+	auditLogRetention := q.defaultAuditLogRetention
+	instanceLimits, err := q.Limits(ctx, authz.GetInstance(ctx).InstanceID())
+	if err != nil && !errors.IsNotFound(err) {
+		return nil, err
+	}
+	if instanceLimits != nil && instanceLimits.AuditLogRetention != nil {
+		auditLogRetention = *instanceLimits.AuditLogRetention
+	}
+	if auditLogRetention != 0 {
+		query = filterAuditLogRetention(ctx, auditLogRetention, query)
+	}
 	events, err := q.eventstore.Filter(ctx, query.AllowTimeTravel())
 	if err != nil {
 		return nil, err
 	}
-
-	if auditLogRetention != 0 {
-		events = filterAuditLogRetention(ctx, events, auditLogRetention)
-	}
-
 	return q.convertEvents(ctx, events), nil
 }
 
-func filterAuditLogRetention(ctx context.Context, events []eventstore.Event, auditLogRetention time.Duration) []eventstore.Event {
+func filterAuditLogRetention(ctx context.Context, auditLogRetention time.Duration, builder *eventstore.SearchQueryBuilder) *eventstore.SearchQueryBuilder {
 	callTime := call.FromContext(ctx)
 	if callTime.IsZero() {
 		callTime = time.Now()
 	}
-	filteredEvents := make([]eventstore.Event, 0, len(events))
-	for _, event := range events {
-		if event.CreationDate().After(callTime.Add(-auditLogRetention)) {
-			filteredEvents = append(filteredEvents, event)
-		}
-	}
-	return filteredEvents
+	return builder.AddExcludingQuery().
+		CreationDateAfter(time.Now().Add(-auditLogRetention)).
+		Builder()
 }
 
 func (q *Queries) SearchEventTypes(ctx context.Context) []string {

@@ -194,14 +194,19 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 	return nil
 }
 
-func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause string, values []interface{}) {
-	values = make([]interface{}, 0, len(filters))
+func prepareCondition(criteria querier, inclusiveFilters [][]*repository.Filter, exclusiveFilters [][]*repository.Filter) (clause string, values []interface{}) {
+	values = make([]interface{}, 0, len(inclusiveFilters))
 
-	if len(filters) == 0 {
+	if len(inclusiveFilters) == 0 && len(exclusiveFilters) == 0 {
 		return clause, values
 	}
 
+	return " WHERE " + strings.Join(clauses, " OR "), values
+}
+
+func buildClauses(filters [][]*repository.Filter) ([]string, []interface{}) {
 	clauses := make([]string, len(filters))
+	values := make([]interface{}, 0, len(filters))
 	for idx, filter := range filters {
 		subClauses := make([]string, 0, len(filter))
 		for _, f := range filter {
@@ -218,13 +223,13 @@ func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause 
 
 			subClauses = append(subClauses, getCondition(criteria, f))
 			if subClauses[len(subClauses)-1] == "" {
-				return "", nil
+				return nil, nil
 			}
 			values = append(values, value)
 		}
 		clauses[idx] = "( " + strings.Join(subClauses, " AND ") + " )"
 	}
-	return " WHERE " + strings.Join(clauses, " OR "), values
+	return clauses, values
 }
 
 func getCondition(cond querier, filter *repository.Filter) (condition string) {

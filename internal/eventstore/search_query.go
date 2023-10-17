@@ -12,15 +12,16 @@ import (
 // SearchQueryBuilder represents the builder for your filter
 // if invalid data are set the filter will fail
 type SearchQueryBuilder struct {
-	columns         repository.Columns
-	limit           uint64
-	desc            bool
-	resourceOwner   string
-	instanceID      string
-	editorUser      string
-	queries         []*SearchQuery
-	tx              *sql.Tx
-	allowTimeTravel bool
+	columns          repository.Columns
+	limit            uint64
+	desc             bool
+	resourceOwner    string
+	instanceID       string
+	editorUser       string
+	queries          []*SearchQuery
+	excludingQueries []*SearchQuery
+	tx               *sql.Tx
+	allowTimeTravel  bool
 }
 
 type SearchQuery struct {
@@ -35,6 +36,8 @@ type SearchQuery struct {
 	eventData            map[string]interface{}
 	creationDateAfter    time.Time
 }
+
+func toFilters(queries []*SearchQuery) [][]
 
 // Columns defines which fields of the event are needed for the query
 type Columns repository.Columns
@@ -138,15 +141,31 @@ func (builder *SearchQueryBuilder) AllowTimeTravel() *SearchQueryBuilder {
 	return builder
 }
 
-// AddQuery creates a new sub query.
+// AddQuery is DEPRECATED: Use AddIncludingQuery instead
 // All fields in the sub query are AND-connected in the storage request.
-// Multiple sub queries are OR-connected in the storage request.
 func (builder *SearchQueryBuilder) AddQuery() *SearchQuery {
+	return builder.AddIncludingQuery()
+}
+
+// AddIncludingQuery creates a new sub query.
+// The sub query results are included in the end result provided that they meet the sub queries added with AddExcludingQuery
+// All fields in the sub query are AND-connected in the storage request.
+func (builder *SearchQueryBuilder) AddIncludingQuery() *SearchQuery {
 	query := &SearchQuery{
 		builder: builder,
 	}
 	builder.queries = append(builder.queries, query)
+	return query
+}
 
+// AddExcludingQuery creates a new sub query.
+// Rows that don't match the returned sub query are not returned in the result
+// All fields in the sub query are AND-connected in the storage request.
+func (builder *SearchQueryBuilder) AddExcludingQuery() *SearchQuery {
+	query := &SearchQuery{
+		builder: builder,
+	}
+	builder.excludingQueries = append(builder.excludingQueries, query)
 	return query
 }
 

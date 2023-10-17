@@ -8,6 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/repository/limits"
+
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 
@@ -49,6 +51,7 @@ type Queries struct {
 	supportedLangs                      []language.Tag
 	zitadelRoles                        []authz.RoleMapping
 	multifactors                        domain.MultifactorConfigs
+	defaultAuditLogRetention            time.Duration
 }
 
 func StartQueries(
@@ -61,6 +64,7 @@ func StartQueries(
 	zitadelRoles []authz.RoleMapping,
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
 	permissionCheck func(q *Queries) domain.PermissionCheck,
+	defaultAuditLogRetention time.Duration,
 ) (repo *Queries, err error) {
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	if err != nil {
@@ -82,6 +86,7 @@ func StartQueries(
 		NotificationTranslationFileContents: make(map[string][]byte),
 		zitadelRoles:                        zitadelRoles,
 		sessionTokenVerifier:                sessionTokenVerifier,
+		defaultAuditLogRetention:            defaultAuditLogRetention,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)
@@ -95,6 +100,7 @@ func StartQueries(
 	authrequest.RegisterEventMappers(repo.eventstore)
 	oidcsession.RegisterEventMappers(repo.eventstore)
 	quota.RegisterEventMappers(repo.eventstore)
+	limits.RegisterEventMappers(repo.eventstore)
 
 	repo.idpConfigEncryption = idpConfigEncryption
 	repo.multifactors = domain.MultifactorConfigs{

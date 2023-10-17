@@ -62,7 +62,7 @@ func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChanges
 		query.OrderAsc()
 	}
 
-	response, err := s.query.SearchEvents(ctx, query, s.auditLogRetention)
+	response, err := s.query.SearchEvents(ctx, query)
 	if err != nil {
 		return nil, err
 	}

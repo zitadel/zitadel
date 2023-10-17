@@ -70,6 +70,7 @@ var (
 	AuthRequestProjection               *authRequestProjection
 	MilestoneProjection                 *milestoneProjection
 	QuotaProjection                     *quotaProjection
+	LimitsProjection                    *limitsProjection
 )
 
 type projection interface {
@@ -150,6 +151,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es *eventstore.Eventsto
 	AuthRequestProjection = newAuthRequestProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["auth_requests"]))
 	MilestoneProjection = newMilestoneProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["milestones"]))
 	QuotaProjection = newQuotaProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["quotas"]))
+	LimitsProjection = newLimitsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["limits"]))
 	newProjectionsList()
 	return nil
 }
@@ -250,5 +252,6 @@ func newProjectionsList() {
 		AuthRequestProjection,
 		MilestoneProjection,
 		QuotaProjection,
+		LimitsProjection,
 	}
 }
