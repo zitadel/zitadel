@@ -35,8 +35,8 @@ FirstInstance:
     # If FirstInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role, not a human user.
     Machine:
       Machine:
-        Username: # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_USERNAME
-        Name: # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_NAME
+        Username: # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME
+        Name: # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME
       MachineKey:
         # date format: 2023-01-01T00:00:00Z
         ExpirationDate: # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINEKEY_EXPIRATIONDATE
