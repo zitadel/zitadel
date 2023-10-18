@@ -28,6 +28,8 @@ Errors:
       RemoveFailed: Objekt konnte nicht gelöscht werden
   Limit:
     ExceedsDefault: Limit überschreitet default Limit
+  Limits:
+    NotFound: Limits konnten nicht gefunden werden
   Language:
     NotParsed: Sprache konnte nicht gemapped werden
   OIDCSettings:

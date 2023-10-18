@@ -28,6 +28,8 @@ Errors:
       RemoveFailed: オブジェクトの削除に失敗しました
   Limit:
     ExceedsDefault: デフォルトの制限を超えています
+  Limits:
+    NotFound: 制限が見つかりません
   Language:
     NotParsed: 言語のパースに失敗しました
   OIDCSettings:

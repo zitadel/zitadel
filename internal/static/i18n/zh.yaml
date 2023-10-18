@@ -28,6 +28,8 @@ Errors:
       RemoveFailed: 无法移除对象
   Limit:
     ExceedsDefault: 超出默认限制
+  Limits:
+    NotFound: 未找到限制
   Language:
     NotParsed: 无法解析语言
   OIDCSettings:

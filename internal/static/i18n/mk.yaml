@@ -28,6 +28,8 @@ Errors:
       RemoveFailed: Објектот не може да се отстрани
   Limit:
     ExceedsDefault: Лимитот го надминува стандардниот лимит
+  Limits:
+    NotFound: Лимитот не е пронајден
   Language:
     NotParsed: Јазикот не може да се парсира
   OIDCSettings:
