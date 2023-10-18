@@ -168,9 +168,9 @@ func instanceIDsScanner(scanner scan, dest interface{}) (err error) {
 
 func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) {
 	return func(scanner scan, dest interface{}) (err error) {
-		events, ok := dest.(*[]eventstore.Event)
+		reduce, ok := dest.(eventstore.Reducer)
 		if !ok {
-			return z_errors.ThrowInvalidArgument(nil, "SQL-4GP6F", "type must be event")
+			return z_errors.ThrowInvalidArgumentf(nil, "SQL-4GP6F", "events scanner: invalid type %T", dest)
 		}
 		event := new(repository.Event)
 		data := sql.RawBytes{}
@@ -211,14 +211,9 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 			logging.New().WithError(err).Warn("unable to scan row")
 			return z_errors.ThrowInternal(err, "SQL-M0dsf", "unable to scan row")
 		}
-
-		event.Data = make([]byte, len(data))
-		copy(event.Data, data)
 		event.Pos = position.Float64
-
-		*events = append(*events, event)
-
-		return nil
+		event.Data = data
+		return reduce(event)
 	}
 }
 

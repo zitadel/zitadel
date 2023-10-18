@@ -1,9 +1,11 @@
 package eventstore
 
 import (
+	"context"
 	"database/sql"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
 )
 
@@ -80,6 +82,13 @@ func (q SearchQueryBuilder) GetEventSequenceGreater() uint64 {
 
 func (q SearchQueryBuilder) GetCreationDateAfter() time.Time {
 	return q.creationDateAfter
+}
+
+// ensureInstanceID makes sure that the instance id is always set
+func (b *SearchQueryBuilder) ensureInstanceID(ctx context.Context) {
+	if b.instanceID == nil && authz.GetInstance(ctx).InstanceID() != "" {
+		b.InstanceID(authz.GetInstance(ctx).InstanceID())
+	}
 }
 
 type SearchQuery struct {
