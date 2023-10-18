@@ -5,28 +5,22 @@ package system_test
 import (
 	"context"
 	"math/rand"
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/zitadel/zitadel/pkg/grpc/auth"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
-
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/pkg/grpc/auth"
+	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
 func TestServer_Limits_AuditLogRetention(t *testing.T) {
 	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(CTX, SystemCTX)
-	_, err := Tester.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
-		InstanceId:        instanceID,
-		AuditLogRetention: durationpb.New(5 * time.Second),
-	})
-	require.NoError(t, err)
 	userID, projectID, appID, projectGrantID := seedObjects(iamOwnerCtx, t)
 	beforeTime := time.Now()
 	zeroCounts := &eventCounts{}
@@ -37,14 +31,14 @@ func TestServer_Limits_AuditLogRetention(t *testing.T) {
 	addedCount := requireEventually(t, iamOwnerCtx, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
 		counts.assertAll(t, c, "added events are > seeded events", assert.Greater, seededCount)
 	}, "wait for added event assertions to pass")
-	_, err = Tester.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
+	_, err := Tester.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
 		InstanceId:        instanceID,
 		AuditLogRetention: durationpb.New(time.Now().Sub(beforeTime)),
 	})
 	require.NoError(t, err)
 	requireEventually(t, iamOwnerCtx, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
-		counts.assertAll(t, c, "limited events > 0", assert.Greater, zeroCounts)
 		counts.assertAll(t, c, "limited events < added events", assert.Less, addedCount)
+		counts.assertAll(t, c, "limited events > 0", assert.Greater, zeroCounts)
 	}, "wait for limited event assertions to pass")
 	_, err = Tester.Client.System.ResetLimits(SystemCTX, &system.ResetLimitsRequest{
 		InstanceId: instanceID,
@@ -62,21 +56,15 @@ func requireEventually(
 	assertCounts func(assert.TestingT, *eventCounts),
 	msg string,
 ) (counts *eventCounts) {
-	counts = countEvents(ctx, t, userID, projectID, appID, projectGrantID)
-	t.Run(msg, func(t *testing.T) {
-		assertCounts(t, counts)
-	})
+	countTimeout := 30 * time.Second
+	assertTimeout := countTimeout + time.Second
+	countCtx, cancel := context.WithTimeout(ctx, countTimeout)
+	defer cancel()
+	require.EventuallyWithT(t, func(c *assert.CollectT) {
+		counts = countEvents(countCtx, t, userID, projectID, appID, projectGrantID)
+		assertCounts(c, counts)
+	}, assertTimeout, time.Second, msg)
 	return counts
-
-	/*	countTimeout := 30 * time.Second
-		assertTimeout := countTimeout + time.Second
-		countCtx, cancel := context.WithTimeout(ctx, countTimeout)
-		defer cancel()
-		require.EventuallyWithT(t, func(c *assert.CollectT) {
-			counts = countEvents(countCtx, t, userID, projectID, appID, projectGrantID)
-			assertCounts(c, counts)
-		}, assertTimeout, time.Second, msg)
-		return counts*/
 }
 
 var runes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -173,29 +161,53 @@ func (e *eventCounts) assertAll(t *testing.T, c assert.TestingT, name string, co
 	})
 }
 
-func countEvents(ctx context.Context, t *testing.T, userID, projectID, appID, grantID string) (counts *eventCounts) {
+func countEvents(ctx context.Context, t *testing.T, userID, projectID, appID, grantID string) *eventCounts {
 	t.Helper()
-	all, err := Tester.Client.Admin.ListEvents(ctx, &admin.ListEventsRequest{})
-	require.NoError(t, err)
-	myUser, err := Tester.Client.Auth.ListMyUserChanges(ctx, &auth.ListMyUserChangesRequest{})
-	require.NoError(t, err)
-	aUser, err := Tester.Client.Mgmt.ListUserChanges(ctx, &management.ListUserChangesRequest{UserId: userID})
-	require.NoError(t, err)
-	app, err := Tester.Client.Mgmt.ListAppChanges(ctx, &management.ListAppChangesRequest{ProjectId: projectID, AppId: appID})
-	require.NoError(t, err)
-	org, err := Tester.Client.Mgmt.ListOrgChanges(ctx, &management.ListOrgChangesRequest{})
-	require.NoError(t, err)
-	project, err := Tester.Client.Mgmt.ListProjectChanges(ctx, &management.ListProjectChangesRequest{ProjectId: projectID})
-	require.NoError(t, err)
-	grant, err := Tester.Client.Mgmt.ListProjectGrantChanges(ctx, &management.ListProjectGrantChangesRequest{ProjectId: projectID, GrantId: grantID})
-	require.NoError(t, err)
-	return &eventCounts{
-		all:     len(all.GetEvents()),
-		myUser:  len(myUser.GetResult()),
-		aUser:   len(aUser.GetResult()),
-		grant:   len(grant.GetResult()),
-		project: len(project.GetResult()),
-		app:     len(app.GetResult()),
-		org:     len(org.GetResult()),
-	}
+	counts := new(eventCounts)
+	var wg sync.WaitGroup
+	wg.Add(7)
+	go func() {
+		defer wg.Done()
+		result, err := Tester.Client.Admin.ListEvents(ctx, &admin.ListEventsRequest{})
+		require.NoError(t, err)
+		counts.all = len(result.GetEvents())
+	}()
+	go func() {
+		defer wg.Done()
+		result, err := Tester.Client.Auth.ListMyUserChanges(ctx, &auth.ListMyUserChangesRequest{})
+		require.NoError(t, err)
+		counts.myUser = len(result.GetResult())
+	}()
+	go func() {
+		defer wg.Done()
+		result, err := Tester.Client.Mgmt.ListUserChanges(ctx, &management.ListUserChangesRequest{UserId: userID})
+		require.NoError(t, err)
+		counts.aUser = len(result.GetResult())
+	}()
+	go func() {
+		defer wg.Done()
+		result, err := Tester.Client.Mgmt.ListAppChanges(ctx, &management.ListAppChangesRequest{ProjectId: projectID, AppId: appID})
+		require.NoError(t, err)
+		counts.app = len(result.GetResult())
+	}()
+	go func() {
+		defer wg.Done()
+		result, err := Tester.Client.Mgmt.ListOrgChanges(ctx, &management.ListOrgChangesRequest{})
+		require.NoError(t, err)
+		counts.org = len(result.GetResult())
+	}()
+	go func() {
+		defer wg.Done()
+		result, err := Tester.Client.Mgmt.ListProjectChanges(ctx, &management.ListProjectChangesRequest{ProjectId: projectID})
+		require.NoError(t, err)
+		counts.project = len(result.GetResult())
+	}()
+	go func() {
+		defer wg.Done()
+		result, err := Tester.Client.Mgmt.ListProjectGrantChanges(ctx, &management.ListProjectGrantChangesRequest{ProjectId: projectID, GrantId: grantID})
+		require.NoError(t, err)
+		counts.grant = len(result.GetResult())
+	}()
+	wg.Wait()
+	return counts
 }
