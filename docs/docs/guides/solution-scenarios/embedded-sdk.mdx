@@ -3,20 +3,28 @@ title: Impersonation for embedded SDK with ZITADEL
 sidebar_label: Embedded SDK
 ---
 
-## Use Case
+Through conversations with our users we encountered a use case that requires to embed an SDK in an existing mobile application and making secure calls to a backend API to store and query additional information.
+Examples of such cases:
+
+- You create a software that enhances existing banking (mobile) applications by providing additional services to the bank's customers. Your service requires integration with the mobile banking application of many banks. Data must be shared securely with a backend API to provide your services, e.g. user profile, analyzing expenditures, calculating portfolio returns, etc.
+- You create software that enables health insurances to provide additional services to their customers. Your service requires integration with the mobile application of many insurances and healthcare providers. Data must be shared securely with a backend API to provide your services, e.g. user profile, fitness data, user uploads
+
+A simple solution would be use a service account's secret in the mobile application to communicate with your backend.
+We consider saving a long-lived secrets in the mobile application unsafe, as this is a public client and the credentials could be leaked.
+
+In this solution scenario guide we describe a solution that uses impersonation of users and is considered best practice in our view, balancing security and integration effort.
+We will also highlight some [alternative approaches](#alternative-approaches).
 
 ## Solution architecture
 
-Prerequisite:
+Precondition:
 
 - Your SDK has access to the app's access token
-
 
 ![Solution Architecture](/img/guides/solution-scenarios/solution-scenario-embedded-sdk.svg)
 
 Impersonation / Delegation
 Take token from client; Call zitadel user-endpoint; Validate on Bank IDP (or not depending on policy) → user_info endpoint or introspect (braucht client secret)
-
 
 ### Considerations
 
@@ -61,7 +69,6 @@ Why is ZITADEL needed and not just send the info straight to an endpoint?
 
 ## Alternative approaches
 
+- Create a session just from user-context (eg, username/id)
 - Backend service customer-side
 - Service account secret: not secure - public client
-
-
