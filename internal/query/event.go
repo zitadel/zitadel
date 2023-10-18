@@ -5,10 +5,8 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
-	"github.com/zitadel/zitadel/internal/errors"
-
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )

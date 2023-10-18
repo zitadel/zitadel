@@ -8,8 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/repository/limits"
-
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 
@@ -25,6 +23,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/repository/limits"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"

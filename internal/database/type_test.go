@@ -2,10 +2,11 @@ package database
 
 import (
 	"database/sql/driver"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMap_Scan(t *testing.T) {

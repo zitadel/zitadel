@@ -3,12 +3,11 @@ package projection
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/repository/limits"
-
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/limits"
 )
 
 const (
@@ -85,12 +84,14 @@ func (p *limitsProjection) reduceLimitsSet(event eventstore.Event) (*handler.Sta
 		handler.NewCol(LimitsColumnInstanceID, e.Aggregate().InstanceID),
 		handler.NewCol(LimitsColumnResourceOwner, e.Aggregate().ResourceOwner),
 	}
-	updateCols := append(conflictCols,
+	updateCols := []handler.Column{
+		handler.NewCol(LimitsColumnInstanceID, e.Aggregate().InstanceID),
+		handler.NewCol(LimitsColumnResourceOwner, e.Aggregate().ResourceOwner),
 		handler.NewCol(LimitsColumnCreationDate, e.CreationDate()),
 		handler.NewCol(LimitsColumnChangeDate, e.CreationDate()),
 		handler.NewCol(LimitsColumnSequence, e.Sequence()),
 		handler.NewCol(LimitsColumnAggregateID, e.Aggregate().ID),
-	)
+	}
 	if e.AuditLogRetention != nil {
 		updateCols = append(updateCols, handler.NewCol(LimitsColumnAuditLogRetention, *e.AuditLogRetention))
 	}
