@@ -227,21 +227,24 @@ func (builder *SearchQueryBuilder) AwaitOpenTransactions() *SearchQueryBuilder {
 }
 
 // SequenceGreater filters for events with sequence greater the requested sequence
-func (query *SearchQueryBuilder) SequenceGreater(sequence uint64) *SearchQueryBuilder {
-	query.eventSequenceGreater = sequence
-	return query
+func (builder *SearchQueryBuilder) SequenceGreater(sequence uint64) *SearchQueryBuilder {
+	builder.eventSequenceGreater = sequence
+	return builder
 }
 
 // ExcludedInstanceID filters for events not having the given instanceIDs
-func (query *SearchQueryBuilder) ExcludedInstanceID(instanceIDs ...string) *SearchQueryBuilder {
-	query.excludedInstanceIDs = instanceIDs
-	return query
+func (builder *SearchQueryBuilder) ExcludedInstanceID(instanceIDs ...string) *SearchQueryBuilder {
+	builder.excludedInstanceIDs = instanceIDs
+	return builder
 }
 
 // CreationDateAfter filters for events which happened after the specified time
-func (query *SearchQueryBuilder) CreationDateAfter(time time.Time) *SearchQueryBuilder {
-	query.creationDateAfter = time
-	return query
+func (builder *SearchQueryBuilder) CreationDateAfter(creationDate time.Time) *SearchQueryBuilder {
+	if creationDate.IsZero() || creationDate.Unix() == 0 {
+		return builder
+	}
+	builder.creationDateAfter = creationDate
+	return builder
 }
 
 // AddQuery creates a new sub query.
