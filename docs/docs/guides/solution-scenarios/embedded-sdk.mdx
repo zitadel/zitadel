@@ -7,11 +7,45 @@ sidebar_label: Embedded SDK
 
 ## Solution architecture
 
+Prerequisite:
+
+- Your SDK has access to the app's access token
+
+
 ![Solution Architecture](/img/guides/solution-scenarios/solution-scenario-embedded-sdk.svg)
+
+Impersonation / Delegation
+Take token from client; Call zitadel user-endpoint; Validate on Bank IDP (or not depending on policy) → user_info endpoint or introspect (braucht client secret)
+
 
 ### Considerations
 
+- Limit permissions of the client: only token exchange etc.
+
+Caveats:
+
+- https://github.com/zitadel/zitadel/discussions/6006
+- https://github.com/zitadel/zitadel/discussions/5895
+- https://github.com/zitadel/zitadel/issues/6701
+- https://github.com/zitadel/zitadel/issues/6700
+
+Session API:
+
+- impersonation fucntionality
+- return AT/IDT/JWT
+
+Impersonation / Actions:
+
+- Call userinfo endpoint (public)
+- Call introspect endpoint (with credentials)
+- Discover issuer in token (or just iterate like KC)
+- Configuration:
+  - opaque tokens: issuer must be submitted
+  - Issuer whitelisting
+  
 ## Benefits
+
+Why is ZITADEL needed and not just send the info straight to an endpoint?
 
 ### Using multiple services
 
@@ -23,4 +57,11 @@ sidebar_label: Embedded SDK
 
 ## Impersonation through ZITADEL session API
 
+## Creating users
+
 ## Alternative approaches
+
+- Backend service customer-side
+- Service account secret: not secure - public client
+
+
