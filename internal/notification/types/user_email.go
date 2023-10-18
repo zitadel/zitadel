@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/internal/notification/templates"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
@@ -17,6 +18,7 @@ func generateEmail(
 	subject,
 	content string,
 	lastEmail bool,
+	templateData templates.TemplateData,
 	triggeringEvent eventstore.Event,
 ) error {
 	content = html.UnescapeString(content)
@@ -24,6 +26,7 @@ func generateEmail(
 		Recipients:      []string{user.VerifiedEmail},
 		Subject:         subject,
 		Content:         content,
+		TemplateData:    templateData,
 		TriggeringEvent: triggeringEvent,
 	}
 	if lastEmail {

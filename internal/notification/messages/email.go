@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/channels"
+	"github.com/zitadel/zitadel/internal/notification/templates"
 )
 
 var (
@@ -26,6 +27,7 @@ type Email struct {
 	ReplyToAddress  string
 	Subject         string
 	Content         string
+	TemplateData    templates.TemplateData
 	TriggeringEvent eventstore.Event
 }
 

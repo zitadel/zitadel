@@ -33,6 +33,7 @@ type TemplateData struct {
 
 	IncludeFooter bool
 	FooterText    string
+	Data          map[string]interface{}
 }
 
 func (data *TemplateData) Translate(translator *i18n.Translator, msgType string, args map[string]interface{}, langs ...string) {
@@ -49,4 +50,5 @@ func (data *TemplateData) Translate(translator *i18n.Translator, msgType string,
 	// we'll include the footer if we have a custom non-empty string and if the string doesn't include the
 	// id of the string that could not be translated example InitCode.Footer
 	data.IncludeFooter = len(data.FooterText) > 0 && data.FooterText != footerText
+	data.Data = args
 }

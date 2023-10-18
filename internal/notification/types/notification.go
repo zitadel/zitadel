@@ -54,6 +54,7 @@ func SendEmail(
 			data.Subject,
 			template,
 			allowUnverifiedNotificationChannel,
+			data,
 			triggeringEvent,
 		)
 	}
