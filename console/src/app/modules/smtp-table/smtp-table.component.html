@@ -9,88 +9,71 @@
 >
   <div class="table-wrapper">
     <table class="table" mat-table [dataSource]="dataSource">
-      <ng-container matColumnDef="availability">
+      <ng-container matColumnDef="activated">
         <th class="availability" mat-header-cell *matHeaderCellDef>
           <span>{{ 'SMTP.LIST.ACTIVATED' | translate }}</span>
         </th>
-        <td class="pointer availability" mat-cell *matCellDef="let idp">
+        <td class="pointer availability" mat-cell *matCellDef="let config">
           <i
             matTooltip="{{ 'IDP.AVAILABLE' | translate }}"
-            *ngIf="isEnabled(idp) && idp.state === IDPState.IDP_STATE_ACTIVE"
+            *ngIf="config.isActive"
             class="idp-available las la-check-circle"
           ></i>
           <i
             matTooltip="{{ 'IDP.AVAILABLEBUTINACTIVE' | translate }}"
-            *ngIf="isEnabled(idp) && idp.state === IDPState.IDP_STATE_INACTIVE"
+            *ngIf="!config.isActive"
             class="idp-not-available las la-check-circle"
           ></i>
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>{{ 'IDP.NAME' | translate }}</th>
-        <td class="pointer" mat-cell *matCellDef="let idp">
-          <span>{{ idp?.name }}</span>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="type">
+      <ng-container matColumnDef="providerType">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.TYPE' | translate }}</th>
-        <td class="pointer" mat-cell *matCellDef="let idp">
-          <div [ngSwitch]="idp.type">
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_AZURE_AD">
-              <img class="idp-logo" src="./assets/images/idp/ms.svg" alt="azure ad" />
-              Microsoft
+        <td class="pointer" mat-cell *matCellDef="let config">
+          <div [ngSwitch]="config.providerType">
+            <div class="idp-table-provider-type" *ngSwitchCase="SMTPProviderType.SMTP_PROVIDER_TYPE_SENDGRID">
+              <img class="idp-logo" src="./assets/images/smtp/sendgrid.png" alt="sendgrid" />
+              Sendgrid
             </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GOOGLE">
-              <img class="idp-logo" src="./assets/images/idp/google.png" alt="google" />
-              Google
+            <div class="idp-table-provider-type" *ngSwitchCase="SMTPProviderType.SMTP_PROVIDER_TYPE_POSTMARK">
+              <img class="idp-logo" src="./assets/images/smtp/postmark.png" alt="postmark" />
+              Postmark
             </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITHUB">
-              <img class="idp-logo dark" src="./assets/images/idp/github-dark.svg" alt="github" />
-              <img class="idp-logo light" src="./assets/images/idp/github.svg" alt="github" />
-              GitHub
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_OIDC">
-              <mat-icon class="idp-icon" svgIcon="mdi_openid" alt="oidc" />
-              Generic OIDC
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_OAUTH">
-              <img class="idp-logo" src="./assets/images/idp/oauth.svg" alt="oauth" />
-              Generic OAuth
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_JWT">
-              <mat-icon class="idp-icon" svgIcon="mdi_jwt" alt="jwt" />
-              Generic JWT
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITLAB">
-              <img class="idp-logo" src="./assets/images/idp/gitlab.svg" alt="gitlab" />
-              Gitlab
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITLAB_SELF_HOSTED">
-              <img class="idp-logo" src="./assets/images/idp/gitlab.svg" alt="gitlab self hosted" />
-              Gitlab Self Hosted
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITHUB_ES">
-              <img class="idp-logo dark" src="./assets/images/idp/github-dark.svg" alt="github" />
-              <img class="idp-logo light" src="./assets/images/idp/github.svg" alt="github" />
-              GitHub Enterprise Server
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_LDAP">
-              <i class="idp-icon las la-building"></i>
-              Active Directory / LDAP
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_APPLE">
-              <img class="idp-logo apple dark" src="./assets/images/idp/apple-dark.svg" alt="apple" />
-              <img class="idp-logo apple light" src="./assets/images/idp/apple.svg" alt="apple" />
-              Apple
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchDefault>coming soon</div>
           </div>
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="state">
+      <ng-container matColumnDef="tls">
+        <th class="availability" mat-header-cell *matHeaderCellDef>
+          <span>TLS</span>
+        </th>
+        <td class="pointer availability" mat-cell *matCellDef="let config">
+          <i *ngIf="config.tls" class="las la-check"></i>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="host">
+        <th mat-header-cell *matHeaderCellDef>{{ 'SETTING.SMTP.HOSTANDPORT' | translate }}</th>
+        <td class="pointer" mat-cell *matCellDef="let config">
+          <span>{{ config?.host }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="senderAddress">
+        <th mat-header-cell *matHeaderCellDef>{{ 'SETTING.SMTP.SENDERADDRESS' | translate }}</th>
+        <td class="pointer" mat-cell *matCellDef="let config">
+          <span>{{ config?.senderAddress }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="senderName">
+        <th mat-header-cell *matHeaderCellDef>{{ 'SETTING.SMTP.SENDERNAME' | translate }}</th>
+        <td class="pointer" mat-cell *matCellDef="let config">
+          <span>{{ config?.senderName }}</span>
+        </td>
+      </ng-container>
+
+      <!-- <ng-container matColumnDef="state">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.STATE' | translate }}</th>
         <td class="pointer" mat-cell *matCellDef="let idp">
           <span
@@ -123,7 +106,7 @@
         <td class="pointer" mat-cell *matCellDef="let idp">
           {{ 'IDP.OWNERTYPES.' + idp.owner | translate }}
         </td>
-      </ng-container>
+      </ng-container> -->
 
       <ng-container matColumnDef="actions" stickyEnd>
         <th class="idp-table-actions" mat-header-cell *matHeaderCellDef></th>
@@ -176,6 +159,7 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns"></tr>
       <!-- <tr class="highlight" (click)="navigateToIDP(row)" mat-row *matRowDef="let row; columns: displayedColumns"></tr> -->
     </table>
   </div>
@@ -185,14 +169,13 @@
     <span>{{ 'SMTP.LIST.EMPTY' | translate }}</span>
   </div>
 
-  <!-- TODO add paginator-->
-  <!-- <cnsl-paginator
+  <cnsl-paginator
     #paginator
     class="paginator"
-    [timestamp]="idpResult?.details?.viewTimestamp"
-    [length]="idpResult?.details?.totalResult || 0"
+    [timestamp]="configsResult?.details?.viewTimestamp"
+    [length]="configsResult?.details?.totalResult || 0"
     [pageSize]="10"
     [pageSizeOptions]="[10, 20, 50, 100]"
     (page)="changePage($event)"
-  ></cnsl-paginator> -->
+  ></cnsl-paginator>
 </cnsl-refresh-table>

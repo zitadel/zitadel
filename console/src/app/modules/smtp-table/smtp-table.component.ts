@@ -5,6 +5,7 @@ import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/materia
 import { Router, RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { SMTPProviderType } from 'src/app/proto/generated/zitadel/settings_pb';
 import {
   IDPLoginPolicyLink,
   IDPOwnerType,
@@ -23,28 +24,29 @@ import { OverlayWorkflowService } from 'src/app/services/overlay/overlay-workflo
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { ListSMTPConfigsRequest, ListSMTPConfigsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
+import { SMTPConfig } from 'src/app/proto/generated/zitadel/settings_pb';
 
 @Component({
   selector: 'cnsl-smtp-table',
   templateUrl: './smtp-table.component.html',
   styleUrls: ['./smtp-table.component.scss'],
 })
-export class SMTPTableComponent implements OnInit, OnDestroy {
+export class SMTPTableComponent implements OnInit {
   @Input() service!: AdminService | ManagementService;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
-  public dataSource: MatTableDataSource<Provider.AsObject> = new MatTableDataSource<Provider.AsObject>();
-  public selection: SelectionModel<Provider.AsObject> = new SelectionModel<Provider.AsObject>(true, []);
-  public providersResult?: ListSMTPConfigsResponse.AsObject;
+  public dataSource: MatTableDataSource<SMTPConfig.AsObject> = new MatTableDataSource<SMTPConfig.AsObject>();
+  public selection: SelectionModel<SMTPConfig.AsObject> = new SelectionModel<SMTPConfig.AsObject>(true, []);
+  public configsResult?: ListSMTPConfigsResponse.AsObject;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public IDPOwnerType: any = IDPOwnerType;
   public IDPState: any = IDPState;
-  public ProviderType: any = ProviderType;
-  public displayedColumns: string[] = ['availability', 'name', 'type', 'creationDate', 'changeDate', 'actions'];
-  @Output() public changedSelection: EventEmitter<Array<Provider.AsObject>> = new EventEmitter();
+  public SMTPProviderType: any = SMTPProviderType;
+  // public displayedColumns: string[] = ['availability', 'name', 'type', 'creationDate', 'changeDate', 'actions'];
+  public displayedColumns: string[] = ['activated', 'providerType', 'tls', 'host', 'senderAddress', 'senderName'];
+  @Output() public changedSelection: EventEmitter<Array<SMTPConfig.AsObject>> = new EventEmitter();
 
-  public idps: IDPLoginPolicyLink.AsObject[] = [];
   public IDPStylingType: any = IDPStylingType;
   public loginPolicy!: LoginPolicy.AsObject;
 
@@ -60,27 +62,10 @@ export class SMTPTableComponent implements OnInit, OnDestroy {
     this.selection.changed.subscribe(() => {
       this.changedSelection.emit(this.selection.selected);
     });
-
-    this.reloadIDPs$.subscribe(() => {
-      this.getIdps()
-        .then((resp) => {
-          this.idps = resp;
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    });
   }
 
   ngOnInit(): void {
     this.getData(10, 0);
-    this.getIdps().then((resp) => {
-      this.idps = resp;
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.reloadIDPs$.complete();
   }
 
   public isAllSelected(): boolean {
@@ -166,9 +151,10 @@ export class SMTPTableComponent implements OnInit, OnDestroy {
     (this.service as AdminService)
       .listSMTPConfigs()
       .then((resp) => {
-        console.log(resp);
-        // this.providersResult = resp;
-        // this.dataSource.data = resp.resultList;
+        this.configsResult = resp;
+        if (resp.resultList) {
+          this.dataSource.data = resp.resultList;
+        }
         this.loadingSubject.next(false);
       })
       .catch((error) => {
@@ -219,15 +205,6 @@ export class SMTPTableComponent implements OnInit, OnDestroy {
   //   }
   // }
 
-  private async getIdps(): Promise<IDPLoginPolicyLink.AsObject[]> {
-    return (this.service as AdminService).getLoginPolicy().then((policyResp) => {
-      if (policyResp.policy) {
-        this.loginPolicy = policyResp.policy;
-      }
-      return policyResp.policy?.idpsList ?? [];
-    });
-  }
-
   // public addIdp(idp: Provider.AsObject): Promise<any> {
   //   return (this.service as AdminService)
   //     .addIDPToLoginPolicy(idp.id)
@@ -270,9 +247,9 @@ export class SMTPTableComponent implements OnInit, OnDestroy {
   //   });
   // }
 
-  public isEnabled(idp: Provider.AsObject): boolean {
-    return this.idps.findIndex((i) => i.idpId === idp.id) > -1;
-  }
+  // public isEnabled(idp: Provider.AsObject): boolean {
+  //   return this.idps.findIndex((i) => i.idpId === idp.id) > -1;
+  // }
 
   public get displayedColumnsWithActions(): string[] {
     return ['actions', ...this.displayedColumns];

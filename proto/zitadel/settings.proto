@@ -93,6 +93,7 @@ message SMTPConfig {
   ];
   bool is_active = 8;
   SMTPProviderType provider_type = 9;
+  string id = 10;
 }
 
 message SMSProvider {
