@@ -28,6 +28,7 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
     iconClasses: 'las la-database',
     darkcolor: greendark,
     lightcolor: greenlight,
+    aggregateType: '',
   },
   {
     order: 1,
@@ -37,6 +38,7 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
     iconClasses: 'lab la-openid',
     darkcolor: purpledark,
     lightcolor: purplelight,
+    aggregateType: '',
   },
   {
     order: 2,
@@ -46,6 +48,7 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
     iconClasses: 'las la-user',
     darkcolor: bluedark,
     lightcolor: bluelight,
+    aggregateType: '',
   },
   {
     order: 3,
@@ -55,6 +58,7 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
     iconClasses: 'las la-shield-alt',
     darkcolor: reddark,
     lightcolor: redlight,
+    aggregateType: '',
   },
   {
     order: 4,
@@ -65,6 +69,7 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
     iconClasses: 'las la-swatchbook',
     darkcolor: pinkdark,
     lightcolor: pinklight,
+    aggregateType: '',
   },
   {
     order: 5,
@@ -75,5 +80,6 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
     iconClasses: 'las la-envelope',
     darkcolor: yellowdark,
     lightcolor: yellowlight,
+    aggregateType: '',
   },
 ];
