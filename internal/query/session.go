@@ -239,7 +239,8 @@ func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQue
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
 			SessionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+		}).
+		ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-sn9Jf", "Errors.Query.InvalidRequest")
 	}
@@ -266,6 +267,14 @@ func NewSessionIDsSearchQuery(ids []string) (SearchQuery, error) {
 
 func NewSessionCreatorSearchQuery(creator string) (SearchQuery, error) {
 	return NewTextQuery(SessionColumnCreator, creator, TextEquals)
+}
+
+func NewUserIDSearchQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(HumanUserIDCol, id, TextEquals)
+}
+
+func NewCreationDateQuery(datetime time.Time, compare TimestampComparison) (SearchQuery, error) {
+	return NewTimestampQuery(SessionColumnCreationDate, datetime, compare)
 }
 
 func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Session, string, error)) {

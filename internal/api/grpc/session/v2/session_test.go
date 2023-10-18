@@ -14,12 +14,17 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	objpb "github.com/zitadel/zitadel/pkg/grpc/object"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
+)
+
+var (
+	creationDate = time.Date(2023, 10, 10, 14, 15, 0, 0, time.UTC)
 )
 
 func Test_sessionsToPb(t *testing.T) {
@@ -309,11 +314,18 @@ func mustNewListQuery(t testing.TB, column query.Column, list []any, compare que
 	return q
 }
 
+func mustNewTimestampQuery(t testing.TB, column query.Column, ts time.Time, compare query.TimestampComparison) query.SearchQuery {
+	q, err := query.NewTimestampQuery(column, ts, compare)
+	require.NoError(t, err)
+	return q
+}
+
 func Test_listSessionsRequestToQuery(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		req *session.ListSessionsRequest
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -331,6 +343,26 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 					Offset: 0,
 					Limit:  0,
 					Asc:    false,
+				},
+				Queries: []query.SearchQuery{
+					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
+				},
+			},
+		},
+		{
+			name: "default request with sorting column",
+			args: args{
+				ctx: authz.NewMockContext("123", "456", "789"),
+				req: &session.ListSessionsRequest{
+					SortingColumn: session.SessionFieldName_SESSION_FIELD_NAME_CREATION_DATE,
+				},
+			},
+			want: &query.SessionsSearchQueries{
+				SearchRequest: query.SearchRequest{
+					Offset:        0,
+					Limit:         0,
+					SortingColumn: query.SessionColumnCreationDate,
+					Asc:           false,
 				},
 				Queries: []query.SearchQuery{
 					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
@@ -358,6 +390,17 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 								Ids: []string{"4", "5", "6"},
 							},
 						}},
+						{Query: &session.SearchQuery_UserIdQuery{
+							UserIdQuery: &session.UserIDQuery{
+								Id: "10",
+							},
+						}},
+						{Query: &session.SearchQuery_CreationDateQuery{
+							CreationDateQuery: &session.CreationDateQuery{
+								CreationDate: timestamppb.New(creationDate),
+								Method:       objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_GREATER,
+							},
+						}},
 					},
 				},
 			},
@@ -370,6 +413,8 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 				Queries: []query.SearchQuery{
 					mustNewListQuery(t, query.SessionColumnID, []interface{}{"1", "2", "3"}, query.ListIn),
 					mustNewListQuery(t, query.SessionColumnID, []interface{}{"4", "5", "6"}, query.ListIn),
+					mustNewTextQuery(t, query.HumanUserIDCol, "10", query.TextEquals),
+					mustNewTimestampQuery(t, query.SessionColumnCreationDate, creationDate, query.TimestampGreater),
 					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
 				},
 			},
@@ -487,7 +532,7 @@ func Test_sessionQueryToQuery(t *testing.T) {
 			wantErr: caos_errs.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid"),
 		},
 		{
-			name: "query",
+			name: "ids query",
 			args: args{&session.SearchQuery{
 				Query: &session.SearchQuery_IdsQuery{
 					IdsQuery: &session.IDsQuery{
@@ -496,6 +541,40 @@ func Test_sessionQueryToQuery(t *testing.T) {
 				},
 			}},
 			want: mustNewListQuery(t, query.SessionColumnID, []interface{}{"1", "2", "3"}, query.ListIn),
+		},
+		{
+			name: "user id query",
+			args: args{&session.SearchQuery{
+				Query: &session.SearchQuery_UserIdQuery{
+					UserIdQuery: &session.UserIDQuery{
+						Id: "10",
+					},
+				},
+			}},
+			want: mustNewTextQuery(t, query.HumanUserIDCol, "10", query.TextEquals),
+		},
+		{
+			name: "creation date query",
+			args: args{&session.SearchQuery{
+				Query: &session.SearchQuery_CreationDateQuery{
+					CreationDateQuery: &session.CreationDateQuery{
+						CreationDate: timestamppb.New(creationDate),
+						Method:       objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_LESS,
+					},
+				},
+			}},
+			want: mustNewTimestampQuery(t, query.SessionColumnCreationDate, creationDate, query.TimestampLess),
+		},
+		{
+			name: "creation date query with default method",
+			args: args{&session.SearchQuery{
+				Query: &session.SearchQuery_CreationDateQuery{
+					CreationDateQuery: &session.CreationDateQuery{
+						CreationDate: timestamppb.New(creationDate),
+					},
+				},
+			}},
+			want: mustNewTimestampQuery(t, query.SessionColumnCreationDate, creationDate, query.TimestampEquals),
 		},
 	}
 	for _, tt := range tests {
