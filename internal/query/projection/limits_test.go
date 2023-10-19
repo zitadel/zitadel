@@ -6,8 +6,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/limits"
 )
 
@@ -25,7 +24,7 @@ func TestLimitsProjection_reduces(t *testing.T) {
 			name: "reduceLimitsSet",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(limits.SetEventType),
+					limits.SetEventType,
 					limits.AggregateType,
 					[]byte(`{
 							"auditLogRetention": 300000000000
@@ -34,9 +33,8 @@ func TestLimitsProjection_reduces(t *testing.T) {
 			},
 			reduce: (&limitsProjection{}).reduceLimitsSet,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("limits"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("limits"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -60,16 +58,15 @@ func TestLimitsProjection_reduces(t *testing.T) {
 			name: "reduceLimitsReset",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(limits.ResetEventType),
+					limits.ResetEventType,
 					limits.AggregateType,
 					[]byte(`{}`),
 				), limits.ResetEventMapper),
 			},
 			reduce: (&limitsProjection{}).reduceLimitsReset,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("limits"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("limits"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/limits"
@@ -42,19 +41,17 @@ func TestLimits_SetLimits(t *testing.T) {
 						t,
 						expectFilter(),
 						expectPush(
-							[]*repository.Event{
-								eventFromEventPusherWithInstanceID(
-									"instance1",
-									limits.NewSetEvent(
-										eventstore.NewBaseEventForPush(
-											context.Background(),
-											&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
-											limits.SetEventType,
-										),
-										limits.ChangeAuditLogRetention(time.Hour),
+							eventFromEventPusherWithInstanceID(
+								"instance1",
+								limits.NewSetEvent(
+									eventstore.NewBaseEventForPush(
+										context.Background(),
+										&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
+										limits.SetEventType,
 									),
+									limits.ChangeAuditLogRetention(time.Hour),
 								),
-							},
+							),
 						),
 					),
 					id_mock.NewIDGeneratorExpectIDs(t, "limits1")
@@ -90,19 +87,17 @@ func TestLimits_SetLimits(t *testing.T) {
 							),
 						),
 						expectPush(
-							[]*repository.Event{
-								eventFromEventPusherWithInstanceID(
-									"instance1",
-									limits.NewSetEvent(
-										eventstore.NewBaseEventForPush(
-											context.Background(),
-											&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
-											limits.SetEventType,
-										),
-										limits.ChangeAuditLogRetention(time.Hour),
+							eventFromEventPusherWithInstanceID(
+								"instance1",
+								limits.NewSetEvent(
+									eventstore.NewBaseEventForPush(
+										context.Background(),
+										&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
+										limits.SetEventType,
 									),
+									limits.ChangeAuditLogRetention(time.Hour),
 								),
-							},
+							),
 						),
 					),
 					nil
@@ -144,19 +139,17 @@ func TestLimits_SetLimits(t *testing.T) {
 							),
 						),
 						expectPush(
-							[]*repository.Event{
-								eventFromEventPusherWithInstanceID(
-									"instance1",
-									limits.NewSetEvent(
-										eventstore.NewBaseEventForPush(
-											context.Background(),
-											&limits.NewAggregate("limits2", "instance1", "instance1").Aggregate,
-											limits.SetEventType,
-										),
-										limits.ChangeAuditLogRetention(time.Hour),
+							eventFromEventPusherWithInstanceID(
+								"instance1",
+								limits.NewSetEvent(
+									eventstore.NewBaseEventForPush(
+										context.Background(),
+										&limits.NewAggregate("limits2", "instance1", "instance1").Aggregate,
+										limits.SetEventType,
 									),
+									limits.ChangeAuditLogRetention(time.Hour),
 								),
-							},
+							),
 						),
 					),
 					id_mock.NewIDGeneratorExpectIDs(t, "limits2")
@@ -279,14 +272,12 @@ func TestLimits_ResetLimits(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								limits.NewResetEvent(context.Background(),
-									&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
-								),
+						eventFromEventPusherWithInstanceID(
+							"instance1",
+							limits.NewResetEvent(context.Background(),
+								&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
 							),
-						},
+						),
 					),
 				)
 			},
