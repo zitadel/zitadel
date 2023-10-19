@@ -62,7 +62,7 @@ Errors:
     DomainNotAllowedAsUsername: Домейнът вече е резервиран и не може да се използва
     AlreadyInactive: Потребителят вече е неактивен
     NotInactive: Потребителят не е неактивен
-    CantDeactivateInitial: 'Потребител с начално състояние може да бъде изтрит, но не и деактивиран'
+    CantDeactivateInitial: "Потребител с начално състояние може да бъде изтрит, но не и деактивиран"
     ShouldBeActiveOrInitial: Потребителят не е активен или начален
     AlreadyInitialised: Потребителят вече е инициализиран
     NotInitialised: Потребителят все още не е инициализиран
@@ -184,6 +184,11 @@ Errors:
     DomainVerificationTypeInvalid: Типът проверка на домейна е невалиден
     DomainVerificationMissing: Проверката на домейна все още не е започнала
     DomainVerificationFailed: Неуспешна проверка на домейна
+    DomainVerificationTXTNotFound: TXT записът _zitadel-challenge не беше намерен за вашия домейн. Проверете дали сте го добавили към вашия DNS сървър или изчакайте, докато новият запис бъде разпространен
+    DomainVerificationTXTNoMatch: TXT записът _zitadel-challenge е намерен за вашия домейн, но не съдържа правилния текст на токена. Проверете дали сте добавили правилния токен към вашия DNS сървър или изчакайте, докато новият запис бъде разпространен
+    DomainVerificationHTTPNotFound: Файлът, съдържащ предизвикателството, не е намерен в очаквания URL адрес. Проверете дали сте качили файла на правилното място с разрешения за четене
+    DomainVerificationHTTPNoMatch: Файлът, съдържащ предизвикателството, е намерен в очаквания URL адрес, но не съдържа правилния текст на токена. Проверете съдържанието му
+    DomainVerificationTimeout: Имаше изчакване при запитване до DNS сървъра
     PrimaryDomainNotDeletable: Основният домейн не трябва да се изтрива
     DomainNotFound: Домейнът не е намерен
     MemberIDMissing: Липсва ID на член
@@ -198,7 +203,7 @@ Errors:
     IdpIsNotOIDC: IDP конфигурацията не е от тип oidc
     Domain:
       AlreadyExists: Домейнът вече съществува
-      InvalidCharacter: 'Само буквено-цифрови знаци, . '
+      InvalidCharacter: "Само буквено-цифрови знаци, . "
     IDP:
       InvalidSearchQuery: Невалидна заявка за търсене
       ClientIDMissing: Липсва ClientID
@@ -838,7 +843,7 @@ EventTypes:
           added: Вторият фактор е добавен към правилата за влизане
           removed: Вторият фактор е премахнат от правилата за влизане
         multifactor:
-          added: 'Много фактор, добавен към правилата за влизане'
+          added: "Много фактор, добавен към правилата за влизане"
           removed: Мултифакторът е премахнат от правилата за влизане
       password:
         complexity:
