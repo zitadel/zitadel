@@ -198,7 +198,7 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 		userOrgID = authReq.UserOrgID
 	case *AuthRequestV2:
 		// trigger activity log for authentication for user
-		activity.Trigger(ctx, "", authReq.UserID, activity.OIDCAccessToken)
+		activity.Trigger(ctx, "", authReq.CurrentAuthRequest.UserID, activity.OIDCAccessToken)
 		return o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.GetID())
 	}
 
