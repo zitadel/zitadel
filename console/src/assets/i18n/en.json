@@ -1995,6 +1995,8 @@
       "CLIENTSECRET_DESCRIPTION": "Keep your client secret at a safe place as it will disappear once the dialog is closed.",
       "REGENERATESECRET": "Regenerate Client Secret",
       "DEVMODE": "Development Mode",
+      "DEVMODE_ENABLED": "Enabled",
+      "DEVMODE_DISABLED": "Disabled",
       "DEVMODEDESC": "Beware: With development mode enabled redirect URIs will not be validated.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Skip Login Success Page",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Skip the success page after a login for this native app.",

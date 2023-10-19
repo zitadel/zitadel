@@ -202,6 +202,7 @@ Errors:
     Domain:
       AlreadyExists: Domäne existiert bereits
       InvalidCharacter: Nur alphanumerische Zeichen, . und - sind für eine Domäne erlaubt
+      EmptyString: Ungültige nicht numerische und alphabetische Zeichen wurden durch Leerzeichen ersetzt und die resultierende Domäne ist eine leere Zeichenfolge
     IDP:
       InvalidSearchQuery: Ungültiger Suchparameter
       ClientIDMissing: ClientID fehlt
