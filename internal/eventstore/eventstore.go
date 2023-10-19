@@ -12,6 +12,7 @@ import (
 // Eventstore abstracts all functions needed to store valid events
 // and filters the stored events
 type Eventstore struct {
+	interceptorMutex  sync.RWMutex
 	eventInterceptors map[EventType]eventTypeInterceptors
 	eventTypes        []string
 	aggregateTypes    []string
@@ -103,8 +104,11 @@ func (es *Eventstore) Filter(ctx context.Context, searchQuery *SearchQueryBuilde
 func (es *Eventstore) mapEvents(events []Event) (mappedEvents []Event, err error) {
 	mappedEvents = make([]Event, len(events))
 
+	es.interceptorMutex.RLock()
+	defer es.interceptorMutex.RUnlock()
+
 	for i, event := range events {
-		mappedEvents[i], err = es.mapEvent(event)
+		mappedEvents[i], err = es.mapEventLocked(event)
 		if err != nil {
 			return nil, err
 		}
@@ -114,6 +118,12 @@ func (es *Eventstore) mapEvents(events []Event) (mappedEvents []Event, err error
 }
 
 func (es *Eventstore) mapEvent(event Event) (Event, error) {
+	es.interceptorMutex.RLock()
+	defer es.interceptorMutex.RUnlock()
+	return es.mapEventLocked(event)
+}
+
+func (es *Eventstore) mapEventLocked(event Event) (Event, error) {
 	interceptors, ok := es.eventInterceptors[event.Type()]
 	if !ok || interceptors.eventMapper == nil {
 		return BaseEventFromRepo(event), nil
@@ -189,6 +199,8 @@ func (es *Eventstore) RegisterFilterEventMapper(aggregateType AggregateType, eve
 	if mapper == nil || eventType == "" {
 		return es
 	}
+	es.interceptorMutex.Lock()
+	defer es.interceptorMutex.Unlock()
 
 	es.appendEventType(eventType)
 	es.appendAggregateType(aggregateType)
