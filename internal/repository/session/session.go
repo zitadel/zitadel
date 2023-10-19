@@ -33,6 +33,7 @@ const (
 
 type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+	UserAgent            *domain.UserAgent `json:"user_agent,omitempty"`
 }
 
 func (e *AddedEvent) Payload() interface{} {
@@ -45,6 +46,7 @@ func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 
 func NewAddedEvent(ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	userAgent *domain.UserAgent,
 ) *AddedEvent {
 	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -52,6 +54,7 @@ func NewAddedEvent(ctx context.Context,
 			aggregate,
 			AddedType,
 		),
+		UserAgent: userAgent,
 	}
 }
 
