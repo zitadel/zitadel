@@ -10,6 +10,8 @@ INSERT INTO wrong_events (
             ) AS next_cd
         FROM
             eventstore.events
+        WHERE
+            "position" IS NULL
     ) sub WHERE
         current_cd < next_cd
     ORDER BY

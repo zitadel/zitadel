@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
@@ -153,16 +152,12 @@ func TestCommandSide_ChangeApplication(t *testing.T) {
 						)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewApplicationChangedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"app1",
-								"app",
-								"app changed",
-							)),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewRemoveApplicationUniqueConstraint("app", "project1")),
-						uniqueConstraintsFromEventConstraint(project.NewAddApplicationUniqueConstraint("app changed", "project1")),
+						project.NewApplicationChangedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"app",
+							"app changed",
+						),
 					),
 				),
 			},
@@ -314,12 +309,10 @@ func TestCommandSide_DeactivateApplication(t *testing.T) {
 						)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewApplicationDeactivatedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"app1",
-							)),
-						},
+						project.NewApplicationDeactivatedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+						),
 					),
 				),
 			},
@@ -468,12 +461,10 @@ func TestCommandSide_ReactivateApplication(t *testing.T) {
 						)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewApplicationReactivatedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"app1",
-							)),
-						},
+						project.NewApplicationReactivatedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+						),
 					),
 				),
 			},
@@ -608,16 +599,12 @@ func TestCommandSide_RemoveApplication(t *testing.T) {
 						)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewApplicationRemovedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"app1",
-								"app",
-								"https://test.com/saml/metadata",
-							)),
-						}, /**/
-						uniqueConstraintsFromEventConstraint(project.NewRemoveApplicationUniqueConstraint("app", "project1")),
-						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata")),
+						project.NewApplicationRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"app",
+							"https://test.com/saml/metadata",
+						),
 					),
 				),
 			},
@@ -648,15 +635,12 @@ func TestCommandSide_RemoveApplication(t *testing.T) {
 					// app is not saml, or no saml config available
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewApplicationRemovedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"app1",
-								"app",
-								"",
-							)),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewRemoveApplicationUniqueConstraint("app", "project1")),
+						project.NewApplicationRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"app",
+							"",
+						),
 					),
 				),
 			},

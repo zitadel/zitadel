@@ -10,8 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -31,39 +30,45 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		{
 			name: "project GrantMemberAddedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantMemberAddedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.GrantMemberAddedType,
+						project.AggregateType,
+						[]byte(`{
 					"userId": "user-id",
 					"roles": ["role"],
 					"grantId": "grant-id"
 				}`),
-				), project.GrantMemberAddedEventMapper),
+					), project.GrantMemberAddedEventMapper),
 			},
 			reduce: (&projectGrantMemberProjection{
-				StatementHandler: getStatementHandlerWithFilters(
-					user.NewHumanAddedEvent(context.Background(),
-						&user.NewAggregate("user-id", "org1").Aggregate,
-						"username1",
-						"firstname1",
-						"lastname1",
-						"nickname1",
-						"displayname1",
-						language.German,
-						domain.GenderMale,
-						"email1",
-						true,
-					),
-					project.NewGrantAddedEvent(context.Background(),
-						&project.NewAggregate("project1", "org2").Aggregate,
-						"grant", "org3", []string{},
-					),
-				)(t)}).reduceAdded,
+				es: newMockEventStore().appendFilterResponse(
+					[]eventstore.Event{
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user-id", "org1").Aggregate,
+							"username1",
+							"firstname1",
+							"lastname1",
+							"nickname1",
+							"displayname1",
+							language.German,
+							domain.GenderMale,
+							"email1",
+							true,
+						),
+					},
+				).appendFilterResponse(
+					[]eventstore.Event{
+						project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org2").Aggregate,
+							"grant", "org3", []string{},
+						),
+					},
+				),
+			}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    project.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: project.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -72,7 +77,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 								"user-id",
 								"org1",
 								false,
-								database.StringArray{"role"},
+								database.TextArray[string]{"role"},
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -92,27 +97,27 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		{
 			name: "project GrantMemberChangedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantMemberChangedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.GrantMemberChangedType,
+						project.AggregateType,
+						[]byte(`{
 					"userId": "user-id",
 					"roles": ["role", "changed"],
 					"grantId": "grant-id"
 				}`),
-				), project.GrantMemberChangedEventMapper),
+					), project.GrantMemberChangedEventMapper),
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceChanged,
 			want: wantReduce{
-				aggregateType:    project.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: project.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.project_grant_members3 SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (instance_id = $4) AND (user_id = $5) AND (project_id = $6) AND (grant_id = $7)",
 							expectedArgs: []interface{}{
-								database.StringArray{"role", "changed"},
+								database.TextArray[string]{"role", "changed"},
 								anyArg{},
 								uint64(15),
 								"instance-id",
@@ -128,20 +133,20 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		{
 			name: "project GrantMemberCascadeRemovedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantMemberCascadeRemovedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.GrantMemberCascadeRemovedType,
+						project.AggregateType,
+						[]byte(`{
 					"userId": "user-id",
 					"grantId": "grant-id"
 				}`),
-				), project.GrantMemberCascadeRemovedEventMapper),
+					), project.GrantMemberCascadeRemovedEventMapper),
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
-				aggregateType:    project.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: project.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -160,20 +165,20 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		{
 			name: "project GrantMemberRemovedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantMemberRemovedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.GrantMemberRemovedType,
+						project.AggregateType,
+						[]byte(`{
 					"userId": "user-id",
 					"grantId": "grant-id"
 				}`),
-				), project.GrantMemberRemovedEventMapper),
+					), project.GrantMemberRemovedEventMapper),
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    project.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: project.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -192,17 +197,17 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		{
 			name: "user UserRemovedEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserRemovedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.UserRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserRemovedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.UserRemovedEventMapper),
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -219,17 +224,17 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		{
 			name: "project ProjectRemovedEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ProjectRemovedType),
-					project.AggregateType,
-					[]byte(`{}`),
-				), project.ProjectRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.ProjectRemovedType,
+						project.AggregateType,
+						[]byte(`{}`),
+					), project.ProjectRemovedEventMapper),
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceProjectRemoved,
 			want: wantReduce{
-				aggregateType:    project.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: project.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -245,17 +250,17 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		}, {
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -271,17 +276,17 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		{
 			name: "project GrantRemovedEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantRemovedType),
-					project.AggregateType,
-					[]byte(`{"grantId": "grant-id"}`),
-				), project.GrantRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.GrantRemovedType,
+						project.AggregateType,
+						[]byte(`{"grantId": "grant-id"}`),
+					), project.GrantRemovedEventMapper),
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceProjectGrantRemoved,
 			want: wantReduce{
-				aggregateType:    project.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: project.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -299,17 +304,17 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		{
 			name: "org OrgRemovedEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					[]byte(`{}`),
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						[]byte(`{}`),
+					), org.OrgRemovedEventMapper),
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceOrgRemoved,
 			want: wantReduce{
-				aggregateType:    org.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: org.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

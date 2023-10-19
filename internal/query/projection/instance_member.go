@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -19,31 +19,46 @@ const (
 )
 
 type instanceMemberProjection struct {
-	crdb.StatementHandler
+	es handler.EventStore
 }
 
-func newInstanceMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *instanceMemberProjection {
-	p := new(instanceMemberProjection)
-	config.ProjectionName = InstanceMemberProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable(
-			append(memberColumns, crdb.NewColumn(InstanceColumnID, crdb.ColumnTypeText)),
-			crdb.NewPrimaryKey(MemberInstanceID, InstanceColumnID, MemberUserIDCol),
-			crdb.WithIndex(crdb.NewIndex("user_id", []string{MemberUserIDCol})),
-			crdb.WithIndex(crdb.NewIndex("user_owner_removed", []string{MemberUserOwnerRemoved})),
+func newInstanceMemberProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, &instanceMemberProjection{es: config.Eventstore})
+}
+
+func (*instanceMemberProjection) Name() string {
+	return InstanceMemberProjectionTable
+}
+
+func (*instanceMemberProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable(
+			append(memberColumns, handler.NewColumn(InstanceColumnID, handler.ColumnTypeText)),
+			handler.NewPrimaryKey(MemberInstanceID, InstanceColumnID, MemberUserIDCol),
+			handler.WithIndex(handler.NewIndex("user_id", []string{MemberUserIDCol})),
+			handler.WithIndex(handler.NewIndex("user_owner_removed", []string{MemberUserOwnerRemoved})),
+			handler.WithIndex(
+				handler.NewIndex("im_instance", []string{MemberInstanceID},
+					handler.WithInclude(
+						MemberCreationDate,
+						MemberChangeDate,
+						MemberUserOwnerRemoved,
+						MemberRolesCol,
+						MemberSequence,
+						MemberResourceOwner,
+						MemberOwnerRemoved,
+					),
+				),
+			),
 		),
 	)
-
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *instanceMemberProjection) reducers() []handler.AggregateReducer {
+func (p *instanceMemberProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.MemberAddedEventType,
 					Reduce: p.reduceAdded,
@@ -68,7 +83,7 @@ func (p *instanceMemberProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceUserOwnerRemoved,
@@ -77,7 +92,7 @@ func (p *instanceMemberProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  user.UserRemovedType,
 					Reduce: p.reduceUserRemoved,
@@ -93,7 +108,7 @@ func (p *instanceMemberProjection) reduceAdded(event eventstore.Event) (*handler
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pGNCu", "reduce.wrong.event.type %s", instance.MemberAddedEventType)
 	}
 	ctx := setMemberContext(e.Aggregate())
-	userOwner, err := getResourceOwnerOfUser(ctx, p.Eventstore, e.Aggregate().InstanceID, e.UserID)
+	userOwner, err := getResourceOwnerOfUser(ctx, p.es, e.Aggregate().InstanceID, e.UserID)
 	if err != nil {
 		return nil, err
 	}

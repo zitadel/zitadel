@@ -112,7 +112,7 @@ func (q *Queries) CustomTextList(ctx context.Context, aggregateID, template, lan
 		return nil, errors.ThrowInternal(err, "QUERY-2j00f", "Errors.Internal")
 	}
 
-	texts.LatestSequence, err = q.latestSequence(ctx, projectsTable)
+	texts.State, err = q.latestState(ctx, projectsTable)
 	return texts, err
 }
 
@@ -142,7 +142,7 @@ func (q *Queries) CustomTextListByTemplate(ctx context.Context, aggregateID, tem
 		return nil, errors.ThrowInternal(err, "QUERY-3n9ge", "Errors.Internal")
 	}
 
-	texts.LatestSequence, err = q.latestSequence(ctx, projectsTable)
+	texts.State, err = q.latestState(ctx, projectsTable)
 	return texts, err
 }
 

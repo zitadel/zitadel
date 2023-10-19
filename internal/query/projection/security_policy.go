@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -20,35 +20,36 @@ const (
 	SecurityPolicyColumnAllowedOrigins = "origins"
 )
 
-type securityPolicyProjection struct {
-	crdb.StatementHandler
+type securityPolicyProjection struct{}
+
+func newSecurityPolicyProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(securityPolicyProjection))
 }
 
-func newSecurityPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *securityPolicyProjection {
-	p := new(securityPolicyProjection)
-	config.ProjectionName = SecurityPolicyProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(SecurityPolicyColumnCreationDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(SecurityPolicyColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(SecurityPolicyColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(SecurityPolicyColumnSequence, crdb.ColumnTypeInt64),
-			crdb.NewColumn(SecurityPolicyColumnEnabled, crdb.ColumnTypeBool, crdb.Default(false)),
-			crdb.NewColumn(SecurityPolicyColumnAllowedOrigins, crdb.ColumnTypeTextArray, crdb.Nullable()),
+func (*securityPolicyProjection) Name() string {
+	return SecurityPolicyProjectionTable
+}
+
+func (*securityPolicyProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(SecurityPolicyColumnCreationDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(SecurityPolicyColumnChangeDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(SecurityPolicyColumnInstanceID, handler.ColumnTypeText),
+			handler.NewColumn(SecurityPolicyColumnSequence, handler.ColumnTypeInt64),
+			handler.NewColumn(SecurityPolicyColumnEnabled, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(SecurityPolicyColumnAllowedOrigins, handler.ColumnTypeTextArray, handler.Nullable()),
 		},
-			crdb.NewPrimaryKey(SecurityPolicyColumnInstanceID),
+			handler.NewPrimaryKey(SecurityPolicyColumnInstanceID),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *securityPolicyProjection) reducers() []handler.AggregateReducer {
+func (p *securityPolicyProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.SecurityPolicySetEventType,
 					Reduce: p.reduceSecurityPolicySet,
@@ -79,7 +80,7 @@ func (p *securityPolicyProjection) reduceSecurityPolicySet(event eventstore.Even
 	if e.AllowedOrigins != nil {
 		changes = append(changes, handler.NewCol(SecurityPolicyColumnAllowedOrigins, e.AllowedOrigins))
 	}
-	return crdb.NewUpsertStatement(
+	return handler.NewUpsertStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(SecurityPolicyColumnInstanceID, ""),

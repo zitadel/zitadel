@@ -8,9 +8,12 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -82,7 +85,8 @@ func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bo
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.UserMetadataProjection.Trigger(ctx)
+		ctx, err = projection.UserMetadataProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
 	}
 
 	query, scan := prepareUserMetadataQuery(ctx, q.client)
@@ -114,7 +118,8 @@ func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.UserMetadataProjection.Trigger(ctx)
+		ctx, err = projection.UserMetadataProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
 	}
 
 	query, scan := prepareUserMetadataListQuery(ctx, q.client)
@@ -137,7 +142,7 @@ func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool
 	if err != nil {
 		return nil, err
 	}
-	metadata.LatestSequence, err = q.latestSequence(ctx, userMetadataTable)
+	metadata.State, err = q.latestState(ctx, userMetadataTable)
 	return metadata, err
 }
 

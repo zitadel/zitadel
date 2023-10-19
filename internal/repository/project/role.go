@@ -2,13 +2,10 @@ package project
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
@@ -19,15 +16,15 @@ var (
 	RoleRemovedType     = roleEventTypePrefix + "removed"
 )
 
-func NewAddProjectRoleUniqueConstraint(roleKey, projectID string) *eventstore.EventUniqueConstraint {
+func NewAddProjectRoleUniqueConstraint(roleKey, projectID string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueRoleType,
 		fmt.Sprintf("%s:%s", roleKey, projectID),
 		"Errors.Project.Role.AlreadyExists")
 }
 
-func NewRemoveProjectRoleUniqueConstraint(roleKey, projectID string) *eventstore.EventUniqueConstraint {
-	return eventstore.NewRemoveEventUniqueConstraint(
+func NewRemoveProjectRoleUniqueConstraint(roleKey, projectID string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
 		UniqueRoleType,
 		fmt.Sprintf("%s:%s", roleKey, projectID))
 }
@@ -40,12 +37,12 @@ type RoleAddedEvent struct {
 	Group       string `json:"group,omitempty"`
 }
 
-func (e *RoleAddedEvent) Data() interface{} {
+func (e *RoleAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *RoleAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddProjectRoleUniqueConstraint(e.Key, e.Aggregate().ID)}
+func (e *RoleAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddProjectRoleUniqueConstraint(e.Key, e.Aggregate().ID)}
 }
 
 func NewRoleAddedEvent(
@@ -67,12 +64,12 @@ func NewRoleAddedEvent(
 	}
 }
 
-func RoleAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func RoleAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &RoleAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "PROJECT-2M0xy", "unable to unmarshal project role")
 	}
@@ -88,11 +85,11 @@ type RoleChangedEvent struct {
 	Group       *string `json:"group,omitempty"`
 }
 
-func (e *RoleChangedEvent) Data() interface{} {
+func (e *RoleChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *RoleChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *RoleChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -138,12 +135,12 @@ func ChangeGroup(group string) func(event *RoleChangedEvent) {
 		e.Group = &group
 	}
 }
-func RoleChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func RoleChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &RoleChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "PROJECT-3M0vx", "unable to unmarshal project role")
 	}
@@ -157,12 +154,12 @@ type RoleRemovedEvent struct {
 	Key string `json:"key,omitempty"`
 }
 
-func (e *RoleRemovedEvent) Data() interface{} {
+func (e *RoleRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *RoleRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveProjectRoleUniqueConstraint(e.Key, e.Aggregate().ID)}
+func (e *RoleRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewRemoveProjectRoleUniqueConstraint(e.Key, e.Aggregate().ID)}
 }
 
 func NewRoleRemovedEvent(
@@ -179,12 +176,12 @@ func NewRoleRemovedEvent(
 	}
 }
 
-func RoleRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func RoleRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &RoleRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "PROJECT-1M0xs", "unable to unmarshal project role")
 	}

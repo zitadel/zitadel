@@ -2,13 +2,10 @@ package project
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
@@ -21,15 +18,15 @@ const (
 	ProjectRemovedType     = projectEventTypePrefix + "removed"
 )
 
-func NewAddProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.EventUniqueConstraint {
+func NewAddProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueProjectnameType,
 		projectName+resourceOwner,
 		"Errors.Project.AlreadyExists")
 }
 
-func NewRemoveProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.EventUniqueConstraint {
-	return eventstore.NewRemoveEventUniqueConstraint(
+func NewRemoveProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
 		UniqueProjectnameType,
 		projectName+resourceOwner)
 }
@@ -44,12 +41,12 @@ type ProjectAddedEvent struct {
 	PrivateLabelingSetting domain.PrivateLabelingSetting `json:"privateLabelingSetting,omitempty"`
 }
 
-func (e *ProjectAddedEvent) Data() interface{} {
+func (e *ProjectAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *ProjectAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+func (e *ProjectAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
 }
 
 func NewProjectAddedEvent(
@@ -75,12 +72,12 @@ func NewProjectAddedEvent(
 	}
 }
 
-func ProjectAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func ProjectAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &ProjectAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "PROJECT-Bfg2f", "unable to unmarshal project")
 	}
@@ -99,13 +96,13 @@ type ProjectChangeEvent struct {
 	oldName                string
 }
 
-func (e *ProjectChangeEvent) Data() interface{} {
+func (e *ProjectChangeEvent) Payload() interface{} {
 	return e
 }
 
-func (e *ProjectChangeEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	if e.oldName != "" {
-		return []*eventstore.EventUniqueConstraint{
+func (e *ProjectChangeEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	if e.Name != nil {
+		return []*eventstore.UniqueConstraint{
 			NewRemoveProjectNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
 			NewAddProjectNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner),
 		}
@@ -168,12 +165,12 @@ func ChangePrivateLabelingSetting(ChangePrivateLabelingSetting domain.PrivateLab
 	}
 }
 
-func ProjectChangeEventMapper(event *repository.Event) (eventstore.Event, error) {
+func ProjectChangeEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &ProjectChangeEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "PROJECT-M9osd", "unable to unmarshal project")
 	}
@@ -185,11 +182,11 @@ type ProjectDeactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *ProjectDeactivatedEvent) Data() interface{} {
+func (e *ProjectDeactivatedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *ProjectDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *ProjectDeactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -203,7 +200,7 @@ func NewProjectDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggre
 	}
 }
 
-func ProjectDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func ProjectDeactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &ProjectDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -213,11 +210,11 @@ type ProjectReactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *ProjectReactivatedEvent) Data() interface{} {
+func (e *ProjectReactivatedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *ProjectReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *ProjectReactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -231,7 +228,7 @@ func NewProjectReactivatedEvent(ctx context.Context, aggregate *eventstore.Aggre
 	}
 }
 
-func ProjectReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func ProjectReactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &ProjectReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -241,15 +238,15 @@ type ProjectRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Name                     string
-	entityIDUniqueContraints []*eventstore.EventUniqueConstraint
+	entityIDUniqueContraints []*eventstore.UniqueConstraint
 }
 
-func (e *ProjectRemovedEvent) Data() interface{} {
+func (e *ProjectRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *ProjectRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	constraints := []*eventstore.EventUniqueConstraint{NewRemoveProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+func (e *ProjectRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	constraints := []*eventstore.UniqueConstraint{NewRemoveProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
 	if e.entityIDUniqueContraints != nil {
 		for _, constraint := range e.entityIDUniqueContraints {
 			constraints = append(constraints, constraint)
@@ -262,7 +259,7 @@ func NewProjectRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	name string,
-	entityIDUniqueContraints []*eventstore.EventUniqueConstraint,
+	entityIDUniqueContraints []*eventstore.UniqueConstraint,
 ) *ProjectRemovedEvent {
 	return &ProjectRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -275,7 +272,7 @@ func NewProjectRemovedEvent(
 	}
 }
 
-func ProjectRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func ProjectRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &ProjectRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
