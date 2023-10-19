@@ -18,9 +18,10 @@ type TriggerMethod int
 const (
 	Unspecified TriggerMethod = iota
 	ResourceAPI
-	Authentication
-	RefreshToken
+	OIDCAccessToken
+	OIDCRefreshToken
 	SessionAPI
+	SAMLResponse
 )
 
 func (t TriggerMethod) String() string {
@@ -29,12 +30,14 @@ func (t TriggerMethod) String() string {
 		return "unspecified"
 	case ResourceAPI:
 		return "resourceAPI"
-	case RefreshToken:
+	case OIDCRefreshToken:
 		return "refreshToken"
-	case Authentication:
-		return "authentication"
+	case OIDCAccessToken:
+		return "accessToken"
 	case SessionAPI:
 		return "sessionAPI"
+	case SAMLResponse:
+		return "samlResponse"
 	default:
 		return "unknown"
 	}
