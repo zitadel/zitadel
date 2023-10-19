@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -49,7 +50,7 @@ func TestLimits_SetLimits(t *testing.T) {
 										&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
 										limits.SetEventType,
 									),
-									limits.ChangeAuditLogRetention(time.Hour),
+									limits.ChangeAuditLogRetention(gu.Ptr(time.Hour)),
 								),
 							),
 						),
@@ -60,7 +61,7 @@ func TestLimits_SetLimits(t *testing.T) {
 				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
 				resourceOwner: "instance1",
 				setLimits: &SetLimits{
-					AuditLogRetention: time.Hour,
+					AuditLogRetention: gu.Ptr(time.Hour),
 				},
 			},
 			res: res{
@@ -82,7 +83,7 @@ func TestLimits_SetLimits(t *testing.T) {
 										&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
 										limits.SetEventType,
 									),
-									limits.ChangeAuditLogRetention(time.Minute),
+									limits.ChangeAuditLogRetention(gu.Ptr(time.Minute)),
 								),
 							),
 						),
@@ -95,7 +96,7 @@ func TestLimits_SetLimits(t *testing.T) {
 										&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
 										limits.SetEventType,
 									),
-									limits.ChangeAuditLogRetention(time.Hour),
+									limits.ChangeAuditLogRetention(gu.Ptr(time.Hour)),
 								),
 							),
 						),
@@ -106,7 +107,7 @@ func TestLimits_SetLimits(t *testing.T) {
 				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
 				resourceOwner: "instance1",
 				setLimits: &SetLimits{
-					AuditLogRetention: time.Hour,
+					AuditLogRetention: gu.Ptr(time.Hour),
 				},
 			},
 			res: res{
@@ -128,7 +129,7 @@ func TestLimits_SetLimits(t *testing.T) {
 										&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
 										limits.SetEventType,
 									),
-									limits.ChangeAuditLogRetention(time.Hour),
+									limits.ChangeAuditLogRetention(gu.Ptr(time.Hour)),
 								),
 							),
 							eventFromEventPusher(
@@ -147,7 +148,7 @@ func TestLimits_SetLimits(t *testing.T) {
 										&limits.NewAggregate("limits2", "instance1", "instance1").Aggregate,
 										limits.SetEventType,
 									),
-									limits.ChangeAuditLogRetention(time.Hour),
+									limits.ChangeAuditLogRetention(gu.Ptr(time.Hour)),
 								),
 							),
 						),
@@ -158,7 +159,7 @@ func TestLimits_SetLimits(t *testing.T) {
 				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
 				resourceOwner: "instance1",
 				setLimits: &SetLimits{
-					AuditLogRetention: time.Hour,
+					AuditLogRetention: gu.Ptr(time.Hour),
 				},
 			},
 			res: res{
@@ -233,7 +234,7 @@ func TestLimits_ResetLimits(t *testing.T) {
 									&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
 									limits.SetEventType,
 								),
-								limits.ChangeAuditLogRetention(time.Hour),
+								limits.ChangeAuditLogRetention(gu.Ptr(time.Hour)),
 							),
 						),
 						eventFromEventPusher(
@@ -267,7 +268,7 @@ func TestLimits_ResetLimits(t *testing.T) {
 									&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
 									limits.SetEventType,
 								),
-								limits.ChangeAuditLogRetention(time.Hour),
+								limits.ChangeAuditLogRetention(gu.Ptr(time.Hour)),
 							),
 						),
 					),
