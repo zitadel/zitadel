@@ -15,7 +15,7 @@ The terms of service (**"TOS"**) outlined in this document establish the most im
 This Agreement has the following appendices. When you enter the Agreement with us, you accept these agreements.
 
 * [**Data Processing Agreement**](data-processing-agreement) - How we process personal data on behalf of you
-* [**Service Descriptions**](./servicedescription/) - How we provide services to yo
+* [**Service Descriptions**](./service-description/) - How we provide services to yo
 * [**Policies**](./policies/) - Policies that apply for use of our services
 
 The outlined policies complement these terms of service.
@@ -51,7 +51,7 @@ The [Annex of the data processing agreement](data-processing-agreement#annex-reg
 
 ### Support
 
-We offer Support Services directly related to the use of our Services. The Description of Support Services is available as [Annex](./servicedescription/support-services) to this document.
+We offer Support Services directly related to the use of our Services. The Description of Support Services is available as [Annex](./service-description/support-services) to this document.
 
 Customers without a subscription can contact us via the official [communication channels](https://zitadel.com/contact).
 
@@ -61,7 +61,7 @@ Be advised that the scope of our influence is limited. For example, the actual a
 
 ### Service level
 
-Customers with a Subscription may be eligible for a SLA as outlined in our [Service Level Description](./servicedescription/service-level-description).
+Customers with a Subscription may be eligible for a SLA as outlined in our [Service Level Description](./service-description/service-level-description).
 
 ### Inclusion of third parties
 

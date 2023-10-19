@@ -691,7 +691,7 @@ module.exports = {
           link: {
             type: "generated-index",
             title: "Service description",
-            slug: "/legal/servicedescription",
+            slug: "/legal/service-description",
             description: "Description of services and service levels for ZITADEL Cloud and Enterprise subscriptions.",
           },
           items: [

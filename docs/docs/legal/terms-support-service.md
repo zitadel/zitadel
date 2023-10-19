@@ -13,7 +13,7 @@ The customer relationship (**Framework Agreement** or **The Agreement**) is crea
 This Agreement has the following appendices. When you enter the Agreement with us, you accept these agreements.
 
 * [**Data Processing Agreement**](data-processing-agreement) - How we process personal data on behalf of you
-* [**Service Descriptions**](./servicedescription/) - How we provide services to yo
+* [**Service Descriptions**](./service-description/) - How we provide services to yo
 * [**Policies**](./policies/) - Policies that apply for use of our services
 
 The outlined policies complement these terms of service.
@@ -55,13 +55,13 @@ The [Annex of the data processing agreement](data-processing-agreement#annex-reg
 
 ### Support Service
 
-The Description of Support Services is available as [Annex](./servicedescription/support-services) to this document.
+The Description of Support Services is available as [Annex](./service-description/support-services) to this document.
 
-The parties may enter a service level agreement, as specified in our [Support Service Description](./servicedescription/support-services), for booked Support Services. Only named persons in the Purchase Order, or as agreed in writing (email is sufficient) may use the Support Services to interact with CAOS.
+The parties may enter a service level agreement, as specified in our [Support Service Description](./service-description/support-services), for booked Support Services. Only named persons in the Purchase Order, or as agreed in writing (email is sufficient) may use the Support Services to interact with CAOS.
 
 ### Service credit
 
-Failure to provide the agreed service level objectives during the term of the Agreement results in compensation via service credits, as outlined in the [Annex](./servicedescription/support-services) per service level objective.
+Failure to provide the agreed service level objectives during the term of the Agreement results in compensation via service credits, as outlined in the [Annex](./service-description/support-services) per service level objective.
 
 Customer must request service credit and must notify CAOS in writing (email sufficient) within 30 days of becoming eligible for service credit and must prove failure of CAOS to meet the stated objective. CAOS will confirm or reject the claim with reasons for a refusal within 10 days. Service credit will in no case be paid as a cash equivalent. No further guarantees are provided.
 
@@ -93,7 +93,7 @@ You will ensure that units eligible for Support Service are maintained and upgra
 
 ### Support Process
 
-You will ensure to follow the support process, especially provide all required initial information to the issue, as outlined in the [Annex](./servicedescription/support-services) to this document.
+You will ensure to follow the support process, especially provide all required initial information to the issue, as outlined in the [Annex](./service-description/support-services) to this document.
 
 ### Training of support staff
 
