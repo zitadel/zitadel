@@ -428,7 +428,7 @@ module.exports = {
         {
           type: 'link',
           label: 'Support Service Descriptions',
-          href: '/legal/support-services',
+          href: '/legal/service-description/support-services',
         },
         {
           type: 'category',

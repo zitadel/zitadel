@@ -28,7 +28,7 @@ During this period you should make sure that you have the necessary resources on
 ## Onboarding term
 
 With the onboarding support we provide the initial knowledge transfer to configure and operate ZITADEL.
-During the term you will get direct access to our engineering team via [Technical Account Management](./support-services.md#technical-account-manager).
+During the term you will get direct access to our engineering team via [Technical Account Management](./service-description/support-services.md#technical-account-manager).
 Duration is typically 3 months but this could vary depending on your requirements.
 
 We offer an onboarding term in combination with ZITADEL Enterprise subscriptions.
