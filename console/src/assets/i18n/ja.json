@@ -68,9 +68,14 @@
         "action": "プロジェクトを作成"
       },
       "APPLICATION_CREATED": {
-        "title": "最初のアプリケーションを作成する",
-        "description": "Web、ネイティブ、API、またはSAMLアプリケーションを作成し、認証フローをセットアップします。",
-        "action": "アプリケーションを作成"
+        "title": "アプリを登録する",
+        "description": "Web、ネイティブ、API、またはSAMLアプリケーションを登録し、認証フローをセットアップします。",
+        "action": "アプリを登録する"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "アプリにログインする",
+        "description": "アプリケーションをZITADELと統合して認証し、管理者ユーザーでログインしてテストします。",
+        "action": "ログイン"
       },
       "user.human.added": {
         "title": "ユーザーを追加する",

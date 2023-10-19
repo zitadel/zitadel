@@ -19,6 +19,9 @@ const purplelight = COLORS[12][200];
 const pinkdark: string = COLORS[15][700];
 const pinklight = COLORS[15][200];
 
+const sthdark: string = COLORS[18][700];
+const sthlight = COLORS[18][200];
+
 export const ONBOARDING_EVENTS: OnboardingActions[] = [
   {
     order: 0,
@@ -36,42 +39,45 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
     darkcolor: purpledark,
     lightcolor: purplelight,
   },
-  /*  {
-    order: 2,
+  {
+    order: 3,
+    milestoneType: StringableMilestoneType.AUTHENTICATION_SUCCEEDED_ON_APPLICATION,
+    link: 'https://zitadel.com/docs/guides/integrate/login-users',
+    darkcolor: sthdark,
+    lightcolor: sthlight,
+  } /*
+  {
+    order: 4,
     milestoneType: 'user.human.added',
-    oneof: ['user.human.added'],
-    link: ['/users/create'],
+    link: '/users/create',
     iconClasses: 'las la-user',
     darkcolor: bluedark,
     lightcolor: bluelight,
   },
   {
-    order: 3,
+    order: 5,
     milestoneType: 'user.grant.added',
-    oneof: ['user.grant.added'],
-    link: ['/grant-create'],
+    link: '/grant-create',
     iconClasses: 'las la-shield-alt',
     darkcolor: reddark,
     lightcolor: redlight,
   },
   {
-    order: 4,
+    order: 6,
     milestoneType: 'instance.policy.label.added',
-    oneof: ['instance.policy.label.added', 'instance.policy.label.changed'],
-    link: ['/settings'],
+    link: '/settings',
     fragment: 'branding',
     iconClasses: 'las la-swatchbook',
     darkcolor: pinkdark,
     lightcolor: pinklight,
   },
   {
-    order: 5,
+    order: 7,
     milestoneType: 'instance.smtp.config.added',
-    oneof: ['instance.smtp.config.added', 'instance.smtp.config.changed'],
-    link: ['/settings'],
+    link: '/settings',
     fragment: 'smtpprovider',
     iconClasses: 'las la-envelope',
     darkcolor: yellowdark,
     lightcolor: yellowlight,
-  },*/
+  },*/,
 ];

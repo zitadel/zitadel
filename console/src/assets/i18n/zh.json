@@ -68,9 +68,14 @@
         "action": "创建项目"
       },
       "APPLICATION_CREATED": {
-        "title": "创建你的第一个应用程序",
+        "title": "注册你的应用程序",
         "description": "创建一个web、native、api或saml应用程序并设置你的认证流程。",
         "action": "创建应用程序"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "登录你的应用程序",
+        "description": "将你的应用程序与 ZITADEL 集成以进行身份验证，并通过使用管理员用户登录来测试它。",
+        "action": "登录"
       },
       "user.human.added": {
         "title": "添加用户",

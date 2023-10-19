@@ -68,9 +68,14 @@
         "action": "Créez projet"
       },
       "APPLICATION_CREATED": {
-        "title": "Créez votre première application",
-        "description": "Créez une application web, native, api ou saml et configurez votre flux d'authentification.",
-        "action": "Créez application"
+        "title": "Enregistrez votre application",
+        "description": "Enregistrez votre application web, native, api ou saml et configurez un flux d'authentification.",
+        "action": "Enregistrez l'application"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Connectez-vous à votre application",
+        "description": "Intégrez votre application avec ZITADEL pour l'authentification et testez-la en vous connectant avec votre utilisateur administrateur.",
+        "action": "Connexion"
       },
       "user.human.added": {
         "title": "Ajouter des utilisateurs",

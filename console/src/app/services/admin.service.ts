@@ -301,6 +301,7 @@ import { StorageLocation, StorageService } from './storage.service';
 import { IsReachedQuery, Milestone, MilestoneQuery, MilestoneType } from '../proto/generated/zitadel/milestone_pb';
 
 export enum StringableMilestoneType {
+  UNSPECIFIED = MilestoneType.MILESTONE_TYPE_UNSPECIFIED,
   PROJECT_CREATED = MilestoneType.MILESTONE_TYPE_PROJECT_CREATED,
   APPLICATION_CREATED = MilestoneType.MILESTONE_TYPE_APPLICATION_CREATED,
   AUTHENTICATION_SUCCEEDED_ON_APPLICATION = MilestoneType.MILESTONE_TYPE_AUTHENTICATION_SUCCEEDED_ON_APPLICATION,
