@@ -7,8 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -26,10 +25,11 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceLoginPolicyAdded without forceMFALocalOnly",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LoginPolicyAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.LoginPolicyAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"allowUsernamePassword": true,
 						"allowRegister": true,
 						"allowExternalIdp": false,
@@ -47,13 +47,12 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 						"secondFactorCheckLifetime": 10000000,
 						"multiFactorCheckLifetime": 10000000
 					}`),
-				), org.LoginPolicyAddedEventMapper),
+					), org.LoginPolicyAddedEventMapper),
 			},
 			reduce: (&loginPolicyProjection{}).reduceLoginPolicyAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -92,7 +91,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			name: "org reduceLoginPolicyAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.LoginPolicyAddedEventType),
+					org.LoginPolicyAddedEventType,
 					org.AggregateType,
 					[]byte(`{
 						"allowUsernamePassword": true,
@@ -117,9 +116,8 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginPolicyProjection{}).reduceLoginPolicyAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -158,10 +156,11 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			name:   "org reduceLoginPolicyChanged",
 			reduce: (&loginPolicyProjection{}).reduceLoginPolicyChanged,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LoginPolicyChangedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.LoginPolicyChangedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"allowUsernamePassword": true,
 						"allowRegister": true,
 						"allowExternalIdp": true,
@@ -180,12 +179,11 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 						"secondFactorCheckLifetime": 10000000,
 						"multiFactorCheckLifetime": 10000000
 					}`),
-				), org.LoginPolicyChangedEventMapper),
+					), org.LoginPolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -222,18 +220,18 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			name:   "org reduceMFAAdded",
 			reduce: (&loginPolicyProjection{}).reduceMFAAdded,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LoginPolicyMultiFactorAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.LoginPolicyMultiFactorAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"mfaType": 1
 }`),
-				), org.MultiFactorAddedEventEventMapper),
+					), org.MultiFactorAddedEventEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -254,18 +252,18 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			name:   "org reduceMFARemoved",
 			reduce: (&loginPolicyProjection{}).reduceMFARemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LoginPolicyMultiFactorRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.LoginPolicyMultiFactorRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 			"mfaType": 1
 			}`),
-				), org.MultiFactorRemovedEventEventMapper),
+					), org.MultiFactorRemovedEventEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -286,16 +284,16 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			name:   "org reduceLoginPolicyRemoved",
 			reduce: (&loginPolicyProjection{}).reduceLoginPolicyRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LoginPolicyRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.LoginPolicyRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LoginPolicyRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.LoginPolicyRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -313,18 +311,18 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			name:   "org reduceSecondFactorAdded",
 			reduce: (&loginPolicyProjection{}).reduceSecondFactorAdded,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LoginPolicySecondFactorAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.LoginPolicySecondFactorAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 			"mfaType": 2
 			}`),
-				), org.SecondFactorAddedEventEventMapper),
+					), org.SecondFactorAddedEventEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -345,18 +343,18 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			name:   "org reduceSecondFactorRemoved",
 			reduce: (&loginPolicyProjection{}).reduceSecondFactorRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LoginPolicySecondFactorRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.LoginPolicySecondFactorRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 			"mfaType": 2
 			}`),
-				), org.SecondFactorRemovedEventEventMapper),
+					), org.SecondFactorRemovedEventEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -377,10 +375,11 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			name:   "instance reduceLoginPolicyAdded",
 			reduce: (&loginPolicyProjection{}).reduceLoginPolicyAdded,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LoginPolicyAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.LoginPolicyAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"allowUsernamePassword": true,
 						"allowRegister": true,
 						"allowExternalIdp": true,
@@ -399,12 +398,11 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 						"secondFactorCheckLifetime": 10000000,
 						"multiFactorCheckLifetime": 10000000
 			}`),
-				), instance.LoginPolicyAddedEventMapper),
+					), instance.LoginPolicyAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -443,10 +441,11 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			name:   "instance reduceLoginPolicyChanged",
 			reduce: (&loginPolicyProjection{}).reduceLoginPolicyChanged,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LoginPolicyChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.LoginPolicyChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 			"allowUsernamePassword": true,
 			"allowRegister": true,
 			"allowExternalIdp": true,
@@ -460,12 +459,11 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			"passwordlessType": 1,
 			"defaultRedirectURI": "https://example.com/redirect"
 			}`),
-				), instance.LoginPolicyChangedEventMapper),
+					), instance.LoginPolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -497,18 +495,18 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			name:   "instance reduceMFAAdded",
 			reduce: (&loginPolicyProjection{}).reduceMFAAdded,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LoginPolicyMultiFactorAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.LoginPolicyMultiFactorAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 		"mfaType": 1
 		}`),
-				), instance.MultiFactorAddedEventMapper),
+					), instance.MultiFactorAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -529,18 +527,18 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			name:   "instance reduceMFARemoved",
 			reduce: (&loginPolicyProjection{}).reduceMFARemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LoginPolicyMultiFactorRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.LoginPolicyMultiFactorRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{
 			"mfaType": 1
 			}`),
-				), instance.MultiFactorRemovedEventMapper),
+					), instance.MultiFactorRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -561,18 +559,18 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			name:   "instance reduceSecondFactorAdded u2f",
 			reduce: (&loginPolicyProjection{}).reduceSecondFactorAdded,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LoginPolicySecondFactorAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.LoginPolicySecondFactorAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 			"mfaType": 2
 			}`),
-				), instance.SecondFactorAddedEventMapper),
+					), instance.SecondFactorAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -593,18 +591,18 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			name:   "instance reduceSecondFactorRemoved  u2f",
 			reduce: (&loginPolicyProjection{}).reduceSecondFactorRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LoginPolicySecondFactorRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.LoginPolicySecondFactorRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{
 			"mfaType": 2
 			}`),
-				), instance.SecondFactorRemovedEventMapper),
+					), instance.SecondFactorRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -626,7 +624,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			reduce: (&loginPolicyProjection{}).reduceSecondFactorAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.LoginPolicySecondFactorAddedEventType),
+					instance.LoginPolicySecondFactorAddedEventType,
 					instance.AggregateType,
 					[]byte(`{
 			"mfaType": 3
@@ -634,9 +632,8 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				), instance.SecondFactorAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -658,7 +655,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			reduce: (&loginPolicyProjection{}).reduceSecondFactorRemoved,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.LoginPolicySecondFactorRemovedEventType),
+					instance.LoginPolicySecondFactorRemovedEventType,
 					instance.AggregateType,
 					[]byte(`{
 			"mfaType": 3
@@ -666,9 +663,8 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				), instance.SecondFactorRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -689,16 +685,16 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&loginPolicyProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -715,17 +711,17 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(LoginPolicyInstanceIDCol),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

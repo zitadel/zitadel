@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
@@ -143,27 +142,22 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewSMTPConfigAddedEvent(
-									context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									true,
-									"from@domain.ch",
-									"name",
-									"",
-									"host:587",
-									"user",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("password"),
-									},
-								),
-							),
-						},
+						instance.NewSMTPConfigAddedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							true,
+							"from@domain.ch",
+							"name",
+							"",
+							"host:587",
+							"user",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("password"),
+							},
+						),
 					),
 				),
 				alg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -208,27 +202,22 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewSMTPConfigAddedEvent(
-									context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									true,
-									"from@domain.ch",
-									"name",
-									"replyto@domain.ch",
-									"host:587",
-									"user",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("password"),
-									},
-								),
-							),
-						},
+						instance.NewSMTPConfigAddedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							true,
+							"from@domain.ch",
+							"name",
+							"replyto@domain.ch",
+							"host:587",
+							"user",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("password"),
+							},
+						),
 					),
 				),
 				alg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -318,27 +307,22 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewSMTPConfigAddedEvent(
-									context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									true,
-									"from@domain.ch",
-									"name",
-									"",
-									"[2001:db8::1]:2525",
-									"user",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("password"),
-									},
-								),
-							),
-						},
+						instance.NewSMTPConfigAddedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							true,
+							"from@domain.ch",
+							"name",
+							"",
+							"[2001:db8::1]:2525",
+							"user",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("password"),
+							},
+						),
 					),
 				),
 				alg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -576,20 +560,15 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								newSMTPConfigChangedEvent(
-									context.Background(),
-									false,
-									"from2@domain.ch",
-									"name2",
-									"replyto@domain.ch",
-									"host2:587",
-									"user2",
-								),
-							),
-						},
+						newSMTPConfigChangedEvent(
+							context.Background(),
+							false,
+							"from2@domain.ch",
+							"name2",
+							"replyto@domain.ch",
+							"host2:587",
+							"user2",
+						),
 					),
 				),
 			},
@@ -690,20 +669,15 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								newSMTPConfigChangedEvent(
-									context.Background(),
-									false,
-									"from2@domain.ch",
-									"name2",
-									"replyto@domain.ch",
-									"[2001:db8::1]:2525",
-									"user2",
-								),
-							),
-						},
+						newSMTPConfigChangedEvent(
+							context.Background(),
+							false,
+							"from2@domain.ch",
+							"name2",
+							"replyto@domain.ch",
+							"[2001:db8::1]:2525",
+							"user2",
+						),
 					),
 				),
 			},
@@ -802,21 +776,16 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewSMTPConfigPasswordChangedEvent(
-									context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("password"),
-									},
-								),
-							),
-						},
+						instance.NewSMTPConfigPasswordChangedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("password"),
+							},
+						),
 					),
 				),
 				alg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -906,15 +875,10 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewSMTPConfigRemovedEvent(
-									context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-								),
-							),
-						},
+						instance.NewSMTPConfigRemovedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+						),
 					),
 				),
 			},

@@ -8,12 +8,14 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -88,7 +90,7 @@ type Instance struct {
 
 type csp struct {
 	enabled        bool
-	allowedOrigins database.StringArray
+	allowedOrigins database.TextArray[string]
 }
 
 type Instances struct {
@@ -181,7 +183,8 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (instanc
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.InstanceProjection.Trigger(ctx)
+		ctx, err = projection.InstanceProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
 	}
 
 	stmt, scan := prepareInstanceDomainQuery(ctx, q.client, authz.GetInstance(ctx).RequestedDomain())
@@ -535,7 +538,7 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 				instance.csp.enabled = securityPolicyEnabled.Bool
 			}
 			if instance.ID == "" {
-				return nil, errors.ThrowNotFound(nil, "QUERY-n0wng", "Errors.IAM.NotFound")
+				return nil, errors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.IAM.NotFound")
 			}
 			instance.DefaultLang = language.Make(lang)
 			if err := rows.Close(); err != nil {

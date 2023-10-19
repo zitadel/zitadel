@@ -2,13 +2,10 @@ package project
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
@@ -21,15 +18,15 @@ const (
 	ApplicationRemovedType     = applicationEventTypePrefix + "removed"
 )
 
-func NewAddApplicationUniqueConstraint(name, projectID string) *eventstore.EventUniqueConstraint {
+func NewAddApplicationUniqueConstraint(name, projectID string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueAppNameType,
 		fmt.Sprintf("%s:%s", name, projectID),
 		"Errors.Project.App.AlreadyExists")
 }
 
-func NewRemoveApplicationUniqueConstraint(name, projectID string) *eventstore.EventUniqueConstraint {
-	return eventstore.NewRemoveEventUniqueConstraint(
+func NewRemoveApplicationUniqueConstraint(name, projectID string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
 		UniqueAppNameType,
 		fmt.Sprintf("%s:%s", name, projectID))
 }
@@ -41,12 +38,12 @@ type ApplicationAddedEvent struct {
 	Name  string `json:"name,omitempty"`
 }
 
-func (e *ApplicationAddedEvent) Data() interface{} {
+func (e *ApplicationAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *ApplicationAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID)}
+func (e *ApplicationAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID)}
 }
 
 func NewApplicationAddedEvent(
@@ -66,12 +63,12 @@ func NewApplicationAddedEvent(
 	}
 }
 
-func ApplicationAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func ApplicationAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &ApplicationAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "APPLICATION-Nffg2", "unable to unmarshal application")
 	}
@@ -87,12 +84,12 @@ type ApplicationChangedEvent struct {
 	oldName string
 }
 
-func (e *ApplicationChangedEvent) Data() interface{} {
+func (e *ApplicationChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *ApplicationChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{
+func (e *ApplicationChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{
 		NewRemoveApplicationUniqueConstraint(e.oldName, e.Aggregate().ID),
 		NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID),
 	}
@@ -117,12 +114,12 @@ func NewApplicationChangedEvent(
 	}
 }
 
-func ApplicationChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func ApplicationChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &ApplicationChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "APPLICATION-9l0cs", "unable to unmarshal application")
 	}
@@ -136,11 +133,11 @@ type ApplicationDeactivatedEvent struct {
 	AppID string `json:"appId,omitempty"`
 }
 
-func (e *ApplicationDeactivatedEvent) Data() interface{} {
+func (e *ApplicationDeactivatedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *ApplicationDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *ApplicationDeactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -159,12 +156,12 @@ func NewApplicationDeactivatedEvent(
 	}
 }
 
-func ApplicationDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func ApplicationDeactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &ApplicationDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "APPLICATION-0p9fB", "unable to unmarshal application")
 	}
@@ -178,11 +175,11 @@ type ApplicationReactivatedEvent struct {
 	AppID string `json:"appId,omitempty"`
 }
 
-func (e *ApplicationReactivatedEvent) Data() interface{} {
+func (e *ApplicationReactivatedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *ApplicationReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *ApplicationReactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -201,12 +198,12 @@ func NewApplicationReactivatedEvent(
 	}
 }
 
-func ApplicationReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func ApplicationReactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &ApplicationReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "APPLICATION-1m9e3", "unable to unmarshal application")
 	}
@@ -222,12 +219,12 @@ type ApplicationRemovedEvent struct {
 	entityID string
 }
 
-func (e *ApplicationRemovedEvent) Data() interface{} {
+func (e *ApplicationRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *ApplicationRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	remove := []*eventstore.EventUniqueConstraint{NewRemoveApplicationUniqueConstraint(e.name, e.Aggregate().ID)}
+func (e *ApplicationRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	remove := []*eventstore.UniqueConstraint{NewRemoveApplicationUniqueConstraint(e.name, e.Aggregate().ID)}
 	if e.entityID != "" {
 		remove = append(remove, NewRemoveSAMLConfigEntityIDUniqueConstraint(e.entityID))
 	}
@@ -253,12 +250,12 @@ func NewApplicationRemovedEvent(
 	}
 }
 
-func ApplicationRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func ApplicationRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &ApplicationRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "APPLICATION-1m9e3", "unable to unmarshal application")
 	}

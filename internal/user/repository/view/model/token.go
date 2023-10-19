@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -9,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 )
@@ -26,22 +24,22 @@ const (
 )
 
 type TokenView struct {
-	ID                string               `json:"tokenId" gorm:"column:id;primary_key"`
-	CreationDate      time.Time            `json:"-" gorm:"column:creation_date"`
-	ChangeDate        time.Time            `json:"-" gorm:"column:change_date"`
-	ResourceOwner     string               `json:"-" gorm:"column:resource_owner"`
-	UserID            string               `json:"-" gorm:"column:user_id"`
-	ApplicationID     string               `json:"applicationId" gorm:"column:application_id"`
-	UserAgentID       string               `json:"userAgentId" gorm:"column:user_agent_id"`
-	Audience          database.StringArray `json:"audience" gorm:"column:audience"`
-	Scopes            database.StringArray `json:"scopes" gorm:"column:scopes"`
-	Expiration        time.Time            `json:"expiration" gorm:"column:expiration"`
-	Sequence          uint64               `json:"-" gorm:"column:sequence"`
-	PreferredLanguage string               `json:"preferredLanguage" gorm:"column:preferred_language"`
-	RefreshTokenID    string               `json:"refreshTokenID,omitempty" gorm:"refresh_token_id"`
-	IsPAT             bool                 `json:"-" gorm:"is_pat"`
-	Deactivated       bool                 `json:"-" gorm:"-"`
-	InstanceID        string               `json:"instanceID" gorm:"column:instance_id;primary_key"`
+	ID                string                     `json:"tokenId" gorm:"column:id;primary_key"`
+	CreationDate      time.Time                  `json:"-" gorm:"column:creation_date"`
+	ChangeDate        time.Time                  `json:"-" gorm:"column:change_date"`
+	ResourceOwner     string                     `json:"-" gorm:"column:resource_owner"`
+	UserID            string                     `json:"-" gorm:"column:user_id"`
+	ApplicationID     string                     `json:"applicationId" gorm:"column:application_id"`
+	UserAgentID       string                     `json:"userAgentId" gorm:"column:user_agent_id"`
+	Audience          database.TextArray[string] `json:"audience" gorm:"column:audience"`
+	Scopes            database.TextArray[string] `json:"scopes" gorm:"column:scopes"`
+	Expiration        time.Time                  `json:"expiration" gorm:"column:expiration"`
+	Sequence          uint64                     `json:"-" gorm:"column:sequence"`
+	PreferredLanguage string                     `json:"preferredLanguage" gorm:"column:preferred_language"`
+	RefreshTokenID    string                     `json:"refreshTokenID,omitempty" gorm:"refresh_token_id"`
+	IsPAT             bool                       `json:"-" gorm:"is_pat"`
+	Deactivated       bool                       `json:"-" gorm:"-"`
+	InstanceID        string                     `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 func TokenViewToModel(token *TokenView) *usr_model.TokenView {
@@ -63,9 +61,9 @@ func TokenViewToModel(token *TokenView) *usr_model.TokenView {
 	}
 }
 
-func (t *TokenView) AppendEventIfMyToken(event *es_models.Event) (err error) {
+func (t *TokenView) AppendEventIfMyToken(event eventstore.Event) (err error) {
 	view := new(TokenView)
-	switch eventstore.EventType(event.Type) {
+	switch event.Type() {
 	case user_repo.UserTokenAddedType,
 		user_repo.PersonalAccessTokenAddedType:
 		view.setRootData(event)
@@ -91,7 +89,7 @@ func (t *TokenView) AppendEventIfMyToken(event *es_models.Event) (err error) {
 		return nil
 	case user_repo.UserUnlockedType,
 		user_repo.UserReactivatedType:
-		if t.ID != "" && event.CreationDate.Before(t.CreationDate) {
+		if t.ID != "" && event.CreatedAt().Before(t.CreationDate) {
 			t.Deactivated = false
 		}
 		return nil
@@ -109,10 +107,10 @@ func (t *TokenView) AppendEventIfMyToken(event *es_models.Event) (err error) {
 	return nil
 }
 
-func (t *TokenView) AppendEvent(event *es_models.Event) error {
-	t.ChangeDate = event.CreationDate
-	t.Sequence = event.Sequence
-	switch eventstore.EventType(event.Type) {
+func (t *TokenView) AppendEvent(event eventstore.Event) error {
+	t.ChangeDate = event.CreatedAt()
+	t.Sequence = event.Sequence()
+	switch event.Type() {
 	case user_repo.UserTokenAddedType,
 		user_repo.PersonalAccessTokenAddedType:
 		t.setRootData(event)
@@ -120,36 +118,36 @@ func (t *TokenView) AppendEvent(event *es_models.Event) error {
 		if err != nil {
 			return err
 		}
-		t.CreationDate = event.CreationDate
-		t.IsPAT = eventstore.EventType(event.Type) == user_repo.PersonalAccessTokenAddedType
+		t.CreationDate = event.CreatedAt()
+		t.IsPAT = event.Type() == user_repo.PersonalAccessTokenAddedType
 	}
 	return nil
 }
 
-func (t *TokenView) setRootData(event *es_models.Event) {
-	t.UserID = event.AggregateID
-	t.ResourceOwner = event.ResourceOwner
-	t.InstanceID = event.InstanceID
+func (t *TokenView) setRootData(event eventstore.Event) {
+	t.UserID = event.Aggregate().ID
+	t.ResourceOwner = event.Aggregate().ResourceOwner
+	t.InstanceID = event.Aggregate().InstanceID
 }
 
-func (t *TokenView) setData(event *es_models.Event) error {
-	if err := json.Unmarshal(event.Data, t); err != nil {
+func (t *TokenView) setData(event eventstore.Event) error {
+	if err := event.Unmarshal(t); err != nil {
 		logging.Log("EVEN-3Gm9s").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-5Gms9", "could not unmarshal event")
 	}
 	return nil
 }
 
-func agentIDFromSession(event *es_models.Event) (string, error) {
+func agentIDFromSession(event eventstore.Event) (string, error) {
 	session := make(map[string]interface{})
-	if err := json.Unmarshal(event.Data, &session); err != nil {
+	if err := event.Unmarshal(&session); err != nil {
 		logging.Log("EVEN-Ghgt3").WithError(err).Error("could not unmarshal event data")
 		return "", caos_errs.ThrowInternal(nil, "MODEL-GBf32", "could not unmarshal data")
 	}
 	return session["userAgentID"].(string), nil
 }
 
-func (t *TokenView) appendTokenRemoved(event *es_models.Event) error {
+func (t *TokenView) appendTokenRemoved(event eventstore.Event) error {
 	token, err := eventToMap(event)
 	if err != nil {
 		return err
@@ -160,7 +158,7 @@ func (t *TokenView) appendTokenRemoved(event *es_models.Event) error {
 	return nil
 }
 
-func (t *TokenView) appendRefreshTokenRemoved(event *es_models.Event) error {
+func (t *TokenView) appendRefreshTokenRemoved(event eventstore.Event) error {
 	refreshToken, err := eventToMap(event)
 	if err != nil {
 		return err
@@ -171,7 +169,7 @@ func (t *TokenView) appendRefreshTokenRemoved(event *es_models.Event) error {
 	return nil
 }
 
-func (t *TokenView) appendPATRemoved(event *es_models.Event) error {
+func (t *TokenView) appendPATRemoved(event eventstore.Event) error {
 	pat, err := eventToMap(event)
 	if err != nil {
 		return err
@@ -182,26 +180,26 @@ func (t *TokenView) appendPATRemoved(event *es_models.Event) error {
 	return nil
 }
 
-func (t *TokenView) GetRelevantEventTypes() []es_models.EventType {
-	return []es_models.EventType{
-		es_models.EventType(user_repo.UserTokenAddedType),
-		es_models.EventType(user_repo.PersonalAccessTokenAddedType),
-		es_models.EventType(user_repo.UserTokenRemovedType),
-		es_models.EventType(user_repo.HumanRefreshTokenRemovedType),
-		es_models.EventType(user_repo.UserV1SignedOutType),
-		es_models.EventType(user_repo.HumanSignedOutType),
-		es_models.EventType(user_repo.UserRemovedType),
-		es_models.EventType(user_repo.UserDeactivatedType),
-		es_models.EventType(user_repo.UserLockedType),
-		es_models.EventType(user_repo.UserLockedType),
-		es_models.EventType(user_repo.UserReactivatedType),
-		es_models.EventType(user_repo.PersonalAccessTokenRemovedType),
+func (t *TokenView) GetRelevantEventTypes() []eventstore.EventType {
+	return []eventstore.EventType{
+		user_repo.UserTokenAddedType,
+		user_repo.PersonalAccessTokenAddedType,
+		user_repo.UserTokenRemovedType,
+		user_repo.HumanRefreshTokenRemovedType,
+		user_repo.UserV1SignedOutType,
+		user_repo.HumanSignedOutType,
+		user_repo.UserRemovedType,
+		user_repo.UserDeactivatedType,
+		user_repo.UserLockedType,
+		user_repo.UserLockedType,
+		user_repo.UserReactivatedType,
+		user_repo.PersonalAccessTokenRemovedType,
 	}
 }
 
-func eventToMap(event *es_models.Event) (map[string]interface{}, error) {
+func eventToMap(event eventstore.Event) (map[string]interface{}, error) {
 	m := make(map[string]interface{})
-	if err := json.Unmarshal(event.Data, &m); err != nil {
+	if err := event.Unmarshal(&m); err != nil {
 		logging.Log("EVEN-Dbffe").WithError(err).Error("could not unmarshal event data")
 		return nil, caos_errs.ThrowInternal(nil, "MODEL-SDAfw", "could not unmarshal data")
 	}

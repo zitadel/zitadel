@@ -2,12 +2,9 @@ package instance
 
 import (
 	"context"
-	"encoding/json"
-
-	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
@@ -20,11 +17,11 @@ type DefaultOrgSetEvent struct {
 	OrgID string `json:"orgId"`
 }
 
-func (e *DefaultOrgSetEvent) Data() interface{} {
+func (e *DefaultOrgSetEvent) Payload() interface{} {
 	return e
 }
 
-func (e *DefaultOrgSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *DefaultOrgSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -43,11 +40,11 @@ func NewDefaultOrgSetEventEvent(
 	}
 }
 
-func DefaultOrgSetMapper(event *repository.Event) (eventstore.Event, error) {
+func DefaultOrgSetMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &DefaultOrgSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-cdFZH", "unable to unmarshal default org set")
 	}

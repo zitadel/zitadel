@@ -16,7 +16,7 @@ profile.cov
 *.out
 
 #Debug
-__debug_bin
+__debug_bin*
 debug
 sandbox.go
 /cmd/dev/
@@ -48,6 +48,7 @@ cmd/zitadel/zitadel
 tmp/
 console/src/app/proto/generated/
 **.pb.go
+!pkg/grpc/protoc/v2/options.pb.go
 **.proto.mock.go
 **.pb.*.go
 **.gen.go 

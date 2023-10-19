@@ -2,14 +2,11 @@ package org
 
 import (
 	"context"
-	"encoding/json"
-
-	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
@@ -23,15 +20,15 @@ const (
 	OrgDomainRemovedEventType            = domainEventPrefix + "removed"
 )
 
-func NewAddOrgDomainUniqueConstraint(orgDomain string) *eventstore.EventUniqueConstraint {
+func NewAddOrgDomainUniqueConstraint(orgDomain string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueOrgDomain,
 		orgDomain,
 		"Errors.Org.Domain.AlreadyExists")
 }
 
-func NewRemoveOrgDomainUniqueConstraint(orgDomain string) *eventstore.EventUniqueConstraint {
-	return eventstore.NewRemoveEventUniqueConstraint(
+func NewRemoveOrgDomainUniqueConstraint(orgDomain string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
 		UniqueOrgDomain,
 		orgDomain)
 }
@@ -42,11 +39,11 @@ type DomainAddedEvent struct {
 	Domain string `json:"domain,omitempty"`
 }
 
-func (e *DomainAddedEvent) Data() interface{} {
+func (e *DomainAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *DomainAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *DomainAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -61,11 +58,11 @@ func NewDomainAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, d
 	}
 }
 
-func DomainAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DomainAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	orgDomainAdded := &DomainAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, orgDomainAdded)
+	err := event.Unmarshal(orgDomainAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "ORG-GBr52", "unable to unmarshal org domain added")
 	}
@@ -81,11 +78,11 @@ type DomainVerificationAddedEvent struct {
 	ValidationCode *crypto.CryptoValue            `json:"validationCode,omitempty"`
 }
 
-func (e *DomainVerificationAddedEvent) Data() interface{} {
+func (e *DomainVerificationAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *DomainVerificationAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *DomainVerificationAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -107,11 +104,11 @@ func NewDomainVerificationAddedEvent(
 	}
 }
 
-func DomainVerificationAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DomainVerificationAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	orgDomainVerificationAdded := &DomainVerificationAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, orgDomainVerificationAdded)
+	err := event.Unmarshal(orgDomainVerificationAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "ORG-NRN32", "unable to unmarshal org domain verification added")
 	}
@@ -125,11 +122,11 @@ type DomainVerificationFailedEvent struct {
 	Domain string `json:"domain,omitempty"`
 }
 
-func (e *DomainVerificationFailedEvent) Data() interface{} {
+func (e *DomainVerificationFailedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *DomainVerificationFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *DomainVerificationFailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -144,11 +141,11 @@ func NewDomainVerificationFailedEvent(ctx context.Context, aggregate *eventstore
 	}
 }
 
-func DomainVerificationFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DomainVerificationFailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	orgDomainVerificationFailed := &DomainVerificationFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, orgDomainVerificationFailed)
+	err := event.Unmarshal(orgDomainVerificationFailed)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "ORG-Bhm37", "unable to unmarshal org domain verification failed")
 	}
@@ -162,12 +159,12 @@ type DomainVerifiedEvent struct {
 	Domain string `json:"domain,omitempty"`
 }
 
-func (e *DomainVerifiedEvent) Data() interface{} {
+func (e *DomainVerifiedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *DomainVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddOrgDomainUniqueConstraint(e.Domain)}
+func (e *DomainVerifiedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddOrgDomainUniqueConstraint(e.Domain)}
 }
 
 func NewDomainVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string) *DomainVerifiedEvent {
@@ -181,11 +178,11 @@ func NewDomainVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggregate
 	}
 }
 
-func DomainVerifiedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DomainVerifiedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	orgDomainVerified := &DomainVerifiedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, orgDomainVerified)
+	err := event.Unmarshal(orgDomainVerified)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "ORG-BFSwt", "unable to unmarshal org domain verified")
 	}
@@ -199,11 +196,11 @@ type DomainPrimarySetEvent struct {
 	Domain string `json:"domain,omitempty"`
 }
 
-func (e *DomainPrimarySetEvent) Data() interface{} {
+func (e *DomainPrimarySetEvent) Payload() interface{} {
 	return e
 }
 
-func (e *DomainPrimarySetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *DomainPrimarySetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -218,11 +215,11 @@ func NewDomainPrimarySetEvent(ctx context.Context, aggregate *eventstore.Aggrega
 	}
 }
 
-func DomainPrimarySetEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DomainPrimarySetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	orgDomainPrimarySet := &DomainPrimarySetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, orgDomainPrimarySet)
+	err := event.Unmarshal(orgDomainPrimarySet)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "ORG-N5787", "unable to unmarshal org domain primary set")
 	}
@@ -237,15 +234,15 @@ type DomainRemovedEvent struct {
 	isVerified bool
 }
 
-func (e *DomainRemovedEvent) Data() interface{} {
+func (e *DomainRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *DomainRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *DomainRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	if !e.isVerified {
 		return nil
 	}
-	return []*eventstore.EventUniqueConstraint{NewRemoveOrgDomainUniqueConstraint(e.Domain)}
+	return []*eventstore.UniqueConstraint{NewRemoveOrgDomainUniqueConstraint(e.Domain)}
 }
 
 func NewDomainRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string, verified bool) *DomainRemovedEvent {
@@ -260,11 +257,11 @@ func NewDomainRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate,
 	}
 }
 
-func DomainRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DomainRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	orgDomainRemoved := &DomainRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, orgDomainRemoved)
+	err := event.Unmarshal(orgDomainRemoved)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "ORG-BngB2", "unable to unmarshal org domain removed")
 	}

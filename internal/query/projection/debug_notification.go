@@ -8,8 +8,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -27,38 +27,39 @@ const (
 	DebugNotificationProviderCompactCol       = "compact"
 )
 
-type debugNotificationProviderProjection struct {
-	crdb.StatementHandler
+type debugNotificationProviderProjection struct{}
+
+func newDebugNotificationProviderProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(debugNotificationProviderProjection))
 }
 
-func newDebugNotificationProviderProjection(ctx context.Context, config crdb.StatementHandlerConfig) *debugNotificationProviderProjection {
-	p := &debugNotificationProviderProjection{}
-	config.ProjectionName = DebugNotificationProviderTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(DebugNotificationProviderAggIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(DebugNotificationProviderCreationDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(DebugNotificationProviderChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(DebugNotificationProviderSequenceCol, crdb.ColumnTypeInt64),
-			crdb.NewColumn(DebugNotificationProviderResourceOwnerCol, crdb.ColumnTypeText),
-			crdb.NewColumn(DebugNotificationProviderInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(DebugNotificationProviderStateCol, crdb.ColumnTypeEnum),
-			crdb.NewColumn(DebugNotificationProviderTypeCol, crdb.ColumnTypeEnum),
-			crdb.NewColumn(DebugNotificationProviderCompactCol, crdb.ColumnTypeBool),
+func (*debugNotificationProviderProjection) Name() string {
+	return DebugNotificationProviderTable
+}
+
+func (*debugNotificationProviderProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(DebugNotificationProviderAggIDCol, handler.ColumnTypeText),
+			handler.NewColumn(DebugNotificationProviderCreationDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(DebugNotificationProviderChangeDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(DebugNotificationProviderSequenceCol, handler.ColumnTypeInt64),
+			handler.NewColumn(DebugNotificationProviderResourceOwnerCol, handler.ColumnTypeText),
+			handler.NewColumn(DebugNotificationProviderInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(DebugNotificationProviderStateCol, handler.ColumnTypeEnum),
+			handler.NewColumn(DebugNotificationProviderTypeCol, handler.ColumnTypeEnum),
+			handler.NewColumn(DebugNotificationProviderCompactCol, handler.ColumnTypeBool),
 		},
-			crdb.NewPrimaryKey(DebugNotificationProviderInstanceIDCol, DebugNotificationProviderAggIDCol, DebugNotificationProviderTypeCol),
+			handler.NewPrimaryKey(DebugNotificationProviderInstanceIDCol, DebugNotificationProviderAggIDCol, DebugNotificationProviderTypeCol),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *debugNotificationProviderProjection) reducers() []handler.AggregateReducer {
+func (p *debugNotificationProviderProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.DebugNotificationProviderFileAddedEventType,
 					Reduce: p.reduceDebugNotificationProviderAdded,
@@ -106,7 +107,7 @@ func (p *debugNotificationProviderProjection) reduceDebugNotificationProviderAdd
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pYPxS", "reduce.wrong.event.type %v", []eventstore.EventType{instance.DebugNotificationProviderFileAddedEventType, instance.DebugNotificationProviderLogAddedEventType})
 	}
 
-	return crdb.NewCreateStatement(&providerEvent, []handler.Column{
+	return handler.NewCreateStatement(&providerEvent, []handler.Column{
 		handler.NewCol(DebugNotificationProviderAggIDCol, providerEvent.Aggregate().ID),
 		handler.NewCol(DebugNotificationProviderCreationDateCol, providerEvent.CreationDate()),
 		handler.NewCol(DebugNotificationProviderChangeDateCol, providerEvent.CreationDate()),
@@ -141,7 +142,7 @@ func (p *debugNotificationProviderProjection) reduceDebugNotificationProviderCha
 		cols = append(cols, handler.NewCol(DebugNotificationProviderCompactCol, *providerEvent.Compact))
 	}
 
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		&providerEvent,
 		cols,
 		[]handler.Condition{
@@ -166,7 +167,7 @@ func (p *debugNotificationProviderProjection) reduceDebugNotificationProviderRem
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-dow9f", "reduce.wrong.event.type %v", []eventstore.EventType{instance.DebugNotificationProviderFileRemovedEventType, instance.DebugNotificationProviderLogRemovedEventType})
 	}
 
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		&providerEvent,
 		[]handler.Condition{
 			handler.NewCond(DebugNotificationProviderAggIDCol, providerEvent.Aggregate().ID),
