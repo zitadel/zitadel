@@ -82,15 +82,40 @@ Calling either of the services requires a valid access token, but for **Other Se
   
 ## Benefits
 
-Why is ZITADEL needed and not just send the info straight to an endpoint?
+In some cases this solution might seem like a lot of effort.
+And you might wonder why is ZITADEL needed at all and why you shouldn't just send the info straight to an endpoint?
+The following benefits can be gained by using this solution for embedding an SDK.
+In the section [alternative approaches](#alternative-approaches) we discuss potential other solutions briefly.
 
-### Using multiple services
+### Short-lived secret
 
-### User permissions
+One of the major benefits with this solution is that you don't store long-lived secrets, such as service user credentials, on a public client.
+Instead you can adhere to OpenID Connect / OAuth 2.0 best practices using short-lived access tokens, even in combination with refresh tokens.
+With that you reduce the impact of accidental exposure of secrets significantly.
+
+### Token revocation
+
+As mentioned, you can use [short-lived secrets](#short-lived-secret) in form of access tokens.
+One major benefit with this solution is that you are able to revoke tokens, for example in cases where the user logged out of the Customer Mobile App or in cases where some security concerns where raised and the user needs to get a new access token.
+When using opaque tokens instead of JWT tokens, you can control the expiration and revocation of tokens even further, as the clients have to request all user information from ZITADEL directly.
 
 ### Audit trail
 
-### Token revocation
+With the impersonation pattern all requests are made transparently in the context of the user.
+ZITADEL provides you with a complete audit trail of access and events that are associated to the user.
+
+### Using multiple services
+
+Given you have multiple endpoints and services that should be accessible by your customers' end-users, then you need to implement some kind of single-sign-on pattern for your services.
+ZITADEL will act as central IDP where all your applications are registered.
+You exchanged the App Access Token for an Backend Access Token that was issues by ZITADEL, so that you can make requests from your SDK to your applications using the Backend Access Token.
+Your applications can then validate that access token directly with ZITADEL and request additional information such as user profile and permissions.
+
+### User permissions
+
+In case you want to give users permission or roles, you need a service to manage and provide that information.
+ZITADEL can provide you with the required role management and self-service in multi-tenancy scenarios to give permissions to users.
+You could, for example, assign roles in ZITADEL automatically based on the end-user's attributes and then use these roles in your applications / backend services.
 
 ## Impersonation through ZITADEL session API
 
