@@ -35,19 +35,18 @@ func (m *MockQuerier) EXPECT() *MockQuerierMockRecorder {
 	return m.recorder
 }
 
-// Filter mocks base method.
-func (m *MockQuerier) Filter(arg0 context.Context, arg1 *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+// FilterToReducer mocks base method.
+func (m *MockQuerier) FilterToReducer(arg0 context.Context, arg1 *eventstore.SearchQueryBuilder, arg2 eventstore.Reducer) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Filter", arg0, arg1)
-	ret0, _ := ret[0].([]eventstore.Event)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "FilterToReducer", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
-// Filter indicates an expected call of Filter.
-func (mr *MockQuerierMockRecorder) Filter(arg0, arg1 interface{}) *gomock.Call {
+// FilterToReducer indicates an expected call of FilterToReducer.
+func (mr *MockQuerierMockRecorder) FilterToReducer(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Filter", reflect.TypeOf((*MockQuerier)(nil).Filter), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterToReducer", reflect.TypeOf((*MockQuerier)(nil).FilterToReducer), arg0, arg1, arg2)
 }
 
 // Health mocks base method.

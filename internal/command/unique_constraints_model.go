@@ -183,7 +183,7 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.UserID, member.UniqueMember)
 		}
 	}
-	return nil
+	return rm.WriteModel.Reduce()
 }
 
 func (rm *UniqueConstraintReadModel) Query() *eventstore.SearchQueryBuilder {

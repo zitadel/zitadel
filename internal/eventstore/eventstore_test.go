@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
-	"sync"
 	"testing"
 	"time"
 
@@ -402,11 +401,24 @@ func (repo *testQuerier) Health(ctx context.Context) error {
 func (repo *testQuerier) CreateInstance(ctx context.Context, instance string) error {
 	return nil
 }
+
 func (repo *testQuerier) Filter(ctx context.Context, searchQuery *SearchQueryBuilder) ([]Event, error) {
 	if repo.err != nil {
 		return nil, repo.err
 	}
 	return repo.events, nil
+}
+
+func (repo *testQuerier) FilterToReducer(ctx context.Context, searchQuery *SearchQueryBuilder, reduce Reducer) error {
+	if repo.err != nil {
+		return repo.err
+	}
+	for _, event := range repo.events {
+		if err := reduce(event); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (repo *testQuerier) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (float64, error) {
@@ -684,7 +696,6 @@ func TestEventstore_Push(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			es := &Eventstore{
 				pusher:            tt.fields.pusher,
-				interceptorMutex:  sync.Mutex{},
 				eventInterceptors: map[EventType]eventTypeInterceptors{},
 			}
 			for eventType, mapper := range tt.fields.eventMapper {
@@ -816,7 +827,6 @@ func TestEventstore_FilterEvents(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			es := &Eventstore{
 				querier:           tt.fields.repo,
-				interceptorMutex:  sync.Mutex{},
 				eventInterceptors: map[EventType]eventTypeInterceptors{},
 			}
 
@@ -1121,7 +1131,6 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			es := &Eventstore{
 				querier:           tt.fields.repo,
-				interceptorMutex:  sync.Mutex{},
 				eventInterceptors: map[EventType]eventTypeInterceptors{},
 			}
 			for eventType, mapper := range tt.fields.eventMapper {
@@ -1238,7 +1247,6 @@ func TestEventstore_mapEvents(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			es := &Eventstore{
-				interceptorMutex:  sync.Mutex{},
 				eventInterceptors: map[EventType]eventTypeInterceptors{},
 			}
 			for eventType, mapper := range tt.fields.eventMapper {

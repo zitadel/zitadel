@@ -30,21 +30,30 @@ func NewRepo(t *testing.T) *MockRepository {
 func (m *MockRepository) ExpectFilterNoEventsNoError() *MockRepository {
 	m.MockQuerier.ctrl.T.Helper()
 
-	m.MockQuerier.EXPECT().Filter(gomock.Any(), gomock.Any()).Return(nil, nil)
+	m.MockQuerier.EXPECT().FilterToReducer(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
 	return m
 }
 
 func (m *MockRepository) ExpectFilterEvents(events ...eventstore.Event) *MockRepository {
 	m.MockQuerier.ctrl.T.Helper()
 
-	m.MockQuerier.EXPECT().Filter(gomock.Any(), gomock.Any()).Return(events, nil)
+	m.MockQuerier.EXPECT().FilterToReducer(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
+		func(_ context.Context, _ *eventstore.SearchQueryBuilder, reduce eventstore.Reducer) error {
+			for _, event := range events {
+				if err := reduce(event); err != nil {
+					return err
+				}
+			}
+			return nil
+		},
+	)
 	return m
 }
 
 func (m *MockRepository) ExpectFilterEventsError(err error) *MockRepository {
 	m.MockQuerier.ctrl.T.Helper()
 
-	m.MockQuerier.EXPECT().Filter(gomock.Any(), gomock.Any()).Return(nil, err)
+	m.MockQuerier.EXPECT().FilterToReducer(gomock.Any(), gomock.Any(), gomock.Any()).Return(err)
 	return m
 }
 
