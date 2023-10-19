@@ -12,6 +12,8 @@ import (
 // Eventstore abstracts all functions needed to store valid events
 // and filters the stored events
 type Eventstore struct {
+	// TODO: get rid of this mutex,
+	// or if we scale to >4vCPU use a sync.Map
 	interceptorMutex  sync.RWMutex
 	eventInterceptors map[EventType]eventTypeInterceptors
 	eventTypes        []string
@@ -130,6 +132,14 @@ func (es *Eventstore) mapEventLocked(event Event) (Event, error) {
 	}
 	return interceptors.eventMapper(event)
 }
+
+// TODO: refactor so we can change to the following interface:
+/*
+type reducer interface {
+	// Reduce applies an event on the object.
+	Reduce(Event) error
+}
+*/
 
 type reducer interface {
 	//Reduce handles the events of the internal events list
