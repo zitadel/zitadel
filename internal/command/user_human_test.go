@@ -16,7 +16,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
@@ -105,7 +104,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newAddHumanEvent("$plain$x$password", true, ""),
+							newAddHumanEvent("$plain$x$password", true, true, ""),
 						),
 					),
 				),
@@ -219,35 +218,28 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanAddedEvent(context.Background(),
-									&userAgg.Aggregate,
-									"username",
-									"firstname",
-									"lastname",
-									"",
-									"firstname lastname",
-									language.English,
-									domain.GenderUnspecified,
-									"email@test.ch",
-									true,
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanInitialCodeAddedEvent(context.Background(),
-									&userAgg.Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("userinit"),
-									},
-									time.Hour*1,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						user.NewHumanAddedEvent(context.Background(),
+							&userAgg.Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"",
+							"firstname lastname",
+							language.English,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
+						),
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&userAgg.Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("userinit"),
+							},
+							time.Hour*1,
+						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -306,24 +298,17 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAddHumanEvent("$plain$x$password", false, ""),
-							),
-							eventFromEventPusher(
-								user.NewHumanInitialCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("userinit"),
-									},
-									1*time.Hour,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newAddHumanEvent("$plain$x$password", false, true, ""),
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("userinit"),
+							},
+							1*time.Hour,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -382,26 +367,19 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAddHumanEvent("$plain$x$password", false, ""),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailCodeAddedEventV2(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("emailCode"),
-									},
-									1*time.Hour,
-									"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}",
-									false,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newAddHumanEvent("$plain$x$password", false, true, ""),
+						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("emailCode"),
+							},
+							1*time.Hour,
+							"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}",
+							false,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -461,26 +439,19 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAddHumanEvent("$plain$x$password", false, ""),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailCodeAddedEventV2(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("emailCode"),
-									},
-									1*time.Hour,
-									"",
-									true,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newAddHumanEvent("$plain$x$password", false, true, ""),
+						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("emailCode"),
+							},
+							1*time.Hour,
+							"",
+							true,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -541,16 +512,10 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAddHumanEvent("$plain$x$password", true, ""),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
-									&userAgg.Aggregate),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newAddHumanEvent("$plain$x$password", true, true, ""),
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&userAgg.Aggregate,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -610,16 +575,10 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAddHumanEvent("$plain$x$password", true, ""),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
-									&userAgg.Aggregate),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newAddHumanEvent("$plain$x$password", true, true, ""),
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&userAgg.Aggregate,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -679,16 +638,10 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAddHumanEvent("$plain$x$password", true, ""),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
-									&userAgg.Aggregate),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", false)),
+						newAddHumanEvent("$plain$x$password", true, false, ""),
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&userAgg.Aggregate,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -808,31 +761,25 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								func() eventstore.Command {
-									event := user.NewHumanAddedEvent(context.Background(),
-										&user.NewAggregate("user1", "org1").Aggregate,
-										"username@test.ch",
-										"firstname",
-										"lastname",
-										"",
-										"firstname lastname",
-										language.English,
-										domain.GenderUnspecified,
-										"email@test.ch",
-										true,
-									)
-									event.AddPasswordData("$plain$x$password", true)
-									return event
-								}(),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
-									&userAgg.Aggregate),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username@test.ch", "org1", false)),
+						func() eventstore.Command {
+							event := user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username@test.ch",
+								"firstname",
+								"lastname",
+								"",
+								"firstname lastname",
+								language.English,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								false,
+							)
+							event.AddPasswordData("$plain$x$password", true)
+							return event
+						}(),
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&userAgg.Aggregate,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -893,28 +840,21 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAddHumanEvent("$plain$x$password", false, "+41711234567"),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(
-									context.Background(),
-									&userAgg.Aggregate,
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanPhoneCodeAddedEvent(context.Background(),
-									&userAgg.Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("phonecode"),
-									},
-									time.Hour*1)),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newAddHumanEvent("$plain$x$password", false, true, "+41711234567"),
+						user.NewHumanEmailVerifiedEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+						),
+						user.NewHumanPhoneCodeAddedEvent(context.Background(),
+							&userAgg.Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("phonecode"),
+							},
+							time.Hour*1,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -965,31 +905,22 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAddHumanEvent("", false, "+41711234567"),
-							),
-							eventFromEventPusher(
-								user.NewHumanInitialCodeAddedEvent(
-									context.Background(),
-									&userAgg.Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("userinit"),
-									},
-									1*time.Hour,
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanPhoneVerifiedEvent(
-									context.Background(),
-									&userAgg.Aggregate,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newAddHumanEvent("", false, true, "+41711234567"),
+						user.NewHumanInitialCodeAddedEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("userinit"),
+							},
+							1*time.Hour,
+						),
+						user.NewHumanPhoneVerifiedEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -1049,30 +980,21 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAddHumanEvent("$plain$x$password", false, "+41711234567"),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate),
-							),
-							eventFromEventPusher(
-								user.NewHumanPhoneCodeAddedEventV2(
-									context.Background(),
-									&userAgg.Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("phoneCode"),
-									},
-									1*time.Hour,
-									true,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newAddHumanEvent("$plain$x$password", false, true, "+41711234567"),
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate),
+						user.NewHumanPhoneCodeAddedEventV2(
+							context.Background(),
+							&userAgg.Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("phoneCode"),
+							},
+							1*time.Hour,
+							true,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -1124,33 +1046,24 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAddHumanEvent("", false, ""),
-							),
-							eventFromEventPusher(
-								user.NewHumanInitialCodeAddedEvent(
-									context.Background(),
-									&userAgg.Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("userinit"),
-									},
-									1*time.Hour,
-								),
-							),
-							eventFromEventPusher(
-								user.NewMetadataSetEvent(
-									context.Background(),
-									&userAgg.Aggregate,
-									"testKey",
-									[]byte("testValue"),
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newAddHumanEvent("", false, true, ""),
+						user.NewHumanInitialCodeAddedEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("userinit"),
+							},
+							1*time.Hour,
+						),
+						user.NewMetadataSetEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+							"testKey",
+							[]byte("testValue"),
+						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -1200,9 +1113,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				if !assert.NoError(t, err) {
 					t.FailNow()
 				}
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
+			} else if !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
+				return
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.want, tt.args.human.Details)
@@ -1399,24 +1312,17 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAddHumanEvent("$plain$x$password", true, ""),
-							),
-							eventFromEventPusher(
-								user.NewHumanInitialCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newAddHumanEvent("$plain$x$password", true, true, ""),
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -1490,16 +1396,10 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAddHumanEvent("$plain$x$password", false, ""),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newAddHumanEvent("$plain$x$password", false, true, ""),
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -1576,29 +1476,20 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					),
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAddHumanEvent("", false, ""),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate),
-							),
-							eventFromEventPusher(
-								user.NewHumanPasswordlessInitCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"code1",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newAddHumanEvent("", false, true, ""),
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate),
+						user.NewHumanPasswordlessInitCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"code1",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1", "code1"),
@@ -1683,29 +1574,20 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					),
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAddHumanEvent("$plain$x$password", false, ""),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate),
-							),
-							eventFromEventPusher(
-								user.NewHumanPasswordlessInitCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"code1",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newAddHumanEvent("$plain$x$password", false, true, ""),
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate),
+						user.NewHumanPasswordlessInitCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"code1",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1", "code1"),
@@ -1793,34 +1675,26 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAddHumanEvent("$plain$x$password", false, "+41711234567"),
-							),
-							eventFromEventPusher(
-								user.NewHumanInitialCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1,
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanPhoneCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1)),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newAddHumanEvent("$plain$x$password", false, true, "+41711234567"),
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+						),
+						user.NewHumanPhoneCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -1900,28 +1774,19 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAddHumanEvent("$plain$x$password", false, "+41711234567"),
-							),
-							eventFromEventPusher(
-								user.NewHumanInitialCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1,
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanPhoneVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newAddHumanEvent("$plain$x$password", false, true, "+41711234567"),
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+						),
+						user.NewHumanPhoneVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -2059,25 +1924,15 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAddHumanEvent("", false, ""),
-							),
-							eventFromEventPusher(
-								user.NewUserIDPLinkAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"idpID",
-									"name",
-									"externalID",
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
-						uniqueConstraintsFromEventConstraint(user.NewAddUserIDPLinkUniqueConstraint("idpID", "externalID")),
+						newAddHumanEvent("", false, true, ""),
+						user.NewUserIDPLinkAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"idpID",
+							"name",
+							"externalID",
+						),
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -2770,24 +2625,17 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newRegisterHumanEvent("email@test.ch", "$plain$x$password", false, ""),
-							),
-							eventFromEventPusher(
-								user.NewHumanInitialCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("email@test.ch", "org1", false)),
+						newRegisterHumanEvent("email@test.ch", "$plain$x$password", false, false, ""),
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -2882,24 +2730,17 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newRegisterHumanEvent("username", "$plain$x$password", false, ""),
-							),
-							eventFromEventPusher(
-								user.NewHumanInitialCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", false)),
+						newRegisterHumanEvent("username", "$plain$x$password", false, false, ""),
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -2995,24 +2836,17 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newRegisterHumanEvent("username", "$plain$x$password", false, ""),
-							),
-							eventFromEventPusher(
-								user.NewHumanInitialCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newRegisterHumanEvent("username", "$plain$x$password", false, true, ""),
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -3108,16 +2942,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newRegisterHumanEvent("username", "$plain$x$password", false, ""),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newRegisterHumanEvent("username", "$plain$x$password", false, true, ""),
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -3215,34 +3042,27 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newRegisterHumanEvent("username", "$plain$x$password", false, "+41711234567"),
-							),
-							eventFromEventPusher(
-								user.NewHumanInitialCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1,
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanPhoneCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1)),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newRegisterHumanEvent("username", "$plain$x$password", false, true, "+41711234567"),
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+						),
+						user.NewHumanPhoneCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -3344,28 +3164,20 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newRegisterHumanEvent("username", "$plain$x$password", false, "+41711234567"),
-							),
-							eventFromEventPusher(
-								user.NewHumanInitialCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1,
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanPhoneVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						newRegisterHumanEvent("username", "$plain$x$password", false, true, "+41711234567"),
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+						),
+						user.NewHumanPhoneVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -3525,25 +3337,16 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newRegisterHumanEvent("username", "$plain$x$password", false, ""),
-							),
-							eventFromEventPusher(
-								user.NewUserIDPLinkAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"idpID",
-									"displayName",
-									"externalID",
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
-						uniqueConstraintsFromEventConstraint(user.NewAddUserIDPLinkUniqueConstraint("idpID", "externalID")),
+						newRegisterHumanEvent("username", "$plain$x$password", false, true, ""),
+						user.NewUserIDPLinkAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"idpID",
+							"displayName",
+							"externalID",
+						),
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -3692,13 +3495,9 @@ func TestCommandSide_HumanMFASkip(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanMFAInitSkippedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanMFAInitSkippedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -3820,14 +3619,10 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanSignedOutEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"agent1",
-								),
-							),
-						},
+						user.NewHumanSignedOutEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"agent1",
+						),
 					),
 				),
 			},
@@ -3880,20 +3675,14 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanSignedOutEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"agent1",
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanSignedOutEvent(context.Background(),
-									&user.NewAggregate("user2", "org1").Aggregate,
-									"agent1",
-								),
-							),
-						},
+						user.NewHumanSignedOutEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"agent1",
+						),
+						user.NewHumanSignedOutEvent(context.Background(),
+							&user.NewAggregate("user2", "org1").Aggregate,
+							"agent1",
+						),
 					),
 				),
 			},
@@ -3925,7 +3714,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 	}
 }
 
-func newAddHumanEvent(password string, changeRequired bool, phone string) *user.HumanAddedEvent {
+func newAddHumanEvent(password string, changeRequired, userLoginMustBeDomain bool, phone string) *user.HumanAddedEvent {
 	event := user.NewHumanAddedEvent(context.Background(),
 		&user.NewAggregate("user1", "org1").Aggregate,
 		"username",
@@ -3936,7 +3725,7 @@ func newAddHumanEvent(password string, changeRequired bool, phone string) *user.
 		language.English,
 		domain.GenderUnspecified,
 		"email@test.ch",
-		true,
+		userLoginMustBeDomain,
 	)
 	if password != "" {
 		event.AddPasswordData(password, changeRequired)
@@ -3947,7 +3736,7 @@ func newAddHumanEvent(password string, changeRequired bool, phone string) *user.
 	return event
 }
 
-func newRegisterHumanEvent(username, password string, changeRequired bool, phone string) *user.HumanRegisteredEvent {
+func newRegisterHumanEvent(username, password string, changeRequired, userLoginMustBeUnique bool, phone string) *user.HumanRegisteredEvent {
 	event := user.NewHumanRegisteredEvent(context.Background(),
 		&user.NewAggregate("user1", "org1").Aggregate,
 		username,
@@ -3958,7 +3747,7 @@ func newRegisterHumanEvent(username, password string, changeRequired bool, phone
 		language.Und,
 		domain.GenderUnspecified,
 		"email@test.ch",
-		true,
+		userLoginMustBeUnique,
 	)
 	if password != "" {
 		event.AddPasswordData(password, changeRequired)

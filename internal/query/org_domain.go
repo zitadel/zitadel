@@ -78,7 +78,7 @@ func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearch
 		return nil, errors.ThrowInternal(err, "QUERY-M6mYN", "Errors.Internal")
 	}
 
-	domains.LatestSequence, err = q.latestSequence(ctx, orgDomainsTable)
+	domains.State, err = q.latestState(ctx, orgDomainsTable)
 	return domains, err
 }
 

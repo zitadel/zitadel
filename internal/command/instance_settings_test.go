@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -95,23 +94,17 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 					t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewSecretGeneratorAddedEvent(
-									context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									domain.SecretGeneratorTypeInitCode,
-									4,
-									time.Hour*1,
-									true,
-									true,
-									true,
-									true,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", instance.NewAddSecretGeneratorTypeUniqueConstraint(domain.SecretGeneratorTypeInitCode)),
+						instance.NewSecretGeneratorAddedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							domain.SecretGeneratorTypeInitCode,
+							4,
+							time.Hour*1,
+							true,
+							true,
+							true,
+							true,
+						),
 					),
 				),
 			},
@@ -193,23 +186,17 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewSecretGeneratorAddedEvent(
-									context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									domain.SecretGeneratorTypeInitCode,
-									4,
-									time.Hour*1,
-									true,
-									true,
-									true,
-									true,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", instance.NewAddSecretGeneratorTypeUniqueConstraint(domain.SecretGeneratorTypeInitCode)),
+						instance.NewSecretGeneratorAddedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							domain.SecretGeneratorTypeInitCode,
+							4,
+							time.Hour*1,
+							true,
+							true,
+							true,
+							true,
+						),
 					),
 				),
 			},
@@ -256,23 +243,17 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewSecretGeneratorAddedEvent(
-									context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									domain.SecretGeneratorTypeInitCode,
-									4,
-									time.Hour*1,
-									true,
-									true,
-									true,
-									true,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", instance.NewAddSecretGeneratorTypeUniqueConstraint(domain.SecretGeneratorTypeInitCode)),
+						instance.NewSecretGeneratorAddedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							domain.SecretGeneratorTypeInitCode,
+							4,
+							time.Hour*1,
+							true,
+							true,
+							true,
+							true,
+						),
 					),
 				),
 			},
@@ -351,19 +332,15 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("INSTANCE",
-								newSecretGeneratorChangedEvent(context.Background(),
-									domain.SecretGeneratorTypeInitCode,
-									8,
-									time.Hour*2,
-									false,
-									false,
-									false,
-									false,
-								),
-							),
-						},
+						newSecretGeneratorChangedEvent(context.Background(),
+							domain.SecretGeneratorTypeInitCode,
+							8,
+							time.Hour*2,
+							false,
+							false,
+							false,
+							false,
+						),
 					),
 				),
 			},
@@ -511,14 +488,9 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								instance.NewSecretGeneratorRemovedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									domain.SecretGeneratorTypeInitCode),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(instance.NewRemoveSecretGeneratorTypeUniqueConstraint(domain.SecretGeneratorTypeInitCode)),
+						instance.NewSecretGeneratorRemovedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							domain.SecretGeneratorTypeInitCode),
 					),
 				),
 			},

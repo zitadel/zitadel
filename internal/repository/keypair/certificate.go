@@ -2,13 +2,11 @@ package keypair
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -21,11 +19,11 @@ type AddedCertificateEvent struct {
 	Certificate *Key `json:"certificate"`
 }
 
-func (e *AddedCertificateEvent) Data() interface{} {
+func (e *AddedCertificateEvent) Payload() interface{} {
 	return e
 }
 
-func (e *AddedCertificateEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *AddedCertificateEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -47,12 +45,12 @@ func NewAddedCertificateEvent(
 	}
 }
 
-func AddedCertificateEventMapper(event *repository.Event) (eventstore.Event, error) {
+func AddedCertificateEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &AddedCertificateEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "KEY-4n9vs", "unable to unmarshal certificate added")
 	}

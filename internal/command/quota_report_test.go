@@ -9,7 +9,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/quota"
@@ -68,14 +67,16 @@ func TestQuotaReport_ReportQuotaUsage(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				dueNotifications: []*quota.NotificationDueEvent{
-					{
-						Unit:        QuotaRequestsAllAuthenticated.Enum(),
-						ID:          "id",
-						CallURL:     "url",
-						PeriodStart: time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
-						Threshold:   1000,
-						Usage:       250,
-					},
+					quota.NewNotificationDueEvent(
+						context.Background(),
+						&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+						QuotaRequestsAllAuthenticated.Enum(),
+						"id",
+						"url",
+						time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
+						1000,
+						250,
+					),
 				},
 			},
 			res: res{},
@@ -87,20 +88,15 @@ func TestQuotaReport_ReportQuotaUsage(t *testing.T) {
 					t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								quota.NewNotificationDueEvent(context.Background(),
-									&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
-									QuotaRequestsAllAuthenticated.Enum(),
-									"id",
-									"url",
-									time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
-									1000,
-									250,
-								),
-							),
-						},
+						quota.NewNotificationDueEvent(context.Background(),
+							&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+							QuotaRequestsAllAuthenticated.Enum(),
+							"id",
+							"url",
+							time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
+							1000,
+							250,
+						),
 					),
 				),
 			},
@@ -143,32 +139,24 @@ func TestQuotaReport_ReportQuotaUsage(t *testing.T) {
 					),
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								quota.NewNotificationDueEvent(context.Background(),
-									&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
-									QuotaRequestsAllAuthenticated.Enum(),
-									"id1",
-									"url",
-									time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
-									1000,
-									250,
-								),
-							),
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								quota.NewNotificationDueEvent(context.Background(),
-									&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
-									QuotaRequestsAllAuthenticated.Enum(),
-									"id3",
-									"url",
-									time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
-									1000,
-									250,
-								),
-							),
-						},
+						quota.NewNotificationDueEvent(context.Background(),
+							&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+							QuotaRequestsAllAuthenticated.Enum(),
+							"id1",
+							"url",
+							time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
+							1000,
+							250,
+						),
+						quota.NewNotificationDueEvent(context.Background(),
+							&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+							QuotaRequestsAllAuthenticated.Enum(),
+							"id3",
+							"url",
+							time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
+							1000,
+							250,
+						),
 					),
 				),
 			},
@@ -250,25 +238,20 @@ func TestQuotaReport_UsageNotificationSent(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								quota.NewNotifiedEvent(
-									context.Background(),
-									"quota1",
-									quota.NewNotificationDueEvent(
-										context.Background(),
-										&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
-										QuotaRequestsAllAuthenticated.Enum(),
-										"id1",
-										"url",
-										time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
-										1000,
-										250,
-									),
-								),
+						quota.NewNotifiedEvent(
+							context.Background(),
+							"quota1",
+							quota.NewNotificationDueEvent(
+								context.Background(),
+								&quota.NewAggregate("quota1", "INSTANCE").Aggregate,
+								QuotaRequestsAllAuthenticated.Enum(),
+								"id1",
+								"url",
+								time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC),
+								1000,
+								250,
 							),
-						},
+						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "quota1"),

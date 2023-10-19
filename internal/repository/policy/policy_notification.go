@@ -1,11 +1,8 @@
 package policy
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -20,11 +17,11 @@ type NotificationPolicyAddedEvent struct {
 	PasswordChange bool `json:"passwordChange,omitempty"`
 }
 
-func (e *NotificationPolicyAddedEvent) Data() interface{} {
+func (e *NotificationPolicyAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *NotificationPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *NotificationPolicyAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -38,12 +35,12 @@ func NewNotificationPolicyAddedEvent(
 	}
 }
 
-func NotificationPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func NotificationPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &NotificationPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-0sp2nios", "unable to unmarshal policy")
 	}
@@ -57,11 +54,11 @@ type NotificationPolicyChangedEvent struct {
 	PasswordChange *bool `json:"passwordChange,omitempty"`
 }
 
-func (e *NotificationPolicyChangedEvent) Data() interface{} {
+func (e *NotificationPolicyChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *NotificationPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *NotificationPolicyChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -89,12 +86,12 @@ func ChangePasswordChange(passwordChange bool) func(*NotificationPolicyChangedEv
 	}
 }
 
-func NotificationPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func NotificationPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &NotificationPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-09s2oss", "unable to unmarshal policy")
 	}
@@ -106,11 +103,11 @@ type NotificationPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *NotificationPolicyRemovedEvent) Data() interface{} {
+func (e *NotificationPolicyRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *NotificationPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *NotificationPolicyRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -120,7 +117,7 @@ func NewNotificationPolicyRemovedEvent(base *eventstore.BaseEvent) *Notification
 	}
 }
 
-func NotificationPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func NotificationPolicyRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &NotificationPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

@@ -2027,7 +2027,7 @@ func (wm *IDPTypeWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *IDPTypeWriteModel) reduceAdded(id string, t domain.IDPType, agg eventstore.Aggregate) {
+func (wm *IDPTypeWriteModel) reduceAdded(id string, t domain.IDPType, agg *eventstore.Aggregate) {
 	if wm.ID != id {
 		return
 	}

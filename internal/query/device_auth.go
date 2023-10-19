@@ -126,7 +126,7 @@ func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 	return sq.Select(deviceAuthSelectColumns...).From(deviceAuthTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*domain.DeviceAuth, error) {
 			dst := new(domain.DeviceAuth)
-			var scopes database.StringArray
+			var scopes database.TextArray[string]
 
 			err := row.Scan(
 				&dst.AggregateID,

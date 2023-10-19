@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -211,18 +210,14 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newIDPJWTConfigChangedEvent(context.Background(),
-									"org1",
-									"config1",
-									"jwt-endpoint-changed",
-									"issuer-changed",
-									"keys-endpoint-changed",
-									"auth-changed",
-								),
-							),
-						},
+						newIDPJWTConfigChangedEvent(context.Background(),
+							"org1",
+							"config1",
+							"jwt-endpoint-changed",
+							"issuer-changed",
+							"keys-endpoint-changed",
+							"auth-changed",
+						),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
