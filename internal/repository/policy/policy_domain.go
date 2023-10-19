@@ -1,12 +1,8 @@
 package policy
 
 import (
-	"encoding/json"
-
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
@@ -23,11 +19,11 @@ type DomainPolicyAddedEvent struct {
 	SMTPSenderAddressMatchesInstanceDomain bool `json:"smtpSenderAddressMatchesInstanceDomain,omitempty"`
 }
 
-func (e *DomainPolicyAddedEvent) Data() interface{} {
+func (e *DomainPolicyAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *DomainPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *DomainPolicyAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -46,12 +42,12 @@ func NewDomainPolicyAddedEvent(
 	}
 }
 
-func DomainPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DomainPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &DomainPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-TvSmA", "unable to unmarshal policy")
 	}
@@ -67,11 +63,11 @@ type DomainPolicyChangedEvent struct {
 	SMTPSenderAddressMatchesInstanceDomain *bool `json:"smtpSenderAddressMatchesInstanceDomain,omitempty"`
 }
 
-func (e *DomainPolicyChangedEvent) Data() interface{} {
+func (e *DomainPolicyChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *DomainPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *DomainPolicyChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -111,12 +107,12 @@ func ChangeSMTPSenderAddressMatchesInstanceDomain(smtpSenderAddressMatchesInstan
 	}
 }
 
-func DomainPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DomainPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &DomainPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-0Pl9d", "unable to unmarshal policy")
 	}
@@ -128,11 +124,11 @@ type DomainPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *DomainPolicyRemovedEvent) Data() interface{} {
+func (e *DomainPolicyRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *DomainPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *DomainPolicyRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -142,7 +138,7 @@ func NewDomainPolicyRemovedEvent(base *eventstore.BaseEvent) *DomainPolicyRemove
 	}
 }
 
-func DomainPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DomainPolicyRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &DomainPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

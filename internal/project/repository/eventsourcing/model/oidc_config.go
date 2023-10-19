@@ -8,7 +8,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
@@ -75,7 +74,7 @@ func (key *ClientKey) AppendEvents(events ...*es_models.Event) error {
 
 func (key *ClientKey) AppendEvent(event *es_models.Event) (err error) {
 	key.ObjectRoot.AppendEvent(event)
-	switch eventstore.EventType(event.Type) {
+	switch event.Type() {
 	case project.ApplicationKeyAddedEventType:
 		err = json.Unmarshal(event.Data, key)
 		if err != nil {

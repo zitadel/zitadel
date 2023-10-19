@@ -306,6 +306,7 @@ export interface OnboardingActions {
   iconClasses?: string;
   darkcolor: string;
   lightcolor: string;
+  aggregateType: string;
 }
 
 type OnboardingEvent = {
@@ -330,7 +331,12 @@ export class AdminService {
     tap(() => this.onboardingLoading.next(true)),
     switchMap((actions) => {
       const searchForTypes = actions.map((oe) => oe.oneof).flat();
-      const eventsReq = new ListEventsRequest().setAsc(true).setEventTypesList(searchForTypes).setAsc(false);
+      const aggregateTypes = actions.map((oe) => oe.aggregateType);
+      const eventsReq = new ListEventsRequest()
+        .setAsc(true)
+        .setEventTypesList(searchForTypes)
+        .setAggregateTypesList(aggregateTypes)
+        .setAsc(false);
       return from(this.listEvents(eventsReq)).pipe(
         map((events) => {
           const el = events.toObject().eventsList.filter((e) => e.editor?.service !== 'System-API' && e.editor?.userId);

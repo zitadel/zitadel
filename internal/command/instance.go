@@ -159,19 +159,13 @@ func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
 	}
 
 	s.zitadel.consoleAppID, err = idGenerator.Next()
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return err
 }
 
 func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, string, *MachineKey, *domain.ObjectDetails, error) {
 	instanceID, err := c.idGenerator.Next()
 	if err != nil {
-		return "", "", nil, nil, err
-	}
-
-	if err = c.eventstore.NewInstance(ctx, instanceID); err != nil {
 		return "", "", nil, nil, err
 	}
 
@@ -464,7 +458,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 	return instanceID, token, machineKey, &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: orgID,
 	}, nil
 }
@@ -695,7 +689,7 @@ func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.Objec
 
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
 	}, nil
 }

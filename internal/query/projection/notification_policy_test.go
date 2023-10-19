@@ -6,8 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -25,19 +24,19 @@ func TestNotificationPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.NotificationPolicyAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.NotificationPolicyAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"passwordChange": true
 }`),
-				), org.NotificationPolicyAddedEventMapper),
+					), org.NotificationPolicyAddedEventMapper),
 			},
 			reduce: (&notificationPolicyProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -62,18 +61,18 @@ func TestNotificationPolicyProjection_reduces(t *testing.T) {
 			name:   "org reduceChanged",
 			reduce: (&notificationPolicyProjection{}).reduceChanged,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.NotificationPolicyChangedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.NotificationPolicyChangedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"passwordChange": true
 		}`),
-				), org.NotificationPolicyChangedEventMapper),
+					), org.NotificationPolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -94,16 +93,16 @@ func TestNotificationPolicyProjection_reduces(t *testing.T) {
 			name:   "org reduceRemoved",
 			reduce: (&notificationPolicyProjection{}).reduceRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.NotificationPolicyRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.NotificationPolicyRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.NotificationPolicyRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.NotificationPolicyRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -119,17 +118,17 @@ func TestNotificationPolicyProjection_reduces(t *testing.T) {
 		}, {
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(NotificationPolicyColumnInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -146,18 +145,18 @@ func TestNotificationPolicyProjection_reduces(t *testing.T) {
 			name:   "instance reduceAdded",
 			reduce: (&notificationPolicyProjection{}).reduceAdded,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.NotificationPolicyAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.NotificationPolicyAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"passwordChange": true
 					}`),
-				), instance.NotificationPolicyAddedEventMapper),
+					), instance.NotificationPolicyAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -182,18 +181,18 @@ func TestNotificationPolicyProjection_reduces(t *testing.T) {
 			name:   "instance reduceChanged",
 			reduce: (&notificationPolicyProjection{}).reduceChanged,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.NotificationPolicyChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.NotificationPolicyChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"passwordChange": true
 					}`),
-				), instance.NotificationPolicyChangedEventMapper),
+					), instance.NotificationPolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -214,16 +213,16 @@ func TestNotificationPolicyProjection_reduces(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&notificationPolicyProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

@@ -2,13 +2,11 @@ package usergrant
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -23,15 +21,15 @@ const (
 	UserGrantReactivatedType    = userGrantEventTypePrefix + "reactivated"
 )
 
-func NewAddUserGrantUniqueConstraint(resourceOwner, userID, projectID, projectGrantID string) *eventstore.EventUniqueConstraint {
+func NewAddUserGrantUniqueConstraint(resourceOwner, userID, projectID, projectGrantID string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueUserGrant,
 		fmt.Sprintf("%s:%s:%s:%v", resourceOwner, userID, projectID, projectGrantID),
 		"Errors.UserGrant.AlreadyExists")
 }
 
-func NewRemoveUserGrantUniqueConstraint(resourceOwner, userID, projectID, projectGrantID string) *eventstore.EventUniqueConstraint {
-	return eventstore.NewRemoveEventUniqueConstraint(
+func NewRemoveUserGrantUniqueConstraint(resourceOwner, userID, projectID, projectGrantID string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
 		UniqueUserGrant,
 		fmt.Sprintf("%s:%s:%s:%s", resourceOwner, userID, projectID, projectGrantID))
 }
@@ -45,12 +43,12 @@ type UserGrantAddedEvent struct {
 	RoleKeys       []string `json:"roleKeys,omitempty"`
 }
 
-func (e *UserGrantAddedEvent) Data() interface{} {
+func (e *UserGrantAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *UserGrantAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.UserID, e.ProjectID, e.ProjectGrantID)}
+func (e *UserGrantAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.UserID, e.ProjectID, e.ProjectGrantID)}
 }
 
 func NewUserGrantAddedEvent(
@@ -73,12 +71,12 @@ func NewUserGrantAddedEvent(
 	}
 }
 
-func UserGrantAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func UserGrantAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &UserGrantAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "UGRANT-0p9ol", "unable to unmarshal user grant")
 	}
@@ -91,11 +89,11 @@ type UserGrantChangedEvent struct {
 	RoleKeys             []string `json:"roleKeys"`
 }
 
-func (e *UserGrantChangedEvent) Data() interface{} {
+func (e *UserGrantChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *UserGrantChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserGrantChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -113,12 +111,12 @@ func NewUserGrantChangedEvent(
 	}
 }
 
-func UserGrantChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func UserGrantChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &UserGrantChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "UGRANT-4M0sd", "unable to unmarshal user grant")
 	}
@@ -131,11 +129,11 @@ type UserGrantCascadeChangedEvent struct {
 	RoleKeys             []string `json:"roleKeys,omitempty"`
 }
 
-func (e *UserGrantCascadeChangedEvent) Data() interface{} {
+func (e *UserGrantCascadeChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *UserGrantCascadeChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserGrantCascadeChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -153,12 +151,12 @@ func NewUserGrantCascadeChangedEvent(
 	}
 }
 
-func UserGrantCascadeChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func UserGrantCascadeChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &UserGrantChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "UGRANT-Gs9df", "unable to unmarshal user grant")
 	}
@@ -173,12 +171,12 @@ type UserGrantRemovedEvent struct {
 	projectGrantID       string `json:"-"`
 }
 
-func (e *UserGrantRemovedEvent) Data() interface{} {
+func (e *UserGrantRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *UserGrantRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.userID, e.projectID, e.projectGrantID)}
+func (e *UserGrantRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.userID, e.projectID, e.projectGrantID)}
 }
 
 func NewUserGrantRemovedEvent(
@@ -200,7 +198,7 @@ func NewUserGrantRemovedEvent(
 	}
 }
 
-func UserGrantRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func UserGrantRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &UserGrantRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -213,12 +211,12 @@ type UserGrantCascadeRemovedEvent struct {
 	projectGrantID       string `json:"-"`
 }
 
-func (e *UserGrantCascadeRemovedEvent) Data() interface{} {
+func (e *UserGrantCascadeRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *UserGrantCascadeRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.userID, e.projectID, e.projectGrantID)}
+func (e *UserGrantCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.userID, e.projectID, e.projectGrantID)}
 }
 
 func NewUserGrantCascadeRemovedEvent(
@@ -240,7 +238,7 @@ func NewUserGrantCascadeRemovedEvent(
 	}
 }
 
-func UserGrantCascadeRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func UserGrantCascadeRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &UserGrantCascadeRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -250,11 +248,11 @@ type UserGrantDeactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *UserGrantDeactivatedEvent) Data() interface{} {
+func (e *UserGrantDeactivatedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *UserGrantDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserGrantDeactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -268,7 +266,7 @@ func NewUserGrantDeactivatedEvent(ctx context.Context, aggregate *eventstore.Agg
 	}
 }
 
-func UserGrantDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func UserGrantDeactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &UserGrantDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -278,11 +276,11 @@ type UserGrantReactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *UserGrantReactivatedEvent) Data() interface{} {
+func (e *UserGrantReactivatedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *UserGrantReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserGrantReactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -296,7 +294,7 @@ func NewUserGrantReactivatedEvent(ctx context.Context, aggregate *eventstore.Agg
 	}
 }
 
-func UserGrantReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func UserGrantReactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &UserGrantReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

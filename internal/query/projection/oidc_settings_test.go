@@ -6,8 +6,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -24,17 +23,17 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 		{
 			name: "reduceOIDCSettingsChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.OIDCSettingsChangedEventType),
-					instance.AggregateType,
-					[]byte(`{"accessTokenLifetime": 10000000, "idTokenLifetime": 10000000, "refreshTokenIdleExpiration": 10000000, "refreshTokenExpiration": 10000000}`),
-				), instance.OIDCSettingsChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.OIDCSettingsChangedEventType,
+						instance.AggregateType,
+						[]byte(`{"accessTokenLifetime": 10000000, "idTokenLifetime": 10000000, "refreshTokenIdleExpiration": 10000000, "refreshTokenExpiration": 10000000}`),
+					), instance.OIDCSettingsChangedEventMapper),
 			},
 			reduce: (&oidcSettingsProjection{}).reduceOIDCSettingsChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -57,17 +56,17 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 		{
 			name: "reduceOIDCSettingsAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.OIDCSettingsAddedEventType),
-					instance.AggregateType,
-					[]byte(`{"accessTokenLifetime": 10000000, "idTokenLifetime": 10000000, "refreshTokenIdleExpiration": 10000000, "refreshTokenExpiration": 10000000}`),
-				), instance.OIDCSettingsAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.OIDCSettingsAddedEventType,
+						instance.AggregateType,
+						[]byte(`{"accessTokenLifetime": 10000000, "idTokenLifetime": 10000000, "refreshTokenIdleExpiration": 10000000, "refreshTokenExpiration": 10000000}`),
+					), instance.OIDCSettingsAddedEventMapper),
 			},
 			reduce: (&oidcSettingsProjection{}).reduceOIDCSettingsAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -92,17 +91,17 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(OIDCSettingsColumnInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

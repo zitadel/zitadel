@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
@@ -28,41 +28,42 @@ const (
 	CustomTextOwnerRemovedCol = "owner_removed"
 )
 
-type customTextProjection struct {
-	crdb.StatementHandler
+type customTextProjection struct{}
+
+func newCustomTextProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(customTextProjection))
 }
 
-func newCustomTextProjection(ctx context.Context, config crdb.StatementHandlerConfig) *customTextProjection {
-	p := new(customTextProjection)
-	config.ProjectionName = CustomTextTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(CustomTextAggregateIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(CustomTextInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(CustomTextCreationDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(CustomTextChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(CustomTextSequenceCol, crdb.ColumnTypeInt64),
-			crdb.NewColumn(CustomTextIsDefaultCol, crdb.ColumnTypeBool),
-			crdb.NewColumn(CustomTextTemplateCol, crdb.ColumnTypeText),
-			crdb.NewColumn(CustomTextLanguageCol, crdb.ColumnTypeText),
-			crdb.NewColumn(CustomTextKeyCol, crdb.ColumnTypeText),
-			crdb.NewColumn(CustomTextTextCol, crdb.ColumnTypeText),
-			crdb.NewColumn(CustomTextOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
+func (*customTextProjection) Name() string {
+	return CustomTextTable
+}
+
+func (*customTextProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(CustomTextAggregateIDCol, handler.ColumnTypeText),
+			handler.NewColumn(CustomTextInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(CustomTextCreationDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(CustomTextChangeDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(CustomTextSequenceCol, handler.ColumnTypeInt64),
+			handler.NewColumn(CustomTextIsDefaultCol, handler.ColumnTypeBool),
+			handler.NewColumn(CustomTextTemplateCol, handler.ColumnTypeText),
+			handler.NewColumn(CustomTextLanguageCol, handler.ColumnTypeText),
+			handler.NewColumn(CustomTextKeyCol, handler.ColumnTypeText),
+			handler.NewColumn(CustomTextTextCol, handler.ColumnTypeText),
+			handler.NewColumn(CustomTextOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
-			crdb.NewPrimaryKey(CustomTextInstanceIDCol, CustomTextAggregateIDCol, CustomTextTemplateCol, CustomTextKeyCol, CustomTextLanguageCol),
-			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{CustomTextOwnerRemovedCol})),
+			handler.NewPrimaryKey(CustomTextInstanceIDCol, CustomTextAggregateIDCol, CustomTextTemplateCol, CustomTextKeyCol, CustomTextLanguageCol),
+			handler.WithIndex(handler.NewIndex("owner_removed", []string{CustomTextOwnerRemovedCol})),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *customTextProjection) reducers() []handler.AggregateReducer {
+func (p *customTextProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.CustomTextSetEventType,
 					Reduce: p.reduceSet,
@@ -83,7 +84,7 @@ func (p *customTextProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.CustomTextSetEventType,
 					Reduce: p.reduceSet,
@@ -118,7 +119,7 @@ func (p *customTextProjection) reduceSet(event eventstore.Event) (*handler.State
 	default:
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-KKfw4", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextSetEventType, instance.CustomTextSetEventType})
 	}
-	return crdb.NewUpsertStatement(
+	return handler.NewUpsertStatement(
 		&customTextEvent,
 		[]handler.Column{
 			handler.NewCol(CustomTextInstanceIDCol, nil),
@@ -151,7 +152,7 @@ func (p *customTextProjection) reduceRemoved(event eventstore.Event) (*handler.S
 	default:
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-n9wJg", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextRemovedEventType, instance.CustomTextRemovedEventType})
 	}
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		&customTextEvent,
 		[]handler.Condition{
 			handler.NewCond(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
@@ -172,7 +173,7 @@ func (p *customTextProjection) reduceTemplateRemoved(event eventstore.Event) (*h
 	default:
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-29iPf", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextTemplateRemovedEventType, instance.CustomTextTemplateRemovedEventType})
 	}
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		&customTextEvent,
 		[]handler.Condition{
 			handler.NewCond(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
@@ -188,7 +189,7 @@ func (p *customTextProjection) reduceOwnerRemoved(event eventstore.Event) (*hand
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-V2T3z", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(CustomTextInstanceIDCol, e.Aggregate().InstanceID),
