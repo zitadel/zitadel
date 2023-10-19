@@ -227,7 +227,7 @@ type Reducer func(event Event) error
 type Querier interface {
 	// Health checks if the connection to the storage is available
 	Health(ctx context.Context) error
-	// FilterToReducer returns all events matching the given search query
+	// FilterToReducer calls r for every event returned from the storage
 	FilterToReducer(ctx context.Context, searchQuery *SearchQueryBuilder, r Reducer) error
 	// LatestSequence returns the latest sequence found by the search query
 	LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (float64, error)

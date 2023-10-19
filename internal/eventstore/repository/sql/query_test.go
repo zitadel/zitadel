@@ -181,7 +181,6 @@ func Test_prepareColumns(t *testing.T) {
 				},
 			},
 			fields: fields{
-				// TO BE DISCUSSED: why is sql.Bytes nil in the tests? And why isn't a nil returned for Data if it nil?
 				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), sql.NullFloat64{Float64: 42, Valid: true}, sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", uint8(1)},
 			},
 		},
