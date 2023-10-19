@@ -28,6 +28,18 @@ type EventEditor struct {
 	AvatarKey         string
 }
 
+type eventsReducer struct {
+	ctx    context.Context
+	q      *Queries
+	events []*Event
+}
+
+func (r *eventsReducer) AppendEvents(events ...eventstore.Event) {
+	r.events = append(r.events, r.q.convertEvents(r.ctx, events)...)
+}
+
+func (r *eventsReducer) Reduce() error { return nil }
+
 func (q *Queries) SearchEvents(ctx context.Context, query *eventstore.SearchQueryBuilder) (_ []*Event, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -42,11 +54,11 @@ func (q *Queries) SearchEvents(ctx context.Context, query *eventstore.SearchQuer
 	if auditLogRetention != 0 {
 		query = filterAuditLogRetention(ctx, auditLogRetention, query)
 	}
-	events, err := q.eventstore.Filter(ctx, query.AllowTimeTravel())
-	if err != nil {
+	reducer := &eventsReducer{ctx: ctx, q: q}
+	if err = q.eventstore.FilterToReducer(ctx, query, reducer); err != nil {
 		return nil, err
 	}
-	return q.convertEvents(ctx, events), nil
+	return reducer.events, nil
 }
 
 func filterAuditLogRetention(ctx context.Context, auditLogRetention time.Duration, builder *eventstore.SearchQueryBuilder) *eventstore.SearchQueryBuilder {

@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -35,12 +34,12 @@ func (c *Commands) SetLimits(
 			return nil, err
 		}
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.SetLimitsCommand(limits.NewAggregate(aggregateId, instanceId, resourceOwner), wm, createNew, setLimits))
 	if err != nil {
 		return nil, err
 	}
-	if len(cmds) > 0 {
-		events, err := c.eventstore.Push(ctx, cmds...)
+	cmd := c.SetLimitsCommand(ctx, limits.NewAggregate(aggregateId, instanceId, resourceOwner), wm, createNew, setLimits)
+	if cmd != nil {
+		events, err := c.eventstore.Push(ctx, cmd)
 		if err != nil {
 			return nil, err
 		}
@@ -79,22 +78,17 @@ func (c *Commands) getLimitsWriteModel(ctx context.Context, instanceId, resource
 	return wm, c.eventstore.FilterToQueryReducer(ctx, wm)
 }
 
-func (c *Commands) SetLimitsCommand(a *limits.Aggregate, wm *limitsWriteModel, createNew bool, setLimits *SetLimits) preparation.Validation {
-	return func() (preparation.CreateCommands, error) {
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (cmd []eventstore.Command, err error) {
-				changes := wm.NewChanges(createNew, setLimits)
-				if len(changes) == 0 {
-					return nil, nil
-				}
-				return []eventstore.Command{limits.NewSetEvent(
-					eventstore.NewBaseEventForPush(
-						ctx,
-						&a.Aggregate,
-						limits.SetEventType,
-					),
-					changes...,
-				)}, err
-			},
-			nil
+func (c *Commands) SetLimitsCommand(ctx context.Context, a *limits.Aggregate, wm *limitsWriteModel, createNew bool, setLimits *SetLimits) eventstore.Command {
+	changes := wm.NewChanges(createNew, setLimits)
+	if len(changes) == 0 {
+		return nil
 	}
+	return limits.NewSetEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			&a.Aggregate,
+			limits.SetEventType,
+		),
+		changes...,
+	)
 }
