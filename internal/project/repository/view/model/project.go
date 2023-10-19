@@ -8,7 +8,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/project/model"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -36,8 +35,8 @@ type ProjectView struct {
 
 func (p *ProjectView) AppendEvent(event *models.Event) (err error) {
 	p.ChangeDate = event.CreationDate
-	p.Sequence = event.Sequence
-	switch eventstore.EventType(event.Type) {
+	p.Sequence = event.Seq
+	switch event.Type() {
 	case project.ProjectAddedType:
 		p.State = int32(model.ProjectStateActive)
 		p.CreationDate = event.CreationDate
@@ -70,11 +69,7 @@ func (p *ProjectView) setData(event *models.Event) error {
 
 func (p *ProjectView) setProjectData(event *models.Event) error {
 	project := new(ProjectView)
-	err := project.SetData(event)
-	if err != nil {
-		return err
-	}
-	return nil
+	return project.SetData(event)
 }
 
 func (p *ProjectView) SetData(event *models.Event) error {

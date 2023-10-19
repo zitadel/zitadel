@@ -33,12 +33,7 @@ func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 		return nil, status.Error(codes.Unauthenticated, "auth header missing")
 	}
 
-	var orgDomain string
-	orgID := grpc_util.GetHeader(authCtx, http.ZitadelOrgID)
-	if o, ok := req.(OrganisationFromRequest); ok {
-		orgID = o.OrganisationFromRequest().ID
-		orgDomain = o.OrganisationFromRequest().Domain
-	}
+	orgID, orgDomain := orgIDAndDomainFromRequest(authCtx, req)
 	ctxSetter, err := authz.CheckUserAuthorization(authCtx, req, authToken, orgID, orgDomain, verifier, authConfig, authOpt, info.FullMethod)
 	if err != nil {
 		return nil, err
@@ -47,11 +42,38 @@ func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 	return handler(ctxSetter(ctx), req)
 }
 
-type OrganisationFromRequest interface {
-	OrganisationFromRequest() *Organisation
+func orgIDAndDomainFromRequest(ctx context.Context, req interface{}) (id, domain string) {
+	orgID := grpc_util.GetHeader(ctx, http.ZitadelOrgID)
+	o, ok := req.(OrganizationFromRequest)
+	if !ok {
+		return orgID, ""
+	}
+	id = o.OrganizationFromRequest().ID
+	domain = o.OrganizationFromRequest().Domain
+	if id != "" || domain != "" {
+		return id, domain
+	}
+	// check if the deprecated organisation is used.
+	// to be removed before going GA (https://github.com/zitadel/zitadel/issues/6718)
+	id = o.OrganisationFromRequest().ID
+	domain = o.OrganisationFromRequest().Domain
+	if id != "" || domain != "" {
+		return id, domain
+	}
+	return orgID, domain
 }
 
-type Organisation struct {
+// Deprecated: will be removed in favor of OrganizationFromRequest (https://github.com/zitadel/zitadel/issues/6718)
+type OrganisationFromRequest interface {
+	OrganisationFromRequest() *Organization
+}
+
+type Organization struct {
 	ID     string
 	Domain string
+}
+
+type OrganizationFromRequest interface {
+	OrganizationFromRequest() *Organization
+	OrganisationFromRequest
 }

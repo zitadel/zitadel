@@ -1,10 +1,9 @@
 package model
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/org/model"
 )
@@ -28,18 +27,18 @@ func GetDomain(domains []*OrgDomain, domain string) (int, *OrgDomain) {
 	return -1, nil
 }
 
-func (o *Org) appendAddDomainEvent(event *es_models.Event) error {
+func (o *Org) appendAddDomainEvent(event eventstore.Event) error {
 	domain := new(OrgDomain)
 	err := domain.SetData(event)
 	if err != nil {
 		return err
 	}
-	domain.ObjectRoot.CreationDate = event.CreationDate
+	domain.ObjectRoot.CreationDate = event.CreatedAt()
 	o.Domains = append(o.Domains, domain)
 	return nil
 }
 
-func (o *Org) appendRemoveDomainEvent(event *es_models.Event) error {
+func (o *Org) appendRemoveDomainEvent(event eventstore.Event) error {
 	domain := new(OrgDomain)
 	err := domain.SetData(event)
 	if err != nil {
@@ -53,7 +52,7 @@ func (o *Org) appendRemoveDomainEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (o *Org) appendVerifyDomainEvent(event *es_models.Event) error {
+func (o *Org) appendVerifyDomainEvent(event eventstore.Event) error {
 	domain := new(OrgDomain)
 	err := domain.SetData(event)
 	if err != nil {
@@ -66,7 +65,7 @@ func (o *Org) appendVerifyDomainEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (o *Org) appendPrimaryDomainEvent(event *es_models.Event) error {
+func (o *Org) appendPrimaryDomainEvent(event eventstore.Event) error {
 	domain := new(OrgDomain)
 	err := domain.SetData(event)
 	if err != nil {
@@ -81,7 +80,7 @@ func (o *Org) appendPrimaryDomainEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (o *Org) appendVerificationDomainEvent(event *es_models.Event) error {
+func (o *Org) appendVerificationDomainEvent(event eventstore.Event) error {
 	domain := new(OrgDomain)
 	err := domain.SetData(event)
 	if err != nil {
@@ -96,8 +95,8 @@ func (o *Org) appendVerificationDomainEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (m *OrgDomain) SetData(event *es_models.Event) error {
-	err := json.Unmarshal(event.Data, m)
+func (m *OrgDomain) SetData(event eventstore.Event) error {
+	err := event.Unmarshal(m)
 	if err != nil {
 		return errors.ThrowInternal(err, "EVENT-Hz7Mb", "unable to unmarshal data")
 	}

@@ -5,9 +5,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/zitadel/oidc/v2/pkg/client/rp"
-	httphelper "github.com/zitadel/oidc/v2/pkg/http"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
+	httphelper "github.com/zitadel/oidc/v3/pkg/http"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/idp"
 )
@@ -25,9 +25,9 @@ type Session struct {
 	Provider *Provider
 }
 
-// GetAuthURL implements the [idp.Session] interface.
-func (s *Session) GetAuthURL() string {
-	return s.AuthURL
+// GetAuth implements the [idp.Session] interface.
+func (s *Session) GetAuth(ctx context.Context) (string, bool) {
+	return idp.Redirect(s.AuthURL)
 }
 
 // FetchUser implements the [idp.Session] interface.
@@ -56,8 +56,6 @@ func (s *Session) authorize(ctx context.Context) (err error) {
 		return ErrCodeMissing
 	}
 	s.Tokens, err = rp.CodeExchange[*oidc.IDTokenClaims](ctx, s.Code, s.Provider.RelyingParty)
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return err
 }

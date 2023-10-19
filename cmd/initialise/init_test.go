@@ -1,17 +1,17 @@
 package initialise
 
 import (
-	"database/sql"
 	"database/sql/driver"
 	"regexp"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 type db struct {
 	mock sqlmock.Sqlmock
-	db   *sql.DB
+	db   *database.DB
 }
 
 func prepareDB(t *testing.T, expectations ...expectation) db {
@@ -25,7 +25,7 @@ func prepareDB(t *testing.T, expectations ...expectation) db {
 	}
 	return db{
 		mock: mock,
-		db:   client,
+		db:   &database.DB{DB: client},
 	}
 }
 
@@ -39,6 +39,20 @@ func expectExec(stmt string, err error, args ...driver.Value) expectation {
 			return
 		}
 		query.WillReturnResult(sqlmock.NewResult(1, 1))
+	}
+}
+
+func expectQuery(stmt string, err error, columns []string, rows [][]driver.Value, args ...driver.Value) expectation {
+	return func(m sqlmock.Sqlmock) {
+		res := sqlmock.NewRows(columns)
+		for _, row := range rows {
+			res.AddRow(row...)
+		}
+		query := m.ExpectQuery(regexp.QuoteMeta(stmt)).WithArgs(args...).WillReturnRows(res)
+		if err != nil {
+			query.WillReturnError(err)
+			return
+		}
 	}
 }
 

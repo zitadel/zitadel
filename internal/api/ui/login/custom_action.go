@@ -7,7 +7,7 @@ import (
 
 	"github.com/dop251/goja"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/actions"
@@ -133,7 +133,7 @@ func (l *Login) runPostExternalAuthenticationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -206,7 +206,7 @@ func (l *Login) runPostInternalAuthenticationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -307,7 +307,7 @@ func (l *Login) runPreCreationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -365,7 +365,7 @@ func (l *Login) runPostCreationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {

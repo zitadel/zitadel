@@ -110,7 +110,7 @@ func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQ
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-C1E4D", "Errors.Internal")
 	}
-	idps.LatestSequence, err = q.latestSequence(ctx, idpUserLinkTable)
+	idps.State, err = q.latestState(ctx, idpUserLinkTable)
 	return idps, err
 }
 

@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/policy"
@@ -67,16 +66,11 @@ func TestCommandSide_AddDefaultLockoutPolicy(t *testing.T) {
 					t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewLockoutPolicyAddedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									10,
-									true,
-								),
-							),
-						},
+						instance.NewLockoutPolicyAddedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							10,
+							true,
+						),
 					),
 				),
 			},
@@ -190,11 +184,7 @@ func TestCommandSide_ChangeDefaultLockoutPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newDefaultLockoutPolicyChangedEvent(context.Background(), 20, false),
-							),
-						},
+						newDefaultLockoutPolicyChangedEvent(context.Background(), 20, false),
 					),
 				),
 			},
@@ -210,6 +200,7 @@ func TestCommandSide_ChangeDefaultLockoutPolicy(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "INSTANCE",
 						ResourceOwner: "INSTANCE",
+						InstanceID:    "INSTANCE",
 					},
 					MaxPasswordAttempts: 20,
 					ShowLockOutFailures: false,

@@ -3,8 +3,8 @@ package oidc
 import (
 	"context"
 
-	"github.com/zitadel/oidc/v2/pkg/client/rp"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/idp"
 )
@@ -100,7 +100,7 @@ func New(name, issuer, clientID, clientSecret, redirectURI string, scopes []stri
 	for _, option := range options {
 		option(provider)
 	}
-	provider.RelyingParty, err = rp.NewRelyingPartyOIDC(issuer, clientID, clientSecret, redirectURI, setDefaultScope(scopes), provider.options...)
+	provider.RelyingParty, err = rp.NewRelyingPartyOIDC(context.TODO(), issuer, clientID, clientSecret, redirectURI, setDefaultScope(scopes), provider.options...)
 	if err != nil {
 		return nil, err
 	}

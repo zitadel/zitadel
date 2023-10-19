@@ -126,7 +126,7 @@ func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecu
 			}
 			// ignore form post callback
 			// it will redirect to the "normal" callback, where the cookie is set again
-			if r.URL.Path == EndpointExternalLoginCallbackFormPost && r.Method == http.MethodPost {
+			if (r.URL.Path == EndpointExternalLoginCallbackFormPost || r.URL.Path == EndpointSAMLACS) && r.Method == http.MethodPost {
 				handler.ServeHTTP(w, r)
 				return
 			}
@@ -161,7 +161,11 @@ func (l *Login) Handler() http.Handler {
 }
 
 func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string) ([]string, error) {
-	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+domain.NewIAMDomainName(orgName, authz.GetInstance(ctx).RequestedDomain()), query.TextEndsWithIgnoreCase)
+	orgDomain, err := domain.NewIAMDomainName(orgName, authz.GetInstance(ctx).RequestedDomain())
+	if err != nil {
+		return nil, err
+	}
+	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+orgDomain, query.TextEndsWithIgnoreCase)
 	if err != nil {
 		return nil, err
 	}

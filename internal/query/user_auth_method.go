@@ -137,7 +137,7 @@ func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMe
 	if err != nil {
 		return nil, err
 	}
-	userAuthMethods.LatestSequence, err = q.latestSequence(ctx, userAuthMethodTable)
+	userAuthMethods.State, err = q.latestState(ctx, userAuthMethodTable)
 	return userAuthMethods, err
 }
 
@@ -171,7 +171,7 @@ func (q *Queries) ListActiveUserAuthMethodTypes(ctx context.Context, userID stri
 	if err != nil {
 		return nil, err
 	}
-	userAuthMethodTypes.LatestSequence, err = q.latestSequence(ctx, userTable, notifyTable, userAuthMethodTable, idpUserLinkTable)
+	userAuthMethodTypes.State, err = q.latestState(ctx, userTable, notifyTable, userAuthMethodTable, idpUserLinkTable)
 	return userAuthMethodTypes, err
 }
 

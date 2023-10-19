@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
@@ -181,19 +180,13 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanEmailChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"email-changed@test.ch",
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanEmailChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"email-changed@test.ch",
+						),
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -241,13 +234,59 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				email: &domain.Email{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "user1",
+					},
+					EmailAddress:    "email@test.ch",
+					IsEmailVerified: true,
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.Email{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					EmailAddress:    "email@test.ch",
+					IsEmailVerified: true,
+				},
+			},
+		},
+		{
+			name: "email verified, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
 							),
-						},
+						),
+					),
+					expectPush(
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -295,26 +334,20 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanEmailChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"email-changed@test.ch",
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1,
-								),
-							),
-						},
+						user.NewHumanEmailChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"email-changed@test.ch",
+						),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+						),
 					),
 				),
 			},
@@ -497,13 +530,9 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanEmailVerificationFailedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanEmailVerificationFailedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -552,13 +581,9 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -755,20 +780,16 @@ func TestCommandSide_CreateVerificationCodeHumanEmail(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanEmailCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1,
-								),
-							),
-						},
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+						),
 					),
 				),
 			},
@@ -887,13 +908,9 @@ func TestCommandSide_EmailVerificationCodeSent(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanEmailCodeSentEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanEmailCodeSentEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},

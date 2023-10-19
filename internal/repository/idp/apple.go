@@ -1,12 +1,9 @@
 package idp
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 type AppleIDPAddedEvent struct {
@@ -46,20 +43,20 @@ func NewAppleIDPAddedEvent(
 	}
 }
 
-func (e *AppleIDPAddedEvent) Data() interface{} {
+func (e *AppleIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *AppleIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *AppleIDPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func AppleIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func AppleIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &AppleIDPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-Beqss", "unable to unmarshal event")
 	}
@@ -142,20 +139,20 @@ func ChangeAppleOptions(options OptionChanges) func(*AppleIDPChangedEvent) {
 	}
 }
 
-func (e *AppleIDPChangedEvent) Data() interface{} {
+func (e *AppleIDPChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *AppleIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *AppleIDPChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func AppleIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func AppleIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &AppleIDPChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-NBe1s", "unable to unmarshal event")
 	}

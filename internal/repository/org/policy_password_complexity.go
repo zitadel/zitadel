@@ -4,8 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
@@ -42,7 +40,7 @@ func NewPasswordComplexityPolicyAddedEvent(
 	}
 }
 
-func PasswordComplexityPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func PasswordComplexityPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.PasswordComplexityPolicyAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -73,7 +71,7 @@ func NewPasswordComplexityPolicyChangedEvent(
 	return &PasswordComplexityPolicyChangedEvent{PasswordComplexityPolicyChangedEvent: *changedEvent}, nil
 }
 
-func PasswordComplexityPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func PasswordComplexityPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.PasswordComplexityPolicyChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -100,7 +98,7 @@ func NewPasswordComplexityPolicyRemovedEvent(
 	}
 }
 
-func PasswordComplexityPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func PasswordComplexityPolicyRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.PasswordComplexityPolicyRemovedEventMapper(event)
 	if err != nil {
 		return nil, err

@@ -28,6 +28,7 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
     iconClasses: 'las la-database',
     darkcolor: greendark,
     lightcolor: greenlight,
+    aggregateType: 'project',
   },
   {
     order: 1,
@@ -37,6 +38,7 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
     iconClasses: 'lab la-openid',
     darkcolor: purpledark,
     lightcolor: purplelight,
+    aggregateType: 'project',
   },
   {
     order: 2,
@@ -46,6 +48,7 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
     iconClasses: 'las la-user',
     darkcolor: bluedark,
     lightcolor: bluelight,
+    aggregateType: 'user',
   },
   {
     order: 3,
@@ -55,6 +58,7 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
     iconClasses: 'las la-shield-alt',
     darkcolor: reddark,
     lightcolor: redlight,
+    aggregateType: 'user_grant',
   },
   {
     order: 4,
@@ -65,15 +69,17 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
     iconClasses: 'las la-swatchbook',
     darkcolor: pinkdark,
     lightcolor: pinklight,
+    aggregateType: 'instance',
   },
   {
     order: 5,
     eventType: 'instance.smtp.config.added',
     oneof: ['instance.smtp.config.added', 'instance.smtp.config.changed'],
     link: ['/settings'],
-    fragment: 'notifications',
+    fragment: 'smtpprovider',
     iconClasses: 'las la-envelope',
     darkcolor: yellowdark,
     lightcolor: yellowlight,
+    aggregateType: 'instance',
   },
 ];

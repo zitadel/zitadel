@@ -6,6 +6,7 @@ import "zitadel/instance.proto";
 import "zitadel/member.proto";
 import "zitadel/quota.proto";
 import "zitadel/auth_n_key.proto";
+import "zitadel/feature.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -894,8 +895,7 @@ message FailedEvent {
 
 message SetInstanceFeatureRequest {
   string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  // the feature (id) according to [internal/domain/feature.go]
-  int32 feature_id = 2 [(validate.rules).int32 = {gt: 0}];
+  zitadel.feature.v1.InstanceFeature feature_id = 2 [(validate.rules).enum = {not_in: 0, defined_only: true}];
   // value based on the feature type
   oneof value {
     option (validate.required) = true;

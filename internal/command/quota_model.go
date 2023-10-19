@@ -37,8 +37,8 @@ func newQuotaWriteModel(instanceId, resourceOwner string, unit quota.Unit) *quot
 func (wm *quotaWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
-		AddQuery().
 		InstanceID(wm.InstanceID).
+		AddQuery().
 		AggregateTypes(quota.AggregateType).
 		EventTypes(
 			quota.AddedEventType,
@@ -51,7 +51,7 @@ func (wm *quotaWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *quotaWriteModel) Reduce() error {
 	for _, event := range wm.Events {
-		wm.ChangeDate = event.CreationDate()
+		wm.ChangeDate = event.CreatedAt()
 		switch e := event.(type) {
 		case *quota.SetEvent:
 			wm.rollingAggregateID = e.Aggregate().ID
@@ -178,7 +178,7 @@ func sortSetEventNotifications(notifications []*quota.SetEventNotification) (err
 		}
 		if i.Percent < j.Percent ||
 			i.Percent == j.Percent && i.CallURL < j.CallURL ||
-			i.Percent == j.Percent && i.CallURL == j.CallURL && i.Repeat == false && j.Repeat == true {
+			i.Percent == j.Percent && i.CallURL == j.CallURL && !i.Repeat && j.Repeat {
 			return -1
 		}
 		return +1

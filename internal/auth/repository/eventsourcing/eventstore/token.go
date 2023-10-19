@@ -9,8 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/errors"
-	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
@@ -18,19 +17,8 @@ import (
 )
 
 type TokenRepo struct {
-	Eventstore v1.Eventstore
+	Eventstore *eventstore.Eventstore
 	View       *view.View
-}
-
-func (repo *TokenRepo) IsTokenValid(ctx context.Context, userID, tokenID string) (bool, error) {
-	token, err := repo.TokenByIDs(ctx, userID, tokenID)
-	if err == nil {
-		return token.Expiration.After(time.Now().UTC()), nil
-	}
-	if errors.IsNotFound(err) {
-		return false, nil
-	}
-	return false, err
 }
 
 func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (*usr_model.TokenView, error) {
@@ -51,7 +39,7 @@ func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (
 		token.UserID = userID
 		token.InstanceID = instanceID
 		if sequence != nil {
-			token.Sequence = sequence.CurrentSequence
+			token.Sequence = sequence.Sequence
 		}
 	}
 
@@ -77,10 +65,10 @@ func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (
 	return model.TokenViewToModel(token), nil
 }
 
-func (r *TokenRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64, eventTypes []models.EventType) ([]*models.Event, error) {
+func (r *TokenRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64, eventTypes []eventstore.EventType) ([]eventstore.Event, error) {
 	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence, eventTypes)
 	if err != nil {
 		return nil, err
 	}
-	return r.Eventstore.FilterEvents(ctx, query)
+	return r.Eventstore.Filter(ctx, query)
 }
