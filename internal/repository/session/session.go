@@ -2,7 +2,6 @@ package session
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/http"
@@ -10,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -37,11 +35,11 @@ type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *AddedEvent) Data() interface{} {
+func (e *AddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -57,11 +55,12 @@ func NewAddedEvent(ctx context.Context,
 	}
 }
 
-func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func AddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	added := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, added)
+
+	err := event.Unmarshal(added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SESSION-DG4gn", "unable to unmarshal session added")
 	}
@@ -76,11 +75,11 @@ type UserCheckedEvent struct {
 	CheckedAt time.Time `json:"checkedAt"`
 }
 
-func (e *UserCheckedEvent) Data() interface{} {
+func (e *UserCheckedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *UserCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserCheckedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -101,11 +100,11 @@ func NewUserCheckedEvent(
 	}
 }
 
-func UserCheckedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func UserCheckedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	added := &UserCheckedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, added)
+	err := event.Unmarshal(added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SESSION-DSGn5", "unable to unmarshal user checked")
 	}
@@ -119,11 +118,11 @@ type PasswordCheckedEvent struct {
 	CheckedAt time.Time `json:"checkedAt"`
 }
 
-func (e *PasswordCheckedEvent) Data() interface{} {
+func (e *PasswordCheckedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *PasswordCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *PasswordCheckedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -142,11 +141,11 @@ func NewPasswordCheckedEvent(
 	}
 }
 
-func PasswordCheckedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func PasswordCheckedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	added := &PasswordCheckedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, added)
+	err := event.Unmarshal(added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SESSION-DGt21", "unable to unmarshal password checked")
 	}
@@ -160,11 +159,11 @@ type IntentCheckedEvent struct {
 	CheckedAt time.Time `json:"checkedAt"`
 }
 
-func (e *IntentCheckedEvent) Data() interface{} {
+func (e *IntentCheckedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *IntentCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *IntentCheckedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -183,11 +182,11 @@ func NewIntentCheckedEvent(
 	}
 }
 
-func IntentCheckedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IntentCheckedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	added := &IntentCheckedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, added)
+	err := event.Unmarshal(added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SESSION-DGt90", "unable to unmarshal intent checked")
 	}
@@ -204,11 +203,11 @@ type WebAuthNChallengedEvent struct {
 	RPID               string                             `json:"rpid,omitempty"`
 }
 
-func (e *WebAuthNChallengedEvent) Data() interface{} {
+func (e *WebAuthNChallengedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *WebAuthNChallengedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *WebAuthNChallengedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -244,11 +243,11 @@ type WebAuthNCheckedEvent struct {
 	UserVerified bool      `json:"userVerified,omitempty"`
 }
 
-func (e *WebAuthNCheckedEvent) Data() interface{} {
+func (e *WebAuthNCheckedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *WebAuthNCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *WebAuthNCheckedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -279,11 +278,11 @@ type TOTPCheckedEvent struct {
 	CheckedAt time.Time `json:"checkedAt"`
 }
 
-func (e *TOTPCheckedEvent) Data() interface{} {
+func (e *TOTPCheckedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *TOTPCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *TOTPCheckedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -315,11 +314,11 @@ type OTPSMSChallengedEvent struct {
 	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
-func (e *OTPSMSChallengedEvent) Data() interface{} {
+func (e *OTPSMSChallengedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OTPSMSChallengedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OTPSMSChallengedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -355,11 +354,11 @@ type OTPSMSSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *OTPSMSSentEvent) Data() interface{} {
+func (e *OTPSMSSentEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OTPSMSSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OTPSMSSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -386,11 +385,11 @@ type OTPSMSCheckedEvent struct {
 	CheckedAt time.Time `json:"checkedAt"`
 }
 
-func (e *OTPSMSCheckedEvent) Data() interface{} {
+func (e *OTPSMSCheckedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OTPSMSCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OTPSMSCheckedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -423,11 +422,11 @@ type OTPEmailChallengedEvent struct {
 	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
-func (e *OTPEmailChallengedEvent) Data() interface{} {
+func (e *OTPEmailChallengedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OTPEmailChallengedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OTPEmailChallengedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -465,11 +464,11 @@ type OTPEmailSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *OTPEmailSentEvent) Data() interface{} {
+func (e *OTPEmailSentEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OTPEmailSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OTPEmailSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -496,11 +495,11 @@ type OTPEmailCheckedEvent struct {
 	CheckedAt time.Time `json:"checkedAt"`
 }
 
-func (e *OTPEmailCheckedEvent) Data() interface{} {
+func (e *OTPEmailCheckedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OTPEmailCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OTPEmailCheckedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -529,11 +528,11 @@ type TokenSetEvent struct {
 	TokenID string `json:"tokenID"`
 }
 
-func (e *TokenSetEvent) Data() interface{} {
+func (e *TokenSetEvent) Payload() interface{} {
 	return e
 }
 
-func (e *TokenSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *TokenSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -552,11 +551,11 @@ func NewTokenSetEvent(
 	}
 }
 
-func TokenSetEventMapper(event *repository.Event) (eventstore.Event, error) {
+func TokenSetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	added := &TokenSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, added)
+	err := event.Unmarshal(added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SESSION-Sf3va", "unable to unmarshal token set")
 	}
@@ -570,11 +569,11 @@ type MetadataSetEvent struct {
 	Metadata map[string][]byte `json:"metadata"`
 }
 
-func (e *MetadataSetEvent) Data() interface{} {
+func (e *MetadataSetEvent) Payload() interface{} {
 	return e
 }
 
-func (e *MetadataSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MetadataSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -593,11 +592,11 @@ func NewMetadataSetEvent(
 	}
 }
 
-func MetadataSetEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MetadataSetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	added := &MetadataSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, added)
+	err := event.Unmarshal(added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SESSION-BD21d", "unable to unmarshal metadata set")
 	}
@@ -609,11 +608,11 @@ type TerminateEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *TerminateEvent) Data() interface{} {
+func (e *TerminateEvent) Payload() interface{} {
 	return e
 }
 
-func (e *TerminateEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *TerminateEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -630,7 +629,7 @@ func NewTerminateEvent(
 	}
 }
 
-func TerminateEventMapper(event *repository.Event) (eventstore.Event, error) {
+func TerminateEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &TerminateEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

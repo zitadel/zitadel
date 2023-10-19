@@ -138,7 +138,7 @@ func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQuerie
 		return nil, errors.ThrowInternal(err, "QUERY-SDfr52", "Errors.Internal")
 	}
 
-	actions.LatestSequence, err = q.latestSequence(ctx, actionTable)
+	actions.State, err = q.latestState(ctx, actionTable)
 	return actions, err
 }
 

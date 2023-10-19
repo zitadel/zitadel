@@ -82,7 +82,7 @@ func AddToDetailsPb(
 }
 
 func ToListDetails(
-	totalResult,
+	totalResult uint64,
 	processedSequence uint64,
 	viewTimestamp time.Time,
 ) *object_pb.ListDetails {

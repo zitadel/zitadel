@@ -1,27 +1,24 @@
 package idpconfig
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
 	UniqueIDPConfigNameType = "idp_config_names"
 )
 
-func NewAddIDPConfigNameUniqueConstraint(idpConfigName, resourceOwner string) *eventstore.EventUniqueConstraint {
+func NewAddIDPConfigNameUniqueConstraint(idpConfigName, resourceOwner string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueIDPConfigNameType,
 		idpConfigName+resourceOwner,
 		"Errors.IDPConfig.AlreadyExists")
 }
 
-func NewRemoveIDPConfigNameUniqueConstraint(idpConfigName, resourceOwner string) *eventstore.EventUniqueConstraint {
-	return eventstore.NewRemoveEventUniqueConstraint(
+func NewRemoveIDPConfigNameUniqueConstraint(idpConfigName, resourceOwner string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
 		UniqueIDPConfigNameType,
 		idpConfigName+resourceOwner)
 }
@@ -54,20 +51,20 @@ func NewIDPConfigAddedEvent(
 	}
 }
 
-func (e *IDPConfigAddedEvent) Data() interface{} {
+func (e *IDPConfigAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *IDPConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+func (e *IDPConfigAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
 }
 
-func IDPConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IDPConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &IDPConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
 	}
@@ -85,15 +82,15 @@ type IDPConfigChangedEvent struct {
 	oldName      string                       `json:"-"`
 }
 
-func (e *IDPConfigChangedEvent) Data() interface{} {
+func (e *IDPConfigChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *IDPConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *IDPConfigChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	if e.oldName == "" {
 		return nil
 	}
-	return []*eventstore.EventUniqueConstraint{
+	return []*eventstore.UniqueConstraint{
 		NewRemoveIDPConfigNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
 		NewAddIDPConfigNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner),
 	}
@@ -139,12 +136,12 @@ func ChangeAutoRegister(autoRegister bool) func(*IDPConfigChangedEvent) {
 	}
 }
 
-func IDPConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IDPConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &IDPConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
 	}
@@ -169,20 +166,20 @@ func NewIDPConfigDeactivatedEvent(
 	}
 }
 
-func (e *IDPConfigDeactivatedEvent) Data() interface{} {
+func (e *IDPConfigDeactivatedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *IDPConfigDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *IDPConfigDeactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func IDPConfigDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IDPConfigDeactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &IDPConfigDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
 	}
@@ -207,20 +204,20 @@ func NewIDPConfigReactivatedEvent(
 	}
 }
 
-func (e *IDPConfigReactivatedEvent) Data() interface{} {
+func (e *IDPConfigReactivatedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *IDPConfigReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *IDPConfigReactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func IDPConfigReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IDPConfigReactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &IDPConfigReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
 	}
@@ -248,20 +245,20 @@ func NewIDPConfigRemovedEvent(
 	}
 }
 
-func (e *IDPConfigRemovedEvent) Data() interface{} {
+func (e *IDPConfigRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *IDPConfigRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveIDPConfigNameUniqueConstraint(e.name, e.Aggregate().ResourceOwner)}
+func (e *IDPConfigRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewRemoveIDPConfigNameUniqueConstraint(e.name, e.Aggregate().ResourceOwner)}
 }
 
-func IDPConfigRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IDPConfigRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &IDPConfigRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
 	}

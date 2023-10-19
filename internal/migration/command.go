@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/service"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 // SetupStep is the command pushed on the eventstore
@@ -35,8 +34,8 @@ func (s *SetupStep) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func setupStartedCmd(migration Migration) eventstore.Command {
-	ctx := authz.SetCtxData(service.WithService(context.Background(), "system"), authz.CtxData{UserID: "system", OrgID: "SYSTEM", ResourceOwner: "SYSTEM"})
+func setupStartedCmd(ctx context.Context, migration Migration) eventstore.Command {
+	ctx = authz.SetCtxData(service.WithService(ctx, "system"), authz.CtxData{UserID: "system", OrgID: "SYSTEM", ResourceOwner: "SYSTEM"})
 	return &SetupStep{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -74,24 +73,24 @@ func setupDoneCmd(ctx context.Context, migration Migration, err error) eventstor
 	return s
 }
 
-func (s *SetupStep) Data() interface{} {
+func (s *SetupStep) Payload() interface{} {
 	return s
 }
 
-func (s *SetupStep) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (s *SetupStep) UniqueConstraints() []*eventstore.UniqueConstraint {
 	switch s.Type() {
 	case StartedType:
-		return []*eventstore.EventUniqueConstraint{
-			eventstore.NewAddGlobalEventUniqueConstraint("migration_started", s.migration.String(), "Errors.Step.Started.AlreadyExists"),
+		return []*eventstore.UniqueConstraint{
+			eventstore.NewAddGlobalUniqueConstraint("migration_started", s.migration.String(), "Errors.Step.Started.AlreadyExists"),
 		}
 	case failedType,
 		repeatableDoneType:
-		return []*eventstore.EventUniqueConstraint{
-			eventstore.NewRemoveGlobalEventUniqueConstraint("migration_started", s.migration.String()),
+		return []*eventstore.UniqueConstraint{
+			eventstore.NewRemoveGlobalUniqueConstraint("migration_started", s.migration.String()),
 		}
 	default:
-		return []*eventstore.EventUniqueConstraint{
-			eventstore.NewAddGlobalEventUniqueConstraint("migration_done", s.migration.String(), "Errors.Step.Done.AlreadyExists"),
+		return []*eventstore.UniqueConstraint{
+			eventstore.NewAddGlobalUniqueConstraint("migration_done", s.migration.String(), "Errors.Step.Done.AlreadyExists"),
 		}
 	}
 }
@@ -103,14 +102,11 @@ func RegisterMappers(es *eventstore.Eventstore) {
 	es.RegisterFilterEventMapper(aggregateType, repeatableDoneType, SetupMapper)
 }
 
-func SetupMapper(event *repository.Event) (eventstore.Event, error) {
+func SetupMapper(event eventstore.Event) (eventstore.Event, error) {
 	step := &SetupStep{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	if len(event.Data) == 0 {
-		return step, nil
-	}
-	err := json.Unmarshal(event.Data, step)
+	err := event.Unmarshal(step)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-hYp7M", "unable to unmarshal step")
 	}

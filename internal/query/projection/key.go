@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
 )
@@ -48,71 +48,74 @@ const (
 )
 
 type keyProjection struct {
-	crdb.StatementHandler
 	encryptionAlgorithm     crypto.EncryptionAlgorithm
 	certEncryptionAlgorithm crypto.EncryptionAlgorithm
 }
 
-func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) *keyProjection {
-	p := new(keyProjection)
-	config.ProjectionName = KeyProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewMultiTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(KeyColumnID, crdb.ColumnTypeText),
-			crdb.NewColumn(KeyColumnCreationDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(KeyColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(KeyColumnResourceOwner, crdb.ColumnTypeText),
-			crdb.NewColumn(KeyColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(KeyColumnSequence, crdb.ColumnTypeInt64),
-			crdb.NewColumn(KeyColumnAlgorithm, crdb.ColumnTypeText, crdb.Default("")),
-			crdb.NewColumn(KeyColumnUse, crdb.ColumnTypeEnum, crdb.Default(0)),
-		},
-			crdb.NewPrimaryKey(KeyColumnInstanceID, KeyColumnID),
-		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(KeyPrivateColumnID, crdb.ColumnTypeText),
-			crdb.NewColumn(KeyPrivateColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(KeyPrivateColumnExpiry, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(KeyPrivateColumnKey, crdb.ColumnTypeJSONB),
-		},
-			crdb.NewPrimaryKey(KeyPrivateColumnInstanceID, KeyPrivateColumnID),
-			privateKeyTableSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
-		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(KeyPublicColumnID, crdb.ColumnTypeText),
-			crdb.NewColumn(KeyPublicColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(KeyPublicColumnExpiry, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(KeyPublicColumnKey, crdb.ColumnTypeBytes),
-		},
-			crdb.NewPrimaryKey(KeyPublicColumnInstanceID, KeyPublicColumnID),
-			publicKeyTableSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
-		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(CertificateColumnID, crdb.ColumnTypeText),
-			crdb.NewColumn(CertificateColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(CertificateColumnExpiry, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(CertificateColumnCertificate, crdb.ColumnTypeBytes),
-		},
-			crdb.NewPrimaryKey(CertificateColumnInstanceID, CertificateColumnID),
-			certificateTableSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
-		),
-	)
-	p.encryptionAlgorithm = keyEncryptionAlgorithm
-	p.certEncryptionAlgorithm = certEncryptionAlgorithm
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-
-	return p
+func newKeyProjection(ctx context.Context, config handler.Config, keyEncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) *handler.Handler {
+	p := &keyProjection{
+		encryptionAlgorithm:     keyEncryptionAlgorithm,
+		certEncryptionAlgorithm: certEncryptionAlgorithm,
+	}
+	return handler.NewHandler(ctx, &config, p)
 }
 
-func (p *keyProjection) reducers() []handler.AggregateReducer {
+func (*keyProjection) Name() string {
+	return KeyProjectionTable
+}
+
+func (*keyProjection) Init() *old_handler.Check {
+	return handler.NewMultiTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(KeyColumnID, handler.ColumnTypeText),
+			handler.NewColumn(KeyColumnCreationDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(KeyColumnChangeDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(KeyColumnResourceOwner, handler.ColumnTypeText),
+			handler.NewColumn(KeyColumnInstanceID, handler.ColumnTypeText),
+			handler.NewColumn(KeyColumnSequence, handler.ColumnTypeInt64),
+			handler.NewColumn(KeyColumnAlgorithm, handler.ColumnTypeText, handler.Default("")),
+			handler.NewColumn(KeyColumnUse, handler.ColumnTypeEnum, handler.Default(0)),
+		},
+			handler.NewPrimaryKey(KeyColumnInstanceID, KeyColumnID),
+		),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(KeyPrivateColumnID, handler.ColumnTypeText),
+			handler.NewColumn(KeyPrivateColumnInstanceID, handler.ColumnTypeText),
+			handler.NewColumn(KeyPrivateColumnExpiry, handler.ColumnTypeTimestamp),
+			handler.NewColumn(KeyPrivateColumnKey, handler.ColumnTypeJSONB),
+		},
+			handler.NewPrimaryKey(KeyPrivateColumnInstanceID, KeyPrivateColumnID),
+			privateKeyTableSuffix,
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
+		),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(KeyPublicColumnID, handler.ColumnTypeText),
+			handler.NewColumn(KeyPublicColumnInstanceID, handler.ColumnTypeText),
+			handler.NewColumn(KeyPublicColumnExpiry, handler.ColumnTypeTimestamp),
+			handler.NewColumn(KeyPublicColumnKey, handler.ColumnTypeBytes),
+		},
+			handler.NewPrimaryKey(KeyPublicColumnInstanceID, KeyPublicColumnID),
+			publicKeyTableSuffix,
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
+		),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(CertificateColumnID, handler.ColumnTypeText),
+			handler.NewColumn(CertificateColumnInstanceID, handler.ColumnTypeText),
+			handler.NewColumn(CertificateColumnExpiry, handler.ColumnTypeTimestamp),
+			handler.NewColumn(CertificateColumnCertificate, handler.ColumnTypeBytes),
+		},
+			handler.NewPrimaryKey(CertificateColumnInstanceID, CertificateColumnID),
+			certificateTableSuffix,
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
+		),
+	)
+}
+
+func (p *keyProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: keypair.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  keypair.AddedEventType,
 					Reduce: p.reduceKeyPairAdded,
@@ -125,7 +128,7 @@ func (p *keyProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(KeyColumnInstanceID),
@@ -141,10 +144,10 @@ func (p *keyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAbr2", "reduce.wrong.event.type %s", keypair.AddedEventType)
 	}
 	if e.PrivateKey.Expiry.Before(time.Now()) && e.PublicKey.Expiry.Before(time.Now()) {
-		return crdb.NewNoOpStatement(e), nil
+		return handler.NewNoOpStatement(e), nil
 	}
-	creates := []func(eventstore.Event) crdb.Exec{
-		crdb.AddCreateStatement(
+	creates := []func(eventstore.Event) handler.Exec{
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(KeyColumnID, e.Aggregate().ID),
 				handler.NewCol(KeyColumnCreationDate, e.CreationDate()),
@@ -158,14 +161,14 @@ func (p *keyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 		),
 	}
 	if e.PrivateKey.Expiry.After(time.Now()) {
-		creates = append(creates, crdb.AddCreateStatement(
+		creates = append(creates, handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(KeyPrivateColumnID, e.Aggregate().ID),
 				handler.NewCol(KeyPrivateColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(KeyPrivateColumnExpiry, e.PrivateKey.Expiry),
 				handler.NewCol(KeyPrivateColumnKey, e.PrivateKey.Key),
 			},
-			crdb.WithTableSuffix(privateKeyTableSuffix),
+			handler.WithTableSuffix(privateKeyTableSuffix),
 		))
 	}
 	if e.PublicKey.Expiry.After(time.Now()) {
@@ -173,18 +176,18 @@ func (p *keyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 		if err != nil {
 			return nil, errors.ThrowInternal(err, "HANDL-DAg2f", "cannot decrypt public key")
 		}
-		creates = append(creates, crdb.AddCreateStatement(
+		creates = append(creates, handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(KeyPublicColumnID, e.Aggregate().ID),
 				handler.NewCol(KeyPublicColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(KeyPublicColumnExpiry, e.PublicKey.Expiry),
 				handler.NewCol(KeyPublicColumnKey, publicKey),
 			},
-			crdb.WithTableSuffix(publicKeyTableSuffix),
+			handler.WithTableSuffix(publicKeyTableSuffix),
 		))
 	}
 
-	return crdb.NewMultiStatement(e, creates...), nil
+	return handler.NewMultiStatement(e, creates...), nil
 }
 
 func (p *keyProjection) reduceCertificateAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -194,7 +197,7 @@ func (p *keyProjection) reduceCertificateAdded(event eventstore.Event) (*handler
 	}
 
 	if e.Certificate.Expiry.Before(time.Now()) {
-		return crdb.NewNoOpStatement(e), nil
+		return handler.NewNoOpStatement(e), nil
 	}
 
 	certificate, err := crypto.Decrypt(e.Certificate.Key, p.certEncryptionAlgorithm)
@@ -202,15 +205,15 @@ func (p *keyProjection) reduceCertificateAdded(event eventstore.Event) (*handler
 		return nil, errors.ThrowInternal(err, "HANDL-Dajwig2f", "cannot decrypt certificate")
 	}
 
-	creates := []func(eventstore.Event) crdb.Exec{crdb.AddCreateStatement(
+	creates := []func(eventstore.Event) handler.Exec{handler.AddCreateStatement(
 		[]handler.Column{
 			handler.NewCol(CertificateColumnID, e.Aggregate().ID),
 			handler.NewCol(CertificateColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(CertificateColumnExpiry, e.Certificate.Expiry),
 			handler.NewCol(CertificateColumnCertificate, certificate),
 		},
-		crdb.WithTableSuffix(certificateTableSuffix),
+		handler.WithTableSuffix(certificateTableSuffix),
 	)}
 
-	return crdb.NewMultiStatement(e, creates...), nil
+	return handler.NewMultiStatement(e, creates...), nil
 }

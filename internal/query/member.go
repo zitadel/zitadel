@@ -5,7 +5,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query/projection"
 
 	sq "github.com/Masterminds/squirrel"
 )
@@ -36,10 +35,10 @@ func NewMemberLastNameSearchQuery(method TextComparison, value string) (SearchQu
 }
 
 func NewMemberUserIDSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(memberUserID, value, TextEquals)
+	return NewTextQuery(membershipUserID, value, TextEquals)
 }
 func NewMemberResourceOwnerSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(memberResourceOwner, value, TextEquals)
+	return NewTextQuery(membershipResourceOwner, value, TextEquals)
 }
 
 type Members struct {
@@ -54,7 +53,7 @@ type Member struct {
 	ResourceOwner string
 
 	UserID             string
-	Roles              database.StringArray
+	Roles              database.TextArray[string]
 	PreferredLoginName string
 	Email              string
 	FirstName          string
@@ -63,19 +62,3 @@ type Member struct {
 	AvatarURL          string
 	UserType           domain.UserType
 }
-
-var (
-	memberTableAlias = table{
-		name:          "members",
-		alias:         "members",
-		instanceIDCol: projection.MemberInstanceID,
-	}
-	memberUserID = Column{
-		name:  projection.MemberUserIDCol,
-		table: memberTableAlias,
-	}
-	memberResourceOwner = Column{
-		name:  projection.MemberResourceOwner,
-		table: memberTableAlias,
-	}
-)

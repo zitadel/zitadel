@@ -1,12 +1,9 @@
 package policy
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -24,11 +21,11 @@ type PrivacyPolicyAddedEvent struct {
 	SupportEmail domain.EmailAddress `json:"supportEmail,omitempty"`
 }
 
-func (e *PrivacyPolicyAddedEvent) Data() interface{} {
+func (e *PrivacyPolicyAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *PrivacyPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *PrivacyPolicyAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -48,11 +45,11 @@ func NewPrivacyPolicyAddedEvent(
 	}
 }
 
-func PrivacyPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func PrivacyPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &PrivacyPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-2k0fs", "unable to unmarshal policy")
 	}
@@ -69,11 +66,11 @@ type PrivacyPolicyChangedEvent struct {
 	SupportEmail *domain.EmailAddress `json:"supportEmail,omitempty"`
 }
 
-func (e *PrivacyPolicyChangedEvent) Data() interface{} {
+func (e *PrivacyPolicyChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *PrivacyPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *PrivacyPolicyChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -119,12 +116,12 @@ func ChangeSupportEmail(supportEmail domain.EmailAddress) func(*PrivacyPolicyCha
 	}
 }
 
-func PrivacyPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func PrivacyPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &PrivacyPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-22nf9", "unable to unmarshal policy")
 	}
@@ -136,11 +133,11 @@ type PrivacyPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *PrivacyPolicyRemovedEvent) Data() interface{} {
+func (e *PrivacyPolicyRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *PrivacyPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *PrivacyPolicyRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -150,7 +147,7 @@ func NewPrivacyPolicyRemovedEvent(base *eventstore.BaseEvent) *PrivacyPolicyRemo
 	}
 }
 
-func PrivacyPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func PrivacyPolicyRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &PrivacyPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

@@ -16,7 +16,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
@@ -184,19 +183,11 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 					),
 					expectFilter(), // token lifetime
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("instanceID",
-								oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-									"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
-							),
-							eventFromEventPusherWithInstanceID("instanceID",
-								oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-									"at_accessTokenID", []string{"openid"}, time.Hour),
-							),
-							eventFromEventPusherWithInstanceID("instanceID",
-								authrequest.NewSucceededEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
-							),
-						},
+						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
+						oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"at_accessTokenID", []string{"openid"}, time.Hour),
+						authrequest.NewSucceededEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 					),
 				),
 				idGenerator:                mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
@@ -385,23 +376,13 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 					),
 					expectFilter(), // token lifetime
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("instanceID",
-								oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-									"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "offline_access"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
-							),
-							eventFromEventPusherWithInstanceID("instanceID",
-								oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-									"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour),
-							),
-							eventFromEventPusherWithInstanceID("instanceID",
-								oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-									"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
-							),
-							eventFromEventPusherWithInstanceID("instanceID",
-								authrequest.NewSucceededEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
-							),
-						},
+						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "offline_access"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
+						oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour),
+						oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
+						authrequest.NewSucceededEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 					),
 				),
 				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID", "refreshTokenID"),
@@ -575,16 +556,10 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 					),
 					expectFilter(), // token lifetime
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("instanceID",
-								oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-									"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour),
-							),
-							eventFromEventPusherWithInstanceID("instanceID",
-								oidcsession.NewRefreshTokenRenewedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-									"rt_refreshTokenID2", 24*time.Hour),
-							),
-						},
+						oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour),
+						oidcsession.NewRefreshTokenRenewedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"rt_refreshTokenID2", 24*time.Hour),
 					),
 				),
 				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "accessTokenID", "refreshTokenID2"),
@@ -906,11 +881,9 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 								"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 						),
 					),
-					expectPush([]*repository.Event{
-						eventFromEventPusherWithInstanceID("instanceID",
-							oidcsession.NewRefreshTokenRevokedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate),
-						),
-					}),
+					expectPush(
+						oidcsession.NewRefreshTokenRevokedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate),
+					),
 				),
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
@@ -985,11 +958,9 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 								"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 						),
 					),
-					expectPush([]*repository.Event{
-						eventFromEventPusherWithInstanceID("instanceID",
-							oidcsession.NewAccessTokenRevokedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate),
-						),
-					}),
+					expectPush(
+						oidcsession.NewAccessTokenRevokedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate),
+					),
 				),
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},

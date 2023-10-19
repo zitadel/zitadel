@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -25,39 +25,40 @@ const (
 	OIDCSettingsColumnRefreshTokenExpiration     = "refresh_token_expiration"
 )
 
-type oidcSettingsProjection struct {
-	crdb.StatementHandler
+type oidcSettingsProjection struct{}
+
+func newOIDCSettingsProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(oidcSettingsProjection))
 }
 
-func newOIDCSettingsProjection(ctx context.Context, config crdb.StatementHandlerConfig) *oidcSettingsProjection {
-	p := new(oidcSettingsProjection)
-	config.ProjectionName = OIDCSettingsProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(OIDCSettingsColumnAggregateID, crdb.ColumnTypeText),
-			crdb.NewColumn(OIDCSettingsColumnCreationDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(OIDCSettingsColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(OIDCSettingsColumnResourceOwner, crdb.ColumnTypeText),
-			crdb.NewColumn(OIDCSettingsColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(OIDCSettingsColumnSequence, crdb.ColumnTypeInt64),
-			crdb.NewColumn(OIDCSettingsColumnAccessTokenLifetime, crdb.ColumnTypeInt64),
-			crdb.NewColumn(OIDCSettingsColumnIdTokenLifetime, crdb.ColumnTypeInt64),
-			crdb.NewColumn(OIDCSettingsColumnRefreshTokenIdleExpiration, crdb.ColumnTypeInt64),
-			crdb.NewColumn(OIDCSettingsColumnRefreshTokenExpiration, crdb.ColumnTypeInt64),
+func (*oidcSettingsProjection) Name() string {
+	return OIDCSettingsProjectionTable
+}
+
+func (*oidcSettingsProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(OIDCSettingsColumnAggregateID, handler.ColumnTypeText),
+			handler.NewColumn(OIDCSettingsColumnCreationDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(OIDCSettingsColumnChangeDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(OIDCSettingsColumnResourceOwner, handler.ColumnTypeText),
+			handler.NewColumn(OIDCSettingsColumnInstanceID, handler.ColumnTypeText),
+			handler.NewColumn(OIDCSettingsColumnSequence, handler.ColumnTypeInt64),
+			handler.NewColumn(OIDCSettingsColumnAccessTokenLifetime, handler.ColumnTypeInt64),
+			handler.NewColumn(OIDCSettingsColumnIdTokenLifetime, handler.ColumnTypeInt64),
+			handler.NewColumn(OIDCSettingsColumnRefreshTokenIdleExpiration, handler.ColumnTypeInt64),
+			handler.NewColumn(OIDCSettingsColumnRefreshTokenExpiration, handler.ColumnTypeInt64),
 		},
-			crdb.NewPrimaryKey(OIDCSettingsColumnInstanceID, OIDCSettingsColumnAggregateID),
+			handler.NewPrimaryKey(OIDCSettingsColumnInstanceID, OIDCSettingsColumnAggregateID),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *oidcSettingsProjection) reducers() []handler.AggregateReducer {
+func (p *oidcSettingsProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.OIDCSettingsAddedEventType,
 					Reduce: p.reduceOIDCSettingsAdded,
@@ -80,7 +81,7 @@ func (p *oidcSettingsProjection) reduceOIDCSettingsAdded(event eventstore.Event)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-f9nwf", "reduce.wrong.event.type %s", instance.OIDCSettingsAddedEventType)
 	}
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(OIDCSettingsColumnAggregateID, e.Aggregate().ID),
@@ -120,7 +121,7 @@ func (p *oidcSettingsProjection) reduceOIDCSettingsChanged(event eventstore.Even
 	if e.RefreshTokenExpiration != nil {
 		columns = append(columns, handler.NewCol(OIDCSettingsColumnRefreshTokenExpiration, *e.RefreshTokenExpiration))
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		columns,
 		[]handler.Condition{

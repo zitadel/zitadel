@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -152,19 +151,13 @@ func TestCommandSide_ChangeHumanPhone(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPhoneChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"+41719876543",
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanPhoneVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanPhoneChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"+41719876543",
+						),
+						user.NewHumanPhoneVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -218,13 +211,65 @@ func TestCommandSide_ChangeHumanPhone(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPhoneVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
+						user.NewHumanPhoneVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				email: &domain.Phone{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "user1",
+					},
+					PhoneNumber:     "+41711234567",
+					IsPhoneVerified: true,
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.Phone{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					PhoneNumber:     "+41711234567",
+					IsPhoneVerified: true,
+				},
+			},
+		},
+		{
+			name: "phone changed to verified, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
 							),
-						},
+						),
+						eventFromEventPusher(
+							user.NewHumanPhoneChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"+41711234567",
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanPhoneVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -272,26 +317,20 @@ func TestCommandSide_ChangeHumanPhone(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPhoneChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"+41711234567",
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanPhoneCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1,
-								),
-							),
-						},
+						user.NewHumanPhoneChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"+41711234567",
+						),
+						user.NewHumanPhoneCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+						),
 					),
 				),
 			},
@@ -480,13 +519,9 @@ func TestCommandSide_VerifyHumanPhone(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPhoneVerificationFailedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanPhoneVerificationFailedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -541,13 +576,9 @@ func TestCommandSide_VerifyHumanPhone(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPhoneVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanPhoneVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -720,20 +751,16 @@ func TestCommandSide_CreateVerificationCodeHumanPhone(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPhoneCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("12345678"),
-									},
-									time.Hour*1,
-								),
-							),
-						},
+						user.NewHumanPhoneCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("12345678"),
+							},
+							time.Hour*1,
+						),
 					),
 				),
 				userEncryption: crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
@@ -848,13 +875,9 @@ func TestCommandSide_PhoneVerificationCodeSent(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPhoneCodeSentEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanPhoneCodeSentEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -993,13 +1016,9 @@ func TestCommandSide_RemoveHumanPhone(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPhoneRemovedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanPhoneRemovedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},

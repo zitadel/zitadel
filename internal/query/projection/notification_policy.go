@@ -6,8 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
@@ -28,39 +28,40 @@ const (
 	NotificationPolicyColumnOwnerRemoved   = "owner_removed"
 )
 
-type notificationPolicyProjection struct {
-	crdb.StatementHandler
+type notificationPolicyProjection struct{}
+
+func newNotificationPolicyProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(notificationPolicyProjection))
 }
 
-func newNotificationPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *notificationPolicyProjection {
-	p := new(notificationPolicyProjection)
-	config.ProjectionName = NotificationPolicyProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(NotificationPolicyColumnID, crdb.ColumnTypeText),
-			crdb.NewColumn(NotificationPolicyColumnCreationDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(NotificationPolicyColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(NotificationPolicyColumnResourceOwner, crdb.ColumnTypeText),
-			crdb.NewColumn(NotificationPolicyColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(NotificationPolicyColumnSequence, crdb.ColumnTypeInt64),
-			crdb.NewColumn(NotificationPolicyColumnStateCol, crdb.ColumnTypeEnum),
-			crdb.NewColumn(NotificationPolicyColumnIsDefault, crdb.ColumnTypeBool),
-			crdb.NewColumn(NotificationPolicyColumnPasswordChange, crdb.ColumnTypeBool),
-			crdb.NewColumn(NotificationPolicyColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
+func (*notificationPolicyProjection) Name() string {
+	return NotificationPolicyProjectionTable
+}
+
+func (*notificationPolicyProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(NotificationPolicyColumnID, handler.ColumnTypeText),
+			handler.NewColumn(NotificationPolicyColumnCreationDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(NotificationPolicyColumnChangeDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(NotificationPolicyColumnResourceOwner, handler.ColumnTypeText),
+			handler.NewColumn(NotificationPolicyColumnInstanceID, handler.ColumnTypeText),
+			handler.NewColumn(NotificationPolicyColumnSequence, handler.ColumnTypeInt64),
+			handler.NewColumn(NotificationPolicyColumnStateCol, handler.ColumnTypeEnum),
+			handler.NewColumn(NotificationPolicyColumnIsDefault, handler.ColumnTypeBool),
+			handler.NewColumn(NotificationPolicyColumnPasswordChange, handler.ColumnTypeBool),
+			handler.NewColumn(NotificationPolicyColumnOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
 		},
-			crdb.NewPrimaryKey(NotificationPolicyColumnInstanceID, NotificationPolicyColumnID),
+			handler.NewPrimaryKey(NotificationPolicyColumnInstanceID, NotificationPolicyColumnID),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *notificationPolicyProjection) reducers() []handler.AggregateReducer {
+func (p *notificationPolicyProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.NotificationPolicyAddedEventType,
 					Reduce: p.reduceAdded,
@@ -81,7 +82,7 @@ func (p *notificationPolicyProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(NotificationPolicyColumnInstanceID),
@@ -112,7 +113,7 @@ func (p *notificationPolicyProjection) reduceAdded(event eventstore.Event) (*han
 	default:
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-x02s1m", "reduce.wrong.event.type %v", []eventstore.EventType{org.NotificationPolicyAddedEventType, instance.NotificationPolicyAddedEventType})
 	}
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		&policyEvent,
 		[]handler.Column{
 			handler.NewCol(NotificationPolicyColumnCreationDate, policyEvent.CreationDate()),
@@ -144,7 +145,7 @@ func (p *notificationPolicyProjection) reduceChanged(event eventstore.Event) (*h
 	if policyEvent.PasswordChange != nil {
 		cols = append(cols, handler.NewCol(NotificationPolicyColumnPasswordChange, *policyEvent.PasswordChange))
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		&policyEvent,
 		cols,
 		[]handler.Condition{
@@ -158,7 +159,7 @@ func (p *notificationPolicyProjection) reduceRemoved(event eventstore.Event) (*h
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Po2iso2", "reduce.wrong.event.type %s", org.NotificationPolicyRemovedEventType)
 	}
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		policyEvent,
 		[]handler.Condition{
 			handler.NewCond(NotificationPolicyColumnID, policyEvent.Aggregate().ID),
@@ -172,7 +173,7 @@ func (p *notificationPolicyProjection) reduceOwnerRemoved(event eventstore.Event
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-poxi9a", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(DomainPolicyInstanceIDCol, e.Aggregate().InstanceID),
