@@ -26,8 +26,8 @@ func newLimitsWriteModel(instanceId, resourceOwner string) *limitsWriteModel {
 func (wm *limitsWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
-		AddQuery().
 		InstanceID(wm.InstanceID).
+		AddQuery().
 		AggregateTypes(limits.AggregateType).
 		EventTypes(
 			limits.SetEventType,
@@ -39,7 +39,7 @@ func (wm *limitsWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *limitsWriteModel) Reduce() error {
 	for _, event := range wm.Events {
-		wm.ChangeDate = event.CreationDate()
+		wm.ChangeDate = event.CreatedAt()
 		switch e := event.(type) {
 		case *limits.SetEvent:
 			wm.rollingAggregateID = e.Aggregate().ID

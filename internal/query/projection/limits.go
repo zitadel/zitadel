@@ -3,9 +3,10 @@ package projection
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/limits"
 )
@@ -23,36 +24,37 @@ const (
 	LimitsColumnAuditLogRetention = "audit_log_retention"
 )
 
-type limitsProjection struct {
-	crdb.StatementHandler
+type limitsProjection struct{}
+
+func newLimitsProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, &limitsProjection{})
 }
 
-func newLimitsProjection(ctx context.Context, config crdb.StatementHandlerConfig) *limitsProjection {
-	p := new(limitsProjection)
-	config.ProjectionName = LimitsProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(LimitsColumnAggregateID, crdb.ColumnTypeText),
-			crdb.NewColumn(LimitsColumnCreationDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(LimitsColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(LimitsColumnResourceOwner, crdb.ColumnTypeText),
-			crdb.NewColumn(LimitsColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(LimitsColumnSequence, crdb.ColumnTypeInt64),
-			crdb.NewColumn(LimitsColumnAuditLogRetention, crdb.ColumnTypeInterval, crdb.Nullable()),
+func (*limitsProjection) Name() string {
+	return LimitsProjectionTable
+}
+
+func (*limitsProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(LimitsColumnAggregateID, handler.ColumnTypeText),
+			handler.NewColumn(LimitsColumnCreationDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(LimitsColumnChangeDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(LimitsColumnResourceOwner, handler.ColumnTypeText),
+			handler.NewColumn(LimitsColumnInstanceID, handler.ColumnTypeText),
+			handler.NewColumn(LimitsColumnSequence, handler.ColumnTypeInt64),
+			handler.NewColumn(LimitsColumnAuditLogRetention, handler.ColumnTypeInterval, handler.Nullable()),
 		},
-			crdb.NewPrimaryKey(LimitsColumnInstanceID, LimitsColumnResourceOwner),
+			handler.NewPrimaryKey(LimitsColumnInstanceID, LimitsColumnResourceOwner),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *limitsProjection) reducers() []handler.AggregateReducer {
+func (p *limitsProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: limits.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  limits.SetEventType,
 					Reduce: p.reduceLimitsSet,
@@ -65,7 +67,7 @@ func (p *limitsProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(LimitsColumnInstanceID),
@@ -95,7 +97,7 @@ func (p *limitsProjection) reduceLimitsSet(event eventstore.Event) (*handler.Sta
 	if e.AuditLogRetention != nil {
 		updateCols = append(updateCols, handler.NewCol(LimitsColumnAuditLogRetention, *e.AuditLogRetention))
 	}
-	return crdb.NewUpsertStatement(e, conflictCols, updateCols), nil
+	return handler.NewUpsertStatement(e, conflictCols, updateCols), nil
 }
 
 func (p *limitsProjection) reduceLimitsReset(event eventstore.Event) (*handler.Statement, error) {
@@ -103,7 +105,7 @@ func (p *limitsProjection) reduceLimitsReset(event eventstore.Event) (*handler.S
 	if err != nil {
 		return nil, err
 	}
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(LimitsColumnInstanceID, e.Aggregate().InstanceID),

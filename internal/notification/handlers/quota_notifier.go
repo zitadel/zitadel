@@ -7,12 +7,10 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/notification/types"
-	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
@@ -21,7 +19,6 @@ const (
 )
 
 type quotaNotifier struct {
-	crdb.StatementHandler
 	commands *command.Commands
 	queries  *NotificationQueries
 	channels types.ChannelChains
@@ -29,27 +26,28 @@ type quotaNotifier struct {
 
 func NewQuotaNotifier(
 	ctx context.Context,
-	config crdb.StatementHandlerConfig,
+	config handler.Config,
 	commands *command.Commands,
 	queries *NotificationQueries,
 	channels types.ChannelChains,
-) *quotaNotifier {
-	p := new(quotaNotifier)
-	config.ProjectionName = QuotaNotificationsProjectionTable
-	config.Reducers = p.reducers()
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	p.commands = commands
-	p.queries = queries
-	p.channels = channels
-	projection.NotificationsQuotaProjection = p
-	return p
+) *handler.Handler {
+	return handler.NewHandler(ctx, &config, &quotaNotifier{
+		commands: commands,
+		queries:  queries,
+		channels: channels,
+	})
+
 }
 
-func (u *quotaNotifier) reducers() []handler.AggregateReducer {
+func (*quotaNotifier) Name() string {
+	return QuotaNotificationsProjectionTable
+}
+
+func (u *quotaNotifier) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: quota.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  quota.NotificationDueEventType,
 					Reduce: u.reduceNotificationDue,
@@ -64,21 +62,20 @@ func (u *quotaNotifier) reduceNotificationDue(event eventstore.Event) (*handler.
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DLxdE", "reduce.wrong.event.type %s", quota.NotificationDueEventType)
 	}
-	ctx := HandlerContext(event.Aggregate())
-	alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, map[string]interface{}{"dueEventID": e.ID}, quota.AggregateType, quota.NotifiedEventType)
-	if err != nil {
-		return nil, err
-	}
-	if alreadyHandled {
-		return crdb.NewNoOpStatement(e), nil
-	}
-	err = types.SendJSON(ctx, webhook.Config{CallURL: e.CallURL, Method: http.MethodPost}, u.channels, e, e).WithoutTemplate()
-	if err != nil {
-		return nil, err
-	}
-	err = u.commands.UsageNotificationSent(ctx, e)
-	if err != nil {
-		return nil, err
-	}
-	return crdb.NewNoOpStatement(e), nil
+
+	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+		ctx := HandlerContext(event.Aggregate())
+		alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, map[string]interface{}{"dueEventID": e.ID}, quota.AggregateType, quota.NotifiedEventType)
+		if err != nil {
+			return err
+		}
+		if alreadyHandled {
+			return nil
+		}
+		err = types.SendJSON(ctx, webhook.Config{CallURL: e.CallURL, Method: http.MethodPost}, u.channels, e, e).WithoutTemplate()
+		if err != nil {
+			return err
+		}
+		return u.commands.UsageNotificationSent(ctx, e)
+	}), nil
 }

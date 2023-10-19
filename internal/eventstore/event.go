@@ -1,49 +1,100 @@
 package eventstore
 
 import (
+	"encoding/json"
+	"reflect"
 	"time"
+
+	"github.com/zitadel/zitadel/internal/errors"
 )
+
+type action interface {
+	Aggregate() *Aggregate
+
+	// Creator is the userid of the user which created the action
+	Creator() string
+	// Type describes the action
+	Type() EventType
+	// Revision of the action
+	Revision() uint16
+}
 
 // Command is the intend to store an event into the eventstore
 type Command interface {
-	//Aggregate is the metadata of an aggregate
-	Aggregate() Aggregate
-	// EditorService is the service who wants to push the event
-	EditorService() string
-	//EditorUser is the user who wants to push the event
-	EditorUser() string
-	//KeyType must return an event type which should be unique in the aggregate
-	Type() EventType
-	//Data returns the payload of the event. It represent the changed fields by the event
+	action
+	// Payload returns the payload of the event. It represent the changed fields by the event
 	// valid types are:
-	// * nil (no payload),
-	// * json byte array
-	// * struct which can be marshalled to json
-	// * pointer to struct which can be marshalled to json
-	Data() interface{}
-	//UniqueConstraints should be added for unique attributes of an event, if nil constraints will not be checked
-	UniqueConstraints() []*EventUniqueConstraint
+	// * nil: no payload
+	// * struct: which can be marshalled to json
+	// * pointer: to struct which can be marshalled to json
+	// * []byte: json marshalled data
+	Payload() any
+	// UniqueConstraints should be added for unique attributes of an event, if nil constraints will not be checked
+	UniqueConstraints() []*UniqueConstraint
 }
 
 // Event is a stored activity
 type Event interface {
-	// EditorService is the service who pushed the event
-	EditorService() string
-	//EditorUser is the user who pushed the event
-	EditorUser() string
-	//KeyType is the type of the event
-	Type() EventType
+	action
 
-	Aggregate() Aggregate
-
+	// Sequence of the event in the aggregate
 	Sequence() uint64
-	CreationDate() time.Time
-	//PreviousAggregateSequence returns the previous sequence of the aggregate root (e.g. for org.42508134)
-	PreviousAggregateSequence() uint64
-	//PreviousAggregateTypeSequence returns the previous sequence of the aggregate type (e.g. for org)
-	PreviousAggregateTypeSequence() uint64
-	//DataAsBytes returns the payload of the event. It represent the changed fields by the event
+	// CreatedAt is the time the event was created at
+	CreatedAt() time.Time
+	// Position is the global position of the event
+	Position() float64
+
+	// Unmarshal parses the payload and stores the result
+	// in the value pointed to by ptr. If ptr is nil or not a pointer,
+	// Unmarshal returns an error
+	Unmarshal(ptr any) error
+
+	// Deprecated: only use for migration
 	DataAsBytes() []byte
+}
+
+type EventType string
+
+func EventData(event Command) ([]byte, error) {
+	switch data := event.Payload().(type) {
+	case nil:
+		return nil, nil
+	case []byte:
+		if json.Valid(data) {
+			return data, nil
+		}
+		return nil, errors.ThrowInvalidArgument(nil, "V2-6SbbS", "data bytes are not json")
+	}
+	dataType := reflect.TypeOf(event.Payload())
+	if dataType.Kind() == reflect.Ptr {
+		dataType = dataType.Elem()
+	}
+	if dataType.Kind() == reflect.Struct {
+		dataBytes, err := json.Marshal(event.Payload())
+		if err != nil {
+			return nil, errors.ThrowInvalidArgument(err, "V2-xG87M", "could  not marshal data")
+		}
+		return dataBytes, nil
+	}
+	return nil, errors.ThrowInvalidArgument(nil, "V2-91NRm", "wrong type of event data")
+}
+
+type BaseEventSetter[T any] interface {
+	Event
+	SetBaseEvent(*BaseEvent)
+	*T
+}
+
+func GenericEventMapper[T any, PT BaseEventSetter[T]](event Event) (Event, error) {
+	e := PT(new(T))
+	e.SetBaseEvent(BaseEventFromRepo(event))
+
+	err := event.Unmarshal(e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "ES-Thai6", "unable to unmarshal event")
+	}
+
+	return e, nil
 }
 
 func isEventTypes(event Event, types ...EventType) bool {

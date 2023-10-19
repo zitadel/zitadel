@@ -214,19 +214,17 @@ func TestCommands_CreateSession(t *testing.T) {
 			[]expect{
 				expectFilter(),
 				expectPush(
-					eventPusherToEvents(
-						session.NewAddedEvent(context.Background(),
-							&session.NewAggregate("sessionID", "org1").Aggregate,
-							&domain.UserAgent{
-								FingerprintID: gu.Ptr("fp1"),
-								IP:            net.ParseIP("1.2.3.4"),
-								Description:   gu.Ptr("firefox"),
-								Header:        http.Header{"foo": []string{"bar"}},
-							},
-						),
-						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-							"tokenID",
-						),
+					session.NewAddedEvent(context.Background(),
+						&session.NewAggregate("sessionID", "org1").Aggregate,
+						&domain.UserAgent{
+							FingerprintID: gu.Ptr("fp1"),
+							IP:            net.ParseIP("1.2.3.4"),
+							Description:   gu.Ptr("firefox"),
+							Header:        http.Header{"foo": []string{"bar"}},
+						},
+					),
+					session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						"tokenID",
 					),
 				),
 			},
@@ -472,15 +470,17 @@ func TestCommands_updateSession(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						eventPusherToEvents(
-							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								"userID", testNow),
-							session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								testNow),
-							session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								map[string][]byte{"key": []byte("value")}),
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								"tokenID"),
+						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							"userID", testNow,
+						),
+						session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							testNow,
+						),
+						session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							map[string][]byte{"key": []byte("value")},
+						),
+						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							"tokenID",
 						),
 					),
 				),
@@ -654,16 +654,14 @@ func TestCommands_updateSession(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						eventPusherToEvents(
-							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								"userID", testNow),
-							session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								testNow),
-							session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								map[string][]byte{"key": []byte("value")}),
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								"tokenID"),
-						),
+						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							"userID", testNow),
+						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							testNow),
+						session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							map[string][]byte{"key": []byte("value")}),
+						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							"tokenID"),
 					),
 				),
 			},
@@ -988,8 +986,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 					),
 					expectPushFailed(
 						caos_errs.ThrowInternal(nil, "id", "pushed failed"),
-						eventPusherToEvents(
-							session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
+						session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate),
 					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
@@ -1026,8 +1023,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
+						session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate),
 					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {

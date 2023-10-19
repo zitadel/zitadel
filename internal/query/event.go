@@ -13,7 +13,7 @@ import (
 
 type Event struct {
 	Editor       *EventEditor
-	Aggregate    eventstore.Aggregate
+	Aggregate    *eventstore.Aggregate
 	Sequence     uint64
 	CreationDate time.Time
 	Type         string
@@ -54,9 +54,7 @@ func filterAuditLogRetention(ctx context.Context, auditLogRetention time.Duratio
 	if callTime.IsZero() {
 		callTime = time.Now()
 	}
-	return builder.AddExclusiveQuery().
-		CreationDateAfter(time.Now().Add(-auditLogRetention)).
-		Builder()
+	return builder.CreationDateAfter(callTime.Add(-auditLogRetention))
 }
 
 func (q *Queries) SearchEventTypes(ctx context.Context) []string {
@@ -81,23 +79,23 @@ func (q *Queries) convertEvent(ctx context.Context, event eventstore.Event, user
 	var err error
 	defer func() { span.EndWithError(err) }()
 
-	editor, ok := users[event.EditorUser()]
+	editor, ok := users[event.Creator()]
 	if !ok {
-		editor = q.editorUserByID(ctx, event.EditorUser())
-		users[event.EditorUser()] = editor
+		editor = q.editorUserByID(ctx, event.Creator())
+		users[event.Creator()] = editor
 	}
 
 	return &Event{
 		Editor: &EventEditor{
-			ID:                event.EditorUser(),
-			Service:           event.EditorService(),
+			ID:                event.Creator(),
+			Service:           "zitadel",
 			DisplayName:       editor.DisplayName,
 			PreferedLoginName: editor.PreferedLoginName,
 			AvatarKey:         editor.AvatarKey,
 		},
 		Aggregate:    event.Aggregate(),
 		Sequence:     event.Sequence(),
-		CreationDate: event.CreationDate(),
+		CreationDate: event.CreatedAt(),
 		Type:         string(event.Type()),
 		Payload:      event.DataAsBytes(),
 	}

@@ -21,6 +21,7 @@ func NewInstanceIDPConfigWriteModel(ctx context.Context, configID string) *Insta
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   authz.GetInstance(ctx).InstanceID(),
 				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
+				InstanceID:    authz.GetInstance(ctx).InstanceID(),
 			},
 			ConfigID: configID,
 		},

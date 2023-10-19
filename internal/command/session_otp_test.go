@@ -265,9 +265,7 @@ func TestCommands_OTPSMSSent(t *testing.T) {
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							session.NewOTPSMSSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate),
-						),
+						session.NewOTPSMSSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate),
 					),
 				),
 			},
@@ -669,9 +667,7 @@ func TestCommands_OTPEmailSent(t *testing.T) {
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							session.NewOTPEmailSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate),
-						),
+						session.NewOTPEmailSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate),
 					),
 				),
 			},

@@ -6,11 +6,6 @@ import (
 	"time"
 )
 
-type Config struct {
-	Dialects map[string]interface{} `mapstructure:",remain"`
-	Dialect  Matcher
-}
-
 type Dialect struct {
 	Matcher   Matcher
 	Config    Connector
@@ -29,7 +24,7 @@ type Matcher interface {
 }
 
 type Connector interface {
-	Connect(useAdmin bool) (*sql.DB, error)
+	Connect(useAdmin, isEventPusher bool, pusherRatio float32, appName string) (*sql.DB, error)
 	Password() string
 	Database
 }

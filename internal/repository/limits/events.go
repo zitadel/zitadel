@@ -2,12 +2,9 @@ package limits
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -18,16 +15,20 @@ const (
 
 // SetEvent describes that limits are added or modified and contains only changed properties
 type SetEvent struct {
-	eventstore.BaseEvent `json:"-"`
-	AuditLogRetention    *time.Duration `json:"auditLogRetention,omitempty"`
+	*eventstore.BaseEvent `json:"-"`
+	AuditLogRetention     *time.Duration `json:"auditLogRetention,omitempty"`
 }
 
-func (e *SetEvent) Data() interface{} {
+func (e *SetEvent) Payload() any {
 	return e
 }
 
-func (e *SetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+func (e *SetEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+	e.BaseEvent = b
 }
 
 func NewSetEvent(
@@ -35,7 +36,7 @@ func NewSetEvent(
 	changes ...LimitsChange,
 ) *SetEvent {
 	changedEvent := &SetEvent{
-		BaseEvent: *base,
+		BaseEvent: base,
 	}
 	for _, change := range changes {
 		change(changedEvent)
@@ -51,27 +52,22 @@ func ChangeAuditLogRetention(auditLogRetention time.Duration) LimitsChange {
 	}
 }
 
-func SetEventMapper(event *repository.Event) (eventstore.Event, error) {
-	e := &SetEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, e)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "LIMITS-YwPkZ", "unable to unmarshal limits set")
-	}
-	return e, nil
-}
+var SetEventMapper = eventstore.GenericEventMapper[SetEvent]
 
 type ResetEvent struct {
-	eventstore.BaseEvent `json:"-"`
+	*eventstore.BaseEvent `json:"-"`
 }
 
-func (e *ResetEvent) Data() interface{} {
+func (e *ResetEvent) Payload() any {
 	return e
 }
 
-func (e *ResetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *ResetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+func (e *ResetEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+	e.BaseEvent = b
 }
 
 func NewResetEvent(
@@ -79,7 +75,7 @@ func NewResetEvent(
 	aggregate *eventstore.Aggregate,
 ) *ResetEvent {
 	return &ResetEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			ResetEventType,
@@ -87,13 +83,4 @@ func NewResetEvent(
 	}
 }
 
-func ResetEventMapper(event *repository.Event) (eventstore.Event, error) {
-	e := &ResetEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, e)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "LIMITS-a9O4Q", "unable to unmarshal limits reset")
-	}
-	return e, nil
-}
+var ResetEventMapper = eventstore.GenericEventMapper[ResetEvent]

@@ -6,8 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
@@ -27,39 +27,40 @@ const (
 	MailTemplateOwnerRemovedCol = "owner_removed"
 )
 
-type mailTemplateProjection struct {
-	crdb.StatementHandler
+type mailTemplateProjection struct{}
+
+func newMailTemplateProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(mailTemplateProjection))
 }
 
-func newMailTemplateProjection(ctx context.Context, config crdb.StatementHandlerConfig) *mailTemplateProjection {
-	p := new(mailTemplateProjection)
-	config.ProjectionName = MailTemplateTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(MailTemplateAggregateIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(MailTemplateInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(MailTemplateCreationDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(MailTemplateChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(MailTemplateSequenceCol, crdb.ColumnTypeInt64),
-			crdb.NewColumn(MailTemplateStateCol, crdb.ColumnTypeEnum),
-			crdb.NewColumn(MailTemplateIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
-			crdb.NewColumn(MailTemplateTemplateCol, crdb.ColumnTypeBytes),
-			crdb.NewColumn(MailTemplateOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
+func (*mailTemplateProjection) Name() string {
+	return MailTemplateTable
+}
+
+func (*mailTemplateProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(MailTemplateAggregateIDCol, handler.ColumnTypeText),
+			handler.NewColumn(MailTemplateInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(MailTemplateCreationDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(MailTemplateChangeDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(MailTemplateSequenceCol, handler.ColumnTypeInt64),
+			handler.NewColumn(MailTemplateStateCol, handler.ColumnTypeEnum),
+			handler.NewColumn(MailTemplateIsDefaultCol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(MailTemplateTemplateCol, handler.ColumnTypeBytes),
+			handler.NewColumn(MailTemplateOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
-			crdb.NewPrimaryKey(MailTemplateInstanceIDCol, MailTemplateAggregateIDCol),
-			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{MailTemplateOwnerRemovedCol})),
+			handler.NewPrimaryKey(MailTemplateInstanceIDCol, MailTemplateAggregateIDCol),
+			handler.WithIndex(handler.NewIndex("owner_removed", []string{MailTemplateOwnerRemovedCol})),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *mailTemplateProjection) reducers() []handler.AggregateReducer {
+func (p *mailTemplateProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.MailTemplateAddedEventType,
 					Reduce: p.reduceAdded,
@@ -80,7 +81,7 @@ func (p *mailTemplateProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.MailTemplateAddedEventType,
 					Reduce: p.reduceAdded,
@@ -111,7 +112,7 @@ func (p *mailTemplateProjection) reduceAdded(event eventstore.Event) (*handler.S
 	default:
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-0pJ3f", "reduce.wrong.event.type, %v", []eventstore.EventType{org.MailTemplateAddedEventType, instance.MailTemplateAddedEventType})
 	}
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		&templateEvent,
 		[]handler.Column{
 			handler.NewCol(MailTemplateAggregateIDCol, templateEvent.Aggregate().ID),
@@ -142,7 +143,7 @@ func (p *mailTemplateProjection) reduceChanged(event eventstore.Event) (*handler
 	if policyEvent.Template != nil {
 		cols = append(cols, handler.NewCol(MailTemplateTemplateCol, *policyEvent.Template))
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		&policyEvent,
 		cols,
 		[]handler.Condition{
@@ -156,7 +157,7 @@ func (p *mailTemplateProjection) reduceRemoved(event eventstore.Event) (*handler
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-3jJGs", "reduce.wrong.event.type %s", org.MailTemplateRemovedEventType)
 	}
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		policyEvent,
 		[]handler.Condition{
 			handler.NewCond(MailTemplateAggregateIDCol, policyEvent.Aggregate().ID),
@@ -170,7 +171,7 @@ func (p *mailTemplateProjection) reduceOwnerRemoved(event eventstore.Event) (*ha
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-CThXR", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(MailTemplateInstanceIDCol, e.Aggregate().InstanceID),
