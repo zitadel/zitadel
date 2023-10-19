@@ -187,53 +187,53 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 		args   args
 		res    res
 	}{
-		// {
-		// 	name: "instance not existing, not found error",
-		// 	fields: fields{
-		// 		eventstore: eventstoreExpect(
-		// 			t,
-		// 			expectFilter(),
-		// 		),
-		// 	},
-		// 	args: args{
-		// 		ctx:        authz.WithInstanceID(context.Background(), "INSTANCE"),
-		// 		instanceID: "INSTANCE",
-		// 	},
-		// 	res: res{
-		// 		err: caos_errs.IsNotFound,
-		// 	},
-		// },
-		// {
-		// 	name: "instance removed, not found error",
-		// 	fields: fields{
-		// 		eventstore: eventstoreExpect(
-		// 			t,
-		// 			expectFilter(
-		// 				eventFromEventPusher(
-		// 					instance.NewInstanceAddedEvent(
-		// 						context.Background(),
-		// 						&instance.NewAggregate("INSTANCE").Aggregate,
-		// 						"INSTANCE",
-		// 					),
-		// 				),
-		// 				eventFromEventPusher(
-		// 					instance.NewInstanceRemovedEvent(context.Background(),
-		// 						&instance.NewAggregate("INSTANCE").Aggregate,
-		// 						"INSTANCE",
-		// 						nil,
-		// 					),
-		// 				),
-		// 			),
-		// 		),
-		// 	},
-		// 	args: args{
-		// 		ctx:        authz.WithInstanceID(context.Background(), "INSTANCE"),
-		// 		instanceID: "INSTANCE",
-		// 	},
-		// 	res: res{
-		// 		err: caos_errs.IsNotFound,
-		// 	},
-		// },
+		{
+			name: "instance not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:        authz.WithInstanceID(context.Background(), "INSTANCE"),
+				instanceID: "INSTANCE",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "instance removed, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewInstanceAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"INSTANCE",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewInstanceRemovedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"INSTANCE",
+								nil,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:        authz.WithInstanceID(context.Background(), "INSTANCE"),
+				instanceID: "INSTANCE",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
 		{
 			name: "instance remove, ok",
 			fields: fields{
