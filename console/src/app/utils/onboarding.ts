@@ -1,4 +1,4 @@
-import { OnboardingActions } from '../services/admin.service';
+import { OnboardingActions, StringableMilestoneType } from '../services/admin.service';
 import { COLORS } from './color';
 
 const reddark: string = COLORS[0][700];
@@ -22,25 +22,23 @@ const pinklight = COLORS[15][200];
 export const ONBOARDING_EVENTS: OnboardingActions[] = [
   {
     order: 0,
-    eventType: 'project.added',
-    oneof: ['project.added'],
-    link: ['/projects/create'],
+    milestoneType: StringableMilestoneType.PROJECT_CREATED,
+    link: '/projects/create',
     iconClasses: 'las la-database',
     darkcolor: greendark,
     lightcolor: greenlight,
   },
   {
     order: 1,
-    eventType: 'project.application.added',
-    oneof: ['project.application.added'],
-    link: ['/projects/app-create'],
+    milestoneType: StringableMilestoneType.APPLICATION_CREATED,
+    link: '/projects/app-create',
     iconClasses: 'lab la-openid',
     darkcolor: purpledark,
     lightcolor: purplelight,
   },
-  {
+  /*  {
     order: 2,
-    eventType: 'user.human.added',
+    milestoneType: 'user.human.added',
     oneof: ['user.human.added'],
     link: ['/users/create'],
     iconClasses: 'las la-user',
@@ -49,7 +47,7 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
   },
   {
     order: 3,
-    eventType: 'user.grant.added',
+    milestoneType: 'user.grant.added',
     oneof: ['user.grant.added'],
     link: ['/grant-create'],
     iconClasses: 'las la-shield-alt',
@@ -58,7 +56,7 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
   },
   {
     order: 4,
-    eventType: 'instance.policy.label.added',
+    milestoneType: 'instance.policy.label.added',
     oneof: ['instance.policy.label.added', 'instance.policy.label.changed'],
     link: ['/settings'],
     fragment: 'branding',
@@ -68,12 +66,12 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
   },
   {
     order: 5,
-    eventType: 'instance.smtp.config.added',
+    milestoneType: 'instance.smtp.config.added',
     oneof: ['instance.smtp.config.added', 'instance.smtp.config.changed'],
     link: ['/settings'],
     fragment: 'smtpprovider',
     iconClasses: 'las la-envelope',
     darkcolor: yellowdark,
     lightcolor: yellowlight,
-  },
+  },*/
 ];

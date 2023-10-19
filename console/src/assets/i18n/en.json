@@ -51,7 +51,7 @@
       "TITLE": "Get your ZITADEL running",
       "DESCRIPTION": "This checklist helps to setup your instance and guides your through the most essential steps"
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Setup your brand",
         "description": "Define coloring and shape of your login and upload your logo and icons.",
@@ -62,12 +62,12 @@
         "description": "Set your own mail server settings.",
         "action": "Setup SMTP"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Create a project",
         "description": "Add a project and define its roles and authorizations.",
         "action": "Create project"
       },
-      "project.application.added": {
+      "APPLICATION_CREATED": {
         "title": "Create an application",
         "description": "Create a web, native, api or saml application and setup your authentication flow.",
         "action": "Create app"

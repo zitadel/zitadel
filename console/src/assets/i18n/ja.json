@@ -51,7 +51,7 @@
       "TITLE": "ZITADELの起動",
       "DESCRIPTION": "このチェックリストを使用して、重要な手順を確認しながらインスタンスをセットアップします。"
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "ブランドをセットアップする",
         "description": "ログインの色と形状を定義し、ロゴとアイコンをアップロードします。",
@@ -62,12 +62,12 @@
         "description": "独自のメールサーバーを設定します。",
         "action": "SMTP 設定を設定する"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "最初のプロジェクトを作成する",
         "description": "最初のプロジェクトを追加し、ロールと認証を定義します。",
         "action": "プロジェクトを作成"
       },
-      "project.application.added": {
+      "APPLICATION_CREATED": {
         "title": "最初のアプリケーションを作成する",
         "description": "Web、ネイティブ、API、またはSAMLアプリケーションを作成し、認証フローをセットアップします。",
         "action": "アプリケーションを作成"

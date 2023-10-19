@@ -51,7 +51,7 @@
       "TITLE": "Uruchom swój ZITADEL",
       "DESCRIPTION": "Ta lista kontrolna pomoże Ci skonfigurować instancję i poprowadzi Cię przez najważniejsze kroki."
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Skonfiguruj swoją markę",
         "description": "Zdefiniuj kolorystykę i kształt swojego loginu oraz wgraj swoje logo i ikony.",
@@ -62,12 +62,12 @@
         "description": "Ustawienie własnego serwera pocztowego",
         "action": "skonfiguruj ustawienia SMTP"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Stwórz swój pierwszy projekt",
         "description": "Dodaj swój pierwszy projekt i określ jego role i uprawnienia.",
         "action": "Utwórz projekt"
       },
-      "project.application.added": {
+      "APPLICATION_CREATED": {
         "title": "Utwórz swoją pierwszą aplikację",
         "description": "Utwórz aplikację internetową, natywną, api lub saml i skonfiguruj swój przepływ uwierzytelniania.",
         "action": "Utwórz aplikację"

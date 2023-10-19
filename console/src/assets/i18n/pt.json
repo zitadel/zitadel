@@ -51,7 +51,7 @@
       "TITLE": "Inicie o ZITADEL",
       "DESCRIPTION": "Esta lista de verificação ajuda a configurar sua instância e orienta você nas etapas mais essenciais"
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Configure sua marca",
         "description": "Defina cores e forma para o seu login e faça o upload do seu logotipo e ícones.",
@@ -62,12 +62,12 @@
         "description": "Configure as configurações do seu próprio servidor de e-mail.",
         "action": "Configurar SMTP"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Crie um projeto",
         "description": "Adicione um projeto e defina suas funções e autorizações.",
         "action": "Criar projeto"
       },
-      "project.application.added": {
+      "APPLICATION_CREATED": {
         "title": "Crie um aplicativo",
         "description": "Crie um aplicativo da web, nativo, API ou SAML e configure o fluxo de autenticação.",
         "action": "Criar aplicativo"

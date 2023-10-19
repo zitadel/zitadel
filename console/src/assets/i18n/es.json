@@ -51,7 +51,7 @@
       "TITLE": "Ponte en marcha con ZITADEL",
       "DESCRIPTION": "Esta lista de tareas te ayuda a configurar tu instancia y te guía por los pasos más esenciales"
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Configura tu imagen de marca",
         "description": "Define el esquema de colores, da forma a tu inicio de sesión y sube tu logo y tus iconos.",
@@ -62,12 +62,12 @@
         "description": "Introduce la configuración de tu propio servidor de correo.",
         "action": "Configurar SMTP"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Crea tu primer proyecto",
         "description": "Añade tu primer proyecto y define sus roles y autorizaciones.",
         "action": "Crear proyecto"
       },
-      "project.application.added": {
+      "APPLICATION_CREATED": {
         "title": "Crea tu primera aplicación",
         "description": "Crea una aplicación web, nativa, api o saml y configura tu flujo de autenticación.",
         "action": "Crear app"

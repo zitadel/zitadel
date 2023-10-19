@@ -51,7 +51,7 @@
       "TITLE": "Faites fonctionner votre ZITADEL",
       "DESCRIPTION": "Cette liste de contrôle vous aide à configurer votre instance et vous guide à travers les étapes les plus essentielles."
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Créez votre marque",
         "description": "Définissez la couleur et la forme de votre connexion et téléchargez votre logo et vos icônes.",
@@ -62,12 +62,12 @@
         "description": "Définissez paramètres de serveur de messagerie",
         "action": "Configurez"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Créez projet",
         "description": "Ajoutez projet et définissez ses rôles et autorisations.",
         "action": "Créez projet"
       },
-      "project.application.added": {
+      "APPLICATION_CREATED": {
         "title": "Créez votre première application",
         "description": "Créez une application web, native, api ou saml et configurez votre flux d'authentification.",
         "action": "Créez application"

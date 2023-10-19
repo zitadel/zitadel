@@ -51,7 +51,7 @@
       "TITLE": "Bringe deine Instanz zum Laufen",
       "DESCRIPTION": "Diese Checkliste hilft bei der Einrichtung Ihrer Instanz und führt Sie durch die wichtigsten Schritte"
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Branding anpassen",
         "description": "Definiere Farben und Form des Login-UIs und uploade deine Logos und Icons.",
@@ -62,12 +62,12 @@
         "description": "Konfiguriere deinen Mailserver.",
         "action": "SMTP einrichten"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Erstelle ein Projekt",
         "description": "Erstelle dein erstes Projekt und definiere Rollen",
         "action": "Projekt erstellen"
       },
-      "project.application.added": {
+      "APPLICATION_CREATED": {
         "title": "Erstelle eine App",
         "description": "Erstelle deine erste Web-, native, API oder SAML-applikation und konfiguriere den Authentification-flow.",
         "action": "App erstellen"

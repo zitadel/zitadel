@@ -51,7 +51,7 @@
       "TITLE": "Fate funzionare il vostro ZITADEL",
       "DESCRIPTION": "Questa lista di azioni aiuta a configurare la vostra istanza e vi guida attraverso i passaggi più essenziali."
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Imposta il tuo marchio",
         "description": "Definisci la colorazione e il design del vostro login e caricate il vostro logo e le vostre icone.",
@@ -62,12 +62,12 @@
         "description": "Imposta il proprio server di posta",
         "action": "Configura SMTP"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Crea il tuo primo progetto",
         "description": "Aggiungere il primo progetto e definire i ruoli e le autorizzazioni.",
         "action": "Crea progetto"
       },
-      "project.application.added": {
+      "APPLICATION_CREATED": {
         "title": "Crea la tua prima applicazione",
         "description": "Crea un'applicazione web, nativa, api o saml e imposta il flusso di autenticazione.",
         "action": "Crea applicazione"

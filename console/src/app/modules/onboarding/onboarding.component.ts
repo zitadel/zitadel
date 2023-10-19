@@ -9,12 +9,12 @@ import { ONBOARDING_EVENTS } from 'src/app/utils/onboarding';
   styleUrls: ['./onboarding.component.scss'],
 })
 export class OnboardingComponent {
-  public actions = this.adminService.progressEvents;
+  public actions = this.adminService.progressMilestones;
 
   constructor(
     public adminService: AdminService,
     public themeService: ThemeService,
   ) {
-    this.adminService.loadEvents.next(ONBOARDING_EVENTS);
+    this.adminService.loadMilestones.next(ONBOARDING_EVENTS);
   }
 }
