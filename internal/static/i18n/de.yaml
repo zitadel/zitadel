@@ -182,6 +182,11 @@ Errors:
     DomainVerificationTypeInvalid: Verifikationstyp der Domäne ist ungültig
     DomainVerificationMissing: Verifikation der Domäne noch nicht erstellt
     DomainVerificationFailed: Verifikation der Domäne ist fehlgeschlagen
+    DomainVerificationTXTNotFound: Der TXT-Eintrag _zitadel-challenge wurde für Ihre Domain nicht gefunden. Überprüfen Sie, ob Sie ihn zu Ihrem DNS-Server hinzugefügt haben, oder warten Sie, bis der neue Eintrag verbreitet wird
+    DomainVerificationTXTNoMatch: Der TXT-Eintrag _zitadel-challenge wurde für Ihre Domain gefunden, enthält jedoch nicht den richtigen Token-Text. Überprüfen Sie, ob Sie das richtige Token zu Ihrem DNS-Server hinzugefügt haben, oder warten Sie, bis der neue Eintrag verbreitet wird
+    DomainVerificationHTTPNotFound: Das File der Challenge wurde unter der erwarteten URL nicht gefunden. Überprüfen Sie, ob Sie die Datei mit Leseberechtigungen an der richtigen Stelle hochgeladen haben
+    DomainVerificationHTTPNoMatch: Das File der Challenge wurde in der erwarteten URL gefunden, enthält jedoch nicht den richtigen Token-Text. Überprüfen Sie den Inhalt
+    DomainVerificationTimeout: There was a timeout querying the DNS server.
     PrimaryDomainNotDeletable: Primäre Domäne kann nicht gelöscht werden
     DomainNotFound: Domäne konnte nicht gefunden werden
     MemberIDMissing: Member ID fehlt
@@ -197,6 +202,7 @@ Errors:
     Domain:
       AlreadyExists: Domäne existiert bereits
       InvalidCharacter: Nur alphanumerische Zeichen, . und - sind für eine Domäne erlaubt
+      EmptyString: Ungültige nicht numerische und alphabetische Zeichen wurden durch Leerzeichen ersetzt und die resultierende Domäne ist eine leere Zeichenfolge
     IDP:
       InvalidSearchQuery: Ungültiger Suchparameter
       ClientIDMissing: ClientID fehlt
@@ -527,7 +533,7 @@ EventTypes:
   user:
     added: Benutzer hinzugefügt
     selfregistered: Benutzer hat sich selbst registriert
-    initialization: 
+    initialization:
       code:
         added: Initialisierungscode generiert
         sent: Initialisierungscode versendet
@@ -569,7 +575,7 @@ EventTypes:
       avatar:
         added: Avatar hinzugefügt
         removed: Avatar entfernt
-      initialization: 
+      initialization:
         code:
           added: Initialisierungscode generiert
           sent: Initialisierungscode versendet
@@ -1225,9 +1231,9 @@ Action:
   Flow:
     Type:
       Unspecified: Unspezifiziert
-      ExternalAuthentication:  Externe Authentifizierung
+      ExternalAuthentication: Externe Authentifizierung
       CustomiseToken: Token ergänzen
-      InternalAuthentication:  Interne Authentifizierung
+      InternalAuthentication: Interne Authentifizierung
       CustomizeSAMLResponse: SAMLResponse ergänzen
   TriggerType:
     Unspecified: Unspezifiziert

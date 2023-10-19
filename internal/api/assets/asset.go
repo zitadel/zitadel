@@ -55,12 +55,6 @@ func AssetAPI(externalSecure bool) func(context.Context) string {
 	}
 }
 
-func AssetAPIFromDomain(externalSecure bool, externalPort uint16) func(context.Context) string {
-	return func(ctx context.Context) string {
-		return http_util.BuildHTTP(authz.GetInstance(ctx).RequestedDomain(), externalPort, externalSecure) + HandlerPrefix
-	}
-}
-
 type Uploader interface {
 	UploadAsset(ctx context.Context, info string, asset *command.AssetUpload, commands *command.Commands) error
 	ObjectName(data authz.CtxData) (string, error)
