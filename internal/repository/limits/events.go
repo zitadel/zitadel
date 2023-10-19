@@ -46,9 +46,9 @@ func NewSetEvent(
 
 type LimitsChange func(*SetEvent)
 
-func ChangeAuditLogRetention(auditLogRetention time.Duration) LimitsChange {
+func ChangeAuditLogRetention(auditLogRetention *time.Duration) LimitsChange {
 	return func(e *SetEvent) {
-		e.AuditLogRetention = &auditLogRetention
+		e.AuditLogRetention = auditLogRetention
 	}
 }
 

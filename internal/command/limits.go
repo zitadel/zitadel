@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -12,7 +13,7 @@ import (
 )
 
 type SetLimits struct {
-	AuditLogRetention time.Duration `json:"AuditLogRetention,omitempty"`
+	AuditLogRetention *time.Duration `json:"AuditLogRetention,omitempty"`
 }
 
 // SetLimits creates new limits or updates existing limits.
@@ -27,7 +28,6 @@ func (c *Commands) SetLimits(
 		return nil, err
 	}
 	aggregateId := wm.AggregateID
-	createNew := aggregateId == ""
 	if aggregateId == "" {
 		aggregateId, err = c.idGenerator.Next()
 		if err != nil {
@@ -37,9 +37,14 @@ func (c *Commands) SetLimits(
 	if err != nil {
 		return nil, err
 	}
-	cmd := c.SetLimitsCommand(ctx, limits.NewAggregate(aggregateId, instanceId, resourceOwner), wm, createNew, setLimits)
-	if cmd != nil {
-		events, err := c.eventstore.Push(ctx, cmd)
+	createCmds, err := c.SetLimitsCommand(limits.NewAggregate(aggregateId, instanceId, resourceOwner), wm, setLimits)()
+	if err != nil {
+		return nil, err
+	}
+	// TODO: Is there a better way?
+	cmds, err := createCmds(ctx, nil)
+	if len(cmds) > 0 {
+		events, err := c.eventstore.Push(ctx, cmds...)
 		if err != nil {
 			return nil, err
 		}
@@ -78,17 +83,24 @@ func (c *Commands) getLimitsWriteModel(ctx context.Context, instanceId, resource
 	return wm, c.eventstore.FilterToQueryReducer(ctx, wm)
 }
 
-func (c *Commands) SetLimitsCommand(ctx context.Context, a *limits.Aggregate, wm *limitsWriteModel, createNew bool, setLimits *SetLimits) eventstore.Command {
-	changes := wm.NewChanges(createNew, setLimits)
-	if len(changes) == 0 {
-		return nil
+func (c *Commands) SetLimitsCommand(a *limits.Aggregate, wm *limitsWriteModel, setLimits *SetLimits) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if setLimits == nil || setLimits.AuditLogRetention == nil {
+			return nil, errors.ThrowInternal(nil, "COMMAND-4M9vs", "Errors.Limits.NoneSpecified")
+		}
+		return func(ctx context.Context, _ preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			changes := wm.NewChanges(setLimits)
+			if len(changes) == 0 {
+				return nil, nil
+			}
+			return []eventstore.Command{limits.NewSetEvent(
+				eventstore.NewBaseEventForPush(
+					ctx,
+					&a.Aggregate,
+					limits.SetEventType,
+				),
+				changes...,
+			)}, nil
+		}, nil
 	}
-	return limits.NewSetEvent(
-		eventstore.NewBaseEventForPush(
-			ctx,
-			&a.Aggregate,
-			limits.SetEventType,
-		),
-		changes...,
-	)
 }

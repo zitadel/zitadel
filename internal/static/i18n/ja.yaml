@@ -30,6 +30,7 @@ Errors:
     ExceedsDefault: デフォルトの制限を超えています
   Limits:
     NotFound: 制限が見つかりません
+    NoneSpecified: 制限が指定されていません
   Language:
     NotParsed: 言語のパースに失敗しました
   OIDCSettings:

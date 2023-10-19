@@ -30,6 +30,7 @@ Errors:
     ExceedsDefault: Лимитот го надминува стандардниот лимит
   Limits:
     NotFound: Лимитот не е пронајден
+    NoneSpecified: Не се наведени лимити
   Language:
     NotParsed: Јазикот не може да се парсира
   OIDCSettings:

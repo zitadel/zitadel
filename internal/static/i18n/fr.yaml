@@ -30,6 +30,7 @@ Errors:
     ExceedsDefault: La limite dépasse la limite par défaut
   Limits:
     NotFound: Limites non trouvée
+    NoneSpecified: Aucune limite spécifiée
   Language:
     NotParsed: Impossible d'analyser la langue
   OIDCSettings:

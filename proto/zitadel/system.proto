@@ -709,7 +709,6 @@ message RemoveQuotaResponse {
 message SetLimitsRequest {
   string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
   google.protobuf.Duration audit_log_retention = 2 [
-    (validate.rules).duration.required = true,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "the maximum lifetime of events returned by search events queries";
     }
