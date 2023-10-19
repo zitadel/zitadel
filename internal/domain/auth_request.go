@@ -57,8 +57,9 @@ type AuthRequest struct {
 	OrgTranslations          []*CustomText
 	SAMLRequestID            string
 
-	LoginAs    bool
-	UserOrigID string
+	LoginAs     bool
+	ShowLoginAs bool
+	UserOrigID  string
 }
 
 type ExternalUser struct {
