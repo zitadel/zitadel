@@ -173,7 +173,6 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 			return z_errors.ThrowInvalidArgumentf(nil, "SQL-4GP6F", "events scanner: invalid type %T", dest)
 		}
 		event := new(repository.Event)
-		data := sql.RawBytes{}
 		position := new(sql.NullFloat64)
 
 		if useV1 {
@@ -181,7 +180,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 				&event.CreationDate,
 				&event.Typ,
 				&event.Seq,
-				&data,
+				&event.Data,
 				&event.EditorUser,
 				&event.ResourceOwner,
 				&event.InstanceID,
@@ -196,7 +195,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 				&event.Typ,
 				&event.Seq,
 				position,
-				&data,
+				&event.Data,
 				&event.EditorUser,
 				&event.ResourceOwner,
 				&event.InstanceID,
@@ -212,7 +211,6 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 			return z_errors.ThrowInternal(err, "SQL-M0dsf", "unable to scan row")
 		}
 		event.Pos = position.Float64
-		event.Data = data
 		return reduce(event)
 	}
 }
