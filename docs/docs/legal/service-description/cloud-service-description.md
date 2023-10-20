@@ -8,6 +8,36 @@ This annex of the [Framework Agreement](../terms-of-service) describes the servi
 
 Last revised: October 31, 2023
 
+## Services offered
+
+### ZITADEL Cloud
+
+[ZITADEL Cloud](https://zitadel.com) is a fully managed cloud service of the [ZITADEL software](https://github.com/zitadel).
+
+You will benefit from the same software as the open source software, but we take care of the hosting, maintenance, backup, scaling, and operational security. The cloud service is managed and maintained by the team that also develops the software.
+
+When creating a new instance, you are able to choose a [data location](#data-location).
+We follow a single-provider strategy by minimizing the involved [sub-processors](../subprocessors.md) to increase security, compliance, and performance of our services. [Billing](./billing.md) is based on effective usage of our services.
+
+### Enterprise license / self-hosted
+
+ZITADEL Enterprise license allows you to use the [ZITADEL software](https://github.com/zitadel) on your own data center or private cloud.
+
+You will benefit from the transparency of the open source and the hyper-scalability of the same software that is being used to operate [ZITADEL Cloud](#zitadel-cloud).
+
+#### Benefits over using open source / community license
+
+- [Enterprise supported features](support-services.md) are only supported under an Enterprise license.
+- Get access to [technical support](support-services.md#technical-account-manager) and a [support SLA](support-services.md#service-level-agreement) that is tailored to your needs.
+
+#### Benefits over ZITADEL Cloud
+
+You can reduce your supply-chain risks by removing us as sub-processor of personal information about your users.
+Support staff will have no access to your infrastructure and will only provide technical support.
+Operation and direct maintenance of ZITADEL will be done by you.
+
+You can freely choose the infrastructure and location to host ZITADEL.
+
 ## Data location
 
 Data location refers to a region, consisting of one or many countries or territories, where the customer's data is being hosted.
