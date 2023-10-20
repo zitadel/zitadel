@@ -834,6 +834,19 @@ AuditLogRetention: 0s
 
 InternalAuthZ:
   RolePermissionMappings:
+    - Role: "SYSTEM_OWNER"
+      Permissions:
+        - "system.instance.read"
+        - "system.instance.write"
+        - "iam.read"
+        - "iam.write"
+        - "system.domain.write"
+        - "system.domain.delete"
+        - "system.debug.read"
+        - "system.debug.write"
+        - "system.feature.write"
+        - "system.limits.write"
+        - "system.quota.write"
     - Role: "IAM_OWNER"
       Permissions:
         - "iam.read"
