@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/info"
 )
 
 const (
@@ -44,17 +45,26 @@ func (t TriggerMethod) String() string {
 }
 
 func Trigger(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
+	path, _ := info.HTTPPathFromContext()(ctx)
+	reqMethod, _ := info.RequestMethodFromContext()(ctx)
+	method, _ := info.RPCMethodFromContext()(ctx)
 	logging.WithFields(
 		"instance", authz.GetInstance(ctx).InstanceID(),
 		"org", orgID,
 		"user", userID,
 		"domain", http_utils.ComposedOrigin(ctx),
 		"trigger", trigger.String(),
+		"method", method,
+		"path", path,
+		"requestMethod", reqMethod,
 	).Info(Activity)
 }
 
-func TriggerWithContext(ctx context.Context, method string, trigger TriggerMethod) {
+func TriggerWithContext(ctx context.Context, trigger TriggerMethod) {
 	data := authz.GetCtxData(ctx)
+	path, _ := info.HTTPPathFromContext()(ctx)
+	reqMethod, _ := info.RequestMethodFromContext()(ctx)
+	method, _ := info.RPCMethodFromContext()(ctx)
 	logging.WithFields(
 		"instance", authz.GetInstance(ctx).InstanceID(),
 		"org", data.OrgID,
@@ -62,5 +72,7 @@ func TriggerWithContext(ctx context.Context, method string, trigger TriggerMetho
 		"domain", http_utils.ComposedOrigin(ctx),
 		"trigger", trigger.String(),
 		"method", method,
+		"path", path,
+		"requestMethod", reqMethod,
 	).Info(Activity)
 }

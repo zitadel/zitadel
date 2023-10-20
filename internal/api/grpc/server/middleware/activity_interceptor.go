@@ -13,7 +13,7 @@ func ActivityInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		resp, err := handler(ctx, req)
 		if isResourceAPI(info.FullMethod) {
-			activity.TriggerWithContext(ctx, info.FullMethod, activity.ResourceAPI)
+			activity.TriggerWithContext(ctx, activity.ResourceAPI)
 		}
 		return resp, err
 	}
