@@ -86,7 +86,7 @@ func (c *Commands) getLimitsWriteModel(ctx context.Context, instanceId, resource
 func (c *Commands) SetLimitsCommand(a *limits.Aggregate, wm *limitsWriteModel, setLimits *SetLimits) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if setLimits == nil || setLimits.AuditLogRetention == nil {
-			return nil, errors.ThrowInternal(nil, "COMMAND-4M9vs", "Errors.Limits.NoneSpecified")
+			return nil, errors.ThrowInvalidArgument(nil, "COMMAND-4M9vs", "Errors.Limits.NoneSpecified")
 		}
 		return func(ctx context.Context, _ preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			changes := wm.NewChanges(setLimits)
