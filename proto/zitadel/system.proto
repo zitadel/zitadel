@@ -191,12 +191,11 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "iam.member.read";
+      permission: "system.iam.member.read";
     };
   }
 
   //Checks if a domain exists
-  // Deprecated: Use the Admin APIs ListInstanceDomains on the admin API instead
   rpc ExistsDomain(ExistsDomainRequest) returns (ExistsDomainResponse) {
     option (google.api.http) = {
       post: "/domains/{domain}/_exists";
@@ -204,7 +203,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "iam.read";
+      permission: "system.domain.read";
     };
   }
 
@@ -218,7 +217,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "iam.read";
+      permission: "system.domain.read";
     };
   }
 
@@ -340,7 +339,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "system.debug.write";
+      permission: "system.debug.delete";
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "failed events";
@@ -398,7 +397,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "system.quota.write";
+      permission: "system.quota.delete";
     };
   }
 
