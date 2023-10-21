@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/client/rp"
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"golang.org/x/oauth2"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -2027,7 +2027,7 @@ func (wm *IDPTypeWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *IDPTypeWriteModel) reduceAdded(id string, t domain.IDPType, agg eventstore.Aggregate) {
+func (wm *IDPTypeWriteModel) reduceAdded(id string, t domain.IDPType, agg *eventstore.Aggregate) {
 	if wm.ID != id {
 		return
 	}

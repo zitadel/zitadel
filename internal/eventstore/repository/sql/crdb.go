@@ -3,6 +3,7 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"regexp"
 	"strconv"
@@ -13,8 +14,10 @@ import (
 	"github.com/lib/pq"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
@@ -52,6 +55,7 @@ const (
 		" aggregate_id," +
 		" aggregate_version," +
 		" creation_date," +
+		" position," +
 		" event_data," +
 		" editor_user," +
 		" editor_service," +
@@ -59,7 +63,8 @@ const (
 		" instance_id," +
 		" event_sequence," +
 		" previous_aggregate_sequence," +
-		" previous_aggregate_type_sequence" +
+		" previous_aggregate_type_sequence," +
+		" in_tx_order" +
 		") " +
 		// defines the data to be inserted
 		"SELECT" +
@@ -67,17 +72,19 @@ const (
 		" $2::VARCHAR AS aggregate_type," +
 		" $3::VARCHAR AS aggregate_id," +
 		" $4::VARCHAR AS aggregate_version," +
-		" statement_timestamp() AS creation_date," +
+		" hlc_to_timestamp(cluster_logical_timestamp()) AS creation_date," +
+		" cluster_logical_timestamp() AS position," +
 		" $5::JSONB AS event_data," +
 		" $6::VARCHAR AS editor_user," +
 		" $7::VARCHAR AS editor_service," +
 		" COALESCE((resource_owner), $8::VARCHAR) AS resource_owner," +
 		" $9::VARCHAR AS instance_id," +
-		" NEXTVAL(CONCAT('eventstore.', (CASE WHEN $9 <> '' THEN CONCAT('i_', $9) ELSE 'system' END), '_seq'))," +
+		" COALESCE(aggregate_sequence, 0)+1," +
 		" aggregate_sequence AS previous_aggregate_sequence," +
-		" aggregate_type_sequence AS previous_aggregate_type_sequence " +
+		" aggregate_type_sequence AS previous_aggregate_type_sequence," +
+		" $10 AS in_tx_order " +
 		"FROM previous_data " +
-		"RETURNING id, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, creation_date, resource_owner, instance_id"
+		"RETURNING id, event_sequence, creation_date, resource_owner, instance_id"
 
 	uniqueInsert = `INSERT INTO eventstore.unique_constraints
 					(
@@ -97,93 +104,109 @@ const (
 					WHERE instance_id = $1`
 )
 
-type CRDB struct {
-	*database.DB
-	AllowOrderByCreationDate bool
+// awaitOpenTransactions ensures event ordering, so we don't events younger that open transactions
+var (
+	awaitOpenTransactionsV1 string
+	awaitOpenTransactionsV2 string
+)
+
+func awaitOpenTransactions(useV1 bool) string {
+	if useV1 {
+		return awaitOpenTransactionsV1
+	}
+	return awaitOpenTransactionsV2
 }
 
-func NewCRDB(client *database.DB, allowOrderByCreationDate bool) *CRDB {
-	return &CRDB{client, allowOrderByCreationDate}
+type CRDB struct {
+	*database.DB
+}
+
+func NewCRDB(client *database.DB) *CRDB {
+	switch client.Type() {
+	case "cockroach":
+		awaitOpenTransactionsV1 = " AND creation_date::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = '" + database.EventstorePusherAppName + "')"
+		awaitOpenTransactionsV2 = ` AND hlc_to_timestamp("position") < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = '` + database.EventstorePusherAppName + `')`
+	case "postgres":
+		awaitOpenTransactionsV1 = ` AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = '` + database.EventstorePusherAppName + `' AND state <> 'idle')`
+		awaitOpenTransactionsV2 = ` AND "position" < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = '` + database.EventstorePusherAppName + `' AND state <> 'idle')`
+	}
+
+	return &CRDB{client}
 }
 
 func (db *CRDB) Health(ctx context.Context) error { return db.Ping() }
 
 // Push adds all events to the eventstreams of the aggregates.
 // This call is transaction save. The transaction will be rolled back if one event fails
-func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
-	err := crdb.ExecuteTx(ctx, db.DB.DB, nil, func(tx *sql.Tx) error {
+func (db *CRDB) Push(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
+	events = make([]eventstore.Event, len(commands))
 
-		var (
-			previousAggregateSequence     Sequence
-			previousAggregateTypeSequence Sequence
-		)
-		for _, event := range events {
+	err = crdb.ExecuteTx(ctx, db.DB.DB, nil, func(tx *sql.Tx) error {
+
+		var uniqueConstraints []*eventstore.UniqueConstraint
+
+		for i, command := range commands {
+			if command.Aggregate().InstanceID == "" {
+				command.Aggregate().InstanceID = authz.GetInstance(ctx).InstanceID()
+			}
+
+			var payload []byte
+			if command.Payload() != nil {
+				payload, err = json.Marshal(command.Payload())
+				if err != nil {
+					return err
+				}
+			}
+			e := &repository.Event{
+				Typ:           command.Type(),
+				Data:          payload,
+				EditorUser:    command.Creator(),
+				Version:       command.Aggregate().Version,
+				AggregateID:   command.Aggregate().ID,
+				AggregateType: command.Aggregate().Type,
+				ResourceOwner: sql.NullString{String: command.Aggregate().ResourceOwner, Valid: command.Aggregate().ResourceOwner != ""},
+				InstanceID:    command.Aggregate().InstanceID,
+			}
+
 			err := tx.QueryRowContext(ctx, crdbInsert,
-				event.Type,
-				event.AggregateType,
-				event.AggregateID,
-				event.Version,
-				Data(event.Data),
-				event.EditorUser,
-				event.EditorService,
-				event.ResourceOwner,
-				event.InstanceID,
-			).Scan(&event.ID, &event.Sequence, &previousAggregateSequence, &previousAggregateTypeSequence, &event.CreationDate, &event.ResourceOwner, &event.InstanceID)
-
-			event.PreviousAggregateSequence = uint64(previousAggregateSequence)
-			event.PreviousAggregateTypeSequence = uint64(previousAggregateTypeSequence)
+				e.Type(),
+				e.Aggregate().Type,
+				e.Aggregate().ID,
+				e.Aggregate().Version,
+				payload,
+				e.Creator(),
+				"zitadel",
+				e.Aggregate().ResourceOwner,
+				e.Aggregate().InstanceID,
+				i,
+			).Scan(&e.ID, &e.Seq, &e.CreationDate, &e.ResourceOwner, &e.InstanceID)
 
 			if err != nil {
 				logging.WithFields(
-					"aggregate", event.AggregateType,
-					"aggregateId", event.AggregateID,
-					"aggregateType", event.AggregateType,
-					"eventType", event.Type,
-					"instanceID", event.InstanceID,
+					"aggregate", e.Aggregate().Type,
+					"aggregateId", e.Aggregate().ID,
+					"aggregateType", e.Aggregate().Type,
+					"eventType", e.Type(),
+					"instanceID", e.Aggregate().InstanceID,
 				).WithError(err).Debug("query failed")
 				return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
 			}
+
+			uniqueConstraints = append(uniqueConstraints, command.UniqueConstraints()...)
+			events[i] = e
 		}
 
-		err := db.handleUniqueConstraints(ctx, tx, uniqueConstraints...)
-		if err != nil {
-			return err
-		}
-		return nil
+		return db.handleUniqueConstraints(ctx, tx, uniqueConstraints...)
 	})
 	if err != nil && !errors.Is(err, &caos_errs.CaosError{}) {
 		err = caos_errs.ThrowInternal(err, "SQL-DjgtG", "unable to store events")
 	}
 
-	return err
-}
-
-var instanceRegexp = regexp.MustCompile(`eventstore\.i_[0-9a-zA-Z]{1,}_seq`)
-
-func (db *CRDB) CreateInstance(ctx context.Context, instanceID string) error {
-	var sequenceName string
-	err := db.QueryRowContext(ctx,
-		func(row *sql.Row) error {
-			if err := row.Scan(&sequenceName); err != nil || !instanceRegexp.MatchString(sequenceName) {
-				return caos_errs.ThrowInvalidArgument(err, "SQL-7gtFA", "Errors.InvalidArgument")
-			}
-			return nil
-		},
-		"SELECT CONCAT('eventstore.i_', $1::TEXT, '_seq')", instanceID,
-	)
-	if err != nil {
-		return err
-	}
-
-	if _, err := db.ExecContext(ctx, "CREATE SEQUENCE "+sequenceName); err != nil {
-		return caos_errs.ThrowInternal(err, "SQL-7gtFA", "Errors.Internal")
-	}
-
-	return nil
+	return events, err
 }
 
 // handleUniqueConstraints adds or removes unique constraints
-func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueConstraints ...*repository.UniqueConstraint) (err error) {
+func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueConstraints ...*eventstore.UniqueConstraint) (err error) {
 	if len(uniqueConstraints) == 0 || (len(uniqueConstraints) == 1 && uniqueConstraints[0] == nil) {
 		return nil
 	}
@@ -191,32 +214,32 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 	for _, uniqueConstraint := range uniqueConstraints {
 		uniqueConstraint.UniqueField = strings.ToLower(uniqueConstraint.UniqueField)
 		switch uniqueConstraint.Action {
-		case repository.UniqueConstraintAdd:
-			_, err := tx.ExecContext(ctx, uniqueInsert, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField, uniqueConstraint.InstanceID)
+		case eventstore.UniqueConstraintAdd:
+			_, err := tx.ExecContext(ctx, uniqueInsert, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField, authz.GetInstance(ctx).InstanceID())
 			if err != nil {
 				logging.WithFields(
 					"unique_type", uniqueConstraint.UniqueType,
 					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("insert unique constraint failed")
 
 				if db.isUniqueViolationError(err) {
-					return caos_errs.ThrowAlreadyExists(err, "SQL-M0dsf", uniqueConstraint.ErrorMessage)
+					return caos_errs.ThrowAlreadyExists(err, "SQL-wHcEq", uniqueConstraint.ErrorMessage)
 				}
 
 				return caos_errs.ThrowInternal(err, "SQL-dM9ds", "unable to create unique constraint")
 			}
-		case repository.UniqueConstraintRemoved:
-			_, err := tx.ExecContext(ctx, uniqueDelete, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField, uniqueConstraint.InstanceID)
+		case eventstore.UniqueConstraintRemove:
+			_, err := tx.ExecContext(ctx, uniqueDelete, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField, authz.GetInstance(ctx).InstanceID())
 			if err != nil {
 				logging.WithFields(
 					"unique_type", uniqueConstraint.UniqueType,
 					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("delete unique constraint failed")
 				return caos_errs.ThrowInternal(err, "SQL-6n88i", "unable to remove unique constraint")
 			}
-		case repository.UniqueConstraintInstanceRemoved:
-			_, err := tx.ExecContext(ctx, uniqueDeleteInstance, uniqueConstraint.InstanceID)
+		case eventstore.UniqueConstraintInstanceRemove:
+			_, err := tx.ExecContext(ctx, uniqueDeleteInstance, authz.GetInstance(ctx).InstanceID())
 			if err != nil {
 				logging.WithFields(
-					"instance_id", uniqueConstraint.InstanceID).WithError(err).Info("delete instance unique constraints failed")
+					"instance_id", authz.GetInstance(ctx).InstanceID()).WithError(err).Info("delete instance unique constraints failed")
 				return caos_errs.ThrowInternal(err, "SQL-6n88i", "unable to remove unique constraints of instance")
 			}
 		}
@@ -224,31 +247,31 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 	return nil
 }
 
-// Filter returns all events matching the given search query
-func (crdb *CRDB) Filter(ctx context.Context, searchQuery *repository.SearchQuery) (events []*repository.Event, err error) {
-	events = []*repository.Event{}
-	err = query(ctx, crdb, searchQuery, &events)
-	if err != nil {
-		return nil, err
+// FilterToReducer finds all events matching the given search query and passes them to the reduce function.
+func (crdb *CRDB) FilterToReducer(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder, reduce eventstore.Reducer) error {
+	err := query(ctx, crdb, searchQuery, reduce, false)
+	if err == nil {
+		return nil
 	}
-
-	return events, nil
+	pgErr := new(pgconn.PgError)
+	// check events2 not exists
+	if errors.As(err, &pgErr) && pgErr.Code == "42P01" {
+		return query(ctx, crdb, searchQuery, reduce, true)
+	}
+	return err
 }
 
 // LatestSequence returns the latest sequence found by the search query
-func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *repository.SearchQuery) (uint64, error) {
-	var seq Sequence
-	err := query(ctx, db, searchQuery, &seq)
-	if err != nil {
-		return 0, err
-	}
-	return uint64(seq), nil
+func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (float64, error) {
+	var position sql.NullFloat64
+	err := query(ctx, db, searchQuery, &position, false)
+	return position.Float64, err
 }
 
 // InstanceIDs returns the instance ids found by the search query
-func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *repository.SearchQuery) ([]string, error) {
+func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) ([]string, error) {
 	var ids []string
-	err := query(ctx, db, searchQuery, &ids)
+	err := query(ctx, db, searchQuery, &ids, false)
 	if err != nil {
 		return nil, err
 	}
@@ -259,70 +282,107 @@ func (db *CRDB) db() *database.DB {
 	return db.DB
 }
 
-func (db *CRDB) orderByEventSequence(desc bool) string {
-	if db.AllowOrderByCreationDate {
+func (db *CRDB) orderByEventSequence(desc, useV1 bool) string {
+	if useV1 {
 		if desc {
-			return " ORDER BY creation_date DESC, event_sequence DESC"
+			return ` ORDER BY event_sequence DESC`
 		}
-
-		return " ORDER BY creation_date, event_sequence"
+		return ` ORDER BY event_sequence`
 	}
-
 	if desc {
-		return " ORDER BY event_sequence DESC"
+		return ` ORDER BY "position" DESC, in_tx_order DESC`
 	}
 
-	return " ORDER BY event_sequence"
+	return ` ORDER BY "position", in_tx_order`
 }
 
-func (db *CRDB) eventQuery() string {
+func (db *CRDB) eventQuery(useV1 bool) string {
+	if useV1 {
+		return "SELECT" +
+			" creation_date" +
+			", event_type" +
+			", event_sequence" +
+			", event_data" +
+			", editor_user" +
+			", resource_owner" +
+			", instance_id" +
+			", aggregate_type" +
+			", aggregate_id" +
+			", aggregate_version" +
+			" FROM eventstore.events"
+	}
 	return "SELECT" +
-		" creation_date" +
+		" created_at" +
 		", event_type" +
-		", event_sequence" +
-		", previous_aggregate_sequence" +
-		", previous_aggregate_type_sequence" +
-		", event_data" +
-		", editor_service" +
-		", editor_user" +
-		", resource_owner" +
+		`, "sequence"` +
+		`, "position"` +
+		", payload" +
+		", creator" +
+		`, "owner"` +
 		", instance_id" +
 		", aggregate_type" +
 		", aggregate_id" +
-		", aggregate_version" +
-		" FROM eventstore.events"
+		", revision" +
+		" FROM eventstore.events2"
 }
 
-func (db *CRDB) maxSequenceQuery() string {
-	return "SELECT MAX(event_sequence) FROM eventstore.events"
+func (db *CRDB) maxSequenceQuery(useV1 bool) string {
+	if useV1 {
+		return `SELECT event_sequence FROM eventstore.events`
+	}
+	return `SELECT "position" FROM eventstore.events2`
 }
 
-func (db *CRDB) instanceIDsQuery() string {
-	return "SELECT DISTINCT instance_id FROM eventstore.events"
+func (db *CRDB) instanceIDsQuery(useV1 bool) string {
+	table := "eventstore.events2"
+	if useV1 {
+		table = "eventstore.events"
+	}
+	return "SELECT DISTINCT instance_id FROM " + table
 }
 
-func (db *CRDB) columnName(col repository.Field) string {
+func (db *CRDB) columnName(col repository.Field, useV1 bool) string {
 	switch col {
 	case repository.FieldAggregateID:
 		return "aggregate_id"
 	case repository.FieldAggregateType:
 		return "aggregate_type"
 	case repository.FieldSequence:
-		return "event_sequence"
+		if useV1 {
+			return "event_sequence"
+		}
+		return `"sequence"`
 	case repository.FieldResourceOwner:
-		return "resource_owner"
+		if useV1 {
+			return "resource_owner"
+		}
+		return `"owner"`
 	case repository.FieldInstanceID:
 		return "instance_id"
 	case repository.FieldEditorService:
-		return "editor_service"
+		if useV1 {
+			return "editor_service"
+		}
+		return ""
 	case repository.FieldEditorUser:
-		return "editor_user"
+		if useV1 {
+			return "editor_user"
+		}
+		return "creator"
 	case repository.FieldEventType:
 		return "event_type"
 	case repository.FieldEventData:
-		return "event_data"
+		if useV1 {
+			return "event_data"
+		}
+		return "payload"
 	case repository.FieldCreationDate:
-		return "creation_date"
+		if useV1 {
+			return "creation_date"
+		}
+		return "created_at"
+	case repository.FieldPosition:
+		return `"position"`
 	default:
 		return ""
 	}

@@ -2,12 +2,10 @@ package org
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
@@ -21,15 +19,15 @@ const (
 	OrgRemovedEventType     = orgEventTypePrefix + "removed"
 )
 
-func NewAddOrgNameUniqueConstraint(orgName string) *eventstore.EventUniqueConstraint {
+func NewAddOrgNameUniqueConstraint(orgName string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		uniqueOrgname,
 		orgName,
 		"Errors.Org.AlreadyExists")
 }
 
-func NewRemoveOrgNameUniqueConstraint(orgName string) *eventstore.EventUniqueConstraint {
-	return eventstore.NewRemoveEventUniqueConstraint(
+func NewRemoveOrgNameUniqueConstraint(orgName string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
 		uniqueOrgname,
 		orgName)
 }
@@ -40,12 +38,12 @@ type OrgAddedEvent struct {
 	Name string `json:"name,omitempty"`
 }
 
-func (e *OrgAddedEvent) Data() interface{} {
+func (e *OrgAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OrgAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddOrgNameUniqueConstraint(e.Name)}
+func (e *OrgAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddOrgNameUniqueConstraint(e.Name)}
 }
 
 func NewOrgAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string) *OrgAddedEvent {
@@ -59,11 +57,11 @@ func NewOrgAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name
 	}
 }
 
-func OrgAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OrgAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	orgAdded := &OrgAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, orgAdded)
+	err := event.Unmarshal(orgAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "ORG-Bren2", "unable to unmarshal org added")
 	}
@@ -78,12 +76,12 @@ type OrgChangedEvent struct {
 	oldName string `json:"-"`
 }
 
-func (e *OrgChangedEvent) Data() interface{} {
+func (e *OrgChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OrgChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{
+func (e *OrgChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{
 		NewRemoveOrgNameUniqueConstraint(e.oldName),
 		NewAddOrgNameUniqueConstraint(e.Name),
 	}
@@ -101,11 +99,11 @@ func NewOrgChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, ol
 	}
 }
 
-func OrgChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OrgChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	orgChanged := &OrgChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, orgChanged)
+	err := event.Unmarshal(orgChanged)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "ORG-Bren2", "unable to unmarshal org added")
 	}
@@ -117,11 +115,11 @@ type OrgDeactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *OrgDeactivatedEvent) Data() interface{} {
+func (e *OrgDeactivatedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OrgDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OrgDeactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -135,7 +133,7 @@ func NewOrgDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate
 	}
 }
 
-func OrgDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OrgDeactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &OrgDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -145,11 +143,11 @@ type OrgReactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *OrgReactivatedEvent) Data() interface{} {
+func (e *OrgReactivatedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OrgReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OrgReactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -163,7 +161,7 @@ func NewOrgReactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate
 	}
 }
 
-func OrgReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OrgReactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &OrgReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -179,12 +177,12 @@ type OrgRemovedEvent struct {
 	samlEntityIDs        []string
 }
 
-func (e *OrgRemovedEvent) Data() interface{} {
+func (e *OrgRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	constraints := []*eventstore.EventUniqueConstraint{
+func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	constraints := []*eventstore.UniqueConstraint{
 		NewRemoveOrgNameUniqueConstraint(e.name),
 	}
 	for _, name := range e.usernames {
@@ -218,7 +216,7 @@ func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, na
 	}
 }
 
-func OrgRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OrgRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &OrgRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

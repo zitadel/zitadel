@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
@@ -43,7 +42,7 @@ func NewMailTextAddedEvent(
 	}
 }
 
-func MailTextAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MailTextAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.MailTextAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -75,7 +74,7 @@ func NewMailTextChangedEvent(
 	return &MailTextChangedEvent{MailTextChangedEvent: *changedEvent}, nil
 }
 
-func MailTextChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MailTextChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.MailTextChangedEventMapper(event)
 	if err != nil {
 		return nil, err

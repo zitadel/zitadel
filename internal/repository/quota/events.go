@@ -2,13 +2,11 @@ package quota
 
 import (
 	"context"
-	"encoding/json"
 	"strconv"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 type Unit uint
@@ -29,7 +27,7 @@ const (
 	ActionsAllRunsSeconds
 )
 
-func NewAddQuotaUnitUniqueConstraint(unit Unit) *eventstore.EventUniqueConstraint {
+func NewAddQuotaUnitUniqueConstraint(unit Unit) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueQuotaNameType,
 		strconv.FormatUint(uint64(unit), 10),
@@ -37,8 +35,8 @@ func NewAddQuotaUnitUniqueConstraint(unit Unit) *eventstore.EventUniqueConstrain
 	)
 }
 
-func NewRemoveQuotaNameUniqueConstraint(unit Unit) *eventstore.EventUniqueConstraint {
-	return eventstore.NewRemoveEventUniqueConstraint(
+func NewRemoveQuotaNameUniqueConstraint(unit Unit) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
 		UniqueQuotaNameType,
 		strconv.FormatUint(uint64(unit), 10),
 	)
@@ -62,11 +60,11 @@ type SetEventNotification struct {
 	CallURL string `json:"callUrl"`
 }
 
-func (e *SetEvent) Data() interface{} {
+func (e *SetEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -117,12 +115,11 @@ func ChangeNotifications(notifications []*SetEventNotification) QuotaChange {
 	}
 }
 
-func SetEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &SetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUOTA-kmIpI", "unable to unmarshal quota set")
 	}
@@ -140,11 +137,11 @@ type NotificationDueEvent struct {
 	Usage                uint64    `json:"usage"`
 }
 
-func (n *NotificationDueEvent) Data() interface{} {
+func (n *NotificationDueEvent) Payload() interface{} {
 	return n
 }
 
-func (n *NotificationDueEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (n *NotificationDueEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -173,12 +170,12 @@ func NewNotificationDueEvent(
 	}
 }
 
-func NotificationDueEventMapper(event *repository.Event) (eventstore.Event, error) {
+func NotificationDueEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &NotificationDueEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUOTA-k56rT", "unable to unmarshal notification due")
 	}
@@ -197,11 +194,11 @@ type NotifiedEvent struct {
 	DueEventID           string    `json:"dueEventID"`
 }
 
-func (e *NotifiedEvent) Data() interface{} {
+func (e *NotifiedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *NotifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *NotifiedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -214,7 +211,7 @@ func NewNotifiedEvent(
 	return &NotifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			&aggregate,
+			aggregate,
 			NotifiedEventType,
 		),
 		ID:         id,
@@ -232,12 +229,12 @@ func NewNotifiedEvent(
 	}
 }
 
-func NotifiedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func NotifiedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &NotifiedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUOTA-4n8vs", "unable to unmarshal quota notified")
 	}
@@ -250,12 +247,12 @@ type RemovedEvent struct {
 	Unit                 Unit `json:"unit"`
 }
 
-func (e *RemovedEvent) Data() interface{} {
+func (e *RemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *RemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveQuotaNameUniqueConstraint(e.Unit)}
+func (e *RemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewRemoveQuotaNameUniqueConstraint(e.Unit)}
 }
 
 func NewRemovedEvent(
@@ -273,12 +270,12 @@ func NewRemovedEvent(
 	}
 }
 
-func RemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func RemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &RemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUOTA-4bReE", "unable to unmarshal quota removed")
 	}

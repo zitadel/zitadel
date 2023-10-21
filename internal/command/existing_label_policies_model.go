@@ -38,7 +38,7 @@ func (rm *ExistingLabelPoliciesReadModel) Reduce() error {
 			}
 		}
 	}
-	return nil
+	return rm.WriteModel.Reduce()
 }
 
 func (rm *ExistingLabelPoliciesReadModel) Query() *eventstore.SearchQueryBuilder {

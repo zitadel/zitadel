@@ -1255,7 +1255,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor OTP";
-            description: "Remove the configured One-Time-Password (OTP) as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator.."
+            description: "Remove the configured One-Time-Password (OTP) as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator."
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -1287,6 +1287,68 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor U2F";
             description: "Remove the configured Universal-Second-Factor (U2F) as a factor from the user. U2F is a device-dependent factor like FingerPrint, Windows-Hello, etc."
+            tags: "Users";
+            tags: "User Human";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc RemoveHumanAuthFactorOTPSMS(RemoveHumanAuthFactorOTPSMSRequest) returns (RemoveHumanAuthFactorOTPSMSResponse) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/auth_factors/otp_sms"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Remove Multi-Factor OTP SMS";
+            description: "Remove the configured One-Time-Password (OTP) SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward."
+            tags: "Users";
+            tags: "User Human";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc RemoveHumanAuthFactorOTPEmail(RemoveHumanAuthFactorOTPEmailRequest) returns (RemoveHumanAuthFactorOTPEmailResponse) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/auth_factors/otp_email"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Remove Multi-Factor OTP SMS";
+            description: "Remove the configured One-Time-Password (OTP) Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward."
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -6806,7 +6868,7 @@ service ManagementService {
         };
     }
 
-    // Add a new Azure AD identity provider in the organisation
+    // Add a new Azure AD identity provider in the organization
     rpc AddAzureADProvider(AddAzureADProviderRequest) returns (AddAzureADProviderResponse) {
         option (google.api.http) = {
             post: "/idps/azure"
@@ -6824,7 +6886,7 @@ service ManagementService {
         };
     }
 
-    // Change an existing Azure AD identity provider in the organisation
+    // Change an existing Azure AD identity provider in the organization
     rpc UpdateAzureADProvider(UpdateAzureADProviderRequest) returns (UpdateAzureADProviderResponse) {
         option (google.api.http) = {
             put: "/idps/azure/{id}"
@@ -8243,6 +8305,22 @@ message RemoveHumanAuthFactorU2FRequest {
 }
 
 message RemoveHumanAuthFactorU2FResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveHumanAuthFactorOTPSMSRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveHumanAuthFactorOTPSMSResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveHumanAuthFactorOTPEmailRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveHumanAuthFactorOTPEmailResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -11759,7 +11837,7 @@ message AddGenericOAuthProviderRequest {
         }
     ];
     string client_secret = 3 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
+        (validate.rules).string = {min_len: 1, max_len: 1000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"client-secret\"";
             description: "Client secret generated by the identity provider";
@@ -11826,7 +11904,7 @@ message UpdateGenericOAuthProviderRequest {
     ];
     // client_secret will only be updated if provided
     string client_secret = 4 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_len: 1000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"client-secret\"";
             description: "Client secret will only be updated if provided";
@@ -11897,7 +11975,7 @@ message AddGenericOIDCProviderRequest {
         }
     ];
     string client_secret = 4 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
+        (validate.rules).string = {min_len: 1, max_len: 1000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"secret\"";
             description: "secret generated by the identity provider"
@@ -11948,7 +12026,7 @@ message UpdateGenericOIDCProviderRequest {
     ];
     // client_secret will only be updated if provided
     string client_secret = 5 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_len: 1000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"secret\"";
             description: "client secret will only be updated if provided";

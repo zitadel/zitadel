@@ -93,7 +93,7 @@ func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery, with
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-PDAVB", "Errors.Query.InvalidRequest")
 	}
 
-	currentSequence, err := q.latestSequence(ctx, orgsTable)
+	currentSequence, err := q.latestState(ctx, orgsTable)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery, with
 		return nil, errors.ThrowInternal(err, "QUERY-5g4yV", "Errors.Internal")
 	}
 
-	members.LatestSequence = currentSequence
+	members.State = currentSequence
 	return members, err
 }
 

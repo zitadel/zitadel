@@ -48,7 +48,7 @@ message GrantedProject {
     ];
     string granted_org_name = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"Some Organisation\""
+            example: "\"Some Organization\""
         }
     ];
     repeated string granted_role_keys = 4 [

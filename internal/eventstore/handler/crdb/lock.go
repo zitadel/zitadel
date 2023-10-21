@@ -91,7 +91,7 @@ func (h *locker) Unlock(instanceIDs ...string) error {
 	return nil
 }
 
-func (h *locker) lockStatement(lockDuration time.Duration, instanceIDs database.StringArray) (string, []interface{}) {
+func (h *locker) lockStatement(lockDuration time.Duration, instanceIDs database.TextArray[string]) (string, []interface{}) {
 	valueQueries := make([]string, len(instanceIDs))
 	values := make([]interface{}, len(instanceIDs)+4)
 	values[0] = h.workerName

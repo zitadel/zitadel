@@ -33,7 +33,7 @@ func generateEmail(
 	if err != nil {
 		return err
 	}
-	if emailChannels.Len() == 0 {
+	if emailChannels == nil || emailChannels.Len() == 0 {
 		return errors.ThrowPreconditionFailed(nil, "MAIL-83nof", "Errors.Notification.Channels.NotPresent")
 	}
 	return emailChannels.HandleMessage(message)

@@ -12,7 +12,7 @@ import (
 
 type SearchResponse struct {
 	Count uint64
-	*LatestSequence
+	*State
 }
 
 type SearchRequest struct {
@@ -44,6 +44,7 @@ func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 type SearchQuery interface {
 	toQuery(sq.SelectBuilder) sq.SelectBuilder
 	comp() sq.Sqlizer
+	Col() Column
 }
 
 type NotNullQuery struct {
@@ -67,6 +68,10 @@ func (q *NotNullQuery) comp() sq.Sqlizer {
 	return sq.NotEq{q.Column.identifier(): nil}
 }
 
+func (q *NotNullQuery) Col() Column {
+	return q.Column
+}
+
 type IsNullQuery struct {
 	Column Column
 }
@@ -86,6 +91,9 @@ func (q *IsNullQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 
 func (q *IsNullQuery) comp() sq.Sqlizer {
 	return sq.Eq{q.Column.identifier(): nil}
+}
+func (q *IsNullQuery) Col() Column {
+	return q.Column
 }
 
 type OrQuery struct {
@@ -115,6 +123,9 @@ type AndQuery struct {
 	queries []SearchQuery
 }
 
+func (q *AndQuery) Col() Column {
+	return Column{}
+}
 func NewAndQuery(queries ...SearchQuery) (*AndQuery, error) {
 	if len(queries) == 0 {
 		return nil, ErrMissingColumn
@@ -138,6 +149,9 @@ type NotQuery struct {
 	query SearchQuery
 }
 
+func (q *NotQuery) Col() Column {
+	return q.query.Col()
+}
 func NewNotQuery(query SearchQuery) (*NotQuery, error) {
 	if query == nil {
 		return nil, ErrMissingColumn
@@ -162,6 +176,10 @@ func (notQ NotQuery) ToSql() (sql string, args []interface{}, err error) {
 
 func (q *NotQuery) comp() sq.Sqlizer {
 	return q
+}
+
+func (q *OrQuery) Col() Column {
+	return Column{}
 }
 
 type ColumnComparisonQuery struct {
@@ -191,6 +209,10 @@ func (q *ColumnComparisonQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 	return query.Where(q.comp())
 }
 
+func (q *ColumnComparisonQuery) Col() Column {
+	return Column{}
+}
+
 func (s *ColumnComparisonQuery) comp() sq.Sqlizer {
 	switch s.Compare {
 	case ColumnEquals:
@@ -214,19 +236,10 @@ type InTextQuery struct {
 	Column Column
 	Values []string
 }
-type TextQuery struct {
-	Column  Column
-	Text    string
-	Compare TextComparison
-}
 
-var (
-	ErrNothingSelected = errors.New("nothing selected")
-	ErrInvalidCompare  = errors.New("invalid compare")
-	ErrMissingColumn   = errors.New("missing column")
-	ErrInvalidNumber   = errors.New("value is no number")
-	ErrEmptyValues     = errors.New("values array must not be empty")
-)
+func (q *InTextQuery) Col() Column {
+	return q.Column
+}
 
 func NewInTextQuery(col Column, values []string) (*InTextQuery, error) {
 	if len(values) == 0 {
@@ -241,6 +254,20 @@ func NewInTextQuery(col Column, values []string) (*InTextQuery, error) {
 	}, nil
 }
 
+type TextQuery struct {
+	Column  Column
+	Text    string
+	Compare TextComparison
+}
+
+var (
+	ErrNothingSelected = errors.New("nothing selected")
+	ErrInvalidCompare  = errors.New("invalid compare")
+	ErrMissingColumn   = errors.New("missing column")
+	ErrInvalidNumber   = errors.New("value is no number")
+	ErrEmptyValues     = errors.New("values array must not be empty")
+)
+
 func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery, error) {
 	if compare < 0 || compare >= textCompareMax {
 		return nil, ErrInvalidCompare
@@ -253,6 +280,10 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery,
 		Text:    value,
 		Compare: compare,
 	}, nil
+}
+
+func (q *TextQuery) Col() Column {
+	return q.Column
 }
 
 func (q *InTextQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -363,6 +394,10 @@ func NewNumberQuery(c Column, value interface{}, compare NumberComparison) (*Num
 
 func (q *NumberQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
+}
+
+func (q *NumberQuery) Col() Column {
+	return q.Column
 }
 
 func (s *NumberQuery) comp() sq.Sqlizer {
@@ -481,6 +516,10 @@ func (s *ListQuery) comp() sq.Sqlizer {
 	return nil
 }
 
+func (q *ListQuery) Col() Column {
+	return q.Column
+}
+
 type ListComparison int
 
 const (
@@ -520,6 +559,10 @@ func (q *or) comp() sq.Sqlizer {
 	return sq.Or(queries)
 }
 
+func (q *or) Col() Column {
+	return Column{}
+}
+
 type BoolQuery struct {
 	Column Column
 	Value  bool
@@ -530,6 +573,10 @@ func NewBoolQuery(c Column, value bool) (*BoolQuery, error) {
 		Column: c,
 		Value:  value,
 	}, nil
+}
+
+func (q *BoolQuery) Col() Column {
+	return q.Column
 }
 
 func (q *BoolQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {

@@ -5,9 +5,11 @@ import (
 	"database/sql"
 	errs "errors"
 	"strings"
+	"sync"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -15,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -33,7 +36,7 @@ type User struct {
 	State              domain.UserState
 	Type               domain.UserType
 	Username           string
-	LoginNames         database.StringArray
+	LoginNames         database.TextArray[string]
 	PreferredLoginName string
 	Human              *Human
 	Machine            *Machine
@@ -104,7 +107,7 @@ type NotifyUser struct {
 	State              domain.UserState
 	Type               domain.UserType
 	Username           string
-	LoginNames         database.StringArray
+	LoginNames         database.TextArray[string]
 	PreferredLoginName string
 	FirstName          string
 	LastName           string
@@ -338,8 +341,7 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.UserProjection.Trigger(ctx)
-		ctx = projection.LoginNameProjection.Trigger(ctx)
+		triggerUserProjections(ctx)
 	}
 
 	query, scan := prepareUserQuery(ctx, q.client)
@@ -370,8 +372,7 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwner
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.UserProjection.Trigger(ctx)
-		ctx = projection.LoginNameProjection.Trigger(ctx)
+		triggerUserProjections(ctx)
 	}
 
 	query, scan := prepareUserQuery(ctx, q.client)
@@ -482,8 +483,7 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		ctx = projection.UserProjection.Trigger(ctx)
-		ctx = projection.LoginNameProjection.Trigger(ctx)
+		triggerUserProjections(ctx)
 	}
 
 	query, scan := prepareNotifyUserQuery(ctx, q.client)
@@ -514,8 +514,7 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		ctx = projection.UserProjection.Trigger(ctx)
-		ctx = projection.LoginNameProjection.Trigger(ctx)
+		triggerUserProjections(ctx)
 	}
 
 	query, scan := prepareNotifyUserQuery(ctx, q.client)
@@ -563,7 +562,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, w
 		return nil, errors.ThrowInternal(err, "QUERY-AG4gs", "Errors.Internal")
 	}
 
-	users.LatestSequence, err = q.latestSequence(ctx, userTable)
+	users.State, err = q.latestState(ctx, userTable)
 	return users, err
 }
 
@@ -725,6 +724,22 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 		subSelect,
 		ListIn,
 	)
+}
+
+func triggerUserProjections(ctx context.Context) {
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+	func() {
+		_, err := projection.UserProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		wg.Done()
+	}()
+	func() {
+		_, err := projection.LoginNameProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		wg.Done()
+	}()
+	wg.Wait()
 }
 
 func prepareLoginNamesQuery() (string, []interface{}, error) {
@@ -1113,7 +1128,7 @@ func prepareNotifyUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 		func(row *sql.Row) (*NotifyUser, error) {
 			u := new(NotifyUser)
 			var count int
-			loginNames := database.StringArray{}
+			loginNames := database.TextArray[string]{}
 			preferredLoginName := sql.NullString{}
 
 			humanID := sql.NullString{}
@@ -1286,7 +1301,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 			var count uint64
 			for rows.Next() {
 				u := new(User)
-				loginNames := database.StringArray{}
+				loginNames := database.TextArray[string]{}
 				preferredLoginName := sql.NullString{}
 
 				humanID := sql.NullString{}
