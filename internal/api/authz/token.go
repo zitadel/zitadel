@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -29,6 +29,7 @@ type TokenVerifier struct {
 	clients          sync.Map
 	authMethods      MethodMapping
 	systemJWTProfile *op.JWTProfileVerifier
+	systemUsers      map[string]Memberships
 }
 
 type MembershipsResolver interface {
@@ -44,6 +45,10 @@ type authZRepo interface {
 }
 
 func Start(authZRepo authZRepo, issuer string, keys map[string]*SystemAPIUser) (v *TokenVerifier) {
+	systemUsers := make(map[string]Memberships, len(keys))
+	for userID, key := range keys {
+		systemUsers[userID] = key.Memberships
+	}
 	return &TokenVerifier{
 		authZRepo: authZRepo,
 		systemJWTProfile: op.NewJWTProfileVerifier(
@@ -55,19 +60,21 @@ func Start(authZRepo authZRepo, issuer string, keys map[string]*SystemAPIUser) (
 			1*time.Hour,
 			time.Second,
 		),
+		systemUsers: systemUsers,
 	}
 }
 
-func (v *TokenVerifier) VerifyAccessToken(ctx context.Context, token string, method string) (userID, clientID, agentID, prefLang, resourceOwner string, err error) {
-	if strings.HasPrefix(method, "/zitadel.system.v1.SystemService") {
-		userID, err := v.verifySystemToken(ctx, token)
-		if err != nil {
-			return "", "", "", "", "", err
-		}
-		return userID, "", "", "", "", nil
-	}
+func (v *TokenVerifier) VerifyAccessToken(ctx context.Context, token string) (userID, clientID, agentID, prefLang, resourceOwner string, isSystemUser bool, err error) {
 	userID, agentID, clientID, prefLang, resourceOwner, err = v.authZRepo.VerifyAccessToken(ctx, token, "", GetInstance(ctx).ProjectID())
-	return userID, clientID, agentID, prefLang, resourceOwner, err
+	if err == nil || !zitadel_errors.IsUnauthenticated(err) {
+		return userID, clientID, agentID, prefLang, resourceOwner, false, err
+	}
+	userID, sysTokenErr := v.verifySystemToken(ctx, token)
+	if sysTokenErr == nil {
+		isSystemUser = true
+		err = nil
+	}
+	return userID, "", "", "", "", isSystemUser, err
 }
 
 func (v *TokenVerifier) verifySystemToken(ctx context.Context, token string) (string, error) {
@@ -85,8 +92,9 @@ type systemJWTStorage struct {
 }
 
 type SystemAPIUser struct {
-	Path    string //if a path is specified, the key will be read from that path
-	KeyData []byte //else you can also specify the data directly in the KeyData
+	Path        string //if a path is specified, the key will be read from that path
+	KeyData     []byte //else you can also specify the data directly in the KeyData
+	Memberships Memberships
 }
 
 func (s *SystemAPIUser) readKey() (*rsa.PublicKey, error) {
@@ -94,7 +102,7 @@ func (s *SystemAPIUser) readKey() (*rsa.PublicKey, error) {
 		var err error
 		s.KeyData, err = os.ReadFile(s.Path)
 		if err != nil {
-			return nil, caos_errs.ThrowInternal(err, "AUTHZ-JK31F", "Errors.NotFound")
+			return nil, zitadel_errors.ThrowInternal(err, "AUTHZ-JK31F", "Errors.NotFound")
 		}
 	}
 	return crypto.BytesToPublicKey(s.KeyData)
@@ -107,7 +115,7 @@ func (s *systemJWTStorage) GetKeyByIDAndClientID(_ context.Context, _, userID st
 	}
 	key, ok := s.keys[userID]
 	if !ok {
-		return nil, caos_errs.ThrowNotFound(nil, "AUTHZ-asfd3", "Errors.User.NotFound")
+		return nil, zitadel_errors.ThrowNotFound(nil, "AUTHZ-asfd3", "Errors.User.NotFound")
 	}
 	defer s.mutex.Unlock()
 	s.mutex.Lock()
@@ -159,15 +167,15 @@ func (v *TokenVerifier) CheckAuthMethod(method string) (Option, bool) {
 	return authOpt, ok
 }
 
-func verifyAccessToken(ctx context.Context, token string, t *TokenVerifier, method string) (userID, clientID, agentID, prefLan, resourceOwner string, err error) {
+func verifyAccessToken(ctx context.Context, token string, t *TokenVerifier) (userID, clientID, agentID, prefLan, resourceOwner string, isSystemUser bool, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	parts := strings.Split(token, BearerPrefix)
 	if len(parts) != 2 {
-		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "AUTH-7fs1e", "invalid auth header")
+		return "", "", "", "", "", false, zitadel_errors.ThrowUnauthenticated(nil, "AUTH-7fs1e", "invalid auth header")
 	}
-	return t.VerifyAccessToken(ctx, parts[1], method)
+	return t.VerifyAccessToken(ctx, parts[1])
 }
 
 func SessionTokenVerifier(algorithm crypto.EncryptionAlgorithm) func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
@@ -181,7 +189,7 @@ func SessionTokenVerifier(algorithm crypto.EncryptionAlgorithm) func(ctx context
 		token, err = algorithm.DecryptString(decodedToken, algorithm.EncryptionKeyID())
 		spanPasswordComparison.EndWithError(err)
 		if err != nil || token != fmt.Sprintf(SessionTokenFormat, sessionID, tokenID) {
-			return caos_errs.ThrowPermissionDenied(err, "COMMAND-sGr42", "Errors.Session.Token.Invalid")
+			return zitadel_errors.ThrowPermissionDenied(err, "COMMAND-sGr42", "Errors.Session.Token.Invalid")
 		}
 		return nil
 	}

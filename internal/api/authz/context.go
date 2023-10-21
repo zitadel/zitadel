@@ -2,7 +2,6 @@ package authz
 
 import (
 	"context"
-	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
@@ -26,10 +25,11 @@ type CtxData struct {
 	AgentID           string
 	PreferredLanguage string
 	ResourceOwner     string
+	SystemMemberships Memberships
 }
 
 func (ctxData CtxData) IsZero() bool {
-	return ctxData.UserID == "" || ctxData.OrgID == ""
+	return ctxData.UserID == "" || ctxData.OrgID == "" && ctxData.SystemMemberships == nil
 }
 
 type Grants []*Grant
@@ -58,18 +58,19 @@ const (
 	MemberTypeProject
 	MemberTypeProjectGrant
 	MemberTypeIam
+	MemberTypeSystem
 )
 
-func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain string, t *TokenVerifier, method string) (_ CtxData, err error) {
+func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain string, t *TokenVerifier) (_ CtxData, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-
-	userID, clientID, agentID, prefLang, resourceOwner, err := verifyAccessToken(ctx, token, t, method)
+	userID, clientID, agentID, prefLang, resourceOwner, isSystemUser, err := verifyAccessToken(ctx, token, t)
 	if err != nil {
 		return CtxData{}, err
 	}
-	if strings.HasPrefix(method, "/zitadel.system.v1.SystemService") {
-		return CtxData{UserID: userID}, nil
+	var systemMemberships Memberships
+	if isSystemUser {
+		systemMemberships = t.systemUsers[userID]
 	}
 	var projectID string
 	var origins []string
@@ -88,19 +89,21 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 	if orgID == "" && orgDomain == "" {
 		orgID = resourceOwner
 	}
-
-	verifiedOrgID, err := t.ExistsOrg(ctx, orgID, orgDomain)
-	if err != nil {
-		return CtxData{}, errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
+	// System API calls dont't have a resource owner
+	if orgID != "" {
+		orgID, err = t.ExistsOrg(ctx, orgID, orgDomain)
+		if err != nil {
+			return CtxData{}, errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
+		}
 	}
-
 	return CtxData{
 		UserID:            userID,
-		OrgID:             verifiedOrgID,
+		OrgID:             orgID,
 		ProjectID:         projectID,
 		AgentID:           agentID,
 		PreferredLanguage: prefLang,
 		ResourceOwner:     resourceOwner,
+		SystemMemberships: systemMemberships,
 	}, nil
 
 }

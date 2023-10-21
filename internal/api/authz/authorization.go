@@ -23,7 +23,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 	ctx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	ctxData, err := VerifyTokenAndCreateCtxData(ctx, token, orgID, orgDomain, verifier, method)
+	ctxData, err := VerifyTokenAndCreateCtxData(ctx, token, orgID, orgDomain, verifier)
 	if err != nil {
 		return nil, err
 	}
