@@ -47,6 +47,10 @@ type authZRepo interface {
 func Start(authZRepo authZRepo, issuer string, keys map[string]*SystemAPIUser) (*TokenVerifier, error) {
 	systemUsers := make(map[string]Memberships, len(keys))
 	for userID, key := range keys {
+		if len(key.Memberships) == 0 {
+			systemUsers[userID] = Memberships{{MemberType: MemberTypeSystem, Roles: []string{"SYSTEM_OWNER"}}}
+			continue
+		}
 		for _, membership := range key.Memberships {
 			switch membership.MemberType {
 			case MemberTypeSystem, MemberTypeIam, MemberTypeOrganisation:
