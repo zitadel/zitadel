@@ -338,6 +338,7 @@ Login:
     # 168h is 7 days, one week
     SharedMaxAge: 168h # ZITADEL_LOGIN_CACHE_SHAREDMAXAGE
   DefaultOTPEmailURLV2: "/otp/verify?loginName={{.LoginName}}&code={{.Code}}" # ZITADEL_LOGIN_CACHE_DEFAULTOTPEMAILURLV2
+  DisableExternalIDPPanel: false # ZITADEL_LOGIN_DISABLEEXTERNALIDPPANEL
 
 Console:
   ShortCache:

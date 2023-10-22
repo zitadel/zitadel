@@ -42,6 +42,7 @@ type Login struct {
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
 	featureCheck        feature.Checker
+	config              *Config
 }
 
 type Config struct {
@@ -52,6 +53,9 @@ type Config struct {
 
 	// LoginV2
 	DefaultOTPEmailURLV2 string
+
+	// Advanced Settings
+	DisableExternalIDPPanel bool
 }
 
 const (
@@ -105,6 +109,7 @@ func CreateLogin(config Config,
 	login.router = CreateRouter(login, statikFS, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), oidcInstanceHandler, samlInstanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor, accessHandler)
 	login.renderer = CreateRenderer(HandlerPrefix, statikFS, staticStorage, config.LanguageCookieName)
 	login.parser = form.NewParser()
+	login.config = &config
 	return login, nil
 }
 

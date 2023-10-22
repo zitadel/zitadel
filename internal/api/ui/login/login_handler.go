@@ -105,6 +105,13 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *dom
 			return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowUsernamePassword
 		},
 		"hasExternalLogin": func() bool {
+			// global disable
+			// TODO: Specific IDPs for an org will be available and optionally hidden.
+			// The ExternalIDPs will not show up in the list if they are hidden.
+			// However they can still be used, if available, by passing the idp scope in the auth request.
+			if l.config.DisableExternalIDPPanel {
+				return false
+			}
 			return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
 		},
 		"hasRegistration": func() bool {
