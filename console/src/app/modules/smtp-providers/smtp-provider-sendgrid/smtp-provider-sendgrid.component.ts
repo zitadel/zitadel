@@ -24,7 +24,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'cnsl-provider-sendgrid',
   templateUrl: './smtp-provider-sendgrid.component.html',
-  styleUrls: ['./smtp-provider-sendgrid.component.scss'],
+  styleUrls: ['../smtp-provider.scss'],
 })
 export class SMTPProviderSendgridComponent implements OnInit {
   public showOptional: boolean = false;

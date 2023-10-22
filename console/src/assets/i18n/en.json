@@ -1907,7 +1907,10 @@
       "TITLE": "SMTP Provider",
       "DESCRIPTION": "Manage your SMTP Provider configuration, which can then be activated/deactivated.",
       "EMPTY": "No SMTP Provider available",
-      "ACTIVATED": "Activated"
+      "ACTIVATED": "Activated",
+      "ACTIVATE": "Activate provider",
+      "DEACTIVATE": "Dectivate provider",
+      "TYPE": "Type"
     },
     "CREATE": {
       "TITLE": "Add SMTP provider",

@@ -44,7 +44,7 @@ export class SMTPTableComponent implements OnInit {
   public IDPState: any = IDPState;
   public SMTPProviderType: any = SMTPProviderType;
   // public displayedColumns: string[] = ['availability', 'name', 'type', 'creationDate', 'changeDate', 'actions'];
-  public displayedColumns: string[] = ['activated', 'providerType', 'tls', 'host', 'senderAddress', 'senderName'];
+  public displayedColumns: string[] = ['activated', 'providerType', 'tls', 'host', 'senderAddress', 'senderName', 'actions'];
   @Output() public changedSelection: EventEmitter<Array<SMTPConfig.AsObject>> = new EventEmitter();
 
   public IDPStylingType: any = IDPStylingType;

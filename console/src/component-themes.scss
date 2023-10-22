@@ -66,6 +66,8 @@
 @import 'src/app/modules/policies/login-policy/factor-table/factor-table.component.scss';
 @import 'src/app/modules/info-overlay/info-overlay.component.scss';
 @import 'src/app/modules/create-layout/create-layout.component.scss';
+@import 'src/app/modules/smtp-table/smtp-table.component.scss';
+@import 'src/app/modules/smtp-providers/smtp-provider.scss';
 @import './styles/codemirror.scss';
 
 @mixin component-themes($theme) {
@@ -77,6 +79,8 @@
   @include header-theme($theme);
   @include app-type-radio-theme($theme);
   @include idp-table-theme($theme);
+  @include smtp-table-theme($theme);
+  @include smtp-provider-theme($theme);
   @include events-theme($theme);
   @include projects-theme($theme);
   @include top-view-theme($theme);

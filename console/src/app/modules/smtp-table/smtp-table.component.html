@@ -1,9 +1,17 @@
-<!-- TODO add timestampt to cnsl-refresh-table-->
 <cnsl-refresh-table
   [loading]="loading$ | async"
   (refreshed)="refreshPage()"
   [dataSize]="dataSource.data.length"
-  [emitRefreshOnPreviousRoutes]="['/instance/idp/create']"
+  [emitRefreshOnPreviousRoutes]="[
+    '/instance/smtpprovider/aws-ses/create',
+    '/instance/smtpprovider/generic/create',
+    '/instance/smtpprovider/google/create',
+    '/instance/smtpprovider/mailgun/create',
+    '/instance/smtpprovider/mailjet/create',
+    '/instance/smtpprovider/postmark/create',
+    '/instance/smtpprovider/sendgrid/create'
+  ]"
+  [timestamp]="configsResult?.details?.viewTimestamp"
   [selection]="selection"
   [hideRefresh]="true"
 >
@@ -15,28 +23,23 @@
         </th>
         <td class="pointer availability" mat-cell *matCellDef="let config">
           <i
-            matTooltip="{{ 'IDP.AVAILABLE' | translate }}"
+            matTooltip="{{ 'SMTP.LIST.ACTIVATED' | translate }}"
             *ngIf="config.isActive"
-            class="idp-available las la-check-circle"
-          ></i>
-          <i
-            matTooltip="{{ 'IDP.AVAILABLEBUTINACTIVE' | translate }}"
-            *ngIf="!config.isActive"
-            class="idp-not-available las la-check-circle"
+            class="smtp-available las la-check-circle"
           ></i>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="providerType">
-        <th mat-header-cell *matHeaderCellDef>{{ 'IDP.TYPE' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'SMTP.LIST.TYPE' | translate }}</th>
         <td class="pointer" mat-cell *matCellDef="let config">
           <div [ngSwitch]="config.providerType">
-            <div class="idp-table-provider-type" *ngSwitchCase="SMTPProviderType.SMTP_PROVIDER_TYPE_SENDGRID">
-              <img class="idp-logo" src="./assets/images/smtp/sendgrid.png" alt="sendgrid" />
+            <div class="smtp-table-provider-type" *ngSwitchCase="SMTPProviderType.SMTP_PROVIDER_TYPE_SENDGRID">
+              <img class="smtp-logo" src="./assets/images/smtp/sendgrid.png" alt="sendgrid" />
               Sendgrid
             </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="SMTPProviderType.SMTP_PROVIDER_TYPE_POSTMARK">
-              <img class="idp-logo" src="./assets/images/smtp/postmark.png" alt="postmark" />
+            <div class="smtp-table-provider-type" *ngSwitchCase="SMTPProviderType.SMTP_PROVIDER_TYPE_POSTMARK">
+              <img class="smtp-logo" src="./assets/images/smtp/postmark.png" alt="postmark" />
               Postmark
             </div>
           </div>
@@ -48,7 +51,8 @@
           <span>TLS</span>
         </th>
         <td class="pointer availability" mat-cell *matCellDef="let config">
-          <i *ngIf="config.tls" class="las la-check"></i>
+          <i *ngIf="config.tls" class="las la-lock"></i>
+          <i *ngIf="!config.tls" class="las la-unlock"></i>
         </td>
       </ng-container>
 
@@ -73,87 +77,40 @@
         </td>
       </ng-container>
 
-      <!-- <ng-container matColumnDef="state">
-        <th mat-header-cell *matHeaderCellDef>{{ 'IDP.STATE' | translate }}</th>
-        <td class="pointer" mat-cell *matCellDef="let idp">
-          <span
-            class="state"
-            [ngClass]="{
-              active: idp.state === IDPState.IDP_STATE_ACTIVE,
-              inactive: idp.state === IDPState.IDP_STATE_INACTIVE
-            }"
-            >{{ 'IDP.STATES.' + idp.state | translate }}</span
-          >
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="creationDate">
-        <th mat-header-cell *matHeaderCellDef>{{ 'IDP.CREATIONDATE' | translate }}</th>
-        <td class="pointer" mat-cell *matCellDef="let idp">
-          <span>{{ idp.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="changeDate">
-        <th mat-header-cell *matHeaderCellDef>{{ 'IDP.CHANGEDATE' | translate }}</th>
-        <td class="pointer" mat-cell *matCellDef="let idp">
-          <span>{{ idp.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="owner">
-        <th mat-header-cell *matHeaderCellDef>{{ 'IDP.OWNER' | translate }}</th>
-        <td class="pointer" mat-cell *matCellDef="let idp">
-          {{ 'IDP.OWNERTYPES.' + idp.owner | translate }}
-        </td>
-      </ng-container> -->
-
       <ng-container matColumnDef="actions" stickyEnd>
-        <th class="idp-table-actions" mat-header-cell *matHeaderCellDef></th>
-        <td class="idp-table-actions" mat-cell *matCellDef="let idp">
+        <th class="smtp-table-actions" mat-header-cell *matHeaderCellDef></th>
+        <td class="smtp-table-actions" mat-cell *matCellDef="let config">
           <cnsl-table-actions>
-            <!-- <button
+            <!-- (click)="addIdp(idp); $event.stopPropagation()" -->
+            <button
               actions
-              *ngIf="!isEnabled(idp)"
-              [disabled]="
-                (['iam.idp.write']
-                  | hasRole
-                  | async) === false
-              "
+              *ngIf="!config.isActive"
+              [disabled]="(['iam.idp.write'] | hasRole | async) === false"
               mat-icon-button
-              matTooltip="{{ 'IDP.SETAVAILABLE' | translate }}"
-              (click)="addIdp(idp); $event.stopPropagation()"
+              matTooltip="{{ 'SMTP.LIST.ACTIVATE' | translate }}"
             >
               <i class="las la-check-circle"></i>
-            </button> -->
-            <!-- <button
+            </button>
+            <!-- (click)="removeIdp(idp); $event.stopPropagation()" -->
+            <button
               actions
-              *ngIf="isEnabled(idp)"
-              [disabled]="
-                (['iam.idp.write']
-                  | hasRole
-                  | async) === false
-              "
+              *ngIf="config.isActive"
+              [disabled]="(['iam.idp.write'] | hasRole | async) === false"
               mat-icon-button
-              matTooltip="{{ 'IDP.SETUNAVAILABLE' | translate }}"
-              (click)="removeIdp(idp); $event.stopPropagation()"
+              matTooltip="{{ 'SMTP.LIST.DEACTIVATE' | translate }}"
             >
               <i class="las la-times-circle"></i>
-            </button> -->
-            <!-- <button
+            </button>
+            <!-- (click)="deleteIdp(idp); $event.stopPropagation()" -->
+            <button
               actions
-              *ngIf="idp.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM"
-              [disabled]="(['iam.idp.write']
-                  | hasRole
-                  | async) === false
-              "
+              [disabled]="(['iam.idp.write'] | hasRole | async) === false"
               mat-icon-button
               color="warn"
               matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
-              (click)="deleteIdp(idp); $event.stopPropagation()"
             >
               <i class="las la-trash"></i>
-            </button> -->
+            </button>
           </cnsl-table-actions>
         </td>
       </ng-container>

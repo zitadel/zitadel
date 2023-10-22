@@ -1,6 +1,6 @@
 @use '@angular/material' as mat;
 
-@mixin identity-provider-theme($theme) {
+@mixin smtp-provider-theme($theme) {
   $is-dark-theme: map-get($theme, is-dark);
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
@@ -8,5 +8,49 @@
   .stepper {
     background: inherit !important;
     margin: 0 -1.5rem;
+  }
+
+  .smtp-create-actions {
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .bck-button {
+      margin-right: 1rem;
+    }
+
+    .create-button {
+      padding: 0.5rem 4rem;
+    }
+  }
+
+  .smtp-form-field,
+  .info-section-warn {
+    max-width: 400px;
+    display: block;
+  }
+
+  .wizard-header {
+    display: flex;
+    align-items: center;
+
+    .smtp-logo {
+      margin-right: 1rem;
+      height: 48px;
+      width: 48px;
+      flex-shrink: 0;
+    }
+  }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+
+    .left,
+    .right {
+      margin-bottom: 0.5rem;
+      font-size: 14px;
+    }
   }
 }
