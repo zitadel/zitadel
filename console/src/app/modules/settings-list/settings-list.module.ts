@@ -14,7 +14,6 @@ import { LoginTextsPolicyModule } from '../policies/login-texts/login-texts.modu
 import { MessageTextsPolicyModule } from '../policies/message-texts/message-texts.module';
 import { NotificationPolicyModule } from '../policies/notification-policy/notification-policy.module';
 import { NotificationSMSProviderModule } from '../policies/notification-sms-provider/notification-sms-provider.module';
-import { NotificationSMTPProviderModule } from '../policies/notification-smtp-provider/notification-smtp-provider.module';
 import { OIDCConfigurationModule } from '../policies/oidc-configuration/oidc-configuration.module';
 import { PasswordComplexityPolicyModule } from '../policies/password-complexity-policy/password-complexity-policy.module';
 import { PasswordLockoutPolicyModule } from '../policies/password-lockout-policy/password-lockout-policy.module';
@@ -49,7 +48,6 @@ import { SMTPSettingsModule } from '../policies/smtp-settings/smtp-settings.modu
     DomainPolicyModule,
     TranslateModule,
     HasRolePipeModule,
-    NotificationSMTPProviderModule,
     NotificationSMSProviderModule,
     OIDCConfigurationModule,
     SecretGeneratorModule,
