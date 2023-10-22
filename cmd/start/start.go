@@ -317,7 +317,10 @@ func startAPIs(
 	}
 	// always set the origin in the context if available in the http headers, no matter for what protocol
 	router.Use(middleware.OriginHandler)
-	verifier := internal_authz.Start(repo, http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
+	verifier, err := internal_authz.Start(repo, http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
+	if err != nil {
+		return err
+	}
 	tlsConfig, err := config.TLS.Config()
 	if err != nil {
 		return err

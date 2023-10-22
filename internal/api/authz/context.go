@@ -70,7 +70,14 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 	}
 	var systemMemberships Memberships
 	if isSystemUser {
-		systemMemberships = t.systemUsers[userID]
+		systemMemberships = make(Memberships, 0, len(t.systemUsers[userID]))
+		for _, membership := range t.systemUsers[userID] {
+			if membership.MemberType == MemberTypeSystem ||
+				membership.MemberType == MemberTypeIam && GetInstance(ctx).InstanceID() == membership.AggregateID ||
+				membership.MemberType == MemberTypeOrganisation && orgID == membership.AggregateID {
+				systemMemberships = append(systemMemberships, membership)
+			}
+		}
 	}
 	var projectID string
 	var origins []string

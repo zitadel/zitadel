@@ -44,10 +44,17 @@ type authZRepo interface {
 	ExistsOrg(ctx context.Context, id, domain string) (string, error)
 }
 
-func Start(authZRepo authZRepo, issuer string, keys map[string]*SystemAPIUser) (v *TokenVerifier) {
+func Start(authZRepo authZRepo, issuer string, keys map[string]*SystemAPIUser) (*TokenVerifier, error) {
 	systemUsers := make(map[string]Memberships, len(keys))
 	for userID, key := range keys {
-		systemUsers[userID] = key.Memberships
+		for _, membership := range key.Memberships {
+			switch membership.MemberType {
+			case MemberTypeSystem, MemberTypeIam, MemberTypeOrganisation:
+				systemUsers[userID] = key.Memberships
+			default:
+				return nil, fmt.Errorf("for system users, only the membership types 1 MemberTypeOrganisation, 4 MemberTypeIam and 5 MemberTypeSystem are supported")
+			}
+		}
 	}
 	return &TokenVerifier{
 		authZRepo: authZRepo,
@@ -61,7 +68,7 @@ func Start(authZRepo authZRepo, issuer string, keys map[string]*SystemAPIUser) (
 			time.Second,
 		),
 		systemUsers: systemUsers,
-	}
+	}, nil
 }
 
 func (v *TokenVerifier) VerifyAccessToken(ctx context.Context, token string) (userID, clientID, agentID, prefLang, resourceOwner string, isSystemUser bool, err error) {
