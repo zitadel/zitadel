@@ -398,6 +398,7 @@ SystemAPIUsers:
 #       - MemberType: System
 #         Roles:
 #           - "SYSTEM_OWNER"
+#           # Actually, we don't recommend adding IAM_OWNER and ORG_OWNER to the System membership, as this basically enables god mode for the system user
 #           - "IAM_OWNER"
 #           - "ORG_OWNER"
 #       # MemberType IAM and Organization let you restrict access to a specific instance or organization by specifying the AggregateID
