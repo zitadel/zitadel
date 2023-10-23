@@ -310,10 +310,11 @@ func startAPIs(
 		authZRepo,
 		queries,
 	}
+	oidcPrefixes := []string{"/.well-known/openid-configuration", "/oidc/v1", "/oauth/v2"}
 	// always set the origin in the context if available in the http headers, no matter for what protocol
 	router.Use(middleware.OriginHandler)
 	// adds used HTTPPathPattern and RequestMethod to context
-	router.Use(middleware.ActivityHandler)
+	router.Use(middleware.ActivityHandler(append(oidcPrefixes, saml.HandlerPrefix, admin.GatewayPathPrefix(), management.GatewayPathPrefix())))
 	verifier := internal_authz.Start(repo, http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
 	tlsConfig, err := config.TLS.Config()
 	if err != nil {
@@ -402,7 +403,7 @@ func startAPIs(
 	if err != nil {
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}
-	apis.RegisterHandlerPrefixes(oidcProvider.HttpHandler(), "/.well-known/openid-configuration", "/oidc/v1", "/oauth/v2")
+	apis.RegisterHandlerPrefixes(oidcProvider.HttpHandler(), oidcPrefixes...)
 
 	samlProvider, err := saml.NewProvider(config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor, limitingAccessInterceptor)
 	if err != nil {

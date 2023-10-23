@@ -65,6 +65,11 @@ func TriggerWithContext(ctx context.Context, trigger TriggerMethod) {
 	path, _ := info.HTTPPathFromContext()(ctx)
 	reqMethod, _ := info.RequestMethodFromContext()(ctx)
 	method, _ := info.RPCMethodFromContext()(ctx)
+	// if GRPC call, path is prefilled with the grpc fullmethod and method is empty
+	if method == "" {
+		method = path
+		path = ""
+	}
 	logging.WithFields(
 		"instance", authz.GetInstance(ctx).InstanceID(),
 		"org", data.OrgID,

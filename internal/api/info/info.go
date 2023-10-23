@@ -14,8 +14,26 @@ func HTTPPathFromContext() func(context.Context) (string, bool) {
 	return runtime.HTTPPathPattern
 }
 
-func RPCMethodFromContext() func(context.Context) (string, bool) {
-	return runtime.RPCMethod
+type rpcMethodKey struct{}
+
+func RPCMethodFromContext() func(ctx context.Context) (string, bool) {
+	return func(ctx context.Context) (string, bool) {
+		m := ctx.Value(rpcMethodKey{})
+		if m == nil {
+			return "", false
+		}
+		ms, ok := m.(string)
+		if !ok {
+			return "", false
+		}
+		return ms, true
+	}
+}
+
+func RPCMethodIntoContext(method string) runtime.AnnotateContextOption {
+	return func(ctx context.Context) context.Context {
+		return context.WithValue(ctx, rpcMethodKey{}, method)
+	}
 }
 
 type requestMethodKey struct{}
