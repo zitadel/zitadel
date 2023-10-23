@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
@@ -49,7 +51,7 @@ func equalStringArray(a, b []string) bool {
 func Test_GetUserPermissions(t *testing.T) {
 	type args struct {
 		ctxData      CtxData
-		verifier     *TokenVerifier
+		verifier     func(t *testing.T) *TokenVerifier
 		requiredPerm string
 		authConfig   Config
 	}
@@ -64,11 +66,15 @@ func Test_GetUserPermissions(t *testing.T) {
 			name: "Empty Context",
 			args: args{
 				ctxData: CtxData{},
-				verifier: Start(&testVerifier{memberships: []*Membership{
-					{
-						Roles: []string{"ORG_OWNER"},
-					},
-				}}, "", nil),
+				verifier: func(t *testing.T) *TokenVerifier {
+					v, err := Start(&testVerifier{memberships: []*Membership{
+						{
+							Roles: []string{"ORG_OWNER"},
+						},
+					}}, "", nil)
+					assert.NoErrorf(t, err, "unexpected error: %v", err)
+					return v
+				},
 				requiredPerm: "project.read",
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
@@ -90,8 +96,12 @@ func Test_GetUserPermissions(t *testing.T) {
 		{
 			name: "No Grants",
 			args: args{
-				ctxData:      CtxData{},
-				verifier:     Start(&testVerifier{memberships: []*Membership{}}, "", nil),
+				ctxData: CtxData{},
+				verifier: func(t *testing.T) *TokenVerifier {
+					v, err := Start(&testVerifier{memberships: []*Membership{}}, "", nil)
+					assert.NoErrorf(t, err, "unexpected error: %v", err)
+					return v
+				},
 				requiredPerm: "project.read",
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
@@ -112,14 +122,18 @@ func Test_GetUserPermissions(t *testing.T) {
 			name: "Get Permissions",
 			args: args{
 				ctxData: CtxData{UserID: "userID", OrgID: "orgID"},
-				verifier: Start(&testVerifier{memberships: []*Membership{
-					{
-						AggregateID: "IAM",
-						ObjectID:    "IAM",
-						MemberType:  MemberTypeIam,
-						Roles:       []string{"IAM_OWNER"},
-					},
-				}}, "", nil),
+				verifier: func(t *testing.T) *TokenVerifier {
+					v, err := Start(&testVerifier{memberships: []*Membership{
+						{
+							AggregateID: "IAM",
+							ObjectID:    "IAM",
+							MemberType:  MemberTypeIam,
+							Roles:       []string{"IAM_OWNER"},
+						},
+					}}, "", nil)
+					assert.NoErrorf(t, err, "unexpected error: %v", err)
+					return v
+				},
 				requiredPerm: "project.read",
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
@@ -139,7 +153,7 @@ func Test_GetUserPermissions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, perms, err := getUserPermissions(context.Background(), tt.args.verifier, tt.args.requiredPerm, tt.args.authConfig.RolePermissionMappings, tt.args.ctxData, tt.args.ctxData.OrgID)
+			_, perms, err := getUserPermissions(context.Background(), tt.args.verifier(t), tt.args.requiredPerm, tt.args.authConfig.RolePermissionMappings, tt.args.ctxData, tt.args.ctxData.OrgID)
 
 			if tt.wantErr && err == nil {
 				t.Errorf("got wrong result, should get err: actual: %v ", err)

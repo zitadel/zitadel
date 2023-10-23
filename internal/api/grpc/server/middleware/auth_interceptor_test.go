@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
@@ -44,7 +46,7 @@ func Test_authorize(t *testing.T) {
 		req         interface{}
 		info        *grpc.UnaryServerInfo
 		handler     grpc.UnaryHandler
-		verifier    *authz.TokenVerifier
+		verifier    func(t *testing.T) *authz.TokenVerifier
 		authConfig  authz.Config
 		authMethods authz.MethodMapping
 	}
@@ -64,11 +66,12 @@ func Test_authorize(t *testing.T) {
 				req:     &mockReq{},
 				info:    mockInfo("/no/token/needed"),
 				handler: emptyMockHandler,
-				verifier: func() *authz.TokenVerifier {
-					verifier := authz.Start(&verifierMock{}, "", nil)
+				verifier: func(t *testing.T) *authz.TokenVerifier {
+					verifier, err := authz.Start(&verifierMock{}, "", nil)
+					assert.NoErrorf(t, err, "unexpected error: %v", err)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{})
 					return verifier
-				}(),
+				},
 				authMethods: mockMethods,
 			},
 			res{
@@ -83,11 +86,12 @@ func Test_authorize(t *testing.T) {
 				req:     &mockReq{},
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
-				verifier: func() *authz.TokenVerifier {
-					verifier := authz.Start(&verifierMock{}, "", nil)
+				verifier: func(t *testing.T) *authz.TokenVerifier {
+					verifier, err := authz.Start(&verifierMock{}, "", nil)
+					assert.NoErrorf(t, err, "unexpected error: %v", err)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
 					return verifier
-				}(),
+				},
 				authConfig:  authz.Config{},
 				authMethods: mockMethods,
 			},
@@ -103,11 +107,12 @@ func Test_authorize(t *testing.T) {
 				req:     &mockReq{},
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
-				verifier: func() *authz.TokenVerifier {
-					verifier := authz.Start(&verifierMock{}, "", nil)
+				verifier: func(t *testing.T) *authz.TokenVerifier {
+					verifier, err := authz.Start(&verifierMock{}, "", nil)
+					assert.NoErrorf(t, err, "unexpected error: %v", err)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
 					return verifier
-				}(),
+				},
 				authConfig:  authz.Config{},
 				authMethods: mockMethods,
 			},
@@ -123,11 +128,12 @@ func Test_authorize(t *testing.T) {
 				req:     &mockReq{},
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
-				verifier: func() *authz.TokenVerifier {
-					verifier := authz.Start(&verifierMock{}, "", nil)
+				verifier: func(t *testing.T) *authz.TokenVerifier {
+					verifier, err := authz.Start(&verifierMock{}, "", nil)
+					assert.NoErrorf(t, err, "unexpected error: %v", err)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
 					return verifier
-				}(),
+				},
 				authConfig:  authz.Config{},
 				authMethods: mockMethods,
 			},
@@ -139,7 +145,7 @@ func Test_authorize(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := authorize(tt.args.ctx, tt.args.req, tt.args.info, tt.args.handler, tt.args.verifier, tt.args.authConfig)
+			got, err := authorize(tt.args.ctx, tt.args.req, tt.args.info, tt.args.handler, tt.args.verifier(t), tt.args.authConfig)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("authorize() error = %v, wantErr %v", err, tt.res.wantErr)
 				return

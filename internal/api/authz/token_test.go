@@ -14,7 +14,6 @@ func Test_VerifyAccessToken(t *testing.T) {
 		ctx      context.Context
 		token    string
 		verifier *TokenVerifier
-		method   string
 	}
 	tests := []struct {
 		name    string
@@ -51,14 +50,13 @@ func Test_VerifyAccessToken(t *testing.T) {
 					}(),
 					authMethods: MethodMapping{"/service/method": Option{Permission: "authenticated"}},
 				},
-				method: "/service/method",
 			},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, _, _, _, _, err := verifyAccessToken(tt.args.ctx, tt.args.token, tt.args.verifier, tt.args.method)
+			_, _, _, _, _, _, err := verifyAccessToken(tt.args.ctx, tt.args.token, tt.args.verifier)
 			if tt.wantErr && err == nil {
 				t.Errorf("got wrong result, should get err: actual: %v ", err)
 			}
