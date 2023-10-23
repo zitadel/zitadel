@@ -73,6 +73,7 @@ type AccessTokenVerifier interface {
 	VerifyAccessToken(ctx context.Context, token string) (userID, clientID, agentID, prefLan, resourceOwner string, err error)
 }
 
+// AccessTokenVerifierFunc implements the SystemTokenVerifier interface so that a function can be used as a AccessTokenVerifier.
 type AccessTokenVerifierFunc func(context.Context, string) (string, string, string, string, string, error)
 
 func (a AccessTokenVerifierFunc) VerifyAccessToken(ctx context.Context, token string) (string, string, string, string, string, error) {
@@ -83,6 +84,7 @@ type SystemTokenVerifier interface {
 	VerifySystemToken(ctx context.Context, token string, orgID string) (matchingMemberships Memberships, userID string, err error)
 }
 
+// SystemTokenVerifierFunc implements the SystemTokenVerifier interface so that a function can be used as a SystemTokenVerifier.
 type SystemTokenVerifierFunc func(context.Context, string, string) (Memberships, string, error)
 
 func (s SystemTokenVerifierFunc) VerifySystemToken(ctx context.Context, token string, orgID string) (Memberships, string, error) {
