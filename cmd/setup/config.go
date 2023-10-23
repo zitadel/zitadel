@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -45,7 +46,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
-			hook.StringToFeatureHookFunc(),
+			hook.EnumHookFunc(domain.FeatureString),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")
@@ -101,7 +102,7 @@ func MustNewSteps(v *viper.Viper) *Steps {
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
-			hook.StringToFeatureHookFunc(),
+			hook.EnumHookFunc(domain.FeatureString),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read steps")
