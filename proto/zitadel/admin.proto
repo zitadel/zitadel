@@ -418,7 +418,7 @@ service AdminService {
 
     rpc RemoveSMTPConfig(RemoveSMTPConfigRequest) returns (RemoveSMTPConfigResponse) {
         option (google.api.http) = {
-            delete: "/smtp";
+            delete: "/smtp/{id}";
         };
 
         option (zitadel.v1.auth_option) = {
@@ -4066,8 +4066,9 @@ message UpdateSMTPConfigPasswordResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-//this is an empty request
-message RemoveSMTPConfigRequest {}
+message RemoveSMTPConfigRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
 
 message RemoveSMTPConfigResponse {
     zitadel.v1.ObjectDetails details = 1;

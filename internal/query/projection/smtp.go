@@ -13,13 +13,13 @@ import (
 const (
 	SMTPConfigProjectionTable = "projections.smtp_configs2"
 
+	SMTPConfigColumnID             = "id"
 	SMTPConfigColumnAggregateID    = "aggregate_id"
 	SMTPConfigColumnCreationDate   = "creation_date"
 	SMTPConfigColumnChangeDate     = "change_date"
 	SMTPConfigColumnSequence       = "sequence"
 	SMTPConfigColumnResourceOwner  = "resource_owner"
 	SMTPConfigColumnInstanceID     = "instance_id"
-	SMTPConfigColumnConfigID       = "config_id"
 	SMTPConfigColumnTLS            = "tls"
 	SMTPConfigColumnSenderAddress  = "sender_address"
 	SMTPConfigColumnSenderName     = "sender_name"
@@ -43,13 +43,13 @@ func newSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerCo
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(SMTPConfigColumnID, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnAggregateID, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(SMTPConfigColumnChangeDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(SMTPConfigColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(SMTPConfigColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(SMTPConfigColumnConfigID, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnTLS, crdb.ColumnTypeBool),
 			crdb.NewColumn(SMTPConfigColumnSenderAddress, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnSenderName, crdb.ColumnTypeText),
@@ -60,7 +60,7 @@ func newSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerCo
 			crdb.NewColumn(SMTPConfigColumnIsActive, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(SMTPConfigColumnProviderType, crdb.ColumnTypeEnum, crdb.Default(SMTP_PROVIDER_TYPE_GENERIC)),
 		},
-			crdb.NewPrimaryKey(SMTPConfigColumnInstanceID, SMTPConfigColumnAggregateID, SMTPConfigColumnConfigID),
+			crdb.NewPrimaryKey(SMTPConfigColumnInstanceID, SMTPConfigColumnID),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -111,7 +111,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 			handler.NewCol(SMTPConfigColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(SMTPConfigColumnSequence, e.Sequence()),
-			handler.NewCol(SMTPConfigColumnConfigID, e.ConfigID),
+			handler.NewCol(SMTPConfigColumnID, e.ID),
 			handler.NewCol(SMTPConfigColumnTLS, e.TLS),
 			handler.NewCol(SMTPConfigColumnSenderAddress, e.SenderAddress),
 			handler.NewCol(SMTPConfigColumnSenderName, e.SenderName),
@@ -196,6 +196,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigRemoved(event eventstore.Event) (
 	return crdb.NewDeleteStatement(
 		e,
 		[]handler.Condition{
+			handler.NewCond(SMTPConfigColumnID, e.ID),
 			handler.NewCond(SMTPConfigColumnAggregateID, e.Aggregate().ID),
 			handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 		},

@@ -21,7 +21,7 @@ const (
 type SMTPConfigAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ConfigID       string              `json:"configID,omitempty"`
+	ID             string              `json:"id,omitempty"`
 	SenderAddress  string              `json:"senderAddress,omitempty"`
 	SenderName     string              `json:"senderName,omitempty"`
 	ReplyToAddress string              `json:"replyToAddress,omitempty"`
@@ -36,7 +36,7 @@ type SMTPConfigAddedEvent struct {
 func NewSMTPConfigAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	configID string,
+	id string,
 	tls bool,
 	senderAddress,
 	senderName,
@@ -53,7 +53,7 @@ func NewSMTPConfigAddedEvent(
 			aggregate,
 			SMTPConfigAddedEventType,
 		),
-		ConfigID:       configID,
+		ID:             id,
 		TLS:            tls,
 		SenderAddress:  senderAddress,
 		SenderName:     senderName,
@@ -235,11 +235,13 @@ func SMTPConfigPasswordChangedEventMapper(event *repository.Event) (eventstore.E
 
 type SMTPConfigRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+	ID                   string `json:"id,omitempty"`
 }
 
 func NewSMTPConfigRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	id string,
 ) *SMTPConfigRemovedEvent {
 	return &SMTPConfigRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -247,6 +249,7 @@ func NewSMTPConfigRemovedEvent(
 			aggregate,
 			SMTPConfigRemovedEventType,
 		),
+		ID: id,
 	}
 }
 

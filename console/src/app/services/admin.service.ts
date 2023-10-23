@@ -186,6 +186,8 @@ import {
   RemoveSecondFactorFromLoginPolicyResponse,
   RemoveSMSProviderRequest,
   RemoveSMSProviderResponse,
+  RemoveSMTPConfigRequest,
+  RemoveSMTPConfigResponse,
   ResetCustomDomainPolicyToDefaultRequest,
   ResetCustomDomainPolicyToDefaultResponse,
   ResetCustomLoginTextsToDefaultRequest,
@@ -864,6 +866,12 @@ export class AdminService {
 
   public updateSMTPConfigPassword(req: UpdateSMTPConfigPasswordRequest): Promise<UpdateSMTPConfigPasswordResponse.AsObject> {
     return this.grpcService.admin.updateSMTPConfigPassword(req, null).then((resp) => resp.toObject());
+  }
+
+  public removeSMTPConfig(id: string): Promise<RemoveSMTPConfigResponse.AsObject> {
+    const req = new RemoveSMTPConfigRequest();
+    req.setId(id);
+    return this.grpcService.admin.removeSMTPConfig(req, null).then((resp) => resp.toObject());
   }
 
   /* sms */

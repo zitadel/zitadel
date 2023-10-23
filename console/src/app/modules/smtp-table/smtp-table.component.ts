@@ -25,6 +25,7 @@ import { PageEvent, PaginatorComponent } from '../paginator/paginator.component'
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { ListSMTPConfigsRequest, ListSMTPConfigsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { SMTPConfig } from 'src/app/proto/generated/zitadel/settings_pb';
+import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 
 @Component({
   selector: 'cnsl-smtp-table',
@@ -32,7 +33,6 @@ import { SMTPConfig } from 'src/app/proto/generated/zitadel/settings_pb';
   styleUrls: ['./smtp-table.component.scss'],
 })
 export class SMTPTableComponent implements OnInit {
-  @Input() service!: AdminService | ManagementService;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   public dataSource: MatTableDataSource<SMTPConfig.AsObject> = new MatTableDataSource<SMTPConfig.AsObject>();
   public selection: SelectionModel<SMTPConfig.AsObject> = new SelectionModel<SMTPConfig.AsObject>(true, []);
@@ -53,6 +53,7 @@ export class SMTPTableComponent implements OnInit {
   private reloadIDPs$: Subject<void> = new Subject();
 
   constructor(
+    private adminService: AdminService,
     private workflowService: OverlayWorkflowService,
     public translate: TranslateService,
     private toast: ToastService,
@@ -112,6 +113,34 @@ export class SMTPTableComponent implements OnInit {
   //     });
   // }
 
+  public deleteSMTPConfig(id: string, senderName: string): void {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'SMTP.LIST.DIALOG.DELETE_TITLE',
+        descriptionKey: 'SMTP.LIST.DIALOG.DELETE_DESCRIPTION',
+        confirmationKey: 'SMTP.LIST.DIALOG.SENDER',
+        confirmation: senderName,
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.adminService
+          .removeSMTPConfig(id)
+          .then(() => {
+            this.toast.showInfo('SMTP.LIST.DIALOG.DELETED', true);
+            this.refreshPage();
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
+    });
+  }
+
   // public deleteIdp(idp: IDP.AsObject): void {
   //   const dialogRef = this.dialog.open(WarnDialogComponent, {
   //     data: {
@@ -148,7 +177,7 @@ export class SMTPTableComponent implements OnInit {
     lq.setOffset(offset);
     lq.setLimit(limit);
     req.setQuery(lq);
-    (this.service as AdminService)
+    this.adminService
       .listSMTPConfigs()
       .then((resp) => {
         this.configsResult = resp;

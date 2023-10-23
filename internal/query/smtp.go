@@ -55,8 +55,8 @@ var (
 		name:  projection.SMTPConfigColumnSequence,
 		table: smtpConfigsTable,
 	}
-	SMTPConfigColumnConfigID = Column{
-		name:  projection.SMTPConfigColumnConfigID,
+	SMTPConfigColumnID = Column{
+		name:  projection.SMTPConfigColumnID,
 		table: smtpConfigsTable,
 	}
 	SMTPConfigColumnTLS = Column{
@@ -103,7 +103,7 @@ type SMTPConfig struct {
 	ChangeDate     time.Time
 	ResourceOwner  string
 	Sequence       uint64
-	ConfigID       string
+	ID             string
 	TLS            bool
 	SenderAddress  string
 	SenderName     string
@@ -140,12 +140,12 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 	password := new(crypto.CryptoValue)
 
 	return sq.Select(
+			SMTPConfigColumnID.identifier(),
 			SMTPConfigColumnAggregateID.identifier(),
 			SMTPConfigColumnCreationDate.identifier(),
 			SMTPConfigColumnChangeDate.identifier(),
 			SMTPConfigColumnResourceOwner.identifier(),
 			SMTPConfigColumnSequence.identifier(),
-			SMTPConfigColumnConfigID.identifier(),
 			SMTPConfigColumnTLS.identifier(),
 			SMTPConfigColumnSenderAddress.identifier(),
 			SMTPConfigColumnSenderName.identifier(),
@@ -160,6 +160,7 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 		func(row *sql.Row) (*SMTPConfig, error) {
 			config := new(SMTPConfig)
 			err := row.Scan(
+				&config.ID,
 				&config.AggregateID,
 				&config.CreationDate,
 				&config.ChangeDate,
@@ -188,12 +189,12 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 
 func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*SMTPConfigs, error)) {
 	return sq.Select(
+			SMTPConfigColumnID.identifier(),
 			SMTPConfigColumnAggregateID.identifier(),
 			SMTPConfigColumnCreationDate.identifier(),
 			SMTPConfigColumnChangeDate.identifier(),
 			SMTPConfigColumnResourceOwner.identifier(),
 			SMTPConfigColumnSequence.identifier(),
-			SMTPConfigColumnConfigID.identifier(),
 			SMTPConfigColumnTLS.identifier(),
 			SMTPConfigColumnSenderAddress.identifier(),
 			SMTPConfigColumnSenderName.identifier(),
@@ -211,11 +212,11 @@ func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			for rows.Next() {
 				config := new(SMTPConfig)
 				err := rows.Scan(
+					&config.ID,
 					&config.AggregateID,
 					&config.CreationDate,
 					&config.ChangeDate,
 					&config.ResourceOwner,
-					&config.ConfigID,
 					&config.Sequence,
 					&config.TLS,
 					&config.SenderAddress,

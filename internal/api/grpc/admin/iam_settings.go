@@ -82,8 +82,8 @@ func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPC
 	}, nil
 }
 
-func (s *Server) RemoveSMTPConfig(ctx context.Context, _ *admin_pb.RemoveSMTPConfigRequest) (*admin_pb.RemoveSMTPConfigResponse, error) {
-	details, err := s.command.RemoveSMTPConfig(ctx)
+func (s *Server) RemoveSMTPConfig(ctx context.Context, req *admin_pb.RemoveSMTPConfigRequest) (*admin_pb.RemoveSMTPConfigResponse, error) {
+	details, err := s.command.RemoveSMTPConfig(ctx, req)
 	if err != nil {
 		return nil, err
 	}

@@ -11,7 +11,7 @@ import (
 
 type InstanceSMTPConfigWriteModel struct {
 	eventstore.WriteModel
-
+	ID             string
 	SenderAddress  string
 	SenderName     string
 	ReplyToAddress string
@@ -28,13 +28,14 @@ type InstanceSMTPConfigWriteModel struct {
 	smtpSenderAddressMatchesInstanceDomain bool
 }
 
-func NewInstanceSMTPConfigWriteModel(instanceID, domain string) *InstanceSMTPConfigWriteModel {
+func NewInstanceSMTPConfigWriteModel(instanceID, id, domain string) *InstanceSMTPConfigWriteModel {
 	return &InstanceSMTPConfigWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   instanceID,
 			ResourceOwner: instanceID,
 		},
 		domain: domain,
+		ID:     id,
 	}
 }
 

@@ -85,7 +85,7 @@
             <button
               actions
               *ngIf="!config.isActive"
-              [disabled]="(['iam.idp.write'] | hasRole | async) === false"
+              [disabled]="(['iam.write'] | hasRole | async) === false"
               mat-icon-button
               matTooltip="{{ 'SMTP.LIST.ACTIVATE' | translate }}"
             >
@@ -95,19 +95,21 @@
             <button
               actions
               *ngIf="config.isActive"
-              [disabled]="(['iam.idp.write'] | hasRole | async) === false"
+              [disabled]="(['iam.write'] | hasRole | async) === false"
               mat-icon-button
               matTooltip="{{ 'SMTP.LIST.DEACTIVATE' | translate }}"
             >
               <i class="las la-times-circle"></i>
             </button>
+
             <!-- (click)="deleteIdp(idp); $event.stopPropagation()" -->
             <button
               actions
-              [disabled]="(['iam.idp.write'] | hasRole | async) === false"
+              [disabled]="(['iam.write'] | hasRole | async) === false"
               mat-icon-button
               color="warn"
               matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+              (click)="deleteSMTPConfig(config.id, config.senderName); $event.stopPropagation()"
             >
               <i class="las la-trash"></i>
             </button>

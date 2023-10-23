@@ -1910,7 +1910,13 @@
       "ACTIVATED": "Activated",
       "ACTIVATE": "Activate provider",
       "DEACTIVATE": "Dectivate provider",
-      "TYPE": "Type"
+      "TYPE": "Type",
+      "DIALOG": {
+        "DELETE_TITLE": "Delete SMTP config",
+        "DELETE_DESCRIPTION": "You are about to delete a configuration. Confirm this action typing the sender name",
+        "DELETED": "SMTP config has been deleted",
+        "SENDER": "Type {{value}}, to delete this SMTP configuration."
+      }
     },
     "CREATE": {
       "TITLE": "Add SMTP provider",

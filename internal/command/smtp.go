@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.Config) (*domain.ObjectDetails, error) {
@@ -53,7 +54,8 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *smtp.Config) (*
 
 func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	smtpConfigWriteModel, err := getSMTPConfigWriteModel(ctx, c.eventstore.Filter, "")
+	// TODO @n40lab empty string ID or not?
+	smtpConfigWriteModel, err := getSMTPConfigWriteModel(ctx, c.eventstore.Filter, "", "")
 	if err != nil {
 		return nil, err
 	}
@@ -81,9 +83,9 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string
 	}, nil
 }
 
-func (c *Commands) RemoveSMTPConfig(ctx context.Context) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveSMTPConfig(ctx context.Context, req *admin_pb.RemoveSMTPConfigRequest) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareRemoveSMTPConfig(instanceAgg)
+	validation := c.prepareRemoveSMTPConfig(instanceAgg, req.Id)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -114,7 +116,8 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, reply
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			fromSplitted := strings.Split(from, "@")
 			senderDomain := fromSplitted[len(fromSplitted)-1]
-			writeModel, err := getSMTPConfigWriteModel(ctx, filter, senderDomain)
+			// TODO @n40lab empty string ID or not?
+			writeModel, err := getSMTPConfigWriteModel(ctx, filter, "", senderDomain)
 			if err != nil {
 				return nil, err
 			}
@@ -170,7 +173,8 @@ func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, re
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			fromSplitted := strings.Split(from, "@")
 			senderDomain := fromSplitted[len(fromSplitted)-1]
-			writeModel, err := getSMTPConfigWriteModel(ctx, filter, senderDomain)
+			// TODO @n40lab empty string ID or not?
+			writeModel, err := getSMTPConfigWriteModel(ctx, filter, "", senderDomain)
 			if err != nil {
 				return nil, err
 			}
@@ -206,18 +210,20 @@ func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, re
 	}
 }
 
-func (c *Commands) prepareRemoveSMTPConfig(a *instance.Aggregate) preparation.Validation {
+func (c *Commands) prepareRemoveSMTPConfig(a *instance.Aggregate, id string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := getSMTPConfigWriteModel(ctx, filter, "")
+			writeModel, err := getSMTPConfigWriteModel(ctx, filter, id, "")
 			if err != nil {
 				return nil, err
 			}
+
+			// TODO @n40lab how to check if state is valid before delete
 			if writeModel.State != domain.SMTPConfigStateActive {
 				return nil, errors.ThrowNotFound(nil, "INST-Sfefg", "Errors.SMTPConfig.NotFound")
 			}
 			return []eventstore.Command{
-				instance.NewSMTPConfigRemovedEvent(ctx, &a.Aggregate),
+				instance.NewSMTPConfigRemovedEvent(ctx, &a.Aggregate, id),
 			}, nil
 		}, nil
 	}
@@ -233,8 +239,8 @@ func checkSenderAddress(writeModel *InstanceSMTPConfigWriteModel) error {
 	return nil
 }
 
-func getSMTPConfigWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, domain string) (_ *InstanceSMTPConfigWriteModel, err error) {
-	writeModel := NewInstanceSMTPConfigWriteModel(authz.GetInstance(ctx).InstanceID(), domain)
+func getSMTPConfigWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, id, domain string) (_ *InstanceSMTPConfigWriteModel, err error) {
+	writeModel := NewInstanceSMTPConfigWriteModel(authz.GetInstance(ctx).InstanceID(), id, domain)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
 		return nil, err
