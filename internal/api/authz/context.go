@@ -5,6 +5,7 @@ package authz
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
@@ -96,11 +97,15 @@ func (s SystemTokenVerifierFunc) VerifySystemToken(ctx context.Context, token st
 func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain string, t APITokenVerifier) (_ CtxData, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	userID, clientID, agentID, prefLang, resourceOwner, err := verifyAccessToken(ctx, token, t)
+	tokenWOBearer, err := extractBearerToken(token)
+	if err != nil {
+		return CtxData{}, err
+	}
+	userID, clientID, agentID, prefLang, resourceOwner, err := t.VerifyAccessToken(ctx, tokenWOBearer)
 	var sysMemberships Memberships
 	if err != nil {
 		var sysTokenErr error
-		sysMemberships, userID, sysTokenErr = t.VerifySystemToken(ctx, token, userID)
+		sysMemberships, userID, sysTokenErr = t.VerifySystemToken(ctx, tokenWOBearer, orgID)
 		err = errors.Join(err, sysTokenErr)
 		if sysTokenErr == nil && sysMemberships != nil {
 			err = nil
@@ -158,11 +163,6 @@ func GetRequestPermissionsFromCtx(ctx context.Context) []string {
 	return ctxPermission
 }
 
-func GetAllPermissionsFromCtx(ctx context.Context) []string {
-	ctxPermission, _ := ctx.Value(allPermissionsKey).([]string)
-	return ctxPermission
-}
-
 func checkOrigin(ctx context.Context, origins []string) error {
 	origin := grpc.GetGatewayHeader(ctx, http_util.Origin)
 	if origin == "" {
@@ -175,4 +175,12 @@ func checkOrigin(ctx context.Context, origins []string) error {
 		return nil
 	}
 	return zitadel_errors.ThrowPermissionDenied(nil, "AUTH-DZG21", "Errors.OriginNotAllowed")
+}
+
+func extractBearerToken(token string) (part string, err error) {
+	parts := strings.Split(token, BearerPrefix)
+	if len(parts) != 2 {
+		return "", zitadel_errors.ThrowUnauthenticated(nil, "AUTH-7fs1e", "invalid auth header")
+	}
+	return parts[1], nil
 }

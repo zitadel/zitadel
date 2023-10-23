@@ -2,9 +2,7 @@ package authz
 
 import (
 	"context"
-	"strings"
 
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -35,21 +33,12 @@ func StartAccessTokenVerifierFromRepo(authZRepo authZRepo) *AccessTokenVerifierF
 }
 
 func (a *AccessTokenVerifierFromRepo) VerifyAccessToken(ctx context.Context, token string) (userID, clientID, agentID, prefLang, resourceOwner string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	userID, agentID, clientID, prefLang, resourceOwner, err = a.authZRepo.VerifyAccessToken(ctx, token, "", GetInstance(ctx).ProjectID())
 	return userID, clientID, agentID, prefLang, resourceOwner, err
 }
 
 type client struct {
 	name string
-}
-
-func verifyAccessToken(ctx context.Context, token string, t AccessTokenVerifier) (userID, clientID, agentID, prefLan, resourceOwner string, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	parts := strings.Split(token, BearerPrefix)
-	if len(parts) != 2 {
-		return "", "", "", "", "", zitadel_errors.ThrowUnauthenticated(nil, "AUTH-7fs1e", "invalid auth header")
-	}
-	return t.VerifyAccessToken(ctx, parts[1])
 }

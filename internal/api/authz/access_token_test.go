@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 )
 
-func Test_VerifyAccessToken(t *testing.T) {
+func Test_extractBearerToken(t *testing.T) {
 
 	type args struct {
 		ctx      context.Context
@@ -49,7 +49,7 @@ func Test_VerifyAccessToken(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, _, _, _, _, err := verifyAccessToken(tt.args.ctx, tt.args.token, tt.args.verifier)
+			_, err := extractBearerToken(tt.args.token)
 			if tt.wantErr && err == nil {
 				t.Errorf("got wrong result, should get err: actual: %v ", err)
 			}
