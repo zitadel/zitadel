@@ -9,9 +9,7 @@ import (
 )
 
 const (
-	BearerPrefix       = "Bearer "
-	SessionTokenPrefix = "sess_"
-	SessionTokenFormat = SessionTokenPrefix + "%s:%s"
+	BearerPrefix = "Bearer "
 )
 
 type MembershipsResolver interface {

@@ -10,6 +10,11 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
+const (
+	SessionTokenPrefix = "sess_"
+	SessionTokenFormat = SessionTokenPrefix + "%s:%s"
+)
+
 func SessionTokenVerifier(algorithm crypto.EncryptionAlgorithm) func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
 	return func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
 		decodedToken, err := base64.RawURLEncoding.DecodeString(sessionToken)
