@@ -19,6 +19,6 @@ func (s *Server) ListMilestones(ctx context.Context, req *admin.ListMilestonesRe
 	}
 	return &admin.ListMilestonesResponse{
 		Result:  milestoneViewsToPb(resp.Milestones),
-		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.Timestamp),
+		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.LastRun),
 	}, nil
 }
