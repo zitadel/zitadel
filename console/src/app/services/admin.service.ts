@@ -50,6 +50,8 @@ import {
   DeactivateIDPResponse,
   DeactivateSMSProviderRequest,
   DeactivateSMSProviderResponse,
+  DeactivateSMTPConfigRequest,
+  DeactivateSMTPConfigResponse,
   DeleteProviderRequest,
   DeleteProviderResponse,
   GetCustomDomainClaimedMessageTextRequest,
@@ -866,6 +868,12 @@ export class AdminService {
 
   public updateSMTPConfigPassword(req: UpdateSMTPConfigPasswordRequest): Promise<UpdateSMTPConfigPasswordResponse.AsObject> {
     return this.grpcService.admin.updateSMTPConfigPassword(req, null).then((resp) => resp.toObject());
+  }
+
+  public deactivateSMTPConfig(id: string): Promise<DeactivateSMTPConfigResponse.AsObject> {
+    const req = new DeactivateSMTPConfigRequest();
+    req.setId(id);
+    return this.grpcService.admin.deactivateSMTPConfig(req, null).then((resp) => resp.toObject());
   }
 
   public removeSMTPConfig(id: string): Promise<RemoveSMTPConfigResponse.AsObject> {

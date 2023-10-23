@@ -91,13 +91,14 @@
             >
               <i class="las la-check-circle"></i>
             </button>
-            <!-- (click)="removeIdp(idp); $event.stopPropagation()" -->
+
             <button
               actions
               *ngIf="config.isActive"
               [disabled]="(['iam.write'] | hasRole | async) === false"
               mat-icon-button
               matTooltip="{{ 'SMTP.LIST.DEACTIVATE' | translate }}"
+              (click)="deactivateSMTPConfig(config.id); $event.stopPropagation()"
             >
               <i class="las la-times-circle"></i>
             </button>

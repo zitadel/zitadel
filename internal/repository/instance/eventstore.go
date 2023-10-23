@@ -15,6 +15,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, SMTPConfigAddedEventType, SMTPConfigAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, SMTPConfigChangedEventType, SMTPConfigChangedEventMapper).
 		RegisterFilterEventMapper(AggregateType, SMTPConfigPasswordChangedEventType, SMTPConfigPasswordChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, SMTPConfigDeactivatedEventType, SMTPConfigDeactivatedEventMapper).
 		RegisterFilterEventMapper(AggregateType, SMTPConfigRemovedEventType, SMTPConfigRemovedEventMapper).
 		RegisterFilterEventMapper(AggregateType, SMSConfigTwilioAddedEventType, SMSConfigTwilioAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, SMSConfigTwilioChangedEventType, SMSConfigTwilioChangedEventMapper).

@@ -1909,9 +1909,12 @@
       "EMPTY": "No SMTP Provider available",
       "ACTIVATED": "Activated",
       "ACTIVATE": "Activate provider",
-      "DEACTIVATE": "Dectivate provider",
+      "DEACTIVATE": "Deactivate provider",
       "TYPE": "Type",
       "DIALOG": {
+        "DEACTIVATE_WARN_TITLE": "Deactivate SMTP config",
+        "DEACTIVATE_WARN_DESCRIPTION": "You are about to deactivate an SMTP configuration. Are you sure?",
+        "DEACTIVATED": "SMTP config has been deactivated",
         "DELETE_TITLE": "Delete SMTP config",
         "DELETE_DESCRIPTION": "You are about to delete a configuration. Confirm this action typing the sender name",
         "DELETED": "SMTP config has been deleted",

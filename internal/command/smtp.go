@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -73,6 +74,24 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string
 		ctx,
 		&instanceAgg.Aggregate,
 		smtpPassword))
+	if err != nil {
+		return nil, err
+	}
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
+	}, nil
+}
+
+func (c *Commands) DeactivateSMTPConfig(ctx context.Context, req *admin_pb.DeactivateSMTPConfigRequest) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	validation := c.prepareDeactivateSMTPConfig(instanceAgg, req.Id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	if err != nil {
+		return nil, err
+	}
+	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -210,6 +229,26 @@ func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, re
 	}
 }
 
+func (c *Commands) prepareDeactivateSMTPConfig(a *instance.Aggregate, id string) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel, err := getSMTPConfigWriteModel(ctx, filter, id, "")
+			if err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, errors.ThrowNotFound(nil, "INST-Sfefg", "Errors.SMTPConfig.NotFound")
+			}
+			if writeModel.State == domain.SMTPConfigStateInactive {
+				return nil, caos_errs.ThrowNotFound(nil, "COMMAND-xk8k0", "Errors.SMTPConfig.AlreadyDeactivated")
+			}
+			return []eventstore.Command{
+				instance.NewSMTPConfigDeactivatedEvent(ctx, &a.Aggregate, id),
+			}, nil
+		}, nil
+	}
+}
+
 func (c *Commands) prepareRemoveSMTPConfig(a *instance.Aggregate, id string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -217,9 +256,7 @@ func (c *Commands) prepareRemoveSMTPConfig(a *instance.Aggregate, id string) pre
 			if err != nil {
 				return nil, err
 			}
-
-			// TODO @n40lab how to check if state is valid before delete
-			if writeModel.State != domain.SMTPConfigStateActive {
+			if !writeModel.State.Exists() {
 				return nil, errors.ThrowNotFound(nil, "INST-Sfefg", "Errors.SMTPConfig.NotFound")
 			}
 			return []eventstore.Command{

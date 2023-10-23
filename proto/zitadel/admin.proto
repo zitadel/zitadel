@@ -416,6 +416,23 @@ service AdminService {
         };
     }
 
+    rpc DeactivateSMTPConfig(DeactivateSMTPConfigRequest) returns (DeactivateSMTPConfigResponse) {
+        option (google.api.http) = {
+            post: "/smtp/{id}/_deactivate";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMTP Provider";
+            summary: "Deactivate SMTP Provider";
+            description: "Deactivate an SMTP provider. After deactivating the provider, the users will not be able to receive SMTP notifications from that provider anymore."
+        };
+    }
+
     rpc RemoveSMTPConfig(RemoveSMTPConfigRequest) returns (RemoveSMTPConfigResponse) {
         option (google.api.http) = {
             delete: "/smtp/{id}";
@@ -4063,6 +4080,14 @@ message UpdateSMTPConfigPasswordRequest {
 }
 
 message UpdateSMTPConfigPasswordResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message DeactivateSMTPConfigRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message DeactivateSMTPConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

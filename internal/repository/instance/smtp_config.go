@@ -16,6 +16,7 @@ const (
 	SMTPConfigChangedEventType         = instanceEventTypePrefix + smtpConfigPrefix + "changed"
 	SMTPConfigPasswordChangedEventType = instanceEventTypePrefix + smtpConfigPrefix + "password.changed"
 	SMTPConfigRemovedEventType         = instanceEventTypePrefix + smtpConfigPrefix + "removed"
+	SMTPConfigDeactivatedEventType     = instanceEventTypePrefix + smtpConfigPrefix + "deactivated"
 )
 
 type SMTPConfigAddedEvent struct {
@@ -231,6 +232,46 @@ func SMTPConfigPasswordChangedEventMapper(event *repository.Event) (eventstore.E
 	}
 
 	return smtpConfigPasswordChagned, nil
+}
+
+type SMTPConfigDeactivatedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	ID                   string `json:"id,omitempty"`
+}
+
+func NewSMTPConfigDeactivatedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+) *SMTPConfigDeactivatedEvent {
+	return &SMTPConfigDeactivatedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			SMTPConfigDeactivatedEventType,
+		),
+		ID: id,
+	}
+}
+
+func (e *SMTPConfigDeactivatedEvent) Data() interface{} {
+	return e
+}
+
+func (e *SMTPConfigDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func SMTPConfigDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	smtpConfigDeactivated := &SMTPConfigDeactivatedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, smtpConfigDeactivated)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "IAM-KPr5t", "unable to unmarshal smtp config removed")
+	}
+
+	return smtpConfigDeactivated, nil
 }
 
 type SMTPConfigRemovedEvent struct {
