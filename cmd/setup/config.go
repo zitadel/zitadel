@@ -47,6 +47,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
 			hook.EnumHookFunc(domain.FeatureString),
+			hook.EnumHookFunc(authz.MemberTypeString),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")
