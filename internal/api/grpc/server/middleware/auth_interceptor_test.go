@@ -55,7 +55,7 @@ func Test_authorize(t *testing.T) {
 		req        interface{}
 		info       *grpc.UnaryServerInfo
 		handler    grpc.UnaryHandler
-		verifier   func(t *testing.T) authz.APITokenVerifier
+		verifier   func() authz.APITokenVerifier
 		authConfig authz.Config
 	}
 	type res struct {
@@ -74,7 +74,7 @@ func Test_authorize(t *testing.T) {
 				req:     &mockReq{},
 				info:    mockInfo("/no/token/needed"),
 				handler: emptyMockHandler,
-				verifier: func(t *testing.T) authz.APITokenVerifier {
+				verifier: func() authz.APITokenVerifier {
 					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{})
 					return verifier
@@ -92,7 +92,7 @@ func Test_authorize(t *testing.T) {
 				req:     &mockReq{},
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
-				verifier: func(t *testing.T) authz.APITokenVerifier {
+				verifier: func() authz.APITokenVerifier {
 					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
 					return verifier
@@ -111,7 +111,7 @@ func Test_authorize(t *testing.T) {
 				req:     &mockReq{},
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
-				verifier: func(t *testing.T) authz.APITokenVerifier {
+				verifier: func() authz.APITokenVerifier {
 					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
 					return verifier
@@ -130,7 +130,7 @@ func Test_authorize(t *testing.T) {
 				req:     &mockReq{},
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
-				verifier: func(t *testing.T) authz.APITokenVerifier {
+				verifier: func() authz.APITokenVerifier {
 					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
 					return verifier
@@ -149,7 +149,7 @@ func Test_authorize(t *testing.T) {
 				req:     &mockReq{},
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
-				verifier: func(t *testing.T) authz.APITokenVerifier {
+				verifier: func() authz.APITokenVerifier {
 					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "to.do.something"}})
 					return verifier
@@ -173,7 +173,7 @@ func Test_authorize(t *testing.T) {
 				req:     &mockReq{},
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
-				verifier: func(t *testing.T) authz.APITokenVerifier {
+				verifier: func() authz.APITokenVerifier {
 					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "to.do.something"}})
 					return verifier
@@ -197,7 +197,7 @@ func Test_authorize(t *testing.T) {
 				req:     &mockReq{},
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
-				verifier: func(t *testing.T) authz.APITokenVerifier {
+				verifier: func() authz.APITokenVerifier {
 					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenNOK, authz.SystemTokenVerifierFunc(func(ctx context.Context, token string, orgID string) (memberships authz.Memberships, userID string, err error) {
 						return authz.Memberships{{
 							MemberType: authz.MemberTypeSystem,
@@ -226,7 +226,7 @@ func Test_authorize(t *testing.T) {
 				req:     &mockReq{},
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
-				verifier: func(t *testing.T) authz.APITokenVerifier {
+				verifier: func() authz.APITokenVerifier {
 					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenNOK, authz.SystemTokenVerifierFunc(func(ctx context.Context, token string, orgID string) (memberships authz.Memberships, userID string, err error) {
 						return authz.Memberships{{
 							MemberType: authz.MemberTypeSystem,
@@ -251,7 +251,7 @@ func Test_authorize(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := authorize(tt.args.ctx, tt.args.req, tt.args.info, tt.args.handler, tt.args.verifier(t), tt.args.authConfig)
+			got, err := authorize(tt.args.ctx, tt.args.req, tt.args.info, tt.args.handler, tt.args.verifier(), tt.args.authConfig)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("authorize() error = %v, wantErr %v", err, tt.res.wantErr)
 				return
