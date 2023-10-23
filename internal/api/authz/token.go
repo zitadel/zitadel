@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rsa"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -55,8 +56,10 @@ func Start(authZRepo authZRepo, issuer string, keys map[string]*SystemAPIUser) (
 			switch membership.MemberType {
 			case MemberTypeSystem, MemberTypeIAM, MemberTypeOrganization:
 				systemUsers[userID] = key.Memberships
+			case MemberTypeUnspecified, MemberTypeProject, MemberTypeProjectGrant:
+				return nil, errors.New("for system users, only the membership types Organization, IAM and System are supported")
 			default:
-				return nil, fmt.Errorf("for system users, only the membership types Organization, IAM and System are supported")
+				return nil, errors.New("unknown membership type")
 			}
 		}
 	}
