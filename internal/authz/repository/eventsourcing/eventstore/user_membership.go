@@ -51,7 +51,7 @@ func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context, orgID
 func userMembershipToMembership(membership *query.Membership) *authz.Membership {
 	if membership.IAM != nil {
 		return &authz.Membership{
-			MemberType:  authz.MemberTypeIam,
+			MemberType:  authz.MemberTypeIAM,
 			AggregateID: membership.IAM.IAMID,
 			ObjectID:    membership.IAM.IAMID,
 			Roles:       membership.Roles,
@@ -59,7 +59,7 @@ func userMembershipToMembership(membership *query.Membership) *authz.Membership 
 	}
 	if membership.Org != nil {
 		return &authz.Membership{
-			MemberType:  authz.MemberTypeOrganisation,
+			MemberType:  authz.MemberTypeOrganization,
 			AggregateID: membership.Org.OrgID,
 			ObjectID:    membership.Org.OrgID,
 			Roles:       membership.Roles,

@@ -1,3 +1,5 @@
+//go:generate enumer -type MemberType -trimprefix MemberType
+
 package authz
 
 import (
@@ -55,10 +57,10 @@ type MemberType int32
 
 const (
 	MemberTypeUnspecified MemberType = iota
-	MemberTypeOrganisation
+	MemberTypeOrganization
 	MemberTypeProject
 	MemberTypeProjectGrant
-	MemberTypeIam
+	MemberTypeIAM
 	MemberTypeSystem
 )
 

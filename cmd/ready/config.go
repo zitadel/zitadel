@@ -23,7 +23,6 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
-			hook.StringToFeatureHookFunc(),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")

@@ -21,7 +21,7 @@ func (v *authzRepoMock) VerifyAccessToken(ctx context.Context, token, clientID, 
 }
 func (v *authzRepoMock) SearchMyMemberships(ctx context.Context, orgID string, _ bool) ([]*authz.Membership, error) {
 	return authz.Memberships{{
-		MemberType:  authz.MemberTypeOrganisation,
+		MemberType:  authz.MemberTypeOrganization,
 		AggregateID: orgID,
 		Roles:       []string{anAPIRole},
 	}}, nil

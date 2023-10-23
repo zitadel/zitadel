@@ -392,8 +392,23 @@ SystemAPIUsers:
 # Add keys for authentication of the systemAPI here:
 # you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
 # - superuser:
-#     Path: /path/to/superuser/key.pem  # you can provide the key either by reference with the path
+#     Path: /path/to/superuser/ey.pem  # you can provide the key either by reference with the path
+#     Memberships:
+#       # MemberType System allows the user to access all APIs for all instances or organizations
+#       - MemberType: System
+#         Roles:
+#           - "SYSTEM_OWNER"
+#           - "IAM_OWNER"
+#           - "ORG_OWNER"
+#       # MemberType IAM and Organization let you restrict access to a specific instance or organization by specifying the AggregateID
+#       - MemberType: IAM
+#         Roles: "IAM_OWNER"
+#         AggregateID: "123456789012345678"
+#       - MemberType: Organization
+#         Roles: "ORG_OWNER"
+#         AggregateID: "123456789012345678"
 # - superuser2:
+#     # If no memberships are specified, the user has a membership of type System with the role "SYSTEM_OWNER"
 #     KeyData: <base64 encoded key>     # or you can directly embed it as base64 encoded value
 
 #TODO: remove as soon as possible

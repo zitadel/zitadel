@@ -1,14 +1,12 @@
 package hook
 
 import (
-	"reflect"
-
 	"github.com/mitchellh/mapstructure"
-
-	"github.com/zitadel/zitadel/internal/domain"
+	"golang.org/x/exp/constraints"
+	"reflect"
 )
 
-func StringToFeatureHookFunc() mapstructure.DecodeHookFuncType {
+func EnumHookFunc[T constraints.Integer](resolve func(string) (T, error)) mapstructure.DecodeHookFuncType {
 	return func(
 		f reflect.Type,
 		t reflect.Type,
@@ -17,11 +15,9 @@ func StringToFeatureHookFunc() mapstructure.DecodeHookFuncType {
 		if f.Kind() != reflect.String {
 			return data, nil
 		}
-
-		if t != reflect.TypeOf(domain.FeatureUnspecified) {
+		if t != reflect.TypeOf(T(0)) {
 			return data, nil
 		}
-
-		return domain.FeatureString(data.(string))
+		return resolve(data.(string))
 	}
 }

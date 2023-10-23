@@ -96,7 +96,7 @@ func Test_GetUserPermissions(t *testing.T) {
 						{
 							AggregateID: "IAM",
 							ObjectID:    "IAM",
-							MemberType:  MemberTypeIam,
+							MemberType:  MemberTypeIAM,
 							Roles:       []string{"IAM_OWNER"},
 						},
 					}, nil
@@ -157,7 +157,7 @@ func Test_MapMembershipToPermissions(t *testing.T) {
 					{
 						AggregateID: "1",
 						ObjectID:    "1",
-						MemberType:  MemberTypeOrganisation,
+						MemberType:  MemberTypeOrganization,
 						Roles:       []string{"ORG_OWNER"},
 					},
 				},
@@ -185,7 +185,7 @@ func Test_MapMembershipToPermissions(t *testing.T) {
 					{
 						AggregateID: "1",
 						ObjectID:    "1",
-						MemberType:  MemberTypeOrganisation,
+						MemberType:  MemberTypeOrganization,
 						Roles:       []string{"ORG_OWNER"},
 					},
 				},
@@ -213,13 +213,13 @@ func Test_MapMembershipToPermissions(t *testing.T) {
 					{
 						AggregateID: "1",
 						ObjectID:    "1",
-						MemberType:  MemberTypeOrganisation,
+						MemberType:  MemberTypeOrganization,
 						Roles:       []string{"ORG_OWNER"},
 					},
 					{
 						AggregateID: "IAM",
 						ObjectID:    "IAM",
-						MemberType:  MemberTypeIam,
+						MemberType:  MemberTypeIAM,
 						Roles:       []string{"IAM_OWNER"},
 					},
 				},
@@ -247,7 +247,7 @@ func Test_MapMembershipToPermissions(t *testing.T) {
 					{
 						AggregateID: "2",
 						ObjectID:    "2",
-						MemberType:  MemberTypeOrganisation,
+						MemberType:  MemberTypeOrganization,
 						Roles:       []string{"ORG_OWNER"},
 					},
 					{
@@ -308,7 +308,7 @@ func Test_MapMembershipToPerm(t *testing.T) {
 				membership: &Membership{
 					AggregateID: "Org",
 					ObjectID:    "Org",
-					MemberType:  MemberTypeOrganisation,
+					MemberType:  MemberTypeOrganization,
 					Roles:       []string{"ORG_OWNER"},
 				},
 				authConfig: Config{
@@ -336,7 +336,7 @@ func Test_MapMembershipToPerm(t *testing.T) {
 				membership: &Membership{
 					AggregateID: "Org",
 					ObjectID:    "Org",
-					MemberType:  MemberTypeOrganisation,
+					MemberType:  MemberTypeOrganization,
 					Roles:       []string{"ORG_OWNER"},
 				},
 				authConfig: Config{

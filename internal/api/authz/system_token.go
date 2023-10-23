@@ -3,7 +3,7 @@ package authz
 import (
 	"context"
 	"crypto/rsa"
-	"fmt"
+	"errors"
 	"os"
 	"sync"
 	"time"
@@ -31,10 +31,12 @@ func StartSystemTokenVerifierFromConfig(issuer string, keys map[string]*SystemAP
 		}
 		for _, membership := range key.Memberships {
 			switch membership.MemberType {
-			case MemberTypeSystem, MemberTypeIam, MemberTypeOrganisation:
+			case MemberTypeSystem, MemberTypeIAM, MemberTypeOrganization:
 				systemUsers[userID] = key.Memberships
+			case MemberTypeUnspecified, MemberTypeProject, MemberTypeProjectGrant:
+				return nil, errors.New("for system users, only the membership types System, IAM and Organization are supported")
 			default:
-				return nil, fmt.Errorf("for system users, only the membership types 1 MemberTypeOrganisation, 4 MemberTypeIam and 5 MemberTypeSystem are supported")
+				return nil, errors.New("unknown membership type")
 			}
 		}
 	}
@@ -64,8 +66,8 @@ func (s *SystemTokenVerifierFromConfig) VerifySystemToken(ctx context.Context, t
 	matchingMemberships = make(Memberships, 0, len(systemUserMemberships))
 	for _, membership := range systemUserMemberships {
 		if membership.MemberType == MemberTypeSystem ||
-			membership.MemberType == MemberTypeIam && GetInstance(ctx).InstanceID() == membership.AggregateID ||
-			membership.MemberType == MemberTypeOrganisation && orgID == membership.AggregateID {
+			membership.MemberType == MemberTypeIAM && GetInstance(ctx).InstanceID() == membership.AggregateID ||
+			membership.MemberType == MemberTypeOrganization && orgID == membership.AggregateID {
 			matchingMemberships = append(matchingMemberships, membership)
 		}
 	}
