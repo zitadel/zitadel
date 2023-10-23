@@ -310,8 +310,15 @@ func startAPIs(
 		authZRepo,
 		queries,
 	}
-	// always set the origin in the context if available in the http headers, no matter for what protocol
-	router.Use(middleware.OriginHandler)
+
+	slogger := config.Log.Slog()
+	router.Use(
+		// request scoped context logger.
+		// Currently only used in oidc
+		// logging.Middleware(logging.WithLogger(slogger)),
+		// always set the origin in the context if available in the http headers, no matter for what protocol
+		middleware.OriginHandler,
+	)
 	verifier := internal_authz.Start(repo, http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
 	tlsConfig, err := config.TLS.Config()
 	if err != nil {
@@ -396,11 +403,11 @@ func startAPIs(
 	}
 	apis.RegisterHandlerOnPrefix(openapi.HandlerPrefix, openAPIHandler)
 
-	oidcProvider, err := oidc.NewProvider(config.OIDC, login.DefaultLoggedOutPath, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.OIDCKey, eventstore, dbClient, userAgentInterceptor, instanceInterceptor.Handler, limitingAccessInterceptor)
+	oidcProvider, err := oidc.NewProvider(config.OIDC, login.DefaultLoggedOutPath, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.OIDCKey, eventstore, dbClient, userAgentInterceptor, instanceInterceptor.Handler, limitingAccessInterceptor, slogger)
 	if err != nil {
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}
-	apis.RegisterHandlerPrefixes(oidcProvider.HttpHandler(), "/.well-known/openid-configuration", "/oidc/v1", "/oauth/v2")
+	apis.RegisterHandlerPrefixes(oidcProvider, "/.well-known/openid-configuration", "/oidc/v1", "/oauth/v2")
 
 	samlProvider, err := saml.NewProvider(config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor, limitingAccessInterceptor)
 	if err != nil {
@@ -421,7 +428,7 @@ func startAPIs(
 		authRepo,
 		store,
 		console.HandlerPrefix+"/",
-		op.AuthCallbackURL(oidcProvider),
+		oidcProvider.AuthCallbackURL(),
 		provider.AuthCallbackURL(samlProvider),
 		config.ExternalSecure,
 		userAgentInterceptor,
