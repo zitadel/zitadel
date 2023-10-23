@@ -3,6 +3,7 @@ package admin
 import (
 	"github.com/zitadel/zitadel/internal/domain"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
+	policy_pb "github.com/zitadel/zitadel/pkg/grpc/policy"
 )
 
 func updateLabelPolicyToDomain(policy *admin_pb.UpdateLabelPolicyRequest) *domain.LabelPolicy {
@@ -17,5 +18,19 @@ func updateLabelPolicyToDomain(policy *admin_pb.UpdateLabelPolicyRequest) *domai
 		FontColorDark:       policy.FontColorDark,
 		HideLoginNameSuffix: policy.HideLoginNameSuffix,
 		DisableWatermark:    policy.DisableWatermark,
+		EnabledTheme:        enabledThemeToDomain(policy.EnabledTheme),
+	}
+}
+
+func enabledThemeToDomain(theme policy_pb.Theme) domain.LabelPolicyTheme {
+	switch theme {
+	case policy_pb.Theme_THEME_ALL:
+		return domain.LabelPolicyThemeAll
+	case policy_pb.Theme_THEME_DARK:
+		return domain.LabelPolicyThemeDark
+	case policy_pb.Theme_THEME_LIGHT:
+		return domain.LabelPolicyThemeLight
+	default:
+		return domain.LabelPolicyThemeAll
 	}
 }

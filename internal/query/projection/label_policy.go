@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	LabelPolicyTable = "projections.label_policies2"
+	LabelPolicyTable = "projections.label_policies3"
 
 	LabelPolicyIDCol                  = "id"
 	LabelPolicyCreationDateCol        = "creation_date"
@@ -29,6 +29,7 @@ const (
 	LabelPolicyShouldErrorPopupCol    = "should_error_popup"
 	LabelPolicyFontURLCol             = "font_url"
 	LabelPolicyOwnerRemovedCol        = "owner_removed"
+	LabelPolicyEnabledThemeCol        = "enabled_theme"
 
 	LabelPolicyLightPrimaryColorCol    = "light_primary_color"
 	LabelPolicyLightWarnColorCol       = "light_warn_color"
@@ -83,6 +84,7 @@ func (*labelPolicyProjection) Init() *old_handler.Check {
 			handler.NewColumn(LabelPolicyDarkLogoURLCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(LabelPolicyDarkIconURLCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(LabelPolicyOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(LabelPolicyEnabledThemeCol, handler.ColumnTypeInt64, handler.Default(0)),
 		},
 			handler.NewPrimaryKey(LabelPolicyInstanceIDCol, LabelPolicyIDCol, LabelPolicyStateCol),
 			handler.WithIndex(handler.NewIndex("owner_removed", []string{LabelPolicyOwnerRemovedCol})),
@@ -264,6 +266,7 @@ func (p *labelPolicyProjection) reduceAdded(event eventstore.Event) (*handler.St
 			handler.NewCol(LabelPolicyHideLoginNameSuffixCol, policyEvent.HideLoginNameSuffix),
 			handler.NewCol(LabelPolicyShouldErrorPopupCol, policyEvent.ErrorMsgPopup),
 			handler.NewCol(LabelPolicyWatermarkDisabledCol, policyEvent.DisableWatermark),
+			handler.NewCol(LabelPolicyEnabledThemeCol, policyEvent.EnabledTheme),
 		}), nil
 }
 
@@ -313,6 +316,9 @@ func (p *labelPolicyProjection) reduceChanged(event eventstore.Event) (*handler.
 	}
 	if policyEvent.DisableWatermark != nil {
 		cols = append(cols, handler.NewCol(LabelPolicyWatermarkDisabledCol, *policyEvent.DisableWatermark))
+	}
+	if policyEvent.EnabledTheme != nil {
+		cols = append(cols, handler.NewCol(LabelPolicyEnabledThemeCol, *policyEvent.EnabledTheme))
 	}
 	return handler.NewUpdateStatement(
 		&policyEvent,

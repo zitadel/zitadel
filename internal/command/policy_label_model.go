@@ -29,6 +29,8 @@ type LabelPolicyWriteModel struct {
 	ErrorMsgPopup       bool
 	DisableWatermark    bool
 
+	EnabledTheme domain.LabelPolicyTheme
+
 	State domain.PolicyState
 }
 
@@ -47,6 +49,7 @@ func (wm *LabelPolicyWriteModel) Reduce() error {
 			wm.HideLoginNameSuffix = e.HideLoginNameSuffix
 			wm.ErrorMsgPopup = e.ErrorMsgPopup
 			wm.DisableWatermark = e.DisableWatermark
+			wm.EnabledTheme = e.EnabledTheme
 			wm.State = domain.PolicyStateActive
 		case *policy.LabelPolicyChangedEvent:
 			if e.PrimaryColor != nil {
@@ -81,6 +84,9 @@ func (wm *LabelPolicyWriteModel) Reduce() error {
 			}
 			if e.DisableWatermark != nil {
 				wm.DisableWatermark = *e.DisableWatermark
+			}
+			if e.EnabledTheme != nil {
+				wm.EnabledTheme = *e.EnabledTheme
 			}
 		case *policy.LabelPolicyLogoAddedEvent:
 			wm.LogoKey = e.StoreKey

@@ -145,6 +145,13 @@ message LabelPolicy {
         }
     ];
     string font_url = 18;
+    Theme enabled_themes = 19;
+}
+
+enum Theme {
+    THEME_ALL = 0;
+    THEME_DARK = 1;
+    THEME_LIGHT = 2;
 }
 
 message LoginPolicy {

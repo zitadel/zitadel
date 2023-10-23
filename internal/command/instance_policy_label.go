@@ -384,6 +384,7 @@ func prepareAddDefaultLabelPolicy(
 	hideLoginNameSuffix,
 	errorMsgPopup,
 	disableWatermark bool,
+	enabledTheme domain.LabelPolicyTheme,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {

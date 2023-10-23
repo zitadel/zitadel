@@ -3,6 +3,7 @@ package instance
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
@@ -45,6 +46,7 @@ func NewLabelPolicyAddedEvent(
 	hideLoginNameSuffix,
 	errorMsgPopup,
 	disableWatermark bool,
+	enabledTheme domain.LabelPolicyTheme,
 ) *LabelPolicyAddedEvent {
 	return &LabelPolicyAddedEvent{
 		LabelPolicyAddedEvent: *policy.NewLabelPolicyAddedEvent(
@@ -62,7 +64,8 @@ func NewLabelPolicyAddedEvent(
 			fontColorDark,
 			hideLoginNameSuffix,
 			errorMsgPopup,
-			disableWatermark),
+			disableWatermark,
+			enabledTheme),
 	}
 }
 

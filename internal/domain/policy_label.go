@@ -34,6 +34,7 @@ type LabelPolicy struct {
 	HideLoginNameSuffix bool
 	ErrorMsgPopup       bool
 	DisableWatermark    bool
+	EnabledTheme        LabelPolicyTheme
 }
 
 type LabelPolicyState int32
@@ -45,6 +46,14 @@ const (
 	LabelPolicyStatePreview
 
 	labelPolicyStateCount
+)
+
+type LabelPolicyTheme int32
+
+const (
+	LabelPolicyThemeAll LabelPolicyTheme = iota
+	LabelPolicyThemeDark
+	LabelPolicyThemeLight
 )
 
 func (f LabelPolicy) IsValid() error {

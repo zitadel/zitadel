@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/policy"
@@ -97,6 +98,7 @@ func (wm *InstanceLabelPolicyWriteModel) NewChangedEvent(
 	hideLoginNameSuffix,
 	errorMsgPopup,
 	disableWatermark bool,
+	enabledTheme domain.LabelPolicyTheme,
 ) (*instance.LabelPolicyChangedEvent, bool) {
 	changes := make([]policy.LabelPolicyChanges, 0)
 	if wm.PrimaryColor != primaryColor {
@@ -131,6 +133,9 @@ func (wm *InstanceLabelPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.DisableWatermark != disableWatermark {
 		changes = append(changes, policy.ChangeDisableWatermark(disableWatermark))
+	}
+	if wm.EnabledTheme != enabledTheme {
+		changes = append(changes, policy.ChangeEnabledTheme(enabledTheme))
 	}
 	if len(changes) == 0 {
 		return nil, false
