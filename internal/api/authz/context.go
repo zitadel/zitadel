@@ -1,3 +1,5 @@
+//go:generate enumer -type MemberType -trimprefix MemberType
+
 package authz
 
 import (
@@ -54,10 +56,10 @@ type MemberType int32
 
 const (
 	MemberTypeUnspecified MemberType = iota
-	MemberTypeOrganisation
+	MemberTypeOrganization
 	MemberTypeProject
 	MemberTypeProjectGrant
-	MemberTypeIam
+	MemberTypeIAM
 	MemberTypeSystem
 )
 
@@ -73,8 +75,8 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 		systemMemberships = make(Memberships, 0, len(t.systemUsers[userID]))
 		for _, membership := range t.systemUsers[userID] {
 			if membership.MemberType == MemberTypeSystem ||
-				membership.MemberType == MemberTypeIam && GetInstance(ctx).InstanceID() == membership.AggregateID ||
-				membership.MemberType == MemberTypeOrganisation && orgID == membership.AggregateID {
+				membership.MemberType == MemberTypeIAM && GetInstance(ctx).InstanceID() == membership.AggregateID ||
+				membership.MemberType == MemberTypeOrganization && orgID == membership.AggregateID {
 				systemMemberships = append(systemMemberships, membership)
 			}
 		}

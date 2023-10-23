@@ -53,10 +53,10 @@ func Start(authZRepo authZRepo, issuer string, keys map[string]*SystemAPIUser) (
 		}
 		for _, membership := range key.Memberships {
 			switch membership.MemberType {
-			case MemberTypeSystem, MemberTypeIam, MemberTypeOrganisation:
+			case MemberTypeSystem, MemberTypeIAM, MemberTypeOrganization:
 				systemUsers[userID] = key.Memberships
 			default:
-				return nil, fmt.Errorf("for system users, only the membership types 1 MemberTypeOrganisation, 4 MemberTypeIam and 5 MemberTypeSystem are supported")
+				return nil, fmt.Errorf("for system users, only the membership types Organization, IAM and System are supported")
 			}
 		}
 	}
