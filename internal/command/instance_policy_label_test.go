@@ -158,6 +158,7 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 				tt.args.hideLoginNameSuffix,
 				tt.args.errorMsgPopup,
 				tt.args.disableWatermark,
+				tt.args.enabledTheme,
 			)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -313,6 +314,7 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 					HideLoginNameSuffix: false,
 					ErrorMsgPopup:       false,
 					DisableWatermark:    false,
+					EnabledTheme:        domain.LabelPolicyThemeDark,
 				},
 			},
 			res: res{
@@ -333,6 +335,7 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 					HideLoginNameSuffix: false,
 					ErrorMsgPopup:       false,
 					DisableWatermark:    false,
+					EnabledTheme:        domain.LabelPolicyThemeDark,
 				},
 			},
 		},

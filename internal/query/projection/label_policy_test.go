@@ -28,7 +28,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					testEvent(
 						org.LabelPolicyAddedEventType,
 						org.AggregateType,
-						[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b", "enabledTheme": "1"}`),
+						[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b", "enabledTheme": 1}`),
 					), org.LabelPolicyAddedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceAdded,
@@ -73,7 +73,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					testEvent(
 						org.LabelPolicyChangedEventType,
 						org.AggregateType,
-						[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b", "enabledTheme": "1"}`),
+						[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b", "enabledTheme": 1}`),
 					), org.LabelPolicyChangedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceChanged,
@@ -83,7 +83,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_primary_color, light_background_color, light_warn_color, light_font_color, enabled_theme) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $7) AND (state = $8) AND (instance_id = $9)",
+							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_primary_color, light_background_color, light_warn_color, light_font_color, enabled_theme) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (state = $9) AND (instance_id = $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -537,7 +537,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					testEvent(
 						instance.LabelPolicyAddedEventType,
 						instance.AggregateType,
-						[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b", "enabledTheme": "1"}`),
+						[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b", "enabledTheme": 1}`),
 					), instance.LabelPolicyAddedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceAdded,
@@ -582,7 +582,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					testEvent(
 						instance.LabelPolicyChangedEventType,
 						instance.AggregateType,
-						[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b", "primaryColorDark": "#ffffff","backgroundColorDark": "#ffffff", "warnColorDark": "#ffffff", "fontColorDark": "#ffffff", "hideLoginNameSuffix": true, "errorMsgPopup": true, "disableWatermark": true, "enabledTheme": "1"}`),
+						[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b", "primaryColorDark": "#ffffff","backgroundColorDark": "#ffffff", "warnColorDark": "#ffffff", "fontColorDark": "#ffffff", "hideLoginNameSuffix": true, "errorMsgPopup": true, "disableWatermark": true, "enabledTheme": 1}`),
 					), instance.LabelPolicyChangedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceChanged,
@@ -592,7 +592,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) WHERE (id = $15) AND (state = $16) AND (instance_id = $17)",
+							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled, enabled_theme) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) WHERE (id = $15) AND (state = $16) AND (instance_id = $17)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

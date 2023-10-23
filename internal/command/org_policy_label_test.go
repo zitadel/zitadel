@@ -162,6 +162,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 					HideLoginNameSuffix: true,
 					ErrorMsgPopup:       true,
 					DisableWatermark:    true,
+					EnabledTheme:        domain.LabelPolicyThemeDark,
 				},
 			},
 		},
