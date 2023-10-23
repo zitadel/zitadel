@@ -40,9 +40,7 @@ func (a *AccessTokenVerifierFromRepo) VerifyAccessToken(ctx context.Context, tok
 }
 
 type client struct {
-	id        string
-	projectID string
-	name      string
+	name string
 }
 
 func verifyAccessToken(ctx context.Context, token string, t AccessTokenVerifier) (userID, clientID, agentID, prefLan, resourceOwner string, err error) {

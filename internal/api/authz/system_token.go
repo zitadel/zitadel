@@ -81,8 +81,8 @@ type systemJWTStorage struct {
 }
 
 type SystemAPIUser struct {
-	Path        string //if a path is specified, the key will be read from that path
-	KeyData     []byte //else you can also specify the data directly in the KeyData
+	Path        string // if a path is specified, the key will be read from that path
+	KeyData     []byte // else you can also specify the data directly in the KeyData
 	Memberships Memberships
 }
 

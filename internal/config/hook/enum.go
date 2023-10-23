@@ -1,9 +1,10 @@
 package hook
 
 import (
+	"reflect"
+
 	"github.com/mitchellh/mapstructure"
 	"golang.org/x/exp/constraints"
-	"reflect"
 )
 
 func EnumHookFunc[T constraints.Integer](resolve func(string) (T, error)) mapstructure.DecodeHookFuncType {
