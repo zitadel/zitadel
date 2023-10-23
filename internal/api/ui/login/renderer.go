@@ -381,8 +381,6 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, titleI
 		Title:                  title,
 		Description:            description,
 		Theme:                  l.getTheme(r),
-		ThemeMode:              l.getThemeMode(r),
-		DarkMode:               l.isDarkMode(r),
 		PrivateLabelingOrgID:   l.getPrivateLabelingID(r, authReq),
 		OrgID:                  l.getOrgID(r, authReq),
 		OrgName:                l.getOrgName(authReq),
@@ -412,6 +410,8 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, titleI
 		}
 		privacyPolicy = policy.ToDomain()
 	}
+	baseData.ThemeMode = l.getThemeMode(r, baseData.LabelPolicy)
+	baseData.DarkMode = l.isDarkMode(r, baseData.LabelPolicy)
 	baseData = l.setLinksOnBaseData(baseData, privacyPolicy)
 	return baseData
 }
@@ -480,14 +480,23 @@ func (l *Login) getTheme(r *http.Request) string {
 	return "zitadel"
 }
 
-func (l *Login) getThemeMode(r *http.Request) string {
-	if l.isDarkMode(r) {
+func (l *Login) getThemeMode(r *http.Request, policy *domain.LabelPolicy) string {
+	if l.isDarkMode(r, policy) {
 		return "lgn-dark-theme"
 	}
 	return "lgn-light-theme"
 }
 
-func (l *Login) isDarkMode(r *http.Request) bool {
+func (l *Login) isDarkMode(r *http.Request, policy *domain.LabelPolicy) bool {
+	if policy != nil {
+		if policy.EnabledTheme == domain.LabelPolicyThemeDark {
+			return true
+		}
+		if policy.EnabledTheme == domain.LabelPolicyThemeLight {
+			return false
+		}
+
+	}
 	cookie, err := r.Cookie("mode")
 	if err != nil {
 		return false

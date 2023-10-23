@@ -15,7 +15,7 @@ import (
 func (c *Commands) AddDefaultLabelPolicy(
 	ctx context.Context,
 	primaryColor, backgroundColor, warnColor, fontColor, primaryColorDark, backgroundColorDark, warnColorDark, fontColorDark string,
-	hideLoginNameSuffix, errorMsgPopup, disableWatermark bool,
+	hideLoginNameSuffix, errorMsgPopup, disableWatermark bool, enabledTheme domain.LabelPolicyTheme,
 ) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter,
@@ -32,6 +32,7 @@ func (c *Commands) AddDefaultLabelPolicy(
 			hideLoginNameSuffix,
 			errorMsgPopup,
 			disableWatermark,
+			enabledTheme,
 		))
 	if err != nil {
 		return nil, err
@@ -69,7 +70,8 @@ func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.
 		policy.FontColorDark,
 		policy.HideLoginNameSuffix,
 		policy.ErrorMsgPopup,
-		policy.DisableWatermark)
+		policy.DisableWatermark,
+		policy.EnabledTheme)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-28fHe", "Errors.IAM.LabelPolicy.NotChanged")
 	}
@@ -413,6 +415,7 @@ func prepareAddDefaultLabelPolicy(
 					hideLoginNameSuffix,
 					errorMsgPopup,
 					disableWatermark,
+					enabledTheme,
 				),
 			}, nil
 		}, nil
