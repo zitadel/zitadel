@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
+// TODO: Define interfaces where they are accepted
 type APITokenVerifier interface {
 	AccessTokenVerifier
 	SystemTokenVerifier
