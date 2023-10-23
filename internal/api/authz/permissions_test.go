@@ -4,37 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
-
-func getTestCtx(userID, orgID string) context.Context {
-	return context.WithValue(context.Background(), dataKey, CtxData{UserID: userID, OrgID: orgID})
-}
-
-type testVerifier struct {
-	memberships []*Membership
-}
-
-func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID, projectID string) (string, string, string, string, string, error) {
-	return "userID", "agentID", "clientID", "de", "orgID", nil
-}
-func (v *testVerifier) SearchMyMemberships(ctx context.Context, orgID string, _ bool) ([]*Membership, error) {
-	return v.memberships, nil
-}
-
-func (v *testVerifier) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (string, []string, error) {
-	return "", nil, nil
-}
-
-func (v *testVerifier) ExistsOrg(ctx context.Context, orgID, domain string) (string, error) {
-	return orgID, nil
-}
-
-func (v *testVerifier) VerifierClientID(ctx context.Context, appName string) (string, string, error) {
-	return "clientID", "projectID", nil
-}
 
 func equalStringArray(a, b []string) bool {
 	if len(a) != len(b) {
@@ -48,12 +19,18 @@ func equalStringArray(a, b []string) bool {
 	return true
 }
 
+type membershipsResolverFunc func(ctx context.Context, orgID string, shouldTriggerBulk bool) ([]*Membership, error)
+
+func (m membershipsResolverFunc) SearchMyMemberships(ctx context.Context, orgID string, shouldTriggerBulk bool) ([]*Membership, error) {
+	return m(ctx, orgID, shouldTriggerBulk)
+}
+
 func Test_GetUserPermissions(t *testing.T) {
 	type args struct {
-		ctxData      CtxData
-		verifier     func(t *testing.T) *TokenVerifier
-		requiredPerm string
-		authConfig   Config
+		ctxData             CtxData
+		membershipsResolver MembershipsResolver
+		requiredPerm        string
+		authConfig          Config
 	}
 	tests := []struct {
 		name    string
@@ -66,15 +43,9 @@ func Test_GetUserPermissions(t *testing.T) {
 			name: "Empty Context",
 			args: args{
 				ctxData: CtxData{},
-				verifier: func(t *testing.T) *TokenVerifier {
-					v, err := Start(&testVerifier{memberships: []*Membership{
-						{
-							Roles: []string{"ORG_OWNER"},
-						},
-					}}, "", nil)
-					assert.NoErrorf(t, err, "unexpected error: %v", err)
-					return v
-				},
+				membershipsResolver: membershipsResolverFunc(func(ctx context.Context, orgID string, shouldTriggerBulk bool) ([]*Membership, error) {
+					return []*Membership{{Roles: []string{"ORG_OWNER"}}}, nil
+				}),
 				requiredPerm: "project.read",
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
@@ -97,11 +68,9 @@ func Test_GetUserPermissions(t *testing.T) {
 			name: "No Grants",
 			args: args{
 				ctxData: CtxData{},
-				verifier: func(t *testing.T) *TokenVerifier {
-					v, err := Start(&testVerifier{memberships: []*Membership{}}, "", nil)
-					assert.NoErrorf(t, err, "unexpected error: %v", err)
-					return v
-				},
+				membershipsResolver: membershipsResolverFunc(func(ctx context.Context, orgID string, shouldTriggerBulk bool) ([]*Membership, error) {
+					return []*Membership{}, nil
+				}),
 				requiredPerm: "project.read",
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
@@ -122,18 +91,16 @@ func Test_GetUserPermissions(t *testing.T) {
 			name: "Get Permissions",
 			args: args{
 				ctxData: CtxData{UserID: "userID", OrgID: "orgID"},
-				verifier: func(t *testing.T) *TokenVerifier {
-					v, err := Start(&testVerifier{memberships: []*Membership{
+				membershipsResolver: membershipsResolverFunc(func(ctx context.Context, orgID string, shouldTriggerBulk bool) ([]*Membership, error) {
+					return []*Membership{
 						{
 							AggregateID: "IAM",
 							ObjectID:    "IAM",
 							MemberType:  MemberTypeIam,
 							Roles:       []string{"IAM_OWNER"},
 						},
-					}}, "", nil)
-					assert.NoErrorf(t, err, "unexpected error: %v", err)
-					return v
-				},
+					}, nil
+				}),
 				requiredPerm: "project.read",
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
@@ -153,7 +120,7 @@ func Test_GetUserPermissions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, perms, err := getUserPermissions(context.Background(), tt.args.verifier(t), tt.args.requiredPerm, tt.args.authConfig.RolePermissionMappings, tt.args.ctxData, tt.args.ctxData.OrgID)
+			_, perms, err := getUserPermissions(context.Background(), tt.args.membershipsResolver, tt.args.requiredPerm, tt.args.authConfig.RolePermissionMappings, tt.args.ctxData, tt.args.ctxData.OrgID)
 
 			if tt.wantErr && err == nil {
 				t.Errorf("got wrong result, should get err: actual: %v ", err)
