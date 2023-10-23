@@ -4,10 +4,11 @@ package authz
 
 import (
 	"context"
+	"errors"
 
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/errors"
+	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -63,30 +64,57 @@ const (
 	MemberTypeSystem
 )
 
-func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain string, t *TokenVerifier) (_ CtxData, err error) {
+type TokenVerifier interface {
+	ExistsOrg(ctx context.Context, id, domain string) (string, error)
+	ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error)
+	AccessTokenVerifier
+	SystemTokenVerifier
+}
+
+type AccessTokenVerifier interface {
+	VerifyAccessToken(ctx context.Context, token string) (userID, clientID, agentID, prefLan, resourceOwner string, err error)
+}
+
+// AccessTokenVerifierFunc implements the SystemTokenVerifier interface so that a function can be used as a AccessTokenVerifier.
+type AccessTokenVerifierFunc func(context.Context, string) (string, string, string, string, string, error)
+
+func (a AccessTokenVerifierFunc) VerifyAccessToken(ctx context.Context, token string) (string, string, string, string, string, error) {
+	return a(ctx, token)
+}
+
+type SystemTokenVerifier interface {
+	VerifySystemToken(ctx context.Context, token string, orgID string) (matchingMemberships Memberships, userID string, err error)
+}
+
+// SystemTokenVerifierFunc implements the SystemTokenVerifier interface so that a function can be used as a SystemTokenVerifier.
+type SystemTokenVerifierFunc func(context.Context, string, string) (Memberships, string, error)
+
+func (s SystemTokenVerifierFunc) VerifySystemToken(ctx context.Context, token string, orgID string) (Memberships, string, error) {
+	return s(ctx, token, orgID)
+}
+
+func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain string, t APITokenVerifier) (_ CtxData, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	userID, clientID, agentID, prefLang, resourceOwner, isSystemUser, err := verifyAccessToken(ctx, token, t)
+	userID, clientID, agentID, prefLang, resourceOwner, err := verifyAccessToken(ctx, token, t)
+	var sysMemberships Memberships
+	if err != nil {
+		var sysTokenErr error
+		sysMemberships, userID, sysTokenErr = t.VerifySystemToken(ctx, token, userID)
+		err = errors.Join(err, sysTokenErr)
+		if sysTokenErr == nil && sysMemberships != nil {
+			err = nil
+		}
+	}
 	if err != nil {
 		return CtxData{}, err
-	}
-	var systemMemberships Memberships
-	if isSystemUser {
-		systemMemberships = make(Memberships, 0, len(t.systemUsers[userID]))
-		for _, membership := range t.systemUsers[userID] {
-			if membership.MemberType == MemberTypeSystem ||
-				membership.MemberType == MemberTypeIAM && GetInstance(ctx).InstanceID() == membership.AggregateID ||
-				membership.MemberType == MemberTypeOrganization && orgID == membership.AggregateID {
-				systemMemberships = append(systemMemberships, membership)
-			}
-		}
 	}
 	var projectID string
 	var origins []string
 	if clientID != "" {
 		projectID, origins, err = t.ProjectIDAndOriginsByClientID(ctx, clientID)
 		if err != nil {
-			return CtxData{}, errors.ThrowPermissionDenied(err, "AUTH-GHpw2", "could not read projectid by clientid")
+			return CtxData{}, zitadel_errors.ThrowPermissionDenied(err, "AUTH-GHpw2", "could not read projectid by clientid")
 		}
 		// We used to check origins for every token, but service users shouldn't be used publicly (native app / SPA).
 		// Therefore, mostly won't send an origin and aren't able to configure them anyway.
@@ -102,7 +130,7 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 	if orgID != "" {
 		orgID, err = t.ExistsOrg(ctx, orgID, orgDomain)
 		if err != nil {
-			return CtxData{}, errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
+			return CtxData{}, zitadel_errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
 		}
 	}
 	return CtxData{
@@ -112,9 +140,8 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 		AgentID:           agentID,
 		PreferredLanguage: prefLang,
 		ResourceOwner:     resourceOwner,
-		SystemMemberships: systemMemberships,
+		SystemMemberships: sysMemberships,
 	}, nil
-
 }
 
 func SetCtxData(ctx context.Context, ctxData CtxData) context.Context {
@@ -147,5 +174,5 @@ func checkOrigin(ctx context.Context, origins []string) error {
 	if http_util.IsOriginAllowed(origins, origin) {
 		return nil
 	}
-	return errors.ThrowPermissionDenied(nil, "AUTH-DZG21", "Errors.OriginNotAllowed")
+	return zitadel_errors.ThrowPermissionDenied(nil, "AUTH-DZG21", "Errors.OriginNotAllowed")
 }
