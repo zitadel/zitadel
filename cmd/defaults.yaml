@@ -389,8 +389,8 @@ EncryptionKeys:
   UserAgentCookieKeyID: "userAgentCookieKey" # ZITADEL_ENCRYPTIONKEYS_USERAGENTCOOKIEKEYID
 
 SystemAPIUsers:
-# Add keys for authentication of the systemAPI here:
-# you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
+# # Add keys for authentication of the systemAPI here:
+# # you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
 # - superuser:
 #     Path: /path/to/superuser/ey.pem  # you can provide the key either by reference with the path
 #     Memberships:
