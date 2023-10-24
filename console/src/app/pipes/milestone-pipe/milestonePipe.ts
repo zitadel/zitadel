@@ -2,7 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { LocalizedDatePipe } from '../localized-date-pipe/localized-date.pipe';
 import { TimestampToDatePipe } from '../timestamp-to-date-pipe/timestamp-to-date.pipe';
-import { Milestone } from '../../proto/generated/zitadel/milestone_pb';
+import { Milestone } from '../../proto/generated/zitadel/milestone/v1/milestone_pb';
 
 @Pipe({
   name: 'milestone',
