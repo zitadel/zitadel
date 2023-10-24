@@ -14,7 +14,7 @@ import "zitadel/event.proto";
 import "zitadel/management.proto";
 import "zitadel/v1.proto";
 import "zitadel/message.proto";
-import "zitadel/milestone.proto";
+import "zitadel/milestone/v1/milestone.proto";
 
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
