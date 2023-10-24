@@ -81,7 +81,7 @@ type OPStorage struct {
 	assetAPIPrefix                    func(ctx context.Context) string
 }
 
-func NewProvider(
+func NewServer(
 	config Config,
 	defaultLogoutRedirectURI string,
 	externalSecure bool,
