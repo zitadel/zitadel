@@ -43,10 +43,10 @@
     }
   },
   "ONBOARDING": {
-    "DESCRIPTION": "オンボーディングの手順",
+    "DESCRIPTION": "チュートリアル",
     "MOREDESCRIPTION": "より多くのショートカット",
     "COMPLETED": "完了",
-    "DISMISS": "いいえ、私はプロです。",
+    "DISMISS": "熟知しているので必要ありません。",
     "CARD": {
       "TITLE": "ZITADELの起動",
       "DESCRIPTION": "このチェックリストを使用して、重要な手順を確認しながらインスタンスをセットアップします。"
@@ -271,8 +271,8 @@
     "MINLENGTH": "{{requiredLength}} 文字以上の文字列が必要です。",
     "UPPERCASEMISSING": "大文字を含める必要があります。",
     "LOWERCASEMISSING": "小文字を含める必要があります。",
-    "SYMBOLERROR": "シンボルや句読点を含める必要があります。",
-    "NUMBERERROR": "小数点を含める必要があります。",
+    "SYMBOLERROR": "記号を含める必要があります。",
+    "NUMBERERROR": "数字を含める必要があります。",
     "PWNOTEQUAL": "パスワードが一致しません。",
     "PHONE": "電話番号は00か+で始まる必要があります。"
   },
@@ -594,7 +594,7 @@
         "EDITDESC": "下のフィールドに新しい電話番号を入力してください。",
         "DELETETITLE": "電話番号の削除",
         "DELETEDESC": "本当に電話番号を削除してよろしいですか？",
-        "OTPSMSREMOVALWARNING": "このアカウントは、この電話番号を 2 番目の要素として使用します。続行すると使用できなくなります。"
+        "OTPSMSREMOVALWARNING": "このアカウントは、この電話番号を二要素認証に使用しています。続行すると二要素認証が使用できなくなります。"
       },
       "RESENDCODE": "再送信コード",
       "ENTERCODE": "認証",
