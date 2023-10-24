@@ -57,6 +57,8 @@ describe('instance notifications', () => {
       cy.get('[formcontrolname="senderNumber"]').clear().type('2312123132');
       cy.get('[data-e2e="save-sms-settings-button"]').click();
       cy.shouldConfirmSuccess();
+      cy.get('h4').contains('Twilio');
+      cy.get('.state').contains('Inactive');
     });
   });
 });
