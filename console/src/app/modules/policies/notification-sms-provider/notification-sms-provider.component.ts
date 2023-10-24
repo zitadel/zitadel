@@ -33,6 +33,7 @@ export class NotificationSMSProviderComponent implements OnInit {
   ngOnInit(): void {
     this.fetchData();
   }
+
   private fetchData(): void {
     this.smsProvidersLoading = true;
     this.service
@@ -63,7 +64,7 @@ export class NotificationSMSProviderComponent implements OnInit {
           this.service
             .updateSMSProviderTwilio(req as UpdateSMSProviderTwilioRequest)
             .then(() => {
-              this.toast.showInfo('SETTING.SMS.TWILIO.ADDED', true);
+              this.toast.showInfo('SETTING.SMS.TWILIO.UPDATED', true);
               this.fetchData();
             })
             .catch((error) => {
