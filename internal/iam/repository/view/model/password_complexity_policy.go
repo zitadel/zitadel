@@ -1,14 +1,12 @@
 package model
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/logging"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/iam/model"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -50,14 +48,14 @@ func PasswordComplexityViewToModel(policy *query.PasswordComplexityPolicy) *mode
 	}
 }
 
-func (i *PasswordComplexityPolicyView) AppendEvent(event *models.Event) (err error) {
-	i.Sequence = event.Sequence
-	i.ChangeDate = event.CreationDate
-	switch eventstore.EventType(event.Type) {
+func (i *PasswordComplexityPolicyView) AppendEvent(event eventstore.Event) (err error) {
+	i.Sequence = event.Sequence()
+	i.ChangeDate = event.CreatedAt()
+	switch event.Type() {
 	case instance.PasswordComplexityPolicyAddedEventType,
 		org.PasswordComplexityPolicyAddedEventType:
 		i.setRootData(event)
-		i.CreationDate = event.CreationDate
+		i.CreationDate = event.CreatedAt()
 		err = i.SetData(event)
 	case instance.PasswordComplexityPolicyChangedEventType,
 		org.PasswordComplexityPolicyChangedEventType:
@@ -66,12 +64,12 @@ func (i *PasswordComplexityPolicyView) AppendEvent(event *models.Event) (err err
 	return err
 }
 
-func (r *PasswordComplexityPolicyView) setRootData(event *models.Event) {
-	r.AggregateID = event.AggregateID
+func (r *PasswordComplexityPolicyView) setRootData(event eventstore.Event) {
+	r.AggregateID = event.Aggregate().ID
 }
 
-func (r *PasswordComplexityPolicyView) SetData(event *models.Event) error {
-	if err := json.Unmarshal(event.Data, r); err != nil {
+func (r *PasswordComplexityPolicyView) SetData(event eventstore.Event) error {
+	if err := event.Unmarshal(r); err != nil {
 		logging.Log("EVEN-Dmi9g").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")
 	}

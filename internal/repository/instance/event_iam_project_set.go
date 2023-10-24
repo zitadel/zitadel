@@ -2,12 +2,9 @@ package instance
 
 import (
 	"context"
-	"encoding/json"
-
-	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
@@ -21,11 +18,11 @@ type ProjectSetEvent struct {
 	ProjectID string `json:"iamProjectId"`
 }
 
-func (e *ProjectSetEvent) Data() interface{} {
+func (e *ProjectSetEvent) Payload() interface{} {
 	return e
 }
 
-func (e *ProjectSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *ProjectSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -44,11 +41,11 @@ func NewIAMProjectSetEvent(
 	}
 }
 
-func ProjectSetMapper(event *repository.Event) (eventstore.Event, error) {
+func ProjectSetMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &ProjectSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-cdFZH", "unable to unmarshal global org set")
 	}
@@ -63,11 +60,11 @@ type ConsoleSetEvent struct {
 	AppID    string `json:"appId"`
 }
 
-func (e *ConsoleSetEvent) Data() interface{} {
+func (e *ConsoleSetEvent) Payload() interface{} {
 	return e
 }
 
-func (e *ConsoleSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *ConsoleSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -88,11 +85,11 @@ func NewIAMConsoleSetEvent(
 	}
 }
 
-func ConsoleSetMapper(event *repository.Event) (eventstore.Event, error) {
+func ConsoleSetMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &ConsoleSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-cdFZH", "unable to unmarshal console set")
 	}

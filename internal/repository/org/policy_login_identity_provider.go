@@ -3,10 +3,8 @@ package org
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
@@ -38,7 +36,7 @@ func NewIdentityProviderAddedEvent(
 	}
 }
 
-func IdentityProviderAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IdentityProviderAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.IdentityProviderAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -68,7 +66,7 @@ func NewIdentityProviderRemovedEvent(
 	}
 }
 
-func IdentityProviderRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IdentityProviderRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.IdentityProviderRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -95,7 +93,7 @@ func NewIdentityProviderCascadeRemovedEvent(
 	}
 }
 
-func IdentityProviderCascadeRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IdentityProviderCascadeRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.IdentityProviderCascadeRemovedEventMapper(event)
 	if err != nil {
 		return nil, err

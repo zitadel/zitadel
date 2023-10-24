@@ -55,7 +55,7 @@ func (wm *InstanceDomainWriteModel) Reduce() error {
 			wm.State = domain.InstanceDomainStateRemoved
 		}
 	}
-	return nil
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *InstanceDomainWriteModel) Query() *eventstore.SearchQueryBuilder {

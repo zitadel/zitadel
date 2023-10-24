@@ -15,6 +15,8 @@ import (
 const (
 	failedEventsColumnProjectionName = "projection_name"
 	failedEventsColumnFailedSequence = "failed_sequence"
+	failedEventsColumnAggregateType  = "aggregate_type"
+	failedEventsColumnAggregateID    = "aggregate_id"
 	failedEventsColumnFailureCount   = "failure_count"
 	failedEventsColumnLastFailed     = "last_failed"
 	failedEventsColumnError          = "error"
@@ -32,6 +34,14 @@ var (
 	}
 	FailedEventsColumnFailedSequence = Column{
 		name:  failedEventsColumnFailedSequence,
+		table: failedEventsTable,
+	}
+	FailedeventsColumnAggregateType = Column{
+		name:  failedEventsColumnAggregateType,
+		table: failedEventsTable,
+	}
+	FailedeventsColumnAggregateID = Column{
+		name:  failedEventsColumnAggregateID,
 		table: failedEventsTable,
 	}
 	FailedEventsColumnFailureCount = Column{
@@ -59,6 +69,8 @@ type FailedEvents struct {
 
 type FailedEvent struct {
 	ProjectionName string
+	AggregateType  string
+	AggregateID    string
 	FailedSequence uint64
 	FailureCount   uint64
 	Error          string
@@ -131,6 +143,8 @@ func prepareFailedEventsQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 	return sq.Select(
 			FailedEventsColumnProjectionName.identifier(),
 			FailedEventsColumnFailedSequence.identifier(),
+			FailedeventsColumnAggregateType.identifier(),
+			FailedeventsColumnAggregateID.identifier(),
 			FailedEventsColumnFailureCount.identifier(),
 			FailedEventsColumnLastFailed.identifier(),
 			FailedEventsColumnError.identifier(),
@@ -146,6 +160,8 @@ func prepareFailedEventsQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				err := rows.Scan(
 					&failedEvent.ProjectionName,
 					&failedEvent.FailedSequence,
+					&failedEvent.AggregateType,
+					&failedEvent.AggregateID,
 					&failedEvent.FailureCount,
 					&lastFailed,
 					&failedEvent.Error,

@@ -25,6 +25,10 @@ type execution struct {
 type anyArg struct{}
 
 func (e *testExecuter) Exec(stmt string, args ...interface{}) (sql.Result, error) {
+	if stmt == "SAVEPOINT stmt_exec" || stmt == "RELEASE SAVEPOINT stmt_exec" {
+		return nil, nil
+	}
+
 	if e.execIdx >= len(e.executions) {
 		return nil, errors.ThrowInternal(nil, "PROJE-8TNoE", "too many executions")
 	}

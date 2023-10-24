@@ -167,7 +167,7 @@ func (c *orgSetupCommands) push(ctx context.Context) (_ *CreatedOrg, err error) 
 	return &CreatedOrg{
 		ObjectDetails: &domain.ObjectDetails{
 			Sequence:      events[len(events)-1].Sequence(),
-			EventDate:     events[len(events)-1].CreationDate(),
+			EventDate:     events[len(events)-1].CreatedAt(),
 			ResourceOwner: c.aggregate.ID,
 		},
 		CreatedAdmins: c.createdAdmins(),
@@ -424,7 +424,7 @@ func (c *Commands) RemoveOrg(ctx context.Context, id string) (*domain.ObjectDeta
 
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
 	}, nil
 }

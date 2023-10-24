@@ -2,13 +2,10 @@ package project
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/member"
 )
 
@@ -20,15 +17,15 @@ var (
 	GrantMemberCascadeRemovedType = grantEventTypePrefix + member.CascadeRemovedEventType
 )
 
-func NewAddProjectGrantMemberUniqueConstraint(projectID, userID, grantID string) *eventstore.EventUniqueConstraint {
+func NewAddProjectGrantMemberUniqueConstraint(projectID, userID, grantID string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueProjectGrantMemberType,
 		fmt.Sprintf("%s:%s:%s", projectID, userID, grantID),
 		"Errors.Project.Member.AlreadyExists")
 }
 
-func NewRemoveProjectGrantMemberUniqueConstraint(projectID, userID, grantID string) *eventstore.EventUniqueConstraint {
-	return eventstore.NewRemoveEventUniqueConstraint(
+func NewRemoveProjectGrantMemberUniqueConstraint(projectID, userID, grantID string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
 		UniqueProjectGrantMemberType,
 		fmt.Sprintf("%s:%s:%s", projectID, userID, grantID),
 	)
@@ -42,12 +39,12 @@ type GrantMemberAddedEvent struct {
 	GrantID string   `json:"grantId"`
 }
 
-func (e *GrantMemberAddedEvent) Data() interface{} {
+func (e *GrantMemberAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GrantMemberAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
+func (e *GrantMemberAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
 }
 
 func NewProjectGrantMemberAddedEvent(
@@ -69,12 +66,12 @@ func NewProjectGrantMemberAddedEvent(
 	}
 }
 
-func GrantMemberAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GrantMemberAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GrantMemberAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "PROJECT-9f0sf", "unable to unmarshal label policy")
 	}
@@ -90,11 +87,11 @@ type GrantMemberChangedEvent struct {
 	UserID  string   `json:"userId"`
 }
 
-func (e *GrantMemberChangedEvent) Data() interface{} {
+func (e *GrantMemberChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GrantMemberChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GrantMemberChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -117,12 +114,12 @@ func NewProjectGrantMemberChangedEvent(
 	}
 }
 
-func GrantMemberChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GrantMemberChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GrantMemberChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "PROJECT-39fi8", "unable to unmarshal label policy")
 	}
@@ -137,12 +134,12 @@ type GrantMemberRemovedEvent struct {
 	GrantID string `json:"grantId"`
 }
 
-func (e *GrantMemberRemovedEvent) Data() interface{} {
+func (e *GrantMemberRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GrantMemberRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
+func (e *GrantMemberRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
 }
 
 func NewProjectGrantMemberRemovedEvent(
@@ -162,12 +159,12 @@ func NewProjectGrantMemberRemovedEvent(
 	}
 }
 
-func GrantMemberRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GrantMemberRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GrantMemberRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "PROJECT-173fM", "unable to unmarshal label policy")
 	}
@@ -182,12 +179,12 @@ type GrantMemberCascadeRemovedEvent struct {
 	GrantID string `json:"grantId"`
 }
 
-func (e *GrantMemberCascadeRemovedEvent) Data() interface{} {
+func (e *GrantMemberCascadeRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GrantMemberCascadeRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
+func (e *GrantMemberCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
 }
 
 func NewProjectGrantMemberCascadeRemovedEvent(
@@ -207,12 +204,12 @@ func NewProjectGrantMemberCascadeRemovedEvent(
 	}
 }
 
-func GrantMemberCascadeRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GrantMemberCascadeRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GrantMemberCascadeRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "PROJECT-3kfs3", "unable to unmarshal label policy")
 	}

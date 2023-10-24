@@ -363,7 +363,7 @@ func Test_UserPrepares(t *testing.T) {
 						domain.UserStateActive,
 						domain.UserTypeHuman,
 						"username",
-						database.StringArray{"login_name1", "login_name2"},
+						database.TextArray[string]{"login_name1", "login_name2"},
 						"login_name1",
 						//human
 						"id",
@@ -397,7 +397,7 @@ func Test_UserPrepares(t *testing.T) {
 				State:              domain.UserStateActive,
 				Type:               domain.UserTypeHuman,
 				Username:           "username",
-				LoginNames:         database.StringArray{"login_name1", "login_name2"},
+				LoginNames:         database.TextArray[string]{"login_name1", "login_name2"},
 				PreferredLoginName: "login_name1",
 				Human: &Human{
 					FirstName:         "first_name",
@@ -430,7 +430,7 @@ func Test_UserPrepares(t *testing.T) {
 						domain.UserStateActive,
 						domain.UserTypeMachine,
 						"username",
-						database.StringArray{"login_name1", "login_name2"},
+						database.TextArray[string]{"login_name1", "login_name2"},
 						"login_name1",
 						//human
 						nil,
@@ -464,7 +464,7 @@ func Test_UserPrepares(t *testing.T) {
 				State:              domain.UserStateActive,
 				Type:               domain.UserTypeMachine,
 				Username:           "username",
-				LoginNames:         database.StringArray{"login_name1", "login_name2"},
+				LoginNames:         database.TextArray[string]{"login_name1", "login_name2"},
 				PreferredLoginName: "login_name1",
 				Machine: &Machine{
 					Name:            "name",
@@ -873,7 +873,7 @@ func Test_UserPrepares(t *testing.T) {
 						domain.UserStateActive,
 						domain.UserTypeHuman,
 						"username",
-						database.StringArray{"login_name1", "login_name2"},
+						database.TextArray[string]{"login_name1", "login_name2"},
 						"login_name1",
 						//human
 						"id",
@@ -904,7 +904,7 @@ func Test_UserPrepares(t *testing.T) {
 				State:              domain.UserStateActive,
 				Type:               domain.UserTypeHuman,
 				Username:           "username",
-				LoginNames:         database.StringArray{"login_name1", "login_name2"},
+				LoginNames:         database.TextArray[string]{"login_name1", "login_name2"},
 				PreferredLoginName: "login_name1",
 				FirstName:          "first_name",
 				LastName:           "last_name",
@@ -936,7 +936,7 @@ func Test_UserPrepares(t *testing.T) {
 						domain.UserStateActive,
 						domain.UserTypeHuman,
 						"username",
-						database.StringArray{"login_name1", "login_name2"},
+						database.TextArray[string]{"login_name1", "login_name2"},
 						"login_name1",
 						//human
 						"id",
@@ -1017,7 +1017,7 @@ func Test_UserPrepares(t *testing.T) {
 							domain.UserStateActive,
 							domain.UserTypeHuman,
 							"username",
-							database.StringArray{"login_name1", "login_name2"},
+							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
 							//human
 							"id",
@@ -1056,7 +1056,7 @@ func Test_UserPrepares(t *testing.T) {
 						State:              domain.UserStateActive,
 						Type:               domain.UserTypeHuman,
 						Username:           "username",
-						LoginNames:         database.StringArray{"login_name1", "login_name2"},
+						LoginNames:         database.TextArray[string]{"login_name1", "login_name2"},
 						PreferredLoginName: "login_name1",
 						Human: &Human{
 							FirstName:         "first_name",
@@ -1092,7 +1092,7 @@ func Test_UserPrepares(t *testing.T) {
 							domain.UserStateActive,
 							domain.UserTypeHuman,
 							"username",
-							database.StringArray{"login_name1", "login_name2"},
+							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
 							//human
 							"id",
@@ -1123,7 +1123,7 @@ func Test_UserPrepares(t *testing.T) {
 							domain.UserStateActive,
 							domain.UserTypeMachine,
 							"username",
-							database.StringArray{"login_name1", "login_name2"},
+							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
 							//human
 							nil,
@@ -1162,7 +1162,7 @@ func Test_UserPrepares(t *testing.T) {
 						State:              domain.UserStateActive,
 						Type:               domain.UserTypeHuman,
 						Username:           "username",
-						LoginNames:         database.StringArray{"login_name1", "login_name2"},
+						LoginNames:         database.TextArray[string]{"login_name1", "login_name2"},
 						PreferredLoginName: "login_name1",
 						Human: &Human{
 							FirstName:         "first_name",
@@ -1187,7 +1187,7 @@ func Test_UserPrepares(t *testing.T) {
 						State:              domain.UserStateActive,
 						Type:               domain.UserTypeMachine,
 						Username:           "username",
-						LoginNames:         database.StringArray{"login_name1", "login_name2"},
+						LoginNames:         database.TextArray[string]{"login_name1", "login_name2"},
 						PreferredLoginName: "login_name1",
 						Machine: &Machine{
 							Name:            "name",

@@ -8,11 +8,14 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -23,7 +26,7 @@ type UserGrant struct {
 	CreationDate time.Time
 	ChangeDate   time.Time
 	Sequence     uint64
-	Roles        database.StringArray
+	Roles        database.TextArray[string]
 	// GrantID represents the project grant id
 	GrantID string
 	State   domain.UserGrantState
@@ -237,7 +240,8 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwn
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.UserGrantProjection.Trigger(ctx)
+		ctx, err = projection.UserGrantProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
 	}
 
 	query, scan := prepareUserGrantQuery(ctx, q.client)
@@ -265,7 +269,8 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, sh
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.UserGrantProjection.Trigger(ctx)
+		ctx, err = projection.UserGrantProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("unable to trigger")
 	}
 
 	query, scan := prepareUserGrantsQuery(ctx, q.client)
@@ -278,7 +283,7 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, sh
 		return nil, errors.ThrowInternal(err, "QUERY-wXnQR", "Errors.Query.SQLStatement")
 	}
 
-	latestSequence, err := q.latestSequence(ctx, userGrantTable)
+	latestSequence, err := q.latestState(ctx, userGrantTable)
 	if err != nil {
 		return nil, err
 	}
@@ -291,7 +296,7 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, sh
 		return nil, err
 	}
 
-	grants.LatestSequence = latestSequence
+	grants.State = latestSequence
 	return grants, nil
 }
 

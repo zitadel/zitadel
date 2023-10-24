@@ -60,7 +60,7 @@ func (wm *InstanceWriteModel) Reduce() error {
 			wm.DefaultLanguage = e.Language
 		}
 	}
-	return nil
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *InstanceWriteModel) Query() *eventstore.SearchQueryBuilder {

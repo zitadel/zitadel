@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -28,42 +28,43 @@ const (
 	SecretGeneratorColumnIncludeSymbols      = "include_symbols"
 )
 
-type secretGeneratorProjection struct {
-	crdb.StatementHandler
+type secretGeneratorProjection struct{}
+
+func newSecretGeneratorProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(secretGeneratorProjection))
 }
 
-func newSecretGeneratorProjection(ctx context.Context, config crdb.StatementHandlerConfig) *secretGeneratorProjection {
-	p := new(secretGeneratorProjection)
-	config.ProjectionName = SecretGeneratorProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(SecretGeneratorColumnGeneratorType, crdb.ColumnTypeEnum),
-			crdb.NewColumn(SecretGeneratorColumnAggregateID, crdb.ColumnTypeText),
-			crdb.NewColumn(SecretGeneratorColumnCreationDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(SecretGeneratorColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(SecretGeneratorColumnSequence, crdb.ColumnTypeInt64),
-			crdb.NewColumn(SecretGeneratorColumnResourceOwner, crdb.ColumnTypeText),
-			crdb.NewColumn(SecretGeneratorColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(SecretGeneratorColumnLength, crdb.ColumnTypeInt64),
-			crdb.NewColumn(SecretGeneratorColumnExpiry, crdb.ColumnTypeInt64),
-			crdb.NewColumn(SecretGeneratorColumnIncludeLowerLetters, crdb.ColumnTypeBool),
-			crdb.NewColumn(SecretGeneratorColumnIncludeUpperLetters, crdb.ColumnTypeBool),
-			crdb.NewColumn(SecretGeneratorColumnIncludeDigits, crdb.ColumnTypeBool),
-			crdb.NewColumn(SecretGeneratorColumnIncludeSymbols, crdb.ColumnTypeBool),
+func (*secretGeneratorProjection) Name() string {
+	return SecretGeneratorProjectionTable
+}
+
+func (*secretGeneratorProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(SecretGeneratorColumnGeneratorType, handler.ColumnTypeEnum),
+			handler.NewColumn(SecretGeneratorColumnAggregateID, handler.ColumnTypeText),
+			handler.NewColumn(SecretGeneratorColumnCreationDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(SecretGeneratorColumnChangeDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(SecretGeneratorColumnSequence, handler.ColumnTypeInt64),
+			handler.NewColumn(SecretGeneratorColumnResourceOwner, handler.ColumnTypeText),
+			handler.NewColumn(SecretGeneratorColumnInstanceID, handler.ColumnTypeText),
+			handler.NewColumn(SecretGeneratorColumnLength, handler.ColumnTypeInt64),
+			handler.NewColumn(SecretGeneratorColumnExpiry, handler.ColumnTypeInt64),
+			handler.NewColumn(SecretGeneratorColumnIncludeLowerLetters, handler.ColumnTypeBool),
+			handler.NewColumn(SecretGeneratorColumnIncludeUpperLetters, handler.ColumnTypeBool),
+			handler.NewColumn(SecretGeneratorColumnIncludeDigits, handler.ColumnTypeBool),
+			handler.NewColumn(SecretGeneratorColumnIncludeSymbols, handler.ColumnTypeBool),
 		},
-			crdb.NewPrimaryKey(SecretGeneratorColumnInstanceID, SecretGeneratorColumnGeneratorType, SecretGeneratorColumnAggregateID),
+			handler.NewPrimaryKey(SecretGeneratorColumnInstanceID, SecretGeneratorColumnGeneratorType, SecretGeneratorColumnAggregateID),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *secretGeneratorProjection) reducers() []handler.AggregateReducer {
+func (p *secretGeneratorProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.SecretGeneratorAddedEventType,
 					Reduce: p.reduceSecretGeneratorAdded,
@@ -90,7 +91,7 @@ func (p *secretGeneratorProjection) reduceSecretGeneratorAdded(event eventstore.
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-sk99F", "reduce.wrong.event.type %s", instance.SecretGeneratorAddedEventType)
 	}
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(SecretGeneratorColumnAggregateID, e.Aggregate().ID),
@@ -137,7 +138,7 @@ func (p *secretGeneratorProjection) reduceSecretGeneratorChanged(event eventstor
 	if e.IncludeSymbols != nil {
 		columns = append(columns, handler.NewCol(SecretGeneratorColumnIncludeSymbols, *e.IncludeSymbols))
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		columns,
 		[]handler.Condition{
@@ -153,7 +154,7 @@ func (p *secretGeneratorProjection) reduceSecretGeneratorRemoved(event eventstor
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fmiIf", "reduce.wrong.event.type %s", instance.SecretGeneratorRemovedEventType)
 	}
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(SecretGeneratorColumnAggregateID, e.Aggregate().ID),

@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
@@ -31,44 +31,46 @@ const (
 	AuthRequestColumnHintUserID    = "hint_user_id"
 )
 
-type authRequestProjection struct {
-	crdb.StatementHandler
+type authRequestProjection struct{}
+
+// Name implements handler.Projection.
+func (*authRequestProjection) Name() string {
+	return AuthRequestsProjectionTable
 }
 
-func newAuthRequestProjection(ctx context.Context, config crdb.StatementHandlerConfig) *authRequestProjection {
-	p := new(authRequestProjection)
-	config.ProjectionName = AuthRequestsProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewMultiTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(AuthRequestColumnID, crdb.ColumnTypeText),
-			crdb.NewColumn(AuthRequestColumnCreationDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(AuthRequestColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(AuthRequestColumnSequence, crdb.ColumnTypeInt64),
-			crdb.NewColumn(AuthRequestColumnResourceOwner, crdb.ColumnTypeText),
-			crdb.NewColumn(AuthRequestColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(AuthRequestColumnLoginClient, crdb.ColumnTypeText),
-			crdb.NewColumn(AuthRequestColumnClientID, crdb.ColumnTypeText),
-			crdb.NewColumn(AuthRequestColumnRedirectURI, crdb.ColumnTypeText),
-			crdb.NewColumn(AuthRequestColumnScope, crdb.ColumnTypeTextArray),
-			crdb.NewColumn(AuthRequestColumnPrompt, crdb.ColumnTypeEnumArray, crdb.Nullable()),
-			crdb.NewColumn(AuthRequestColumnUILocales, crdb.ColumnTypeTextArray, crdb.Nullable()),
-			crdb.NewColumn(AuthRequestColumnMaxAge, crdb.ColumnTypeInt64, crdb.Nullable()),
-			crdb.NewColumn(AuthRequestColumnLoginHint, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(AuthRequestColumnHintUserID, crdb.ColumnTypeText, crdb.Nullable()),
+func newAuthRequestProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(authRequestProjection))
+}
+
+func (*authRequestProjection) Init() *old_handler.Check {
+	return handler.NewMultiTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(AuthRequestColumnID, handler.ColumnTypeText),
+			handler.NewColumn(AuthRequestColumnCreationDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(AuthRequestColumnChangeDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(AuthRequestColumnSequence, handler.ColumnTypeInt64),
+			handler.NewColumn(AuthRequestColumnResourceOwner, handler.ColumnTypeText),
+			handler.NewColumn(AuthRequestColumnInstanceID, handler.ColumnTypeText),
+			handler.NewColumn(AuthRequestColumnLoginClient, handler.ColumnTypeText),
+			handler.NewColumn(AuthRequestColumnClientID, handler.ColumnTypeText),
+			handler.NewColumn(AuthRequestColumnRedirectURI, handler.ColumnTypeText),
+			handler.NewColumn(AuthRequestColumnScope, handler.ColumnTypeTextArray),
+			handler.NewColumn(AuthRequestColumnPrompt, handler.ColumnTypeEnumArray, handler.Nullable()),
+			handler.NewColumn(AuthRequestColumnUILocales, handler.ColumnTypeTextArray, handler.Nullable()),
+			handler.NewColumn(AuthRequestColumnMaxAge, handler.ColumnTypeInt64, handler.Nullable()),
+			handler.NewColumn(AuthRequestColumnLoginHint, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(AuthRequestColumnHintUserID, handler.ColumnTypeText, handler.Nullable()),
 		},
-			crdb.NewPrimaryKey(AuthRequestColumnInstanceID, AuthRequestColumnID),
+			handler.NewPrimaryKey(AuthRequestColumnInstanceID, AuthRequestColumnID),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *authRequestProjection) reducers() []handler.AggregateReducer {
+func (p *authRequestProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: authrequest.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  authrequest.AddedType,
 					Reduce: p.reduceAuthRequestAdded,
@@ -85,7 +87,7 @@ func (p *authRequestProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(AuthRequestColumnInstanceID),
@@ -101,7 +103,7 @@ func (p *authRequestProjection) reduceAuthRequestAdded(event eventstore.Event) (
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Sfwfa", "reduce.wrong.event.type %s", authrequest.AddedType)
 	}
 
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(AuthRequestColumnID, e.Aggregate().ID),
@@ -132,7 +134,7 @@ func (p *authRequestProjection) reduceAuthRequestEnded(event eventstore.Event) (
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ASF3h", "reduce.wrong.event.type %s", []eventstore.EventType{authrequest.SucceededType, authrequest.FailedType})
 	}
 
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		event,
 		[]handler.Condition{
 			handler.NewCond(AuthRequestColumnID, event.Aggregate().ID),

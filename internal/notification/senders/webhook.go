@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/channels/fs"

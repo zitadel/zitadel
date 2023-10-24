@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/op"
-	"gopkg.in/square/go-jose.v2"
+	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -121,15 +121,15 @@ func (o *OPStorage) getSigningKey(ctx context.Context) (op.SigningKey, error) {
 	if len(keys.Keys) > 0 {
 		return o.privateKeyToSigningKey(selectSigningKey(keys.Keys))
 	}
-	var sequence uint64
-	if keys.LatestSequence != nil {
-		sequence = keys.LatestSequence.Sequence
+	var position float64
+	if keys.State != nil {
+		position = keys.State.Position
 	}
-	return nil, o.refreshSigningKey(ctx, o.signingKeyAlgorithm, sequence)
+	return nil, o.refreshSigningKey(ctx, o.signingKeyAlgorithm, position)
 }
 
-func (o *OPStorage) refreshSigningKey(ctx context.Context, algorithm string, sequence uint64) error {
-	ok, err := o.ensureIsLatestKey(ctx, sequence)
+func (o *OPStorage) refreshSigningKey(ctx context.Context, algorithm string, position float64) error {
+	ok, err := o.ensureIsLatestKey(ctx, position)
 	if err != nil || !ok {
 		return errors.ThrowInternal(err, "OIDC-ASfh3", "cannot ensure that projection is up to date")
 	}
@@ -140,12 +140,12 @@ func (o *OPStorage) refreshSigningKey(ctx context.Context, algorithm string, seq
 	return errors.ThrowInternal(nil, "OIDC-Df1bh", "")
 }
 
-func (o *OPStorage) ensureIsLatestKey(ctx context.Context, sequence uint64) (bool, error) {
+func (o *OPStorage) ensureIsLatestKey(ctx context.Context, position float64) (bool, error) {
 	maxSequence, err := o.getMaxKeySequence(ctx)
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
-	return sequence == maxSequence, nil
+	return position >= maxSequence, nil
 }
 
 func (o *OPStorage) privateKeyToSigningKey(key query.PrivateKey) (_ op.SigningKey, err error) {
@@ -183,13 +183,20 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm
 	return o.command.GenerateSigningKeyPair(setOIDCCtx(ctx), algorithm)
 }
 
-func (o *OPStorage) getMaxKeySequence(ctx context.Context) (uint64, error) {
+func (o *OPStorage) getMaxKeySequence(ctx context.Context) (float64, error) {
 	return o.eventstore.LatestSequence(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
+			AwaitOpenTransactions().
 			AllowTimeTravel().
 			AddQuery().
-			AggregateTypes(keypair.AggregateType, instance.AggregateType).
+			AggregateTypes(keypair.AggregateType).
+			EventTypes(
+				keypair.AddedEventType,
+			).
+			Or().
+			AggregateTypes(instance.AggregateType).
+			EventTypes(instance.InstanceRemovedEventType).
 			Builder(),
 	)
 }

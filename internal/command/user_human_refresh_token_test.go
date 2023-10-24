@@ -8,13 +8,12 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
@@ -376,13 +375,11 @@ func TestCommands_RevokeRefreshToken(t *testing.T) {
 						)),
 					),
 					expectPushFailed(caos_errs.ThrowInternal(nil, "ERROR", "internal"),
-						[]*repository.Event{
-							eventFromEventPusher(user.NewHumanRefreshTokenRemovedEvent(
-								context.Background(),
-								&user.NewAggregate("userID", "orgID").Aggregate,
-								"tokenID",
-							)),
-						},
+						user.NewHumanRefreshTokenRemovedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "orgID").Aggregate,
+							"tokenID",
+						),
 					),
 				),
 			},
@@ -417,13 +414,11 @@ func TestCommands_RevokeRefreshToken(t *testing.T) {
 						)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(user.NewHumanRefreshTokenRemovedEvent(
-								context.Background(),
-								&user.NewAggregate("userID", "orgID").Aggregate,
-								"tokenID",
-							)),
-						},
+						user.NewHumanRefreshTokenRemovedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "orgID").Aggregate,
+							"tokenID",
+						),
 					),
 				),
 			},
@@ -563,18 +558,16 @@ func TestCommands_RevokeRefreshTokens(t *testing.T) {
 						)),
 					),
 					expectPushFailed(caos_errs.ThrowInternal(nil, "ERROR", "internal"),
-						[]*repository.Event{
-							eventFromEventPusher(user.NewHumanRefreshTokenRemovedEvent(
-								context.Background(),
-								&user.NewAggregate("userID", "orgID").Aggregate,
-								"tokenID",
-							)),
-							eventFromEventPusher(user.NewHumanRefreshTokenRemovedEvent(
-								context.Background(),
-								&user.NewAggregate("userID", "orgID").Aggregate,
-								"tokenID2",
-							)),
-						},
+						user.NewHumanRefreshTokenRemovedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "orgID").Aggregate,
+							"tokenID",
+						),
+						user.NewHumanRefreshTokenRemovedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "orgID").Aggregate,
+							"tokenID2",
+						),
 					),
 				),
 			},
@@ -625,18 +618,16 @@ func TestCommands_RevokeRefreshTokens(t *testing.T) {
 						)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(user.NewHumanRefreshTokenRemovedEvent(
-								context.Background(),
-								&user.NewAggregate("userID", "orgID").Aggregate,
-								"tokenID",
-							)),
-							eventFromEventPusher(user.NewHumanRefreshTokenRemovedEvent(
-								context.Background(),
-								&user.NewAggregate("userID", "orgID").Aggregate,
-								"tokenID2",
-							)),
-						},
+						user.NewHumanRefreshTokenRemovedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "orgID").Aggregate,
+							"tokenID",
+						),
+						user.NewHumanRefreshTokenRemovedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "orgID").Aggregate,
+							"tokenID2",
+						),
 					),
 				),
 			},
