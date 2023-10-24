@@ -274,7 +274,7 @@
     "SYMBOLERROR": "Deve incluir um símbolo ou caractere de pontuação.",
     "NUMBERERROR": "Deve incluir um dígito.",
     "PWNOTEQUAL": "As senhas fornecidas não correspondem.",
-    "PHONE": "O número de telefone deve começar com 00 ou +."
+    "PHONE": "O número de telefone deve começar com +."
   },
   "USER": {
     "SETTINGS": {
@@ -486,7 +486,7 @@
       "TITLE": "Perfil",
       "EMAIL": "E-mail",
       "PHONE": "Número de Telefone",
-      "PHONE_HINT": "Use 00 ou o símbolo + seguido do código de chamada do país, ou selecione o país na lista suspensa e, em seguida, insira o número de telefone",
+      "PHONE_HINT": "Use o símbolo + seguido do código de chamada do país, ou selecione o país na lista suspensa e, em seguida, insira o número de telefone",
       "USERNAME": "Nome de Usuário",
       "CHANGEUSERNAME": "modificar",
       "CHANGEUSERNAME_TITLE": "Alterar nome de usuário",
