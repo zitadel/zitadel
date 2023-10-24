@@ -1263,16 +1263,19 @@ func (repo *AuthRequestRepo) getUserIdFromRequest(ctx context.Context, request *
 			if err != nil {
 				return "", err
 			}
+			hasLoginAsUser := false
 			for _, us := range userSessions {
 				if loginAsPossibleMap[us.UserID] {
+					hasLoginAsUser = true
 					if us.State == domain.UserSessionStateActive {
 						request.UserOrigID = us.UserID
 						request.LoginAs = true
 						return us.UserID, nil
-					} else {
-						return "", nil
 					}
 				}
+			}
+			if hasLoginAsUser {
+				return "", nil
 			}
 		}
 	}
