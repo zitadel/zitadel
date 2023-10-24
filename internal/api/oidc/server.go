@@ -61,10 +61,6 @@ func (s *Server) IssuerFromRequest(r *http.Request) string {
 	return s.Provider().IssuerFromRequest(r)
 }
 
-func (s *Server) AuthCallbackURL() func(context.Context, string) string {
-	return op.AuthCallbackURL(s.Provider())
-}
-
 func (s *Server) Health(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
