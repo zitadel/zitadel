@@ -7,14 +7,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_HTTPPath(t *testing.T) {
+func Test_ActivityInfo(t *testing.T) {
 	type args struct {
-		path string
-		ok   bool
+		ctx           context.Context
+		ok            bool
+		path          string
+		method        string
+		requestMethod string
 	}
 	type want struct {
-		path string
-		ok   bool
+		ok            bool
+		path          string
+		method        string
+		requestMethod string
 	}
 	tests := []struct {
 		name string
@@ -22,164 +27,91 @@ func Test_HTTPPath(t *testing.T) {
 		want want
 	}{
 		{
-			"not set",
+			"already set",
 			args{
-				ok: false,
+				ctx: ctxWithActivityInfo(context.Background(), "set", "set", "set"),
+				ok:  false,
 			},
 			want{
-				ok: false,
+				ok:            true,
+				path:          "set",
+				method:        "set",
+				requestMethod: "set",
+			},
+		},
+		{
+			"not set, empty",
+			args{
+				ctx: context.Background(),
+				ok:  false,
+			},
+			want{
+				ok: true,
 			},
 		},
 		{
 			"set empty",
 			args{
-				ok:   true,
-				path: "",
+				ctx: context.Background(),
+				ok:  true,
 			},
 			want{
-				ok:   true,
-				path: "",
+				ok: true,
 			},
 		},
 		{
 			"set",
 			args{
-				ok:   true,
-				path: "set",
+				ctx:           context.Background(),
+				ok:            true,
+				path:          "set",
+				method:        "set",
+				requestMethod: "set",
 			},
 			want{
-				ok:   true,
-				path: "set",
+				ok:            true,
+				path:          "set",
+				method:        "set",
+				requestMethod: "set",
+			},
+		},
+		{
+			"reset",
+			args{
+				ctx:           ctxWithActivityInfo(context.Background(), "set", "set", "set"),
+				ok:            true,
+				path:          "set2",
+				method:        "set2",
+				requestMethod: "set2",
+			},
+			want{
+				ok:            true,
+				path:          "set2",
+				method:        "set2",
+				requestMethod: "set2",
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.Background()
+			ai := &ActivityInfo{}
+			ai.SetMethod(tt.args.method).SetPath(tt.args.path).SetRequestMethod(tt.args.requestMethod)
 			if tt.args.ok {
-				ctx = HTTPPathIntoContext(tt.args.path)(ctx)
+				tt.args.ctx = ai.IntoContext(tt.args.ctx)
 			}
-			path, ok := HTTPPathFromContext()(ctx)
-			assert.Equal(t, tt.want.ok, ok)
-			assert.Equal(t, tt.want.path, path)
+
+			res := ActivityInfoFromContext(tt.args.ctx)
+			if tt.want.ok {
+				assert.NotNil(t, res)
+			}
+			assert.Equal(t, tt.want.path, res.Path)
+			assert.Equal(t, tt.want.method, res.Method)
+			assert.Equal(t, tt.want.requestMethod, res.RequestMethod)
 		})
 	}
 }
 
-func Test_RPCMethod(t *testing.T) {
-	type args struct {
-		method string
-		ok     bool
-	}
-	type want struct {
-		method string
-		ok     bool
-	}
-	tests := []struct {
-		name string
-		args args
-		want want
-	}{
-		{
-			"not set",
-			args{
-				ok: false,
-			},
-			want{
-				ok: false,
-			},
-		},
-		{
-			"set empty",
-			args{
-				ok:     true,
-				method: "",
-			},
-			want{
-				ok:     true,
-				method: "",
-			},
-		},
-		{
-			"set",
-			args{
-				ok:     true,
-				method: "set",
-			},
-			want{
-				ok:     true,
-				method: "set",
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.Background()
-			if tt.args.ok {
-				ctx = RPCMethodIntoContext(tt.args.method)(ctx)
-			}
-			method, ok := RPCMethodFromContext()(ctx)
-			assert.Equal(t, tt.want.ok, ok)
-			assert.Equal(t, tt.want.method, method)
-		})
-	}
-}
-
-func Test_RequestMethod(t *testing.T) {
-	type args struct {
-		method string
-		ok     bool
-	}
-	type want struct {
-		method string
-		ok     bool
-	}
-	tests := []struct {
-		name string
-		args args
-		want want
-	}{
-		{
-			"not set",
-			args{
-				ok: false,
-			},
-			want{
-				ok: false,
-			},
-		},
-		{
-			"set empty",
-			args{
-				ok:     true,
-				method: "",
-			},
-			want{
-				ok:     true,
-				method: "",
-			},
-		},
-		{
-			"set",
-			args{
-				ok:     true,
-				method: "set",
-			},
-			want{
-				ok:     true,
-				method: "set",
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.Background()
-			if tt.args.ok {
-				ctx = RequestMethodIntoContext(tt.args.method)(ctx)
-			}
-			method, ok := RequestMethodFromContext()(ctx)
-			assert.Equal(t, tt.want.ok, ok)
-			assert.Equal(t, tt.want.method, method)
-		})
-	}
+func ctxWithActivityInfo(ctx context.Context, method, path, requestMethod string) context.Context {
+	ai := &ActivityInfo{}
+	return ai.SetPath(path).SetRequestMethod(requestMethod).SetMethod(method).IntoContext(ctx)
 }
