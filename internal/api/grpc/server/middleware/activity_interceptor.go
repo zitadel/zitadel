@@ -19,10 +19,13 @@ func ActivityInterceptor() grpc.UnaryServerInterceptor {
 	}
 }
 
+var resourcePrefixes = []string{
+	"/zitadel.management.v1.ManagementService/",
+	"/zitadel.admin.v1.AdminService/",
+}
+
 func isResourceAPI(method string) bool {
-	if strings.HasPrefix(method, "/zitadel.management.v1.ManagementService/") ||
-		strings.HasPrefix(method, "/zitadel.admin.v1.AdminService/") {
-		return true
-	}
-	return false
+	return slices.ContainsFunc(resourcePrefixes, func(prefix string) bool {
+		return strings.HasPrefix(method, prefix)
+	})
 }
