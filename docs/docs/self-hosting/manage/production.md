@@ -212,7 +212,7 @@ DefaultInstance:
 ## Limits and Quotas
 
 If you host ZITADEL as a service,
-you might want to [limit usage and/or execute tasks on certain usage units and levels](/self-hosting/manage/usage-control).
+you might want to [limit usage and/or execute tasks on certain usage units and levels](/self-hosting/manage/usage_control).
 
 ## Minimum system requirements
 
