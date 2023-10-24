@@ -274,7 +274,7 @@
     "SYMBOLERROR": "Must include a symbol or punctuation mark.",
     "NUMBERERROR": "Must include a digit.",
     "PWNOTEQUAL": "The passwords provided do not match.",
-    "PHONE": "The phone number must start with 00 or +."
+    "PHONE": "The phone number must start with +."
   },
   "USER": {
     "SETTINGS": {
@@ -486,7 +486,7 @@
       "TITLE": "Profile",
       "EMAIL": "E-mail",
       "PHONE": "Phone number",
-      "PHONE_HINT": "Use 00 or the + symbol followed by the calling country code, or select the country from the dropdown and finally enter the phone number",
+      "PHONE_HINT": "Use the + symbol followed by the calling country code, or select the country from the dropdown and finally enter the phone number",
       "USERNAME": "User Name",
       "CHANGEUSERNAME": "modify",
       "CHANGEUSERNAME_TITLE": "Change username",
