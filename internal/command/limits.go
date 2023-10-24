@@ -41,7 +41,6 @@ func (c *Commands) SetLimits(
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Is there a better way?
 	cmds, err := createCmds(ctx, nil)
 	if len(cmds) > 0 {
 		events, err := c.eventstore.Push(ctx, cmds...)
