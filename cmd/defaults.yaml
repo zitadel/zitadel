@@ -872,6 +872,7 @@ InternalAuthZ:
         - "system.instance.read"
         - "system.domain.read"
         - "system.debug.read"
+        - "system.iam.member.read"
     - Role: "IAM_OWNER"
       Permissions:
         - "iam.read"

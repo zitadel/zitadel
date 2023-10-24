@@ -22,8 +22,7 @@ func SessionTokenVerifier(algorithm crypto.EncryptionAlgorithm) func(ctx context
 			return err
 		}
 		_, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
-		var token string
-		token, err = algorithm.DecryptString(decodedToken, algorithm.EncryptionKeyID())
+		token, err := algorithm.DecryptString(decodedToken, algorithm.EncryptionKeyID())
 		spanPasswordComparison.EndWithError(err)
 		if err != nil || token != fmt.Sprintf(SessionTokenFormat, sessionID, tokenID) {
 			return zitadel_errors.ThrowPermissionDenied(err, "COMMAND-sGr42", "Errors.Session.Token.Invalid")

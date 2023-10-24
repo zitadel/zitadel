@@ -103,16 +103,16 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 	}
 	userID, clientID, agentID, prefLang, resourceOwner, err := t.VerifyAccessToken(ctx, tokenWOBearer)
 	var sysMemberships Memberships
+	if err != nil && !zitadel_errors.IsUnauthenticated(err) {
+		return CtxData{}, err
+	}
 	if err != nil {
 		var sysTokenErr error
 		sysMemberships, userID, sysTokenErr = t.VerifySystemToken(ctx, tokenWOBearer, orgID)
 		err = errors.Join(err, sysTokenErr)
-		if sysTokenErr == nil && sysMemberships != nil {
-			err = nil
+		if sysTokenErr != nil || sysMemberships == nil {
+			return CtxData{}, err
 		}
-	}
-	if err != nil {
-		return CtxData{}, err
 	}
 	var projectID string
 	var origins []string

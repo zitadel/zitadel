@@ -106,8 +106,8 @@ func (s *systemJWTStorage) GetKeyByIDAndClientID(_ context.Context, _, userID st
 	if !ok {
 		return nil, zitadel_errors.ThrowNotFound(nil, "AUTHZ-asfd3", "Errors.User.NotFound")
 	}
-	defer s.mutex.Unlock()
 	s.mutex.Lock()
+	defer s.mutex.Unlock()
 	publicKey, err := key.readKey()
 	if err != nil {
 		return nil, err
