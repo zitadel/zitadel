@@ -117,7 +117,7 @@ func TestLimits_SetLimits(t *testing.T) {
 			},
 		},
 		{
-			name: "recreate limit, ok",
+			name: "set limits after resetting limits, ok",
 			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
 				return eventstoreExpect(
 						t,
