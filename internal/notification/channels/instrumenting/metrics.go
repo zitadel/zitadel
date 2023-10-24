@@ -11,8 +11,8 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
-func countMessages(ctx context.Context, channel channels.NotificationChannel, successMetricName, errorMetricName string) channels.NotificationChannel {
-	return channels.HandleMessageFunc(func(message channels.Message) error {
+func countMessages[T channels.Message](ctx context.Context, channel channels.NotificationChannel[T], successMetricName, errorMetricName string) channels.NotificationChannel[T] {
+	return channels.HandleMessageFunc[T](func(message T) error {
 		err := channel.HandleMessage(message)
 		metricName := successMetricName
 		if err != nil {
@@ -25,8 +25,8 @@ func countMessages(ctx context.Context, channel channels.NotificationChannel, su
 
 func addCount(ctx context.Context, metricName string, message channels.Message, err error) {
 	labels := map[string]attribute.Value{
-		"triggering_event_typey": attribute.StringValue(string(message.GetTriggeringEvent().Type())),
-		"instance":               attribute.StringValue(authz.GetInstance(ctx).InstanceID()),
+		"triggering_event_type": attribute.StringValue(string(message.GetTriggeringEvent().Type())),
+		"instance":              attribute.StringValue(authz.GetInstance(ctx).InstanceID()),
 	}
 	if err != nil {
 		labels["error"] = attribute.StringValue(err.Error())

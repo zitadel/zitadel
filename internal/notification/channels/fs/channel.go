@@ -16,21 +16,20 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/messages"
 )
 
-func InitFSChannel(config Config) (channels.NotificationChannel, error) {
+func InitFSChannel[T channels.Message](config Config) (channels.NotificationChannel[T], error) {
 	if err := os.MkdirAll(config.Path, os.ModePerm); err != nil {
 		return nil, err
 	}
 
 	logging.Debug("successfully initialized filesystem email and sms channel")
 
-	return channels.HandleMessageFunc(func(message channels.Message) error {
-
+	return channels.HandleMessageFunc[T](func(message T) error {
 		fileName := fmt.Sprintf("%d_", time.Now().Unix())
 		content, err := message.GetContent()
 		if err != nil {
 			return err
 		}
-		switch msg := message.(type) {
+		switch msg := any(message).(type) {
 		case *messages.Email:
 			recipients := make([]string, len(msg.Recipients))
 			copy(recipients, msg.Recipients)

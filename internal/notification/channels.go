@@ -2,6 +2,7 @@ package notification
 
 import (
 	"context"
+	"github.com/zitadel/zitadel/internal/notification/messages"
 
 	"github.com/zitadel/logging"
 
@@ -14,7 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
-var _ types.ChannelChains = (*channels)(nil)
+var _ types.ChannelChains = (*allChannels)(nil)
 
 type counters struct {
 	success deliveryMetrics
@@ -27,13 +28,13 @@ type deliveryMetrics struct {
 	json  string
 }
 
-type channels struct {
+type allChannels struct {
 	q        *handlers.NotificationQueries
 	counters counters
 }
 
-func newChannels(q *handlers.NotificationQueries) *channels {
-	c := &channels{
+func newChannels(q *handlers.NotificationQueries) *allChannels {
+	c := &allChannels{
 		q: q,
 		counters: counters{
 			success: deliveryMetrics{
@@ -62,7 +63,7 @@ func registerCounter(counter, desc string) {
 	logging.WithFields("metric", counter).OnError(err).Panic("unable to register counter")
 }
 
-func (c *channels) Email(ctx context.Context) (*senders.Chain, *smtp.Config, error) {
+func (c *allChannels) Email(ctx context.Context) (*senders.Chain[*messages.Email], *smtp.Config, error) {
 	smtpCfg, err := c.q.GetSMTPConfig(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -78,7 +79,7 @@ func (c *channels) Email(ctx context.Context) (*senders.Chain, *smtp.Config, err
 	return chain, smtpCfg, err
 }
 
-func (c *channels) SMS(ctx context.Context) (*senders.Chain, *twilio.Config, error) {
+func (c *allChannels) SMS(ctx context.Context) (*senders.Chain[*messages.SMS], *twilio.Config, error) {
 	twilioCfg, err := c.q.GetTwilioConfig(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -94,7 +95,7 @@ func (c *channels) SMS(ctx context.Context) (*senders.Chain, *twilio.Config, err
 	return chain, twilioCfg, err
 }
 
-func (c *channels) Webhook(ctx context.Context, cfg webhook.Config) (*senders.Chain, error) {
+func (c *allChannels) Webhook(ctx context.Context, cfg webhook.Config) (*senders.Chain[*messages.JSON], error) {
 	return senders.WebhookChannels(
 		ctx,
 		cfg,

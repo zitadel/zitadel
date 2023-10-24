@@ -2,19 +2,19 @@ package senders
 
 import "github.com/zitadel/zitadel/internal/notification/channels"
 
-var _ channels.NotificationChannel = (*Chain)(nil)
+var _ channels.NotificationChannel[channels.Message] = (*Chain[channels.Message])(nil)
 
-type Chain struct {
-	channels []channels.NotificationChannel
+type Chain[T channels.Message] struct {
+	channels []channels.NotificationChannel[T]
 }
 
-func ChainChannels(channel ...channels.NotificationChannel) *Chain {
-	return &Chain{channels: channel}
+func ChainChannels[T channels.Message](channel ...channels.NotificationChannel[T]) *Chain[T] {
+	return &Chain[T]{channels: channel}
 }
 
 // HandleMessage returns a non nil error from a provider immediately if any occurs
 // messages are sent to channels in the same order they were provided to ChainChannels()
-func (c *Chain) HandleMessage(message channels.Message) error {
+func (c *Chain[T]) HandleMessage(message T) error {
 	for i := range c.channels {
 		if err := c.channels[i].HandleMessage(message); err != nil {
 			return err
@@ -23,6 +23,6 @@ func (c *Chain) HandleMessage(message channels.Message) error {
 	return nil
 }
 
-func (c *Chain) Len() int {
+func (c *Chain[T]) Len() int {
 	return len(c.channels)
 }

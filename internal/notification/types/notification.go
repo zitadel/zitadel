@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"github.com/zitadel/zitadel/internal/notification/messages"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/i18n"
@@ -21,9 +22,9 @@ type Notify func(
 ) error
 
 type ChannelChains interface {
-	Email(context.Context) (*senders.Chain, *smtp.Config, error)
-	SMS(context.Context) (*senders.Chain, *twilio.Config, error)
-	Webhook(context.Context, webhook.Config) (*senders.Chain, error)
+	Email(context.Context) (*senders.Chain[*messages.Email], *smtp.Config, error)
+	SMS(context.Context) (*senders.Chain[*messages.SMS], *twilio.Config, error)
+	Webhook(context.Context, webhook.Config) (*senders.Chain[*messages.JSON], error)
 }
 
 func SendEmail(

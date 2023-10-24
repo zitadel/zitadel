@@ -2,6 +2,7 @@ package senders
 
 import (
 	"context"
+	"github.com/zitadel/zitadel/internal/notification/messages"
 
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/channels/fs"
@@ -19,8 +20,8 @@ func SMSChannels(
 	getLogProvider func(ctx context.Context) (*log.Config, error),
 	successMetricName,
 	failureMetricName string,
-) (chain *Chain, err error) {
-	channels := make([]channels.NotificationChannel, 0, 3)
+) (chain *Chain[*messages.SMS], err error) {
+	channels := make([]channels.NotificationChannel[*messages.SMS], 0, 3)
 	if twilioConfig != nil {
 		channels = append(
 			channels,
@@ -33,6 +34,6 @@ func SMSChannels(
 			),
 		)
 	}
-	channels = append(channels, debugChannels(ctx, getFileSystemProvider, getLogProvider)...)
+	channels = append(channels, debugChannels[*messages.SMS](ctx, getFileSystemProvider, getLogProvider)...)
 	return ChainChannels(channels...), nil
 }

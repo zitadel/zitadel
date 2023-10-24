@@ -10,7 +10,7 @@ import (
 var _ channels.Message = (*JSON)(nil)
 
 type JSON struct {
-	Serializable    interface{}
+	Serializable    any
 	TriggeringEvent eventstore.Event
 }
 

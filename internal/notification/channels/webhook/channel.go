@@ -14,20 +14,16 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/messages"
 )
 
-func InitChannel(ctx context.Context, cfg Config) (channels.NotificationChannel, error) {
+func InitChannel(ctx context.Context, cfg Config) (channels.NotificationChannel[*messages.JSON], error) {
 	if err := cfg.Validate(); err != nil {
 		return nil, err
 	}
 
 	logging.Debug("successfully initialized webhook json channel")
-	return channels.HandleMessageFunc(func(message channels.Message) error {
+	return channels.HandleMessageFunc[*messages.JSON](func(message *messages.JSON) error {
 		requestCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
-		msg, ok := message.(*messages.JSON)
-		if !ok {
-			return errors.ThrowInternal(nil, "WEBH-K686U", "message is not JSON")
-		}
-		payload, err := msg.GetContent()
+		payload, err := message.GetContent()
 		if err != nil {
 			return err
 		}

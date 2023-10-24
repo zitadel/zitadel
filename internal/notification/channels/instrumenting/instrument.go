@@ -6,13 +6,13 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels"
 )
 
-func Wrap(
+func Wrap[T channels.Message](
 	ctx context.Context,
-	channel channels.NotificationChannel,
+	channel channels.NotificationChannel[T],
 	traceSpanName,
 	successMetricName,
 	failureMetricName string,
-) channels.NotificationChannel {
+) channels.NotificationChannel[T] {
 	return traceMessages(
 		ctx,
 		countMessages(

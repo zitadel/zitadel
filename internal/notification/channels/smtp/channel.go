@@ -1,24 +1,18 @@
 package smtp
 
 import (
-	"bytes"
 	"crypto/tls"
-	"encoding/base64"
-	"encoding/json"
-	"net"
-	"net/http"
-	"net/smtp"
-	"os"
-
 	"github.com/pkg/errors"
 	"github.com/zitadel/logging"
+	"net"
+	"net/smtp"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 )
 
-var _ channels.NotificationChannel = (*Email)(nil)
+var _ channels.NotificationChannel[*messages.Email] = (*Email)(nil)
 
 type Email struct {
 	smtpClient      *smtp.Client
@@ -36,27 +30,7 @@ type HttpRelayClient struct {
 }
 
 func InitChannel(cfg *Config) (*Email, error) {
-	if os.Getenv("ZITADEL_SEND_SMTP_EMAIL_TO_HTTP_RELAY") == "true" {
-		logging.New().Debug("successfully initialized email http relay channel")
-		protocol := "http://"
-		if cfg.Tls {
-			protocol = "https://"
-		}
-		return &Email{
-			smtpClient: nil,
-			httpRelayClient: &HttpRelayClient{
-				Host:     cfg.SMTP.Host,
-				User:     cfg.SMTP.User,
-				Password: cfg.SMTP.Password,
-				Protocol: protocol,
-			},
-			senderName:     cfg.FromName,
-			senderAddress:  cfg.From,
-			replyToAddress: cfg.ReplyToAddress,
-		}, nil
-	}
 	client, err := cfg.SMTP.connectToSMTP(cfg.Tls)
-
 	if err != nil {
 		logging.New().WithError(err).Error("could not connect to smtp")
 		return nil, err
@@ -70,64 +44,19 @@ func InitChannel(cfg *Config) (*Email, error) {
 	}, nil
 }
 
-func (email *Email) HandleMessage(message channels.Message) error {
-	if email.httpRelayClient != nil {
-		emailMsg, ok := message.(*messages.Email)
-		if !ok {
-			return caos_errs.ThrowInternal(nil, "EMAIL-proxy1", "message is not EmailMessage")
-		}
-		if os.Getenv("ZITADEL_HTTP_RELAY_DATA_ONLY") == "true" {
-			emailMsg.Content = ""
-		}
-		type EmailProxyPost struct {
-			EmailMsg *messages.Email
-			User     string
-			Password string
-		}
-		emailMsg.SenderEmail = email.senderAddress
-		emailMsg.SenderName = email.senderName
-		emailMsg.ReplyToAddress = email.replyToAddress
-		emailProxyPost := EmailProxyPost{EmailMsg: emailMsg}
-		if os.Getenv("ZITADEL_HTTP_RELAY_INCLUDE_CREDENTIALS") == "true" {
-			emailProxyPost.User = email.httpRelayClient.User
-			emailProxyPost.Password = email.httpRelayClient.Password
-		}
-		jsonStr, err := json.Marshal(emailProxyPost)
-		if err != nil {
-			return caos_errs.ThrowInternalf(nil, "EMAIL-proxy2", "could not marshal json")
-		}
-		req, err := http.NewRequest(http.MethodPost, email.httpRelayClient.Protocol+email.httpRelayClient.Host, bytes.NewBuffer(jsonStr))
-		if err != nil {
-			return caos_errs.ThrowInternalf(nil, "EMAIL-proxy3", "could not create request: "+err.Error())
-		}
-		if os.Getenv("ZITADEL_HTTP_RELAY_BASIC_AUTH") == "true" {
-			auth := base64.StdEncoding.EncodeToString([]byte(email.httpRelayClient.User + ":" + email.httpRelayClient.Password))
-			req.Header.Add("Authorization", "Basic "+auth)
-		}
-		_, err = http.DefaultClient.Do(req)
-		if err != nil {
-			return caos_errs.ThrowInternalf(nil, "EMAIL-proxy4", "error making request: "+err.Error())
-		}
-		return nil
-	}
+func (email *Email) HandleMessage(message *messages.Email) error {
 	defer email.smtpClient.Close()
-	emailMsg, ok := message.(*messages.Email)
-	if !ok {
-		return caos_errs.ThrowInternal(nil, "EMAIL-s8JLs", "message is not EmailMessage")
+	if message.Content == "" || message.Subject == "" || len(message.Recipients) == 0 {
+		return caos_errs.ThrowInternalf(nil, "EMAIL-zGemZ", "subject, recipients and content must be set but got subject %s, recipients length %d and content length %d", message.Subject, len(message.Recipients), len(message.Content))
 	}
-
-	if emailMsg.Content == "" || emailMsg.Subject == "" || len(emailMsg.Recipients) == 0 {
-		return caos_errs.ThrowInternalf(nil, "EMAIL-zGemZ", "subject, recipients and content must be set but got subject %s, recipients length %d and content length %d", emailMsg.Subject, len(emailMsg.Recipients), len(emailMsg.Content))
-	}
-	emailMsg.SenderEmail = email.senderAddress
-	emailMsg.SenderName = email.senderName
-	emailMsg.ReplyToAddress = email.replyToAddress
-
+	message.SenderEmail = email.senderAddress
+	message.SenderName = email.senderName
+	message.ReplyToAddress = email.replyToAddress
 	// To && From
-	if err := email.smtpClient.Mail(emailMsg.SenderEmail); err != nil {
-		return caos_errs.ThrowInternalf(err, "EMAIL-s3is3", "could not set sender: %v", emailMsg.SenderEmail)
+	if err := email.smtpClient.Mail(message.SenderEmail); err != nil {
+		return caos_errs.ThrowInternalf(err, "EMAIL-s3is3", "could not set sender: %v", message.SenderEmail)
 	}
-	for _, recp := range append(append(emailMsg.Recipients, emailMsg.CC...), emailMsg.BCC...) {
+	for _, recp := range append(append(message.Recipients, message.CC...), message.BCC...) {
 		if err := email.smtpClient.Rcpt(recp); err != nil {
 			return caos_errs.ThrowInternalf(err, "EMAIL-s4is4", "could not set recipient: %v", recp)
 		}
@@ -139,7 +68,7 @@ func (email *Email) HandleMessage(message channels.Message) error {
 		return err
 	}
 
-	content, err := emailMsg.GetContent()
+	content, err := message.GetContent()
 	if err != nil {
 		return err
 	}

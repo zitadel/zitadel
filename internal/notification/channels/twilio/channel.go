@@ -9,21 +9,17 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/messages"
 )
 
-func InitChannel(config Config) channels.NotificationChannel {
+func InitChannel(config Config) channels.NotificationChannel[*messages.SMS] {
 	client := twilio.NewClient(config.SID, config.Token, nil)
 
 	logging.Debug("successfully initialized twilio sms channel")
 
-	return channels.HandleMessageFunc(func(message channels.Message) error {
-		twilioMsg, ok := message.(*messages.SMS)
-		if !ok {
-			return caos_errs.ThrowInternal(nil, "TWILI-s0pLc", "message is not SMS")
-		}
-		content, err := twilioMsg.GetContent()
+	return channels.HandleMessageFunc[*messages.SMS](func(message *messages.SMS) error {
+		content, err := message.GetContent()
 		if err != nil {
 			return err
 		}
-		m, err := client.Messages.SendMessage(twilioMsg.SenderPhoneNumber, twilioMsg.RecipientPhoneNumber, content, nil)
+		m, err := client.Messages.SendMessage(message.SenderPhoneNumber, message.RecipientPhoneNumber, content, nil)
 		if err != nil {
 			return caos_errs.ThrowInternal(err, "TWILI-osk3S", "could not send message")
 		}

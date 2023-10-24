@@ -9,11 +9,11 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels"
 )
 
-func InitStdoutChannel(config Config) channels.NotificationChannel {
+func InitStdoutChannel[T channels.Message](config Config) channels.NotificationChannel[T] {
 
 	logging.Log("NOTIF-D0164").Debug("successfully initialized stdout email and sms channel")
 
-	return channels.HandleMessageFunc(func(message channels.Message) error {
+	return channels.HandleMessageFunc[T](func(message T) error {
 
 		content, err := message.GetContent()
 		if err != nil {

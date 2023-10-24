@@ -7,14 +7,14 @@ type Message interface {
 	GetContent() (string, error)
 }
 
-type NotificationChannel interface {
-	HandleMessage(message Message) error
+type NotificationChannel[T Message] interface {
+	HandleMessage(message T) error
 }
 
-var _ NotificationChannel = (HandleMessageFunc)(nil)
+var _ NotificationChannel[Message] = (HandleMessageFunc[Message])(nil)
 
-type HandleMessageFunc func(message Message) error
+type HandleMessageFunc[T Message] func(message T) error
 
-func (h HandleMessageFunc) HandleMessage(message Message) error {
+func (h HandleMessageFunc[T]) HandleMessage(message T) error {
 	return h(message)
 }
