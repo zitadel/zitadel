@@ -6,6 +6,7 @@ import (
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"golang.org/x/exp/slog"
 )
 
@@ -74,7 +75,128 @@ func (s *Server) AuthCallbackURL() func(context.Context, string) string {
 	return op.AuthCallbackURL(s.Provider())
 }
 
-// CodeExchange is an example how we can override / implement the handler methods.
-func (s *Server) CodeExchange(ctx context.Context, req *op.ClientRequest[oidc.AccessTokenRequest]) (*op.Response, error) {
-	return s.LegacyServer.CodeExchange(ctx, req)
+func (s *Server) Health(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.Health(ctx, r)
+}
+
+func (s *Server) Ready(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.Ready(ctx, r)
+}
+
+func (s *Server) Discovery(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.Discovery(ctx, r)
+}
+
+func (s *Server) Keys(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.Keys(ctx, r)
+}
+
+func (s *Server) VerifyAuthRequest(ctx context.Context, r *op.Request[oidc.AuthRequest]) (_ *op.ClientRequest[oidc.AuthRequest], err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.VerifyAuthRequest(ctx, r)
+}
+
+func (s *Server) Authorize(ctx context.Context, r *op.ClientRequest[oidc.AuthRequest]) (_ *op.Redirect, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.Authorize(ctx, r)
+}
+
+func (s *Server) DeviceAuthorization(ctx context.Context, r *op.ClientRequest[oidc.DeviceAuthorizationRequest]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.DeviceAuthorization(ctx, r)
+}
+
+func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCredentials]) (_ op.Client, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.VerifyClient(ctx, r)
+}
+
+func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.AccessTokenRequest]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.CodeExchange(ctx, r)
+}
+
+func (s *Server) RefreshToken(ctx context.Context, r *op.ClientRequest[oidc.RefreshTokenRequest]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.RefreshToken(ctx, r)
+}
+
+func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGrantRequest]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.JWTProfile(ctx, r)
+}
+
+func (s *Server) TokenExchange(ctx context.Context, r *op.ClientRequest[oidc.TokenExchangeRequest]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.TokenExchange(ctx, r)
+}
+
+func (s *Server) ClientCredentialsExchange(ctx context.Context, r *op.ClientRequest[oidc.ClientCredentialsRequest]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.ClientCredentialsExchange(ctx, r)
+}
+
+func (s *Server) DeviceToken(ctx context.Context, r *op.ClientRequest[oidc.DeviceAccessTokenRequest]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.DeviceToken(ctx, r)
+}
+
+func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionRequest]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.Introspect(ctx, r)
+}
+
+func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoRequest]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.UserInfo(ctx, r)
+}
+
+func (s *Server) Revocation(ctx context.Context, r *op.ClientRequest[oidc.RevocationRequest]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.Revocation(ctx, r)
+}
+
+func (s *Server) EndSession(ctx context.Context, r *op.Request[oidc.EndSessionRequest]) (_ *op.Redirect, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	return s.LegacyServer.EndSession(ctx, r)
 }
