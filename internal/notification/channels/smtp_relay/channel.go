@@ -2,11 +2,11 @@ package smtp_relay
 
 import (
 	"context"
-	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
-	"github.com/zitadel/zitadel/internal/notification/templates"
 
 	"github.com/zitadel/zitadel/internal/notification/channels"
+	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/internal/notification/templates"
 )
 
 type SMTPRelayMessage struct {
@@ -22,11 +22,7 @@ type SMTPRelayMessage struct {
 }
 
 func newSMTPRelayMessage(email *messages.Email, includeSMTPContent bool) (msg SMTPRelayMessage, err error) {
-	var content string
-	if includeSMTPContent {
-		content, err = email.GetContent()
-	}
-	return SMTPRelayMessage{
+	msg = SMTPRelayMessage{
 		Recipients:     email.Recipients,
 		BCC:            email.BCC,
 		CC:             email.CC,
@@ -34,9 +30,12 @@ func newSMTPRelayMessage(email *messages.Email, includeSMTPContent bool) (msg SM
 		SenderName:     email.SenderName,
 		ReplyToAddress: email.ReplyToAddress,
 		Subject:        email.Subject,
-		SMTPContent:    content,
 		TemplateData:   email.TemplateData,
-	}, nil
+	}
+	if includeSMTPContent {
+		msg.SMTPContent, err = email.GetContent()
+	}
+	return msg, err
 }
 
 func InitChannel(ctx context.Context, cfg *Config) (channels.NotificationChannel[*messages.Email], error) {
