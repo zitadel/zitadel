@@ -305,16 +305,9 @@ import {
   MilestoneType,
 } from '../proto/generated/zitadel/milestone/v1/milestone_pb';
 
-export enum StringableMilestoneType {
-  UNSPECIFIED = MilestoneType.MILESTONE_TYPE_UNSPECIFIED,
-  PROJECT_CREATED = MilestoneType.MILESTONE_TYPE_PROJECT_CREATED,
-  APPLICATION_CREATED = MilestoneType.MILESTONE_TYPE_APPLICATION_CREATED,
-  AUTHENTICATION_SUCCEEDED_ON_APPLICATION = MilestoneType.MILESTONE_TYPE_AUTHENTICATION_SUCCEEDED_ON_APPLICATION,
-}
-
 export interface OnboardingActions {
   order: number;
-  milestoneType: StringableMilestoneType;
+  milestoneType: MilestoneType;
   link: string;
   fragment?: string | undefined;
   iconClasses?: string;
@@ -337,6 +330,7 @@ type OnboardingMilestoneEntries = Array<[string, OnboardingMilestone]> | [];
   providedIn: 'root',
 })
 export class AdminService {
+  private readonly milestoneTypePrefixLength = 'MILESTONE_TYPE_'.length;
   public hideOnboarding: boolean = false;
   public loadMilestones: Subject<OnboardingActions[]> = new Subject();
   public onboardingLoading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -353,7 +347,7 @@ export class AdminService {
         map((reachedMilestones) => {
           let obj: { [type: string]: OnboardingMilestone } = {};
           actions.map((action) => {
-            obj[StringableMilestoneType[action.milestoneType]] = {
+            obj[Object.keys(MilestoneType)[action.milestoneType].substring(this.milestoneTypePrefixLength)] = {
               order: action.order,
               link: action.link,
               fragment: action.fragment,

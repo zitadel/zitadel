@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { AdminService } from 'src/app/services/admin.service';
 import { ThemeService } from 'src/app/services/theme.service';
-import { ONBOARDING_EVENTS } from 'src/app/utils/onboarding';
+import { ONBOARDING_MILESTONES } from 'src/app/utils/onboarding';
 
 @Component({
   selector: 'cnsl-onboarding',
@@ -15,6 +15,6 @@ export class OnboardingComponent {
     public adminService: AdminService,
     public themeService: ThemeService,
   ) {
-    this.adminService.loadMilestones.next(ONBOARDING_EVENTS);
+    this.adminService.loadMilestones.next(ONBOARDING_MILESTONES);
   }
 }

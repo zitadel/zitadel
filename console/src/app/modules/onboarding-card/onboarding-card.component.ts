@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { AdminService } from 'src/app/services/admin.service';
-import { ONBOARDING_EVENTS } from 'src/app/utils/onboarding';
+import { ONBOARDING_MILESTONES } from 'src/app/utils/onboarding';
 
 @Component({
   selector: 'cnsl-onboarding-card',
@@ -21,6 +21,6 @@ export class OnboardingCardComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.adminService.loadMilestones.next(ONBOARDING_EVENTS);
+    this.adminService.loadMilestones.next(ONBOARDING_MILESTONES);
   }
 }

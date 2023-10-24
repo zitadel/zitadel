@@ -1,5 +1,6 @@
-import { OnboardingActions, StringableMilestoneType } from '../services/admin.service';
+import { OnboardingActions } from '../services/admin.service';
 import { COLORS } from './color';
+import { MilestoneType } from '../proto/generated/zitadel/milestone/v1/milestone_pb';
 
 const reddark: string = COLORS[0][700];
 const redlight = COLORS[0][200];
@@ -22,10 +23,10 @@ const pinklight = COLORS[15][200];
 const sthdark: string = COLORS[18][700];
 const sthlight = COLORS[18][200];
 
-export const ONBOARDING_EVENTS: OnboardingActions[] = [
+export const ONBOARDING_MILESTONES: OnboardingActions[] = [
   {
     order: 0,
-    milestoneType: StringableMilestoneType.PROJECT_CREATED,
+    milestoneType: MilestoneType.MILESTONE_TYPE_PROJECT_CREATED,
     link: '/projects/create',
     iconClasses: 'las la-database',
     darkcolor: greendark,
@@ -33,7 +34,7 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
   },
   {
     order: 1,
-    milestoneType: StringableMilestoneType.APPLICATION_CREATED,
+    milestoneType: MilestoneType.MILESTONE_TYPE_APPLICATION_CREATED,
     link: '/projects/app-create',
     iconClasses: 'lab la-openid',
     darkcolor: purpledark,
@@ -41,7 +42,7 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
   },
   {
     order: 3,
-    milestoneType: StringableMilestoneType.AUTHENTICATION_SUCCEEDED_ON_APPLICATION,
+    milestoneType: MilestoneType.MILESTONE_TYPE_AUTHENTICATION_SUCCEEDED_ON_APPLICATION,
     link: 'https://zitadel.com/docs/guides/integrate/login-users',
     iconClasses: 'las la-sign-in-alt',
     darkcolor: sthdark,
