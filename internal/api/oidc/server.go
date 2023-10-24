@@ -7,21 +7,11 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"golang.org/x/exp/slog"
 )
 
 type Server struct {
 	http.Handler
 	*op.LegacyServer
-	storage *OPStorage
-}
-
-func newServer(provider op.OpenIDProvider, storage *OPStorage, endpointConfig *EndpointConfig, logger *slog.Logger) *Server {
-	server := &Server{
-		LegacyServer: op.NewLegacyServer(provider, endpoints(endpointConfig)),
-	}
-	server.Handler = op.RegisterLegacyServer(server, op.WithFallbackLogger(logger))
-	return server
 }
 
 func endpoints(endpointConfig *EndpointConfig) op.Endpoints {
