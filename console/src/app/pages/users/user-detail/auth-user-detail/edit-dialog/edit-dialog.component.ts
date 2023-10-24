@@ -23,13 +23,13 @@ export class EditDialogComponent implements OnInit {
   public controlKey = 'editingField';
   public isPhone: boolean = false;
   public isVerified: boolean = false;
-  public phoneCountry: string = 'CH';
+  public phoneCountry: string = 'US';
   public dialogForm!: UntypedFormGroup;
   public EditDialogType: any = EditDialogType;
   public selected: CountryPhoneCode | undefined = {
-    countryCallingCode: '41',
-    countryCode: 'CH',
-    countryName: 'Switzerland',
+    countryCallingCode: '1',
+    countryCode: 'US',
+    countryName: 'United States of America',
   };
   public countryPhoneCodes: CountryPhoneCode[] = [];
   constructor(

@@ -36,9 +36,9 @@ export class UserCreateComponent implements OnInit, OnDestroy {
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
   public languages: string[] = supportedLanguages;
   public selected: CountryPhoneCode | undefined = {
-    countryCallingCode: '41',
-    countryCode: 'CH',
-    countryName: 'Switzerland',
+    countryCallingCode: '1',
+    countryCode: 'US',
+    countryName: 'United States of America',
   };
   public countryPhoneCodes: CountryPhoneCode[] = [];
   public userForm!: UntypedFormGroup;

@@ -1,7 +1,7 @@
 import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
 
 export function formatPhone(phone: string): { phone: string; country: CountryCode } | null {
-  const defaultCountry = 'CH';
+  const defaultCountry = 'US';
 
   if (phone) {
     try {
