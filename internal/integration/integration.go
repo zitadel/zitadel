@@ -19,8 +19,8 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/client"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/client"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"

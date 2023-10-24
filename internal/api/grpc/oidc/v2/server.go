@@ -1,7 +1,7 @@
 package oidc
 
 import (
-	"github.com/zitadel/oidc/v2/pkg/op"
+	"github.com/zitadel/oidc/v3/pkg/op"
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"

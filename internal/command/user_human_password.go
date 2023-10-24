@@ -175,7 +175,7 @@ func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner
 
 func (c *Commands) PasswordCodeSent(ctx context.Context, orgID, userID string) (err error) {
 	if userID == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-MM9fs", "Errors.User.UserIDMissing")
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-meEfe", "Errors.User.UserIDMissing")
 	}
 
 	existingPassword, err := c.passwordWriteModel(ctx, userID, orgID)

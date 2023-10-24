@@ -1093,6 +1093,7 @@
         "TOKEN": "Токен",
         "SENDERNUMBER": "Број на испраќач",
         "ADDED": "Twilio e успешно додаден.",
+        "UPDATED": "Twilio се ажурираше успешно.",
         "REMOVED": "Twilio отстранет",
         "CHANGETOKEN": "Смени токен",
         "SETTOKEN": "Постави токен",

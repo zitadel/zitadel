@@ -1091,6 +1091,7 @@
         "TOKEN": "令牌",
         "SENDERNUMBER": "发件人号码",
         "ADDED": "Twilio 添加成功。",
+        "UPDATED": "Twilio 更新成功。",
         "REMOVED": "Twilio 已删除",
         "CHANGETOKEN": "更改令牌",
         "SETTOKEN": "设置令牌",

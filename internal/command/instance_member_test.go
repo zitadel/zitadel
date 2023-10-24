@@ -7,16 +7,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/repository/user"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/member"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 func TestCommandSide_AddIAMMember(t *testing.T) {
@@ -159,14 +156,11 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 					),
 					expectFilter(),
 					expectPushFailed(caos_errs.ThrowAlreadyExists(nil, "ERROR", "internal"),
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("INSTANCE", instance.NewMemberAddedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								"user1",
-								[]string{"IAM_OWNER"}...,
-							)),
-						},
-						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", member.NewAddMemberUniqueConstraint("INSTANCE", "user1")),
+						instance.NewMemberAddedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"user1",
+							[]string{"IAM_OWNER"}...,
+						),
 					),
 				),
 				zitadelRoles: []authz.RoleMapping{
@@ -208,16 +202,11 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 					),
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewMemberAddedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									"user1",
-									[]string{"IAM_OWNER"}...,
-								)),
-						},
-						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", member.NewAddMemberUniqueConstraint("INSTANCE", "user1")),
+						instance.NewMemberAddedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"user1",
+							[]string{"IAM_OWNER"}...,
+						),
 					),
 				),
 				zitadelRoles: []authz.RoleMapping{
@@ -388,13 +377,11 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(instance.NewMemberChangedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								"user1",
-								[]string{"IAM_OWNER", "IAM_OWNER_VIEWER"}...,
-							)),
-						},
+						instance.NewMemberChangedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"user1",
+							[]string{"IAM_OWNER", "IAM_OWNER_VIEWER"}...,
+						),
 					),
 				),
 				zitadelRoles: []authz.RoleMapping{
@@ -418,6 +405,7 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						ResourceOwner: "INSTANCE",
 						AggregateID:   "INSTANCE",
+						InstanceID:    "INSTANCE",
 					},
 					UserID: "user1",
 					Roles:  []string{"IAM_OWNER", "IAM_OWNER_VIEWER"},
@@ -510,13 +498,10 @@ func TestCommandSide_RemoveIAMMember(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(instance.NewMemberRemovedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								"user1",
-							)),
-						},
-						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint("INSTANCE", "user1")),
+						instance.NewMemberRemovedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"user1",
+						),
 					),
 				),
 			},

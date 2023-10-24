@@ -27,7 +27,7 @@ func (s *Server) ListIAMMembers(ctx context.Context, req *admin_pb.ListIAMMember
 		return nil, err
 	}
 	return &admin_pb.ListIAMMembersResponse{
-		Details: object.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: object.ToListDetails(res.Count, res.Sequence, res.LastRun),
 		//TODO: resource owner of user of the member instead of the membership resource owner
 		Result: member.MembersToPb("", res.Members),
 	}, nil

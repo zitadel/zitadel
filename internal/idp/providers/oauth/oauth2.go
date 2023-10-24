@@ -3,8 +3,8 @@ package oauth
 import (
 	"context"
 
-	"github.com/zitadel/oidc/v2/pkg/client/rp"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/oauth2"
 
 	"github.com/zitadel/zitadel/internal/idp"

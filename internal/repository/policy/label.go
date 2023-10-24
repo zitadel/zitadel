@@ -1,11 +1,8 @@
 package policy
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/asset"
 )
 
@@ -48,11 +45,11 @@ type LabelPolicyAddedEvent struct {
 	DisableWatermark    bool   `json:"disableMsgPopup,omitempty"`
 }
 
-func (e *LabelPolicyAddedEvent) Data() interface{} {
+func (e *LabelPolicyAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LabelPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LabelPolicyAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -87,12 +84,12 @@ func NewLabelPolicyAddedEvent(
 	}
 }
 
-func LabelPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LabelPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &LabelPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-puqv4", "unable to unmarshal label policy")
 	}
@@ -116,11 +113,11 @@ type LabelPolicyChangedEvent struct {
 	DisableWatermark    *bool   `json:"disableWatermark,omitempty"`
 }
 
-func (e *LabelPolicyChangedEvent) Data() interface{} {
+func (e *LabelPolicyChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LabelPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LabelPolicyChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -208,12 +205,12 @@ func ChangeDisableWatermark(disableWatermark bool) func(*LabelPolicyChangedEvent
 	}
 }
 
-func LabelPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LabelPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &LabelPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-qhfFb", "unable to unmarshal label policy")
 	}
@@ -225,11 +222,11 @@ type LabelPolicyActivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *LabelPolicyActivatedEvent) Data() interface{} {
+func (e *LabelPolicyActivatedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LabelPolicyActivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LabelPolicyActivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -239,7 +236,7 @@ func NewLabelPolicyActivatedEvent(base *eventstore.BaseEvent) *LabelPolicyActiva
 	}
 }
 
-func LabelPolicyActivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LabelPolicyActivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &LabelPolicyActivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -249,11 +246,11 @@ type LabelPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *LabelPolicyRemovedEvent) Data() interface{} {
+func (e *LabelPolicyRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LabelPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LabelPolicyRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -263,7 +260,7 @@ func NewLabelPolicyRemovedEvent(base *eventstore.BaseEvent) *LabelPolicyRemovedE
 	}
 }
 
-func LabelPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LabelPolicyRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &LabelPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -273,11 +270,11 @@ type LabelPolicyLogoAddedEvent struct {
 	asset.AddedEvent
 }
 
-func (e *LabelPolicyLogoAddedEvent) Data() interface{} {
+func (e *LabelPolicyLogoAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LabelPolicyLogoAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LabelPolicyLogoAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -287,7 +284,7 @@ func NewLabelPolicyLogoAddedEvent(base *eventstore.BaseEvent, storageKey string)
 	}
 }
 
-func LabelPolicyLogoAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LabelPolicyLogoAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := asset.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -300,11 +297,11 @@ type LabelPolicyLogoRemovedEvent struct {
 	asset.RemovedEvent
 }
 
-func (e *LabelPolicyLogoRemovedEvent) Data() interface{} {
+func (e *LabelPolicyLogoRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LabelPolicyLogoRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LabelPolicyLogoRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -314,7 +311,7 @@ func NewLabelPolicyLogoRemovedEvent(base *eventstore.BaseEvent, storageKey strin
 	}
 }
 
-func LabelPolicyLogoRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LabelPolicyLogoRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := asset.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -327,11 +324,11 @@ type LabelPolicyIconAddedEvent struct {
 	asset.AddedEvent
 }
 
-func (e *LabelPolicyIconAddedEvent) Data() interface{} {
+func (e *LabelPolicyIconAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LabelPolicyIconAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LabelPolicyIconAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -341,7 +338,7 @@ func NewLabelPolicyIconAddedEvent(base *eventstore.BaseEvent, storageKey string)
 	}
 }
 
-func LabelPolicyIconAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LabelPolicyIconAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := asset.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -354,11 +351,11 @@ type LabelPolicyIconRemovedEvent struct {
 	asset.RemovedEvent
 }
 
-func (e *LabelPolicyIconRemovedEvent) Data() interface{} {
+func (e *LabelPolicyIconRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LabelPolicyIconRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LabelPolicyIconRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -368,7 +365,7 @@ func NewLabelPolicyIconRemovedEvent(base *eventstore.BaseEvent, storageKey strin
 	}
 }
 
-func LabelPolicyIconRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LabelPolicyIconRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := asset.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -381,11 +378,11 @@ type LabelPolicyLogoDarkAddedEvent struct {
 	asset.AddedEvent
 }
 
-func (e *LabelPolicyLogoDarkAddedEvent) Data() interface{} {
+func (e *LabelPolicyLogoDarkAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LabelPolicyLogoDarkAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LabelPolicyLogoDarkAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -395,7 +392,7 @@ func NewLabelPolicyLogoDarkAddedEvent(base *eventstore.BaseEvent, storageKey str
 	}
 }
 
-func LabelPolicyLogoDarkAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LabelPolicyLogoDarkAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := asset.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -408,11 +405,11 @@ type LabelPolicyLogoDarkRemovedEvent struct {
 	asset.RemovedEvent
 }
 
-func (e *LabelPolicyLogoDarkRemovedEvent) Data() interface{} {
+func (e *LabelPolicyLogoDarkRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LabelPolicyLogoDarkRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LabelPolicyLogoDarkRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -422,7 +419,7 @@ func NewLabelPolicyLogoDarkRemovedEvent(base *eventstore.BaseEvent, storageKey s
 	}
 }
 
-func LabelPolicyLogoDarkRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LabelPolicyLogoDarkRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := asset.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -435,11 +432,11 @@ type LabelPolicyIconDarkAddedEvent struct {
 	asset.AddedEvent
 }
 
-func (e *LabelPolicyIconDarkAddedEvent) Data() interface{} {
+func (e *LabelPolicyIconDarkAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LabelPolicyIconDarkAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LabelPolicyIconDarkAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -449,7 +446,7 @@ func NewLabelPolicyIconDarkAddedEvent(base *eventstore.BaseEvent, storageKey str
 	}
 }
 
-func LabelPolicyIconDarkAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LabelPolicyIconDarkAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := asset.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -462,11 +459,11 @@ type LabelPolicyIconDarkRemovedEvent struct {
 	asset.RemovedEvent
 }
 
-func (e *LabelPolicyIconDarkRemovedEvent) Data() interface{} {
+func (e *LabelPolicyIconDarkRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LabelPolicyIconDarkRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LabelPolicyIconDarkRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -476,7 +473,7 @@ func NewLabelPolicyIconDarkRemovedEvent(base *eventstore.BaseEvent, storageKey s
 	}
 }
 
-func LabelPolicyIconDarkRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LabelPolicyIconDarkRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := asset.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -489,11 +486,11 @@ type LabelPolicyFontAddedEvent struct {
 	asset.AddedEvent
 }
 
-func (e *LabelPolicyFontAddedEvent) Data() interface{} {
+func (e *LabelPolicyFontAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LabelPolicyFontAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LabelPolicyFontAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -503,7 +500,7 @@ func NewLabelPolicyFontAddedEvent(base *eventstore.BaseEvent, storageKey string)
 	}
 }
 
-func LabelPolicyFontAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LabelPolicyFontAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := asset.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -516,11 +513,11 @@ type LabelPolicyFontRemovedEvent struct {
 	asset.RemovedEvent
 }
 
-func (e *LabelPolicyFontRemovedEvent) Data() interface{} {
+func (e *LabelPolicyFontRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LabelPolicyFontRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LabelPolicyFontRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -530,7 +527,7 @@ func NewLabelPolicyFontRemovedEvent(base *eventstore.BaseEvent, storageKey strin
 	}
 }
 
-func LabelPolicyFontRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LabelPolicyFontRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := asset.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -543,11 +540,11 @@ type LabelPolicyAssetsRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *LabelPolicyAssetsRemovedEvent) Data() interface{} {
+func (e *LabelPolicyAssetsRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *LabelPolicyAssetsRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LabelPolicyAssetsRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -557,7 +554,7 @@ func NewLabelPolicyAssetsRemovedEvent(base *eventstore.BaseEvent) *LabelPolicyAs
 	}
 }
 
-func LabelPolicyAssetsRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LabelPolicyAssetsRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &LabelPolicyAssetsRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

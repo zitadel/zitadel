@@ -1091,6 +1091,7 @@
         "TOKEN": "Jeton",
         "SENDERNUMBER": "Numéro d'expéditeur",
         "ADDED": "Twilio a été ajouté avec succès.",
+        "UPDATED": "Twilio a été mis à jour avec succès.",
         "REMOVED": "Twilio a été supprimé avec succès",
         "CHANGETOKEN": "Changer de Token",
         "SETTOKEN": "Définir le jeton",

@@ -6,8 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -26,17 +25,17 @@ func TestProjectProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ProjectRemovedType),
-					project.AggregateType,
-					nil,
-				), project.ProjectRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.ProjectRemovedType,
+						project.AggregateType,
+						nil,
+					), project.ProjectRemovedEventMapper),
 			},
 			reduce: (&projectProjection{}).reduceProjectRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -53,17 +52,17 @@ func TestProjectProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(ProjectColumnInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -79,17 +78,17 @@ func TestProjectProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectReactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ProjectReactivatedType),
-					project.AggregateType,
-					nil,
-				), project.ProjectReactivatedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.ProjectReactivatedType,
+						project.AggregateType,
+						nil,
+					), project.ProjectReactivatedEventMapper),
 			},
 			reduce: (&projectProjection{}).reduceProjectReactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -109,17 +108,17 @@ func TestProjectProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectDeactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ProjectDeactivatedType),
-					project.AggregateType,
-					nil,
-				), project.ProjectDeactivatedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.ProjectDeactivatedType,
+						project.AggregateType,
+						nil,
+					), project.ProjectDeactivatedEventMapper),
 			},
 			reduce: (&projectProjection{}).reduceProjectDeactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -139,17 +138,17 @@ func TestProjectProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ProjectChangedType),
-					project.AggregateType,
-					[]byte(`{"name": "new name", "projectRoleAssertion": true, "projectRoleCheck": true, "hasProjectCheck": true, "privateLabelingSetting": 1}`),
-				), project.ProjectChangeEventMapper),
+				event: getEvent(
+					testEvent(
+						project.ProjectChangedType,
+						project.AggregateType,
+						[]byte(`{"name": "new name", "projectRoleAssertion": true, "projectRoleCheck": true, "hasProjectCheck": true, "privateLabelingSetting": 1}`),
+					), project.ProjectChangeEventMapper),
 			},
 			reduce: (&projectProjection{}).reduceProjectChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -173,34 +172,34 @@ func TestProjectProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectChanged no changes",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ProjectChangedType),
-					project.AggregateType,
-					[]byte(`{}`),
-				), project.ProjectChangeEventMapper),
+				event: getEvent(
+					testEvent(
+						project.ProjectChangedType,
+						project.AggregateType,
+						[]byte(`{}`),
+					), project.ProjectChangeEventMapper),
 			},
 			reduce: (&projectProjection{}).reduceProjectChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
-				executer:         &testExecuter{},
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
+				executer:      &testExecuter{},
 			},
 		},
 		{
 			name: "reduceProjectAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ProjectAddedType),
-					project.AggregateType,
-					[]byte(`{"name": "name", "projectRoleAssertion": true, "projectRoleCheck": true, "hasProjectCheck": true, "privateLabelingSetting": 1}`),
-				), project.ProjectAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.ProjectAddedType,
+						project.AggregateType,
+						[]byte(`{"name": "name", "projectRoleAssertion": true, "projectRoleCheck": true, "hasProjectCheck": true, "privateLabelingSetting": 1}`),
+					), project.ProjectAddedEventMapper),
 			},
 			reduce: (&projectProjection{}).reduceProjectAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -228,16 +227,16 @@ func TestProjectProjection_reduces(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&projectProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

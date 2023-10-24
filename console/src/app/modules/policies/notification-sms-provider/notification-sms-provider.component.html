@@ -24,6 +24,7 @@
         *ngIf="twilio && twilio.id"
         [disabled]="(['iam.write'] | hasRole | async) === false"
         mat-stroked-button
+        data-e2e="activate-sms-provider-button"
         (click)="toggleSMSProviderState(twilio.id)"
       >
         <span *ngIf="twilio.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_ACTIVE">{{

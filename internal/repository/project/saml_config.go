@@ -2,11 +2,9 @@ package project
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -24,25 +22,25 @@ type SAMLConfigAddedEvent struct {
 	MetadataURL string `json:"metadata_url,omitempty"`
 }
 
-func (e *SAMLConfigAddedEvent) Data() interface{} {
+func (e *SAMLConfigAddedEvent) Payload() interface{} {
 	return e
 }
 
-func NewAddSAMLConfigEntityIDUniqueConstraint(entityID string) *eventstore.EventUniqueConstraint {
+func NewAddSAMLConfigEntityIDUniqueConstraint(entityID string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueEntityIDType,
 		entityID,
 		"Errors.Project.App.SAMLEntityIDAlreadyExists")
 }
 
-func NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID string) *eventstore.EventUniqueConstraint {
-	return eventstore.NewRemoveEventUniqueConstraint(
+func NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
 		UniqueEntityIDType,
 		entityID)
 }
 
-func (e *SAMLConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddSAMLConfigEntityIDUniqueConstraint(e.EntityID)}
+func (e *SAMLConfigAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddSAMLConfigEntityIDUniqueConstraint(e.EntityID)}
 }
 
 func NewSAMLConfigAddedEvent(
@@ -66,12 +64,12 @@ func NewSAMLConfigAddedEvent(
 	}
 }
 
-func SAMLConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SAMLConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &SAMLConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SAML-BDd15", "unable to unmarshal saml config")
 	}
@@ -89,13 +87,13 @@ type SAMLConfigChangedEvent struct {
 	oldEntityID string
 }
 
-func (e *SAMLConfigChangedEvent) Data() interface{} {
+func (e *SAMLConfigChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SAMLConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SAMLConfigChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	if e.EntityID != "" {
-		return []*eventstore.EventUniqueConstraint{
+		return []*eventstore.UniqueConstraint{
 			NewRemoveSAMLConfigEntityIDUniqueConstraint(e.oldEntityID),
 			NewAddSAMLConfigEntityIDUniqueConstraint(e.EntityID),
 		}
@@ -149,12 +147,12 @@ func ChangeEntityID(entityID string) func(event *SAMLConfigChangedEvent) {
 	}
 }
 
-func SAMLConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SAMLConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &SAMLConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SAML-BFd15", "unable to unmarshal saml config")
 	}

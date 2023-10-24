@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/zitadel/oidc/v2/pkg/client/rp"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -38,7 +38,7 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 			return nil, err
 		}
 	}
-	info, err := rp.Userinfo(
+	info, err := rp.Userinfo[*oidc.UserInfo](ctx,
 		s.Tokens.AccessToken,
 		s.Tokens.TokenType,
 		s.Tokens.IDTokenClaims.GetSubject(),

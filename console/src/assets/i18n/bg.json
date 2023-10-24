@@ -1085,6 +1085,7 @@
         "TOKEN": "Токен",
         "SENDERNUMBER": "Номер на изпращача",
         "ADDED": "Twilio добави успешно.",
+        "UPDATED": "Twilio се актуализира успешно.",
         "REMOVED": "Twilio премахнат",
         "CHANGETOKEN": "Промяна на токена",
         "SETTOKEN": "Задаване на токен",

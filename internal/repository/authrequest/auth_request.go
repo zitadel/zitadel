@@ -2,13 +2,11 @@ package authrequest
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -40,11 +38,11 @@ type AddedEvent struct {
 	HintUserID    *string                   `json:"hint_user_id,omitempty"`
 }
 
-func (e *AddedEvent) Data() interface{} {
+func (e *AddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -88,11 +86,11 @@ func NewAddedEvent(ctx context.Context,
 	}
 }
 
-func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func AddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	added := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, added)
+	err := event.Unmarshal(added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "AUTHR-DG4gn", "unable to unmarshal auth request added")
 	}
@@ -109,11 +107,11 @@ type SessionLinkedEvent struct {
 	AuthMethods []domain.UserAuthMethodType `json:"auth_methods"`
 }
 
-func (e *SessionLinkedEvent) Data() interface{} {
+func (e *SessionLinkedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SessionLinkedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SessionLinkedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -137,11 +135,11 @@ func NewSessionLinkedEvent(ctx context.Context,
 	}
 }
 
-func SessionLinkedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SessionLinkedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	added := &SessionLinkedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, added)
+	err := event.Unmarshal(added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "AUTHR-Sfe3w", "unable to unmarshal auth request session linked")
 	}
@@ -155,11 +153,11 @@ type FailedEvent struct {
 	Reason domain.OIDCErrorReason `json:"reason,omitempty"`
 }
 
-func (e *FailedEvent) Data() interface{} {
+func (e *FailedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *FailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *FailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -178,11 +176,11 @@ func NewFailedEvent(
 	}
 }
 
-func FailedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func FailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	added := &FailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, added)
+	err := event.Unmarshal(added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "AUTHR-Sfe3w", "unable to unmarshal auth request session linked")
 	}
@@ -194,11 +192,11 @@ type CodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *CodeAddedEvent) Data() interface{} {
+func (e *CodeAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *CodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *CodeAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -214,11 +212,11 @@ func NewCodeAddedEvent(ctx context.Context,
 	}
 }
 
-func CodeAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func CodeAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	added := &CodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, added)
+	err := event.Unmarshal(added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "AUTHR-Sfe3w", "unable to unmarshal auth request code added")
 	}
@@ -230,11 +228,11 @@ type CodeExchangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *CodeExchangedEvent) Data() interface{} {
+func (e *CodeExchangedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *CodeExchangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *CodeExchangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -250,7 +248,7 @@ func NewCodeExchangedEvent(ctx context.Context,
 	}
 }
 
-func CodeExchangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func CodeExchangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &CodeExchangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -260,11 +258,11 @@ type SucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *SucceededEvent) Data() interface{} {
+func (e *SucceededEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *SucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -280,7 +278,7 @@ func NewSucceededEvent(ctx context.Context,
 	}
 }
 
-func SucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &SucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
