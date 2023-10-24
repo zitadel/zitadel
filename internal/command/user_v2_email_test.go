@@ -15,7 +15,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -521,19 +520,13 @@ func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanEmailChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"email-changed@test.ch",
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanEmailChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"email-changed@test.ch",
+						),
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -561,7 +554,7 @@ func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 			}
 			got, err := c.ChangeUserEmailVerified(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.email)
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, got, tt.want)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -720,27 +713,21 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanEmailChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"email-changed@test.ch",
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailCodeAddedEventV2(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1,
-									"", false,
-								),
-							),
-						},
+						user.NewHumanEmailChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"email-changed@test.ch",
+						),
+						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+							"", false,
+						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -783,27 +770,21 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanEmailChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"email-changed@test.ch",
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailCodeAddedEventV2(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1,
-									"", true,
-								),
-							),
-						},
+						user.NewHumanEmailChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"email-changed@test.ch",
+						),
+						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+							"", true,
+						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -847,27 +828,21 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanEmailChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"email-changed@test.ch",
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailCodeAddedEventV2(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1,
-									"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}", false,
-								),
-							),
-						},
+						user.NewHumanEmailChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"email-changed@test.ch",
+						),
+						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+							"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}", false,
+						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -1023,13 +998,9 @@ func TestCommands_VerifyUserEmail(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanEmailVerificationFailedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanEmailVerificationFailedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -1146,13 +1117,9 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanEmailVerificationFailedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanEmailVerificationFailedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -1198,13 +1165,9 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanEmailVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},

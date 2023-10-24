@@ -9,8 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -38,17 +37,17 @@ func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(IDPInstanceIDCol),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -65,16 +64,16 @@ func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 			name:   "org reduceOwnerRemoved",
 			reduce: (&idpTemplateProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -92,18 +91,18 @@ func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 			name:   "org reduceIDPRemoved",
 			reduce: (&idpTemplateProjection{}).reduceIDPRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.IDPRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.IDPRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"id": "idp-id"
 }`),
-				), org.IDPRemovedEventMapper),
+					), org.IDPRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -121,18 +120,18 @@ func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 			name:   "org reduceIDPConfigRemoved",
 			reduce: (&idpTemplateProjection{}).reduceIDPConfigRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.IDPConfigRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.IDPConfigRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"idpConfigId": "idp-id"
 }`),
-				), org.IDPConfigRemovedEventMapper),
+					), org.IDPConfigRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -175,10 +174,11 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 		{
 			name: "instance reduceOAuthIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.OAuthIDPAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.OAuthIDPAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
 	"clientId": "client_id",
@@ -197,13 +197,12 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.OAuthIDPAddedEventMapper),
+					), instance.OAuthIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOAuthIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -235,7 +234,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 								"auth",
 								"token",
 								"user",
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								"id-attribute",
 							},
 						},
@@ -246,10 +245,11 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 		{
 			name: "org reduceOAuthIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OAuthIDPAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.OAuthIDPAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
 	"clientId": "client_id",
@@ -268,13 +268,12 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), org.OAuthIDPAddedEventMapper),
+					), org.OAuthIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOAuthIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -306,7 +305,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 								"auth",
 								"token",
 								"user",
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								"id-attribute",
 							},
 						},
@@ -317,21 +316,21 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 		{
 			name: "instance reduceOAuthIDPChanged minimal",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.OAuthIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.OAuthIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"isCreationAllowed": true,
 	"clientId": "id"
 }`),
-				), instance.OAuthIDPChangedEventMapper),
+					), instance.OAuthIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOAuthIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -359,10 +358,11 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 		{
 			name: "instance reduceOAuthIDPChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.OAuthIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.OAuthIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
 	"clientId": "client_id",
@@ -381,13 +381,12 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.OAuthIDPChangedEventMapper),
+					), instance.OAuthIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOAuthIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -412,7 +411,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 								"auth",
 								"token",
 								"user",
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								"id-attribute",
 								"idp-id",
 								"instance-id",
@@ -451,10 +450,11 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 		{
 			name: "instance reduceAzureADIDPAdded minimal",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.AzureADIDPAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.AzureADIDPAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "name",
 	"client_id": "client_id",
@@ -464,13 +464,12 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
         "keyId": "key-id"
     }
 }`),
-				), instance.AzureADIDPAddedEventMapper),
+					), instance.AzureADIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceAzureADIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -499,7 +498,7 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 								"instance-id",
 								"client_id",
 								anyArg{},
-								database.StringArray(nil),
+								database.TextArray[string](nil),
 								"",
 								false,
 							},
@@ -511,10 +510,11 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 		{
 			name: "instance reduceAzureADIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.AzureADIDPAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.AzureADIDPAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "name",
 	"client_id": "client_id",
@@ -531,13 +531,12 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.AzureADIDPAddedEventMapper),
+					), instance.AzureADIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceAzureADIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -566,7 +565,7 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 								"instance-id",
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								"tenant",
 								true,
 							},
@@ -578,10 +577,11 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 		{
 			name: "org reduceAzureADIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.AzureADIDPAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.AzureADIDPAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "name",
 	"client_id": "client_id",
@@ -598,13 +598,12 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), org.AzureADIDPAddedEventMapper),
+					), org.AzureADIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceAzureADIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -633,7 +632,7 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 								"instance-id",
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								"tenant",
 								true,
 							},
@@ -645,21 +644,21 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 		{
 			name: "instance reduceAzureADIDPChanged minimal",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.AzureADIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.AzureADIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"isCreationAllowed": true,
 	"client_id": "id"
 }`),
-				), instance.AzureADIDPChangedEventMapper),
+					), instance.AzureADIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceAzureADIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -687,10 +686,11 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 		{
 			name: "instance reduceAzureADIDPChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.AzureADIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.AzureADIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "name",
 	"client_id": "client_id",
@@ -707,13 +707,12 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.AzureADIDPChangedEventMapper),
+					), instance.AzureADIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceAzureADIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -735,7 +734,7 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 							expectedArgs: []interface{}{
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								"tenant",
 								true,
 								"idp-id",
@@ -775,10 +774,11 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 		{
 			name: "instance reduceGitHubIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.GitHubIDPAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.GitHubIDPAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "name",
 	"clientId": "client_id",
@@ -793,13 +793,12 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.GitHubIDPAddedEventMapper),
+					), instance.GitHubIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitHubIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -828,7 +827,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 								"instance-id",
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 							},
 						},
 					},
@@ -838,10 +837,11 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 		{
 			name: "org reduceGitHubIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.GitHubIDPAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.GitHubIDPAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "name",
 	"clientId": "client_id",
@@ -856,13 +856,12 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), org.GitHubIDPAddedEventMapper),
+					), org.GitHubIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitHubIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -891,7 +890,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 								"instance-id",
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 							},
 						},
 					},
@@ -901,21 +900,21 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 		{
 			name: "instance reduceGitHubIDPChanged minimal",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.GitHubIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.GitHubIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"isCreationAllowed": true,
 	"clientId": "id"
 }`),
-				), instance.GitHubIDPChangedEventMapper),
+					), instance.GitHubIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitHubIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -943,10 +942,11 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 		{
 			name: "instance reduceGitHubIDPChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.GitHubIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.GitHubIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "name",
 	"clientId": "client_id",
@@ -961,13 +961,12 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.GitHubIDPChangedEventMapper),
+					), instance.GitHubIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitHubIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -989,7 +988,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 							expectedArgs: []interface{}{
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								"idp-id",
 								"instance-id",
 							},
@@ -1027,10 +1026,11 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 		{
 			name: "instance reduceGitHubEnterpriseIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.GitHubEnterpriseIDPAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.GitHubEnterpriseIDPAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "name",
 	"clientId": "client_id",
@@ -1048,13 +1048,12 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.GitHubEnterpriseIDPAddedEventMapper),
+					), instance.GitHubEnterpriseIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitHubEnterpriseIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1086,7 +1085,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 								"auth",
 								"token",
 								"user",
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 							},
 						},
 					},
@@ -1096,10 +1095,11 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 		{
 			name: "org reduceGitHubEnterpriseIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.GitHubEnterpriseIDPAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.GitHubEnterpriseIDPAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "name",
 	"clientId": "client_id",
@@ -1117,13 +1117,12 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), org.GitHubEnterpriseIDPAddedEventMapper),
+					), org.GitHubEnterpriseIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitHubEnterpriseIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1155,7 +1154,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 								"auth",
 								"token",
 								"user",
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 							},
 						},
 					},
@@ -1165,21 +1164,21 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 		{
 			name: "instance reduceGitHubEnterpriseIDPChanged minimal",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.GitHubEnterpriseIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.GitHubEnterpriseIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"isCreationAllowed": true,
 	"clientId": "id"
 }`),
-				), instance.GitHubEnterpriseIDPChangedEventMapper),
+					), instance.GitHubEnterpriseIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitHubEnterpriseIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1207,10 +1206,11 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 		{
 			name: "instance reduceGitHubEnterpriseIDPChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.GitHubEnterpriseIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.GitHubEnterpriseIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "name",
 	"clientId": "client_id",
@@ -1228,13 +1228,12 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.GitHubEnterpriseIDPChangedEventMapper),
+					), instance.GitHubEnterpriseIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitHubEnterpriseIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1259,7 +1258,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 								"auth",
 								"token",
 								"user",
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								"idp-id",
 								"instance-id",
 							},
@@ -1297,10 +1296,11 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 		{
 			name: "instance reduceGitLabIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.GitLabIDPAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.GitLabIDPAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"client_id": "client_id",
 	"client_secret": {
@@ -1314,13 +1314,12 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.GitLabIDPAddedEventMapper),
+					), instance.GitLabIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitLabIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1349,7 +1348,7 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 								"instance-id",
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 							},
 						},
 					},
@@ -1359,10 +1358,11 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 		{
 			name: "org reduceGitLabIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.GitLabIDPAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.GitLabIDPAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"client_id": "client_id",
 	"client_secret": {
@@ -1376,13 +1376,12 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), org.GitLabIDPAddedEventMapper),
+					), org.GitLabIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitLabIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1411,7 +1410,7 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 								"instance-id",
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 							},
 						},
 					},
@@ -1421,21 +1420,21 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 		{
 			name: "instance reduceGitLabIDPChanged minimal",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.GitLabIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.GitLabIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"isCreationAllowed": true,
 	"client_id": "id"
 }`),
-				), instance.GitLabIDPChangedEventMapper),
+					), instance.GitLabIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitLabIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1463,10 +1462,11 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 		{
 			name: "instance reduceGitLabIDPChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.GitLabIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.GitLabIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "name",
 	"client_id": "client_id",
@@ -1481,13 +1481,12 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.GitLabIDPChangedEventMapper),
+					), instance.GitLabIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitLabIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1509,7 +1508,7 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 							expectedArgs: []interface{}{
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								"idp-id",
 								"instance-id",
 							},
@@ -1547,10 +1546,11 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 		{
 			name: "instance reduceGitLabSelfHostedIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.GitLabSelfHostedIDPAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.GitLabSelfHostedIDPAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "name",
 	"issuer": "issuer",
@@ -1566,13 +1566,12 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.GitLabSelfHostedIDPAddedEventMapper),
+					), instance.GitLabSelfHostedIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitLabSelfHostedIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1602,7 +1601,7 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 								"issuer",
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 							},
 						},
 					},
@@ -1612,10 +1611,11 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 		{
 			name: "org reduceGitLabSelfHostedIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.GitLabSelfHostedIDPAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.GitLabSelfHostedIDPAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "name",
 	"issuer": "issuer",
@@ -1631,13 +1631,12 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), org.GitLabSelfHostedIDPAddedEventMapper),
+					), org.GitLabSelfHostedIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitLabSelfHostedIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1667,7 +1666,7 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 								"issuer",
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 							},
 						},
 					},
@@ -1677,21 +1676,21 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 		{
 			name: "instance reduceGitLabSelfHostedIDPChanged minimal",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.GitLabSelfHostedIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.GitLabSelfHostedIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"isCreationAllowed": true,
 	"issuer": "issuer"
 }`),
-				), instance.GitLabSelfHostedIDPChangedEventMapper),
+					), instance.GitLabSelfHostedIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitLabSelfHostedIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1719,10 +1718,11 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 		{
 			name: "instance reduceGitLabSelfHostedIDPChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.GitLabSelfHostedIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.GitLabSelfHostedIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "name",
 	"issuer": "issuer",
@@ -1738,13 +1738,12 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.GitLabSelfHostedIDPChangedEventMapper),
+					), instance.GitLabSelfHostedIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitLabSelfHostedIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1767,7 +1766,7 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 								"issuer",
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								"idp-id",
 								"instance-id",
 							},
@@ -1805,10 +1804,11 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 		{
 			name: "instance reduceGoogleIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.GoogleIDPAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.GoogleIDPAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"clientId": "client_id",
 	"clientSecret": {
@@ -1822,13 +1822,12 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.GoogleIDPAddedEventMapper),
+					), instance.GoogleIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGoogleIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1857,7 +1856,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 								"instance-id",
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 							},
 						},
 					},
@@ -1867,10 +1866,11 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 		{
 			name: "org reduceGoogleIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.GoogleIDPAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.GoogleIDPAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"clientId": "client_id",
 	"clientSecret": {
@@ -1884,13 +1884,12 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), org.GoogleIDPAddedEventMapper),
+					), org.GoogleIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGoogleIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1919,7 +1918,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 								"instance-id",
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 							},
 						},
 					},
@@ -1929,21 +1928,21 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 		{
 			name: "instance reduceGoogleIDPChanged minimal",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.GoogleIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.GoogleIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"isCreationAllowed": true,
 	"clientId": "id"
 }`),
-				), instance.GoogleIDPChangedEventMapper),
+					), instance.GoogleIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGoogleIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1971,10 +1970,11 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 		{
 			name: "instance reduceGoogleIDPChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.GoogleIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.GoogleIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "name",
 	"clientId": "client_id",
@@ -1989,13 +1989,12 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.GoogleIDPChangedEventMapper),
+					), instance.GoogleIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceGoogleIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2017,7 +2016,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 							expectedArgs: []interface{}{
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								"idp-id",
 								"instance-id",
 							},
@@ -2055,10 +2054,11 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 		{
 			name: "instance reduceLDAPIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LDAPIDPAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.LDAPIDPAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
 	"servers": ["server"],
@@ -2092,13 +2092,12 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.LDAPIDPAddedEventMapper),
+					), instance.LDAPIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceLDAPIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2125,14 +2124,14 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
-								database.StringArray{"server"},
+								database.TextArray[string]{"server"},
 								false,
 								"basedn",
 								"binddn",
 								anyArg{},
 								"user",
-								database.StringArray{"object"},
-								database.StringArray{"filter"},
+								database.TextArray[string]{"object"},
+								database.TextArray[string]{"filter"},
 								time.Duration(30000000000),
 								"id",
 								"first",
@@ -2156,10 +2155,11 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 		{
 			name: "org reduceLDAPIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LDAPIDPAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.LDAPIDPAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
 	"servers": ["server"],
@@ -2193,13 +2193,12 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), org.LDAPIDPAddedEventMapper),
+					), org.LDAPIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceLDAPIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2226,14 +2225,14 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
-								database.StringArray{"server"},
+								database.TextArray[string]{"server"},
 								false,
 								"basedn",
 								"binddn",
 								anyArg{},
 								"user",
-								database.StringArray{"object"},
-								database.StringArray{"filter"},
+								database.TextArray[string]{"object"},
+								database.TextArray[string]{"filter"},
 								time.Duration(30000000000),
 								"id",
 								"first",
@@ -2257,21 +2256,21 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 		{
 			name: "instance reduceLDAPIDPChanged minimal",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LDAPIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.LDAPIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
 	"baseDN": "basedn"
 }`),
-				), instance.LDAPIDPChangedEventMapper),
+					), instance.LDAPIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceLDAPIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2299,10 +2298,11 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 		{
 			name: "instance reduceLDAPIDPChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LDAPIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.LDAPIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
 	"servers": ["server"],
@@ -2336,13 +2336,12 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.LDAPIDPChangedEventMapper),
+					), instance.LDAPIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceLDAPIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2362,14 +2361,14 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 						{
 							expectedStmt: "UPDATE projections.idp_templates5_ldap2 SET (servers, start_tls, base_dn, bind_dn, bind_password, user_base, user_object_classes, user_filters, timeout, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22) WHERE (idp_id = $23) AND (instance_id = $24)",
 							expectedArgs: []interface{}{
-								database.StringArray{"server"},
+								database.TextArray[string]{"server"},
 								false,
 								"basedn",
 								"binddn",
 								anyArg{},
 								"user",
-								database.StringArray{"object"},
-								database.StringArray{"filter"},
+								database.TextArray[string]{"object"},
+								database.TextArray[string]{"filter"},
 								time.Duration(30000000000),
 								"id",
 								"first",
@@ -2396,16 +2395,16 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&idpProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2449,7 +2448,7 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 			name: "instance reduceAppleIDPAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.AppleIDPAddedEventType),
+					instance.AppleIDPAddedEventType,
 					instance.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
@@ -2471,9 +2470,8 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceAppleIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2504,7 +2502,7 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 								"team_id",
 								"key_id",
 								anyArg{},
-								database.StringArray{"name"},
+								database.TextArray[string]{"name"},
 							},
 						},
 					},
@@ -2515,7 +2513,7 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 			name: "org reduceAppleIDPAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.AppleIDPAddedEventType),
+					org.AppleIDPAddedEventType,
 					org.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
@@ -2537,9 +2535,8 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceAppleIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2570,7 +2567,7 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 								"team_id",
 								"key_id",
 								anyArg{},
-								database.StringArray{"name"},
+								database.TextArray[string]{"name"},
 							},
 						},
 					},
@@ -2581,7 +2578,7 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 			name: "instance reduceAppleIDPChanged minimal",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.AppleIDPChangedEventType),
+					instance.AppleIDPChangedEventType,
 					instance.AggregateType,
 					[]byte(`{
 			"id": "idp-id",
@@ -2592,9 +2589,8 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceAppleIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2623,7 +2619,7 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 			name: "instance reduceAppleIDPChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.AppleIDPChangedEventType),
+					instance.AppleIDPChangedEventType,
 					instance.AggregateType,
 					[]byte(`{
 			"id": "idp-id",
@@ -2646,9 +2642,8 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceAppleIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2672,7 +2667,7 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 								"team_id",
 								"key_id",
 								anyArg{},
-								database.StringArray{"name"},
+								database.TextArray[string]{"name"},
 								"idp-id",
 								"instance-id",
 							},
@@ -2711,7 +2706,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			name: "instance reduceSAMLIDPAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.SAMLIDPAddedEventType),
+					instance.SAMLIDPAddedEventType,
 					instance.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
@@ -2734,9 +2729,8 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceSAMLIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2778,7 +2772,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			name: "org reduceSAMLIDPAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.SAMLIDPAddedEventType),
+					org.SAMLIDPAddedEventType,
 					org.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
@@ -2801,9 +2795,8 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceSAMLIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2845,7 +2838,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			name: "instance reduceSAMLIDPChanged minimal",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.SAMLIDPChangedEventType),
+					instance.SAMLIDPChangedEventType,
 					instance.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
@@ -2856,9 +2849,8 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceSAMLIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2887,7 +2879,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			name: "instance reduceSAMLIDPChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.SAMLIDPChangedEventType),
+					instance.SAMLIDPChangedEventType,
 					instance.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
@@ -2910,9 +2902,8 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceSAMLIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2950,15 +2941,14 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			reduce: (&idpProjection{}).reduceOwnerRemoved,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
+					org.OrgRemovedEventType,
 					org.AggregateType,
 					nil,
 				), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3001,10 +2991,11 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 		{
 			name: "instance reduceOIDCIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.OIDCIDPAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.OIDCIDPAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"issuer": "issuer",
 	"clientId": "client_id",
@@ -3020,13 +3011,12 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.OIDCIDPAddedEventMapper),
+					), instance.OIDCIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOIDCIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3056,7 +3046,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								"issuer",
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								true,
 							},
 						},
@@ -3067,10 +3057,11 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 		{
 			name: "org reduceOIDCIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OIDCIDPAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.OIDCIDPAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"issuer": "issuer",
 	"clientId": "client_id",
@@ -3086,13 +3077,12 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), org.OIDCIDPAddedEventMapper),
+					), org.OIDCIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOIDCIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3122,7 +3112,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								"issuer",
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								true,
 							},
 						},
@@ -3133,21 +3123,21 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 		{
 			name: "instance reduceOIDCIDPChanged minimal",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.OIDCIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.OIDCIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"isCreationAllowed": true,
 	"clientId": "id"
 }`),
-				), instance.OIDCIDPChangedEventMapper),
+					), instance.OIDCIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOIDCIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3175,10 +3165,11 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 		{
 			name: "instance reduceOIDCIDPChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.OIDCIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.OIDCIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"name": "name",
 	"issuer": "issuer",
@@ -3195,13 +3186,12 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.OIDCIDPChangedEventMapper),
+					), instance.OIDCIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOIDCIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3224,7 +3214,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								"client_id",
 								anyArg{},
 								"issuer",
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								true,
 								"idp-id",
 								"instance-id",
@@ -3238,7 +3228,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 			name: "instance reduceOIDCIDPMigratedAzureAD",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.OIDCIDPMigratedAzureADEventType),
+					instance.OIDCIDPMigratedAzureADEventType,
 					instance.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
@@ -3261,9 +3251,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOIDCIDPMigratedAzureAD,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3295,7 +3284,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								"instance-id",
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								"tenant",
 								true,
 							},
@@ -3308,7 +3297,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 			name: "org reduceOIDCIDPMigratedAzureAD",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OIDCIDPMigratedAzureADEventType),
+					org.OIDCIDPMigratedAzureADEventType,
 					org.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
@@ -3331,9 +3320,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOIDCIDPMigratedAzureAD,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3365,7 +3353,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								"instance-id",
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								"tenant",
 								true,
 							},
@@ -3378,7 +3366,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 			name: "instance reduceOIDCIDPMigratedGoogle",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.OIDCIDPMigratedGoogleEventType),
+					instance.OIDCIDPMigratedGoogleEventType,
 					instance.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
@@ -3399,9 +3387,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOIDCIDPMigratedGoogle,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3433,7 +3420,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								"instance-id",
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 							},
 						},
 					},
@@ -3444,7 +3431,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 			name: "org reduceOIDCIDPMigratedGoogle",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OIDCIDPMigratedGoogleEventType),
+					org.OIDCIDPMigratedGoogleEventType,
 					org.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
@@ -3465,9 +3452,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOIDCIDPMigratedGoogle,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3499,7 +3485,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								"instance-id",
 								"client_id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 							},
 						},
 					},
@@ -3535,23 +3521,23 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 		{
 			name: "instance reduceOldConfigAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.IDPConfigAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.IDPConfigAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"idpConfigId": "idp-config-id",
 	"name": "custom-zitadel-instance",
 	"idpType": 0,
 	"stylingType": 0,
 	"autoRegister": true
 }`),
-				), instance.IDPConfigAddedEventMapper),
+					), instance.IDPConfigAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3580,23 +3566,23 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 		{
 			name: "org reduceOldConfigAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.IDPConfigAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.IDPConfigAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"idpConfigId": "idp-config-id",
 	"name": "custom-zitadel-instance",
 	"idpType": 0,
 	"stylingType": 0,
 	"autoRegister": true
 }`),
-				), org.IDPConfigAddedEventMapper),
+					), org.IDPConfigAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3625,22 +3611,22 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 		{
 			name: "instance reduceOldConfigChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.IDPConfigChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.IDPConfigChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
         "idpConfigId": "idp-config-id",
         "name": "custom-zitadel-instance",
         "stylingType": 1,
         "autoRegister": true
         }`),
-				), instance.IDPConfigChangedEventMapper),
+					), instance.IDPConfigChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3661,22 +3647,22 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 		{
 			name: "org reduceOldConfigChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.IDPConfigChangedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.IDPConfigChangedEventType,
+						org.AggregateType,
+						[]byte(`{
         "idpConfigId": "idp-config-id",
         "name": "custom-zitadel-instance",
         "stylingType": 1,
         "autoRegister": true
         }`),
-				), org.IDPConfigChangedEventMapper),
+					), org.IDPConfigChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3697,10 +3683,11 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 		{
 			name: "instance reduceOldOIDCConfigAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.IDPOIDCConfigAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.IDPOIDCConfigAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
         "idpConfigId": "idp-config-id",
         "clientId": "client-id",
         "clientSecret": {
@@ -3713,13 +3700,12 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
         "idpDisplayNameMapping": 0,
         "usernameMapping": 1
         }`),
-				), instance.IDPOIDCConfigAddedEventMapper),
+					), instance.IDPOIDCConfigAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldOIDCConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3740,7 +3726,7 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 								"issuer",
 								"client-id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								true,
 							},
 						},
@@ -3751,10 +3737,11 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 		{
 			name: "org reduceOldOIDCConfigAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.IDPOIDCConfigAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.IDPOIDCConfigAddedEventType,
+						org.AggregateType,
+						[]byte(`{
         "idpConfigId": "idp-config-id",
         "clientId": "client-id",
         "clientSecret": {
@@ -3767,13 +3754,12 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
         "idpDisplayNameMapping": 0,
         "usernameMapping": 1
         }`),
-				), org.IDPOIDCConfigAddedEventMapper),
+					), org.IDPOIDCConfigAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldOIDCConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3794,7 +3780,7 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 								"issuer",
 								"client-id",
 								anyArg{},
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								true,
 							},
 						},
@@ -3805,10 +3791,11 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 		{
 			name: "instance reduceOldOIDCConfigChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.IDPOIDCConfigChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.IDPOIDCConfigChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
         "idpConfigId": "idp-config-id",
         "clientId": "client-id",
         "clientSecret": {
@@ -3821,13 +3808,12 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
         "idpDisplayNameMapping": 0,
         "usernameMapping": 1
         }`),
-				), instance.IDPOIDCConfigChangedEventMapper),
+					), instance.IDPOIDCConfigChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldOIDCConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3845,7 +3831,7 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 								"client-id",
 								anyArg{},
 								"issuer",
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								"idp-config-id",
 								"instance-id",
 							},
@@ -3857,10 +3843,11 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 		{
 			name: "org reduceOldOIDCConfigChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.IDPOIDCConfigChangedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.IDPOIDCConfigChangedEventType,
+						org.AggregateType,
+						[]byte(`{
         "idpConfigId": "idp-config-id",
         "clientId": "client-id",
         "clientSecret": {
@@ -3873,13 +3860,12 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
         "idpDisplayNameMapping": 0,
         "usernameMapping": 1
         }`),
-				), org.IDPOIDCConfigChangedEventMapper),
+					), org.IDPOIDCConfigChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldOIDCConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3897,7 +3883,7 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 								"client-id",
 								anyArg{},
 								"issuer",
-								database.StringArray{"profile"},
+								database.TextArray[string]{"profile"},
 								"idp-config-id",
 								"instance-id",
 							},
@@ -3909,23 +3895,23 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 		{
 			name: "instance reduceOldJWTConfigAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.IDPJWTConfigAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.IDPJWTConfigAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
         "idpConfigId": "idp-config-id",
         "jwtEndpoint": "https://api.zitadel.ch/jwt",
         "issuer": "issuer",
         "keysEndpoint": "https://api.zitadel.ch/keys",
         "headerName": "hodor"
         }`),
-				), instance.IDPJWTConfigAddedEventMapper),
+					), instance.IDPJWTConfigAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldJWTConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3957,23 +3943,23 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 		{
 			name: "org reduceOldJWTConfigAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.IDPJWTConfigAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.IDPJWTConfigAddedEventType,
+						org.AggregateType,
+						[]byte(`{
         "idpConfigId": "idp-config-id",
         "jwtEndpoint": "https://api.zitadel.ch/jwt",
         "issuer": "issuer",
         "keysEndpoint": "https://api.zitadel.ch/keys",
         "headerName": "hodor"
         }`),
-				), org.IDPJWTConfigAddedEventMapper),
+					), org.IDPJWTConfigAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldJWTConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -4004,23 +3990,23 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 		{
 			name: "instance reduceOldJWTConfigChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.IDPJWTConfigChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.IDPJWTConfigChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
         "idpConfigId": "idp-config-id",
         "jwtEndpoint": "https://api.zitadel.ch/jwt",
         "issuer": "issuer",
         "keysEndpoint": "https://api.zitadel.ch/keys",
         "headerName": "hodor"
         }`),
-				), instance.IDPJWTConfigChangedEventMapper),
+					), instance.IDPJWTConfigChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldJWTConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -4050,23 +4036,23 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 		{
 			name: "org reduceOldJWTConfigChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.IDPJWTConfigChangedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.IDPJWTConfigChangedEventType,
+						org.AggregateType,
+						[]byte(`{
         "idpConfigId": "idp-config-id",
         "jwtEndpoint": "https://api.zitadel.ch/jwt",
         "issuer": "issuer",
         "keysEndpoint": "https://api.zitadel.ch/keys",
         "headerName": "hodor"
         }`),
-				), org.IDPJWTConfigChangedEventMapper),
+					), org.IDPJWTConfigChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldJWTConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -4122,10 +4108,11 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 		{
 			name: "instance reduceJWTIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.JWTIDPAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.JWTIDPAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"issuer": "issuer",
 	"jwtEndpoint": "jwt",
@@ -4136,13 +4123,12 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.JWTIDPAddedEventMapper),
+					), instance.JWTIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceJWTIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -4182,10 +4168,11 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 		{
 			name: "org reduceJWTIDPAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.JWTIDPAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.JWTIDPAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"issuer": "issuer",
 	"jwtEndpoint": "jwt",
@@ -4196,13 +4183,12 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), org.JWTIDPAddedEventMapper),
+					), org.JWTIDPAddedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceJWTIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -4242,21 +4228,21 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 		{
 			name: "instance reduceJWTIDPChanged minimal",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.JWTIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.JWTIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"isCreationAllowed": true,
 	"jwtEndpoint": "jwt"
 }`),
-				), instance.JWTIDPChangedEventMapper),
+					), instance.JWTIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceJWTIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -4284,10 +4270,11 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 		{
 			name: "instance reduceJWTIDPChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.JWTIDPChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.JWTIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"id": "idp-id",
 	"issuer": "issuer",
 	"jwtEndpoint": "jwt",
@@ -4298,13 +4285,12 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 	"isAutoCreation": true,
 	"isAutoUpdate": true
 }`),
-				), instance.JWTIDPChangedEventMapper),
+					), instance.JWTIDPChangedEventMapper),
 			},
 			reduce: (&idpTemplateProjection{}).reduceJWTIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

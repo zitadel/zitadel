@@ -7,8 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -30,7 +29,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			name: "reduceInstanceAdded",
 			args: args{
 				event: getEvent(timedTestEvent(
-					repository.EventType(instance.InstanceAddedEventType),
+					instance.InstanceAddedEventType,
 					instance.AggregateType,
 					[]byte(`{}`),
 					now,
@@ -38,9 +37,8 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			},
 			reduce: (&milestoneProjection{}).reduceInstanceAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -94,16 +92,15 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			name: "reduceInstancePrimaryDomainSet",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceDomainPrimarySetEventType),
+					instance.InstanceDomainPrimarySetEventType,
 					instance.AggregateType,
 					[]byte(`{"domain": "my.domain"}`),
 				), instance.DomainPrimarySetEventMapper),
 			},
 			reduce: (&milestoneProjection{}).reduceInstanceDomainPrimarySet,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -121,7 +118,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			name: "reduceProjectAdded",
 			args: args{
 				event: getEvent(timedTestEvent(
-					repository.EventType(project.ProjectAddedType),
+					project.ProjectAddedType,
 					project.AggregateType,
 					[]byte(`{}`),
 					now,
@@ -129,9 +126,8 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			},
 			reduce: (&milestoneProjection{}).reduceProjectAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -150,7 +146,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			name: "reduceApplicationAdded",
 			args: args{
 				event: getEvent(timedTestEvent(
-					repository.EventType(project.ApplicationAddedType),
+					project.ApplicationAddedType,
 					project.AggregateType,
 					[]byte(`{}`),
 					now,
@@ -158,9 +154,8 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			},
 			reduce: (&milestoneProjection{}).reduceApplicationAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -179,33 +174,31 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			name: "reduceOIDCConfigAdded user event",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(project.OIDCConfigAddedType),
+					project.OIDCConfigAddedType,
 					project.AggregateType,
 					[]byte(`{}`),
 				), project.OIDCConfigAddedEventMapper),
 			},
 			reduce: (&milestoneProjection{}).reduceOIDCConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
-				executer:         &testExecuter{},
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
+				executer:      &testExecuter{},
 			},
 		},
 		{
 			name: "reduceOIDCConfigAdded system event",
 			args: args{
 				event: getEvent(toSystemEvent(testEvent(
-					repository.EventType(project.OIDCConfigAddedType),
+					project.OIDCConfigAddedType,
 					project.AggregateType,
 					[]byte(`{"clientId": "client-id"}`),
 				)), project.OIDCConfigAddedEventMapper),
 			},
 			reduce: (&milestoneProjection{}).reduceOIDCConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -224,33 +217,31 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			name: "reduceAPIConfigAdded user event",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(project.APIConfigAddedType),
+					project.APIConfigAddedType,
 					project.AggregateType,
 					[]byte(`{}`),
 				), project.APIConfigAddedEventMapper),
 			},
 			reduce: (&milestoneProjection{}).reduceAPIConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
-				executer:         &testExecuter{},
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
+				executer:      &testExecuter{},
 			},
 		},
 		{
 			name: "reduceAPIConfigAdded system event",
 			args: args{
 				event: getEvent(toSystemEvent(testEvent(
-					repository.EventType(project.APIConfigAddedType),
+					project.APIConfigAddedType,
 					project.AggregateType,
 					[]byte(`{"clientId": "client-id"}`),
 				)), project.APIConfigAddedEventMapper),
 			},
 			reduce: (&milestoneProjection{}).reduceAPIConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -269,7 +260,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			name: "reduceUserTokenAdded",
 			args: args{
 				event: getEvent(timedTestEvent(
-					repository.EventType(user.UserTokenAddedType),
+					user.UserTokenAddedType,
 					user.AggregateType,
 					[]byte(`{"applicationId": "client-id"}`),
 					now,
@@ -277,9 +268,8 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			},
 			reduce: (&milestoneProjection{}).reduceUserTokenAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("user"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("user"),
+				sequence:      15,
 				executer: &testExecuter{
 					// TODO: This can be optimized to only use one statement with OR
 					executions: []execution{
@@ -297,7 +287,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 								now,
 								"instance-id",
 								milestone.AuthenticationSucceededOnApplication,
-								database.StringArray{"client-id"},
+								database.TextArray[string]{"client-id"},
 							},
 						},
 					},
@@ -308,7 +298,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			name: "reduceInstanceRemoved",
 			args: args{
 				event: getEvent(timedTestEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
+					instance.InstanceRemovedEventType,
 					instance.AggregateType,
 					[]byte(`{}`),
 					now,
@@ -316,9 +306,8 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			},
 			reduce: (&milestoneProjection{}).reduceInstanceRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -337,7 +326,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			name: "reduceMilestonePushed normal milestone",
 			args: args{
 				event: getEvent(timedTestEvent(
-					repository.EventType(milestone.PushedEventType),
+					milestone.PushedEventType,
 					milestone.AggregateType,
 					[]byte(`{"type": "ProjectCreated"}`),
 					now,
@@ -345,9 +334,8 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			},
 			reduce: (&milestoneProjection{}).reduceMilestonePushed,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("milestone"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("milestone"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -366,16 +354,15 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			name: "reduceMilestonePushed instance deleted milestone",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(milestone.PushedEventType),
+					milestone.PushedEventType,
 					milestone.AggregateType,
 					[]byte(`{"type": "InstanceDeleted"}`),
 				), milestone.PushedEventMapper),
 			},
 			reduce: (&milestoneProjection{}).reduceMilestonePushed,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("milestone"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("milestone"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

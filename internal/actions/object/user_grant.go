@@ -65,7 +65,7 @@ func UserGrantsFromQuery(c *actions.FieldConfig, userGrants *query.UserGrants) g
 	grantList := &userGrantList{
 		Count:     userGrants.Count,
 		Sequence:  userGrants.Sequence,
-		Timestamp: userGrants.Timestamp,
+		Timestamp: userGrants.LastRun,
 		Grants:    make([]*userGrant, len(userGrants.UserGrants)),
 	}
 

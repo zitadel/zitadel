@@ -5,8 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -24,22 +23,22 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceSet",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextSetEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextSetEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "Text",
 						"language": "en",
 						"template": "InitCode",
 						"text": "Test"
 					}`),
-				), org.CustomTextSetEventMapper),
+					), org.CustomTextSetEventMapper),
 			},
 			reduce: (&customTextProjection{}).reduceSet,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -65,20 +64,20 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 			name:   "org reduceRemoved",
 			reduce: (&customTextProjection{}).reduceRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "Text",
 						"language": "en",
 						"template": "InitCode"
 					}`),
-				), org.CustomTextRemovedEventMapper),
+					), org.CustomTextRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -99,20 +98,20 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 			name:   "org reduceTemplateRemoved",
 			reduce: (&customTextProjection{}).reduceTemplateRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextTemplateRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextTemplateRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "Text",
 						"language": "en",
 						"template": "InitCode"
 					}`),
-				), org.CustomTextTemplateRemovedEventMapper),
+					), org.CustomTextTemplateRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -131,17 +130,17 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(CustomTextInstanceIDCol),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -158,21 +157,21 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 			name:   "instance reduceAdded",
 			reduce: (&customTextProjection{}).reduceSet,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.CustomTextSetEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.CustomTextSetEventType,
+						instance.AggregateType,
+						[]byte(`{
 					"key": "Text",
 						"language": "en",
 						"template": "InitCode",
 						"text": "Test"
 					}`),
-				), instance.CustomTextSetEventMapper),
+					), instance.CustomTextSetEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -198,20 +197,20 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 			name:   "instance reduceRemoved",
 			reduce: (&customTextProjection{}).reduceRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.CustomTextTemplateRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.CustomTextTemplateRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"key": "Text",
 						"language": "en",
 						"template": "InitCode"
 					}`),
-				), instance.CustomTextRemovedEventMapper),
+					), instance.CustomTextRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -232,20 +231,20 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 			name:   "instance reduceTemplateRemoved",
 			reduce: (&customTextProjection{}).reduceTemplateRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.CustomTextTemplateRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.CustomTextTemplateRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"key": "Text",
 						"language": "en",
 						"template": "InitCode"
 					}`),
-				), instance.CustomTextTemplateRemovedEventMapper),
+					), instance.CustomTextTemplateRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -265,16 +264,16 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&customTextProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

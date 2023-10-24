@@ -37,14 +37,14 @@ func TestMain(m *testing.M) {
 		ts.Stop()
 	}()
 
-	if err = initDB(testCRDBClient); err != nil {
+	if err = initDB(&database.DB{DB: testCRDBClient, Database: &cockroach.Config{Database: "zitadel"}}); err != nil {
 		logging.WithFields("error", err).Fatal("migrations failed")
 	}
 
 	os.Exit(m.Run())
 }
 
-func initDB(db *sql.DB) error {
+func initDB(db *database.DB) error {
 	config := new(database.Config)
 	config.SetConnector(&cockroach.Config{User: cockroach.User{Username: "zitadel"}, Database: "zitadel"})
 
@@ -60,11 +60,13 @@ func initDB(db *sql.DB) error {
 		return err
 	}
 
-	return initialise.VerifyZitadel(db, *config)
-}
+	err = initialise.VerifyZitadel(db, *config)
+	if err != nil {
+		return err
+	}
 
-func fillUniqueData(unique_type, field, instanceID string) error {
-	_, err := testCRDBClient.Exec("INSERT INTO eventstore.unique_constraints (unique_type, unique_field, instance_id) VALUES ($1, $2, $3)", unique_type, field, instanceID)
+	// create old events
+	_, err = db.Exec(oldEventsTable)
 	return err
 }
 
@@ -76,4 +78,26 @@ func (*testDB) DatabaseName() string { return "db" }
 
 func (*testDB) Username() string { return "user" }
 
-func (*testDB) Type() string { return "type" }
+func (*testDB) Type() string { return "cockroach" }
+
+const oldEventsTable = `CREATE TABLE IF NOT EXISTS eventstore.events (
+	id UUID DEFAULT gen_random_uuid()
+	, event_type TEXT NOT NULL
+	, aggregate_type TEXT NOT NULL
+	, aggregate_id TEXT NOT NULL
+	, aggregate_version TEXT NOT NULL
+	, event_sequence BIGINT NOT NULL
+	, previous_aggregate_sequence BIGINT
+	, previous_aggregate_type_sequence INT8
+	, creation_date TIMESTAMPTZ NOT NULL DEFAULT now()
+	, created_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
+	, event_data JSONB
+	, editor_user TEXT NOT NULL 
+	, editor_service TEXT
+	, resource_owner TEXT NOT NULL
+	, instance_id TEXT NOT NULL
+	, "position" DECIMAL NOT NULL
+	, in_tx_order INTEGER NOT NULL
+
+	, PRIMARY KEY (instance_id, aggregate_type, aggregate_id, event_sequence DESC)
+);`

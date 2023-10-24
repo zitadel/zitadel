@@ -174,7 +174,7 @@ func (q *Queries) SearchSecretGenerators(ctx context.Context, queries *SecretGen
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-4miii", "Errors.Internal")
 	}
-	secretGenerators.LatestSequence, err = q.latestSequence(ctx, secretGeneratorsTable)
+	secretGenerators.State, err = q.latestState(ctx, secretGeneratorsTable)
 	return secretGenerators, err
 }
 

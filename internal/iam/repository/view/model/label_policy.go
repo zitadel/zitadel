@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -83,15 +82,15 @@ func (p *LabelPolicyView) ToDomain() *domain.LabelPolicy {
 	}
 }
 
-func (i *LabelPolicyView) AppendEvent(event *models.Event) (err error) {
+func (i *LabelPolicyView) AppendEvent(event eventstore.Event) (err error) {
 	asset := &AssetView{}
-	i.Sequence = event.Sequence
-	i.ChangeDate = event.CreationDate
-	switch eventstore.EventType(event.Type) {
+	i.Sequence = event.Sequence()
+	i.ChangeDate = event.CreatedAt()
+	switch event.Type() {
 	case instance.LabelPolicyAddedEventType,
 		org.LabelPolicyAddedEventType:
 		i.setRootData(event)
-		i.CreationDate = event.CreationDate
+		i.CreationDate = event.CreatedAt()
 		i.State = int32(domain.LabelPolicyStatePreview)
 		err = i.SetData(event)
 	case instance.LabelPolicyChangedEventType,
@@ -172,21 +171,21 @@ func (i *LabelPolicyView) AppendEvent(event *models.Event) (err error) {
 	return err
 }
 
-func (r *LabelPolicyView) setRootData(event *models.Event) {
-	r.AggregateID = event.AggregateID
-	r.InstanceID = event.InstanceID
+func (r *LabelPolicyView) setRootData(event eventstore.Event) {
+	r.AggregateID = event.Aggregate().ID
+	r.InstanceID = event.Aggregate().InstanceID
 }
 
-func (r *LabelPolicyView) SetData(event *models.Event) error {
-	if err := json.Unmarshal(event.Data, r); err != nil {
+func (r *LabelPolicyView) SetData(event eventstore.Event) error {
+	if err := event.Unmarshal(r); err != nil {
 		logging.Log("MODEL-Flp9C").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")
 	}
 	return nil
 }
 
-func (r *AssetView) SetData(event *models.Event) error {
-	if err := json.Unmarshal(event.Data, r); err != nil {
+func (r *AssetView) SetData(event eventstore.Event) error {
+	if err := event.Unmarshal(r); err != nil {
 		logging.Log("MODEL-Ms8f2").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")
 	}

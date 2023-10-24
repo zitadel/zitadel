@@ -2,12 +2,10 @@ package user
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -24,11 +22,11 @@ type PersonalAccessTokenAddedEvent struct {
 	Scopes     []string  `json:"scopes"`
 }
 
-func (e *PersonalAccessTokenAddedEvent) Data() interface{} {
+func (e *PersonalAccessTokenAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *PersonalAccessTokenAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *PersonalAccessTokenAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -51,11 +49,11 @@ func NewPersonalAccessTokenAddedEvent(
 	}
 }
 
-func PersonalAccessTokenAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func PersonalAccessTokenAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	tokenAdded := &PersonalAccessTokenAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, tokenAdded)
+	err := event.Unmarshal(tokenAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-Dbges", "unable to unmarshal token added")
 	}
@@ -69,11 +67,11 @@ type PersonalAccessTokenRemovedEvent struct {
 	TokenID string `json:"tokenId"`
 }
 
-func (e *PersonalAccessTokenRemovedEvent) Data() interface{} {
+func (e *PersonalAccessTokenRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *PersonalAccessTokenRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *PersonalAccessTokenRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -92,11 +90,11 @@ func NewPersonalAccessTokenRemovedEvent(
 	}
 }
 
-func PersonalAccessTokenRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func PersonalAccessTokenRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	tokenRemoved := &PersonalAccessTokenRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, tokenRemoved)
+	err := event.Unmarshal(tokenRemoved)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-Dbneg", "unable to unmarshal token removed")
 	}

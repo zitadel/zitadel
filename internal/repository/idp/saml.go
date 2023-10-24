@@ -1,12 +1,9 @@
 package idp
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 type SAMLIDPAddedEvent struct {
@@ -46,20 +43,20 @@ func NewSAMLIDPAddedEvent(
 	}
 }
 
-func (e *SAMLIDPAddedEvent) Data() interface{} {
+func (e *SAMLIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SAMLIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SAMLIDPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func SAMLIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SAMLIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &SAMLIDPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-v9uajo3k71", "unable to unmarshal event")
 	}
@@ -142,20 +139,20 @@ func ChangeSAMLOptions(options OptionChanges) func(*SAMLIDPChangedEvent) {
 	}
 }
 
-func (e *SAMLIDPChangedEvent) Data() interface{} {
+func (e *SAMLIDPChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SAMLIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SAMLIDPChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func SAMLIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SAMLIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &SAMLIDPChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-w1t1824tw5", "unable to unmarshal event")
 	}

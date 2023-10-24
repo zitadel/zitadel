@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
@@ -115,17 +114,13 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 						),
 					),
 					expectPushFailed(caos_errs.ThrowAlreadyExists(nil, "id", "internal"),
-						[]*repository.Event{
-							eventFromEventPusher(project.NewRoleAddedEvent(
-								context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"key1",
-								"key",
-								"group",
-							),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewAddProjectRoleUniqueConstraint("key1", "project1")),
+						project.NewRoleAddedEvent(
+							context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"key1",
+							"key",
+							"group",
+						),
 					),
 				),
 			},
@@ -160,17 +155,13 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewRoleAddedEvent(
-								context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"key1",
-								"key",
-								"group",
-							),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewAddProjectRoleUniqueConstraint("key1", "project1")),
+						project.NewRoleAddedEvent(
+							context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"key1",
+							"key",
+							"group",
+						),
 					),
 				),
 			},
@@ -325,26 +316,20 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 						),
 					),
 					expectPushFailed(caos_errs.ThrowAlreadyExists(nil, "id", "internal"),
-						[]*repository.Event{
-							eventFromEventPusher(project.NewRoleAddedEvent(
-								context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"key1",
-								"key",
-								"group",
-							),
-							),
-							eventFromEventPusher(project.NewRoleAddedEvent(
-								context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"key2",
-								"key2",
-								"group",
-							),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewAddProjectRoleUniqueConstraint("key1", "project1")),
-						uniqueConstraintsFromEventConstraint(project.NewAddProjectRoleUniqueConstraint("key2", "project1")),
+						project.NewRoleAddedEvent(
+							context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"key1",
+							"key",
+							"group",
+						),
+						project.NewRoleAddedEvent(
+							context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"key2",
+							"key2",
+							"group",
+						),
 					),
 				),
 			},
@@ -384,26 +369,20 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewRoleAddedEvent(
-								context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"key1",
-								"key",
-								"group",
-							),
-							),
-							eventFromEventPusher(project.NewRoleAddedEvent(
-								context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"key2",
-								"key2",
-								"group",
-							),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewAddProjectRoleUniqueConstraint("key1", "project1")),
-						uniqueConstraintsFromEventConstraint(project.NewAddProjectRoleUniqueConstraint("key2", "project1")),
+						project.NewRoleAddedEvent(
+							context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"key1",
+							"key",
+							"group",
+						),
+						project.NewRoleAddedEvent(
+							context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"key2",
+							"key2",
+							"group",
+						),
 					),
 				),
 			},
@@ -641,11 +620,7 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newRoleChangedEvent(context.Background(), "project1", "org1", "key1", "keychanged", "groupchanged"),
-							),
-						},
+						newRoleChangedEvent(context.Background(), "project1", "org1", "key1", "keychanged", "groupchanged"),
 					),
 				),
 			},
@@ -815,15 +790,10 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewRoleRemovedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"key1",
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectRoleUniqueConstraint("key1", "project1")),
+						project.NewRoleRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"key1",
+						),
 					),
 				),
 			},
@@ -856,15 +826,10 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 					),
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewRoleRemovedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"key1",
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectRoleUniqueConstraint("key1", "project1")),
+						project.NewRoleRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"key1",
+						),
 					),
 				),
 			},
@@ -907,22 +872,15 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewRoleRemovedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"key1",
-								),
-							),
-							eventFromEventPusher(
-								project.NewGrantCascadeChangedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"projectgrant1",
-									[]string{},
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectRoleUniqueConstraint("key1", "project1")),
+						project.NewRoleRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"key1",
+						),
+						project.NewGrantCascadeChangedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							[]string{},
+						),
 					),
 				),
 			},
@@ -956,15 +914,10 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 					),
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewRoleRemovedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"key1",
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectRoleUniqueConstraint("key1", "project1")),
+						project.NewRoleRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"key1",
+						),
 					),
 				),
 			},
@@ -1006,21 +959,14 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 								[]string{"key1"})),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewRoleRemovedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"key1",
-								),
-							),
-							eventFromEventPusher(
-								usergrant.NewUserGrantCascadeChangedEvent(context.Background(),
-									&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
-									[]string{},
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectRoleUniqueConstraint("key1", "project1")),
+						project.NewRoleRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"key1",
+						),
+						usergrant.NewUserGrantCascadeChangedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							[]string{},
+						),
 					),
 				),
 			},

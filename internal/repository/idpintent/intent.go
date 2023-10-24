@@ -2,13 +2,11 @@ package idpintent
 
 import (
 	"context"
-	"encoding/json"
 	"net/url"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -47,20 +45,20 @@ func NewStartedEvent(
 	}
 }
 
-func (e *StartedEvent) Data() interface{} {
+func (e *StartedEvent) Payload() any {
 	return e
 }
 
-func (e *StartedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *StartedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func StartedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func StartedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &StartedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-Sf3f1", "unable to unmarshal event")
 	}
@@ -105,20 +103,20 @@ func NewSucceededEvent(
 	}
 }
 
-func (e *SucceededEvent) Data() interface{} {
+func (e *SucceededEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func SucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &SucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-HBreq", "unable to unmarshal event")
 	}
@@ -160,20 +158,20 @@ func NewSAMLSucceededEvent(
 	}
 }
 
-func (e *SAMLSucceededEvent) Data() interface{} {
+func (e *SAMLSucceededEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SAMLSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SAMLSucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func SAMLSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SAMLSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &SAMLSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-l4tw23y6lq", "unable to unmarshal event")
 	}
@@ -202,20 +200,20 @@ func NewSAMLRequestEvent(
 	}
 }
 
-func (e *SAMLRequestEvent) Data() interface{} {
+func (e *SAMLRequestEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SAMLRequestEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SAMLRequestEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func SAMLRequestEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SAMLRequestEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &SAMLRequestEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-l85678vwlf", "unable to unmarshal event")
 	}
@@ -257,20 +255,20 @@ func NewLDAPSucceededEvent(
 	}
 }
 
-func (e *LDAPSucceededEvent) Data() interface{} {
+func (e *LDAPSucceededEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LDAPSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LDAPSucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func LDAPSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LDAPSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &LDAPSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-HBreq", "unable to unmarshal event")
 	}
@@ -299,20 +297,20 @@ func NewFailedEvent(
 	}
 }
 
-func (e *FailedEvent) Data() interface{} {
+func (e *FailedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *FailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *FailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func FailedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func FailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &FailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-Sfer3", "unable to unmarshal event")
 	}

@@ -165,19 +165,17 @@ func TestCommands_CreateIntent(t *testing.T) {
 							)),
 					),
 					expectPush(
-						eventPusherToEvents(
-							func() eventstore.Command {
-								success, _ := url.Parse("https://success.url")
-								failure, _ := url.Parse("https://failure.url")
-								return idpintent.NewStartedEvent(
-									context.Background(),
-									&idpintent.NewAggregate("id", "ro").Aggregate,
-									success,
-									failure,
-									"idp",
-								)
-							}(),
-						),
+						func() eventstore.Command {
+							success, _ := url.Parse("https://success.url")
+							failure, _ := url.Parse("https://failure.url")
+							return idpintent.NewStartedEvent(
+								context.Background(),
+								&idpintent.NewAggregate("id", "ro").Aggregate,
+								success,
+								failure,
+								"idp",
+							)
+						}(),
 					),
 				),
 				idGenerator: mock.ExpectID(t, "id"),
@@ -545,13 +543,13 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 						),
 					),
 					expectRandomPush(
-						eventPusherToEvents(
+						[]eventstore.Command{
 							idpintent.NewSAMLRequestEvent(
 								context.Background(),
 								&idpintent.NewAggregate("id", "ro").Aggregate,
 								"request",
 							),
-						),
+						},
 					),
 				),
 			},
@@ -667,8 +665,8 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 				idpConfigEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						eventPusherToEvents(
-							idpintent.NewSucceededEvent(
+						func() eventstore.Command {
+							event := idpintent.NewSucceededEvent(
 								context.Background(),
 								&idpintent.NewAggregate("id", "ro").Aggregate,
 								[]byte(`{"sub":"id","preferred_username":"username"}`),
@@ -682,8 +680,9 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 									Crypted:    []byte("accessToken"),
 								},
 								"idToken",
-							),
-						),
+							)
+							return event
+						}(),
 					),
 				),
 			},
@@ -768,21 +767,19 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 				idpConfigEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						eventPusherToEvents(
-							idpintent.NewSAMLSucceededEvent(
-								context.Background(),
-								&idpintent.NewAggregate("id", "ro").Aggregate,
-								[]byte(`{"sub":"id","preferred_username":"username"}`),
-								"id",
-								"username",
-								"",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
-								},
-							),
+						idpintent.NewSAMLSucceededEvent(
+							context.Background(),
+							&idpintent.NewAggregate("id", "ro").Aggregate,
+							[]byte(`{"sub":"id","preferred_username":"username"}`),
+							"id",
+							"username",
+							"",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
+							},
 						),
 					),
 				),
@@ -808,21 +805,19 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 				idpConfigEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						eventPusherToEvents(
-							idpintent.NewSAMLSucceededEvent(
-								context.Background(),
-								&idpintent.NewAggregate("id", "ro").Aggregate,
-								[]byte(`{"sub":"id","preferred_username":"username"}`),
-								"id",
-								"username",
-								"user",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
-								},
-							),
+						idpintent.NewSAMLSucceededEvent(
+							context.Background(),
+							&idpintent.NewAggregate("id", "ro").Aggregate,
+							[]byte(`{"sub":"id","preferred_username":"username"}`),
+							"id",
+							"username",
+							"user",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
+							},
 						),
 					),
 				),
@@ -880,12 +875,10 @@ func TestCommands_RequestSAMLIDPIntent(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						eventPusherToEvents(
-							idpintent.NewSAMLRequestEvent(
-								context.Background(),
-								&idpintent.NewAggregate("id", "ro").Aggregate,
-								"request",
-							),
+						idpintent.NewSAMLRequestEvent(
+							context.Background(),
+							&idpintent.NewAggregate("id", "ro").Aggregate,
+							"request",
 						),
 					),
 				),
@@ -955,16 +948,14 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 				idpConfigEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						eventPusherToEvents(
-							idpintent.NewLDAPSucceededEvent(
-								context.Background(),
-								&idpintent.NewAggregate("id", "ro").Aggregate,
-								[]byte(`{"id":"id","preferredUsername":"username","preferredLanguage":"und"}`),
-								"id",
-								"username",
-								"",
-								map[string][]string{"id": {"id"}},
-							),
+						idpintent.NewLDAPSucceededEvent(
+							context.Background(),
+							&idpintent.NewAggregate("id", "ro").Aggregate,
+							[]byte(`{"id":"id","preferredUsername":"username","preferredLanguage":"und"}`),
+							"id",
+							"username",
+							"",
+							map[string][]string{"id": {"id"}},
 						),
 					),
 				),
@@ -1030,12 +1021,10 @@ func TestCommands_FailIDPIntent(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						eventPusherToEvents(
-							idpintent.NewFailedEvent(
-								context.Background(),
-								&idpintent.NewAggregate("id", "ro").Aggregate,
-								"reason",
-							),
+						idpintent.NewFailedEvent(
+							context.Background(),
+							&idpintent.NewAggregate("id", "ro").Aggregate,
+							"reason",
 						),
 					),
 				),

@@ -202,7 +202,7 @@ func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time) (keys *Publ
 		return nil, errors.ThrowInternal(err, "QUERY-Sghn4", "Errors.Internal")
 	}
 
-	keys.LatestSequence, err = q.latestSequence(ctx, keyTable)
+	keys.State, err = q.latestState(ctx, keyTable)
 	if !errors.IsNotFound(err) {
 		return keys, err
 	}
@@ -236,7 +236,7 @@ func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (key
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-WRFG4", "Errors.Internal")
 	}
-	keys.LatestSequence, err = q.latestSequence(ctx, keyTable)
+	keys.State, err = q.latestState(ctx, keyTable)
 	if !errors.IsNotFound(err) {
 		return keys, err
 	}

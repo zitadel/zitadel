@@ -10,11 +10,14 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -189,7 +192,8 @@ func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, s
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.SessionProjection.Trigger(ctx)
+		ctx, err = projection.SessionProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("unable to trigger")
 	}
 
 	query, scan := prepareSessionQuery(ctx, q.client)
@@ -241,7 +245,7 @@ func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQue
 		return nil, errors.ThrowInternal(err, "QUERY-Sfg42", "Errors.Internal")
 	}
 
-	sessions.LatestSequence, err = q.latestSequence(ctx, sessionsTable)
+	sessions.State, err = q.latestState(ctx, sessionsTable)
 	return sessions, err
 }
 

@@ -33,7 +33,7 @@ func TestApplicationAppendEvent(t *testing.T) {
 		{
 			name: "append added app event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ApplicationAddedType), Data: mockAppData(&es_model.Application{Name: "AppName"})},
+				event: &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ApplicationAddedType, Data: mockAppData(&es_model.Application{Name: "AppName"})},
 				app:   &ApplicationView{},
 			},
 			result: &ApplicationView{ProjectID: "AggregateID", Name: "AppName", State: int32(model.AppStateActive)},
@@ -41,7 +41,7 @@ func TestApplicationAppendEvent(t *testing.T) {
 		{
 			name: "append changed app event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ApplicationChangedType), Data: mockAppData(&es_model.Application{Name: "AppNameChanged"})},
+				event: &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ApplicationChangedType, Data: mockAppData(&es_model.Application{Name: "AppNameChanged"})},
 				app:   &ApplicationView{ProjectID: "AggregateID", Name: "AppName", State: int32(model.AppStateActive)},
 			},
 			result: &ApplicationView{ProjectID: "AggregateID", Name: "AppNameChanged", State: int32(model.AppStateActive)},
@@ -49,7 +49,7 @@ func TestApplicationAppendEvent(t *testing.T) {
 		{
 			name: "append deactivate app event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ApplicationDeactivatedType)},
+				event: &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ApplicationDeactivatedType},
 				app:   &ApplicationView{ProjectID: "AggregateID", Name: "AppName", State: int32(model.AppStateActive)},
 			},
 			result: &ApplicationView{ProjectID: "AggregateID", Name: "AppName", State: int32(model.AppStateInactive)},
@@ -57,7 +57,7 @@ func TestApplicationAppendEvent(t *testing.T) {
 		{
 			name: "append reactivate app event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ApplicationReactivatedType)},
+				event: &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ApplicationReactivatedType},
 				app:   &ApplicationView{ProjectID: "AggregateID", Name: "AppName", State: int32(model.AppStateInactive)},
 			},
 			result: &ApplicationView{ProjectID: "AggregateID", Name: "AppName", State: int32(model.AppStateActive)},
@@ -65,7 +65,7 @@ func TestApplicationAppendEvent(t *testing.T) {
 		{
 			name: "append added oidc config event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.OIDCConfigAddedType), Data: mockOIDCConfigData(&es_model.OIDCConfig{ClientID: "clientID"})},
+				event: &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.OIDCConfigAddedType, Data: mockOIDCConfigData(&es_model.OIDCConfig{ClientID: "clientID"})},
 				app:   &ApplicationView{ProjectID: "AggregateID", Name: "AppName", State: int32(model.AppStateActive)},
 			},
 			result: &ApplicationView{ProjectID: "AggregateID", Name: "AppName", IsOIDC: true, OIDCClientID: "clientID", State: int32(model.AppStateActive)},
@@ -73,7 +73,7 @@ func TestApplicationAppendEvent(t *testing.T) {
 		{
 			name: "append changed oidc config event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.OIDCConfigAddedType), Data: mockOIDCConfigData(&es_model.OIDCConfig{ClientID: "clientIDChanged"})},
+				event: &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.OIDCConfigAddedType, Data: mockOIDCConfigData(&es_model.OIDCConfig{ClientID: "clientIDChanged"})},
 				app:   &ApplicationView{ProjectID: "AggregateID", Name: "AppName", OIDCClientID: "clientID", State: int32(model.AppStateActive)},
 			},
 			result: &ApplicationView{ProjectID: "AggregateID", Name: "AppName", IsOIDC: true, OIDCClientID: "clientIDChanged", State: int32(model.AppStateActive)},
