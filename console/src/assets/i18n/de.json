@@ -278,7 +278,7 @@
     "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
     "NUMBERERROR": "Muss eine Ziffer beinhalten.",
     "PWNOTEQUAL": "Die Passwörter stimmen nicht überein.",
-    "PHONE": "Die Telefonnummer muss mit 00 oder + starten."
+    "PHONE": "Die Telefonnummer muss mit + starten."
   },
   "USER": {
     "SETTINGS": {
@@ -490,7 +490,7 @@
       "TITLE": "Profil",
       "EMAIL": "E-Mail",
       "PHONE": "Telefonnummer",
-      "PHONE_HINT": "Verwenden Sie 00 oder das Symbol + gefolgt von der Landesvorwahl des Anrufers oder wählen Sie das Land aus der Dropdown-Liste aus und geben anschließend die Telefonnummer ein",
+      "PHONE_HINT": "Verwenden das Symbol + gefolgt von der Landesvorwahl des Anrufers oder wählen Sie das Land aus der Dropdown-Liste aus und geben anschließend die Telefonnummer ein",
       "USERNAME": "Benutzername",
       "CHANGEUSERNAME": "bearbeiten",
       "CHANGEUSERNAME_TITLE": "Benutzername ändern",
@@ -1096,6 +1096,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio erfolgreich hinzugefügt.",
+        "UPDATED": "Twilio wurde erfolgreich aktualisiert.",
         "REMOVED": "Twilio entfernt",
         "CHANGETOKEN": "Token ändern",
         "SETTOKEN": "Token setzen",
