@@ -1092,6 +1092,7 @@
         "TOKEN": "トークン",
         "SENDERNUMBER": "送信者番号",
         "ADDED": "Twilioは正常に追加されました。",
+        "UPDATED": "Twilio が正常に更新されました。",
         "REMOVED": "Twilioが削除されました",
         "CHANGETOKEN": "トークンを変更する",
         "SETTOKEN": "トークンを設定する",
