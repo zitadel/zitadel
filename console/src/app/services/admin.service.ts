@@ -298,7 +298,7 @@ import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { GrpcService } from './grpc.service';
 import { StorageLocation, StorageService } from './storage.service';
-import { IsReachedQuery, Milestone, MilestoneQuery, MilestoneType } from '../proto/generated/zitadel/milestone_pb';
+import { IsReachedQuery, Milestone, MilestoneQuery, MilestoneType } from '../proto/generated/zitadel/milestone/v1/milestone_pb';
 
 export enum StringableMilestoneType {
   UNSPECIFIED = MilestoneType.MILESTONE_TYPE_UNSPECIFIED,
