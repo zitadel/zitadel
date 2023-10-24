@@ -183,7 +183,7 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.UserID, member.UniqueMember)
 		}
 	}
-	return nil
+	return rm.WriteModel.Reduce()
 }
 
 func (rm *UniqueConstraintReadModel) Query() *eventstore.SearchQueryBuilder {
@@ -256,7 +256,7 @@ func (rm *UniqueConstraintReadModel) getUniqueConstraint(aggregateID, objectID, 
 	return nil
 }
 
-func (rm *UniqueConstraintReadModel) addUniqueConstraint(aggregateID, objectID string, constraint *eventstore.EventUniqueConstraint) {
+func (rm *UniqueConstraintReadModel) addUniqueConstraint(aggregateID, objectID string, constraint *eventstore.UniqueConstraint) {
 	migrateUniqueConstraint := &domain.UniqueConstraintMigration{
 		AggregateID:  aggregateID,
 		ObjectID:     objectID,
@@ -267,7 +267,7 @@ func (rm *UniqueConstraintReadModel) addUniqueConstraint(aggregateID, objectID s
 	rm.UniqueConstraints = append(rm.UniqueConstraints, migrateUniqueConstraint)
 }
 
-func (rm *UniqueConstraintReadModel) changeUniqueConstraint(aggregateID, objectID string, constraint *eventstore.EventUniqueConstraint) {
+func (rm *UniqueConstraintReadModel) changeUniqueConstraint(aggregateID, objectID string, constraint *eventstore.UniqueConstraint) {
 	for i, uniqueConstraint := range rm.UniqueConstraints {
 		if uniqueConstraint.AggregateID == aggregateID && uniqueConstraint.ObjectID == objectID && uniqueConstraint.UniqueType == constraint.UniqueType {
 			rm.UniqueConstraints[i] = &domain.UniqueConstraintMigration{

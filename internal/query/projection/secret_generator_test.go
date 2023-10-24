@@ -7,8 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -25,17 +24,17 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 		{
 			name: "reduceSecretGeneratorRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SecretGeneratorRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{"generatorType": 1}`),
-				), instance.SecretGeneratorRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.SecretGeneratorRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{"generatorType": 1}`),
+					), instance.SecretGeneratorRemovedEventMapper),
 			},
 			reduce: (&secretGeneratorProjection{}).reduceSecretGeneratorRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -53,17 +52,17 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 		{
 			name: "reduceSecretGeneratorChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SecretGeneratorChangedEventType),
-					instance.AggregateType,
-					[]byte(`{"generatorType": 1, "length": 4, "expiry": 10000000, "includeLowerLetters": true, "includeUpperLetters": true, "includeDigits": true, "includeSymbols": true}`),
-				), instance.SecretGeneratorChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.SecretGeneratorChangedEventType,
+						instance.AggregateType,
+						[]byte(`{"generatorType": 1, "length": 4, "expiry": 10000000, "includeLowerLetters": true, "includeUpperLetters": true, "includeDigits": true, "includeSymbols": true}`),
+					), instance.SecretGeneratorChangedEventMapper),
 			},
 			reduce: (&secretGeneratorProjection{}).reduceSecretGeneratorChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -89,17 +88,17 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 		{
 			name: "reduceSecretGeneratorAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SecretGeneratorAddedEventType),
-					instance.AggregateType,
-					[]byte(`{"generatorType": 1, "length": 4, "expiry": 10000000, "includeLowerLetters": true, "includeUpperLetters": true, "includeDigits": true, "includeSymbols": true}`),
-				), instance.SecretGeneratorAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.SecretGeneratorAddedEventType,
+						instance.AggregateType,
+						[]byte(`{"generatorType": 1, "length": 4, "expiry": 10000000, "includeLowerLetters": true, "includeUpperLetters": true, "includeDigits": true, "includeSymbols": true}`),
+					), instance.SecretGeneratorAddedEventMapper),
 			},
 			reduce: (&secretGeneratorProjection{}).reduceSecretGeneratorAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -127,17 +126,17 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 		{
 			name: "reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

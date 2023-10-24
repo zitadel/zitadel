@@ -11,6 +11,8 @@ const (
 	PushedEventType = eventTypePrefix + "pushed"
 )
 
+var _ eventstore.Command = (*PushedEvent)(nil)
+
 type PushedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 	MilestoneType         Type     `json:"type"`
@@ -19,11 +21,12 @@ type PushedEvent struct {
 	Endpoints             []string `json:"endpoints"`
 }
 
-func (p *PushedEvent) Data() interface{} {
+// Payload implements eventstore.Command.
+func (p *PushedEvent) Payload() any {
 	return p
 }
 
-func (p *PushedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (p *PushedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 

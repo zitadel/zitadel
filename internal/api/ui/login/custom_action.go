@@ -7,7 +7,7 @@ import (
 
 	"github.com/dop251/goja"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/actions"

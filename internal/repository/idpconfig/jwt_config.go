@@ -1,12 +1,9 @@
 package idpconfig
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -24,11 +21,11 @@ type JWTConfigAddedEvent struct {
 	HeaderName   string `json:"headerName,omitempty"`
 }
 
-func (e *JWTConfigAddedEvent) Data() interface{} {
+func (e *JWTConfigAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *JWTConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *JWTConfigAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -50,12 +47,12 @@ func NewJWTConfigAddedEvent(
 	}
 }
 
-func JWTConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func JWTConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &JWTConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "JWT-m0fwf", "unable to unmarshal event")
 	}
@@ -74,11 +71,11 @@ type JWTConfigChangedEvent struct {
 	HeaderName   *string `json:"headerName,omitempty"`
 }
 
-func (e *JWTConfigChangedEvent) Data() interface{} {
+func (e *JWTConfigChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *JWTConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *JWTConfigChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -126,12 +123,12 @@ func ChangeHeaderName(headerName string) func(*JWTConfigChangedEvent) {
 	}
 }
 
-func JWTConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func JWTConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &JWTConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "JWT-fk3fs", "unable to unmarshal event")
 	}

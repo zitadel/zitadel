@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zitadel/oidc/v2/pkg/op"
-	"gopkg.in/square/go-jose.v2"
+	"github.com/go-jose/go-jose/v3"
+	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -28,17 +28,17 @@ type TokenVerifier struct {
 	authZRepo        authZRepo
 	clients          sync.Map
 	authMethods      MethodMapping
-	systemJWTProfile op.JWTProfileVerifier
+	systemJWTProfile *op.JWTProfileVerifier
 }
 
 type MembershipsResolver interface {
-	SearchMyMemberships(ctx context.Context, orgID string) ([]*Membership, error)
+	SearchMyMemberships(ctx context.Context, orgID string, shouldTriggerBulk bool) ([]*Membership, error)
 }
 
 type authZRepo interface {
+	MembershipsResolver
 	VerifyAccessToken(ctx context.Context, token, verifierClientID, projectID string) (userID, agentID, clientID, prefLang, resourceOwner string, err error)
 	VerifierClientID(ctx context.Context, name string) (clientID, projectID string, err error)
-	SearchMyMemberships(ctx context.Context, orgID string) ([]*Membership, error)
 	ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error)
 	ExistsOrg(ctx context.Context, id, domain string) (string, error)
 }
@@ -135,10 +135,10 @@ func (v *TokenVerifier) RegisterServer(appName, methodPrefix string, mappings Me
 	}
 }
 
-func (v *TokenVerifier) SearchMyMemberships(ctx context.Context, orgID string) (_ []*Membership, err error) {
+func (v *TokenVerifier) SearchMyMemberships(ctx context.Context, orgID string, shouldTriggerBulk bool) (_ []*Membership, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return v.authZRepo.SearchMyMemberships(ctx, orgID)
+	return v.authZRepo.SearchMyMemberships(ctx, orgID, shouldTriggerBulk)
 }
 
 func (v *TokenVerifier) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (_ string, _ []string, err error) {

@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/oauth2"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"

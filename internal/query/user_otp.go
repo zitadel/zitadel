@@ -80,6 +80,7 @@ func (wm *HumanOTPReadModel) Reduce() error {
 
 func (wm *HumanOTPReadModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).

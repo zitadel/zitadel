@@ -5,8 +5,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/settings"
-
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -40,7 +38,7 @@ func NewDebugNotificationProviderLogAddedEvent(
 	}
 }
 
-func DebugNotificationProviderLogAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DebugNotificationProviderLogAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := settings.DebugNotificationProviderAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -71,7 +69,7 @@ func NewDebugNotificationProviderLogChangedEvent(
 	return &DebugNotificationProviderLogChangedEvent{DebugNotificationProviderChangedEvent: *changedEvent}, nil
 }
 
-func DebugNotificationProviderLogChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DebugNotificationProviderLogChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := settings.DebugNotificationProviderChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -98,7 +96,7 @@ func NewDebugNotificationProviderLogRemovedEvent(
 	}
 }
 
-func DebugNotificationProviderLogRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DebugNotificationProviderLogRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := settings.DebugNotificationProviderRemovedEventMapper(event)
 	if err != nil {
 		return nil, err

@@ -36,7 +36,7 @@ func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*m
 	}
 	return &mgmt_pb.ListAppsResponse{
 		Result:  project_grpc.AppsToPb(apps.Apps),
-		Details: object_grpc.ToListDetails(apps.Count, apps.Sequence, apps.Timestamp),
+		Details: object_grpc.ToListDetails(apps.Count, apps.Sequence, apps.LastRun),
 	}, nil
 }
 
@@ -55,10 +55,11 @@ func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChanges
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AllowTimeTravel().
 		Limit(limit).
+		AwaitOpenTransactions().
 		OrderDesc().
 		ResourceOwner(authz.GetCtxData(ctx).OrgID).
-		AddQuery().
 		SequenceGreater(sequence).
+		AddQuery().
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(req.ProjectId).
 		EventData(map[string]interface{}{
@@ -278,7 +279,7 @@ func (s *Server) ListAppKeys(ctx context.Context, req *mgmt_pb.ListAppKeysReques
 	}
 	return &mgmt_pb.ListAppKeysResponse{
 		Result:  authn_grpc.KeysToPb(keys.AuthNKeys),
-		Details: object_grpc.ToListDetails(keys.Count, keys.Sequence, keys.Timestamp),
+		Details: object_grpc.ToListDetails(keys.Count, keys.Sequence, keys.LastRun),
 	}, nil
 }
 

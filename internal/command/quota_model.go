@@ -37,8 +37,8 @@ func newQuotaWriteModel(instanceId, resourceOwner string, unit quota.Unit) *quot
 func (wm *quotaWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
-		AddQuery().
 		InstanceID(wm.InstanceID).
+		AddQuery().
 		AggregateTypes(quota.AggregateType).
 		EventTypes(
 			quota.AddedEventType,
@@ -51,7 +51,7 @@ func (wm *quotaWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *quotaWriteModel) Reduce() error {
 	for _, event := range wm.Events {
-		wm.ChangeDate = event.CreationDate()
+		wm.ChangeDate = event.CreatedAt()
 		switch e := event.(type) {
 		case *quota.SetEvent:
 			wm.rollingAggregateID = e.Aggregate().ID
@@ -79,7 +79,7 @@ func (wm *quotaWriteModel) Reduce() error {
 	}
 	// wm.WriteModel.Reduce() sets the aggregateID to the first event's aggregateID, but we need the last one
 	wm.AggregateID = wm.rollingAggregateID
-	return nil
+	return wm.WriteModel.Reduce()
 }
 
 // NewChanges returns all changes that need to be applied to the aggregate.

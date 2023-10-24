@@ -1,20 +1,17 @@
 package model
 
 import (
-	"encoding/json"
 	"time"
-
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/org"
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 const (
@@ -37,18 +34,18 @@ type IDPConfigView struct {
 	IDPProviderType int32     `json:"-" gorm:"column:idp_provider_type"`
 	AutoRegister    bool      `json:"autoRegister" gorm:"column:auto_register"`
 
-	IsOIDC                     bool                 `json:"-" gorm:"column:is_oidc"`
-	OIDCClientID               string               `json:"clientId" gorm:"column:oidc_client_id"`
-	OIDCClientSecret           *crypto.CryptoValue  `json:"clientSecret" gorm:"column:oidc_client_secret"`
-	OIDCIssuer                 string               `json:"issuer" gorm:"column:oidc_issuer"`
-	OIDCScopes                 database.StringArray `json:"scopes" gorm:"column:oidc_scopes"`
-	OIDCIDPDisplayNameMapping  int32                `json:"idpDisplayNameMapping" gorm:"column:oidc_idp_display_name_mapping"`
-	OIDCUsernameMapping        int32                `json:"usernameMapping" gorm:"column:oidc_idp_username_mapping"`
-	OAuthAuthorizationEndpoint string               `json:"authorizationEndpoint" gorm:"column:oauth_authorization_endpoint"`
-	OAuthTokenEndpoint         string               `json:"tokenEndpoint" gorm:"column:oauth_token_endpoint"`
-	JWTEndpoint                string               `json:"jwtEndpoint" gorm:"jwt_endpoint"`
-	JWTKeysEndpoint            string               `json:"keysEndpoint" gorm:"jwt_keys_endpoint"`
-	JWTHeaderName              string               `json:"headerName" gorm:"jwt_header_name"`
+	IsOIDC                     bool                       `json:"-" gorm:"column:is_oidc"`
+	OIDCClientID               string                     `json:"clientId" gorm:"column:oidc_client_id"`
+	OIDCClientSecret           *crypto.CryptoValue        `json:"clientSecret" gorm:"column:oidc_client_secret"`
+	OIDCIssuer                 string                     `json:"issuer" gorm:"column:oidc_issuer"`
+	OIDCScopes                 database.TextArray[string] `json:"scopes" gorm:"column:oidc_scopes"`
+	OIDCIDPDisplayNameMapping  int32                      `json:"idpDisplayNameMapping" gorm:"column:oidc_idp_display_name_mapping"`
+	OIDCUsernameMapping        int32                      `json:"usernameMapping" gorm:"column:oidc_idp_username_mapping"`
+	OAuthAuthorizationEndpoint string                     `json:"authorizationEndpoint" gorm:"column:oauth_authorization_endpoint"`
+	OAuthTokenEndpoint         string                     `json:"tokenEndpoint" gorm:"column:oauth_token_endpoint"`
+	JWTEndpoint                string                     `json:"jwtEndpoint" gorm:"jwt_endpoint"`
+	JWTKeysEndpoint            string                     `json:"keysEndpoint" gorm:"jwt_keys_endpoint"`
+	JWTHeaderName              string                     `json:"headerName" gorm:"jwt_header_name"`
 
 	Sequence   uint64 `json:"-" gorm:"column:sequence"`
 	InstanceID string `json:"instanceID" gorm:"column:instance_id;primary_key"`
@@ -86,13 +83,13 @@ func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
 	return view
 }
 
-func (i *IDPConfigView) AppendEvent(providerType model.IDPProviderType, event *models.Event) (err error) {
-	i.Sequence = event.Sequence
-	i.ChangeDate = event.CreationDate
-	switch eventstore.EventType(event.Type) {
+func (i *IDPConfigView) AppendEvent(providerType model.IDPProviderType, event eventstore.Event) (err error) {
+	i.Sequence = event.Sequence()
+	i.ChangeDate = event.CreatedAt()
+	switch event.Type() {
 	case instance.IDPConfigAddedEventType, org.IDPConfigAddedEventType:
 		i.setRootData(event)
-		i.CreationDate = event.CreationDate
+		i.CreationDate = event.CreatedAt()
 		i.IDPProviderType = int32(providerType)
 		err = i.SetData(event)
 	case instance.IDPOIDCConfigAddedEventType, org.IDPOIDCConfigAddedEventType:
@@ -111,13 +108,14 @@ func (i *IDPConfigView) AppendEvent(providerType model.IDPProviderType, event *m
 	return err
 }
 
-func (r *IDPConfigView) setRootData(event *models.Event) {
-	r.AggregateID = event.AggregateID
-	r.InstanceID = event.InstanceID
+func (r *IDPConfigView) setRootData(event eventstore.Event) {
+	r.AggregateID = event.Aggregate().ID
+	r.InstanceID = event.Aggregate().InstanceID
 }
 
-func (r *IDPConfigView) SetData(event *models.Event) error {
-	if err := json.Unmarshal(event.Data, r); err != nil {
+func (r *IDPConfigView) SetData(event eventstore.Event) error {
+	err := event.Unmarshal(r)
+	if err != nil {
 		logging.New().WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-lub6s", "Could not unmarshal data")
 	}

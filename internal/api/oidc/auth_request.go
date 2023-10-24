@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
-	"github.com/zitadel/oidc/v2/pkg/op"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"

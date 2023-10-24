@@ -9,8 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -47,9 +46,8 @@ func TestSessionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&sessionProjection{}).reduceSessionAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("session"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("session"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -87,9 +85,8 @@ func TestSessionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&sessionProjection{}).reduceUserChecked,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("session"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("session"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -120,9 +117,8 @@ func TestSessionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&sessionProjection{}).reducePasswordChecked,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("session"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("session"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -153,9 +149,8 @@ func TestSessionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&sessionProjection{}).reduceWebAuthNChecked,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("session"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("session"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -186,9 +181,8 @@ func TestSessionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&sessionProjection{}).reduceIntentChecked,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("session"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("session"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -218,9 +212,8 @@ func TestSessionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&sessionProjection{}).reduceTOTPChecked,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("session"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("session"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -250,9 +243,8 @@ func TestSessionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&sessionProjection{}).reduceTokenSet,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("session"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("session"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -284,9 +276,8 @@ func TestSessionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&sessionProjection{}).reduceMetadataSet,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("session"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("session"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -316,9 +307,8 @@ func TestSessionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&sessionProjection{}).reduceSessionTerminated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("session"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("session"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -335,17 +325,17 @@ func TestSessionProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(SessionColumnInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -362,7 +352,7 @@ func TestSessionProjection_reduces(t *testing.T) {
 			name: "reducePasswordChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(user.HumanPasswordChangedType),
+					user.HumanPasswordChangedType,
 					user.AggregateType,
 					[]byte(`{"secret": {
 								"cryptoType": 0,
@@ -374,9 +364,8 @@ func TestSessionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&sessionProjection{}).reducePasswordChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("user"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("user"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

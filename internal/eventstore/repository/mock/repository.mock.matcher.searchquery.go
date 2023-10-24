@@ -11,7 +11,7 @@ type filterQueryMatcher repository.SearchQuery
 
 func (f *filterQueryMatcher) String() string {
 	var filterLists []string
-	for _, filterSlice := range f.Filters {
+	for _, filterSlice := range f.SubQueries {
 		var str string
 		for _, filter := range filterSlice {
 			str += "," + (*filterMatcher)(filter).String()
@@ -24,15 +24,15 @@ func (f *filterQueryMatcher) String() string {
 
 func (f *filterQueryMatcher) Matches(x interface{}) bool {
 	other := x.(*repository.SearchQuery)
-	if len(f.Filters) != len(other.Filters) {
+	if len(f.SubQueries) != len(other.SubQueries) {
 		return false
 	}
-	for filterSliceIdx, filterSlice := range f.Filters {
-		if len(filterSlice) != len(other.Filters[filterSliceIdx]) {
+	for filterSliceIdx, filterSlice := range f.SubQueries {
+		if len(filterSlice) != len(other.SubQueries[filterSliceIdx]) {
 			return false
 		}
-		for filterIdx, filter := range f.Filters[filterSliceIdx] {
-			if !(*filterMatcher)(filter).Matches(other.Filters[filterSliceIdx][filterIdx]) {
+		for filterIdx, filter := range f.SubQueries[filterSliceIdx] {
+			if !(*filterMatcher)(filter).Matches(other.SubQueries[filterSliceIdx][filterIdx]) {
 				return false
 			}
 		}

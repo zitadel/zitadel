@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -25,39 +25,40 @@ const (
 	InstanceColumnDefaultLanguage = "default_language"
 )
 
-type instanceProjection struct {
-	crdb.StatementHandler
+type instanceProjection struct{}
+
+func newInstanceProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(instanceProjection))
 }
 
-func newInstanceProjection(ctx context.Context, config crdb.StatementHandlerConfig) *instanceProjection {
-	p := new(instanceProjection)
-	config.ProjectionName = InstanceProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(InstanceColumnID, crdb.ColumnTypeText),
-			crdb.NewColumn(InstanceColumnName, crdb.ColumnTypeText, crdb.Default("")),
-			crdb.NewColumn(InstanceColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(InstanceColumnCreationDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(InstanceColumnDefaultOrgID, crdb.ColumnTypeText, crdb.Default("")),
-			crdb.NewColumn(InstanceColumnProjectID, crdb.ColumnTypeText, crdb.Default("")),
-			crdb.NewColumn(InstanceColumnConsoleID, crdb.ColumnTypeText, crdb.Default("")),
-			crdb.NewColumn(InstanceColumnConsoleAppID, crdb.ColumnTypeText, crdb.Default("")),
-			crdb.NewColumn(InstanceColumnSequence, crdb.ColumnTypeInt64),
-			crdb.NewColumn(InstanceColumnDefaultLanguage, crdb.ColumnTypeText, crdb.Default("")),
+func (*instanceProjection) Name() string {
+	return InstanceProjectionTable
+}
+
+func (*instanceProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(InstanceColumnID, handler.ColumnTypeText),
+			handler.NewColumn(InstanceColumnName, handler.ColumnTypeText, handler.Default("")),
+			handler.NewColumn(InstanceColumnChangeDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(InstanceColumnCreationDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(InstanceColumnDefaultOrgID, handler.ColumnTypeText, handler.Default("")),
+			handler.NewColumn(InstanceColumnProjectID, handler.ColumnTypeText, handler.Default("")),
+			handler.NewColumn(InstanceColumnConsoleID, handler.ColumnTypeText, handler.Default("")),
+			handler.NewColumn(InstanceColumnConsoleAppID, handler.ColumnTypeText, handler.Default("")),
+			handler.NewColumn(InstanceColumnSequence, handler.ColumnTypeInt64),
+			handler.NewColumn(InstanceColumnDefaultLanguage, handler.ColumnTypeText, handler.Default("")),
 		},
-			crdb.NewPrimaryKey(InstanceColumnID),
+			handler.NewPrimaryKey(InstanceColumnID),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *instanceProjection) reducers() []handler.AggregateReducer {
+func (p *instanceProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceAddedEventType,
 					Reduce: p.reduceInstanceAdded,
@@ -96,7 +97,7 @@ func (p *instanceProjection) reduceInstanceAdded(event eventstore.Event) (*handl
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-29nlS", "reduce.wrong.event.type %s", instance.InstanceAddedEventType)
 	}
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(InstanceColumnID, e.Aggregate().InstanceID),
@@ -114,7 +115,7 @@ func reduceInstanceRemovedHelper(instanceIDCol string) func(event eventstore.Eve
 		if !ok {
 			return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-22nlS", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
 		}
-		return crdb.NewDeleteStatement(
+		return handler.NewDeleteStatement(
 			e,
 			[]handler.Condition{
 				handler.NewCond(instanceIDCol, e.Aggregate().ID),
@@ -128,7 +129,7 @@ func (p *instanceProjection) reduceInstanceChanged(event eventstore.Event) (*han
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-so2am1", "reduce.wrong.event.type %s", instance.InstanceChangedEventType)
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(InstanceColumnName, e.Name),
@@ -146,7 +147,7 @@ func (p *instanceProjection) reduceDefaultOrgSet(event eventstore.Event) (*handl
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2n9f2", "reduce.wrong.event.type %s", instance.DefaultOrgSetEventType)
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
@@ -164,7 +165,7 @@ func (p *instanceProjection) reduceIAMProjectSet(event eventstore.Event) (*handl
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.ProjectSetEventType)
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
@@ -182,7 +183,7 @@ func (p *instanceProjection) reduceConsoleSet(event eventstore.Event) (*handler.
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dgf11", "reduce.wrong.event.type %s", instance.ConsoleSetEventType)
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
@@ -201,7 +202,7 @@ func (p *instanceProjection) reduceDefaultLanguageSet(event eventstore.Event) (*
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.DefaultLanguageSetEventType)
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),

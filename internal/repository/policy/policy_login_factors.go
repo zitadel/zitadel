@@ -1,12 +1,9 @@
 package policy
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -35,12 +32,12 @@ func NewSecondFactorAddedEvent(
 	}
 }
 
-func SecondFactorAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SecondFactorAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &SecondFactorAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-Lp0dE", "unable to unmarshal policy")
 	}
@@ -48,11 +45,11 @@ func SecondFactorAddedEventMapper(event *repository.Event) (eventstore.Event, er
 	return e, nil
 }
 
-func (e *SecondFactorAddedEvent) Data() interface{} {
+func (e *SecondFactorAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SecondFactorAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SecondFactorAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -71,12 +68,12 @@ func NewSecondFactorRemovedEvent(
 	}
 }
 
-func SecondFactorRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SecondFactorRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &SecondFactorRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-5M9gd", "unable to unmarshal policy")
 	}
@@ -84,11 +81,11 @@ func SecondFactorRemovedEventMapper(event *repository.Event) (eventstore.Event, 
 	return e, nil
 }
 
-func (e *SecondFactorRemovedEvent) Data() interface{} {
+func (e *SecondFactorRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SecondFactorRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SecondFactorRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -108,12 +105,12 @@ func NewMultiFactorAddedEvent(
 	}
 }
 
-func MultiFactorAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MultiFactorAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &MultiFactorAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-5Ms90", "unable to unmarshal policy")
 	}
@@ -121,11 +118,11 @@ func MultiFactorAddedEventMapper(event *repository.Event) (eventstore.Event, err
 	return e, nil
 }
 
-func (e *MultiFactorAddedEvent) Data() interface{} {
+func (e *MultiFactorAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *MultiFactorAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MultiFactorAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -144,12 +141,12 @@ func NewMultiFactorRemovedEvent(
 	}
 }
 
-func MultiFactorRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MultiFactorRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &MultiFactorRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-1N8sd", "unable to unmarshal policy")
 	}
@@ -157,10 +154,10 @@ func MultiFactorRemovedEventMapper(event *repository.Event) (eventstore.Event, e
 	return e, nil
 }
 
-func (e *MultiFactorRemovedEvent) Data() interface{} {
+func (e *MultiFactorRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *MultiFactorRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MultiFactorRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }

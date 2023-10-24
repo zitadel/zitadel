@@ -2,14 +2,11 @@ package project
 
 import (
 	"context"
-	"encoding/json"
-
-	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
@@ -29,11 +26,11 @@ type APIConfigAddedEvent struct {
 	AuthMethodType domain.APIAuthMethodType `json:"authMethodType,omitempty"`
 }
 
-func (e *APIConfigAddedEvent) Data() interface{} {
+func (e *APIConfigAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *APIConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *APIConfigAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -77,12 +74,12 @@ func (e *APIConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 	return true
 }
 
-func APIConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func APIConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &APIConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "API-BFd15", "unable to unmarshal api config")
 	}
@@ -98,11 +95,11 @@ type APIConfigChangedEvent struct {
 	AuthMethodType *domain.APIAuthMethodType `json:"authMethodType,omitempty"`
 }
 
-func (e *APIConfigChangedEvent) Data() interface{} {
+func (e *APIConfigChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *APIConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *APIConfigChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -138,12 +135,12 @@ func ChangeAPIAuthMethodType(authMethodType domain.APIAuthMethodType) func(event
 	}
 }
 
-func APIConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func APIConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &APIConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "API-BFd15", "unable to unmarshal api config")
 	}
@@ -158,11 +155,11 @@ type APIConfigSecretChangedEvent struct {
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
 }
 
-func (e *APIConfigSecretChangedEvent) Data() interface{} {
+func (e *APIConfigSecretChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *APIConfigSecretChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *APIConfigSecretChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -183,12 +180,12 @@ func NewAPIConfigSecretChangedEvent(
 	}
 }
 
-func APIConfigSecretChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func APIConfigSecretChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &APIConfigSecretChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "API-M893d", "unable to unmarshal api config")
 	}
@@ -202,11 +199,11 @@ type APIConfigSecretCheckSucceededEvent struct {
 	AppID string `json:"appId"`
 }
 
-func (e *APIConfigSecretCheckSucceededEvent) Data() interface{} {
+func (e *APIConfigSecretCheckSucceededEvent) Payload() interface{} {
 	return e
 }
 
-func (e *APIConfigSecretCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *APIConfigSecretCheckSucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -225,12 +222,12 @@ func NewAPIConfigSecretCheckSucceededEvent(
 	}
 }
 
-func APIConfigSecretCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+func APIConfigSecretCheckSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &APIConfigSecretCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "API-837gV", "unable to unmarshal api config")
 	}
@@ -244,11 +241,11 @@ type APIConfigSecretCheckFailedEvent struct {
 	AppID string `json:"appId"`
 }
 
-func (e *APIConfigSecretCheckFailedEvent) Data() interface{} {
+func (e *APIConfigSecretCheckFailedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *APIConfigSecretCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *APIConfigSecretCheckFailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -267,12 +264,12 @@ func NewAPIConfigSecretCheckFailedEvent(
 	}
 }
 
-func APIConfigSecretCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func APIConfigSecretCheckFailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &APIConfigSecretCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "API-987g%", "unable to unmarshal api config")
 	}

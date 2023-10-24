@@ -1,12 +1,11 @@
 package model
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/user/model"
 )
@@ -22,7 +21,7 @@ type OTPVerified struct {
 	UserAgentID string `json:"userAgentID,omitempty"`
 }
 
-func (u *Human) appendOTPAddedEvent(event *es_models.Event) error {
+func (u *Human) appendOTPAddedEvent(event eventstore.Event) error {
 	u.OTP = &OTP{
 		State: int32(model.MFAStateNotReady),
 	}
@@ -37,17 +36,17 @@ func (u *Human) appendOTPRemovedEvent() {
 	u.OTP = nil
 }
 
-func (o *OTP) setData(event *es_models.Event) error {
+func (o *OTP) setData(event eventstore.Event) error {
 	o.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.Data, o); err != nil {
+	if err := event.Unmarshal(o); err != nil {
 		logging.Log("EVEN-d9soe").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-lo023", "could not unmarshal event")
 	}
 	return nil
 }
 
-func (o *OTPVerified) SetData(event *es_models.Event) error {
-	if err := json.Unmarshal(event.Data, o); err != nil {
+func (o *OTPVerified) SetData(event eventstore.Event) error {
+	if err := event.Unmarshal(o); err != nil {
 		logging.Log("EVEN-BF421").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-GB6hj", "could not unmarshal event")
 	}
