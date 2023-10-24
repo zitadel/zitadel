@@ -24,7 +24,7 @@
         <td class="pointer availability" mat-cell *matCellDef="let config">
           <i
             matTooltip="{{ 'SMTP.LIST.ACTIVATED' | translate }}"
-            *ngIf="config.isActive"
+            *ngIf="isActive(config.state)"
             class="smtp-available las la-check-circle"
           ></i>
         </td>
@@ -84,7 +84,7 @@
             <!-- (click)="addIdp(idp); $event.stopPropagation()" -->
             <button
               actions
-              *ngIf="!config.isActive"
+              *ngIf="!isActive(config.state)"
               [disabled]="(['iam.write'] | hasRole | async) === false"
               mat-icon-button
               matTooltip="{{ 'SMTP.LIST.ACTIVATE' | translate }}"
@@ -94,7 +94,7 @@
 
             <button
               actions
-              *ngIf="config.isActive"
+              *ngIf="isActive(config.state)"
               [disabled]="(['iam.write'] | hasRole | async) === false"
               mat-icon-button
               matTooltip="{{ 'SMTP.LIST.DEACTIVATE' | translate }}"

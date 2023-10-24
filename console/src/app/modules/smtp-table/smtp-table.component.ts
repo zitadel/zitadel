@@ -5,7 +5,7 @@ import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/materia
 import { Router, RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { SMTPProviderType } from 'src/app/proto/generated/zitadel/settings_pb';
+import { SMTPConfigState, SMTPProviderType } from 'src/app/proto/generated/zitadel/settings_pb';
 import {
   IDPLoginPolicyLink,
   IDPOwnerType,
@@ -67,6 +67,10 @@ export class SMTPTableComponent implements OnInit {
 
   ngOnInit(): void {
     this.getData(10, 0);
+  }
+
+  public isActive(state: number) {
+    return state === SMTPConfigState.SMTP_CONFIG_ACTIVE;
   }
 
   public isAllSelected(): boolean {

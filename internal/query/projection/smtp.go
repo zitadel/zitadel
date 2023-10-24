@@ -3,6 +3,7 @@ package projection
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -13,7 +14,6 @@ import (
 const (
 	SMTPConfigProjectionTable = "projections.smtp_configs2"
 
-	SMTPConfigColumnID             = "id"
 	SMTPConfigColumnAggregateID    = "aggregate_id"
 	SMTPConfigColumnCreationDate   = "creation_date"
 	SMTPConfigColumnChangeDate     = "change_date"
@@ -27,7 +27,8 @@ const (
 	SMTPConfigColumnSMTPHost       = "host"
 	SMTPConfigColumnSMTPUser       = "username"
 	SMTPConfigColumnSMTPPassword   = "password"
-	SMTPConfigColumnIsActive       = "is_active"
+	SMTPConfigColumnID             = "id"
+	SMTPConfigColumnState          = "state"
 	SMTPConfigColumnProviderType   = "provider_type"
 )
 
@@ -57,7 +58,7 @@ func newSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerCo
 			crdb.NewColumn(SMTPConfigColumnSMTPHost, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnSMTPUser, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnSMTPPassword, crdb.ColumnTypeJSONB, crdb.Nullable()),
-			crdb.NewColumn(SMTPConfigColumnIsActive, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(SMTPConfigColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(SMTPConfigColumnProviderType, crdb.ColumnTypeEnum, crdb.Default(SMTP_PROVIDER_TYPE_GENERIC)),
 		},
 			crdb.NewPrimaryKey(SMTPConfigColumnInstanceID, SMTPConfigColumnID),
@@ -123,7 +124,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 			handler.NewCol(SMTPConfigColumnSMTPHost, e.Host),
 			handler.NewCol(SMTPConfigColumnSMTPUser, e.User),
 			handler.NewCol(SMTPConfigColumnSMTPPassword, e.Password),
-			handler.NewCol(SMTPConfigColumnIsActive, e.IsActive),
+			handler.NewCol(SMTPConfigColumnState, domain.SMTPConfigStateInactive),
 			handler.NewCol(SMTPConfigColumnProviderType, e.ProviderType),
 		},
 	), nil
@@ -155,9 +156,6 @@ func (p *smtpConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 	}
 	if e.User != nil {
 		columns = append(columns, handler.NewCol(SMTPConfigColumnSMTPUser, *e.User))
-	}
-	if e.IsActive != nil {
-		columns = append(columns, handler.NewCol(SMTPConfigColumnIsActive, *e.IsActive))
 	}
 	if e.ProviderType != nil {
 		columns = append(columns, handler.NewCol(SMTPConfigColumnProviderType, *e.ProviderType))
@@ -203,7 +201,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigDeactivated(event eventstore.Even
 		[]handler.Column{
 			handler.NewCol(SMTPConfigColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SMTPConfigColumnSequence, e.Sequence()),
-			handler.NewCol(SMTPConfigColumnIsActive, false),
+			handler.NewCol(SMTPConfigColumnState, domain.SMTPConfigStateInactive),
 		},
 		[]handler.Condition{
 			handler.NewCond(SMTPConfigColumnID, e.ID),

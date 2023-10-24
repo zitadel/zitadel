@@ -20,7 +20,6 @@ type InstanceSMTPConfigWriteModel struct {
 	User           string
 	Password       *crypto.CryptoValue
 	State          domain.SMTPConfigState
-	IsActive       bool
 	ProviderType   uint32
 
 	domain                                 string
@@ -70,9 +69,8 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 			wm.SenderAddress = e.SenderAddress
 			wm.SenderName = e.SenderName
 			wm.ReplyToAddress = e.ReplyToAddress
-			wm.IsActive = e.IsActive
 			wm.ProviderType = e.ProviderType
-			wm.State = domain.SMTPConfigStateActive
+			wm.State = domain.SMTPConfigStateInactive
 		case *instance.SMTPConfigChangedEvent:
 			if e.TLS != nil {
 				wm.TLS = *e.TLS
@@ -95,14 +93,10 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 			if e.ReplyToAddress != nil {
 				wm.ReplyToAddress = *e.ReplyToAddress
 			}
-			if e.IsActive != nil {
-				wm.IsActive = *e.IsActive
-			}
 			if e.ProviderType != nil {
 				wm.ProviderType = *e.ProviderType
 			}
 		case *instance.SMTPConfigRemovedEvent:
-			wm.State = domain.SMTPConfigStateRemoved
 			wm.TLS = false
 			wm.SenderName = ""
 			wm.SenderAddress = ""
@@ -110,8 +104,10 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 			wm.Host = ""
 			wm.User = ""
 			wm.Password = nil
-			wm.IsActive = false
 			wm.ProviderType = 0
+			wm.State = domain.SMTPConfigStateRemoved
+		case *instance.SMTPConfigDeactivatedEvent:
+			wm.State = domain.SMTPConfigStateInactive
 		case *instance.DomainAddedEvent:
 			wm.domainState = domain.InstanceDomainStateActive
 		case *instance.DomainRemovedEvent:
@@ -137,6 +133,8 @@ func (wm *InstanceSMTPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.SMTPConfigAddedEventType,
 			instance.SMTPConfigChangedEventType,
 			instance.SMTPConfigPasswordChangedEventType,
+			instance.SMTPConfigDeactivatedEventType,
+			instance.SMTPConfigRemovedEventType,
 			instance.InstanceDomainAddedEventType,
 			instance.InstanceDomainRemovedEventType,
 			instance.DomainPolicyAddedEventType,
@@ -144,7 +142,7 @@ func (wm *InstanceSMTPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (wm *InstanceSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, tls bool, fromAddress, fromName, replyToAddress, smtpHost, smtpUser string, isActive bool, providerType uint32) (*instance.SMTPConfigChangedEvent, bool, error) {
+func (wm *InstanceSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, tls bool, fromAddress, fromName, replyToAddress, smtpHost, smtpUser string, providerType uint32) (*instance.SMTPConfigChangedEvent, bool, error) {
 	changes := make([]instance.SMTPConfigChanges, 0)
 	var err error
 
@@ -165,9 +163,6 @@ func (wm *InstanceSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, agg
 	}
 	if wm.User != smtpUser {
 		changes = append(changes, instance.ChangeSMTPConfigSMTPUser(smtpUser))
-	}
-	if wm.IsActive != isActive {
-		changes = append(changes, instance.ChangeSMTPConfigIsActive(isActive))
 	}
 	if wm.ProviderType != providerType {
 		changes = append(changes, instance.ChangeSMTPConfigProviderType(providerType))

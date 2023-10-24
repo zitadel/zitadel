@@ -19,7 +19,7 @@ import (
 
 func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.Config) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareAddSMTPConfig(instanceAgg, config.From, config.FromName, config.ReplyToAddress, config.SMTP.Host, config.SMTP.User, []byte(config.SMTP.Password), config.Tls, config.SMTP.IsActive, config.SMTP.ProviderType)
+	validation := c.prepareAddSMTPConfig(instanceAgg, config.From, config.FromName, config.ReplyToAddress, config.SMTP.Host, config.SMTP.User, []byte(config.SMTP.Password), config.Tls, config.SMTP.ProviderType)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.Config) (*dom
 
 func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *smtp.Config) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareChangeSMTPConfig(instanceAgg, config.From, config.FromName, config.ReplyToAddress, config.SMTP.Host, config.SMTP.User, config.Tls, config.SMTP.IsActive, config.SMTP.ProviderType)
+	validation := c.prepareChangeSMTPConfig(instanceAgg, config.From, config.FromName, config.ReplyToAddress, config.SMTP.Host, config.SMTP.User, config.Tls, config.SMTP.ProviderType)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string
 	if err != nil {
 		return nil, err
 	}
-	if smtpConfigWriteModel.State != domain.SMTPConfigStateActive {
+	if !smtpConfigWriteModel.State.Exists() {
 		return nil, errors.ThrowNotFound(nil, "COMMAND-3n9ls", "Errors.SMTPConfig.NotFound")
 	}
 	var smtpPassword *crypto.CryptoValue
@@ -120,7 +120,7 @@ func (c *Commands) RemoveSMTPConfig(ctx context.Context, req *admin_pb.RemoveSMT
 	}, nil
 }
 
-func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, replyTo, hostAndPort, user string, password []byte, tls, isActive bool, providerType uint32) preparation.Validation {
+func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, replyTo, hostAndPort, user string, password []byte, tls bool, providerType uint32) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if from = strings.TrimSpace(from); from == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-mruNY", "Errors.Invalid.Argument")
@@ -170,7 +170,6 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, reply
 					hostAndPort,
 					user,
 					smtpPassword,
-					isActive,
 					providerType,
 				),
 			}, nil
@@ -178,7 +177,7 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, reply
 	}
 }
 
-func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, replyTo, hostAndPort, user string, tls, isActive bool, providerType uint32) preparation.Validation {
+func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, replyTo, hostAndPort, user string, tls bool, providerType uint32) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if from = strings.TrimSpace(from); from == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-ASv2d", "Errors.Invalid.Argument")
@@ -197,7 +196,7 @@ func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, re
 			if err != nil {
 				return nil, err
 			}
-			if writeModel.State != domain.SMTPConfigStateActive {
+			if !writeModel.State.Exists() {
 				return nil, errors.ThrowNotFound(nil, "INST-Svq1a", "Errors.SMTPConfig.NotFound")
 			}
 			err = checkSenderAddress(writeModel)
@@ -213,7 +212,6 @@ func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, re
 				replyTo,
 				hostAndPort,
 				user,
-				isActive,
 				providerType,
 			)
 			if err != nil {

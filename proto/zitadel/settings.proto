@@ -51,6 +51,12 @@ enum SMTPProviderType {
   SMTP_PROVIDER_TYPE_GENERIC = 7;
 }
 
+enum SMTPConfigState {
+  SMTP_CONFIG_STATE_UNSPECIFIED = 0;
+  SMTP_CONFIG_ACTIVE = 1;
+  SMTP_CONFIG_INACTIVE = 2;
+}
+
 enum SecretGeneratorType {
   SECRET_GENERATOR_TYPE_UNSPECIFIED = 0;
   SECRET_GENERATOR_TYPE_INIT_CODE = 1;
@@ -91,7 +97,7 @@ message SMTPConfig {
       example: "\"replyto@m.zitadel.cloud\"";
     }
   ];
-  bool is_active = 8;
+  SMTPConfigState state = 8;
   SMTPProviderType provider_type = 9;
   string id = 10;
 }

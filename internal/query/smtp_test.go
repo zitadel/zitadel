@@ -114,7 +114,6 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 				Host:           "host",
 				User:           "user",
 				Password:       &crypto.CryptoValue{},
-				IsActive:       false,
 				ProviderType:   1,
 			},
 		},

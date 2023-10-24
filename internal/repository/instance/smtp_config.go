@@ -30,7 +30,6 @@ type SMTPConfigAddedEvent struct {
 	Host           string              `json:"host,omitempty"`
 	User           string              `json:"user,omitempty"`
 	Password       *crypto.CryptoValue `json:"password,omitempty"`
-	IsActive       bool                `json:"isActive,omitempty"`
 	ProviderType   uint32              `json:"providerType,omitempty"`
 }
 
@@ -45,7 +44,6 @@ func NewSMTPConfigAddedEvent(
 	host,
 	user string,
 	password *crypto.CryptoValue,
-	isActive bool,
 	providerType uint32,
 ) *SMTPConfigAddedEvent {
 	return &SMTPConfigAddedEvent{
@@ -62,7 +60,6 @@ func NewSMTPConfigAddedEvent(
 		Host:           host,
 		User:           user,
 		Password:       password,
-		IsActive:       isActive,
 		ProviderType:   providerType,
 	}
 }
@@ -97,7 +94,6 @@ type SMTPConfigChangedEvent struct {
 	Host           *string             `json:"host,omitempty"`
 	User           *string             `json:"user,omitempty"`
 	Password       *crypto.CryptoValue `json:"password,omitempty"`
-	IsActive       *bool               `json:"isActive,omitempty"`
 	ProviderType   *uint32             `json:"providerType,omitempty"`
 }
 
@@ -165,12 +161,6 @@ func ChangeSMTPConfigSMTPHost(smtpHost string) func(event *SMTPConfigChangedEven
 func ChangeSMTPConfigSMTPUser(smtpUser string) func(event *SMTPConfigChangedEvent) {
 	return func(e *SMTPConfigChangedEvent) {
 		e.User = &smtpUser
-	}
-}
-
-func ChangeSMTPConfigIsActive(isActive bool) func(event *SMTPConfigChangedEvent) {
-	return func(e *SMTPConfigChangedEvent) {
-		e.IsActive = &isActive
 	}
 }
 

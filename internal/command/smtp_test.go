@@ -63,7 +63,6 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 						Host:         "host:587",
 						User:         "user",
 						Password:     "password",
-						IsActive:     false,
 						ProviderType: 1,
 					},
 				},
@@ -94,6 +93,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewSMTPConfigAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
+								"",
 								true,
 								"from@domain.ch",
 								"name",
@@ -101,7 +101,6 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 								"host:587",
 								"user",
 								&crypto.CryptoValue{},
-								false,
 								7,
 							),
 						),
@@ -119,7 +118,6 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 						Host:         "host:587",
 						User:         "user",
 						Password:     "password",
-						IsActive:     false,
 						ProviderType: 7,
 					},
 				},
@@ -155,6 +153,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 								instance.NewSMTPConfigAddedEvent(
 									context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
+									"",
 									true,
 									"from@domain.ch",
 									"name",
@@ -167,7 +166,6 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 										KeyID:      "id",
 										Crypted:    []byte("password"),
 									},
-									false,
 									7,
 								),
 							),
@@ -186,7 +184,6 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 						Host:         "host:587",
 						User:         "user",
 						Password:     "password",
-						IsActive:     false,
 						ProviderType: 7,
 					},
 				},
@@ -224,6 +221,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 								instance.NewSMTPConfigAddedEvent(
 									context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
+									"",
 									true,
 									"from@domain.ch",
 									"name",
@@ -236,7 +234,6 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 										KeyID:      "id",
 										Crypted:    []byte("password"),
 									},
-									false,
 									7,
 								),
 							),
@@ -256,7 +253,6 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 						Host:         "host:587",
 						User:         "user",
 						Password:     "password",
-						IsActive:     false,
 						ProviderType: 7,
 					},
 				},
@@ -304,7 +300,6 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 						Host:         "   ",
 						User:         "user",
 						Password:     "password",
-						IsActive:     false,
 						ProviderType: 1,
 					},
 				},
@@ -340,6 +335,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 								instance.NewSMTPConfigAddedEvent(
 									context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
+									"",
 									true,
 									"from@domain.ch",
 									"name",
@@ -352,7 +348,6 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 										KeyID:      "id",
 										Crypted:    []byte("password"),
 									},
-									false,
 									7,
 								),
 							),
@@ -371,7 +366,6 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 						Host:         "[2001:db8::1]:2525",
 						User:         "user",
 						Password:     "password",
-						IsActive:     false,
 						ProviderType: 7,
 					},
 				},
@@ -453,7 +447,6 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					SMTP: smtp.SMTP{
 						Host:         "host:587",
 						User:         "user",
-						IsActive:     false,
 						ProviderType: 1,
 					},
 				},
@@ -485,6 +478,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 							instance.NewSMTPConfigAddedEvent(
 								context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
+								"",
 								true,
 								"from@domain.ch",
 								"name",
@@ -492,7 +486,6 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								"host:587",
 								"user",
 								&crypto.CryptoValue{},
-								false,
 								7,
 							),
 						),
@@ -508,7 +501,6 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					SMTP: smtp.SMTP{
 						Host:         "host:587",
 						User:         "user",
-						IsActive:     false,
 						ProviderType: 7,
 					},
 				},
@@ -540,6 +532,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 							instance.NewSMTPConfigAddedEvent(
 								context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
+								"",
 								true,
 								"from@domain.ch",
 								"name",
@@ -547,7 +540,6 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								"host:587",
 								"user",
 								&crypto.CryptoValue{},
-								false,
 								7,
 							),
 						),
@@ -563,7 +555,6 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					SMTP: smtp.SMTP{
 						Host:         "host:587",
 						User:         "user",
-						IsActive:     false,
 						ProviderType: 7,
 					},
 				},
@@ -595,6 +586,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 							instance.NewSMTPConfigAddedEvent(
 								context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
+								"",
 								true,
 								"from@domain.ch",
 								"name",
@@ -602,7 +594,6 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								"host:587",
 								"user",
 								&crypto.CryptoValue{},
-								false,
 								1,
 							),
 						),
@@ -619,7 +610,6 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 									"replyto@domain.ch",
 									"host2:587",
 									"user2",
-									true,
 									7,
 								),
 							),
@@ -637,7 +627,6 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					SMTP: smtp.SMTP{
 						Host:         "host2:587",
 						User:         "user2",
-						IsActive:     true,
 						ProviderType: 7,
 					},
 				},
@@ -663,7 +652,6 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 						Host:         "host",
 						User:         "user",
 						Password:     "password",
-						IsActive:     false,
 						ProviderType: 1,
 					},
 				},
@@ -687,7 +675,6 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 						Host:         "   ",
 						User:         "user",
 						Password:     "password",
-						IsActive:     false,
 						ProviderType: 1,
 					},
 				},
@@ -719,6 +706,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 							instance.NewSMTPConfigAddedEvent(
 								context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
+								"",
 								true,
 								"from@domain.ch",
 								"name",
@@ -726,7 +714,6 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								"host:587",
 								"user",
 								&crypto.CryptoValue{},
-								false,
 								7,
 							),
 						),
@@ -743,7 +730,6 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 									"replyto@domain.ch",
 									"[2001:db8::1]:2525",
 									"user2",
-									true,
 									2,
 								),
 							),
@@ -761,7 +747,6 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					SMTP: smtp.SMTP{
 						Host:         "[2001:db8::1]:2525",
 						User:         "user2",
-						IsActive:     true,
 						ProviderType: 2,
 					},
 				},
@@ -837,6 +822,7 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 							instance.NewSMTPConfigAddedEvent(
 								context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
+								"",
 								true,
 								"from",
 								"name",
@@ -844,7 +830,6 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 								"host:587",
 								"user",
 								&crypto.CryptoValue{},
-								false,
 								7,
 							),
 						),
@@ -943,6 +928,7 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 							instance.NewSMTPConfigAddedEvent(
 								context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
+								"999",
 								true,
 								"from",
 								"name",
@@ -950,7 +936,6 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 								"host:587",
 								"user",
 								&crypto.CryptoValue{},
-								false,
 								7,
 							),
 						),
@@ -962,6 +947,7 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 								instance.NewSMTPConfigRemovedEvent(
 									context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
+									"999",
 								),
 							),
 						},
@@ -978,6 +964,7 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 			},
 		},
 	}
+	// TODO @n40lab
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
@@ -998,7 +985,7 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 	}
 }
 
-func newSMTPConfigChangedEvent(ctx context.Context, tls bool, fromAddress, fromName, replyTo, host, user string, isActive bool, providerType uint32) *instance.SMTPConfigChangedEvent {
+func newSMTPConfigChangedEvent(ctx context.Context, tls bool, fromAddress, fromName, replyTo, host, user string, providerType uint32) *instance.SMTPConfigChangedEvent {
 	changes := []instance.SMTPConfigChanges{
 		instance.ChangeSMTPConfigTLS(tls),
 		instance.ChangeSMTPConfigFromAddress(fromAddress),
@@ -1006,7 +993,6 @@ func newSMTPConfigChangedEvent(ctx context.Context, tls bool, fromAddress, fromN
 		instance.ChangeSMTPConfigReplyToAddress(replyTo),
 		instance.ChangeSMTPConfigSMTPHost(host),
 		instance.ChangeSMTPConfigSMTPUser(user),
-		instance.ChangeSMTPConfigIsActive(isActive),
 		instance.ChangeSMTPConfigProviderType(providerType),
 	}
 	event, _ := instance.NewSMTPConfigChangeEvent(ctx,

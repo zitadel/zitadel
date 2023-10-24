@@ -22,11 +22,11 @@ func SMTPConfigToProviderPb(config *query.SMTPConfig) *settings_pb.SMTPConfig {
 	return &settings_pb.SMTPConfig{
 		Details:       object.ToViewDetailsPb(config.Sequence, config.CreationDate, config.ChangeDate, config.ResourceOwner),
 		Id:            config.ID,
-		IsActive:      config.IsActive,
 		Tls:           config.TLS,
 		Host:          config.Host,
 		User:          config.User,
 		ProviderType:  settings_pb.SMTPProviderType(config.ProviderType),
+		State:         settings_pb.SMTPConfigState(config.State),
 		SenderAddress: config.SenderAddress,
 		SenderName:    config.SenderName,
 	}

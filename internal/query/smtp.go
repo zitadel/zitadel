@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -55,10 +56,6 @@ var (
 		name:  projection.SMTPConfigColumnSequence,
 		table: smtpConfigsTable,
 	}
-	SMTPConfigColumnID = Column{
-		name:  projection.SMTPConfigColumnID,
-		table: smtpConfigsTable,
-	}
 	SMTPConfigColumnTLS = Column{
 		name:  projection.SMTPConfigColumnTLS,
 		table: smtpConfigsTable,
@@ -87,8 +84,12 @@ var (
 		name:  projection.SMTPConfigColumnSMTPPassword,
 		table: smtpConfigsTable,
 	}
-	SMTPConfigColumnIsActive = Column{
-		name:  projection.SMTPConfigColumnIsActive,
+	SMTPConfigColumnID = Column{
+		name:  projection.SMTPConfigColumnID,
+		table: smtpConfigsTable,
+	}
+	SMTPConfigColumnState = Column{
+		name:  projection.SMTPConfigColumnState,
 		table: smtpConfigsTable,
 	}
 	SMTPConfigColumnProviderType = Column{
@@ -103,7 +104,6 @@ type SMTPConfig struct {
 	ChangeDate     time.Time
 	ResourceOwner  string
 	Sequence       uint64
-	ID             string
 	TLS            bool
 	SenderAddress  string
 	SenderName     string
@@ -111,11 +111,13 @@ type SMTPConfig struct {
 	Host           string
 	User           string
 	Password       *crypto.CryptoValue
-	IsActive       bool
+	ID             string
+	State          domain.SMTPConfigState
 	ProviderType   uint32
 }
 
 func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (config *SMTPConfig, err error) {
+	// TODO @n40lab
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -123,7 +125,7 @@ func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID strin
 	query, args, err := stmt.Where(sq.Eq{
 		SMTPConfigColumnAggregateID.identifier(): aggregateID,
 		SMTPConfigColumnInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
-		SMTPConfigColumnIsActive.identifier():    true,
+		SMTPConfigColumnState.identifier():       true,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-3m9sl", "Errors.Query.SQLStatment")
@@ -140,7 +142,6 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 	password := new(crypto.CryptoValue)
 
 	return sq.Select(
-			SMTPConfigColumnID.identifier(),
 			SMTPConfigColumnAggregateID.identifier(),
 			SMTPConfigColumnCreationDate.identifier(),
 			SMTPConfigColumnChangeDate.identifier(),
@@ -153,14 +154,14 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			SMTPConfigColumnSMTPHost.identifier(),
 			SMTPConfigColumnSMTPUser.identifier(),
 			SMTPConfigColumnSMTPPassword.identifier(),
-			SMTPConfigColumnIsActive.identifier(),
+			SMTPConfigColumnID.identifier(),
+			SMTPConfigColumnState.identifier(),
 			SMTPConfigColumnProviderType.identifier()).
 			From(smtpConfigsTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SMTPConfig, error) {
 			config := new(SMTPConfig)
 			err := row.Scan(
-				&config.ID,
 				&config.AggregateID,
 				&config.CreationDate,
 				&config.ChangeDate,
@@ -173,7 +174,8 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				&config.Host,
 				&config.User,
 				&password,
-				&config.IsActive,
+				&config.ID,
+				&config.State,
 				&config.ProviderType,
 			)
 			if err != nil {
@@ -189,7 +191,6 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 
 func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*SMTPConfigs, error)) {
 	return sq.Select(
-			SMTPConfigColumnID.identifier(),
 			SMTPConfigColumnAggregateID.identifier(),
 			SMTPConfigColumnCreationDate.identifier(),
 			SMTPConfigColumnChangeDate.identifier(),
@@ -202,7 +203,8 @@ func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			SMTPConfigColumnSMTPHost.identifier(),
 			SMTPConfigColumnSMTPUser.identifier(),
 			SMTPConfigColumnSMTPPassword.identifier(),
-			SMTPConfigColumnIsActive.identifier(),
+			SMTPConfigColumnID.identifier(),
+			SMTPConfigColumnState.identifier(),
 			SMTPConfigColumnProviderType.identifier(),
 			countColumn.identifier()).
 			From(smtpConfigsTable.identifier() + db.Timetravel(call.Took(ctx))).
@@ -212,7 +214,6 @@ func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			for rows.Next() {
 				config := new(SMTPConfig)
 				err := rows.Scan(
-					&config.ID,
 					&config.AggregateID,
 					&config.CreationDate,
 					&config.ChangeDate,
@@ -225,7 +226,8 @@ func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 					&config.Host,
 					&config.User,
 					&config.Password,
-					&config.IsActive,
+					&config.ID,
+					&config.State,
 					&config.ProviderType,
 					&configs.Count,
 				)
