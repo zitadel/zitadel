@@ -2,8 +2,6 @@ package senders
 
 import (
 	"context"
-	"github.com/zitadel/zitadel/internal/notification/handlers"
-	"github.com/zitadel/zitadel/internal/notification/messages"
 
 	"github.com/zitadel/logging"
 
@@ -11,13 +9,15 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/channels/instrumenting"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
+	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/internal/notification/resources"
 )
 
 const webhookSpanName = "webhook.NotificationChannel"
 
 func WebhookChannels(
 	ctx context.Context,
-	queries *handlers.NotificationQueries,
+	queries *resources.NotificationQueries,
 	webhookConfig webhook.Config,
 	successMetricName,
 	failureMetricName string,

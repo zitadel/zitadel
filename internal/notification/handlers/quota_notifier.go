@@ -4,12 +4,12 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
+	"github.com/zitadel/zitadel/internal/notification/resources"
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -22,16 +22,16 @@ const (
 
 type quotaNotifier struct {
 	crdb.StatementHandler
-	commands *command.Commands
-	queries  *NotificationQueries
+	commands resources.Commands
+	queries  *resources.NotificationQueries
 	channels types.ChannelChains
 }
 
 func NewQuotaNotifier(
 	ctx context.Context,
 	config crdb.StatementHandlerConfig,
-	commands *command.Commands,
-	queries *NotificationQueries,
+	commands resources.Commands,
+	queries *resources.NotificationQueries,
 	channels types.ChannelChains,
 ) *quotaNotifier {
 	p := new(quotaNotifier)

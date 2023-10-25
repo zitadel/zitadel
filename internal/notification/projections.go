@@ -2,6 +2,7 @@ package notification
 
 import (
 	"context"
+	"github.com/zitadel/zitadel/internal/notification/resources"
 
 	statik_fs "github.com/rakyll/statik/fs"
 	"github.com/zitadel/logging"
@@ -31,7 +32,7 @@ func Start(
 ) {
 	statikFS, err := statik_fs.NewWithNamespace("notification")
 	logging.OnError(err).Panic("unable to start listener")
-	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption, statikFS)
+	q := resources.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption, statikFS)
 	c := newChannels(q)
 	handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl).Start()
 	handlers.NewQuotaNotifier(ctx, projection.ApplyCustomConfig(quotaHandlerCustomConfig), commands, q, c).Start()

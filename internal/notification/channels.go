@@ -3,13 +3,13 @@ package notification
 import (
 	"context"
 	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/internal/notification/resources"
 
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
-	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
@@ -30,11 +30,11 @@ type deliveryMetrics struct {
 }
 
 type allChannels struct {
-	q        *handlers.NotificationQueries
+	q        *resources.NotificationQueries
 	counters counters
 }
 
-func newChannels(q *handlers.NotificationQueries) *allChannels {
+func newChannels(q *resources.NotificationQueries) *allChannels {
 	c := &allChannels{
 		q: q,
 		counters: counters{
@@ -70,6 +70,10 @@ func registerCounter(counter, desc string) {
 
 func (c *allChannels) Email(ctx context.Context) (*senders.Chain[*messages.Email], *smtp.Config, error) {
 	smtpCfg, err := c.q.GetSMTPConfig(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	webhookCfg, err := c.q.GetEmailWebhookConfig(ctx)
 	if err != nil {
 		return nil, nil, err
 	}

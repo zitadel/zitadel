@@ -1,4 +1,4 @@
-package handlers
+package resources
 
 import (
 	"context"
@@ -31,7 +31,7 @@ type Queries interface {
 type NotificationQueries struct {
 	Queries
 	es                 *eventstore.Eventstore
-	externalDomain     string
+	ExternalDomain     string
 	externalPort       uint16
 	externalSecure     bool
 	fileSystemPath     string
@@ -56,7 +56,7 @@ func NewNotificationQueries(
 	return &NotificationQueries{
 		Queries:            baseQueries,
 		es:                 es,
-		externalDomain:     externalDomain,
+		ExternalDomain:     externalDomain,
 		externalPort:       externalPort,
 		externalSecure:     externalSecure,
 		fileSystemPath:     fileSystemPath,

@@ -2,14 +2,14 @@ package senders
 
 import (
 	"context"
-	"github.com/zitadel/zitadel/internal/notification/handlers"
+	"github.com/zitadel/zitadel/internal/notification/resources"
 
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/channels/fs"
 	"github.com/zitadel/zitadel/internal/notification/channels/log"
 )
 
-func connectToDebugChannels[T channels.Message](ctx context.Context, queries *handlers.NotificationQueries) []channels.NotificationChannel[T] {
+func connectToDebugChannels[T channels.Message](ctx context.Context, queries *resources.NotificationQueries) []channels.NotificationChannel[T] {
 	var (
 		providers []channels.NotificationChannel[T]
 	)

@@ -3,8 +3,8 @@ package senders
 import (
 	"context"
 	"github.com/zitadel/zitadel/internal/notification/channels/email_webhook"
-	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/internal/notification/resources"
 
 	"github.com/zitadel/logging"
 
@@ -21,7 +21,7 @@ const (
 
 func EmailChannels(
 	ctx context.Context,
-	queries *handlers.NotificationQueries,
+	queries *resources.NotificationQueries,
 	smtpConfig *smtp.Config,
 	webhookConfig *email_webhook.Config,
 	successMetricSMTPName,

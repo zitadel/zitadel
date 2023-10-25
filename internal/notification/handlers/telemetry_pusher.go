@@ -7,11 +7,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/notification/resources"
+
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -39,8 +40,8 @@ type TelemetryPusherConfig struct {
 type telemetryPusher struct {
 	crdb.StatementHandler
 	cfg      TelemetryPusherConfig
-	commands *command.Commands
-	queries  *NotificationQueries
+	commands resources.Commands
+	queries  *resources.NotificationQueries
 	channels types.ChannelChains
 }
 
@@ -48,8 +49,8 @@ func NewTelemetryPusher(
 	ctx context.Context,
 	telemetryCfg TelemetryPusherConfig,
 	handlerCfg crdb.StatementHandlerConfig,
-	commands *command.Commands,
-	queries *NotificationQueries,
+	commands resources.Commands,
+	queries *resources.NotificationQueries,
 	channels types.ChannelChains,
 ) *telemetryPusher {
 	p := new(telemetryPusher)
@@ -138,7 +139,7 @@ func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.Sched
 				ReachedDate    time.Time      `json:"reached"`
 			}{
 				InstanceID:     ms.InstanceID,
-				ExternalDomain: t.queries.externalDomain,
+				ExternalDomain: t.queries.ExternalDomain,
 				PrimaryDomain:  ms.PrimaryDomain,
 				Type:           ms.Type,
 				ReachedDate:    ms.ReachedDate,

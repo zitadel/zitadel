@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"github.com/zitadel/zitadel/internal/notification/resources"
 	"strings"
 	"time"
 
@@ -26,8 +27,8 @@ const (
 
 type userNotifier struct {
 	crdb.StatementHandler
-	commands     Commands
-	queries      *NotificationQueries
+	commands     resources.Commands
+	queries      *resources.NotificationQueries
 	channels     types.ChannelChains
 	otpEmailTmpl string
 }
@@ -35,8 +36,8 @@ type userNotifier struct {
 func NewUserNotifier(
 	ctx context.Context,
 	config crdb.StatementHandlerConfig,
-	commands Commands,
-	queries *NotificationQueries,
+	commands resources.Commands,
+	queries *resources.NotificationQueries,
 	channels types.ChannelChains,
 	otpEmailTmpl string,
 ) *userNotifier {

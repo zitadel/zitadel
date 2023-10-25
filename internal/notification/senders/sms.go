@@ -2,8 +2,8 @@ package senders
 
 import (
 	"context"
-	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/internal/notification/resources"
 
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/channels/instrumenting"
@@ -14,7 +14,7 @@ const twilioSpanName = "twilio.NotificationChannel"
 
 func SMSChannels(
 	ctx context.Context,
-	queries *handlers.NotificationQueries,
+	queries *resources.NotificationQueries,
 	twilioConfig *twilio.Config,
 	successMetricName,
 	failureMetricName string,
