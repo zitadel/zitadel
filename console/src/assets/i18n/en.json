@@ -1198,6 +1198,11 @@
         "ERROR": "User could not be found!",
         "PRIMARYBUTTON": "next",
         "SECONDARYBUTTON": "register"
+      },
+      "THEMEMODE": {
+        "THEME_ALL": "Auto Mode",
+        "THEME_LIGHT": "Light Mode only",
+        "THEME_DARK": "Dark Mode only"
       }
     },
     "PWD_AGE": {

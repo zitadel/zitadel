@@ -9,6 +9,7 @@ import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/lega
 import { MatLegacyCheckboxModule as MatCheckboxModule } from '@angular/material/legacy-checkbox';
 import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { ColorChromeModule } from 'ngx-color/chrome';
@@ -49,6 +50,7 @@ import { PrivateLabelingPolicyComponent } from './private-labeling-policy.compon
     WarnDialogModule,
     HasRolePipeModule,
     MatProgressSpinnerModule,
+    MatSelectModule,
     MatExpansionModule,
     InfoSectionModule,
   ],
