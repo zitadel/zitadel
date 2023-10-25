@@ -30,6 +30,8 @@ func themeModeToDomain(theme policy_pb.ThemeMode) domain.LabelPolicyThemeMode {
 		return domain.LabelPolicyThemeDark
 	case policy_pb.ThemeMode_THEME_MODE_LIGHT:
 		return domain.LabelPolicyThemeLight
+	case policy_pb.ThemeMode_THEME_MODE_UNSPECIFIED:
+		return domain.LabelPolicyThemeAuto
 	default:
 		return domain.LabelPolicyThemeAuto
 	}
