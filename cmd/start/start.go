@@ -164,6 +164,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 				return internal_authz.CheckPermission(ctx, &authz_es.UserMembershipRepo{Queries: q}, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 			}
 		},
+		config.AuditLogRetention,
 		config.SystemAPIUsers,
 	)
 	if err != nil {
@@ -315,8 +316,11 @@ func startAPIs(
 		authZRepo,
 		queries,
 	}
+	oidcPrefixes := []string{"/.well-known/openid-configuration", "/oidc/v1", "/oauth/v2"}
 	// always set the origin in the context if available in the http headers, no matter for what protocol
 	router.Use(middleware.OriginHandler)
+	// adds used HTTPPathPattern and RequestMethod to context
+	router.Use(middleware.ActivityHandler(append(oidcPrefixes, saml.HandlerPrefix, admin.GatewayPathPrefix(), management.GatewayPathPrefix())))
 	verifier := internal_authz.Start(repo, http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
 	tlsConfig, err := config.TLS.Config()
 	if err != nil {
@@ -364,10 +368,10 @@ func startAPIs(
 	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, config.SystemDefaults, config.ExternalSecure, keys.User, config.AuditLogRetention)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
+	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, keys.User, config.ExternalSecure)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
+	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, keys.User, config.ExternalSecure)); err != nil {
 		return err
 	}
 	if err := apis.RegisterService(ctx, user_v2.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(config.ExternalSecure), idp.SAMLRootURL(config.ExternalSecure))); err != nil {
@@ -412,7 +416,7 @@ func startAPIs(
 	if err != nil {
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}
-	apis.RegisterHandlerPrefixes(oidcServer, "/.well-known/openid-configuration", "/oidc/v1", "/oauth/v2")
+	apis.RegisterHandlerPrefixes(oidcServer, oidcPrefixes...)
 
 	samlProvider, err := saml.NewProvider(config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor, limitingAccessInterceptor)
 	if err != nil {
