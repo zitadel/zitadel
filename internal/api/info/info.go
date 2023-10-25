@@ -10,7 +10,6 @@ type ActivityInfo struct {
 	Method        string
 	Path          string
 	RequestMethod string
-	IsSystemUser  bool
 }
 
 func (a *ActivityInfo) IntoContext(ctx context.Context) context.Context {
