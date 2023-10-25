@@ -2,7 +2,6 @@ package management
 
 import (
 	"context"
-	"time"
 
 	"google.golang.org/grpc"
 
@@ -24,14 +23,13 @@ var _ management.ManagementServiceServer = (*Server)(nil)
 
 type Server struct {
 	management.UnimplementedManagementServiceServer
-	command           *command.Commands
-	query             *query.Queries
-	systemDefaults    systemdefaults.SystemDefaults
-	assetAPIPrefix    func(context.Context) string
-	passwordHashAlg   crypto.HashAlgorithm
-	userCodeAlg       crypto.EncryptionAlgorithm
-	externalSecure    bool
-	auditLogRetention time.Duration
+	command         *command.Commands
+	query           *query.Queries
+	systemDefaults  systemdefaults.SystemDefaults
+	assetAPIPrefix  func(context.Context) string
+	passwordHashAlg crypto.HashAlgorithm
+	userCodeAlg     crypto.EncryptionAlgorithm
+	externalSecure  bool
 }
 
 func CreateServer(
@@ -40,17 +38,15 @@ func CreateServer(
 	sd systemdefaults.SystemDefaults,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	externalSecure bool,
-	auditLogRetention time.Duration,
 ) *Server {
 	return &Server{
-		command:           command,
-		query:             query,
-		systemDefaults:    sd,
-		assetAPIPrefix:    assets.AssetAPI(externalSecure),
-		passwordHashAlg:   crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
-		userCodeAlg:       userCodeAlg,
-		externalSecure:    externalSecure,
-		auditLogRetention: auditLogRetention,
+		command:         command,
+		query:           query,
+		systemDefaults:  sd,
+		assetAPIPrefix:  assets.AssetAPI(externalSecure),
+		passwordHashAlg: crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
+		userCodeAlg:     userCodeAlg,
+		externalSecure:  externalSecure,
 	}
 }
 
@@ -75,5 +71,9 @@ func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
 }
 
 func (s *Server) GatewayPathPrefix() string {
+	return GatewayPathPrefix()
+}
+
+func GatewayPathPrefix() string {
 	return "/management/v1"
 }

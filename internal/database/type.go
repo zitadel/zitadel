@@ -103,3 +103,25 @@ func (d *Duration) Scan(src any) error {
 	*d = Duration(time.Duration(interval.Microseconds*1000) + time.Duration(interval.Days)*24*time.Hour + time.Duration(interval.Months)*30*24*time.Hour)
 	return nil
 }
+
+// NullDuration can be used for NULL intervals.
+// If Valid is false, the scanned value was NULL
+// This behavior is similar to [database/sql.NullString]
+type NullDuration struct {
+	Valid    bool
+	Duration time.Duration
+}
+
+// Scan implements the [database/sql.Scanner] interface.
+func (d *NullDuration) Scan(src any) error {
+	if src == nil {
+		d.Duration, d.Valid = 0, false
+		return nil
+	}
+	duration := new(Duration)
+	if err := duration.Scan(src); err != nil {
+		return err
+	}
+	d.Duration, d.Valid = time.Duration(*duration), true
+	return nil
+}
