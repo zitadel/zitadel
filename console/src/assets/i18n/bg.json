@@ -1191,6 +1191,11 @@
         "ERROR": "Потребителят не може да бъде намерен!",
         "PRIMARYBUTTON": "следващия",
         "SECONDARYBUTTON": "регистрирам"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Автоматичен режим",
+        "THEME_MODE_LIGHT": "Само светъл режим",
+        "THEME_MODE_DARK": "Само тъмен режим"
       }
     },
     "PWD_AGE": {

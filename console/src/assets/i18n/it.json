@@ -1197,6 +1197,11 @@
         "ERROR": "L'utente non \u00e8 stato trovato!",
         "PRIMARYBUTTON": "Avanti",
         "SECONDARYBUTTON": "Registra"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Modalità automatica",
+        "THEME_MODE_LIGHT": "Solo modalità luminosa",
+        "THEME_MODE_DARK": "Solo modalità oscura"
       }
     },
     "PWD_AGE": {

@@ -1196,6 +1196,11 @@
         "ERROR": "找不到用户！",
         "PRIMARYBUTTON": "下一步",
         "SECONDARYBUTTON": "注册"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "自动模式",
+        "THEME_MODE_LIGHT": "仅限灯光模式",
+        "THEME_MODE_DARK": "仅限深色模式"
       }
     },
     "PWD_AGE": {

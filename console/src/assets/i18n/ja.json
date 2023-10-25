@@ -1194,6 +1194,11 @@
         "ERROR": "ユーザーは見つかりません！",
         "PRIMARYBUTTON": "次へ",
         "SECONDARYBUTTON": "登録"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "自動モード",
+        "THEME_MODE_LIGHT": "ライトモードのみ",
+        "THEME_MODE_DARK": "ダークモードのみ"
       }
     },
     "PWD_AGE": {
