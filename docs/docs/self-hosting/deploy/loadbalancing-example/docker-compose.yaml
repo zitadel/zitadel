@@ -28,7 +28,7 @@ services:
       - 'zitadel-certs:/crdb-certs:ro'
 
   certs:
-    image: 'cockroachdb/cockroach:v22.2.2'
+    image: 'cockroachdb/cockroach:latest'
     entrypoint: [ '/bin/bash', '-c' ]
     command: [ 'cp /certs/* /zitadel-certs/ && cockroach cert create-client --overwrite --certs-dir /zitadel-certs/ --ca-key /zitadel-certs/ca.key zitadel_user && chown 1000:1000 /zitadel-certs/*' ]
     volumes:
@@ -42,7 +42,7 @@ services:
     restart: 'always'
     networks:
       - 'zitadel'
-    image: 'cockroachdb/cockroach:v22.2.2'
+    image: 'cockroachdb/cockroach:latest'
     command: 'start-single-node --advertise-addr my-cockroach-db'
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
