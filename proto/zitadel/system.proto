@@ -115,7 +115,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.instance.read";
     };
   }
 
@@ -126,7 +126,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.instance.read";
     };
   }
 
@@ -140,7 +140,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.instance.write";
     };
   }
 
@@ -152,7 +152,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.instance.write";
     };
   }
 
@@ -165,7 +165,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.instance.write";
     };
   }
 
@@ -177,12 +177,13 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.instance.delete";
     };
   }
 
   //Returns all instance members matching the request
   // all queries need to match (ANDed)
+  // Deprecated: Use the Admin APIs ListIAMMembers instead
   rpc ListIAMMembers(ListIAMMembersRequest) returns (ListIAMMembersResponse) {
     option (google.api.http) = {
       post: "/instances/{instance_id}/members/_search";
@@ -190,11 +191,11 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.iam.member.read";
     };
   }
 
-  // Checks if a domain exists
+  //Checks if a domain exists
   rpc ExistsDomain(ExistsDomainRequest) returns (ExistsDomainResponse) {
     option (google.api.http) = {
       post: "/domains/{domain}/_exists";
@@ -202,11 +203,13 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.domain.read";
     };
   }
 
   // Returns the custom domains of an instance
+  //Checks if a domain exists
+  // Deprecated: Use the Admin APIs ListInstanceDomains on the admin API instead
   rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {
     option (google.api.http) = {
       post: "/instances/{instance_id}/domains/_search";
@@ -214,7 +217,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.domain.read";
     };
   }
 
@@ -226,7 +229,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.domain.write";
     };
   }
 
@@ -237,7 +240,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.domain.delete";
     };
   }
 
@@ -249,7 +252,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.domain.write";
     };
   }
 
@@ -263,7 +266,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.debug.read";
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -287,7 +290,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.debug.write";
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -311,7 +314,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.debug.read";
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -336,9 +339,8 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.debug.delete";
     };
-
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "failed events";
       responses: {
@@ -375,7 +377,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.quota.write";
     };
   }
 
@@ -392,7 +394,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.quota.write";
     };
   }
 
@@ -407,7 +409,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.quota.delete";
     };
   }
 
@@ -419,7 +421,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.feature.write";
     };
   }
 

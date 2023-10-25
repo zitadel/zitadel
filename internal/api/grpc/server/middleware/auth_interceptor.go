@@ -13,13 +13,13 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func AuthorizationInterceptor(verifier *authz.TokenVerifier, authConfig authz.Config) grpc.UnaryServerInterceptor {
+func AuthorizationInterceptor(verifier authz.APITokenVerifier, authConfig authz.Config) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		return authorize(ctx, req, info, handler, verifier, authConfig)
 	}
 }
 
-func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier *authz.TokenVerifier, authConfig authz.Config) (_ interface{}, err error) {
+func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.APITokenVerifier, authConfig authz.Config) (_ interface{}, err error) {
 	authOpt, needsToken := verifier.CheckAuthMethod(info.FullMethod)
 	if !needsToken {
 		return handler(ctx, req)
