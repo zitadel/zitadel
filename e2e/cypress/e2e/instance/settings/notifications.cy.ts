@@ -19,7 +19,6 @@ describe('instance notifications', () => {
       cy.visit(smtpPath);
       cy.contains('SMTP Settings');
     });
-
     it(`should add SMTP provider settings`, () => {
       cy.visit(smtpPath);
       cy.get('[formcontrolname="senderAddress"]').clear().type('sender@example.com');
@@ -33,7 +32,6 @@ describe('instance notifications', () => {
       cy.get('[formcontrolname="hostAndPort"]').should('have.value', 'smtp.mailtrap.io:2525');
       cy.get('[formcontrolname="user"]').should('have.value', 'user@example.com');
     });
-
     it(`should add SMTP provider password`, () => {
       cy.visit(smtpPath);
       cy.get('[data-e2e="add-smtp-password-button"]').click();
@@ -59,6 +57,57 @@ describe('instance notifications', () => {
       cy.shouldConfirmSuccess();
       cy.get('h4').contains('Twilio');
       cy.get('.state').contains('Inactive');
+    });
+
+    it(`should activate SMS provider`, () => {
+      cy.visit(smsPath);
+      cy.get('h4').contains('Twilio');
+      cy.get('.state').contains('Inactive');
+      cy.get('[data-e2e="activate-sms-provider-button"]').click();
+      cy.shouldConfirmSuccess();
+      cy.get('.state').contains('Active');
+    });
+
+    it(`should edit SMS provider`, () => {
+      cy.visit(smsPath);
+      cy.get('h4').contains('Twilio');
+      cy.get('.state').contains('Active');
+      cy.get('[data-e2e="new-twilio-button"]').click();
+      cy.get('[formcontrolname="sid"]').should('have.value', 'test');
+      cy.get('[formcontrolname="senderNumber"]').should('have.value', '2312123132');
+      cy.get('[formcontrolname="sid"]').clear().type('test2');
+      cy.get('[formcontrolname="senderNumber"]').clear().type('6666666666');
+      cy.get('[data-e2e="save-sms-settings-button"]').click();
+      cy.shouldConfirmSuccess();
+    });
+
+    it(`should contain edited values`, () => {
+      cy.visit(smsPath);
+      cy.get('h4').contains('Twilio');
+      cy.get('.state').contains('Active');
+      cy.get('[data-e2e="new-twilio-button"]').click();
+      cy.get('[formcontrolname="sid"]').should('have.value', 'test2');
+      cy.get('[formcontrolname="senderNumber"]').should('have.value', '6666666666');
+    });
+
+    it(`should edit SMS provider token`, () => {
+      cy.visit(smsPath);
+      cy.get('h4').contains('Twilio');
+      cy.get('.state').contains('Active');
+      cy.get('[data-e2e="new-twilio-button"]').click();
+      cy.get('[data-e2e="edit-sms-token-button"]').click();
+      cy.get('[data-e2e="notification-setting-password"]').clear().type('newsupertoken');
+      cy.get('[data-e2e="save-notification-setting-password-button"]').click();
+      cy.shouldConfirmSuccess();
+    });
+
+    it(`should remove SMS provider`, () => {
+      cy.visit(smsPath);
+      cy.get('h4').contains('Twilio');
+      cy.get('.state').contains('Active');
+      cy.get('[data-e2e="remove-sms-provider-button"]').click();
+      cy.get('[data-e2e="confirm-dialog-button"]').click();
+      cy.shouldConfirmSuccess();
     });
   });
 });

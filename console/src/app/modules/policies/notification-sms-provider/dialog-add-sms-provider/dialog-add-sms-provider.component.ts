@@ -61,15 +61,14 @@ export class DialogAddSMSProviderComponent {
   }
 
   public closeDialogWithRequest(): void {
-    if (!!this.twilio) {
+    if (!!this.twilio && this.twilioProvider && this.twilioProvider.id) {
       this.req = new UpdateSMSProviderTwilioRequest();
-
+      this.req.setId(this.twilioProvider.id);
       this.req.setSid(this.sid?.value);
       this.req.setSenderNumber(this.senderNumber?.value);
       this.dialogRef.close(this.req);
     } else {
       this.req = new AddSMSProviderTwilioRequest();
-
       this.req.setSid(this.sid?.value);
       this.req.setToken(this.token?.value);
       this.req.setSenderNumber(this.senderNumber?.value);

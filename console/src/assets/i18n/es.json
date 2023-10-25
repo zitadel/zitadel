@@ -274,7 +274,7 @@
     "SYMBOLERROR": "Debe incluir un símbolo o un signo de puntuación.",
     "NUMBERERROR": "Debe incluir un dígito.",
     "PWNOTEQUAL": "Las contraseñas proporcionadas no coinciden.",
-    "PHONE": "El número de teléfono debe comenzar con 00 o +."
+    "PHONE": "El número de teléfono debe comenzar con +."
   },
   "USER": {
     "SETTINGS": {
@@ -486,7 +486,7 @@
       "TITLE": "Perfil",
       "EMAIL": "Email",
       "PHONE": "Número de teléfono",
-      "PHONE_HINT": "Usa 00 o el símbolo + seguido del prefijo del país o selecciona el país del menú desplegable y finalmente introduce el número de teléfono",
+      "PHONE_HINT": "Usa el símbolo + seguido del prefijo del país o selecciona el país del menú desplegable y finalmente introduce el número de teléfono",
       "USERNAME": "Nombre de usuario",
       "CHANGEUSERNAME": "modificar",
       "CHANGEUSERNAME_TITLE": "Cambiar nombre de usuario",
@@ -1092,6 +1092,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Número de emisor",
         "ADDED": "Twilio añadido con éxito.",
+        "UPDATED": "Twilio actualizado con éxito",
         "REMOVED": "Twilio eliminado",
         "CHANGETOKEN": "Cambiar token",
         "SETTOKEN": "Establecer token",
