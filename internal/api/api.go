@@ -28,7 +28,7 @@ import (
 type API struct {
 	port              uint16
 	grpcServer        *grpc.Server
-	verifier          *internal_authz.TokenVerifier
+	verifier          internal_authz.APITokenVerifier
 	health            healthCheck
 	router            *mux.Router
 	http1HostName     string
@@ -47,7 +47,7 @@ func New(
 	port uint16,
 	router *mux.Router,
 	queries *query.Queries,
-	verifier *internal_authz.TokenVerifier,
+	verifier internal_authz.APITokenVerifier,
 	authZ internal_authz.Config,
 	tlsConfig *tls.Config, http2HostName, http1HostName string,
 	accessInterceptor *http_mw.AccessInterceptor,

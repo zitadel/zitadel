@@ -2,19 +2,17 @@ package authz
 
 import (
 	"context"
-	"sync"
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/errors"
 )
 
-func Test_VerifyAccessToken(t *testing.T) {
+func Test_extractBearerToken(t *testing.T) {
 
 	type args struct {
 		ctx      context.Context
 		token    string
-		verifier *TokenVerifier
-		method   string
+		verifier AccessTokenVerifier
 	}
 	tests := []struct {
 		name    string
@@ -42,23 +40,16 @@ func Test_VerifyAccessToken(t *testing.T) {
 			args: args{
 				ctx:   context.Background(),
 				token: "Bearer AUTH",
-				verifier: &TokenVerifier{
-					authZRepo: &testVerifier{memberships: []*Membership{}},
-					clients: func() sync.Map {
-						m := sync.Map{}
-						m.Store("service", &client{name: "name"})
-						return m
-					}(),
-					authMethods: MethodMapping{"/service/method": Option{Permission: "authenticated"}},
-				},
-				method: "/service/method",
+				verifier: AccessTokenVerifierFunc(func(context.Context, string) (string, string, string, string, string, error) {
+					return "", "", "", "", "", nil
+				}),
 			},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, _, _, _, _, err := verifyAccessToken(tt.args.ctx, tt.args.token, tt.args.verifier, tt.args.method)
+			_, err := extractBearerToken(tt.args.token)
 			if tt.wantErr && err == nil {
 				t.Errorf("got wrong result, should get err: actual: %v ", err)
 			}

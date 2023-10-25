@@ -320,8 +320,13 @@ func startAPIs(
 	// always set the origin in the context if available in the http headers, no matter for what protocol
 	router.Use(middleware.OriginHandler)
 	// adds used HTTPPathPattern and RequestMethod to context
-	router.Use(middleware.ActivityHandler(append(oidcPrefixes, saml.HandlerPrefix, admin.GatewayPathPrefix(), management.GatewayPathPrefix())))
-	verifier := internal_authz.Start(repo, http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
+	router.Use(middleware.ActivityHandler)
+	systemTokenVerifier, err := internal_authz.StartSystemTokenVerifierFromConfig(http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
+	if err != nil {
+		return err
+	}
+	accessTokenVerifer := internal_authz.StartAccessTokenVerifierFromRepo(repo)
+	verifier := internal_authz.StartAPITokenVerifier(repo, accessTokenVerifer, systemTokenVerifier)
 	tlsConfig, err := config.TLS.Config()
 	if err != nil {
 		return err
