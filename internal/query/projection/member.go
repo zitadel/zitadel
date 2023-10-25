@@ -6,8 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/member"
 )
 
@@ -26,17 +25,17 @@ const (
 )
 
 var (
-	memberColumns = []*crdb.Column{
-		crdb.NewColumn(MemberCreationDate, crdb.ColumnTypeTimestamp),
-		crdb.NewColumn(MemberChangeDate, crdb.ColumnTypeTimestamp),
-		crdb.NewColumn(MemberUserIDCol, crdb.ColumnTypeText),
-		crdb.NewColumn(MemberUserResourceOwner, crdb.ColumnTypeText),
-		crdb.NewColumn(MemberUserOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
-		crdb.NewColumn(MemberRolesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
-		crdb.NewColumn(MemberSequence, crdb.ColumnTypeInt64),
-		crdb.NewColumn(MemberResourceOwner, crdb.ColumnTypeText),
-		crdb.NewColumn(MemberInstanceID, crdb.ColumnTypeText),
-		crdb.NewColumn(MemberOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
+	memberColumns = []*handler.InitColumn{
+		handler.NewColumn(MemberCreationDate, handler.ColumnTypeTimestamp),
+		handler.NewColumn(MemberChangeDate, handler.ColumnTypeTimestamp),
+		handler.NewColumn(MemberUserIDCol, handler.ColumnTypeText),
+		handler.NewColumn(MemberUserResourceOwner, handler.ColumnTypeText),
+		handler.NewColumn(MemberUserOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
+		handler.NewColumn(MemberRolesCol, handler.ColumnTypeTextArray, handler.Nullable()),
+		handler.NewColumn(MemberSequence, handler.ColumnTypeInt64),
+		handler.NewColumn(MemberResourceOwner, handler.ColumnTypeText),
+		handler.NewColumn(MemberInstanceID, handler.ColumnTypeText),
+		handler.NewColumn(MemberOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
 	}
 )
 
@@ -67,9 +66,9 @@ func reduceMemberAdded(e member.MemberAddedEvent, userResourceOwner string, opts
 			handler.NewCol(MemberUserIDCol, e.UserID),
 			handler.NewCol(MemberUserResourceOwner, userResourceOwner),
 			handler.NewCol(MemberUserOwnerRemoved, false),
-			handler.NewCol(MemberRolesCol, database.StringArray(e.Roles)),
-			handler.NewCol(MemberCreationDate, e.CreationDate()),
-			handler.NewCol(MemberChangeDate, e.CreationDate()),
+			handler.NewCol(MemberRolesCol, database.TextArray[string](e.Roles)),
+			handler.NewCol(MemberCreationDate, e.CreatedAt()),
+			handler.NewCol(MemberChangeDate, e.CreatedAt()),
 			handler.NewCol(MemberSequence, e.Sequence()),
 			handler.NewCol(MemberResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(MemberInstanceID, e.Aggregate().InstanceID),
@@ -80,14 +79,14 @@ func reduceMemberAdded(e member.MemberAddedEvent, userResourceOwner string, opts
 		config = opt(config)
 	}
 
-	return crdb.NewCreateStatement(&e, config.cols), nil
+	return handler.NewCreateStatement(&e, config.cols), nil
 }
 
 func reduceMemberChanged(e member.MemberChangedEvent, opts ...reduceMemberOpt) (*handler.Statement, error) {
 	config := reduceMemberConfig{
 		cols: []handler.Column{
-			handler.NewCol(MemberRolesCol, database.StringArray(e.Roles)),
-			handler.NewCol(MemberChangeDate, e.CreationDate()),
+			handler.NewCol(MemberRolesCol, database.TextArray[string](e.Roles)),
+			handler.NewCol(MemberChangeDate, e.CreatedAt()),
 			handler.NewCol(MemberSequence, e.Sequence()),
 		},
 		conds: []handler.Condition{
@@ -99,7 +98,7 @@ func reduceMemberChanged(e member.MemberChangedEvent, opts ...reduceMemberOpt) (
 		config = opt(config)
 	}
 
-	return crdb.NewUpdateStatement(&e, config.cols, config.conds), nil
+	return handler.NewUpdateStatement(&e, config.cols, config.conds), nil
 }
 
 func reduceMemberCascadeRemoved(e member.MemberCascadeRemovedEvent, opts ...reduceMemberOpt) (*handler.Statement, error) {
@@ -112,7 +111,7 @@ func reduceMemberCascadeRemoved(e member.MemberCascadeRemovedEvent, opts ...redu
 	for _, opt := range opts {
 		config = opt(config)
 	}
-	return crdb.NewDeleteStatement(&e, config.conds), nil
+	return handler.NewDeleteStatement(&e, config.conds), nil
 }
 
 func reduceMemberRemoved(e eventstore.Event, opts ...reduceMemberOpt) (*handler.Statement, error) {
@@ -125,10 +124,10 @@ func reduceMemberRemoved(e eventstore.Event, opts ...reduceMemberOpt) (*handler.
 	for _, opt := range opts {
 		config = opt(config)
 	}
-	return crdb.NewDeleteStatement(e, config.conds), nil
+	return handler.NewDeleteStatement(e, config.conds), nil
 }
 
-func multiReduceMemberOwnerRemoved(e eventstore.Event, opts ...reduceMemberOpt) func(eventstore.Event) crdb.Exec {
+func multiReduceMemberOwnerRemoved(e eventstore.Event, opts ...reduceMemberOpt) func(eventstore.Event) handler.Exec {
 	config := reduceMemberConfig{
 		conds: []handler.Condition{
 			handler.NewCond(MemberInstanceID, e.Aggregate().InstanceID),
@@ -140,7 +139,7 @@ func multiReduceMemberOwnerRemoved(e eventstore.Event, opts ...reduceMemberOpt) 
 		config = opt(config)
 	}
 
-	return crdb.AddDeleteStatement(
+	return handler.AddDeleteStatement(
 		config.conds,
 	)
 }
@@ -161,25 +160,25 @@ func memberUserOwnerRemovedConds(e eventstore.Event, opts ...reduceMemberOpt) []
 
 func memberUserOwnerRemovedCols(e eventstore.Event) []handler.Column {
 	return []handler.Column{
-		handler.NewCol(MemberChangeDate, e.CreationDate()),
+		handler.NewCol(MemberChangeDate, e.CreatedAt()),
 		handler.NewCol(MemberSequence, e.Sequence()),
 		handler.NewCol(MemberUserOwnerRemoved, true),
 	}
 }
 
 func reduceMemberUserOwnerRemoved(e eventstore.Event, opts ...reduceMemberOpt) (*handler.Statement, error) {
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		memberUserOwnerRemovedConds(e, opts...),
 	), nil
 }
 
-func multiReduceMemberUserOwnerRemoved(e eventstore.Event, opts ...reduceMemberOpt) func(eventstore.Event) crdb.Exec {
-	return crdb.AddDeleteStatement(
+func multiReduceMemberUserOwnerRemoved(e eventstore.Event, opts ...reduceMemberOpt) func(eventstore.Event) handler.Exec {
+	return handler.AddDeleteStatement(
 		memberUserOwnerRemovedConds(e, opts...),
 	)
 }
 
-func setMemberContext(event eventstore.Aggregate) context.Context {
-	return authz.WithInstanceID(context.Background(), event.InstanceID)
+func setMemberContext(aggregate *eventstore.Aggregate) context.Context {
+	return authz.WithInstanceID(context.Background(), aggregate.InstanceID)
 }

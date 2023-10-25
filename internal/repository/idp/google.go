@@ -1,12 +1,9 @@
 package idp
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 type GoogleIDPAddedEvent struct {
@@ -40,20 +37,20 @@ func NewGoogleIDPAddedEvent(
 	}
 }
 
-func (e *GoogleIDPAddedEvent) Data() interface{} {
+func (e *GoogleIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GoogleIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GoogleIDPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func GoogleIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GoogleIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GoogleIDPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-SAff1", "unable to unmarshal event")
 	}
@@ -121,20 +118,20 @@ func ChangeGoogleOptions(options OptionChanges) func(*GoogleIDPChangedEvent) {
 	}
 }
 
-func (e *GoogleIDPChangedEvent) Data() interface{} {
+func (e *GoogleIDPChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GoogleIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GoogleIDPChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func GoogleIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GoogleIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GoogleIDPChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-SF3t2", "unable to unmarshal event")
 	}

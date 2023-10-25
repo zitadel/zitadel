@@ -28,7 +28,7 @@ func TestGrantedProjectMemberAppendEvent(t *testing.T) {
 		{
 			name: "append added member event",
 			args: args{
-				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.GrantMemberAddedType), ResourceOwner: "OrgID", Data: mockProjectGrantMemberData(&es_model.ProjectGrantMember{GrantID: "ProjectGrantID", UserID: "UserID", Roles: []string{"Role"}})},
+				event:  &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.GrantMemberAddedType, ResourceOwner: "OrgID", Data: mockProjectGrantMemberData(&es_model.ProjectGrantMember{GrantID: "ProjectGrantID", UserID: "UserID", Roles: []string{"Role"}})},
 				member: &ProjectGrantMemberView{},
 			},
 			result: &ProjectGrantMemberView{ProjectID: "AggregateID", UserID: "UserID", GrantID: "ProjectGrantID", Roles: []string{"Role"}},
@@ -36,7 +36,7 @@ func TestGrantedProjectMemberAppendEvent(t *testing.T) {
 		{
 			name: "append changed member event",
 			args: args{
-				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.GrantMemberAddedType), ResourceOwner: "OrgID", Data: mockProjectGrantMemberData(&es_model.ProjectGrantMember{GrantID: "ProjectGrantID", Roles: []string{"RoleChanged"}})},
+				event:  &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.GrantMemberAddedType, ResourceOwner: "OrgID", Data: mockProjectGrantMemberData(&es_model.ProjectGrantMember{GrantID: "ProjectGrantID", Roles: []string{"RoleChanged"}})},
 				member: &ProjectGrantMemberView{ProjectID: "AggregateID", UserID: "UserID", GrantID: "ProjectGrantID", Roles: []string{"Role"}},
 			},
 			result: &ProjectGrantMemberView{ProjectID: "AggregateID", UserID: "UserID", GrantID: "ProjectGrantID", Roles: []string{"RoleChanged"}},

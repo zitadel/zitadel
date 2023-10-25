@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -381,17 +380,12 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewUserIDPLinkAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"config1",
-									"name",
-									"externaluser1",
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUserIDPLinkUniqueConstraint("config1", "externaluser1")),
+						user.NewUserIDPLinkAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"config1",
+							"name",
+							"externaluser1",
+						),
 					),
 				),
 			},
@@ -485,17 +479,12 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewUserIDPLinkAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"config1",
-									"name",
-									"externaluser1",
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUserIDPLinkUniqueConstraint("config1", "externaluser1")),
+						user.NewUserIDPLinkAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"config1",
+							"name",
+							"externaluser1",
+						),
 					),
 				),
 			},
@@ -662,16 +651,11 @@ func TestCommandSide_RemoveUserIDPLink(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewUserIDPLinkRemovedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"config1",
-									"externaluser1",
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewRemoveUserIDPLinkUniqueConstraint("config1", "externaluser1")),
+						user.NewUserIDPLinkRemovedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"config1",
+							"externaluser1",
+						),
 					),
 				),
 			},
@@ -802,18 +786,14 @@ func TestCommandSide_ExternalLoginCheck(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewUserIDPCheckSucceededEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&user.AuthRequestInfo{
-										ID:                  "request1",
-										UserAgentID:         "useragent1",
-										SelectedIDPConfigID: "config1",
-									},
-								),
-							),
-						},
+						user.NewUserIDPCheckSucceededEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&user.AuthRequestInfo{
+								ID:                  "request1",
+								UserAgentID:         "useragent1",
+								SelectedIDPConfigID: "config1",
+							},
+						),
 					),
 				),
 			},
@@ -927,16 +907,12 @@ func TestCommandSide_MigrateUserIDP(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewUserIDPExternalIDMigratedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"idpConfig1",
-									"previousID",
-									"newID",
-								),
-							),
-						},
+						user.NewUserIDPExternalIDMigratedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"idpConfig1",
+							"previousID",
+							"newID",
+						),
 					),
 				),
 			},

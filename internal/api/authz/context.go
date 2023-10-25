@@ -91,13 +91,7 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 
 	verifiedOrgID, err := t.ExistsOrg(ctx, orgID, orgDomain)
 	if err != nil {
-		err = retry(func() error {
-			verifiedOrgID, err = t.ExistsOrg(ctx, orgID, orgDomain)
-			return err
-		})
-		if err != nil {
-			return CtxData{}, errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
-		}
+		return CtxData{}, errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
 	}
 
 	return CtxData{

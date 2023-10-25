@@ -16,7 +16,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -175,9 +174,9 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 						),
 					),
 					expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
-					expectPush([]*repository.Event{eventFromEventPusher(
+					expectPush(
 						user.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, "123"),
-					)}),
+					),
 				),
 			},
 			args: args{
@@ -286,9 +285,9 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 						),
 					),
 					expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
-					expectPush([]*repository.Event{eventFromEventPusher(
+					expectPush(
 						user.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, "123"),
-					)}),
+					),
 				),
 			},
 			args: args{
@@ -394,11 +393,11 @@ func TestCommands_pushUserPasskey(t *testing.T) {
 		{
 			name: "push error",
 			expectPush: func(challenge string) expect {
-				return expectPushFailed(io.ErrClosedPipe, []*repository.Event{eventFromEventPusher(
+				return expectPushFailed(io.ErrClosedPipe,
 					user.NewHumanPasswordlessAddedEvent(ctx,
 						userAgg, "123", challenge, "rpID",
 					),
-				)})
+				)
 			},
 			args:    args{},
 			wantErr: io.ErrClosedPipe,
@@ -406,27 +405,23 @@ func TestCommands_pushUserPasskey(t *testing.T) {
 		{
 			name: "success",
 			expectPush: func(challenge string) expect {
-				return expectPush([]*repository.Event{eventFromEventPusher(
+				return expectPush(
 					user.NewHumanPasswordlessAddedEvent(ctx,
 						userAgg, "123", challenge, "rpID",
 					),
-				)})
+				)
 			},
 			args: args{},
 		},
 		{
 			name: "initcode succeeded event",
 			expectPush: func(challenge string) expect {
-				return expectPush([]*repository.Event{
-					eventFromEventPusher(
-						user.NewHumanPasswordlessAddedEvent(ctx,
-							userAgg, "123", challenge, "rpID",
-						),
+				return expectPush(
+					user.NewHumanPasswordlessAddedEvent(ctx,
+						userAgg, "123", challenge, "rpID",
 					),
-					eventFromEventPusher(
-						user.NewHumanPasswordlessInitCodeCheckSucceededEvent(ctx, userAgg, "123"),
-					),
-				})
+					user.NewHumanPasswordlessInitCodeCheckSucceededEvent(ctx, userAgg, "123"),
+				)
 			},
 			args: args{
 				events: []eventCallback{func(ctx context.Context, userAgg *eventstore.Aggregate) eventstore.Command {
@@ -509,19 +504,17 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 							true,
 						),
 					)),
-					expectPush([]*repository.Event{
-						eventFromEventPusher(
-							user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
-								userAgg,
-								"123", &crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("passkey1"),
-								}, time.Minute, "", false,
-							),
+					expectPush(
+						user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
+							userAgg,
+							"123", &crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("passkey1"),
+							}, time.Minute, "", false,
 						),
-					}),
+					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			},
@@ -615,22 +608,20 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 							true,
 						),
 					)),
-					expectPush([]*repository.Event{
-						eventFromEventPusher(
-							user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
-								userAgg,
-								"123", &crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("passkey1"),
-								},
-								time.Minute,
-								"https://example.com/passkey/register?userID={{.UserID}}&orgID={{.OrgID}}&codeID={{.CodeID}}&code={{.Code}}",
-								false,
-							),
+					expectPush(
+						user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
+							userAgg,
+							"123", &crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("passkey1"),
+							},
+							time.Minute,
+							"https://example.com/passkey/register?userID={{.UserID}}&orgID={{.OrgID}}&codeID={{.CodeID}}&code={{.Code}}",
+							false,
 						),
-					}),
+					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			},
@@ -709,19 +700,17 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 							true,
 						),
 					)),
-					expectPush([]*repository.Event{
-						eventFromEventPusher(
-							user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
-								userAgg,
-								"123", &crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("passkey1"),
-								}, time.Minute, "", true,
-							),
+					expectPush(
+						user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
+							userAgg,
+							"123", &crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("passkey1"),
+							}, time.Minute, "", true,
 						),
-					}),
+					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			},
@@ -832,19 +821,17 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 							true,
 						),
 					)),
-					expectPushFailed(io.ErrClosedPipe, []*repository.Event{
-						eventFromEventPusher(
-							user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"123", &crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("passkey1"),
-								}, time.Minute, "", false,
-							),
+					expectPushFailed(io.ErrClosedPipe,
+						user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"123", &crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("passkey1"),
+							}, time.Minute, "", false,
 						),
-					}),
+					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			},
@@ -873,19 +860,17 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 							true,
 						),
 					)),
-					expectPush([]*repository.Event{
-						eventFromEventPusher(
-							user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
-								userAgg,
-								"123", &crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("passkey1"),
-								}, time.Minute, "", false,
-							),
+					expectPush(
+						user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
+							userAgg,
+							"123", &crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("passkey1"),
+							}, time.Minute, "", false,
 						),
-					}),
+					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			},

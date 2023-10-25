@@ -16,7 +16,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
@@ -59,7 +58,7 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 					expectFilter(),
 				),
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-MM9fs", "Errors.User.NotFound"),
+			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SqyJz", "Errors.User.NotFound"),
 		},
 		{
 			name: "push error",
@@ -105,9 +104,9 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 						),
 					),
 					expectFilter(),
-					expectRandomPushFailed(io.ErrClosedPipe, []*repository.Event{eventFromEventPusher(
+					expectRandomPushFailed(io.ErrClosedPipe, []eventstore.Command{
 						user.NewHumanOTPAddedEvent(ctx, userAgg, nil),
-					)}),
+					}),
 				),
 			},
 			wantErr: io.ErrClosedPipe,
@@ -156,9 +155,9 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 						),
 					),
 					expectFilter(),
-					expectRandomPush([]*repository.Event{eventFromEventPusher(
+					expectRandomPush([]eventstore.Command{
 						user.NewHumanOTPAddedEvent(ctx, userAgg, nil),
-					)}),
+					}),
 				),
 			},
 			want: true,
@@ -230,9 +229,9 @@ func TestCommands_CheckUserTOTP(t *testing.T) {
 							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
 						),
 					),
-					expectPush([]*repository.Event{eventFromEventPusher(
+					expectPush(
 						user.NewHumanOTPVerifiedEvent(ctx, userAgg, ""),
-					)}),
+					),
 				),
 			},
 			args: args{

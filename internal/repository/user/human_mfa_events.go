@@ -4,8 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -17,11 +15,11 @@ type HumanMFAInitSkippedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanMFAInitSkippedEvent) Data() interface{} {
+func (e *HumanMFAInitSkippedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanMFAInitSkippedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanMFAInitSkippedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -35,7 +33,7 @@ func NewHumanMFAInitSkippedEvent(ctx context.Context, aggregate *eventstore.Aggr
 	}
 }
 
-func HumanMFAInitSkippedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanMFAInitSkippedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &HumanMFAInitSkippedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

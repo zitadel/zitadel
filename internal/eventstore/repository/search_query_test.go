@@ -3,6 +3,8 @@ package repository
 import (
 	"reflect"
 	"testing"
+
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 func TestNewFilter(t *testing.T) {
@@ -105,7 +107,7 @@ func TestFilter_Validate(t *testing.T) {
 
 func TestColumns_Validate(t *testing.T) {
 	type fields struct {
-		columns Columns
+		columns eventstore.Columns
 	}
 	tests := []struct {
 		name    string
@@ -115,7 +117,7 @@ func TestColumns_Validate(t *testing.T) {
 		{
 			name: "correct filter",
 			fields: fields{
-				columns: ColumnsEvent,
+				columns: eventstore.ColumnsEvent,
 			},
 			wantErr: false,
 		},
@@ -129,7 +131,7 @@ func TestColumns_Validate(t *testing.T) {
 		{
 			name: "columns too high",
 			fields: fields{
-				columns: columnsCount,
+				columns: 100,
 			},
 			wantErr: true,
 		},

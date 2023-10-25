@@ -42,7 +42,7 @@ func (s *Server) ListLoginPolicyIDPs(ctx context.Context, req *admin_pb.ListLogi
 	}
 	return &admin_pb.ListLoginPolicyIDPsResponse{
 		Result:  idp.IDPLoginPolicyLinksToPb(res.Links),
-		Details: object.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: object.ToListDetails(res.Count, res.Sequence, res.LastRun),
 	}, nil
 }
 
@@ -88,7 +88,7 @@ func (s *Server) ListLoginPolicySecondFactors(ctx context.Context, req *admin_pb
 		return nil, err
 	}
 	return &admin_pb.ListLoginPolicySecondFactorsResponse{
-		Details: object.ToListDetails(result.Count, result.Sequence, result.Timestamp),
+		Details: object.ToListDetails(result.Count, result.Sequence, result.LastRun),
 		Result:  policy_grpc.ModelSecondFactorTypesToPb(result.Factors),
 	}, nil
 }
@@ -119,7 +119,7 @@ func (s *Server) ListLoginPolicyMultiFactors(ctx context.Context, req *admin_pb.
 		return nil, err
 	}
 	return &admin_pb.ListLoginPolicyMultiFactorsResponse{
-		Details: object.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: object.ToListDetails(res.Count, res.Sequence, res.LastRun),
 		Result:  policy_grpc.ModelMultiFactorTypesToPb(res.Factors),
 	}, nil
 }

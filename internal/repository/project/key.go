@@ -2,14 +2,11 @@ package project
 
 import (
 	"context"
-	"encoding/json"
 	"time"
-
-	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
@@ -29,11 +26,11 @@ type ApplicationKeyAddedEvent struct {
 	PublicKey      []byte              `json:"publicKey,omitempty"`
 }
 
-func (e *ApplicationKeyAddedEvent) Data() interface{} {
+func (e *ApplicationKeyAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *ApplicationKeyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *ApplicationKeyAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -62,12 +59,12 @@ func NewApplicationKeyAddedEvent(
 	}
 }
 
-func ApplicationKeyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func ApplicationKeyAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &ApplicationKeyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "API-BFd15", "unable to unmarshal api config")
 	}
@@ -81,11 +78,11 @@ type ApplicationKeyRemovedEvent struct {
 	KeyID string `json:"keyId,omitempty"`
 }
 
-func (e *ApplicationKeyRemovedEvent) Data() interface{} {
+func (e *ApplicationKeyRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *ApplicationKeyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *ApplicationKeyRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -104,13 +101,13 @@ func NewApplicationKeyRemovedEvent(
 	}
 }
 
-func ApplicationKeyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func ApplicationKeyRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	applicationKeyRemoved := &ApplicationKeyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, applicationKeyRemoved)
+	err := event.Unmarshal(applicationKeyRemoved)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-5Gm9s", "unable to unmarshal application key removed")
+		return nil, errors.ThrowInternal(err, "USER-cjLeA", "unable to unmarshal application key removed")
 	}
 
 	return applicationKeyRemoved, nil

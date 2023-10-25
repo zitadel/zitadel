@@ -10,8 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -30,34 +29,37 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 		{
 			name: "instance MemberAddedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.MemberAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.MemberAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 					"userId": "user-id",
 					"roles": ["role"]
 				}`),
-				), instance.MemberAddedEventMapper),
+					), instance.MemberAddedEventMapper),
 			},
 			reduce: (&instanceMemberProjection{
-				StatementHandler: getStatementHandlerWithFilters(
-					user.NewHumanAddedEvent(context.Background(),
-						&user.NewAggregate("user-id", "org1").Aggregate,
-						"username1",
-						"firstname1",
-						"lastname1",
-						"nickname1",
-						"displayname1",
-						language.German,
-						domain.GenderMale,
-						"email1",
-						true,
-					),
-				)(t)}).reduceAdded,
+				es: newMockEventStore().appendFilterResponse(
+					[]eventstore.Event{
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user-id", "org1").Aggregate,
+							"username1",
+							"firstname1",
+							"lastname1",
+							"nickname1",
+							"displayname1",
+							language.German,
+							domain.GenderMale,
+							"email1",
+							true,
+						),
+					},
+				),
+			}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    instance.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: instance.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -66,7 +68,7 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 								"user-id",
 								"org1",
 								false,
-								database.StringArray{"role"},
+								database.TextArray[string]{"role"},
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -83,26 +85,26 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 		{
 			name: "instance MemberChangedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.MemberChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.MemberChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 					"userId": "user-id",
 					"roles": ["role", "changed"]
 				}`),
-				), instance.MemberChangedEventMapper),
+					), instance.MemberChangedEventMapper),
 			},
 			reduce: (&instanceMemberProjection{}).reduceChanged,
 			want: wantReduce{
-				aggregateType:    instance.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: instance.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.instance_members3 SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (instance_id = $4) AND (user_id = $5)",
 							expectedArgs: []interface{}{
-								database.StringArray{"role", "changed"},
+								database.TextArray[string]{"role", "changed"},
 								anyArg{},
 								uint64(15),
 								"instance-id",
@@ -116,19 +118,19 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 		{
 			name: "instance MemberCascadeRemovedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.MemberCascadeRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.MemberCascadeRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{
 					"userId": "user-id"
 				}`),
-				), instance.MemberCascadeRemovedEventMapper),
+					), instance.MemberCascadeRemovedEventMapper),
 			},
 			reduce: (&instanceMemberProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
-				aggregateType:    instance.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: instance.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -145,19 +147,19 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 		{
 			name: "instance MemberRemovedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.MemberRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.MemberRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{
 					"userId": "user-id"
 				}`),
-				), instance.MemberRemovedEventMapper),
+					), instance.MemberRemovedEventMapper),
 			},
 			reduce: (&instanceMemberProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    instance.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: instance.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -174,17 +176,17 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 		{
 			name: "user UserRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserRemovedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.UserRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserRemovedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.UserRemovedEventMapper),
 			},
 			reduce: (&instanceMemberProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -201,17 +203,17 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 		{
 			name: "org.OrgRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			reduce: (&instanceMemberProjection{}).reduceUserOwnerRemoved,
 			want: wantReduce{
-				aggregateType:    org.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: org.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -228,17 +230,17 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

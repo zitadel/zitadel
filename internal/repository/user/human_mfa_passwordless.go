@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/http"
@@ -10,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -56,7 +54,7 @@ func NewHumanPasswordlessAddedEvent(
 	}
 }
 
-func HumanPasswordlessAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordlessAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -100,7 +98,7 @@ func NewHumanPasswordlessVerifiedEvent(
 	}
 }
 
-func HumanPasswordlessVerifiedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordlessVerifiedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNVerifiedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -132,7 +130,7 @@ func NewHumanPasswordlessSignCountChangedEvent(
 	}
 }
 
-func HumanPasswordlessSignCountChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordlessSignCountChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNSignCountChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -168,7 +166,7 @@ func NewHumanPasswordlessRemovedEvent(
 	}
 }
 
-func HumanPasswordlessRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordlessRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -202,7 +200,7 @@ func NewHumanPasswordlessBeginLoginEvent(
 	}
 }
 
-func HumanPasswordlessBeginLoginEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordlessBeginLoginEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNBeginLoginEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -231,7 +229,7 @@ func NewHumanPasswordlessCheckSucceededEvent(
 	}
 }
 
-func HumanPasswordlessCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordlessCheckSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNCheckSucceededEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -260,7 +258,7 @@ func NewHumanPasswordlessCheckFailedEvent(
 	}
 }
 
-func HumanPasswordlessCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordlessCheckFailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNCheckFailedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -277,11 +275,11 @@ type HumanPasswordlessInitCodeAddedEvent struct {
 	Expiry time.Duration       `json:"expiry"`
 }
 
-func (e *HumanPasswordlessInitCodeAddedEvent) Data() interface{} {
+func (e *HumanPasswordlessInitCodeAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanPasswordlessInitCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanPasswordlessInitCodeAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -304,11 +302,11 @@ func NewHumanPasswordlessInitCodeAddedEvent(
 	}
 }
 
-func HumanPasswordlessInitCodeAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordlessInitCodeAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	webAuthNAdded := &HumanPasswordlessInitCodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, webAuthNAdded)
+	err := event.Unmarshal(webAuthNAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-BDf32", "unable to unmarshal human passwordless code added")
 	}
@@ -326,11 +324,11 @@ type HumanPasswordlessInitCodeRequestedEvent struct {
 	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
-func (e *HumanPasswordlessInitCodeRequestedEvent) Data() interface{} {
+func (e *HumanPasswordlessInitCodeRequestedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanPasswordlessInitCodeRequestedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanPasswordlessInitCodeRequestedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -362,11 +360,11 @@ func NewHumanPasswordlessInitCodeRequestedEvent(
 	}
 }
 
-func HumanPasswordlessInitCodeRequestedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordlessInitCodeRequestedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	webAuthNAdded := &HumanPasswordlessInitCodeRequestedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, webAuthNAdded)
+	err := event.Unmarshal(webAuthNAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-VGfg3", "unable to unmarshal human passwordless code delivery added")
 	}
@@ -379,11 +377,11 @@ type HumanPasswordlessInitCodeSentEvent struct {
 	ID string `json:"id"`
 }
 
-func (e *HumanPasswordlessInitCodeSentEvent) Data() interface{} {
+func (e *HumanPasswordlessInitCodeSentEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanPasswordlessInitCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanPasswordlessInitCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -402,11 +400,11 @@ func NewHumanPasswordlessInitCodeSentEvent(
 	}
 }
 
-func HumanPasswordlessInitCodeSentEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordlessInitCodeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	webAuthNAdded := &HumanPasswordlessInitCodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, webAuthNAdded)
+	err := event.Unmarshal(webAuthNAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-Gtg4j", "unable to unmarshal human passwordless code sent")
 	}
@@ -419,11 +417,11 @@ type HumanPasswordlessInitCodeCheckFailedEvent struct {
 	ID string `json:"id"`
 }
 
-func (e *HumanPasswordlessInitCodeCheckFailedEvent) Data() interface{} {
+func (e *HumanPasswordlessInitCodeCheckFailedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanPasswordlessInitCodeCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanPasswordlessInitCodeCheckFailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -442,11 +440,11 @@ func NewHumanPasswordlessInitCodeCheckFailedEvent(
 	}
 }
 
-func HumanPasswordlessInitCodeCodeCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordlessInitCodeCodeCheckFailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	webAuthNAdded := &HumanPasswordlessInitCodeCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, webAuthNAdded)
+	err := event.Unmarshal(webAuthNAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-Gtg4j", "unable to unmarshal human passwordless code check failed")
 	}
@@ -459,11 +457,11 @@ type HumanPasswordlessInitCodeCheckSucceededEvent struct {
 	ID string `json:"id"`
 }
 
-func (e *HumanPasswordlessInitCodeCheckSucceededEvent) Data() interface{} {
+func (e *HumanPasswordlessInitCodeCheckSucceededEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanPasswordlessInitCodeCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanPasswordlessInitCodeCheckSucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -482,11 +480,11 @@ func NewHumanPasswordlessInitCodeCheckSucceededEvent(
 	}
 }
 
-func HumanPasswordlessInitCodeCodeCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordlessInitCodeCodeCheckSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	webAuthNAdded := &HumanPasswordlessInitCodeCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, webAuthNAdded)
+	err := event.Unmarshal(webAuthNAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-Gtg4j", "unable to unmarshal human passwordless code check succeeded")
 	}

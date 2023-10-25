@@ -94,7 +94,7 @@ func (wm *SystemConfigWriteModel) Reduce() error {
 			}
 		}
 	}
-	return nil
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *SystemConfigWriteModel) Query() *eventstore.SearchQueryBuilder {

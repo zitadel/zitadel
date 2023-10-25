@@ -6,8 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -29,43 +29,44 @@ const (
 	ActionOwnerRemovedCol  = "owner_removed"
 )
 
-type actionProjection struct {
-	crdb.StatementHandler
+type actionProjection struct{}
+
+func newActionProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(actionProjection))
 }
 
-func newActionProjection(ctx context.Context, config crdb.StatementHandlerConfig) *actionProjection {
-	p := new(actionProjection)
-	config.ProjectionName = ActionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(ActionIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(ActionCreationDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(ActionChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(ActionResourceOwnerCol, crdb.ColumnTypeText),
-			crdb.NewColumn(ActionInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(ActionStateCol, crdb.ColumnTypeEnum),
-			crdb.NewColumn(ActionSequenceCol, crdb.ColumnTypeInt64),
-			crdb.NewColumn(ActionNameCol, crdb.ColumnTypeText),
-			crdb.NewColumn(ActionScriptCol, crdb.ColumnTypeText, crdb.Default("")),
-			crdb.NewColumn(ActionTimeoutCol, crdb.ColumnTypeInt64, crdb.Default(0)),
-			crdb.NewColumn(ActionAllowedToFailCol, crdb.ColumnTypeBool, crdb.Default(false)),
-			crdb.NewColumn(ActionOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
+func (*actionProjection) Name() string {
+	return ActionTable
+}
+
+func (*actionProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(ActionIDCol, handler.ColumnTypeText),
+			handler.NewColumn(ActionCreationDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(ActionChangeDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(ActionResourceOwnerCol, handler.ColumnTypeText),
+			handler.NewColumn(ActionInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(ActionStateCol, handler.ColumnTypeEnum),
+			handler.NewColumn(ActionSequenceCol, handler.ColumnTypeInt64),
+			handler.NewColumn(ActionNameCol, handler.ColumnTypeText),
+			handler.NewColumn(ActionScriptCol, handler.ColumnTypeText, handler.Default("")),
+			handler.NewColumn(ActionTimeoutCol, handler.ColumnTypeInt64, handler.Default(0)),
+			handler.NewColumn(ActionAllowedToFailCol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(ActionOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
-			crdb.NewPrimaryKey(ActionInstanceIDCol, ActionIDCol),
-			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{ActionResourceOwnerCol})),
-			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{ActionOwnerRemovedCol})),
+			handler.NewPrimaryKey(ActionInstanceIDCol, ActionIDCol),
+			handler.WithIndex(handler.NewIndex("resource_owner", []string{ActionResourceOwnerCol})),
+			handler.WithIndex(handler.NewIndex("owner_removed", []string{ActionOwnerRemovedCol})),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *actionProjection) reducers() []handler.AggregateReducer {
+func (p *actionProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: action.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  action.AddedEventType,
 					Reduce: p.reduceActionAdded,
@@ -90,7 +91,7 @@ func (p *actionProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceOwnerRemoved,
@@ -99,7 +100,7 @@ func (p *actionProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(ActionInstanceIDCol),
@@ -114,7 +115,7 @@ func (p *actionProjection) reduceActionAdded(event eventstore.Event) (*handler.S
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dff21", "reduce.wrong.event.type% s", action.AddedEventType)
 	}
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(ActionIDCol, e.Aggregate().ID),
@@ -153,7 +154,7 @@ func (p *actionProjection) reduceActionChanged(event eventstore.Event) (*handler
 	if e.AllowedToFail != nil {
 		values = append(values, handler.NewCol(ActionAllowedToFailCol, *e.AllowedToFail))
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		values,
 		[]handler.Condition{
@@ -168,7 +169,7 @@ func (p *actionProjection) reduceActionDeactivated(event eventstore.Event) (*han
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Fgh32", "reduce.wrong.event.type %s", action.DeactivatedEventType)
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(ActionChangeDateCol, e.CreationDate()),
@@ -187,7 +188,7 @@ func (p *actionProjection) reduceActionReactivated(event eventstore.Event) (*han
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-hwdqa", "reduce.wrong.event.type %s", action.ReactivatedEventType)
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(ActionChangeDateCol, e.CreationDate()),
@@ -206,7 +207,7 @@ func (p *actionProjection) reduceActionRemoved(event eventstore.Event) (*handler
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dgh2d", "reduce.wrong.event.type %s", action.RemovedEventType)
 	}
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(ActionIDCol, e.Aggregate().ID),
@@ -220,7 +221,7 @@ func (p *actionProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-mSmWM", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(ActionInstanceIDCol, e.Aggregate().InstanceID),

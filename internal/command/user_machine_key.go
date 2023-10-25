@@ -109,7 +109,7 @@ func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *MachineKey
 	}
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }
@@ -161,7 +161,7 @@ func (c *Commands) RemoveUserMachineKey(ctx context.Context, machineKey *Machine
 	}
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }

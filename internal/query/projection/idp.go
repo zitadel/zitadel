@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -55,72 +55,73 @@ const (
 	JWTConfigEndpointCol     = "endpoint"
 )
 
-type idpProjection struct {
-	crdb.StatementHandler
+type idpProjection struct{}
+
+func newIDPProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(idpProjection))
 }
 
-func newIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *idpProjection {
-	p := new(idpProjection)
-	config.ProjectionName = IDPTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewMultiTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(IDPIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(IDPCreationDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(IDPChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(IDPSequenceCol, crdb.ColumnTypeInt64),
-			crdb.NewColumn(IDPResourceOwnerCol, crdb.ColumnTypeText),
-			crdb.NewColumn(IDPInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(IDPStateCol, crdb.ColumnTypeEnum),
-			crdb.NewColumn(IDPNameCol, crdb.ColumnTypeText),
-			crdb.NewColumn(IDPStylingTypeCol, crdb.ColumnTypeEnum),
-			crdb.NewColumn(IDPOwnerTypeCol, crdb.ColumnTypeEnum),
-			crdb.NewColumn(IDPAutoRegisterCol, crdb.ColumnTypeBool, crdb.Default(false)),
-			crdb.NewColumn(IDPTypeCol, crdb.ColumnTypeEnum, crdb.Nullable()),
-			crdb.NewColumn(IDPOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
+func (*idpProjection) Name() string {
+	return IDPTable
+}
+
+func (*idpProjection) Init() *old_handler.Check {
+	return handler.NewMultiTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(IDPIDCol, handler.ColumnTypeText),
+			handler.NewColumn(IDPCreationDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(IDPChangeDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(IDPSequenceCol, handler.ColumnTypeInt64),
+			handler.NewColumn(IDPResourceOwnerCol, handler.ColumnTypeText),
+			handler.NewColumn(IDPInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(IDPStateCol, handler.ColumnTypeEnum),
+			handler.NewColumn(IDPNameCol, handler.ColumnTypeText),
+			handler.NewColumn(IDPStylingTypeCol, handler.ColumnTypeEnum),
+			handler.NewColumn(IDPOwnerTypeCol, handler.ColumnTypeEnum),
+			handler.NewColumn(IDPAutoRegisterCol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(IDPTypeCol, handler.ColumnTypeEnum, handler.Nullable()),
+			handler.NewColumn(IDPOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
-			crdb.NewPrimaryKey(IDPInstanceIDCol, IDPIDCol),
-			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{IDPResourceOwnerCol})),
-			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{IDPOwnerRemovedCol})),
+			handler.NewPrimaryKey(IDPInstanceIDCol, IDPIDCol),
+			handler.WithIndex(handler.NewIndex("resource_owner", []string{IDPResourceOwnerCol})),
+			handler.WithIndex(handler.NewIndex("owner_removed", []string{IDPOwnerRemovedCol})),
 		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(OIDCConfigIDPIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(OIDCConfigInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(OIDCConfigClientIDCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(OIDCConfigClientSecretCol, crdb.ColumnTypeJSONB, crdb.Nullable()),
-			crdb.NewColumn(OIDCConfigIssuerCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(OIDCConfigScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
-			crdb.NewColumn(OIDCConfigDisplayNameMappingCol, crdb.ColumnTypeEnum, crdb.Nullable()),
-			crdb.NewColumn(OIDCConfigUsernameMappingCol, crdb.ColumnTypeEnum, crdb.Nullable()),
-			crdb.NewColumn(OIDCConfigAuthorizationEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(OIDCConfigTokenEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(OIDCConfigIDPIDCol, handler.ColumnTypeText),
+			handler.NewColumn(OIDCConfigInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(OIDCConfigClientIDCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(OIDCConfigClientSecretCol, handler.ColumnTypeJSONB, handler.Nullable()),
+			handler.NewColumn(OIDCConfigIssuerCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(OIDCConfigScopesCol, handler.ColumnTypeTextArray, handler.Nullable()),
+			handler.NewColumn(OIDCConfigDisplayNameMappingCol, handler.ColumnTypeEnum, handler.Nullable()),
+			handler.NewColumn(OIDCConfigUsernameMappingCol, handler.ColumnTypeEnum, handler.Nullable()),
+			handler.NewColumn(OIDCConfigAuthorizationEndpointCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(OIDCConfigTokenEndpointCol, handler.ColumnTypeText, handler.Nullable()),
 		},
-			crdb.NewPrimaryKey(OIDCConfigInstanceIDCol, OIDCConfigIDPIDCol),
+			handler.NewPrimaryKey(OIDCConfigInstanceIDCol, OIDCConfigIDPIDCol),
 			IDPOIDCSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(JWTConfigIDPIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(JWTConfigInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(JWTConfigIssuerCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(JWTConfigKeysEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(JWTConfigHeaderNameCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(JWTConfigEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(JWTConfigIDPIDCol, handler.ColumnTypeText),
+			handler.NewColumn(JWTConfigInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(JWTConfigIssuerCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(JWTConfigKeysEndpointCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(JWTConfigHeaderNameCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(JWTConfigEndpointCol, handler.ColumnTypeText, handler.Nullable()),
 		},
-			crdb.NewPrimaryKey(JWTConfigInstanceIDCol, JWTConfigIDPIDCol),
+			handler.NewPrimaryKey(JWTConfigInstanceIDCol, JWTConfigIDPIDCol),
 			IDPJWTSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *idpProjection) reducers() []handler.AggregateReducer {
+func (p *idpProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.IDPConfigAddedEventType,
 					Reduce: p.reduceIDPAdded,
@@ -165,7 +166,7 @@ func (p *idpProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.IDPConfigAddedEventType,
 					Reduce: p.reduceIDPAdded,
@@ -225,7 +226,7 @@ func (p *idpProjection) reduceIDPAdded(event eventstore.Event) (*handler.Stateme
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fcUdQ", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigAddedEventType, instance.IDPConfigAddedEventType})
 	}
 
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		&idpEvent,
 		[]handler.Column{
 			handler.NewCol(IDPIDCol, idpEvent.ConfigID),
@@ -265,7 +266,7 @@ func (p *idpProjection) reduceIDPChanged(event eventstore.Event) (*handler.State
 		cols = append(cols, handler.NewCol(IDPAutoRegisterCol, *idpEvent.AutoRegister))
 	}
 	if len(cols) == 0 {
-		return crdb.NewNoOpStatement(&idpEvent), nil
+		return handler.NewNoOpStatement(&idpEvent), nil
 	}
 
 	cols = append(cols,
@@ -273,7 +274,7 @@ func (p *idpProjection) reduceIDPChanged(event eventstore.Event) (*handler.State
 		handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
 	)
 
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		&idpEvent,
 		cols,
 		[]handler.Condition{
@@ -294,7 +295,7 @@ func (p *idpProjection) reduceIDPDeactivated(event eventstore.Event) (*handler.S
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-94O5l", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigDeactivatedEventType, instance.IDPConfigDeactivatedEventType})
 	}
 
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		&idpEvent,
 		[]handler.Column{
 			handler.NewCol(IDPStateCol, domain.IDPConfigStateInactive),
@@ -319,7 +320,7 @@ func (p *idpProjection) reduceIDPReactivated(event eventstore.Event) (*handler.S
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-I8QyS", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigReactivatedEventType, instance.IDPConfigReactivatedEventType})
 	}
 
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		&idpEvent,
 		[]handler.Column{
 			handler.NewCol(IDPStateCol, domain.IDPConfigStateActive),
@@ -344,7 +345,7 @@ func (p *idpProjection) reduceIDPRemoved(event eventstore.Event) (*handler.State
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-B4zy8", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
 	}
 
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		&idpEvent,
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
@@ -364,8 +365,8 @@ func (p *idpProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2FuAA", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigAddedEventType, instance.IDPOIDCConfigAddedEventType})
 	}
 
-	return crdb.NewMultiStatement(&idpEvent,
-		crdb.AddUpdateStatement(
+	return handler.NewMultiStatement(&idpEvent,
+		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
 				handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
@@ -376,20 +377,20 @@ func (p *idpProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
 		),
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
 				handler.NewCol(OIDCConfigInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(OIDCConfigClientIDCol, idpEvent.ClientID),
 				handler.NewCol(OIDCConfigClientSecretCol, idpEvent.ClientSecret),
 				handler.NewCol(OIDCConfigIssuerCol, idpEvent.Issuer),
-				handler.NewCol(OIDCConfigScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(OIDCConfigScopesCol, database.TextArray[string](idpEvent.Scopes)),
 				handler.NewCol(OIDCConfigDisplayNameMappingCol, idpEvent.IDPDisplayNameMapping),
 				handler.NewCol(OIDCConfigUsernameMappingCol, idpEvent.UserNameMapping),
 				handler.NewCol(OIDCConfigAuthorizationEndpointCol, idpEvent.AuthorizationEndpoint),
 				handler.NewCol(OIDCConfigTokenEndpointCol, idpEvent.TokenEndpoint),
 			},
-			crdb.WithTableSuffix(IDPOIDCSuffix),
+			handler.WithTableSuffix(IDPOIDCSuffix),
 		),
 	), nil
 }
@@ -423,7 +424,7 @@ func (p *idpProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(OIDCConfigTokenEndpointCol, *idpEvent.TokenEndpoint))
 	}
 	if idpEvent.Scopes != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigScopesCol, database.StringArray(idpEvent.Scopes)))
+		cols = append(cols, handler.NewCol(OIDCConfigScopesCol, database.TextArray[string](idpEvent.Scopes)))
 	}
 	if idpEvent.IDPDisplayNameMapping != nil {
 		cols = append(cols, handler.NewCol(OIDCConfigDisplayNameMappingCol, *idpEvent.IDPDisplayNameMapping))
@@ -433,11 +434,11 @@ func (p *idpProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 	}
 
 	if len(cols) == 0 {
-		return crdb.NewNoOpStatement(&idpEvent), nil
+		return handler.NewNoOpStatement(&idpEvent), nil
 	}
 
-	return crdb.NewMultiStatement(&idpEvent,
-		crdb.AddUpdateStatement(
+	return handler.NewMultiStatement(&idpEvent,
+		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
 				handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
@@ -447,13 +448,13 @@ func (p *idpProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 				handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
 		),
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			cols,
 			[]handler.Condition{
 				handler.NewCond(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
 				handler.NewCond(OIDCConfigInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
-			crdb.WithTableSuffix(IDPOIDCSuffix),
+			handler.WithTableSuffix(IDPOIDCSuffix),
 		),
 	), nil
 }
@@ -469,8 +470,8 @@ func (p *idpProjection) reduceJWTConfigAdded(event eventstore.Event) (*handler.S
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-qvPdb", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigAddedEventType, instance.IDPJWTConfigAddedEventType})
 	}
 
-	return crdb.NewMultiStatement(&idpEvent,
-		crdb.AddUpdateStatement(
+	return handler.NewMultiStatement(&idpEvent,
+		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
 				handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
@@ -482,7 +483,7 @@ func (p *idpProjection) reduceJWTConfigAdded(event eventstore.Event) (*handler.S
 			},
 		),
 
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(JWTConfigIDPIDCol, idpEvent.IDPConfigID),
 				handler.NewCol(JWTConfigInstanceIDCol, idpEvent.Aggregate().InstanceID),
@@ -491,7 +492,7 @@ func (p *idpProjection) reduceJWTConfigAdded(event eventstore.Event) (*handler.S
 				handler.NewCol(JWTConfigKeysEndpointCol, idpEvent.KeysEndpoint),
 				handler.NewCol(JWTConfigHeaderNameCol, idpEvent.HeaderName),
 			},
-			crdb.WithTableSuffix(IDPJWTSuffix),
+			handler.WithTableSuffix(IDPJWTSuffix),
 		),
 	), nil
 }
@@ -523,11 +524,11 @@ func (p *idpProjection) reduceJWTConfigChanged(event eventstore.Event) (*handler
 	}
 
 	if len(cols) == 0 {
-		return crdb.NewNoOpStatement(&idpEvent), nil
+		return handler.NewNoOpStatement(&idpEvent), nil
 	}
 
-	return crdb.NewMultiStatement(&idpEvent,
-		crdb.AddUpdateStatement(
+	return handler.NewMultiStatement(&idpEvent,
+		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
 				handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
@@ -537,13 +538,13 @@ func (p *idpProjection) reduceJWTConfigChanged(event eventstore.Event) (*handler
 				handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
 		),
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			cols,
 			[]handler.Condition{
 				handler.NewCond(JWTConfigIDPIDCol, idpEvent.IDPConfigID),
 				handler.NewCond(JWTConfigInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
-			crdb.WithTableSuffix(IDPJWTSuffix),
+			handler.WithTableSuffix(IDPJWTSuffix),
 		),
 	), nil
 }
@@ -554,7 +555,7 @@ func (p *idpProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Sta
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-YsbQC", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(IDPInstanceIDCol, e.Aggregate().InstanceID),

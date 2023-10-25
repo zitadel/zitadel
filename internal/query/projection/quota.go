@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
@@ -51,62 +51,68 @@ const (
 )
 
 type quotaProjection struct {
-	crdb.StatementHandler
-	client *database.DB
+	handler *handler.Handler
+	client  *database.DB
 }
 
-func newQuotaProjection(ctx context.Context, config crdb.StatementHandlerConfig) *quotaProjection {
-	p := new(quotaProjection)
-	config.ProjectionName = QuotasProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewMultiTableCheck(
-		crdb.NewTable(
-			[]*crdb.Column{
-				crdb.NewColumn(QuotaColumnID, crdb.ColumnTypeText),
-				crdb.NewColumn(QuotaColumnInstanceID, crdb.ColumnTypeText),
-				crdb.NewColumn(QuotaColumnUnit, crdb.ColumnTypeEnum),
-				crdb.NewColumn(QuotaColumnAmount, crdb.ColumnTypeInt64, crdb.Nullable()),
-				crdb.NewColumn(QuotaColumnFrom, crdb.ColumnTypeTimestamp, crdb.Nullable()),
-				crdb.NewColumn(QuotaColumnInterval, crdb.ColumnTypeInterval, crdb.Nullable()),
-				crdb.NewColumn(QuotaColumnLimit, crdb.ColumnTypeBool, crdb.Nullable()),
-			},
-			crdb.NewPrimaryKey(QuotaColumnInstanceID, QuotaColumnUnit),
-		),
-		crdb.NewSuffixedTable(
-			[]*crdb.Column{
-				crdb.NewColumn(QuotaPeriodColumnInstanceID, crdb.ColumnTypeText),
-				crdb.NewColumn(QuotaPeriodColumnUnit, crdb.ColumnTypeEnum),
-				crdb.NewColumn(QuotaPeriodColumnStart, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(QuotaPeriodColumnUsage, crdb.ColumnTypeInt64),
-			},
-			crdb.NewPrimaryKey(QuotaPeriodColumnInstanceID, QuotaPeriodColumnUnit, QuotaPeriodColumnStart),
-			quotaPeriodsTableSuffix,
-		),
-		crdb.NewSuffixedTable(
-			[]*crdb.Column{
-				crdb.NewColumn(QuotaNotificationColumnInstanceID, crdb.ColumnTypeText),
-				crdb.NewColumn(QuotaNotificationColumnUnit, crdb.ColumnTypeEnum),
-				crdb.NewColumn(QuotaNotificationColumnID, crdb.ColumnTypeText),
-				crdb.NewColumn(QuotaNotificationColumnCallURL, crdb.ColumnTypeText),
-				crdb.NewColumn(QuotaNotificationColumnPercent, crdb.ColumnTypeInt64),
-				crdb.NewColumn(QuotaNotificationColumnRepeat, crdb.ColumnTypeBool),
-				crdb.NewColumn(QuotaNotificationColumnLatestDuePeriodStart, crdb.ColumnTypeTimestamp, crdb.Nullable()),
-				crdb.NewColumn(QuotaNotificationColumnNextDueThreshold, crdb.ColumnTypeInt64, crdb.Nullable()),
-			},
-			crdb.NewPrimaryKey(QuotaNotificationColumnInstanceID, QuotaNotificationColumnUnit, QuotaNotificationColumnID),
-			quotaNotificationsTableSuffix,
-		),
-	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	p.client = config.Client
+func newQuotaProjection(ctx context.Context, config handler.Config) *quotaProjection {
+	p := &quotaProjection{
+		client: config.Client,
+	}
+	p.handler = handler.NewHandler(ctx, &config, p)
 	return p
 }
 
-func (q *quotaProjection) reducers() []handler.AggregateReducer {
+func (*quotaProjection) Name() string {
+	return QuotasProjectionTable
+}
+
+func (*quotaProjection) Init() *old_handler.Check {
+	return handler.NewMultiTableCheck(
+		handler.NewTable(
+			[]*handler.InitColumn{
+				handler.NewColumn(QuotaColumnID, handler.ColumnTypeText),
+				handler.NewColumn(QuotaColumnInstanceID, handler.ColumnTypeText),
+				handler.NewColumn(QuotaColumnUnit, handler.ColumnTypeEnum),
+				handler.NewColumn(QuotaColumnAmount, handler.ColumnTypeInt64, handler.Nullable()),
+				handler.NewColumn(QuotaColumnFrom, handler.ColumnTypeTimestamp, handler.Nullable()),
+				handler.NewColumn(QuotaColumnInterval, handler.ColumnTypeInterval, handler.Nullable()),
+				handler.NewColumn(QuotaColumnLimit, handler.ColumnTypeBool, handler.Nullable()),
+			},
+			handler.NewPrimaryKey(QuotaColumnInstanceID, QuotaColumnUnit),
+		),
+		handler.NewSuffixedTable(
+			[]*handler.InitColumn{
+				handler.NewColumn(QuotaPeriodColumnInstanceID, handler.ColumnTypeText),
+				handler.NewColumn(QuotaPeriodColumnUnit, handler.ColumnTypeEnum),
+				handler.NewColumn(QuotaPeriodColumnStart, handler.ColumnTypeTimestamp),
+				handler.NewColumn(QuotaPeriodColumnUsage, handler.ColumnTypeInt64),
+			},
+			handler.NewPrimaryKey(QuotaPeriodColumnInstanceID, QuotaPeriodColumnUnit, QuotaPeriodColumnStart),
+			quotaPeriodsTableSuffix,
+		),
+		handler.NewSuffixedTable(
+			[]*handler.InitColumn{
+				handler.NewColumn(QuotaNotificationColumnInstanceID, handler.ColumnTypeText),
+				handler.NewColumn(QuotaNotificationColumnUnit, handler.ColumnTypeEnum),
+				handler.NewColumn(QuotaNotificationColumnID, handler.ColumnTypeText),
+				handler.NewColumn(QuotaNotificationColumnCallURL, handler.ColumnTypeText),
+				handler.NewColumn(QuotaNotificationColumnPercent, handler.ColumnTypeInt64),
+				handler.NewColumn(QuotaNotificationColumnRepeat, handler.ColumnTypeBool),
+				handler.NewColumn(QuotaNotificationColumnLatestDuePeriodStart, handler.ColumnTypeTimestamp, handler.Nullable()),
+				handler.NewColumn(QuotaNotificationColumnNextDueThreshold, handler.ColumnTypeInt64, handler.Nullable()),
+			},
+			handler.NewPrimaryKey(QuotaNotificationColumnInstanceID, QuotaNotificationColumnUnit, QuotaNotificationColumnID),
+			quotaNotificationsTableSuffix,
+		),
+	)
+}
+
+func (q *quotaProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: q.reduceInstanceRemoved,
@@ -115,7 +121,7 @@ func (q *quotaProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: quota.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  quota.AddedEventType,
 					Reduce: q.reduceQuotaSet,
@@ -142,7 +148,7 @@ func (q *quotaProjection) reducers() []handler.AggregateReducer {
 }
 
 func (q *quotaProjection) reduceQuotaNotified(event eventstore.Event) (*handler.Statement, error) {
-	return crdb.NewNoOpStatement(event), nil
+	return handler.NewNoOpStatement(event), nil
 }
 
 func (q *quotaProjection) reduceQuotaSet(event eventstore.Event) (*handler.Statement, error) {
@@ -150,7 +156,7 @@ func (q *quotaProjection) reduceQuotaSet(event eventstore.Event) (*handler.State
 	if err != nil {
 		return nil, err
 	}
-	var statements []func(e eventstore.Event) crdb.Exec
+	var statements []func(e eventstore.Event) handler.Exec
 
 	// 1. Insert or update quota if the event has not only notification changes
 	quotaConflictColumns := []handler.Column{
@@ -174,24 +180,24 @@ func (q *quotaProjection) reduceQuotaSet(event eventstore.Event) (*handler.State
 		// TODO: Add the quota ID to the primary key in a migration?
 		quotaUpdateCols = append(quotaUpdateCols, handler.NewCol(QuotaColumnID, e.Aggregate().ID))
 		quotaUpdateCols = append(quotaUpdateCols, quotaConflictColumns...)
-		statements = append(statements, crdb.AddUpsertStatement(quotaConflictColumns, quotaUpdateCols))
+		statements = append(statements, handler.AddUpsertStatement(quotaConflictColumns, quotaUpdateCols))
 	}
 
 	// 2. Delete existing notifications
 	if e.Notifications == nil {
-		return crdb.NewMultiStatement(e, statements...), nil
+		return handler.NewMultiStatement(e, statements...), nil
 	}
-	statements = append(statements, crdb.AddDeleteStatement(
+	statements = append(statements, handler.AddDeleteStatement(
 		[]handler.Condition{
 			handler.NewCond(QuotaNotificationColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(QuotaNotificationColumnUnit, e.Unit),
 		},
-		crdb.WithTableSuffix(quotaNotificationsTableSuffix),
+		handler.WithTableSuffix(quotaNotificationsTableSuffix),
 	))
 	notifications := *e.Notifications
 	for i := range notifications {
 		notification := notifications[i]
-		statements = append(statements, crdb.AddCreateStatement(
+		statements = append(statements, handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(QuotaNotificationColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(QuotaNotificationColumnUnit, e.Unit),
@@ -200,10 +206,10 @@ func (q *quotaProjection) reduceQuotaSet(event eventstore.Event) (*handler.State
 				handler.NewCol(QuotaNotificationColumnPercent, notification.Percent),
 				handler.NewCol(QuotaNotificationColumnRepeat, notification.Repeat),
 			},
-			crdb.WithTableSuffix(quotaNotificationsTableSuffix),
+			handler.WithTableSuffix(quotaNotificationsTableSuffix),
 		))
 	}
-	return crdb.NewMultiStatement(e, statements...), nil
+	return handler.NewMultiStatement(e, statements...), nil
 }
 
 func (q *quotaProjection) reduceQuotaNotificationDue(event eventstore.Event) (*handler.Statement, error) {
@@ -211,7 +217,7 @@ func (q *quotaProjection) reduceQuotaNotificationDue(event eventstore.Event) (*h
 	if err != nil {
 		return nil, err
 	}
-	return crdb.NewUpdateStatement(e,
+	return handler.NewUpdateStatement(e,
 		[]handler.Column{
 			handler.NewCol(QuotaNotificationColumnLatestDuePeriodStart, e.PeriodStart),
 			handler.NewCol(QuotaNotificationColumnNextDueThreshold, e.Threshold+100), // next due_threshold is always the reached + 100 => percent (e.g. 90) in the next bucket (e.g. 190)
@@ -221,9 +227,7 @@ func (q *quotaProjection) reduceQuotaNotificationDue(event eventstore.Event) (*h
 			handler.NewCond(QuotaNotificationColumnUnit, e.Unit),
 			handler.NewCond(QuotaNotificationColumnID, e.ID),
 		},
-		crdb.WithTableSuffix(quotaNotificationsTableSuffix),
-		// The notification could have been removed in the meantime
-		crdb.WithIgnoreNotFound(),
+		handler.WithTableSuffix(quotaNotificationsTableSuffix),
 	), nil
 }
 
@@ -232,23 +236,23 @@ func (q *quotaProjection) reduceQuotaRemoved(event eventstore.Event) (*handler.S
 	if err != nil {
 		return nil, err
 	}
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		e,
-		crdb.AddDeleteStatement(
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(QuotaPeriodColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCond(QuotaPeriodColumnUnit, e.Unit),
 			},
-			crdb.WithTableSuffix(quotaPeriodsTableSuffix),
+			handler.WithTableSuffix(quotaPeriodsTableSuffix),
 		),
-		crdb.AddDeleteStatement(
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(QuotaNotificationColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCond(QuotaNotificationColumnUnit, e.Unit),
 			},
-			crdb.WithTableSuffix(quotaNotificationsTableSuffix),
+			handler.WithTableSuffix(quotaNotificationsTableSuffix),
 		),
-		crdb.AddDeleteStatement(
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(QuotaColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCond(QuotaColumnUnit, e.Unit),
@@ -263,21 +267,21 @@ func (q *quotaProjection) reduceInstanceRemoved(event eventstore.Event) (*handle
 	if err != nil {
 		return nil, err
 	}
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		e,
-		crdb.AddDeleteStatement(
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(QuotaPeriodColumnInstanceID, e.Aggregate().InstanceID),
 			},
-			crdb.WithTableSuffix(quotaPeriodsTableSuffix),
+			handler.WithTableSuffix(quotaPeriodsTableSuffix),
 		),
-		crdb.AddDeleteStatement(
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(QuotaNotificationColumnInstanceID, e.Aggregate().InstanceID),
 			},
-			crdb.WithTableSuffix(quotaNotificationsTableSuffix),
+			handler.WithTableSuffix(quotaNotificationsTableSuffix),
 		),
-		crdb.AddDeleteStatement(
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(QuotaColumnInstanceID, e.Aggregate().InstanceID),
 			},

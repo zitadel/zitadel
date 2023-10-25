@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/durationpb"
 
@@ -78,7 +78,7 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 	}
 	return &mgmt_pb.ListUsersResponse{
 		Result:  user_grpc.UsersToPb(res.Users, s.assetAPIPrefix(ctx)),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastRun),
 	}, nil
 }
 
@@ -97,10 +97,11 @@ func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChang
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AllowTimeTravel().
 		Limit(limit).
+		AwaitOpenTransactions().
 		OrderDesc().
 		ResourceOwner(authz.GetCtxData(ctx).OrgID).
-		AddQuery().
 		SequenceGreater(sequence).
+		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(req.UserId).
 		Builder()
@@ -151,7 +152,7 @@ func (s *Server) ListUserMetadata(ctx context.Context, req *mgmt_pb.ListUserMeta
 	}
 	return &mgmt_pb.ListUserMetadataResponse{
 		Result:  metadata.UserMetadataListToPb(res.Metadata),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastRun),
 	}, nil
 }
 
@@ -383,7 +384,7 @@ func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*
 	}
 	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
 		Queries: []query.SearchQuery{membershipsUserQuery},
-	}, true)
+	}, true, false)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -772,7 +773,7 @@ func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKe
 	}
 	return &mgmt_pb.ListMachineKeysResponse{
 		Result:  authn.KeysToPb(result.AuthNKeys),
-		Details: obj_grpc.ToListDetails(result.Count, result.Sequence, result.Timestamp),
+		Details: obj_grpc.ToListDetails(result.Count, result.Sequence, result.LastRun),
 	}, nil
 }
 
@@ -865,7 +866,7 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *mgmt_pb.List
 	}
 	return &mgmt_pb.ListPersonalAccessTokensResponse{
 		Result:  user_grpc.PersonalAccessTokensToPb(result.PersonalAccessTokens),
-		Details: obj_grpc.ToListDetails(result.Count, result.Sequence, result.Timestamp),
+		Details: obj_grpc.ToListDetails(result.Count, result.Sequence, result.LastRun),
 	}, nil
 }
 
@@ -904,7 +905,7 @@ func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHuman
 	}
 	return &mgmt_pb.ListHumanLinkedIDPsResponse{
 		Result:  idp_grpc.IDPUserLinksToPb(res.Links),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastRun),
 	}, nil
 }
 func (s *Server) RemoveHumanLinkedIDP(ctx context.Context, req *mgmt_pb.RemoveHumanLinkedIDPRequest) (*mgmt_pb.RemoveHumanLinkedIDPResponse, error) {
@@ -922,13 +923,13 @@ func (s *Server) ListUserMemberships(ctx context.Context, req *mgmt_pb.ListUserM
 	if err != nil {
 		return nil, err
 	}
-	response, err := s.query.Memberships(ctx, request, false)
+	response, err := s.query.Memberships(ctx, request, false, false)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListUserMembershipsResponse{
 		Result:  user_grpc.MembershipsToMembershipsPb(response.Memberships),
-		Details: obj_grpc.ToListDetails(response.Count, response.Sequence, response.Timestamp),
+		Details: obj_grpc.ToListDetails(response.Count, response.Sequence, response.LastRun),
 	}, nil
 }
 

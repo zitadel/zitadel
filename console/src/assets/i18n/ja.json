@@ -274,7 +274,7 @@
     "SYMBOLERROR": "シンボルや句読点を含める必要があります。",
     "NUMBERERROR": "小数点を含める必要があります。",
     "PWNOTEQUAL": "パスワードが一致しません。",
-    "PHONE": "電話番号は00か+で始まる必要があります。"
+    "PHONE": "電話番号は + で始まる必要があります。"
   },
   "USER": {
     "SETTINGS": {
@@ -486,7 +486,7 @@
       "TITLE": "プロフィール",
       "EMAIL": "Eメール",
       "PHONE": "電話番号",
-      "PHONE_HINT": "00または+マークの後に通話先の国番号を入力するか、ドロップダウンから国を選択し、最後に電話番号を入力します。",
+      "PHONE_HINT": "+ マークに続いて電話をかけたい国コードを入力するか、ドロップダウンから国を選択して電話番号を入力します。",
       "USERNAME": "ユーザー名",
       "CHANGEUSERNAME": "変更",
       "CHANGEUSERNAME_TITLE": "ユーザー名の変更",
@@ -1092,6 +1092,7 @@
         "TOKEN": "トークン",
         "SENDERNUMBER": "送信者番号",
         "ADDED": "Twilioは正常に追加されました。",
+        "UPDATED": "Twilio が正常に更新されました。",
         "REMOVED": "Twilioが削除されました",
         "CHANGETOKEN": "トークンを変更する",
         "SETTOKEN": "トークンを設定する",
