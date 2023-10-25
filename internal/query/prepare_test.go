@@ -13,13 +13,16 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	sq "github.com/Masterminds/squirrel"
+	"github.com/jackc/pgtype"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"github.com/zitadel/zitadel/internal/database"
 )
 
 var (
 	testNow = time.Now()
+	dayNow  = testNow.Truncate(24 * time.Hour)
 )
 
 // assertPrepare checks if the prepare func executes the correct sql query and returns the correct object
@@ -383,6 +386,15 @@ func TestValidatePrepare(t *testing.T) {
 			}
 		})
 	}
+}
+
+func intervalDriverValue(t *testing.T, src time.Duration) pgtype.Interval {
+	interval := pgtype.Interval{}
+	err := interval.Set(src)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return interval
 }
 
 type prepareDB struct{}

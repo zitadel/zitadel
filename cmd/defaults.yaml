@@ -795,7 +795,11 @@ DefaultInstance:
       ButtonText: Login
   Features:
     - FeatureLoginDefaultOrg: true
-
+  Limits:
+    # AuditLogRetention limits the number of events that can be queried via the events API by their age.
+    # A value of "0s" means that all events are available.
+    # If this value is set, it overwrites the system default unless it is not reset via the admin API.
+    AuditLogRetention: # ZITADEL_DEFAULTINSTANCE_LIMITS_AUDITLOGRETENTION
   Quotas:
     # Items take a slice of quota configurations, whereas, for each unit type and instance, one or zero quotas may exist.
     # The following unit types are supported
@@ -830,7 +834,10 @@ DefaultInstance:
 #            # CallURL is called when a relative amount of the quota is used.
 #            CallURL: "https://httpbin.org/post"
 
-AuditLogRetention: 0s
+# AuditLogRetention limits the number of events that can be queried via the events API by their age.
+# A value of "0s" means that all events are available.
+# If an audit log retention is set using an instance limit, it will overwrite the system default.
+AuditLogRetention: 0s # ZITADEL_AUDITLOGRETENTION
 
 InternalAuthZ:
   RolePermissionMappings:
@@ -904,6 +911,7 @@ InternalAuthZ:
         - "project.grant.member.write"
         - "project.grant.member.delete"
         - "events.read"
+        - "milestones.read"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -929,6 +937,7 @@ InternalAuthZ:
         - "project.grant.read"
         - "project.grant.member.read"
         - "events.read"
+        - "milestones.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
