@@ -24,7 +24,7 @@ type verifierMock struct{}
 func (v *verifierMock) VerifyAccessToken(ctx context.Context, token, clientID, projectID string) (string, string, string, string, string, error) {
 	return "", "", "", "", "", nil
 }
-func (v *verifierMock) SearchMyMemberships(ctx context.Context, orgID string) ([]*authz.Membership, error) {
+func (v *verifierMock) SearchMyMemberships(ctx context.Context, orgID string, _ bool) ([]*authz.Membership, error) {
 	return nil, nil
 }
 

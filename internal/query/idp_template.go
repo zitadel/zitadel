@@ -8,12 +8,15 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -59,7 +62,7 @@ type OAuthIDPTemplate struct {
 	AuthorizationEndpoint string
 	TokenEndpoint         string
 	UserEndpoint          string
-	Scopes                database.StringArray
+	Scopes                database.TextArray[string]
 	IDAttribute           string
 }
 
@@ -68,7 +71,7 @@ type OIDCIDPTemplate struct {
 	ClientID         string
 	ClientSecret     *crypto.CryptoValue
 	Issuer           string
-	Scopes           database.StringArray
+	Scopes           database.TextArray[string]
 	IsIDTokenMapping bool
 }
 
@@ -84,7 +87,7 @@ type AzureADIDPTemplate struct {
 	IDPID           string
 	ClientID        string
 	ClientSecret    *crypto.CryptoValue
-	Scopes          database.StringArray
+	Scopes          database.TextArray[string]
 	Tenant          string
 	IsEmailVerified bool
 }
@@ -93,7 +96,7 @@ type GitHubIDPTemplate struct {
 	IDPID        string
 	ClientID     string
 	ClientSecret *crypto.CryptoValue
-	Scopes       database.StringArray
+	Scopes       database.TextArray[string]
 }
 
 type GitHubEnterpriseIDPTemplate struct {
@@ -103,14 +106,14 @@ type GitHubEnterpriseIDPTemplate struct {
 	AuthorizationEndpoint string
 	TokenEndpoint         string
 	UserEndpoint          string
-	Scopes                database.StringArray
+	Scopes                database.TextArray[string]
 }
 
 type GitLabIDPTemplate struct {
 	IDPID        string
 	ClientID     string
 	ClientSecret *crypto.CryptoValue
-	Scopes       database.StringArray
+	Scopes       database.TextArray[string]
 }
 
 type GitLabSelfHostedIDPTemplate struct {
@@ -118,14 +121,14 @@ type GitLabSelfHostedIDPTemplate struct {
 	Issuer       string
 	ClientID     string
 	ClientSecret *crypto.CryptoValue
-	Scopes       database.StringArray
+	Scopes       database.TextArray[string]
 }
 
 type GoogleIDPTemplate struct {
 	IDPID        string
 	ClientID     string
 	ClientSecret *crypto.CryptoValue
-	Scopes       database.StringArray
+	Scopes       database.TextArray[string]
 }
 
 type LDAPIDPTemplate struct {
@@ -148,7 +151,7 @@ type AppleIDPTemplate struct {
 	TeamID     string
 	KeyID      string
 	PrivateKey *crypto.CryptoValue
-	Scopes     database.StringArray
+	Scopes     database.TextArray[string]
 }
 
 type SAMLIDPTemplate struct {
@@ -701,7 +704,8 @@ func (q *Queries) IDPTemplateByID(ctx context.Context, shouldTriggerBulk bool, i
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.IDPTemplateProjection.Trigger(ctx)
+		ctx, err = projection.IDPTemplateProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("unable to trigger")
 	}
 
 	eq := sq.Eq{
@@ -751,7 +755,7 @@ func (q *Queries) IDPTemplates(ctx context.Context, queries *IDPTemplateSearchQu
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-BDFrq", "Errors.Internal")
 	}
-	idps.LatestSequence, err = q.latestSequence(ctx, idpTemplateTable)
+	idps.State, err = q.latestState(ctx, idpTemplateTable)
 	return idps, err
 }
 
@@ -928,14 +932,14 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			oauthAuthorizationEndpoint := sql.NullString{}
 			oauthTokenEndpoint := sql.NullString{}
 			oauthUserEndpoint := sql.NullString{}
-			oauthScopes := database.StringArray{}
+			oauthScopes := database.TextArray[string]{}
 			oauthIDAttribute := sql.NullString{}
 
 			oidcID := sql.NullString{}
 			oidcIssuer := sql.NullString{}
 			oidcClientID := sql.NullString{}
 			oidcClientSecret := new(crypto.CryptoValue)
-			oidcScopes := database.StringArray{}
+			oidcScopes := database.TextArray[string]{}
 			oidcIDTokenMapping := sql.NullBool{}
 
 			jwtID := sql.NullString{}
@@ -947,14 +951,14 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			azureadID := sql.NullString{}
 			azureadClientID := sql.NullString{}
 			azureadClientSecret := new(crypto.CryptoValue)
-			azureadScopes := database.StringArray{}
+			azureadScopes := database.TextArray[string]{}
 			azureadTenant := sql.NullString{}
 			azureadIsEmailVerified := sql.NullBool{}
 
 			githubID := sql.NullString{}
 			githubClientID := sql.NullString{}
 			githubClientSecret := new(crypto.CryptoValue)
-			githubScopes := database.StringArray{}
+			githubScopes := database.TextArray[string]{}
 
 			githubEnterpriseID := sql.NullString{}
 			githubEnterpriseClientID := sql.NullString{}
@@ -962,23 +966,23 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			githubEnterpriseAuthorizationEndpoint := sql.NullString{}
 			githubEnterpriseTokenEndpoint := sql.NullString{}
 			githubEnterpriseUserEndpoint := sql.NullString{}
-			githubEnterpriseScopes := database.StringArray{}
+			githubEnterpriseScopes := database.TextArray[string]{}
 
 			gitlabID := sql.NullString{}
 			gitlabClientID := sql.NullString{}
 			gitlabClientSecret := new(crypto.CryptoValue)
-			gitlabScopes := database.StringArray{}
+			gitlabScopes := database.TextArray[string]{}
 
 			gitlabSelfHostedID := sql.NullString{}
 			gitlabSelfHostedIssuer := sql.NullString{}
 			gitlabSelfHostedClientID := sql.NullString{}
 			gitlabSelfHostedClientSecret := new(crypto.CryptoValue)
-			gitlabSelfHostedScopes := database.StringArray{}
+			gitlabSelfHostedScopes := database.TextArray[string]{}
 
 			googleID := sql.NullString{}
 			googleClientID := sql.NullString{}
 			googleClientSecret := new(crypto.CryptoValue)
-			googleScopes := database.StringArray{}
+			googleScopes := database.TextArray[string]{}
 
 			samlID := sql.NullString{}
 			var samlMetadata []byte
@@ -988,14 +992,14 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			samlWithSignedRequest := sql.NullBool{}
 
 			ldapID := sql.NullString{}
-			ldapServers := database.StringArray{}
+			ldapServers := database.TextArray[string]{}
 			ldapStartTls := sql.NullBool{}
 			ldapBaseDN := sql.NullString{}
 			ldapBindDN := sql.NullString{}
 			ldapBindPassword := new(crypto.CryptoValue)
 			ldapUserBase := sql.NullString{}
-			ldapUserObjectClasses := database.StringArray{}
-			ldapUserFilters := database.StringArray{}
+			ldapUserObjectClasses := database.TextArray[string]{}
+			ldapUserFilters := database.TextArray[string]{}
 			ldapTimeout := sql.NullInt64{}
 			ldapIDAttribute := sql.NullString{}
 			ldapFirstNameAttribute := sql.NullString{}
@@ -1016,7 +1020,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			appleTeamID := sql.NullString{}
 			appleKeyID := sql.NullString{}
 			applePrivateKey := new(crypto.CryptoValue)
-			appleScopes := database.StringArray{}
+			appleScopes := database.TextArray[string]{}
 
 			err := row.Scan(
 				&idpTemplate.ID,
@@ -1418,14 +1422,14 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				oauthAuthorizationEndpoint := sql.NullString{}
 				oauthTokenEndpoint := sql.NullString{}
 				oauthUserEndpoint := sql.NullString{}
-				oauthScopes := database.StringArray{}
+				oauthScopes := database.TextArray[string]{}
 				oauthIDAttribute := sql.NullString{}
 
 				oidcID := sql.NullString{}
 				oidcIssuer := sql.NullString{}
 				oidcClientID := sql.NullString{}
 				oidcClientSecret := new(crypto.CryptoValue)
-				oidcScopes := database.StringArray{}
+				oidcScopes := database.TextArray[string]{}
 				oidcIDTokenMapping := sql.NullBool{}
 
 				jwtID := sql.NullString{}
@@ -1437,14 +1441,14 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				azureadID := sql.NullString{}
 				azureadClientID := sql.NullString{}
 				azureadClientSecret := new(crypto.CryptoValue)
-				azureadScopes := database.StringArray{}
+				azureadScopes := database.TextArray[string]{}
 				azureadTenant := sql.NullString{}
 				azureadIsEmailVerified := sql.NullBool{}
 
 				githubID := sql.NullString{}
 				githubClientID := sql.NullString{}
 				githubClientSecret := new(crypto.CryptoValue)
-				githubScopes := database.StringArray{}
+				githubScopes := database.TextArray[string]{}
 
 				githubEnterpriseID := sql.NullString{}
 				githubEnterpriseClientID := sql.NullString{}
@@ -1452,23 +1456,23 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				githubEnterpriseAuthorizationEndpoint := sql.NullString{}
 				githubEnterpriseTokenEndpoint := sql.NullString{}
 				githubEnterpriseUserEndpoint := sql.NullString{}
-				githubEnterpriseScopes := database.StringArray{}
+				githubEnterpriseScopes := database.TextArray[string]{}
 
 				gitlabID := sql.NullString{}
 				gitlabClientID := sql.NullString{}
 				gitlabClientSecret := new(crypto.CryptoValue)
-				gitlabScopes := database.StringArray{}
+				gitlabScopes := database.TextArray[string]{}
 
 				gitlabSelfHostedID := sql.NullString{}
 				gitlabSelfHostedIssuer := sql.NullString{}
 				gitlabSelfHostedClientID := sql.NullString{}
 				gitlabSelfHostedClientSecret := new(crypto.CryptoValue)
-				gitlabSelfHostedScopes := database.StringArray{}
+				gitlabSelfHostedScopes := database.TextArray[string]{}
 
 				googleID := sql.NullString{}
 				googleClientID := sql.NullString{}
 				googleClientSecret := new(crypto.CryptoValue)
-				googleScopes := database.StringArray{}
+				googleScopes := database.TextArray[string]{}
 
 				samlID := sql.NullString{}
 				var samlMetadata []byte
@@ -1478,14 +1482,14 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				samlWithSignedRequest := sql.NullBool{}
 
 				ldapID := sql.NullString{}
-				ldapServers := database.StringArray{}
+				ldapServers := database.TextArray[string]{}
 				ldapStartTls := sql.NullBool{}
 				ldapBaseDN := sql.NullString{}
 				ldapBindDN := sql.NullString{}
 				ldapBindPassword := new(crypto.CryptoValue)
 				ldapUserBase := sql.NullString{}
-				ldapUserObjectClasses := database.StringArray{}
-				ldapUserFilters := database.StringArray{}
+				ldapUserObjectClasses := database.TextArray[string]{}
+				ldapUserFilters := database.TextArray[string]{}
 				ldapTimeout := sql.NullInt64{}
 				ldapIDAttribute := sql.NullString{}
 				ldapFirstNameAttribute := sql.NullString{}
@@ -1506,7 +1510,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				appleTeamID := sql.NullString{}
 				appleKeyID := sql.NullString{}
 				applePrivateKey := new(crypto.CryptoValue)
-				appleScopes := database.StringArray{}
+				appleScopes := database.TextArray[string]{}
 
 				err := rows.Scan(
 					&idpTemplate.ID,

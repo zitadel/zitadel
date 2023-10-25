@@ -21,6 +21,7 @@ func NewInstanceMailTemplateWriteModel(ctx context.Context) *InstanceMailTemplat
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   authz.GetInstance(ctx).InstanceID(),
 				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
+				InstanceID:    authz.GetInstance(ctx).InstanceID(),
 			},
 		},
 	}

@@ -2,13 +2,11 @@ package instance
 
 import (
 	"context"
-	"encoding/json"
 
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -21,11 +19,11 @@ type DefaultLanguageSetEvent struct {
 	Language language.Tag `json:"language"`
 }
 
-func (e *DefaultLanguageSetEvent) Data() interface{} {
+func (e *DefaultLanguageSetEvent) Payload() interface{} {
 	return e
 }
 
-func (e *DefaultLanguageSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *DefaultLanguageSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -44,11 +42,11 @@ func NewDefaultLanguageSetEvent(
 	}
 }
 
-func DefaultLanguageSetMapper(event *repository.Event) (eventstore.Event, error) {
+func DefaultLanguageSetMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &DefaultLanguageSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-3j9fs", "unable to unmarshal default language set")
 	}

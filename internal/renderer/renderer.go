@@ -116,10 +116,8 @@ func (r *Renderer) addFileToTemplate(dir http.FileSystem, tmpl *template.Templat
 		return err
 	}
 	tmpl, err = tmpl.New(file.Name()).Funcs(funcs).Parse(string(content))
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return err
 }
 
 func (r *Renderer) registerTranslateFn(req *http.Request, translator *i18n.Translator, funcs map[string]interface{}) map[string]interface{} {

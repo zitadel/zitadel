@@ -7,6 +7,5 @@ import (
 )
 
 type TokenRepository interface {
-	IsTokenValid(ctx context.Context, userID, tokenID string) (bool, error)
 	TokenByIDs(ctx context.Context, userID, tokenID string) (*usr_model.TokenView, error)
 }

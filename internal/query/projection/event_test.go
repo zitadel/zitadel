@@ -6,44 +6,41 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 func testEvent(
-	eventType repository.EventType,
-	aggregateType repository.AggregateType,
+	eventType eventstore.EventType,
+	aggregateType eventstore.AggregateType,
 	data []byte,
 ) *repository.Event {
 	return timedTestEvent(eventType, aggregateType, data, time.Now())
 }
 
 func toSystemEvent(event *repository.Event) *repository.Event {
-	event.EditorService = "SYSTEM"
+	event.EditorUser = "SYSTEM"
 	return event
 }
 
 func timedTestEvent(
-	eventType repository.EventType,
-	aggregateType repository.AggregateType,
+	eventType eventstore.EventType,
+	aggregateType eventstore.AggregateType,
 	data []byte,
 	creationDate time.Time,
 ) *repository.Event {
 	return &repository.Event{
-		Sequence:                      15,
-		PreviousAggregateSequence:     10,
-		PreviousAggregateTypeSequence: 10,
-		CreationDate:                  creationDate,
-		Type:                          eventType,
-		AggregateType:                 aggregateType,
-		Data:                          data,
-		Version:                       "v1",
-		AggregateID:                   "agg-id",
-		ResourceOwner:                 sql.NullString{String: "ro-id", Valid: true},
-		InstanceID:                    "instance-id",
-		ID:                            "event-id",
-		EditorService:                 "editor-svc",
-		EditorUser:                    "editor-user",
+		Seq:           15,
+		CreationDate:  creationDate,
+		Typ:           eventType,
+		AggregateType: aggregateType,
+		Data:          data,
+		Version:       "v1",
+		AggregateID:   "agg-id",
+		ResourceOwner: sql.NullString{String: "ro-id", Valid: true},
+		InstanceID:    "instance-id",
+		ID:            "event-id",
+		EditorUser:    "editor-user",
 	}
 }
 
@@ -51,7 +48,7 @@ func baseEvent(*testing.T) eventstore.Event {
 	return &eventstore.BaseEvent{}
 }
 
-func getEvent(event *repository.Event, mapper func(*repository.Event) (eventstore.Event, error)) func(t *testing.T) eventstore.Event {
+func getEvent(event *repository.Event, mapper func(eventstore.Event) (eventstore.Event, error)) func(t *testing.T) eventstore.Event {
 	return func(t *testing.T) eventstore.Event {
 		e, err := mapper(event)
 		if err != nil {
@@ -62,11 +59,10 @@ func getEvent(event *repository.Event, mapper func(*repository.Event) (eventstor
 }
 
 type wantReduce struct {
-	aggregateType    eventstore.AggregateType
-	sequence         uint64
-	previousSequence uint64
-	executer         *testExecuter
-	err              func(error) bool
+	aggregateType eventstore.AggregateType
+	sequence      uint64
+	executer      *testExecuter
+	err           func(error) bool
 }
 
 func assertReduce(t *testing.T, stmt *handler.Statement, err error, projection string, want wantReduce) {
@@ -80,10 +76,6 @@ func assertReduce(t *testing.T, stmt *handler.Statement, err error, projection s
 	}
 	if stmt.AggregateType != want.aggregateType {
 		t.Errorf("wrong aggregate type: want: %q got: %q", want.aggregateType, stmt.AggregateType)
-	}
-
-	if stmt.PreviousSequence != want.previousSequence {
-		t.Errorf("wrong previous sequence: want: %d got: %d", want.previousSequence, stmt.PreviousSequence)
 	}
 
 	if stmt.Sequence != want.sequence {

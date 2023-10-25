@@ -72,9 +72,9 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 				}, args{
 					event: &user.HumanInitialCodeAddedEvent{
@@ -111,9 +111,9 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 				}, args{
 					event: &user.HumanInitialCodeAddedEvent{
@@ -144,9 +144,9 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 				}, args{
 					event: &user.HumanInitialCodeAddedEvent{
@@ -184,9 +184,9 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 				}, args{
 					event: &user.HumanInitialCodeAddedEvent{
@@ -210,7 +210,13 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			_, err = newUserNotifier(t, ctrl, queries, fs, f, a, w).reduceInitCodeAdded(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, fs, f, a, w).reduceInitCodeAdded(a.event)
+			if w.err != nil {
+				w.err(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+			err = stmt.Execute(nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -241,9 +247,9 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 				}, args{
 					event: &user.HumanEmailCodeAddedEvent{
@@ -282,9 +288,9 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 				}, args{
 					event: &user.HumanEmailCodeAddedEvent{
@@ -317,9 +323,9 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 					SMSTokenCrypto: nil,
 				}, args{
@@ -360,9 +366,9 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 				}, args{
 					event: &user.HumanEmailCodeAddedEvent{
@@ -396,9 +402,9 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 					SMSTokenCrypto: nil,
 				}, args{
@@ -425,7 +431,13 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			_, err = newUserNotifier(t, ctrl, queries, fs, f, a, w).reduceEmailCodeAdded(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, fs, f, a, w).reduceEmailCodeAdded(a.event)
+			if w.err != nil {
+				w.err(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+			err = stmt.Execute(nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -456,9 +468,9 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 				}, args{
 					event: &user.HumanPasswordCodeAddedEvent{
@@ -497,9 +509,9 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 				}, args{
 					event: &user.HumanPasswordCodeAddedEvent{
@@ -532,9 +544,9 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 					SMSTokenCrypto: nil,
 				}, args{
@@ -575,9 +587,9 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 				}, args{
 					event: &user.HumanPasswordCodeAddedEvent{
@@ -611,9 +623,9 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 					SMSTokenCrypto: nil,
 				}, args{
@@ -640,7 +652,13 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			_, err = newUserNotifier(t, ctrl, queries, fs, f, a, w).reducePasswordCodeAdded(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, fs, f, a, w).reducePasswordCodeAdded(a.event)
+			if w.err != nil {
+				w.err(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+			err = stmt.Execute(nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -670,9 +688,9 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 				}, args{
 					event: &user.DomainClaimedEvent{
 						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
@@ -705,9 +723,9 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 				}, args{
 					event: &user.DomainClaimedEvent{
 						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
@@ -727,7 +745,13 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			_, err = newUserNotifier(t, ctrl, queries, fs, f, a, w).reduceDomainClaimed(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, fs, f, a, w).reduceDomainClaimed(a.event)
+			if w.err != nil {
+				w.err(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+			err = stmt.Execute(nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -758,9 +782,9 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 				}, args{
 					event: &user.HumanPasswordlessInitCodeRequestedEvent{
@@ -800,9 +824,9 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 				}, args{
 					event: &user.HumanPasswordlessInitCodeRequestedEvent{
@@ -836,9 +860,9 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 					SMSTokenCrypto: nil,
 				}, args{
@@ -880,9 +904,9 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 				}, args{
 					event: &user.HumanPasswordlessInitCodeRequestedEvent{
@@ -917,9 +941,9 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 					SMSTokenCrypto: nil,
 				}, args{
@@ -947,7 +971,13 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			_, err = newUserNotifier(t, ctrl, queries, fs, f, a, w).reducePasswordlessCodeRequested(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, fs, f, a, w).reducePasswordlessCodeRequested(a.event)
+			if w.err != nil {
+				w.err(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+			err = stmt.Execute(nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -980,9 +1010,9 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 				}, args{
 					event: &user.HumanPasswordChangedEvent{
 						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
@@ -1018,9 +1048,9 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 				}, args{
 					event: &user.HumanPasswordChangedEvent{
 						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
@@ -1040,7 +1070,13 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			_, err = newUserNotifier(t, ctrl, queries, fs, f, a, w).reducePasswordChanged(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, fs, f, a, w).reducePasswordChanged(a.event)
+			if w.err != nil {
+				w.err(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+			err = stmt.Execute(nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1072,9 +1108,9 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 				}, args{
 					event: &session.OTPEmailChallengedEvent{
@@ -1114,9 +1150,9 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 				}, args{
 					event: &session.OTPEmailChallengedEvent{
@@ -1150,9 +1186,9 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 					SMSTokenCrypto: nil,
 				}, args{
@@ -1194,9 +1230,9 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 				}, args{
 					event: &session.OTPEmailChallengedEvent{
@@ -1230,9 +1266,9 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 			return fields{
 					queries:  queries,
 					commands: commands,
-					es: eventstore.NewEventstore(eventstore.TestConfig(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
-					)),
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
 					userDataCrypto: codeAlg,
 					SMSTokenCrypto: nil,
 				}, args{

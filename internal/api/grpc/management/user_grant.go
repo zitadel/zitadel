@@ -39,7 +39,7 @@ func (s *Server) ListUserGrants(ctx context.Context, req *mgmt_pb.ListUserGrantR
 	}
 	return &mgmt_pb.ListUserGrantResponse{
 		Result:  user.UserGrantsToPb(s.assetAPIPrefix(ctx), res.UserGrants),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastRun),
 	}, nil
 }
 

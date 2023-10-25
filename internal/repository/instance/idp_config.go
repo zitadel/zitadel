@@ -3,10 +3,8 @@ package instance
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 )
 
@@ -48,7 +46,7 @@ func NewIDPConfigAddedEvent(
 	}
 }
 
-func IDPConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IDPConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idpconfig.IDPConfigAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -83,7 +81,7 @@ func NewIDPConfigChangedEvent(
 	return &IDPConfigChangedEvent{IDPConfigChangedEvent: *changeEvent}, nil
 }
 
-func IDPConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IDPConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idpconfig.IDPConfigChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -115,7 +113,7 @@ func NewIDPConfigRemovedEvent(
 	}
 }
 
-func IDPConfigRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IDPConfigRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idpconfig.IDPConfigRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -146,7 +144,7 @@ func NewIDPConfigDeactivatedEvent(
 	}
 }
 
-func IDPConfigDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IDPConfigDeactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idpconfig.IDPConfigDeactivatedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -177,7 +175,7 @@ func NewIDPConfigReactivatedEvent(
 	}
 }
 
-func IDPConfigReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IDPConfigReactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idpconfig.IDPConfigReactivatedEventMapper(event)
 	if err != nil {
 		return nil, err

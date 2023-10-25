@@ -54,6 +54,7 @@ func (wm *OIDCSessionAccessTokenReadModel) Reduce() error {
 
 func (wm *OIDCSessionAccessTokenReadModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
 		AllowTimeTravel().
 		AddQuery().
 		AggregateTypes(oidcsession.AggregateType).
@@ -86,7 +87,7 @@ func (wm *OIDCSessionAccessTokenReadModel) reduceAccessTokenAdded(e *oidcsession
 
 func (wm *OIDCSessionAccessTokenReadModel) reduceTokenRevoked(e eventstore.Event) {
 	wm.AccessTokenID = ""
-	wm.AccessTokenExpiration = e.CreationDate()
+	wm.AccessTokenExpiration = e.CreatedAt()
 }
 
 // ActiveAccessTokenByToken will check if the token is active by retrieving the OIDCSession events from the eventstore.
@@ -133,14 +134,15 @@ func (q *Queries) checkSessionNotTerminatedAfter(ctx context.Context, sessionID 
 	defer func() { span.EndWithError(err) }()
 
 	events, err := q.eventstore.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
 		AllowTimeTravel().
+		CreationDateAfter(creation).
 		AddQuery().
 		AggregateTypes(session.AggregateType).
 		AggregateIDs(sessionID).
 		EventTypes(
 			session.TerminateType,
 		).
-		CreationDateAfter(creation).
 		Builder())
 	if err != nil {
 		return caos_errs.ThrowPermissionDenied(err, "QUERY-SJ642", "Errors.Internal")
