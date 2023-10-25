@@ -8,10 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/repository/session"
-
-	"github.com/zitadel/zitadel/internal/notification/messages"
-
 	"github.com/golang/mock/gomock"
 	statik_fs "github.com/rakyll/statik/fs"
 	"github.com/stretchr/testify/assert"
@@ -21,14 +17,16 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	es_repo_mock "github.com/zitadel/zitadel/internal/eventstore/repository/mock"
-	channel_mock "github.com/zitadel/zitadel/internal/notification/channels/mock"
+	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	"github.com/zitadel/zitadel/internal/notification/handlers/mock"
+	"github.com/zitadel/zitadel/internal/notification/messages"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -210,7 +208,9 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			_, err = newUserNotifier(t, ctrl, queries, fs, f, a, w).reduceInitCodeAdded(a.event)
+			channels := &mockChannels{}
+			_, err = newUserNotifier(t, ctrl, queries, fs, f, channels).reduceInitCodeAdded(a.event)
+			assert.Len(t, channels.sentEmails, 1)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -425,7 +425,9 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			_, err = newUserNotifier(t, ctrl, queries, fs, f, a, w).reduceEmailCodeAdded(a.event)
+			channels := &mockChannels{}
+			_, err = newUserNotifier(t, ctrl, queries, fs, f, channels).reduceEmailCodeAdded(a.event)
+			assert.Len(t, channels.sentEmails, 1)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -640,7 +642,9 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			_, err = newUserNotifier(t, ctrl, queries, fs, f, a, w).reducePasswordCodeAdded(a.event)
+			channels := &mockChannels{}
+			_, err = newUserNotifier(t, ctrl, queries, fs, f, channels).reducePasswordCodeAdded(a.event)
+			assert.Len(t, channels.sentEmails, 1)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -727,7 +731,9 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			_, err = newUserNotifier(t, ctrl, queries, fs, f, a, w).reduceDomainClaimed(a.event)
+			channels := &mockChannels{}
+			_, err = newUserNotifier(t, ctrl, queries, fs, f, channels).reduceDomainClaimed(a.event)
+			assert.Len(t, channels.sentEmails, 1)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -947,7 +953,9 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			_, err = newUserNotifier(t, ctrl, queries, fs, f, a, w).reducePasswordlessCodeRequested(a.event)
+			channels := &mockChannels{}
+			_, err = newUserNotifier(t, ctrl, queries, fs, f, channels).reducePasswordlessCodeRequested(a.event)
+			assert.Len(t, channels.sentEmails, 1)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1040,7 +1048,9 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			_, err = newUserNotifier(t, ctrl, queries, fs, f, a, w).reducePasswordChanged(a.event)
+			channels := &mockChannels{}
+			_, err = newUserNotifier(t, ctrl, queries, fs, f, channels).reducePasswordChanged(a.event)
+			assert.Len(t, channels.sentEmails, 1)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1259,7 +1269,9 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			_, err = newUserNotifier(t, ctrl, queries, fs, f, a, w).reduceSessionOTPEmailChallenged(a.event)
+			channels := &mockChannels{}
+			_, err = newUserNotifier(t, ctrl, queries, fs, f, channels).reduceSessionOTPEmailChallenged(a.event)
+			assert.Len(t, channels.sentEmails, 1)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1284,14 +1296,9 @@ type want struct {
 	err     assert.ErrorAssertionFunc
 }
 
-func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, fs http.FileSystem, f fields, a args, w want) *userNotifier {
+func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, fs http.FileSystem, f fields, channels *mockChannels) *userNotifier {
 	queries.EXPECT().NotificationProviderByIDAndType(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(&query.DebugNotificationProvider{}, nil)
 	smtpAlg, _ := cryptoValue(t, ctrl, "smtppw")
-	channel := channel_mock.NewMockNotificationChannel(ctrl)
-	if w.err == nil {
-		w.message.TriggeringEvent = a.event
-		channel.EXPECT().HandleMessage(&w.message).Return(nil)
-	}
 	return &userNotifier{
 		commands: f.commands,
 		queries: NewNotificationQueries(
@@ -1307,26 +1314,35 @@ func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQu
 			fs,
 		),
 		otpEmailTmpl: defaultOTPEmailTemplate,
-		channels:     &channels{Chain: *senders.ChainChannels(channel)},
+		channels:     channels,
 	}
 }
 
-var _ types.ChannelChains = (*channels)(nil)
+var _ types.ChannelChains = (*mockChannels)(nil)
 
-type channels struct {
-	senders.Chain
+type mockChannels struct {
+	sentEmails []*messages.Email
+	sentSMS    []*messages.SMS
+	sentJSON   []*messages.JSON
 }
 
-func (c *channels) Email(context.Context) (*senders.Chain, *smtp.Config, error) {
-	return &c.Chain, nil, nil
+func (c *mockChannels) Email(context.Context) (*senders.Chain[*messages.Email], *smtp.Config, error) {
+	return appendMessageChan(&c.sentEmails), nil, nil
 }
 
-func (c *channels) SMS(context.Context) (*senders.Chain, *twilio.Config, error) {
-	return &c.Chain, nil, nil
+func (c *mockChannels) SMS(context.Context) (*senders.Chain[*messages.SMS], *twilio.Config, error) {
+	return appendMessageChan(&c.sentSMS), nil, nil
 }
 
-func (c *channels) Webhook(context.Context, webhook.Config) (*senders.Chain, error) {
-	return &c.Chain, nil
+func (c *mockChannels) Webhook(context.Context, webhook.Config) (*senders.Chain[*messages.JSON], error) {
+	return appendMessageChan(&c.sentJSON), nil
+}
+
+func appendMessageChan[T channels.Message](appendTo *[]T) *senders.Chain[T] {
+	return senders.ChainChannels[T](channels.HandleMessageFunc[T](func(msg T) error {
+		*appendTo = append(*appendTo, msg)
+		return nil
+	}))
 }
 
 func expectTemplateQueries(queries *mock.MockQueries, template string) {
