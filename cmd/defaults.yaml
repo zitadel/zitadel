@@ -389,11 +389,27 @@ EncryptionKeys:
   UserAgentCookieKeyID: "userAgentCookieKey" # ZITADEL_ENCRYPTIONKEYS_USERAGENTCOOKIEKEYID
 
 SystemAPIUsers:
-# Add keys for authentication of the systemAPI here:
-# you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
+# # Add keys for authentication of the systemAPI here:
+# # you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
 # - superuser:
-#     Path: /path/to/superuser/key.pem  # you can provide the key either by reference with the path
+#     Path: /path/to/superuser/ey.pem  # you can provide the key either by reference with the path
+#     Memberships:
+#       # MemberType System allows the user to access all APIs for all instances or organizations
+#       - MemberType: System
+#         Roles:
+#           - "SYSTEM_OWNER"
+#           # Actually, we don't recommend adding IAM_OWNER and ORG_OWNER to the System membership, as this basically enables god mode for the system user
+#           - "IAM_OWNER"
+#           - "ORG_OWNER"
+#       # MemberType IAM and Organization let you restrict access to a specific instance or organization by specifying the AggregateID
+#       - MemberType: IAM
+#         Roles: "IAM_OWNER"
+#         AggregateID: "123456789012345678"
+#       - MemberType: Organization
+#         Roles: "ORG_OWNER"
+#         AggregateID: "123456789012345678"
 # - superuser2:
+#     # If no memberships are specified, the user has a membership of type System with the role "SYSTEM_OWNER"
 #     KeyData: <base64 encoded key>     # or you can directly embed it as base64 encoded value
 
 #TODO: remove as soon as possible
@@ -841,6 +857,29 @@ AuditLogRetention: 0s # ZITADEL_AUDITLOGRETENTION
 
 InternalAuthZ:
   RolePermissionMappings:
+    - Role: "SYSTEM_OWNER"
+      Permissions:
+        - "system.instance.read"
+        - "system.instance.write"
+        - "system.instance.delete"
+        - "system.domain.read"
+        - "system.domain.write"
+        - "system.domain.delete"
+        - "system.debug.read"
+        - "system.debug.write"
+        - "system.debug.delete"
+        - "system.feature.write"
+        - "system.limits.write"
+        - "system.limits.delete"
+        - "system.quota.write"
+        - "system.quota.delete"
+        - "system.iam.member.read"
+    - Role: "SYSTEM_OWNER_VIEWER"
+      Permissions:
+        - "system.instance.read"
+        - "system.domain.read"
+        - "system.debug.read"
+        - "system.iam.member.read"
     - Role: "IAM_OWNER"
       Permissions:
         - "iam.read"
