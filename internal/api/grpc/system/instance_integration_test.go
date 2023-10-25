@@ -22,6 +22,26 @@ func TestServer_ListInstances(t *testing.T) {
 		wantErr bool
 	}{
 		{
+			name: "empty query error",
+			req: &system_pb.ListInstancesRequest{
+				Queries: []*instance.Query{{}},
+			},
+			wantErr: true,
+		},
+		{
+			name: "non-existing id",
+			req: &system_pb.ListInstancesRequest{
+				Queries: []*instance.Query{{
+					Query: &instance.Query_IdQuery{
+						IdQuery: &instance.IdsQuery{
+							Ids: []string{"foo"},
+						},
+					},
+				}},
+			},
+			want: []*instance.Instance{},
+		},
+		{
 			name: "get 1 by id",
 			req: &system_pb.ListInstancesRequest{
 				Query: &object.ListQuery{
@@ -38,6 +58,19 @@ func TestServer_ListInstances(t *testing.T) {
 			want: []*instance.Instance{{
 				Id: instanceID,
 			}},
+		},
+		{
+			name: "non-existing domain",
+			req: &system_pb.ListInstancesRequest{
+				Queries: []*instance.Query{{
+					Query: &instance.Query_DomainQuery{
+						DomainQuery: &instance.DomainsQuery{
+							Domains: []string{"foo"},
+						},
+					},
+				}},
+			},
+			want: []*instance.Instance{},
 		},
 		{
 			name: "get 1 by domain",
