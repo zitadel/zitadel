@@ -382,6 +382,7 @@ func (p *labelPolicyProjection) reduceActivated(event eventstore.Event) (*handle
 			handler.NewCol(LabelPolicyDarkFontColorCol, nil),
 			handler.NewCol(LabelPolicyDarkLogoURLCol, nil),
 			handler.NewCol(LabelPolicyDarkIconURLCol, nil),
+			handler.NewCol(LabelPolicyEnabledThemeCol, nil),
 		},
 		[]handler.Column{
 			handler.NewCol(LabelPolicyChangeDateCol, nil),
@@ -408,6 +409,7 @@ func (p *labelPolicyProjection) reduceActivated(event eventstore.Event) (*handle
 			handler.NewCol(LabelPolicyDarkFontColorCol, nil),
 			handler.NewCol(LabelPolicyDarkLogoURLCol, nil),
 			handler.NewCol(LabelPolicyDarkIconURLCol, nil),
+			handler.NewCol(LabelPolicyEnabledThemeCol, nil),
 		},
 		[]handler.NamespacedCondition{
 			handler.NewNamespacedCondition(LabelPolicyIDCol, event.Aggregate().ID),
