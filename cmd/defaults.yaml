@@ -904,6 +904,7 @@ InternalAuthZ:
         - "project.grant.member.write"
         - "project.grant.member.delete"
         - "events.read"
+        - "milestones.read"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -929,6 +930,7 @@ InternalAuthZ:
         - "project.grant.read"
         - "project.grant.member.read"
         - "events.read"
+        - "milestones.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
