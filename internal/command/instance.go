@@ -96,7 +96,7 @@ type InstanceSetup struct {
 		HideLoginNameSuffix bool
 		ErrorMsgPopup       bool
 		DisableWatermark    bool
-		EnabledTheme        domain.LabelPolicyTheme
+		ThemeMode           domain.LabelPolicyThemeMode
 	}
 	LockoutPolicy struct {
 		MaxAttempts              uint64
@@ -268,7 +268,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LabelPolicy.HideLoginNameSuffix,
 			setup.LabelPolicy.ErrorMsgPopup,
 			setup.LabelPolicy.DisableWatermark,
-			setup.LabelPolicy.EnabledTheme,
+			setup.LabelPolicy.ThemeMode,
 		),
 		prepareActivateDefaultLabelPolicy(instanceAgg),
 

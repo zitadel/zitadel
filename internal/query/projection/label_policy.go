@@ -29,7 +29,7 @@ const (
 	LabelPolicyShouldErrorPopupCol    = "should_error_popup"
 	LabelPolicyFontURLCol             = "font_url"
 	LabelPolicyOwnerRemovedCol        = "owner_removed"
-	LabelPolicyEnabledThemeCol        = "enabled_theme"
+	LabelPolicyThemeModeCol           = "theme_mode"
 
 	LabelPolicyLightPrimaryColorCol    = "light_primary_color"
 	LabelPolicyLightWarnColorCol       = "light_warn_color"
@@ -84,7 +84,7 @@ func (*labelPolicyProjection) Init() *old_handler.Check {
 			handler.NewColumn(LabelPolicyDarkLogoURLCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(LabelPolicyDarkIconURLCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(LabelPolicyOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
-			handler.NewColumn(LabelPolicyEnabledThemeCol, handler.ColumnTypeInt64, handler.Default(0)),
+			handler.NewColumn(LabelPolicyThemeModeCol, handler.ColumnTypeEnum, handler.Default(0)),
 		},
 			handler.NewPrimaryKey(LabelPolicyInstanceIDCol, LabelPolicyIDCol, LabelPolicyStateCol),
 			handler.WithIndex(handler.NewIndex("owner_removed", []string{LabelPolicyOwnerRemovedCol})),
@@ -266,7 +266,7 @@ func (p *labelPolicyProjection) reduceAdded(event eventstore.Event) (*handler.St
 			handler.NewCol(LabelPolicyHideLoginNameSuffixCol, policyEvent.HideLoginNameSuffix),
 			handler.NewCol(LabelPolicyShouldErrorPopupCol, policyEvent.ErrorMsgPopup),
 			handler.NewCol(LabelPolicyWatermarkDisabledCol, policyEvent.DisableWatermark),
-			handler.NewCol(LabelPolicyEnabledThemeCol, policyEvent.EnabledTheme),
+			handler.NewCol(LabelPolicyThemeModeCol, policyEvent.ThemeMode),
 		}), nil
 }
 
@@ -317,8 +317,8 @@ func (p *labelPolicyProjection) reduceChanged(event eventstore.Event) (*handler.
 	if policyEvent.DisableWatermark != nil {
 		cols = append(cols, handler.NewCol(LabelPolicyWatermarkDisabledCol, *policyEvent.DisableWatermark))
 	}
-	if policyEvent.EnabledTheme != nil {
-		cols = append(cols, handler.NewCol(LabelPolicyEnabledThemeCol, *policyEvent.EnabledTheme))
+	if policyEvent.ThemeMode != nil {
+		cols = append(cols, handler.NewCol(LabelPolicyThemeModeCol, *policyEvent.ThemeMode))
 	}
 	return handler.NewUpdateStatement(
 		&policyEvent,
@@ -382,7 +382,7 @@ func (p *labelPolicyProjection) reduceActivated(event eventstore.Event) (*handle
 			handler.NewCol(LabelPolicyDarkFontColorCol, nil),
 			handler.NewCol(LabelPolicyDarkLogoURLCol, nil),
 			handler.NewCol(LabelPolicyDarkIconURLCol, nil),
-			handler.NewCol(LabelPolicyEnabledThemeCol, nil),
+			handler.NewCol(LabelPolicyThemeModeCol, nil),
 		},
 		[]handler.Column{
 			handler.NewCol(LabelPolicyChangeDateCol, nil),
@@ -409,7 +409,7 @@ func (p *labelPolicyProjection) reduceActivated(event eventstore.Event) (*handle
 			handler.NewCol(LabelPolicyDarkFontColorCol, nil),
 			handler.NewCol(LabelPolicyDarkLogoURLCol, nil),
 			handler.NewCol(LabelPolicyDarkIconURLCol, nil),
-			handler.NewCol(LabelPolicyEnabledThemeCol, nil),
+			handler.NewCol(LabelPolicyThemeModeCol, nil),
 		},
 		[]handler.NamespacedCondition{
 			handler.NewNamespacedCondition(LabelPolicyIDCol, event.Aggregate().ID),

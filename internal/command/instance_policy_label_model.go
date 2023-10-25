@@ -98,7 +98,7 @@ func (wm *InstanceLabelPolicyWriteModel) NewChangedEvent(
 	hideLoginNameSuffix,
 	errorMsgPopup,
 	disableWatermark bool,
-	enabledTheme domain.LabelPolicyTheme,
+	themeMode domain.LabelPolicyThemeMode,
 ) (*instance.LabelPolicyChangedEvent, bool) {
 	changes := make([]policy.LabelPolicyChanges, 0)
 	if wm.PrimaryColor != primaryColor {
@@ -134,8 +134,8 @@ func (wm *InstanceLabelPolicyWriteModel) NewChangedEvent(
 	if wm.DisableWatermark != disableWatermark {
 		changes = append(changes, policy.ChangeDisableWatermark(disableWatermark))
 	}
-	if wm.EnabledTheme != enabledTheme {
-		changes = append(changes, policy.ChangeEnabledTheme(enabledTheme))
+	if wm.ThemeMode != themeMode {
+		changes = append(changes, policy.ChangeThemeMode(themeMode))
 	}
 	if len(changes) == 0 {
 		return nil, false

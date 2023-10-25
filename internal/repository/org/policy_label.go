@@ -47,7 +47,7 @@ func NewLabelPolicyAddedEvent(
 	hideLoginNameSuffix,
 	errorMsgPopup,
 	disableWatermark bool,
-	enabledTheme domain.LabelPolicyTheme,
+	themeMode domain.LabelPolicyThemeMode,
 ) *LabelPolicyAddedEvent {
 	return &LabelPolicyAddedEvent{
 		LabelPolicyAddedEvent: *policy.NewLabelPolicyAddedEvent(
@@ -66,7 +66,7 @@ func NewLabelPolicyAddedEvent(
 			hideLoginNameSuffix,
 			errorMsgPopup,
 			disableWatermark,
-			enabledTheme),
+			themeMode),
 	}
 }
 

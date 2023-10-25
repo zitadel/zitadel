@@ -494,7 +494,7 @@ func (l *Login) getThemeClass(r *http.Request, policy *domain.LabelPolicy) strin
 // isDarkMode checks policy first and if not set to specifically use dark or light only,
 // it will also check the cookie.
 func (l *Login) isDarkMode(r *http.Request, policy *domain.LabelPolicy) bool {
-	if mode := l.getThemeMode(policy); mode != domain.LabelPolicyThemeAll {
+	if mode := l.getThemeMode(policy); mode != domain.LabelPolicyThemeAuto {
 		return mode == domain.LabelPolicyThemeDark
 	}
 	cookie, err := r.Cookie("mode")
@@ -504,11 +504,11 @@ func (l *Login) isDarkMode(r *http.Request, policy *domain.LabelPolicy) bool {
 	return strings.HasSuffix(cookie.Value, "dark")
 }
 
-func (l *Login) getThemeMode(policy *domain.LabelPolicy) domain.LabelPolicyTheme {
+func (l *Login) getThemeMode(policy *domain.LabelPolicy) domain.LabelPolicyThemeMode {
 	if policy != nil {
-		return policy.EnabledTheme
+		return policy.ThemeMode
 	}
-	return domain.LabelPolicyThemeAll
+	return domain.LabelPolicyThemeAuto
 }
 
 func (l *Login) getOrgID(r *http.Request, authReq *domain.AuthRequest) string {
@@ -623,7 +623,7 @@ type baseData struct {
 	Title                  string
 	Description            string
 	Theme                  string
-	ThemeMode              domain.LabelPolicyTheme
+	ThemeMode              domain.LabelPolicyThemeMode
 	ThemeClass             string
 	DarkMode               bool
 	PrivateLabelingOrgID   string

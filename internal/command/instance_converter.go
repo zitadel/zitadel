@@ -59,7 +59,7 @@ func writeModelToLabelPolicy(wm *LabelPolicyWriteModel) *domain.LabelPolicy {
 		HideLoginNameSuffix: wm.HideLoginNameSuffix,
 		ErrorMsgPopup:       wm.ErrorMsgPopup,
 		DisableWatermark:    wm.DisableWatermark,
-		EnabledTheme:        wm.EnabledTheme,
+		ThemeMode:           wm.ThemeMode,
 	}
 }
 

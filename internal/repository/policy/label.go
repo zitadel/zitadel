@@ -33,18 +33,18 @@ const (
 type LabelPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	PrimaryColor        string                  `json:"primaryColor,omitempty"`
-	BackgroundColor     string                  `json:"backgroundColor,omitempty"`
-	WarnColor           string                  `json:"warnColor,omitempty"`
-	FontColor           string                  `json:"fontColor,omitempty"`
-	PrimaryColorDark    string                  `json:"primaryColorDark,omitempty"`
-	BackgroundColorDark string                  `json:"backgroundColorDark,omitempty"`
-	WarnColorDark       string                  `json:"warnColorDark,omitempty"`
-	FontColorDark       string                  `json:"fontColorDark,omitempty"`
-	HideLoginNameSuffix bool                    `json:"hideLoginNameSuffix,omitempty"`
-	ErrorMsgPopup       bool                    `json:"errorMsgPopup,omitempty"`
-	DisableWatermark    bool                    `json:"disableMsgPopup,omitempty"`
-	EnabledTheme        domain.LabelPolicyTheme `json:"enabledTheme,omitempty"`
+	PrimaryColor        string                      `json:"primaryColor,omitempty"`
+	BackgroundColor     string                      `json:"backgroundColor,omitempty"`
+	WarnColor           string                      `json:"warnColor,omitempty"`
+	FontColor           string                      `json:"fontColor,omitempty"`
+	PrimaryColorDark    string                      `json:"primaryColorDark,omitempty"`
+	BackgroundColorDark string                      `json:"backgroundColorDark,omitempty"`
+	WarnColorDark       string                      `json:"warnColorDark,omitempty"`
+	FontColorDark       string                      `json:"fontColorDark,omitempty"`
+	HideLoginNameSuffix bool                        `json:"hideLoginNameSuffix,omitempty"`
+	ErrorMsgPopup       bool                        `json:"errorMsgPopup,omitempty"`
+	DisableWatermark    bool                        `json:"disableMsgPopup,omitempty"`
+	ThemeMode           domain.LabelPolicyThemeMode `json:"themeMode,omitempty"`
 }
 
 func (e *LabelPolicyAddedEvent) Payload() interface{} {
@@ -68,7 +68,7 @@ func NewLabelPolicyAddedEvent(
 	hideLoginNameSuffix,
 	errorMsgPopup,
 	disableWatermark bool,
-	enabledTheme domain.LabelPolicyTheme,
+	themeMode domain.LabelPolicyThemeMode,
 ) *LabelPolicyAddedEvent {
 
 	return &LabelPolicyAddedEvent{
@@ -84,7 +84,7 @@ func NewLabelPolicyAddedEvent(
 		HideLoginNameSuffix: hideLoginNameSuffix,
 		ErrorMsgPopup:       errorMsgPopup,
 		DisableWatermark:    disableWatermark,
-		EnabledTheme:        enabledTheme,
+		ThemeMode:           themeMode,
 	}
 }
 
@@ -104,18 +104,18 @@ func LabelPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, erro
 type LabelPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	PrimaryColor        *string                  `json:"primaryColor,omitempty"`
-	BackgroundColor     *string                  `json:"backgroundColor,omitempty"`
-	WarnColor           *string                  `json:"warnColor,omitempty"`
-	FontColor           *string                  `json:"fontColor,omitempty"`
-	PrimaryColorDark    *string                  `json:"primaryColorDark,omitempty"`
-	BackgroundColorDark *string                  `json:"backgroundColorDark,omitempty"`
-	WarnColorDark       *string                  `json:"warnColorDark,omitempty"`
-	FontColorDark       *string                  `json:"fontColorDark,omitempty"`
-	HideLoginNameSuffix *bool                    `json:"hideLoginNameSuffix,omitempty"`
-	ErrorMsgPopup       *bool                    `json:"errorMsgPopup,omitempty"`
-	DisableWatermark    *bool                    `json:"disableWatermark,omitempty"`
-	EnabledTheme        *domain.LabelPolicyTheme `json:"enabledTheme,omitempty"`
+	PrimaryColor        *string                      `json:"primaryColor,omitempty"`
+	BackgroundColor     *string                      `json:"backgroundColor,omitempty"`
+	WarnColor           *string                      `json:"warnColor,omitempty"`
+	FontColor           *string                      `json:"fontColor,omitempty"`
+	PrimaryColorDark    *string                      `json:"primaryColorDark,omitempty"`
+	BackgroundColorDark *string                      `json:"backgroundColorDark,omitempty"`
+	WarnColorDark       *string                      `json:"warnColorDark,omitempty"`
+	FontColorDark       *string                      `json:"fontColorDark,omitempty"`
+	HideLoginNameSuffix *bool                        `json:"hideLoginNameSuffix,omitempty"`
+	ErrorMsgPopup       *bool                        `json:"errorMsgPopup,omitempty"`
+	DisableWatermark    *bool                        `json:"disableWatermark,omitempty"`
+	ThemeMode           *domain.LabelPolicyThemeMode `json:"themeMode,omitempty"`
 }
 
 func (e *LabelPolicyChangedEvent) Payload() interface{} {
@@ -210,9 +210,9 @@ func ChangeDisableWatermark(disableWatermark bool) func(*LabelPolicyChangedEvent
 	}
 }
 
-func ChangeEnabledTheme(enabledTheme domain.LabelPolicyTheme) func(*LabelPolicyChangedEvent) {
+func ChangeThemeMode(themeMode domain.LabelPolicyThemeMode) func(*LabelPolicyChangedEvent) {
 	return func(e *LabelPolicyChangedEvent) {
-		e.EnabledTheme = &enabledTheme
+		e.ThemeMode = &themeMode
 	}
 }
 

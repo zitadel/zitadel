@@ -18,20 +18,20 @@ func AddLabelPolicyToDomain(p *mgmt_pb.AddCustomLabelPolicyRequest) *domain.Labe
 		FontColorDark:       p.FontColorDark,
 		HideLoginNameSuffix: p.HideLoginNameSuffix,
 		DisableWatermark:    p.DisableWatermark,
-		EnabledTheme:        enabledThemeToDomain(p.EnabledTheme),
+		ThemeMode:           themeModeToDomain(p.ThemeMode),
 	}
 }
 
-func enabledThemeToDomain(theme policy_pb.Theme) domain.LabelPolicyTheme {
+func themeModeToDomain(theme policy_pb.ThemeMode) domain.LabelPolicyThemeMode {
 	switch theme {
-	case policy_pb.Theme_THEME_ALL:
-		return domain.LabelPolicyThemeAll
-	case policy_pb.Theme_THEME_DARK:
+	case policy_pb.ThemeMode_THEME_MODE_AUTO:
+		return domain.LabelPolicyThemeAuto
+	case policy_pb.ThemeMode_THEME_MODE_DARK:
 		return domain.LabelPolicyThemeDark
-	case policy_pb.Theme_THEME_LIGHT:
+	case policy_pb.ThemeMode_THEME_MODE_LIGHT:
 		return domain.LabelPolicyThemeLight
 	default:
-		return domain.LabelPolicyThemeAll
+		return domain.LabelPolicyThemeAuto
 	}
 }
 
@@ -47,6 +47,6 @@ func updateLabelPolicyToDomain(p *mgmt_pb.UpdateCustomLabelPolicyRequest) *domai
 		FontColorDark:       p.FontColorDark,
 		HideLoginNameSuffix: p.HideLoginNameSuffix,
 		DisableWatermark:    p.DisableWatermark,
-		EnabledTheme:        enabledThemeToDomain(p.EnabledTheme),
+		ThemeMode:           themeModeToDomain(p.ThemeMode),
 	}
 }

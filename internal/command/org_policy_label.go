@@ -40,7 +40,7 @@ func (c *Commands) AddLabelPolicy(ctx context.Context, resourceOwner string, pol
 		policy.HideLoginNameSuffix,
 		policy.ErrorMsgPopup,
 		policy.DisableWatermark,
-		policy.EnabledTheme))
+		policy.ThemeMode))
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func (c *Commands) ChangeLabelPolicy(ctx context.Context, resourceOwner string, 
 		policy.HideLoginNameSuffix,
 		policy.ErrorMsgPopup,
 		policy.DisableWatermark,
-		policy.EnabledTheme)
+		policy.ThemeMode)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-8nfSr", "Errors.Org.LabelPolicy.NotChanged")
 	}
