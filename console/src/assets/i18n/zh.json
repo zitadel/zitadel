@@ -51,7 +51,7 @@
       "TITLE": "让你的ZITADEL运转起来",
       "DESCRIPTION": "这份清单有助于设置你的实例，并指导你完成最重要的步骤"
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "设置你的品牌",
         "description": "定义你的登录的颜色和形状，上传你的标志和图标。",
@@ -62,15 +62,20 @@
         "description": "设置你自己的邮件服务器设置",
         "action": "设置 SMTP 设置"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "创建你的第一个项目",
         "description": "添加你的第一个项目并定义其角色和授权。",
         "action": "创建项目"
       },
-      "project.application.added": {
-        "title": "创建你的第一个应用程序",
+      "APPLICATION_CREATED": {
+        "title": "注册你的应用程序",
         "description": "创建一个web、native、api或saml应用程序并设置你的认证流程。",
         "action": "创建应用程序"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "登录你的应用程序",
+        "description": "将你的应用程序与 ZITADEL 集成以进行身份验证，并通过使用管理员用户登录来测试它。",
+        "action": "登录"
       },
       "user.human.added": {
         "title": "添加用户",

@@ -109,7 +109,7 @@ func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChang
 		query.OrderAsc()
 	}
 
-	changes, err := s.query.SearchEvents(ctx, query, s.auditLogRetention)
+	changes, err := s.query.SearchEvents(ctx, query)
 	if err != nil {
 		return nil, err
 	}
