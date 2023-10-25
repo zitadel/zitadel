@@ -27,14 +27,6 @@ const (
 	ActionsAllRunsSeconds
 )
 
-func NewAddQuotaUnitUniqueConstraint(unit Unit) *eventstore.UniqueConstraint {
-	return eventstore.NewAddEventUniqueConstraint(
-		UniqueQuotaNameType,
-		strconv.FormatUint(uint64(unit), 10),
-		"Errors.Quota.AlreadyExists",
-	)
-}
-
 func NewRemoveQuotaNameUniqueConstraint(unit Unit) *eventstore.UniqueConstraint {
 	return eventstore.NewRemoveUniqueConstraint(
 		UniqueQuotaNameType,

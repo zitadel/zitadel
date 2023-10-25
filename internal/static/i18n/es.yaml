@@ -28,6 +28,9 @@ Errors:
       RemoveFailed: El objeto no pudo eliminarse
   Limit:
     ExceedsDefault: El límite excede el límite por defecto
+  Limits:
+    NotFound: Límite no encontrado
+    NoneSpecified: No se especificaron límites
   Language:
     NotParsed: No pude analizar el idioma
   OIDCSettings:
