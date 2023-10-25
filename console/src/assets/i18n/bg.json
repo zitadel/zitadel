@@ -2071,11 +2071,16 @@
         "DESCRIPTION": "SAML приложения"
       },
       "CONFIGSECTION": "SAML конфигурация",
-      "URL": "Url, където се намира файлът с метаданни",
-      "OR": "или",
-      "XML": "Качете XML метаданни",
+      "CHOOSEMETADATASOURCE": "Предоставете вашата SAML конфигурация, като използвате една от следните опции:",
+      "METADATAOPT1": "Опция 1. Посочете URL адреса, където се намира файлът с метаданни",
+      "METADATAOPT2": "Опция 2. Качете файл, съдържащ вашите XML метаданни",
+      "METADATAOPT3": "Опция 3. Създайте минимален файл с метаданни в движение, предоставяйки ENTITYID и ACS URL",
+      "UPLOAD": "Качете XML файл",
       "METADATA": "Метаданни",
-      "METADATAFROMFILE": "Метаданни от файл"
+      "METADATAFROMFILE": "Метаданни от файл",
+      "CREATEMETADATA": "Създайте метаданни",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {
