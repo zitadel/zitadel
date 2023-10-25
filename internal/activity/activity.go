@@ -46,17 +46,25 @@ func (t TriggerMethod) String() string {
 
 func Trigger(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
 	ai := info.ActivityInfoFromContext(ctx)
-	triggerLog(authz.GetInstance(ctx).InstanceID(), orgID, userID, http_utils.ComposedOrigin(ctx), trigger, ai.Method, ai.Path, ai.RequestMethod)
+	data := authz.GetCtxData(ctx)
+	triggerLog(
+		authz.GetInstance(ctx).InstanceID(),
+		orgID,
+		userID,
+		http_utils.ComposedOrigin(ctx),
+		trigger,
+		ai.Method,
+		ai.Path,
+		ai.RequestMethod,
+		data.SystemMemberships != nil,
+	)
 }
 
 func TriggerWithContext(ctx context.Context, trigger TriggerMethod) {
-	data := authz.GetCtxData(ctx)
-	ai := info.ActivityInfoFromContext(ctx)
-	// if GRPC call, path is prefilled with the grpc fullmethod and method is empty
-	triggerLog(authz.GetInstance(ctx).InstanceID(), data.OrgID, data.UserID, http_utils.ComposedOrigin(ctx), trigger, ai.Path, "", ai.RequestMethod)
+	Trigger(ctx, authz.GetCtxData(ctx).OrgID, authz.GetCtxData(ctx).UserID, trigger)
 }
 
-func triggerLog(instanceID, orgID, userID, domain string, trigger TriggerMethod, method, path, requestMethod string) {
+func triggerLog(instanceID, orgID, userID, domain string, trigger TriggerMethod, method, path, requestMethod string, isSystemUser bool) {
 	logging.WithFields(
 		"instance", instanceID,
 		"org", orgID,
@@ -66,5 +74,6 @@ func triggerLog(instanceID, orgID, userID, domain string, trigger TriggerMethod,
 		"method", method,
 		"path", path,
 		"requestMethod", requestMethod,
+		"isSystemUser", isSystemUser,
 	).Info(Activity)
 }
