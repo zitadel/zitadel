@@ -409,10 +409,6 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       .then((data) => {
         if (data.policy) {
           this.previewData = data.policy;
-          if (this.previewData) {
-            console.log('preview', data.policy);
-            // this.themeMode = this.previewData.themeMode as ThemeMode;
-          }
           if (this.previewData?.fontUrl) {
             this.fetchFontMetadataAndPreview(this.previewData.fontUrl);
           } else {
@@ -429,10 +425,6 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       .then((data) => {
         if (data.policy) {
           this.data = data.policy;
-          if (this.data) {
-            console.log('active', data.policy);
-            //this.themeMode = this.data.themeMode as ThemeMode;
-          }
           if (this.data?.fontUrl) {
             this.fetchFontMetadataAndPreview(this.data?.fontUrl);
           } else {
