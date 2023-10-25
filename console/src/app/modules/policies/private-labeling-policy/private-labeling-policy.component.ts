@@ -1,8 +1,8 @@
-import {HttpErrorResponse} from '@angular/common/http';
-import {Component, EventEmitter, Injector, Input, OnDestroy, OnInit, Type} from '@angular/core';
-import {MatLegacyDialog as MatDialog} from '@angular/material/legacy-dialog';
-import {Subject, Subscription} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, EventEmitter, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import {
   GetLabelPolicyResponse as AdminGetLabelPolicyResponse,
   GetPreviewLabelPolicyResponse as AdminGetPreviewLabelPolicyResponse,
@@ -14,12 +14,12 @@ import {
   GetPreviewLabelPolicyResponse as MgmtGetPreviewLabelPolicyResponse,
   UpdateCustomLabelPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import {Org} from 'src/app/proto/generated/zitadel/org_pb';
-import {LabelPolicy, ThemeMode} from 'src/app/proto/generated/zitadel/policy_pb';
-import {AdminService} from 'src/app/services/admin.service';
-import {AssetEndpoint, AssetService, AssetType} from 'src/app/services/asset.service';
-import {ManagementService} from 'src/app/services/mgmt.service';
-import {StorageKey, StorageLocation, StorageService} from 'src/app/services/storage.service';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
+import { LabelPolicy, ThemeMode } from 'src/app/proto/generated/zitadel/policy_pb';
+import { AdminService } from 'src/app/services/admin.service';
+import { AssetEndpoint, AssetService, AssetType } from 'src/app/services/asset.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
+import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 import {
   BACKGROUND,
   DARK_BACKGROUND,
@@ -29,12 +29,12 @@ import {
   ThemeService,
   WARN,
 } from 'src/app/services/theme.service';
-import {ToastService} from 'src/app/services/toast.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 import * as opentype from 'opentype.js';
-import {InfoSectionType} from '../../info-section/info-section.component';
-import {WarnDialogComponent} from '../../warn-dialog/warn-dialog.component';
-import {PolicyComponentServiceType} from '../policy-component-types.enum';
+import { InfoSectionType } from '../../info-section/info-section.component';
+import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
+import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 export enum Theme {
   DARK,
@@ -112,20 +112,20 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       return;
     }
     if (this.previewData?.themeMode === ThemeMode.THEME_MODE_LIGHT) {
-     this.theme = Theme.LIGHT;
+      this.theme = Theme.LIGHT;
     }
     if (this.previewData?.themeMode === ThemeMode.THEME_MODE_DARK) {
-     this.theme = Theme.DARK;
+      this.theme = Theme.DARK;
     }
     this.savePolicy();
   }
 
   public toggleView(view: View): void {
-    let themeMode = this.data?.themeMode
+    let themeMode = this.data?.themeMode;
     if (view === View.PREVIEW) {
-      themeMode = this.previewData?.themeMode
+      themeMode = this.previewData?.themeMode;
     }
-     if (themeMode === ThemeMode.THEME_MODE_LIGHT) {
+    if (themeMode === ThemeMode.THEME_MODE_LIGHT) {
       this.theme = Theme.LIGHT;
     }
     if (themeMode === ThemeMode.THEME_MODE_DARK) {
@@ -410,8 +410,8 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         if (data.policy) {
           this.previewData = data.policy;
           if (this.previewData) {
-            console.log("preview", data.policy)
-           // this.themeMode = this.previewData.themeMode as ThemeMode;
+            console.log('preview', data.policy);
+            // this.themeMode = this.previewData.themeMode as ThemeMode;
           }
           if (this.previewData?.fontUrl) {
             this.fetchFontMetadataAndPreview(this.previewData.fontUrl);
@@ -430,7 +430,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         if (data.policy) {
           this.data = data.policy;
           if (this.data) {
-            console.log("active", data.policy)
+            console.log('active', data.policy);
             //this.themeMode = this.data.themeMode as ThemeMode;
           }
           if (this.data?.fontUrl) {
