@@ -61,8 +61,8 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/superseriousbusiness/exifremove v0.0.0-20210330092427-6acd27eac203
 	github.com/ttacon/libphonenumber v1.2.1
-	github.com/zitadel/logging v0.4.0
-	github.com/zitadel/oidc/v3 v3.0.2
+	github.com/zitadel/logging v0.5.0
+	github.com/zitadel/oidc/v3 v3.1.1
 	github.com/zitadel/passwap v0.4.0
 	github.com/zitadel/saml v0.1.2
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.43.0
@@ -76,6 +76,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v0.40.0
 	go.opentelemetry.io/otel/trace v1.19.0
 	golang.org/x/crypto v0.14.0
+	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 	golang.org/x/net v0.17.0
 	golang.org/x/oauth2 v0.13.0
 	golang.org/x/sync v0.3.0
@@ -110,7 +111,6 @@ require (
 	github.com/smartystreets/assertions v1.0.0 // indirect
 	github.com/zenazn/goji v1.0.1 // indirect
 	github.com/zitadel/schema v1.3.0 // indirect
-	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63 // indirect
 	google.golang.org/genproto v0.0.0-20230822172742-b8732ec3820d // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230822172742-b8732ec3820d // indirect
 )

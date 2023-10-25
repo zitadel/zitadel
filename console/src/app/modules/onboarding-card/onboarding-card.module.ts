@@ -6,7 +6,7 @@ import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/le
 import { TranslateModule } from '@ngx-translate/core';
 
 import { RouterModule } from '@angular/router';
-import { EventPipeModule } from 'src/app/pipes/event-pipe/event-pipe.module';
+import { MilestonePipeModule } from 'src/app/pipes/milestone-pipe/milestone-pipe.module';
 import { OnboardingCardComponent } from './onboarding-card.component';
 
 @NgModule({
@@ -17,7 +17,7 @@ import { OnboardingCardComponent } from './onboarding-card.component';
     TranslateModule,
     RouterModule,
     MatProgressSpinnerModule,
-    EventPipeModule,
+    MilestonePipeModule,
     MatTooltipModule,
   ],
   exports: [OnboardingCardComponent],

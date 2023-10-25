@@ -95,7 +95,7 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 			},
 			res: res{
 				want: nil,
-				err:  caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.ie4Ai.NotFound"),
+				err:  caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.User.NotFound"),
 			},
 		},
 		{

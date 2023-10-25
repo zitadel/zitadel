@@ -9,6 +9,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/muhlemmer/gu"
+
+	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
@@ -57,6 +59,7 @@ func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRe
 	if err != nil {
 		return nil, err
 	}
+
 	return &session.CreateSessionResponse{
 		Details:      object.DomainToDetailsPb(set.ObjectDetails),
 		SessionId:    set.ID,
@@ -310,6 +313,9 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 		if err != nil {
 			return nil, err
 		}
+
+		// trigger activity log for session for user
+		activity.Trigger(ctx, user.ResourceOwner, user.ID, activity.SessionAPI)
 		sessionChecks = append(sessionChecks, command.CheckUser(user.ID))
 	}
 	if password := checks.GetPassword(); password != nil {

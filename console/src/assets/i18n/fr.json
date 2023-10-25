@@ -51,7 +51,7 @@
       "TITLE": "Faites fonctionner votre ZITADEL",
       "DESCRIPTION": "Cette liste de contrôle vous aide à configurer votre instance et vous guide à travers les étapes les plus essentielles."
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Créez votre marque",
         "description": "Définissez la couleur et la forme de votre connexion et téléchargez votre logo et vos icônes.",
@@ -62,15 +62,20 @@
         "description": "Définissez paramètres de serveur de messagerie",
         "action": "Configurez"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Créez projet",
         "description": "Ajoutez projet et définissez ses rôles et autorisations.",
         "action": "Créez projet"
       },
-      "project.application.added": {
-        "title": "Créez votre première application",
-        "description": "Créez une application web, native, api ou saml et configurez votre flux d'authentification.",
-        "action": "Créez application"
+      "APPLICATION_CREATED": {
+        "title": "Enregistrez votre application",
+        "description": "Enregistrez votre application web, native, api ou saml et configurez un flux d'authentification.",
+        "action": "Enregistrez l'application"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Connectez-vous à votre application",
+        "description": "Intégrez votre application avec ZITADEL pour l'authentification et testez-la en vous connectant avec votre utilisateur administrateur.",
+        "action": "Connexion"
       },
       "user.human.added": {
         "title": "Ajouter des utilisateurs",
@@ -273,7 +278,7 @@
     "SYMBOLERROR": "Doit inclure un symbole ou un signe de ponctuation.",
     "NUMBERERROR": "Doit inclure un chiffre.",
     "PWNOTEQUAL": "Les mots de passe fournis ne correspondent pas.",
-    "PHONE": "Le numéro de téléphone doit commencer par 00 ou +."
+    "PHONE": "Le numéro de téléphone doit commencer par +."
   },
   "USER": {
     "SETTINGS": {
@@ -485,7 +490,7 @@
       "TITLE": "Profil",
       "EMAIL": "Courriel",
       "PHONE": "Numéro de téléphone",
-      "PHONE_HINT": "Utilisez 00 ou le symbole + suivi de l'indicatif du pays de l'appelant, ou sélectionnez le pays dans la liste déroulante et saisissez enfin le numéro de téléphone",
+      "PHONE_HINT": "Utilisez le symbole + suivi de l'indicatif du pays de l'appelant, ou sélectionnez le pays dans la liste déroulante et saisissez enfin le numéro de téléphone",
       "USERNAME": "Nom de l'utilisateur",
       "CHANGEUSERNAME": "modifier",
       "CHANGEUSERNAME_TITLE": "Modifier le nom d'utilisateur",
@@ -1091,6 +1096,7 @@
         "TOKEN": "Jeton",
         "SENDERNUMBER": "Numéro d'expéditeur",
         "ADDED": "Twilio a été ajouté avec succès.",
+        "UPDATED": "Twilio a été mis à jour avec succès.",
         "REMOVED": "Twilio a été supprimé avec succès",
         "CHANGETOKEN": "Changer de Token",
         "SETTOKEN": "Définir le jeton",
@@ -2068,6 +2074,23 @@
         "0": "Base",
         "1": "Clé privée JWT"
       }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "Applications SAML"
+      },
+      "CONFIGSECTION": "Configuration SAML",
+      "CHOOSEMETADATASOURCE": "Fournissez votre configuration SAML à l'aide de l'une des options suivantes :",
+      "METADATAOPT1": "Option 1. Spécifiez l'URL où se trouve le fichier de métadonnées",
+      "METADATAOPT2": "Option 2. Téléchargez un fichier contenant vos métadonnées XML",
+      "METADATAOPT3": "Option 3. Créer un fichier de métadonnées minimal à la volée fournissant l'ENTITYID et l'URL ACS",
+      "UPLOAD": "Télécharger le fichier XML",
+      "METADATA": "Métadonnées",
+      "METADATAFROMFILE": "Métadonnées du fichier",
+      "CREATEMETADATA": "Créer des métadonnées",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {

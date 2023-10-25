@@ -365,7 +365,10 @@ export class UserDetailComponent implements OnInit {
   public savePhone(phone: string): void {
     if (this.user.id && phone) {
       // Format phone before save (add +)
-      phone = formatPhone(phone).phone;
+      const formattedPhone = formatPhone(phone);
+      if (formattedPhone) {
+        phone = formattedPhone.phone;
+      }
 
       this.mgmtUserService
         .updateHumanPhone(this.user.id, phone)
