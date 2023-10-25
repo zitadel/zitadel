@@ -85,6 +85,26 @@ func (s *Server) ListSMTPConfigs(ctx context.Context, req *admin_pb.ListSMTPConf
 	}, nil
 }
 
+func (s *Server) ActivateSMTPConfig(ctx context.Context, req *admin_pb.ActivateSMTPConfigRequest) (*admin_pb.ActivateSMTPConfigResponse, error) {
+
+	// Get the ID of current SMTP active provider if any
+	currentActiveProviderID := ""
+	smtp, err := s.query.SMTPConfigByAggregateID(ctx, authz.GetInstance(ctx).InstanceID())
+	if err == nil {
+		currentActiveProviderID = smtp.ID
+	}
+
+	result, err := s.command.ActivateSMTPConfig(ctx, req, currentActiveProviderID)
+	if err != nil {
+		return nil, err
+
+	}
+
+	return &admin_pb.ActivateSMTPConfigResponse{
+		Details: object.DomainToAddDetailsPb(result),
+	}, nil
+}
+
 func (s *Server) DeactivateSMTPConfig(ctx context.Context, req *admin_pb.DeactivateSMTPConfigRequest) (*admin_pb.DeactivateSMTPConfigResponse, error) {
 	result, err := s.command.DeactivateSMTPConfig(ctx, req)
 	if err != nil {

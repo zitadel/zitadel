@@ -117,6 +117,32 @@ export class SMTPTableComponent implements OnInit {
   //     });
   // }
 
+  public activateSMTPConfig(id: string): void {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.CONTINUE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'SMTP.LIST.DIALOG.ACTIVATE_WARN_TITLE',
+        descriptionKey: 'SMTP.LIST.DIALOG.ACTIVATE_WARN_DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.adminService
+          .activateSMTPConfig(id)
+          .then(() => {
+            this.toast.showInfo('SMTP.LIST.DIALOG.ACTIVATED', true);
+            this.refreshPage();
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
+    });
+  }
+
   public deactivateSMTPConfig(id: string): void {
     const dialogRef = this.dialog.open(WarnDialogComponent, {
       data: {

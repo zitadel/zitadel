@@ -6,6 +6,8 @@ import {
   ActivateLabelPolicyResponse,
   ActivateSMSProviderRequest,
   ActivateSMSProviderResponse,
+  ActivateSMTPConfigRequest,
+  ActivateSMTPConfigResponse,
   AddAppleProviderRequest,
   AddAppleProviderResponse,
   AddAzureADProviderRequest,
@@ -868,6 +870,12 @@ export class AdminService {
 
   public updateSMTPConfigPassword(req: UpdateSMTPConfigPasswordRequest): Promise<UpdateSMTPConfigPasswordResponse.AsObject> {
     return this.grpcService.admin.updateSMTPConfigPassword(req, null).then((resp) => resp.toObject());
+  }
+
+  public activateSMTPConfig(id: string): Promise<ActivateSMTPConfigResponse.AsObject> {
+    const req = new ActivateSMTPConfigRequest();
+    req.setId(id);
+    return this.grpcService.admin.activateSMTPConfig(req, null).then((resp) => resp.toObject());
   }
 
   public deactivateSMTPConfig(id: string): Promise<DeactivateSMTPConfigResponse.AsObject> {

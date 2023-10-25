@@ -34,13 +34,17 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'SMTP.LIST.TYPE' | translate }}</th>
         <td class="pointer" mat-cell *matCellDef="let config">
           <div [ngSwitch]="config.providerType">
-            <div class="smtp-table-provider-type" *ngSwitchCase="SMTPProviderType.SMTP_PROVIDER_TYPE_SENDGRID">
-              <img class="smtp-logo" src="./assets/images/smtp/sendgrid.png" alt="sendgrid" />
-              Sendgrid
+            <div class="smtp-table-provider-type" *ngSwitchCase="SMTPProviderType.SMTP_PROVIDER_TYPE_MAILGUN">
+              <img class="smtp-logo" src="./assets/images/smtp/mailgun.svg" alt="postmark" />
+              Mailgun
             </div>
             <div class="smtp-table-provider-type" *ngSwitchCase="SMTPProviderType.SMTP_PROVIDER_TYPE_POSTMARK">
               <img class="smtp-logo" src="./assets/images/smtp/postmark.png" alt="postmark" />
               Postmark
+            </div>
+            <div class="smtp-table-provider-type" *ngSwitchCase="SMTPProviderType.SMTP_PROVIDER_TYPE_SENDGRID">
+              <img class="smtp-logo" src="./assets/images/smtp/sendgrid.png" alt="sendgrid" />
+              Sendgrid
             </div>
           </div>
         </td>
@@ -81,13 +85,13 @@
         <th class="smtp-table-actions" mat-header-cell *matHeaderCellDef></th>
         <td class="smtp-table-actions" mat-cell *matCellDef="let config">
           <cnsl-table-actions>
-            <!-- (click)="addIdp(idp); $event.stopPropagation()" -->
             <button
               actions
               *ngIf="!isActive(config.state)"
               [disabled]="(['iam.write'] | hasRole | async) === false"
               mat-icon-button
               matTooltip="{{ 'SMTP.LIST.ACTIVATE' | translate }}"
+              (click)="activateSMTPConfig(config.id); $event.stopPropagation()"
             >
               <i class="las la-check-circle"></i>
             </button>
@@ -103,7 +107,6 @@
               <i class="las la-times-circle"></i>
             </button>
 
-            <!-- (click)="deleteIdp(idp); $event.stopPropagation()" -->
             <button
               actions
               [disabled]="(['iam.write'] | hasRole | async) === false"

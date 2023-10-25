@@ -86,6 +86,10 @@ func (p *smtpConfigProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceSMTPConfigPasswordChanged,
 				},
 				{
+					Event:  instance.SMTPConfigActivatedEventType,
+					Reduce: p.reduceSMTPConfigActivated,
+				},
+				{
 					Event:  instance.SMTPConfigDeactivatedEventType,
 					Reduce: p.reduceSMTPConfigDeactivated,
 				},
@@ -190,10 +194,31 @@ func (p *smtpConfigProjection) reduceSMTPConfigPasswordChanged(event eventstore.
 	), nil
 }
 
+func (p *smtpConfigProjection) reduceSMTPConfigActivated(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*instance.SMTPConfigActivatedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fq92r", "reduce.wrong.event.type %s", instance.SMTPConfigActivatedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SMTPConfigColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SMTPConfigColumnSequence, e.Sequence()),
+			handler.NewCol(SMTPConfigColumnState, domain.SMTPConfigStateActive),
+		},
+		[]handler.Condition{
+			handler.NewCond(SMTPConfigColumnID, e.ID),
+			handler.NewCond(SMTPConfigColumnAggregateID, e.Aggregate().ID),
+			handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
 func (p *smtpConfigProjection) reduceSMTPConfigDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SMTPConfigDeactivatedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fk02f", "reduce.wrong.event.type %s", instance.SMTPConfigChangedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-hv89j", "reduce.wrong.event.type %s", instance.SMTPConfigDeactivatedEventType)
 	}
 
 	return crdb.NewUpdateStatement(

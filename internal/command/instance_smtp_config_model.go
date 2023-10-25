@@ -106,8 +106,6 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 			wm.Password = nil
 			wm.ProviderType = 0
 			wm.State = domain.SMTPConfigStateRemoved
-		case *instance.SMTPConfigDeactivatedEvent:
-			wm.State = domain.SMTPConfigStateInactive
 		case *instance.DomainAddedEvent:
 			wm.domainState = domain.InstanceDomainStateActive
 		case *instance.DomainRemovedEvent:
@@ -133,6 +131,7 @@ func (wm *InstanceSMTPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.SMTPConfigAddedEventType,
 			instance.SMTPConfigChangedEventType,
 			instance.SMTPConfigPasswordChangedEventType,
+			instance.SMTPConfigActivatedEventType,
 			instance.SMTPConfigDeactivatedEventType,
 			instance.SMTPConfigRemovedEventType,
 			instance.InstanceDomainAddedEventType,

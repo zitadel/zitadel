@@ -1912,6 +1912,9 @@
       "DEACTIVATE": "Deactivate provider",
       "TYPE": "Type",
       "DIALOG": {
+        "ACTIVATED": "SMTP config has been activated",
+        "ACTIVATE_WARN_TITLE": "Activate SMTP config",
+        "ACTIVATE_WARN_DESCRIPTION": "You are about to activate an SMTP configuration. First we'll deactivate the current active provider and then activate this configuration. Are you sure?",
         "DEACTIVATE_WARN_TITLE": "Deactivate SMTP config",
         "DEACTIVATE_WARN_DESCRIPTION": "You are about to deactivate an SMTP configuration. Are you sure?",
         "DEACTIVATED": "SMTP config has been deactivated",

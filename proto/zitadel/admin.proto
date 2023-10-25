@@ -416,6 +416,23 @@ service AdminService {
         };
     }
 
+    rpc ActivateSMTPConfig(ActivateSMTPConfigRequest) returns (ActivateSMTPConfigResponse) {
+        option (google.api.http) = {
+            post: "/smtp/{id}/_activate";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMTP Provider";
+            summary: "Activate SMTP Provider";
+            description: "Activate an SMTP provider."
+        };
+    }
+
     rpc DeactivateSMTPConfig(DeactivateSMTPConfigRequest) returns (DeactivateSMTPConfigResponse) {
         option (google.api.http) = {
             post: "/smtp/{id}/_deactivate";
@@ -4080,6 +4097,14 @@ message UpdateSMTPConfigPasswordRequest {
 }
 
 message UpdateSMTPConfigPasswordResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ActivateSMTPConfigRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ActivateSMTPConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
