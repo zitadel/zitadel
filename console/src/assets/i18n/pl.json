@@ -51,7 +51,7 @@
       "TITLE": "Uruchom swój ZITADEL",
       "DESCRIPTION": "Ta lista kontrolna pomoże Ci skonfigurować instancję i poprowadzi Cię przez najważniejsze kroki."
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Skonfiguruj swoją markę",
         "description": "Zdefiniuj kolorystykę i kształt swojego loginu oraz wgraj swoje logo i ikony.",
@@ -62,15 +62,20 @@
         "description": "Ustawienie własnego serwera pocztowego",
         "action": "skonfiguruj ustawienia SMTP"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Stwórz swój pierwszy projekt",
         "description": "Dodaj swój pierwszy projekt i określ jego role i uprawnienia.",
         "action": "Utwórz projekt"
       },
-      "project.application.added": {
-        "title": "Utwórz swoją pierwszą aplikację",
-        "description": "Utwórz aplikację internetową, natywną, api lub saml i skonfiguruj swój przepływ uwierzytelniania.",
-        "action": "Utwórz aplikację"
+      "APPLICATION_CREATED": {
+        "title": "Zarejestruj swoją aplikację",
+        "description": "Zarejestruj swoją aplikację webową, natywną, API lub SAML i skonfiguruj przepływ uwierzytelniania.",
+        "action": "Zarejestruj aplikację"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Zaloguj się do swojej aplikacji",
+        "description": "Zintegruj swoją aplikację z ZITADEL w celu uwierzytelniania i przetestuj ją, logując się za pomocą swojego użytkownika administratora.",
+        "action": "Zaloguj się"
       },
       "user.human.added": {
         "title": "Dodaj użytkowników",
@@ -273,7 +278,7 @@
     "SYMBOLERROR": "Musi zawierać symbol lub znak interpunkcyjny.",
     "NUMBERERROR": "Musi zawierać cyfrę.",
     "PWNOTEQUAL": "Podane hasła nie są identyczne.",
-    "PHONE": "Numer telefonu musi zaczynać się od 00 lub +."
+    "PHONE": "Numer telefonu musi zaczynać się od +."
   },
   "USER": {
     "SETTINGS": {
@@ -485,7 +490,7 @@
       "TITLE": "Profil",
       "EMAIL": "E-mail",
       "PHONE": "Numer telefonu",
-      "PHONE_HINT": "Użyj 00 lub symbolu +, a następnie kodu kraju, z którego dzwonisz, lub wybierz kraj z listy rozwijanej i wprowadź numer telefonu.",
+      "PHONE_HINT": "Użyj symbolu +, a następnie kodu kraju, z którego dzwonisz, lub wybierz kraj z listy rozwijanej i wprowadź numer telefonu.",
       "USERNAME": "Nazwa użytkownika",
       "CHANGEUSERNAME": "modyfikuj",
       "CHANGEUSERNAME_TITLE": "Zmień nazwę użytkownika",
@@ -1091,6 +1096,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Numer nadawcy",
         "ADDED": "Twilio dodano pomyślnie.",
+        "UPDATED": "Twilio zostało pomyślnie zaktualizowane.",
         "REMOVED": "Twilio usunięte",
         "CHANGETOKEN": "Zmień Token",
         "SETTOKEN": "Ustaw Token",

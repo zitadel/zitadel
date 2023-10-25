@@ -262,7 +262,7 @@ func (s *SessionCommands) gethumanWriteModel(ctx context.Context) (*HumanWriteMo
 		return nil, err
 	}
 	if humanWriteModel.UserState != domain.UserStateActive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.ie4Ai.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.User.NotFound")
 	}
 	return humanWriteModel, nil
 }

@@ -15,6 +15,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/actions/object"
+	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"
@@ -148,6 +149,9 @@ func (p *Storage) SetUserinfoWithUserID(ctx context.Context, applicationID strin
 	}
 
 	setUserinfo(user, userinfo, attributes, customAttributes)
+
+	// trigger activity log for authentication for user
+	activity.Trigger(ctx, user.ResourceOwner, user.ID, activity.SAMLResponse)
 	return nil
 }
 

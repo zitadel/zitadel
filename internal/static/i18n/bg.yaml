@@ -28,6 +28,9 @@ Errors:
       RemoveFailed: Обектът не можа да бъде премахнат
   Limit:
     ExceedsDefault: Лимитът надвишава лимита по подразбиране
+  Limits:
+    NotFound: Лимитът не е намерен
+    NoneSpecified: Не са посочени лимити
   Language:
     NotParsed: Езикът не можа да бъде анализиран синтактично
   OIDCSettings:

@@ -14,6 +14,7 @@ import "zitadel/event.proto";
 import "zitadel/management.proto";
 import "zitadel/v1.proto";
 import "zitadel/message.proto";
+import "zitadel/milestone/v1/milestone.proto";
 
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
@@ -290,6 +291,10 @@ service AdminService {
     rpc ListInstanceDomains(ListInstanceDomainsRequest) returns (ListInstanceDomainsResponse) {
         option (google.api.http) = {
             post: "/domains/_search";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -3771,6 +3776,23 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.feature.write";
+        };
+    }
+
+    rpc ListMilestones(ListMilestonesRequest) returns (ListMilestonesResponse) {
+        option (google.api.http) = {
+            post: "/milestones/_search";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "milestones.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Milestones";
+            summary: "Search Milestones";
+            description: "Returns a list of reached instance usage milestones."
         };
     }
 }
@@ -7897,4 +7919,18 @@ message ActivateFeatureLoginDefaultOrgRequest {}
 
 message ActivateFeatureLoginDefaultOrgResponse {
     zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListMilestonesRequest {
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 1;
+    // the field the result is sorted
+    zitadel.milestone.v1.MilestoneFieldName sorting_column = 2;
+    //criteria the client is looking for
+    repeated zitadel.milestone.v1.MilestoneQuery queries = 3;
+}
+
+message ListMilestonesResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.milestone.v1.Milestone result = 2;
 }

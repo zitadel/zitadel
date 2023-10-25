@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+package zitadel.milestone.v1;
+
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/milestone";
+
+enum MilestoneType {
+  MILESTONE_TYPE_UNSPECIFIED = 0;
+  MILESTONE_TYPE_INSTANCE_CREATED = 1;
+  MILESTONE_TYPE_AUTHENTICATION_SUCCEEDED_ON_INSTANCE = 2;
+  MILESTONE_TYPE_PROJECT_CREATED = 3;
+  MILESTONE_TYPE_APPLICATION_CREATED = 4;
+  MILESTONE_TYPE_AUTHENTICATION_SUCCEEDED_ON_APPLICATION = 5;
+  MILESTONE_TYPE_INSTANCE_DELETED = 6;
+}
+
+enum MilestoneFieldName {
+  MILESTONE_FIELD_NAME_UNSPECIFIED = 0;
+  MILESTONE_FIELD_NAME_TYPE = 1;
+  MILESTONE_FIELD_NAME_REACHED_DATE = 2;
+}
+
+message Milestone {
+  // For the milestones, the standard details are not projected yet
+  reserved 1;
+  reserved "details";
+  MilestoneType type = 2;
+  google.protobuf.Timestamp reached_date = 3;
+}
+
+message MilestoneQuery {
+  oneof query {
+    IsReachedQuery is_reached_query = 1;
+  }
+}
+
+message IsReachedQuery {
+  bool reached = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "only reached milestones";
+    }
+  ];
+}

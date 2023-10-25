@@ -51,7 +51,7 @@
       "TITLE": "Fate funzionare il vostro ZITADEL",
       "DESCRIPTION": "Questa lista di azioni aiuta a configurare la vostra istanza e vi guida attraverso i passaggi più essenziali."
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Imposta il tuo marchio",
         "description": "Definisci la colorazione e il design del vostro login e caricate il vostro logo e le vostre icone.",
@@ -62,15 +62,20 @@
         "description": "Imposta il proprio server di posta",
         "action": "Configura SMTP"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Crea il tuo primo progetto",
         "description": "Aggiungere il primo progetto e definire i ruoli e le autorizzazioni.",
         "action": "Crea progetto"
       },
-      "project.application.added": {
-        "title": "Crea la tua prima applicazione",
-        "description": "Crea un'applicazione web, nativa, api o saml e imposta il flusso di autenticazione.",
-        "action": "Crea applicazione"
+      "APPLICATION_CREATED": {
+        "title": "Registra la tua app",
+        "description": "Registra la tua applicazione web, nativa, api o saml e configura un flusso di autenticazione.",
+        "action": "Registra app"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Accedi alla tua app",
+        "description": "Integra la tua applicazione con ZITADEL per l'autenticazione e testala accedendo con il tuo utente amministratore.",
+        "action": "Accedi"
       },
       "user.human.added": {
         "title": "Aggiungi utenti",
@@ -272,7 +277,7 @@
     "SYMBOLERROR": "Deve includere un simbolo o un segno di punteggiatura.",
     "NUMBERERROR": "Deve includere una cifra.",
     "PWNOTEQUAL": "Le password fornite non corrispondono.",
-    "PHONE": "Il numero di telefono deve iniziare con 00 o +."
+    "PHONE": "Il numero di telefono deve iniziare con +."
   },
   "USER": {
     "SETTINGS": {
@@ -484,7 +489,7 @@
       "TITLE": "Profilo",
       "EMAIL": "E-mail",
       "PHONE": "Numero di telefono",
-      "PHONE_HINT": "Utilizza 00 o il simbolo + seguito dal prefisso del paese, o seleziona il paese ed inserisci il numero di telefono",
+      "PHONE_HINT": "Utilizza il simbolo + seguito dal prefisso del paese, o seleziona il paese ed inserisci il numero di telefono",
       "USERNAME": "Nome utente",
       "CHANGEUSERNAME": "cambia",
       "CHANGEUSERNAME_TITLE": "Cambia nome utente",
@@ -1091,6 +1096,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio aggiunto con successo.",
+        "UPDATED": "Twilio aggiornato correttamente.",
         "REMOVED": "Twilio rimosso con successo.",
         "CHANGETOKEN": "Cambia Token",
         "SETTOKEN": "Cambia Token",
