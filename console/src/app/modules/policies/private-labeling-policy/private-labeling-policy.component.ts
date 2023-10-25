@@ -15,7 +15,7 @@ import {
   UpdateCustomLabelPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import {Org} from 'src/app/proto/generated/zitadel/org_pb';
-import {LabelPolicy, Theme as ThemeMode} from 'src/app/proto/generated/zitadel/policy_pb';
+import {LabelPolicy, ThemeMode} from 'src/app/proto/generated/zitadel/policy_pb';
 import {AdminService} from 'src/app/services/admin.service';
 import {AssetEndpoint, AssetService, AssetType} from 'src/app/services/asset.service';
 import {ManagementService} from 'src/app/services/mgmt.service';
@@ -111,24 +111,24 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
     if (this.view === View.CURRENT) {
       return;
     }
-    if (this.previewData?.enabledThemes === ThemeMode.THEME_LIGHT) {
+    if (this.previewData?.themeMode === ThemeMode.THEME_MODE_LIGHT) {
      this.theme = Theme.LIGHT;
     }
-    if (this.previewData?.enabledThemes === ThemeMode.THEME_DARK) {
+    if (this.previewData?.themeMode === ThemeMode.THEME_MODE_DARK) {
      this.theme = Theme.DARK;
     }
     this.savePolicy();
   }
 
   public toggleView(view: View): void {
-    let enabledThemes = this.data?.enabledThemes
+    let themeMode = this.data?.themeMode
     if (view === View.PREVIEW) {
-      enabledThemes = this.previewData?.enabledThemes
+      themeMode = this.previewData?.themeMode
     }
-     if (enabledThemes === ThemeMode.THEME_LIGHT) {
+     if (themeMode === ThemeMode.THEME_MODE_LIGHT) {
       this.theme = Theme.LIGHT;
     }
-    if (enabledThemes === ThemeMode.THEME_DARK) {
+    if (themeMode === ThemeMode.THEME_MODE_DARK) {
       this.theme = Theme.DARK;
     }
   }
@@ -411,7 +411,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
           this.previewData = data.policy;
           if (this.previewData) {
             console.log("preview", data.policy)
-           // this.themeMode = this.previewData.enabledThemes as ThemeMode;
+           // this.themeMode = this.previewData.themeMode as ThemeMode;
           }
           if (this.previewData?.fontUrl) {
             this.fetchFontMetadataAndPreview(this.previewData.fontUrl);
@@ -431,7 +431,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
           this.data = data.policy;
           if (this.data) {
             console.log("active", data.policy)
-            //this.themeMode = this.data.enabledThemes as ThemeMode;
+            //this.themeMode = this.data.themeMode as ThemeMode;
           }
           if (this.data?.fontUrl) {
             this.fetchFontMetadataAndPreview(this.data?.fontUrl);
@@ -650,7 +650,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       req.setDisableWatermark(this.previewData.disableWatermark);
       req.setHideLoginNameSuffix(this.previewData.hideLoginNameSuffix);
 
-      req.setEnabledTheme(this.previewData.enabledThemes);
+      req.setThemeMode(this.previewData.themeMode);
     }
   }
 
