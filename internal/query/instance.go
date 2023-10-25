@@ -150,6 +150,15 @@ func NewInstanceIDsListSearchQuery(ids ...string) (SearchQuery, error) {
 	return NewListQuery(InstanceColumnID, list, ListIn)
 }
 
+func NewInstanceDomainsListSearchQuery(domains ...string) (SearchQuery, error) {
+	list := make([]interface{}, len(domains))
+	for i, value := range domains {
+		list[i] = value
+	}
+
+	return NewListQuery(InstanceDomainDomainCol, list, ListIn)
+}
+
 func (q *InstanceSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
@@ -280,7 +289,8 @@ func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 	return sq.Select(
 			InstanceColumnID.identifier(),
 			countColumn.identifier(),
-		).From(instanceTable.identifier()),
+		).From(instanceTable.identifier()).
+			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)),
 		func(builder sq.SelectBuilder) sq.SelectBuilder {
 			return sq.Select(
 				instanceFilterCountColumn,
