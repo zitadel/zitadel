@@ -16,13 +16,11 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/messages"
 )
 
-func InitFSChannel[T channels.Message](config Config) (channels.NotificationChannel[T], error) {
+func Connect[T channels.Message](config Config) (channels.NotificationChannel[T], error) {
 	if err := os.MkdirAll(config.Path, os.ModePerm); err != nil {
 		return nil, err
 	}
-
-	logging.Debug("successfully initialized filesystem email and sms channel")
-
+	logging.Debug("successfully connected filesystem notification channel")
 	return channels.HandleMessageFunc[T](func(message T) error {
 		fileName := fmt.Sprintf("%d_", time.Now().Unix())
 		content, err := message.GetContent()
@@ -45,7 +43,6 @@ func InitFSChannel[T channels.Message](config Config) (channels.NotificationChan
 		default:
 			return errors.ThrowUnimplementedf(nil, "NOTIF-6f9a1", "filesystem provider doesn't support message type %T", message)
 		}
-
 		return os.WriteFile(filepath.Join(config.Path, fileName), []byte(content), 0666)
 	}), nil
 }

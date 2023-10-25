@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/messages"
 )
 
-func InitChannel(ctx context.Context, cfg Config) (channels.NotificationChannel[*messages.JSON], error) {
+func Connect(ctx context.Context, cfg Config) (channels.NotificationChannel[*messages.JSON], error) {
 	if err := cfg.Validate(); err != nil {
 		return nil, err
 	}

@@ -30,7 +30,7 @@ type HttpRelayClient struct {
 	Protocol string
 }
 
-func InitChannel(cfg *Config) (*Email, error) {
+func Connect(cfg *Config) (*Email, error) {
 	client, err := cfg.SMTP.connectToSMTP(cfg.Tls)
 	if err != nil {
 		logging.New().WithError(err).Error("could not connect to smtp")

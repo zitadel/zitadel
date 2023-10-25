@@ -24,6 +24,7 @@ type Queries interface {
 	NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType) (*query.DebugNotificationProvider, error)
 	SMSProviderConfig(ctx context.Context, queries ...query.SearchQuery) (*query.SMSConfig, error)
 	SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (*query.SMTPConfig, error)
+	EmailWebhookConfigByAggregateID(ctx context.Context, aggregateID string) (*query.EmailWebhookConfig, error)
 	GetDefaultLanguage(ctx context.Context) language.Tag
 }
 

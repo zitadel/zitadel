@@ -23,9 +23,10 @@ type counters struct {
 }
 
 type deliveryMetrics struct {
-	email string
-	sms   string
-	json  string
+	smtp         string
+	emailWebhook string
+	sms          string
+	json         string
 }
 
 type allChannels struct {
@@ -38,23 +39,27 @@ func newChannels(q *handlers.NotificationQueries) *allChannels {
 		q: q,
 		counters: counters{
 			success: deliveryMetrics{
-				email: "successful_deliveries_email",
-				sms:   "successful_deliveries_sms",
-				json:  "successful_deliveries_json",
+				smtp:         "successful_deliveries_email",
+				emailWebhook: "successful_deliveries_email_webhook",
+				sms:          "successful_deliveries_sms",
+				json:         "successful_deliveries_json",
 			},
 			failed: deliveryMetrics{
-				email: "failed_deliveries_email",
-				sms:   "failed_deliveries_sms",
-				json:  "failed_deliveries_json",
+				smtp:         "failed_deliveries_email",
+				emailWebhook: "failed_deliveries_email_webhook",
+				sms:          "failed_deliveries_sms",
+				json:         "failed_deliveries_json",
 			},
 		},
 	}
-	registerCounter(c.counters.success.email, "Successfully delivered emails")
-	registerCounter(c.counters.failed.email, "Failed email deliveries")
+	registerCounter(c.counters.success.smtp, "Successfully delivered emails over SMTP")
+	registerCounter(c.counters.failed.smtp, "Failed email deliveries over SMTP")
+	registerCounter(c.counters.success.emailWebhook, "Successfully delivered emails over webhook")
+	registerCounter(c.counters.failed.emailWebhook, "Failed email deliveries over webhook")
 	registerCounter(c.counters.success.sms, "Successfully delivered SMS")
 	registerCounter(c.counters.failed.sms, "Failed SMS deliveries")
-	registerCounter(c.counters.success.json, "Successfully delivered JSON messages")
-	registerCounter(c.counters.failed.json, "Failed JSON message deliveries")
+	registerCounter(c.counters.success.json, "Successfully delivered JSON messages over webhook")
+	registerCounter(c.counters.failed.json, "Failed JSON message deliveries over webhook")
 	return c
 }
 
@@ -70,11 +75,13 @@ func (c *allChannels) Email(ctx context.Context) (*senders.Chain[*messages.Email
 	}
 	chain, err := senders.EmailChannels(
 		ctx,
+		c.q,
 		smtpCfg,
-		c.q.GetFileSystemProvider,
-		c.q.GetLogProvider,
-		c.counters.success.email,
-		c.counters.failed.email,
+		webhookCfg,
+		c.counters.success.smtp,
+		c.counters.failed.smtp,
+		c.counters.success.emailWebhook,
+		c.counters.failed.emailWebhook,
 	)
 	return chain, smtpCfg, err
 }
@@ -84,24 +91,10 @@ func (c *allChannels) SMS(ctx context.Context) (*senders.Chain[*messages.SMS], *
 	if err != nil {
 		return nil, nil, err
 	}
-	chain, err := senders.SMSChannels(
-		ctx,
-		twilioCfg,
-		c.q.GetFileSystemProvider,
-		c.q.GetLogProvider,
-		c.counters.success.sms,
-		c.counters.failed.sms,
-	)
+	chain, err := senders.SMSChannels(ctx, c.q, twilioCfg, c.counters.success.sms, c.counters.failed.sms)
 	return chain, twilioCfg, err
 }
 
 func (c *allChannels) Webhook(ctx context.Context, cfg webhook.Config) (*senders.Chain[*messages.JSON], error) {
-	return senders.WebhookChannels(
-		ctx,
-		cfg,
-		c.q.GetFileSystemProvider,
-		c.q.GetLogProvider,
-		c.counters.success.json,
-		c.counters.failed.json,
-	)
+	return senders.WebhookChannels(ctx, c.q, cfg, c.counters.success.json, c.counters.failed.json)
 }

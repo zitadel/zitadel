@@ -19,16 +19,17 @@ var (
 var _ channels.Message = (*Email)(nil)
 
 type Email struct {
-	Recipients      []string
-	BCC             []string
-	CC              []string
-	SenderEmail     string
-	SenderName      string
-	ReplyToAddress  string
-	Subject         string
-	Content         string
-	TemplateData    templates.TemplateData
-	TriggeringEvent eventstore.Event
+	Recipients      []string               `json:"recipients,omitempty"`
+	BCC             []string               `json:"bcc,omitempty"`
+	CC              []string               `json:"cc,omitempty"`
+	SenderEmail     string                 `json:"senderEmail,omitempty"`
+	SenderName      string                 `json:"senderName,omitempty"`
+	ReplyToAddress  string                 `json:"replyToAddress,omitempty"`
+	Subject         string                 `json:"subject,omitempty"`
+	Content         string                 `json:"content,omitempty"`
+	SMTPMessage     string                 `json:"smtpMessage,omitempty"`
+	TemplateData    templates.TemplateData `json:"templateData,omitempty"`
+	TriggeringEvent eventstore.Event       `json:"-"`
 }
 
 func (msg *Email) GetContent() (string, error) {
@@ -64,6 +65,20 @@ func (msg *Email) GetContent() (string, error) {
 
 func (msg *Email) GetTriggeringEvent() eventstore.Event {
 	return msg.TriggeringEvent
+}
+
+func (msg *Email) ToJSON(includeContent, includeSMTPMessage bool) (json *JSON, err error) {
+	webhookEmail := *msg
+	if !includeContent {
+		webhookEmail.Content = ""
+	}
+	if includeSMTPMessage {
+		webhookEmail.SMTPMessage, err = webhookEmail.GetContent()
+	}
+	return &JSON{
+		Serializable:    webhookEmail,
+		TriggeringEvent: msg.TriggeringEvent,
+	}, err
 }
 
 func isHTML(input string) bool {

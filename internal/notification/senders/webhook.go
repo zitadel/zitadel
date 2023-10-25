@@ -2,15 +2,14 @@ package senders
 
 import (
 	"context"
+	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/notification/channels"
-	"github.com/zitadel/zitadel/internal/notification/channels/fs"
 	"github.com/zitadel/zitadel/internal/notification/channels/instrumenting"
-	"github.com/zitadel/zitadel/internal/notification/channels/log"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 )
 
@@ -18,9 +17,8 @@ const webhookSpanName = "webhook.NotificationChannel"
 
 func WebhookChannels(
 	ctx context.Context,
+	queries *handlers.NotificationQueries,
 	webhookConfig webhook.Config,
-	getFileSystemProvider func(ctx context.Context) (*fs.Config, error),
-	getLogProvider func(ctx context.Context) (*log.Config, error),
 	successMetricName,
 	failureMetricName string,
 ) (*Chain[*messages.JSON], error) {
@@ -28,11 +26,11 @@ func WebhookChannels(
 		return nil, err
 	}
 	channels := make([]channels.NotificationChannel[*messages.JSON], 0, 3)
-	webhookChannel, err := webhook.InitChannel(ctx, webhookConfig)
+	webhookChannel, err := webhook.Connect(ctx, webhookConfig)
 	logging.WithFields(
 		"instance", authz.GetInstance(ctx).InstanceID(),
 		"callurl", webhookConfig.CallURL,
-	).OnError(err).Debug("initializing JSON channel failed")
+	).OnError(err).Debug("connecting to JSON channel failed")
 	if err == nil {
 		channels = append(
 			channels,
@@ -45,6 +43,6 @@ func WebhookChannels(
 			),
 		)
 	}
-	channels = append(channels, debugChannels[*messages.JSON](ctx, getFileSystemProvider, getLogProvider)...)
+	channels = append(channels, connectToDebugChannels[*messages.JSON](ctx, queries)...)
 	return ChainChannels(channels...), nil
 }
