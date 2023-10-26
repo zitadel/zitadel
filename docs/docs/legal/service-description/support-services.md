@@ -23,20 +23,20 @@ You may purchase additional premium support plans which replace the default supp
 Support features for ZITADEL Cloud subscriptions are as follows:
 
 Subscription Plans | Free | Production | Enterprise Cloud
---- | --- | --- | --- | ---
-[Support hours](#support-hours) | Business hours | Business hours | up to 24x7
-[Response Time](#slo---initial-response-time) (Severity 1) | Best effort | 48 business hours | as low as 30min
+--- | --- | --- | ---
+[Support hours](#support-hours) | Business hours | Business hours | bespoke (up to 24x7)
+[Response Time](#slo---initial-response-time) (Severity 1) | Best effort | 48 business hours | bespoke (as low as 30min)
 [Community support](#community-support) | yes | yes | yes
 [Professional support](#professional-support) | no | yes | yes
 [Enterprise supported features](/docs/support/software-release-cycles-support.md#enterprise-supported) |  no | no | yes
-[Technical Account Management](#technical-account-manager) | no | no | optional
+[Technical Account Management](#technical-account-manager) | no | no | bespoke
 
 If you want to add a [Technical Account Manager](#technical-account-manager) or need assistance during onboarding, please [get in touch](https://zitadel.com/contact).
 
 #### Premium support
 
-Premium support can be booked for ZITADEL Cloud.
-Support features are as follows:
+Premium support can be added to ZITADEL Cloud subscription plans.
+The default support features will be replaced as follows:
 
 Premium support | Default
 --- | ---
