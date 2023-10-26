@@ -1,8 +1,6 @@
-@use '@angular/material' as mat;
-
 @mixin avatar-theme($theme) {
   $primary: map-get($theme, primary);
-  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-color: map-get($primary, 500);
 
   .avatar-circle {
     border-radius: 50%;
@@ -17,7 +15,11 @@
     outline: none;
     color: white;
     font-weight: bold;
-    font-family: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family:
+      'Lato',
+      -apple-system,
+      BlinkMacSystemFont,
+      sans-serif;
     // box-shadow: 0 0 3px #0000001a;
 
     img {

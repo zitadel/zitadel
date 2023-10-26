@@ -1,5 +1,6 @@
 import { OnboardingActions } from '../services/admin.service';
 import { COLORS } from './color';
+import { MilestoneType } from '../proto/generated/zitadel/milestone/v1/milestone_pb';
 
 const reddark: string = COLORS[0][700];
 const redlight = COLORS[0][200];
@@ -19,61 +20,66 @@ const purplelight = COLORS[12][200];
 const pinkdark: string = COLORS[15][700];
 const pinklight = COLORS[15][200];
 
-export const ONBOARDING_EVENTS: OnboardingActions[] = [
+const sthdark: string = COLORS[18][700];
+const sthlight = COLORS[18][200];
+
+export const ONBOARDING_MILESTONES: OnboardingActions[] = [
   {
     order: 0,
-    eventType: 'project.added',
-    oneof: ['project.added'],
-    link: ['/projects/create'],
+    milestoneType: MilestoneType.MILESTONE_TYPE_PROJECT_CREATED,
+    link: '/projects/create',
     iconClasses: 'las la-database',
     darkcolor: greendark,
     lightcolor: greenlight,
   },
   {
     order: 1,
-    eventType: 'project.application.added',
-    oneof: ['project.application.added'],
-    link: ['/projects/app-create'],
+    milestoneType: MilestoneType.MILESTONE_TYPE_APPLICATION_CREATED,
+    link: '/projects/app-create',
     iconClasses: 'lab la-openid',
     darkcolor: purpledark,
     lightcolor: purplelight,
   },
   {
-    order: 2,
-    eventType: 'user.human.added',
-    oneof: ['user.human.added'],
-    link: ['/users/create'],
+    order: 3,
+    milestoneType: MilestoneType.MILESTONE_TYPE_AUTHENTICATION_SUCCEEDED_ON_APPLICATION,
+    link: 'https://zitadel.com/docs/guides/integrate/login-users',
+    iconClasses: 'las la-sign-in-alt',
+    darkcolor: sthdark,
+    lightcolor: sthlight,
+  } /*
+  {
+    order: 4,
+    milestoneType: 'user.human.added',
+    link: '/users/create',
     iconClasses: 'las la-user',
     darkcolor: bluedark,
     lightcolor: bluelight,
   },
   {
-    order: 3,
-    eventType: 'user.grant.added',
-    oneof: ['user.grant.added'],
-    link: ['/grant-create'],
+    order: 5,
+    milestoneType: 'user.grant.added',
+    link: '/grant-create',
     iconClasses: 'las la-shield-alt',
     darkcolor: reddark,
     lightcolor: redlight,
   },
   {
-    order: 4,
-    eventType: 'instance.policy.label.added',
-    oneof: ['instance.policy.label.added', 'instance.policy.label.changed'],
-    link: ['/settings'],
+    order: 6,
+    milestoneType: 'instance.policy.label.added',
+    link: '/settings',
     fragment: 'branding',
     iconClasses: 'las la-swatchbook',
     darkcolor: pinkdark,
     lightcolor: pinklight,
   },
   {
-    order: 5,
-    eventType: 'instance.smtp.config.added',
-    oneof: ['instance.smtp.config.added', 'instance.smtp.config.changed'],
-    link: ['/settings'],
-    fragment: 'notifications',
+    order: 7,
+    milestoneType: 'instance.smtp.config.added',
+    link: '/settings',
+    fragment: 'smtpprovider',
     iconClasses: 'las la-envelope',
     darkcolor: yellowdark,
     lightcolor: yellowlight,
-  },
+  },*/,
 ];

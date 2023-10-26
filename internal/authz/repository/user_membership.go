@@ -7,5 +7,5 @@ import (
 )
 
 type UserMembershipRepository interface {
-	SearchMyMemberships(ctx context.Context, orgID string) ([]*authz.Membership, error)
+	SearchMyMemberships(ctx context.Context, orgID string, shouldTriggerBulk bool) ([]*authz.Membership, error)
 }

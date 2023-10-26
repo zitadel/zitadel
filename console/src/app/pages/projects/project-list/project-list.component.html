@@ -20,33 +20,38 @@
         [routerLink]="['/projects', 'create']"
         color="primary"
         mat-raised-button
-        class="cnsl-action-button"
       >
-        <mat-icon class="icon">add</mat-icon>
-        <span>{{ 'ACTIONS.NEW' | translate }}</span>
-        <cnsl-action-keys (actionTriggered)="gotoRouterLink(['/projects', 'create'])"> </cnsl-action-keys>
+        <div class="cnsl-action-button">
+          <mat-icon class="icon">add</mat-icon>
+          <span>{{ 'ACTIONS.NEW' | translate }}</span>
+          <cnsl-action-keys (actionTriggered)="gotoRouterLink(['/projects', 'create'])"> </cnsl-action-keys>
+        </div>
       </a>
     </ng-template>
     <div class="table-wrapper">
       <table class="table" mat-table [dataSource]="dataSource">
         <ng-container matColumnDef="select">
-          <th class="selection" mat-header-cell *matHeaderCellDef>
-            <mat-checkbox
-              color="primary"
-              (change)="$event ? masterToggle() : null"
-              [checked]="selection.hasValue() && isAllSelected()"
-              [indeterminate]="selection.hasValue() && !isAllSelected()"
-            >
-            </mat-checkbox>
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="selection">
+              <mat-checkbox
+                color="primary"
+                (change)="$event ? masterToggle() : null"
+                [checked]="selection.hasValue() && isAllSelected()"
+                [indeterminate]="selection.hasValue() && !isAllSelected()"
+              >
+              </mat-checkbox>
+            </div>
           </th>
-          <td class="selection" mat-cell *matCellDef="let row">
-            <mat-checkbox
-              color="primary"
-              (click)="$event.stopPropagation()"
-              (change)="$event ? selection.toggle(row) : null"
-              [checked]="selection.isSelected(row)"
-            >
-            </mat-checkbox>
+          <td mat-cell *matCellDef="let row">
+            <div class="selection">
+              <mat-checkbox
+                color="primary"
+                (click)="$event.stopPropagation()"
+                (change)="$event ? selection.toggle(row) : null"
+                [checked]="selection.isSelected(row)"
+              >
+              </mat-checkbox>
+            </div>
           </td>
         </ng-container>
 
@@ -111,7 +116,7 @@
             *matCellDef="let project"
           >
             <span *ngIf="project.details.creationDate">{{
-              project.details.creationDate | timestampToDate | localizedDate : 'EEE dd. MMM, HH:mm'
+              project.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
             }}</span>
           </td>
         </ng-container>
@@ -129,7 +134,7 @@
             *matCellDef="let project"
           >
             <span *ngIf="project.details.changeDate">{{
-              project.details.changeDate | timestampToDate | localizedDate : 'EEE dd. MMM, HH:mm'
+              project.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
             }}</span>
           </td>
         </ng-container>

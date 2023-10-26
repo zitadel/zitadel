@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { GetPasswordComplexityPolicyResponse as AdminGetPasswordComplexityPolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { GetPasswordComplexityPolicyResponse as MgmtGetPasswordComplexityPolicyResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
@@ -27,7 +27,11 @@ export class PasswordComplexityPolicyComponent implements OnInit {
   public loading: boolean = false;
   public InfoSectionType: any = InfoSectionType;
 
-  constructor(private toast: ToastService, private injector: Injector, private dialog: MatDialog) {}
+  constructor(
+    private toast: ToastService,
+    private injector: Injector,
+    private dialog: MatDialog,
+  ) {}
 
   public ngOnInit(): void {
     switch (this.serviceType) {

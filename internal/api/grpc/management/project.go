@@ -53,7 +53,7 @@ func (s *Server) ListProjects(ctx context.Context, req *mgmt_pb.ListProjectsRequ
 	}
 	return &mgmt_pb.ListProjectsResponse{
 		Result:  project_grpc.ProjectViewsToPb(projects.Projects),
-		Details: object_grpc.ToListDetails(projects.Count, projects.Sequence, projects.Timestamp),
+		Details: object_grpc.ToListDetails(projects.Count, projects.Sequence, projects.LastRun),
 	}, nil
 }
 
@@ -74,8 +74,9 @@ func (s *Server) ListProjectGrantChanges(ctx context.Context, req *mgmt_pb.ListP
 		Limit(limit).
 		OrderDesc().
 		ResourceOwner(authz.GetCtxData(ctx).OrgID).
-		AddQuery().
+		AwaitOpenTransactions().
 		SequenceGreater(sequence).
+		AddQuery().
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(req.ProjectId).
 		EventData(map[string]interface{}{
@@ -86,7 +87,7 @@ func (s *Server) ListProjectGrantChanges(ctx context.Context, req *mgmt_pb.ListP
 		query.OrderAsc()
 	}
 
-	changes, err := s.query.SearchEvents(ctx, query, s.auditLogRetention)
+	changes, err := s.query.SearchEvents(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +116,7 @@ func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrant
 	}
 	return &mgmt_pb.ListGrantedProjectsResponse{
 		Result:  project_grpc.GrantedProjectViewsToPb(projects.ProjectGrants),
-		Details: object_grpc.ToListDetails(projects.Count, projects.Sequence, projects.Timestamp),
+		Details: object_grpc.ToListDetails(projects.Count, projects.Sequence, projects.LastRun),
 	}, nil
 }
 
@@ -134,7 +135,7 @@ func (s *Server) ListGrantedProjectRoles(ctx context.Context, req *mgmt_pb.ListG
 	}
 	return &mgmt_pb.ListGrantedProjectRolesResponse{
 		Result:  project_grpc.RoleViewsToPb(roles.ProjectRoles),
-		Details: object_grpc.ToListDetails(roles.Count, roles.Sequence, roles.Timestamp),
+		Details: object_grpc.ToListDetails(roles.Count, roles.Sequence, roles.LastRun),
 	}, nil
 }
 
@@ -153,10 +154,11 @@ func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjec
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AllowTimeTravel().
 		Limit(limit).
+		AwaitOpenTransactions().
 		OrderDesc().
 		ResourceOwner(authz.GetCtxData(ctx).OrgID).
-		AddQuery().
 		SequenceGreater(sequence).
+		AddQuery().
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(req.ProjectId).
 		Builder()
@@ -164,7 +166,7 @@ func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjec
 		query.OrderAsc()
 	}
 
-	changes, err := s.query.SearchEvents(ctx, query, s.auditLogRetention)
+	changes, err := s.query.SearchEvents(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -259,7 +261,7 @@ func (s *Server) ListProjectRoles(ctx context.Context, req *mgmt_pb.ListProjectR
 	}
 	return &mgmt_pb.ListProjectRolesResponse{
 		Result:  project_grpc.RoleViewsToPb(roles.ProjectRoles),
-		Details: object_grpc.ToListDetails(roles.Count, roles.Sequence, roles.Timestamp),
+		Details: object_grpc.ToListDetails(roles.Count, roles.Sequence, roles.LastRun),
 	}, nil
 }
 
@@ -349,7 +351,7 @@ func (s *Server) ListProjectMembers(ctx context.Context, req *mgmt_pb.ListProjec
 	}
 	return &mgmt_pb.ListProjectMembersResponse{
 		Result:  member_grpc.MembersToPb(s.assetAPIPrefix(ctx), members.Members),
-		Details: object_grpc.ToListDetails(members.Count, members.Sequence, members.Timestamp),
+		Details: object_grpc.ToListDetails(members.Count, members.Sequence, members.LastRun),
 	}, nil
 }
 

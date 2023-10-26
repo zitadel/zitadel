@@ -6,26 +6,18 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/notification/channels/fs"
-	"github.com/zitadel/zitadel/internal/notification/channels/log"
-	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/notification/messages"
-	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
 func generateEmail(
 	ctx context.Context,
+	channels ChannelChains,
 	user *query.NotifyUser,
 	subject,
 	content string,
-	smtpConfig func(ctx context.Context) (*smtp.Config, error),
-	getFileSystemProvider func(ctx context.Context) (*fs.Config, error),
-	getLogProvider func(ctx context.Context) (*log.Config, error),
 	lastEmail bool,
 	triggeringEvent eventstore.Event,
-	successMetricName,
-	failureMetricName string,
 ) error {
 	content = html.UnescapeString(content)
 	message := &messages.Email{
@@ -37,23 +29,14 @@ func generateEmail(
 	if lastEmail {
 		message.Recipients = []string{user.LastEmail}
 	}
-
-	channelChain, err := senders.EmailChannels(
-		ctx,
-		smtpConfig,
-		getFileSystemProvider,
-		getLogProvider,
-		successMetricName,
-		failureMetricName,
-	)
+	emailChannels, _, err := channels.Email(ctx)
 	if err != nil {
 		return err
 	}
-
-	if channelChain.Len() == 0 {
+	if emailChannels == nil || emailChannels.Len() == 0 {
 		return errors.ThrowPreconditionFailed(nil, "MAIL-83nof", "Errors.Notification.Channels.NotPresent")
 	}
-	return channelChain.HandleMessage(message)
+	return emailChannels.HandleMessage(message)
 }
 
 func mapNotifyUserToArgs(user *query.NotifyUser, args map[string]interface{}) map[string]interface{} {

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { UpdateSecretGeneratorRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { OIDCSettings, SecretGenerator, SecretGeneratorType } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -29,7 +29,11 @@ export class SecretGeneratorComponent implements OnInit {
     SecretGeneratorType.SECRET_GENERATOR_TYPE_OTP_EMAIL,
   ];
 
-  constructor(private service: AdminService, private toast: ToastService, private dialog: MatDialog) {}
+  constructor(
+    private service: AdminService,
+    private toast: ToastService,
+    private dialog: MatDialog,
+  ) {}
 
   ngOnInit(): void {
     this.fetchData();

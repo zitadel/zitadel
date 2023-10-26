@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/zitadel/oidc/v2/pkg/client/rp"
-	openid "github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
+	openid "github.com/zitadel/oidc/v3/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
@@ -77,10 +77,14 @@ func TestProvider_BeginAuth(t *testing.T) {
 			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.options...)
 			r.NoError(err)
 
-			session, err := provider.BeginAuth(context.Background(), "testState")
+			ctx := context.Background()
+			session, err := provider.BeginAuth(ctx, "testState")
 			r.NoError(err)
 
-			a.Equal(tt.want.GetAuthURL(), session.GetAuthURL())
+			wantHeaders, wantContent := tt.want.GetAuth(ctx)
+			gotHeaders, gotContent := session.GetAuth(ctx)
+			a.Equal(wantHeaders, gotHeaders)
+			a.Equal(wantContent, gotContent)
 		})
 	}
 }

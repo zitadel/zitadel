@@ -17,15 +17,11 @@
 
       <p class="cnsl-secondary-text">{{ 'USER.SIGNEDOUT' | translate }}</p>
 
-      <a
-        class="cnsl-action-button"
-        matTooltip="{{ 'ACTIONS.LOGIN' | translate }}"
-        color="primary"
-        mat-raised-button
-        [routerLink]="['/users/me']"
-      >
-        <i class="las la-sign-in-alt"></i>
-        <span>{{ 'USER.SIGNEDOUT_BTN' | translate }}</span>
+      <a matTooltip="{{ 'ACTIONS.LOGIN' | translate }}" color="primary" mat-raised-button [routerLink]="['/users/me']">
+        <div class="cnsl-action-button">
+          <i class="las la-sign-in-alt"></i>
+          <span>{{ 'USER.SIGNEDOUT_BTN' | translate }}</span>
+        </div>
       </a>
     </div>
   </div>

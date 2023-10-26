@@ -19,7 +19,7 @@ func (s *Server) ListActions(ctx context.Context, req *mgmt_pb.ListActionsReques
 		return nil, err
 	}
 	return &mgmt_pb.ListActionsResponse{
-		Details: obj_grpc.ToListDetails(actions.Count, actions.Sequence, actions.Timestamp),
+		Details: obj_grpc.ToListDetails(actions.Count, actions.Sequence, actions.LastRun),
 		Result:  action_grpc.ActionsToPb(actions.Actions),
 	}, nil
 }

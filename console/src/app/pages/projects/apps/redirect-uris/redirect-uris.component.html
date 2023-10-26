@@ -15,7 +15,7 @@
 </form>
 
 <div class="redirect-uris-list">
-  <div *ngFor="let uri of value" class="uri-line" [ngClass]="{ alert: !devMode && !(uri | redirect : isNative) }">
+  <div *ngFor="let uri of value" class="uri-line" [ngClass]="{ alert: !devMode && !(uri | redirect: isNative) }">
     <span
       class="uri"
       [ngClass]="{ green: !devMode && uri?.startsWith('https://'), red: !devMode && !uri?.startsWith('https://') }"

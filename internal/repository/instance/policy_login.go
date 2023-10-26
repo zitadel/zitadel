@@ -4,10 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
@@ -67,7 +65,7 @@ func NewLoginPolicyAddedEvent(
 	}
 }
 
-func LoginPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LoginPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.LoginPolicyAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -98,7 +96,7 @@ func NewLoginPolicyChangedEvent(
 	return &LoginPolicyChangedEvent{LoginPolicyChangedEvent: *changedEvent}, nil
 }
 
-func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LoginPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.LoginPolicyChangedEventMapper(event)
 	if err != nil {
 		return nil, err

@@ -28,6 +28,9 @@ Errors:
       RemoveFailed: L'oggetto non può essere rimosso
   Limit:
     ExceedsDefault: Il limite supera quello predefinito
+  Limits:
+    NotFound: Limite non trovato
+    NoneSpecified: Nessun limite specificato
   Language:
     NotParsed: Impossibile analizzare la lingua
   OIDCSettings:
@@ -182,6 +185,11 @@ Errors:
     DomainVerificationTypeInvalid: Il tipo di verifica del dominio non è valido
     DomainVerificationMissing: La verifica del dominio non è ancora iniziata
     DomainVerificationFailed: Verifica del dominio fallita
+    DomainVerificationTXTNotFound: Il record TXT _zitadel-challenge non è stato trovato per il tuo dominio. Verifica di averlo aggiunto al tuo server DNS o attendi la propagazione del nuovo record
+    DomainVerificationTXTNoMatch: È stato trovato il record TXT _zitadel-challenge per il tuo dominio ma non contiene il testo del token corretto. Verifica di aver aggiunto il token corretto al tuo server DNS o attendi la propagazione del nuovo record
+    DomainVerificationHTTPNotFound: Il file della challenge non è stato trovato nell'URL previsto. Verifica di aver caricato il file nel posto giusto con permessi di lettura
+    DomainVerificationHTTPNoMatch: Il file della challenge è stato trovato nell'URL previsto ma non contiene il testo del token corretto. Controlla il suo contenuto
+    DomainVerificationTimeout: Si è verificato un timeout nella richiesta del server DNS
     PrimaryDomainNotDeletable: Il dominio primario non deve essere cancellato
     DomainNotFound: Dominio non trovato
     MemberIDMissing: ID membro mancante
@@ -196,6 +204,8 @@ Errors:
     IdpIsNotOIDC: La configurazione IDP non è di tipo oidc
     Domain:
       AlreadyExists: Il dominio già esistente
+      InvalidCharacter: Solo caratteri alfanumerici, . e - sono consentiti per un dominio
+      EmptyString: I caratteri non numerici e alfabetici non validi sono stati sostituiti con spazi vuoti e il dominio risultante è una stringa vuota
     IDP:
       InvalidSearchQuery: Parametro di ricerca non valido
       InvalidCharacter: Per un dominio sono ammessi solo caratteri alfanumerici, . e -
@@ -487,6 +497,8 @@ Errors:
       NoChallenge: Sessione senza sfida WebAuthN
   Intent:
     IDPMissing: IDP mancante nella richiesta
+    IDPInvalid: IDP non valido per la richiesta
+    ResponseInvalid: La risposta dell'IDP non è valida
     SuccessURLMissing: URL di successo mancante nella richiesta
     FailureURLMissing: URL di errore mancante nella richiesta
     StateMissing: parametro di stato mancante nella richiesta
@@ -505,6 +517,10 @@ Errors:
       Invalid: Token non è valido
       Expired: Token è scaduto
     InvalidClient: Il token non è stato emesso per questo cliente
+  Feature:
+    NotExisting: La funzionalità non esiste
+    TypeNotSupported: Il tipo di funzionalità non è supportato
+    InvalidValue: Valore non valido per questa funzionalità
 
 AggregateTypes:
   action: Azione
@@ -515,6 +531,7 @@ AggregateTypes:
   user: Utente
   usergrant: Sovvenzione utente
   quota: Quota
+  feature: Funzionalità
 
 EventTypes:
   user:

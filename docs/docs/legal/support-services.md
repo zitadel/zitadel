@@ -10,7 +10,7 @@ This annex of the [Framework Agreement](terms-of-service) and the [Support Servi
 Support Services for products and services provided by ZITADEL is offered to customers according to the terms and conditions outlined in this document.
 The customer may purchase support services from ZITADEL (CAOS Ltd.) directly.
 
-Last revised: March 15, 2023
+Last revised: October 6, 2023
 
 ## Support Services
 
@@ -82,7 +82,8 @@ Phone Support | +41 43 215 27 34
 ZITADEL will enhance its support offering by providing eligible clients with a Technical Account Manager (TAM), who will perform the following tasks for up to the specified amount of time per week during the term of service:
 
 - Provide support and advice regarding best practices on platform, product and configuration covered by the applicable Support Services;
-- Participate in review calls every other week at mutually agreed times addressing customer’s operational issues.
+- Participate in review calls every other week at mutually agreed times addressing customer’s operational challenges or complex support requests;
+- Walk-through of new features and customer feedback.
 
 We offer TAM services only bundled with specific subscription plans, and the option to add more TAM hours to these plans.
 If you require consulting for your projects, please request a quote via our [website](https://zitadel.com/contact).

@@ -32,6 +32,9 @@ func ready(config *Config) bool {
 		return false
 	}
 	defer res.Body.Close()
-	logging.WithFields("status", res.StatusCode).Warn("ready check failed")
-	return res.StatusCode == 200
+	if res.StatusCode != 200 {
+		logging.WithFields("status", res.StatusCode).Warn("ready check failed")
+		return false
+	}
+	return true
 }

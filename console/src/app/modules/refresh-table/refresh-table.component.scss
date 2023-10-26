@@ -1,5 +1,3 @@
-@use '@angular/material' as mat;
-
 @mixin refresh-table-theme($theme) {
   $foreground: map-get($theme, foreground);
 
@@ -48,6 +46,8 @@
 
       .icon {
         font-size: 1.2rem;
+        height: 1.2rem;
+        width: 1.2rem;
       }
     }
   }

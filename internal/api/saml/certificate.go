@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/saml/pkg/provider/key"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -77,20 +77,20 @@ func (p *Storage) getCertificateAndKey(ctx context.Context, usage domain.KeyUsag
 		return p.certificateToCertificateAndKey(selectCertificate(certs.Certificates))
 	}
 
-	var sequence uint64
-	if certs.LatestSequence != nil {
-		sequence = certs.LatestSequence.Sequence
+	var position float64
+	if certs.State != nil {
+		position = certs.State.Position
 	}
 
-	return nil, p.refreshCertificate(ctx, usage, sequence)
+	return nil, p.refreshCertificate(ctx, usage, position)
 }
 
 func (p *Storage) refreshCertificate(
 	ctx context.Context,
 	usage domain.KeyUsage,
-	sequence uint64,
+	position float64,
 ) error {
-	ok, err := p.ensureIsLatestCertificate(ctx, sequence)
+	ok, err := p.ensureIsLatestCertificate(ctx, position)
 	if err != nil {
 		logging.WithError(err).Error("could not ensure latest key")
 		return err
@@ -99,20 +99,20 @@ func (p *Storage) refreshCertificate(
 		logging.Warn("view not up to date, retrying later")
 		return err
 	}
-	err = p.lockAndGenerateCertificateAndKey(ctx, usage, sequence)
+	err = p.lockAndGenerateCertificateAndKey(ctx, usage)
 	logging.OnError(err).Warn("could not create signing key")
 	return nil
 }
 
-func (p *Storage) ensureIsLatestCertificate(ctx context.Context, sequence uint64) (bool, error) {
+func (p *Storage) ensureIsLatestCertificate(ctx context.Context, position float64) (bool, error) {
 	maxSequence, err := p.getMaxKeySequence(ctx)
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
-	return sequence == maxSequence, nil
+	return position >= maxSequence, nil
 }
 
-func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage domain.KeyUsage, sequence uint64) error {
+func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage domain.KeyUsage) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	ctx = setSAMLCtx(ctx)
@@ -152,12 +152,20 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage do
 	}
 }
 
-func (p *Storage) getMaxKeySequence(ctx context.Context) (uint64, error) {
+func (p *Storage) getMaxKeySequence(ctx context.Context) (float64, error) {
 	return p.eventstore.LatestSequence(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
+			AwaitOpenTransactions().
 			AddQuery().
-			AggregateTypes(keypair.AggregateType, instance.AggregateType).
+			AggregateTypes(keypair.AggregateType).
+			EventTypes(
+				keypair.AddedEventType,
+				keypair.AddedCertificateEventType,
+			).
+			Or().
+			AggregateTypes(instance.AggregateType).
+			EventTypes(instance.InstanceRemovedEventType).
 			Builder(),
 	)
 }

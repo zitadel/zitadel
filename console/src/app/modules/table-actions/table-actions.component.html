@@ -5,12 +5,12 @@
     <button
       (click)="$event.stopPropagation()"
       *ngIf="hasActions"
-      class="table-actions-trigger"
       mat-icon-button
+      class="more-button"
       [matMenuTriggerFor]="actions"
       data-e2e="table-actions-button"
     >
-      <mat-icon>more_horiz</mat-icon>
+      <mat-icon>more_vert</mat-icon>
     </button>
 
     <mat-menu #actions="matMenu" xPosition="before" class="table-actions-menu">

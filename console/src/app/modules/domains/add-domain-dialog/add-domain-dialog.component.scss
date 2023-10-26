@@ -1,0 +1,17 @@
+.title {
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+.desc {
+  font-size: 0.9rem;
+}
+
+.action {
+  display: flex;
+  justify-content: space-between;
+
+  .ok-button {
+    margin-left: 0.5rem;
+  }
+}

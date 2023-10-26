@@ -3,10 +3,10 @@
   $warn: map-get($theme, warn);
   $background: map-get($theme, background);
   $accent: map-get($theme, accent);
-  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-color: map-get($primary, 500);
 
-  $warn-color: mat.get-color-from-palette($warn, 500);
-  $accent-color: mat.get-color-from-palette($accent, 500);
+  $warn-color: map-get($warn, 500);
+  $accent-color: map-get($accent, 500);
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
   $back: map-get($background, background);
@@ -41,7 +41,7 @@
 
     .show-all {
       width: 100%;
-      color: mat.get-color-from-palette($foreground, text);
+      color: map-get($foreground, text);
       border-top: 1px solid map-get($foreground, divider);
     }
 
@@ -58,6 +58,10 @@
         min-height: 36px;
         position: relative;
         overflow: hidden;
+
+        .mdc-button__label {
+          width: 100%;
+        }
 
         .org-flex-row {
           display: flex;
@@ -77,6 +81,7 @@
             margin-right: -0.5rem;
             visibility: hidden;
             opacity: 0.5;
+            padding: 0;
 
             &:hover {
               opacity: 1;
@@ -85,7 +90,7 @@
             mat-icon {
               font-size: 20px;
               height: 20px;
-              width: 20px;
+              width: 36px;
             }
           }
         }

@@ -1,11 +1,11 @@
 package oidc
 
 import (
-	"github.com/zitadel/oidc/v2/pkg/op"
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
+	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
@@ -18,7 +18,7 @@ type Server struct {
 	command *command.Commands
 	query   *query.Queries
 
-	op             op.OpenIDProvider
+	op             *oidc.Server
 	externalSecure bool
 }
 
@@ -27,7 +27,7 @@ type Config struct{}
 func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
-	op op.OpenIDProvider,
+	op *oidc.Server,
 	externalSecure bool,
 ) *Server {
 	return &Server{

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
@@ -24,7 +24,10 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
 
   public states: OrgState[] = [OrgState.ORG_STATE_ACTIVE, OrgState.ORG_STATE_INACTIVE, OrgState.ORG_STATE_REMOVED];
 
-  constructor(router: Router, protected override route: ActivatedRoute) {
+  constructor(
+    router: Router,
+    protected override route: ActivatedRoute,
+  ) {
     super(router, route);
   }
 

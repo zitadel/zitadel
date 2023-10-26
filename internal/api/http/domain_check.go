@@ -1,6 +1,7 @@
 package http
 
 import (
+	errorsAs "errors"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -36,6 +37,9 @@ func ValidateDomainHTTP(domain, token, verifier string) error {
 		return errors.ThrowInternal(err, "HTTP-BH42h", "Errors.Internal")
 	}
 	if resp.StatusCode != 200 {
+		if resp.StatusCode == 404 {
+			return errors.ThrowNotFound(err, "ORG-F4zhw", "Errors.Org.DomainVerificationHTTPNotFound")
+		}
 		return errors.ThrowInternal(err, "HTTP-G2zsw", "Errors.Internal")
 	}
 	defer resp.Body.Close()
@@ -46,12 +50,21 @@ func ValidateDomainHTTP(domain, token, verifier string) error {
 	if string(body) == verifier {
 		return nil
 	}
-	return errors.ThrowInvalidArgument(err, "HTTP-GH422", "Errors.Internal")
+	return errors.ThrowNotFound(err, "ORG-GH422", "Errors.Org.DomainVerificationHTTPNoMatch")
 }
 
 func ValidateDomainDNS(domain, verifier string) error {
 	txtRecords, err := net.LookupTXT(tokenUrlDNS(domain))
 	if err != nil {
+		var dnsError *net.DNSError
+		if errorsAs.As(err, &dnsError) {
+			if dnsError.IsNotFound {
+				return errors.ThrowNotFound(err, "ORG-G241f", "Errors.Org.DomainVerificationTXTNotFound")
+			}
+			if dnsError.IsTimeout {
+				return errors.ThrowNotFound(err, "ORG-K563l", "Errors.Org.DomainVerificationTimeout")
+			}
+		}
 		return errors.ThrowInternal(err, "HTTP-Hwsw2", "Errors.Internal")
 	}
 
@@ -60,7 +73,7 @@ func ValidateDomainDNS(domain, verifier string) error {
 			return nil
 		}
 	}
-	return errors.ThrowInvalidArgument(err, "HTTP-G241f", "Errors.Internal")
+	return errors.ThrowNotFound(err, "ORG-G28if", "Errors.Org.DomainVerificationTXTNoMatch")
 }
 
 func TokenUrl(domain, token string, checkType CheckType) (string, error) {

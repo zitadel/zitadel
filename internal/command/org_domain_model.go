@@ -84,7 +84,7 @@ func (wm *OrgDomainWriteModel) Reduce() error {
 			wm.ValidationCode = nil
 		}
 	}
-	return nil
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *OrgDomainWriteModel) Query() *eventstore.SearchQueryBuilder {
@@ -154,7 +154,7 @@ func (wm *OrgDomainsWriteModel) Reduce() error {
 			}
 		}
 	}
-	return nil
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *OrgDomainsWriteModel) Query() *eventstore.SearchQueryBuilder {
@@ -216,7 +216,7 @@ func (wm *OrgDomainVerifiedWriteModel) Reduce() error {
 			wm.Verified = false
 		}
 	}
-	return nil
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *OrgDomainVerifiedWriteModel) Query() *eventstore.SearchQueryBuilder {

@@ -4,9 +4,12 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"encoding/xml"
 	"net/url"
 
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/crewjam/saml"
+	"github.com/crewjam/saml/samlsp"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -76,12 +79,36 @@ func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureU
 	return writeModel, writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) GetProvider(ctx context.Context, idpID string, callbackURL string) (idp.Provider, error) {
+func (c *Commands) GetProvider(ctx context.Context, idpID string, idpCallback string, samlRootURL string) (idp.Provider, error) {
 	writeModel, err := IDPProviderWriteModel(ctx, c.eventstore.Filter, idpID)
 	if err != nil {
 		return nil, err
 	}
-	return writeModel.ToProvider(callbackURL, c.idpConfigEncryption)
+	if writeModel.IDPType != domain.IDPTypeSAML {
+		return writeModel.ToProvider(idpCallback, c.idpConfigEncryption)
+	}
+	return writeModel.ToSAMLProvider(
+		samlRootURL,
+		c.idpConfigEncryption,
+		func(ctx context.Context, intentID string) (*samlsp.TrackedRequest, error) {
+			intent, err := c.GetActiveIntent(ctx, intentID)
+			if err != nil {
+				return nil, err
+			}
+			return &samlsp.TrackedRequest{
+				SAMLRequestID: intent.RequestID,
+				Index:         intentID,
+				URI:           intent.SuccessURL.String(),
+			}, nil
+		},
+		func(ctx context.Context, intentID, samlRequestID string) error {
+			intent, err := c.GetActiveIntent(ctx, intentID)
+			if err != nil {
+				return err
+			}
+			return c.RequestSAMLIDPIntent(ctx, intent, samlRequestID)
+		},
+	)
 }
 
 func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIntentWriteModel, error) {
@@ -98,16 +125,18 @@ func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIn
 	return intent, nil
 }
 
-func (c *Commands) AuthURLFromProvider(ctx context.Context, idpID, state string, callbackURL string) (string, error) {
-	provider, err := c.GetProvider(ctx, idpID, callbackURL)
+func (c *Commands) AuthFromProvider(ctx context.Context, idpID, state string, idpCallback, samlRootURL string) (string, bool, error) {
+	provider, err := c.GetProvider(ctx, idpID, idpCallback, samlRootURL)
 	if err != nil {
-		return "", err
+		return "", false, err
 	}
 	session, err := provider.BeginAuth(ctx, state)
 	if err != nil {
-		return "", err
+		return "", false, err
 	}
-	return session.GetAuthURL(), nil
+
+	content, redirect := session.GetAuth(ctx)
+	return content, redirect, nil
 }
 
 func getIDPIntentWriteModel(ctx context.Context, writeModel *IDPIntentWriteModel, filter preparation.FilterToQueryReducer) error {
@@ -150,6 +179,47 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 		return "", err
 	}
 	return token, nil
+}
+
+func (c *Commands) SucceedSAMLIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, userID string, assertion *saml.Assertion) (string, error) {
+	token, err := c.generateIntentToken(writeModel.AggregateID)
+	if err != nil {
+		return "", err
+	}
+	idpInfo, err := json.Marshal(idpUser)
+	if err != nil {
+		return "", err
+	}
+	assertionData, err := xml.Marshal(assertion)
+	if err != nil {
+		return "", err
+	}
+	assertionEnc, err := crypto.Encrypt(assertionData, c.idpConfigEncryption)
+	if err != nil {
+		return "", err
+	}
+	cmd := idpintent.NewSAMLSucceededEvent(
+		ctx,
+		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
+		idpInfo,
+		idpUser.GetID(),
+		idpUser.GetPreferredUsername(),
+		userID,
+		assertionEnc,
+	)
+	err = c.pushAppendAndReduce(ctx, writeModel, cmd)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
+
+func (c *Commands) RequestSAMLIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, requestID string) error {
+	return c.pushAppendAndReduce(ctx, writeModel, idpintent.NewSAMLRequestEvent(
+		ctx,
+		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
+		requestID,
+	))
 }
 
 func (c *Commands) generateIntentToken(intentID string) (string, error) {

@@ -44,7 +44,7 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 	}
 	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
 		Queries: []query.SearchQuery{userQuery},
-	}, false)
+	}, false, false)
 	if err != nil {
 		return nil, err
 	}
@@ -73,9 +73,10 @@ func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserC
 		AllowTimeTravel().
 		Limit(limit).
 		OrderDesc().
+		AwaitOpenTransactions().
 		ResourceOwner(authz.GetCtxData(ctx).ResourceOwner).
-		AddQuery().
 		SequenceGreater(sequence).
+		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(authz.GetCtxData(ctx).UserID).
 		Builder()
@@ -83,7 +84,7 @@ func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserC
 		query.OrderAsc()
 	}
 
-	changes, err := s.query.SearchEvents(ctx, query, s.auditLogRetention)
+	changes, err := s.query.SearchEvents(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +105,7 @@ func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadata
 	}
 	return &auth_pb.ListMyMetadataResponse{
 		Result:  metadata.UserMetadataListToPb(res.Metadata),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastRun),
 	}, nil
 }
 
@@ -158,7 +159,7 @@ func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGr
 	}
 	return &auth_pb.ListMyUserGrantsResponse{
 		Result:  UserGrantsToPb(res.UserGrants),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastRun),
 	}, nil
 }
 
@@ -225,7 +226,7 @@ func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProje
 		return nil, err
 	}
 	return &auth_pb.ListMyProjectOrgsResponse{
-		Details: obj_grpc.ToListDetails(orgs.Count, orgs.Sequence, orgs.Timestamp),
+		Details: obj_grpc.ToListDetails(orgs.Count, orgs.Sequence, orgs.LastRun),
 		Result:  org.OrgsToPb(orgs.Orgs),
 	}, nil
 }
@@ -237,7 +238,7 @@ func (s *Server) myOrgsQuery(ctx context.Context, ctxData authz.CtxData) (*query
 	}
 	return s.query.Memberships(ctx, &query.MembershipSearchQuery{
 		Queries: []query.SearchQuery{userQuery},
-	}, false)
+	}, false, false)
 }
 
 func isIAMAdmin(memberships []*query.Membership) bool {

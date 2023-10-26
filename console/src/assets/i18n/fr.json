@@ -51,7 +51,7 @@
       "TITLE": "Faites fonctionner votre ZITADEL",
       "DESCRIPTION": "Cette liste de contrôle vous aide à configurer votre instance et vous guide à travers les étapes les plus essentielles."
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Créez votre marque",
         "description": "Définissez la couleur et la forme de votre connexion et téléchargez votre logo et vos icônes.",
@@ -62,15 +62,20 @@
         "description": "Définissez paramètres de serveur de messagerie",
         "action": "Configurez"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Créez projet",
         "description": "Ajoutez projet et définissez ses rôles et autorisations.",
         "action": "Créez projet"
       },
-      "project.application.added": {
-        "title": "Créez votre première application",
-        "description": "Créez une application web, native, api ou saml et configurez votre flux d'authentification.",
-        "action": "Créez application"
+      "APPLICATION_CREATED": {
+        "title": "Enregistrez votre application",
+        "description": "Enregistrez votre application web, native, api ou saml et configurez un flux d'authentification.",
+        "action": "Enregistrez l'application"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Connectez-vous à votre application",
+        "description": "Intégrez votre application avec ZITADEL pour l'authentification et testez-la en vous connectant avec votre utilisateur administrateur.",
+        "action": "Connexion"
       },
       "user.human.added": {
         "title": "Ajouter des utilisateurs",
@@ -95,7 +100,6 @@
     "EVENTS": "Événements",
     "FAILEDEVENTS": "Événements échoués",
     "ORGANIZATION": "Organisation",
-    "DOMAINS": "Domaines",
     "PROJECT": "Projets",
     "PROJECTOVERVIEW": "Vue d'ensemble",
     "PROJECTGRANTS": "Subventions",
@@ -274,7 +278,7 @@
     "SYMBOLERROR": "Doit inclure un symbole ou un signe de ponctuation.",
     "NUMBERERROR": "Doit inclure un chiffre.",
     "PWNOTEQUAL": "Les mots de passe fournis ne correspondent pas.",
-    "PHONE": "Le numéro de téléphone doit commencer par 00 ou +."
+    "PHONE": "Le numéro de téléphone doit commencer par +."
   },
   "USER": {
     "SETTINGS": {
@@ -486,7 +490,7 @@
       "TITLE": "Profil",
       "EMAIL": "Courriel",
       "PHONE": "Numéro de téléphone",
-      "PHONE_HINT": "Utilisez 00 ou le symbole + suivi de l'indicatif du pays de l'appelant, ou sélectionnez le pays dans la liste déroulante et saisissez enfin le numéro de téléphone",
+      "PHONE_HINT": "Utilisez le symbole + suivi de l'indicatif du pays de l'appelant, ou sélectionnez le pays dans la liste déroulante et saisissez enfin le numéro de téléphone",
       "USERNAME": "Nom de l'utilisateur",
       "CHANGEUSERNAME": "modifier",
       "CHANGEUSERNAME_TITLE": "Modifier le nom d'utilisateur",
@@ -713,7 +717,6 @@
   },
   "METADATA": {
     "TITLE": "Métadonnées",
-    "DESCRIPTION": "",
     "KEY": "Clé",
     "VALUE": "Valeur",
     "ADD": "Nouvelle entrée",
@@ -953,7 +956,7 @@
     },
     "DOMAINS": {
       "NEW": "Ajouter un domaine",
-      "TITLE": "Domaines",
+      "TITLE": "Domaines vérifiés",
       "DESCRIPTION": "Configurez vos domaines. Ce domaine peut être utilisé pour se connecter avec vos utilisateurs.",
       "SETPRIMARY": "Définir comme primaire",
       "DELETE": {
@@ -1020,9 +1023,12 @@
       "LOCKOUT": "Verrouillage",
       "COMPLEXITY": "Complexité du mot de passe",
       "NOTIFICATIONS": "Paramètres de notification",
+      "SMTP_PROVIDER": "Fournisseur SMTP",
+      "SMS_PROVIDER": "SMS/Téléphone Fournisseur",
       "NOTIFICATIONS_DESC": "Paramètres SMTP et SMS",
       "MESSAGETEXTS": "Textes des messages",
       "IDP": "Fournisseurs d'identité",
+      "VERIFIED_DAMAINS": "Domaines vérifiés",
       "DOMAIN": "Paramètres du domaine",
       "LOGINTEXTS": "Textes de l'interface de connexion",
       "BRANDING": "Image de marque",
@@ -1089,6 +1095,7 @@
         "TOKEN": "Jeton",
         "SENDERNUMBER": "Numéro d'expéditeur",
         "ADDED": "Twilio a été ajouté avec succès.",
+        "UPDATED": "Twilio a été mis à jour avec succès.",
         "REMOVED": "Twilio a été supprimé avec succès",
         "CHANGETOKEN": "Changer de Token",
         "SETTOKEN": "Définir le jeton",
@@ -1195,6 +1202,11 @@
         "ERROR": "L'utilisateur n'a pas pu être trouvé !",
         "PRIMARYBUTTON": "suivant",
         "SECONDARYBUTTON": "enregistrez-vous"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Mode automatique",
+        "THEME_MODE_LIGHT": "Mode clair uniquement",
+        "THEME_MODE_DARK": "Mode sombre uniquement"
       }
     },
     "PWD_AGE": {
@@ -1985,6 +1997,8 @@
       "CLIENTSECRET_DESCRIPTION": "Conservez votre secret client dans un endroit sûr car il disparaîtra une fois la boîte de dialogue fermée.",
       "REGENERATESECRET": "Régénérer le secret du client",
       "DEVMODE": "Mode développement",
+      "DEVMODE_ENABLED": "Activé",
+      "DEVMODE_DISABLED": "Désactivé",
       "DEVMODEDESC": "Attention",
       "SKIPNATIVEAPPSUCCESSPAGE": "Sauter la page de succès de connexion",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Sauter la page de succès après la connexion pour cette application native",
@@ -2064,6 +2078,23 @@
         "0": "Base",
         "1": "Clé privée JWT"
       }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "Applications SAML"
+      },
+      "CONFIGSECTION": "Configuration SAML",
+      "CHOOSEMETADATASOURCE": "Fournissez votre configuration SAML à l'aide de l'une des options suivantes :",
+      "METADATAOPT1": "Option 1. Spécifiez l'URL où se trouve le fichier de métadonnées",
+      "METADATAOPT2": "Option 2. Téléchargez un fichier contenant vos métadonnées XML",
+      "METADATAOPT3": "Option 3. Créer un fichier de métadonnées minimal à la volée fournissant l'ENTITYID et l'URL ACS",
+      "UPLOAD": "Télécharger le fichier XML",
+      "METADATA": "Métadonnées",
+      "METADATAFROMFILE": "Métadonnées du fichier",
+      "CREATEMETADATA": "Créer des métadonnées",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {

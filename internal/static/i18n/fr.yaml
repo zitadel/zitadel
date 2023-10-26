@@ -28,6 +28,9 @@ Errors:
       RemoveFailed: L'objet n'a pas pu être retiré
   Limit:
     ExceedsDefault: La limite dépasse la limite par défaut
+  Limits:
+    NotFound: Limites non trouvée
+    NoneSpecified: Aucune limite spécifiée
   Language:
     NotParsed: Impossible d'analyser la langue
   OIDCSettings:
@@ -182,6 +185,11 @@ Errors:
     DomainVerificationTypeInvalid: Le type de vérification du domaine n'est pas valide
     DomainVerificationMissing: La vérification du domaine n'a pas encore commencé
     DomainVerificationFailed: La vérification du domaine a échoué
+    DomainVerificationTXTNotFound: L'enregistrement TXT _zitadel-challenge est introuvable pour votre domaine. Vérifiez que vous l'avez ajouté à votre serveur DNS ou attendez que le nouvel enregistrement se propage
+    DomainVerificationTXTNoMatch: L'enregistrement TXT _zitadel-challenge a été trouvé pour votre domaine mais il ne contient pas le bon texte de jeton. Vérifiez que vous avez ajouté le bon token à votre serveur DNS ou attendez que le nouvel enregistrement se propage
+    DomainVerificationHTTPNotFound: Le fichier contenant le défi n'a pas été trouvé dans l'URL attendue. Vérifiez que vous avez téléchargé le fichier au bon endroit avec les autorisations de lecture
+    DomainVerificationHTTPNoMatch: Le fichier contenant le défi a été trouvé dans l'URL attendue mais il ne contient pas le bon texte de token. Vérifiez son contenu
+    DomainVerificationTimeout: Il y a eu un délai d'attente lors de l'interrogation du serveur DNS
     PrimaryDomainNotDeletable: Le domaine primaire ne doit pas être supprimé
     DomainNotFound: Domaine non trouvé
     MemberIDMissing: ID du membre manquant
@@ -197,6 +205,7 @@ Errors:
     Domain:
       AlreadyExists: Le domaine existe déjà
       InvalidCharacter: Seuls les caractères alphanumériques, . et - sont autorisés pour un domaine
+      EmptyString: Les caractères non numériques et alphabétiques non valides ont été remplacés par des espaces vides et le domaine résultant est une chaîne vide
     IDP:
       InvalidSearchQuery: Paramètre de recherche non valide
       ClientIDMissing: ID client manquant
@@ -487,6 +496,8 @@ Errors:
       NoChallenge: Session sans challenge WebAuthN
   Intent:
     IDPMissing: IDP manquant dans la requête
+    IDPInvalid: IDP non valide pour la demande
+    ResponseInvalid: La réponse de l'IDP n'est pas valide
     SuccessURLMissing: Success URL absent de la requête
     FailureURLMissing: Failure URL absent de la requête
     StateMissing: Paramètre d'état manquant dans la requête
@@ -505,6 +516,10 @@ Errors:
       Invalid: Le jeton n'est pas valide
       Expired: Le jeton est expiré
     InvalidClient: Le token n'a pas été émis pour ce client
+  Feature:
+    NotExisting: La fonctionnalité n'existe pas
+    TypeNotSupported: Le type de fonctionnalité n'est pas pris en charge
+    InvalidValue: Valeur non valide pour cette fonctionnalité
 
 AggregateTypes:
   action: Action
@@ -515,6 +530,7 @@ AggregateTypes:
   user: Utilisateur
   usergrant: Subvention de l'utilisateur
   quota: Contingent
+  feature: Fonctionnalité
 
 EventTypes:
   user:

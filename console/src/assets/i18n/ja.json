@@ -43,15 +43,15 @@
     }
   },
   "ONBOARDING": {
-    "DESCRIPTION": "オンボーディングの手順",
+    "DESCRIPTION": "チュートリアル",
     "MOREDESCRIPTION": "より多くのショートカット",
     "COMPLETED": "完了",
-    "DISMISS": "いいえ、私はプロです。",
+    "DISMISS": "熟知しているので必要ありません。",
     "CARD": {
       "TITLE": "ZITADELの起動",
       "DESCRIPTION": "このチェックリストを使用して、重要な手順を確認しながらインスタンスをセットアップします。"
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "ブランドをセットアップする",
         "description": "ログインの色と形状を定義し、ロゴとアイコンをアップロードします。",
@@ -62,15 +62,20 @@
         "description": "独自のメールサーバーを設定します。",
         "action": "SMTP 設定を設定する"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "最初のプロジェクトを作成する",
         "description": "最初のプロジェクトを追加し、ロールと認証を定義します。",
         "action": "プロジェクトを作成"
       },
-      "project.application.added": {
-        "title": "最初のアプリケーションを作成する",
-        "description": "Web、ネイティブ、API、またはSAMLアプリケーションを作成し、認証フローをセットアップします。",
-        "action": "アプリケーションを作成"
+      "APPLICATION_CREATED": {
+        "title": "アプリを登録する",
+        "description": "Web、ネイティブ、API、またはSAMLアプリケーションを登録し、認証フローをセットアップします。",
+        "action": "アプリを登録する"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "アプリにログインする",
+        "description": "アプリケーションをZITADELと統合して認証し、管理者ユーザーでログインしてテストします。",
+        "action": "ログイン"
       },
       "user.human.added": {
         "title": "ユーザーを追加する",
@@ -95,7 +100,6 @@
     "EVENTS": "イベント",
     "FAILEDEVENTS": "失敗したイベント",
     "ORGANIZATION": "組織",
-    "DOMAINS": "ドメイン",
     "PROJECT": "プロジェクト",
     "PROJECTOVERVIEW": "概要",
     "PROJECTGRANTS": "グラント",
@@ -272,10 +276,10 @@
     "MINLENGTH": "{{requiredLength}} 文字以上の文字列が必要です。",
     "UPPERCASEMISSING": "大文字を含める必要があります。",
     "LOWERCASEMISSING": "小文字を含める必要があります。",
-    "SYMBOLERROR": "シンボルや句読点を含める必要があります。",
-    "NUMBERERROR": "小数点を含める必要があります。",
+    "SYMBOLERROR": "記号を含める必要があります。",
+    "NUMBERERROR": "数字を含める必要があります。",
     "PWNOTEQUAL": "パスワードが一致しません。",
-    "PHONE": "電話番号は00か+で始まる必要があります。"
+    "PHONE": "電話番号は + で始まる必要があります。"
   },
   "USER": {
     "SETTINGS": {
@@ -487,7 +491,7 @@
       "TITLE": "プロフィール",
       "EMAIL": "Eメール",
       "PHONE": "電話番号",
-      "PHONE_HINT": "00または+マークの後に通話先の国番号を入力するか、ドロップダウンから国を選択し、最後に電話番号を入力します。",
+      "PHONE_HINT": "+ マークに続いて電話をかけたい国コードを入力するか、ドロップダウンから国を選択して電話番号を入力します。",
       "USERNAME": "ユーザー名",
       "CHANGEUSERNAME": "変更",
       "CHANGEUSERNAME_TITLE": "ユーザー名の変更",
@@ -595,7 +599,7 @@
         "EDITDESC": "下のフィールドに新しい電話番号を入力してください。",
         "DELETETITLE": "電話番号の削除",
         "DELETEDESC": "本当に電話番号を削除してよろしいですか？",
-        "OTPSMSREMOVALWARNING": "このアカウントは、この電話番号を 2 番目の要素として使用します。続行すると使用できなくなります。"
+        "OTPSMSREMOVALWARNING": "このアカウントは、この電話番号を二要素認証に使用しています。続行すると二要素認証が使用できなくなります。"
       },
       "RESENDCODE": "再送信コード",
       "ENTERCODE": "認証",
@@ -714,7 +718,6 @@
   },
   "METADATA": {
     "TITLE": "メタデータ",
-    "DESCRIPTION": "",
     "KEY": "キー",
     "VALUE": "値",
     "ADD": "新しいエントリ",
@@ -954,7 +957,7 @@
     },
     "DOMAINS": {
       "NEW": "ドメインを追加する",
-      "TITLE": "ドメイン",
+      "TITLE": "検証済みドメイン",
       "DESCRIPTION": "ドメインを設定します。このドメインは、ユーザーのログインで使用できます。",
       "SETPRIMARY": "プライマリとして設定する",
       "DELETE": {
@@ -1021,9 +1024,12 @@
       "LOCKOUT": "ロックアウト",
       "COMPLEXITY": "パスワードの複雑さ",
       "NOTIFICATIONS": "通知設定",
+      "SMTP_PROVIDER": "SMTPプロバイダー",
+      "SMS_PROVIDER": "SMS/電話プロバイダー",
       "NOTIFICATIONS_DESC": "SMTPおよびSMS設定",
       "MESSAGETEXTS": "メッセージテキスト",
       "IDP": "IDプロバイダー",
+      "VERIFIED_DAMAINS": "検証済みドメイン",
       "DOMAIN": "ドメイン設定",
       "LOGINTEXTS": "ログイン画面のテキスト",
       "BRANDING": "ブランディング",
@@ -1090,6 +1096,7 @@
         "TOKEN": "トークン",
         "SENDERNUMBER": "送信者番号",
         "ADDED": "Twilioは正常に追加されました。",
+        "UPDATED": "Twilio が正常に更新されました。",
         "REMOVED": "Twilioが削除されました",
         "CHANGETOKEN": "トークンを変更する",
         "SETTOKEN": "トークンを設定する",
@@ -1192,6 +1199,11 @@
         "ERROR": "ユーザーは見つかりません！",
         "PRIMARYBUTTON": "次へ",
         "SECONDARYBUTTON": "登録"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "自動モード",
+        "THEME_MODE_LIGHT": "ライトモードのみ",
+        "THEME_MODE_DARK": "ダークモードのみ"
       }
     },
     "PWD_AGE": {
@@ -1976,6 +1988,8 @@
       "CLIENTSECRET_DESCRIPTION": "クライアントシークレットは、ダイアログを閉じると消えてしまうので、安全な場所に保管してください。",
       "REGENERATESECRET": "クライアントシークレットを再生成する",
       "DEVMODE": "開発モード",
+      "DEVMODE_ENABLED": "アクティブ化された",
+      "DEVMODE_DISABLED": "無効化されました",
       "DEVMODEDESC": "注意：開発モードを有効にすると、URIが認証されません。",
       "SKIPNATIVEAPPSUCCESSPAGE": "ログイン後に成功ページをスキップする",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "このネイティブアプリのログイン後に成功ページをスキップする",
@@ -2062,11 +2076,16 @@
         "DESCRIPTION": "SAMLアプリケーション"
       },
       "CONFIGSECTION": "SAML構成",
-      "URL": "メタデータファイルが配置されているURL",
-      "OR": "または",
-      "XML": "メタデータXMLをアップロードする",
+      "CHOOSEMETADATASOURCE": "次のオプションのいずれかを使用して SAML 構成を指定します。",
+      "METADATAOPT1": "オプション 1. メタデータ ファイルが存在する URL を指定する",
+      "METADATAOPT2": "オプション 2. メタデータ XML を含むファイルをアップロードする",
+      "METADATAOPT3": "オプション 3. ENTITYID と ACS URL を指定して最小限のメタデータ ファイルをオンザフライで作成する",
+      "UPLOAD": "XMLファイルをアップロードする",
       "METADATA": "メタデータ",
-      "METADATAFROMFILE": "ファイルからのメタデータ"
+      "METADATAFROMFILE": "ファイルからのメタデータ",
+      "CREATEMETADATA": "メタデータの作成",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {

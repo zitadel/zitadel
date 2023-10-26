@@ -52,7 +52,7 @@ jobs:
     - 
       uses: bufbuild/buf-breaking-action@v1
       with:
-        against: "https://github.com/${{ github.repository }}.git#branch=main"
+        against: "https://github.com/${{ github.repository }}.git#branch=${{ github.base_ref }}"
 
   console:
     if: ${{ github.event_name == 'pull_request' }}

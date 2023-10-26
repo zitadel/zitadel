@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
 	"google.golang.org/grpc/codes"
@@ -49,7 +48,6 @@ func TestMain(m *testing.M) {
 // Get calls would return a Not Found error.
 func TestImport_and_Get(t *testing.T) {
 	const N = 100
-	var misses int
 
 	for i := 0; i < N; i++ {
 		firstName := strconv.Itoa(i)
@@ -76,18 +74,11 @@ func TestImport_and_Get(t *testing.T) {
 
 			_, err = Client.GetUserByID(CTX, &management.GetUserByIDRequest{Id: res.GetUserId()})
 
-			if s, ok := status.FromError(err); ok {
-				if s == nil {
-					return
-				}
-				if s.Code() == codes.NotFound {
-					t.Log(s)
-					misses++
-					return
-				}
+			s, ok := status.FromError(err)
+			if ok && s != nil && s.Code() == codes.NotFound {
+				t.Errorf("iteration %d: user with id %q not found", i, res.GetUserId())
 			}
 			require.NoError(t, err) // catch and fail on any other error
 		})
 	}
-	assert.Zerof(t, misses, "Not Found errors %d out of %d", misses, N)
 }

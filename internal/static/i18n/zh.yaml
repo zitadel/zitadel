@@ -28,6 +28,9 @@ Errors:
       RemoveFailed: 无法移除对象
   Limit:
     ExceedsDefault: 超出默认限制
+  Limits:
+    NotFound: 未找到限制
+    NoneSpecified: 未指定限制
   Language:
     NotParsed: 无法解析语言
   OIDCSettings:
@@ -182,6 +185,11 @@ Errors:
     DomainVerificationTypeInvalid: 域名验证类型无效
     DomainVerificationMissing: 域名验证尚未开始
     DomainVerificationFailed: 域名验证失败
+    DomainVerificationTXTNotFound: 未找到您的域的 _zitadel-challenge TXT 记录。检查您是否已将其添加到 DNS 服务器或等待新记录传播
+    DomainVerificationTXTNoMatch: 已找到您的域的 _zitadel-challenge TXT 记录，但它不包含正确的令牌文本。检查您是否已将正确的令牌添加到 DNS 服务器或等待新记录传播
+    DomainVerificationHTTPNotFound: 在预期的 URL 中找不到包含质询的文件。检查您是否已将文件上传到正确的位置并具有读取权限
+    DomainVerificationHTTPNoMatch: 已在预期 URL 中找到包含质询的文件，但它不包含正确的标记文本。检查其内容
+    DomainVerificationTimeout: 查询 DNS 服务器超时
     PrimaryDomainNotDeletable: 不得删除主域名
     DomainNotFound: 未找到域名
     MemberIDMissing: 成员 ID 丢失
@@ -197,6 +205,7 @@ Errors:
     Domain:
       AlreadyExists: 域名已存在
       InvalidCharacter: 只有字母数字字符，.和 - 允许用于域名中
+      EmptyString: 无效的非数字和字母字符被替换为空格，结果域是空字符串
     IDP:
       InvalidSearchQuery: 无效的搜索查询
       ClientIDMissing: 客户端 ID 丢失
@@ -487,6 +496,8 @@ Errors:
       NoChallenge: 没有 WebAuthN 质询的会话
   Intent:
     IDPMissing: 请求中缺少IDP ID
+    IDPInvalid: 请求的 IDP 无效
+    ResponseInvalid: IDP 响应无效
     SuccessURLMissing: 请求中缺少成功URL
     FailureURLMissing: 请求中缺少失败的URL
     StateMissing: 请求中缺少状态参数
@@ -505,6 +516,10 @@ Errors:
       Invalid: 令牌无效
       Expired: 令牌已过期
     InvalidClient: 没有为该客户发放令牌
+  Feature:
+    NotExisting: 功能不存在
+    TypeNotSupported: 不支持功能类型
+    InvalidValue: 此功能的值无效
 
 AggregateTypes:
   action: 动作
@@ -515,6 +530,7 @@ AggregateTypes:
   user: 用户
   usergrant: 用户授权
   quota: 配额
+  feature: 特征
 
 EventTypes:
   user:
@@ -616,7 +632,7 @@ EventTypes:
           removed: 删除 MFA OTP
           check:
             succeeded: 验证 MFA OTP 成功
-            failed:  验证 MFA OTP 失败
+            failed: 验证 MFA OTP 失败
           sms:
             added: 添加了多因素 OTP 短信
             removed: 删除了多因素 OTP 短信

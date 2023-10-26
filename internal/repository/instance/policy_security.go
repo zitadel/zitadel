@@ -2,11 +2,9 @@ package instance
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -59,19 +57,19 @@ func ChangeSecurityPolicyAllowedOrigins(allowedOrigins []string) func(event *Sec
 	}
 }
 
-func (e *SecurityPolicySetEvent) Data() interface{} {
+func (e *SecurityPolicySetEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SecurityPolicySetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SecurityPolicySetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func SecurityPolicySetEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SecurityPolicySetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	securityPolicyAdded := &SecurityPolicySetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, securityPolicyAdded)
+	err := event.Unmarshal(securityPolicyAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-soiwj", "unable to unmarshal oidc config added")
 	}
