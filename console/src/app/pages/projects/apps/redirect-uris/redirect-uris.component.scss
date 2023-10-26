@@ -1,5 +1,3 @@
-@use '@angular/material' as mat;
-
 @mixin redirect-uris-theme($theme) {
   $foreground: map-get($theme, foreground);
   $background: map-get($theme, background);
