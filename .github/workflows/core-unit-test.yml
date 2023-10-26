@@ -40,6 +40,7 @@ jobs:
         uses: actions/cache/restore@v3
         id: cache
         timeout-minutes: 1
+        continue-on-error: true
         name: restore previous results
         with:
           key: unit-test-${{ inputs.core_cache_key }}

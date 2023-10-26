@@ -147,7 +147,7 @@ func (c *HasherConfig) buildHasher() (hasher passwap.Hasher, prefixes []string, 
 
 func (c *HasherConfig) decodeParams(dst any) error {
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		ErrorUnused: true,
+		ErrorUnused: false,
 		ErrorUnset:  true,
 		Result:      dst,
 	})

@@ -51,7 +51,7 @@
       "TITLE": "Ponte en marcha con ZITADEL",
       "DESCRIPTION": "Esta lista de tareas te ayuda a configurar tu instancia y te guía por los pasos más esenciales"
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Configura tu imagen de marca",
         "description": "Define el esquema de colores, da forma a tu inicio de sesión y sube tu logo y tus iconos.",
@@ -62,15 +62,20 @@
         "description": "Introduce la configuración de tu propio servidor de correo.",
         "action": "Configurar SMTP"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Crea tu primer proyecto",
         "description": "Añade tu primer proyecto y define sus roles y autorizaciones.",
         "action": "Crear proyecto"
       },
-      "project.application.added": {
-        "title": "Crea tu primera aplicación",
-        "description": "Crea una aplicación web, nativa, api o saml y configura tu flujo de autenticación.",
-        "action": "Crear app"
+      "APPLICATION_CREATED": {
+        "title": "Registra tu aplicación",
+        "description": "Registra tu aplicación web, nativa, api o saml y configura tu flujo de autenticación.",
+        "action": "Registrar app"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Inicia sesión en tu aplicación",
+        "description": "Integra tu aplicación con ZITADEL para la autenticación y pruébala iniciando sesión con tu usuario administrador.",
+        "action": "Iniciar sesión"
       },
       "user.human.added": {
         "title": "Añade usuarios",
@@ -274,7 +279,7 @@
     "SYMBOLERROR": "Debe incluir un símbolo o un signo de puntuación.",
     "NUMBERERROR": "Debe incluir un dígito.",
     "PWNOTEQUAL": "Las contraseñas proporcionadas no coinciden.",
-    "PHONE": "El número de teléfono debe comenzar con 00 o +."
+    "PHONE": "El número de teléfono debe comenzar con +."
   },
   "USER": {
     "SETTINGS": {
@@ -486,7 +491,7 @@
       "TITLE": "Perfil",
       "EMAIL": "Email",
       "PHONE": "Número de teléfono",
-      "PHONE_HINT": "Usa 00 o el símbolo + seguido del prefijo del país o selecciona el país del menú desplegable y finalmente introduce el número de teléfono",
+      "PHONE_HINT": "Usa el símbolo + seguido del prefijo del país o selecciona el país del menú desplegable y finalmente introduce el número de teléfono",
       "USERNAME": "Nombre de usuario",
       "CHANGEUSERNAME": "modificar",
       "CHANGEUSERNAME_TITLE": "Cambiar nombre de usuario",
@@ -1092,6 +1097,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Número de emisor",
         "ADDED": "Twilio añadido con éxito.",
+        "UPDATED": "Twilio actualizado con éxito",
         "REMOVED": "Twilio eliminado",
         "CHANGETOKEN": "Cambiar token",
         "SETTOKEN": "Establecer token",
@@ -1198,6 +1204,11 @@
         "ERROR": "¡No se encontró el usuario!",
         "PRIMARYBUTTON": "siguiente",
         "SECONDARYBUTTON": "registrar"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Modo automático",
+        "THEME_MODE_LIGHT": "Sólo modo claro",
+        "THEME_MODE_DARK": "Sólo modo oscuro"
       }
     },
     "PWD_AGE": {
@@ -2071,11 +2082,16 @@
         "DESCRIPTION": "Aplicaciones SAML"
       },
       "CONFIGSECTION": "Configuración SAML",
-      "URL": "URL donde está ubicado el fichero de metadatos",
-      "OR": "o",
-      "XML": "Sube un fichero XML de metadatos",
+      "CHOOSEMETADATASOURCE": "Proporciona tu configuración SAML usando una de las siguientes opciones:",
+      "METADATAOPT1": "Opción 1. Especifica la URL donde se encuentra el fichero de metadatos",
+      "METADATAOPT2": "Opción 2. Sube un fichero que contenga tus metadatos XML",
+      "METADATAOPT3": "Opción 3. Crea, al vuelo, un fichero de metadatos mínimo proporcionando el ENTITYID y la ACS URL",
+      "UPLOAD": "Subir fichero XML",
       "METADATA": "Metadatos",
-      "METADATAFROMFILE": "Metadatos desde un fichero"
+      "METADATAFROMFILE": "Metadatos desde un fichero",
+      "CREATEMETADATA": "Crear metadatos",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {

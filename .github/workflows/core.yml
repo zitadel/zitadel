@@ -41,6 +41,7 @@ jobs:
         - 
           uses: actions/cache/restore@v3
           timeout-minutes: 1
+          continue-on-error: true
           id: cache
           with:
             key: core-${{ hashFiles( 'go.*', 'openapi', 'cmd', 'pkg/grpc/**/*.go', 'proto', 'internal') }}
