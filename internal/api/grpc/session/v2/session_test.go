@@ -413,7 +413,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 				Queries: []query.SearchQuery{
 					mustNewListQuery(t, query.SessionColumnID, []interface{}{"1", "2", "3"}, query.ListIn),
 					mustNewListQuery(t, query.SessionColumnID, []interface{}{"4", "5", "6"}, query.ListIn),
-					mustNewTextQuery(t, query.HumanUserIDCol, "10", query.TextEquals),
+					mustNewTextQuery(t, query.SessionColumnUserID, "10", query.TextEquals),
 					mustNewTimestampQuery(t, query.SessionColumnCreationDate, creationDate, query.TimestampGreater),
 					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
 				},
@@ -551,7 +551,7 @@ func Test_sessionQueryToQuery(t *testing.T) {
 					},
 				},
 			}},
-			want: mustNewTextQuery(t, query.HumanUserIDCol, "10", query.TextEquals),
+			want: mustNewTextQuery(t, query.SessionColumnUserID, "10", query.TextEquals),
 		},
 		{
 			name: "creation date query",
