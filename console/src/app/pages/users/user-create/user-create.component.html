@@ -111,6 +111,7 @@
             >
               <mat-select-trigger>
                 <span class="fi fi-{{ selected?.countryCode | lowercase }}"></span>
+                <span class="trigger-name">{{ selected?.countryName }}</span>
               </mat-select-trigger>
               <mat-option class="phone-country-option" *ngFor="let country of countryPhoneCodes" [value]="country">
                 <span class="phone-country-row">
