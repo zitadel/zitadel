@@ -15,7 +15,6 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/pseudo"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type EventStore interface {
