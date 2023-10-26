@@ -38,8 +38,14 @@ jobs:
     # ✏️ If the Autobuild fails above, remove it and uncomment the following three lines
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
+    
+    # node to install sass
+    - uses: actions/setup-node@v3
+    - run: npm install -g sass
     - run: |
-        make core_dependencies
+        mkdir -p console/dist/console/
+        make core_build
         make core_api
+        make compile_pipeline
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
