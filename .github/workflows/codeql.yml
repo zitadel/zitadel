@@ -50,6 +50,6 @@ jobs:
         mkdir -p console/dist/console
         touch console/dist/console/placeholder
         make core_build
-      # make compile_pipeline
+        make compile_pipeline
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
