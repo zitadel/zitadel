@@ -98,7 +98,6 @@ require (
 	github.com/go-webauthn/x v0.1.4 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.3 // indirect
 	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
-	github.com/golang/glog v1.1.2 // indirect
 	github.com/google/go-tpm v0.9.0 // indirect
 	github.com/google/pprof v0.0.0-20230821062121-407c9e7a662f // indirect
 	github.com/google/s2a-go v0.1.7 // indirect
@@ -156,7 +155,6 @@ require (
 	github.com/golang/geo v0.0.0-20230421003525-6adc56603217 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/uuid v1.3.1
 	github.com/googleapis/enterprise-certificate-proxy v0.3.1 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
@@ -197,7 +195,6 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/afero v1.10.0 // indirect
 	github.com/spf13/cast v1.5.1 // indirect
-	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
