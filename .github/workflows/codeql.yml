@@ -29,6 +29,7 @@ jobs:
       # Override language selection by uncommenting this and choosing your languages
       with:
         languages: go, javascript
+        debug: true
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
     # - name: Autobuild
@@ -42,7 +43,10 @@ jobs:
     # node to install sass
     - uses: actions/setup-node@v3
     - run: npm install -g sass
-    - run: |
+    # autobuild does not work anymore
+    # and to be able to compile without an actual console build, we just need a placeholder in the console dist folder
+    - name: compile
+      run: |
         mkdir -p console/dist/console
         touch console/dist/console/placeholder
         make core_build
