@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy, Renderer2, RendererFactory2 } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of, pairwise, Subject, takeUntil } from 'rxjs';
 
@@ -118,14 +118,8 @@ export class KeyboardShortcutsService implements OnDestroy {
   }
 
   public openOverviewDialog(): void {
-    const dialogRef = this.dialog.open(KeyboardShortcutsComponent, {
-      data: {},
+    this.dialog.open(KeyboardShortcutsComponent, {
       width: '400px',
-    });
-
-    dialogRef.afterClosed().subscribe((resp) => {
-      if (resp) {
-      }
     });
   }
 
