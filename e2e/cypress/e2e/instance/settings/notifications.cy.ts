@@ -21,21 +21,26 @@ describe('instance notifications', () => {
     });
     it(`should add SMTP provider settings`, () => {
       cy.visit(smtpPath);
-      cy.get('[formcontrolname="senderAddress"]').clear().type('sender@example.com');
-      cy.get('[formcontrolname="senderName"]').clear().type('Zitadel');
-      cy.get('[formcontrolname="hostAndPort"]').clear().type('smtp.mailtrap.io:2525');
-      cy.get('[formcontrolname="user"]').clear().type('user@example.com');
+      cy.get('[formcontrolname="senderAddress"]').as('senderAddress').clear()
+      cy.get('@senderAddress').should('be.enabled').type('sender@example.com');
+      cy.get('[formcontrolname="senderName"]').as('senderName').clear()
+      cy.get('@senderName').should('be.enabled').type('Zitadel');
+      cy.get('[formcontrolname="hostAndPort"]').as('hostAndPort').clear()
+      cy.get('@hostAndPort').should('be.enabled').type('smtp.mailtrap.io:2525');
+      cy.get('[formcontrolname="user"]').get('user').clear()
+      cy.get('@user').should('be.enabled').type('user@example.com');
       cy.get('[data-e2e="save-smtp-settings-button"]').click();
       cy.shouldConfirmSuccess();
-      cy.get('[formcontrolname="senderAddress"]').should('have.value', 'sender@example.com');
-      cy.get('[formcontrolname="senderName"]').should('have.value', 'Zitadel');
-      cy.get('[formcontrolname="hostAndPort"]').should('have.value', 'smtp.mailtrap.io:2525');
-      cy.get('[formcontrolname="user"]').should('have.value', 'user@example.com');
+      cy.get('@senderAddress').should('have.value', 'sender@example.com');
+      cy.get('@senderName').should('have.value', 'Zitadel');
+      cy.get('@hostAndPort').should('have.value', 'smtp.mailtrap.io:2525');
+      cy.get('@user').should('have.value', 'user@example.com');
     });
     it(`should add SMTP provider password`, () => {
       cy.visit(smtpPath);
       cy.get('[data-e2e="add-smtp-password-button"]').click();
-      cy.get('[data-e2e="notification-setting-password"]').clear().type('dummy@example.com');
+      cy.get('[data-e2e="notification-setting-password"]').as('password').clear()
+      cy.get('@password').should('be.enabled').type('dummy@example.com');
       cy.get('[data-e2e="save-notification-setting-password-button"]').click();
       cy.shouldConfirmSuccess();
     });
@@ -50,9 +55,12 @@ describe('instance notifications', () => {
     it(`should add SMS provider`, () => {
       cy.visit(smsPath);
       cy.get('[data-e2e="new-twilio-button"]').click();
-      cy.get('[formcontrolname="sid"]').clear().type('test');
-      cy.get('[formcontrolname="token"]').clear().type('token');
-      cy.get('[formcontrolname="senderNumber"]').clear().type('2312123132');
+      cy.get('[formcontrolname="sid"]').as('sid').clear()
+          cy.get('@sid').should('be.enabled').type('test');
+      cy.get('[formcontrolname="token"]').as('token').clear()
+      cy.get('@token').should('be.enabled').type('token');
+      cy.get('[formcontrolname="senderNumber"]').as('senderNumber').clear()
+      cy.get('@senderNumber').should('be.enabled').type('2312123132');
       cy.get('[data-e2e="save-sms-settings-button"]').click();
       cy.shouldConfirmSuccess();
       cy.get('h4').contains('Twilio');
@@ -75,8 +83,10 @@ describe('instance notifications', () => {
       cy.get('[data-e2e="new-twilio-button"]').click();
       cy.get('[formcontrolname="sid"]').should('have.value', 'test');
       cy.get('[formcontrolname="senderNumber"]').should('have.value', '2312123132');
-      cy.get('[formcontrolname="sid"]').clear().type('test2');
-      cy.get('[formcontrolname="senderNumber"]').clear().type('6666666666');
+      cy.get('[formcontrolname="sid"]').as('sid').clear()
+      cy.get('@sid').should('be.enabled').type('test2');
+      cy.get('[formcontrolname="senderNumber"]').as('senderNumber').clear()
+      cy.get('@senderNumber').should('be.enabled').type('6666666666');
       cy.get('[data-e2e="save-sms-settings-button"]').click();
       cy.shouldConfirmSuccess();
     });
@@ -96,7 +106,8 @@ describe('instance notifications', () => {
       cy.get('.state').contains('Active');
       cy.get('[data-e2e="new-twilio-button"]').click();
       cy.get('[data-e2e="edit-sms-token-button"]').click();
-      cy.get('[data-e2e="notification-setting-password"]').clear().type('newsupertoken');
+      cy.get('[data-e2e="notification-setting-password"]').as('password').clear()
+      cy.get('@password').should('be.enabled').type('newsupertoken');
       cy.get('[data-e2e="save-notification-setting-password-button"]').click();
       cy.shouldConfirmSuccess();
     });

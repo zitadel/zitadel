@@ -23,7 +23,7 @@ describe('projects', () => {
 
     it('should add a project', () => {
       cy.get('.add-project-button').click({ force: true });
-      cy.get('input').type(testProjectNameCreate);
+      cy.get('input').should('be.enabled').type(testProjectNameCreate);
       cy.get('[data-e2e="continue-button"]').click();
       cy.shouldConfirmSuccess();
     });
@@ -46,9 +46,9 @@ describe('projects', () => {
     it('should add a role', () => {
       cy.get('[data-e2e="sidenav-element-roles"]').click();
       cy.get('[data-e2e="add-new-role"]').click();
-      cy.get('[formcontrolname="key"]').type(testRoleName);
-      cy.get('[formcontrolname="displayName"]').type('e2eroleundertestdisplay');
-      cy.get('[formcontrolname="group"]').type('e2eroleundertestgroup');
+      cy.get('[formcontrolname="key"]').should('be.enabled').type(testRoleName);
+      cy.get('[formcontrolname="displayName"]').should('be.enabled').type('e2eroleundertestdisplay');
+      cy.get('[formcontrolname="group"]').should('be.enabled').type('e2eroleundertestgroup');
       cy.get('[data-e2e="save-button"]').click();
       cy.shouldConfirmSuccess();
       cy.contains('tr', testRoleName);
@@ -59,7 +59,7 @@ describe('projects', () => {
 
       cy.get('[data-e2e="sidenav-element-projectgrants"]').click();
       cy.get('[data-e2e="create-project-grant-button"]').click();
-      cy.get('[data-e2e="add-org-input"]').type(defaultOrg);
+      cy.get('[data-e2e="add-org-input"]').should('be.enabled').type(defaultOrg);
       cy.get('mat-option').contains(defaultOrg).click();
       cy.get('button').should('be.enabled');
       cy.get('[data-e2e="project-grant-continue"]').first().click();
@@ -84,7 +84,7 @@ describe('projects', () => {
         cy.get('[data-e2e="toggle-grid"]').click();
         cy.get('[data-e2e="timestamp"]');
         cy.get(rowSelector).find('[data-e2e="delete-project-button"]').click({ force: true });
-        cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testProjectNameDelete);
+        cy.get('[data-e2e="confirm-dialog-input"]').focus().should('be.enabled').type(testProjectNameDelete);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
         cy.shouldConfirmSuccess();
         cy.shouldNotExist({
@@ -96,7 +96,7 @@ describe('projects', () => {
       it('removes the project from grid view', () => {
         const cardSelector = `[data-e2e="grid-card"]:contains(${testProjectNameDelete})`;
         cy.get(cardSelector).find('[data-e2e="delete-project-button"]').click({ force: true });
-        cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testProjectNameDelete);
+        cy.get('[data-e2e="confirm-dialog-input"]').focus().should('be.enabled').type(testProjectNameDelete);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
         cy.shouldConfirmSuccess();
         cy.shouldNotExist({

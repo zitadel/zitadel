@@ -22,16 +22,16 @@ describe('oidc settings', () => {
   });
 
   it(`should update oidc settings`, () => {
-    cy.get('[formcontrolname="accessTokenLifetime"]').should('value', accessTokenPrecondition).clear().type('2');
-    cy.get('[formcontrolname="idTokenLifetime"]').should('value', idTokenPrecondition).clear().type('24');
+    cy.get('[formcontrolname="accessTokenLifetime"]').should('value', accessTokenPrecondition).clear().should('be.enabled').type('2');
+    cy.get('[formcontrolname="idTokenLifetime"]').should('value', idTokenPrecondition).clear().should('be.enabled').type('24');
     cy.get('[formcontrolname="refreshTokenExpiration"]')
       .should('value', refreshTokenExpirationPrecondition)
       .clear()
-      .type('30');
+      .should('be.enabled').type('30');
     cy.get('[formcontrolname="refreshTokenIdleExpiration"]')
       .should('value', refreshTokenIdleExpirationPrecondition)
       .clear()
-      .type('7');
+      .should('be.enabled').type('7');
     cy.get('[data-e2e="save-button"]').click();
     cy.shouldConfirmSuccess();
   });
