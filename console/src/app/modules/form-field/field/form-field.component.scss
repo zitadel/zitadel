@@ -1,8 +1,6 @@
-@use '@angular/material' as mat;
-
 @mixin cnsl-form-field-theme($theme) {
   $primary: map-get($theme, primary);
-  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-color: map-get($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
   $foreground: map-get($theme, foreground);
 
@@ -16,6 +14,15 @@
   .cnsl-form-field-wrapper {
     width: 100%;
     margin: 10px 0;
+
+    .mat-datepicker-toggle button {
+      padding: 0;
+      height: 40px;
+      width: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 
   .cnsl-rel {
@@ -35,7 +42,7 @@
   }
 
   input {
-    color: mat.get-color-from-palette($foreground, text);
+    color: map-get($foreground, text);
   }
 
   // Wrapper for the hints and error messages.

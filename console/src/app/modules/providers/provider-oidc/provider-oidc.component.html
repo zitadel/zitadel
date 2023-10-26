@@ -64,17 +64,11 @@
             </div>
 
             <cnsl-form-field class="formfield">
-              <mat-chip-list #chipScopesList aria-label="scope selection">
-                <mat-chip
-                  class="chip"
-                  *ngFor="let scope of scopesList?.value"
-                  selectable="false"
-                  removable
-                  (removed)="removeScope(scope)"
-                >
+              <mat-chip-grid #chipScopesList aria-label="scope selection">
+                <mat-chip-row class="chip" *ngFor="let scope of scopesList?.value" removable (removed)="removeScope(scope)">
                   {{ scope }} <mat-icon matChipRemove>cancel</mat-icon>
-                </mat-chip>
-              </mat-chip-list>
+                </mat-chip-row>
+              </mat-chip-grid>
             </cnsl-form-field>
           </div>
 

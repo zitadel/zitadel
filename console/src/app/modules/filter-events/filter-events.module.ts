@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
-import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { OverlayModule } from '@angular/cdk/overlay';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox';
-import { MatLegacyProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { InputModule } from '../input/input.module';
 import { FilterEventsComponent } from './filter-events.component';
@@ -23,9 +23,9 @@ import { FilterEventsComponent } from './filter-events.component';
     ReactiveFormsModule,
     OverlayModule,
     MatDatepickerModule,
-    MatLegacyProgressSpinnerModule,
+    MatProgressSpinnerModule,
     TranslateModule,
-    MatLegacyCheckboxModule,
+    MatCheckboxModule,
     MatSelectModule,
     ActionKeysModule,
   ],
