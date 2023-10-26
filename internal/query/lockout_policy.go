@@ -89,8 +89,10 @@ func (q *Queries) LockoutPolicyByOrg(ctx context.Context, shouldTriggerBulk bool
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerLockoutPolicyProjection")
 		ctx, err = projection.LockoutPolicyProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 	eq := sq.Eq{
 		LockoutColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),

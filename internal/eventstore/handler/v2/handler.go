@@ -234,12 +234,6 @@ func WithAwaitRunning() triggerOpt {
 }
 
 func (h *Handler) Trigger(ctx context.Context, opts ...triggerOpt) (_ context.Context, err error) {
-	if authz.GetInstance(ctx).InstanceID() != "" {
-		var span *tracing.Span
-		ctx, span = tracing.NewSpan(ctx)
-		defer func() { span.EndWithError(err) }()
-	}
-
 	config := new(triggerConfig)
 	for _, opt := range opts {
 		opt(config)
