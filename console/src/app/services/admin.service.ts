@@ -308,7 +308,8 @@ import {
 export interface OnboardingActions {
   order: number;
   milestoneType: MilestoneType;
-  link: string;
+  routerLink?: string;
+  externalLink?: string;
   fragment?: string | undefined;
   iconClasses?: string;
   darkcolor: string;
@@ -317,7 +318,8 @@ export interface OnboardingActions {
 
 type OnboardingMilestone = {
   order: number;
-  link: string;
+  routerLink?: string;
+  externalLink?: string;
   fragment: string | undefined;
   reached: Milestone.AsObject | undefined;
   iconClasses?: string;
@@ -349,7 +351,8 @@ export class AdminService {
           actions.map((action) => {
             obj[Object.keys(MilestoneType)[action.milestoneType].substring(this.milestoneTypePrefixLength)] = {
               order: action.order,
-              link: action.link,
+              routerLink: action.routerLink,
+              externalLink: action.externalLink,
               fragment: action.fragment,
               iconClasses: action.iconClasses,
               darkcolor: action.darkcolor,

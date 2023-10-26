@@ -24,7 +24,8 @@
   >
     <ng-container *ngFor="let action of actions | async">
       <a
-        [routerLink]="action[1].link"
+        [routerLink]="action[1].routerLink ? action[1].routerLink : null"
+        [attr.href]="action[1].externalLink ? action[1].externalLink : null"
         [queryParams]="{ id: action[1].fragment }"
         class="action-card card"
         [ngClass]="{ done: action[1].reached !== undefined }"
