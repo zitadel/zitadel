@@ -10,9 +10,18 @@ Metrics:
 
 Tracing:
   # Choose one in "otel", "google", "log" and "none"
+  # Depending on the type there are different configuration options
+  # for type 'otel' is used for standard [open telemetry](https://opentelemetry.io)
+  # Fraction: 1.0
+  # Endpoint: 'otel.collector.endpoint'
+  # 
+  # type 'log' or '' disables tracing
+  # 
+  # for type 'google'
+  # ProjectID: ''
+  # Fraction: 1.0
   Type: none # ZITADEL_TRACING_TYPE
   Fraction: 1.0 # ZITADEL_TRACING_FRACTION
-  MetricPrefix: zitadel # ZITADEL_TRACING_METRICPREFIX
   # The endpoint of the otel collector endpoint
   Endpoint: '' #ZITADEL_TRACING_ENDPOINT
 
