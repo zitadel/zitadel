@@ -26,13 +26,13 @@ describe('applications', () => {
 
     it('add web pkce app', () => {
       cy.get('[data-e2e="app-card-add"]').should('be.visible').click();
-      cy.get('[formcontrolname="name"]').focus().type(testPKCEAppName);
+      cy.get('[formcontrolname="name"]').focus().should('be.enabled').type(testPKCEAppName);
       cy.get('[for="WEB"]').click();
       cy.get('[data-e2e="continue-button-nameandtype"]').click();
       cy.get('[for="PKCE"]').should('be.visible').click();
       cy.get('[data-e2e="continue-button-authmethod"]').click();
-      cy.get('[data-e2e="redirect-uris"] input').focus().type('http://localhost:3000/api/auth/callback/zitadel');
-      cy.get('[data-e2e="postlogout-uris"] input').focus().type('http://localhost:3000');
+      cy.get('[data-e2e="redirect-uris"] input').focus().should('be.enabled').type('http://localhost:3000/api/auth/callback/zitadel');
+      cy.get('[data-e2e="postlogout-uris"] input').focus().should('be.enabled').type('http://localhost:3000');
       cy.get('[data-e2e="continue-button-redirecturis"]').click();
       cy.get('[data-e2e="create-button"]').click();
       cy.get('[id*=overlay]').should('exist');
@@ -56,7 +56,7 @@ describe('applications', () => {
 
     it('add device code app', () => {
       cy.get('[data-e2e="app-card-add"]').should('be.visible').click();
-      cy.get('[formcontrolname="name"]').focus().type(testDEVICECODEAppName);
+      cy.get('[formcontrolname="name"]').focus().should('be.enabled').type(testDEVICECODEAppName);
       cy.get('[for="N"]').click();
       cy.get('[data-e2e="continue-button-nameandtype"]').click();
       cy.get('[for="DEVICECODE"]').should('be.visible').click();
