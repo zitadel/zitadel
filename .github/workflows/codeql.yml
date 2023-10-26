@@ -45,7 +45,11 @@ jobs:
     - run: npm install -g sass
     # autobuild does not work anymore
     # and to be able to compile without an actual console build, we just need a placeholder in the console dist folder
-    - name: compile
+    - if: matrix.language == 'javascript'
+      name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+    - if: matrix.language == 'go'
+      name: compile go
       run: |
         mkdir -p console/dist/console
         touch console/dist/console/placeholder
