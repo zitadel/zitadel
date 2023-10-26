@@ -2083,11 +2083,16 @@
         "DESCRIPTION": "SAML Апликации"
       },
       "CONFIGSECTION": "SAML Конфигурација",
-      "URL": "URL каде што се наоѓа Metadata датотеката",
-      "OR": "или",
-      "XML": "Подигни Metadata XML",
-      "METADATA": "Metadata",
-      "METADATAFROMFILE": "Metadata од датотека"
+      "CHOOSEMETADATASOURCE": "Обезбедете ја вашата SAML конфигурација користејќи една од следниве опции:",
+      "METADATAOPT1": "Опција 1. Наведете ја адресата каде што се наоѓа датотеката со метаподатоци",
+      "METADATAOPT2": "Опција 2. Поставете датотека што ги содржи вашите метаподатоци XML",
+      "METADATAOPT3": "Опција 3. Создадете датотека со минимални метаподатоци во лет, обезбедувајќи ENTITYID и ACS URL",
+      "UPLOAD": "Поставете XML датотека",
+      "METADATA": "Метаподатоци",
+      "METADATAFROMFILE": "Метаподатоци од датотека",
+      "CREATEMETADATA": "Креирајте метаподатоци",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {

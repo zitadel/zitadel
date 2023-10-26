@@ -1,6 +1,7 @@
 package idp
 
 import (
+	"github.com/crewjam/saml"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
@@ -476,6 +477,10 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 		appleConfigToPb(providerConfig, config.AppleIDPTemplate)
 		return providerConfig
 	}
+	if config.SAMLIDPTemplate != nil {
+		samlConfigToPb(providerConfig, config.SAMLIDPTemplate)
+		return providerConfig
+	}
 	return providerConfig
 }
 
@@ -635,5 +640,30 @@ func appleConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.Appl
 			KeyId:    template.KeyID,
 			Scopes:   template.Scopes,
 		},
+	}
+}
+
+func samlConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.SAMLIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Saml{
+		Saml: &idp_pb.SAMLConfig{
+			MetadataXml:       template.Metadata,
+			Binding:           bindingToPb(template.Binding),
+			WithSignedRequest: template.WithSignedRequest,
+		},
+	}
+}
+
+func bindingToPb(binding string) idp_pb.SAMLBinding {
+	switch binding {
+	case "":
+		return idp_pb.SAMLBinding_SAML_BINDING_UNSPECIFIED
+	case saml.HTTPPostBinding:
+		return idp_pb.SAMLBinding_SAML_BINDING_POST
+	case saml.HTTPRedirectBinding:
+		return idp_pb.SAMLBinding_SAML_BINDING_REDIRECT
+	case saml.HTTPArtifactBinding:
+		return idp_pb.SAMLBinding_SAML_BINDING_ARTIFACT
+	default:
+		return idp_pb.SAMLBinding_SAML_BINDING_UNSPECIFIED
 	}
 }
