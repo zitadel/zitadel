@@ -51,6 +51,6 @@ jobs:
         touch console/dist/console/placeholder
         make core_build
         go list ./...
-        make compile_pipeline
+        go build ./...
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
