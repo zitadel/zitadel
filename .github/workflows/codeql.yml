@@ -39,6 +39,7 @@ jobs:
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
     - run: |
-        make core_build
+        make core_dependencies
+        make core_api
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
