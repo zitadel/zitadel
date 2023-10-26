@@ -27,8 +27,9 @@ You will benefit from the transparency of the open source and the hyper-scalabil
 
 #### Benefits over using open source / community license
 
-- [Enterprise supported features](support-services.md) are only supported under an Enterprise license.
-- Get access to [technical support](support-services.md#technical-account-manager) and a [support SLA](support-services.md#service-level-agreement) that is tailored to your needs.
+- [Enterprise supported features](support-services.md) are only supported under an Enterprise license
+- Get access to our support with a [Service Level Agreement](support-services.md#service-level-agreement) that is tailored to your needs
+- Benefit from personal [technical account management](support-services.md#technical-account-manager) provided by our engineers to help you with architecture, integration, migration, and operational improvements of your setup
 
 #### Benefits over ZITADEL Cloud
 
