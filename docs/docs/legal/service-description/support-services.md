@@ -9,7 +9,7 @@ This annex of the [Framework Agreement](../terms-of-service) and the [Support Se
 Support Services for products and services provided by ZITADEL is offered to customers according to the terms and conditions outlined in this document.
 The customer may purchase support services from ZITADEL (CAOS Ltd.) directly.
 
-Last revised: October 6, 2023
+Last revised: November 1, 2023
 
 ## Service Level Agreement
 
@@ -83,7 +83,7 @@ Subscription Plans | Default | Extended SLA | Custom
 --- | --- | --- | ---
 Severity 1| Best effort | 1 business hour | up to 30min
 Severity 2| Best effort | 2 business hour | 2 business hours
-Severity 3| Best effort | 12 business hour | 12 business hours 
+Severity 3| Best effort | 12 business hour | 12 business hours
 Severity 4| Best effort | 24 business hour | 24 business hours
 
 If we fail to provide the initial response time objective, you will be entitled to service credits. For every 15 minutes exceeding the state objective, 1 day will be added as extension to the current term.
@@ -96,12 +96,13 @@ Community support for ZITADEL is available on our website, our [public chat](htt
 
 #### Professional support
 
-- Support is available in Swiss-German, German, and English
-- Default contact: Whenever customers require support, Customers should consult the documentation of the service or product or post a question to our community.
+- Support is available in English
+- Default contact: Whenever customers require support, Customers should consult the documentation of the service or product or post a question to our community
 - When Customer is eligible for support services through a Subscription Plan, Customer may contact ZITADEL support via the following channels
 
 Support Feature | Contact information
 --- | ---
+Ticket | Submit an issue via the [customer portal](https://zitadel.com/admin/support)
 eMail Support | support@zitadel.com
 Chat Support | Private chat channel between ZITADEL and Customer that is opened when Subscription becomes active
 Phone Support | +41 43 215 27 34
