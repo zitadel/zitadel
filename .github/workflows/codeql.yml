@@ -32,7 +32,10 @@ jobs:
     - if: matrix.language == 'go'
       uses: actions/setup-node@v3
     - if: matrix.language == 'go'
-      run: npm install -g sass
+      run: |
+        npm install -g sass
+        mkdir -p console/dist/console
+        touch console/dist/console/placeholder
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
@@ -58,8 +61,6 @@ jobs:
     - if: matrix.language == 'go'
       name: compile go
       run: |
-        mkdir -p console/dist/console
-        touch console/dist/console/placeholder
         make core_build
         go list ./...
         go build ./...
