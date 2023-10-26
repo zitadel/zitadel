@@ -94,8 +94,10 @@ func (q *Queries) DomainPolicyByOrg(ctx context.Context, shouldTriggerBulk bool,
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerDomainPolicyProjection")
 		ctx, err = projection.DomainPolicyProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 	eq := sq.And{
 		sq.Eq{DomainPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},

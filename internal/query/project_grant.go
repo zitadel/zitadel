@@ -119,8 +119,10 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, 
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerProjectGrantProjection")
 		ctx, err = projection.ProjectGrantProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	stmt, scan := prepareProjectGrantQuery(ctx, q.client)

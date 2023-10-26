@@ -85,8 +85,10 @@ func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk boo
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerOrgMetadataProjection")
 		ctx, err = projection.OrgMetadataProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	query, scan := prepareOrgMetadataQuery(ctx, q.client)
@@ -118,8 +120,10 @@ func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool,
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerOrgMetadataProjection")
 		ctx, err = projection.OrgMetadataProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 	eq := sq.Eq{
 		OrgMetadataOrgIDCol.identifier():      orgID,
