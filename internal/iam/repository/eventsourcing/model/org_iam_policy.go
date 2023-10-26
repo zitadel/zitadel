@@ -1,9 +1,8 @@
 package model
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 )
@@ -32,8 +31,8 @@ func (p *DomainPolicy) Changes(changed *DomainPolicy) map[string]interface{} {
 	return changes
 }
 
-func (p *DomainPolicy) SetData(event *es_models.Event) error {
-	err := json.Unmarshal(event.Data, p)
+func (p *DomainPolicy) SetData(event eventstore.Event) error {
+	err := event.Unmarshal(p)
 	if err != nil {
 		return errors.ThrowInternal(err, "EVENT-7JS9d", "unable to unmarshal data")
 	}

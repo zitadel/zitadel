@@ -1136,7 +1136,7 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 
 			for {
 				got, err = Client.ListAuthenticationMethodTypes(tt.args.ctx, tt.args.req)
-				if err == nil && got.GetDetails().GetProcessedSequence() >= idpLink.GetDetails().GetSequence() {
+				if err == nil && !got.GetDetails().GetTimestamp().AsTime().Before(idpLink.GetDetails().GetChangeDate().AsTime()) {
 					break
 				}
 				select {

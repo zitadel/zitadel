@@ -15,7 +15,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/op"
+	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/api/authz"

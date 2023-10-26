@@ -102,6 +102,36 @@ export class UserMfaComponent implements OnInit, OnDestroy {
             .catch((error) => {
               this.toast.showError(error);
             });
+        } else if (factor.otpEmail) {
+          this.mgmtUserService
+            .removeHumanAuthFactorOTPEmail(this.user.id)
+            .then(() => {
+              this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
+
+              const index = this.dataSource.data.findIndex((mfa) => !!mfa.otpEmail);
+              if (index > -1) {
+                this.dataSource.data.splice(index, 1);
+              }
+              this.getMFAs();
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        } else if (factor.otpSms) {
+          this.mgmtUserService
+            .removeHumanAuthFactorOTPSMS(this.user.id)
+            .then(() => {
+              this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
+
+              const index = this.dataSource.data.findIndex((mfa) => !!mfa.otpSms);
+              if (index > -1) {
+                this.dataSource.data.splice(index, 1);
+              }
+              this.getMFAs();
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
         }
       }
     });

@@ -17,8 +17,8 @@ func deviceCodeUniqueField(clientID, deviceCode string) string {
 	return strings.Join([]string{clientID, deviceCode}, ":")
 }
 
-func NewAddUniqueConstraints(clientID, deviceCode, userCode string) []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{
+func NewAddUniqueConstraints(clientID, deviceCode, userCode string) []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{
 		eventstore.NewAddEventUniqueConstraint(
 			UniqueDeviceCode,
 			deviceCodeUniqueField(clientID, deviceCode),
@@ -32,13 +32,13 @@ func NewAddUniqueConstraints(clientID, deviceCode, userCode string) []*eventstor
 	}
 }
 
-func NewRemoveUniqueConstraints(clientID, deviceCode, userCode string) []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{
-		eventstore.NewRemoveEventUniqueConstraint(
+func NewRemoveUniqueConstraints(clientID, deviceCode, userCode string) []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{
+		eventstore.NewRemoveUniqueConstraint(
 			UniqueDeviceCode,
 			deviceCodeUniqueField(clientID, deviceCode),
 		),
-		eventstore.NewRemoveEventUniqueConstraint(
+		eventstore.NewRemoveUniqueConstraint(
 			UniqueUserCode,
 			userCode,
 		),

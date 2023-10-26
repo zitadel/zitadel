@@ -1,8 +1,6 @@
 package model
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -41,7 +39,7 @@ func ProjectToModel(project *Project) *model.Project {
 	}
 }
 
-func ProjectFromEvents(project *Project, events ...*es_models.Event) (*Project, error) {
+func ProjectFromEvents(project *Project, events ...eventstore.Event) (*Project, error) {
 	if project == nil {
 		project = &Project{}
 	}
@@ -49,7 +47,7 @@ func ProjectFromEvents(project *Project, events ...*es_models.Event) (*Project, 
 	return project, project.AppendEvents(events...)
 }
 
-func (p *Project) AppendEvents(events ...*es_models.Event) error {
+func (p *Project) AppendEvents(events ...eventstore.Event) error {
 	for _, event := range events {
 		if err := p.AppendEvent(event); err != nil {
 			return err
@@ -58,10 +56,10 @@ func (p *Project) AppendEvents(events ...*es_models.Event) error {
 	return nil
 }
 
-func (p *Project) AppendEvent(event *es_models.Event) error {
+func (p *Project) AppendEvent(event eventstore.Event) error {
 	p.ObjectRoot.AppendEvent(event)
 
-	switch eventstore.EventType(event.Type) {
+	switch event.Type() {
 	case project.ProjectAddedType, project.ProjectChangedType:
 		return p.AppendAddProjectEvent(event)
 	case project.ProjectDeactivatedType:
@@ -78,7 +76,7 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (p *Project) AppendAddProjectEvent(event *es_models.Event) error {
+func (p *Project) AppendAddProjectEvent(event eventstore.Event) error {
 	p.SetData(event)
 	p.State = int32(model.ProjectStateActive)
 	return nil
@@ -99,18 +97,18 @@ func (p *Project) appendRemovedEvent() error {
 	return nil
 }
 
-func (p *Project) appendOIDCConfig(event *es_models.Event) error {
+func (p *Project) appendOIDCConfig(event eventstore.Event) error {
 	appEvent := new(oidcApp)
-	if err := json.Unmarshal(event.Data, appEvent); err != nil {
+	if err := event.Unmarshal(p); err != nil {
 		return err
 	}
 	p.OIDCApplications = append(p.OIDCApplications, appEvent)
 	return nil
 }
 
-func (p *Project) appendApplicationRemoved(event *es_models.Event) error {
+func (p *Project) appendApplicationRemoved(event eventstore.Event) error {
 	appEvent := new(oidcApp)
-	if err := json.Unmarshal(event.Data, appEvent); err != nil {
+	if err := event.Unmarshal(appEvent); err != nil {
 		return err
 	}
 	for i := len(p.OIDCApplications) - 1; i >= 0; i-- {
@@ -124,8 +122,8 @@ func (p *Project) appendApplicationRemoved(event *es_models.Event) error {
 	return nil
 }
 
-func (p *Project) SetData(event *es_models.Event) error {
-	if err := json.Unmarshal(event.Data, p); err != nil {
+func (p *Project) SetData(event eventstore.Event) error {
+	if err := event.Unmarshal(p); err != nil {
 		logging.Log("EVEN-lo9sr").WithError(err).Error("could not unmarshal event data")
 		return err
 	}

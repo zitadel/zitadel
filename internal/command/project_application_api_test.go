@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
@@ -248,29 +247,22 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewApplicationAddedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"app1",
-									"app",
-								),
-							),
-							eventFromEventPusher(
-								project.NewAPIConfigAddedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"app1",
-									"client1@project",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									domain.APIAuthMethodTypeBasic),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewAddApplicationUniqueConstraint("app", "project1")),
+						project.NewApplicationAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"app",
+						),
+						project.NewAPIConfigAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"client1@project",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							domain.APIAuthMethodTypeBasic),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1"),
@@ -316,24 +308,17 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewApplicationAddedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"app1",
-									"app",
-								),
-							),
-							eventFromEventPusher(
-								project.NewAPIConfigAddedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"app1",
-									"client1@project",
-									nil,
-									domain.APIAuthMethodTypePrivateKeyJWT),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewAddApplicationUniqueConstraint("app", "project1")),
+						project.NewApplicationAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"app",
+						),
+						project.NewAPIConfigAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"client1@project",
+							nil,
+							domain.APIAuthMethodTypePrivateKeyJWT),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1"),
@@ -540,15 +525,11 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newAPIAppChangedEvent(context.Background(),
-									"app1",
-									"project1",
-									"org1",
-									domain.APIAuthMethodTypePrivateKeyJWT),
-							),
-						},
+						newAPIAppChangedEvent(context.Background(),
+							"app1",
+							"project1",
+							"org1",
+							domain.APIAuthMethodTypePrivateKeyJWT),
 					),
 				),
 			},
@@ -698,19 +679,16 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewAPIConfigSecretChangedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"app1",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									}),
-							),
-						},
+						project.NewAPIConfigSecretChangedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+						),
 					),
 				),
 			},

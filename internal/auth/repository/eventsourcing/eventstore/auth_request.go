@@ -16,7 +16,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query"
@@ -24,7 +23,6 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	user_model "github.com/zitadel/zitadel/internal/user/model"
 	user_view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
-	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 const unknownUserID = "UNKNOWN"
@@ -34,7 +32,6 @@ type AuthRequestRepo struct {
 	Query        *query.Queries
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
-	Eventstore   v1.Eventstore
 	UserCodeAlg  crypto.EncryptionAlgorithm
 
 	LabelPolicyProvider       labelPolicyProvider
@@ -69,7 +66,7 @@ type privacyPolicyProvider interface {
 type userSessionViewProvider interface {
 	UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error)
 	UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error)
-	GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*repository.CurrentSequence, error)
+	GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*query.CurrentState, error)
 }
 
 type userViewProvider interface {
@@ -93,7 +90,7 @@ type idpUserLinksProvider interface {
 }
 
 type userEventProvider interface {
-	UserEventsByID(ctx context.Context, id string, sequence uint64, eventTypes []es_models.EventType) ([]*es_models.Event, error)
+	UserEventsByID(ctx context.Context, id string, sequence uint64, eventTypes []eventstore.EventType) ([]eventstore.Event, error)
 }
 
 type userCommandProvider interface {
@@ -1338,6 +1335,7 @@ func labelPolicyToDomain(p *query.LabelPolicy) *domain.LabelPolicy {
 		HideLoginNameSuffix: p.HideLoginNameSuffix,
 		ErrorMsgPopup:       p.ShouldErrorPopup,
 		DisableWatermark:    p.WatermarkDisabled,
+		ThemeMode:           p.ThemeMode,
 	}
 }
 
@@ -1436,25 +1434,25 @@ func userSessionsByUserAgentID(ctx context.Context, provider userSessionViewProv
 }
 
 var (
-	userSessionEventTypes = []es_models.EventType{
-		es_models.EventType(user_repo.UserV1PasswordCheckSucceededType),
-		es_models.EventType(user_repo.UserV1PasswordCheckFailedType),
-		es_models.EventType(user_repo.UserV1MFAOTPCheckSucceededType),
-		es_models.EventType(user_repo.UserV1MFAOTPCheckFailedType),
-		es_models.EventType(user_repo.UserV1SignedOutType),
-		es_models.EventType(user_repo.UserLockedType),
-		es_models.EventType(user_repo.UserDeactivatedType),
-		es_models.EventType(user_repo.HumanPasswordCheckSucceededType),
-		es_models.EventType(user_repo.HumanPasswordCheckFailedType),
-		es_models.EventType(user_repo.UserIDPLoginCheckSucceededType),
-		es_models.EventType(user_repo.HumanMFAOTPCheckSucceededType),
-		es_models.EventType(user_repo.HumanMFAOTPCheckFailedType),
-		es_models.EventType(user_repo.HumanSignedOutType),
-		es_models.EventType(user_repo.HumanPasswordlessTokenCheckSucceededType),
-		es_models.EventType(user_repo.HumanPasswordlessTokenCheckFailedType),
-		es_models.EventType(user_repo.HumanU2FTokenCheckSucceededType),
-		es_models.EventType(user_repo.HumanU2FTokenCheckFailedType),
-		es_models.EventType(user_repo.UserRemovedType),
+	userSessionEventTypes = []eventstore.EventType{
+		user_repo.UserV1PasswordCheckSucceededType,
+		user_repo.UserV1PasswordCheckFailedType,
+		user_repo.UserV1MFAOTPCheckSucceededType,
+		user_repo.UserV1MFAOTPCheckFailedType,
+		user_repo.UserV1SignedOutType,
+		user_repo.UserLockedType,
+		user_repo.UserDeactivatedType,
+		user_repo.HumanPasswordCheckSucceededType,
+		user_repo.HumanPasswordCheckFailedType,
+		user_repo.UserIDPLoginCheckSucceededType,
+		user_repo.HumanMFAOTPCheckSucceededType,
+		user_repo.HumanMFAOTPCheckFailedType,
+		user_repo.HumanSignedOutType,
+		user_repo.HumanPasswordlessTokenCheckSucceededType,
+		user_repo.HumanPasswordlessTokenCheckFailedType,
+		user_repo.HumanU2FTokenCheckSucceededType,
+		user_repo.HumanU2FTokenCheckFailedType,
+		user_repo.UserRemovedType,
 	}
 )
 
@@ -1471,7 +1469,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			Errorf("could not get current sequence for userSessionByIDs")
 		session = &user_view_model.UserSessionView{UserAgentID: agentID, UserID: user.ID}
 		if sequence != nil {
-			session.Sequence = sequence.CurrentSequence
+			session.Sequence = sequence.Sequence
 		}
 	}
 	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence, append(session.EventTypes(), userSessionEventTypes...))
@@ -1481,7 +1479,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	}
 	sessionCopy := *session
 	for _, event := range events {
-		switch eventstore.EventType(event.Type) {
+		switch event.Type() {
 		case user_repo.UserV1PasswordCheckSucceededType,
 			user_repo.UserV1PasswordCheckFailedType,
 			user_repo.UserV1MFAOTPCheckSucceededType,

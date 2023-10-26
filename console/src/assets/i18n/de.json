@@ -51,7 +51,7 @@
       "TITLE": "Bringe deine Instanz zum Laufen",
       "DESCRIPTION": "Diese Checkliste hilft bei der Einrichtung Ihrer Instanz und führt Sie durch die wichtigsten Schritte"
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Branding anpassen",
         "description": "Definiere Farben und Form des Login-UIs und uploade deine Logos und Icons.",
@@ -62,15 +62,20 @@
         "description": "Konfiguriere deinen Mailserver.",
         "action": "SMTP einrichten"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Erstelle ein Projekt",
         "description": "Erstelle dein erstes Projekt und definiere Rollen",
         "action": "Projekt erstellen"
       },
-      "project.application.added": {
-        "title": "Erstelle eine App",
-        "description": "Erstelle deine erste Web-, native, API oder SAML-applikation und konfiguriere den Authentification-flow.",
-        "action": "App erstellen"
+      "APPLICATION_CREATED": {
+        "title": "Registriere deine App",
+        "description": "Registriere deine erste Web-, native, API oder SAML-Applikation und konfiguriere den Authentification-flow.",
+        "action": "App registrieren"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Logge dich in deine App ein",
+        "description": "Integriere deine Applikation mit ZITADEL für die Authentifizierung und teste es, indem du dich mit deinem Admin-Benutzer einloggst.",
+        "action": "Einloggen"
       },
       "user.human.added": {
         "title": "Erfasse Benutzer",
@@ -273,7 +278,7 @@
     "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
     "NUMBERERROR": "Muss eine Ziffer beinhalten.",
     "PWNOTEQUAL": "Die Passwörter stimmen nicht überein.",
-    "PHONE": "Die Telefonnummer muss mit 00 oder + starten."
+    "PHONE": "Die Telefonnummer muss mit + starten."
   },
   "USER": {
     "SETTINGS": {
@@ -485,7 +490,7 @@
       "TITLE": "Profil",
       "EMAIL": "E-Mail",
       "PHONE": "Telefonnummer",
-      "PHONE_HINT": "Verwenden Sie 00 oder das Symbol + gefolgt von der Landesvorwahl des Anrufers oder wählen Sie das Land aus der Dropdown-Liste aus und geben anschließend die Telefonnummer ein",
+      "PHONE_HINT": "Verwenden das Symbol + gefolgt von der Landesvorwahl des Anrufers oder wählen Sie das Land aus der Dropdown-Liste aus und geben anschließend die Telefonnummer ein",
       "USERNAME": "Benutzername",
       "CHANGEUSERNAME": "bearbeiten",
       "CHANGEUSERNAME_TITLE": "Benutzername ändern",
@@ -1090,6 +1095,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio erfolgreich hinzugefügt.",
+        "UPDATED": "Twilio wurde erfolgreich aktualisiert.",
         "REMOVED": "Twilio entfernt",
         "CHANGETOKEN": "Token ändern",
         "SETTOKEN": "Token setzen",
@@ -1196,6 +1202,11 @@
         "ERROR": "Benutzer konnte nicht gefunden werden!",
         "PRIMARYBUTTON": "weiter",
         "SECONDARYBUTTON": "registrieren"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Automatischer Modus",
+        "THEME_MODE_LIGHT": "Nur heller Modus",
+        "THEME_MODE_DARK": "Nur dunkler Modus"
       }
     },
     "PWD_AGE": {
@@ -1985,6 +1996,8 @@
       "CLIENTSECRET_DESCRIPTION": "Verwahre das Client Secret an einem sicheren Ort, da es nicht mehr angezeigt werden kann, sobald der Dialog geschlossen wird.",
       "REGENERATESECRET": "Client Secret neu generieren",
       "DEVMODE": "Entwicklermodus",
+      "DEVMODE_ENABLED": "Aktiviert",
+      "DEVMODE_DISABLED": "Deaktiviert",
       "DEVMODEDESC": "Bei eingeschaltetem Entwicklermodus werden die Weiterleitungs-URIs im OIDC-Flow nicht validiert.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Login Erfolgseite überspringen",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Erfolgseite nach dem Login für diese Native Applikation überspringen.",
@@ -2071,11 +2084,16 @@
         "DESCRIPTION": "SAML Applikationen"
       },
       "CONFIGSECTION": "SAML Konfiguration",
-      "URL": "Url der Metadaten-Datei",
-      "OR": "oder",
-      "XML": "Metadaten XML hochladen",
+      "CHOOSEMETADATASOURCE": "Stellen Sie Ihre SAML-Konfiguration mit einer der folgenden Optionen bereit:",
+      "METADATAOPT1": "Option 1: Geben Sie die URL an, unter der sich die Metadatendatei befindet",
+      "METADATAOPT2": "Option 2: Laden Sie eine Datei hoch, die Ihre XML-Metadaten enthält",
+      "METADATAOPT3": "Option 3: Erstellen Sie spontan eine minimale Metadatendatei mit ENTITYID und ACS-URL",
+      "UPLOAD": "XML-Datei hochladen",
       "METADATA": "Metadaten",
-      "METADATAFROMFILE": "Metadata aus Datei"
+      "METADATAFROMFILE": "Metadata aus Datei",
+      "CREATEMETADATA": "Create metadata",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {

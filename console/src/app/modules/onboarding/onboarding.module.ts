@@ -9,7 +9,7 @@ import { ShortcutsModule } from 'src/app/modules/shortcuts/shortcuts.module';
 
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { RouterModule } from '@angular/router';
-import { EventPipeModule } from 'src/app/pipes/event-pipe/event-pipe.module';
+import { MilestonePipeModule } from 'src/app/pipes/milestone-pipe/milestone-pipe.module';
 import { OnboardingComponent } from './onboarding.component';
 
 @NgModule({
@@ -24,7 +24,7 @@ import { OnboardingComponent } from './onboarding.component';
     RouterModule,
     MatProgressSpinnerModule,
     MatProgressBarModule,
-    EventPipeModule,
+    MilestonePipeModule,
   ],
   exports: [OnboardingComponent],
 })

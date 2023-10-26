@@ -1,13 +1,14 @@
 package initialise
 
 import (
-	"database/sql"
 	_ "embed"
 	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 func newGrant() *cobra.Command {
@@ -28,8 +29,8 @@ Prereqesits:
 	}
 }
 
-func VerifyGrant(databaseName, username string) func(*sql.DB) error {
-	return func(db *sql.DB) error {
+func VerifyGrant(databaseName, username string) func(*database.DB) error {
+	return func(db *database.DB) error {
 		logging.WithFields("user", username, "database", databaseName).Info("verify grant")
 
 		return exec(db, fmt.Sprintf(grantStmt, databaseName, username), nil)

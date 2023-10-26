@@ -7,8 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -27,10 +26,11 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanAddedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanAddedType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "user-name",
 						"firstName": "first-name",
 						"lastName": "last-name",
@@ -41,13 +41,12 @@ func TestUserProjection_reduces(t *testing.T) {
 						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
-				), user.HumanAddedEventMapper),
+					), user.HumanAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -96,10 +95,11 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1Added",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1AddedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserV1AddedType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "user-name",
 						"firstName": "first-name",
 						"lastName": "last-name",
@@ -110,13 +110,12 @@ func TestUserProjection_reduces(t *testing.T) {
 						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
-				), user.HumanAddedEventMapper),
+					), user.HumanAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -165,22 +164,22 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanAdded NULLs",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanAddedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanAddedType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "user-name",
 						"firstName": "first-name",
 						"lastName": "last-name",
 						"email": "email@zitadel.com"
 					}`),
-				), user.HumanAddedEventMapper),
+					), user.HumanAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -229,10 +228,11 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanRegistered",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanRegisteredType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanRegisteredType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "user-name",
 						"firstName": "first-name",
 						"lastName": "last-name",
@@ -243,13 +243,12 @@ func TestUserProjection_reduces(t *testing.T) {
 						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
-				), user.HumanRegisteredEventMapper),
+					), user.HumanRegisteredEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanRegistered,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -298,10 +297,11 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1Registered",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1RegisteredType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserV1RegisteredType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "user-name",
 						"firstName": "first-name",
 						"lastName": "last-name",
@@ -312,13 +312,12 @@ func TestUserProjection_reduces(t *testing.T) {
 						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
-				), user.HumanRegisteredEventMapper),
+					), user.HumanRegisteredEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanRegistered,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -367,22 +366,22 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanRegistered NULLs",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanRegisteredType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanRegisteredType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "user-name",
 						"firstName": "first-name",
 						"lastName": "last-name",
 						"email": "email@zitadel.com"
 					}`),
-				), user.HumanRegisteredEventMapper),
+					), user.HumanRegisteredEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanRegistered,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -431,17 +430,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanInitCodeAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanInitialCodeAddedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanInitialCodeAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.HumanInitialCodeAddedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanInitialCodeAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanInitCodeAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -459,17 +458,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1InitCodeAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1InitialCodeAddedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanInitialCodeAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserV1InitialCodeAddedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanInitialCodeAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanInitCodeAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -487,17 +486,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanInitCodeSucceeded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanInitializedCheckSucceededType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanInitializedCheckSucceededEventMapper),
+				event: getEvent(
+					testEvent(
+						user.HumanInitializedCheckSucceededType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanInitializedCheckSucceededEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanInitCodeSucceeded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -515,17 +514,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1InitCodeAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1InitializedCheckSucceededType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanInitializedCheckSucceededEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserV1InitializedCheckSucceededType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanInitializedCheckSucceededEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanInitCodeSucceeded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -543,17 +542,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserLocked",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserLockedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.UserLockedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserLockedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.UserLockedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceUserLocked,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -573,17 +572,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserUnlocked",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserUnlockedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.UserUnlockedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserUnlockedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.UserUnlockedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceUserUnlocked,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -603,17 +602,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserDeactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserDeactivatedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.UserDeactivatedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserDeactivatedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.UserDeactivatedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceUserDeactivated,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -633,17 +632,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserReactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserReactivatedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.UserReactivatedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserReactivatedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.UserReactivatedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceUserReactivated,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -663,17 +662,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserRemovedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.UserRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserRemovedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.UserRemovedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -690,19 +689,19 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserUserNameChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserUserNameChangedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserUserNameChangedType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "username"
 					}`),
-				), user.UsernameChangedEventMapper),
+					), user.UsernameChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceUserNameChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -722,19 +721,19 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceDomainClaimed",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserDomainClaimedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserDomainClaimedType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "id@temporary.domain"
 					}`),
-				), user.DomainClaimedEventMapper),
+					), user.DomainClaimedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceDomainClaimed,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -754,10 +753,11 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanProfileChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanProfileChangedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanProfileChangedType,
+						user.AggregateType,
+						[]byte(`{
 						"firstName": "first-name",
 						"lastName": "last-name",
 						"nickName": "nick-name",
@@ -765,13 +765,12 @@ func TestUserProjection_reduces(t *testing.T) {
 						"preferredLanguage": "ch-DE",
 						"gender": 3
 					}`),
-				), user.HumanProfileChangedEventMapper),
+					), user.HumanProfileChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanProfileChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -803,10 +802,11 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1ProfileChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1ProfileChangedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserV1ProfileChangedType,
+						user.AggregateType,
+						[]byte(`{
 						"firstName": "first-name",
 						"lastName": "last-name",
 						"nickName": "nick-name",
@@ -814,13 +814,12 @@ func TestUserProjection_reduces(t *testing.T) {
 						"preferredLanguage": "ch-DE",
 						"gender": 3
 					}`),
-				), user.HumanProfileChangedEventMapper),
+					), user.HumanProfileChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanProfileChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -852,19 +851,19 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanPhoneChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanPhoneChangedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanPhoneChangedType,
+						user.AggregateType,
+						[]byte(`{
 						"phone": "+41 00 000 00 00"
 						}`),
-				), user.HumanPhoneChangedEventMapper),
+					), user.HumanPhoneChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -900,19 +899,19 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1PhoneChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1PhoneChangedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserV1PhoneChangedType,
+						user.AggregateType,
+						[]byte(`{
 						"phone": "+41 00 000 00 00"
 						}`),
-				), user.HumanPhoneChangedEventMapper),
+					), user.HumanPhoneChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -948,17 +947,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanPhoneRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanPhoneRemovedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanPhoneRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.HumanPhoneRemovedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanPhoneRemovedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -995,17 +994,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1PhoneRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1PhoneRemovedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanPhoneRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserV1PhoneRemovedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanPhoneRemovedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1042,17 +1041,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanPhoneVerified",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanPhoneVerifiedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanPhoneVerifiedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.HumanPhoneVerifiedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanPhoneVerifiedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneVerified,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1086,17 +1085,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1PhoneVerified",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1PhoneVerifiedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanPhoneVerifiedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserV1PhoneVerifiedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanPhoneVerifiedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneVerified,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1130,19 +1129,19 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanEmailChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanEmailChangedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanEmailChangedType,
+						user.AggregateType,
+						[]byte(`{
 						"email": "email@zitadel.com"
 					}`),
-				), user.HumanEmailChangedEventMapper),
+					), user.HumanEmailChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanEmailChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1178,19 +1177,19 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1EmailChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1EmailChangedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserV1EmailChangedType,
+						user.AggregateType,
+						[]byte(`{
 						"email": "email@zitadel.com"
 					}`),
-				), user.HumanEmailChangedEventMapper),
+					), user.HumanEmailChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanEmailChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1226,17 +1225,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanEmailVerified",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanEmailVerifiedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanEmailVerifiedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.HumanEmailVerifiedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanEmailVerifiedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanEmailVerified,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1270,17 +1269,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1EmailVerified",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1EmailVerifiedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanEmailVerifiedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserV1EmailVerifiedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanEmailVerifiedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanEmailVerified,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1314,19 +1313,19 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanAvatarAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanAvatarAddedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanAvatarAddedType,
+						user.AggregateType,
+						[]byte(`{
 						"storeKey": "users/agg-id/avatar"
 					}`),
-				), user.HumanAvatarAddedEventMapper),
+					), user.HumanAvatarAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanAvatarAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1353,17 +1352,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanAvatarRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanAvatarRemovedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanAvatarRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.HumanAvatarRemovedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanAvatarRemovedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanAvatarRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1390,20 +1389,20 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMachineAddedEvent no description",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineAddedEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.MachineAddedEventType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "username",
 						"name": "machine-name"
 					}`),
-				), user.MachineAddedEventMapper),
+					), user.MachineAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceMachineAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1437,21 +1436,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMachineAddedEvent",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineAddedEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.MachineAddedEventType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "username",
 						"name": "machine-name",
 						"description": "description"
 					}`),
-				), user.MachineAddedEventMapper),
+					), user.MachineAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceMachineAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1485,20 +1484,20 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMachineChangedEvent",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineChangedEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.MachineChangedEventType,
+						user.AggregateType,
+						[]byte(`{
 						"name": "machine-name",
 						"description": "description"
 					}`),
-				), user.MachineChangedEventMapper),
+					), user.MachineChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceMachineChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1526,19 +1525,19 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMachineChangedEvent name",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineChangedEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.MachineChangedEventType,
+						user.AggregateType,
+						[]byte(`{
 						"name": "machine-name"
 					}`),
-				), user.MachineChangedEventMapper),
+					), user.MachineChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceMachineChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1565,19 +1564,19 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMachineChangedEvent description",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineChangedEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.MachineChangedEventType,
+						user.AggregateType,
+						[]byte(`{
 						"description": "description"
 					}`),
-				), user.MachineChangedEventMapper),
+					), user.MachineChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceMachineChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1604,17 +1603,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMachineChangedEvent no values",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineChangedEventType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.MachineChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.MachineChangedEventType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.MachineChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceMachineChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
@@ -1623,19 +1622,19 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMachineSecretSet",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineSecretSetType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.MachineSecretSetType,
+						user.AggregateType,
+						[]byte(`{
 						"client_secret": {}
 					}`),
-				), user.MachineSecretSetEventMapper),
+					), user.MachineSecretSetEventMapper),
 			},
 			reduce: (&userProjection{}).reduceMachineSecretSet,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1662,17 +1661,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMachineSecretSet",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineSecretRemovedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.MachineSecretRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.MachineSecretRemovedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.MachineSecretRemovedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceMachineSecretRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1700,16 +1699,16 @@ func TestUserProjection_reduces(t *testing.T) {
 			name:   "org reduceOwnerRemoved",
 			reduce: (&userProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1726,17 +1725,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(UserInstanceIDCol),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

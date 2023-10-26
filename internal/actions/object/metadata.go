@@ -16,7 +16,7 @@ func UserMetadataListFromQuery(c *actions.FieldConfig, metadata *query.UserMetad
 	result := &userMetadataList{
 		Count:     metadata.Count,
 		Sequence:  metadata.Sequence,
-		Timestamp: metadata.Timestamp,
+		Timestamp: metadata.LastRun,
 		Metadata:  make([]*userMetadata, len(metadata.Metadata)),
 	}
 

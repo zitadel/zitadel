@@ -31,11 +31,11 @@ func (e *AddedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *AddedEvent) Data() any {
+func (e *AddedEvent) Payload() any {
 	return e
 }
 
-func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return NewAddUniqueConstraints(e.ClientID, e.DeviceCode, e.UserCode)
 }
 
@@ -65,11 +65,11 @@ func (e *ApprovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *ApprovedEvent) Data() any {
+func (e *ApprovedEvent) Payload() any {
 	return e
 }
 
-func (e *ApprovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *ApprovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -95,11 +95,11 @@ func (e *CanceledEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *CanceledEvent) Data() any {
+func (e *CanceledEvent) Payload() any {
 	return e
 }
 
-func (e *CanceledEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *CanceledEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -119,11 +119,11 @@ func (e *RemovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *RemovedEvent) Data() any {
+func (e *RemovedEvent) Payload() any {
 	return e
 }
 
-func (e *RemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *RemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return NewRemoveUniqueConstraints(e.ClientID, e.DeviceCode, e.UserCode)
 }
 

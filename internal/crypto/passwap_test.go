@@ -379,7 +379,10 @@ func TestHasherConfig_decodeParams(t *testing.T) {
 				"b": 2,
 				"c": 3,
 			},
-			wantErr: true,
+			want: dst{
+				A: 1,
+				B: 2,
+			},
 		},
 		{
 			name: "unset",

@@ -303,7 +303,10 @@ export class AuthUserDetailComponent implements OnDestroy {
   public savePhone(phone: string): void {
     if (this.user?.human) {
       // Format phone before save (add +)
-      phone = formatPhone(phone).phone;
+      const formattedPhone = formatPhone(phone);
+      if (formattedPhone) {
+        phone = formattedPhone.phone;
+      }
 
       this.userService
         .setMyPhone(phone)

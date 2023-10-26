@@ -1,11 +1,8 @@
 package asset
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -19,11 +16,11 @@ type AddedEvent struct {
 	StoreKey string `json:"storeKey"`
 }
 
-func (e *AddedEvent) Data() interface{} {
+func (e *AddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -38,12 +35,12 @@ func NewAddedEvent(
 	}
 }
 
-func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func AddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "ASSET-1WEAx", "unable to unmarshal asset")
 	}
@@ -57,11 +54,11 @@ type RemovedEvent struct {
 	StoreKey string `json:"storeKey"`
 }
 
-func (e *RemovedEvent) Data() interface{} {
+func (e *RemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *RemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *RemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -76,12 +73,12 @@ func NewRemovedEvent(
 	}
 }
 
-func RemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func RemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &RemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "ASSET-1m9PP", "unable to unmarshal asset")
 	}

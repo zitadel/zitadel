@@ -158,10 +158,7 @@ func TestServer_SetPassword(t *testing.T) {
 						Password: "InitialPassw0rd!",
 					},
 				})
-				if err != nil {
-					return err
-				}
-				return nil
+				return err
 			},
 			args: args{
 				ctx: CTX,
