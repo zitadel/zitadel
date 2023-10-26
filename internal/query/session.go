@@ -270,7 +270,7 @@ func NewSessionCreatorSearchQuery(creator string) (SearchQuery, error) {
 }
 
 func NewUserIDSearchQuery(id string) (SearchQuery, error) {
-	return NewTextQuery(HumanUserIDCol, id, TextEquals)
+	return NewTextQuery(SessionColumnUserID, id, TextEquals)
 }
 
 func NewCreationDateQuery(datetime time.Time, compare TimestampComparison) (SearchQuery, error) {
