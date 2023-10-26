@@ -1203,6 +1203,11 @@
         "ERROR": "Benutzer konnte nicht gefunden werden!",
         "PRIMARYBUTTON": "weiter",
         "SECONDARYBUTTON": "registrieren"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Automatischer Modus",
+        "THEME_MODE_LIGHT": "Nur heller Modus",
+        "THEME_MODE_DARK": "Nur dunkler Modus"
       }
     },
     "PWD_AGE": {

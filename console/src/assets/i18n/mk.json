@@ -1205,6 +1205,11 @@
         "ERROR": "Корисникот не е пронајден!",
         "PRIMARYBUTTON": "следно",
         "SECONDARYBUTTON": "регистрирај се"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Автоматски режим",
+        "THEME_MODE_LIGHT": "Само светлосен режим",
+        "THEME_MODE_DARK": "Само темен режим"
       }
     },
     "PWD_AGE": {

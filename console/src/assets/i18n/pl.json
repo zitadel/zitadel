@@ -1203,6 +1203,11 @@
         "ERROR": "Nie znaleziono użytkownika!",
         "PRIMARYBUTTON": "Dalej",
         "SECONDARYBUTTON": "Zarejestruj"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Tryb automatyczny",
+        "THEME_MODE_LIGHT": "Tylko tryb jasny",
+        "THEME_MODE_DARK": "Tylko tryb ciemny"
       }
     },
     "PWD_AGE": {

@@ -1335,6 +1335,7 @@ func labelPolicyToDomain(p *query.LabelPolicy) *domain.LabelPolicy {
 		HideLoginNameSuffix: p.HideLoginNameSuffix,
 		ErrorMsgPopup:       p.ShouldErrorPopup,
 		DisableWatermark:    p.WatermarkDisabled,
+		ThemeMode:           p.ThemeMode,
 	}
 }
 

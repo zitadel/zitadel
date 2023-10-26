@@ -1203,6 +1203,11 @@
         "ERROR": "L'utilisateur n'a pas pu être trouvé !",
         "PRIMARYBUTTON": "suivant",
         "SECONDARYBUTTON": "enregistrez-vous"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Mode automatique",
+        "THEME_MODE_LIGHT": "Mode clair uniquement",
+        "THEME_MODE_DARK": "Mode sombre uniquement"
       }
     },
     "PWD_AGE": {

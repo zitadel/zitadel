@@ -1204,6 +1204,11 @@
         "ERROR": "¡No se encontró el usuario!",
         "PRIMARYBUTTON": "siguiente",
         "SECONDARYBUTTON": "registrar"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Modo automático",
+        "THEME_MODE_LIGHT": "Sólo modo claro",
+        "THEME_MODE_DARK": "Sólo modo oscuro"
       }
     },
     "PWD_AGE": {

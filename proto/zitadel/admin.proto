@@ -6230,6 +6230,11 @@ message UpdateLabelPolicyRequest {
         }
     ];
     bool disable_watermark = 11;
+    zitadel.policy.v1.ThemeMode theme_mode = 12 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "setting if there should be a restriction on which themes are available";
+        }
+    ];
 }
 
 message UpdateLabelPolicyResponse {

@@ -28,6 +28,7 @@ type LabelPolicy struct {
 	FontURL             string
 	WatermarkDisabled   bool
 	ShouldErrorPopup    bool
+	ThemeMode           domain.LabelPolicyThemeMode
 
 	Dark  Theme
 	Light Theme
@@ -234,6 +235,9 @@ var (
 	LabelPolicyOwnerRemoved = Column{
 		name: projection.LabelPolicyOwnerRemovedCol,
 	}
+	LabelPolicyThemeMode = Column{
+		name: projection.LabelPolicyThemeModeCol,
+	}
 )
 
 func prepareLabelPolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, error)) {
@@ -250,6 +254,7 @@ func prepareLabelPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			LabelPolicyColFontURL.identifier(),
 			LabelPolicyColWatermarkDisabled.identifier(),
 			LabelPolicyColShouldErrorPopup.identifier(),
+			LabelPolicyThemeMode.identifier(),
 
 			LabelPolicyColLightPrimaryColor.identifier(),
 			LabelPolicyColLightWarnColor.identifier(),
@@ -299,6 +304,7 @@ func prepareLabelPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Select
 				&fontURL,
 				&policy.WatermarkDisabled,
 				&policy.ShouldErrorPopup,
+				&policy.ThemeMode,
 
 				&lightPrimaryColor,
 				&lightWarnColor,
@@ -358,5 +364,6 @@ func (p *LabelPolicy) ToDomain() *domain.LabelPolicy {
 		HideLoginNameSuffix: p.HideLoginNameSuffix,
 		ErrorMsgPopup:       p.ShouldErrorPopup,
 		DisableWatermark:    p.WatermarkDisabled,
+		ThemeMode:           p.ThemeMode,
 	}
 }

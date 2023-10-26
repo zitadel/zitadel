@@ -1204,6 +1204,11 @@
         "ERROR": "User could not be found!",
         "PRIMARYBUTTON": "next",
         "SECONDARYBUTTON": "register"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Auto Mode",
+        "THEME_MODE_LIGHT": "Light Mode only",
+        "THEME_MODE_DARK": "Dark Mode only"
       }
     },
     "PWD_AGE": {
