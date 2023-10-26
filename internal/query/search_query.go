@@ -553,6 +553,10 @@ func NewTimestampQuery(c Column, value time.Time, compare TimestampComparison) (
 	}, nil
 }
 
+func (q *TimestampQuery) Col() Column {
+	return q.Column
+}
+
 func (q *TimestampQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
 }
