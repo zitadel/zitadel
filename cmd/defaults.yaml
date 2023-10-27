@@ -200,7 +200,14 @@ Projections:
   # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
     Projects:
+      BulkLimit: 50
       TransactionDuration: 2s
+    message_texts:
+      TransactionDuration: 2s
+      BulkLimit: 400
+    custom_texts:
+      TransactionDuration: 2s
+      BulkLimit: 400
     # The Notifications projection is used for sending emails and SMS to users
     Notifications:
       # As notification projections don't result in database statements, retries don't have an effect
