@@ -1,6 +1,6 @@
 ---
-title: Service description
-sidebar_label: Cloud service
+title: Service description for ZITADEL Cloud and ZITADEL Enterprise
+sidebar_label: Service description
 custom_edit_url: null
 --- 
 
@@ -27,9 +27,10 @@ You will benefit from the transparency of the open source and the hyper-scalabil
 
 #### Benefits over using open source / community license
 
-- [Enterprise supported features](support-services.md) are only supported under an Enterprise license
-- Get access to our support with a [Service Level Agreement](support-services.md#service-level-agreement) that is tailored to your needs
-- Benefit from personal [technical account management](support-services.md#technical-account-manager) provided by our engineers to help you with architecture, integration, migration, and operational improvements of your setup
+- [Enterprise supported features](support-services) are only supported under an Enterprise license
+- Individual [onboarding support](./support-services#onboarding-support) tailored to your needs and team
+- Get access to our support with a [Service Level Agreement](support-services#service-level-agreement) that is tailored to your needs
+- Benefit from personal [technical account management](support-services#technical-account-manager) provided by our engineers to help you with architecture, integration, migration, and operational improvements of your setup
 
 #### Benefits over ZITADEL Cloud
 
