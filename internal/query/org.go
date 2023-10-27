@@ -4,17 +4,15 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
+	"fmt"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	domain_pkg "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -96,27 +94,14 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if shouldTriggerBulk {
-		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerOrgProjection")
-		ctx, err = projection.OrgProjection.Trigger(ctx, handler.WithAwaitRunning())
-		logging.OnError(err).Debug("trigger failed")
-		traceSpan.EndWithError(err)
-	}
+	fmt.Println("OrgByID")
 
-	stmt, scan := prepareOrgQuery(ctx, q.client)
-	query, args, err := stmt.Where(sq.Eq{
-		OrgColumnID.identifier():         id,
-		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
+	orgProjection := newOrgProjection(authz.GetInstance(ctx).InstanceID(), id)
+	err = q.eventstore.FilterToQueryReducer(ctx, orgProjection)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-AWx52", "Errors.Query.SQLStatement")
+		return nil, err
 	}
-
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		org, err = scan(row)
-		return err
-	}, query, args...)
-	return org, err
+	return &orgProjection.Org, nil
 }
 
 func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (org *Org, err error) {
@@ -202,12 +187,17 @@ func (q *Queries) ExistsOrg(ctx context.Context, id, domain string) (verifiedID 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	var org *Org
 	if id != "" {
-		org, err = q.OrgByID(ctx, true, id)
-	} else {
-		org, err = q.OrgByVerifiedDomain(ctx, domain)
+		orgState := newOrgStateProjection(authz.GetInstance(ctx).InstanceID(), id)
+		if err = q.eventstore.FilterToQueryReducer(ctx, orgState); err != nil {
+			return "", err
+		}
+		if orgState.Exists() {
+			return id, nil
+		}
 	}
+
+	org, err := q.OrgByVerifiedDomain(ctx, domain)
 	if err != nil {
 		return "", err
 	}
