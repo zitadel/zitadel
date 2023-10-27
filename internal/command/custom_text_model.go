@@ -28,6 +28,9 @@ func (wm *CustomTextWriteModel) Reduce() error {
 			wm.State = domain.CustomTextStateActive
 		case *policy.CustomTextRemovedEvent:
 			wm.State = domain.CustomTextStateRemoved
+		case *policy.CustomTextTemplateRemovedEvent:
+			wm.Text = ""
+			wm.State = domain.CustomTextStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
