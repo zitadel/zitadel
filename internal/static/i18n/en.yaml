@@ -424,6 +424,7 @@ Errors:
     AuditRetention: History is outside of the Audit Log Retention
   Token:
     NotFound: Token not found
+    Invalid: Token is invalid
   UserSession:
     NotFound: UserSession not found
   Key:

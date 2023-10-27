@@ -192,8 +192,10 @@ func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, s
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerSessionProjection")
 		ctx, err = projection.SessionProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("unable to trigger")
+		traceSpan.EndWithError(err)
 	}
 
 	query, scan := prepareSessionQuery(ctx, q.client)

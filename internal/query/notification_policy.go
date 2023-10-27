@@ -82,7 +82,9 @@ func (q *Queries) NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerNotificationPolicyProjection")
 		ctx, err = projection.NotificationPolicyProjection.Trigger(ctx, handler.WithAwaitRunning())
+		traceSpan.EndWithError(err)
 		if err != nil {
 			return nil, err
 		}
@@ -117,7 +119,9 @@ func (q *Queries) DefaultNotificationPolicy(ctx context.Context, shouldTriggerBu
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerNotificationPolicyProjection")
 		ctx, err = projection.NotificationPolicyProjection.Trigger(ctx, handler.WithAwaitRunning())
+		traceSpan.EndWithError(err)
 		if err != nil {
 			return nil, err
 		}
