@@ -6,9 +6,10 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 )
 
-// pushPlaceholderFmt defines how data are inserted into the events table
 var (
-	pushPlaceholderFmt             string
+	// pushPlaceholderFmt defines how data are inserted into the events table
+	pushPlaceholderFmt string
+	// uniqueConstraintPlaceholderFmt defines the format of the unique constraint error returned from the database
 	uniqueConstraintPlaceholderFmt string
 )
 
