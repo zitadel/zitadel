@@ -4,6 +4,9 @@ sidebar_label: Support service
 custom_edit_url: null
 --- 
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 This annex of the [Framework Agreement](../terms-of-service) and the [Support Service Terms and Conditions](../terms-support-service) describes the support services offered by us for our Services.
 
 Support Services for products and services provided by ZITADEL is offered to customers according to the terms and conditions outlined in this document.
@@ -13,7 +16,10 @@ Last revised: November 1, 2023
 
 ## Service Level Agreement
 
-### ZITADEL Cloud SLA
+ZITADEL provides a Service Level Agreement for support of the [services offered](./cloud-service-description.md#services-offered).
+Depending on your subscription plan you might be eligible to the following support service level agreement.
+
+### ZITADEL Cloud
 
 Based on your subscription plan you may be eligible for the support services as outlined in this document.
 You may purchase additional premium support plans which replace the default support features.
@@ -31,8 +37,6 @@ Subscription Plans | Free | Production | Enterprise Cloud
 [Enterprise supported features](/docs/support/software-release-cycles-support.md#enterprise-supported) |  no | no | yes
 [Technical Account Management](#technical-account-manager) | no | no | bespoke
 
-If you want to add a [Technical Account Manager](#technical-account-manager) or need assistance during onboarding, please [get in touch](https://zitadel.com/contact).
-
 #### Premium support
 
 Premium support can be added to ZITADEL Cloud subscription plans.
@@ -47,16 +51,18 @@ Premium support | Default
 [Enterprise supported features](/docs/support/software-release-cycles-support.md#enterprise-supported) |  no
 [Technical Account Management](#technical-account-manager) | no
 
-### ZITADEL Enterprise SLA
+### ZITADEL Enterprise / self-hostable
 
-Support plans for self-hosting according to your purchase order.
+With ZITADEL Enterprise you become eligible for support plans according to your purchase order for self-hosting ZITADEL.
 
-Customers can define the SLA and additional support options, such as
-
-- Support Hours (business, extended, 24x7) along different severities
-- SLO [Initial response time](#slo---initial-response-time)
-- [Technical account manager](#technical-account-manager)
-- Communication channels
+ZITADEL Enterprise self-hostable| Default
+--- | ---
+[Support hours](#support-hours) | bespoke (up to 24x7)
+[Response Time](#slo---initial-response-time) (Severity 1) | bespoke (as low as 30min)
+[Community support](#community-support) | yes
+[Professional support](#professional-support) | yes
+[Enterprise supported features](/docs/support/software-release-cycles-support.md#enterprise-supported) |  yes
+[Technical Account Management](#technical-account-manager) | bespoke
 
 ## Description of support services
 
@@ -121,6 +127,81 @@ ZITADEL will enhance its support offering by providing eligible clients with a T
 
 We offer TAM services only bundled with specific subscription plans, and the option to add more TAM hours to these plans.
 If you require consulting for your projects, please request a quote via our [website](https://zitadel.com/contact).
+
+### Onboarding support
+
+Our onboarding support should help you, as a new customer, to get a better understanding on how to integrate ZITADEL into your solution, how to tackle the migration, and ensure a highly-available day-to-day operation.
+
+Onboarding support services can be offered to customers that enter a ZITADEL Cloud or a ZITADEL Enterprise subscription.
+
+If you intend to use the open source version exclusively then please join our community chat or Github.
+Your questions might help other people in the community and will make our project better over time.
+
+Please [contact us](https://zitadel.com/contact) for a quote and to get started with onboarding support.
+Below you will find topics covered and scope of the offered services.
+
+#### Proof of value
+
+Within a short time-frame, f.e. 3 weeks, we can show the value of using our services and have the ability to establish the proof a of working setup for your most critical use cases.
+We may offer to support you during an initial period to evaluate next steps.
+Before the start of the period we may ask you to provide a description of your critical use cases and a high-level overview of your planned integration architecture.
+During this period you should make sure that you have the necessary resources on your side to complete the proof of value.
+
+#### Onboarding term
+
+With the onboarding support we provide the initial knowledge transfer to configure and operate ZITADEL.
+During the term you will get direct access to our engineering team via [Technical Account Management](./service-description/support-services.md#technical-account-manager).
+Duration is typically 3 months but this could vary depending on your requirements.
+
+We offer an onboarding term in combination with ZITADEL Enterprise subscriptions.
+
+#### Topics covered
+
+The scope will be tailored to your requirements.
+Topics of the onboarding term may include
+
+- Administration
+- DevOps (Operation)
+- Architecture
+- Integration
+- Migration
+- Security Best Practices & Go-Live Checkup
+
+<Tabs>
+    <TabItem value="in" label="Topics in scope">
+      <ul>
+        <li>IAM Configuration</li>
+        <li>Walk-though all features</li>
+        <li>Users / Manuals</li>
+        <li>Authentication & Management APIs</li>
+        <li>Validation of tokens</li>
+        <li>Client integration best-practices</li>
+        <li>Event types</li>
+        <li>Database schemas and compute models</li>
+        <li>Accessing database</li>
+        <li>Observability (Logs, Errors, Metrics, Tracing)</li>
+        <li>Operations best practices (Deployment, Backup, Networking etc.)</li>
+        <li>Check prerequisites and architecture</li>
+        <li>Troubleshoot installation and configuration of ZITADEL</li>
+        <li>Troubleshoot and configuration connectivity to the database</li>
+        <li>Functional testing of the ZITADEL instance</li>
+      </ul>
+    </TabItem>
+    <TabItem value="out" label="Topics out of scope" default>
+      <ul>
+        <li>Performance testing</li>
+        <li>Setting up or maintaining backup storage</li>
+        <li>Running multiple ZITADEL instances on the same cluster</li>
+        <li>Integration into internal monitoring and alerting</li>
+        <li>Multi-cluster architecture deployments</li>
+        <li>DNS, Network and Firewall configuration</li>
+        <li>Customer-specific Kubernetes configuration needs</li>
+        <li>Non-production environments</li>
+        <li>Production deployment</li>
+        <li>Application-side coding, configuration, or tuning</li>
+      </ul>
+    </TabItem>
+</Tabs>
 
 ## Support
 
