@@ -1,20 +1,18 @@
-@use '@angular/material' as mat;
-
 @mixin project-role-chips-theme($theme) {
   $primary: map-get($theme, primary);
   $warn: map-get($theme, warn);
   $background: map-get($theme, background);
   $accent: map-get($theme, accent);
-  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-color: map-get($primary, 500);
 
-  $warn-color: mat.get-color-from-palette($warn, 500);
-  $accent-color: mat.get-color-from-palette($accent, 500);
+  $warn-color: map-get($warn, 500);
+  $accent-color: map-get($accent, 500);
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
   $back: map-get($background, background);
 
-  $list-background-color: mat.get-color-from-palette($background, 300);
-  $card-background-color: mat.get-color-from-palette($background, cards);
+  $list-background-color: map-get($background, 300);
+  $card-background-color: map-get($background, cards);
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
   $border-selected-color: if($is-dark-theme, #fff, #000);
 
@@ -32,18 +30,27 @@
     font-weight: 600;
 
     .role-rm {
-      height: 1rem;
-      width: 1rem;
+      height: 1.5rem !important;
+      width: 1.5rem !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       line-height: 1rem;
       margin-left: 4px;
       margin-right: -0.5rem;
+      padding: 0 !important;
+
+      .mat-mdc-button-touch-target {
+        height: 1.5rem;
+        width: 1.5rem;
+      }
 
       .role-rm-icon {
         font-size: 1rem;
         height: 1rem;
         width: 1rem;
         line-height: 1rem;
-        transform: translateY(-2px);
+        // transform: translateY(-2px);
       }
     }
   }

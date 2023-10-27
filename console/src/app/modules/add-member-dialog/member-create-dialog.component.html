@@ -1,9 +1,10 @@
 <h1 mat-dialog-title>
   <span class="title">{{ 'MEMBER.ADD' | translate }}</span>
 </h1>
-<p class="desc cnsl-secondary-text">{{ 'ORG_DETAIL.MEMBER.ADDDESCRIPTION' | translate }}</p>
 
 <div mat-dialog-content>
+  <p class="desc cnsl-secondary-text">{{ 'ORG_DETAIL.MEMBER.ADDDESCRIPTION' | translate }}</p>
+
   <ng-container *ngIf="showCreationTypeSelector">
     <cnsl-form-field class="full-width">
       <cnsl-label>{{ 'MEMBER.CREATIONTYPE' | translate }}</cnsl-label>

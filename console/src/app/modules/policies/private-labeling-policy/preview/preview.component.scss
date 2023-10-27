@@ -1,5 +1,3 @@
-@use '@angular/material' as mat;
-
 @import '../../../../../styles/input.scss';
 @import '../../../label/label.component.scss';
 
@@ -11,7 +9,7 @@
   //   @include mat.all-component-themes($theme);
 
   $primary: map-get($theme, primary);
-  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-color: map-get($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);

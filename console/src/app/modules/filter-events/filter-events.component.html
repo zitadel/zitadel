@@ -3,15 +3,20 @@
     mat-stroked-button
     cdkOverlayOrigin
     (click)="showFilter = !showFilter"
-    class="cnsl-action-button"
     #triggereventfilter="cdkOverlayOrigin"
     data-e2e="open-filter-button"
   >
-    <i class="las la-filter no-margin"></i>
-    <span>{{ 'ACTIONS.FILTER' | translate }}</span>
-    <span *ngIf="queryCount" class="filter-count">{{ queryCount }}</span>
-    <cnsl-action-keys [doNotUseContrast]="true" [type]="ActionKeysType.FILTER" (actionTriggered)="showFilter = !showFilter">
-    </cnsl-action-keys>
+    <div class="cnsl-action-button">
+      <i class="las la-filter no-margin"></i>
+      <span>{{ 'ACTIONS.FILTER' | translate }}</span>
+      <span *ngIf="queryCount" class="filter-count">{{ queryCount }}</span>
+      <cnsl-action-keys
+        [doNotUseContrast]="true"
+        [type]="ActionKeysType.FILTER"
+        (actionTriggered)="showFilter = !showFilter"
+      >
+      </cnsl-action-keys>
+    </div>
   </button>
   <ng-template
     cdkConnectedOverlay

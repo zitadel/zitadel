@@ -282,17 +282,17 @@
               </cnsl-info-section>
 
               <p class="clockskew-title cnsl-secondary-text">ClockSkew</p>
+              <!-- TODO: The 'tickInterval' property no longer exists -->
               <mat-slider
                 color="primary"
                 formControlName="clockSkewSeconds"
                 class="clockskew-slider"
                 thumbLabel
                 [displayWith]="formatClockSkewLabel"
-                tickInterval=".1"
                 min="0"
                 [step]="1"
                 max="5"
-              >
+                ><input matSliderThumb />
               </mat-slider>
               <cnsl-info-section class="full-width app-desc">
                 <span>{{ 'APP.OIDC.CLOCKSKEW' | translate }}</span>
