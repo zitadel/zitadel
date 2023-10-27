@@ -62,7 +62,6 @@ jobs:
       name: compile go
       run: |
         make core_build
-        go list ./...
-        go build ./...
+        make compile_pipeline
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
