@@ -69,7 +69,7 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventst
 			if constraint := constraintFromErr(err, addConstraints); constraint != nil {
 				errMessage = constraint.ErrorMessage
 			}
-			return errs.ThrowInternal(err, "V3-DKcYh", errMessage)
+			return errs.ThrowAlreadyExists(err, "V3-DKcYh", errMessage)
 		}
 	}
 	return nil
