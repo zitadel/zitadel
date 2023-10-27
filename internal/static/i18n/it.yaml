@@ -425,6 +425,7 @@ Errors:
     AuditRetention: La storia è al di fuori della Ritenzione Audit Log
   Token:
     NotFound: Token non trovato
+    Invalid: Token non valido
   UserSession:
     NotFound: Sessione non trovata
   Key:

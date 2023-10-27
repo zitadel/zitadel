@@ -424,6 +424,7 @@ Errors:
     AuditRetention: El histórico está fuera de la retención del registro de auditoría
   Token:
     NotFound: Token no encontrado
+    Invalid: Token no válido
   UserSession:
     NotFound: UserSession no encontrado
   Key:
