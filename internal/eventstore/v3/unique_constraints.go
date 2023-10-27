@@ -37,15 +37,15 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventst
 			case eventstore.UniqueConstraintAdd:
 				addPlaceholders = append(addPlaceholders, fmt.Sprintf("($%d, $%d, $%d)", len(addArgs)+1, len(addArgs)+2, len(addArgs)+3))
 				addArgs = append(addArgs, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)
-				addConstraints[fmt.Sprintf("('%s', '%s', '%s')", command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
+				addConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintRemove:
 				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d AND unique_type = $%d AND unique_field = $%d)", len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
 				deleteArgs = append(deleteArgs, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)
-				deleteConstraints[fmt.Sprintf("('%s', '%s', '%s')", command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
+				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintInstanceRemove:
 				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d)", len(deleteArgs)+1))
 				deleteArgs = append(deleteArgs, command.Aggregate().InstanceID)
-				deleteConstraints[fmt.Sprintf("('%s', '%s', '%s')", command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
+				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			}
 		}
 	}
@@ -69,7 +69,7 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventst
 			if constraint := constraintFromErr(err, addConstraints); constraint != nil {
 				errMessage = constraint.ErrorMessage
 			}
-			return errs.ThrowInternal(err, "V3-DKcYh", errMessage)
+			return errs.ThrowAlreadyExists(err, "V3-DKcYh", errMessage)
 		}
 	}
 	return nil
