@@ -2087,6 +2087,8 @@
       "UPLOAD": "Prześlij plik XML",
       "METADATA": "Metadados",
       "METADATAFROMFILE": "Metadados do Arquivo",
+      "CERTIFICATE": "Certificado SAML",
+      "DOWNLOADCERT": "Baixar certificado SAML",
       "CREATEMETADATA": "Criar metadados",
       "ENTITYID": "Entity ID",
       "ACSURL": "ACS endpoint URL"
