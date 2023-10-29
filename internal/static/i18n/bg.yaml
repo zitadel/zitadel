@@ -436,6 +436,7 @@ Errors:
     AuditRetention: Историята е извън съхранението на журнала за проверка
   Token:
     NotFound: Токенът не е намерен
+    Invalid: Токенът е невалиден
   UserSession:
     NotFound: UserSession не е намерена
   Key:

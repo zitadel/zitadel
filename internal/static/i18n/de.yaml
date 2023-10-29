@@ -424,6 +424,7 @@ Errors:
     AuditRetention: Änderungsverlauf ist ausserhalb der Audit Log Retention
   Token:
     NotFound: Token konnte nicht gefunden werden
+    Invalid: Token ist ungültig
   UserSession:
     NotFound: Benutzer Sitzung konnte nicht gefunden werden
   Key:

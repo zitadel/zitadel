@@ -109,9 +109,8 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 	if err != nil {
 		var sysTokenErr error
 		sysMemberships, userID, sysTokenErr = t.VerifySystemToken(ctx, tokenWOBearer, orgID)
-		err = errors.Join(err, sysTokenErr)
 		if sysTokenErr != nil || sysMemberships == nil {
-			return CtxData{}, err
+			return CtxData{}, zitadel_errors.ThrowUnauthenticated(errors.Join(err, sysTokenErr), "AUTH-7fs1e", "Errors.Token.Invalid")
 		}
 	}
 	var projectID string

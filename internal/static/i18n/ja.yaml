@@ -413,6 +413,7 @@ Errors:
     AuditRetention: 履歴は監査ログの管理外にあります
   Token:
     NotFound: トークンが見つかりません
+    Invalid: 無効なトークンです
   UserSession:
     NotFound: ユーザーが見つかりません
   Key:
