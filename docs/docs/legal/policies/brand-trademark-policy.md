@@ -1,6 +1,6 @@
 ---
 title: Use of brands and trademarks
-sidebar_label: Brand and trademark policy
+sidebar_label: Brand and Trademark Policy
 custom_edit_url: null
 ---
 
