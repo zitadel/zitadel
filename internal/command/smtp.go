@@ -114,14 +114,14 @@ func (c *Commands) DeactivateSMTPConfig(ctx context.Context, req *admin_pb.Deact
 	}
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
 	}, nil
 }
 
-func (c *Commands) RemoveSMTPConfig(ctx context.Context, req *admin_pb.RemoveSMTPConfigRequest) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveSMTPConfig(ctx context.Context, id string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareRemoveSMTPConfig(instanceAgg, req.Id)
+	validation := c.prepareRemoveSMTPConfig(instanceAgg, id)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -132,7 +132,7 @@ func (c *Commands) RemoveSMTPConfig(ctx context.Context, req *admin_pb.RemoveSMT
 	}
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
 	}, nil
 }

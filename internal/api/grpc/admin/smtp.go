@@ -45,7 +45,7 @@ func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPC
 }
 
 func (s *Server) RemoveSMTPConfig(ctx context.Context, req *admin_pb.RemoveSMTPConfigRequest) (*admin_pb.RemoveSMTPConfigResponse, error) {
-	details, err := s.command.RemoveSMTPConfig(ctx, req)
+	details, err := s.command.RemoveSMTPConfig(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (s *Server) ListSMTPConfigs(ctx context.Context, req *admin_pb.ListSMTPConf
 		return nil, err
 	}
 	return &admin_pb.ListSMTPConfigsResponse{
-		Details: object.ToListDetails(result.Count, result.Sequence, result.Timestamp),
+		Details: object.ToListDetails(result.Count, result.Sequence, result.LastRun),
 		Result:  SMTPConfigsToPb(result.Configs),
 	}, nil
 }

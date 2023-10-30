@@ -861,6 +861,7 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
+		id  string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -882,6 +883,7 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
+				id:  "9999",
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -920,6 +922,7 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				id:  "999",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -928,14 +931,13 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 			},
 		},
 	}
-	// TODO @n40lab
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore:     tt.fields.eventstore,
 				smtpEncryption: tt.fields.alg,
 			}
-			got, err := r.RemoveSMTPConfig(tt.args.ctx)
+			got, err := r.RemoveSMTPConfig(tt.args.ctx, tt.args.id)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

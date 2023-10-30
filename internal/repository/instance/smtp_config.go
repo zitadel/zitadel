@@ -2,12 +2,10 @@ package instance
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -171,7 +169,7 @@ func ChangeSMTPConfigProviderType(providerType uint32) func(event *SMTPConfigCha
 	}
 }
 
-func SMTPConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SMTPConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &SMTPConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -245,15 +243,19 @@ func NewSMTPConfigActivatedEvent(
 	}
 }
 
-func (e *SMTPConfigActivatedEvent) Data() interface{} {
+func (e *SMTPConfigActivatedEvent) Payload() interface{} {
 	return e
 }
 
-func SMTPConfigActivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func (e *SMTPConfigActivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func SMTPConfigActivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	smtpConfigActivated := &SMTPConfigActivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, smtpConfigActivated)
+	err := event.Unmarshal(smtpConfigActivated)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-KPr5t", "unable to unmarshal smtp config removed")
 	}
@@ -281,15 +283,19 @@ func NewSMTPConfigDeactivatedEvent(
 	}
 }
 
-func (e *SMTPConfigDeactivatedEvent) Data() interface{} {
+func (e *SMTPConfigDeactivatedEvent) Payload() interface{} {
 	return e
 }
 
-func SMTPConfigDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func (e *SMTPConfigDeactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func SMTPConfigDeactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	smtpConfigDeactivated := &SMTPConfigDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, smtpConfigDeactivated)
+	err := event.Unmarshal(smtpConfigDeactivated)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-KPr5t", "unable to unmarshal smtp config removed")
 	}

@@ -264,6 +264,5 @@ func (q *Queries) SearchSMTPConfigs(ctx context.Context, queries *SMTPConfigsSea
 		return nil, errors.ThrowInternal(err, "QUERY-tOpKN", "Errors.Internal")
 	}
 
-	configs.LatestSequence, err = q.latestSequence(ctx, smtpConfigsTable)
 	return configs, err
 }
