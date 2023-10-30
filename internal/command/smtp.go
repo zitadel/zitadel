@@ -29,7 +29,7 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.Config) (*dom
 	}
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
 	}, nil
 }
@@ -47,7 +47,7 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *smtp.Config) (*
 	}
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
 	}, nil
 }
@@ -78,7 +78,7 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string
 	}
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
 	}, nil
 }
@@ -96,7 +96,7 @@ func (c *Commands) ActivateSMTPConfig(ctx context.Context, req *admin_pb.Activat
 	}
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
 	}, nil
 }

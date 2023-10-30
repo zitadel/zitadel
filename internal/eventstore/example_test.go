@@ -2,13 +2,13 @@ package eventstore_test
 
 import (
 	"context"
-	"encoding/json"
 	"testing"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	query_repo "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
+	v3 "github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
 // ------------------------------------------------------------
@@ -43,12 +43,13 @@ func NewUserAddedEvent(id string, firstName string) *UserAddedEvent {
 	}
 }
 
-func UserAddedEventMapper() (eventstore.AggregateType, eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
-	return "user", "user.added", func(event *repository.Event) (eventstore.Event, error) {
+func UserAddedEventMapper() (eventstore.AggregateType, eventstore.EventType, func(eventstore.Event) (eventstore.Event, error)) {
+	return "user", "user.added", func(event eventstore.Event) (eventstore.Event, error) {
 		e := &UserAddedEvent{
 			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}
-		err := json.Unmarshal(event.Data, e)
+
+		err := event.Unmarshal(e)
 		if err != nil {
 			return nil, err
 		}
@@ -56,11 +57,11 @@ func UserAddedEventMapper() (eventstore.AggregateType, eventstore.EventType, fun
 	}
 }
 
-func (e *UserAddedEvent) Data() interface{} {
+func (e *UserAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *UserAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -88,12 +89,12 @@ func NewUserFirstNameChangedEvent(id, firstName string) *UserFirstNameChangedEve
 	}
 }
 
-func UserFirstNameChangedMapper() (eventstore.AggregateType, eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
-	return "user", "user.firstName.changed", func(event *repository.Event) (eventstore.Event, error) {
+func UserFirstNameChangedMapper() (eventstore.AggregateType, eventstore.EventType, func(eventstore.Event) (eventstore.Event, error)) {
+	return "user", "user.firstName.changed", func(event eventstore.Event) (eventstore.Event, error) {
 		e := &UserFirstNameChangedEvent{
 			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}
-		err := json.Unmarshal(event.Data, e)
+		err := event.Unmarshal(e)
 		if err != nil {
 			return nil, err
 		}
@@ -101,11 +102,11 @@ func UserFirstNameChangedMapper() (eventstore.AggregateType, eventstore.EventTyp
 	}
 }
 
-func (e *UserFirstNameChangedEvent) Data() interface{} {
+func (e *UserFirstNameChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *UserFirstNameChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserFirstNameChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -130,19 +131,19 @@ func NewUserPasswordCheckedEvent(id string) *UserPasswordCheckedEvent {
 	}
 }
 
-func UserPasswordCheckedMapper() (eventstore.AggregateType, eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
-	return "user", "user.password.checked", func(event *repository.Event) (eventstore.Event, error) {
+func UserPasswordCheckedMapper() (eventstore.AggregateType, eventstore.EventType, func(eventstore.Event) (eventstore.Event, error)) {
+	return "user", "user.password.checked", func(event eventstore.Event) (eventstore.Event, error) {
 		return &UserPasswordCheckedEvent{
 			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}, nil
 	}
 }
 
-func (e *UserPasswordCheckedEvent) Data() interface{} {
+func (e *UserPasswordCheckedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *UserPasswordCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserPasswordCheckedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -167,19 +168,19 @@ func NewUserDeletedEvent(id string) *UserDeletedEvent {
 	}
 }
 
-func UserDeletedMapper() (eventstore.AggregateType, eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
-	return "user", "user.deleted", func(event *repository.Event) (eventstore.Event, error) {
+func UserDeletedMapper() (eventstore.AggregateType, eventstore.EventType, func(eventstore.Event) (eventstore.Event, error)) {
+	return "user", "user.deleted", func(event eventstore.Event) (eventstore.Event, error) {
 		return &UserDeletedEvent{
 			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}, nil
 	}
 }
 
-func (e *UserDeletedEvent) Data() interface{} {
+func (e *UserDeletedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *UserDeletedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserDeletedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -286,12 +287,13 @@ func (rm *UserReadModel) Reduce() error {
 // ------------------------------------------------------------
 
 func TestUserReadModel(t *testing.T) {
-	es, err := eventstore.Start(&eventstore.Config{Client: testCRDBClient})
-	if err != nil {
-		t.Errorf("unable to start eventstore: %v", err)
-		t.FailNow()
-	}
-	// es := eventstore.NewEventstore(&eventstore.Config{re})
+	es := eventstore.NewEventstore(
+		&eventstore.Config{
+			Querier: query_repo.NewCRDB(testCRDBClient),
+			Pusher:  v3.NewEventstore(testCRDBClient),
+		},
+	)
+
 	es.RegisterFilterEventMapper(UserAddedEventMapper()).
 		RegisterFilterEventMapper(UserFirstNameChangedMapper()).
 		RegisterFilterEventMapper(UserPasswordCheckedMapper()).

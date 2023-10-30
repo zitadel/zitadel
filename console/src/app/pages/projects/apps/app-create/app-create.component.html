@@ -2,7 +2,7 @@
   title="{{ 'APP.PAGES.CREATE' | translate }}"
   class="app-create-wrapper"
   [createSteps]="
-    !devmode
+    !pro
       ? appType?.value?.createType === AppCreateType.OIDC
         ? appType?.value.oidcAppType !== OIDCAppType.OIDC_APP_TYPE_NATIVE
           ? 4
@@ -20,13 +20,13 @@
   <h1>{{ 'APP.PAGES.CREATE_DESC_TITLE' | translate }}</h1>
   <mat-progress-bar class="progress-bar" color="primary" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 
-  <mat-checkbox class="proswitch" color="primary" [(ngModel)]="devmode">
+  <mat-checkbox class="proswitch" color="primary" [(ngModel)]="pro">
     {{ 'APP.PROSWITCH' | translate }}
   </mat-checkbox>
 
   <mat-horizontal-stepper
     class="stepper {{ 'last-edited-step-' + stepper.selectedIndex }}"
-    *ngIf="!devmode"
+    *ngIf="!pro"
     linear
     #stepper
     labelPosition="bottom"
@@ -109,6 +109,15 @@
         {{ 'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate }}
       </p>
 
+      <mat-slide-toggle
+        color="primary"
+        [(ngModel)]="devMode"
+        [ngModelOptions]="{ standalone: true }"
+        matTooltip="{{ 'APP.OIDC.DEVMODEDESC' | translate }}"
+      >
+        {{ 'APP.OIDC.DEVMODE' | translate }}
+      </mat-slide-toggle>
+
       <cnsl-redirect-uris
         class="redirect-section"
         [disabled]="false"
@@ -116,6 +125,7 @@
         [(ngModel)]="redirectUris"
         [getValues]="requestRedirectValuesSubject$"
         title="{{ 'APP.OIDC.REDIRECT' | translate }}"
+        [devMode]="devMode"
         data-e2e="redirect-uris"
       >
       </cnsl-redirect-uris>
@@ -144,6 +154,7 @@
         [getValues]="requestRedirectValuesSubject$"
         title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
         [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+        [devMode]="devMode"
         data-e2e="postlogout-uris"
       >
       </cnsl-redirect-uris>
@@ -159,26 +170,56 @@
     <mat-step *ngIf="appType?.value?.createType === AppCreateType.SAML" [editable]="true">
       <ng-template matStepLabel>{{ 'APP.SAML.CONFIGSECTION' | translate }}</ng-template>
 
-      <form [formGroup]="samlConfigForm">
-        <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'APP.SAML.URL' | translate }}</cnsl-label>
-          <input cnslInput formControlName="metadataUrl" placeholder="https://" />
-        </cnsl-form-field>
-      </form>
+      <h3 class="title cnsl-secondary-text">
+        {{ 'APP.SAML.CHOOSEMETADATASOURCE' | translate }}
+      </h3>
 
-      <span class="cnsl-app-or cnsl-secondary-text">{{ 'APP.SAML.OR' | translate }}</span>
+      <div class="cnsl-secondary-text metadata-option">
+        <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT1' | translate }}</span>
+        <form [formGroup]="samlConfigForm">
+          <cnsl-form-field class="formfield">
+            <cnsl-label></cnsl-label>
+            <input cnslInput formControlName="metadataUrl" placeholder="https://" />
+          </cnsl-form-field>
+        </form>
+      </div>
 
-      <input
-        #xmlFileInput
-        style="display: none"
-        class="file-input"
-        type="file"
-        accept="text/xml,application/xml"
-        (change)="onDropXML($any($event.target).files)"
-      />
-      <button type="button" mat-stroked-button (click)="$event.preventDefault(); xmlFileInput.click()">
-        {{ 'APP.SAML.XML' | translate }}
-      </button>
+      <div class="cnsl-secondary-text metadata-option">
+        <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT2' | translate }}</span>
+
+        <form>
+          <input
+            #xmlFileInput
+            style="display: none"
+            class="file-input"
+            type="file"
+            accept="text/xml,application/xml"
+            (change)="onDropXML($any($event.target).files)"
+          />
+          <button
+            type="button"
+            class="upload-button"
+            mat-stroked-button
+            (click)="$event.preventDefault(); xmlFileInput.click()"
+          >
+            {{ 'APP.SAML.UPLOAD' | translate }}
+          </button>
+        </form>
+      </div>
+
+      <div class="cnsl-secondary-text metadata-option">
+        <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT3' | translate }}</span>
+        <form [formGroup]="samlConfigForm">
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'APP.SAML.ENTITYID' | translate }}</cnsl-label>
+            <input cnslInput formControlName="entityId" placeholder="https://" />
+          </cnsl-form-field>
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'APP.SAML.ACSURL' | translate }}</cnsl-label>
+            <input cnslInput formControlName="acsURL" placeholder="https://" />
+          </cnsl-form-field>
+        </form>
+      </div>
 
       <div
         class="saml-xml"
@@ -188,6 +229,7 @@
         <!-- <p class="preview-text cnsl-secondary-text">PREVIEW</p> -->
         <ngx-codemirror
           [(ngModel)]="decodedBase64"
+          [ngModelOptions]="{ standalone: true }"
           [options]="{
             lineNumbers: true,
             theme: 'material',
@@ -299,6 +341,19 @@
         </div>
       </ng-container>
 
+      <ng-container *ngIf="appType?.value?.createType === AppCreateType.OIDC">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
+            {{ 'APP.OIDC.DEVMODE' | translate }}
+          </span>
+          <span class="right">
+            <span>
+              {{ devMode ? ('APP.OIDC.DEVMODE_ENABLED' | translate) : ('APP.OIDC.DEVMODE_DISABLED' | translate) }}
+            </span>
+          </span>
+        </div>
+      </ng-container>
+
       <ng-container *ngIf="appType?.value?.createType === AppCreateType.API">
         <div class="row">
           <span class="left cnsl-secondary-text">
@@ -342,7 +397,7 @@
     </ng-template>
   </mat-horizontal-stepper>
 
-  <div *ngIf="devmode" class="dev">
+  <div *ngIf="pro" class="dev">
     <form [formGroup]="form" (ngSubmit)="createApp()" data-e2e="create-app-wizzard-3">
       <div class="content">
         <cnsl-form-field class="formfield">
@@ -395,31 +450,64 @@
       <div class="content">
         <ng-container *ngIf="formappType?.value?.createType === AppCreateType.SAML">
           <div class="saml">
-            <cnsl-form-field class="formfield">
-              <cnsl-label>{{ 'APP.SAML.URL' | translate }}</cnsl-label>
-              <input cnslInput formControlName="metadataUrl" placeholder="https://" />
-            </cnsl-form-field>
+            <h3 class="title cnsl-secondary-text">
+              {{ 'APP.SAML.CHOOSEMETADATASOURCE' | translate }}
+            </h3>
+            <div class="cnsl-secondary-text metadata-option">
+              <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT1' | translate }}</span>
+              <form [formGroup]="samlConfigForm">
+                <cnsl-form-field class="formfield">
+                  <cnsl-label></cnsl-label>
+                  <input cnslInput formControlName="metadataUrl" placeholder="https://" />
+                </cnsl-form-field>
+              </form>
+            </div>
 
-            <span class="cnsl-app-or cnsl-secondary-text">{{ 'APP.SAML.OR' | translate }}</span>
+            <div class="cnsl-secondary-text metadata-option">
+              <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT2' | translate }}</span>
 
-            <input
-              #xmlFileInput
-              style="display: none"
-              class="file-input"
-              type="file"
-              (change)="onDropXML($any($event.target).files)"
-            />
-            <button type="button" mat-stroked-button (click)="$event.preventDefault(); xmlFileInput.click()">
-              {{ 'APP.SAML.XML' | translate }}
-            </button>
+              <form>
+                <input
+                  #xmlFileInput
+                  style="display: none"
+                  class="file-input"
+                  type="file"
+                  accept="text/xml,application/xml"
+                  (change)="onDropXML($any($event.target).files)"
+                />
+                <button
+                  type="button"
+                  class="upload-button"
+                  mat-stroked-button
+                  (click)="$event.preventDefault(); xmlFileInput.click()"
+                >
+                  {{ 'APP.SAML.UPLOAD' | translate }}
+                </button>
+              </form>
+            </div>
+
+            <div class="cnsl-secondary-text metadata-option">
+              <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT3' | translate }}</span>
+              <form [formGroup]="samlConfigForm">
+                <cnsl-form-field class="formfield">
+                  <cnsl-label>{{ 'APP.SAML.ENTITYID' | translate }}</cnsl-label>
+                  <input cnslInput formControlName="entityId" placeholder="https://" />
+                </cnsl-form-field>
+                <cnsl-form-field class="formfield">
+                  <cnsl-label>{{ 'APP.SAML.ACSURL' | translate }}</cnsl-label>
+                  <input cnslInput formControlName="acsURL" placeholder="https://" />
+                </cnsl-form-field>
+              </form>
+            </div>
 
             <div
               class="saml-xml"
-              [ngClass]="{ disabled: !!formMetadataUrl?.value }"
+              [ngClass]="{ disabled: !!metadataUrl?.value }"
               *ngIf="decodedBase64 && samlAppRequest.toObject().metadataXml && !samlAppRequest.toObject().metadataUrl"
             >
               <ngx-codemirror
                 [(ngModel)]="decodedBase64"
+                [ngModelOptions]="{ standalone: true }"
                 [options]="{
                   lineNumbers: true,
                   theme: 'material',
@@ -439,6 +527,14 @@
         "
       >
         <div class="formfield full-width">
+          <mat-slide-toggle
+            color="primary"
+            [(ngModel)]="devMode"
+            [ngModelOptions]="{ standalone: true }"
+            matTooltip="{{ 'APP.OIDC.DEVMODEDESC' | translate }}"
+          >
+            {{ 'APP.OIDC.DEVMODE' | translate }}
+          </mat-slide-toggle>
           <cnsl-redirect-uris
             class="redirect-section"
             [disabled]="false"

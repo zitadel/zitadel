@@ -3,7 +3,6 @@ package system
 import (
 	"google.golang.org/grpc"
 
-	"github.com/zitadel/zitadel/internal/admin/repository"
 	"github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
@@ -23,7 +22,6 @@ type Server struct {
 	database        string
 	command         *command.Commands
 	query           *query.Queries
-	administrator   repository.AdministratorRepository
 	defaultInstance command.InstanceSetup
 	externalDomain  string
 }
@@ -35,7 +33,6 @@ type Config struct {
 func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
-	repo repository.Repository,
 	database string,
 	defaultInstance command.InstanceSetup,
 	externalDomain string,
@@ -43,7 +40,6 @@ func CreateServer(
 	return &Server{
 		command:         command,
 		query:           query,
-		administrator:   repo,
 		database:        database,
 		defaultInstance: defaultInstance,
 		externalDomain:  externalDomain,

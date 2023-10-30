@@ -1,9 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import {
-  MatLegacyDialogRef as MatDialogRef,
-  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
-} from '@angular/material/legacy-dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { Action, FlowType, TriggerType } from 'src/app/proto/generated/zitadel/action_pb';
 import { SetTriggerActionsRequest } from 'src/app/proto/generated/zitadel/management_pb';

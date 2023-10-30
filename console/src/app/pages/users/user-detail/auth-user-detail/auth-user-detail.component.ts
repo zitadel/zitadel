@@ -2,7 +2,7 @@ import { MediaMatcher } from '@angular/cdk/layout';
 import { Location } from '@angular/common';
 import { Component, EventEmitter, OnDestroy } from '@angular/core';
 import { Validators } from '@angular/forms';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
@@ -303,7 +303,10 @@ export class AuthUserDetailComponent implements OnDestroy {
   public savePhone(phone: string): void {
     if (this.user?.human) {
       // Format phone before save (add +)
-      phone = formatPhone(phone).phone;
+      const formattedPhone = formatPhone(phone);
+      if (formattedPhone) {
+        phone = formattedPhone.phone;
+      }
 
       this.userService
         .setMyPhone(phone)

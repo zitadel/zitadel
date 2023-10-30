@@ -1,19 +1,14 @@
-@use '@angular/material' as mat;
-
 @mixin table-actions-theme($theme) {
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
-  $card-background-color: mat.get-color-from-palette($background, cards);
+  $card-background-color: map-get($background, cards);
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
 
   .cnsl-table-action-wrapper {
-    position: relative;
     height: 36px;
 
     .cnsl-table-action {
-      position: absolute;
-      right: 0;
       display: flex;
       background-color: $card-background-color;
       transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -25,6 +20,9 @@
       box-shadow: 0 0 3px #0000001a;
       height: 36px;
       align-items: center;
+      width: fit-content;
+      float: right;
+      overflow: hidden;
 
       button {
         height: 36px;
@@ -32,6 +30,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
+
+        &.more-button {
+          font-size: 1rem;
+          line-height: 1.5rem;
+          padding: 0;
+        }
       }
 
       button:only-of-type {

@@ -13,13 +13,16 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	sq "github.com/Masterminds/squirrel"
+	"github.com/jackc/pgtype"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"github.com/zitadel/zitadel/internal/database"
 )
 
 var (
 	testNow = time.Now()
+	dayNow  = testNow.Truncate(24 * time.Hour)
 )
 
 // assertPrepare checks if the prepare func executes the correct sql query and returns the correct object
@@ -54,7 +57,7 @@ func assertPrepare(t *testing.T, prepareFunc, expectedObject interface{}, sqlExp
 		}
 		return isErr(err)
 	}
-	object, ok, didScan := execScan(&database.DB{DB: client}, builder, scan, errCheck)
+	object, ok, didScan := execScan(t, &database.DB{DB: client}, builder, scan, errCheck)
 	if !ok {
 		t.Error(object)
 		return false
@@ -168,7 +171,7 @@ var (
 	selectBuilderType = reflect.TypeOf(sq.SelectBuilder{})
 )
 
-func execScan(client *database.DB, builder sq.SelectBuilder, scan interface{}, errCheck checkErr) (object interface{}, ok bool, didScan bool) {
+func execScan(t testing.TB, client *database.DB, builder sq.SelectBuilder, scan interface{}, errCheck checkErr) (object interface{}, ok bool, didScan bool) {
 	scanType := reflect.TypeOf(scan)
 	err := validateScan(scanType)
 	if err != nil {
@@ -177,7 +180,7 @@ func execScan(client *database.DB, builder sq.SelectBuilder, scan interface{}, e
 
 	stmt, args, err := builder.ToSql()
 	if err != nil {
-		return fmt.Errorf("unexpeted error from sql builder: %w", err), false, false
+		return fmt.Errorf("unexpected error from sql builder: %w", err), false, false
 	}
 
 	//resultSet represents *sql.Row or *sql.Rows,
@@ -199,6 +202,9 @@ func execScan(client *database.DB, builder sq.SelectBuilder, scan interface{}, e
 		// if scan(*sql.Row)...
 	} else if scanType.In(0).AssignableTo(rowType) {
 		err = client.QueryRow(func(r *sql.Row) error {
+			if r.Err() != nil {
+				return r.Err()
+			}
 			didScan = true
 			res = reflect.ValueOf(scan).Call([]reflect.Value{reflect.ValueOf(r)})
 			if err, ok := res[1].Interface().(error); ok {
@@ -213,6 +219,9 @@ func execScan(client *database.DB, builder sq.SelectBuilder, scan interface{}, e
 
 	if err != nil {
 		err, ok := errCheck(err)
+		if !ok {
+			t.Fatal(err)
+		}
 		if didScan {
 			return res[0].Interface(), ok, didScan
 		}
@@ -377,6 +386,15 @@ func TestValidatePrepare(t *testing.T) {
 			}
 		})
 	}
+}
+
+func intervalDriverValue(t *testing.T, src time.Duration) pgtype.Interval {
+	interval := pgtype.Interval{}
+	err := interval.Set(src)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return interval
 }
 
 type prepareDB struct{}

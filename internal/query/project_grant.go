@@ -8,11 +8,14 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -102,7 +105,7 @@ type ProjectGrant struct {
 	ProjectName       string
 	GrantedOrgID      string
 	OrgName           string
-	GrantedRoleKeys   database.StringArray
+	GrantedRoleKeys   database.TextArray[string]
 	ResourceOwnerName string
 }
 
@@ -116,7 +119,10 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, 
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.ProjectGrantProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerProjectGrantProjection")
+		ctx, err = projection.ProjectGrantProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	stmt, scan := prepareProjectGrantQuery(ctx, q.client)
@@ -191,7 +197,7 @@ func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrant
 		return nil, errors.ThrowInternal(err, "QUERY-PP02n", "Errors.Internal")
 	}
 
-	grants.LatestSequence, err = q.latestSequence(ctx, projectGrantsTable)
+	grants.State, err = q.latestState(ctx, projectGrantsTable)
 	return grants, err
 }
 

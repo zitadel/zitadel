@@ -8,10 +8,13 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -105,7 +108,10 @@ func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id st
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.ProjectProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerProjectProjection")
+		ctx, err = projection.ProjectProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	stmt, scan := prepareProjectQuery(ctx, q.client)
@@ -149,7 +155,7 @@ func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQuer
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-2j00f", "Errors.Internal")
 	}
-	projects.LatestSequence, err = q.latestSequence(ctx, projectsTable)
+	projects.State, err = q.latestState(ctx, projectsTable)
 	return projects, err
 }
 

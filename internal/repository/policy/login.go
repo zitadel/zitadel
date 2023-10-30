@@ -1,13 +1,11 @@
 package policy
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -39,11 +37,11 @@ type LoginPolicyAddedEvent struct {
 	MultiFactorCheckLifetime   time.Duration           `json:"multiFactorCheckLifetime,omitempty"`
 }
 
-func (e *LoginPolicyAddedEvent) Data() interface{} {
+func (e *LoginPolicyAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LoginPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LoginPolicyAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -89,12 +87,12 @@ func NewLoginPolicyAddedEvent(
 	}
 }
 
-func LoginPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LoginPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &LoginPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-nWndT", "unable to unmarshal policy")
 	}
@@ -124,11 +122,11 @@ type LoginPolicyChangedEvent struct {
 	MultiFactorCheckLifetime   *time.Duration           `json:"multiFactorCheckLifetime,omitempty"`
 }
 
-func (e *LoginPolicyChangedEvent) Data() interface{} {
+func (e *LoginPolicyChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LoginPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LoginPolicyChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -252,12 +250,12 @@ func ChangeDisableLoginWithPhone(DisableLoginWithPhone bool) func(*LoginPolicyCh
 	}
 }
 
-func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LoginPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &LoginPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-ehssl", "unable to unmarshal policy")
 	}
@@ -269,11 +267,11 @@ type LoginPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *LoginPolicyRemovedEvent) Data() interface{} {
+func (e *LoginPolicyRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *LoginPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LoginPolicyRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -283,7 +281,7 @@ func NewLoginPolicyRemovedEvent(base *eventstore.BaseEvent) *LoginPolicyRemovedE
 	}
 }
 
-func LoginPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LoginPolicyRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &LoginPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

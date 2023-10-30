@@ -26,16 +26,17 @@ describe('humans', () => {
       });
 
       it('should add a user', () => {
-        cy.get('[data-e2e="create-user-button"]').click();
+        cy.get('[data-e2e="create-user-button"]').should('be.visible').click();
         cy.url().should('contain', 'users/create');
         cy.get('[formcontrolname="email"]').type('dummy@dummy.com');
         //force needed due to the prefilled username prefix
         cy.get('[formcontrolname="userName"]').type(user.addName);
         cy.get('[formcontrolname="firstName"]').type('e2ehumanfirstname');
         cy.get('[formcontrolname="lastName"]').type('e2ehumanlastname');
-        cy.get('mat-select[data-cy="country-calling-code"]').click().get('mat-option').contains('Switzerland').click();
+        cy.get('mat-select[data-cy="country-calling-code"]').click();
+        cy.contains('mat-option', 'Switzerland').scrollIntoView().click();
         cy.get('[formcontrolname="phone"]').type('123456789');
-        cy.get('[data-e2e="create-button"]').click();
+        cy.get('[data-e2e="create-button"]').click({ force: true });
         cy.shouldConfirmSuccess();
         let loginName = user.addName;
         if (user.mustBeDomain) {

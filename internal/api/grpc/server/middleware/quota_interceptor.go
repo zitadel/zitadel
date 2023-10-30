@@ -28,7 +28,9 @@ func QuotaExhaustedInterceptor(svc *logstore.Service[*record.AccessLog], ignoreS
 
 		// The auth interceptor will ensure that only authorized or public requests are allowed.
 		// So if there's no authorization context, we don't need to check for limitation
-		if authz.GetCtxData(ctx).IsZero() {
+		// Also, we don't limit calls with system user tokens
+		ctxData := authz.GetCtxData(ctx)
+		if ctxData.IsZero() || ctxData.SystemMemberships != nil {
 			return handler(ctx, req)
 		}
 

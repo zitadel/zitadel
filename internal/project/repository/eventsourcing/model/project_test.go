@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/project/model"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -11,7 +12,7 @@ import (
 
 func TestProjectFromEvents(t *testing.T) {
 	type args struct {
-		event   []*es_models.Event
+		event   []eventstore.Event
 		project *Project
 	}
 	tests := []struct {
@@ -22,8 +23,8 @@ func TestProjectFromEvents(t *testing.T) {
 		{
 			name: "project from events, ok",
 			args: args{
-				event: []*es_models.Event{
-					{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectAddedType)},
+				event: []eventstore.Event{
+					&es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ProjectAddedType},
 				},
 				project: &Project{Name: "ProjectName"},
 			},
@@ -32,8 +33,8 @@ func TestProjectFromEvents(t *testing.T) {
 		{
 			name: "project from events, nil project",
 			args: args{
-				event: []*es_models.Event{
-					{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectAddedType)},
+				event: []eventstore.Event{
+					&es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ProjectAddedType},
 				},
 				project: nil,
 			},
@@ -44,7 +45,7 @@ func TestProjectFromEvents(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.args.project != nil {
 				data, _ := json.Marshal(tt.args.project)
-				tt.args.event[0].Data = data
+				tt.args.event[0].(*es_models.Event).Data = data
 			}
 			result, _ := ProjectFromEvents(tt.args.project, tt.args.event...)
 			if result.Name != tt.result.Name {
@@ -67,7 +68,7 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append added event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectAddedType)},
+				event:   &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ProjectAddedType},
 				project: &Project{Name: "ProjectName"},
 			},
 			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive), Name: "ProjectName"},
@@ -75,7 +76,7 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append change event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectChangedType)},
+				event:   &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ProjectChangedType},
 				project: &Project{Name: "ProjectName"},
 			},
 			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive), Name: "ProjectName"},
@@ -83,14 +84,14 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append deactivate event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectDeactivatedType)},
+				event: &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ProjectDeactivatedType},
 			},
 			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateInactive)},
 		},
 		{
 			name: "append reactivate event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectReactivatedType)},
+				event: &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ProjectReactivatedType},
 			},
 			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive)},
 		},

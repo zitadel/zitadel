@@ -6,8 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -34,45 +34,46 @@ const (
 
 const SMTP_PROVIDER_TYPE_GENERIC = 7
 
-type smtpConfigProjection struct {
-	crdb.StatementHandler
+type smtpConfigProjection struct{}
+
+func newSMTPConfigProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(smtpConfigProjection))
 }
 
-func newSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerConfig) *smtpConfigProjection {
-	p := new(smtpConfigProjection)
-	config.ProjectionName = SMTPConfigProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(SMTPConfigColumnID, crdb.ColumnTypeText),
-			crdb.NewColumn(SMTPConfigColumnAggregateID, crdb.ColumnTypeText),
-			crdb.NewColumn(SMTPConfigColumnCreationDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(SMTPConfigColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(SMTPConfigColumnSequence, crdb.ColumnTypeInt64),
-			crdb.NewColumn(SMTPConfigColumnResourceOwner, crdb.ColumnTypeText),
-			crdb.NewColumn(SMTPConfigColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(SMTPConfigColumnTLS, crdb.ColumnTypeBool),
-			crdb.NewColumn(SMTPConfigColumnSenderAddress, crdb.ColumnTypeText),
-			crdb.NewColumn(SMTPConfigColumnSenderName, crdb.ColumnTypeText),
-			crdb.NewColumn(SMTPConfigColumnReplyToAddress, crdb.ColumnTypeText),
-			crdb.NewColumn(SMTPConfigColumnSMTPHost, crdb.ColumnTypeText),
-			crdb.NewColumn(SMTPConfigColumnSMTPUser, crdb.ColumnTypeText),
-			crdb.NewColumn(SMTPConfigColumnSMTPPassword, crdb.ColumnTypeJSONB, crdb.Nullable()),
-			crdb.NewColumn(SMTPConfigColumnState, crdb.ColumnTypeEnum),
-			crdb.NewColumn(SMTPConfigColumnProviderType, crdb.ColumnTypeEnum, crdb.Default(SMTP_PROVIDER_TYPE_GENERIC)),
+func (*smtpConfigProjection) Name() string {
+	return SMTPConfigProjectionTable
+}
+
+func (*smtpConfigProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(SMTPConfigColumnID, handler.ColumnTypeText),
+			handler.NewColumn(SMTPConfigColumnAggregateID, handler.ColumnTypeText),
+			handler.NewColumn(SMTPConfigColumnCreationDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(SMTPConfigColumnChangeDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(SMTPConfigColumnSequence, handler.ColumnTypeInt64),
+			handler.NewColumn(SMTPConfigColumnResourceOwner, handler.ColumnTypeText),
+			handler.NewColumn(SMTPConfigColumnInstanceID, handler.ColumnTypeText),
+			handler.NewColumn(SMTPConfigColumnTLS, handler.ColumnTypeBool),
+			handler.NewColumn(SMTPConfigColumnSenderAddress, handler.ColumnTypeText),
+			handler.NewColumn(SMTPConfigColumnSenderName, handler.ColumnTypeText),
+			handler.NewColumn(SMTPConfigColumnReplyToAddress, handler.ColumnTypeText),
+			handler.NewColumn(SMTPConfigColumnSMTPHost, handler.ColumnTypeText),
+			handler.NewColumn(SMTPConfigColumnSMTPUser, handler.ColumnTypeText),
+			handler.NewColumn(SMTPConfigColumnSMTPPassword, handler.ColumnTypeJSONB, handler.Nullable()),
+			handler.NewColumn(SMTPConfigColumnState, handler.ColumnTypeEnum),
+			handler.NewColumn(SMTPConfigColumnProviderType, handler.ColumnTypeEnum, handler.Default(SMTP_PROVIDER_TYPE_GENERIC)),
 		},
-			crdb.NewPrimaryKey(SMTPConfigColumnInstanceID, SMTPConfigColumnID),
+			handler.NewPrimaryKey(SMTPConfigColumnInstanceID, SMTPConfigColumnID),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *smtpConfigProjection) reducers() []handler.AggregateReducer {
+func (p *smtpConfigProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.SMTPConfigAddedEventType,
 					Reduce: p.reduceSMTPConfigAdded,
@@ -111,7 +112,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-sk99F", "reduce.wrong.event.type %s", instance.SMTPConfigAddedEventType)
 	}
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(SMTPConfigColumnAggregateID, e.Aggregate().ID),
@@ -164,7 +165,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 	if e.ProviderType != nil {
 		columns = append(columns, handler.NewCol(SMTPConfigColumnProviderType, *e.ProviderType))
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		columns,
 		[]handler.Condition{
@@ -180,7 +181,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigPasswordChanged(event eventstore.
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fk02f", "reduce.wrong.event.type %s", instance.SMTPConfigChangedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(SMTPConfigColumnChangeDate, e.CreationDate()),
@@ -200,7 +201,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigActivated(event eventstore.Event)
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fq92r", "reduce.wrong.event.type %s", instance.SMTPConfigActivatedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(SMTPConfigColumnChangeDate, e.CreationDate()),
@@ -221,7 +222,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigDeactivated(event eventstore.Even
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-hv89j", "reduce.wrong.event.type %s", instance.SMTPConfigDeactivatedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(SMTPConfigColumnChangeDate, e.CreationDate()),
@@ -241,7 +242,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigRemoved(event eventstore.Event) (
 	if err != nil {
 		return nil, err
 	}
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(SMTPConfigColumnID, e.ID),

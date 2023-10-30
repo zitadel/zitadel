@@ -157,17 +157,22 @@
             </form>
           </cnsl-card>
 
-          <cnsl-card *ngIf="samlForm && app?.samlConfig">
-            <form [formGroup]="samlForm">
-              <cnsl-form-field class="formfield">
-                <cnsl-label>{{ 'APP.SAML.URL' | translate }}</cnsl-label>
-                <input cnslInput formControlName="metadataUrl" placeholder="https://" />
-              </cnsl-form-field>
-            </form>
+          <cnsl-card *ngIf="samlForm && app?.samlConfig" title="{{ 'APP.SAML.CONFIGSECTION' | translate }}">
+            <h3 class="title cnsl-secondary-text">
+              {{ 'APP.SAML.CHOOSEMETADATASOURCE' | translate }}
+            </h3>
 
-            <div class="cnsl-saml-config-line">
-              <span class="cnsl-app-or cnsl-secondary-text">{{ 'APP.SAML.OR' | translate }}</span>
+            <div class="metadata-option">
+              <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT1' | translate }}</span>
+              <form [formGroup]="samlForm">
+                <cnsl-form-field class="formfield">
+                  <input cnslInput formControlName="metadataUrl" placeholder="https://" />
+                </cnsl-form-field>
+              </form>
+            </div>
 
+            <div class="metadata-option">
+              <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT2' | translate }}</span>
               <input
                 #xmlFileInput
                 style="display: none"
@@ -176,9 +181,23 @@
                 accept="text/xml,application/xml"
                 (change)="onDropXML($any($event.target).files)"
               />
-              <button mat-stroked-button (click)="$event.preventDefault(); xmlFileInput.click()">
-                {{ 'APP.SAML.XML' | translate }}
+              <button class="upload-button" mat-stroked-button (click)="$event.preventDefault(); xmlFileInput.click()">
+                {{ 'APP.SAML.UPLOAD' | translate }}
               </button>
+            </div>
+
+            <div class="metadata-option">
+              <span class="saml-config-option">{{ 'APP.SAML.METADATAOPT3' | translate }}</span>
+              <form [formGroup]="samlForm">
+                <cnsl-form-field class="formfield">
+                  <cnsl-label>{{ 'APP.SAML.ENTITYID' | translate }}</cnsl-label>
+                  <input cnslInput formControlName="entityId" placeholder="https://" />
+                </cnsl-form-field>
+                <cnsl-form-field class="formfield">
+                  <cnsl-label>{{ 'APP.SAML.ACSURL' | translate }}</cnsl-label>
+                  <input cnslInput formControlName="acsURL" placeholder="https://" />
+                </cnsl-form-field>
+              </form>
             </div>
 
             <div
@@ -263,17 +282,16 @@
               </cnsl-info-section>
 
               <p class="clockskew-title cnsl-secondary-text">ClockSkew</p>
+              <!-- TODO: The 'tickInterval' property no longer exists -->
               <mat-slider
                 color="primary"
-                formControlName="clockSkewSeconds"
                 class="clockskew-slider"
                 thumbLabel
                 [displayWith]="formatClockSkewLabel"
-                tickInterval=".1"
                 min="0"
                 [step]="1"
                 max="5"
-              >
+                ><input matSliderThumb formControlName="clockSkewSeconds" />
               </mat-slider>
               <cnsl-info-section class="full-width app-desc">
                 <span>{{ 'APP.OIDC.CLOCKSKEW' | translate }}</span>
@@ -427,7 +445,7 @@
 
             <div class="app-info-row">
               <div class="app-info-wrapper" *ngFor="let wellKnownV of wellKnownMap$ | async | keyvalue">
-                <ng-container *ngIf="wellKnownV.key.endsWith('endpoint')">
+                <ng-container *ngIf="wellKnownV.key.endsWith('endpoint') || wellKnownV.key.toString() === 'jwks_uri'">
                   <p class="app-info-row-title cnsl-secondary-text">{{ wellKnownV.key }}</p>
                   <div class="app-copy-row">
                     <div *ngIf="wellKnownV.value" class="environment">

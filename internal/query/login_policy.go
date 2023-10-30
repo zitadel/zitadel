@@ -8,11 +8,14 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -27,8 +30,8 @@ type LoginPolicy struct {
 	AllowExternalIDPs          bool
 	ForceMFA                   bool
 	ForceMFALocalOnly          bool
-	SecondFactors              database.EnumArray[domain.SecondFactorType]
-	MultiFactors               database.EnumArray[domain.MultiFactorType]
+	SecondFactors              database.Array[domain.SecondFactorType]
+	MultiFactors               database.Array[domain.MultiFactorType]
 	PasswordlessType           domain.PasswordlessType
 	IsDefault                  bool
 	HidePasswordReset          bool
@@ -47,12 +50,12 @@ type LoginPolicy struct {
 
 type SecondFactors struct {
 	SearchResponse
-	Factors database.EnumArray[domain.SecondFactorType]
+	Factors database.Array[domain.SecondFactorType]
 }
 
 type MultiFactors struct {
 	SearchResponse
-	Factors database.EnumArray[domain.MultiFactorType]
+	Factors database.Array[domain.MultiFactorType]
 }
 
 var (
@@ -171,7 +174,10 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.LoginPolicyProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerLoginPolicyProjection")
+		ctx, err = projection.LoginPolicyProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 	eq := sq.Eq{LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
@@ -272,7 +278,7 @@ func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (factors
 	if err != nil {
 		return nil, err
 	}
-	factors.LatestSequence, err = q.latestSequence(ctx, loginPolicyTable)
+	factors.State, err = q.latestState(ctx, loginPolicyTable)
 	return factors, err
 }
 
@@ -296,7 +302,7 @@ func (q *Queries) DefaultSecondFactors(ctx context.Context) (factors *SecondFact
 	if err != nil {
 		return nil, err
 	}
-	factors.LatestSequence, err = q.latestSequence(ctx, loginPolicyTable)
+	factors.State, err = q.latestState(ctx, loginPolicyTable)
 	return factors, err
 }
 
@@ -332,7 +338,7 @@ func (q *Queries) MultiFactorsByOrg(ctx context.Context, orgID string) (factors 
 	if err != nil {
 		return nil, err
 	}
-	factors.LatestSequence, err = q.latestSequence(ctx, loginPolicyTable)
+	factors.State, err = q.latestState(ctx, loginPolicyTable)
 	return factors, err
 }
 
@@ -356,7 +362,7 @@ func (q *Queries) DefaultMultiFactors(ctx context.Context) (factors *MultiFactor
 	if err != nil {
 		return nil, err
 	}
-	factors.LatestSequence, err = q.latestSequence(ctx, loginPolicyTable)
+	factors.State, err = q.latestState(ctx, loginPolicyTable)
 	return factors, err
 }
 

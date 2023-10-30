@@ -65,19 +65,19 @@ func NewSMTPConfigAddedEvent(
 	}
 }
 
-func (e *SMTPConfigAddedEvent) Data() interface{} {
+func (e *SMTPConfigAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SMTPConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SMTPConfigAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func SMTPConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SMTPConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	smtpConfigAdded := &SMTPConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, smtpConfigAdded)
+	err := event.Unmarshal(smtpConfigAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-39fks", "unable to unmarshal smtp config added")
 	}
@@ -98,11 +98,11 @@ type SMTPConfigChangedEvent struct {
 	ProviderType   *uint32             `json:"providerType,omitempty"`
 }
 
-func (e *SMTPConfigChangedEvent) Data() interface{} {
+func (e *SMTPConfigChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SMTPConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SMTPConfigChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -176,7 +176,7 @@ func SMTPConfigChangedEventMapper(event *repository.Event) (eventstore.Event, er
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-m09oo", "unable to unmarshal smtp changed")
 	}
@@ -205,19 +205,19 @@ func NewSMTPConfigPasswordChangedEvent(
 	}
 }
 
-func (e *SMTPConfigPasswordChangedEvent) Data() interface{} {
+func (e *SMTPConfigPasswordChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SMTPConfigPasswordChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SMTPConfigPasswordChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func SMTPConfigPasswordChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SMTPConfigPasswordChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	smtpConfigPasswordChanged := &SMTPConfigPasswordChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, smtpConfigPasswordChanged)
+	err := event.Unmarshal(smtpConfigPasswordChanged)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-99iNF", "unable to unmarshal smtp config password changed")
 	}
@@ -247,10 +247,6 @@ func NewSMTPConfigActivatedEvent(
 
 func (e *SMTPConfigActivatedEvent) Data() interface{} {
 	return e
-}
-
-func (e *SMTPConfigActivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
 }
 
 func SMTPConfigActivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
@@ -289,10 +285,6 @@ func (e *SMTPConfigDeactivatedEvent) Data() interface{} {
 	return e
 }
 
-func (e *SMTPConfigDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
 func SMTPConfigDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	smtpConfigDeactivated := &SMTPConfigDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -325,19 +317,19 @@ func NewSMTPConfigRemovedEvent(
 	}
 }
 
-func (e *SMTPConfigRemovedEvent) Data() interface{} {
+func (e *SMTPConfigRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SMTPConfigRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SMTPConfigRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func SMTPConfigRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SMTPConfigRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	smtpConfigRemoved := &SMTPConfigRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, smtpConfigRemoved)
+	err := event.Unmarshal(smtpConfigRemoved)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-DVw1s", "unable to unmarshal smtp config removed")
 	}

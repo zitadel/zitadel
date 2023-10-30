@@ -8,11 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -72,19 +70,14 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 					t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewOIDCSettingsAddedEvent(
-									context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									time.Hour*1,
-									time.Hour*1,
-									time.Hour*1,
-									time.Hour*1,
-								),
-							),
-						},
+						instance.NewOIDCSettingsAddedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							time.Hour*1,
+							time.Hour*1,
+							time.Hour*1,
+							time.Hour*1,
+						),
 					),
 				),
 			},
@@ -372,16 +365,12 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("INSTANCE",
-								newOIDCConfigChangedEvent(
-									context.Background(),
-									time.Hour*2,
-									time.Hour*2,
-									time.Hour*2,
-									time.Hour*2),
-							),
-						},
+						newOIDCConfigChangedEvent(
+							context.Background(),
+							time.Hour*2,
+							time.Hour*2,
+							time.Hour*2,
+							time.Hour*2),
 					),
 				),
 			},

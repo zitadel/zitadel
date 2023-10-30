@@ -1,12 +1,9 @@
 package idp
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 type AzureADIDPAddedEvent struct {
@@ -46,20 +43,20 @@ func NewAzureADIDPAddedEvent(
 	}
 }
 
-func (e *AzureADIDPAddedEvent) Data() interface{} {
+func (e *AzureADIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *AzureADIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *AzureADIDPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func AzureADIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func AzureADIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &AzureADIDPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-Grh2g", "unable to unmarshal event")
 	}
@@ -142,20 +139,20 @@ func ChangeAzureADIsEmailVerified(isEmailVerified bool) func(*AzureADIDPChangedE
 	}
 }
 
-func (e *AzureADIDPChangedEvent) Data() interface{} {
+func (e *AzureADIDPChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *AzureADIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *AzureADIDPChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func AzureADIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func AzureADIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &AzureADIDPChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-D3gjzh", "unable to unmarshal event")
 	}

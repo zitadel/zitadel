@@ -12,17 +12,18 @@ type UserMembershipRepo struct {
 	Queries *query.Queries
 }
 
-func (repo *UserMembershipRepo) SearchMyMemberships(ctx context.Context, orgID string) (_ []*authz.Membership, err error) {
+func (repo *UserMembershipRepo) SearchMyMemberships(ctx context.Context, orgID string, shouldTriggerBulk bool) (_ []*authz.Membership, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	memberships, err := repo.searchUserMemberships(ctx, orgID)
+
+	memberships, err := repo.searchUserMemberships(ctx, orgID, shouldTriggerBulk)
 	if err != nil {
 		return nil, err
 	}
 	return userMembershipsToMemberships(memberships), nil
 }
 
-func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context, orgID string) (_ []*query.Membership, err error) {
+func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context, orgID string, shouldTriggerBulk bool) (_ []*query.Membership, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	ctxData := authz.GetCtxData(ctx)
@@ -40,7 +41,7 @@ func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context, orgID
 	}
 	memberships, err := repo.Queries.Memberships(ctx, &query.MembershipSearchQuery{
 		Queries: []query.SearchQuery{userIDQuery, query.Or(orgIDsQuery, grantedIDQuery)},
-	}, false)
+	}, false, shouldTriggerBulk)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +51,7 @@ func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context, orgID
 func userMembershipToMembership(membership *query.Membership) *authz.Membership {
 	if membership.IAM != nil {
 		return &authz.Membership{
-			MemberType:  authz.MemberTypeIam,
+			MemberType:  authz.MemberTypeIAM,
 			AggregateID: membership.IAM.IAMID,
 			ObjectID:    membership.IAM.IAMID,
 			Roles:       membership.Roles,
@@ -58,7 +59,7 @@ func userMembershipToMembership(membership *query.Membership) *authz.Membership 
 	}
 	if membership.Org != nil {
 		return &authz.Membership{
-			MemberType:  authz.MemberTypeOrganisation,
+			MemberType:  authz.MemberTypeOrganization,
 			AggregateID: membership.Org.OrgID,
 			ObjectID:    membership.Org.OrgID,
 			Roles:       membership.Roles,

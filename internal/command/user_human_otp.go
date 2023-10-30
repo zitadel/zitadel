@@ -71,7 +71,7 @@ func (c *Commands) createHumanTOTP(ctx context.Context, userID, resourceOwner st
 	human, err := c.getHuman(ctx, userID, resourceOwner)
 	if err != nil {
 		logging.WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get human for loginname")
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-MM9fs", "Errors.User.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-SqyJz", "Errors.User.NotFound")
 	}
 	org, err := c.getOrg(ctx, human.ResourceOwner)
 	if err != nil {

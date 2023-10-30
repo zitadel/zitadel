@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -81,7 +82,9 @@ func (q *Queries) NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx, err = projection.NotificationPolicyProjection.TriggerErr(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerNotificationPolicyProjection")
+		ctx, err = projection.NotificationPolicyProjection.Trigger(ctx, handler.WithAwaitRunning())
+		traceSpan.EndWithError(err)
 		if err != nil {
 			return nil, err
 		}
@@ -116,7 +119,9 @@ func (q *Queries) DefaultNotificationPolicy(ctx context.Context, shouldTriggerBu
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx, err = projection.NotificationPolicyProjection.TriggerErr(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerNotificationPolicyProjection")
+		ctx, err = projection.NotificationPolicyProjection.Trigger(ctx, handler.WithAwaitRunning())
+		traceSpan.EndWithError(err)
 		if err != nil {
 			return nil, err
 		}

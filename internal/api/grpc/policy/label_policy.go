@@ -26,11 +26,25 @@ func ModelLabelPolicyToPb(policy *query.LabelPolicy, assetPrefix string) *policy
 
 		DisableWatermark:    policy.WatermarkDisabled,
 		HideLoginNameSuffix: policy.HideLoginNameSuffix,
+		ThemeMode:           themeModeToPb(policy.ThemeMode),
 		Details: object.ToViewDetailsPb(
 			policy.Sequence,
 			policy.CreationDate,
 			policy.ChangeDate,
 			policy.ResourceOwner,
 		),
+	}
+}
+
+func themeModeToPb(theme domain.LabelPolicyThemeMode) policy_pb.ThemeMode {
+	switch theme {
+	case domain.LabelPolicyThemeAuto:
+		return policy_pb.ThemeMode_THEME_MODE_AUTO
+	case domain.LabelPolicyThemeDark:
+		return policy_pb.ThemeMode_THEME_MODE_DARK
+	case domain.LabelPolicyThemeLight:
+		return policy_pb.ThemeMode_THEME_MODE_LIGHT
+	default:
+		return policy_pb.ThemeMode_THEME_MODE_AUTO
 	}
 }

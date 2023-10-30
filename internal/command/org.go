@@ -167,7 +167,7 @@ func (c *orgSetupCommands) push(ctx context.Context) (_ *CreatedOrg, err error) 
 	return &CreatedOrg{
 		ObjectDetails: &domain.ObjectDetails{
 			Sequence:      events[len(events)-1].Sequence(),
-			EventDate:     events[len(events)-1].CreationDate(),
+			EventDate:     events[len(events)-1].CreatedAt(),
 			ResourceOwner: c.aggregate.ID,
 		},
 		CreatedAdmins: c.createdAdmins(),
@@ -238,7 +238,10 @@ func AddOrgCommand(ctx context.Context, a *org.Aggregate, name string, userIDs .
 		if name = strings.TrimSpace(name); name == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument")
 		}
-		defaultDomain := domain.NewIAMDomainName(name, authz.GetInstance(ctx).RequestedDomain())
+		defaultDomain, err := domain.NewIAMDomainName(name, authz.GetInstance(ctx).RequestedDomain())
+		if err != nil {
+			return nil, err
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
 				org.NewOrgAddedEvent(ctx, &a.Aggregate, name),
@@ -421,7 +424,7 @@ func (c *Commands) RemoveOrg(ctx context.Context, id string) (*domain.ObjectDeta
 
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
 	}, nil
 }

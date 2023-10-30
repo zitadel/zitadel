@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -31,45 +31,46 @@ const (
 	ProjectGrantColumnGrantedOrgRemoved = "granted_org_removed"
 )
 
-type projectGrantProjection struct {
-	crdb.StatementHandler
+type projectGrantProjection struct{}
+
+func newProjectGrantProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(projectGrantProjection))
 }
 
-func newProjectGrantProjection(ctx context.Context, config crdb.StatementHandlerConfig) *projectGrantProjection {
-	p := new(projectGrantProjection)
-	config.ProjectionName = ProjectGrantProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(ProjectGrantColumnGrantID, crdb.ColumnTypeText),
-			crdb.NewColumn(ProjectGrantColumnCreationDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(ProjectGrantColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(ProjectGrantColumnSequence, crdb.ColumnTypeInt64),
-			crdb.NewColumn(ProjectGrantColumnState, crdb.ColumnTypeEnum),
-			crdb.NewColumn(ProjectGrantColumnResourceOwner, crdb.ColumnTypeText),
-			crdb.NewColumn(ProjectGrantColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(ProjectGrantColumnProjectID, crdb.ColumnTypeText),
-			crdb.NewColumn(ProjectGrantColumnGrantedOrgID, crdb.ColumnTypeText),
-			crdb.NewColumn(ProjectGrantColumnRoleKeys, crdb.ColumnTypeTextArray, crdb.Nullable()),
-			crdb.NewColumn(ProjectGrantColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
-			crdb.NewColumn(ProjectGrantColumnGrantedOrgRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
+func (*projectGrantProjection) Name() string {
+	return ProjectGrantProjectionTable
+}
+
+func (*projectGrantProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(ProjectGrantColumnGrantID, handler.ColumnTypeText),
+			handler.NewColumn(ProjectGrantColumnCreationDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(ProjectGrantColumnChangeDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(ProjectGrantColumnSequence, handler.ColumnTypeInt64),
+			handler.NewColumn(ProjectGrantColumnState, handler.ColumnTypeEnum),
+			handler.NewColumn(ProjectGrantColumnResourceOwner, handler.ColumnTypeText),
+			handler.NewColumn(ProjectGrantColumnInstanceID, handler.ColumnTypeText),
+			handler.NewColumn(ProjectGrantColumnProjectID, handler.ColumnTypeText),
+			handler.NewColumn(ProjectGrantColumnGrantedOrgID, handler.ColumnTypeText),
+			handler.NewColumn(ProjectGrantColumnRoleKeys, handler.ColumnTypeTextArray, handler.Nullable()),
+			handler.NewColumn(ProjectGrantColumnOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(ProjectGrantColumnGrantedOrgRemoved, handler.ColumnTypeBool, handler.Default(false)),
 		},
-			crdb.NewPrimaryKey(ProjectGrantColumnInstanceID, ProjectGrantColumnGrantID),
-			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{ProjectGrantColumnResourceOwner})),
-			crdb.WithIndex(crdb.NewIndex("granted_org", []string{ProjectGrantColumnGrantedOrgID})),
-			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{ProjectGrantColumnOwnerRemoved})),
-			crdb.WithIndex(crdb.NewIndex("granted_org_removed", []string{ProjectGrantColumnGrantedOrgRemoved})),
+			handler.NewPrimaryKey(ProjectGrantColumnInstanceID, ProjectGrantColumnGrantID),
+			handler.WithIndex(handler.NewIndex("resource_owner", []string{ProjectGrantColumnResourceOwner})),
+			handler.WithIndex(handler.NewIndex("granted_org", []string{ProjectGrantColumnGrantedOrgID})),
+			handler.WithIndex(handler.NewIndex("owner_removed", []string{ProjectGrantColumnOwnerRemoved})),
+			handler.WithIndex(handler.NewIndex("granted_org_removed", []string{ProjectGrantColumnGrantedOrgRemoved})),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *projectGrantProjection) reducers() []handler.AggregateReducer {
+func (p *projectGrantProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: project.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  project.GrantAddedType,
 					Reduce: p.reduceProjectGrantAdded,
@@ -102,7 +103,7 @@ func (p *projectGrantProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceOwnerRemoved,
@@ -111,7 +112,7 @@ func (p *projectGrantProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(ProjectGrantColumnInstanceID),
@@ -126,7 +127,7 @@ func (p *projectGrantProjection) reduceProjectGrantAdded(event eventstore.Event)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-g92Fg", "reduce.wrong.event.type %s", project.GrantAddedType)
 	}
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(ProjectGrantColumnGrantID, e.GrantID),
@@ -138,7 +139,7 @@ func (p *projectGrantProjection) reduceProjectGrantAdded(event eventstore.Event)
 			handler.NewCol(ProjectGrantColumnState, domain.ProjectGrantStateActive),
 			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectGrantColumnGrantedOrgID, e.GrantedOrgID),
-			handler.NewCol(ProjectGrantColumnRoleKeys, database.StringArray(e.RoleKeys)),
+			handler.NewCol(ProjectGrantColumnRoleKeys, database.TextArray[string](e.RoleKeys)),
 		},
 	), nil
 }
@@ -148,12 +149,12 @@ func (p *projectGrantProjection) reduceProjectGrantChanged(event eventstore.Even
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-g0fg4", "reduce.wrong.event.type %s", project.GrantChangedType)
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
 			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
-			handler.NewCol(ProjectGrantColumnRoleKeys, database.StringArray(e.RoleKeys)),
+			handler.NewCol(ProjectGrantColumnRoleKeys, database.TextArray[string](e.RoleKeys)),
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
@@ -168,12 +169,12 @@ func (p *projectGrantProjection) reduceProjectGrantCascadeChanged(event eventsto
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ll9Ts", "reduce.wrong.event.type %s", project.GrantCascadeChangedType)
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
 			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
-			handler.NewCol(ProjectGrantColumnRoleKeys, database.StringArray(e.RoleKeys)),
+			handler.NewCol(ProjectGrantColumnRoleKeys, database.TextArray[string](e.RoleKeys)),
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
@@ -188,7 +189,7 @@ func (p *projectGrantProjection) reduceProjectGrantDeactivated(event eventstore.
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-0fj2f", "reduce.wrong.event.type %s", project.GrantDeactivatedType)
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
@@ -208,7 +209,7 @@ func (p *projectGrantProjection) reduceProjectGrantReactivated(event eventstore.
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2M0ve", "reduce.wrong.event.type %s", project.GrantReactivatedType)
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
@@ -228,7 +229,7 @@ func (p *projectGrantProjection) reduceProjectGrantRemoved(event eventstore.Even
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-o0w4f", "reduce.wrong.event.type %s", project.GrantRemovedType)
 	}
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
@@ -243,7 +244,7 @@ func (p *projectGrantProjection) reduceProjectRemoved(event eventstore.Event) (*
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-gn9rw", "reduce.wrong.event.type %s", project.ProjectRemovedType)
 	}
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
@@ -258,15 +259,15 @@ func (p *projectGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*ha
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-HDgW3", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		e,
-		crdb.AddDeleteStatement(
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCond(ProjectGrantColumnResourceOwner, e.Aggregate().ID),
 			},
 		),
-		crdb.AddDeleteStatement(
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCond(ProjectGrantColumnGrantedOrgID, e.Aggregate().ID),

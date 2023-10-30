@@ -1,12 +1,57 @@
-@use '@angular/material' as mat;
-
 @mixin theme-setting($theme) {
   $primary: map-get($theme, primary);
   $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
   $back: map-get($background, background);
 
-  .theme-setting-button {
-    background-color: if($is-dark-theme, #ffffff10, #fff) !important;
+  .theme-flex {
+    display: flex;
+    align-items: center;
+    border: 1px solid if($is-dark-theme, #ffffff20, #00000020);
+    border-radius: 50vw;
+    padding: 0.25rem;
+
+    .theme-setting-button {
+      background-color: transparent;
+      border-radius: 50vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 2rem;
+      width: 2rem;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+
+      .moon,
+      .sun {
+        color: map-get($foreground, text);
+        fill: transparent;
+        height: 1rem;
+        width: 1rem;
+        opacity: 0.7;
+      }
+
+      .sun {
+        height: 1.5rem;
+        width: 1.5rem;
+      }
+
+      &:hover {
+        .moon,
+        .sun {
+          opacity: 1;
+        }
+      }
+
+      &.active {
+        background-color: if($is-dark-theme, #ffffff10, #00000010) !important;
+        .moon,
+        .sun {
+          opacity: 1;
+        }
+      }
+    }
   }
 }

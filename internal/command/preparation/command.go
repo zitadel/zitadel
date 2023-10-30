@@ -25,6 +25,8 @@ var (
 )
 
 // PrepareCommands checks the passed validations and if ok creates the commands
+//
+// Deprecated: filter causes unneeded allocation. Use [eventstore.FilterToQueryReducer] instead.
 func PrepareCommands(ctx context.Context, filter FilterToQueryReducer, validations ...Validation) (cmds []eventstore.Command, err error) {
 	commanders, err := validate(validations)
 	if err != nil {

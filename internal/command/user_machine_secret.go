@@ -31,7 +31,7 @@ func (c *Commands) GenerateMachineSecret(ctx context.Context, userID string, res
 
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }
@@ -80,7 +80,7 @@ func (c *Commands) RemoveMachineSecret(ctx context.Context, userID string, resou
 
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }
@@ -131,7 +131,7 @@ func (c *Commands) VerifyMachineSecret(ctx context.Context, userID string, resou
 
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }

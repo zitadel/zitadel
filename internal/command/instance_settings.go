@@ -25,7 +25,7 @@ func (c *Commands) AddSecretGeneratorConfig(ctx context.Context, typ domain.Secr
 	}
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: agg.ResourceOwner,
 	}, nil
 }
