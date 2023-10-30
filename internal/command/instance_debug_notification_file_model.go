@@ -5,9 +5,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/settings"
-
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/settings"
 )
 
 type InstanceDebugNotificationFileWriteModel struct {
@@ -15,11 +14,13 @@ type InstanceDebugNotificationFileWriteModel struct {
 }
 
 func NewInstanceDebugNotificationFileWriteModel(ctx context.Context) *InstanceDebugNotificationFileWriteModel {
+	instanceID := authz.GetInstance(ctx).InstanceID()
 	return &InstanceDebugNotificationFileWriteModel{
 		DebugNotificationWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   authz.GetInstance(ctx).InstanceID(),
-				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
+				InstanceID:    instanceID,
 			},
 		},
 	}

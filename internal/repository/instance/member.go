@@ -4,8 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/member"
 )
 
@@ -40,7 +38,7 @@ func NewMemberAddedEvent(
 	}
 }
 
-func MemberAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MemberAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := member.MemberAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -72,7 +70,7 @@ func NewMemberChangedEvent(
 	}
 }
 
-func MemberChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MemberChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := member.ChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -102,7 +100,7 @@ func NewMemberRemovedEvent(
 	}
 }
 
-func MemberRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MemberRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := member.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -132,7 +130,7 @@ func NewMemberCascadeRemovedEvent(
 	}
 }
 
-func MemberCascadeRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MemberCascadeRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := member.CascadeRemovedEventMapper(event)
 	if err != nil {
 		return nil, err

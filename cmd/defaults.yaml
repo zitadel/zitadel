@@ -78,13 +78,17 @@ HTTP1HostHeader: "host" # ZITADEL_HTTP1HOSTHEADER
 WebAuthNName: ZITADEL # ZITADEL_WEBAUTHN_NAME
 
 Database:
+  # This setting defines the ratio of how many connections defined below
+  # are used to push events. ZITADEL manages two database connection pools
+  # one to push events and one for the remaining queries. 
+  EventPushConnRatio: 0.2 # ZITADEL_DATABASE_COCKROACH_EVENTPUSHCONNRATIO
   # CockroachDB is the default database of ZITADEL
   cockroach:
     Host: localhost # ZITADEL_DATABASE_COCKROACH_HOST
     Port: 26257 # ZITADEL_DATABASE_COCKROACH_PORT
     Database: zitadel # ZITADEL_DATABASE_COCKROACH_DATABASE
-    MaxOpenConns: 20 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
-    MaxIdleConns: 10 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
+    MaxOpenConns: 40 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
+    MaxIdleConns: 20 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
     MaxConnLifetime: 30m # ZITADEL_DATABASE_COCKROACH_MAXCONNLIFETIME
     MaxConnIdleTime: 5m # ZITADEL_DATABASE_COCKROACH_MAXCONNIDLETIME
     Options: "" # ZITADEL_DATABASE_COCKROACH_OPTIONS
@@ -177,14 +181,16 @@ AssetStorage:
 
 # The Projections section defines the behavior for the scheduled and synchronous events projections.
 Projections:
+  # The maximum duration a transaction remains open 
+  # before it spots left folding additional events
+  # and updates the table.
+  TransactionDuration: 500ms # ZITADEL_PROJECTIONS_TRANSACTIONDURATION
   # Time interval between scheduled projections
   RequeueEvery: 60s # ZITADEL_PROJECTIONS_REQUEUEEVERY
   # Time between retried database statements resulting from projected events
   RetryFailedAfter: 1s # ZITADEL_PROJECTIONS_RETRYFAILED
   # Retried execution number of database statements resulting from projected events
   MaxFailureCount: 5 # ZITADEL_PROJECTIONS_MAXFAILURECOUNT
-  # Number of concurrent projection routines. Values of 0 and below are overwritten to 1
-  ConcurrentInstances: 1 # ZITADEL_PROJECTIONS_CONCURRENTINSTANCES
   # Limit of returned events per query
   BulkLimit: 200 # ZITADEL_PROJECTIONS_BULKLIMIT
   # Only instances are projected, for which at least a projection-relevant event exists within the timeframe
@@ -194,11 +200,20 @@ Projections:
   # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
     Projects:
-      BulkLimit: 2000 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_PROJECTS_BULKLIMIT
+      TransactionDuration: 2s
+    custom_texts:
+      TransactionDuration: 2s
+      BulkLimit: 400
     # The Notifications projection is used for sending emails and SMS to users
     Notifications:
       # As notification projections don't result in database statements, retries don't have an effect
-      MaxFailureCount: 0 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONS_MAXFAILURECOUNT
+      MaxFailureCount: 10 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONS_MAXFAILURECOUNT
+      # Sending emails can take longer than 500ms
+      TransactionDuration: 5s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONS_TRANSACTIONDURATION
+    password_complexities:
+      TransactionDuration: 2s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_PASSWORD_COMPLEXITIES_TRANSACTIONDURATION
+    lockout_policy:
+      TransactionDuration: 2s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_LOCKOUT_POLICY_TRANSACTIONDURATION
     # The NotificationsQuotas projection is used for calling quota webhooks
     NotificationsQuotas:
       # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
@@ -207,9 +222,13 @@ Projections:
       # Defaults to 45 days
       HandleActiveInstances: 1080h # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_HANDLEACTIVEINSTANCES
       # As quota notification projections don't result in database statements, retries don't have an effect
-      MaxFailureCount: 0 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_MAXFAILURECOUNT
+      MaxFailureCount: 10 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_MAXFAILURECOUNT
       # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the db too much.
       RequeueEvery: 300s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_REQUEUEEVERY
+      # Sending emails can take longer than 500ms
+      TransactionDuration: 5s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONQUOTAS_TRANSACTIONDURATION
+    milestones:
+      BulkLimit: 50
     # The Telemetry projection is used for calling telemetry webhooks
     Telemetry:
       # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
@@ -223,20 +242,34 @@ Projections:
       RequeueEvery: 3300s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_REQUEUEEVERY
 
 Auth:
+  # See Projections.BulkLimit
   SearchLimit: 1000 # ZITADEL_AUTH_SEARCHLIMIT
   Spooler:
-    ConcurrentWorkers: 1 # ZITADEL_AUTH_SPOOLER_CONCURRENTWORKERS
-    ConcurrentInstances: 1 # ZITADEL_AUTH_SPOOLER_CONCURRENTINSTANCES
-    BulkLimit: 10000 # ZITADEL_AUTH_SPOOLER_BULKLIMIT
-    FailureCountUntilSkip: 5 # ZITADEL_AUTH_SPOOLER_FAILURECOUNTUNTILSKIP
+  # See Projections.TransationDuration
+    TransactionDuration: 10s #ZITADEL_AUTH_SPOOLER_TRANSACTIONDURATION
+    # See Projections.BulkLimit
+    BulkLimit: 100 #ZITADEL_AUTH_SPOOLER_BULKLIMIT
+    # See Projections.MaxFailureCount
+    FailureCountUntilSkip: 5 #ZITADEL_AUTH_SPOOLER_FAILURECOUNTUNTILSKIP
+    # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
+    # from HandleActiveInstances duration in the past until the projections current time
+    # Defaults to twice the RequeueEvery duration
+    HandleActiveInstances: 120s #ZITADEL_AUTH_SPOOLER_HANDLEACTIVEINSTANCES
 
 Admin:
+  # See Projections.BulkLimit
   SearchLimit: 1000 # ZITADEL_ADMIN_SEARCHLIMIT
   Spooler:
-    ConcurrentWorkers: 1 # ZITADEL_ADMIN_SPOOLER_CONCURRENTWORKERS
-    ConcurrentInstances: 1 # ZITADEL_ADMIN_SPOOLER_CONCURRENTINSTANCES
-    BulkLimit: 10000 # ZITADEL_ADMIN_SPOOLER_BULKLIMIT
-    FailureCountUntilSkip: 5 # ZITADEL_ADMIN_SPOOLER_FAILURECOUNTUNTILSKIP
+    # See Projections.TransationDuration
+    TransactionDuration: 10s
+    # See Projections.BulkLimit
+    BulkLimit: 200
+    # See Projections.MaxFailureCount
+    FailureCountUntilSkip: 5
+    # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
+    # from HandleActiveInstances duration in the past until the projections current time
+    # Defaults to twice the RequeueEvery duration
+    HandleActiveInstances: 120s
 
 UserAgentCookie:
   Name: zitadel.useragent # ZITADEL_USERAGENTCOOKIE_NAME
@@ -322,10 +355,12 @@ Console:
 Notification:
   Repository:
     Spooler:
-      ConcurrentWorkers: 1 # ZITADEL_NOTIFICATION_REPOSITORY_SPOOLER_CONCURRENTWORKERS
-      ConcurrentInstances: 10 # ZITADEL_NOTIFICATION_REPOSITORY_SPOOLER_CONCURRENTINSTANCES
-      BulkLimit: 10000 # ZITADEL_NOTIFICATION_REPOSITORY_SPOOLER_BULKLIMIT
-      FailureCountUntilSkip: 5 # ZITADEL_NOTIFICATION_REPOSITORY_SPOOLER_FAILURECOUNTUNTILSKIP
+      # See Projections.TransactionDuration
+      TransactionDuration: 10s #ZITADEL_NOTIFICATION_REPOSITORY_SPOOLER_TRANSACTIONDURATION
+      # See Projections.BulkLimit
+      BulkLimit: 200 #ZITADEL_NOTIFICATION_REPOSITORY_SPOOLER_BULKLIMIT
+      # See Projections.MaxFailureCount
+      FailureCountUntilSkip: 5 #ZITADEL_NOTIFICATION_REPOSITORY_SPOOLER_FAILURECOUNTUNTILSKIP
       Handlers:
 
 EncryptionKeys:
@@ -357,11 +392,27 @@ EncryptionKeys:
   UserAgentCookieKeyID: "userAgentCookieKey" # ZITADEL_ENCRYPTIONKEYS_USERAGENTCOOKIEKEYID
 
 SystemAPIUsers:
-# Add keys for authentication of the systemAPI here:
-# you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
+# # Add keys for authentication of the systemAPI here:
+# # you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
 # - superuser:
-#     Path: /path/to/superuser/key.pem  # you can provide the key either by reference with the path
+#     Path: /path/to/superuser/ey.pem  # you can provide the key either by reference with the path
+#     Memberships:
+#       # MemberType System allows the user to access all APIs for all instances or organizations
+#       - MemberType: System
+#         Roles:
+#           - "SYSTEM_OWNER"
+#           # Actually, we don't recommend adding IAM_OWNER and ORG_OWNER to the System membership, as this basically enables god mode for the system user
+#           - "IAM_OWNER"
+#           - "ORG_OWNER"
+#       # MemberType IAM and Organization let you restrict access to a specific instance or organization by specifying the AggregateID
+#       - MemberType: IAM
+#         Roles: "IAM_OWNER"
+#         AggregateID: "123456789012345678"
+#       - MemberType: Organization
+#         Roles: "ORG_OWNER"
+#         AggregateID: "123456789012345678"
 # - superuser2:
+#     # If no memberships are specified, the user has a membership of type System with the role "SYSTEM_OWNER"
 #     KeyData: <base64 encoded key>     # or you can directly embed it as base64 encoded value
 
 #TODO: remove as soon as possible
@@ -477,8 +528,8 @@ Quotas:
       MaxBulkSize: 0 # ZITADEL_QUOTAS_EXECUTION_DEBOUNCE_MAXBULKSIZE
 
 Eventstore:
-  PushTimeout: 15s # ZITADEL_EVENTSTORE_PUSHTIMEOUT
-  AllowOrderByCreationDate: false # ZITADEL_EVENTSTORE_ALLOWORDERBYCREATIONDATE
+  # Sets the maximum duration of transactions pushing events
+  PushTimeout: 15s #ZITADEL_EVENTSTORE_PUSHTIMEOUT
 
 DefaultInstance:
   InstanceName: ZITADEL # ZITADEL_DEFAULTINSTANCE_INSTANCENAME
@@ -735,7 +786,7 @@ DefaultInstance:
       PreHeader: Verify email
       Subject: Verify email
       Greeting: Hello {{.DisplayName}},
-      Text: A new email has been added. Please use the button below to verify your mail. (Code {{.Code}}) If you din't add a new email, please ignore this email.
+      Text: A new email has been added. Please use the button below to verify your email. (Code {{.Code}}) If you din't add a new email, please ignore this email.
       ButtonText: Verify email
     - MessageTextType: VerifyPhone
       Language: en
@@ -763,7 +814,11 @@ DefaultInstance:
       ButtonText: Login
   Features:
     - FeatureLoginDefaultOrg: true
-
+  Limits:
+    # AuditLogRetention limits the number of events that can be queried via the events API by their age.
+    # A value of "0s" means that all events are available.
+    # If this value is set, it overwrites the system default unless it is not reset via the admin API.
+    AuditLogRetention: # ZITADEL_DEFAULTINSTANCE_LIMITS_AUDITLOGRETENTION
   Quotas:
     # Items take a slice of quota configurations, whereas, for each unit type and instance, one or zero quotas may exist.
     # The following unit types are supported
@@ -798,10 +853,36 @@ DefaultInstance:
 #            # CallURL is called when a relative amount of the quota is used.
 #            CallURL: "https://httpbin.org/post"
 
-AuditLogRetention: 0s
+# AuditLogRetention limits the number of events that can be queried via the events API by their age.
+# A value of "0s" means that all events are available.
+# If an audit log retention is set using an instance limit, it will overwrite the system default.
+AuditLogRetention: 0s # ZITADEL_AUDITLOGRETENTION
 
 InternalAuthZ:
   RolePermissionMappings:
+    - Role: "SYSTEM_OWNER"
+      Permissions:
+        - "system.instance.read"
+        - "system.instance.write"
+        - "system.instance.delete"
+        - "system.domain.read"
+        - "system.domain.write"
+        - "system.domain.delete"
+        - "system.debug.read"
+        - "system.debug.write"
+        - "system.debug.delete"
+        - "system.feature.write"
+        - "system.limits.write"
+        - "system.limits.delete"
+        - "system.quota.write"
+        - "system.quota.delete"
+        - "system.iam.member.read"
+    - Role: "SYSTEM_OWNER_VIEWER"
+      Permissions:
+        - "system.instance.read"
+        - "system.domain.read"
+        - "system.debug.read"
+        - "system.iam.member.read"
     - Role: "IAM_OWNER"
       Permissions:
         - "iam.read"
@@ -872,6 +953,7 @@ InternalAuthZ:
         - "project.grant.member.write"
         - "project.grant.member.delete"
         - "events.read"
+        - "milestones.read"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -897,6 +979,7 @@ InternalAuthZ:
         - "project.grant.read"
         - "project.grant.member.read"
         - "events.read"
+        - "milestones.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"

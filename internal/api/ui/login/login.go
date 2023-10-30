@@ -161,7 +161,11 @@ func (l *Login) Handler() http.Handler {
 }
 
 func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string) ([]string, error) {
-	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+domain.NewIAMDomainName(orgName, authz.GetInstance(ctx).RequestedDomain()), query.TextEndsWithIgnoreCase)
+	orgDomain, err := domain.NewIAMDomainName(orgName, authz.GetInstance(ctx).RequestedDomain())
+	if err != nil {
+		return nil, err
+	}
+	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+orgDomain, query.TextEndsWithIgnoreCase)
 	if err != nil {
 		return nil, err
 	}

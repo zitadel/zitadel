@@ -324,8 +324,12 @@ import {
   RemoveCustomLabelPolicyLogoDarkResponse,
   RemoveCustomLabelPolicyLogoRequest,
   RemoveCustomLabelPolicyLogoResponse,
+  RemoveHumanAuthFactorOTPEmailRequest,
+  RemoveHumanAuthFactorOTPEmailResponse,
   RemoveHumanAuthFactorOTPRequest,
   RemoveHumanAuthFactorOTPResponse,
+  RemoveHumanAuthFactorOTPSMSRequest,
+  RemoveHumanAuthFactorOTPSMSResponse,
   RemoveHumanAuthFactorU2FRequest,
   RemoveHumanAuthFactorU2FResponse,
   RemoveHumanLinkedIDPRequest,
@@ -1815,6 +1819,18 @@ export class ManagementService {
     req.setUserId(userId);
     req.setTokenId(tokenId);
     return this.grpcService.mgmt.removeHumanAuthFactorU2F(req, null).then((resp) => resp.toObject());
+  }
+
+  public removeHumanAuthFactorOTPSMS(userId: string): Promise<RemoveHumanAuthFactorOTPSMSResponse.AsObject> {
+    const req = new RemoveHumanAuthFactorOTPSMSRequest();
+    req.setUserId(userId);
+    return this.grpcService.mgmt.removeHumanAuthFactorOTPSMS(req, null).then((resp) => resp.toObject());
+  }
+
+  public removeHumanAuthFactorOTPEmail(userId: string): Promise<RemoveHumanAuthFactorOTPEmailResponse.AsObject> {
+    const req = new RemoveHumanAuthFactorOTPEmailRequest();
+    req.setUserId(userId);
+    return this.grpcService.mgmt.removeHumanAuthFactorOTPEmail(req, null).then((resp) => resp.toObject());
   }
 
   public updateHumanProfile(

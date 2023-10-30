@@ -7,15 +7,14 @@ import (
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
-	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
 )
 
 type UserRepo struct {
 	SearchLimit    uint64
-	Eventstore     v1.Eventstore
+	Eventstore     *eventstore.Eventstore
 	View           *view.View
 	Query          *query.Queries
 	SystemDefaults systemdefaults.SystemDefaults
@@ -39,14 +38,14 @@ func (repo *UserRepo) UserSessionUserIDsByAgentID(ctx context.Context, agentID s
 	return userIDs, nil
 }
 
-func (repo *UserRepo) UserEventsByID(ctx context.Context, id string, sequence uint64, eventTypes []models.EventType) ([]*models.Event, error) {
+func (repo *UserRepo) UserEventsByID(ctx context.Context, id string, sequence uint64, eventTypes []eventstore.EventType) ([]eventstore.Event, error) {
 	return repo.getUserEvents(ctx, id, sequence, eventTypes)
 }
 
-func (r *UserRepo) getUserEvents(ctx context.Context, userID string, sequence uint64, eventTypes []models.EventType) ([]*models.Event, error) {
+func (r *UserRepo) getUserEvents(ctx context.Context, userID string, sequence uint64, eventTypes []eventstore.EventType) ([]eventstore.Event, error) {
 	query, err := usr_view.UserByIDQuery(userID, authz.GetInstance(ctx).InstanceID(), sequence, eventTypes)
 	if err != nil {
 		return nil, err
 	}
-	return r.Eventstore.FilterEvents(ctx, query)
+	return r.Eventstore.Filter(ctx, query)
 }

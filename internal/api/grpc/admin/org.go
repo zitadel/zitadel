@@ -61,12 +61,16 @@ func (s *Server) ListOrgs(ctx context.Context, req *admin_pb.ListOrgsRequest) (*
 	}
 	return &admin_pb.ListOrgsResponse{
 		Result:  org_grpc.OrgViewsToPb(orgs.Orgs),
-		Details: object.ToListDetails(orgs.Count, orgs.Sequence, orgs.Timestamp),
+		Details: object.ToListDetails(orgs.Count, orgs.Sequence, orgs.LastRun),
 	}, nil
 }
 
 func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*admin_pb.SetUpOrgResponse, error) {
-	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, domain.NewIAMDomainName(req.Org.Name, authz.GetInstance(ctx).RequestedDomain()))
+	orgDomain, err := domain.NewIAMDomainName(req.Org.Name, authz.GetInstance(ctx).RequestedDomain())
+	if err != nil {
+		return nil, err
+	}
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, orgDomain)
 	if err != nil {
 		return nil, err
 	}

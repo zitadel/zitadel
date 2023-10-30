@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -224,26 +223,22 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newDefaultIDPOIDCConfigChangedEvent(context.Background(),
-									"config1",
-									"clientid-changed",
-									"issuer-changed",
-									"authorization-endpoint-changed",
-									"token-endpoint-changed",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("secret-changed"),
-									},
-									domain.OIDCMappingFieldPreferredLoginName,
-									domain.OIDCMappingFieldPreferredLoginName,
-									[]string{"scope", "scope2"},
-								),
-							),
-						},
+						newDefaultIDPOIDCConfigChangedEvent(context.Background(),
+							"config1",
+							"clientid-changed",
+							"issuer-changed",
+							"authorization-endpoint-changed",
+							"token-endpoint-changed",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("secret-changed"),
+							},
+							domain.OIDCMappingFieldPreferredLoginName,
+							domain.OIDCMappingFieldPreferredLoginName,
+							[]string{"scope", "scope2"},
+						),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -268,6 +263,7 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "INSTANCE",
 						ResourceOwner: "INSTANCE",
+						InstanceID:    "INSTANCE",
 					},
 					IDPConfigID:           "config1",
 					ClientID:              "clientid-changed",

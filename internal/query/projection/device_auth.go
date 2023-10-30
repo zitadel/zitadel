@@ -6,8 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
 )
 
@@ -29,44 +29,44 @@ const (
 	DeviceAuthColumnInstanceID   = "instance_id"
 )
 
-type deviceAuthProjection struct {
-	crdb.StatementHandler
+type deviceAuthProjection struct{}
+
+func newDeviceAuthProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(deviceAuthProjection))
 }
 
-func newDeviceAuthProjection(ctx context.Context, config crdb.StatementHandlerConfig) *deviceAuthProjection {
-	p := new(deviceAuthProjection)
-	config.ProjectionName = DeviceAuthProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(DeviceAuthColumnID, crdb.ColumnTypeText),
-			crdb.NewColumn(DeviceAuthColumnClientID, crdb.ColumnTypeText),
-			crdb.NewColumn(DeviceAuthColumnDeviceCode, crdb.ColumnTypeText),
-			crdb.NewColumn(DeviceAuthColumnUserCode, crdb.ColumnTypeText),
-			crdb.NewColumn(DeviceAuthColumnExpires, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(DeviceAuthColumnScopes, crdb.ColumnTypeTextArray),
-			crdb.NewColumn(DeviceAuthColumnState, crdb.ColumnTypeEnum, crdb.Default(domain.DeviceAuthStateInitiated)),
-			crdb.NewColumn(DeviceAuthColumnSubject, crdb.ColumnTypeText, crdb.Default("")),
-			crdb.NewColumn(DeviceAuthColumnCreationDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(DeviceAuthColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(DeviceAuthColumnSequence, crdb.ColumnTypeInt64),
-			crdb.NewColumn(DeviceAuthColumnInstanceID, crdb.ColumnTypeText),
+func (*deviceAuthProjection) Name() string {
+	return DeviceAuthProjectionTable
+}
+
+func (*deviceAuthProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(DeviceAuthColumnID, handler.ColumnTypeText),
+			handler.NewColumn(DeviceAuthColumnClientID, handler.ColumnTypeText),
+			handler.NewColumn(DeviceAuthColumnDeviceCode, handler.ColumnTypeText),
+			handler.NewColumn(DeviceAuthColumnUserCode, handler.ColumnTypeText),
+			handler.NewColumn(DeviceAuthColumnExpires, handler.ColumnTypeTimestamp),
+			handler.NewColumn(DeviceAuthColumnScopes, handler.ColumnTypeTextArray),
+			handler.NewColumn(DeviceAuthColumnState, handler.ColumnTypeEnum, handler.Default(domain.DeviceAuthStateInitiated)),
+			handler.NewColumn(DeviceAuthColumnSubject, handler.ColumnTypeText, handler.Default("")),
+			handler.NewColumn(DeviceAuthColumnCreationDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(DeviceAuthColumnChangeDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(DeviceAuthColumnSequence, handler.ColumnTypeInt64),
+			handler.NewColumn(DeviceAuthColumnInstanceID, handler.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(DeviceAuthColumnInstanceID, DeviceAuthColumnID),
-			crdb.WithIndex(crdb.NewIndex("user_code", []string{DeviceAuthColumnInstanceID, DeviceAuthColumnUserCode})),
-			crdb.WithIndex(crdb.NewIndex("device_code", []string{DeviceAuthColumnInstanceID, DeviceAuthColumnClientID, DeviceAuthColumnDeviceCode})),
+			handler.NewPrimaryKey(DeviceAuthColumnInstanceID, DeviceAuthColumnID),
+			handler.WithIndex(handler.NewIndex("user_code", []string{DeviceAuthColumnInstanceID, DeviceAuthColumnUserCode})),
+			handler.WithIndex(handler.NewIndex("device_code", []string{DeviceAuthColumnInstanceID, DeviceAuthColumnClientID, DeviceAuthColumnDeviceCode})),
 		),
 	)
-
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *deviceAuthProjection) reducers() []handler.AggregateReducer {
+func (p *deviceAuthProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: deviceauth.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  deviceauth.AddedEventType,
 					Reduce: p.reduceAdded,
@@ -93,7 +93,7 @@ func (p *deviceAuthProjection) reduceAdded(event eventstore.Event) (*handler.Sta
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-chu6O", "reduce.wrong.event.type %T != %s", event, deviceauth.AddedEventType)
 	}
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(DeviceAuthColumnID, e.Aggregate().ID),
@@ -115,7 +115,7 @@ func (p *deviceAuthProjection) reduceAppoved(event eventstore.Event) (*handler.S
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-kei0A", "reduce.wrong.event.type %T != %s", event, deviceauth.ApprovedEventType)
 	}
-	return crdb.NewUpdateStatement(e,
+	return handler.NewUpdateStatement(e,
 		[]handler.Column{
 			handler.NewCol(DeviceAuthColumnState, domain.DeviceAuthStateApproved),
 			handler.NewCol(DeviceAuthColumnSubject, e.Subject),
@@ -134,7 +134,7 @@ func (p *deviceAuthProjection) reduceCanceled(event eventstore.Event) (*handler.
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-eeS8d", "reduce.wrong.event.type %T != %s", event, deviceauth.CanceledEventType)
 	}
-	return crdb.NewUpdateStatement(e,
+	return handler.NewUpdateStatement(e,
 		[]handler.Column{
 			handler.NewCol(DeviceAuthColumnState, e.Reason.State()),
 			handler.NewCol(DeviceAuthColumnChangeDate, e.CreationDate()),
@@ -152,7 +152,7 @@ func (p *deviceAuthProjection) reduceRemoved(event eventstore.Event) (*handler.S
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AJi1u", "reduce.wrong.event.type %T != %s", event, deviceauth.RemovedEventType)
 	}
-	return crdb.NewDeleteStatement(e,
+	return handler.NewDeleteStatement(e,
 		[]handler.Condition{
 			handler.NewCond(DeviceAuthColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(DeviceAuthColumnID, e.Aggregate().ID),

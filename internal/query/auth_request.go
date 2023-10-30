@@ -8,11 +8,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -50,13 +53,16 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.AuthRequestProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerAuthRequestProjection")
+		ctx, err = projection.AuthRequestProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	var (
-		scope   database.StringArray
-		prompt  database.EnumArray[domain.Prompt]
-		locales database.StringArray
+		scope   database.TextArray[string]
+		prompt  database.Array[domain.Prompt]
+		locales database.TextArray[string]
 	)
 
 	dst := new(AuthRequest)

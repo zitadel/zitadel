@@ -8,12 +8,15 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -43,7 +46,7 @@ type OIDCIDP struct {
 	ClientID              string
 	ClientSecret          *crypto.CryptoValue
 	Issuer                string
-	Scopes                database.StringArray
+	Scopes                database.TextArray[string]
 	DisplayNameMapping    domain.OIDCMappingField
 	UsernameMapping       domain.OIDCMappingField
 	AuthorizationEndpoint string
@@ -193,7 +196,10 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.IDPProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerIDPProjection")
+		ctx, err = projection.IDPProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	eq := sq.Eq{
@@ -247,7 +253,7 @@ func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries, withOwner
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-xPlVH", "Errors.Internal")
 	}
-	idps.LatestSequence, err = q.latestSequence(ctx, idpTable)
+	idps.State, err = q.latestState(ctx, idpTable)
 	return idps, err
 }
 
@@ -325,7 +331,7 @@ func prepareIDPByIDQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			oidcClientID := sql.NullString{}
 			oidcClientSecret := new(crypto.CryptoValue)
 			oidcIssuer := sql.NullString{}
-			oidcScopes := database.StringArray{}
+			oidcScopes := database.TextArray[string]{}
 			oidcDisplayNameMapping := sql.NullInt32{}
 			oidcUsernameMapping := sql.NullInt32{}
 			oidcAuthorizationEndpoint := sql.NullString{}
@@ -437,7 +443,7 @@ func prepareIDPsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 				oidcClientID := sql.NullString{}
 				oidcClientSecret := new(crypto.CryptoValue)
 				oidcIssuer := sql.NullString{}
-				oidcScopes := database.StringArray{}
+				oidcScopes := database.TextArray[string]{}
 				oidcDisplayNameMapping := sql.NullInt32{}
 				oidcUsernameMapping := sql.NullInt32{}
 				oidcAuthorizationEndpoint := sql.NullString{}

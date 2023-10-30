@@ -51,7 +51,7 @@
       "TITLE": "Get your ZITADEL running",
       "DESCRIPTION": "This checklist helps to setup your instance and guides your through the most essential steps"
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Setup your brand",
         "description": "Define coloring and shape of your login and upload your logo and icons.",
@@ -62,15 +62,20 @@
         "description": "Set your own mail server settings.",
         "action": "Setup SMTP"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Create a project",
         "description": "Add a project and define its roles and authorizations.",
         "action": "Create project"
       },
-      "project.application.added": {
-        "title": "Create an application",
-        "description": "Create a web, native, api or saml application and setup your authentication flow.",
-        "action": "Create app"
+      "APPLICATION_CREATED": {
+        "title": "Register your app",
+        "description": "Register your web, native, api or saml application and setup an authentication flow.",
+        "action": "Register app"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Log in to your app",
+        "description": "Integrate your application with ZITADEL for authentication and test it by logging in with your admin user.",
+        "action": "Log in"
       },
       "user.human.added": {
         "title": "Add users",
@@ -274,7 +279,7 @@
     "SYMBOLERROR": "Must include a symbol or punctuation mark.",
     "NUMBERERROR": "Must include a digit.",
     "PWNOTEQUAL": "The passwords provided do not match.",
-    "PHONE": "The phone number must start with 00 or +."
+    "PHONE": "The phone number must start with +."
   },
   "USER": {
     "SETTINGS": {
@@ -486,7 +491,7 @@
       "TITLE": "Profile",
       "EMAIL": "E-mail",
       "PHONE": "Phone number",
-      "PHONE_HINT": "Use 00 or the + symbol followed by the calling country code, or select the country from the dropdown and finally enter the phone number",
+      "PHONE_HINT": "Use the + symbol followed by the calling country code, or select the country from the dropdown and finally enter the phone number",
       "USERNAME": "User Name",
       "CHANGEUSERNAME": "modify",
       "CHANGEUSERNAME_TITLE": "Change username",
@@ -713,7 +718,6 @@
   },
   "METADATA": {
     "TITLE": "Metadata",
-    "DESCRIPTION": "",
     "KEY": "Key",
     "VALUE": "Value",
     "ADD": "New Entry",
@@ -1092,6 +1096,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio added successfully.",
+        "UPDATED": "Twilio updated successfully.",
         "REMOVED": "Twilio removed",
         "CHANGETOKEN": "Change Token",
         "SETTOKEN": "Set Token",
@@ -1198,6 +1203,11 @@
         "ERROR": "User could not be found!",
         "PRIMARYBUTTON": "next",
         "SECONDARYBUTTON": "register"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Auto Mode",
+        "THEME_MODE_LIGHT": "Light Mode only",
+        "THEME_MODE_DARK": "Dark Mode only"
       }
     },
     "PWD_AGE": {
@@ -2005,6 +2015,8 @@
       "CLIENTSECRET_DESCRIPTION": "Keep your client secret at a safe place as it will disappear once the dialog is closed.",
       "REGENERATESECRET": "Regenerate Client Secret",
       "DEVMODE": "Development Mode",
+      "DEVMODE_ENABLED": "Enabled",
+      "DEVMODE_DISABLED": "Disabled",
       "DEVMODEDESC": "Beware: With development mode enabled redirect URIs will not be validated.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Skip Login Success Page",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Skip the success page after a login for this native app.",
@@ -2091,11 +2103,16 @@
         "DESCRIPTION": "SAML Applications"
       },
       "CONFIGSECTION": "SAML Configuration",
-      "URL": "Url where Metadata file is located",
-      "OR": "or",
-      "XML": "Upload Metadata XML",
+      "CHOOSEMETADATASOURCE": "Provide your SAML configuration using one of the following options:",
+      "METADATAOPT1": "Option 1. Specify the url where metadata file is located",
+      "METADATAOPT2": "Option 2. Upload a file containing your metadata XML",
+      "METADATAOPT3": "Option 3. Create a minimal metadata file on the fly providing ENTITYID and ACS URL",
+      "UPLOAD": "Upload XML file",
       "METADATA": "Metadata",
-      "METADATAFROMFILE": "Metadata from File"
+      "METADATAFROMFILE": "Metadata from file",
+      "CREATEMETADATA": "Create metadata",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {

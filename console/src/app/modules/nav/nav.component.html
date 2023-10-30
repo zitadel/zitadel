@@ -204,19 +204,22 @@
     <ng-template cnslHasRole [hasRole]="['iam.read']">
       <span class="fill-space"></span>
       <ng-container *ngIf="!adminService.hideOnboarding && (adminService.progressAllDone | async) === false">
-        <button
+        <div
           cdkOverlayOrigin
+          role="button"
           #trigger="cdkOverlayOrigin"
           matRipple
           class="progress-bar"
           (click)="showInstanceProgress = !showInstanceProgress"
         >
-          <mat-progress-bar
-            class="progress"
-            mode="determinate"
-            [value]="adminService.progressPercentage | async"
-          ></mat-progress-bar>
-        </button>
+          <div class="progress-div">
+            <mat-progress-bar
+              class="progress"
+              mode="determinate"
+              [value]="adminService.progressPercentage | async"
+            ></mat-progress-bar>
+          </div>
+        </div>
 
         <ng-template
           cdkConnectedOverlay

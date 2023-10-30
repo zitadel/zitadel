@@ -24,6 +24,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/logstore"
@@ -92,7 +93,8 @@ func MustNewConfig(v *viper.Viper) *Config {
 			database.DecodeHook,
 			actions.HTTPConfigDecodeHook,
 			systemAPIUsersDecodeHook,
-			hook.StringToFeatureHookFunc(),
+			hook.EnumHookFunc(domain.FeatureString),
+			hook.EnumHookFunc(internal_authz.MemberTypeString),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read config")

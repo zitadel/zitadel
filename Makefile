@@ -83,7 +83,7 @@ console_build: console_dependencies console_client
 
 .PHONY: clean
 clean:
-	$(RM) .artifacts/grpc
+	$(RM) -r .artifacts/grpc
 	$(RM) $(gen_authopt_path)
 	$(RM) $(gen_zitadel_path)
 

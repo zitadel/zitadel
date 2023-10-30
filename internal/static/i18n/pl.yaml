@@ -28,6 +28,9 @@ Errors:
       RemoveFailed: Obiekt nie mógł zostać usunięty
   Limit:
     ExceedsDefault: Limit przekracza domyślny limit
+  Limits:
+    NotFound: Limit nie znaleziony
+    NoneSpecified: Nie określono limitów
   Language:
     NotParsed: Nie można przeanalizować języka
   OIDCSettings:
@@ -182,6 +185,11 @@ Errors:
     DomainVerificationTypeInvalid: Typ weryfikacji domeny jest nieprawidłowy
     DomainVerificationMissing: Weryfikacja domeny nie została jeszcze rozpoczęta
     DomainVerificationFailed: Weryfikacja domeny nie powiodła się
+    DomainVerificationTXTNotFound: Nie znaleziono rekordu TXT _zitadel-challenge dla Twojej domeny. Sprawdź, czy dodałeś go do swojego serwera DNS lub poczekaj, aż nowy rekord zostanie rozpropagowany
+    DomainVerificationTXTNoMatch: Znaleziono rekord TXT _zitadel-challenge dla Twojej domeny, ale nie zawiera on prawidłowego tekstu tokena. Sprawdź, czy dodałeś właściwy token do swojego serwera DNS lub poczekaj, aż nowy rekord zostanie rozpropagowany
+    DomainVerificationHTTPNotFound: Pod oczekiwanym adresem URL nie znaleziono pliku zawierającego wyzwanie. Sprawdź, czy przesłałeś plik we właściwe miejsce z uprawnieniami do odczytu
+    DomainVerificationHTTPNoMatch: Znaleziono plik zawierający wyzwanie pod oczekiwanym adresem URL, ale nie zawiera on prawidłowego tekstu tokena. Sprawdź jego zawartość
+    DomainVerificationTimeout: Upłynął limit czasu podczas wysyłania zapytania do serwera DNS
     PrimaryDomainNotDeletable: Domena główna nie może być usunięta
     DomainNotFound: Domena nie znaleziona
     MemberIDMissing: Brak identyfikatora członka
@@ -197,6 +205,7 @@ Errors:
     Domain:
       AlreadyExists: Domena już istnieje
       InvalidCharacter: Tylko znaki alfanumeryczne, . i - są dozwolone dla domeny
+      EmptyString: Nieprawidłowe znaki inne niż numeryczne i alfabetyczne zostały zastąpione pustymi spacjami, a wynikowa domena jest pustym ciągiem znaków
     IDP:
       InvalidSearchQuery: Nieprawidłowe zapytanie wyszukiwania
       ClientIDMissing: Brak ClientID
@@ -415,6 +424,7 @@ Errors:
     AuditRetention: Historia jest poza zasięgiem retencji dziennika audytu
   Token:
     NotFound: Token nie znaleziony
+    Invalid: Token jest nieprawidłowy
   UserSession:
     NotFound: Sesja użytkownika nie znaleziona
   Key:

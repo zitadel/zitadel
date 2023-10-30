@@ -107,6 +107,20 @@ func brandingSettingsToPb(current *query.LabelPolicy, assetPrefix string) *setti
 		DisableWatermark:    current.WatermarkDisabled,
 		HideLoginNameSuffix: current.HideLoginNameSuffix,
 		ResourceOwnerType:   isDefaultToResourceOwnerTypePb(current.IsDefault),
+		ThemeMode:           themeModeToPb(current.ThemeMode),
+	}
+}
+
+func themeModeToPb(themeMode domain.LabelPolicyThemeMode) settings.ThemeMode {
+	switch themeMode {
+	case domain.LabelPolicyThemeAuto:
+		return settings.ThemeMode_THEME_MODE_AUTO
+	case domain.LabelPolicyThemeLight:
+		return settings.ThemeMode_THEME_MODE_LIGHT
+	case domain.LabelPolicyThemeDark:
+		return settings.ThemeMode_THEME_MODE_DARK
+	default:
+		return settings.ThemeMode_THEME_MODE_AUTO
 	}
 }
 

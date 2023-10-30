@@ -2,14 +2,15 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
-import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
+import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 
+import { MatDialogModule } from '@angular/material/dialog';
 import { InfoSectionModule } from '../info-section/info-section.module';
 import { AddTokenDialogComponent } from './add-token-dialog.component';
 
@@ -22,6 +23,7 @@ import { AddTokenDialogComponent } from './add-token-dialog.component';
     InfoSectionModule,
     InputModule,
     MatSelectModule,
+    MatDialogModule,
     MatIconModule,
     FormsModule,
     MatDatepickerModule,

@@ -7,27 +7,11 @@
   </div>
 
   <div class="privatelabeling-top-row">
-    <mat-button-toggle-group class="buttongroup" [(ngModel)]="theme" name="theme" aria-label="Theme">
-      <mat-button-toggle [value]="Theme.LIGHT">
-        <div class="toggle-row">
-          <i class="icon las la-sun"></i>
-          <span>{{ 'POLICY.PRIVATELABELING.LIGHT' | translate }}</span>
-          <div *ngIf="theme === Theme.LIGHT" class="current-dot"></div>
-        </div>
-      </mat-button-toggle>
-      <mat-button-toggle [value]="Theme.DARK">
-        <div class="toggle-row">
-          <i class="icon las la-moon"></i>
-          <span> {{ 'POLICY.PRIVATELABELING.DARK' | translate }}</span>
-          <div *ngIf="theme === Theme.DARK" class="current-dot"></div>
-        </div>
-      </mat-button-toggle>
-    </mat-button-toggle-group>
-
     <mat-button-toggle-group
       class="theme-toggle"
       class="buttongroup"
       [(ngModel)]="view"
+      (change)="toggleView(view)"
       name="displayview"
       aria-label="Display View"
     >
@@ -45,6 +29,109 @@
         <div class="toggle-row">
           <span> {{ 'POLICY.PRIVATELABELING.VIEWS.CURRENT' | translate }}</span>
           <div *ngIf="view === View.CURRENT" class="current-dot"></div>
+        </div>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  <div class="privatelabeling-top-row">
+    <mat-button-toggle-group
+      *ngIf="previewData && data"
+      class="buttongroup"
+      [(ngModel)]="view === View.CURRENT ? data.themeMode : previewData.themeMode"
+      (change)="toggleThemeMode()"
+      [disabled]="
+        view === View.CURRENT ||
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
+      name="thememode"
+      aria-label="Theme Mode"
+    >
+      <mat-button-toggle [value]="ThemeMode.THEME_MODE_AUTO">
+        <div class="toggle-row">
+          <i class="icon las la-adjust"></i>
+          <span>{{ 'POLICY.PRIVATELABELING.THEMEMODE.THEME_MODE_AUTO' | translate }}</span>
+          <div
+            *ngIf="
+              view === View.PREVIEW
+                ? previewData.themeMode === ThemeMode.THEME_MODE_AUTO
+                : data.themeMode === ThemeMode.THEME_MODE_AUTO
+            "
+            class="current-dot"
+          ></div>
+        </div>
+      </mat-button-toggle>
+      <mat-button-toggle [value]="ThemeMode.THEME_MODE_LIGHT">
+        <div class="toggle-row">
+          <i class="icon las la-sun"></i>
+          <span> {{ 'POLICY.PRIVATELABELING.THEMEMODE.THEME_MODE_LIGHT' | translate }}</span>
+          <div
+            *ngIf="
+              view === View.PREVIEW
+                ? previewData.themeMode === ThemeMode.THEME_MODE_LIGHT
+                : data.themeMode === ThemeMode.THEME_MODE_LIGHT
+            "
+            class="current-dot"
+          ></div>
+        </div>
+      </mat-button-toggle>
+      <mat-button-toggle [value]="ThemeMode.THEME_MODE_DARK">
+        <div class="toggle-row">
+          <i class="icon las la-moon"></i>
+          <span> {{ 'POLICY.PRIVATELABELING.THEMEMODE.THEME_MODE_DARK' | translate }}</span>
+          <div
+            *ngIf="
+              view === View.PREVIEW
+                ? previewData.themeMode === ThemeMode.THEME_MODE_DARK
+                : data.themeMode === ThemeMode.THEME_MODE_DARK
+            "
+            class="current-dot"
+          ></div>
+        </div>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <mat-button-toggle-group
+      class="buttongroup"
+      [(ngModel)]="theme"
+      name="theme"
+      aria-label="Theme"
+      *ngIf="previewData && data"
+    >
+      <mat-button-toggle
+        [value]="Theme.LIGHT"
+        [disabled]="
+          view === View.PREVIEW
+            ? previewData.themeMode === ThemeMode.THEME_MODE_DARK
+            : data.themeMode === ThemeMode.THEME_MODE_DARK
+        "
+      >
+        <div class="toggle-row">
+          <i class="icon las la-sun"></i>
+          <span>{{ 'POLICY.PRIVATELABELING.LIGHT' | translate }}</span>
+          <div *ngIf="theme === Theme.LIGHT" class="current-dot"></div>
+        </div>
+      </mat-button-toggle>
+      <mat-button-toggle
+        [value]="Theme.DARK"
+        [disabled]="
+          view === View.PREVIEW
+            ? previewData.themeMode === ThemeMode.THEME_MODE_LIGHT
+            : data.themeMode === ThemeMode.THEME_MODE_LIGHT
+        "
+      >
+        <div class="toggle-row">
+          <i class="icon las la-moon"></i>
+          <span> {{ 'POLICY.PRIVATELABELING.DARK' | translate }}</span>
+          <div *ngIf="theme === Theme.DARK" class="current-dot"></div>
         </div>
       </mat-button-toggle>
     </mat-button-toggle-group>

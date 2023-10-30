@@ -577,10 +577,15 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 				continue
 			}
 		case *policy.CustomTextTemplateRemovedEvent:
-			if e.Template != domain.LoginCustomText {
+			if e.Template != domain.LoginCustomText || wm.Language != e.Language {
 				continue
 			}
-			wm.State = domain.PolicyStateRemoved
+			// Reset all values
+			*wm = CustomLoginTextReadModel{
+				WriteModel: wm.WriteModel,
+				Language:   wm.Language,
+				State:      domain.PolicyStateRemoved,
+			}
 		}
 	}
 	return wm.WriteModel.Reduce()

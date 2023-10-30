@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/feature"
@@ -81,14 +80,10 @@ func TestCommands_SetBooleanInstanceFeature(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("instanceID",
-								feature.NewSetEvent[feature.Boolean](context.Background(), &feature.NewAggregate("featureID", "instanceID").Aggregate,
-									feature.EventTypeFromFeature(domain.FeatureLoginDefaultOrg),
-									feature.Boolean{Boolean: true},
-								),
-							),
-						},
+						feature.NewSetEvent[feature.Boolean](context.Background(), &feature.NewAggregate("featureID", "instanceID").Aggregate,
+							feature.EventTypeFromFeature(domain.FeatureLoginDefaultOrg),
+							feature.Boolean{Boolean: true},
+						),
 					),
 				),
 				idGenerator: mock.ExpectID(t, "featureID"),
@@ -117,14 +112,10 @@ func TestCommands_SetBooleanInstanceFeature(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("instanceID",
-								feature.NewSetEvent[feature.Boolean](context.Background(), &feature.NewAggregate("featureID", "instanceID").Aggregate,
-									feature.EventTypeFromFeature(domain.FeatureLoginDefaultOrg),
-									feature.Boolean{Boolean: false},
-								),
-							),
-						},
+						feature.NewSetEvent[feature.Boolean](context.Background(), &feature.NewAggregate("featureID", "instanceID").Aggregate,
+							feature.EventTypeFromFeature(domain.FeatureLoginDefaultOrg),
+							feature.Boolean{Boolean: false},
+						),
 					),
 				),
 			},

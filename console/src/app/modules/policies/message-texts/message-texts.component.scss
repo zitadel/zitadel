@@ -1,8 +1,6 @@
-@use '@angular/material' as mat;
-
 @mixin message-texts-theme($theme) {
   $primary: map-get($theme, primary);
-  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-color: map-get($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
@@ -15,12 +13,14 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
+    flex-wrap: wrap;
 
     .type {
       display: block;
       min-width: 200px;
       width: fit-content;
       margin-right: 1rem;
+      flex: 1;
     }
 
     .language {

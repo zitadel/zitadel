@@ -9,8 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jackc/pgtype"
-
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
@@ -32,19 +30,6 @@ var (
 		"now",
 	}
 )
-
-func dayNow() time.Time {
-	return time.Now().Truncate(24 * time.Hour)
-}
-
-func interval(t *testing.T, src time.Duration) pgtype.Interval {
-	interval := pgtype.Interval{}
-	err := interval.Set(src)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return interval
-}
 
 func Test_QuotaPrepare(t *testing.T) {
 	type want struct {
@@ -84,8 +69,8 @@ func Test_QuotaPrepare(t *testing.T) {
 					quotaCols,
 					[]driver.Value{
 						"quota-id",
-						dayNow(),
-						interval(t, time.Hour*24),
+						dayNow,
+						intervalDriverValue(t, time.Hour*24),
 						uint64(1000),
 						true,
 						testNow,
@@ -94,9 +79,9 @@ func Test_QuotaPrepare(t *testing.T) {
 			},
 			object: &Quota{
 				ID:                 "quota-id",
-				From:               dayNow(),
+				From:               dayNow,
 				ResetInterval:      time.Hour * 24,
-				CurrentPeriodStart: dayNow(),
+				CurrentPeriodStart: dayNow,
 				Amount:             1000,
 				Limit:              true,
 			},

@@ -1,15 +1,16 @@
 <h1 mat-dialog-title>
   <span>{{ data.titleKey | translate }} {{ data?.number }}</span>
 </h1>
-<p class="desc cnsl-secondary-text">{{ data.descKey | translate }}</p>
 <div mat-dialog-content>
+  <p class="desc cnsl-secondary-text">{{ data.descKey | translate }}</p>
+
   <cnsl-form-field class="formfield">
     <cnsl-label>{{ data.labelKey | translate }}</cnsl-label>
     <input data-e2e="name" cnslInput [(ngModel)]="name" />
   </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
-  <button color="primary" mat-stroked-button (click)="closeDialog()">
+  <button mat-stroked-button (click)="closeDialog()">
     {{ 'ACTIONS.CLOSE' | translate }}
   </button>
 

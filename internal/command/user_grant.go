@@ -140,7 +140,7 @@ func (c *Commands) removeRoleFromUserGrant(ctx context.Context, userGrantID stri
 
 func (c *Commands) DeactivateUserGrant(ctx context.Context, grantID, resourceOwner string) (objectDetails *domain.ObjectDetails, err error) {
 	if grantID == "" || resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-M0dsf", "Errors.UserGrant.IDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-N2OhG", "Errors.UserGrant.IDMissing")
 	}
 
 	existingUserGrant, err := c.userGrantWriteModelByID(ctx, grantID, resourceOwner)

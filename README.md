@@ -30,16 +30,37 @@
         <img src="./docs/static/logos/oidc-cert.png" /></a>
 </p>
 
-Do you look for a user management that's quickly set up like Auth0 and open source like Keycloak?
+
+Are you searching for a user management tool that is quickly set up like Auth0 and open source like Keycloak?
 
 Do you have a project that requires multi-tenant user management with self-service for your customers?
 
-Look no further — ZITADEL combines the ease of Auth0 with the versatility of Keycloak.
+Look no further — ZITADEL is the identity infrastructure, simplified for you.
 
-We provide you with a wide range of out-of-the-box features to accelerate your project.
-Multi-tenancy with branding customization, secure login, self-service, OpenID Connect, OAuth2.x, SAML2, LDAP, Passwordless with FIDO2 (including Passkeys), OTP, U2F, and an unlimited audit trail is there for you, ready to use.
+We provide you with a wide range of out-of-the-box features to accelerate your project, including:
 
-With ZITADEL you can rely on a hardened and extensible turnkey solution to solve all of your authentication and authorization needs.
+:white_check_mark: Multi-tenancy with branding customization
+
+:white_check_mark: Secure login
+
+:white_check_mark: Self-service
+
+:white_check_mark: OpenID Connect
+
+:white_check_mark: OAuth2.x
+
+:white_check_mark: SAML2
+
+:white_check_mark: LDAP
+
+:white_check_mark: Passkeys / FIDO2
+
+:white_check_mark: OTP
+
+:white_check_mark: U2F, and an unlimited audit trail is there for you, ready to use.
+
+
+With ZITADEL, you are assured of a robust and customizable turnkey solution for all your authentication and authorization needs.
 
 ---
 
@@ -51,7 +72,7 @@ With ZITADEL you can rely on a hardened and extensible turnkey solution to solve
 
 ### Deploy ZITADEL (Self-Hosted)
 
-Deploying ZITADEL locally takes less than 3 minutes. So go ahead and give it a try!
+Deploying ZITADEL locally takes less than 3 minutes. Go ahead and give it a try!
 
 * [Linux](https://zitadel.com/docs/self-hosting/deploy/linux)
 * [MacOS](https://zitadel.com/docs/self-hosting/deploy/macos)
@@ -67,7 +88,7 @@ See all guides [here](https://zitadel.com/docs/self-hosting/deploy/overview)
 
 If you want to experience a hands-free ZITADEL, you should use [ZITADEL Cloud](https://zitadel.cloud).
 
-It is free for up to 25'000 authenticated requests and provides you all the features that make ZITADEL great.
+ZITADEL Cloud comes with a free tier, providing you with all the same features as the open-source version.
 Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
 
 ### Example applications
@@ -84,6 +105,7 @@ We built ZITADEL with a complex multi-tenancy architecture in mind and provide t
 Yet it offers everything you need for a customer identity ([CIAM](https://zitadel.com/docs/guides/solution-scenarios/b2c)) use case.
 
 - [API-first approach](https://zitadel.com/docs/apis/introduction)
+- [Multi-tenancy](https://zitadel.com/docs/guides/solution-scenarios/b2b) authentication and access management
 - Strong audit trail thanks to [event sourcing](https://zitadel.com/docs/concepts/eventstore/overview) as storage pattern
 - [Actions](https://zitadel.com/docs/apis/actions/introduction) to react on events with custom code and extended ZITADEL for you needs
 - [Branding](https://zitadel.com/docs/guides/manage/customize/branding) for a uniform user experience across multiple organizations
@@ -94,12 +116,15 @@ Yet it offers everything you need for a customer identity ([CIAM](https://zitade
 
 Authentication
 - Single Sign On (SSO)
-- Passwordless with FIDO2 support (Including Passkeys)
+- Passkeys support (FIDO2 / WebAuthN)
 - Username / Password
 - Multifactor authentication with OTP, U2F, Email OTP, SMS OTP
 - LDAP
+- External enterprise identity providers and social logins
+- [Device authorization](https://zitadel.com/docs/guides/solution-scenarios/device-authorization)
 - [OpenID Connect certified](https://openid.net/certification/#OPs) => [OIDC Endpoints](https://zitadel.com/docs/apis/openidoauth/endpoints)
 - [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html) => [SAML Endpoints](https://zitadel.com/docs/apis/saml/endpoints)
+- [Custom sessions](https://zitadel.com/docs/guides/integrate/login-ui/username-password) if you need to go beyond OIDC or SAML 
 - [Machine-to-machine](https://zitadel.com/docs/guides/integrate/serviceusers) with JWT profile, Personal Access Tokens (PAT), and Client Credentials
 
 Multi-Tenancy
@@ -118,14 +143,14 @@ Self-Service
 - [Administration UI (Console)](https://zitadel.com/docs/guides/manage/console/overview)
 
 Deployment
-- [Postgres](https://zitadel.com/docs/self-hosting/manage/database#postgres) (version >= 14) or [CockroachDB](https://zitadel.com/docs/self-hosting/manage/database#cockroach) (version >= 22.0)
+- [Postgres](https://zitadel.com/docs/self-hosting/manage/database#postgres) (version >= 14) or [CockroachDB](https://zitadel.com/docs/self-hosting/manage/database#cockroach) (version latest stable)
 - [Zero Downtime Updates](https://zitadel.com/docs/concepts/architecture/solution#zero-downtime-updates)
 
 Track upcoming features on our [roadmap](https://zitadel.com/roadmap).
 
 ## How To Contribute
 
-Details about how to contribute you can find in the [Contribution Guide](./CONTRIBUTING.md)
+Find details about how you can contribute in our [Contribution Guide](./CONTRIBUTING.md)
 
 ## Contributors
 
@@ -157,13 +182,13 @@ Use [Console](https://zitadel.com/docs/guides/manage/console/overview) or our [A
 
 ## Security
 
-See the policy [here](./SECURITY.md).
+You can find our security policy [here](./SECURITY.md).
 
 [Technical Advisories](https://zitadel.com/docs/support/technical_advisory) are published regarding major issues with the ZITADEL platform that could potentially impact security or stability in production environments.
 
 ## License
 
-See the exact licensing terms [here](./LICENSE)
+[here](./LICENSE) are our exact licensing terms.
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and limitations under the License.
+See our [license](./LICENSE) for detailed information governing permissions and limitations on use.

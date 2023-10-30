@@ -17,8 +17,8 @@ var {{.ServiceName}}_AuthMethods = authz.MethodMapping {
 }
 
 {{ range $m := .AuthContext}}
-func (r *{{ $m.Name }}) OrganisationFromRequest() *middleware.Organisation {
-	return &middleware.Organisation{
+func (r *{{ $m.Name }}) OrganizationFromRequest() *middleware.Organization {
+	return &middleware.Organization{
 		ID: r{{$m.OrgMethod}}.GetOrgId(),
 		Domain: r{{$m.OrgMethod}}.GetOrgDomain(),
 	}

@@ -1,9 +1,9 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatCheckboxChange } from '@angular/material/checkbox';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
@@ -183,7 +183,32 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     this.samlForm = this.fb.group({
       metadataUrl: [{ value: '', disabled: true }],
+      entityId: ['', []],
+      acsURL: ['', []],
       metadataXml: [{ value: '', disabled: true }],
+    });
+
+    this.samlForm.valueChanges.subscribe((form) => {
+      let minimalMetadata =
+        this.entityId?.value && this.acsURL?.value
+          ? `<?xml version="1.0"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="${this.entityId?.value}">
+    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol">
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${this.acsURL?.value}" index="0"/>
+    </md:SPSSODescriptor>
+</md:EntityDescriptor>`
+          : '';
+
+      if (this.metadataUrl && this.metadataUrl.value.length > 0) {
+        if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml) {
+          this.app.samlConfig.metadataXml = '';
+        }
+      }
+
+      if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml && minimalMetadata) {
+        const base64 = Buffer.from(minimalMetadata, 'utf-8').toString('base64');
+        this.app.samlConfig.metadataXml = base64;
+      }
     });
   }
 
@@ -242,6 +267,15 @@ export class AppDetailComponent implements OnInit, OnDestroy {
           .then((app) => {
             if (app.app) {
               this.app = app.app;
+
+              // TODO: duplicates should be handled in the API
+              if (this.app.oidcConfig?.complianceProblemsList && this.app.oidcConfig?.complianceProblemsList.length) {
+                this.app.oidcConfig.complianceProblemsList = this.app.oidcConfig?.complianceProblemsList.filter(
+                  (element, index) => {
+                    return this.app?.oidcConfig?.complianceProblemsList.findIndex((e) => e.key === element.key) === index;
+                  },
+                );
+              }
 
               const breadcrumbs = [
                 new Breadcrumb({
@@ -406,6 +440,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.toast.showInfo('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', true);
       } else {
         this.metadataUrl?.setValue('');
+        this.entityId?.setValue('');
+        this.acsURL?.setValue('');
         const reader = new FileReader();
         reader.onload = ((aXML) => {
           return (e) => {
@@ -777,6 +813,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public get metadataUrl(): AbstractControl | null {
     return this.samlForm.get('metadataUrl');
+  }
+
+  public get entityId(): AbstractControl | null {
+    return this.samlForm.get('entityId');
+  }
+
+  public get acsURL(): AbstractControl | null {
+    return this.samlForm.get('acsURL');
   }
 
   get decodedBase64(): string {

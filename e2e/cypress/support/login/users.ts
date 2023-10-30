@@ -1,3 +1,5 @@
+import { authenticate as authenticateOnBaseUrl } from './authenticate';
+
 export enum User {
   OrgOwner = 'org_owner',
   OrgOwnerViewer = 'org_owner_viewer',
@@ -39,18 +41,10 @@ export function login(
           },
         );
 
-        let userToken: string;
-        cy.intercept(
-          {
-            method: 'POST',
-            url: `${issuerUrl}/token`,
-          },
-          (req) => {
-            req.continue((res) => {
-              userToken = res.body['access_token'];
-            });
-          },
-        ).as('token');
+        cy.intercept({
+          method: 'POST',
+          url: `${issuerUrl}/token`,
+        }).as('token');
 
         cy.intercept({
           method: 'POST',
@@ -60,29 +54,30 @@ export function login(
 
         cy.visit(Cypress.config('baseUrl'), { retryOnNetworkFailure: true });
 
-        onUsernameScreen ? onUsernameScreen() : null;
-        cy.get('#loginName').type(creds.username);
-        cy.get('#submit-button').click();
+        const backendUrl = Cypress.env('BACKEND_URL');
 
-        onPasswordScreen ? onPasswordScreen() : null;
-        cy.get('#password').type(creds.password);
-        cy.get('#submit-button').click();
-
-        cy.wait('@password').then((interception) => {
-          if (interception.response.body.indexOf(`${loginUrl}/mfa/prompt`) === -1) {
-            return;
-          }
-
-          cy.contains('button', 'skip').click();
-        });
-
-        cy.wait('@token').then(() => {
-          cy.task('safetoken', { key: creds.username, token: userToken });
-        });
-
-        onAuthenticated ? onAuthenticated() : null;
-
-        cy.wait(1000);
+        if (Cypress.config('baseUrl').startsWith(backendUrl)) {
+          authenticateOnBaseUrl(loginUrl, creds, onUsernameScreen, onPasswordScreen, onAuthenticated);
+          cy.get('@token')
+            .its('response.body.access_token')
+            .then((token) => {
+              cy.task('safetoken', { key: creds.username, token: token });
+            });
+        } else {
+          cy.origin(
+            backendUrl,
+            { args: { loginUrl, creds, onUsernameScreen, onPasswordScreen, onAuthenticated } },
+            ({ loginUrl, creds, onUsernameScreen, onPasswordScreen, onAuthenticated }) => {
+              const authenticateOnBackendUrl = Cypress.require('./authenticate');
+              authenticateOnBackendUrl.authenticate(loginUrl, creds, onUsernameScreen, onPasswordScreen, onAuthenticated);
+            },
+          );
+          cy.get('@token')
+            .its('response.body.access_token')
+            .then((token) => {
+              cy.task('safetoken', { key: creds.username, token: token });
+            });
+        }
 
         cy.visit('/');
 

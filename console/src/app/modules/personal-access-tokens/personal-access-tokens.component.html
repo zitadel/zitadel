@@ -12,7 +12,9 @@
       mat-raised-button
       (click)="openAddKey()"
     >
-      <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+      <div class="cnsl-action-button">
+        <mat-icon class="icon">add</mat-icon><span>{{ 'ACTIONS.NEW' | translate }}</span>
+      </div>
     </a>
   </div>
 

@@ -139,7 +139,7 @@ func SetQuery(query *gorm.DB, key ColumnKey, value interface{}, method domain.Se
 		if !ok {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-Psois", "list contains only possible for strings")
 		}
-		query = query.Where("? <@ "+column, database.StringArray{valueText})
+		query = query.Where("? <@ "+column, database.TextArray[string]{valueText})
 	default:
 		return nil, nil
 	}

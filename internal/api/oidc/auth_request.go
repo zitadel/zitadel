@@ -7,9 +7,10 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
-	"github.com/zitadel/oidc/v2/pkg/op"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -196,6 +197,8 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 		applicationID = authReq.ApplicationID
 		userOrgID = authReq.UserOrgID
 	case *AuthRequestV2:
+		// trigger activity log for authentication for user
+		activity.Trigger(ctx, "", authReq.CurrentAuthRequest.UserID, activity.OIDCAccessToken)
 		return o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.GetID())
 	}
 
@@ -208,6 +211,9 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 	if err != nil {
 		return "", time.Time{}, err
 	}
+
+	// trigger activity log for authentication for user
+	activity.Trigger(ctx, userOrgID, req.GetSubject(), activity.OIDCAccessToken)
 	return resp.TokenID, resp.Expiration, nil
 }
 
@@ -218,8 +224,12 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 	// handle V2 request directly
 	switch tokenReq := req.(type) {
 	case *AuthRequestV2:
+		// trigger activity log for authentication for user
+		activity.Trigger(ctx, "", tokenReq.GetSubject(), activity.OIDCRefreshToken)
 		return o.command.AddOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.GetID())
 	case *RefreshTokenRequestV2:
+		// trigger activity log for authentication for user
+		activity.Trigger(ctx, "", tokenReq.GetSubject(), activity.OIDCRefreshToken)
 		return o.command.ExchangeOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.OIDCSessionWriteModel.AggregateID, refreshToken, tokenReq.RequestedScopes)
 	}
 
@@ -246,6 +256,9 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 		}
 		return "", "", time.Time{}, err
 	}
+
+	// trigger activity log for authentication for user
+	activity.Trigger(ctx, userOrgID, req.GetSubject(), activity.OIDCRefreshToken)
 	return resp.TokenID, token, resp.Expiration, nil
 }
 
@@ -274,6 +287,8 @@ func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken
 		if err != nil {
 			return nil, err
 		}
+		// trigger activity log for authentication for user
+		activity.Trigger(ctx, "", oidcSession.UserID, activity.OIDCRefreshToken)
 		return &RefreshTokenRequestV2{OIDCSessionWriteModel: oidcSession}, nil
 	}
 
@@ -281,6 +296,9 @@ func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken
 	if err != nil {
 		return nil, err
 	}
+
+	// trigger activity log for use of refresh token for user
+	activity.Trigger(ctx, tokenView.ResourceOwner, tokenView.UserID, activity.OIDCRefreshToken)
 	return RefreshTokenRequestFromBusiness(tokenView), nil
 }
 

@@ -28,6 +28,9 @@ Errors:
       RemoveFailed: El objeto no pudo eliminarse
   Limit:
     ExceedsDefault: El límite excede el límite por defecto
+  Limits:
+    NotFound: Límite no encontrado
+    NoneSpecified: No se especificaron límites
   Language:
     NotParsed: No pude analizar el idioma
   OIDCSettings:
@@ -182,6 +185,11 @@ Errors:
     DomainVerificationTypeInvalid: El tipo verificación del dominio no es válido
     DomainVerificationMissing: La verificación del dominio no ha comenzado
     DomainVerificationFailed: La verificación del dominio falló
+    DomainVerificationTXTNotFound: No se encontró el registro TXT _zitadel-challenge para su dominio. Verifique que lo haya agregado a su servidor DNS o espere hasta que se propague el nuevo registro
+    DomainVerificationTXTNoMatch: Se encontró el registro TXT _zitadel-challenge para su dominio, pero no contiene el texto del token correcto. Verifique que haya agregado el token correcto a su servidor DNS o espere hasta que se propague el nuevo registro
+    DomainVerificationHTTPNotFound: El archivo que contiene el desafío no se encontró en la URL esperada. Comprueba que has subido el archivo en el lugar correcto con permisos de lectura.
+    DomainVerificationHTTPNoMatch: El archivo que contiene el desafío se encontró en la URL esperada, pero no contiene el texto del token correcto. Consulta su contenido
+    DomainVerificationTimeout: Se superó el tiempo de espera al consultar el servidor DNS.
     PrimaryDomainNotDeletable: El dominio primario no debe borrarse
     DomainNotFound: Dominio no encontrado
     MemberIDMissing: Falta el ID del miembro
@@ -197,6 +205,7 @@ Errors:
     Domain:
       AlreadyExists: El dominio ya existe
       InvalidCharacter: Solo caracteres alfanuméricos, . y - se permiten para un dominio
+      EmptyString: Los caracteres alfabéticos y no numéricos no válidos se reemplazaron con espacios vacíos y el dominio resultante es una cadena vacía
     IDP:
       InvalidSearchQuery: Consulta de búsqueda no válida
       ClientIDMissing: Falta ClientID
@@ -415,6 +424,7 @@ Errors:
     AuditRetention: El histórico está fuera de la retención del registro de auditoría
   Token:
     NotFound: Token no encontrado
+    Invalid: Token no válido
   UserSession:
     NotFound: UserSession no encontrado
   Key:

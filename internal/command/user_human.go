@@ -149,7 +149,7 @@ func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *Ad
 	}
 	human.Details = &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}
 

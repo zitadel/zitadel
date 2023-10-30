@@ -8,10 +8,13 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -152,7 +155,7 @@ func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 		return nil, errors.ThrowInternal(err, "QUERY-Dbg53", "Errors.Internal")
 	}
 
-	authNKeys.LatestSequence, err = q.latestSequence(ctx, authNKeyTable)
+	authNKeys.State, err = q.latestState(ctx, authNKeyTable)
 	return authNKeys, err
 }
 
@@ -181,7 +184,7 @@ func (q *Queries) SearchAuthNKeysData(ctx context.Context, queries *AuthNKeySear
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dbi53", "Errors.Internal")
 	}
-	authNKeys.LatestSequence, err = q.latestSequence(ctx, authNKeyTable)
+	authNKeys.State, err = q.latestState(ctx, authNKeyTable)
 	return authNKeys, err
 }
 
@@ -190,7 +193,10 @@ func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, i
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.AuthNKeyProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerAuthNKeyProjection")
+		ctx, err = projection.AuthNKeyProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	query, scan := prepareAuthNKeyQuery(ctx, q.client)

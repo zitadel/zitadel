@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"reflect"
 	"testing"
 
@@ -9,44 +10,54 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 )
 
-var (
-	mockMethods = authz.MethodMapping{
-		"need.authentication": authz.Option{
-			Permission: "authenticated",
-		},
-	}
-)
+const anAPIRole = "AN_API_ROLE"
 
-type verifierMock struct{}
+type authzRepoMock struct{}
 
-func (v *verifierMock) VerifyAccessToken(ctx context.Context, token, clientID, projectID string) (string, string, string, string, string, error) {
+func (v *authzRepoMock) VerifyAccessToken(ctx context.Context, token, clientID, projectID string) (string, string, string, string, string, error) {
 	return "", "", "", "", "", nil
 }
-func (v *verifierMock) SearchMyMemberships(ctx context.Context, orgID string) ([]*authz.Membership, error) {
-	return nil, nil
+func (v *authzRepoMock) SearchMyMemberships(ctx context.Context, orgID string, _ bool) ([]*authz.Membership, error) {
+	return authz.Memberships{{
+		MemberType:  authz.MemberTypeOrganization,
+		AggregateID: orgID,
+		Roles:       []string{anAPIRole},
+	}}, nil
 }
 
-func (v *verifierMock) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (string, []string, error) {
+func (v *authzRepoMock) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (string, []string, error) {
 	return "", nil, nil
 }
-func (v *verifierMock) ExistsOrg(ctx context.Context, orgID, domain string) (string, error) {
+func (v *authzRepoMock) ExistsOrg(ctx context.Context, orgID, domain string) (string, error) {
 	return orgID, nil
 }
-func (v *verifierMock) VerifierClientID(ctx context.Context, appName string) (string, string, error) {
+func (v *authzRepoMock) VerifierClientID(ctx context.Context, appName string) (string, string, error) {
 	return "", "", nil
 }
 
+var (
+	accessTokenOK = authz.AccessTokenVerifierFunc(func(ctx context.Context, token string) (userID string, clientID string, agentID string, prefLan string, resourceOwner string, err error) {
+		return "user1", "", "", "", "org1", nil
+	})
+	accessTokenNOK = authz.AccessTokenVerifierFunc(func(ctx context.Context, token string) (userID string, clientID string, agentID string, prefLan string, resourceOwner string, err error) {
+		return "", "", "", "", "", zitadel_errors.ThrowUnauthenticated(nil, "TEST-fQHDI", "unauthenticaded")
+	})
+	systemTokenNOK = authz.SystemTokenVerifierFunc(func(ctx context.Context, token string, orgID string) (memberships authz.Memberships, userID string, err error) {
+		return nil, "", errors.New("system token error")
+	})
+)
+
 func Test_authorize(t *testing.T) {
 	type args struct {
-		ctx         context.Context
-		req         interface{}
-		info        *grpc.UnaryServerInfo
-		handler     grpc.UnaryHandler
-		verifier    *authz.TokenVerifier
-		authConfig  authz.Config
-		authMethods authz.MethodMapping
+		ctx        context.Context
+		req        interface{}
+		info       *grpc.UnaryServerInfo
+		handler    grpc.UnaryHandler
+		verifier   func() authz.APITokenVerifier
+		authConfig authz.Config
 	}
 	type res struct {
 		want    interface{}
@@ -64,12 +75,11 @@ func Test_authorize(t *testing.T) {
 				req:     &mockReq{},
 				info:    mockInfo("/no/token/needed"),
 				handler: emptyMockHandler,
-				verifier: func() *authz.TokenVerifier {
-					verifier := authz.Start(&verifierMock{}, "", nil)
+				verifier: func() authz.APITokenVerifier {
+					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{})
 					return verifier
-				}(),
-				authMethods: mockMethods,
+				},
 			},
 			res{
 				&mockReq{},
@@ -83,13 +93,12 @@ func Test_authorize(t *testing.T) {
 				req:     &mockReq{},
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
-				verifier: func() *authz.TokenVerifier {
-					verifier := authz.Start(&verifierMock{}, "", nil)
+				verifier: func() authz.APITokenVerifier {
+					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
 					return verifier
-				}(),
-				authConfig:  authz.Config{},
-				authMethods: mockMethods,
+				},
+				authConfig: authz.Config{},
 			},
 			res{
 				nil,
@@ -103,13 +112,12 @@ func Test_authorize(t *testing.T) {
 				req:     &mockReq{},
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
-				verifier: func() *authz.TokenVerifier {
-					verifier := authz.Start(&verifierMock{}, "", nil)
+				verifier: func() authz.APITokenVerifier {
+					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
 					return verifier
-				}(),
-				authConfig:  authz.Config{},
-				authMethods: mockMethods,
+				},
+				authConfig: authz.Config{},
 			},
 			res{
 				nil,
@@ -123,13 +131,118 @@ func Test_authorize(t *testing.T) {
 				req:     &mockReq{},
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
-				verifier: func() *authz.TokenVerifier {
-					verifier := authz.Start(&verifierMock{}, "", nil)
+				verifier: func() authz.APITokenVerifier {
+					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
 					return verifier
-				}(),
-				authConfig:  authz.Config{},
-				authMethods: mockMethods,
+				},
+				authConfig: authz.Config{},
+			},
+			res{
+				&mockReq{},
+				false,
+			},
+		},
+		{
+			"permission denied error",
+			args{
+				ctx:     metadata.NewIncomingContext(context.Background(), metadata.Pairs("authorization", "Bearer token")),
+				req:     &mockReq{},
+				info:    mockInfo("/need/authentication"),
+				handler: emptyMockHandler,
+				verifier: func() authz.APITokenVerifier {
+					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
+					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "to.do.something"}})
+					return verifier
+				},
+				authConfig: authz.Config{
+					RolePermissionMappings: []authz.RoleMapping{{
+						Role:        anAPIRole,
+						Permissions: []string{"to.do.something.else"},
+					}},
+				},
+			},
+			res{
+				nil,
+				true,
+			},
+		},
+		{
+			"permission ok",
+			args{
+				ctx:     metadata.NewIncomingContext(context.Background(), metadata.Pairs("authorization", "Bearer token")),
+				req:     &mockReq{},
+				info:    mockInfo("/need/authentication"),
+				handler: emptyMockHandler,
+				verifier: func() authz.APITokenVerifier {
+					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
+					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "to.do.something"}})
+					return verifier
+				},
+				authConfig: authz.Config{
+					RolePermissionMappings: []authz.RoleMapping{{
+						Role:        anAPIRole,
+						Permissions: []string{"to.do.something"},
+					}},
+				},
+			},
+			res{
+				&mockReq{},
+				false,
+			},
+		},
+		{
+			"system token permission denied error",
+			args{
+				ctx:     metadata.NewIncomingContext(context.Background(), metadata.Pairs("authorization", "Bearer token")),
+				req:     &mockReq{},
+				info:    mockInfo("/need/authentication"),
+				handler: emptyMockHandler,
+				verifier: func() authz.APITokenVerifier {
+					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenNOK, authz.SystemTokenVerifierFunc(func(ctx context.Context, token string, orgID string) (memberships authz.Memberships, userID string, err error) {
+						return authz.Memberships{{
+							MemberType: authz.MemberTypeSystem,
+							Roles:      []string{"A_SYSTEM_ROLE"},
+						}}, "systemuser", nil
+					}))
+					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "to.do.something"}})
+					return verifier
+				},
+				authConfig: authz.Config{
+					RolePermissionMappings: []authz.RoleMapping{{
+						Role:        "A_SYSTEM_ROLE",
+						Permissions: []string{"to.do.something.else"},
+					}},
+				},
+			},
+			res{
+				nil,
+				true,
+			},
+		},
+		{
+			"system token permission denied error",
+			args{
+				ctx:     metadata.NewIncomingContext(context.Background(), metadata.Pairs("authorization", "Bearer token")),
+				req:     &mockReq{},
+				info:    mockInfo("/need/authentication"),
+				handler: emptyMockHandler,
+				verifier: func() authz.APITokenVerifier {
+					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenNOK, authz.SystemTokenVerifierFunc(func(ctx context.Context, token string, orgID string) (memberships authz.Memberships, userID string, err error) {
+						return authz.Memberships{{
+							MemberType: authz.MemberTypeSystem,
+							Roles:      []string{"A_SYSTEM_ROLE"},
+						}}, "systemuser", nil
+					}))
+					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "to.do.something"}})
+					return verifier
+				},
+				authConfig: authz.Config{
+					RolePermissionMappings: []authz.RoleMapping{{
+						Role:        "A_SYSTEM_ROLE",
+						Permissions: []string{"to.do.something"},
+					}},
+				},
 			},
 			res{
 				&mockReq{},
@@ -139,7 +252,7 @@ func Test_authorize(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := authorize(tt.args.ctx, tt.args.req, tt.args.info, tt.args.handler, tt.args.verifier, tt.args.authConfig)
+			got, err := authorize(tt.args.ctx, tt.args.req, tt.args.info, tt.args.handler, tt.args.verifier(), tt.args.authConfig)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("authorize() error = %v, wantErr %v", err, tt.res.wantErr)
 				return

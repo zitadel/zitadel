@@ -35,11 +35,14 @@ Quotas:
     Enabled: true
 
 Projections:
+  HandleActiveInstances: 60s
   Customizations:
     NotificationsQuotas:
       RequeueEvery: 1s
+      HandleActiveInstances: 60s
     Telemetry:
       RequeueEvery: 5s
+      HandleActiveInstances: 60s
 
 DefaultInstance:
   LoginPolicy:

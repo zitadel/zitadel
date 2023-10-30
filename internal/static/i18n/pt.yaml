@@ -28,6 +28,9 @@ Errors:
       RemoveFailed: Não foi possível remover o objeto
   Limit:
     ExceedsDefault: Limite excede o limite padrão
+  Limits:
+    NotFound: Limite não encontrado
+    NoneSpecified: Nenhum limite especificado
   Language:
     NotParsed: Não foi possível analisar o idioma
   OIDCSettings:
@@ -180,6 +183,11 @@ Errors:
     DomainVerificationTypeInvalid: O tipo de verificação do domínio é inválido
     DomainVerificationMissing: A verificação do domínio ainda não foi iniciada
     DomainVerificationFailed: Falha na verificação do domínio
+    DomainVerificationTXTNotFound: O registro TXT _zitadel-challenge não foi encontrado para seu domínio. Verifique se você o adicionou ao seu servidor DNS ou espere até que o novo registro seja propagado
+    DomainVerificationTXTNoMatch: O registro TXT _zitadel-challenge foi encontrado para seu domínio, mas não contém o texto do token correto. Verifique se você adicionou o token correto ao seu servidor DNS ou espere até que o novo registro seja propagado
+    DomainVerificationHTTPNotFound: O arquivo que contém o desafio não foi encontrado na URL esperada. Verifique se você carregou o arquivo no lugar certo com permissões de leitura
+    DomainVerificationHTTPNoMatch: O arquivo que contém o desafio foi encontrado na URL esperada, mas não contém o texto do token correto. Verifique seu conteúdo
+    DomainVerificationTimeout: Houve um tempo limite na consulta do servidor DNS
     PrimaryDomainNotDeletable: O domínio principal não pode ser excluído
     DomainNotFound: Domínio não encontrado
     MemberIDMissing: ID do membro ausente
@@ -195,6 +203,7 @@ Errors:
     Domain:
       AlreadyExists: Domínio já existe
       InvalidCharacter: Apenas caracteres alfanuméricos, . e - são permitidos para um domínio
+      EmptyString: Caracteres não numéricos e alfabéticos inválidos foram substituídos por espaços vazios e o domínio resultante é uma string vazia
     IDP:
       InvalidSearchQuery: Consulta de pesquisa inválida
       ClientIDMissing: ClientID ausente
@@ -413,6 +422,7 @@ Errors:
     AuditRetention: O histórico está fora do período de retenção do registro de auditoria
   Token:
     NotFound: Token não encontrado
+    Invalid: Token inválido
   UserSession:
     NotFound: Sessão do usuário não encontrada
   Key:

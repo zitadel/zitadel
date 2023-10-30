@@ -166,8 +166,8 @@ func (s *SessionCommands) Exec(ctx context.Context) error {
 	return nil
 }
 
-func (s *SessionCommands) Start(ctx context.Context) {
-	s.eventCommands = append(s.eventCommands, session.NewAddedEvent(ctx, s.sessionWriteModel.aggregate))
+func (s *SessionCommands) Start(ctx context.Context, userAgent *domain.UserAgent) {
+	s.eventCommands = append(s.eventCommands, session.NewAddedEvent(ctx, s.sessionWriteModel.aggregate, userAgent))
 }
 
 func (s *SessionCommands) UserChecked(ctx context.Context, userID string, checkedAt time.Time) error {
@@ -262,7 +262,7 @@ func (s *SessionCommands) gethumanWriteModel(ctx context.Context) (*HumanWriteMo
 		return nil, err
 	}
 	if humanWriteModel.UserState != domain.UserStateActive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.ie4Ai.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.User.NotFound")
 	}
 	return humanWriteModel, nil
 }
@@ -280,7 +280,7 @@ func (s *SessionCommands) commands(ctx context.Context) (string, []eventstore.Co
 	return token, s.eventCommands, nil
 }
 
-func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, metadata map[string][]byte) (set *SessionChanged, err error) {
+func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, metadata map[string][]byte, userAgent *domain.UserAgent) (set *SessionChanged, err error) {
 	sessionID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -291,7 +291,7 @@ func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, met
 		return nil, err
 	}
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
-	cmd.Start(ctx)
+	cmd.Start(ctx, userAgent)
 	return c.updateSession(ctx, cmd, metadata)
 }
 
