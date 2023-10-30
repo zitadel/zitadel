@@ -3257,10 +3257,10 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
-"@types/file-saver@^2.0.2":
-  version "2.0.5"
-  resolved "https://registry.npmjs.org/@types/file-saver/-/file-saver-2.0.5.tgz"
-  integrity sha512-zv9kNf3keYegP5oThGLaPk8E081DFDuwfqjtiTzm6PoxChdJ1raSuADf2YGCVIyrSynLrgc8JWv296s7Q7pQSQ==
+"@types/file-saver@^2.0.6":
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/@types/file-saver/-/file-saver-2.0.6.tgz#914688eec1ccce7dd1bf655c0b0a178e89303589"
+  integrity sha512-Mw671DVqoMHbjw0w4v2iiOro01dlT/WhWp5uwecBa0Wg8c+bcZOjgF1ndBnlaxhtvFCgTRBtsGivSVhrK/vnag==
 
 "@types/google-protobuf@^3.15.3":
   version "3.15.6"
