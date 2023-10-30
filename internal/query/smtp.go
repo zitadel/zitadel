@@ -263,6 +263,6 @@ func (q *Queries) SearchSMTPConfigs(ctx context.Context, queries *SMTPConfigsSea
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-tOpKN", "Errors.Internal")
 	}
-
+	configs.State, err = q.latestState(ctx, smsConfigsTable)
 	return configs, err
 }

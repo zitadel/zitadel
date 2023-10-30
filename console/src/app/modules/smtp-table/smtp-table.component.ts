@@ -1,7 +1,5 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
 import { Router, RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
@@ -26,6 +24,8 @@ import { PolicyComponentServiceType } from '../policies/policy-component-types.e
 import { ListSMTPConfigsRequest, ListSMTPConfigsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { SMTPConfig } from 'src/app/proto/generated/zitadel/settings_pb';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'cnsl-smtp-table',
@@ -249,7 +249,8 @@ export class SMTPTableComponent implements OnInit {
   }
 
   public refreshPage(): void {
-    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
+    // TODO @n40lab
+    // this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
   }
 
   public get createRouterLink(): RouterLink | any {
