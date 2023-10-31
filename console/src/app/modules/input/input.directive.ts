@@ -361,7 +361,6 @@ export class InputDirective
 
   /** Does some manual dirty checking on the native input `placeholder` attribute. */
   private _dirtyCheckPlaceholder(): void {
-    // const placeholder = this._getPlaceholder();
     // If we're hiding the native placeholder, it should also be cleared from the DOM, otherwise
     // screen readers will read it out twice: once from the label and once from the attribute.
     const placeholder = this._getPlaceholder();
