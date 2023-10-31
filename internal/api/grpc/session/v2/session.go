@@ -4,7 +4,9 @@ import (
 	"context"
 	"net"
 	"net/http"
+	"time"
 
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -46,7 +48,7 @@ func (s *Server) ListSessions(ctx context.Context, req *session.ListSessionsRequ
 }
 
 func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRequest) (*session.CreateSessionResponse, error) {
-	checks, metadata, userAgent, err := s.createSessionRequestToCommand(ctx, req)
+	checks, metadata, userAgent, lifetime, err := s.createSessionRequestToCommand(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +57,7 @@ func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRe
 		return nil, err
 	}
 
-	set, err := s.command.CreateSession(ctx, cmds, metadata, userAgent)
+	set, err := s.command.CreateSession(ctx, cmds, metadata, userAgent, lifetime)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +80,7 @@ func (s *Server) SetSession(ctx context.Context, req *session.SetSessionRequest)
 		return nil, err
 	}
 
-	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), req.GetSessionToken(), cmds, req.GetMetadata())
+	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), req.GetSessionToken(), cmds, req.GetMetadata(), lifetimeToCommand(req.GetLifetime()))
 	if err != nil {
 		return nil, err
 	}
@@ -268,12 +270,12 @@ func idsQueryToQuery(q *session.IDsQuery) (query.SearchQuery, error) {
 	return query.NewSessionIDsSearchQuery(q.Ids)
 }
 
-func (s *Server) createSessionRequestToCommand(ctx context.Context, req *session.CreateSessionRequest) ([]command.SessionCommand, map[string][]byte, *domain.UserAgent, error) {
+func (s *Server) createSessionRequestToCommand(ctx context.Context, req *session.CreateSessionRequest) ([]command.SessionCommand, map[string][]byte, *domain.UserAgent, time.Duration, error) {
 	checks, err := s.checksToCommand(ctx, req.Checks)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, 0, err
 	}
-	return checks, req.GetMetadata(), userAgentToCommand(req.GetUserAgent()), nil
+	return checks, req.GetMetadata(), userAgentToCommand(req.GetUserAgent()), lifetimeToCommand(req.GetLifetime()), nil
 }
 
 func userAgentToCommand(userAgent *session.UserAgent) *domain.UserAgent {
@@ -292,6 +294,13 @@ func userAgentToCommand(userAgent *session.UserAgent) *domain.UserAgent {
 		}
 	}
 	return out
+}
+
+func lifetimeToCommand(lifetime *durationpb.Duration) time.Duration {
+	if lifetime == nil {
+		return 0
+	}
+	return lifetime.AsDuration()
 }
 
 func (s *Server) setSessionRequestToCommand(ctx context.Context, req *session.SetSessionRequest) ([]command.SessionCommand, error) {

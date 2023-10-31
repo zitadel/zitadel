@@ -252,6 +252,13 @@ func (s *SessionCommands) ChangeMetadata(ctx context.Context, metadata map[strin
 	}
 }
 
+func (s *SessionCommands) SetLifetime(ctx context.Context, lifetime time.Duration) {
+	if lifetime == 0 {
+		return
+	}
+	s.eventCommands = append(s.eventCommands, session.NewLifetimeSetEvent(ctx, s.sessionWriteModel.aggregate, lifetime))
+}
+
 func (s *SessionCommands) gethumanWriteModel(ctx context.Context) (*HumanWriteModel, error) {
 	if s.sessionWriteModel.UserID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-eeR2e", "Errors.User.UserIDMissing")
@@ -280,7 +287,7 @@ func (s *SessionCommands) commands(ctx context.Context) (string, []eventstore.Co
 	return token, s.eventCommands, nil
 }
 
-func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, metadata map[string][]byte, userAgent *domain.UserAgent) (set *SessionChanged, err error) {
+func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, metadata map[string][]byte, userAgent *domain.UserAgent, lifetime time.Duration) (set *SessionChanged, err error) {
 	sessionID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -292,10 +299,10 @@ func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, met
 	}
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
 	cmd.Start(ctx, userAgent)
-	return c.updateSession(ctx, cmd, metadata)
+	return c.updateSession(ctx, cmd, metadata, lifetime)
 }
 
-func (c *Commands) UpdateSession(ctx context.Context, sessionID, sessionToken string, cmds []SessionCommand, metadata map[string][]byte) (set *SessionChanged, err error) {
+func (c *Commands) UpdateSession(ctx context.Context, sessionID, sessionToken string, cmds []SessionCommand, metadata map[string][]byte, lifetime time.Duration) (set *SessionChanged, err error) {
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetCtxData(ctx).OrgID)
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
 	if err != nil {
@@ -305,7 +312,7 @@ func (c *Commands) UpdateSession(ctx context.Context, sessionID, sessionToken st
 		return nil, err
 	}
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
-	return c.updateSession(ctx, cmd, metadata)
+	return c.updateSession(ctx, cmd, metadata, lifetime)
 }
 
 func (c *Commands) TerminateSession(ctx context.Context, sessionID string, sessionToken string) (*domain.ObjectDetails, error) {
@@ -326,7 +333,7 @@ func (c *Commands) terminateSession(ctx context.Context, sessionID, sessionToken
 			return nil, err
 		}
 	}
-	if sessionWriteModel.State != domain.SessionStateActive {
+	if sessionWriteModel.CheckIsActive() != nil {
 		return writeModelToObjectDetails(&sessionWriteModel.WriteModel), nil
 	}
 	terminate := session.NewTerminateEvent(ctx, &session.NewAggregate(sessionWriteModel.AggregateID, sessionWriteModel.ResourceOwner).Aggregate)
@@ -342,15 +349,19 @@ func (c *Commands) terminateSession(ctx context.Context, sessionID, sessionToken
 }
 
 // updateSession execute the [SessionCommands] where new events will be created and as well as for metadata (changes)
-func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, metadata map[string][]byte) (set *SessionChanged, err error) {
+func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, metadata map[string][]byte, lifetime time.Duration) (set *SessionChanged, err error) {
 	if checks.sessionWriteModel.State == domain.SessionStateTerminated {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMAND-SAjeh", "Errors.Session.Terminated")
+	}
+	if !checks.sessionWriteModel.Expiration.IsZero() && checks.sessionWriteModel.Expiration.Before(time.Now()) {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMAND-Gh5j3", "Errors.Session.Expired")
 	}
 	if err := checks.Exec(ctx); err != nil {
 		// TODO: how to handle failed checks (e.g. pw wrong) https://github.com/zitadel/zitadel/issues/5807
 		return nil, err
 	}
 	checks.ChangeMetadata(ctx, metadata)
+	checks.SetLifetime(ctx, lifetime)
 	sessionToken, cmds, err := checks.commands(ctx)
 	if err != nil {
 		return nil, err

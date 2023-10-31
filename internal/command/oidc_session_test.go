@@ -119,7 +119,7 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 				authRequestID: "V2_authRequestID",
 			},
 			res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "OIDCS-sjkl3", "Errors.Session.Terminated"),
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Flk38", "Errors.Session.NotExisting"),
 			},
 		},
 		{
@@ -320,7 +320,7 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 				authRequestID: "V2_authRequestID",
 			},
 			res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "OIDCS-sjkl3", "Errors.Session.Terminated"),
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Flk38", "Errors.Session.NotExisting"),
 			},
 		},
 		{
