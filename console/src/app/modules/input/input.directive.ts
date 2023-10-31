@@ -363,12 +363,18 @@ export class InputDirective
   private _dirtyCheckPlaceholder(): void {
     // If we're hiding the native placeholder, it should also be cleared from the DOM, otherwise
     // screen readers will read it out twice: once from the label and once from the attribute.
-    const placeholder = null;
+    const placeholder = this._getPlaceholder();
+
     if (placeholder !== this._previousPlaceholder) {
       const element = this._elementRef.nativeElement;
       this._previousPlaceholder = placeholder;
       placeholder ? element.setAttribute('placeholder', placeholder) : element.removeAttribute('placeholder');
     }
+  }
+
+  /** Gets the current placeholder of the form field. */
+  protected _getPlaceholder(): string | null {
+    return this.placeholder || null;
   }
 
   /** Does some manual dirty checking on the native input `value` property. */
