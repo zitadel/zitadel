@@ -611,7 +611,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 
 func TestServer_SetSession_expired(t *testing.T) {
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
-		Lifetime: durationpb.New(10 * time.Second),
+		Lifetime: durationpb.New(20 * time.Second),
 	})
 	require.NoError(t, err)
 
@@ -619,20 +619,16 @@ func TestServer_SetSession_expired(t *testing.T) {
 	sessionResp, err := Tester.Client.SessionV2.SetSession(CTX, &session.SetSessionRequest{
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),
-		Metadata: map[string][]byte{
-			"key": []byte("value"),
-		},
+		Lifetime:     durationpb.New(20 * time.Second),
 	})
 	require.NoError(t, err)
 
 	// ensure session expires and does not work anymore
-	time.Sleep(10 * time.Second)
+	time.Sleep(20 * time.Second)
 	_, err = Tester.Client.SessionV2.SetSession(CTX, &session.SetSessionRequest{
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: sessionResp.GetSessionToken(),
-		Metadata: map[string][]byte{
-			"key": []byte("value"),
-		},
+		Lifetime:     durationpb.New(20 * time.Second),
 	})
 	require.Error(t, err)
 }
@@ -689,7 +685,7 @@ func Test_ZITADEL_API_session_not_found(t *testing.T) {
 }
 
 func Test_ZITADEL_API_session_expired(t *testing.T) {
-	id, token, _, _ := Tester.CreateVerifiedWebAuthNSessionWithLifetime(t, CTX, User.GetUserId(), 30*time.Second)
+	id, token, _, _ := Tester.CreateVerifiedWebAuthNSessionWithLifetime(t, CTX, User.GetUserId(), 20*time.Second)
 
 	// test session token works
 	ctx := Tester.WithAuthorizationToken(context.Background(), token)
@@ -697,7 +693,7 @@ func Test_ZITADEL_API_session_expired(t *testing.T) {
 	require.NoError(t, err)
 
 	// ensure session expires and does not work anymore
-	time.Sleep(30 * time.Second)
+	time.Sleep(20 * time.Second)
 	sessionResp, err := Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
 	require.Error(t, err)
 	require.Nil(t, sessionResp)
