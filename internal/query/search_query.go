@@ -245,6 +245,8 @@ func (q *TextQuery) comp() sq.Sqlizer {
 	switch q.Compare {
 	case TextEquals:
 		return sq.Eq{q.Column.identifier(): q.Text}
+	case TextNotEquals:
+		return sq.NotEq{q.Column.identifier(): q.Text}
 	case TextEqualsIgnoreCase:
 		return sq.ILike{q.Column.identifier(): q.Text}
 	case TextStartsWith:
@@ -261,7 +263,10 @@ func (q *TextQuery) comp() sq.Sqlizer {
 		return sq.ILike{q.Column.identifier(): "%" + q.Text + "%"}
 	case TextListContains:
 		return &listContains{col: q.Column, args: []interface{}{q.Text}}
+	case textCompareMax:
+		return nil
 	}
+
 	return nil
 }
 
@@ -354,7 +359,10 @@ func (q *NumberQuery) comp() sq.Sqlizer {
 		return sq.Gt{q.Column.identifier(): q.Number}
 	case NumberListContains:
 		return &listContains{col: q.Column, args: []interface{}{q.Number}}
+	case numberCompareMax:
+		return nil
 	}
+
 	return nil
 }
 
@@ -444,18 +452,18 @@ func (q *ListQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (q *ListQuery) comp() sq.Sqlizer {
-	switch q.Compare {
-	case ListIn:
-		if subSelect, ok := q.Data.(*SubSelect); ok {
-			subSelect, args, err := subSelect.comp().ToSql()
-			if err != nil {
-				return nil
-			}
-			return sq.Expr(q.Column.identifier()+" IN ( "+subSelect+" )", args...)
-		}
-		return sq.Eq{q.Column.identifier(): q.Data}
+	if q.Compare != ListIn {
+		return nil
 	}
-	return nil
+
+	if subSelect, ok := q.Data.(*SubSelect); ok {
+		subSelect, args, err := subSelect.comp().ToSql()
+		if err != nil {
+			return nil
+		}
+		return sq.Expr(q.Column.identifier()+" IN ( "+subSelect+" )", args...)
+	}
+	return sq.Eq{q.Column.identifier(): q.Data}
 }
 
 func (q *ListQuery) Col() Column {
