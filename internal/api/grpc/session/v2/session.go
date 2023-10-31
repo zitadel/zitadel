@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -80,7 +79,7 @@ func (s *Server) SetSession(ctx context.Context, req *session.SetSessionRequest)
 		return nil, err
 	}
 
-	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), req.GetSessionToken(), cmds, req.GetMetadata(), lifetimeToCommand(req.GetLifetime()))
+	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), req.GetSessionToken(), cmds, req.GetMetadata(), req.GetLifetime().AsDuration())
 	if err != nil {
 		return nil, err
 	}
@@ -115,13 +114,14 @@ func sessionsToPb(sessions []*query.Session) []*session.Session {
 
 func sessionToPb(s *query.Session) *session.Session {
 	return &session.Session{
-		Id:           s.ID,
-		CreationDate: timestamppb.New(s.CreationDate),
-		ChangeDate:   timestamppb.New(s.ChangeDate),
-		Sequence:     s.Sequence,
-		Factors:      factorsToPb(s),
-		Metadata:     s.Metadata,
-		UserAgent:    userAgentToPb(s.UserAgent),
+		Id:             s.ID,
+		CreationDate:   timestamppb.New(s.CreationDate),
+		ChangeDate:     timestamppb.New(s.ChangeDate),
+		Sequence:       s.Sequence,
+		Factors:        factorsToPb(s),
+		Metadata:       s.Metadata,
+		UserAgent:      userAgentToPb(s.UserAgent),
+		ExpirationDate: expirationToPb(s.Expiration),
 	}
 }
 
@@ -147,6 +147,13 @@ func userAgentToPb(ua domain.UserAgent) *session.UserAgent {
 		}
 	}
 	return out
+}
+
+func expirationToPb(expiration time.Time) *timestamppb.Timestamp {
+	if expiration.IsZero() {
+		return nil
+	}
+	return timestamppb.New(expiration)
 }
 
 func factorsToPb(s *query.Session) *session.Factors {
@@ -275,7 +282,7 @@ func (s *Server) createSessionRequestToCommand(ctx context.Context, req *session
 	if err != nil {
 		return nil, nil, nil, 0, err
 	}
-	return checks, req.GetMetadata(), userAgentToCommand(req.GetUserAgent()), lifetimeToCommand(req.GetLifetime()), nil
+	return checks, req.GetMetadata(), userAgentToCommand(req.GetUserAgent()), req.GetLifetime().AsDuration(), nil
 }
 
 func userAgentToCommand(userAgent *session.UserAgent) *domain.UserAgent {
@@ -294,13 +301,6 @@ func userAgentToCommand(userAgent *session.UserAgent) *domain.UserAgent {
 		}
 	}
 	return out
-}
-
-func lifetimeToCommand(lifetime *durationpb.Duration) time.Duration {
-	if lifetime == nil {
-		return 0
-	}
-	return lifetime.AsDuration()
 }
 
 func (s *Server) setSessionRequestToCommand(ctx context.Context, req *session.SetSessionRequest) ([]command.SessionCommand, error) {

@@ -253,10 +253,9 @@ func (s *SessionCommands) ChangeMetadata(ctx context.Context, metadata map[strin
 }
 
 func (s *SessionCommands) SetLifetime(ctx context.Context, lifetime time.Duration) {
-	if lifetime == 0 {
-		return
+	if lifetime > 0 {
+		s.eventCommands = append(s.eventCommands, session.NewLifetimeSetEvent(ctx, s.sessionWriteModel.aggregate, lifetime))
 	}
-	s.eventCommands = append(s.eventCommands, session.NewLifetimeSetEvent(ctx, s.sessionWriteModel.aggregate, lifetime))
 }
 
 func (s *SessionCommands) gethumanWriteModel(ctx context.Context) (*HumanWriteModel, error) {
