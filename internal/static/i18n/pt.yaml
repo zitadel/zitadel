@@ -489,6 +489,7 @@ Errors:
   Session:
     NotExisting: A sessão não existe
     Terminated: A sessão já foi encerrada
+    Expired: A Sessão expirou
     Token:
       Invalid: O token da sessão é inválido
     WebAuthN:

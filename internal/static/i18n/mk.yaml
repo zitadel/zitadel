@@ -491,6 +491,7 @@ Errors:
   Session:
     NotExisting: Сесијата не постои
     Terminated: Сесијата е веќе завршена
+    Expired: Сесијата истече
     Token:
       Invalid: Токенот за сесија е невалиден
     WebAuthN:

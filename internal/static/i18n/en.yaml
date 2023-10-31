@@ -491,6 +491,7 @@ Errors:
   Session:
     NotExisting: Session does not exist
     Terminated: Session already terminated
+    Expired: Session has expired
     Token:
       Invalid: Session Token is invalid
     WebAuthN:

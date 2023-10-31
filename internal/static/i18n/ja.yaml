@@ -480,6 +480,7 @@ Errors:
   Session:
     NotExisting: セッションが存在しない
     Terminated: セッションはすでに終了しています
+    Expired: セッションの有効期限が切れました
     Token:
       Invalid: セッショントークンが無効です
     WebAuthN:

@@ -491,7 +491,8 @@ Errors:
       ScanFailed: La query dei secondi delle azioni utilizzate non è riuscita
   Session:
     NotExisting: La sessione non esiste
-    Terminated: Sessione già terminata
+    Terminated: La Sessione già terminata
+    Expired: La sessione è scaduta
     Token:
       Invalid: Il token della sessione non è valido
     WebAuthN:
