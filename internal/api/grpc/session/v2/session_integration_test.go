@@ -629,7 +629,7 @@ func Test_ZITADEL_API_missing_mfa(t *testing.T) {
 }
 
 func Test_ZITADEL_API_success(t *testing.T) {
-	id, token, _, _ := Tester.CreateVerfiedWebAuthNSession(t, CTX, User.GetUserId())
+	id, token, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, User.GetUserId())
 
 	ctx := Tester.WithAuthorizationToken(context.Background(), token)
 	sessionResp, err := Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
@@ -641,7 +641,7 @@ func Test_ZITADEL_API_success(t *testing.T) {
 }
 
 func Test_ZITADEL_API_session_not_found(t *testing.T) {
-	id, token, _, _ := Tester.CreateVerfiedWebAuthNSession(t, CTX, User.GetUserId())
+	id, token, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, User.GetUserId())
 
 	// test session token works
 	ctx := Tester.WithAuthorizationToken(context.Background(), token)

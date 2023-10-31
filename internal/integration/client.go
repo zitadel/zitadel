@@ -325,7 +325,7 @@ func (s *Tester) CreateSuccessfulSAMLIntent(t *testing.T, idpID, userID, idpUser
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
 }
 
-func (s *Tester) CreateVerfiedWebAuthNSession(t *testing.T, ctx context.Context, userID string) (id, token string, start, change time.Time) {
+func (s *Tester) CreateVerifiedWebAuthNSession(t *testing.T, ctx context.Context, userID string) (id, token string, start, change time.Time) {
 	return s.CreateVerifiedWebAuthNSessionWithLifetime(t, ctx, userID, 0)
 }
 
