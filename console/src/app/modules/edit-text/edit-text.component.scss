@@ -22,6 +22,10 @@
 
         .edit-text-area {
           min-height: 80px;
+
+          &.defaulttext {
+            color: if($is-dark-theme, #ffffff50, #00000050);
+          }
         }
 
         &.hovering {
