@@ -1,8 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { AddSMSProviderTwilioRequest, UpdateSMSProviderTwilioRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { SMSProvider, SMSProviderConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
 
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { InfoSectionType } from '../../info-section/info-section.component';
@@ -15,7 +15,7 @@ import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-
   templateUrl: './notification-sms-provider.component.html',
   styleUrls: ['./notification-sms-provider.component.scss'],
 })
-export class NotificationSMSProviderComponent {
+export class NotificationSMSProviderComponent implements OnInit {
   @Input() public serviceType!: PolicyComponentServiceType;
   public smsProviders: SMSProvider.AsObject[] = [];
 
@@ -29,6 +29,10 @@ export class NotificationSMSProviderComponent {
     private dialog: MatDialog,
     private toast: ToastService,
   ) {}
+
+  ngOnInit(): void {
+    this.fetchData();
+  }
 
   private fetchData(): void {
     this.smsProvidersLoading = true;
@@ -60,7 +64,7 @@ export class NotificationSMSProviderComponent {
           this.service
             .updateSMSProviderTwilio(req as UpdateSMSProviderTwilioRequest)
             .then(() => {
-              this.toast.showInfo('SETTING.SMS.TWILIO.ADDED', true);
+              this.toast.showInfo('SETTING.SMS.TWILIO.UPDATED', true);
               this.fetchData();
             })
             .catch((error) => {

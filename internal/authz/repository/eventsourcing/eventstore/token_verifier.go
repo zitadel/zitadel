@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
-	"github.com/zitadel/oidc/v2/pkg/op"
-	"gopkg.in/square/go-jose.v2"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
@@ -274,7 +274,7 @@ func (repo *TokenVerifierRepo) getTokenIDAndSubject(ctx context.Context, accessT
 	return splitToken[0], splitToken[1], true
 }
 
-func (repo *TokenVerifierRepo) jwtTokenVerifier(ctx context.Context) op.AccessTokenVerifier {
+func (repo *TokenVerifierRepo) jwtTokenVerifier(ctx context.Context) *op.AccessTokenVerifier {
 	keySet := &openIDKeySet{repo.Query}
 	issuer := http_util.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), repo.ExternalSecure)
 	return op.NewAccessTokenVerifier(issuer, keySet)

@@ -721,12 +721,16 @@ func triggerUserProjections(ctx context.Context) {
 	wg := sync.WaitGroup{}
 	wg.Add(2)
 	func() {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerUserProjection")
 		_, err := projection.UserProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 		wg.Done()
 	}()
 	func() {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerLoginNameProjection")
 		_, err := projection.LoginNameProjection.Trigger(ctx, handler.WithAwaitRunning())
+		traceSpan.EndWithError(err)
 		logging.OnError(err).Debug("trigger failed")
 		wg.Done()
 	}()

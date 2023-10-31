@@ -42,6 +42,7 @@
         margin-top: 3rem;
         display: block;
         padding: 0.5rem 4rem;
+        height: 3.5rem;
         border-radius: 0.5rem;
       }
     }
@@ -60,15 +61,47 @@
   grid-template-columns: auto 1fr;
   column-gap: 1rem;
 
+  .phone-country {
+    min-width: 200px;
+  }
+
   @media only screen and (max-width: 500px) {
     grid-template-columns: 1fr;
   }
 }
 
-.phone-country-name {
-  padding: 0 0.5em;
+.trigger-name {
+  font-size: 14px;
+  margin-left: 0.5rem;
 }
 
-.phone-country-code {
-  color: darkgrey;
+.phone-country-flag {
+  margin-right: 0.5rem;
+  min-width: 22px;
+}
+
+.phone-country-row {
+  display: flex;
+  align-items: center;
+
+  .phone-country-flag {
+    margin-right: 0.5rem;
+  }
+
+  .phone-country-name {
+    padding: 0 0.5em;
+  }
+
+  .phone-country-code {
+    color: darkgrey;
+  }
+
+  .fill-space {
+    flex: 1;
+  }
+}
+
+.create-button {
+  padding: 0.5rem 4rem;
+  height: 3.5rem;
 }

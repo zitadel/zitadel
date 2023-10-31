@@ -28,6 +28,9 @@ Errors:
       RemoveFailed: Објектот не може да се отстрани
   Limit:
     ExceedsDefault: Лимитот го надминува стандардниот лимит
+  Limits:
+    NotFound: Лимитот не е пронајден
+    NoneSpecified: Не се наведени лимити
   Language:
     NotParsed: Јазикот не може да се парсира
   OIDCSettings:
@@ -421,6 +424,7 @@ Errors:
     AuditRetention: Историјата е надвор од задржувањето на аудитот
   Token:
     NotFound: Токенот не е пронајден
+    Invalid: Токенот е невалиден
   UserSession:
     NotFound: Корисничката сесија не е пронајдена
   Key:

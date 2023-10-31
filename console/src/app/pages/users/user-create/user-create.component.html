@@ -101,14 +101,25 @@
         <p class="user-create-section">{{ 'USER.CREATE.ADDRESSANDPHONESECTION' | translate }}</p>
 
         <div class="phone-grid">
-          <cnsl-form-field>
+          <cnsl-form-field class="phone-country">
             <cnsl-label>{{ 'USER.PROFILE.COUNTRY' | translate }}</cnsl-label>
-            <mat-select [(value)]="selected" (selectionChange)="setCountryCallingCode()" data-cy="country-calling-code">
-              <mat-select-trigger> <span class="fi fi-{{ selected?.countryCode | lowercase }}"></span></mat-select-trigger>
-              <mat-option *ngFor="let country of countryPhoneCodes" [value]="country">
-                <span class="fi fi-{{ country.countryCode | lowercase }}"></span>
-                <span class="phone-country-name">{{ country.countryName }}</span>
-                <span class="phone-country-code">+{{ country.countryCallingCode }}</span>
+            <mat-select
+              [(value)]="selected"
+              [compareWith]="compareCountries"
+              (selectionChange)="setCountryCallingCode()"
+              data-cy="country-calling-code"
+            >
+              <mat-select-trigger>
+                <span class="fi fi-{{ selected?.countryCode | lowercase }}"></span>
+                <span class="trigger-name">{{ selected?.countryName }}</span>
+              </mat-select-trigger>
+              <mat-option class="phone-country-option" *ngFor="let country of countryPhoneCodes" [value]="country">
+                <span class="phone-country-row">
+                  <span class="phone-country-flag fi fi-{{ country.countryCode | lowercase }}"></span>
+                  <span class="phone-country-name">{{ country.countryName }}</span>
+                  <span class="fill-space"></span>
+                  <small class="phone-country-code">+{{ country.countryCallingCode }}</small>
+                </span>
               </mat-option>
             </mat-select>
           </cnsl-form-field>
@@ -124,6 +135,7 @@
           color="primary"
           [disabled]="userForm.invalid || (this.usePassword && this.pwdForm.invalid)"
           type="submit"
+          class="create-button"
           mat-raised-button
         >
           {{ 'ACTIONS.CREATE' | translate }}

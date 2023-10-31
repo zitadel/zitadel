@@ -1,10 +1,8 @@
-@use '@angular/material' as mat;
-
 @mixin detail-layout-theme($theme) {
   $primary: map-get($theme, primary);
-  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-color: map-get($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
-  $lighter-color: rgba(mat.get-color-from-palette($primary, 300), 0.5);
+  $lighter-color: rgba(map-get($primary, 300), 0.5);
 
   .detail-layout-head {
     margin-bottom: 2rem;

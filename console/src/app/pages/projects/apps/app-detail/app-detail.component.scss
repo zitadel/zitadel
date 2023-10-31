@@ -1,5 +1,3 @@
-@use '@angular/material' as mat;
-
 @mixin app-detail-theme($theme) {
   $foreground: map-get($theme, foreground);
   $background: map-get($theme, background);
@@ -9,6 +7,23 @@
   $button-text-color: map-get($foreground, text);
   $button-disabled-text-color: map-get($foreground, disabled-button);
   $divider-color: map-get($foreground, dividers);
+
+  .metadata-option {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    flex-direction: column;
+
+    .upload-button {
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      width: 25%;
+    }
+
+    .saml-config-option {
+      font-size: 14px;
+    }
+  }
 
   .app-zitadel-warning {
     font-size: 14px;
@@ -226,7 +241,7 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 
   .rt {
-    margin-top: 2.3rem;
+    margin-top: 1.7rem;
     margin-left: 0.5rem;
   }
 }

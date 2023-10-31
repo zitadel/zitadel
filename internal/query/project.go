@@ -108,8 +108,10 @@ func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id st
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerProjectProjection")
 		ctx, err = projection.ProjectProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	stmt, scan := prepareProjectQuery(ctx, q.client)

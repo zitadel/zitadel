@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/feature"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/limits"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/quota"
@@ -96,6 +97,7 @@ type InstanceSetup struct {
 		HideLoginNameSuffix bool
 		ErrorMsgPopup       bool
 		DisableWatermark    bool
+		ThemeMode           domain.LabelPolicyThemeMode
 	}
 	LockoutPolicy struct {
 		MaxAttempts              uint64
@@ -114,6 +116,9 @@ type InstanceSetup struct {
 		Items []*SetQuota
 	}
 	Features map[domain.Feature]any
+	Limits   *struct {
+		AuditLogRetention *time.Duration
+	}
 }
 
 type SecretGenerators struct {
@@ -135,6 +140,7 @@ type ZitadelConfig struct {
 	adminAppID   string
 	authAppID    string
 	consoleAppID string
+	limitsID     string
 }
 
 func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
@@ -159,7 +165,10 @@ func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
 	}
 
 	s.zitadel.consoleAppID, err = idGenerator.Next()
-
+	if err != nil {
+		return err
+	}
+	s.zitadel.limitsID, err = idGenerator.Next()
 	return err
 }
 
@@ -190,6 +199,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	orgAgg := org.NewAggregate(orgID)
 	userAgg := user.NewAggregate(userID, orgID)
 	projectAgg := project.NewAggregate(setup.zitadel.projectID, orgID)
+	limitsAgg := limits.NewAggregate(setup.zitadel.limitsID, instanceID, instanceID)
 
 	validations := []preparation.Validation{
 		prepareAddInstance(instanceAgg, setup.InstanceName, setup.DefaultLanguage),
@@ -267,6 +277,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LabelPolicy.HideLoginNameSuffix,
 			setup.LabelPolicy.ErrorMsgPopup,
 			setup.LabelPolicy.DisableWatermark,
+			setup.LabelPolicy.ThemeMode,
 		),
 		prepareActivateDefaultLabelPolicy(instanceAgg),
 
@@ -439,6 +450,12 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		default:
 			return "", "", nil, nil, errors.ThrowInvalidArgument(nil, "INST-GE4tg", "Errors.Feature.TypeNotSupported")
 		}
+	}
+
+	if setup.Limits != nil {
+		validations = append(validations, c.SetLimitsCommand(limitsAgg, &limitsWriteModel{}, &SetLimits{
+			AuditLogRetention: setup.Limits.AuditLogRetention,
+		}))
 	}
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)

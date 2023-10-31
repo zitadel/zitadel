@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/op"
-	"gopkg.in/square/go-jose.v2"
+	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"

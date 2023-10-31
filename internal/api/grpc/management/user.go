@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/durationpb"
 
@@ -109,7 +109,7 @@ func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChang
 		query.OrderAsc()
 	}
 
-	changes, err := s.query.SearchEvents(ctx, query, s.auditLogRetention)
+	changes, err := s.query.SearchEvents(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -643,6 +643,26 @@ func (s *Server) RemoveHumanAuthFactorU2F(ctx context.Context, req *mgmt_pb.Remo
 		return nil, err
 	}
 	return &mgmt_pb.RemoveHumanAuthFactorU2FResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
+	}, nil
+}
+
+func (s *Server) RemoveHumanAuthFactorOTPSMS(ctx context.Context, req *mgmt_pb.RemoveHumanAuthFactorOTPSMSRequest) (*mgmt_pb.RemoveHumanAuthFactorOTPSMSResponse, error) {
+	objectDetails, err := s.command.RemoveHumanOTPSMS(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveHumanAuthFactorOTPSMSResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
+	}, nil
+}
+
+func (s *Server) RemoveHumanAuthFactorOTPEmail(ctx context.Context, req *mgmt_pb.RemoveHumanAuthFactorOTPEmailRequest) (*mgmt_pb.RemoveHumanAuthFactorOTPEmailResponse, error) {
+	objectDetails, err := s.command.RemoveHumanOTPEmail(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveHumanAuthFactorOTPEmailResponse{
 		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

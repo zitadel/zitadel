@@ -36,6 +36,7 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 		hideLoginNameSuffix bool
 		errorMsgPopup       bool
 		disableWatermark    bool
+		themeMode           domain.LabelPolicyThemeMode
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -67,6 +68,7 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -85,6 +87,7 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 				hideLoginNameSuffix: true,
 				errorMsgPopup:       true,
 				disableWatermark:    true,
+				themeMode:           domain.LabelPolicyThemeAuto,
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
@@ -110,6 +113,7 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 							true,
 							true,
 							true,
+							domain.LabelPolicyThemeDark,
 						),
 					),
 				),
@@ -127,6 +131,7 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 				hideLoginNameSuffix: true,
 				errorMsgPopup:       true,
 				disableWatermark:    true,
+				themeMode:           domain.LabelPolicyThemeDark,
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -153,6 +158,7 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 				tt.args.hideLoginNameSuffix,
 				tt.args.errorMsgPopup,
 				tt.args.disableWatermark,
+				tt.args.themeMode,
 			)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -225,6 +231,7 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -244,6 +251,7 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 					HideLoginNameSuffix: true,
 					ErrorMsgPopup:       true,
 					DisableWatermark:    true,
+					ThemeMode:           domain.LabelPolicyThemeAuto,
 				},
 			},
 			res: res{
@@ -270,6 +278,7 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -286,7 +295,8 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 							"#000000",
 							false,
 							false,
-							false),
+							false,
+							domain.LabelPolicyThemeDark),
 					),
 				),
 			},
@@ -304,6 +314,7 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 					HideLoginNameSuffix: false,
 					ErrorMsgPopup:       false,
 					DisableWatermark:    false,
+					ThemeMode:           domain.LabelPolicyThemeDark,
 				},
 			},
 			res: res{
@@ -324,6 +335,7 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 					HideLoginNameSuffix: false,
 					ErrorMsgPopup:       false,
 					DisableWatermark:    false,
+					ThemeMode:           domain.LabelPolicyThemeDark,
 				},
 			},
 		},
@@ -399,6 +411,7 @@ func TestCommandSide_ActivateDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -500,6 +513,7 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -541,6 +555,7 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -645,6 +660,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 						eventFromEventPusher(
@@ -684,6 +700,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 						eventFromEventPusher(
@@ -793,6 +810,7 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -834,6 +852,7 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -938,6 +957,7 @@ func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 						eventFromEventPusher(
@@ -1049,6 +1069,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -1091,6 +1112,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -1195,6 +1217,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 						eventFromEventPusher(
@@ -1234,6 +1257,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 						eventFromEventPusher(
@@ -1343,6 +1367,7 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -1384,6 +1409,7 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -1488,6 +1514,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 						eventFromEventPusher(
@@ -1527,6 +1554,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 						eventFromEventPusher(
@@ -1636,6 +1664,7 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -1677,6 +1706,7 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -1781,6 +1811,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 						eventFromEventPusher(
@@ -1820,6 +1851,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 						eventFromEventPusher(
@@ -1867,7 +1899,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 	}
 }
 
-func newDefaultLabelPolicyChangedEvent(ctx context.Context, primaryColor, backgroundColor, warnColor, fontColor, primaryColorDark, backgroundColorDark, warnColorDark, fontColorDark string, hideLoginNameSuffix, errMsgPopup, disableWatermark bool) *instance.LabelPolicyChangedEvent {
+func newDefaultLabelPolicyChangedEvent(ctx context.Context, primaryColor, backgroundColor, warnColor, fontColor, primaryColorDark, backgroundColorDark, warnColorDark, fontColorDark string, hideLoginNameSuffix, errMsgPopup, disableWatermark bool, theme domain.LabelPolicyThemeMode) *instance.LabelPolicyChangedEvent {
 	event, _ := instance.NewLabelPolicyChangedEvent(ctx,
 		&instance.NewAggregate("INSTANCE").Aggregate,
 		[]policy.LabelPolicyChanges{
@@ -1882,6 +1914,7 @@ func newDefaultLabelPolicyChangedEvent(ctx context.Context, primaryColor, backgr
 			policy.ChangeHideLoginNameSuffix(hideLoginNameSuffix),
 			policy.ChangeErrorMsgPopup(errMsgPopup),
 			policy.ChangeDisableWatermark(disableWatermark),
+			policy.ChangeThemeMode(theme),
 		},
 	)
 	return event

@@ -1,10 +1,8 @@
-@use '@angular/material' as mat;
-
 @import './preview/preview.component.scss';
 
 @mixin private-label-theme($theme) {
   $primary: map-get($theme, primary);
-  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-color: map-get($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
@@ -53,14 +51,6 @@
       .buttongroup {
         margin-right: 0.5rem;
         margin-top: 0.5rem;
-
-        .mat-button-toggle-button {
-          display: flex;
-          height: 36px;
-          line-height: 36px;
-          align-items: center;
-          font-size: 14px;
-        }
 
         .toggle-row {
           display: flex;

@@ -19,7 +19,7 @@ services:
       - "zitadel-certs:/crdb-certs:ro"
 
   certs:
-    image: "cockroachdb/cockroach:v22.2.2"
+    image: "cockroachdb/cockroach:latest"
     entrypoint: ["/bin/bash", "-c"]
     command:
       [
@@ -36,7 +36,7 @@ services:
     restart: "always"
     networks:
       - "zitadel"
-    image: "cockroachdb/cockroach:v22.2.2"
+    image: "cockroachdb/cockroach:latest"
     command: "start-single-node --advertise-addr my-cockroach-db"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { map, Observable, of, switchMap, tap } from 'rxjs';
 import { WarnDialogComponent } from '../modules/warn-dialog/warn-dialog.component';
 import { Environment } from './environment.service';

@@ -1,13 +1,11 @@
-@use '@angular/material' as mat;
-
 @mixin events-theme($theme) {
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
-  $card-background-color: mat.get-color-from-palette($background, cards);
+  $card-background-color: map-get($background, cards);
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
   $primary: map-get($theme, primary);
-  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-color: map-get($primary, 500);
 
   .mat-column-payload {
     position: relative;
@@ -35,9 +33,9 @@
       transform: translateY(-50%);
 
       .open-in-dialog-btn {
-        width: 36px;
-        height: 36px;
-        line-height: initial;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     }
 

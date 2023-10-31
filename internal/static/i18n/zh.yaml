@@ -28,6 +28,9 @@ Errors:
       RemoveFailed: 无法移除对象
   Limit:
     ExceedsDefault: 超出默认限制
+  Limits:
+    NotFound: 未找到限制
+    NoneSpecified: 未指定限制
   Language:
     NotParsed: 无法解析语言
   OIDCSettings:
@@ -421,6 +424,7 @@ Errors:
     AuditRetention: 历史记录在审核日志保留范围之外
   Token:
     NotFound: 令牌不存在
+    Invalid: 令牌无效
   UserSession:
     NotFound: 用户会话不存在
   Key:

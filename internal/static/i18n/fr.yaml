@@ -28,6 +28,9 @@ Errors:
       RemoveFailed: L'objet n'a pas pu être retiré
   Limit:
     ExceedsDefault: La limite dépasse la limite par défaut
+  Limits:
+    NotFound: Limites non trouvée
+    NoneSpecified: Aucune limite spécifiée
   Language:
     NotParsed: Impossible d'analyser la langue
   OIDCSettings:
@@ -421,6 +424,7 @@ Errors:
     AuditRetention: L'historique est en dehors de la rétention du journal d'audit
   Token:
     NotFound: Token non trouvé
+    Invalid: Le jeton n'est pas valide
   UserSession:
     NotFound: UserSession non trouvé
   Key:

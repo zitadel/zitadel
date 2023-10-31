@@ -28,6 +28,9 @@ Errors:
       RemoveFailed: Object could not be removed
   Limit:
     ExceedsDefault: Limit exceeds default limit
+  Limits:
+    NotFound: Limits not found
+    NoneSpecified: No limits specified
   Language:
     NotParsed: Could not parse language
   OIDCSettings:
@@ -421,6 +424,7 @@ Errors:
     AuditRetention: History is outside of the Audit Log Retention
   Token:
     NotFound: Token not found
+    Invalid: Token is invalid
   UserSession:
     NotFound: UserSession not found
   Key:
