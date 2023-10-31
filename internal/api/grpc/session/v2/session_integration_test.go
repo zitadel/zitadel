@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
@@ -606,6 +607,34 @@ func TestServer_SetSession_flow(t *testing.T) {
 		sessionToken = resp.GetSessionToken()
 		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, wantUserFactor, wantWebAuthNFactor, wantOTPEmailFactor)
 	})
+}
+
+func TestServer_SetSession_expired(t *testing.T) {
+	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+		Lifetime: durationpb.New(10 * time.Second),
+	})
+	require.NoError(t, err)
+
+	// test session token works
+	sessionResp, err := Tester.Client.SessionV2.SetSession(CTX, &session.SetSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: createResp.GetSessionToken(),
+		Metadata: map[string][]byte{
+			"key": []byte("value"),
+		},
+	})
+	require.NoError(t, err)
+
+	// ensure session expires and does not work anymore
+	time.Sleep(10 * time.Second)
+	_, err = Tester.Client.SessionV2.SetSession(CTX, &session.SetSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: sessionResp.GetSessionToken(),
+		Metadata: map[string][]byte{
+			"key": []byte("value"),
+		},
+	})
+	require.Error(t, err)
 }
 
 func Test_ZITADEL_API_missing_authentication(t *testing.T) {
