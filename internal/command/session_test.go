@@ -425,7 +425,7 @@ func TestCommands_updateSession(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMAND-SAjeh", "Errors.Session.Terminated"),
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Hewfq", "Errors.Session.Terminated"),
 			},
 		},
 		{

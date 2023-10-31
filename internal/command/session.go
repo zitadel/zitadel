@@ -350,11 +350,8 @@ func (c *Commands) terminateSession(ctx context.Context, sessionID, sessionToken
 
 // updateSession execute the [SessionCommands] where new events will be created and as well as for metadata (changes)
 func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, metadata map[string][]byte, lifetime time.Duration) (set *SessionChanged, err error) {
-	if checks.sessionWriteModel.State == domain.SessionStateTerminated {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMAND-SAjeh", "Errors.Session.Terminated")
-	}
-	if !checks.sessionWriteModel.Expiration.IsZero() && checks.sessionWriteModel.Expiration.Before(time.Now()) {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMAND-Gh5j3", "Errors.Session.Expired")
+	if err = checks.sessionWriteModel.CheckNotInvalidated(); err != nil {
+		return nil, err
 	}
 	if err := checks.Exec(ctx); err != nil {
 		// TODO: how to handle failed checks (e.g. pw wrong) https://github.com/zitadel/zitadel/issues/5807

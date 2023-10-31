@@ -13,6 +13,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
@@ -325,6 +326,10 @@ func (s *Tester) CreateSuccessfulSAMLIntent(t *testing.T, idpID, userID, idpUser
 }
 
 func (s *Tester) CreateVerfiedWebAuthNSession(t *testing.T, ctx context.Context, userID string) (id, token string, start, change time.Time) {
+	return s.CreateVerifiedWebAuthNSessionWithLifetime(t, ctx, userID, 0)
+}
+
+func (s *Tester) CreateVerifiedWebAuthNSessionWithLifetime(t *testing.T, ctx context.Context, userID string, lifetime time.Duration) (id, token string, start, change time.Time) {
 	createResp, err := s.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -337,6 +342,7 @@ func (s *Tester) CreateVerfiedWebAuthNSession(t *testing.T, ctx context.Context,
 				UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 			},
 		},
+		Lifetime: durationpb.New(lifetime),
 	})
 	require.NoError(t, err)
 

@@ -255,10 +255,9 @@ func (wm *SessionWriteModel) AuthMethodTypes() []domain.UserAuthMethodType {
 	return types
 }
 
-func (wm *SessionWriteModel) CheckIsActive() error {
-	if wm.State == domain.SessionStateUnspecified {
-		return errors.ThrowPreconditionFailed(nil, "COMMAND-Flk38", "Errors.Session.NotExisting")
-	}
+// CheckNotInvalidated checks that the session was not invalidated either manually ([session.TerminateType])
+// or automatically (expired).
+func (wm *SessionWriteModel) CheckNotInvalidated() error {
 	if wm.State == domain.SessionStateTerminated {
 		return errors.ThrowPreconditionFailed(nil, "COMMAND-Hewfq", "Errors.Session.Terminated")
 	}
@@ -266,4 +265,12 @@ func (wm *SessionWriteModel) CheckIsActive() error {
 		return errors.ThrowPreconditionFailed(nil, "COMMAND-Hkl3d", "Errors.Session.Expired")
 	}
 	return nil
+}
+
+// CheckIsActive checks that the session was not invalidated ([CheckNotInvalidated]) and actually already exists.
+func (wm *SessionWriteModel) CheckIsActive() error {
+	if wm.State == domain.SessionStateUnspecified {
+		return errors.ThrowPreconditionFailed(nil, "COMMAND-Flk38", "Errors.Session.NotExisting")
+	}
+	return wm.CheckNotInvalidated()
 }
