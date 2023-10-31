@@ -1094,16 +1094,15 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	if missing {
 		return append(steps, &domain.GrantRequiredStep{}), nil
 	}
-
+	if request.LoginAs && request.UserOrigID == "" {
+		steps = append(steps, &domain.LoginAsStep{})
+	}
 	ok, err = repo.hasSucceededPage(ctx, request, repo.ApplicationProvider)
 	if err != nil {
 		return nil, err
 	}
 	if ok {
 		steps = append(steps, &domain.LoginSucceededStep{})
-	}
-	if request.LoginAs && request.UserOrigID == "" {
-		steps = append(steps, &domain.LoginAsStep{})
 	}
 	return append(steps, &domain.RedirectToCallbackStep{}), nil
 }
