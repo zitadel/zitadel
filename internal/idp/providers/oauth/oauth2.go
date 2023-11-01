@@ -92,13 +92,16 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (
 	opts := []rp.AuthURLOpt{}
 	// https://github.com/zitadel/zitadel/blob/main/proto/zitadel/oidc/v2beta/authorization.proto
 	switch prompt := os.Getenv("ZITADEL_GENERIC_OAUTH_AUTH_PROMPT"); prompt {
-	case "0":
-	case "1":
+	case "PROMPT_UNSPECIFIED":
+		// When set to "UNSPECIFIED" send no "prompt" param
+	case "PROMPT_NONE":
 		opts = append(opts, rp.WithPrompt(oidc.PromptNone))
-	case "2":
+	case "PROMPT_LOGIN":
 		opts = append(opts, rp.WithPrompt(oidc.PromptLogin))
-	case "3":
+	case "PROMPT_CONSENT":
 		opts = append(opts, rp.WithPrompt(oidc.PromptConsent))
+	case "PROMPT_SELECT_ACCOUNT":
+		opts = append(opts, rp.WithPrompt(oidc.PromptSelectAccount))
 	default:
 		// previous behavior must be default to prevent a breaking change
 		opts = append(opts, rp.WithPrompt(oidc.PromptSelectAccount))
