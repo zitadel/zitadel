@@ -15,6 +15,7 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { AddDomainDialogModule } from './add-domain-dialog/add-domain-dialog.module';
 import { DomainVerificationComponent } from './domain-verification/domain-verification.component';
 import { DomainsComponent } from './domains.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [DomainsComponent, DomainVerificationComponent],
@@ -30,6 +31,7 @@ import { DomainsComponent } from './domains.component';
     MatTooltipModule,
     CopyToClipboardModule,
     InputModule,
+    MatDialogModule,
     TranslateModule,
     InfoSectionModule,
     MatProgressSpinnerModule,

@@ -33,9 +33,9 @@
       transform: translateY(-50%);
 
       .open-in-dialog-btn {
-        width: 36px;
-        height: 36px;
-        line-height: initial;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     }
 
