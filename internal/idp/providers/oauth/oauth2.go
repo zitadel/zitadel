@@ -2,6 +2,7 @@ package oauth
 
 import (
 	"context"
+	"os"
 
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -88,7 +89,21 @@ func (p *Provider) Name() string {
 // BeginAuth implements the [idp.Provider] interface.
 // It will create a [Session] with an OAuth2.0 authorization request as AuthURL.
 func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (idp.Session, error) {
-	opts := []rp.AuthURLOpt{rp.WithPrompt(oidc.PromptSelectAccount)}
+	opts := []rp.AuthURLOpt{}
+	// https://github.com/zitadel/zitadel/blob/main/proto/zitadel/oidc/v2beta/authorization.proto
+	switch prompt := os.Getenv("ZITADEL_GENERIC_OAUTH_AUTH_PROMPT"); prompt {
+	case "0":
+	case "1":
+		opts = append(opts, rp.WithPrompt(oidc.PromptNone))
+	case "2":
+		opts = append(opts, rp.WithPrompt(oidc.PromptLogin))
+	case "3":
+		opts = append(opts, rp.WithPrompt(oidc.PromptConsent))
+	default:
+		// previous behavior must be default to prevent a breaking change
+		opts = append(opts, rp.WithPrompt(oidc.PromptSelectAccount))
+	}
+
 	for _, param := range params {
 		if option, ok := param.(rp.AuthURLOpt); ok {
 			opts = append(opts, option)
