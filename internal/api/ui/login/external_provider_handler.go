@@ -3,6 +3,7 @@ package login
 import (
 	"context"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/crewjam/saml/samlsp"
@@ -870,8 +871,14 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]openid.ProviderOpts, 1, 2)
-	opts[0] = openid.WithSelectAccount()
+	opts := make([]openid.ProviderOpts, 0, 2)
+	switch prompt := os.Getenv("ZITADEL_GENERIC_OAUTH_AUTH_PROMPT"); prompt {
+	case "PROMPT_UNSPECIFIED":
+		// When set to "UNSPECIFIED" send no "prompt" param
+	default:
+		// previous behavior must be default to prevent a breaking change
+		opts = append(opts, openid.WithSelectAccount())
+	}
 	if identityProvider.OIDCIDPTemplate.IsIDTokenMapping {
 		opts = append(opts, openid.WithIDTokenMapping())
 	}
