@@ -742,11 +742,13 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	} else {
 		user, err = repo.checkLoginNameInput(ctx, request, preferredLoginName)
 	}
-	// force select user showing if
-	// if err != nil && errors.IsNotFound(err) {
-	//	 request.ShowLoginAs = true
-	//	 user, err = repo.checkLoginAsNameInput(ctx, request, loginName)
-	// }
+	// trigger select user showing if selected user has LOGIN AS rights
+	if err != nil && errors.IsNotFound(err) {
+		user, err = repo.checkLoginAsNameInput(ctx, request, preferredLoginName)
+		if user != nil && request.ShowSelectUserStep == domain.ShowSelectUserStepNone {
+			request.ShowSelectUserStep = domain.ShowSelectUserStepToDo
+		}
+	}
 	// return any error apart from not found ones directly
 	if err != nil && !errors.IsNotFound(err) {
 		return err
@@ -1060,6 +1062,15 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		return append(steps, step), nil
 	}
 
+	if request.ShowSelectUserStep == domain.ShowSelectUserStepToDo {
+		request.ShowSelectUserStep = domain.ShowSelectUserStepDone
+		users, err := repo.usersForUserSelection(ctx, request)
+		if err != nil {
+			return nil, err
+		}
+		return append(steps, &domain.SelectUserStep{Users: users}), nil
+	}
+
 	if user.PasswordChangeRequired {
 		steps = append(steps, &domain.ChangePasswordStep{})
 	}
@@ -1248,12 +1259,11 @@ func (repo *AuthRequestRepo) getUserIdFromRequest(ctx context.Context, request *
 		if err != nil {
 			return "", err
 		}
-		instanceID := authz.GetInstance(ctx).InstanceID()
-		userSession, err := repo.UserSessionViewProvider.UserSessionByIDs(request.AgentID, user.ID, instanceID)
+		userSession, err := userSessionByIDs(ctx, repo.UserSessionViewProvider, repo.UserEventProvider, request.AgentID, user)
 		if err != nil && !errors.IsNotFound(err) {
 			return "", err
 		}
-		if userSession == nil || domain.UserSessionState(userSession.State) == domain.UserSessionStateTerminated {
+		if userSession == nil || userSession.State == domain.UserSessionStateTerminated {
 			userSessions, err := userSessionsByUserAgentID(ctx, repo.UserSessionViewProvider, request.AgentID, request.InstanceID)
 			if err != nil {
 				return "", err
