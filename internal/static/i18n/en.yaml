@@ -428,6 +428,7 @@ Errors:
   UserSession:
     NotFound: UserSession not found
   Key:
+    NotFound: Key not found
     ExpireBeforeNow: The expiration date is in the past
   Login:
     LoginPolicy:

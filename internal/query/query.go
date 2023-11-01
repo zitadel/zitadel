@@ -38,9 +38,10 @@ type Queries struct {
 	eventstore *eventstore.Eventstore
 	client     *database.DB
 
-	idpConfigEncryption  crypto.EncryptionAlgorithm
-	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error)
-	checkPermission      domain.PermissionCheck
+	keyEncryptionAlgorithm crypto.EncryptionAlgorithm
+	idpConfigEncryption    crypto.EncryptionAlgorithm
+	sessionTokenVerifier   func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error)
+	checkPermission        domain.PermissionCheck
 
 	DefaultLanguage                     language.Tag
 	LoginDir                            http.FileSystem
@@ -86,8 +87,16 @@ func StartQueries(
 		LoginTranslationFileContents:        make(map[string][]byte),
 		NotificationTranslationFileContents: make(map[string][]byte),
 		zitadelRoles:                        zitadelRoles,
+		keyEncryptionAlgorithm:              keyEncryptionAlgorithm,
+		idpConfigEncryption:                 idpConfigEncryption,
 		sessionTokenVerifier:                sessionTokenVerifier,
-		defaultAuditLogRetention:            defaultAuditLogRetention,
+		multifactors: domain.MultifactorConfigs{
+			OTP: domain.OTPConfig{
+				CryptoMFA: otpEncryption,
+				Issuer:    defaults.Multifactors.OTP.Issuer,
+			},
+		},
+		defaultAuditLogRetention: defaultAuditLogRetention,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)
@@ -102,14 +111,6 @@ func StartQueries(
 	oidcsession.RegisterEventMappers(repo.eventstore)
 	quota.RegisterEventMappers(repo.eventstore)
 	limits.RegisterEventMappers(repo.eventstore)
-
-	repo.idpConfigEncryption = idpConfigEncryption
-	repo.multifactors = domain.MultifactorConfigs{
-		OTP: domain.OTPConfig{
-			CryptoMFA: otpEncryption,
-			Issuer:    defaults.Multifactors.OTP.Issuer,
-		},
-	}
 
 	repo.checkPermission = permissionCheck(repo)
 

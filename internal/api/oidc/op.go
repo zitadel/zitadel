@@ -68,6 +68,7 @@ type OPStorage struct {
 	command                           *command.Commands
 	query                             *query.Queries
 	eventstore                        *eventstore.Eventstore
+	keySet                            *keySet
 	defaultLoginURL                   string
 	defaultLoginURLV2                 string
 	defaultLogoutURLV2                string
@@ -119,6 +120,7 @@ func NewServer(
 	}
 
 	server := &Server{
+		storage:      storage,
 		LegacyServer: op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
@@ -172,12 +174,16 @@ func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []
 	return opConfig, nil
 }
 
-func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, db *database.DB, externalSecure bool) *OPStorage {
+func newStorage(config Config, command *command.Commands, queries *query.Queries, repo repository.Repository, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, db *database.DB, externalSecure bool) *OPStorage {
 	return &OPStorage{
-		repo:                              repo,
-		command:                           command,
-		query:                             query,
-		eventstore:                        es,
+		repo:       repo,
+		command:    command,
+		query:      queries,
+		eventstore: es,
+		keySet: &keySet{
+			keys:     make(map[string]query.PublicKey),
+			queryKey: queries.GetActivePublicKeyByID,
+		},
 		defaultLoginURL:                   fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
 		defaultLoginURLV2:                 config.DefaultLoginURLV2,
 		defaultLogoutURLV2:                config.DefaultLogoutURLV2,
