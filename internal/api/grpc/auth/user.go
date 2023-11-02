@@ -68,7 +68,6 @@ func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserC
 		sequence = req.Query.Sequence
 		asc = req.Query.Asc
 	}
-
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AllowTimeTravel().
 		Limit(limit).

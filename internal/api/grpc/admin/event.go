@@ -62,17 +62,11 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 		EditorUser(req.EditorUserId).
 		SequenceGreater(req.Sequence)
 
-	asc := req.GetAsc()
-	if asc {
+	if req.GetAsc() {
 		builder.OrderAsc()
-	}
-
-	if !req.CreationDate.AsTime().IsZero() {
-		if asc {
-			builder.CreationDateAfter(req.CreationDate.AsTime())
-		} else {
-			builder.CreationDateBefore(req.CreationDate.AsTime())
-		}
+		builder.CreationDateAfter(req.CreationDate.AsTime())
+	} else {
+		builder.CreationDateBefore(req.CreationDate.AsTime())
 	}
 
 	if len(aggregateIDs) > 0 || len(aggregateTypes) > 0 || len(eventTypes) > 0 {
