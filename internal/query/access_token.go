@@ -52,11 +52,8 @@ func (wm *OIDCSessionAccessTokenReadModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *OIDCSessionAccessTokenReadModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		AwaitOpenTransactions().
-		AllowTimeTravel().
-		AddQuery().
+func (wm *OIDCSessionAccessTokenReadModel) addQuery(b *eventstore.SearchQueryBuilder) *eventstore.SearchQueryBuilder {
+	return b.AddQuery().
 		AggregateTypes(oidcsession.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
@@ -66,6 +63,14 @@ func (wm *OIDCSessionAccessTokenReadModel) Query() *eventstore.SearchQueryBuilde
 			oidcsession.RefreshTokenRevokedType,
 		).
 		Builder()
+}
+
+func (wm *OIDCSessionAccessTokenReadModel) Query() *eventstore.SearchQueryBuilder {
+	return wm.addQuery(
+		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+			AwaitOpenTransactions().
+			AllowTimeTravel(),
+	)
 }
 
 func (wm *OIDCSessionAccessTokenReadModel) reduceAdded(e *oidcsession.AddedEvent) {

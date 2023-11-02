@@ -27,6 +27,7 @@ import (
 )
 
 const (
+	// TODO: remove declarations: (moved to domain package)
 	ScopeProjectRolePrefix  = "urn:zitadel:iam:org:project:role:"
 	ScopeProjectsRoles      = "urn:zitadel:iam:org:projects:roles"
 	ClaimProjectRoles       = "urn:zitadel:iam:org:project:roles"
@@ -178,21 +179,6 @@ func (o *OPStorage) SetUserinfoFromRequest(ctx context.Context, userinfo *oidc.U
 func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection *oidc.IntrospectionResponse, tokenID, subject, clientID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-
-	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
-		token, err := o.query.ActiveAccessTokenByToken(ctx, tokenID)
-		if err != nil {
-			return err
-		}
-		projectID, err := o.query.ProjectIDFromClientID(ctx, clientID, false)
-		if err != nil {
-			return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
-		}
-		return o.introspect(ctx, introspection,
-			tokenID, token.UserID, token.ClientID, clientID, projectID,
-			token.Audience, token.Scope,
-			token.AccessTokenCreation, token.AccessTokenExpiration)
-	}
 
 	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
 	if err != nil {

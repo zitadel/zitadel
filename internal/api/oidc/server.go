@@ -2,10 +2,7 @@ package oidc
 
 import (
 	"context"
-	"errors"
 	"net/http"
-	"strings"
-	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
@@ -161,62 +158,6 @@ func (s *Server) DeviceToken(ctx context.Context, r *op.ClientRequest[oidc.Devic
 	defer func() { span.EndWithError(err) }()
 
 	return s.LegacyServer.DeviceToken(ctx, r)
-}
-
-func (s *Server) authenticateResourceClient(ctx context.Context, cc *op.ClientCredentials) (clientID string, err error) {
-	if cc.ClientAssertion != "" {
-		verifier := op.NewJWTProfileVerifier(s.storage, op.IssuerFromContext(ctx), 1*time.Hour, time.Second)
-		profile, err := op.VerifyJWTAssertion(ctx, cc.ClientAssertion, verifier)
-		if err != nil {
-			return "", err
-		}
-		return profile.Issuer, nil
-	}
-
-	if err = s.storage.AuthorizeClientIDSecret(ctx, cc.ClientID, cc.ClientSecret); err != nil {
-		if err != nil {
-			return "", err
-		}
-	}
-	return cc.ClientID, nil
-}
-
-func (s *Server) getTokenIDAndSubject(ctx context.Context, accessToken string) (idToken, subject string, err error) {
-	provider := s.Provider()
-	tokenIDSubject, err := provider.Crypto().Decrypt(accessToken)
-	if err == nil {
-		splitToken := strings.Split(tokenIDSubject, ":")
-		if len(splitToken) != 2 {
-			return "", "", errors.New("invalid token format")
-		}
-		return splitToken[0], splitToken[1], nil
-	}
-
-	verifier := op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), s.storage.keySet)
-	accessTokenClaims, err := op.VerifyAccessToken[*oidc.AccessTokenClaims](ctx, accessToken, verifier)
-	if err != nil {
-		return "", "", err
-	}
-	return accessTokenClaims.JWTID, accessTokenClaims.Subject, nil
-}
-
-func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionRequest]) (_ *op.Response, err error) {
-	clientID, err := s.authenticateResourceClient(ctx, r.Data.ClientCredentials)
-	if err != nil {
-		return nil, err
-	}
-	response := new(oidc.IntrospectionResponse)
-	tokenID, subject, err := s.getTokenIDAndSubject(ctx, r.Data.Token)
-	if err != nil {
-		// TODO: log error
-		return op.NewResponse(response), nil
-	}
-	err = s.storage.SetIntrospectionFromToken(ctx, response, tokenID, subject, clientID)
-	if err != nil {
-		return op.NewResponse(response), nil
-	}
-	response.Active = true
-	return op.NewResponse(response), nil
 }
 
 func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoRequest]) (_ *op.Response, err error) {
