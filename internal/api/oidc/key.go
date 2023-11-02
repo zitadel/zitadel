@@ -21,24 +21,77 @@ import (
 )
 
 type keySet struct {
-	mtx      sync.RWMutex
-	keys     map[string]query.PublicKey
-	queryKey func(ctx context.Context, keyID string, current time.Time) (query.PublicKey, error)
+	mtx          sync.RWMutex
+	instanceKeys map[string]map[string]query.PublicKey
+	queryKey     func(ctx context.Context, keyID string, current time.Time) (query.PublicKey, error)
+}
+
+func newKeySet(background context.Context, purgeInterval time.Duration, queryKey func(ctx context.Context, keyID string, current time.Time) (query.PublicKey, error)) *keySet {
+	k := &keySet{
+		instanceKeys: make(map[string]map[string]query.PublicKey),
+		queryKey:     queryKey,
+	}
+	go k.purgeOnInterval(background, purgeInterval)
+	return k
+}
+
+func (v *keySet) purgeOnInterval(background context.Context, purgeInterval time.Duration) {
+	timer := time.NewTimer(purgeInterval)
+	defer func() {
+		if !timer.Stop() {
+			<-timer.C // make sure the channel is emptied
+		}
+	}()
+
+loop:
+	for {
+		select {
+		case <-background.Done():
+			break loop
+		case <-timer.C:
+			timer.Reset(purgeInterval)
+		}
+
+		// do the actual purging
+		v.mtx.Lock()
+		for instanceID, keys := range v.instanceKeys {
+			for keyID, key := range keys {
+				if key.Expiry().Before(time.Now()) {
+					delete(keys, keyID)
+				}
+			}
+			if len(keys) == 0 {
+				delete(v.instanceKeys, instanceID)
+			}
+		}
+		v.mtx.Unlock()
+	}
+
+}
+
+func (v *keySet) setKey(instanceID, keyID string, key query.PublicKey) {
+	v.mtx.Lock()
+	defer v.mtx.Unlock()
+
+	if keys, ok := v.instanceKeys[instanceID]; ok {
+		keys[keyID] = key
+		return
+	}
+
+	v.instanceKeys[instanceID] = map[string]query.PublicKey{keyID: key}
 }
 
 func (v *keySet) getKey(ctx context.Context, keyID string, current time.Time) (*jose.JSONWebKey, error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+
 	v.mtx.RLock()
-	key, ok := v.keys[keyID]
+	key, ok := v.instanceKeys[instanceID][keyID]
 	v.mtx.RUnlock()
 
 	if ok {
 		if key.Expiry().After(current) {
 			return jsonWebkey(key), nil
 		}
-		v.mtx.Lock()
-		delete(v.keys, keyID) // cleanup expired keys
-		v.mtx.Unlock()
-
 		return nil, errors.ThrowInvalidArgument(nil, "OIDC-Zoh9E", "Errors.Key.ExpireBeforeNow")
 	}
 
@@ -46,11 +99,7 @@ func (v *keySet) getKey(ctx context.Context, keyID string, current time.Time) (*
 	if err != nil {
 		return nil, err
 	}
-
-	v.mtx.Lock()
-	v.keys[key.ID()] = key
-	v.mtx.Unlock()
-
+	v.setKey(instanceID, keyID, key)
 	return jsonWebkey(key), nil
 }
 

@@ -395,7 +395,7 @@ func (wm *PublicKeyReadModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (q *Queries) GetActivePublicKeyByID(ctx context.Context, keyID string, after time.Time) (_ PublicKey, err error) {
+func (q *Queries) GetActivePublicKeyByID(ctx context.Context, keyID string, current time.Time) (_ PublicKey, err error) {
 	model := NewPublicKeyReadModel(keyID, authz.GetInstance(ctx).InstanceID())
 	if err := q.eventstore.FilterToQueryReducer(ctx, model); err != nil {
 		return nil, err
@@ -403,7 +403,7 @@ func (q *Queries) GetActivePublicKeyByID(ctx context.Context, keyID string, afte
 	if model.Algorithm == "" || model.Key == nil {
 		return nil, errors.ThrowNotFound(err, "QUERY-Ahf7x", "Errors.Key.NotFound")
 	}
-	if model.Expiry.After(after) {
+	if model.Expiry.Before(current) {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-ciF4k", "Errors.Key.ExpireBeforeNow")
 	}
 	keyValue, err := crypto.Decrypt(model.Key, q.keyEncryptionAlgorithm)

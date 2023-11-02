@@ -176,14 +176,11 @@ func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []
 
 func newStorage(config Config, command *command.Commands, queries *query.Queries, repo repository.Repository, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, db *database.DB, externalSecure bool) *OPStorage {
 	return &OPStorage{
-		repo:       repo,
-		command:    command,
-		query:      queries,
-		eventstore: es,
-		keySet: &keySet{
-			keys:     make(map[string]query.PublicKey),
-			queryKey: queries.GetActivePublicKeyByID,
-		},
+		repo:                              repo,
+		command:                           command,
+		query:                             queries,
+		eventstore:                        es,
+		keySet:                            newKeySet(context.TODO(), time.Hour, queries.GetActivePublicKeyByID),
 		defaultLoginURL:                   fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
 		defaultLoginURLV2:                 config.DefaultLoginURLV2,
 		defaultLogoutURLV2:                config.DefaultLogoutURLV2,
