@@ -25,4 +25,3 @@ http:
       loadBalancer:
         servers:
           - url: h2c://zitadel-external-tls:8080
-        passHostHeader: true
