@@ -1,60 +1,12 @@
+import CodeBlock from '@theme/CodeBlock';
+import ExternalYamlSource from "!!raw-loader!./traefik-external-tls.yaml";
+
 ## TLS mode external
 
-```yaml
-entrypoints:
-  web:
-    address: ":80"
-  websecure:
-    address: ":443"
-tls:
-  stores:
-    default: 
-      defaultCertificate:
-providers:
-  file:
-    filename: /etc/traefik/traefik.yaml
-http:
-  middlewares:
-    zitadel:
-      headers:
-        isDevelopment: false
-        allowedHosts:
-        - 'localhost'
-        customRequestHeaders:
-          :authority: 'localhost'
-    redirect-to-https:
-      redirectScheme:
-        scheme: https
-        port: 443
-        permanent: true
-  routers:
-    router0:
-      entryPoints:
-      - web
-      middlewares:
-      - redirect-to-https
-      rule: 'HostRegexp(`localhost`, `{subdomain:[a-z]+}.localhost`)'
-      service: zitadel
-    router1:
-      entryPoints:
-      - websecure
-      service: zitadel
-      middlewares:
-      - zitadel
-      rule: 'HostRegexp(`localhost`, `{subdomain:[a-z]+}.localhost`)'
-      tls:
-        domains:
-          - main: "localhost"
-            sans:
-              - "*.localhost"
-              - "localhost"
-  services:
-    zitadel:
-      loadBalancer:
-        servers:
-        - url: h2c://localhost:8080
-        passHostHeader: true
-```
+<details>
+  <summary>traefik-external-tls.yaml</summary>
+  <CodeBlock language="yaml">{ExternalYamlSource}</CodeBlock>
+</details>
 
 ## TLS mode enabled
 

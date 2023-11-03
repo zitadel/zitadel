@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+
+  traefik-external-tls:
+    image: "traefik:v2.10.5"
+    volumes:
+      - "./traefik-external-tls.yaml:/etc/traefik/traefik.yaml"
+    depends_on:
+      zitadel-external-tls:
+        condition: 'service_healthy'
+    profiles:
+      - "traefik"
+      - "external-tls"
+    ports:
+      - "443:443"
+
+  zitadel-external-tls:
+    extends:
+      service: zitadel-init
+    environment:
+      - ZITADEL_EXTERNALPORT=443
+      - ZITADEL_EXTERNALSECURE=true
+      - ZITADEL_TLS_ENABLED=false
+    command: 'start-from-setup --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
+    depends_on:
+      zitadel-init:
+        condition: 'service_completed_successfully'
+      db:
+        condition: 'service_healthy'
+    ports:
+      - "8080:8080"
+
+  zitadel-init:
+    user: '$UID'
+    image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}'
+    build:
+      context: ../../../../..
+      dockerfile: ./build/Dockerfile
+      target: artifact
+    command: 'init --config /zitadel.yaml'
+    depends_on:
+      db:
+        condition: 'service_healthy'
+    volumes:
+      - ./zitadel.yaml:/zitadel.yaml
+    healthcheck:
+      test: ["CMD", "/app/zitadel", "ready"]
+      interval: '10s'
+      timeout: '5s'
+      retries: 5
+      start_period: '10s'
+
+  db:
+    restart: 'always'
+    image: 'cockroachdb/cockroach:latest'
+    command: 'start-single-node --insecure --http-addr :9090'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9090/health?ready=1']
+      interval: '10s'
+      timeout: '30s'
+      retries: 5
+      start_period: '20s'
+    ports:
+      - "26257:26257"
+      - "9090:9090"

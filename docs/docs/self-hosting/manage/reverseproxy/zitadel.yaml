@@ -1,0 +1,15 @@
+ExternalDomain: 127.0.0.1.sslip.io
+
+Database:
+  cockroach:
+    Host: db
+
+LogStore:
+  Access:
+    Stdout:
+      Enabled: true
+
+FirstInstance:
+  Org:
+    Human:
+      PasswordChangeRequired: false
