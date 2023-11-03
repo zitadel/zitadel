@@ -7894,7 +7894,7 @@ message ListEventsRequest {
     google.protobuf.Timestamp creation_date = 9 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"2019-04-01T08:45:00.000000Z\"";
-            description: "If asc is false creation_date is used as less than filter If asc is true creation_date is used as greater than filter. If creation_date is not set the field is ignored.";
+            description: "If asc is false, the events returned are older than creation_date. If asc is true, the events returned are younger than creation_date. If creation_date is not set the field is ignored.";
         }
     ];
 }
