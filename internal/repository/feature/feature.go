@@ -17,7 +17,7 @@ func EventTypeFromFeature(feature domain.Feature) eventstore.EventType {
 }
 
 type SetEvent[T SetEventType] struct {
-	*eventstore.BaseEvent
+	*eventstore.BaseEvent `json:"-"`
 
 	Value T
 }
