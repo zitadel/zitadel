@@ -25,6 +25,7 @@ type SearchQueryBuilder struct {
 	positionAfter         float64
 	awaitOpenTransactions bool
 	creationDateAfter     time.Time
+	creationDateBefore    time.Time
 	eventSequenceGreater  uint64
 }
 
@@ -82,6 +83,10 @@ func (q SearchQueryBuilder) GetEventSequenceGreater() uint64 {
 
 func (q SearchQueryBuilder) GetCreationDateAfter() time.Time {
 	return q.creationDateAfter
+}
+
+func (q SearchQueryBuilder) GetCreationDateBefore() time.Time {
+	return q.creationDateBefore
 }
 
 // ensureInstanceID makes sure that the instance id is always set
@@ -253,6 +258,15 @@ func (builder *SearchQueryBuilder) CreationDateAfter(creationDate time.Time) *Se
 		return builder
 	}
 	builder.creationDateAfter = creationDate
+	return builder
+}
+
+// CreationDateBefore filters for events which happened before the specified time
+func (builder *SearchQueryBuilder) CreationDateBefore(creationDate time.Time) *SearchQueryBuilder {
+	if creationDate.IsZero() || creationDate.Unix() == 0 {
+		return builder
+	}
+	builder.creationDateBefore = creationDate
 	return builder
 }
 
