@@ -48,6 +48,7 @@ Errors:
   Notification:
     NoDomain: メッセージのドメインが見つかりません
   User:
+    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: ユーザーが見つかりません
     AlreadyExists: 既に存在するユーザーです
     NotFoundOnOrg: ユーザーが選択した組織内で見つかりません

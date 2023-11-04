@@ -48,6 +48,7 @@ Errors:
   Notification:
     NoDomain: 未找到对应的域名
   User:
+    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: 找不到用户
     AlreadyExists: 用户已存在
     NotFoundOnOrg: 在所选组织中找不到用户
