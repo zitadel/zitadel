@@ -1,22 +1,27 @@
 td {
   cursor: pointer;
 
-  .cpy-button {
-    visibility: hidden;
+  .primary-domain-wrapper {
+    display: flex;
+    align-items: center;
 
-    i {
-      pointer-events: none;
+    .cpy-button {
+      visibility: hidden;
+
+      i {
+        pointer-events: none;
+      }
+    }
+
+    &:hover {
+      .cpy-button {
+        visibility: visible;
+      }
     }
   }
 
   .orgdefaultlabel {
     margin-left: 0.5rem;
-  }
-
-  &:hover {
-    .cpy-button {
-      visibility: visible;
-    }
   }
 }
 

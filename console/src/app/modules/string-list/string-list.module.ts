@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyButtonModule } from '@angular/material/legacy-button';
-import { MatLegacyChipsModule } from '@angular/material/legacy-chips';
-import { MatLegacyTooltipModule } from '@angular/material/legacy-tooltip';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { InputModule } from '../input/input.module';
 import { StringListComponent } from './string-list.component';
@@ -16,11 +16,11 @@ import { StringListComponent } from './string-list.component';
     InputModule,
     FormsModule,
     ReactiveFormsModule,
-    MatLegacyChipsModule,
+    MatChipsModule,
     TranslateModule,
     MatIconModule,
-    MatLegacyTooltipModule,
-    MatLegacyButtonModule,
+    MatTooltipModule,
+    MatButtonModule,
   ],
   exports: [StringListComponent],
 })

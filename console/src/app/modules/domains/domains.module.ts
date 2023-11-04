@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
-import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
-import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
@@ -15,6 +15,7 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { AddDomainDialogModule } from './add-domain-dialog/add-domain-dialog.module';
 import { DomainVerificationComponent } from './domain-verification/domain-verification.component';
 import { DomainsComponent } from './domains.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [DomainsComponent, DomainVerificationComponent],
@@ -30,6 +31,7 @@ import { DomainsComponent } from './domains.component';
     MatTooltipModule,
     CopyToClipboardModule,
     InputModule,
+    MatDialogModule,
     TranslateModule,
     InfoSectionModule,
     MatProgressSpinnerModule,

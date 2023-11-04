@@ -1,10 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import {
-  MatLegacyDialog as MatDialog,
-  MatLegacyDialogRef as MatDialogRef,
-  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
-} from '@angular/material/legacy-dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import {
   AddSMSProviderTwilioRequest,
@@ -61,15 +57,14 @@ export class DialogAddSMSProviderComponent {
   }
 
   public closeDialogWithRequest(): void {
-    if (!!this.twilio) {
+    if (!!this.twilio && this.twilioProvider && this.twilioProvider.id) {
       this.req = new UpdateSMSProviderTwilioRequest();
-
+      this.req.setId(this.twilioProvider.id);
       this.req.setSid(this.sid?.value);
       this.req.setSenderNumber(this.senderNumber?.value);
       this.dialogRef.close(this.req);
     } else {
       this.req = new AddSMSProviderTwilioRequest();
-
       this.req.setSid(this.sid?.value);
       this.req.setToken(this.token?.value);
       this.req.setSenderNumber(this.senderNumber?.value);

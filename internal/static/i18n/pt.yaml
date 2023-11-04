@@ -28,6 +28,9 @@ Errors:
       RemoveFailed: Não foi possível remover o objeto
   Limit:
     ExceedsDefault: Limite excede o limite padrão
+  Limits:
+    NotFound: Limite não encontrado
+    NoneSpecified: Nenhum limite especificado
   Language:
     NotParsed: Não foi possível analisar o idioma
   OIDCSettings:
@@ -420,6 +423,7 @@ Errors:
     AuditRetention: O histórico está fora do período de retenção do registro de auditoria
   Token:
     NotFound: Token não encontrado
+    Invalid: Token inválido
   UserSession:
     NotFound: Sessão do usuário não encontrada
   Key:

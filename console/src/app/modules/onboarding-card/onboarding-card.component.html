@@ -20,15 +20,18 @@
         [routerLink]="action[1].link"
         [queryParams]="{ id: action[1].fragment }"
         class="action-element"
-        [ngClass]="{ done: action[1].event !== undefined }"
+        [ngClass]="{ done: action[1].reached !== undefined }"
       >
         <div class="state-circle">
-          <mat-icon *ngIf="action[1]?.event !== undefined" class="success-icon" matTooltip="{{ action[1].event | event }}"
+          <mat-icon
+            *ngIf="action[1]?.reached !== undefined"
+            class="success-icon"
+            matTooltip="{{ action[1].reached | milestone }}"
             >check_circle</mat-icon
           >
         </div>
 
-        <span class="name">{{ 'ONBOARDING.EVENTS.' + action[0] + '.title' | translate }}</span>
+        <span class="name">{{ 'ONBOARDING.MILESTONES.' + action[0] + '.title' | translate }}</span>
         <mat-icon class="arrow-right">keyboard_arrow_right</mat-icon>
       </a>
     </ng-container>

@@ -53,8 +53,10 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerAuthRequestProjection")
 		ctx, err = projection.AuthRequestProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	var (

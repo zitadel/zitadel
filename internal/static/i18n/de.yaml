@@ -28,6 +28,9 @@ Errors:
       RemoveFailed: Objekt konnte nicht gelöscht werden
   Limit:
     ExceedsDefault: Limit überschreitet default Limit
+  Limits:
+    NotFound: Limits konnten nicht gefunden werden
+    NoneSpecified: Keine Limits angegeben
   Language:
     NotParsed: Sprache konnte nicht gemapped werden
   OIDCSettings:
@@ -422,6 +425,7 @@ Errors:
     AuditRetention: Änderungsverlauf ist ausserhalb der Audit Log Retention
   Token:
     NotFound: Token konnte nicht gefunden werden
+    Invalid: Token ist ungültig
   UserSession:
     NotFound: Benutzer Sitzung konnte nicht gefunden werden
   Key:

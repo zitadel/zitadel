@@ -17,7 +17,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { NgControl } from '@angular/forms';
-import { MatLegacyFormFieldControl as MatFormFieldControl } from '@angular/material/legacy-form-field';
+import { MatFormFieldControl } from '@angular/material/form-field';
 import { combineLatest, map, Observable, of, startWith, Subject, takeUntil } from 'rxjs';
 
 import { CnslErrorDirective, CNSL_ERROR } from '../error/error.directive';

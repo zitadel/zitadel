@@ -49,8 +49,8 @@
   }
 }
 
-::ng-deep .paginator-select.mat-select {
+::ng-deep .paginator-select.mat-mdc-select {
   min-width: 60px;
   height: 36px !important;
-  padding-top: 8px !important;
+  padding-top: 4px !important;
 }

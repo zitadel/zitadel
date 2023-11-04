@@ -30,6 +30,11 @@ func getUserPermissions(ctx context.Context, resolver MembershipsResolver, requi
 		return nil, nil, errors.ThrowUnauthenticated(nil, "AUTH-rKLWEH", "context missing")
 	}
 
+	if ctxData.SystemMemberships != nil {
+		requestedPermissions, allPermissions = mapMembershipsToPermissions(requiredPerm, ctxData.SystemMemberships, roleMappings)
+		return requestedPermissions, allPermissions, nil
+	}
+
 	ctx = context.WithValue(ctx, dataKey, ctxData)
 	memberships, err := resolver.SearchMyMemberships(ctx, orgID, false)
 	if err != nil {

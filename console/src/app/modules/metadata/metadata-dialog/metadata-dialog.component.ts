@@ -1,8 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import {
-  MatLegacyDialogRef as MatDialogRef,
-  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
-} from '@angular/material/legacy-dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
 import { ToastService } from 'src/app/services/toast.service';
@@ -14,7 +11,6 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class MetadataDialogComponent {
   public metadata: Partial<Metadata.AsObject>[] = [];
-  public loading: boolean = false;
   public ts!: Timestamp.AsObject | undefined;
 
   constructor(

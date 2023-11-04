@@ -4,11 +4,11 @@
   $background: map-get($theme, background);
   $accent: map-get($theme, accent);
 
-  $lighter-primary-color: mat.get-color-from-palette($primary, 300);
-  $darker-primary-color: mat.get-color-from-palette($primary, 700);
+  $lighter-primary-color: map-get($primary, 300);
+  $darker-primary-color: map-get($primary, 700);
 
-  $warn-color: mat.get-color-from-palette($warn, 500);
-  $accent-color: mat.get-color-from-palette($accent, 500);
+  $warn-color: map-get($warn, 500);
+  $accent-color: map-get($accent, 500);
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
   $back: map-get($background, background);
@@ -60,19 +60,6 @@
         justify-content: flex-end;
         flex: 1;
         margin: 0.5rem 0;
-
-        i {
-          margin-right: 0.5rem;
-        }
-
-        svg {
-          opacity: 0.7;
-          fill: map-get($foreground, text);
-          height: 1.25rem;
-          width: 1.25rem;
-          margin-right: -8px;
-          margin-left: 0.5rem;
-        }
       }
 
       .swiss-wrapper {

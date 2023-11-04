@@ -14,6 +14,7 @@ import "zitadel/event.proto";
 import "zitadel/management.proto";
 import "zitadel/v1.proto";
 import "zitadel/message.proto";
+import "zitadel/milestone/v1/milestone.proto";
 
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
@@ -290,6 +291,10 @@ service AdminService {
     rpc ListInstanceDomains(ListInstanceDomainsRequest) returns (ListInstanceDomainsResponse) {
         option (google.api.http) = {
             post: "/domains/_search";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -3773,6 +3778,23 @@ service AdminService {
             permission: "iam.feature.write";
         };
     }
+
+    rpc ListMilestones(ListMilestonesRequest) returns (ListMilestonesResponse) {
+        option (google.api.http) = {
+            post: "/milestones/_search";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "milestones.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Milestones";
+            summary: "Search Milestones";
+            description: "Returns a list of reached instance usage milestones."
+        };
+    }
 }
 
 
@@ -6208,6 +6230,11 @@ message UpdateLabelPolicyRequest {
         }
     ];
     bool disable_watermark = 11;
+    zitadel.policy.v1.ThemeMode theme_mode = 12 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "setting if there should be a restriction on which themes are available";
+        }
+    ];
 }
 
 message UpdateLabelPolicyResponse {
@@ -7867,7 +7894,7 @@ message ListEventsRequest {
     google.protobuf.Timestamp creation_date = 9 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"2019-04-01T08:45:00.000000Z\"";
-            description: "If asc is false creation_date is used as less than filter If asc is true creation_date is used as greater than filter. If creation_date is not set the field is ignored.";
+            description: "If asc is false, the events returned are older than creation_date. If asc is true, the events returned are younger than creation_date. If creation_date is not set the field is ignored.";
         }
     ];
 }
@@ -7892,4 +7919,18 @@ message ActivateFeatureLoginDefaultOrgRequest {}
 
 message ActivateFeatureLoginDefaultOrgResponse {
     zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListMilestonesRequest {
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 1;
+    // the field the result is sorted
+    zitadel.milestone.v1.MilestoneFieldName sorting_column = 2;
+    //criteria the client is looking for
+    repeated zitadel.milestone.v1.MilestoneQuery queries = 3;
+}
+
+message ListMilestonesResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.milestone.v1.Milestone result = 2;
 }
