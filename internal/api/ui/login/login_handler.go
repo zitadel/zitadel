@@ -58,6 +58,12 @@ func (l *Login) handleLoginName(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	authReq.LoginAs = false
+	err = l.updateAuthRequest(r, authReq)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
 	l.renderLogin(w, r, authReq, nil)
 }
 
