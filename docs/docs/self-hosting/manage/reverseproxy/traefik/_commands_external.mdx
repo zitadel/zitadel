@@ -1,0 +1,10 @@
+```bash
+# Download the docker compose configuration shown above.
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/reverseproxy/docker-compose.yaml
+
+# Download the nginx configuration shown above.
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/reverseproxy/traefik/traefik-external-tls.yaml
+
+# Run the database, zitadel and Traefik
+docker compose up traefik-external-tls --detach
+```

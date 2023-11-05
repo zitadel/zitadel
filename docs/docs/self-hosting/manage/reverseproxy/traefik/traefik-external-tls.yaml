@@ -1,0 +1,27 @@
+log:
+  level: "DEBUG"
+
+entrypoints:
+  web:
+    address: ":443"
+providers:
+  file:
+    filename: "/etc/traefik/traefik.yaml"
+http:
+  routers:
+    router0:
+      entryPoints:
+        - "web"
+      service: "zitadel"
+      rule: 'PathPrefix(`/`)'
+      tls:
+        domains:
+          - main: "127.0.0.1.sslip.io"
+            sans:
+              - "*.127.0.0.1.sslip.io"
+              - "127.0.0.1.sslip.io"
+  services:
+    zitadel:
+      loadBalancer:
+        servers:
+          - url: "h2c://zitadel-external-tls:8080"
