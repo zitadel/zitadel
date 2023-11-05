@@ -869,7 +869,8 @@ func (repo *AuthRequestRepo) checkLoginNameInputForResourceOwner(ctx context.Con
 		// and take the user regardless if there would be a user with that email or phone
 		return user, nil
 	}
-	if request.LoginPolicy != nil && !request.LoginPolicy.DisableLoginWithEmail {
+	policy, _ := repo.LoginPolicyViewProvider.LoginPolicyByID(ctx, false, request.RequestedOrgID, false)
+	if (request.LoginPolicy != nil && !request.LoginPolicy.DisableLoginWithEmail) || (policy != nil && !policy.DisableLoginWithEmail) {
 		// if login by email is allowed and there was a single user with the specified email
 		// take that user (and ignore possible phone number matches)
 		user, emailErr := repo.View.UserByEmailAndResourceOwner(ctx, loginNameInput, request.RequestedOrgID, request.InstanceID)
