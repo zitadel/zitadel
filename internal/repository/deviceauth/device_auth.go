@@ -17,7 +17,7 @@ const (
 )
 
 type AddedEvent struct {
-	*eventstore.BaseEvent
+	*eventstore.BaseEvent `json:"-"`
 
 	ClientID   string
 	DeviceCode string
@@ -56,7 +56,7 @@ func NewAddedEvent(
 }
 
 type ApprovedEvent struct {
-	*eventstore.BaseEvent
+	*eventstore.BaseEvent `json:"-"`
 
 	Subject string
 }
@@ -87,7 +87,8 @@ func NewApprovedEvent(
 }
 
 type CanceledEvent struct {
-	*eventstore.BaseEvent
+	*eventstore.BaseEvent `json:"-"`
+
 	Reason domain.DeviceAuthCanceled
 }
 
@@ -108,7 +109,7 @@ func NewCanceledEvent(ctx context.Context, aggregate *eventstore.Aggregate, reas
 }
 
 type RemovedEvent struct {
-	*eventstore.BaseEvent
+	*eventstore.BaseEvent `json:"-"`
 
 	ClientID   string
 	DeviceCode string

@@ -199,7 +199,7 @@ func prepareUserMetadataQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-Rgh32", "Errors.User.NotFound")
+					return nil, errors.ThrowNotFound(err, "QUERY-Rgh32", "Errors.Metadata.NotFound")
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-Hhjt2", "Errors.Internal")
 			}
