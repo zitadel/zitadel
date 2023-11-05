@@ -58,7 +58,7 @@ type AuthRequest struct {
 	SAMLRequestID            string
 
 	LoginAs            bool
-	UserOrigID         string
+	UserOrigID         *string
 	ShowSelectUserStep ShowSelectUserStep
 }
 

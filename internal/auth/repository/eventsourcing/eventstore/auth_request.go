@@ -1105,7 +1105,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	if missing {
 		return append(steps, &domain.GrantRequiredStep{}), nil
 	}
-	if request.LoginAs && request.UserOrigID == "" {
+	if request.LoginAs && (request.UserOrigID == nil || *request.UserOrigID == "") {
 		steps = append(steps, &domain.LoginAsStep{})
 	}
 	ok, err = repo.hasSucceededPage(ctx, request, repo.ApplicationProvider)
@@ -1252,18 +1252,24 @@ func (repo *AuthRequestRepo) checkLoginAsNameInput(ctx context.Context, request 
 }
 
 func (repo *AuthRequestRepo) getUserIdFromRequest(ctx context.Context, request *domain.AuthRequest) (string, error) {
-	if request.UserOrigID != "" {
-		return request.UserOrigID, nil
-	} else if request.LoginHint != "" && !request.LoginAs {
+	if request.UserOrigID != nil && *request.UserOrigID != "" {
+		return *request.UserOrigID, nil
+	} else if request.UserOrigID == nil && request.LoginHint != "" && request.RequestedOrgID != "" {
+		defer func() {
+			_ = repo.AuthRequests.UpdateAuthRequest(ctx, request)
+		}()
+		request.UserOrigID = new(string)
+
 		user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID, request.LoginPolicy.IgnoreUnknownUsernames)
 		if err != nil {
 			return "", err
 		}
-		userSession, err := userSessionByIDs(ctx, repo.UserSessionViewProvider, repo.UserEventProvider, request.AgentID, user)
+		instanceID := authz.GetInstance(ctx).InstanceID()
+		userSession, err := repo.UserSessionViewProvider.UserSessionByIDs(request.AgentID, user.ID, instanceID)
 		if err != nil && !errors.IsNotFound(err) {
 			return "", err
 		}
-		if userSession == nil || userSession.State == domain.UserSessionStateTerminated {
+		if userSession == nil || domain.UserSessionState(userSession.State) == domain.UserSessionStateTerminated {
 			userSessions, err := userSessionsByUserAgentID(ctx, repo.UserSessionViewProvider, request.AgentID, request.InstanceID)
 			if err != nil {
 				return "", err
@@ -1277,7 +1283,7 @@ func (repo *AuthRequestRepo) getUserIdFromRequest(ctx context.Context, request *
 				if loginAsPossibleMap[us.UserID] {
 					hasLoginAsUser = true
 					if us.State == domain.UserSessionStateActive {
-						request.UserOrigID = us.UserID
+						request.UserOrigID = &us.UserID
 						request.LoginAs = true
 						return us.UserID, nil
 					}

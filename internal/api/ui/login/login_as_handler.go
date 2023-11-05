@@ -46,14 +46,14 @@ func (l *Login) handleLoginAsCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = l.checkUserResourceOwner(r.Context(), authReq.UserID, userOrigID)
+	err = l.checkUserResourceOwner(r, authReq.UserID, userOrigID)
 	if err != nil {
 		l.renderLoginAs(w, r, authReq, err)
 		return
 	}
 
-	authReq.UserOrigID = userOrigID
-	err = l.updateAuthRequest(r.Context(), authReq)
+	authReq.UserOrigID = &userOrigID
+	err = l.updateAuthRequest(r, authReq)
 	if err != nil {
 		l.renderLoginAs(w, r, authReq, err)
 		return
@@ -85,11 +85,11 @@ func (l *Login) renderLoginAs(w http.ResponseWriter, r *http.Request, authReq *d
 	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplLoginAs], data, nil)
 }
 
-func (l *Login) checkUserResourceOwner(ctx context.Context, userID, userOrigID string) error {
+func (l *Login) checkUserResourceOwner(r *http.Request, userID, userOrigID string) error {
 	if userID != userOrigID {
-		i, _ := l.query.Instance(ctx, false)
-		u, _ := l.query.GetUserByID(ctx, false, userID, false)
-		uo, _ := l.query.GetUserByID(ctx, false, userOrigID, false)
+		i, _ := l.query.Instance(r.Context(), false)
+		u, _ := l.query.GetUserByID(r.Context(), false, userID, false)
+		uo, _ := l.query.GetUserByID(r.Context(), false, userOrigID, false)
 		if uo.ResourceOwner != i.DefaultOrgID && uo.ResourceOwner != u.ResourceOwner {
 			return errors.ThrowPermissionDenied(nil, "AUTH-Bss7s", "Orig and target users belong to different orgs")
 		}
@@ -98,11 +98,11 @@ func (l *Login) checkUserResourceOwner(ctx context.Context, userID, userOrigID s
 	return nil
 }
 
-func (l *Login) updateAuthRequest(ctx context.Context, request *domain.AuthRequest) error {
+func (l *Login) updateAuthRequest(r *http.Request, request *domain.AuthRequest) error {
 	authRequestRepo, ok := l.authRepo.(*eventsourcing.EsRepository)
 	var err error
 	if ok {
-		err = authRequestRepo.AuthRequests.UpdateAuthRequest(ctx, request)
+		err = authRequestRepo.AuthRequests.UpdateAuthRequest(r.Context(), request)
 	} else {
 		err = errors.ThrowInternal(err, "AUTH-7Mssd", "unable assert interface to type")
 	}

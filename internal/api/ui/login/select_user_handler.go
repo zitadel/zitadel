@@ -45,7 +45,7 @@ func (l *Login) handleSelectUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	authSession.LoginAs = data.LoginAs
-	err = l.updateAuthRequest(r.Context(), authSession)
+	err = l.updateAuthRequest(r, authSession)
 	if err != nil {
 		l.renderError(w, r, authSession, err)
 		return
