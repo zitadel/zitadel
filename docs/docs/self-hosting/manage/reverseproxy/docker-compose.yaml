@@ -2,11 +2,35 @@ version: '3.8'
 
 services:
 
-<<<<<<< Updated upstream
+  zitadel-disabled-tls:
+    extends:
+      service: zitadel-init
+    command: 'start-from-setup --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
+    environment:
+      - ZITADEL_EXTERNALPORT=80
+      - ZITADEL_EXTERNALSECURE=false
+      - ZITADEL_TLS_ENABLED=false
+    depends_on:
+      zitadel-init:
+        condition: 'service_completed_successfully'
+      db:
+        condition: 'service_healthy'
+
   zitadel-external-tls:
-=======
+    extends:
+      service: zitadel-init
+    command: 'start-from-setup --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
+    environment:
+      - ZITADEL_EXTERNALPORT=443
+      - ZITADEL_EXTERNALSECURE=true
+      - ZITADEL_TLS_ENABLED=false
+    depends_on:
+      zitadel-init:
+        condition: 'service_completed_successfully'
+      db:
+        condition: 'service_healthy'
+
   zitadel-enabled-tls:
->>>>>>> Stashed changes
     extends:
       service: zitadel-init
     command: 'start-from-setup --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
@@ -25,24 +49,6 @@ services:
         condition: 'service_completed_successfully'
       db:
         condition: 'service_healthy'
-    ports:
-      - "8080:8080"
-
-  zitadel-external-tls:
-    extends:
-      service: zitadel-init
-    command: 'start-from-setup --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
-    environment:
-      - ZITADEL_EXTERNALPORT=443
-      - ZITADEL_EXTERNALSECURE=true
-      - ZITADEL_TLS_ENABLED=false
-    depends_on:
-      zitadel-init:
-        condition: 'service_completed_successfully'
-      db:
-        condition: 'service_healthy'
-    ports:
-      - "8080:8080"
 
   zitadel-init:
     user: '$UID'
