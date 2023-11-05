@@ -1,0 +1,12 @@
+```bash
+# Download the configuration files and the insecure self-signed certificate and its key
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/reverseproxy/docker-compose.yaml -O docker-compose-base.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/reverseproxy/zitadel.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/reverseproxy/traefik/docker-compose.yaml -O docker-compose-traefik.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/reverseproxy/traefik/traefik-enabled-tls.conf
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/reverseproxy/selfsigned.crt
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/reverseproxy/selfsigned.key
+
+# Run the database, zitadel and Traefik
+docker compose --file docker-compose-base.yaml --file docker-compose-traefik.yaml up traefik-enabled-tls --detach
+```

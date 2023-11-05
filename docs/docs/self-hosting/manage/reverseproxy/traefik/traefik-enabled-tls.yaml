@@ -24,4 +24,4 @@ http:
     zitadel:
       loadBalancer:
         servers:
-          - url: "h2c://zitadel-external-tls:8080"
+          - url: "https://zitadel-enabled-tls:8080"

@@ -3,7 +3,7 @@ log:
 
 entrypoints:
   web:
-    address: ":443"
+    address: ":80"
 providers:
   file:
     filename: "/etc/traefik/traefik.yaml"
@@ -14,14 +14,8 @@ http:
         - "web"
       service: "zitadel"
       rule: 'PathPrefix(`/`)'
-      tls:
-        domains:
-          - main: "127.0.0.1.sslip.io"
-            sans:
-              - "*.127.0.0.1.sslip.io"
-              - "127.0.0.1.sslip.io"
   services:
     zitadel:
       loadBalancer:
         servers:
-          - url: "h2c://zitadel-external-tls:8080"
+          - url: "h2c://zitadel-disabled-tls:8080"
