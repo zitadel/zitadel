@@ -1,6 +1,7 @@
 package ready
 
 import (
+	"crypto/tls"
 	"net"
 	"net/http"
 	"os"
@@ -30,7 +31,9 @@ func ready(config *Config) bool {
 	if !config.TLS.Enabled {
 		scheme = "http"
 	}
-	res, err := http.Get(scheme + "://" + net.JoinHostPort("localhost", strconv.Itoa(int(config.Port))) + "/debug/ready")
+	// Checking the TLS cert is not in the scope of the readiness check
+	httpClient := http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}}
+	res, err := httpClient.Get(scheme + "://" + net.JoinHostPort("localhost", strconv.Itoa(int(config.Port))) + "/debug/ready")
 	if err != nil {
 		logging.WithError(err).Warn("ready check failed")
 		return false
