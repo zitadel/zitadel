@@ -3,6 +3,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
+import { SMTPKnownProviders } from '../../smtp-provider/known-smtp-providers-settings';
 
 @Component({
   selector: 'cnsl-smtp-settings',
@@ -14,6 +15,8 @@ export class SMTPSettingsComponent implements OnInit {
   public service!: ManagementService | AdminService;
 
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
+  public providers = SMTPKnownProviders;
+
   constructor(private injector: Injector) {}
 
   ngOnInit(): void {

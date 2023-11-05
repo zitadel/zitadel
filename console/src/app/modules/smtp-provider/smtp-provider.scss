@@ -41,6 +41,21 @@
       width: 48px;
       flex-shrink: 0;
     }
+
+    .smtp-icon {
+      margin-right: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 36px;
+      width: 36px;
+
+      .icon {
+        font-size: 2.25rem;
+        height: 2.25rem;
+        width: 2.25rem;
+      }
+    }
   }
 
   .row {

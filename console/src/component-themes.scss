@@ -66,7 +66,8 @@
 @import 'src/app/modules/info-overlay/info-overlay.component.scss';
 @import 'src/app/modules/create-layout/create-layout.component.scss';
 @import 'src/app/modules/smtp-table/smtp-table.component.scss';
-@import 'src/app/modules/smtp-providers/smtp-provider.scss';
+@import 'src/app/modules/smtp-provider/smtp-provider.scss';
+@import 'src/app/modules/policies/smtp-settings/smtp-settings.component.scss';
 @import './styles/codemirror.scss';
 
 @mixin component-themes($theme) {
@@ -140,4 +141,5 @@
   @include codemirror-theme($theme);
   @include contact-theme($theme);
   @include app-create-theme($theme);
+  @include smtp-settings-theme($theme);
 }

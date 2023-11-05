@@ -1915,7 +1915,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP Provider",
-      "DESCRIPTION": "Manage your SMTP Provider configuration, which can then be activated/deactivated.",
+      "DESCRIPTION": "These are the SMTP providers for your Zitadel instance. Activate the one you want to use to send notifications to your users.",
       "EMPTY": "No SMTP Provider available",
       "ACTIVATED": "Activated",
       "ACTIVATE": "Activate provider",
@@ -1938,17 +1938,11 @@
       "TITLE": "Add SMTP provider",
       "DESCRIPTION": "Select one ore more of the following providers.",
       "STEPS": {
+        "TITLE": "Add {{ value }} SMTP Provider",
+        "CREATE_DESC_TITLE": "Enter your {{ value }} SMTP settings step by step",
         "PROVIDER_SETTINGS": "SMTP Provider Settings",
         "SENDER_SETTINGS": "Sender Settings",
         "TEST_SETTINGS": "Test SMTP Settings"
-      },
-      "GOOGLE": {
-        "TITLE": "Google Provider",
-        "DESCRIPTION": "Enter the credentials for your Google SMTP Provider"
-      },
-      "SENDGRID": {
-        "TITLE": "Add Sendgrid SMTP Provider",
-        "DESCRIPTION": "Enter the configuration for your Sendgrid SMTP Provider"
       }
     },
     "DETAIL": {
@@ -1956,9 +1950,7 @@
     },
     "EMPTY": "No SMTP provider available",
     "STEPS": {
-      "SENDGRID": {
-        "CREATE_DESC_TITLE": "Enter your Sendgrid SMTP settings step by step"
-      }
+      "SENDGRID": {}
     }
   },
   "APP": {

@@ -33,19 +33,20 @@
       <ng-container matColumnDef="providerType">
         <th mat-header-cell *matHeaderCellDef>{{ 'SMTP.LIST.TYPE' | translate }}</th>
         <td class="pointer" mat-cell *matCellDef="let config">
-          <div [ngSwitch]="config.providerType">
-            <div class="smtp-table-provider-type" *ngSwitchCase="SMTPProviderType.SMTP_PROVIDER_TYPE_MAILGUN">
-              <img class="smtp-logo" src="./assets/images/smtp/mailgun.svg" alt="postmark" />
-              Mailgun
+          <div class="smtp-table-provider-type" *ngIf="getProviderDetails(config.providerType)?.name !== 'generic'">
+            <img
+              class="smtp-logo"
+              src="{{ getProviderDetails(config.providerType)?.image }}"
+              alt="{{ getProviderDetails(config.providerType)?.name }}"
+            />
+            {{ getProviderDetails(config.providerType)?.name | titlecase }}
+          </div>
+
+          <div class="smtp-table-provider-type" *ngIf="getProviderDetails(config.providerType)?.name === 'generic'">
+            <div class="smtp-icon">
+              <mat-icon class="icon" svgIcon="mdi_smtp" />
             </div>
-            <div class="smtp-table-provider-type" *ngSwitchCase="SMTPProviderType.SMTP_PROVIDER_TYPE_POSTMARK">
-              <img class="smtp-logo" src="./assets/images/smtp/postmark.png" alt="postmark" />
-              Postmark
-            </div>
-            <div class="smtp-table-provider-type" *ngSwitchCase="SMTPProviderType.SMTP_PROVIDER_TYPE_SENDGRID">
-              <img class="smtp-logo" src="./assets/images/smtp/sendgrid.png" alt="sendgrid" />
-              Sendgrid
-            </div>
+            {{ getProviderDetails(config.providerType)?.name | titlecase }}
           </div>
         </td>
       </ng-container>

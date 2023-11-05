@@ -1,17 +1,10 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
-import { MatLegacyCheckboxModule as MatCheckboxModule } from '@angular/material/legacy-checkbox';
-import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy-chips';
-import { MatLegacyProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
-import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
-import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { InputModule } from 'src/app/modules/input/input.module';
 
-import { MatLegacyProgressBarModule as MatProgressBarModule } from '@angular/material/legacy-progress-bar';
 import { MatStepperModule } from '@angular/material/stepper';
 import { CardModule } from '../card/card.module';
 import { CreateLayoutModule } from '../create-layout/create-layout.module';
@@ -19,11 +12,18 @@ import { InfoSectionModule } from '../info-section/info-section.module';
 import { ProviderOptionsModule } from '../provider-options/provider-options.module';
 import { StringListModule } from '../string-list/string-list.module';
 import { SMTPProvidersRoutingModule } from './smtp-provider-routing.module';
-import { SMTPProviderSendgridComponent } from './smtp-provider-sendgrid/smtp-provider-sendgrid.component';
+import { SMTPProviderComponent } from './smtp-provider.component';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
-  declarations: [SMTPProviderSendgridComponent],
+  declarations: [SMTPProviderComponent],
   imports: [
     SMTPProvidersRoutingModule,
     CommonModule,
@@ -45,7 +45,7 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
     TranslateModule,
     ProviderOptionsModule,
     HasRolePipeModule,
-    MatLegacyProgressSpinnerModule,
+    MatProgressSpinnerModule,
   ],
 })
 export default class SMTPProviderModule {}

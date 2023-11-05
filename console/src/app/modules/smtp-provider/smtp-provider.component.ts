@@ -4,11 +4,10 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Subject, take } from 'rxjs';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
-import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
-import { requiredValidator } from '../../form-field/validators/validators';
+import { Options } from 'src/app/proto/generated/zitadel/idp_pb';
+import { requiredValidator } from '../form-field/validators/validators';
 
-import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
-import { MatLegacyCheckboxChange } from '@angular/material/legacy-checkbox';
+import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import {
   AddSMTPConfigRequest,
   AddSMTPConfigResponse,
@@ -17,19 +16,30 @@ import {
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
-import { SMTPProviderType } from 'src/app/proto/generated/zitadel/settings_pb';
 import { ToastService } from 'src/app/services/toast.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MatCheckboxChange } from '@angular/material/checkbox';
+import {
+  AmazonSESDefaultSettings,
+  GenericDefaultSettings,
+  GoogleDefaultSettings,
+  MailgunDefaultSettings,
+  MailjetDefaultSettings,
+  PostmarkDefaultSettings,
+  ProviderDefaultSettings,
+  SendgridDefaultSettings,
+} from './known-smtp-providers-settings';
 
 @Component({
-  selector: 'cnsl-provider-sendgrid',
-  templateUrl: './smtp-provider-sendgrid.component.html',
-  styleUrls: ['../smtp-provider.scss'],
+  selector: 'cnsl-provider',
+  templateUrl: './smtp-provider.component.html',
+  styleUrls: ['./smtp-provider.scss'],
 })
-export class SMTPProviderSendgridComponent implements OnInit {
+export class SMTPProviderComponent implements OnInit {
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
   public id: string | null = '';
+  public providerDefaultSetting: ProviderDefaultSettings = GenericDefaultSettings;
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
@@ -37,7 +47,6 @@ export class SMTPProviderSendgridComponent implements OnInit {
   public smtpLoading: boolean = false;
   public hasSMTPConfig: boolean = false;
 
-  public provider?: Provider.AsObject;
   public updateClientSecret: boolean = false;
 
   // stepper
@@ -46,10 +55,6 @@ export class SMTPProviderSendgridComponent implements OnInit {
   public firstFormGroup!: UntypedFormGroup;
   public secondFormGroup!: UntypedFormGroup;
 
-  private host: string = 'smtp.sendgrid.net';
-  private unencryptedPort: number = 587;
-  private encryptedPort: number = 465;
-
   constructor(
     private service: AdminService,
     private _location: Location,
@@ -57,20 +62,8 @@ export class SMTPProviderSendgridComponent implements OnInit {
     private authService: GrpcAuthService,
     private toast: ToastService,
     private router: Router,
-  ) {
-    this.firstFormGroup = this.fb.group({
-      tls: [false],
-      hostAndPort: [`${this.host}:${this.unencryptedPort}`],
-      user: ['apiKey'],
-      password: [''],
-    });
-
-    this.secondFormGroup = this.fb.group({
-      senderAddress: ['', [requiredValidator]],
-      senderName: ['', [requiredValidator]],
-      replyToAddress: [''],
-    });
-  }
+    private route: ActivatedRoute,
+  ) {}
 
   ngOnInit(): void {
     if (!this.router.url.endsWith('/create')) {
@@ -85,6 +78,56 @@ export class SMTPProviderSendgridComponent implements OnInit {
           }
         });
     }
+
+    this.route.parent?.url.subscribe((urlPath) => {
+      const providerName = urlPath[urlPath.length - 1].path;
+      switch (providerName) {
+        case 'aws-ses':
+          this.providerDefaultSetting = AmazonSESDefaultSettings;
+          break;
+        case 'google':
+          this.providerDefaultSetting = GoogleDefaultSettings;
+          break;
+        case 'mailgun':
+          this.providerDefaultSetting = MailgunDefaultSettings;
+          break;
+        case 'mailjet':
+          this.providerDefaultSetting = MailjetDefaultSettings;
+          break;
+        case 'postmark':
+          this.providerDefaultSetting = PostmarkDefaultSettings;
+          break;
+        case 'sendgrid':
+          this.providerDefaultSetting = SendgridDefaultSettings;
+          break;
+      }
+
+      this.firstFormGroup = this.fb.group({
+        tls: [{ value: this.providerDefaultSetting.requiredTls, disabled: this.providerDefaultSetting.requiredTls }],
+        region: [''],
+        hostAndPort: [
+          this.providerDefaultSetting?.host
+            ? `${this.providerDefaultSetting?.host}:${this.providerDefaultSetting?.unencryptedPort}`
+            : '',
+        ],
+        user: [this.providerDefaultSetting?.user.value || ''],
+        password: [this.providerDefaultSetting?.password.value || ''],
+      });
+
+      this.secondFormGroup = this.fb.group({
+        senderAddress: ['', [requiredValidator]],
+        senderName: ['', [requiredValidator]],
+        replyToAddress: [''],
+      });
+
+      this.region?.valueChanges.subscribe((region: string) => {
+        this.hostAndPort?.setValue(
+          `${region}:${
+            this.tls ? this.providerDefaultSetting?.encryptedPort : this.providerDefaultSetting?.unencryptedPort
+          }`,
+        );
+      });
+    });
   }
 
   public changeStep(event: StepperSelectionEvent): void {
@@ -99,8 +142,14 @@ export class SMTPProviderSendgridComponent implements OnInit {
     this._location.back();
   }
 
-  public toggleTLS(event: MatLegacyCheckboxChange) {
-    this.hostAndPort?.setValue(`${this.host}:${event.checked ? this.encryptedPort : this.unencryptedPort}`);
+  public toggleTLS(event: MatCheckboxChange) {
+    if (this.providerDefaultSetting.host) {
+      this.hostAndPort?.setValue(
+        `${this.providerDefaultSetting?.host}:${
+          event.checked ? this.providerDefaultSetting?.encryptedPort : this.providerDefaultSetting?.unencryptedPort
+        }`,
+      );
+    }
   }
 
   private fetchData(): void {
@@ -154,7 +203,7 @@ export class SMTPProviderSendgridComponent implements OnInit {
       if (this.replyToAddress && this.replyToAddress.value) {
         req.setReplyToAddress(this.replyToAddress.value);
       }
-      req.setProviderType(SMTPProviderType.SMTP_PROVIDER_TYPE_SENDGRID);
+      req.setProviderType(this.providerDefaultSetting.type);
       return this.service.updateSMTPConfig(req);
     } else {
       const req = new AddSMTPConfigRequest();
@@ -166,7 +215,7 @@ export class SMTPProviderSendgridComponent implements OnInit {
       req.setUser(this.user?.value ?? '');
       req.setPassword(this.password?.value ?? '');
       req.setIsActive(false);
-      req.setProviderType(SMTPProviderType.SMTP_PROVIDER_TYPE_SENDGRID);
+      req.setProviderType(this.providerDefaultSetting.type);
       return this.service.addSMTPConfig(req);
     }
   }
@@ -188,12 +237,16 @@ export class SMTPProviderSendgridComponent implements OnInit {
     return this.firstFormGroup.get('tls');
   }
 
-  public get user(): AbstractControl | null {
-    return this.firstFormGroup.get('user');
+  public get region(): AbstractControl | null {
+    return this.firstFormGroup.get('region');
   }
 
   public get hostAndPort(): AbstractControl | null {
     return this.firstFormGroup.get('hostAndPort');
+  }
+
+  public get user(): AbstractControl | null {
+    return this.firstFormGroup.get('user');
   }
 
   public get password(): AbstractControl | null {

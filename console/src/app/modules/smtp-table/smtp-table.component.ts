@@ -4,18 +4,10 @@ import { Router, RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { SMTPConfigState, SMTPProviderType } from 'src/app/proto/generated/zitadel/settings_pb';
-import {
-  IDPLoginPolicyLink,
-  IDPOwnerType,
-  IDPState,
-  IDPStylingType,
-  Provider,
-  ProviderType,
-} from 'src/app/proto/generated/zitadel/idp_pb';
+import { IDPOwnerType, IDPState, IDPStylingType } from 'src/app/proto/generated/zitadel/idp_pb';
 import { ListQuery } from 'src/app/proto/generated/zitadel/object_pb';
 import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { OverlayWorkflowService } from 'src/app/services/overlay/overlay-workflow.service';
@@ -26,6 +18,7 @@ import { SMTPConfig } from 'src/app/proto/generated/zitadel/settings_pb';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
+import { SMTPKnownProviders } from '../smtp-provider/known-smtp-providers-settings';
 
 @Component({
   selector: 'cnsl-smtp-table',
@@ -43,22 +36,17 @@ export class SMTPTableComponent implements OnInit {
   public IDPOwnerType: any = IDPOwnerType;
   public IDPState: any = IDPState;
   public SMTPProviderType: any = SMTPProviderType;
-  // public displayedColumns: string[] = ['availability', 'name', 'type', 'creationDate', 'changeDate', 'actions'];
   public displayedColumns: string[] = ['activated', 'providerType', 'tls', 'host', 'senderAddress', 'senderName', 'actions'];
   @Output() public changedSelection: EventEmitter<Array<SMTPConfig.AsObject>> = new EventEmitter();
 
   public IDPStylingType: any = IDPStylingType;
   public loginPolicy!: LoginPolicy.AsObject;
 
-  private reloadIDPs$: Subject<void> = new Subject();
-
   constructor(
     private adminService: AdminService,
-    private workflowService: OverlayWorkflowService,
     public translate: TranslateService,
     private toast: ToastService,
     private dialog: MatDialog,
-    private router: Router,
   ) {
     this.selection.changed.subscribe(() => {
       this.changedSelection.emit(this.selection.selected);
@@ -249,8 +237,7 @@ export class SMTPTableComponent implements OnInit {
   }
 
   public refreshPage(): void {
-    // TODO @n40lab
-    // this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
+    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
   }
 
   public get createRouterLink(): RouterLink | any {
@@ -311,5 +298,9 @@ export class SMTPTableComponent implements OnInit {
 
   public get displayedColumnsWithActions(): string[] {
     return ['actions', ...this.displayedColumns];
+  }
+
+  public getProviderDetails(providerType: SMTPProviderType) {
+    return SMTPKnownProviders.find((provider) => provider.type === providerType);
   }
 }

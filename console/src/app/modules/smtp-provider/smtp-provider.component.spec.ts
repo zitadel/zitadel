@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { SMTPProviderSendgridComponent } from './smtp-provider-sendgrid.component';
+import { SMTPProviderComponent } from './smtp-provider.component';
 
 describe('SMTPProviderSendgridComponent', () => {
-  let component: SMTPProviderSendgridComponent;
-  let fixture: ComponentFixture<SMTPProviderSendgridComponent>;
+  let component: SMTPProviderComponent;
+  let fixture: ComponentFixture<SMTPProviderComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [SMTPProviderSendgridComponent],
+      declarations: [SMTPProviderComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SMTPProviderSendgridComponent);
+    fixture = TestBed.createComponent(SMTPProviderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

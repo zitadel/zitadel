@@ -35,7 +35,7 @@ const routes: Routes = [
   {
     path: 'smtpprovider',
     canActivate: [AuthGuard, RoleGuard],
-    loadChildren: () => import('src/app/modules/smtp-providers/smtp-provider.module'),
+    loadChildren: () => import('src/app/modules/smtp-provider/smtp-provider.module'),
     data: {
       roles: ['iam.idp.read'],
       serviceType: PolicyComponentServiceType.ADMIN,
