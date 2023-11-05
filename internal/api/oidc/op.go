@@ -68,7 +68,7 @@ type OPStorage struct {
 	command                           *command.Commands
 	query                             *query.Queries
 	eventstore                        *eventstore.Eventstore
-	keySet                            *keySet
+	keySet                            *keySetCache
 	defaultLoginURL                   string
 	defaultLoginURLV2                 string
 	defaultLogoutURLV2                string
@@ -122,6 +122,7 @@ func NewServer(
 	server := &Server{
 		storage:      storage,
 		LegacyServer: op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
+		hashAlg:      crypto.NewBCrypt(10), // as we are only verifying in oidc, the cost is already part of the hash string and the config here is irrelevant.
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	server.Handler = op.RegisterLegacyServer(server, op.WithHTTPMiddleware(

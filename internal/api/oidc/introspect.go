@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"slices"
 	"strings"
@@ -10,7 +11,10 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/crypto"
 	errz "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionRequest]) (_ *op.Response, err error) {
@@ -94,41 +98,54 @@ type instrospectionClientResult struct {
 }
 
 func (s *Server) instrospectionClientAuth(ctx context.Context, cc *op.ClientCredentials, rc chan<- *instrospectionClientResult) {
-	clientID := cc.ClientID
+	ctx, span := tracing.NewSpan(ctx)
 
-	if cc.ClientAssertion != "" {
-		verifier := op.NewJWTProfileVerifier(s.storage, op.IssuerFromContext(ctx), 1*time.Hour, time.Second)
-		profile, err := op.VerifyJWTAssertion(ctx, cc.ClientAssertion, verifier)
+	clientID, projectID, err := func() (string, string, error) {
+		client, err := s.clientFromCredentials(ctx, cc)
 		if err != nil {
-			rc <- &instrospectionClientResult{
-				err: oidc.ErrUnauthorizedClient().WithParent(err),
-			}
-			return
+			return "", "", err
 		}
-		clientID = profile.Issuer
-	} else {
-		if err := s.storage.AuthorizeClientIDSecret(ctx, cc.ClientID, cc.ClientSecret); err != nil {
-			if err != nil {
-				rc <- &instrospectionClientResult{
-					err: oidc.ErrUnauthorizedClient().WithParent(err),
-				}
-				return
+
+		if cc.ClientAssertion != "" {
+			verifier := op.NewJWTProfileVerifierKeySet(keySetMap(client.PublicKeys), op.IssuerFromContext(ctx), time.Hour, time.Second)
+			if _, err := op.VerifyJWTAssertion(ctx, cc.ClientAssertion, verifier); err != nil {
+				return "", "", oidc.ErrUnauthorizedClient().WithParent(err)
+			}
+		} else {
+			if err := crypto.CompareHash(client.ClientSecret, []byte(cc.ClientSecret), s.hashAlg); err != nil {
+				return "", "", oidc.ErrUnauthorizedClient().WithParent(err)
 			}
 		}
 
-	}
+		return client.ClientID, client.ProjectID, nil
+	}()
 
-	// TODO: give clients their own aggregate, so we can skip this query
-	projectID, err := s.storage.query.ProjectIDFromClientID(ctx, clientID, false)
-	if err != nil {
-		rc <- &instrospectionClientResult{err: err}
-		return
-	}
+	span.EndWithError(err)
 
 	rc <- &instrospectionClientResult{
 		clientID:  clientID,
 		projectID: projectID,
+		err:       err,
 	}
+}
+
+// clientFromCredentials parses the client ID early,
+// and makes a single query for the client for either auth methods.
+func (s *Server) clientFromCredentials(ctx context.Context, cc *op.ClientCredentials) (client *query.IntrospectionClient, err error) {
+	if cc.ClientAssertion != "" {
+		claims := new(oidc.JWTTokenRequest)
+		if _, err := oidc.ParseToken(cc.ClientAssertion, claims); err != nil {
+			return nil, oidc.ErrUnauthorizedClient().WithParent(err)
+		}
+		client, err = s.storage.query.GetIntrospectionClientByID(ctx, claims.Issuer, true)
+	} else {
+		client, err = s.storage.query.GetIntrospectionClientByID(ctx, cc.ClientID, false)
+	}
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, oidc.ErrUnauthorizedClient().WithParent(err)
+	}
+	// any other error is regarded internal and should not be reported back to the client.
+	return client, err
 }
 
 type introspectionTokenResult struct {

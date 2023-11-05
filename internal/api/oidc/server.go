@@ -6,6 +6,7 @@ import (
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -13,6 +14,8 @@ type Server struct {
 	http.Handler
 	storage *OPStorage
 	*op.LegacyServer
+
+	hashAlg crypto.HashAlgorithm
 }
 
 func endpoints(endpointConfig *EndpointConfig) op.Endpoints {
