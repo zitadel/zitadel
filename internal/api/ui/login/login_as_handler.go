@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"net/http"
+	"strings"
 )
 
 const (
@@ -33,7 +34,7 @@ func (l *Login) handleLoginAsCheck(w http.ResponseWriter, r *http.Request) {
 	userOrigID := authReq.UserID
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	loginName := data.LoginAsName
+	loginName := strings.Split(data.LoginAsName, " / ")[0]
 	err = l.authRepo.CheckLoginName(r.Context(), authReq.ID, loginName, userAgentID)
 	if err != nil {
 		l.renderLoginAs(w, r, authReq, err)
@@ -132,17 +133,26 @@ func (l *Login) getLoginNames(ctx context.Context, orgId string) ([]string, erro
 		}
 	}
 
+	loginPolicy, err := l.query.LoginPolicyByID(ctx, false, orgId, false)
+	if err != nil {
+		return nil, err
+	}
 	users, err := l.query.SearchUsers(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}
 	var loginNames = make([]string, len(users.Users))
 	for i, user := range users.Users {
+		loginNameParts := make([]string, 0)
 		if user.PreferredLoginName != "" {
-			loginNames[i] = user.PreferredLoginName
+			loginNameParts = append(loginNameParts, user.PreferredLoginName)
 		} else {
-			loginNames[i] = user.Username
+			loginNameParts = append(loginNameParts, user.Username)
 		}
+		if !loginPolicy.DisableLoginWithEmail && user.Human.IsEmailVerified {
+			loginNameParts = append(loginNameParts, string(user.Human.Email))
+		}
+		loginNames[i] = strings.Join(loginNameParts, " / ")
 	}
 	return loginNames, nil
 }
