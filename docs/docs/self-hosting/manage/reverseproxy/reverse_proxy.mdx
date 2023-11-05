@@ -2,26 +2,28 @@
 title: Reverse Proxy Configuration
 ---
 
+When configuring a reverse proxy in front of ZITADEL, you need to make sure that HTTP/2 is enabled.
+For getting started with your favorite reverse proxy, we have prepared some examples for you.
+Where possible, all three ZITADEL TLS modes are
+
+
+
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import Zcloud from "./_zitadel_cloud.mdx";
-import Nginx from "./_nginx.mdx";
-import Traefik from "./_traefik.mdx";
 import Caddy from "./_caddy.mdx";
 import Httpd from "./_httpd.mdx";
 import Cftunnel from "./_cloudflare_tunnel.mdx";
 import Cloudflare from "./_cloudflare.mdx";
 import More from "./_more.mdx";
 
-# Proxy Configuration
+
 
 <Tabs
   groupId="proxy-vendor"
   default="zcloud"
   values={[
     { label: "ZITADEL Cloud", value: "zcloud" },
-    { label: "NGINX", value: "nginx" },
-    { label: "Traefik", value: "traefik" },
     { label: "Caddy", value: "caddy" },
     { label: "Apache httpd", value: "httpd" },
     { label: "Cloudflare Tunnel", value: "cftunnel" },
@@ -30,14 +32,6 @@ import More from "./_more.mdx";
 >
   <TabItem value="zcloud">
     <Zcloud />
-    <More />
-  </TabItem>
-  <TabItem value="nginx">
-    <Nginx />
-    <More />
-  </TabItem>
-  <TabItem value="traefik">
-    <Traefik />
     <More />
   </TabItem>
   <TabItem value="caddy">
