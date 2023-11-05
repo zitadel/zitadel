@@ -396,6 +396,9 @@ func (wm *PublicKeyReadModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 func (q *Queries) GetActivePublicKeyByID(ctx context.Context, keyID string, current time.Time) (_ PublicKey, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	model := NewPublicKeyReadModel(keyID, authz.GetInstance(ctx).InstanceID())
 	if err := q.eventstore.FilterToQueryReducer(ctx, model); err != nil {
 		return nil, err

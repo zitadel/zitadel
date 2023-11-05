@@ -87,7 +87,10 @@ func (k *keySetCache) setKey(instanceID, keyID string, key query.PublicKey) {
 	k.instanceKeys[instanceID] = map[string]query.PublicKey{keyID: key}
 }
 
-func (k *keySetCache) getKey(ctx context.Context, keyID string, current time.Time) (*jose.JSONWebKey, error) {
+func (k *keySetCache) getKey(ctx context.Context, keyID string, current time.Time) (_ *jose.JSONWebKey, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	instanceID := authz.GetInstance(ctx).InstanceID()
 
 	k.mtx.RLock()
@@ -101,7 +104,7 @@ func (k *keySetCache) getKey(ctx context.Context, keyID string, current time.Tim
 		return nil, errors.ThrowInvalidArgument(nil, "OIDC-Zoh9E", "Errors.Key.ExpireBeforeNow")
 	}
 
-	key, err := k.queryKey(ctx, keyID, current)
+	key, err = k.queryKey(ctx, keyID, current)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +113,10 @@ func (k *keySetCache) getKey(ctx context.Context, keyID string, current time.Tim
 }
 
 // VerifySignature implements the oidc.KeySet interface.
-func (k *keySetCache) VerifySignature(ctx context.Context, jws *jose.JSONWebSignature) ([]byte, error) {
+func (k *keySetCache) VerifySignature(ctx context.Context, jws *jose.JSONWebSignature) (_ []byte, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if len(jws.Signatures) != 1 {
 		return nil, errors.ThrowInvalidArgument(nil, "OIDC-Gid9s", "Errors.Token.Invalid")
 	}

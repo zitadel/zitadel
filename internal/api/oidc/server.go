@@ -4,6 +4,9 @@ import (
 	"context"
 	"net/http"
 
+	"golang.org/x/exp/slog"
+
+	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -15,7 +18,8 @@ type Server struct {
 	storage *OPStorage
 	*op.LegacyServer
 
-	hashAlg crypto.HashAlgorithm
+	fallbackLogger *slog.Logger
+	hashAlg        crypto.HashAlgorithm
 }
 
 func endpoints(endpointConfig *EndpointConfig) op.Endpoints {
@@ -59,6 +63,13 @@ func endpoints(endpointConfig *EndpointConfig) op.Endpoints {
 		endpoints.DeviceAuthorization = op.NewEndpointWithURL(endpointConfig.DeviceAuth.Path, endpointConfig.DeviceAuth.URL)
 	}
 	return endpoints
+}
+
+func (s *Server) getLogger(ctx context.Context) *slog.Logger {
+	if logger, ok := logging.FromContext(ctx); ok {
+		return logger
+	}
+	return s.fallbackLogger
 }
 
 func (s *Server) IssuerFromRequest(r *http.Request) string {

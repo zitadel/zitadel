@@ -6,9 +6,11 @@ import (
 	_ "embed"
 
 	"github.com/jackc/pgtype"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type IntrospectionClient struct {
@@ -22,6 +24,9 @@ type IntrospectionClient struct {
 var introspectionClientByIDQuery string
 
 func (q *Queries) GetIntrospectionClientByID(ctx context.Context, clientID string, getKeys bool) (_ *IntrospectionClient, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	var (
 		instanceID = authz.GetInstance(ctx).InstanceID()
 		client     = new(IntrospectionClient)

@@ -10,14 +10,18 @@ import (
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
+
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	errz "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/user/model"
 )
 
-func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionRequest]) (_ *op.Response, err error) {
+func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionRequest]) (resp *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -62,33 +66,40 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		return nil, err
 	}
 
-	// all other errors should result in a response with active: false.
-	response := new(oidc.IntrospectionResponse)
+	// remaining errors shoudn't be returned to the client,
+	// so we catch errors here, log them and return the response
+	// with active: false
+	defer func() {
+		if err != nil {
+			s.getLogger(ctx).ErrorContext(ctx, "oidc introspection", "err", err)
+		}
+		resp, err = op.NewResponse(new(oidc.IntrospectionResponse)), nil
+	}()
+
 	if err != nil {
-		// TODO: log error
-		return op.NewResponse(response), nil
+		return nil, err
 	}
 	if err = validateIntrospectionAudience(token.audience, client.clientID, client.projectID); err != nil {
-		// TODO: log error
-		return op.NewResponse(response), nil
+		return nil, err
 	}
 	userInfo, err := s.storage.query.GetOIDCUserinfo(ctx, token.userID, token.scope, []string{client.projectID})
 	if err != nil {
-		// TODO: log error
-		return op.NewResponse(response), nil
+		return nil, err
 	}
-	response.SetUserInfo(userinfoToOIDC(userInfo, token.scope))
-	response.Scope = token.scope
-	response.ClientID = token.clientID
-	response.TokenType = oidc.BearerToken
-	response.Expiration = oidc.FromTime(token.tokenExpiration)
-	response.IssuedAt = oidc.FromTime(token.tokenCreation)
-	response.NotBefore = oidc.FromTime(token.tokenCreation)
-	response.Audience = token.audience
-	response.Issuer = op.IssuerFromContext(ctx)
-	response.JWTID = token.tokenID
-	response.Active = true
-	return op.NewResponse(response), nil
+	introspectionResp := &oidc.IntrospectionResponse{
+		Active:     true,
+		Scope:      token.scope,
+		ClientID:   token.clientID,
+		TokenType:  oidc.BearerToken,
+		Expiration: oidc.FromTime(token.tokenExpiration),
+		IssuedAt:   oidc.FromTime(token.tokenCreation),
+		NotBefore:  oidc.FromTime(token.tokenCreation),
+		Audience:   token.audience,
+		Issuer:     op.IssuerFromContext(ctx),
+		JWTID:      token.tokenID,
+	}
+	introspectionResp.SetUserInfo(userinfoToOIDC(userInfo, token.scope))
+	return op.NewResponse(introspectionResp), nil
 }
 
 type instrospectionClientResult struct {
@@ -163,52 +174,53 @@ type introspectionTokenResult struct {
 }
 
 func (s *Server) introspectionToken(ctx context.Context, accessToken string, rc chan<- *introspectionTokenResult) {
-	var tokenID, subject string
+	ctx, span := tracing.NewSpan(ctx)
 
-	if tokenIDSubject, err := s.Provider().Crypto().Decrypt(accessToken); err == nil {
-		split := strings.Split(tokenIDSubject, ":")
-		if len(split) != 2 {
-			rc <- &introspectionTokenResult{err: errors.New("invalid token format")}
-			return
+	result, err := func() (_ *introspectionTokenResult, err error) {
+		var tokenID, subject string
+
+		if tokenIDSubject, err := s.Provider().Crypto().Decrypt(accessToken); err == nil {
+			split := strings.Split(tokenIDSubject, ":")
+			if len(split) != 2 {
+				return nil, errors.New("invalid token format")
+			}
+			tokenID, subject = split[0], split[1]
+		} else {
+			verifier := op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), s.storage.keySet)
+			claims, err := op.VerifyAccessToken[*oidc.AccessTokenClaims](ctx, accessToken, verifier)
+			if err != nil {
+				return nil, err
+			}
+			tokenID, subject = claims.JWTID, claims.Subject
 		}
-		tokenID, subject = split[0], split[1]
-	} else {
-		verifier := op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), s.storage.keySet)
-		claims, err := op.VerifyAccessToken[*oidc.AccessTokenClaims](ctx, accessToken, verifier)
+
+		if strings.HasPrefix(tokenID, command.IDPrefixV2) {
+			token, err := s.storage.query.ActiveAccessTokenByToken(ctx, tokenID)
+			if err != nil {
+				rc <- &introspectionTokenResult{err: err}
+				return nil, err
+			}
+			return introspectionTokenResultV2(tokenID, subject, token), nil
+		}
+
+		token, err := s.storage.repo.TokenByIDs(ctx, subject, tokenID)
 		if err != nil {
-			rc <- &introspectionTokenResult{err: err}
-			return
+			return nil, errz.ThrowPermissionDenied(err, "OIDC-Dsfb2", "token is not valid or has expired")
 		}
-		tokenID, subject = claims.JWTID, claims.Subject
-	}
+		return introspectionTokenResultV1(tokenID, subject, token), nil
+	}()
 
-	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
-		token, err := s.storage.query.ActiveAccessTokenByToken(ctx, tokenID)
-		if err != nil {
-			rc <- &introspectionTokenResult{err: err}
-			return
-		}
-		rc <- &introspectionTokenResult{
-			tokenID:         tokenID,
-			userID:          token.UserID,
-			subject:         subject,
-			clientID:        token.ClientID,
-			audience:        token.Audience,
-			scope:           token.Scope,
-			tokenCreation:   token.AccessTokenCreation,
-			tokenExpiration: token.AccessTokenExpiration,
-		}
-		return
-	}
+	span.EndWithError(err)
 
-	token, err := s.storage.repo.TokenByIDs(ctx, subject, tokenID)
 	if err != nil {
-		rc <- &introspectionTokenResult{
-			err: errz.ThrowPermissionDenied(err, "OIDC-Dsfb2", "token is not valid or has expired"),
-		}
+		rc <- &introspectionTokenResult{err: err}
 		return
 	}
-	rc <- &introspectionTokenResult{
+	rc <- result
+}
+
+func introspectionTokenResultV1(tokenID, subject string, token *model.TokenView) *introspectionTokenResult {
+	return &introspectionTokenResult{
 		tokenID:         tokenID,
 		userID:          token.UserID,
 		subject:         subject,
@@ -218,6 +230,19 @@ func (s *Server) introspectionToken(ctx context.Context, accessToken string, rc 
 		tokenCreation:   token.CreationDate,
 		tokenExpiration: token.Expiration,
 		isPAT:           token.IsPAT,
+	}
+}
+
+func introspectionTokenResultV2(tokenID, subject string, token *query.OIDCSessionAccessTokenReadModel) *introspectionTokenResult {
+	return &introspectionTokenResult{
+		tokenID:         tokenID,
+		userID:          token.UserID,
+		subject:         subject,
+		clientID:        token.ClientID,
+		audience:        token.Audience,
+		scope:           token.Scope,
+		tokenCreation:   token.AccessTokenCreation,
+		tokenExpiration: token.AccessTokenExpiration,
 	}
 }
 
