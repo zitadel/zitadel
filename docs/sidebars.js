@@ -658,7 +658,20 @@ module.exports = {
         "self-hosting/manage/production",
         "self-hosting/manage/productionchecklist",
         "self-hosting/manage/configure/configure",
-        "self-hosting/manage/reverseproxy/reverse_proxy",
+        {
+          type: "category",
+          label: "Reverse Proxy",
+
+          link: {
+            type: "doc",
+            id: "self-hosting/manage/reverseproxy/reverse_proxy",
+          },
+          items: [
+            "self-hosting/manage/reverseproxy/traefik/traefik",
+            "self-hosting/manage/reverseproxy/nginx/nginx",
+            "self-hosting/manage/reverseproxy/caddy/caddy",
+          ],
+        },
         "self-hosting/manage/custom-domain",
         "self-hosting/manage/http2",
         "self-hosting/manage/tls_modes",

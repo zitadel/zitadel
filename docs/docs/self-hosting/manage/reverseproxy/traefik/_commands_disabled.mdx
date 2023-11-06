@@ -5,6 +5,6 @@ wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosti
 wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/reverseproxy/traefik/docker-compose.yaml -O docker-compose-traefik.yaml
 wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/reverseproxy/traefik/traefik-disabled-tls.conf
 
-# Run the database, zitadel and Traefik
+# Run the database, ZITADEL and Traefik
 docker compose --file docker-compose-base.yaml --file docker-compose-traefik.yaml up traefik-disabled-tls --detach
 ```

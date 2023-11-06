@@ -3,9 +3,9 @@ version: '3.8'
 services:
 
   proxy-disabled-tls:
-    image: "traefik:v2.10.5"
+    image: "caddy:2.7.5-alpine"
     volumes:
-      - "./traefik-disabled-tls.yaml:/etc/traefik/traefik.yaml:ro"
+      - "./disabled-tls.Caddyfile:/etc/caddy/Caddyfile:ro"
     ports:
       - "80:80"
     depends_on:
@@ -13,9 +13,9 @@ services:
         condition: 'service_healthy'
 
   proxy-external-tls:
-    image: "traefik:v2.10.5"
+    image: "caddy:2.7.5-alpine"
     volumes:
-      - "./traefik-external-tls.yaml:/etc/traefik/traefik.yaml:ro"
+      - "./external-tls.Caddyfile:/etc/caddy/Caddyfile:ro"
     ports:
       - "443:443"
     depends_on:
@@ -23,9 +23,9 @@ services:
         condition: 'service_healthy'
 
   proxy-enabled-tls:
-    image: "traefik:v2.10.5"
+    image: "caddy:2.7.5-alpine"
     volumes:
-      - "./traefik-enabled-tls.yaml:/etc/traefik/traefik.yaml:ro"
+      - "./enabled-tls.Caddyfile:/etc/caddy/Caddyfile:ro"
     ports:
       - "443:443"
     depends_on:

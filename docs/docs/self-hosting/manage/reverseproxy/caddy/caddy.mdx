@@ -1,0 +1,50 @@
+---
+title: Configure ZITADEL with Caddy
+sidebar_label: Caddy
+---
+
+import CodeBlock from '@theme/CodeBlock';
+
+import Overview from '../_overview.mdx';
+import CommandsIntro from '../_commands_intro.mdx';
+import DescriptionDisabled from '../_description_disabled.mdx';
+import DescriptionExternal from '../_description_external.mdx';
+import DescriptionEnabled from '../_description_enabled.mdx';
+import ConfigDisabled from "!!raw-loader!./disabled-tls.Caddyfile";
+import ConfigExternal from "!!raw-loader!./external-tls.Caddyfile";
+import ConfigEnabled from "!!raw-loader!./enabled-tls.Caddyfile";
+import CommandsDisabled from './_commands_disabled.mdx';
+import CommandsExternal from './_commands_external.mdx';
+import CommandsEnabled from './_commands_enabled.mdx';
+
+<Overview proxylink={<a href="https://caddyserver.com/">Caddy</a>}/>
+
+## TLS mode disabled
+
+<DescriptionDisabled proxy={'Caddy'}/>
+<CommandsIntro proxy={'Caddy'}/>
+<details open>
+    <summary>caddy-disabled-tls.yaml</summary>
+    <CodeBlock language="Caddyfile">{ConfigDisabled}</CodeBlock>
+</details>
+<CommandsDisabled/>
+
+## TLS mode external
+
+<DescriptionExternal proxy={'Caddy'}/>
+<CommandsIntro proxy={'Caddy'}/>
+<details open>
+    <summary>caddy-external-tls.yaml</summary>
+    <CodeBlock language="Caddyfile">{ConfigExternal}</CodeBlock>
+</details>
+<CommandsExternal/>
+
+## TLS mode enabled
+
+<DescriptionEnabled proxy={'Caddy'}/>
+<CommandsIntro proxy={'Caddy'}/>
+<details open>
+    <summary>caddy-external-tls.yaml</summary>
+    <CodeBlock language="Caddyfile">{ConfigEnabled}</CodeBlock>
+</details>
+<CommandsEnabled/>
