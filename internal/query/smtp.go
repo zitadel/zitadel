@@ -128,7 +128,29 @@ func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID strin
 		SMTPConfigColumnState.identifier():       domain.SMTPConfigStateActive,
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-3m9sl", "Errors.Query.SQLStatment")
+		return nil, errors.ThrowInternal(err, "QUERY-3m9sl", "Errors.Query.SQLStatement")
+	}
+
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		config, err = scan(row)
+		return err
+	}, query, args...)
+	return config, err
+}
+
+func (q *Queries) SMTPConfigByID(ctx context.Context, aggregateID, id string) (config *SMTPConfig, err error) {
+	// TODO @n40lab Test
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	stmt, scan := prepareSMTPConfigQuery(ctx, q.client)
+	query, args, err := stmt.Where(sq.Eq{
+		SMTPConfigColumnAggregateID.identifier(): aggregateID,
+		SMTPConfigColumnInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
+		SMTPConfigColumnID.identifier():          id,
+	}).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-8f8gw", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {

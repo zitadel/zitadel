@@ -365,8 +365,24 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "SMTP";
-            summary: "Get SMTP Configuration";
-            description: "Returns the SMTP configuration from the system. This is used to send E-Mails to the users."
+            summary: "Get active SMTP Configuration";
+            description: "Returns the active SMTP configuration from the system. This is used to send E-Mails to the users."
+        };
+    }
+
+    rpc GetSMTPConfigById(GetSMTPConfigByIdRequest) returns (GetSMTPConfigByIdResponse) {
+        option (google.api.http) = {
+            get: "/smtp/{id}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMTP";
+            summary: "Get SMTP provider configuration by its id";
+            description: "Get a specific SMTP provider configuration by its ID.";
         };
     }
 
@@ -3975,6 +3991,14 @@ message UpdateSecretGeneratorResponse {
 message GetSMTPConfigRequest {}
 
 message GetSMTPConfigResponse {
+    zitadel.settings.v1.SMTPConfig smtp_config = 1;
+}
+
+message GetSMTPConfigByIdRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
+}
+
+message GetSMTPConfigByIdResponse {
     zitadel.settings.v1.SMTPConfig smtp_config = 1;
 }
 

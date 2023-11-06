@@ -1,8 +1,8 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { Subject, take } from 'rxjs';
+import { Subject } from 'rxjs';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Options } from 'src/app/proto/generated/zitadel/idp_pb';
 import { requiredValidator } from '../form-field/validators/validators';
@@ -15,7 +15,6 @@ import {
   UpdateSMTPConfigResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatCheckboxChange } from '@angular/material/checkbox';
@@ -31,11 +30,11 @@ import {
 } from './known-smtp-providers-settings';
 
 @Component({
-  selector: 'cnsl-provider',
+  selector: 'cnsl-smtp-provider',
   templateUrl: './smtp-provider.component.html',
   styleUrls: ['./smtp-provider.scss'],
 })
-export class SMTPProviderComponent implements OnInit {
+export class SMTPProviderComponent {
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
   public id: string | null = '';
@@ -59,26 +58,10 @@ export class SMTPProviderComponent implements OnInit {
     private service: AdminService,
     private _location: Location,
     private fb: UntypedFormBuilder,
-    private authService: GrpcAuthService,
     private toast: ToastService,
     private router: Router,
     private route: ActivatedRoute,
-  ) {}
-
-  ngOnInit(): void {
-    if (!this.router.url.endsWith('/create')) {
-      this.fetchData();
-      this.authService
-        .isAllowed(['iam.write'])
-        .pipe(take(1))
-        .subscribe((allowed) => {
-          if (allowed) {
-            this.firstFormGroup.enable();
-            this.secondFormGroup.enable();
-          }
-        });
-    }
-
+  ) {
     this.route.parent?.url.subscribe((urlPath) => {
       const providerName = urlPath[urlPath.length - 1].path;
       switch (providerName) {
@@ -127,6 +110,13 @@ export class SMTPProviderComponent implements OnInit {
           }`,
         );
       });
+
+      if (!this.router.url.endsWith('/create')) {
+        this.id = this.route.snapshot.paramMap.get('id');
+        if (this.id) {
+          this.fetchData(this.id);
+        }
+      }
     });
   }
 
@@ -152,23 +142,23 @@ export class SMTPProviderComponent implements OnInit {
     }
   }
 
-  private fetchData(): void {
+  private fetchData(id: string): void {
     this.smtpLoading = true;
     this.service
-      .getSMTPConfig()
-      .then((smtpConfig) => {
+      .getSMTPConfigById(id)
+      .then((data) => {
         this.smtpLoading = false;
-        if (smtpConfig.smtpConfig) {
+        if (data.smtpConfig) {
           this.hasSMTPConfig = true;
           this.firstFormGroup.patchValue({
-            ['tls']: smtpConfig.smtpConfig.tls,
-            ['hostAndPort']: smtpConfig.smtpConfig.host,
-            ['user']: smtpConfig.smtpConfig.user,
+            ['tls']: data.smtpConfig.tls,
+            ['hostAndPort']: data.smtpConfig.host,
+            ['user']: data.smtpConfig.user,
           });
           this.secondFormGroup.patchValue({
-            ['senderAddress']: smtpConfig.smtpConfig.senderAddress,
-            ['senderName']: smtpConfig.smtpConfig.senderName,
-            ['replyToAddress']: smtpConfig.smtpConfig.replyToAddress,
+            ['senderAddress']: data.smtpConfig.senderAddress,
+            ['senderName']: data.smtpConfig.senderName,
+            ['replyToAddress']: data.smtpConfig.replyToAddress,
           });
         }
       })

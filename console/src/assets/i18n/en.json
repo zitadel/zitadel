@@ -1940,13 +1940,14 @@
       "STEPS": {
         "TITLE": "Add {{ value }} SMTP Provider",
         "CREATE_DESC_TITLE": "Enter your {{ value }} SMTP settings step by step",
+        "CURRENT_DESC_TITLE": "These are your {{ value }} SMTP settings",
         "PROVIDER_SETTINGS": "SMTP Provider Settings",
         "SENDER_SETTINGS": "Sender Settings",
         "TEST_SETTINGS": "Test SMTP Settings"
       }
     },
     "DETAIL": {
-      "TITLE": "SMTP Provider"
+      "TITLE": "SMTP Provider Settings"
     },
     "EMPTY": "No SMTP provider available",
     "STEPS": {

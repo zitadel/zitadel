@@ -134,6 +134,8 @@ import {
   GetSecurityPolicyResponse,
   GetSMSProviderRequest,
   GetSMSProviderResponse,
+  GetSMTPConfigByIdRequest,
+  GetSMTPConfigByIdResponse,
   GetSMTPConfigRequest,
   GetSMTPConfigResponse,
   GetSupportedLanguagesRequest,
@@ -855,6 +857,12 @@ export class AdminService {
   public getSMTPConfig(): Promise<GetSMTPConfigResponse.AsObject> {
     const req = new GetSMTPConfigRequest();
     return this.grpcService.admin.getSMTPConfig(req, null).then((resp) => resp.toObject());
+  }
+
+  public getSMTPConfigById(id: string): Promise<GetSMTPConfigByIdResponse.AsObject> {
+    const req = new GetSMTPConfigByIdRequest();
+    req.setId(id);
+    return this.grpcService.admin.getSMTPConfigById(req, null).then((resp) => resp.toObject());
   }
 
   public listSMTPConfigs(): Promise<ListSMTPConfigsResponse.AsObject> {

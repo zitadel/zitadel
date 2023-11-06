@@ -18,6 +18,16 @@ func (s *Server) GetSMTPConfig(ctx context.Context, req *admin_pb.GetSMTPConfigR
 	}, nil
 }
 
+func (s *Server) GetSMTPConfigById(ctx context.Context, req *admin_pb.GetSMTPConfigByIdRequest) (*admin_pb.GetSMTPConfigByIdResponse, error) {
+	smtp, err := s.query.SMTPConfigByID(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetSMTPConfigByIdResponse{
+		SmtpConfig: SMTPConfigToPb(smtp),
+	}, nil
+}
+
 func (s *Server) AddSMTPConfig(ctx context.Context, req *admin_pb.AddSMTPConfigRequest) (*admin_pb.AddSMTPConfigResponse, error) {
 	details, err := s.command.AddSMTPConfig(ctx, AddSMTPToConfig(req))
 	if err != nil {
