@@ -40,6 +40,11 @@ message Session {
     }
   ];
   UserAgent user_agent = 7;
+  optional google.protobuf.Timestamp expiration_date = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time the session will be automatically invalidated\"";
+    }
+  ];
 }
 
 message Factors {

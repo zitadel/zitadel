@@ -327,7 +327,67 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				sessionID: "sessionID",
 			},
 			res{
-				wantErr: caos_errs.ThrowNotFound(nil, "COMMAND-x0099887", "Errors.Session.NotExisting"),
+				wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Flk38", "Errors.Session.NotExisting"),
+			},
+		},
+		{
+			"session expired",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"loginClient",
+								"clientID",
+								"redirectURI",
+								"state",
+								"nonce",
+								[]string{"openid"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeCode,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(mockCtx,
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+								"userID", testNow.Add(-5*time.Minute)),
+						),
+						eventFromEventPusher(
+							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+								testNow.Add(-5*time.Minute)),
+						),
+						eventFromEventPusher(
+							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+								2*time.Minute),
+						),
+					),
+				),
+			},
+			args{
+				ctx:          mockCtx,
+				id:           "V2_id",
+				sessionID:    "sessionID",
+				sessionToken: "token",
+			},
+			res{
+				wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Hkl3d", "Errors.Session.Expired"),
 			},
 		},
 		{
@@ -475,6 +535,10 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
 								testNow),
 						),
+						eventFromEventPusherWithCreationDateNow(
+							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+								2*time.Minute),
+						),
 					),
 					expectPush(
 						authrequest.NewSessionLinkedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
@@ -558,6 +622,10 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 						eventFromEventPusher(
 							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
 								testNow),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+								2*time.Minute),
 						),
 					),
 					expectPush(

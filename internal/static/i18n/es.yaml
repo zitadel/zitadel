@@ -490,7 +490,9 @@ Errors:
       ScanFailed: La consulta de uso de los segundos de ejecuciónde acciones ha fallado
   Session:
     NotExisting: La sesión no existe
-    Terminated: Sesión ya terminada
+    Terminated: La Sesión ya terminada
+    Expired: La sesión ha expirado
+    PositiveLifetime: La duración de la sesión no debe ser inferior a 0
     Token:
       Invalid: El identificador de sesión no es válido
     WebAuthN:
