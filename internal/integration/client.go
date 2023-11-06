@@ -330,6 +330,10 @@ func (s *Tester) CreateVerifiedWebAuthNSession(t *testing.T, ctx context.Context
 }
 
 func (s *Tester) CreateVerifiedWebAuthNSessionWithLifetime(t *testing.T, ctx context.Context, userID string, lifetime time.Duration) (id, token string, start, change time.Time) {
+	var sessionLifetime *durationpb.Duration
+	if lifetime > 0 {
+		sessionLifetime = durationpb.New(lifetime)
+	}
 	createResp, err := s.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -342,7 +346,7 @@ func (s *Tester) CreateVerifiedWebAuthNSessionWithLifetime(t *testing.T, ctx con
 				UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 			},
 		},
-		Lifetime: durationpb.New(lifetime),
+		Lifetime: sessionLifetime,
 	})
 	require.NoError(t, err)
 

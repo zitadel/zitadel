@@ -492,7 +492,7 @@ Errors:
     NotExisting: Sesja nie istnieje
     Terminated: Sesja już zakończona
     Expired: Sesja wygasła
-    NegativeLifetime: Czas życia sesji nie może być krótszy niż 0
+    PositiveLifetime: Czas życia sesji nie może być krótszy niż 0
     Token:
       Invalid: Token sesji jest nieprawidłowy
     WebAuthN:

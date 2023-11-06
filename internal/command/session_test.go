@@ -217,7 +217,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				expectFilter(),
 			},
 			res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.NegativeLifetime"),
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.PositiveLifetime"),
 			},
 		},
 		{
@@ -520,7 +520,7 @@ func TestCommands_updateSession(t *testing.T) {
 				lifetime: -10 * time.Minute,
 			},
 			res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.NegativeLifetime"),
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.PositiveLifetime"),
 			},
 		},
 		{
