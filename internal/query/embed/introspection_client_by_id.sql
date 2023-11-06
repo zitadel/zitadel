@@ -20,5 +20,4 @@ keys as (
 )
 select apps.project_id, config.client_secret, keys.public_keys from config
 join projections.apps5 apps on apps.id = config.app_id
-left join keys on keys.client_id = config.client_id
-where apps.owner_removed = false;
+left join keys on keys.client_id = config.client_id;

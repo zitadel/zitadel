@@ -113,7 +113,7 @@ type projectProvider interface {
 }
 
 type applicationProvider interface {
-	AppByOIDCClientID(context.Context, string, bool) (*query.App, error)
+	AppByOIDCClientID(context.Context, string) (*query.App, error)
 }
 
 type customTextProvider interface {
@@ -140,7 +140,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	if err != nil {
 		return nil, err
 	}
-	appIDs, err := repo.Query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
+	appIDs, err := repo.Query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
@@ -1351,7 +1351,7 @@ func (repo *AuthRequestRepo) hasSucceededPage(ctx context.Context, request *doma
 	if _, ok := request.Request.(*domain.AuthRequestOIDC); !ok {
 		return false, nil
 	}
-	app, err := provider.AppByOIDCClientID(ctx, request.ApplicationID, false)
+	app, err := provider.AppByOIDCClientID(ctx, request.ApplicationID)
 	if err != nil {
 		return false, err
 	}

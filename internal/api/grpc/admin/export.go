@@ -630,7 +630,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 				return nil, nil, nil, nil, err
 			}
 
-			keys, err := s.query.SearchAuthNKeysData(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{userIDQuery, orgIDQuery}}, false)
+			keys, err := s.query.SearchAuthNKeysData(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{userIDQuery, orgIDQuery}})
 			if err != nil {
 				return nil, nil, nil, nil, err
 			}
@@ -836,7 +836,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 			if err != nil {
 				return nil, nil, nil, nil, nil, err
 			}
-			keys, err := s.query.SearchAuthNKeysData(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{appIDQuery, projectIDQuery, orgIDQuery}}, false)
+			keys, err := s.query.SearchAuthNKeysData(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{appIDQuery, projectIDQuery, orgIDQuery}})
 			if err != nil {
 				return nil, nil, nil, nil, nil, err
 			}

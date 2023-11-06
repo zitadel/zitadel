@@ -44,7 +44,7 @@ const (
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	client, err := o.query.AppByOIDCClientID(ctx, id, false)
+	client, err := o.query.AppByOIDCClientID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 		UserID: oidcCtx,
 		OrgID:  oidcCtx,
 	})
-	app, err := o.query.AppByClientID(ctx, id, false)
+	app, err := o.query.AppByClientID(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -150,7 +150,7 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo *oidc.Us
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	if applicationID != "" {
-		app, err := o.query.AppByOIDCClientID(ctx, applicationID, false)
+		app, err := o.query.AppByOIDCClientID(ctx, applicationID)
 		if err != nil {
 			return err
 		}
@@ -184,7 +184,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
-	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID, false)
+	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 	}
@@ -245,7 +245,7 @@ func (o *OPStorage) isOriginAllowed(ctx context.Context, clientID, origin string
 	if origin == "" {
 		return nil
 	}
-	app, err := o.query.AppByOIDCClientID(ctx, clientID, false)
+	app, err := o.query.AppByOIDCClientID(ctx, clientID)
 	if err != nil {
 		return err
 	}
@@ -750,7 +750,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	if (applicationID == "" || len(requestedRoles) == 0) && len(roleAudience) == 0 {
 		return nil, nil, nil
 	}
-	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID, false)
+	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID)
 	// applicationID might contain a username (e.g. client credentials) -> ignore the not found
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, nil, err

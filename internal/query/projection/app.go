@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	AppProjectionTable = "projections.apps5"
+	AppProjectionTable = "projections.apps6"
 	AppAPITable        = AppProjectionTable + "_" + appAPITableSuffix
 	AppOIDCTable       = AppProjectionTable + "_" + appOIDCTableSuffix
 	AppSAMLTable       = AppProjectionTable + "_" + appSAMLTableSuffix
@@ -29,7 +29,6 @@ const (
 	AppColumnInstanceID    = "instance_id"
 	AppColumnState         = "state"
 	AppColumnSequence      = "sequence"
-	AppColumnOwnerRemoved  = "owner_removed"
 
 	appAPITableSuffix              = "api_configs"
 	AppAPIConfigColumnAppID        = "app_id"
@@ -89,11 +88,9 @@ func (*appProjection) Init() *old_handler.Check {
 			handler.NewColumn(AppColumnInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(AppColumnState, handler.ColumnTypeEnum),
 			handler.NewColumn(AppColumnSequence, handler.ColumnTypeInt64),
-			handler.NewColumn(AppColumnOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(AppColumnInstanceID, AppColumnID),
 			handler.WithIndex(handler.NewIndex("project_id", []string{AppColumnProjectID})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{AppColumnOwnerRemoved})),
 		),
 		handler.NewSuffixedTable([]*handler.InitColumn{
 			handler.NewColumn(AppAPIConfigColumnAppID, handler.ColumnTypeText),

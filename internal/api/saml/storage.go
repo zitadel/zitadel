@@ -55,7 +55,7 @@ type Storage struct {
 }
 
 func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error) {
-	app, err := p.query.AppBySAMLEntityID(ctx, entityID, false)
+	app, err := p.query.AppBySAMLEntityID(ctx, entityID)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*servicep
 }
 
 func (p *Storage) GetEntityIDByAppID(ctx context.Context, appID string) (string, error) {
-	app, err := p.query.AppByID(ctx, appID, false)
+	app, err := p.query.AppByID(ctx, appID)
 	if err != nil {
 		return "", err
 	}
@@ -314,7 +314,7 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 }
 
 func (p *Storage) getGrants(ctx context.Context, userID, applicationID string) (*query.UserGrants, error) {
-	projectID, err := p.query.ProjectIDFromClientID(ctx, applicationID, false)
+	projectID, err := p.query.ProjectIDFromClientID(ctx, applicationID)
 	if err != nil {
 		return nil, err
 	}
