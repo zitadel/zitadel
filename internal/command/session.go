@@ -254,7 +254,7 @@ func (s *SessionCommands) ChangeMetadata(ctx context.Context, metadata map[strin
 
 func (s *SessionCommands) SetLifetime(ctx context.Context, lifetime time.Duration) error {
 	if lifetime < 0 {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.InvalidLifetime")
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.NegativeLifetime")
 	}
 	if lifetime == 0 {
 		return nil
