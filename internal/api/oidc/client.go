@@ -370,7 +370,7 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 	if err != nil {
 		return err
 	}
-	o.setUserInfoRoleClaims(userInfo, projectRoles)
+	setUserInfoRoleClaims(userInfo, projectRoles)
 
 	return o.userinfoFlows(ctx, user, userGrants, userInfo)
 }
@@ -432,7 +432,7 @@ func (o *OPStorage) setUserInfoResourceOwner(ctx context.Context, userInfo *oidc
 	return nil
 }
 
-func (o *OPStorage) setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
+func setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
 	if roles != nil && len(roles.projects) > 0 {
 		if roles, ok := roles.projects[roles.requestProjectID]; ok {
 			userInfo.AppendClaims(ClaimProjectRoles, roles)

@@ -15,7 +15,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-func (q *Queries) GetOIDCUserinfo(ctx context.Context, userID string, scope, roleAudience []string) (_ *OIDCUserinfo, err error) {
+func (q *Queries) GetOIDCUserInfo(ctx context.Context, userID string, scope, roleAudience []string) (_ *OIDCUserInfo, err error) {
 	if slices.Contains(scope, domain.ScopeProjectsRoles) {
 		roleAudience = domain.AddAudScopeToAudience(ctx, roleAudience, scope)
 		// TODO: we need to get the project roles and user roles.
@@ -37,7 +37,7 @@ func (q *Queries) GetOIDCUserinfo(ctx context.Context, userID string, scope, rol
 		user.OrgPrimaryDomain = org.PrimaryDomain
 	}
 
-	return &user.OIDCUserinfo, nil
+	return &user.OIDCUserInfo, nil
 }
 
 func hasOrgScope(scope []string) bool {
@@ -46,7 +46,7 @@ func hasOrgScope(scope []string) bool {
 	})
 }
 
-type OIDCUserinfo struct {
+type OIDCUserInfo struct {
 	ID                string
 	UserName          string
 	Name              string
@@ -80,25 +80,25 @@ type OIDCUserinfo struct {
 	Metadata map[string]string
 }
 
-type oidcUserinfoReadmodel struct {
+type oidcUserInfoReadmodel struct {
 	eventstore.ReadModel
 	scope []string // Scope is used to determine events
-	OIDCUserinfo
+	OIDCUserInfo
 }
 
-func newOidcUserinfoReadModel(userID string, scope []string) *oidcUserinfoReadmodel {
-	return &oidcUserinfoReadmodel{
+func newOidcUserinfoReadModel(userID string, scope []string) *oidcUserInfoReadmodel {
+	return &oidcUserInfoReadmodel{
 		ReadModel: eventstore.ReadModel{
 			AggregateID: userID,
 		},
 		scope: scope,
-		OIDCUserinfo: OIDCUserinfo{
+		OIDCUserInfo: OIDCUserInfo{
 			ID: userID,
 		},
 	}
 }
 
-func (rm *oidcUserinfoReadmodel) Query() *eventstore.SearchQueryBuilder {
+func (rm *oidcUserInfoReadmodel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AwaitOpenTransactions().
 		AllowTimeTravel().
@@ -112,7 +112,7 @@ func (rm *oidcUserinfoReadmodel) Query() *eventstore.SearchQueryBuilder {
 // scopeToEventTypes sets required user events to obtain get the correct userinfo.
 // Events such as UserLocked, UserDeactivated and UserRemoved are not checked,
 // as access tokens should already be revoked.
-func (rm *oidcUserinfoReadmodel) scopeToEventTypes() []eventstore.EventType {
+func (rm *oidcUserInfoReadmodel) scopeToEventTypes() []eventstore.EventType {
 	types := make([]eventstore.EventType, 0, len(rm.scope))
 	types = append(types, user.HumanAddedType, user.MachineAddedEventType)
 
@@ -133,7 +133,7 @@ func (rm *oidcUserinfoReadmodel) scopeToEventTypes() []eventstore.EventType {
 	return slices.Compact(types)
 }
 
-func (rm *oidcUserinfoReadmodel) Reduce() error {
+func (rm *oidcUserInfoReadmodel) Reduce() error {
 	for _, event := range rm.Events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:

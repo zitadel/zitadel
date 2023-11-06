@@ -82,7 +82,7 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 	if err = validateIntrospectionAudience(token.audience, client.clientID, client.projectID); err != nil {
 		return nil, err
 	}
-	userInfo, err := s.storage.query.GetOIDCUserinfo(ctx, token.userID, token.scope, []string{client.projectID})
+	userInfo, err := s.getUserInfoWithRoles(ctx, token.userID, client.projectID, token.scope, []string{client.projectID})
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		Issuer:     op.IssuerFromContext(ctx),
 		JWTID:      token.tokenID,
 	}
-	introspectionResp.SetUserInfo(userinfoToOIDC(userInfo, token.scope))
+	introspectionResp.SetUserInfo(userInfo)
 	return op.NewResponse(introspectionResp), nil
 }
 
@@ -224,7 +224,7 @@ func introspectionTokenResultV1(tokenID, subject string, token *model.TokenView)
 		tokenID:         tokenID,
 		userID:          token.UserID,
 		subject:         subject,
-		clientID:        token.ApplicationID, // check correctness?
+		clientID:        token.ApplicationID,
 		audience:        token.Audience,
 		scope:           token.Scopes,
 		tokenCreation:   token.CreationDate,

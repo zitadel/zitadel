@@ -122,8 +122,9 @@ func NewServer(
 	server := &Server{
 		storage:        storage,
 		LegacyServer:   op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
-		hashAlg:        crypto.NewBCrypt(10), // as we are only verifying in oidc, the cost is already part of the hash string and the config here is irrelevant.
+		query:          query,
 		fallbackLogger: fallbackLogger,
+		hashAlg:        crypto.NewBCrypt(10), // as we are only verifying in oidc, the cost is already part of the hash string and the config here is irrelevant.
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	server.Handler = op.RegisterLegacyServer(server, op.WithHTTPMiddleware(
