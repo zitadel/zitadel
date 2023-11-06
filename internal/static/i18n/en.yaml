@@ -492,6 +492,7 @@ Errors:
     NotExisting: Session does not exist
     Terminated: Session already terminated
     Expired: Session has expired
+    NegativeLifetime: Session lifetime must not be less than 0
     Token:
       Invalid: Session Token is invalid
     WebAuthN:

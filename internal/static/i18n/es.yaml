@@ -492,6 +492,7 @@ Errors:
     NotExisting: La sesión no existe
     Terminated: La Sesión ya terminada
     Expired: La sesión ha expirado
+    NegativeLifetime: La duración de la sesión no debe ser inferior a 0
     Token:
       Invalid: El identificador de sesión no es válido
     WebAuthN:

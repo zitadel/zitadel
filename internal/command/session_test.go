@@ -194,6 +194,33 @@ func TestCommands_CreateSession(t *testing.T) {
 			},
 		},
 		{
+			"negative lifetime",
+			fields{
+				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
+				tokenCreator: func(sessionID string) (string, string, error) {
+					return "tokenID",
+						"token",
+						nil
+				},
+			},
+			args{
+				ctx: authz.NewMockContext("", "org1", ""),
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				lifetime: -10 * time.Minute,
+			},
+			[]expect{
+				expectFilter(),
+			},
+			res{
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.NegativeLifetime"),
+			},
+		},
+		{
 			"empty session",
 			fields{
 				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
@@ -468,6 +495,32 @@ func TestCommands_updateSession(t *testing.T) {
 					ID:       "sessionID",
 					NewToken: "",
 				},
+			},
+		},
+		{
+			"negative lifetime",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: context.Background(),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionCommands:   []SessionCommand{},
+					eventstore:        eventstoreExpect(t),
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				lifetime: -10 * time.Minute,
+			},
+			res{
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.NegativeLifetime"),
 			},
 		},
 		{

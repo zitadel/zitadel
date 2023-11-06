@@ -252,10 +252,15 @@ func (s *SessionCommands) ChangeMetadata(ctx context.Context, metadata map[strin
 	}
 }
 
-func (s *SessionCommands) SetLifetime(ctx context.Context, lifetime time.Duration) {
-	if lifetime > 0 {
-		s.eventCommands = append(s.eventCommands, session.NewLifetimeSetEvent(ctx, s.sessionWriteModel.aggregate, lifetime))
+func (s *SessionCommands) SetLifetime(ctx context.Context, lifetime time.Duration) error {
+	if lifetime < 0 {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.InvalidLifetime")
 	}
+	if lifetime == 0 {
+		return nil
+	}
+	s.eventCommands = append(s.eventCommands, session.NewLifetimeSetEvent(ctx, s.sessionWriteModel.aggregate, lifetime))
+	return nil
 }
 
 func (s *SessionCommands) gethumanWriteModel(ctx context.Context) (*HumanWriteModel, error) {
@@ -357,7 +362,10 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, m
 		return nil, err
 	}
 	checks.ChangeMetadata(ctx, metadata)
-	checks.SetLifetime(ctx, lifetime)
+	err = checks.SetLifetime(ctx, lifetime)
+	if err != nil {
+		return nil, err
+	}
 	sessionToken, cmds, err := checks.commands(ctx)
 	if err != nil {
 		return nil, err

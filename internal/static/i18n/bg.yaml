@@ -510,6 +510,7 @@ Errors:
     NotExisting: Сесията не съществува
     Terminated: Сесията вече е прекратена
     Expired: Сесията е изтекла
+    NegativeLifetime: Животът на сесията не трябва да е по-малък от 0
     Token:
       Invalid: Токенът на сесията е невалиден
     WebAuthN:

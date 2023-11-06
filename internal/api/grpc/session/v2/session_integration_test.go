@@ -190,6 +190,14 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 		},
 		{
+			name: "negative lifetime",
+			req: &session.CreateSessionRequest{
+				Metadata: map[string][]byte{"foo": []byte("bar")},
+				Lifetime: durationpb.New(-5 * time.Minute),
+			},
+			wantErr: true,
+		},
+		{
 			name: "lifetime",
 			req: &session.CreateSessionRequest{
 				Metadata: map[string][]byte{"foo": []byte("bar")},

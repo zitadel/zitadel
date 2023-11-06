@@ -277,6 +277,7 @@ message CreateSessionRequest{
   RequestChallenges challenges = 3;
   UserAgent user_agent = 4;
   optional google.protobuf.Duration lifetime = 5 [
+    (validate.rules).duration = {gt: {seconds: 0}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"duration after which the session will be automatically invalidated\"";
     }
@@ -329,6 +330,7 @@ message SetSessionRequest{
   ];
   RequestChallenges challenges = 5;
   optional google.protobuf.Duration lifetime = 6 [
+    (validate.rules).duration = {gt: {seconds: 0}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"duration after which the session will be automatically invalidated\"";
     }

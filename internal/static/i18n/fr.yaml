@@ -492,6 +492,7 @@ Errors:
     NotExisting: La session n'existe pas
     Terminated: La session est déjà terminée
     Expired: La session a expiré
+    NegativeLifetime: La durée de vie de la session ne doit pas être inférieure à 0
     Token:
       Invalid: Le jeton de session n'est pas valide
     WebAuthN:
