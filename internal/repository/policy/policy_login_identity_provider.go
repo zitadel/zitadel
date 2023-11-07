@@ -14,7 +14,7 @@ const (
 )
 
 type IdentityProviderAddedEvent struct {
-	eventstore.BaseEvent
+	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID     string                      `json:"idpConfigId,omitempty"`
 	IDPProviderType domain.IdentityProviderType `json:"idpProviderType,omitempty"`
@@ -55,7 +55,7 @@ func IdentityProviderAddedEventMapper(event eventstore.Event) (eventstore.Event,
 }
 
 type IdentityProviderRemovedEvent struct {
-	eventstore.BaseEvent
+	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID string `json:"idpConfigId"`
 }
@@ -92,7 +92,7 @@ func IdentityProviderRemovedEventMapper(event eventstore.Event) (eventstore.Even
 }
 
 type IdentityProviderCascadeRemovedEvent struct {
-	eventstore.BaseEvent
+	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID string `json:"idpConfigId"`
 }

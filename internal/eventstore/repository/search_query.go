@@ -25,7 +25,8 @@ type SearchQuery struct {
 	Owner             *Filter
 	Position          *Filter
 	Sequence          *Filter
-	CreatedAt         *Filter
+	CreatedAfter      *Filter
+	CreatedBefore     *Filter
 }
 
 // Filter represents all fields needed to compare a field of an event with a value
@@ -136,6 +137,7 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 		positionAfterFilter,
 		eventSequenceGreaterFilter,
 		creationDateAfterFilter,
+		creationDateBeforeFilter,
 	} {
 		filter := f(builder, query)
 		if filter == nil {
@@ -191,8 +193,16 @@ func creationDateAfterFilter(builder *eventstore.SearchQueryBuilder, query *Sear
 	if builder.GetCreationDateAfter().IsZero() {
 		return nil
 	}
-	query.CreatedAt = NewFilter(FieldCreationDate, builder.GetCreationDateAfter(), OperationGreater)
-	return query.CreatedAt
+	query.CreatedAfter = NewFilter(FieldCreationDate, builder.GetCreationDateAfter(), OperationGreater)
+	return query.CreatedAfter
+}
+
+func creationDateBeforeFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {
+	if builder.GetCreationDateBefore().IsZero() {
+		return nil
+	}
+	query.CreatedBefore = NewFilter(FieldCreationDate, builder.GetCreationDateBefore(), OperationLess)
+	return query.CreatedBefore
 }
 
 func resourceOwnerFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {

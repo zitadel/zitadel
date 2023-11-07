@@ -424,6 +424,7 @@ Errors:
     AuditRetention: 历史记录在审核日志保留范围之外
   Token:
     NotFound: 令牌不存在
+    Invalid: 令牌无效
   UserSession:
     NotFound: 用户会话不存在
   Key:
@@ -490,6 +491,8 @@ Errors:
   Session:
     NotExisting: 会话不存在
     Terminated: 会话已经终止
+    Expired: 会话已过期
+    PositiveLifetime: 会话生存期不得小于 0
     Token:
       Invalid: 会话令牌是无效的
     WebAuthN:

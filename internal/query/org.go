@@ -97,8 +97,10 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerOrgProjection")
 		ctx, err = projection.OrgProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	stmt, scan := prepareOrgQuery(ctx, q.client)

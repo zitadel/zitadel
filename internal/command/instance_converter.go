@@ -86,16 +86,6 @@ func writeModelToMailTemplatePolicy(wm *MailTemplateWriteModel) *domain.MailTemp
 	}
 }
 
-func writeModelToCustomText(wm *CustomTextWriteModel) *domain.CustomText {
-	return &domain.CustomText{
-		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
-		State:      wm.State,
-		Key:        wm.Key,
-		Language:   wm.Language,
-		Text:       wm.Text,
-	}
-}
-
 func writeModelToPasswordAgePolicy(wm *PasswordAgePolicyWriteModel) *domain.PasswordAgePolicy {
 	return &domain.PasswordAgePolicy{
 		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),

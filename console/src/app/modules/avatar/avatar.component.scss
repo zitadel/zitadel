@@ -1,8 +1,6 @@
-@use '@angular/material' as mat;
-
 @mixin avatar-theme($theme) {
   $primary: map-get($theme, primary);
-  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-color: map-get($primary, 500);
 
   .avatar-circle {
     border-radius: 50%;

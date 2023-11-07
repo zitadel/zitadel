@@ -146,7 +146,6 @@ export class ProviderJWTComponent {
     req.setJwtEndpoint(this.jwtEndpoint?.value);
     req.setKeysEndpoint(this.keysEndpoint?.value);
     req.setProviderOptions(this.options);
-
     this.loading = true;
     this.service
       .addJWTProvider(req)

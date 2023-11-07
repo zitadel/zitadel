@@ -424,6 +424,7 @@ Errors:
     AuditRetention: Историјата е надвор од задржувањето на аудитот
   Token:
     NotFound: Токенот не е пронајден
+    Invalid: Токенот е невалиден
   UserSession:
     NotFound: Корисничката сесија не е пронајдена
   Key:
@@ -490,6 +491,8 @@ Errors:
   Session:
     NotExisting: Сесијата не постои
     Terminated: Сесијата е веќе завршена
+    Expired: Сесијата истече
+    PositiveLifetime: Времетраењето на сесијата не смее да биде помало од 0
     Token:
       Invalid: Токенот за сесија е невалиден
     WebAuthN:

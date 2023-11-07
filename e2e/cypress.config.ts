@@ -60,6 +60,7 @@ export default defineConfig({
   e2e: {
     baseUrl: baseUrl(),
     experimentalRunAllSpecs: true,
+    experimentalOriginDependencies: true,
     setupNodeEvents(on, config) {
 
       startWebhookEventHandler()

@@ -153,6 +153,9 @@ func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID
 	if err != nil {
 		return "", "", "", err
 	}
+	if !session.Expiration.IsZero() && session.Expiration.Before(time.Now()) {
+		return "", "", "", caos_errs.ThrowPermissionDenied(nil, "AUTHZ-EGDo3", "session expired")
+	}
 	if err = repo.checkAuthentication(ctx, authMethodsFromSession(session), session.UserFactor.UserID); err != nil {
 		return "", "", "", err
 	}

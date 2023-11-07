@@ -424,6 +424,7 @@ Errors:
     AuditRetention: Änderungsverlauf ist ausserhalb der Audit Log Retention
   Token:
     NotFound: Token konnte nicht gefunden werden
+    Invalid: Token ist ungültig
   UserSession:
     NotFound: Benutzer Sitzung konnte nicht gefunden werden
   Key:
@@ -490,6 +491,8 @@ Errors:
   Session:
     NotExisting: Session existiert nicht
     Terminated: Session bereits beendet
+    Expired: Session ist abgelaufen
+    PositiveLifetime: Session Lebensdauer darf nicht kleiner als 0 sein
     Token:
       Invalid: Session Token ist ungültig
     WebAuthN:

@@ -254,8 +254,10 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bo
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerAppProjection")
 		ctx, err = projection.AppProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	stmt, scan := prepareAppQuery(ctx, q.client)

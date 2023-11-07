@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Domain, DomainValidationType } from 'src/app/proto/generated/zitadel/org_pb';
@@ -63,7 +63,6 @@ export class DomainsComponent implements OnInit {
 
   public addNewDomain(): void {
     const dialogRef = this.dialog.open(AddDomainDialogComponent, {
-      data: {},
       width: '400px',
     });
 

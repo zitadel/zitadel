@@ -67,7 +67,7 @@ We understand that these advisories may include breaking changes, and we aim to 
       facing UI yourself and not use ZITADELs console UI.
       ZITADEL hosted Login-UI is not affected by this change.
     </td>
-    <td>TBD</td>
+    <td>2.40.0</td>
     <td>Calendar week 44</td>
   </tr>
   <tr>
@@ -159,3 +159,10 @@ A breaking behavior change refers to a modification or update that changes the b
 This change does not necessarily affect the APIs or any functions you are calling, so it may not require an update to your code.
 However, if you rely on specific results or behaviors, they may no longer be guaranteed after the change is implemented.
 Therefore, it is important to be aware of breaking behavior changes and their potential impact on your use of ZITADEL, and to take appropriate action if needed to ensure continued functionality.
+
+### Expected downtime during upgrade
+
+Expected downtime during upgrade means that ZITADEL might become unavailable during and upgrade.
+ZITADEL is built for [zero downtime upgrades](/docs/concepts/architecture/solution#zero-downtime-updates) at upgrades can be executed without downtime by just updating to a more recent version.
+When deploying certain changes a zero downtime upgrade might not be possible, for example to guarantee data integrity.
+In such cases we will issue a technical advisory to make you aware of this unexpected behavior.

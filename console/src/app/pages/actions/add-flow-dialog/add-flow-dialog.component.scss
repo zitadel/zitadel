@@ -9,8 +9,11 @@
 
 .action {
   display: flex;
-  justify-content: space-between;
   margin-top: 1rem;
+
+  .fill-space {
+    flex: 1;
+  }
 
   .ok-button {
     margin-left: 0.5rem;

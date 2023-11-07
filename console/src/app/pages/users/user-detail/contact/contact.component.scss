@@ -1,5 +1,3 @@
-@use '@angular/material' as mat;
-
 @mixin contact-theme($theme) {
   $foreground: map-get($theme, foreground);
   $background: map-get($theme, background);
@@ -86,8 +84,4 @@
       }
     }
   }
-}
-
-.mat-form-field-wrapper {
-  padding-bottom: 0 !important;
 }

@@ -85,8 +85,10 @@ func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bo
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerUserMetadataProjection")
 		ctx, err = projection.UserMetadataProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	query, scan := prepareUserMetadataQuery(ctx, q.client)
@@ -118,8 +120,10 @@ func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerUserMetadataProjection")
 		ctx, err = projection.UserMetadataProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	query, scan := prepareUserMetadataListQuery(ctx, q.client)
@@ -195,7 +199,7 @@ func prepareUserMetadataQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-Rgh32", "Errors.User.NotFound")
+					return nil, errors.ThrowNotFound(err, "QUERY-Rgh32", "Errors.Metadata.NotFound")
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-Hhjt2", "Errors.Internal")
 			}

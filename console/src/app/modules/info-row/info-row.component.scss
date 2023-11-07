@@ -1,5 +1,3 @@
-@use '@angular/material' as mat;
-
 @mixin info-row-theme($theme) {
   $foreground: map-get($theme, foreground);
   $button-text-color: map-get($foreground, text);
