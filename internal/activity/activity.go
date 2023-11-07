@@ -44,7 +44,7 @@ func (t TriggerMethod) String() string {
 	}
 }
 
-func Trigger(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
+func TriggerHTTP(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
 	ai := info.ActivityInfoFromContext(ctx)
 	triggerLog(
 		authz.GetInstance(ctx).InstanceID(),
@@ -59,7 +59,24 @@ func Trigger(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
 	)
 }
 
-func TriggerWithContext(ctx context.Context, trigger TriggerMethod) {
+func TriggerGRPC(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
+	ai := info.ActivityInfoFromContext(ctx)
+	// GRPC call the method is contained in the HTTP request path
+	method := ai.Path
+	triggerLog(
+		authz.GetInstance(ctx).InstanceID(),
+		orgID,
+		userID,
+		http_utils.ComposedOrigin(ctx),
+		trigger,
+		method,
+		"",
+		ai.RequestMethod,
+		authz.GetCtxData(ctx).SystemMemberships != nil,
+	)
+}
+
+func TriggerGRPCWithContext(ctx context.Context, trigger TriggerMethod) {
 	ai := info.ActivityInfoFromContext(ctx)
 	// GRPC call the method is contained in the HTTP request path
 	method := ai.Path
