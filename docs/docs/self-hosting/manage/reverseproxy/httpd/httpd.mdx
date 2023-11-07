@@ -3,43 +3,27 @@ title: Configure ZITADEL with Apache httpd
 sidebar_label: Apache httpd
 ---
 
-import CodeBlock from '@theme/CodeBlock';
-
-import Overview from '../_overview.mdx';
-import Commands from '../_commands.mdx';
-import Description from '../_description.mdx';
+import ProxyGuideOverview from '../_proxy_guide_overview.mdx';
+import ProxyGuideTLSMode from '../_proxy_guide_tls_mode.mdx';
 import Compose from "!!raw-loader!./docker-compose.yaml";
 import ConfigDisabled from "!!raw-loader!./httpd-disabled-tls.conf";
 import ConfigExternal from "!!raw-loader!./httpd-external-tls.conf";
 import ConfigEnabled from "!!raw-loader!./httpd-enabled-tls.conf";
 
-export const link = <a href="https://httpd.apache.org//">Apache httpd</a>
+export const providername = "Apache httpd";
+export const lower = "httpd";
+export const link = <a href="https://httpd.apache.org//">{providername}</a>
 
-<Overview link={link} compose={Compose}/>
+<ProxyGuideOverview link={link} compose={Compose}></ProxyGuideOverview>
 
 ## TLS mode disabled
 
-<Description link={link} mode="disabled"/>
-<details open>
-    <summary>httpd-disabled-tls.yaml</summary>
-    <CodeBlock language="conf">{ConfigDisabled}</CodeBlock>
-</details>
-<Commands name="Apache httpd" lower="httpd" configfile="httpd-disabled-tls.conf" mode="disabled"/>
+<ProxyGuideTLSMode mode="disabled" configfilename="httpd-disabled-tls.conf" configfilecontent={ConfigDisabled} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
 
 ## TLS mode external
 
-<Description link={link} mode="external"/>
-<details open>
-    <summary>caddy-external-tls.yaml</summary>
-    <CodeBlock language="conf">{ConfigExternal}</CodeBlock>
-</details>
-<Commands name="Apache httpd" lower="httpd" configfile="httpd-external-tls.conf" mode="external"/>
+<ProxyGuideTLSMode mode="external" configfilename="httpd-external-tls.conf" configfilecontent={ConfigExternal} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
 
 ## TLS mode enabled
 
-<Description link={link} mode="enabled"/>
-<details open>
-    <summary>caddy-external-tls.yaml</summary>
-    <CodeBlock language="conf">{ConfigEnabled}</CodeBlock>
-</details>
-<Commands name="Apache httpd" lower="httpd" configfile="httpd-enabled-tls.conf" mode="enabled"/>
+<ProxyGuideTLSMode mode="enabled" configfilename="httpd-enabled-tls.conf" configfilecontent={ConfigEnabled} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>

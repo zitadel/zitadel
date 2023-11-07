@@ -2,52 +2,13 @@
 title: Reverse Proxy Configuration
 ---
 
-When configuring a reverse proxy in front of ZITADEL, you need to make sure that HTTP/2 is enabled.
-For getting started with your favorite reverse proxy, we have prepared some examples for you.
-Where possible, all three ZITADEL TLS modes are
+Check out one of the following guides to configure your favorite reverse proxy:
 
+- [Traefik](/self-hosting/manage/reverseproxy/traefik)
+- [NGINX](/self-hosting/manage/reverseproxy/nginx)
+- [Caddy](/self-hosting/manage/reverseproxy/caddy)
+- [Apache httpd](/self-hosting/manage/reverseproxy/httpd)
+- [Cloudflare](/self-hosting/manage/reverseproxy/cloudflare)
+- [Cloudflare Tunnel](/self-hosting/manage/reverseproxy/cloudflare_tunnel)
+- [Fronting ZITADEL Cloud](/self-hosting/manage/reverseproxy/zitadel_cloud)
 
-
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import Zcloud from "./_zitadel_cloud.mdx";
-import Caddy from "./_caddy.mdx";
-import Httpd from "./_httpd.mdx";
-import Cftunnel from "./_cloudflare_tunnel.mdx";
-import Cloudflare from "./_cloudflare.mdx";
-import More from "./_more.mdx";
-
-
-
-<Tabs
-  groupId="proxy-vendor"
-  default="zcloud"
-  values={[
-    { label: "ZITADEL Cloud", value: "zcloud" },
-    { label: "Caddy", value: "caddy" },
-    { label: "Apache httpd", value: "httpd" },
-    { label: "Cloudflare Tunnel", value: "cftunnel" },
-    { label: "Cloudflare", value: "cf" },
-  ]}
->
-  <TabItem value="zcloud">
-    <Zcloud />
-    <More />
-  </TabItem>
-  <TabItem value="caddy">
-    <Caddy />
-    <More />
-  </TabItem>
-  <TabItem value="httpd">
-    <Httpd />
-    <More />
-  </TabItem>
-  <TabItem value="cftunnel">
-    <Cftunnel />
-    <More />
-  </TabItem>
-  <TabItem value="cf">
-    <Cloudflare />
-    <More />
-  </TabItem>
-</Tabs>

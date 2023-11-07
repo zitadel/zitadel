@@ -3,43 +3,27 @@ title: Configure ZITADEL with NGINX
 sidebar_label: NGINX
 ---
 
-import CodeBlock from '@theme/CodeBlock';
-
-import Overview from '../_overview.mdx';
+import ProxyGuideOverview from '../_proxy_guide_overview.mdx';
+import ProxyGuideTLSMode from '../_proxy_guide_tls_mode.mdx';
 import Compose from "!!raw-loader!./docker-compose.yaml";
-import Description from '../_description.mdx';
-import Commands from '../_commands.mdx';
 import ConfigDisabled from "!!raw-loader!./nginx-disabled-tls.conf";
 import ConfigExternal from "!!raw-loader!./nginx-external-tls.conf";
 import ConfigEnabled from "!!raw-loader!./nginx-enabled-tls.conf";
 
-export const link = <a href="https://nginx.com/">NGINX</a>
+export const providername = 'NGINX';
+export const lower = "nginx";
+export const link = <a href="https://nginx.com/">{providername}</a>;
 
-<Overview link={link} compose={Compose}></Overview>
+<ProxyGuideOverview link={link} compose={Compose}></ProxyGuideOverview>
 
 ## TLS mode disabled
 
-<Description link={link} mode="disabled"/>
-<details open>
-    <summary>nginx-disabled-tls.conf</summary>
-    <CodeBlock>{ConfigDisabled}</CodeBlock>
-</details>
-<Commands name="NGINX" lower="nginx" configfile="nginx-disabled-tls.conf" mode="disabled"/>
+<ProxyGuideTLSMode mode="disabled" configfilename="nginx-disabled-tls.conf" configfilecontent={ConfigDisabled} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
 
 ## TLS mode external
 
-<Description link={link} mode="external"/>
-<details open>
-    <summary>nginx-external-tls.conf</summary>
-    <CodeBlock>{ConfigExternal}</CodeBlock>
-</details>
-<Commands name="NGINX" lower="nginx" configfile="nginx-external-tls.conf" mode="external"/>
+<ProxyGuideTLSMode mode="external" configfilename="nginx-external-tls.conf" configfilecontent={ConfigExternal} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
 
 ## TLS mode enabled
 
-<Description link={link} mode="enabled"/>
-<details open>
-    <summary>nginx-external-tls.conf</summary>
-    <CodeBlock>{ConfigEnabled}</CodeBlock>
-</details>
-<Commands name="NGINX" lower="nginx" configfile="nginx-enabled-tls.conf" mode="enabled"/>
+<ProxyGuideTLSMode mode="enabled" configfilename="nginx-enabled-tls.conf" configfilecontent={ConfigEnabled} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>

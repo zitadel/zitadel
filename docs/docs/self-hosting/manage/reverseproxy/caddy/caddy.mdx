@@ -3,43 +3,32 @@ title: Configure ZITADEL with Caddy
 sidebar_label: Caddy
 ---
 
-import CodeBlock from '@theme/CodeBlock';
-
-import Overview from '../_overview.mdx';
+import ProxyGuideOverview from '../_proxy_guide_overview.mdx';
+import ProxyGuideTLSMode from '../_proxy_guide_tls_mode.mdx';
+import ProxyGuideMore from '../_proxy_guide_more.mdx';
 import Compose from "!!raw-loader!./docker-compose.yaml";
-import Commands from '../_commands.mdx';
-import Description from '../_description.mdx';
 import ConfigDisabled from "!!raw-loader!./disabled-tls.Caddyfile";
 import ConfigExternal from "!!raw-loader!./external-tls.Caddyfile";
 import ConfigEnabled from "!!raw-loader!./enabled-tls.Caddyfile";
 
-export const link=<a href="https://caddyserver.com/">Caddy</a>
+export const providername = 'Caddy';
+export const lower = "caddy";
+export const link = <a href="https://caddyserver.com/">{providername}</a>
 
-<Overview link={link} compose={Compose}/>
+<ProxyGuideOverview link={link} compose={Compose}></ProxyGuideOverview>
 
 ## TLS mode disabled
 
-<Description link={link} mode="disabled"/>
-<details open>
-    <summary>caddy-disabled-tls.yaml</summary>
-    <CodeBlock language="Caddyfile">{ConfigDisabled}</CodeBlock>
-</details>
-<Commands name="Caddy" lower="caddy" configfile="disabled-tls.Caddyfile" mode="disabled"/>
+<ProxyGuideTLSMode mode="disabled" configfilename="disabled-tls.Caddyfile" configfilecontent={ConfigDisabled} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
 
 ## TLS mode external
 
-<Description link={link} mode="external"/>
-<details open>
-    <summary>caddy-external-tls.yaml</summary>
-    <CodeBlock language="Caddyfile">{ConfigExternal}</CodeBlock>
-</details>
-<Commands name="Caddy" lower="caddy" configfile="external-tls.Caddyfile" mode="external"/>
+<ProxyGuideTLSMode mode="external" configfilename="external-tls.Caddyfile" configfilecontent={ConfigExternal} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
 
 ## TLS mode enabled
 
-<Description link={link} mode="enabled"/>
-<details open>
-    <summary>caddy-external-tls.yaml</summary>
-    <CodeBlock language="Caddyfile">{ConfigEnabled}</CodeBlock>
-</details>
-<Commands name="Caddy" lower="caddy" configfile="enabled-tls.Caddyfile" mode="enabled"/>
+<ProxyGuideTLSMode mode="enabled" configfilename="enabled-tls.Caddyfile" configfilecontent={ConfigEnabled} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
+
+## More Information
+
+<ProxyGuideMore></ProxyGuideMore>

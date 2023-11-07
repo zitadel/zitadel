@@ -3,43 +3,27 @@ title: Configure ZITADEL with Traefik
 sidebar_label: Traefik
 ---
 
-import CodeBlock from '@theme/CodeBlock';
-
-import Overview from '../_overview.mdx';
+import ProxyGuideOverview from '../_proxy_guide_overview.mdx';
+import ProxyGuideTLSMode from '../_proxy_guide_tls_mode.mdx';
 import Compose from "!!raw-loader!./docker-compose.yaml";
-import Description from '../_description.mdx';
-import Commands from '../_commands.mdx';
 import ConfigDisabled from "!!raw-loader!./traefik-disabled-tls.yaml";
 import ConfigExternal from "!!raw-loader!./traefik-external-tls.yaml";
 import ConfigEnabled from "!!raw-loader!./traefik-enabled-tls.yaml";
 
-export const link=<a href="https://doc.traefik.io/traefik/">Traefik</a>
+export const providername = 'Traefik';
+export const lower = "traefik";
+export const link = <a href="https://doc.traefik.io/traefik/">{providername}</a>;
 
-<Overview link={link} compose={Compose}/>
+<ProxyGuideOverview link={link} compose={Compose}></ProxyGuideOverview>
 
 ## TLS mode disabled
 
-<Description link={link} mode="disabled"/>
-<details open>
-    <summary>traefik-disabled-tls.yaml</summary>
-    <CodeBlock language="yaml">{ConfigDisabled}</CodeBlock>
-</details>
-<Commands name="Traefik" lower="traefik" configfile="traefik-disabled-tls.yaml" mode="disabled"/>
+<ProxyGuideTLSMode mode="disabled" configfilename="traefik-disabled-tls.yaml" configfilecontent={ConfigDisabled} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
 
 ## TLS mode external
 
-<Description link={link} mode="external"/>
-<details open>
-    <summary>traefik-external-tls.yaml</summary>
-    <CodeBlock language="yaml">{ConfigExternal}</CodeBlock>
-</details>
-<Commands name="Traefik" lower="traefik" configfile="traefik-external-tls.yaml" mode="external"/>
+<ProxyGuideTLSMode mode="external" configfilename="traefik-external-tls.yaml" configfilecontent={ConfigExternal} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
 
 ## TLS mode enabled
 
-<Description link={link} mode="enabled"/>
-<details open>
-    <summary>traefik-external-tls.yaml</summary>
-    <CodeBlock language="yaml">{ConfigEnabled}</CodeBlock>
-</details>
-<Commands name="Traefik" lower="traefik" configfile="traefik-enabled-tls.yaml" mode="enabled"/>
+<ProxyGuideTLSMode mode="enabled" configfilename="traefik-enabled-tls.yaml" configfilecontent={ConfigEnabled} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>

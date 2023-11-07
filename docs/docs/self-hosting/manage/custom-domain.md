@@ -1,31 +1,65 @@
 ---
-title: Run ZITADEL on a Custom Domain
-sidebar: Custom Domain
+title: External ZITADEL Access
+sidebar_label: Instance Not Found
 ---
 
-# Run ZITADEL on a (Sub)domain of Your Choice
+## Why do I get an "Instance not found" error?
+
+Also, ZITADEL has the [concept of virtual instances](/concepts/structure/instance#multiple-virtual-instances).
+It uses a requests Host header to determine which virtual instance to use.
+This is useful for multi-tenancy and resource sharing, for example in SaaS scenarios.
+For most cases however, ZITADEL should run on exactly one domain.
 
 This guide assumes you are already familiar with [configuring ZITADEL](./configure).
 
-You most probably need to configure these fields for making ZITADEL work on your custom domain.
-
 ## Standard Config
 
-For security reasons, ZITADEL only serves requests sent to the expected protocol, host and port.
-If not using localhost as ExternalDomain, ExternalSecure must be true and you need to serve the ZITADEL console over HTTPS.
+ZITADEL only serves requests sent to the expected protocol, host and port.
+For local testing purposes, you can use following configuration:
 
 ```yaml
-ExternalSecure: true
-ExternalDomain: 'zitadel.my.domain'
-ExternalPort: 443
+ExternalDomain: localhost
+ExternalPort: 8080
+ExternalSecure: false
 ```
 
-## Database Initialization Steps Config
+For productive setups however, we recommend using HTTPS and a custom domain:
 
-ZITADEL creates random subdomains for each instance created.
-However, for the first instance, this is most probably not the desired behavior.
-In this case the `ExternalDomain`-field of the configuration is used.
+```yaml
+ExternalDomain: 'zitadel.my.domain'
+ExternalPort: 443
+ExternalSecure: true
+```
 
-## Example
+## Changing ExternalDomain, ExternalPort or ExternalSecure
 
-Go to the [loadbalancing example with Traefik](/docs/self-hosting/deploy/loadbalancing-example) for seeing a working example configuration.
+You can change the ExternalDomain, ExternalPort and ExternalSecure configuration options at any time.
+However, for ZITADEL to be able to pick up the changes, [you need to rerun ZITADELs setup phase](/self-hosting/manage/updating_scaling#the-setup-phase).
+
+## Running ZITADEL behind a Reverse Proxy
+
+If you run ZITADEL behind a reverse proxy, you need to ensure that it sends the correct request headers to ZITADEL.
+The proxy must either ensure that
+- the original *Host* header value is assigned to the *Forwarded* headers host directive.
+- the original requests *Host* header value is unchanged by the proxy.
+
+Check out the [reverse proxy configuration examples](/self-hosting/manage/reverseproxy) for more information.
+
+## Organization Domains
+
+Note that by default, you cannot access ZITADEL at an organizations domain.
+Organization level domains [are intended for routing users by their login methods to their correct organization](http://localhost:3000/docs/guides/solution-scenarios/domain-discovery).
+
+However, if you insist on using an organization domain for accessing ZITADEL, [you can add additional domains using the System API](/apis/resources/system/system-service-add-domain#adds-a-domain-to-an-instance).
+Be aware that you won't automatically have the organizations context when you access ZITADEL like this.
+
+## Generated Subdomains
+
+ZITADEL creates random subdomains for [each new virtual instance](/concepts/structure/instance#multiple-virtual-instances).
+You can immediately access the ZITADEL Console an APIs using these subdomains without further actions.
+
+## More Information
+
+- [Check out the production-near loadbalancing example with Traefik](/self-hosting/deploy/loadbalancing-example)
+- [Explore some concrete proxy configuration examples for ZITADEL using the domain 127.0.0.1.sslip.io](/self-hosting/manage/reverseproxy)
+
