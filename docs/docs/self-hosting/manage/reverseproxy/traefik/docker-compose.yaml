@@ -16,6 +16,8 @@ services:
     image: "traefik:v2.10.5"
     volumes:
       - "./traefik-external-tls.yaml:/etc/traefik/traefik.yaml:ro"
+      - "./selfsigned.crt:/etc/certs/selfsigned.crt:ro"
+      - "./selfsigned.key:/etc/certs/selfsigned.key:ro"
     ports:
       - "443:443"
     depends_on:
@@ -26,6 +28,8 @@ services:
     image: "traefik:v2.10.5"
     volumes:
       - "./traefik-enabled-tls.yaml:/etc/traefik/traefik.yaml:ro"
+      - "./selfsigned.crt:/etc/certs/selfsigned.crt:ro"
+      - "./selfsigned.key:/etc/certs/selfsigned.key:ro"
     ports:
       - "443:443"
     depends_on:

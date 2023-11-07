@@ -1,6 +1,5 @@
 log:
   level: "DEBUG"
-
 entrypoints:
   web:
     address: ":80"
@@ -19,4 +18,3 @@ http:
       loadBalancer:
         servers:
           - url: "h2c://zitadel-disabled-tls:8080"
-            port: 8080

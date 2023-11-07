@@ -1,6 +1,12 @@
 log:
   level: "DEBUG"
 
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/certs/selfsigned.crt
+        keyFile: /etc/certs/selfsigned.key
 entrypoints:
   web:
     address: ":443"
@@ -14,14 +20,13 @@ http:
         - "web"
       service: "zitadel"
       rule: 'PathPrefix(`/`)'
-      tls:
-        domains:
-          - main: "127.0.0.1.sslip.io"
-            sans:
-              - "*.127.0.0.1.sslip.io"
-              - "127.0.0.1.sslip.io"
+      tls: {}
+  serversTransports:
+    zitadel:
+      insecureSkipVerify: true
   services:
     zitadel:
       loadBalancer:
+        serversTransport: "zitadel"
         servers:
           - url: "https://zitadel-enabled-tls:8080"
