@@ -158,7 +158,7 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
 		},
@@ -177,7 +177,7 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
 			wantUserAgent: &session.UserAgent{
@@ -205,7 +205,7 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
 			wantExpirationWindow: 5 * time.Minute,
@@ -224,7 +224,7 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
 			wantFactors: []wantFactor{wantUserFactor},

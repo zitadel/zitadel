@@ -204,7 +204,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				},
 			},
 			args{
-				ctx: authz.NewMockContext("", "org1", ""),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				userAgent: &domain.UserAgent{
 					FingerprintID: gu.Ptr("fp1"),
 					IP:            net.ParseIP("1.2.3.4"),
@@ -231,7 +231,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				},
 			},
 			args{
-				ctx: authz.NewMockContext("", "org1", ""),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				userAgent: &domain.UserAgent{
 					FingerprintID: gu.Ptr("fp1"),
 					IP:            net.ParseIP("1.2.3.4"),
@@ -244,7 +244,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				expectFilter(),
 				expectPush(
 					session.NewAddedEvent(context.Background(),
-						&session.NewAggregate("sessionID", "org1").Aggregate,
+						&session.NewAggregate("sessionID", "instance1").Aggregate,
 						&domain.UserAgent{
 							FingerprintID: gu.Ptr("fp1"),
 							IP:            net.ParseIP("1.2.3.4"),
@@ -252,15 +252,15 @@ func TestCommands_CreateSession(t *testing.T) {
 							Header:        http.Header{"foo": []string{"bar"}},
 						},
 					),
-					session.NewLifetimeSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, 10*time.Minute),
-					session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+					session.NewLifetimeSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate, 10*time.Minute),
+					session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 						"tokenID",
 					),
 				),
 			},
 			res{
 				want: &SessionChanged{
-					ObjectDetails: &domain.ObjectDetails{ResourceOwner: "org1"},
+					ObjectDetails: &domain.ObjectDetails{ResourceOwner: "instance1"},
 					ID:            "sessionID",
 					NewToken:      "token",
 				},
@@ -326,7 +326,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(context.Background(),
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -335,7 +335,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 								},
 							)),
 						eventFromEventPusher(
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 								"tokenID")),
 					),
 				),
@@ -359,7 +359,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(context.Background(),
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -368,7 +368,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 								},
 							)),
 						eventFromEventPusher(
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 								"tokenID")),
 					),
 				),
@@ -384,7 +384,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 			res{
 				want: &SessionChanged{
 					ObjectDetails: &domain.ObjectDetails{
-						ResourceOwner: "org1",
+						ResourceOwner: "instance1",
 					},
 					ID:       "sessionID",
 					NewToken: "",
@@ -463,7 +463,7 @@ func TestCommands_updateSession(t *testing.T) {
 			args{
 				ctx: context.Background(),
 				checks: &SessionCommands{
-					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						func(ctx context.Context, cmd *SessionCommands) error {
 							return caos_errs.ThrowInternal(nil, "id", "check failed")
@@ -481,16 +481,16 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t),
 			},
 			args{
-				ctx: context.Background(),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
-					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands:   []SessionCommand{},
 				},
 			},
 			res{
 				want: &SessionChanged{
 					ObjectDetails: &domain.ObjectDetails{
-						ResourceOwner: "org1",
+						ResourceOwner: "instance1",
 					},
 					ID:       "sessionID",
 					NewToken: "",
@@ -503,9 +503,9 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t),
 			},
 			args{
-				ctx: context.Background(),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
-					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands:   []SessionCommand{},
 					eventstore:        eventstoreExpect(t),
 					createToken: func(sessionID string) (string, string, error) {
@@ -528,19 +528,19 @@ func TestCommands_updateSession(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						session.NewLifetimeSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						session.NewLifetimeSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							10*time.Minute,
 						),
-						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							"tokenID",
 						),
 					),
 				),
 			},
 			args{
-				ctx: context.Background(),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
-					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands:   []SessionCommand{},
 					eventstore:        eventstoreExpect(t),
 					createToken: func(sessionID string) (string, string, error) {
@@ -557,7 +557,7 @@ func TestCommands_updateSession(t *testing.T) {
 			res{
 				want: &SessionChanged{
 					ObjectDetails: &domain.ObjectDetails{
-						ResourceOwner: "org1",
+						ResourceOwner: "instance1",
 					},
 					ID:       "sessionID",
 					NewToken: "token",
@@ -569,27 +569,27 @@ func TestCommands_updateSession(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-							"userID", testNow,
+						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+							"userID", "org1", testNow,
 						),
-						session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow,
 						),
-						session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							map[string][]byte{"key": []byte("value")},
 						),
-						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							"tokenID",
 						),
 					),
 				),
 			},
 			args{
-				ctx: context.Background(),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
-					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID"),
+						CheckUser("userID", "org1"),
 						CheckPassword("password"),
 					},
 					eventstore: eventstoreExpect(t,
@@ -621,7 +621,7 @@ func TestCommands_updateSession(t *testing.T) {
 			res{
 				want: &SessionChanged{
 					ObjectDetails: &domain.ObjectDetails{
-						ResourceOwner: "org1",
+						ResourceOwner: "instance1",
 					},
 					ID:       "sessionID",
 					NewToken: "token",
@@ -634,11 +634,11 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t),
 			},
 			args{
-				ctx: context.Background(),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
-					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID"),
+						CheckUser("userID", "org1"),
 						CheckIntent("intent", "aW50ZW50"),
 					},
 					eventstore: eventstoreExpect(t,
@@ -673,11 +673,11 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t),
 			},
 			args{
-				ctx: context.Background(),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
-					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID"),
+						CheckUser("userID", "org1"),
 						CheckIntent("intent", "aW50ZW50"),
 					},
 					eventstore: eventstoreExpect(t,
@@ -722,11 +722,11 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t),
 			},
 			args{
-				ctx: context.Background(),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
-					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID"),
+						CheckUser("userID", "org1"),
 						CheckIntent("intent2", "aW50ZW50"),
 					},
 					eventstore: eventstoreExpect(t),
@@ -753,23 +753,23 @@ func TestCommands_updateSession(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-							"userID", testNow),
-						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+							"userID", "org1", testNow),
+						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow),
-						session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							map[string][]byte{"key": []byte("value")}),
-						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							"tokenID"),
 					),
 				),
 			},
 			args{
-				ctx: context.Background(),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
-					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID"),
+						CheckUser("userID", "org1"),
 						CheckIntent("intent", "aW50ZW50"),
 					},
 					eventstore: eventstoreExpect(t,
@@ -807,7 +807,7 @@ func TestCommands_updateSession(t *testing.T) {
 			res{
 				want: &SessionChanged{
 					ObjectDetails: &domain.ObjectDetails{
-						ResourceOwner: "org1",
+						ResourceOwner: "instance1",
 					},
 					ID:       "sessionID",
 					NewToken: "token",
@@ -828,13 +828,13 @@ func TestCommands_updateSession(t *testing.T) {
 }
 
 func TestCheckTOTP(t *testing.T) {
-	ctx := authz.NewMockContext("", "org1", "user1")
+	ctx := authz.NewMockContext("instance1", "org1", "user1")
 
 	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	key, secret, err := domain.NewTOTPKey("example.com", "user1", cryptoAlg)
 	require.NoError(t, err)
 
-	sessAgg := &session.NewAggregate("session1", "org1").Aggregate
+	sessAgg := &session.NewAggregate("session1", "instance1").Aggregate
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 
 	code, err := totp.GenerateCode(key.Secret(), testNow)
@@ -1000,7 +1000,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(context.Background(),
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -1009,7 +1009,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 								},
 							)),
 						eventFromEventPusher(
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 								"tokenID")),
 					),
 				),
@@ -1033,7 +1033,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(context.Background(),
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -1042,10 +1042,10 @@ func TestCommands_TerminateSession(t *testing.T) {
 								},
 							)),
 						eventFromEventPusher(
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 								"tokenID")),
 						eventFromEventPusher(
-							session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
+							session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate)),
 					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
@@ -1059,7 +1059,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 			},
 			res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance1",
 				},
 			},
 		},
@@ -1070,7 +1070,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(context.Background(),
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -1079,13 +1079,13 @@ func TestCommands_TerminateSession(t *testing.T) {
 								},
 							)),
 						eventFromEventPusher(
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 								"tokenID"),
 						),
 					),
 					expectPushFailed(
 						caos_errs.ThrowInternal(nil, "id", "pushed failed"),
-						session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate),
+						session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate),
 					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
@@ -1108,7 +1108,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(context.Background(),
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -1117,12 +1117,12 @@ func TestCommands_TerminateSession(t *testing.T) {
 								},
 							)),
 						eventFromEventPusher(
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 								"tokenID"),
 						),
 					),
 					expectPush(
-						session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate),
+						session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate),
 					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
@@ -1136,7 +1136,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 			},
 			res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance1",
 				},
 			},
 		},

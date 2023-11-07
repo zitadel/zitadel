@@ -39,6 +39,7 @@ type SessionWriteModel struct {
 
 	TokenID              string
 	UserID               string
+	UserResourceOwner    string
 	UserCheckedAt        time.Time
 	PasswordCheckedAt    time.Time
 	IntentCheckedAt      time.Time
@@ -58,14 +59,14 @@ type SessionWriteModel struct {
 	aggregate *eventstore.Aggregate
 }
 
-func NewSessionWriteModel(sessionID string, resourceOwner string) *SessionWriteModel {
+func NewSessionWriteModel(sessionID string, instanceID string) *SessionWriteModel {
 	return &SessionWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   sessionID,
-			ResourceOwner: resourceOwner,
+			ResourceOwner: instanceID,
 		},
 		Metadata:  make(map[string][]byte),
-		aggregate: &session.NewAggregate(sessionID, resourceOwner).Aggregate,
+		aggregate: &session.NewAggregate(sessionID, instanceID).Aggregate,
 	}
 }
 

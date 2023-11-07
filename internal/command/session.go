@@ -55,12 +55,12 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 }
 
 // CheckUser defines a user check to be executed for a session update
-func CheckUser(id string) SessionCommand {
+func CheckUser(id string, resourceOwner string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) error {
 		if cmd.sessionWriteModel.UserID != "" && id != "" && cmd.sessionWriteModel.UserID != id {
 			return caos_errs.ThrowInvalidArgument(nil, "", "user change not possible")
 		}
-		return cmd.UserChecked(ctx, id, cmd.now())
+		return cmd.UserChecked(ctx, id, resourceOwner, cmd.now())
 	}
 }
 
@@ -170,10 +170,11 @@ func (s *SessionCommands) Start(ctx context.Context, userAgent *domain.UserAgent
 	s.eventCommands = append(s.eventCommands, session.NewAddedEvent(ctx, s.sessionWriteModel.aggregate, userAgent))
 }
 
-func (s *SessionCommands) UserChecked(ctx context.Context, userID string, checkedAt time.Time) error {
-	s.eventCommands = append(s.eventCommands, session.NewUserCheckedEvent(ctx, s.sessionWriteModel.aggregate, userID, checkedAt))
+func (s *SessionCommands) UserChecked(ctx context.Context, userID, resourceOwner string, checkedAt time.Time) error {
+	s.eventCommands = append(s.eventCommands, session.NewUserCheckedEvent(ctx, s.sessionWriteModel.aggregate, userID, resourceOwner, checkedAt))
 	// set the userID so other checks can use it
 	s.sessionWriteModel.UserID = userID
+	s.sessionWriteModel.UserResourceOwner = resourceOwner
 	return nil
 }
 
@@ -267,7 +268,7 @@ func (s *SessionCommands) gethumanWriteModel(ctx context.Context) (*HumanWriteMo
 	if s.sessionWriteModel.UserID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-eeR2e", "Errors.User.UserIDMissing")
 	}
-	humanWriteModel := NewHumanWriteModel(s.sessionWriteModel.UserID, s.sessionWriteModel.ResourceOwner)
+	humanWriteModel := NewHumanWriteModel(s.sessionWriteModel.UserID, s.sessionWriteModel.UserResourceOwner)
 	err := s.eventstore.FilterToQueryReducer(ctx, humanWriteModel)
 	if err != nil {
 		return nil, err
@@ -296,7 +297,7 @@ func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, met
 	if err != nil {
 		return nil, err
 	}
-	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetCtxData(ctx).OrgID)
+	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
 	if err != nil {
 		return nil, err
@@ -307,7 +308,7 @@ func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, met
 }
 
 func (c *Commands) UpdateSession(ctx context.Context, sessionID, sessionToken string, cmds []SessionCommand, metadata map[string][]byte, lifetime time.Duration) (set *SessionChanged, err error) {
-	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetCtxData(ctx).OrgID)
+	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
 	if err != nil {
 		return nil, err
@@ -328,7 +329,7 @@ func (c *Commands) TerminateSessionWithoutTokenCheck(ctx context.Context, sessio
 }
 
 func (c *Commands) terminateSession(ctx context.Context, sessionID, sessionToken string, mustCheckToken bool) (*domain.ObjectDetails, error) {
-	sessionWriteModel := NewSessionWriteModel(sessionID, "")
+	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
 	if err := c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}

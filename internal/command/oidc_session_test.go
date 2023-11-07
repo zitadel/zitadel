@@ -166,7 +166,7 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(context.Background(),
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -177,7 +177,7 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 						),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,
-								"userID", testNow),
+								"userID", "org1", testNow),
 						),
 						eventFromEventPusher(
 							session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,
@@ -367,7 +367,7 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(context.Background(),
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -378,7 +378,7 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 						),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,
-								"userID", testNow),
+								"userID", "org1", testNow),
 						),
 						eventFromEventPusher(
 							session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,

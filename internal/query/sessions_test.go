@@ -20,63 +20,63 @@ import (
 )
 
 var (
-	expectedSessionQuery = regexp.QuoteMeta(`SELECT projections.sessions7.id,` +
-		` projections.sessions7.creation_date,` +
-		` projections.sessions7.change_date,` +
-		` projections.sessions7.sequence,` +
-		` projections.sessions7.state,` +
-		` projections.sessions7.resource_owner,` +
-		` projections.sessions7.creator,` +
-		` projections.sessions7.user_id,` +
-		` projections.sessions7.user_checked_at,` +
+	expectedSessionQuery = regexp.QuoteMeta(`SELECT projections.sessions8_1.id,` +
+		` projections.sessions8_1.creation_date,` +
+		` projections.sessions8_1.change_date,` +
+		` projections.sessions8_1.sequence,` +
+		` projections.sessions8_1.state,` +
+		` projections.sessions8_1.resource_owner,` +
+		` projections.sessions8_1.creator,` +
+		` projections.sessions8_1.user_id,` +
+		` projections.sessions8_1.user_checked_at,` +
 		` projections.login_names2.login_name,` +
 		` projections.users8_humans.display_name,` +
 		` projections.users8.resource_owner,` +
-		` projections.sessions7.password_checked_at,` +
-		` projections.sessions7.intent_checked_at,` +
-		` projections.sessions7.webauthn_checked_at,` +
-		` projections.sessions7.webauthn_user_verified,` +
-		` projections.sessions7.totp_checked_at,` +
-		` projections.sessions7.otp_sms_checked_at,` +
-		` projections.sessions7.otp_email_checked_at,` +
-		` projections.sessions7.metadata,` +
-		` projections.sessions7.token_id,` +
-		` projections.sessions7.user_agent_fingerprint_id,` +
-		` projections.sessions7.user_agent_ip,` +
-		` projections.sessions7.user_agent_description,` +
-		` projections.sessions7.user_agent_header,` +
-		` projections.sessions7.expiration` +
-		` FROM projections.sessions7` +
-		` LEFT JOIN projections.login_names2 ON projections.sessions7.user_id = projections.login_names2.user_id AND projections.sessions7.instance_id = projections.login_names2.instance_id` +
-		` LEFT JOIN projections.users8_humans ON projections.sessions7.user_id = projections.users8_humans.user_id AND projections.sessions7.instance_id = projections.users8_humans.instance_id` +
-		` LEFT JOIN projections.users8 ON projections.sessions7.user_id = projections.users8.id AND projections.sessions7.instance_id = projections.users8.instance_id` +
+		` projections.sessions8_1.password_checked_at,` +
+		` projections.sessions8_1.intent_checked_at,` +
+		` projections.sessions8_1.webauthn_checked_at,` +
+		` projections.sessions8_1.webauthn_user_verified,` +
+		` projections.sessions8_1.totp_checked_at,` +
+		` projections.sessions8_1.otp_sms_checked_at,` +
+		` projections.sessions8_1.otp_email_checked_at,` +
+		` projections.sessions8_1.metadata,` +
+		` projections.sessions8_1.token_id,` +
+		` projections.sessions8_1.user_agent_fingerprint_id,` +
+		` projections.sessions8_1.user_agent_ip,` +
+		` projections.sessions8_1.user_agent_description,` +
+		` projections.sessions8_1.user_agent_header,` +
+		` projections.sessions8_1.expiration` +
+		` FROM projections.sessions8_1` +
+		` LEFT JOIN projections.login_names2 ON projections.sessions8_1.user_id = projections.login_names2.user_id AND projections.sessions8_1.instance_id = projections.login_names2.instance_id` +
+		` LEFT JOIN projections.users8_humans ON projections.sessions8_1.user_id = projections.users8_humans.user_id AND projections.sessions8_1.instance_id = projections.users8_humans.instance_id` +
+		` LEFT JOIN projections.users8 ON projections.sessions8_1.user_id = projections.users8.id AND projections.sessions8_1.instance_id = projections.users8.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
-	expectedSessionsQuery = regexp.QuoteMeta(`SELECT projections.sessions7.id,` +
-		` projections.sessions7.creation_date,` +
-		` projections.sessions7.change_date,` +
-		` projections.sessions7.sequence,` +
-		` projections.sessions7.state,` +
-		` projections.sessions7.resource_owner,` +
-		` projections.sessions7.creator,` +
-		` projections.sessions7.user_id,` +
-		` projections.sessions7.user_checked_at,` +
+	expectedSessionsQuery = regexp.QuoteMeta(`SELECT projections.sessions8_1.id,` +
+		` projections.sessions8_1.creation_date,` +
+		` projections.sessions8_1.change_date,` +
+		` projections.sessions8_1.sequence,` +
+		` projections.sessions8_1.state,` +
+		` projections.sessions8_1.resource_owner,` +
+		` projections.sessions8_1.creator,` +
+		` projections.sessions8_1.user_id,` +
+		` projections.sessions8_1.user_checked_at,` +
 		` projections.login_names2.login_name,` +
 		` projections.users8_humans.display_name,` +
 		` projections.users8.resource_owner,` +
-		` projections.sessions7.password_checked_at,` +
-		` projections.sessions7.intent_checked_at,` +
-		` projections.sessions7.webauthn_checked_at,` +
-		` projections.sessions7.webauthn_user_verified,` +
-		` projections.sessions7.totp_checked_at,` +
-		` projections.sessions7.otp_sms_checked_at,` +
-		` projections.sessions7.otp_email_checked_at,` +
-		` projections.sessions7.metadata,` +
-		` projections.sessions7.expiration,` +
+		` projections.sessions8_1.password_checked_at,` +
+		` projections.sessions8_1.intent_checked_at,` +
+		` projections.sessions8_1.webauthn_checked_at,` +
+		` projections.sessions8_1.webauthn_user_verified,` +
+		` projections.sessions8_1.totp_checked_at,` +
+		` projections.sessions8_1.otp_sms_checked_at,` +
+		` projections.sessions8_1.otp_email_checked_at,` +
+		` projections.sessions8_1.metadata,` +
+		` projections.sessions8_1.expiration,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.sessions7` +
-		` LEFT JOIN projections.login_names2 ON projections.sessions7.user_id = projections.login_names2.user_id AND projections.sessions7.instance_id = projections.login_names2.instance_id` +
-		` LEFT JOIN projections.users8_humans ON projections.sessions7.user_id = projections.users8_humans.user_id AND projections.sessions7.instance_id = projections.users8_humans.instance_id` +
-		` LEFT JOIN projections.users8 ON projections.sessions7.user_id = projections.users8.id AND projections.sessions7.instance_id = projections.users8.instance_id` +
+		` FROM projections.sessions8_1` +
+		` LEFT JOIN projections.login_names2 ON projections.sessions8_1.user_id = projections.login_names2.user_id AND projections.sessions8_1.instance_id = projections.login_names2.instance_id` +
+		` LEFT JOIN projections.users8_humans ON projections.sessions8_1.user_id = projections.users8_humans.user_id AND projections.sessions8_1.instance_id = projections.users8_humans.instance_id` +
+		` LEFT JOIN projections.users8 ON projections.sessions8_1.user_id = projections.users8.id AND projections.sessions8_1.instance_id = projections.users8.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
 
 	sessionCols = []string{

@@ -357,7 +357,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(mockCtx,
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -366,15 +366,15 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								},
 							)),
 						eventFromEventPusher(
-							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
-								"userID", testNow.Add(-5*time.Minute)),
+							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"userID", "org1", testNow.Add(-5*time.Minute)),
 						),
 						eventFromEventPusher(
-							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
 								testNow.Add(-5*time.Minute)),
 						),
 						eventFromEventPusher(
-							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
 								2*time.Minute),
 						),
 					),
@@ -417,7 +417,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(mockCtx,
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -468,7 +468,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(mockCtx,
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -519,7 +519,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(mockCtx,
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -528,15 +528,15 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								},
 							)),
 						eventFromEventPusher(
-							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
-								"userID", testNow),
+							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"userID", "org1", testNow),
 						),
 						eventFromEventPusher(
-							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
 								testNow),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
 								2*time.Minute),
 						),
 					),
@@ -607,7 +607,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(mockCtx,
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -616,15 +616,15 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								},
 							)),
 						eventFromEventPusher(
-							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
-								"userID", testNow),
+							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"userID", "org1", testNow),
 						),
 						eventFromEventPusher(
-							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
 								testNow),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
 								2*time.Minute),
 						),
 					),
