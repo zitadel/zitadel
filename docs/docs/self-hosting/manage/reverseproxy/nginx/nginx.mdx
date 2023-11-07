@@ -6,17 +6,20 @@ sidebar_label: NGINX
 import CodeBlock from '@theme/CodeBlock';
 
 import Overview from '../_overview.mdx';
+import Compose from "!!raw-loader!./docker-compose.yaml";
 import Description from '../_description.mdx';
 import Commands from '../_commands.mdx';
 import ConfigDisabled from "!!raw-loader!./nginx-disabled-tls.conf";
 import ConfigExternal from "!!raw-loader!./nginx-external-tls.conf";
 import ConfigEnabled from "!!raw-loader!./nginx-enabled-tls.conf";
 
-<Overview proxylink={<a href="https://nginx.com/">NGINX</a>}></Overview>
+export const link = <a href="https://nginx.com/">NGINX</a>
+
+<Overview link={link} compose={Compose}></Overview>
 
 ## TLS mode disabled
 
-<Description name="NGINX" mode="disabled"/>
+<Description link={link} mode="disabled"/>
 <details open>
     <summary>nginx-disabled-tls.conf</summary>
     <CodeBlock>{ConfigDisabled}</CodeBlock>
@@ -25,7 +28,7 @@ import ConfigEnabled from "!!raw-loader!./nginx-enabled-tls.conf";
 
 ## TLS mode external
 
-<Description name="NGINX" mode="external"/>
+<Description link={link} mode="external"/>
 <details open>
     <summary>nginx-external-tls.conf</summary>
     <CodeBlock>{ConfigExternal}</CodeBlock>
@@ -34,7 +37,7 @@ import ConfigEnabled from "!!raw-loader!./nginx-enabled-tls.conf";
 
 ## TLS mode enabled
 
-<Description name="NGINX" mode="enabled"/>
+<Description link={link} mode="enabled"/>
 <details open>
     <summary>nginx-external-tls.conf</summary>
     <CodeBlock>{ConfigEnabled}</CodeBlock>

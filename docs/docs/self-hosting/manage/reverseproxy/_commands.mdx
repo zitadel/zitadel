@@ -1,7 +1,7 @@
 import CodeBlock from '@theme/CodeBlock';
 
 export default function ( {name, lower, configfile, mode }) {
-    let genCert = '# Generate a self signed certificate and key.\nopenssl req -x509 -batch -subj "/O=ZITADEL Demo" -nodes -newkey rsa:2048 -keyout ./selfsigned.key -out ./selfsigned.crt\n\n';
+    let genCert = '# Generate a self signed certificate and key.\nopenssl req -x509 -batch -subj "/CN=127.0.0.1.sslip.io/O=ZITADEL Demo" -nodes -newkey rsa:2048 -keyout ./selfsigned.key -out ./selfsigned.crt\n\n';
     if (mode === "disabled") {
         genCert = ''
     }
@@ -12,7 +12,6 @@ export default function ( {name, lower, configfile, mode }) {
                 {'# Download the configuration files.'}{'\n'}
                 {'ZITADEL_CONFIG_FILES=https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/reverseproxy'}{'\n'}
                 {`wget $\{ZITADEL_CONFIG_FILES\}/docker-compose.yaml -O docker-compose-base.yaml`}{'\n'}
-                {'wget $\{ZITADEL_CONFIG_FILES\}/zitadel.yaml'}{'\n'}
                 {'wget $\{ZITADEL_CONFIG_FILES\}/'}{lower}{'/docker-compose.yaml -O docker-compose-'}{lower}{'.yaml'}{'\n'}
                 {'wget $\{ZITADEL_CONFIG_FILES\}/'}{lower}{'/'}{configfile}{'\n'}
                 {'\n'}

@@ -6,17 +6,20 @@ sidebar_label: Traefik
 import CodeBlock from '@theme/CodeBlock';
 
 import Overview from '../_overview.mdx';
+import Compose from "!!raw-loader!./docker-compose.yaml";
 import Description from '../_description.mdx';
 import Commands from '../_commands.mdx';
 import ConfigDisabled from "!!raw-loader!./traefik-disabled-tls.yaml";
 import ConfigExternal from "!!raw-loader!./traefik-external-tls.yaml";
 import ConfigEnabled from "!!raw-loader!./traefik-enabled-tls.yaml";
 
-<Overview proxylink={<a href="https://doc.traefik.io/traefik/">Traefik</a>}/>
+export const link=<a href="https://doc.traefik.io/traefik/">Traefik</a>
+
+<Overview link={link} compose={Compose}/>
 
 ## TLS mode disabled
 
-<Description name="Traefik" mode="disabled"/>
+<Description link={link} mode="disabled"/>
 <details open>
     <summary>traefik-disabled-tls.yaml</summary>
     <CodeBlock language="yaml">{ConfigDisabled}</CodeBlock>
@@ -25,7 +28,7 @@ import ConfigEnabled from "!!raw-loader!./traefik-enabled-tls.yaml";
 
 ## TLS mode external
 
-<Description name="Traefik" mode="external"/>
+<Description link={link} mode="external"/>
 <details open>
     <summary>traefik-external-tls.yaml</summary>
     <CodeBlock language="yaml">{ConfigExternal}</CodeBlock>
@@ -34,7 +37,7 @@ import ConfigEnabled from "!!raw-loader!./traefik-enabled-tls.yaml";
 
 ## TLS mode enabled
 
-<Description name="Traefik" mode="enabled"/>
+<Description link={link} mode="enabled"/>
 <details open>
     <summary>traefik-external-tls.yaml</summary>
     <CodeBlock language="yaml">{ConfigEnabled}</CodeBlock>

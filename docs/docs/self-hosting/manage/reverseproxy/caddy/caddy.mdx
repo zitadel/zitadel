@@ -6,17 +6,20 @@ sidebar_label: Caddy
 import CodeBlock from '@theme/CodeBlock';
 
 import Overview from '../_overview.mdx';
+import Compose from "!!raw-loader!./docker-compose.yaml";
 import Commands from '../_commands.mdx';
 import Description from '../_description.mdx';
 import ConfigDisabled from "!!raw-loader!./disabled-tls.Caddyfile";
 import ConfigExternal from "!!raw-loader!./external-tls.Caddyfile";
 import ConfigEnabled from "!!raw-loader!./enabled-tls.Caddyfile";
 
-<Overview proxylink={<a href="https://caddyserver.com/">Caddy</a>}/>
+export const link=<a href="https://caddyserver.com/">Caddy</a>
+
+<Overview link={link} compose={Compose}/>
 
 ## TLS mode disabled
 
-<Description name="Caddy" mode="disabled"/>
+<Description link={link} mode="disabled"/>
 <details open>
     <summary>caddy-disabled-tls.yaml</summary>
     <CodeBlock language="Caddyfile">{ConfigDisabled}</CodeBlock>
@@ -25,7 +28,7 @@ import ConfigEnabled from "!!raw-loader!./enabled-tls.Caddyfile";
 
 ## TLS mode external
 
-<Description name="Caddy" mode="external"/>
+<Description link={link} mode="external"/>
 <details open>
     <summary>caddy-external-tls.yaml</summary>
     <CodeBlock language="Caddyfile">{ConfigExternal}</CodeBlock>
@@ -34,7 +37,7 @@ import ConfigEnabled from "!!raw-loader!./enabled-tls.Caddyfile";
 
 ## TLS mode enabled
 
-<Description name="Caddy" mode="enabled"/>
+<Description link={link} mode="enabled"/>
 <details open>
     <summary>caddy-external-tls.yaml</summary>
     <CodeBlock language="Caddyfile">{ConfigEnabled}</CodeBlock>
