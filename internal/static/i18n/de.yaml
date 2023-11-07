@@ -491,6 +491,8 @@ Errors:
   Session:
     NotExisting: Session existiert nicht
     Terminated: Session bereits beendet
+    Expired: Session ist abgelaufen
+    PositiveLifetime: Session Lebensdauer darf nicht kleiner als 0 sein
     Token:
       Invalid: Session Token ist ungültig
     WebAuthN:

@@ -27,7 +27,7 @@ func Test_sessionsToPb(t *testing.T) {
 	past := now.Add(-time.Hour)
 
 	sessions := []*query.Session{
-		{ // no factor, with user agent
+		{ // no factor, with user agent and expiration
 			ID:            "999",
 			CreationDate:  now,
 			ChangeDate:    now,
@@ -42,6 +42,7 @@ func Test_sessionsToPb(t *testing.T) {
 				IP:            net.IPv4(1, 2, 3, 4),
 				Header:        http.Header{"foo": []string{"foo", "bar"}},
 			},
+			Expiration: now,
 		},
 		{ // user factor
 			ID:            "999",
@@ -124,7 +125,7 @@ func Test_sessionsToPb(t *testing.T) {
 	}
 
 	want := []*session.Session{
-		{ // no factor, with user agent
+		{ // no factor, with user agent and expiration
 			Id:           "999",
 			CreationDate: timestamppb.New(now),
 			ChangeDate:   timestamppb.New(now),
@@ -139,6 +140,7 @@ func Test_sessionsToPb(t *testing.T) {
 					"foo": {Values: []string{"foo", "bar"}},
 				},
 			},
+			ExpirationDate: timestamppb.New(now),
 		},
 		{ // user factor
 			Id:           "999",

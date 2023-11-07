@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	SessionsProjectionTable = "projections.sessions6"
+	SessionsProjectionTable = "projections.sessions7"
 
 	SessionColumnID                     = "id"
 	SessionColumnCreationDate           = "creation_date"
@@ -39,6 +39,7 @@ const (
 	SessionColumnUserAgentIP            = "user_agent_ip"
 	SessionColumnUserAgentDescription   = "user_agent_description"
 	SessionColumnUserAgentHeader        = "user_agent_header"
+	SessionColumnExpiration             = "expiration"
 )
 
 type sessionProjection struct{}
@@ -77,6 +78,7 @@ func (*sessionProjection) Init() *old_handler.Check {
 			handler.NewColumn(SessionColumnUserAgentIP, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SessionColumnUserAgentDescription, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SessionColumnUserAgentHeader, handler.ColumnTypeJSONB, handler.Nullable()),
+			handler.NewColumn(SessionColumnExpiration, handler.ColumnTypeTimestamp, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(SessionColumnInstanceID, SessionColumnID),
 			handler.WithIndex(handler.NewIndex(
@@ -131,6 +133,10 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  session.MetadataSetType,
 					Reduce: p.reduceMetadataSet,
+				},
+				{
+					Event:  session.LifetimeSetType,
+					Reduce: p.reduceLifetimeSet,
 				},
 				{
 					Event:  session.TerminateType,
@@ -368,6 +374,26 @@ func (p *sessionProjection) reduceMetadataSet(event eventstore.Event) (*handler.
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
 			handler.NewCol(SessionColumnMetadata, e.Metadata),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceLifetimeSet(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*session.LifetimeSetEvent](event)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnExpiration, e.CreationDate().Add(e.Lifetime)),
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnID, e.Aggregate().ID),

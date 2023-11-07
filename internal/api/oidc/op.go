@@ -119,7 +119,8 @@ func NewServer(
 	}
 
 	server := &Server{
-		LegacyServer: op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
+		LegacyServer:        op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
+		signingKeyAlgorithm: config.SigningKeyAlgorithm,
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	server.Handler = op.RegisterLegacyServer(server, op.WithHTTPMiddleware(

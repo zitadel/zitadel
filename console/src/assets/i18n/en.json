@@ -1726,6 +1726,10 @@
       "APPLE": {
         "TITLE": "Sign in with Apple",
         "DESCRIPTION": "Enter the credentials for your Apple Provider"
+      },
+      "SAML": {
+        "TITLE": "Sign in with Saml SP",
+        "DESCRIPTION": "Enter the credentials for your SAML Provider"
       }
     },
     "DETAIL": {
@@ -1846,6 +1850,12 @@
       "UPDATEPRIVATEKEY": "Update Private Key",
       "UPLOADPRIVATEKEY": "Upload Private Key",
       "KEYMAXSIZEEXCEEDED": "Maximum size of 5kB exceeded."
+    },
+    "SAML": {
+      "METADATAXML": "Metadata Xml",
+      "METADATAURL": "Metadata URL",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "Signed Request"
     },
     "TOAST": {
       "SAVED": "Successfully saved.",
