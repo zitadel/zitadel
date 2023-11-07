@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PrivacyPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { faXTwitter } from '@fortawesome/free-brands-svg-icons';
 
 @Component({
   selector: 'cnsl-footer',
@@ -9,6 +10,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 })
 export class FooterComponent implements OnInit {
   public policy?: PrivacyPolicy.AsObject;
+  public faXTwitter = faXTwitter;
   constructor(public authService: GrpcAuthService) {}
 
   ngOnInit(): void {
