@@ -38,12 +38,12 @@ services:
       - ZITADEL_EXTERNALPORT=443
       - ZITADEL_EXTERNALSECURE=true
       - ZITADEL_TLS_ENABLED=true
-      - ZITADEL_TLS_CERTPATH=/selfsigned.crt
-      - ZITADEL_TLS_KEYPATH=/selfsigned.key
+      - ZITADEL_TLS_CERTPATH=/etc/certs/selfsigned.crt
+      - ZITADEL_TLS_KEYPATH=/etc/certs/selfsigned.key
     volumes:
       - ./zitadel.yaml:/zitadel.yaml
-      - ./selfsigned.crt:/selfsigned.crt
-      - ./selfsigned.key:/selfsigned.key
+      - ./selfsigned.crt:/etc/certs/selfsigned.crt
+      - ./selfsigned.key:/etc/certs/selfsigned.key
     depends_on:
       zitadel-init:
         condition: 'service_completed_successfully'
@@ -59,6 +59,8 @@ services:
         condition: 'service_healthy'
     volumes:
       - ./zitadel.yaml:/zitadel.yaml
+    environment:
+      - ZITADEL_DATABASE_COCKROACH_HOST=db
     healthcheck:
       test: ["CMD", "/app/zitadel", "ready"]
       interval: '10s'

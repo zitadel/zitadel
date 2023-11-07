@@ -1,11 +1,11 @@
 log:
   level: "DEBUG"
-entrypoints:
-  web:
-    address: ":80"
 providers:
   file:
     filename: "/etc/traefik/traefik.yaml"
+entrypoints:
+  web:
+    address: ":80"
 http:
   routers:
     router:

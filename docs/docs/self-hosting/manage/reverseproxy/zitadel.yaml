@@ -1,16 +1,11 @@
 # ExternalDomain defines how ZITADEL should be accessed.
-# If ZITADEL can't resolve a requests host to one of these domains,
+# If ZITADEL can't resolve a requests original host to this domain,
 # it will return a 404 Instance not found error.
-ExternalDomain:
-  - 127.0.0.1.sslip.io
-Database:
-  cockroach:
-    # db is the docker service name for the CockroachDB container
-    Host: db
+ExternalDomain: 127.0.0.1.sslip.io
 LogStore:
   Access:
     Stdout:
-      # In case you need to debug your netwwork setup,
+      # In case you need to debug your network setup,
       # it can be handy to have the access logs in the container logs.
       Enabled: true
 FirstInstance:

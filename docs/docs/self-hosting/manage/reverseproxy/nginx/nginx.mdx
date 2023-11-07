@@ -6,45 +6,37 @@ sidebar_label: NGINX
 import CodeBlock from '@theme/CodeBlock';
 
 import Overview from '../_overview.mdx';
-import CommandsIntro from '../_commands_intro.mdx';
-import DescriptionDisabled from '../_description_disabled.mdx';
-import DescriptionExternal from '../_description_external.mdx';
-import DescriptionEnabled from '../_description_enabled.mdx';
+import Description from '../_description.mdx';
+import Commands from '../_commands.mdx';
 import ConfigDisabled from "!!raw-loader!./nginx-disabled-tls.conf";
 import ConfigExternal from "!!raw-loader!./nginx-external-tls.conf";
 import ConfigEnabled from "!!raw-loader!./nginx-enabled-tls.conf";
-import CommandsDisabled from './_commands_disabled.mdx';
-import CommandsExternal from './_commands_external.mdx';
-import CommandsEnabled from './_commands_enabled.mdx';
 
 <Overview proxylink={<a href="https://nginx.com/">NGINX</a>}></Overview>
 
 ## TLS mode disabled
 
-<DescriptionDisabled proxy={'NGINX'}/>
-<CommandsIntro proxy={'NGINX'}/>
+<Description name="NGINX" mode="disabled"/>
 <details open>
     <summary>nginx-disabled-tls.conf</summary>
     <CodeBlock>{ConfigDisabled}</CodeBlock>
 </details>
-<CommandsDisabled/>
+<Commands name="NGINX" lower="nginx" configfile="nginx-disabled-tls.conf" mode="disabled"/>
 
 ## TLS mode external
 
-<DescriptionExternal proxy={'NGINX'}/>
-<CommandsIntro proxy={'NGINX'}/>
+<Description name="NGINX" mode="external"/>
 <details open>
     <summary>nginx-external-tls.conf</summary>
     <CodeBlock>{ConfigExternal}</CodeBlock>
 </details>
-<CommandsExternal/>
+<Commands name="NGINX" lower="nginx" configfile="nginx-external-tls.conf" mode="external"/>
 
 ## TLS mode enabled
 
-<DescriptionEnabled proxy={'NGINX'}/>
-<CommandsIntro proxy={'NGINX'}/>
+<Description name="NGINX" mode="enabled"/>
 <details open>
     <summary>nginx-external-tls.conf</summary>
     <CodeBlock>{ConfigEnabled}</CodeBlock>
 </details>
-<CommandsEnabled/>
+<Commands name="NGINX" lower="nginx" configfile="nginx-enabled-tls.conf" mode="enabled"/>

@@ -1,18 +1,11 @@
 log:
   level: "DEBUG"
-
-tls:
-  stores:
-    default:
-      defaultCertificate:
-        certFile: /etc/certs/selfsigned.crt
-        keyFile: /etc/certs/selfsigned.key
-entrypoints:
-  web:
-    address: ":443"
 providers:
   file:
     filename: "/etc/traefik/traefik.yaml"
+entrypoints:
+  web:
+    address: ":443"
 http:
   routers:
     router:
@@ -21,12 +14,18 @@ http:
       service: "zitadel"
       rule: 'PathPrefix(`/`)'
       tls: {}
-  serversTransports:
-    zitadel:
-      insecureSkipVerify: true
   services:
     zitadel:
       loadBalancer:
         serversTransport: "zitadel"
         servers:
           - url: "https://zitadel-enabled-tls:8080"
+  serversTransports:
+    zitadel:
+      insecureSkipVerify: true
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/certs/selfsigned.crt
+        keyFile: /etc/certs/selfsigned.key

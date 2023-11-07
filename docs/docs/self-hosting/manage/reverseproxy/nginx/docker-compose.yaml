@@ -16,8 +16,8 @@ services:
     image: "nginx:1.25.3-alpine"
     volumes:
       - "./nginx-external-tls.conf:/etc/nginx/nginx.conf:ro"
-      - "./selfsigned.crt:/etc/nginx/ssl/selfsigned.crt:ro"
-      - "./selfsigned.key:/etc/nginx/ssl/selfsigned.key:ro"
+      - "./selfsigned.crt:/etc/certs/selfsigned.crt:ro"
+      - "./selfsigned.key:/etc/certs/selfsigned.key:ro"
     ports:
       - "443:443"
     depends_on:
@@ -28,8 +28,8 @@ services:
     image: "nginx:1.25.3-alpine"
     volumes:
       - "./nginx-enabled-tls.conf:/etc/nginx/nginx.conf:ro"
-      - "./selfsigned.crt:/etc/nginx/ssl/selfsigned.crt:ro"
-      - "./selfsigned.key:/etc/nginx/ssl/selfsigned.key:ro"
+      - "./selfsigned.crt:/etc/certs/selfsigned.crt:ro"
+      - "./selfsigned.key:/etc/certs/selfsigned.key:ro"
     ports:
       - "443:443"
     depends_on:

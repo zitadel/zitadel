@@ -1,0 +1,25 @@
+import CodeBlock from '@theme/CodeBlock';
+
+export default function ( {name, lower, configfile, mode }) {
+    let genCert = '# Generate a self signed certificate and key.\nopenssl req -x509 -batch -subj "/O=ZITADEL Demo" -nodes -newkey rsa:2048 -keyout ./selfsigned.key -out ./selfsigned.crt\n\n';
+    if (mode === "disabled") {
+        genCert = ''
+    }
+    return (
+        <div>
+            <CodeBlock language="bash">
+                {genCert}
+                {'# Download the configuration files.'}{'\n'}
+                {'ZITADEL_CONFIG_FILES=https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/reverseproxy'}{'\n'}
+                {`wget $\{ZITADEL_CONFIG_FILES\}/docker-compose.yaml -O docker-compose-base.yaml`}{'\n'}
+                {'wget $\{ZITADEL_CONFIG_FILES\}/zitadel.yaml'}{'\n'}
+                {'wget $\{ZITADEL_CONFIG_FILES\}/'}{lower}{'/docker-compose.yaml -O docker-compose-'}{lower}{'.yaml'}{'\n'}
+                {'wget $\{ZITADEL_CONFIG_FILES\}/'}{lower}{'/'}{configfile}{'\n'}
+                {'\n'}
+                {'# Run the database, ZITADEL and '}{name}{'.'}{'\n'}
+                {'docker compose --file docker-compose-base.yaml --file docker-compose-'}{lower}{'.yaml up '}{lower}{'-'}{mode}{'-tls --detach'}{'\n'}
+            </CodeBlock>
+        </div>
+    )
+}
+
