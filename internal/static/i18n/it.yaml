@@ -318,7 +318,7 @@ Errors:
       NotActive: Grant del progetto non è attivo
       NotInactive: Grant del progetto non è inattivo
   IAM:
-    NotFound: Istanza non trovata
+    NotFound: Istanza non trovata. Controlla https://zitadel.com/docs/self-hosting/manage/custom-domain
     Member:
       RolesNotChanged: I ruoli non sono stati cambiati
     MemberInvalid: Il membro non è valido

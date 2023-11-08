@@ -315,7 +315,7 @@ Errors:
       NotActive: A concessão do projeto não está ativa
       NotInactive: A concessão do projeto não está inativa
   IAM:
-    NotFound: Instância não encontrada
+    NotFound: Instância não encontrada. Confira https://zitadel.com/docs/self-hosting/manage/custom-domain
     Member:
       RolesNotChanged: As funções não foram alteradas
     MemberInvalid: O membro é inválido
