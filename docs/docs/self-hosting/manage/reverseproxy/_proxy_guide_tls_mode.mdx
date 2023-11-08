@@ -45,7 +45,7 @@ export const Commands = ({mode, name, lower, configfilename}) => {
                 {'\n'}
                 {genCert}
                 {'# Run the database, ZITADEL and '}{name}{'.'}{'\n'}
-                {'docker compose --file docker-compose-base.yaml --file docker-compose-'}{lower}{'.yaml up '}{lower}{'-'}{mode}{'-tls --detach'}{'\n'}
+                {'docker compose --file docker-compose-base.yaml --file docker-compose-'}{lower}{'.yaml up --detach proxy-'}{mode}{'-tls'}{'\n'}
                 {'\n'}
                 {'# Test that gRPC and HTTP APIs work\n'}
                 {'grpcurl '}{connInsecureFlag}{'127.0.0.1.sslip.io:'}{connPort}{' zitadel.admin.v1.AdminService/Healthz\n'}
