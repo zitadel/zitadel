@@ -58,8 +58,8 @@ jobs:
       uses: github/codeql-action/autobuild@v2
     - if: matrix.language == 'go'
       name: compile go
-      uses: github/codeql-action/autobuild@v2
-      #run: |
-       # make compile
+      run: |
+        make compile
+        go list ./...
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
