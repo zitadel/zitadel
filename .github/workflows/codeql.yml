@@ -16,24 +16,30 @@ on:
 jobs:
   CodeQL-Build:
     runs-on: ubuntu-latest
-    env:
-      CODEQL_EXTRACTOR_GO_BUILD_TRACING: 'on'
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [go,javascirpt]
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-    - name: Install Go
+    - if: matrix.language == 'go'
+      name: Install Go
       uses: actions/setup-go@v4
       with:
         go-version-file: go.mod
     # node to install sass for go
-    - uses: actions/setup-node@v3
-    - run: |
+    - if: matrix.language == 'go'
+      uses: actions/setup-node@v3
+    - if: matrix.language == 'go'
+      run: |
         npm install -g sass
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
       # Override language selection by uncommenting this and choosing your languages
       with:
+        languages: ${{ matrix.language }}
         debug: true
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
@@ -47,7 +53,11 @@ jobs:
     
     # autobuild does not work anymore
     # and to be able to compile without an actual console build, we just need a placeholder in the console dist folder
-    - name: compile
+    - if: matrix.language == 'javascript'
+      name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+    - if: matrix.language == 'go'
+      name: compile go
       run: |
         make compile
     - name: Perform CodeQL Analysis
