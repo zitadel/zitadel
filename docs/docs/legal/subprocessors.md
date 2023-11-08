@@ -1,6 +1,6 @@
 ---
 title: Third party sub-processors for ZITADEL
-sidebar_label: Sub-processors
+sidebar_label: Third Party Sub-Processors
 custom_edit_url: null
 --- 
 
