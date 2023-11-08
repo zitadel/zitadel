@@ -152,6 +152,7 @@ func TestCommands_CreateSession(t *testing.T) {
 		checks    []SessionCommand
 		metadata  map[string][]byte
 		userAgent *domain.UserAgent
+		lifetime  time.Duration
 	}
 	type res struct {
 		want *SessionChanged
@@ -193,6 +194,33 @@ func TestCommands_CreateSession(t *testing.T) {
 			},
 		},
 		{
+			"negative lifetime",
+			fields{
+				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
+				tokenCreator: func(sessionID string) (string, string, error) {
+					return "tokenID",
+						"token",
+						nil
+				},
+			},
+			args{
+				ctx: authz.NewMockContext("", "org1", ""),
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				lifetime: -10 * time.Minute,
+			},
+			[]expect{
+				expectFilter(),
+			},
+			res{
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.PositiveLifetime"),
+			},
+		},
+		{
 			"empty session",
 			fields{
 				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
@@ -210,6 +238,7 @@ func TestCommands_CreateSession(t *testing.T) {
 					Description:   gu.Ptr("firefox"),
 					Header:        http.Header{"foo": []string{"bar"}},
 				},
+				lifetime: 10 * time.Minute,
 			},
 			[]expect{
 				expectFilter(),
@@ -223,6 +252,7 @@ func TestCommands_CreateSession(t *testing.T) {
 							Header:        http.Header{"foo": []string{"bar"}},
 						},
 					),
+					session.NewLifetimeSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, 10*time.Minute),
 					session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 						"tokenID",
 					),
@@ -245,7 +275,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				idGenerator:         tt.fields.idGenerator,
 				sessionTokenCreator: tt.fields.tokenCreator,
 			}
-			got, err := c.CreateSession(tt.args.ctx, tt.args.checks, tt.args.metadata, tt.args.userAgent)
+			got, err := c.CreateSession(tt.args.ctx, tt.args.checks, tt.args.metadata, tt.args.userAgent, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})
@@ -263,6 +293,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 		sessionToken string
 		checks       []SessionCommand
 		metadata     map[string][]byte
+		lifetime     time.Duration
 	}
 	type res struct {
 		want *SessionChanged
@@ -368,7 +399,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 				eventstore:           tt.fields.eventstore,
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 			}
-			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.sessionToken, tt.args.checks, tt.args.metadata)
+			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.sessionToken, tt.args.checks, tt.args.metadata, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})
@@ -397,6 +428,7 @@ func TestCommands_updateSession(t *testing.T) {
 		ctx      context.Context
 		checks   *SessionCommands
 		metadata map[string][]byte
+		lifetime time.Duration
 	}
 	type res struct {
 		want *SessionChanged
@@ -420,7 +452,7 @@ func TestCommands_updateSession(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMAND-SAjeh", "Errors.Session.Terminated"),
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Hewfq", "Errors.Session.Terminated"),
 			},
 		},
 		{
@@ -462,6 +494,73 @@ func TestCommands_updateSession(t *testing.T) {
 					},
 					ID:       "sessionID",
 					NewToken: "",
+				},
+			},
+		},
+		{
+			"negative lifetime",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: context.Background(),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionCommands:   []SessionCommand{},
+					eventstore:        eventstoreExpect(t),
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				lifetime: -10 * time.Minute,
+			},
+			res{
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.PositiveLifetime"),
+			},
+		},
+		{
+			"lifetime set",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectPush(
+						session.NewLifetimeSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							10*time.Minute,
+						),
+						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							"tokenID",
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionCommands:   []SessionCommand{},
+					eventstore:        eventstoreExpect(t),
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				lifetime: 10 * time.Minute,
+			},
+			res{
+				want: &SessionChanged{
+					ObjectDetails: &domain.ObjectDetails{
+						ResourceOwner: "org1",
+					},
+					ID:       "sessionID",
+					NewToken: "token",
 				},
 			},
 		},
@@ -721,7 +820,7 @@ func TestCommands_updateSession(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := c.updateSession(tt.args.ctx, tt.args.checks, tt.args.metadata)
+			got, err := c.updateSession(tt.args.ctx, tt.args.checks, tt.args.metadata, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
@@ -290,36 +291,41 @@ func (q *InTextQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
 }
 
-func (s *InTextQuery) comp() sq.Sqlizer {
+func (q *InTextQuery) comp() sq.Sqlizer {
 	// This translates to an IN query
-	return sq.Eq{s.Column.identifier(): s.Values}
+	return sq.Eq{q.Column.identifier(): q.Values}
 }
 
 func (q *TextQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
 }
 
-func (s *TextQuery) comp() sq.Sqlizer {
-	switch s.Compare {
+func (q *TextQuery) comp() sq.Sqlizer {
+	switch q.Compare {
 	case TextEquals:
-		return sq.Eq{s.Column.identifier(): s.Text}
+		return sq.Eq{q.Column.identifier(): q.Text}
+	case TextNotEquals:
+		return sq.NotEq{q.Column.identifier(): q.Text}
 	case TextEqualsIgnoreCase:
-		return sq.ILike{s.Column.identifier(): s.Text}
+		return sq.ILike{q.Column.identifier(): q.Text}
 	case TextStartsWith:
-		return sq.Like{s.Column.identifier(): s.Text + "%"}
+		return sq.Like{q.Column.identifier(): q.Text + "%"}
 	case TextStartsWithIgnoreCase:
-		return sq.ILike{s.Column.identifier(): s.Text + "%"}
+		return sq.ILike{q.Column.identifier(): q.Text + "%"}
 	case TextEndsWith:
-		return sq.Like{s.Column.identifier(): "%" + s.Text}
+		return sq.Like{q.Column.identifier(): "%" + q.Text}
 	case TextEndsWithIgnoreCase:
-		return sq.ILike{s.Column.identifier(): "%" + s.Text}
+		return sq.ILike{q.Column.identifier(): "%" + q.Text}
 	case TextContains:
-		return sq.Like{s.Column.identifier(): "%" + s.Text + "%"}
+		return sq.Like{q.Column.identifier(): "%" + q.Text + "%"}
 	case TextContainsIgnoreCase:
-		return sq.ILike{s.Column.identifier(): "%" + s.Text + "%"}
+		return sq.ILike{q.Column.identifier(): "%" + q.Text + "%"}
 	case TextListContains:
-		return &listContains{col: s.Column, args: []interface{}{s.Text}}
+		return &listContains{col: q.Column, args: []interface{}{q.Text}}
+	case textCompareMax:
+		return nil
 	}
+
 	return nil
 }
 
@@ -400,19 +406,22 @@ func (q *NumberQuery) Col() Column {
 	return q.Column
 }
 
-func (s *NumberQuery) comp() sq.Sqlizer {
-	switch s.Compare {
+func (q *NumberQuery) comp() sq.Sqlizer {
+	switch q.Compare {
 	case NumberEquals:
-		return sq.Eq{s.Column.identifier(): s.Number}
+		return sq.Eq{q.Column.identifier(): q.Number}
 	case NumberNotEquals:
-		return sq.NotEq{s.Column.identifier(): s.Number}
+		return sq.NotEq{q.Column.identifier(): q.Number}
 	case NumberLess:
-		return sq.Lt{s.Column.identifier(): s.Number}
+		return sq.Lt{q.Column.identifier(): q.Number}
 	case NumberGreater:
-		return sq.Gt{s.Column.identifier(): s.Number}
+		return sq.Gt{q.Column.identifier(): q.Number}
 	case NumberListContains:
-		return &listContains{col: s.Column, args: []interface{}{s.Number}}
+		return &listContains{col: q.Column, args: []interface{}{q.Number}}
+	case numberCompareMax:
+		return nil
 	}
+
 	return nil
 }
 
@@ -501,19 +510,19 @@ func (q *ListQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
 }
 
-func (s *ListQuery) comp() sq.Sqlizer {
-	switch s.Compare {
-	case ListIn:
-		if subSelect, ok := s.Data.(*SubSelect); ok {
-			subSelect, args, err := subSelect.comp().ToSql()
-			if err != nil {
-				return nil
-			}
-			return sq.Expr(s.Column.identifier()+" IN ( "+subSelect+" )", args...)
-		}
-		return sq.Eq{s.Column.identifier(): s.Data}
+func (q *ListQuery) comp() sq.Sqlizer {
+	if q.Compare != ListIn {
+		return nil
 	}
-	return nil
+
+	if subSelect, ok := q.Data.(*SubSelect); ok {
+		subSelect, args, err := subSelect.comp().ToSql()
+		if err != nil {
+			return nil
+		}
+		return sq.Expr(q.Column.identifier()+" IN ( "+subSelect+" )", args...)
+	}
+	return sq.Eq{q.Column.identifier(): q.Data}
 }
 
 func (q *ListQuery) Col() Column {
@@ -583,16 +592,64 @@ func (q *BoolQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
 }
 
-func (s *BoolQuery) comp() sq.Sqlizer {
-	return sq.Eq{s.Column.identifier(): s.Value}
+func (q *BoolQuery) comp() sq.Sqlizer {
+	return sq.Eq{q.Column.identifier(): q.Value}
+}
+
+type TimestampComparison int
+
+const (
+	TimestampEquals TimestampComparison = iota
+	TimestampGreater
+	TimestampGreaterOrEquals
+	TimestampLess
+	TimestampLessOrEquals
+)
+
+type TimestampQuery struct {
+	Column  Column
+	Compare TimestampComparison
+	Value   time.Time
+}
+
+func NewTimestampQuery(c Column, value time.Time, compare TimestampComparison) (*TimestampQuery, error) {
+	return &TimestampQuery{
+		Column:  c,
+		Compare: compare,
+		Value:   value,
+	}, nil
+}
+
+func (q *TimestampQuery) Col() Column {
+	return q.Column
+}
+
+func (q *TimestampQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (q *TimestampQuery) comp() sq.Sqlizer {
+	switch q.Compare {
+	case TimestampEquals:
+		return sq.Eq{q.Column.identifier(): q.Value}
+	case TimestampGreater:
+		return sq.Gt{q.Column.identifier(): q.Value}
+	case TimestampGreaterOrEquals:
+		return sq.GtOrEq{q.Column.identifier(): q.Value}
+	case TimestampLess:
+		return sq.Lt{q.Column.identifier(): q.Value}
+	case TimestampLessOrEquals:
+		return sq.LtOrEq{q.Column.identifier(): q.Value}
+	}
+	return nil
 }
 
 var (
-	//countColumn represents the default counter for search responses
+	// countColumn represents the default counter for search responses
 	countColumn = Column{
 		name: "COUNT(*) OVER ()",
 	}
-	//uniqueColumn shows if there are any results
+	// uniqueColumn shows if there are any results
 	uniqueColumn = Column{
 		name: "COUNT(*) = 0",
 	}

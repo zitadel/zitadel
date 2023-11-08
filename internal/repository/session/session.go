@@ -28,6 +28,7 @@ const (
 	OTPEmailCheckedType    = sessionEventPrefix + "otp.email.checked"
 	TokenSetType           = sessionEventPrefix + "token.set"
 	MetadataSetType        = sessionEventPrefix + "metadata.set"
+	LifetimeSetType        = sessionEventPrefix + "lifetime.set"
 	TerminateType          = sessionEventPrefix + "terminated"
 )
 
@@ -605,6 +606,39 @@ func MetadataSetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 
 	return added, nil
+}
+
+type LifetimeSetEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Lifetime time.Duration `json:"lifetime"`
+}
+
+func (e *LifetimeSetEvent) Payload() interface{} {
+	return e
+}
+
+func (e *LifetimeSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *LifetimeSetEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewLifetimeSetEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	lifetime time.Duration,
+) *LifetimeSetEvent {
+	return &LifetimeSetEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			LifetimeSetType,
+		),
+		Lifetime: lifetime,
+	}
 }
 
 type TerminateEvent struct {
