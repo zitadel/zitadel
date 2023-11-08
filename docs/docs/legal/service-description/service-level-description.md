@@ -52,7 +52,7 @@ This excludes specifically:
 
 Core Services means the following ZITADEL Cloud Services and API’s:
 
-- **Authentication API** Endpoints
+- **Authentication API** Endpoints including the session endpoints
 - **OpenID Connect 1.0 / OAuth 2.0 API** Endpoints
 - **SAML 2.0** Endpoints
 - **Login Service** means the graphical user interface of ZITADEL Cloud for users to Login, Self-Register, and conduct a Password Reset.
