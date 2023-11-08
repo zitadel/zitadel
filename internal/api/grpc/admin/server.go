@@ -43,7 +43,6 @@ func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
 	sd systemdefaults.SystemDefaults,
-	externalSecure bool,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	auditLogRetention time.Duration,
 ) *Server {
@@ -51,7 +50,7 @@ func CreateServer(
 		database:          database,
 		command:           command,
 		query:             query,
-		assetsAPIDomain:   assets.AssetAPI(externalSecure),
+		assetsAPIDomain:   assets.AssetAPI(),
 		userCodeAlg:       userCodeAlg,
 		passwordHashAlg:   crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
 		auditLogRetention: auditLogRetention,

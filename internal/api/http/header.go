@@ -70,18 +70,6 @@ func OriginHeader(ctx context.Context) string {
 	return headers.Get(Origin)
 }
 
-func ComposedOrigin(ctx context.Context) string {
-	o, ok := ctx.Value(origin).(string)
-	if !ok {
-		return ""
-	}
-	return o
-}
-
-func WithComposedOrigin(ctx context.Context, composed string) context.Context {
-	return context.WithValue(ctx, origin, composed)
-}
-
 func RemoteIPFromCtx(ctx context.Context) string {
 	ctxHeaders, ok := HeadersFromCtx(ctx)
 	if !ok {

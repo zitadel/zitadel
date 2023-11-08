@@ -15,15 +15,13 @@ type Instance interface {
 	ProjectID() string
 	ConsoleClientID() string
 	ConsoleApplicationID() string
-	RequestedDomain() string
-	RequestedHost() string
 	DefaultLanguage() language.Tag
 	DefaultOrganisationID() string
 	SecurityPolicyAllowedOrigins() []string
 }
 
 type InstanceVerifier interface {
-	InstanceByHost(ctx context.Context, host string) (Instance, error)
+	InstanceByDomain(ctx context.Context, host string) (Instance, error)
 	InstanceByID(ctx context.Context) (Instance, error)
 }
 
@@ -52,14 +50,6 @@ func (i *instance) ConsoleApplicationID() string {
 	return i.appID
 }
 
-func (i *instance) RequestedDomain() string {
-	return i.domain
-}
-
-func (i *instance) RequestedHost() string {
-	return i.domain
-}
-
 func (i *instance) DefaultLanguage() language.Tag {
 	return language.Und
 }
@@ -86,16 +76,6 @@ func WithInstance(ctx context.Context, instance Instance) context.Context {
 
 func WithInstanceID(ctx context.Context, id string) context.Context {
 	return context.WithValue(ctx, instanceKey, &instance{id: id})
-}
-
-func WithRequestedDomain(ctx context.Context, domain string) context.Context {
-	i, ok := ctx.Value(instanceKey).(*instance)
-	if !ok {
-		i = new(instance)
-	}
-
-	i.domain = domain
-	return context.WithValue(ctx, instanceKey, i)
 }
 
 func WithConsole(ctx context.Context, projectID, appID string) context.Context {

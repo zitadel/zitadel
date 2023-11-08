@@ -935,7 +935,7 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 		opts = append(opts, saml.WithBinding(identityProvider.SAMLIDPTemplate.Binding))
 	}
 	opts = append(opts,
-		saml.WithEntityID(http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), l.externalSecure)+"/idps/"+identityProvider.ID+"/saml/metadata"),
+		saml.WithEntityID(http_utils.RequestOriginFromCtx(ctx).Full+"/idps/"+identityProvider.ID+"/saml/metadata"),
 		saml.WithCustomRequestTracker(
 			requesttracker.New(
 				func(ctx context.Context, authRequestID, samlRequestID string) error {

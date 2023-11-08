@@ -100,7 +100,7 @@ func NewServer(
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
-	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections, externalSecure)
+	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections)
 	var options []op.Option
 	if !externalSecure {
 		options = append(options, op.WithAllowInsecure())
@@ -173,7 +173,7 @@ func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []
 	return opConfig, nil
 }
 
-func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, db *database.DB, externalSecure bool) *OPStorage {
+func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, db *database.DB) *OPStorage {
 	return &OPStorage{
 		repo:                              repo,
 		command:                           command,
@@ -189,7 +189,7 @@ func newStorage(config Config, command *command.Commands, query *query.Queries, 
 		defaultRefreshTokenExpiration:     config.DefaultRefreshTokenExpiration,
 		encAlg:                            encAlg,
 		locker:                            crdb.NewLocker(db.DB, locksTable, signingKey),
-		assetAPIPrefix:                    assets.AssetAPI(externalSecure),
+		assetAPIPrefix:                    assets.AssetAPI(),
 	}
 }
 

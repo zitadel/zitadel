@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
@@ -31,7 +31,10 @@ func TestConfig_serverFromContext(t *testing.T) {
 		},
 		{
 			name: "success from ctx",
-			args: args{authz.WithRequestedDomain(context.Background(), "example.com"), "", ""},
+			args: args{ctx: http_util.WithRequestOrigin(context.Background(), http_util.RequestOrigin{
+				Domain: "example.com",
+				Full:   "https://example.com",
+			})},
 			want: &webauthn.WebAuthn{
 				Config: &webauthn.Config{
 					RPDisplayName: "DisplayName",
@@ -42,7 +45,10 @@ func TestConfig_serverFromContext(t *testing.T) {
 		},
 		{
 			name: "success from id",
-			args: args{authz.WithRequestedDomain(context.Background(), "example.com"), "external.com", "https://external.com"},
+			args: args{http_util.WithRequestOrigin(context.Background(), http_util.RequestOrigin{
+				Domain: "example.com",
+				Full:   "https://example.com",
+			}), "external.com", "https://external.com"},
 			want: &webauthn.WebAuthn{
 				Config: &webauthn.Config{
 					RPDisplayName: "DisplayName",
@@ -55,8 +61,7 @@ func TestConfig_serverFromContext(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			w := &Config{
-				DisplayName:    "DisplayName",
-				ExternalSecure: true,
+				DisplayName: "DisplayName",
 			}
 			got, err := w.serverFromContext(tt.args.ctx, tt.args.id, tt.args.origin)
 			require.ErrorIs(t, err, tt.wantErr)

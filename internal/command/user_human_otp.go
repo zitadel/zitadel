@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -99,7 +100,7 @@ func (c *Commands) createHumanTOTP(ctx context.Context, userID, resourceOwner st
 	}
 	issuer := c.multifactors.OTP.Issuer
 	if issuer == "" {
-		issuer = authz.GetInstance(ctx).RequestedDomain()
+		issuer = http_utils.RequestOriginFromCtx(ctx).Domain
 	}
 	key, secret, err := domain.NewTOTPKey(issuer, accountName, c.multifactors.OTP.CryptoMFA)
 	if err != nil {

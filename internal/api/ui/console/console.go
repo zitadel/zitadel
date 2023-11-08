@@ -108,7 +108,6 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 
 	handler.Use(callDurationInterceptor, instanceHandler, security, limitingAccessInterceptor.WithoutLimiting().Handle)
 	handler.Handle(envRequestPath, middleware.TelemetryHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		url := http_util.BuildOrigin(r.Host, externalSecure)
 		ctx := r.Context()
 		instance := authz.GetInstance(ctx)
 		instanceMgmtURL, err := templateInstanceManagementURL(config.InstanceManagementURL, instance)
@@ -117,7 +116,7 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 			return
 		}
 		exhausted := limitingAccessInterceptor.Limit(ctx)
-		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ConsoleClientID(), customerPortal, instanceMgmtURL, exhausted)
+		environmentJSON, err := createEnvironmentJSON(http_util.RequestOriginFromCtx(ctx).Full, issuer(r), instance.ConsoleClientID(), customerPortal, instanceMgmtURL, exhausted)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("unable to marshal env for console: %v", err), http.StatusInternalServerError)
 			return

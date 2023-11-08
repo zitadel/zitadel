@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -132,7 +131,7 @@ func TestAddDomain(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			AssertValidation(
 				t,
-				authz.WithRequestedDomain(context.Background(), "domain"),
+				http.WithRequestOrigin(context.Background(), http.RequestOrigin{Domain: "domain"}),
 				(&Commands{idGenerator: tt.args.idGenerator}).prepareAddOrgDomain(tt.args.a, tt.args.domain, tt.args.claimedUserIDs),
 				tt.args.filter,
 				tt.want,
@@ -1106,7 +1105,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				domainVerificationValidator: tt.fields.domainValidationFunc,
 				idGenerator:                 tt.fields.idGenerator,
 			}
-			got, err := r.ValidateOrgDomain(authz.WithRequestedDomain(tt.args.ctx, "zitadel.ch"), tt.args.domain, tt.args.claimedUserIDs)
+			got, err := r.ValidateOrgDomain(http.WithRequestOrigin(context.Background(), http.RequestOrigin{Domain: "zitadel.ch"}), tt.args.domain, tt.args.claimedUserIDs)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

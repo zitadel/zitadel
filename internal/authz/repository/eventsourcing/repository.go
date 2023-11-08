@@ -17,7 +17,7 @@ type EsRepository struct {
 	authz_es.TokenVerifierRepo
 }
 
-func Start(queries *query.Queries, es *eventstore.Eventstore, dbClient *database.DB, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, externalSecure bool) (repository.Repository, error) {
+func Start(queries *query.Queries, es *eventstore.Eventstore, dbClient *database.DB, keyEncryptionAlgorithm crypto.EncryptionAlgorithm) (repository.Repository, error) {
 	view, err := authz_view.StartView(dbClient, queries)
 	if err != nil {
 		return nil, err
@@ -32,7 +32,6 @@ func Start(queries *query.Queries, es *eventstore.Eventstore, dbClient *database
 			Eventstore:           es,
 			View:                 view,
 			Query:                queries,
-			ExternalSecure:       externalSecure,
 		},
 	}, nil
 }

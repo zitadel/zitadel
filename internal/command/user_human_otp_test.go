@@ -14,6 +14,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -483,7 +484,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.WithRequestedDomain(context.Background(), "zitadel.com"),
+				ctx:           http.WithRequestOrigin(context.Background(), http.RequestOrigin{Domain: "zitadel.com"}),
 				resourceOwner: "org1",
 				userID:        "user1",
 			},

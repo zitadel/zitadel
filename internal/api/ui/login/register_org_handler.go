@@ -3,7 +3,7 @@ package login
 import (
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -110,7 +110,7 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 	orgPolicy, _ := l.getDefaultDomainPolicy(r)
 	if orgPolicy != nil {
 		data.UserLoginMustBeDomain = orgPolicy.UserLoginMustBeDomain
-		data.IamDomain = authz.GetInstance(r.Context()).RequestedDomain()
+		data.IamDomain = http_utils.RequestOriginFromCtx(r.Context()).Domain
 	}
 
 	if authRequest == nil {

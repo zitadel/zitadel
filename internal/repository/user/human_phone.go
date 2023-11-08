@@ -190,7 +190,7 @@ func NewHumanPhoneCodeAddedEventV2(
 		Code:              code,
 		Expiry:            expiry,
 		CodeReturned:      codeReturned,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.RequestOriginFromCtx(ctx).Full,
 	}
 }
 

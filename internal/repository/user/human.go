@@ -272,7 +272,7 @@ func NewHumanInitialCodeAddedEvent(
 		),
 		Code:              code,
 		Expiry:            expiry,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.RequestOriginFromCtx(ctx).Full,
 	}
 }
 

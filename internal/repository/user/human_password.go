@@ -62,7 +62,7 @@ func NewHumanPasswordChangedEvent(
 		EncodedHash:       encodeHash,
 		ChangeRequired:    changeRequired,
 		UserAgentID:       userAgentID,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.RequestOriginFromCtx(ctx).Full,
 	}
 }
 
@@ -131,7 +131,7 @@ func NewHumanPasswordCodeAddedEventV2(
 		NotificationType:  notificationType,
 		URLTemplate:       urlTemplate,
 		CodeReturned:      codeReturned,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.RequestOriginFromCtx(ctx).Full,
 	}
 }
 

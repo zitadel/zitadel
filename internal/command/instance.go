@@ -178,7 +178,8 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		return "", "", nil, nil, err
 	}
 
-	ctx = authz.SetCtxData(authz.WithRequestedDomain(authz.WithInstanceID(ctx, instanceID), c.externalDomain), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
+	ctx = authz.WithInstanceID(ctx, instanceID)
+	ctx = authz.SetCtxData(ctx, authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
 	orgID, err := c.idGenerator.Next()
 	if err != nil {

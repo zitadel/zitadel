@@ -107,6 +107,8 @@ func (m InstanceUserMap) Get(instanceID string, typ UserType) *User {
 type Tester struct {
 	*start.Server
 
+	Ctx context.Context
+
 	Instance     authz.Instance
 	Organisation *query.Org
 	Users        InstanceUserMap
@@ -123,12 +125,8 @@ type Tester struct {
 
 const commandLine = `start --masterkeyFromEnv`
 
-func (s *Tester) Host() string {
-	return fmt.Sprintf("%s:%d", s.Config.ExternalDomain, s.Config.Port)
-}
-
 func (s *Tester) createClientConn(ctx context.Context, opts ...grpc.DialOption) {
-	target := s.Host()
+	target := http_util.RequestOriginFromCtx(ctx).Host
 	cc, err := grpc.DialContext(ctx, target, append(opts,
 		grpc.WithBlock(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -206,7 +204,7 @@ func (s *Tester) createLoginClient(ctx context.Context) {
 func (s *Tester) createMachineUser(ctx context.Context, username string, userType UserType) (context.Context, *query.User) {
 	var err error
 
-	s.Instance, err = s.Queries.InstanceByHost(ctx, s.Host())
+	s.Instance, err = s.Queries.InstanceByDomain(ctx, http_util.RequestOriginFromCtx(ctx).Domain)
 	logging.OnError(err).Fatal("query instance")
 	ctx = authz.WithInstance(ctx, s.Instance)
 
@@ -248,7 +246,7 @@ func (s *Tester) WithAuthorization(ctx context.Context, u UserType) context.Cont
 
 func (s *Tester) WithInstanceAuthorization(ctx context.Context, u UserType, instanceID string) context.Context {
 	if u == SystemUser {
-		s.ensureSystemUser()
+		s.ensureSystemUser(ctx)
 	}
 	return s.WithAuthorizationToken(ctx, s.Users.Get(instanceID, u).Token)
 }
@@ -262,12 +260,12 @@ func (s *Tester) WithAuthorizationToken(ctx context.Context, token string) conte
 	return metadata.NewOutgoingContext(ctx, md)
 }
 
-func (s *Tester) ensureSystemUser() {
+func (s *Tester) ensureSystemUser(ctx context.Context) {
 	const ISSUER = "tester"
 	if s.Users.Get(FirstInstanceUsersKey, SystemUser) != nil {
 		return
 	}
-	audience := http_util.BuildOrigin(s.Host(), s.Server.Config.ExternalSecure)
+	audience := http_util.RequestOriginFromCtx(ctx).Full
 	signer, err := client.NewSignerFromPrivateKeyByte(systemUserKey, "")
 	logging.OnError(err).Fatal("system key signer")
 	jwt, err := client.SignedJWTProfileAssertion(ISSUER, []string{audience}, time.Hour, signer)
@@ -346,12 +344,14 @@ func NewTester(ctx context.Context) *Tester {
 	case <-ctx.Done():
 		logging.OnError(ctx.Err()).Fatal("waiting for integration tester server")
 	}
-	tester.createClientConn(ctx)
-	tester.createLoginClient(ctx)
-	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, http_util.BuildOrigin(tester.Host(), tester.Config.ExternalSecure))
-	tester.createMachineUserOrgOwner(ctx)
-	tester.createMachineUserInstanceOwner(ctx)
-	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, "https://"+tester.Host())
+	tester.Ctx = http_util.WithDefaultOrigin(ctx, tester.Config.ExternalSecure, tester.Config.ExternalDomain, tester.Config.ExternalPort)
+	origin := http_util.RequestOriginFromCtx(tester.Ctx)
+	tester.createClientConn(tester.Ctx)
+	tester.createLoginClient(tester.Ctx)
+	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, origin.Full)
+	tester.createMachineUserOrgOwner(tester.Ctx)
+	tester.createMachineUserInstanceOwner(tester.Ctx)
+	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, "https://"+origin.Host)
 	return &tester
 }
 

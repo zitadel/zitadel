@@ -43,7 +43,7 @@ func CreateServer(
 		command:         command,
 		query:           query,
 		systemDefaults:  sd,
-		assetAPIPrefix:  assets.AssetAPI(externalSecure),
+		assetAPIPrefix:  assets.AssetAPI(),
 		passwordHashAlg: crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
 		userCodeAlg:     userCodeAlg,
 		externalSecure:  externalSecure,

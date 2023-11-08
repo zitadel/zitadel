@@ -31,7 +31,6 @@ type API struct {
 	verifier          internal_authz.APITokenVerifier
 	health            healthCheck
 	router            *mux.Router
-	http1HostName     string
 	grpcGateway       *server.Gateway
 	healthServer      *health.Server
 	accessInterceptor *http_mw.AccessInterceptor
@@ -49,7 +48,7 @@ func New(
 	queries *query.Queries,
 	verifier internal_authz.APITokenVerifier,
 	authZ internal_authz.Config,
-	tlsConfig *tls.Config, http2HostName, http1HostName string,
+	tlsConfig *tls.Config,
 	accessInterceptor *http_mw.AccessInterceptor,
 ) (_ *API, err error) {
 	api := &API{
@@ -57,13 +56,12 @@ func New(
 		verifier:          verifier,
 		health:            queries,
 		router:            router,
-		http1HostName:     http1HostName,
 		queries:           queries,
 		accessInterceptor: accessInterceptor,
 	}
 
-	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig, accessInterceptor.AccessService())
-	api.grpcGateway, err = server.CreateGateway(ctx, port, http1HostName, accessInterceptor)
+	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, tlsConfig, accessInterceptor.AccessService())
+	api.grpcGateway, err = server.CreateGateway(ctx, port, accessInterceptor)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +84,6 @@ func (a *API) RegisterServer(ctx context.Context, grpcServer server.WithGatewayP
 		ctx,
 		grpcServer,
 		a.port,
-		a.http1HostName,
 		a.accessInterceptor,
 		a.queries,
 	)

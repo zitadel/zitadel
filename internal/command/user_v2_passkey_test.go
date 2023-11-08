@@ -12,6 +12,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -25,11 +26,10 @@ import (
 
 func TestCommands_RegisterUserPasskey(t *testing.T) {
 	ctx := authz.NewMockContextWithPermissions("instance1", "org1", "user1", nil)
-	ctx = authz.WithRequestedDomain(ctx, "example.com")
+	ctx = http.WithRequestOrigin(ctx, http.RequestOrigin{Domain: "example.com"})
 
 	webauthnConfig := &webauthn_helper.Config{
-		DisplayName:    "test",
-		ExternalSecure: true,
+		DisplayName: "test",
 	}
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
@@ -129,10 +129,9 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 }
 
 func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
-	ctx := authz.WithRequestedDomain(context.Background(), "example.com")
+	ctx := http.WithRequestOrigin(context.Background(), http.RequestOrigin{Domain: "example.com"})
 	webauthnConfig := &webauthn_helper.Config{
-		DisplayName:    "test",
-		ExternalSecure: true,
+		DisplayName: "test",
 	}
 	alg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	es := eventstoreExpect(t,
@@ -231,7 +230,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 }
 
 func TestCommands_verifyUserPasskeyCode(t *testing.T) {
-	ctx := authz.WithRequestedDomain(context.Background(), "example.com")
+	ctx := http.WithRequestOrigin(context.Background(), http.RequestOrigin{Domain: "example.com"})
 	alg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	es := eventstoreExpect(t,
 		expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
@@ -339,10 +338,9 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 }
 
 func TestCommands_pushUserPasskey(t *testing.T) {
-	ctx := authz.WithRequestedDomain(context.Background(), "example.com")
+	ctx := http.WithRequestOrigin(context.Background(), http.RequestOrigin{Domain: "example.com"})
 	webauthnConfig := &webauthn_helper.Config{
-		DisplayName:    "test",
-		ExternalSecure: true,
+		DisplayName: "test",
 	}
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 

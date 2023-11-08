@@ -11,7 +11,7 @@ import (
 )
 
 func (notify Notify) SendDomainClaimed(ctx context.Context, user *query.NotifyUser, username string) error {
-	url := login.LoginLink(http_utils.ComposedOrigin(ctx), user.ResourceOwner)
+	url := login.LoginLink(http_utils.RequestOriginFromCtx(ctx).Full, user.ResourceOwner)
 	index := strings.LastIndex(user.LastEmail, "@")
 	args := make(map[string]interface{})
 	args["TempUsername"] = username

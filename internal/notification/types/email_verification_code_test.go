@@ -80,7 +80,7 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, notify := mockNotify()
-			err := notify.SendEmailVerificationCode(http_utils.WithComposedOrigin(context.Background(), tt.args.origin), tt.args.user, tt.args.code, tt.args.urlTmpl)
+			err := notify.SendEmailVerificationCode(http_utils.WithRequestOrigin(context.Background(), http_utils.RequestOrigin{Full: tt.args.origin}), tt.args.user, tt.args.code, tt.args.urlTmpl)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})

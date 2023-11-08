@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -12,22 +11,21 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type instanceInterceptor struct {
 	verifier        authz.InstanceVerifier
-	headerName      string
 	ignoredPrefixes []string
 	translator      *i18n.Translator
 }
 
-func InstanceInterceptor(verifier authz.InstanceVerifier, headerName string, ignoredPrefixes ...string) *instanceInterceptor {
+func InstanceInterceptor(verifier authz.InstanceVerifier, ignoredPrefixes ...string) *instanceInterceptor {
 	return &instanceInterceptor{
 		verifier:        verifier,
-		headerName:      headerName,
 		ignoredPrefixes: ignoredPrefixes,
 		translator:      newZitadelTranslator(),
 	}
@@ -52,9 +50,9 @@ func (a *instanceInterceptor) handleInstance(w http.ResponseWriter, r *http.Requ
 			return
 		}
 	}
-	ctx, err := setInstance(r, a.verifier, a.headerName)
+	ctx, err := setInstance(r, a.verifier)
 	if err != nil {
-		caosErr := new(caos_errors.NotFoundError)
+		caosErr := new(zitadel_errors.NotFoundError)
 		if errors.As(err, &caosErr) {
 			caosErr.Message = a.translator.LocalizeFromRequest(r, caosErr.GetMessage(), nil)
 		}
@@ -65,34 +63,16 @@ func (a *instanceInterceptor) handleInstance(w http.ResponseWriter, r *http.Requ
 	next.ServeHTTP(w, r)
 }
 
-func setInstance(r *http.Request, verifier authz.InstanceVerifier, headerName string) (_ context.Context, err error) {
+func setInstance(r *http.Request, verifier authz.InstanceVerifier) (_ context.Context, err error) {
 	ctx := r.Context()
-
 	authCtx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-
-	host, err := HostFromRequest(r, headerName)
-	if err != nil {
-		return nil, err
-	}
-
-	instance, err := verifier.InstanceByHost(authCtx, host)
+	instance, err := verifier.InstanceByDomain(authCtx, http_utils.RequestOriginFromCtx(ctx).Domain)
 	if err != nil {
 		return nil, err
 	}
 	span.End()
 	return authz.WithInstance(ctx, instance), nil
-}
-
-func HostFromRequest(r *http.Request, headerName string) (string, error) {
-	host := r.Host
-	if headerName != "host" {
-		host = r.Header.Get(headerName)
-	}
-	if host == "" {
-		return "", fmt.Errorf("host header `%s` not found", headerName)
-	}
-	return host, nil
 }
 
 func newZitadelTranslator() *i18n.Translator {

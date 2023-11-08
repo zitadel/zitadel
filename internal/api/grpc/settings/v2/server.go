@@ -27,12 +27,11 @@ type Config struct{}
 func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
-	externalSecure bool,
 ) *Server {
 	return &Server{
 		command:         command,
 		query:           query,
-		assetsAPIDomain: assets.AssetAPI(externalSecure),
+		assetsAPIDomain: assets.AssetAPI(),
 	}
 }
 

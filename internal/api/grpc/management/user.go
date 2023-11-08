@@ -15,7 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/metadata"
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
-	"github.com/zitadel/zitadel/internal/api/http"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/command"
@@ -291,7 +291,7 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 		),
 	}
 	if code != nil {
-		origin := http.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), s.externalSecure)
+		origin := http_util.RequestOriginFromCtx(ctx).Full
 		resp.PasswordlessRegistration = &mgmt_pb.ImportHumanUserResponse_PasswordlessRegistration{
 			Link:       code.Link(origin + login.HandlerPrefix + login.EndpointPasswordlessRegistration),
 			Lifetime:   durationpb.New(code.Expiration),
@@ -700,7 +700,7 @@ func (s *Server) AddPasswordlessRegistration(ctx context.Context, req *mgmt_pb.A
 	if err != nil {
 		return nil, err
 	}
-	origin := http.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), s.externalSecure)
+	origin := http_util.RequestOriginFromCtx(ctx).Full
 	return &mgmt_pb.AddPasswordlessRegistrationResponse{
 		Details:    obj_grpc.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
 		Link:       initCode.Link(origin + login.HandlerPrefix + login.EndpointPasswordlessRegistration),

@@ -50,7 +50,7 @@ func CreateServer(command *command.Commands,
 		query:           query,
 		repo:            authRepo,
 		defaults:        defaults,
-		assetsAPIDomain: assets.AssetAPI(externalSecure),
+		assetsAPIDomain: assets.AssetAPI(),
 		userCodeAlg:     userCodeAlg,
 		externalSecure:  externalSecure,
 	}

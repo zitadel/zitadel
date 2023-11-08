@@ -167,7 +167,7 @@ func NewHumanEmailCodeAddedEventV2(
 		Expiry:            expiry,
 		URLTemplate:       urlTemplate,
 		CodeReturned:      codeReturned,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.RequestOriginFromCtx(ctx).Full,
 	}
 }
 

@@ -13,7 +13,7 @@ import (
 func (notify Notify) SendEmailVerificationCode(ctx context.Context, user *query.NotifyUser, code string, urlTmpl string) error {
 	var url string
 	if urlTmpl == "" {
-		url = login.MailVerificationLink(http_utils.ComposedOrigin(ctx), user.ID, code, user.ResourceOwner)
+		url = login.MailVerificationLink(http_utils.RequestOriginFromCtx(ctx).Full, user.ID, code, user.ResourceOwner)
 	} else {
 		var buf strings.Builder
 		if err := domain.RenderConfirmURLTemplate(&buf, urlTmpl, user.ID, code, user.ResourceOwner); err != nil {

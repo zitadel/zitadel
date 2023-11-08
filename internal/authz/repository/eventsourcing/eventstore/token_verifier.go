@@ -32,7 +32,6 @@ type TokenVerifierRepo struct {
 	Eventstore           *eventstore.Eventstore
 	View                 *view.View
 	Query                *query.Queries
-	ExternalSecure       bool
 }
 
 func (repo *TokenVerifierRepo) Health() error {
@@ -279,7 +278,7 @@ func (repo *TokenVerifierRepo) getTokenIDAndSubject(ctx context.Context, accessT
 
 func (repo *TokenVerifierRepo) jwtTokenVerifier(ctx context.Context) *op.AccessTokenVerifier {
 	keySet := &openIDKeySet{repo.Query}
-	issuer := http_util.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), repo.ExternalSecure)
+	issuer := http_util.RequestOriginFromCtx(ctx).Full
 	return op.NewAccessTokenVerifier(issuer, keySet)
 }
 

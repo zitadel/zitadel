@@ -314,7 +314,7 @@ func NewHumanOTPSMSCodeAddedEvent(
 		),
 		Code:              code,
 		Expiry:            expiry,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.RequestOriginFromCtx(ctx).Full,
 		AuthRequestInfo:   info,
 	}
 }
@@ -515,7 +515,7 @@ func NewHumanOTPEmailCodeAddedEvent(
 		Code:              code,
 		Expiry:            expiry,
 		AuthRequestInfo:   info,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.RequestOriginFromCtx(ctx).Full,
 	}
 }
 

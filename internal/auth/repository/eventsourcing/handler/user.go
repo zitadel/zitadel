@@ -522,7 +522,6 @@ func (u *User) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_m
 	if esOrg.Sequence == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-3m9vs", "Errors.Org.NotFound")
 	}
-
 	return org_es_model.OrgToModel(esOrg), nil
 }
 

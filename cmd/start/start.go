@@ -119,9 +119,9 @@ type Server struct {
 }
 
 func startZitadel(config *Config, masterKey string, server chan<- *Server) error {
-	showBasicInformation(config)
 
-	ctx := context.Background()
+	ctx := http_util.WithDefaultOrigin(context.Background(), config.ExternalSecure, config.ExternalDomain, config.ExternalPort)
+	showBasicInformation(ctx, config)
 
 	zitadelDBClient, err := database.Connect(config.Database, false, false)
 	if err != nil {
@@ -171,7 +171,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		return fmt.Errorf("cannot start queries: %w", err)
 	}
 
-	authZRepo, err := authz.Start(queries, eventstoreClient, zitadelDBClient, keys.OIDC, config.ExternalSecure)
+	authZRepo, err := authz.Start(queries, eventstoreClient, zitadelDBClient, keys.OIDC)
 	if err != nil {
 		return fmt.Errorf("error starting authz repo: %w", err)
 	}
@@ -184,8 +184,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		return fmt.Errorf("cannot start asset storage client: %w", err)
 	}
 	webAuthNConfig := &webauthn.Config{
-		DisplayName:    config.WebAuthNName,
-		ExternalSecure: config.ExternalSecure,
+		DisplayName: config.WebAuthNName,
 	}
 	commands, err := command.StartCommands(
 		eventstoreClient,
@@ -318,7 +317,7 @@ func startAPIs(
 	}
 	oidcPrefixes := []string{"/.well-known/openid-configuration", "/oidc/v1", "/oauth/v2"}
 	// always set the origin in the context if available in the http headers, no matter for what protocol
-	router.Use(middleware.OriginHandler)
+	router.Use(middleware.OriginHandlerFunc(config.ExternalSecure, config.HTTP1HostHeader, config.HTTP2HostHeader))
 	// adds used HTTPPathPattern and RequestMethod to context
 	router.Use(middleware.ActivityHandler)
 	systemTokenVerifier, err := internal_authz.StartSystemTokenVerifierFromConfig(http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
@@ -348,7 +347,7 @@ func startAPIs(
 		http_util.WithMaxAge(int(math.Floor(config.Quotas.Access.ExhaustedCookieMaxAge.Seconds()))),
 	)
 	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, exhaustedCookieHandler, &config.Quotas.Access.AccessConfig)
-	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, limitingAccessInterceptor)
+	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, limitingAccessInterceptor)
 	if err != nil {
 		return fmt.Errorf("error creating api %w", err)
 	}
@@ -370,7 +369,7 @@ func startAPIs(
 	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, config.SystemDefaults, config.ExternalSecure, keys.User, config.AuditLogRetention)); err != nil {
+	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, config.SystemDefaults, keys.User, config.AuditLogRetention)); err != nil {
 		return err
 	}
 	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, keys.User, config.ExternalSecure)); err != nil {
@@ -379,24 +378,24 @@ func startAPIs(
 	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, keys.User, config.ExternalSecure)); err != nil {
 		return err
 	}
-	if err := apis.RegisterService(ctx, user_v2.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(config.ExternalSecure), idp.SAMLRootURL(config.ExternalSecure))); err != nil {
+	if err := apis.RegisterService(ctx, user_v2.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(), idp.SAMLRootURL())); err != nil {
 		return err
 	}
 	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return err
 	}
 
-	if err := apis.RegisterService(ctx, settings.CreateServer(commands, queries, config.ExternalSecure)); err != nil {
+	if err := apis.RegisterService(ctx, settings.CreateServer(commands, queries)); err != nil {
 		return err
 	}
 	if err := apis.RegisterService(ctx, org.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return err
 	}
-	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)
+	instanceInterceptor := middleware.InstanceInterceptor(queries, login.IgnoreInstanceEndpoints...)
 	assetsCache := middleware.AssetsCacheInterceptor(config.AssetStorage.Cache.MaxAge, config.AssetStorage.Cache.SharedMaxAge)
 	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, middleware.CallDurationHandler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.Handle))
 
-	apis.RegisterHandlerOnPrefix(idp.HandlerPrefix, idp.NewHandler(commands, queries, keys.IDPConfig, config.ExternalSecure, instanceInterceptor.Handler))
+	apis.RegisterHandlerOnPrefix(idp.HandlerPrefix, idp.NewHandler(commands, queries, keys.IDPConfig, instanceInterceptor.Handler))
 
 	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator(), config.ExternalSecure, login.EndpointResources, login.EndpointExternalLoginCallbackFormPost, login.EndpointSAMLACS)
 	if err != nil {
@@ -444,7 +443,6 @@ func startAPIs(
 		console.HandlerPrefix+"/",
 		oidcServer.AuthCallbackURL(),
 		provider.AuthCallbackURL(samlProvider),
-		config.ExternalSecure,
 		userAgentInterceptor,
 		op.NewIssuerInterceptor(oidcServer.IssuerFromRequest).Handler,
 		provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler,
@@ -514,22 +512,26 @@ func shutdownServer(ctx context.Context, server *http.Server) error {
 	return nil
 }
 
-func showBasicInformation(startConfig *Config) {
+func showBasicInformation(ctx context.Context, startConfig *Config) {
 	fmt.Println(color.MagentaString(figure.NewFigure("ZITADEL", "", true).String()))
-	http := "http"
-	if startConfig.TLS.Enabled || startConfig.ExternalSecure {
-		http = "https"
+	origin := http_util.RequestOriginFromCtx(ctx)
+	consoleURL := fmt.Sprintf("%s/ui/console\n", http_util.RequestOriginFromCtx(ctx).Full)
+	hostname, err := os.Hostname()
+	if err != nil {
+		hostname = origin.Domain
 	}
-
-	consoleURL := fmt.Sprintf("%s://%s:%v/ui/console\n", http, startConfig.ExternalDomain, startConfig.ExternalPort)
-	healthCheckURL := fmt.Sprintf("%s://%s:%v/debug/healthz\n", http, startConfig.ExternalDomain, startConfig.ExternalPort)
-
-	insecure := !startConfig.TLS.Enabled && !startConfig.ExternalSecure
-
+	healthCheckURL := fmt.Sprintf("%s/debug/healthz\n", http_util.BuildHTTP(hostname, startConfig.Port, startConfig.TLS.Enabled))
+	insecure := origin.Scheme == "http"
+	printTlsMode := "disabled"
+	if startConfig.ExternalSecure {
+		printTlsMode = "external"
+	}
+	if startConfig.TLS.Enabled {
+		printTlsMode = "enabled"
+	}
 	fmt.Printf(" ===============================================================\n\n")
 	fmt.Printf(" Version          : %s\n", build.Version())
-	fmt.Printf(" TLS enabled      : %v\n", startConfig.TLS.Enabled)
-	fmt.Printf(" External Secure  : %v\n", startConfig.ExternalSecure)
+	fmt.Printf(" TLS mode         : %v\n", printTlsMode)
 	fmt.Printf(" Console URL      : %s", color.BlueString(consoleURL))
 	fmt.Printf(" Health Check URL : %s", color.BlueString(healthCheckURL))
 	if insecure {

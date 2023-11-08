@@ -350,7 +350,7 @@ func NewOTPSMSChallengedEvent(
 		Code:              code,
 		Expiry:            expiry,
 		CodeReturned:      codeReturned,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.RequestOriginFromCtx(ctx).Full,
 	}
 }
 
@@ -460,7 +460,7 @@ func NewOTPEmailChallengedEvent(
 		Expiry:            expiry,
 		ReturnCode:        returnCode,
 		URLTmpl:           urlTmpl,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.RequestOriginFromCtx(ctx).Full,
 	}
 }
 

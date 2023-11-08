@@ -35,7 +35,6 @@ type Login struct {
 	query               *query.Queries
 	staticStorage       static.Storage
 	authRepo            auth_repository.Repository
-	externalSecure      bool
 	consolePath         string
 	oidcAuthCallbackURL func(context.Context, string) string
 	samlAuthCallbackURL func(context.Context, string) string
@@ -68,7 +67,6 @@ func CreateLogin(config Config,
 	consolePath string,
 	oidcAuthCallbackURL func(context.Context, string) string,
 	samlAuthCallbackURL func(context.Context, string) string,
-	externalSecure bool,
 	userAgentCookie,
 	issuerInterceptor,
 	oidcInstanceHandler,
@@ -83,7 +81,6 @@ func CreateLogin(config Config,
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
 		samlAuthCallbackURL: samlAuthCallbackURL,
-		externalSecure:      externalSecure,
 		consolePath:         consolePath,
 		command:             command,
 		query:               query,
@@ -98,7 +95,7 @@ func CreateLogin(config Config,
 		return nil, fmt.Errorf("unable to create filesystem: %w", err)
 	}
 
-	csrfInterceptor := createCSRFInterceptor(config.CSRFCookieName, csrfCookieKey, externalSecure, login.csrfErrorHandler())
+	csrfInterceptor := createCSRFInterceptor(config.CSRFCookieName, csrfCookieKey, login.csrfErrorHandler())
 	cacheInterceptor := createCacheInterceptor(config.Cache.MaxAge, config.Cache.SharedMaxAge, assetCache)
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
 
@@ -116,7 +113,7 @@ func csp() *middleware.CSP {
 	return &csp
 }
 
-func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecure bool, errorHandler http.Handler) func(http.Handler) http.Handler {
+func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, errorHandler http.Handler) func(http.Handler) http.Handler {
 	path := "/"
 	return func(handler http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -129,6 +126,10 @@ func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecu
 			if (r.URL.Path == EndpointExternalLoginCallbackFormPost || r.URL.Path == EndpointSAMLACS) && r.Method == http.MethodPost {
 				handler.ServeHTTP(w, r)
 				return
+			}
+			var externalSecure bool
+			if http_utils.RequestOriginFromCtx(r.Context()).Scheme == "https" {
+				externalSecure = true
 			}
 			csrf.Protect(csrfCookieKey,
 				csrf.Secure(externalSecure),
@@ -161,7 +162,7 @@ func (l *Login) Handler() http.Handler {
 }
 
 func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string) ([]string, error) {
-	orgDomain, err := domain.NewIAMDomainName(orgName, authz.GetInstance(ctx).RequestedDomain())
+	orgDomain, err := domain.NewIAMDomainName(orgName, http_utils.RequestOriginFromCtx(ctx).Domain)
 	if err != nil {
 		return nil, err
 	}
@@ -197,5 +198,5 @@ func setUserContext(ctx context.Context, userID, resourceOwner string) context.C
 }
 
 func (l *Login) baseURL(ctx context.Context) string {
-	return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), l.externalSecure) + HandlerPrefix
+	return http_utils.RequestOriginFromCtx(ctx).Full + HandlerPrefix
 }

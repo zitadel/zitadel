@@ -6,7 +6,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -53,8 +52,6 @@ func (n *NotificationQueries) Origin(ctx context.Context, e eventstore.Event) (c
 	), nil
 }
 
-func enrichCtx(ctx context.Context, host, origin string) context.Context {
-	ctx = authz.WithRequestedDomain(ctx, host)
-	ctx = http_utils.WithComposedOrigin(ctx, origin)
-	return ctx
+func enrichCtx(ctx context.Context, domain, origin string) context.Context {
+	return http_utils.WithRequestOrigin(ctx, http_utils.RequestOrigin{Full: origin, Domain: domain})
 }

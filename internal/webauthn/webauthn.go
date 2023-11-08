@@ -10,15 +10,13 @@ import (
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/http"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 type Config struct {
-	DisplayName    string
-	ExternalSecure bool
+	DisplayName string
 }
 
 type webUser struct {
@@ -195,11 +193,11 @@ func (w *Config) serverFromContext(ctx context.Context, id, origin string) (*web
 }
 
 func (w *Config) configFromContext(ctx context.Context) *webauthn.Config {
-	instance := authz.GetInstance(ctx)
+	origin := http_utils.RequestOriginFromCtx(ctx)
 	return &webauthn.Config{
 		RPDisplayName: w.DisplayName,
-		RPID:          instance.RequestedDomain(),
-		RPOrigins:     []string{http.BuildOrigin(instance.RequestedHost(), w.ExternalSecure)},
+		RPID:          origin.Domain,
+		RPOrigins:     []string{origin.Full},
 	}
 }
 

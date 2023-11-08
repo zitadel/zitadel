@@ -8,7 +8,7 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -343,7 +343,7 @@ func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events
 		user.NewDomainClaimedEvent(
 			ctx,
 			userAgg,
-			fmt.Sprintf("%s@temporary.%s", id, authz.GetInstance(ctx).RequestedDomain()),
+			fmt.Sprintf("%s@temporary.%s", id, http_utils.RequestOriginFromCtx(ctx).Domain),
 			existingUser.UserName,
 			domainPolicy.UserLoginMustBeDomain),
 	}, changedUserGrant, nil
@@ -371,7 +371,7 @@ func (c *Commands) prepareUserDomainClaimed(ctx context.Context, filter preparat
 	return user.NewDomainClaimedEvent(
 		ctx,
 		userAgg,
-		fmt.Sprintf("%s@temporary.%s", id, authz.GetInstance(ctx).RequestedDomain()),
+		fmt.Sprintf("%s@temporary.%s", id, http_utils.RequestOriginFromCtx(ctx).Domain),
 		userWriteModel.UserName,
 		domainPolicy.UserLoginMustBeDomain), nil
 }

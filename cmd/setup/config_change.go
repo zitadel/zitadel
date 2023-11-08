@@ -28,9 +28,9 @@ func (mig *externalConfigChange) SetLastExecution(lastRun map[string]interface{}
 }
 
 func (mig *externalConfigChange) Check() bool {
-	return mig.currentExternalSecure != mig.ExternalSecure ||
-		mig.currentExternalPort != mig.ExternalPort ||
-		mig.currentExternalDomain != mig.ExternalDomain
+	return mig.currentExternalDomain != mig.ExternalDomain ||
+		mig.currentExternalSecure != mig.ExternalSecure ||
+		mig.currentExternalPort != mig.ExternalPort
 }
 
 func (mig *externalConfigChange) Execute(ctx context.Context) error {

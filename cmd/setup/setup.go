@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/tls"
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
@@ -61,7 +62,8 @@ func Flags(cmd *cobra.Command) {
 }
 
 func Setup(config *Config, steps *Steps, masterKey string) {
-	ctx := context.Background()
+	ctx := http.WithDefaultOrigin(context.Background(), config.ExternalSecure, config.ExternalDomain, config.ExternalPort)
+
 	logging.Info("setup started")
 
 	zitadelDBClient, err := database.Connect(config.Database, false, false)
