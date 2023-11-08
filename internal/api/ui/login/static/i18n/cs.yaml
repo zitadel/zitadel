@@ -247,6 +247,7 @@ RegistrationUser:
   Portuguese: Português
   Macedonian: Македонски
   Czech: Čeština
+  Russian: Русский
   GenderLabel: Pohlaví
   Female: Žena
   Male: Muž
@@ -284,6 +285,7 @@ ExternalRegistrationUserOverview:
   Portuguese: Português
   Macedonian: Македонски
   Czech: Čeština
+  Russian: Русский
   TosAndPrivacyLabel: Obchodní podmínky
   TosConfirm: Souhlasím s
   TosLinkText: obchodními podmínkami
@@ -349,6 +351,7 @@ ExternalNotFound:
   Portuguese: Português
   Macedonian: Македонски
   Czech: Čeština
+  Russian: Русский
 DeviceAuth:
   Title: Autorizace zařízení
   UserCode:
