@@ -20,7 +20,7 @@ func UserQueriesToQuery(queries []*user_pb.SearchQuery, level uint8) (_ []query.
 
 func UserQueryToQuery(query *user_pb.SearchQuery, level uint8) (query.SearchQuery, error) {
 	if level > 20 {
-		//can't go deeper than 20 levels of nesting.
+		// can't go deeper than 20 levels of nesting.
 		return nil, errors.ThrowInvalidArgument(nil, "USER-zsQ97", "Errors.User.TooManyNestingLevels")
 	}
 	switch q := query.Query.(type) {
