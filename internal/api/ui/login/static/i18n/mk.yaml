@@ -246,6 +246,8 @@ RegistrationUser:
   Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
   GenderLabel: Пол
   Female: Женски
   Male: Машки
@@ -282,6 +284,8 @@ ExternalRegistrationUserOverview:
   Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
   TosAndPrivacyLabel: Правила и услови
   TosConfirm: Се согласувам со
   TosLinkText: правилата за користење
@@ -346,6 +350,8 @@ ExternalNotFound:
   Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
 
 DeviceAuth:
   Title: Овластување преку уред

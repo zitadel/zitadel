@@ -6,12 +6,14 @@ import (
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
+
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type Server struct {
 	http.Handler
 	*op.LegacyServer
+	signingKeyAlgorithm string
 }
 
 func endpoints(endpointConfig *EndpointConfig) op.Endpoints {
@@ -79,7 +81,7 @@ func (s *Server) Discovery(ctx context.Context, r *op.Request[struct{}]) (_ *op.
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	return s.LegacyServer.Discovery(ctx, r)
+	return op.NewResponse(s.createDiscoveryConfig(ctx)), nil
 }
 
 func (s *Server) Keys(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
@@ -185,4 +187,35 @@ func (s *Server) EndSession(ctx context.Context, r *op.Request[oidc.EndSessionRe
 	defer func() { span.EndWithError(err) }()
 
 	return s.LegacyServer.EndSession(ctx, r)
+}
+
+func (s *Server) createDiscoveryConfig(ctx context.Context) *oidc.DiscoveryConfiguration {
+	issuer := op.IssuerFromContext(ctx)
+	return &oidc.DiscoveryConfiguration{
+		Issuer:                                     issuer,
+		AuthorizationEndpoint:                      s.Endpoints().Authorization.Absolute(issuer),
+		TokenEndpoint:                              s.Endpoints().Token.Absolute(issuer),
+		IntrospectionEndpoint:                      s.Endpoints().Introspection.Absolute(issuer),
+		UserinfoEndpoint:                           s.Endpoints().Userinfo.Absolute(issuer),
+		RevocationEndpoint:                         s.Endpoints().Revocation.Absolute(issuer),
+		EndSessionEndpoint:                         s.Endpoints().EndSession.Absolute(issuer),
+		JwksURI:                                    s.Endpoints().JwksURI.Absolute(issuer),
+		DeviceAuthorizationEndpoint:                s.Endpoints().DeviceAuthorization.Absolute(issuer),
+		ScopesSupported:                            op.Scopes(s.Provider()),
+		ResponseTypesSupported:                     op.ResponseTypes(s.Provider()),
+		GrantTypesSupported:                        op.GrantTypes(s.Provider()),
+		SubjectTypesSupported:                      op.SubjectTypes(s.Provider()),
+		IDTokenSigningAlgValuesSupported:           []string{s.signingKeyAlgorithm},
+		RequestObjectSigningAlgValuesSupported:     op.RequestObjectSigAlgorithms(s.Provider()),
+		TokenEndpointAuthMethodsSupported:          op.AuthMethodsTokenEndpoint(s.Provider()),
+		TokenEndpointAuthSigningAlgValuesSupported: op.TokenSigAlgorithms(s.Provider()),
+		IntrospectionEndpointAuthSigningAlgValuesSupported: op.IntrospectionSigAlgorithms(s.Provider()),
+		IntrospectionEndpointAuthMethodsSupported:          op.AuthMethodsIntrospectionEndpoint(s.Provider()),
+		RevocationEndpointAuthSigningAlgValuesSupported:    op.RevocationSigAlgorithms(s.Provider()),
+		RevocationEndpointAuthMethodsSupported:             op.AuthMethodsRevocationEndpoint(s.Provider()),
+		ClaimsSupported:                                    op.SupportedClaims(s.Provider()),
+		CodeChallengeMethodsSupported:                      op.CodeChallengeMethods(s.Provider()),
+		UILocalesSupported:                                 s.Provider().SupportedUILocales(),
+		RequestParameterSupported:                          s.Provider().RequestObjectSupported(),
+	}
 }
