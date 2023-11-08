@@ -247,22 +247,18 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 	return nil
 }
 
-// Filter returns all events matching the given search query
-func (crdb *CRDB) Filter(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (events []eventstore.Event, err error) {
-	events = make([]eventstore.Event, 0, searchQuery.GetLimit())
-	err = query(ctx, crdb, searchQuery, &events, false)
+// FilterToReducer finds all events matching the given search query and passes them to the reduce function.
+func (crdb *CRDB) FilterToReducer(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder, reduce eventstore.Reducer) error {
+	err := query(ctx, crdb, searchQuery, reduce, false)
+	if err == nil {
+		return nil
+	}
 	pgErr := new(pgconn.PgError)
 	// check events2 not exists
-	if err != nil && errors.As(err, &pgErr) {
-		if pgErr.Code == "42P01" {
-			err = query(ctx, crdb, searchQuery, &events, true)
-		}
+	if errors.As(err, &pgErr) && pgErr.Code == "42P01" {
+		return query(ctx, crdb, searchQuery, reduce, true)
 	}
-	if err != nil {
-		return nil, err
-	}
-
-	return events, nil
+	return err
 }
 
 // LatestSequence returns the latest sequence found by the search query

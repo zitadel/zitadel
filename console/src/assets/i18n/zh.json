@@ -51,7 +51,7 @@
       "TITLE": "让你的ZITADEL运转起来",
       "DESCRIPTION": "这份清单有助于设置你的实例，并指导你完成最重要的步骤"
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "设置你的品牌",
         "description": "定义你的登录的颜色和形状，上传你的标志和图标。",
@@ -62,15 +62,20 @@
         "description": "设置你自己的邮件服务器设置",
         "action": "设置 SMTP 设置"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "创建你的第一个项目",
         "description": "添加你的第一个项目并定义其角色和授权。",
         "action": "创建项目"
       },
-      "project.application.added": {
-        "title": "创建你的第一个应用程序",
+      "APPLICATION_CREATED": {
+        "title": "注册你的应用程序",
         "description": "创建一个web、native、api或saml应用程序并设置你的认证流程。",
         "action": "创建应用程序"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "登录你的应用程序",
+        "description": "将你的应用程序与 ZITADEL 集成以进行身份验证，并通过使用管理员用户登录来测试它。",
+        "action": "登录"
       },
       "user.human.added": {
         "title": "添加用户",
@@ -273,7 +278,7 @@
     "SYMBOLERROR": "密码必须包含符号或标点符号。",
     "NUMBERERROR": "密码必须包含数字。",
     "PWNOTEQUAL": "提供的密码不匹配。",
-    "PHONE": "电话号码必须以00或+开头。"
+    "PHONE": "电话号码必须以 + 开头。"
   },
   "USER": {
     "SETTINGS": {
@@ -485,7 +490,7 @@
       "TITLE": "信息",
       "EMAIL": "电子邮件",
       "PHONE": "手机号码",
-      "PHONE_HINT": "使用 00 或 + 符号后跟呼叫者的国家代码，或从下拉列表中选择国家，最后输入电话号码",
+      "PHONE_HINT": "使用+号，后跟呼叫者的国家/地区代码，或从下拉列表中选择国家/地区，最后输入电话号码",
       "USERNAME": "用户名",
       "CHANGEUSERNAME": "修改",
       "CHANGEUSERNAME_TITLE": "修改用户名称",
@@ -712,7 +717,6 @@
   },
   "METADATA": {
     "TITLE": "元数据",
-    "DESCRIPTION": "",
     "KEY": "键",
     "VALUE": "值",
     "ADD": "新条目",
@@ -1055,7 +1059,9 @@
       "zh": "简体中文",
       "bg": "Български",
       "pt": "Portuguese",
-      "mk": "Македонски"
+      "mk": "Македонски",
+      "cs": "Čeština",
+      "ru": "Русский"
     },
     "SMTP": {
       "TITLE": "SMTP 设置",
@@ -1091,6 +1097,7 @@
         "TOKEN": "令牌",
         "SENDERNUMBER": "发件人号码",
         "ADDED": "Twilio 添加成功。",
+        "UPDATED": "Twilio 更新成功。",
         "REMOVED": "Twilio 已删除",
         "CHANGETOKEN": "更改令牌",
         "SETTOKEN": "设置令牌",
@@ -1196,6 +1203,11 @@
         "ERROR": "找不到用户！",
         "PRIMARYBUTTON": "下一步",
         "SECONDARYBUTTON": "注册"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "自动模式",
+        "THEME_MODE_LIGHT": "仅限灯光模式",
+        "THEME_MODE_DARK": "仅限深色模式"
       }
     },
     "PWD_AGE": {
@@ -1259,7 +1271,9 @@
         "zh": "简体中文",
         "bg": "Български",
         "pt": "Portuguese",
-        "mk": "Македонски"
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -2068,6 +2082,23 @@
         "1": "Private Key JWT"
       }
     },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "SAML 应用"
+      },
+      "CONFIGSECTION": "SAML 配置",
+      "CHOOSEMETADATASOURCE": "使用以下选项之一提供您的 SAML 配置：",
+      "METADATAOPT1": "选项 1.指定元数据文件所在的 url",
+      "METADATAOPT2": "选项 2. 上传包含元数据 XML 的文件",
+      "METADATAOPT3": "选项 3. 动态创建最小元数据文件，提供 ENTITYID 和 ACS URL",
+      "UPLOAD": "上传 XML 文件",
+      "METADATA": "元数据",
+      "METADATAFROMFILE": "文件中的元数据",
+      "CREATEMETADATA": "创建元数据",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
+    },
     "AUTHMETHODS": {
       "CODE": {
         "TITLE": "Code",
@@ -2131,7 +2162,9 @@
     "zh": "简体中文",
     "bg": "Български",
     "pt": "Portuguese",
-    "mk": "Македонски"
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский"
   },
   "MEMBER": {
     "ADD": "添加管理者",

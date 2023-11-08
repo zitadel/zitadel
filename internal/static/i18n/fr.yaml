@@ -28,6 +28,9 @@ Errors:
       RemoveFailed: L'objet n'a pas pu être retiré
   Limit:
     ExceedsDefault: La limite dépasse la limite par défaut
+  Limits:
+    NotFound: Limites non trouvée
+    NoneSpecified: Aucune limite spécifiée
   Language:
     NotParsed: Impossible d'analyser la langue
   OIDCSettings:
@@ -421,6 +424,7 @@ Errors:
     AuditRetention: L'historique est en dehors de la rétention du journal d'audit
   Token:
     NotFound: Token non trouvé
+    Invalid: Le jeton n'est pas valide
   UserSession:
     NotFound: UserSession non trouvé
   Key:
@@ -487,6 +491,8 @@ Errors:
   Session:
     NotExisting: La session n'existe pas
     Terminated: La session est déjà terminée
+    Expired: La session a expiré
+    PositiveLifetime: La durée de vie de la session ne doit pas être inférieure à 0
     Token:
       Invalid: Le jeton de session n'est pas valide
     WebAuthN:

@@ -1,14 +1,12 @@
-@use '@angular/material' as mat;
-
 @mixin table-theme($theme) {
   $primary: map-get($theme, primary);
-  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-color: map-get($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
   $foreground: map-get($theme, foreground);
   $background: map-get($theme, background);
 
-  .mat-table,
-  .mat-paginator {
+  .mat-mdc-table,
+  .mat-mdc-paginator {
     background-color: inherit !important;
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
@@ -28,7 +26,7 @@
     font-weight: bold;
     white-space: nowrap;
 
-    &.mat-header-cell {
+    &.mat-mdc-header-cell {
       color: map-get($foreground, text);
       font-size: 11px;
       font-weight: 500;
@@ -40,7 +38,7 @@
   }
 
   tr {
-    &.mat-header-row {
+    &.mat-mdc-header-row {
       height: 40px !important;
       padding-bottom: 4px;
     }
@@ -78,7 +76,7 @@
     padding: 0 0.5rem !important;
   }
 
-  td .mat-checkbox,
+  td .mat-mdc-checkbox,
   th .mat-checkbox {
     margin-left: 1rem;
   }
@@ -96,15 +94,27 @@
   }
 
   .selection {
-    width: 65px;
-    max-width: 65px;
-    padding-right: 1rem !important;
+    width: 80px;
+    max-width: 80px;
+
+    .checkbox {
+      margin-right: auto;
+    }
+
+    .hidden {
+      visibility: hidden;
+    }
+  }
+
+  th .selection {
+    margin-left: 1rem;
   }
 
   .state {
     border-radius: 50vw;
     padding: 2px 0.5rem;
     letter-spacing: 0.05em;
+    font-weight: 500;
     font-size: 12px;
     white-space: nowrap;
     background-color: if($is-dark-theme, map-get($background, state), #e4e7e4);

@@ -35,7 +35,7 @@ type WithGatewayPrefix interface {
 }
 
 func CreateServer(
-	verifier *authz.TokenVerifier,
+	verifier authz.APITokenVerifier,
 	authConfig authz.Config,
 	queries *query.Queries,
 	hostHeaderName string,
@@ -58,6 +58,7 @@ func CreateServer(
 				middleware.TranslationHandler(),
 				middleware.ValidationHandler(),
 				middleware.ServiceHandler(),
+				middleware.ActivityInterceptor(),
 			),
 		),
 	}

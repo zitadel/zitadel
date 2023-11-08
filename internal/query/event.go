@@ -4,7 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -26,33 +28,51 @@ type EventEditor struct {
 	AvatarKey         string
 }
 
-func (q *Queries) SearchEvents(ctx context.Context, query *eventstore.SearchQueryBuilder, auditLogRetention time.Duration) (_ []*Event, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-	events, err := q.eventstore.Filter(ctx, query.AllowTimeTravel())
-	if err != nil {
-		return nil, err
-	}
-
-	if auditLogRetention != 0 {
-		events = filterAuditLogRetention(ctx, events, auditLogRetention)
-	}
-
-	return q.convertEvents(ctx, events), nil
+type eventsReducer struct {
+	ctx    context.Context
+	q      *Queries
+	events []*Event
 }
 
-func filterAuditLogRetention(ctx context.Context, events []eventstore.Event, auditLogRetention time.Duration) []eventstore.Event {
+func (r *eventsReducer) AppendEvents(events ...eventstore.Event) {
+	r.events = append(r.events, r.q.convertEvents(r.ctx, events)...)
+}
+
+func (r *eventsReducer) Reduce() error { return nil }
+
+func (q *Queries) SearchEvents(ctx context.Context, query *eventstore.SearchQueryBuilder) (_ []*Event, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	auditLogRetention := q.defaultAuditLogRetention
+	instanceLimits, err := q.Limits(ctx, authz.GetInstance(ctx).InstanceID())
+	if err != nil && !errors.IsNotFound(err) {
+		return nil, err
+	}
+	if instanceLimits != nil && instanceLimits.AuditLogRetention != nil {
+		auditLogRetention = *instanceLimits.AuditLogRetention
+	}
+	if auditLogRetention != 0 {
+		query = filterAuditLogRetention(ctx, auditLogRetention, query)
+	}
+	reducer := &eventsReducer{ctx: ctx, q: q}
+	if err = q.eventstore.FilterToReducer(ctx, query, reducer); err != nil {
+		return nil, err
+	}
+	return reducer.events, nil
+}
+
+func filterAuditLogRetention(ctx context.Context, auditLogRetention time.Duration, builder *eventstore.SearchQueryBuilder) *eventstore.SearchQueryBuilder {
 	callTime := call.FromContext(ctx)
 	if callTime.IsZero() {
 		callTime = time.Now()
 	}
-	filteredEvents := make([]eventstore.Event, 0, len(events))
-	for _, event := range events {
-		if event.CreatedAt().After(callTime.Add(-auditLogRetention)) {
-			filteredEvents = append(filteredEvents, event)
-		}
+	oldestAllowed := callTime.Add(-auditLogRetention)
+	// The audit log retention time should overwrite the creation date after query only if it is older
+	// For example API calls should still be able to restrict the creation date after to a more recent date
+	if builder.GetCreationDateAfter().Before(oldestAllowed) {
+		return builder.CreationDateAfter(oldestAllowed)
 	}
-	return filteredEvents
+	return builder
 }
 
 func (q *Queries) SearchEventTypes(ctx context.Context) []string {

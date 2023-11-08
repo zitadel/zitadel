@@ -6,10 +6,12 @@
     margin: 0;
   }
 
-  a i {
-    font-size: 1.2rem;
-    height: 1.2rem;
-    line-height: 1.2rem;
+  a {
+    .icon {
+      font-size: 1.2rem;
+      height: 1.2rem;
+      width: 1.2rem;
+    }
   }
 }
 
@@ -20,6 +22,10 @@
 
 @mixin projects-theme($theme) {
   $foreground: map-get($theme, foreground);
+
+  .project-title-row a {
+    color: map-get($foreground, text);
+  }
 
   .projects-controls {
     display: flex;

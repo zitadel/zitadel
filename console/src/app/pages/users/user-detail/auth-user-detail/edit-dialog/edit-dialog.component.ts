@@ -1,9 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import {
-  MatLegacyDialogRef as MatDialogRef,
-  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
-} from '@angular/material/legacy-dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { debounceTime } from 'rxjs';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
@@ -22,10 +20,14 @@ export class EditDialogComponent implements OnInit {
   public controlKey = 'editingField';
   public isPhone: boolean = false;
   public isVerified: boolean = false;
-  public phoneCountry: string = 'CH';
+  public phoneCountry: string = 'US';
   public dialogForm!: UntypedFormGroup;
   public EditDialogType: any = EditDialogType;
-  public selected: CountryPhoneCode | undefined;
+  public selected: CountryPhoneCode | undefined = {
+    countryCallingCode: '1',
+    countryCode: 'US',
+    countryName: 'United States of America',
+  };
   public countryPhoneCodes: CountryPhoneCode[] = [];
   constructor(
     public dialogRef: MatDialogRef<EditDialogComponent>,
@@ -38,6 +40,16 @@ export class EditDialogComponent implements OnInit {
     this.dialogForm = new FormGroup({
       [this.controlKey]: new UntypedFormControl(data.value, data.validator || requiredValidator),
     });
+
+    if (this.isPhone) {
+      this.ctrl?.valueChanges.pipe(debounceTime(200)).subscribe((value: string) => {
+        const phoneNumber = formatPhone(value);
+        if (phoneNumber) {
+          this.selected = this.countryPhoneCodes.find((code) => code.countryCode === phoneNumber.country);
+          this.ctrl?.setValue(phoneNumber.phone);
+        }
+      });
+    }
   }
 
   public setCountryCallingCode(): void {
@@ -52,8 +64,10 @@ export class EditDialogComponent implements OnInit {
       // Get country phone codes and set selected flag to guessed country or default country
       this.countryPhoneCodes = this.countryCallingCodesService.getCountryCallingCodes();
       const phoneNumber = formatPhone(this.dialogForm.controls[this.controlKey]?.value);
-      this.selected = this.countryPhoneCodes.find((code) => code.countryCode === phoneNumber.country);
-      this.dialogForm.controls[this.controlKey].setValue(phoneNumber.phone);
+      if (phoneNumber) {
+        this.selected = this.countryPhoneCodes.find((code) => code.countryCode === phoneNumber.country);
+        this.dialogForm.controls[this.controlKey].setValue(phoneNumber.phone);
+      }
     }
   }
 
@@ -67,5 +81,15 @@ export class EditDialogComponent implements OnInit {
 
   public get ctrl() {
     return this.dialogForm.get(this.controlKey);
+  }
+
+  public compareCountries(i1: CountryPhoneCode, i2: CountryPhoneCode) {
+    return (
+      i1 &&
+      i2 &&
+      i1.countryCallingCode === i2.countryCallingCode &&
+      i1.countryCode == i2.countryCode &&
+      i1.countryName == i2.countryName
+    );
   }
 }

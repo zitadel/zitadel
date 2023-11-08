@@ -1,6 +1,6 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { take } from 'rxjs';
 import {

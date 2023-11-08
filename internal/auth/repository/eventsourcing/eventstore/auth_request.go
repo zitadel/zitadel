@@ -1335,6 +1335,7 @@ func labelPolicyToDomain(p *query.LabelPolicy) *domain.LabelPolicy {
 		HideLoginNameSuffix: p.HideLoginNameSuffix,
 		ErrorMsgPopup:       p.ShouldErrorPopup,
 		DisableWatermark:    p.WatermarkDisabled,
+		ThemeMode:           p.ThemeMode,
 	}
 }
 
@@ -1585,7 +1586,7 @@ func linkExternalIDPs(ctx context.Context, userCommandProvider userCommandProvid
 			ObjectRoot:     es_models.ObjectRoot{AggregateID: request.UserID},
 			IDPConfigID:    linkingUser.IDPConfigID,
 			ExternalUserID: linkingUser.ExternalUserID,
-			DisplayName:    linkingUser.DisplayName,
+			DisplayName:    linkingUser.PreferredUsername,
 		}
 		externalIDPs[i] = externalIDP
 	}

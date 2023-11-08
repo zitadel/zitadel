@@ -79,7 +79,7 @@ func (wm *quotaWriteModel) Reduce() error {
 	}
 	// wm.WriteModel.Reduce() sets the aggregateID to the first event's aggregateID, but we need the last one
 	wm.AggregateID = wm.rollingAggregateID
-	return nil
+	return wm.WriteModel.Reduce()
 }
 
 // NewChanges returns all changes that need to be applied to the aggregate.

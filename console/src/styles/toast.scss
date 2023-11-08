@@ -1,8 +1,6 @@
-@use '@angular/material' as mat;
-
 @mixin toast-theme($theme) {
   $warn: map-get($theme, warn);
-  $warn-color: mat.get-color-from-palette($warn, 500);
+  $warn-color: map-get($warn, 500);
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
 
@@ -12,7 +10,13 @@
   //   }
 
   .data-e2e-failure {
-    color: $warn-color !important;
-    background-color: mat.get-color-from-palette($background, cards) !important;
+    .mdc-snackbar__surface {
+      background-color: map-get($background, toast) !important;
+      color: $warn-color !important;
+
+      * {
+        color: $warn-color !important;
+      }
+    }
   }
 }

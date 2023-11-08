@@ -63,6 +63,8 @@ func InstanceQueryToModel(searchQuery *instance_pb.Query) (query.SearchQuery, er
 	switch q := searchQuery.Query.(type) {
 	case *instance_pb.Query_IdQuery:
 		return query.NewInstanceIDsListSearchQuery(q.IdQuery.Ids...)
+	case *instance_pb.Query_DomainQuery:
+		return query.NewInstanceDomainsListSearchQuery(q.DomainQuery.Domains...)
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "INST-3m0se", "List.Query.Invalid")
 	}

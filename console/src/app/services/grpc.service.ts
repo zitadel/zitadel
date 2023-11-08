@@ -1,6 +1,6 @@
 import { PlatformLocation } from '@angular/common';
 import { Injectable } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthConfig } from 'angular-oauth2-oidc';
 import { catchError, switchMap, tap, throwError } from 'rxjs';
@@ -17,7 +17,6 @@ import { ExhaustedGrpcInterceptor } from './interceptors/exhausted.grpc.intercep
 import { I18nInterceptor } from './interceptors/i18n.interceptor';
 import { OrgInterceptor } from './interceptors/org.interceptor';
 import { StorageService } from './storage.service';
-import { ThemeService } from './theme.service';
 
 @Injectable({
   providedIn: 'root',
@@ -35,11 +34,9 @@ export class GrpcService {
     private dialog: MatDialog,
     private translate: TranslateService,
     private exhaustedService: ExhaustedService,
-    private themeService: ThemeService,
   ) {}
 
   public loadAppEnvironment(): Promise<any> {
-    this.themeService.applyLabelPolicy();
     // We use the browser language until we can make API requests to get the users configured language.
 
     const browserLanguage = this.translate.getBrowserLang();

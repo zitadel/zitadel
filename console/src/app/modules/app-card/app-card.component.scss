@@ -1,12 +1,10 @@
-@use '@angular/material' as mat;
-
 @mixin app-card-theme($theme) {
   $primary: map-get($theme, primary);
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
   $accent: map-get($theme, accent);
   $is-dark-theme: map-get($theme, is-dark);
-  $accent-color: mat.get-color-from-palette($primary, 500);
+  $accent-color: map-get($primary, 500);
   $back: map-get($background, background);
 
   .cnsl-app-card {
@@ -26,7 +24,7 @@
     font-weight: 600;
     background-color: $back;
     transition: background-color box-shadow 0.3s ease-in;
-    color: mat.get-color-from-palette($primary, default-contrast);
+    color: map-get($primary, default-contrast);
 
     &.add {
       background-color: map-get($primary, 500);

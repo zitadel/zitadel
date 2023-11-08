@@ -18,7 +18,7 @@
           <div class="cnsl-doc-row">
             <span class="cnsl-type" [innerHtml]="sub"></span>
             <a *ngIf="docLink" mat-icon-button [href]="docLink" rel="noreferrer" target="_blank">
-              <i class="las la-info-circle"></i>
+              <mat-icon class="icon">info_outline</mat-icon>
             </a>
           </div>
         </div>
@@ -29,13 +29,15 @@
       <ng-container *ngIf="hasActions">
         <button
           data-e2e="actions"
-          class="cnsl-actions-trigger-desk cnsl-action-button"
+          class="cnsl-actions-trigger-desk"
           mat-raised-button
           color="primary"
           [matMenuTriggerFor]="actions"
         >
-          <span>{{ 'ACTIONS.ACTIONS' | translate }}</span>
-          <mat-icon class="icon">keyboard_arrow_down</mat-icon>
+          <div class="cnsl-action-button">
+            <span>{{ 'ACTIONS.ACTIONS' | translate }}</span>
+            <mat-icon class="icon">keyboard_arrow_down</mat-icon>
+          </div>
         </button>
         <button
           class="cnsl-actions-trigger-mob"

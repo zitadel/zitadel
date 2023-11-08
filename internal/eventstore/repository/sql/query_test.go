@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/cockroach"
@@ -74,6 +75,8 @@ func Test_getCondition(t *testing.T) {
 }
 
 func Test_prepareColumns(t *testing.T) {
+	var reducedEvents []eventstore.Event
+
 	type fields struct {
 		dbRow []interface{}
 	}
@@ -146,13 +149,16 @@ func Test_prepareColumns(t *testing.T) {
 			name: "events",
 			args: args{
 				columns: eventstore.ColumnsEvent,
-				dest:    &[]eventstore.Event{},
-				useV1:   true,
+				dest: eventstore.Reducer(func(event eventstore.Event) error {
+					reducedEvents = append(reducedEvents, event)
+					return nil
+				}),
+				useV1: true,
 			},
 			res: res{
 				query: `SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events`,
 				expected: []eventstore.Event{
-					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Data: make(sql.RawBytes, 0)},
+					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Data: nil},
 				},
 			},
 			fields: fields{
@@ -163,12 +169,15 @@ func Test_prepareColumns(t *testing.T) {
 			name: "events v2",
 			args: args{
 				columns: eventstore.ColumnsEvent,
-				dest:    &[]eventstore.Event{},
+				dest: eventstore.Reducer(func(event eventstore.Event) error {
+					reducedEvents = append(reducedEvents, event)
+					return nil
+				}),
 			},
 			res: res{
 				query: `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2`,
 				expected: []eventstore.Event{
-					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Pos: 42, Data: make(sql.RawBytes, 0), Version: "v1"},
+					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Pos: 42, Data: nil, Version: "v1"},
 				},
 			},
 			fields: fields{
@@ -179,12 +188,15 @@ func Test_prepareColumns(t *testing.T) {
 			name: "event null position",
 			args: args{
 				columns: eventstore.ColumnsEvent,
-				dest:    &[]eventstore.Event{},
+				dest: eventstore.Reducer(func(event eventstore.Event) error {
+					reducedEvents = append(reducedEvents, event)
+					return nil
+				}),
 			},
 			res: res{
 				query: `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2`,
 				expected: []eventstore.Event{
-					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Pos: 0, Data: make(sql.RawBytes, 0), Version: "v1"},
+					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Pos: 0, Data: nil, Version: "v1"},
 				},
 			},
 			fields: fields{
@@ -207,9 +219,12 @@ func Test_prepareColumns(t *testing.T) {
 			name: "event query error",
 			args: args{
 				columns: eventstore.ColumnsEvent,
-				dest:    &[]eventstore.Event{},
-				dbErr:   sql.ErrConnDone,
-				useV1:   true,
+				dest: eventstore.Reducer(func(event eventstore.Event) error {
+					reducedEvents = append(reducedEvents, event)
+					return nil
+				}),
+				dbErr: sql.ErrConnDone,
+				useV1: true,
 			},
 			res: res{
 				query: `SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events`,
@@ -242,6 +257,12 @@ func Test_prepareColumns(t *testing.T) {
 				equalizer.Equal(tt.args.dest.(*sql.NullTime).Time)
 				return
 			}
+			if _, ok := tt.args.dest.(eventstore.Reducer); ok {
+				assert.Equal(t, tt.res.expected, reducedEvents)
+				reducedEvents = nil
+				return
+			}
+
 			got := reflect.Indirect(reflect.ValueOf(tt.args.dest)).Interface()
 			if !reflect.DeepEqual(got, tt.res.expected) {
 				t.Errorf("unexpected result from rowScanner \nwant: %+v \ngot: %+v", tt.res.expected, got)
@@ -625,7 +646,10 @@ func Test_query_events_with_crdb(t *testing.T) {
 			}
 
 			events := []eventstore.Event{}
-			if err := query(context.Background(), db, tt.args.searchQuery, &events, true); (err != nil) != tt.wantErr {
+			if err := query(context.Background(), db, tt.args.searchQuery, eventstore.Reducer(func(event eventstore.Event) error {
+				events = append(events, event)
+				return nil
+			}), true); (err != nil) != tt.wantErr {
 				t.Errorf("CRDB.query() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

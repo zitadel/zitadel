@@ -28,6 +28,9 @@ Errors:
       RemoveFailed: El objeto no pudo eliminarse
   Limit:
     ExceedsDefault: El límite excede el límite por defecto
+  Limits:
+    NotFound: Límite no encontrado
+    NoneSpecified: No se especificaron límites
   Language:
     NotParsed: No pude analizar el idioma
   OIDCSettings:
@@ -421,6 +424,7 @@ Errors:
     AuditRetention: El histórico está fuera de la retención del registro de auditoría
   Token:
     NotFound: Token no encontrado
+    Invalid: Token no válido
   UserSession:
     NotFound: UserSession no encontrado
   Key:
@@ -486,7 +490,9 @@ Errors:
       ScanFailed: La consulta de uso de los segundos de ejecuciónde acciones ha fallado
   Session:
     NotExisting: La sesión no existe
-    Terminated: Sesión ya terminada
+    Terminated: La Sesión ya terminada
+    Expired: La sesión ha expirado
+    PositiveLifetime: La duración de la sesión no debe ser inferior a 0
     Token:
       Invalid: El identificador de sesión no es válido
     WebAuthN:
