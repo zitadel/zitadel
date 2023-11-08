@@ -39,16 +39,15 @@ Telemetry:
 
 # Port ZITADEL will listen on
 Port: 8080 # ZITADEL_PORT
-# Port ZITADEL is exposed on, it can differ from port e.g. if you proxy the traffic
-# !!! Changing this after the initial setup breaks your system !!!
+# ExternalPort is the port on which end users access ZITADEL.
+# It can differ from Port e.g. if a reverse proxy forwards the traffic to ZITADEL
+# Search the ZITADEL docs page "External ZITADEL Access" more information.
 ExternalPort: 8080 # ZITADEL_EXTERNALPORT
-# Domain/hostname ZITADEL is exposed externally
-# !!! Changing this after the initial setup breaks your system !!!
+# ExternalPort is the domain on which end users access ZITADEL.
+# Search the ZITADEL docs page "External ZITADEL Access" more information.
 ExternalDomain: localhost # ZITADEL_EXTERNALDOMAIN
-# specifies if ZITADEL is exposed externally through TLS
-# this must be set to true even if TLS is not enabled on ZITADEL itself
-# but TLS traffic is terminated on a reverse proxy
-# !!! Changing this after the initial setup breaks your system !!!
+# ExternalSecure specifies if ZITADEL is exposed externally using HTTPS or HTTP.
+# Search the ZITADEL docs page "External ZITADEL Access" more information.
 ExternalSecure: true # ZITADEL_EXTERNALSECURE
 TLS:
   # If enabled, ZITADEL will serve all traffic over TLS (HTTPS and gRPC)
