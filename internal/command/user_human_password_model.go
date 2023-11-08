@@ -86,6 +86,7 @@ func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
+		SequenceGreater(wm.WriteModel.ProcessedSequence).
 		EventTypes(user.HumanAddedType,
 			user.HumanRegisteredType,
 			user.HumanInitialCodeAddedType,
@@ -113,9 +114,6 @@ func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
-	}
-	if wm.WriteModel.ProcessedSequence != 0 {
-		query.SequenceGreater(wm.WriteModel.ProcessedSequence)
 	}
 	return query
 }
