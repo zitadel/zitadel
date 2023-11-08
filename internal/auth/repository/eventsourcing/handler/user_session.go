@@ -358,14 +358,18 @@ func (u *UserSession) loginNameInformation(ctx context.Context, orgID string, in
 	if err != nil {
 		return false, "", err
 	}
+	primaryDomain, err = org.GetPrimaryDomain()
+	if err != nil {
+		return false, "", err
+	}
 	if org.DomainPolicy != nil {
-		return org.DomainPolicy.UserLoginMustBeDomain, org.GetPrimaryDomain().Domain, nil
+		return org.DomainPolicy.UserLoginMustBeDomain, primaryDomain, nil
 	}
 	policy, err := u.queries.DefaultDomainPolicy(authz.WithInstanceID(ctx, org.InstanceID))
 	if err != nil {
 		return false, "", err
 	}
-	return policy.UserLoginMustBeDomain, org.GetPrimaryDomain().Domain, nil
+	return policy.UserLoginMustBeDomain, primaryDomain, nil
 }
 
 func (u *UserSession) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_model.Org, error) {

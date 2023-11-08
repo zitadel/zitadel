@@ -56,7 +56,6 @@
 @import 'src/app/modules/user-grants/user-grants.component.scss';
 @import 'src/app/modules/shortcuts/shortcuts.component.scss';
 @import 'src/app/modules/policies/idp-settings/idp-settings.component.scss';
-@import 'src/app/pages/actions/add-action-dialog/add-action-dialog.component';
 @import 'src/app/modules/project-role-chip/project-role-chip.component';
 @import 'src/app/pages/events/events.component';
 @import 'src/app/pages/home/home.component.scss';
@@ -132,7 +131,6 @@
   @include granted-project-detail-theme($theme);
   @include user-grants-theme($theme);
   @include info-row-theme($theme);
-  @include action-dialog-theme($theme);
   @include redirect-uris-theme($theme);
   @include action-keys-theme($theme);
   @include codemirror-theme($theme);

@@ -717,7 +717,6 @@
   },
   "METADATA": {
     "TITLE": "Metadane",
-    "DESCRIPTION": "",
     "KEY": "Klucz",
     "VALUE": "Wartość",
     "ADD": "Nowy wpis",
@@ -1060,7 +1059,8 @@
       "zh": "简体中文",
       "bg": "Български",
       "pt": "Portuguese",
-      "mk": "Македонски"
+      "mk": "Македонски",
+      "cs": "Čeština"
     },
     "SMTP": {
       "TITLE": "Ustawienia SMTP",
@@ -1203,6 +1203,11 @@
         "ERROR": "Nie znaleziono użytkownika!",
         "PRIMARYBUTTON": "Dalej",
         "SECONDARYBUTTON": "Zarejestruj"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Tryb automatyczny",
+        "THEME_MODE_LIGHT": "Tylko tryb jasny",
+        "THEME_MODE_DARK": "Tylko tryb ciemny"
       }
     },
     "PWD_AGE": {
@@ -1266,7 +1271,8 @@
         "zh": "简体中文",
         "bg": "Български",
         "pt": "Portuguese",
-        "mk": "Македонски"
+        "mk": "Македонски",
+        "cs": "Čeština"
       },
       "KEYS": {
         "emailVerificationDoneText": "Weryfikacja adresu e-mail zakończona",
@@ -2081,11 +2087,16 @@
         "DESCRIPTION": "Aplikacje SAML"
       },
       "CONFIGSECTION": "Konfiguracja SAML",
-      "URL": "Adres URL, gdzie znajduje się plik metadanych",
-      "OR": "lub",
-      "XML": "Prześlij plik XML metadanych",
+      "CHOOSEMETADATASOURCE": "Podaj konfigurację SAML, korzystając z jednej z następujących opcji:",
+      "METADATAOPT1": "Opcja 1. Podaj adres URL, pod którym znajduje się plik metadanych",
+      "METADATAOPT2": "Opcja 2. Prześlij plik zawierający metadane XML",
+      "METADATAOPT3": "Opcja 3. Utwórz na bieżąco minimalny plik metadanych, podając ENTITYID i adres URL ACS",
+      "UPLOAD": "Prześlij plik XML",
       "METADATA": "Metadane",
-      "METADATAFROMFILE": "Metadane z pliku"
+      "METADATAFROMFILE": "Metadane z pliku",
+      "CREATEMETADATA": "Utwórz metadane",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {
@@ -2150,7 +2161,8 @@
     "zh": "简体中文",
     "bg": "Български",
     "pt": "Portuguese",
-    "mk": "Македонски"
+    "mk": "Македонски",
+    "cs": "Čeština"
   },
   "MEMBER": {
     "ADD": "Dodaj managera",

@@ -1,12 +1,10 @@
-@use '@angular/material' as mat;
-
 @mixin action-keys-theme($theme) {
   $primary: map-get($theme, primary);
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
   $accent: map-get($theme, accent);
   $is-dark-theme: map-get($theme, is-dark);
-  $accent-color: mat.get-color-from-palette($primary, 500);
+  $accent-color: map-get($primary, 500);
   $back: map-get($background, background);
 
   .action-keys-wrapper {
@@ -45,7 +43,7 @@
           right: 0;
           bottom: 0;
           left: 0;
-          background: mat.get-color-from-palette($primary, default-contrast);
+          background: map-get($primary, default-contrast);
           opacity: 0.2;
           border-radius: 4px;
         }

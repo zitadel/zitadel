@@ -1,7 +1,7 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, OnDestroy } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { Subject, takeUntil } from 'rxjs';
 import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';

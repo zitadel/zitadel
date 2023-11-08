@@ -17,14 +17,16 @@
   >
     <button
       actions
-      class="button cnsl-action-button"
+      class="button"
       (click)="addAuthFactor()"
       mat-raised-button
       color="primary"
       matTooltip="{{ 'ACTIONS.NEW' | translate }}"
     >
-      <mat-icon class="icon">add</mat-icon>
-      <span>{{ 'USER.MFA.ADD' | translate }}</span>
+      <div class="cnsl-action-button">
+        <mat-icon class="icon">add</mat-icon>
+        <span>{{ 'USER.MFA.ADD' | translate }}</span>
+      </div>
     </button>
 
     <table class="table" mat-table [dataSource]="dataSource">

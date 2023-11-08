@@ -717,7 +717,6 @@
   },
   "METADATA": {
     "TITLE": "Metadaten",
-    "DESCRIPTION": "",
     "KEY": "Schlüssel",
     "VALUE": "Wert",
     "ADD": "Neues Element",
@@ -1060,7 +1059,8 @@
       "zh": "简体中文",
       "bg": "Български",
       "pt": "Portuguese",
-      "mk": "Македонски"
+      "mk": "Македонски",
+      "cs": "Čeština"
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -1203,6 +1203,11 @@
         "ERROR": "Benutzer konnte nicht gefunden werden!",
         "PRIMARYBUTTON": "weiter",
         "SECONDARYBUTTON": "registrieren"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Automatischer Modus",
+        "THEME_MODE_LIGHT": "Nur heller Modus",
+        "THEME_MODE_DARK": "Nur dunkler Modus"
       }
     },
     "PWD_AGE": {
@@ -1266,7 +1271,8 @@
         "zh": "简体中文",
         "bg": "Български",
         "pt": "Portuguese",
-        "mk": "Македонски"
+        "mk": "Македонски",
+        "cs": "Čeština"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -2080,11 +2086,16 @@
         "DESCRIPTION": "SAML Applikationen"
       },
       "CONFIGSECTION": "SAML Konfiguration",
-      "URL": "Url der Metadaten-Datei",
-      "OR": "oder",
-      "XML": "Metadaten XML hochladen",
+      "CHOOSEMETADATASOURCE": "Stellen Sie Ihre SAML-Konfiguration mit einer der folgenden Optionen bereit:",
+      "METADATAOPT1": "Option 1: Geben Sie die URL an, unter der sich die Metadatendatei befindet",
+      "METADATAOPT2": "Option 2: Laden Sie eine Datei hoch, die Ihre XML-Metadaten enthält",
+      "METADATAOPT3": "Option 3: Erstellen Sie spontan eine minimale Metadatendatei mit ENTITYID und ACS-URL",
+      "UPLOAD": "XML-Datei hochladen",
       "METADATA": "Metadaten",
-      "METADATAFROMFILE": "Metadata aus Datei"
+      "METADATAFROMFILE": "Metadata aus Datei",
+      "CREATEMETADATA": "Create metadata",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {
@@ -2149,7 +2160,8 @@
     "zh": "简体中文",
     "bg": "Български",
     "pt": "Portuguese",
-    "mk": "Македонски"
+    "mk": "Македонски",
+    "cs": "Čeština"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

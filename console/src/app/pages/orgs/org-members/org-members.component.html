@@ -2,7 +2,7 @@
   <p class="subinfo" sub>
     <span class="cnsl-secondary-text">{{ 'ORG.MEMBER.DESCRIPTION' | translate }}</span>
     <a mat-icon-button href="https://zitadel.com/docs/concepts/structure/managers" target="_blank">
-      <i class="las la-info-circle"></i>
+      <mat-icon class="icon">info_outline</mat-icon>
     </a>
   </p>
   <cnsl-members-table
@@ -29,10 +29,12 @@
       </button>
     </ng-template>
     <ng-template cnslHasRole writeactions [hasRole]="['org.member.write:' + org?.id, 'org.member.write']">
-      <button color="primary" (click)="openAddMember()" class="cnsl-action-button" mat-raised-button>
-        <mat-icon class="icon">add</mat-icon>
-        <span>{{ 'ACTIONS.NEW' | translate }}</span>
-        <cnsl-action-keys (actionTriggered)="openAddMember()"> </cnsl-action-keys>
+      <button color="primary" (click)="openAddMember()" mat-raised-button>
+        <div class="cnsl-action-button">
+          <mat-icon class="icon">add</mat-icon>
+          <span>{{ 'ACTIONS.NEW' | translate }}</span>
+          <cnsl-action-keys (actionTriggered)="openAddMember()"> </cnsl-action-keys>
+        </div>
       </button>
     </ng-template>
   </cnsl-members-table>

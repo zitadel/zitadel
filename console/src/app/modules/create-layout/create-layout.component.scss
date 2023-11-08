@@ -1,8 +1,6 @@
-@use '@angular/material' as mat;
-
 @mixin app-create-theme($theme) {
   $primary: map-get($theme, primary);
-  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-color: map-get($primary, 500);
 
   // Number of steps creating app
   $steps: 3;
@@ -35,7 +33,11 @@
 
   .abort {
     font-size: 1.2rem;
-    margin-left: 2rem;
+    margin-left: 1.5rem;
+    text-transform: uppercase;
+    font-size: 14px;
+    opacity: 0.8;
+    letter-spacing: 0.05em;
   }
 
   .abort-2 {

@@ -717,7 +717,6 @@
   },
   "METADATA": {
     "TITLE": "Métadonnées",
-    "DESCRIPTION": "",
     "KEY": "Clé",
     "VALUE": "Valeur",
     "ADD": "Nouvelle entrée",
@@ -1060,7 +1059,8 @@
       "zh": "简体中文",
       "bg": "Български",
       "pt": "Portuguese",
-      "mk": "Македонски"
+      "mk": "Македонски",
+      "cs": "Čeština"
     },
     "SMTP": {
       "TITLE": "Paramètres SMTP",
@@ -1203,6 +1203,11 @@
         "ERROR": "L'utilisateur n'a pas pu être trouvé !",
         "PRIMARYBUTTON": "suivant",
         "SECONDARYBUTTON": "enregistrez-vous"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Mode automatique",
+        "THEME_MODE_LIGHT": "Mode clair uniquement",
+        "THEME_MODE_DARK": "Mode sombre uniquement"
       }
     },
     "PWD_AGE": {
@@ -1266,7 +1271,8 @@
         "zh": "简体中文",
         "bg": "Български",
         "pt": "Portuguese",
-        "mk": "Македонски"
+        "mk": "Македонски",
+        "cs": "Čeština"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'email effectuée",
@@ -2075,6 +2081,23 @@
         "1": "Clé privée JWT"
       }
     },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "Applications SAML"
+      },
+      "CONFIGSECTION": "Configuration SAML",
+      "CHOOSEMETADATASOURCE": "Fournissez votre configuration SAML à l'aide de l'une des options suivantes :",
+      "METADATAOPT1": "Option 1. Spécifiez l'URL où se trouve le fichier de métadonnées",
+      "METADATAOPT2": "Option 2. Téléchargez un fichier contenant vos métadonnées XML",
+      "METADATAOPT3": "Option 3. Créer un fichier de métadonnées minimal à la volée fournissant l'ENTITYID et l'URL ACS",
+      "UPLOAD": "Télécharger le fichier XML",
+      "METADATA": "Métadonnées",
+      "METADATAFROMFILE": "Métadonnées du fichier",
+      "CREATEMETADATA": "Créer des métadonnées",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
+    },
     "AUTHMETHODS": {
       "CODE": {
         "TITLE": "Code",
@@ -2138,7 +2161,8 @@
     "zh": "简体中文",
     "bg": "Български",
     "pt": "Portuguese",
-    "mk": "Македонски"
+    "mk": "Македонски",
+    "cs": "Čeština"
   },
   "MEMBER": {
     "ADD": "Ajouter un manager",

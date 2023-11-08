@@ -1,15 +1,6 @@
-@use '@angular/material' as mat;
-
 .action-dialog-title {
   font-size: 1.2rem;
   margin-top: 0;
-}
-
-@mixin action-dialog-theme($theme) {
-  $primary: map-get($theme, primary);
-  $primary-color: mat.get-color-from-palette($primary, 500);
-  $is-dark-theme: map-get($theme, is-dark);
-  $foreground: map-get($theme, foreground);
 }
 
 .action {

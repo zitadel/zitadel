@@ -93,8 +93,10 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerPersonalAccessTokenProjection")
 		ctx, err = projection.PersonalAccessTokenProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	query, scan := preparePersonalAccessTokenQuery(ctx, q.client)

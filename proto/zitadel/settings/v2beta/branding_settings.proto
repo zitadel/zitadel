@@ -33,6 +33,11 @@ message BrandingSettings {
       description: "resource_owner_type returns if the setting is managed on the organization or on the instance";
     }
   ];
+  ThemeMode theme_mode = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "states whether both or only dark or light theme will be used";
+    }
+  ];
 }
 
 message Theme {
@@ -78,4 +83,11 @@ message Theme {
       example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/icon-180950498874178817\"";
     }
   ];
+}
+
+enum ThemeMode {
+  THEME_MODE_UNSPECIFIED = 0;
+  THEME_MODE_AUTO = 1;
+  THEME_MODE_LIGHT = 2;
+  THEME_MODE_DARK = 3;
 }

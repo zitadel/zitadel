@@ -424,6 +424,7 @@ Errors:
     AuditRetention: Historia jest poza zasięgiem retencji dziennika audytu
   Token:
     NotFound: Token nie znaleziony
+    Invalid: Token jest nieprawidłowy
   UserSession:
     NotFound: Sesja użytkownika nie znaleziona
   Key:
@@ -490,6 +491,8 @@ Errors:
   Session:
     NotExisting: Sesja nie istnieje
     Terminated: Sesja już zakończona
+    Expired: Sesja wygasła
+    PositiveLifetime: Czas życia sesji nie może być krótszy niż 0
     Token:
       Invalid: Token sesji jest nieprawidłowy
     WebAuthN:
