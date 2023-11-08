@@ -1223,6 +1223,68 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			},
 		},
 		{
+			name: "user locked, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserLockedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
 			name: "existing password empty, precondition error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -1336,6 +1398,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 								false,
 								"")),
 					),
+					expectFilter(),
 					expectPush(
 						user.NewHumanPasswordCheckFailedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -1417,8 +1480,10 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"$plain$x$password",
 								false,
-								"")),
+								""),
+						),
 					),
+					expectFilter(),
 					expectPush(
 						user.NewHumanPasswordCheckFailedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -1507,6 +1572,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 								false,
 								"")),
 					),
+					expectFilter(),
 					expectPush(
 						user.NewHumanPasswordCheckSucceededEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -1587,6 +1653,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 								false,
 								"")),
 					),
+					expectFilter(),
 					expectPush(
 						user.NewHumanPasswordCheckSucceededEvent(
 							context.Background(),
@@ -1615,6 +1682,86 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				},
 			},
 			res: res{},
+		},
+		{
+			name: "check password ok, locked in the mean time",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPasswordChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"$plain$x$password",
+								false,
+								"")),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewUserLockedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+				authReq: &domain.AuthRequest{
+					ID:      "request1",
+					AgentID: "agent1",
+				},
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
 		},
 		{
 			name: "regression test old version event",
@@ -1682,6 +1829,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 							},
 						),
 					),
+					expectFilter(),
 					expectPush(
 						user.NewHumanPasswordCheckSucceededEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
