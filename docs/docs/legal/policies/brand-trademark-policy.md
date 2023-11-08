@@ -44,6 +44,6 @@ To ensure the logo is used as intended, we provide specific examples below and r
 
 ## Entry into force
 
-This policy is valid from November 1, 2023.
+This policy is valid from November 9, 2023.
 
-Last revised November 1, 2023
+Last revised November 9, 2023

@@ -6,7 +6,7 @@ custom_edit_url: null
 
 This annex of the [Framework Agreement](../terms-of-service) describes the services offered by us.
 
-Last revised: October 31, 2023
+Last revised: November 9, 2023
 
 ## Services offered
 

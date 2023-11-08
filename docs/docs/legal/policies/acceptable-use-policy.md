@@ -39,6 +39,6 @@ You will not be entitled to any Financial Credit or compensation for any interru
 
 ## Entry into force
 
-This policy is valid from October 31, 2023.
+This policy is valid from November 9, 2023.
 
-Last revised October 31, 2023
+Last revised November 9, 2023
