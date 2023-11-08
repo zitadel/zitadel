@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	cache "github.com/zitadel/zitadel/internal/auth_request/repository"
@@ -15,7 +16,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query"
@@ -23,7 +23,6 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	user_model "github.com/zitadel/zitadel/internal/user/model"
 	user_view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
-	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 const unknownUserID = "UNKNOWN"
@@ -33,7 +32,6 @@ type AuthRequestRepo struct {
 	Query        *query.Queries
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
-	Eventstore   v1.Eventstore
 	UserCodeAlg  crypto.EncryptionAlgorithm
 
 	LabelPolicyProvider       labelPolicyProvider
@@ -50,6 +48,9 @@ type AuthRequestRepo struct {
 	UserGrantProvider         userGrantProvider
 	ProjectProvider           projectProvider
 	ApplicationProvider       applicationProvider
+	CustomTextProvider        customTextProvider
+
+	FeatureCheck feature.Checker
 
 	IdGenerator id.Generator
 }
@@ -65,7 +66,7 @@ type privacyPolicyProvider interface {
 type userSessionViewProvider interface {
 	UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error)
 	UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error)
-	GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*repository.CurrentSequence, error)
+	GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*query.CurrentState, error)
 }
 
 type userViewProvider interface {
@@ -89,7 +90,7 @@ type idpUserLinksProvider interface {
 }
 
 type userEventProvider interface {
-	UserEventsByID(ctx context.Context, id string, sequence uint64, eventTypes []es_models.EventType) ([]*es_models.Event, error)
+	UserEventsByID(ctx context.Context, id string, sequence uint64, eventTypes []eventstore.EventType) ([]eventstore.Event, error)
 }
 
 type userCommandProvider interface {
@@ -113,6 +114,10 @@ type projectProvider interface {
 
 type applicationProvider interface {
 	AppByOIDCClientID(context.Context, string, bool) (*query.App, error)
+}
+
+type customTextProvider interface {
+	CustomTextListByTemplate(ctx context.Context, aggregateID string, text string, withOwnerRemoved bool) (texts *query.CustomTexts, err error)
 }
 
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
@@ -182,6 +187,17 @@ func (repo *AuthRequestRepo) SaveAuthCode(ctx context.Context, id, code, userAge
 		return err
 	}
 	request.Code = code
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
+func (repo *AuthRequestRepo) SaveSAMLRequestID(ctx context.Context, id, requestID, userAgentID string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	request, err := repo.getAuthRequest(ctx, id, userAgentID)
+	if err != nil {
+		return err
+	}
+	request.SAMLRequestID = requestID
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
@@ -645,7 +661,12 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		orgID = request.UserOrgID
 	}
 	if orgID == "" {
-		orgID = authz.GetInstance(ctx).InstanceID()
+		orgID = authz.GetInstance(ctx).DefaultOrganisationID()
+		f, err := repo.FeatureCheck.CheckInstanceBooleanFeature(ctx, domain.FeatureLoginDefaultOrg)
+		logging.WithFields("authReq", request.ID).OnError(err).Warnf("could not check feature %s", domain.FeatureLoginDefaultOrg)
+		if !f.Boolean {
+			orgID = authz.GetInstance(ctx).InstanceID()
+		}
 	}
 
 	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
@@ -666,19 +687,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		return err
 	}
 	request.PrivacyPolicy = privacyPolicy
-	privateLabelingOrgID := authz.GetInstance(ctx).InstanceID()
-	if request.PrivateLabelingSetting != domain.PrivateLabelingSettingUnspecified {
-		privateLabelingOrgID = request.ApplicationResourceOwner
-	}
-	if request.PrivateLabelingSetting == domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy || request.PrivateLabelingSetting == domain.PrivateLabelingSettingUnspecified {
-		if request.UserOrgID != "" {
-			privateLabelingOrgID = request.UserOrgID
-		}
-	}
-	if request.RequestedOrgID != "" {
-		privateLabelingOrgID = request.RequestedOrgID
-	}
-	labelPolicy, err := repo.getLabelPolicy(ctx, privateLabelingOrgID)
+	labelPolicy, err := repo.getLabelPolicy(ctx, request.PrivateLabelingOrgID(orgID))
 	if err != nil {
 		return err
 	}
@@ -744,8 +753,9 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	}
 	// the user was either not found or not active
 	// so check if the loginname suffix matches a verified org domain
-	if repo.checkDomainDiscovery(ctx, request, loginName) {
-		return nil
+	ok, errDomainDiscovery := repo.checkDomainDiscovery(ctx, request, loginName)
+	if errDomainDiscovery != nil || ok {
+		return errDomainDiscovery
 	}
 	// let's once again check if the user was just inactive
 	if user != nil && user.State == int32(domain.UserStateInactive) {
@@ -777,30 +787,34 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	return errors.ThrowInternal(nil, "AUTH-asf3df", "Errors.Internal")
 }
 
-func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *domain.AuthRequest, loginName string) bool {
+func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *domain.AuthRequest, loginName string) (bool, error) {
 	// check if there's a suffix in the loginname
 	loginName = strings.TrimSpace(strings.ToLower(loginName))
 	index := strings.LastIndex(loginName, "@")
 	if index < 0 {
-		return false
+		return false, nil
 	}
 	// check if the suffix matches a verified domain
 	org, err := repo.Query.OrgByVerifiedDomain(ctx, loginName[index+1:])
 	if err != nil {
-		return false
+		return false, nil
 	}
 	// and if the login policy allows domain discovery
 	policy, err := repo.Query.LoginPolicyByID(ctx, true, org.ID, false)
 	if err != nil || !policy.AllowDomainDiscovery {
-		return false
+		return false, nil
 	}
 	// discovery was allowed, so set the org as requested org
 	// and clear all potentially existing user information and only set the loginname as hint (for registration)
+	// also ensure that the policies are read from the org
 	request.SetOrgInformation(org.ID, org.Name, org.Domain, false)
 	request.SetUserInfo("", "", "", "", "", org.ID)
+	if err = repo.fillPolicies(ctx, request); err != nil {
+		return false, err
+	}
 	request.LoginHint = loginName
 	request.Prompt = append(request.Prompt, domain.PromptCreate) // to trigger registration
-	return true
+	return true, nil
 }
 
 func (repo *AuthRequestRepo) checkLoginNameInput(ctx context.Context, request *domain.AuthRequest, loginNameInput string) (*user_view_model.UserView, error) {
@@ -1113,8 +1127,18 @@ func (repo *AuthRequestRepo) nextStepsUser(ctx context.Context, request *domain.
 		if len(steps) > 0 {
 			return steps, nil
 		}
-		// a single user session was found, use that automatically
+		// the single user session was inactive
+		if users[0].UserSessionState != domain.UserSessionStateActive {
+			return append(steps, &domain.SelectUserStep{Users: users}), nil
+		}
+		// a single active user session was found, use that automatically
 		request.SetUserInfo(users[0].UserID, users[0].UserName, users[0].LoginName, users[0].DisplayName, users[0].AvatarKey, users[0].ResourceOwner)
+		if err = repo.fillPolicies(ctx, request); err != nil {
+			return nil, err
+		}
+		if err = repo.AuthRequests.UpdateAuthRequest(ctx, request); err != nil {
+			return nil, err
+		}
 	}
 	return steps, nil
 }
@@ -1311,11 +1335,12 @@ func labelPolicyToDomain(p *query.LabelPolicy) *domain.LabelPolicy {
 		HideLoginNameSuffix: p.HideLoginNameSuffix,
 		ErrorMsgPopup:       p.ShouldErrorPopup,
 		DisableWatermark:    p.WatermarkDisabled,
+		ThemeMode:           p.ThemeMode,
 	}
 }
 
 func (repo *AuthRequestRepo) getLoginTexts(ctx context.Context, aggregateID string) ([]*domain.CustomText, error) {
-	loginTexts, err := repo.Query.CustomTextListByTemplate(ctx, aggregateID, domain.LoginCustomText, false)
+	loginTexts, err := repo.CustomTextProvider.CustomTextListByTemplate(ctx, aggregateID, domain.LoginCustomText, false)
 	if err != nil {
 		return nil, err
 	}
@@ -1409,25 +1434,25 @@ func userSessionsByUserAgentID(ctx context.Context, provider userSessionViewProv
 }
 
 var (
-	userSessionEventTypes = []es_models.EventType{
-		es_models.EventType(user_repo.UserV1PasswordCheckSucceededType),
-		es_models.EventType(user_repo.UserV1PasswordCheckFailedType),
-		es_models.EventType(user_repo.UserV1MFAOTPCheckSucceededType),
-		es_models.EventType(user_repo.UserV1MFAOTPCheckFailedType),
-		es_models.EventType(user_repo.UserV1SignedOutType),
-		es_models.EventType(user_repo.UserLockedType),
-		es_models.EventType(user_repo.UserDeactivatedType),
-		es_models.EventType(user_repo.HumanPasswordCheckSucceededType),
-		es_models.EventType(user_repo.HumanPasswordCheckFailedType),
-		es_models.EventType(user_repo.UserIDPLoginCheckSucceededType),
-		es_models.EventType(user_repo.HumanMFAOTPCheckSucceededType),
-		es_models.EventType(user_repo.HumanMFAOTPCheckFailedType),
-		es_models.EventType(user_repo.HumanSignedOutType),
-		es_models.EventType(user_repo.HumanPasswordlessTokenCheckSucceededType),
-		es_models.EventType(user_repo.HumanPasswordlessTokenCheckFailedType),
-		es_models.EventType(user_repo.HumanU2FTokenCheckSucceededType),
-		es_models.EventType(user_repo.HumanU2FTokenCheckFailedType),
-		es_models.EventType(user_repo.UserRemovedType),
+	userSessionEventTypes = []eventstore.EventType{
+		user_repo.UserV1PasswordCheckSucceededType,
+		user_repo.UserV1PasswordCheckFailedType,
+		user_repo.UserV1MFAOTPCheckSucceededType,
+		user_repo.UserV1MFAOTPCheckFailedType,
+		user_repo.UserV1SignedOutType,
+		user_repo.UserLockedType,
+		user_repo.UserDeactivatedType,
+		user_repo.HumanPasswordCheckSucceededType,
+		user_repo.HumanPasswordCheckFailedType,
+		user_repo.UserIDPLoginCheckSucceededType,
+		user_repo.HumanMFAOTPCheckSucceededType,
+		user_repo.HumanMFAOTPCheckFailedType,
+		user_repo.HumanSignedOutType,
+		user_repo.HumanPasswordlessTokenCheckSucceededType,
+		user_repo.HumanPasswordlessTokenCheckFailedType,
+		user_repo.HumanU2FTokenCheckSucceededType,
+		user_repo.HumanU2FTokenCheckFailedType,
+		user_repo.UserRemovedType,
 	}
 )
 
@@ -1444,7 +1469,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			Errorf("could not get current sequence for userSessionByIDs")
 		session = &user_view_model.UserSessionView{UserAgentID: agentID, UserID: user.ID}
 		if sequence != nil {
-			session.Sequence = sequence.CurrentSequence
+			session.Sequence = sequence.Sequence
 		}
 	}
 	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence, append(session.EventTypes(), userSessionEventTypes...))
@@ -1454,7 +1479,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	}
 	sessionCopy := *session
 	for _, event := range events {
-		switch eventstore.EventType(event.Type) {
+		switch event.Type() {
 		case user_repo.UserV1PasswordCheckSucceededType,
 			user_repo.UserV1PasswordCheckFailedType,
 			user_repo.UserV1MFAOTPCheckSucceededType,
@@ -1561,7 +1586,7 @@ func linkExternalIDPs(ctx context.Context, userCommandProvider userCommandProvid
 			ObjectRoot:     es_models.ObjectRoot{AggregateID: request.UserID},
 			IDPConfigID:    linkingUser.IDPConfigID,
 			ExternalUserID: linkingUser.ExternalUserID,
-			DisplayName:    linkingUser.DisplayName,
+			DisplayName:    linkingUser.PreferredUsername,
 		}
 		externalIDPs[i] = externalIDP
 	}

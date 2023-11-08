@@ -1,12 +1,9 @@
 package policy
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -17,17 +14,17 @@ const (
 )
 
 type IdentityProviderAddedEvent struct {
-	eventstore.BaseEvent
+	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID     string                      `json:"idpConfigId,omitempty"`
 	IDPProviderType domain.IdentityProviderType `json:"idpProviderType,omitempty"`
 }
 
-func (e *IdentityProviderAddedEvent) Data() interface{} {
+func (e *IdentityProviderAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *IdentityProviderAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *IdentityProviderAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -44,12 +41,12 @@ func NewIdentityProviderAddedEvent(
 	}
 }
 
-func IdentityProviderAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IdentityProviderAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &IdentityProviderAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "PROVI-bfNnp", "Errors.Internal")
 	}
@@ -58,16 +55,16 @@ func IdentityProviderAddedEventMapper(event *repository.Event) (eventstore.Event
 }
 
 type IdentityProviderRemovedEvent struct {
-	eventstore.BaseEvent
+	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID string `json:"idpConfigId"`
 }
 
-func (e *IdentityProviderRemovedEvent) Data() interface{} {
+func (e *IdentityProviderRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *IdentityProviderRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *IdentityProviderRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -81,12 +78,12 @@ func NewIdentityProviderRemovedEvent(
 	}
 }
 
-func IdentityProviderRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IdentityProviderRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &IdentityProviderRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "PROVI-6H0KQ", "Errors.Internal")
 	}
@@ -95,16 +92,16 @@ func IdentityProviderRemovedEventMapper(event *repository.Event) (eventstore.Eve
 }
 
 type IdentityProviderCascadeRemovedEvent struct {
-	eventstore.BaseEvent
+	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID string `json:"idpConfigId"`
 }
 
-func (e *IdentityProviderCascadeRemovedEvent) Data() interface{} {
+func (e *IdentityProviderCascadeRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *IdentityProviderCascadeRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *IdentityProviderCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -118,12 +115,12 @@ func NewIdentityProviderCascadeRemovedEvent(
 	}
 }
 
-func IdentityProviderCascadeRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IdentityProviderCascadeRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &IdentityProviderCascadeRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "PROVI-7M9fs", "Errors.Internal")
 	}

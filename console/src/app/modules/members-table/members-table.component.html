@@ -17,40 +17,44 @@
   <div class="table-wrapper">
     <table mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
       <ng-container matColumnDef="select">
-        <th class="selection" mat-header-cell *matHeaderCellDef>
-          <mat-checkbox
-            [disabled]="!canWrite"
-            color="primary"
-            (change)="$event ? masterToggle() : null"
-            [checked]="selection.hasValue() && isAllSelected()"
-            [indeterminate]="selection.hasValue() && !isAllSelected()"
-          >
-          </mat-checkbox>
-        </th>
-        <td class="selection" mat-cell *matCellDef="let row">
-          <mat-checkbox
-            [disabled]="!canWrite"
-            color="primary"
-            (click)="$event.stopPropagation()"
-            (change)="$event ? selection.toggle(row) : null"
-            [checked]="selection.isSelected(row)"
-          >
-            <cnsl-avatar
-              *ngIf="row?.userType === UserType.TYPE_HUMAN; else cog"
-              class="avatar"
-              [name]="row.displayName"
-              [avatarUrl]="row.avatarUrl || ''"
-              [avatarUrl]="row.avatarUrl || ''"
-              [forColor]="row?.preferredLoginName"
-              [size]="32"
+        <th mat-header-cell *matHeaderCellDef>
+          <div class="selection">
+            <mat-checkbox
+              [disabled]="!canWrite"
+              color="primary"
+              (change)="$event ? masterToggle() : null"
+              [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()"
             >
-            </cnsl-avatar>
-            <ng-template #cog>
-              <cnsl-avatar [forColor]="row.preferredLoginName" [isMachine]="true">
-                <i class="las la-robot"></i>
+            </mat-checkbox>
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <div class="selection">
+            <mat-checkbox
+              [disabled]="!canWrite"
+              color="primary"
+              (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(row) : null"
+              [checked]="selection.isSelected(row)"
+            >
+              <cnsl-avatar
+                *ngIf="row?.userType === UserType.TYPE_HUMAN; else cog"
+                class="avatar"
+                [name]="row.displayName"
+                [avatarUrl]="row.avatarUrl || ''"
+                [avatarUrl]="row.avatarUrl || ''"
+                [forColor]="row?.preferredLoginName"
+                [size]="32"
+              >
               </cnsl-avatar>
-            </ng-template>
-          </mat-checkbox>
+              <ng-template #cog>
+                <cnsl-avatar [forColor]="row.preferredLoginName" [isMachine]="true">
+                  <i class="las la-robot"></i>
+                </cnsl-avatar>
+              </ng-template>
+            </mat-checkbox>
+          </div>
         </td>
       </ng-container>
 
@@ -99,7 +103,7 @@
             </button>
 
             <button menuActions mat-menu-item [routerLink]="['/users', member.userId]">
-              {{ 'ACTIONS.TABLE.SHOWUSER' | translate : { value: member.displayName } }}
+              {{ 'ACTIONS.TABLE.SHOWUSER' | translate: { value: member.displayName } }}
             </button>
           </cnsl-table-actions>
         </td>
@@ -108,22 +112,24 @@
       <ng-container matColumnDef="roles">
         <th mat-header-cell *matHeaderCellDef class="role-row">{{ 'ROLESLABEL' | translate }}</th>
         <td mat-cell *matCellDef="let member" class="role-row">
-          <mat-chip-list class="cnsl-chip-list" aria-label="role selection">
-            <mat-chip
+          <mat-chip-listbox class="cnsl-chip-list" aria-label="role selection">
+            <mat-chip-option
+              [selectable]="false"
               class="cnsl-chip"
               *ngFor="let role of member.rolesList"
               [removable]="canWrite"
-              [selectable]="false"
               (removed)="removeRole(member, role)"
               data-e2e="role"
             >
-              <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
-              <span>{{ role | roletransform }}</span>
-              <button *ngIf="canWrite" matChipRemove data-e2e="remove-role-button">
-                <mat-icon>cancel</mat-icon>
-              </button>
-            </mat-chip>
-          </mat-chip-list>
+              <div class="cnsl-chip-content">
+                <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
+                <span>{{ role | roletransform }}</span>
+                <button *ngIf="canWrite" matChipRemove data-e2e="remove-role-button">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </div>
+            </mat-chip-option>
+          </mat-chip-listbox>
         </td>
       </ng-container>
 

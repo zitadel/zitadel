@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	org_model "github.com/zitadel/zitadel/internal/org/model"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/user/model"
@@ -43,18 +42,18 @@ const (
 )
 
 type UserView struct {
-	ID                 string               `json:"-" gorm:"column:id;primary_key"`
-	CreationDate       time.Time            `json:"-" gorm:"column:creation_date"`
-	ChangeDate         time.Time            `json:"-" gorm:"column:change_date"`
-	ResourceOwner      string               `json:"-" gorm:"column:resource_owner"`
-	State              int32                `json:"-" gorm:"column:user_state"`
-	LastLogin          time.Time            `json:"-" gorm:"column:last_login"`
-	LoginNames         database.StringArray `json:"-" gorm:"column:login_names"`
-	PreferredLoginName string               `json:"-" gorm:"column:preferred_login_name"`
-	Sequence           uint64               `json:"-" gorm:"column:sequence"`
-	Type               userType             `json:"-" gorm:"column:user_type"`
-	UserName           string               `json:"userName" gorm:"column:user_name"`
-	InstanceID         string               `json:"instanceID" gorm:"column:instance_id;primary_key"`
+	ID                 string                     `json:"-" gorm:"column:id;primary_key"`
+	CreationDate       time.Time                  `json:"-" gorm:"column:creation_date"`
+	ChangeDate         time.Time                  `json:"-" gorm:"column:change_date"`
+	ResourceOwner      string                     `json:"-" gorm:"column:resource_owner"`
+	State              int32                      `json:"-" gorm:"column:user_state"`
+	LastLogin          time.Time                  `json:"-" gorm:"column:last_login"`
+	LoginNames         database.TextArray[string] `json:"-" gorm:"column:login_names"`
+	PreferredLoginName string                     `json:"-" gorm:"column:preferred_login_name"`
+	Sequence           uint64                     `json:"-" gorm:"column:sequence"`
+	Type               userType                   `json:"-" gorm:"column:user_type"`
+	UserName           string                     `json:"userName" gorm:"column:user_name"`
+	InstanceID         string                     `json:"instanceID" gorm:"column:instance_id;primary_key"`
 	*MachineView
 	*HumanView
 }
@@ -236,12 +235,12 @@ func (u *UserView) SetLoginNames(userLoginMustBeDomain bool, domains []*org_mode
 	}
 }
 
-func (u *UserView) AppendEvent(event *models.Event) (err error) {
-	u.ChangeDate = event.CreationDate
-	u.Sequence = event.Sequence
-	switch eventstore.EventType(event.Type) {
+func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
+	u.ChangeDate = event.CreatedAt()
+	u.Sequence = event.Sequence()
+	switch event.Type() {
 	case user.MachineAddedEventType:
-		u.CreationDate = event.CreationDate
+		u.CreationDate = event.CreatedAt()
 		u.setRootData(event)
 		u.Type = userTypeMachine
 		err = u.setData(event)
@@ -252,7 +251,7 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		user.UserV1RegisteredType,
 		user.HumanRegisteredType,
 		user.HumanAddedType:
-		u.CreationDate = event.CreationDate
+		u.CreationDate = event.CreatedAt()
 		u.setRootData(event)
 		u.Type = userTypeHuman
 		err = u.setData(event)
@@ -317,14 +316,14 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case user.UserV1MFAOTPAddedType,
 		user.HumanMFAOTPAddedType:
 		if u.HumanView == nil {
-			logging.WithFields("sequence", event.Sequence, "instance", event.InstanceID).Warn("event is ignored because human not exists")
+			logging.WithFields("event_sequence", event.Sequence, "aggregate_id", event.Aggregate().ID, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
 			return errors.ThrowInvalidArgument(nil, "MODEL-p2BXx", "event ignored: human not exists")
 		}
 		u.OTPState = int32(model.MFAStateNotReady)
 	case user.UserV1MFAOTPVerifiedType,
 		user.HumanMFAOTPVerifiedType:
 		if u.HumanView == nil {
-			logging.WithFields("sequence", event.Sequence, "instance", event.InstanceID).Warn("event is ignored because human not exists")
+			logging.WithFields("event_sequence", event.Sequence, "aggregate_id", event.Aggregate().ID, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
 			return errors.ThrowInvalidArgument(nil, "MODEL-o6Lcq", "event ignored: human not exists")
 		}
 		u.OTPState = int32(model.MFAStateReady)
@@ -354,7 +353,7 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		err = u.removeU2FToken(event)
 	case user.UserV1MFAInitSkippedType,
 		user.HumanMFAInitSkippedType:
-		u.MFAInitSkipped = event.CreationDate
+		u.MFAInitSkipped = event.CreatedAt()
 	case user.UserV1InitialCodeAddedType,
 		user.HumanInitialCodeAddedType:
 		u.InitRequired = true
@@ -367,6 +366,10 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		u.AvatarKey = ""
 	case user.HumanPasswordlessInitCodeAddedType,
 		user.HumanPasswordlessInitCodeRequestedType:
+		if u.HumanView == nil {
+			logging.WithFields("event_sequence", event.Sequence, "aggregate_id", event.Aggregate().ID, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
+			return errors.ThrowInvalidArgument(nil, "MODEL-MbyC0", "event ignored: human not exists")
+		}
 		if !u.PasswordSet {
 			u.PasswordlessInitRequired = true
 			u.PasswordInitRequired = false
@@ -376,34 +379,34 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	return err
 }
 
-func (u *UserView) setRootData(event *models.Event) {
-	u.ID = event.AggregateID
-	u.ResourceOwner = event.ResourceOwner
-	u.InstanceID = event.InstanceID
+func (u *UserView) setRootData(event eventstore.Event) {
+	u.ID = event.Aggregate().ID
+	u.ResourceOwner = event.Aggregate().ResourceOwner
+	u.InstanceID = event.Aggregate().InstanceID
 }
 
-func (u *UserView) setData(event *models.Event) error {
-	if err := json.Unmarshal(event.Data, u); err != nil {
+func (u *UserView) setData(event eventstore.Event) error {
+	if err := event.Unmarshal(u); err != nil {
 		logging.Log("MODEL-lso9e").WithError(err).Error("could not unmarshal event data")
 		return errors.ThrowInternal(nil, "MODEL-8iows", "could not unmarshal data")
 	}
 	return nil
 }
 
-func (u *UserView) setPasswordData(event *models.Event) error {
+func (u *UserView) setPasswordData(event eventstore.Event) error {
 	password := new(es_model.Password)
-	if err := json.Unmarshal(event.Data, password); err != nil {
+	if err := event.Unmarshal(password); err != nil {
 		logging.Log("MODEL-sdw4r").WithError(err).Error("could not unmarshal event data")
 		return errors.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
 	u.PasswordSet = password.Secret != nil || password.EncodedHash != ""
 	u.PasswordInitRequired = !u.PasswordSet
 	u.PasswordChangeRequired = password.ChangeRequired
-	u.PasswordChanged = event.CreationDate
+	u.PasswordChanged = event.CreatedAt()
 	return nil
 }
 
-func (u *UserView) addPasswordlessToken(event *models.Event) error {
+func (u *UserView) addPasswordlessToken(event eventstore.Event) error {
 	token, err := webAuthNViewFromEvent(event)
 	if err != nil {
 		return err
@@ -419,7 +422,7 @@ func (u *UserView) addPasswordlessToken(event *models.Event) error {
 	return nil
 }
 
-func (u *UserView) updatePasswordlessToken(event *models.Event) error {
+func (u *UserView) updatePasswordlessToken(event eventstore.Event) error {
 	token, err := webAuthNViewFromEvent(event)
 	if err != nil {
 		return err
@@ -434,7 +437,7 @@ func (u *UserView) updatePasswordlessToken(event *models.Event) error {
 	return nil
 }
 
-func (u *UserView) removePasswordlessToken(event *models.Event) error {
+func (u *UserView) removePasswordlessToken(event eventstore.Event) error {
 	token, err := webAuthNViewFromEvent(event)
 	if err != nil {
 		return err
@@ -450,7 +453,7 @@ func (u *UserView) removePasswordlessToken(event *models.Event) error {
 	return nil
 }
 
-func (u *UserView) addU2FToken(event *models.Event) error {
+func (u *UserView) addU2FToken(event eventstore.Event) error {
 	token, err := webAuthNViewFromEvent(event)
 	if err != nil {
 		return err
@@ -466,7 +469,7 @@ func (u *UserView) addU2FToken(event *models.Event) error {
 	return nil
 }
 
-func (u *UserView) updateU2FToken(event *models.Event) error {
+func (u *UserView) updateU2FToken(event eventstore.Event) error {
 	token, err := webAuthNViewFromEvent(event)
 	if err != nil {
 		return err
@@ -481,7 +484,7 @@ func (u *UserView) updateU2FToken(event *models.Event) error {
 	return nil
 }
 
-func (u *UserView) removeU2FToken(event *models.Event) error {
+func (u *UserView) removeU2FToken(event eventstore.Event) error {
 	token, err := webAuthNViewFromEvent(event)
 	if err != nil {
 		return err
@@ -496,9 +499,9 @@ func (u *UserView) removeU2FToken(event *models.Event) error {
 	return nil
 }
 
-func webAuthNViewFromEvent(event *models.Event) (*WebAuthNView, error) {
+func webAuthNViewFromEvent(event eventstore.Event) (*WebAuthNView, error) {
 	token := new(WebAuthNView)
-	err := json.Unmarshal(event.Data, token)
+	err := event.Unmarshal(token)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "MODEL-FSaq1", "could not unmarshal data")
 	}
@@ -552,62 +555,62 @@ func (u *UserView) SetEmptyUserType() {
 	}
 }
 
-func (u *UserView) EventTypes() []models.EventType {
-	return []models.EventType{
-		models.EventType(user.MachineAddedEventType),
-		models.EventType(user.UserV1AddedType),
-		models.EventType(user.UserV1RegisteredType),
-		models.EventType(user.HumanRegisteredType),
-		models.EventType(user.HumanAddedType),
-		models.EventType(user.UserRemovedType),
-		models.EventType(user.UserV1PasswordChangedType),
-		models.EventType(user.HumanPasswordChangedType),
-		models.EventType(user.HumanPasswordlessTokenAddedType),
-		models.EventType(user.HumanPasswordlessTokenVerifiedType),
-		models.EventType(user.HumanPasswordlessTokenRemovedType),
-		models.EventType(user.UserV1ProfileChangedType),
-		models.EventType(user.HumanProfileChangedType),
-		models.EventType(user.UserV1AddressChangedType),
-		models.EventType(user.HumanAddressChangedType),
-		models.EventType(user.MachineChangedEventType),
-		models.EventType(user.UserDomainClaimedType),
-		models.EventType(user.UserUserNameChangedType),
-		models.EventType(user.UserV1EmailChangedType),
-		models.EventType(user.HumanEmailChangedType),
-		models.EventType(user.UserV1EmailVerifiedType),
-		models.EventType(user.HumanEmailVerifiedType),
-		models.EventType(user.UserV1PhoneChangedType),
-		models.EventType(user.HumanPhoneChangedType),
-		models.EventType(user.UserV1PhoneVerifiedType),
-		models.EventType(user.HumanPhoneVerifiedType),
-		models.EventType(user.UserV1PhoneRemovedType),
-		models.EventType(user.HumanPhoneRemovedType),
-		models.EventType(user.UserDeactivatedType),
-		models.EventType(user.UserReactivatedType),
-		models.EventType(user.UserUnlockedType),
-		models.EventType(user.UserLockedType),
-		models.EventType(user.UserV1MFAOTPAddedType),
-		models.EventType(user.HumanMFAOTPAddedType),
-		models.EventType(user.UserV1MFAOTPVerifiedType),
-		models.EventType(user.HumanMFAOTPVerifiedType),
-		models.EventType(user.UserV1MFAOTPRemovedType),
-		models.EventType(user.HumanMFAOTPRemovedType),
-		models.EventType(user.HumanOTPSMSAddedType),
-		models.EventType(user.HumanOTPSMSRemovedType),
-		models.EventType(user.HumanOTPEmailAddedType),
-		models.EventType(user.HumanOTPEmailRemovedType),
-		models.EventType(user.HumanU2FTokenAddedType),
-		models.EventType(user.HumanU2FTokenVerifiedType),
-		models.EventType(user.HumanU2FTokenRemovedType),
-		models.EventType(user.UserV1MFAInitSkippedType),
-		models.EventType(user.HumanMFAInitSkippedType),
-		models.EventType(user.UserV1InitialCodeAddedType),
-		models.EventType(user.HumanInitialCodeAddedType),
-		models.EventType(user.UserV1InitializedCheckSucceededType),
-		models.EventType(user.HumanInitializedCheckSucceededType),
-		models.EventType(user.HumanAvatarAddedType),
-		models.EventType(user.HumanAvatarRemovedType),
-		models.EventType(user.HumanPasswordlessInitCodeAddedType),
-		models.EventType(user.HumanPasswordlessInitCodeRequestedType),
+func (u *UserView) EventTypes() []eventstore.EventType {
+	return []eventstore.EventType{
+		user.MachineAddedEventType,
+		user.UserV1AddedType,
+		user.UserV1RegisteredType,
+		user.HumanRegisteredType,
+		user.HumanAddedType,
+		user.UserRemovedType,
+		user.UserV1PasswordChangedType,
+		user.HumanPasswordChangedType,
+		user.HumanPasswordlessTokenAddedType,
+		user.HumanPasswordlessTokenVerifiedType,
+		user.HumanPasswordlessTokenRemovedType,
+		user.UserV1ProfileChangedType,
+		user.HumanProfileChangedType,
+		user.UserV1AddressChangedType,
+		user.HumanAddressChangedType,
+		user.MachineChangedEventType,
+		user.UserDomainClaimedType,
+		user.UserUserNameChangedType,
+		user.UserV1EmailChangedType,
+		user.HumanEmailChangedType,
+		user.UserV1EmailVerifiedType,
+		user.HumanEmailVerifiedType,
+		user.UserV1PhoneChangedType,
+		user.HumanPhoneChangedType,
+		user.UserV1PhoneVerifiedType,
+		user.HumanPhoneVerifiedType,
+		user.UserV1PhoneRemovedType,
+		user.HumanPhoneRemovedType,
+		user.UserDeactivatedType,
+		user.UserReactivatedType,
+		user.UserUnlockedType,
+		user.UserLockedType,
+		user.UserV1MFAOTPAddedType,
+		user.HumanMFAOTPAddedType,
+		user.UserV1MFAOTPVerifiedType,
+		user.HumanMFAOTPVerifiedType,
+		user.UserV1MFAOTPRemovedType,
+		user.HumanMFAOTPRemovedType,
+		user.HumanOTPSMSAddedType,
+		user.HumanOTPSMSRemovedType,
+		user.HumanOTPEmailAddedType,
+		user.HumanOTPEmailRemovedType,
+		user.HumanU2FTokenAddedType,
+		user.HumanU2FTokenVerifiedType,
+		user.HumanU2FTokenRemovedType,
+		user.UserV1MFAInitSkippedType,
+		user.HumanMFAInitSkippedType,
+		user.UserV1InitialCodeAddedType,
+		user.HumanInitialCodeAddedType,
+		user.UserV1InitializedCheckSucceededType,
+		user.HumanInitializedCheckSucceededType,
+		user.HumanAvatarAddedType,
+		user.HumanAvatarRemovedType,
+		user.HumanPasswordlessInitCodeAddedType,
+		user.HumanPasswordlessInitCodeRequestedType,
 	}
 }

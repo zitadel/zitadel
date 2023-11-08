@@ -8,9 +8,12 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -82,7 +85,10 @@ func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bo
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.UserMetadataProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerUserMetadataProjection")
+		ctx, err = projection.UserMetadataProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	query, scan := prepareUserMetadataQuery(ctx, q.client)
@@ -114,7 +120,10 @@ func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.UserMetadataProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerUserMetadataProjection")
+		ctx, err = projection.UserMetadataProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	query, scan := prepareUserMetadataListQuery(ctx, q.client)
@@ -137,7 +146,7 @@ func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool
 	if err != nil {
 		return nil, err
 	}
-	metadata.LatestSequence, err = q.latestSequence(ctx, userMetadataTable)
+	metadata.State, err = q.latestState(ctx, userMetadataTable)
 	return metadata, err
 }
 
@@ -190,7 +199,7 @@ func prepareUserMetadataQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-Rgh32", "Errors.User.NotFound")
+					return nil, errors.ThrowNotFound(err, "QUERY-Rgh32", "Errors.Metadata.NotFound")
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-Hhjt2", "Errors.Internal")
 			}

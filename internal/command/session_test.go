@@ -3,10 +3,13 @@ package command
 import (
 	"context"
 	"io"
+	"net"
+	"net/http"
 	"testing"
 	"time"
 
 	"github.com/golang/mock/gomock"
+	"github.com/muhlemmer/gu"
 	"github.com/pquerna/otp/totp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -92,7 +95,7 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 			},
 			res: res{
 				want: nil,
-				err:  caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.ie4Ai.NotFound"),
+				err:  caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.User.NotFound"),
 			},
 		},
 		{
@@ -145,9 +148,11 @@ func TestCommands_CreateSession(t *testing.T) {
 		tokenCreator func(sessionID string) (string, string, error)
 	}
 	type args struct {
-		ctx      context.Context
-		checks   []SessionCommand
-		metadata map[string][]byte
+		ctx       context.Context
+		checks    []SessionCommand
+		metadata  map[string][]byte
+		userAgent *domain.UserAgent
+		lifetime  time.Duration
 	}
 	type res struct {
 		want *SessionChanged
@@ -189,6 +194,33 @@ func TestCommands_CreateSession(t *testing.T) {
 			},
 		},
 		{
+			"negative lifetime",
+			fields{
+				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
+				tokenCreator: func(sessionID string) (string, string, error) {
+					return "tokenID",
+						"token",
+						nil
+				},
+			},
+			args{
+				ctx: authz.NewMockContext("", "org1", ""),
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				lifetime: -10 * time.Minute,
+			},
+			[]expect{
+				expectFilter(),
+			},
+			res{
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.PositiveLifetime"),
+			},
+		},
+		{
 			"empty session",
 			fields{
 				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
@@ -200,15 +232,29 @@ func TestCommands_CreateSession(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("", "org1", ""),
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				lifetime: 10 * time.Minute,
 			},
 			[]expect{
 				expectFilter(),
 				expectPush(
-					eventPusherToEvents(
-						session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate),
-						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-							"tokenID",
-						),
+					session.NewAddedEvent(context.Background(),
+						&session.NewAggregate("sessionID", "org1").Aggregate,
+						&domain.UserAgent{
+							FingerprintID: gu.Ptr("fp1"),
+							IP:            net.ParseIP("1.2.3.4"),
+							Description:   gu.Ptr("firefox"),
+							Header:        http.Header{"foo": []string{"bar"}},
+						},
+					),
+					session.NewLifetimeSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate, 10*time.Minute),
+					session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						"tokenID",
 					),
 				),
 			},
@@ -229,7 +275,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				idGenerator:         tt.fields.idGenerator,
 				sessionTokenCreator: tt.fields.tokenCreator,
 			}
-			got, err := c.CreateSession(tt.args.ctx, tt.args.checks, tt.args.metadata)
+			got, err := c.CreateSession(tt.args.ctx, tt.args.checks, tt.args.metadata, tt.args.userAgent, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})
@@ -247,6 +293,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 		sessionToken string
 		checks       []SessionCommand
 		metadata     map[string][]byte
+		lifetime     time.Duration
 	}
 	type res struct {
 		want *SessionChanged
@@ -278,7 +325,15 @@ func TestCommands_UpdateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID")),
@@ -303,7 +358,15 @@ func TestCommands_UpdateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID")),
@@ -336,7 +399,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 				eventstore:           tt.fields.eventstore,
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 			}
-			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.sessionToken, tt.args.checks, tt.args.metadata)
+			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.sessionToken, tt.args.checks, tt.args.metadata, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})
@@ -365,6 +428,7 @@ func TestCommands_updateSession(t *testing.T) {
 		ctx      context.Context
 		checks   *SessionCommands
 		metadata map[string][]byte
+		lifetime time.Duration
 	}
 	type res struct {
 		want *SessionChanged
@@ -388,7 +452,7 @@ func TestCommands_updateSession(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMAND-SAjeh", "Errors.Session.Terminated"),
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Hewfq", "Errors.Session.Terminated"),
 			},
 		},
 		{
@@ -434,19 +498,88 @@ func TestCommands_updateSession(t *testing.T) {
 			},
 		},
 		{
+			"negative lifetime",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: context.Background(),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionCommands:   []SessionCommand{},
+					eventstore:        eventstoreExpect(t),
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				lifetime: -10 * time.Minute,
+			},
+			res{
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.PositiveLifetime"),
+			},
+		},
+		{
+			"lifetime set",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectPush(
+						session.NewLifetimeSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							10*time.Minute,
+						),
+						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							"tokenID",
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionCommands:   []SessionCommand{},
+					eventstore:        eventstoreExpect(t),
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				lifetime: 10 * time.Minute,
+			},
+			res{
+				want: &SessionChanged{
+					ObjectDetails: &domain.ObjectDetails{
+						ResourceOwner: "org1",
+					},
+					ID:       "sessionID",
+					NewToken: "token",
+				},
+			},
+		},
+		{
 			"set user, password, metadata and token",
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						eventPusherToEvents(
-							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								"userID", testNow),
-							session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								testNow),
-							session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								map[string][]byte{"key": []byte("value")}),
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								"tokenID"),
+						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							"userID", testNow,
+						),
+						session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							testNow,
+						),
+						session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							map[string][]byte{"key": []byte("value")},
+						),
+						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							"tokenID",
 						),
 					),
 				),
@@ -620,16 +753,14 @@ func TestCommands_updateSession(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						eventPusherToEvents(
-							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								"userID", testNow),
-							session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								testNow),
-							session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								map[string][]byte{"key": []byte("value")}),
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								"tokenID"),
-						),
+						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							"userID", testNow),
+						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							testNow),
+						session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							map[string][]byte{"key": []byte("value")}),
+						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							"tokenID"),
 					),
 				),
 			},
@@ -689,7 +820,7 @@ func TestCommands_updateSession(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := c.updateSession(tt.args.ctx, tt.args.checks, tt.args.metadata)
+			got, err := c.updateSession(tt.args.ctx, tt.args.checks, tt.args.metadata, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})
@@ -868,7 +999,15 @@ func TestCommands_TerminateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID")),
@@ -893,7 +1032,15 @@ func TestCommands_TerminateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID")),
@@ -922,7 +1069,15 @@ func TestCommands_TerminateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID"),
@@ -930,8 +1085,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 					),
 					expectPushFailed(
 						caos_errs.ThrowInternal(nil, "id", "pushed failed"),
-						eventPusherToEvents(
-							session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
+						session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate),
 					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
@@ -953,15 +1107,22 @@ func TestCommands_TerminateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								"tokenID"),
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
+						session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate),
 					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {

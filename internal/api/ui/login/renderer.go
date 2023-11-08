@@ -381,8 +381,6 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, titleI
 		Title:                  title,
 		Description:            description,
 		Theme:                  l.getTheme(r),
-		ThemeMode:              l.getThemeMode(r),
-		DarkMode:               l.isDarkMode(r),
 		PrivateLabelingOrgID:   l.getPrivateLabelingID(r, authReq),
 		OrgID:                  l.getOrgID(r, authReq),
 		OrgName:                l.getOrgName(authReq),
@@ -412,6 +410,9 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, titleI
 		}
 		privacyPolicy = policy.ToDomain()
 	}
+	baseData.ThemeMode = l.getThemeMode(baseData.LabelPolicy)
+	baseData.ThemeClass = l.getThemeClass(r, baseData.LabelPolicy)
+	baseData.DarkMode = l.isDarkMode(r, baseData.LabelPolicy)
 	baseData = l.setLinksOnBaseData(baseData, privacyPolicy)
 	return baseData
 }
@@ -480,19 +481,34 @@ func (l *Login) getTheme(r *http.Request) string {
 	return "zitadel"
 }
 
-func (l *Login) getThemeMode(r *http.Request) string {
-	if l.isDarkMode(r) {
+// getThemeClass returns the css class for the login html.
+// Possible values are `lgn-light-theme` and `lgn-dark-theme` and are based on the policy first
+// and if it's set to auto the cookie is checked.
+func (l *Login) getThemeClass(r *http.Request, policy *domain.LabelPolicy) string {
+	if l.isDarkMode(r, policy) {
 		return "lgn-dark-theme"
 	}
 	return "lgn-light-theme"
 }
 
-func (l *Login) isDarkMode(r *http.Request) bool {
+// isDarkMode checks policy first and if not set to specifically use dark or light only,
+// it will also check the cookie.
+func (l *Login) isDarkMode(r *http.Request, policy *domain.LabelPolicy) bool {
+	if mode := l.getThemeMode(policy); mode != domain.LabelPolicyThemeAuto {
+		return mode == domain.LabelPolicyThemeDark
+	}
 	cookie, err := r.Cookie("mode")
 	if err != nil {
 		return false
 	}
 	return strings.HasSuffix(cookie.Value, "dark")
+}
+
+func (l *Login) getThemeMode(policy *domain.LabelPolicy) domain.LabelPolicyThemeMode {
+	if policy != nil {
+		return policy.ThemeMode
+	}
+	return domain.LabelPolicyThemeAuto
 }
 
 func (l *Login) getOrgID(r *http.Request, authReq *domain.AuthRequest) string {
@@ -506,25 +522,19 @@ func (l *Login) getOrgID(r *http.Request, authReq *domain.AuthRequest) string {
 }
 
 func (l *Login) getPrivateLabelingID(r *http.Request, authReq *domain.AuthRequest) string {
-	privateLabelingOrgID := authz.GetInstance(r.Context()).InstanceID()
-	if authReq == nil {
-		if id := r.FormValue(queryOrgID); id != "" {
-			return id
-		}
-		return privateLabelingOrgID
+	defaultID := authz.GetInstance(r.Context()).DefaultOrganisationID()
+	f, err := l.featureCheck.CheckInstanceBooleanFeature(r.Context(), domain.FeatureLoginDefaultOrg)
+	logging.OnError(err).Warnf("could not check feature %s", domain.FeatureLoginDefaultOrg)
+	if !f.Boolean {
+		defaultID = authz.GetInstance(r.Context()).InstanceID()
 	}
-	if authReq.PrivateLabelingSetting != domain.PrivateLabelingSettingUnspecified {
-		privateLabelingOrgID = authReq.ApplicationResourceOwner
+	if authReq != nil {
+		return authReq.PrivateLabelingOrgID(defaultID)
 	}
-	if authReq.PrivateLabelingSetting == domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy || authReq.PrivateLabelingSetting == domain.PrivateLabelingSettingUnspecified {
-		if authReq.UserOrgID != "" {
-			privateLabelingOrgID = authReq.UserOrgID
-		}
+	if id := r.FormValue(queryOrgID); id != "" {
+		return id
 	}
-	if authReq.RequestedOrgID != "" {
-		privateLabelingOrgID = authReq.RequestedOrgID
-	}
-	return privateLabelingOrgID
+	return defaultID
 }
 
 func (l *Login) getOrgName(authReq *domain.AuthRequest) string {
@@ -613,7 +623,8 @@ type baseData struct {
 	Title                  string
 	Description            string
 	Theme                  string
-	ThemeMode              string
+	ThemeMode              domain.LabelPolicyThemeMode
+	ThemeClass             string
 	DarkMode               bool
 	PrivateLabelingOrgID   string
 	OrgID                  string

@@ -17,7 +17,7 @@ const (
 )
 
 type AddedEvent struct {
-	*eventstore.BaseEvent
+	*eventstore.BaseEvent `json:"-"`
 
 	ClientID   string
 	DeviceCode string
@@ -31,11 +31,11 @@ func (e *AddedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *AddedEvent) Data() any {
+func (e *AddedEvent) Payload() any {
 	return e
 }
 
-func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return NewAddUniqueConstraints(e.ClientID, e.DeviceCode, e.UserCode)
 }
 
@@ -56,7 +56,7 @@ func NewAddedEvent(
 }
 
 type ApprovedEvent struct {
-	*eventstore.BaseEvent
+	*eventstore.BaseEvent `json:"-"`
 
 	Subject string
 }
@@ -65,11 +65,11 @@ func (e *ApprovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *ApprovedEvent) Data() any {
+func (e *ApprovedEvent) Payload() any {
 	return e
 }
 
-func (e *ApprovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *ApprovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -87,7 +87,8 @@ func NewApprovedEvent(
 }
 
 type CanceledEvent struct {
-	*eventstore.BaseEvent
+	*eventstore.BaseEvent `json:"-"`
+
 	Reason domain.DeviceAuthCanceled
 }
 
@@ -95,11 +96,11 @@ func (e *CanceledEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *CanceledEvent) Data() any {
+func (e *CanceledEvent) Payload() any {
 	return e
 }
 
-func (e *CanceledEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *CanceledEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -108,7 +109,7 @@ func NewCanceledEvent(ctx context.Context, aggregate *eventstore.Aggregate, reas
 }
 
 type RemovedEvent struct {
-	*eventstore.BaseEvent
+	*eventstore.BaseEvent `json:"-"`
 
 	ClientID   string
 	DeviceCode string
@@ -119,11 +120,11 @@ func (e *RemovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *RemovedEvent) Data() any {
+func (e *RemovedEvent) Payload() any {
 	return e
 }
 
-func (e *RemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *RemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return NewRemoveUniqueConstraints(e.ClientID, e.DeviceCode, e.UserCode)
 }
 

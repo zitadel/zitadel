@@ -177,25 +177,29 @@
         id="systembutton"
         *ngIf="!isOnInstance && (['iam.read$', 'iam.write$'] | hasRole | async)"
         [routerLink]="['/instance']"
-        class="iam-settings cnsl-action-button"
+        class="iam-settings"
         mat-stroked-button
       >
-        <span class="iam-label">{{ 'MENU.INSTANCE' | translate }}</span>
-        <i class="las la-cog"></i>
+        <div class="cnsl-action-button">
+          <span class="iam-label">{{ 'MENU.INSTANCE' | translate }}</span>
+          <i class="las la-cog"></i>
+        </div>
       </a>
       <a
         id="orgbutton"
         *ngIf="isOnInstance && (['org.read'] | hasRole | async)"
         [routerLink]="['/org']"
-        class="org-settings cnsl-action-button"
+        class="org-settings"
         mat-stroked-button
       >
-        <span class="iam-label">{{ 'MENU.ORGANIZATION' | translate }}</span>
-        <i class="las la-cog"></i>
+        <div class="cnsl-action-button">
+          <span class="iam-label">{{ 'MENU.ORGANIZATION' | translate }}</span>
+          <i class="las la-cog"></i>
+        </div>
       </a>
     </div>
 
-    <ng-container *ngIf="user">
+    <ng-container *ngIf="user && user.id">
       <div class="account-card-wrapper">
         <button
           cdkOverlayOrigin

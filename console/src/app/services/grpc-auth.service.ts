@@ -1,19 +1,8 @@
 import { Injectable } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
-import {
-  catchError,
-  distinctUntilChanged,
-  filter,
-  finalize,
-  map,
-  mergeMap,
-  switchMap,
-  take,
-  timeout,
-  withLatestFrom,
-} from 'rxjs/operators';
+import { BehaviorSubject, forkJoin, from, Observable, of, Subject } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, finalize, map, switchMap, timeout, withLatestFrom } from 'rxjs/operators';
 
 import {
   AddMyAuthFactorOTPEmailRequest,
@@ -174,7 +163,6 @@ export class GrpcAuthService {
 
     this.labelpolicy$.subscribe({
       next: (policy) => {
-        themeService.applyLabelPolicy(policy);
         this.labelpolicy.next(policy);
         this.labelPolicyLoading$.next(false);
       },
@@ -184,25 +172,21 @@ export class GrpcAuthService {
       },
     });
 
-    this.user = merge(
-      of(this.oauthService.getAccessToken()).pipe(filter((token) => (token ? true : false))),
+    this.user = forkJoin([
+      of(this.oauthService.getAccessToken()),
       this.oauthService.events.pipe(
         filter((e) => e.type === 'token_received'),
         timeout(this.oauthService.waitForTokenInMsec || 0),
         catchError((_) => of(null)), // timeout is not an error
         map((_) => this.oauthService.getAccessToken()),
       ),
-    ).pipe(
-      take(1),
-      mergeMap(() => {
+    ]).pipe(
+      filter((token) => (token ? true : false)),
+      distinctUntilChanged(),
+      switchMap(() => {
         return from(
           this.getMyUser().then((resp) => {
-            const user = resp.user;
-            if (user) {
-              return user;
-            } else {
-              return undefined;
-            }
+            return resp.user;
           }),
         );
       }),
@@ -309,15 +293,37 @@ export class GrpcAuthService {
         filter(([hL, p]) => {
           return hL === true && !!p.length;
         }),
-        map(([_, zroles]) => {
-          const what = this.hasRoles(zroles, roles, requiresAll);
-          return what;
-        }),
+        map(([_, zroles]) => this.hasRoles(zroles, roles, requiresAll)),
         distinctUntilChanged(),
       );
     } else {
       return of(false);
     }
+  }
+
+  /**
+   * filters objects based on roles
+   * @param objects array of objects
+   * @param mapper mapping function which maps to a string[] or Regexp[] of roles
+   * @param requiresAll wheter all, or just a single roles is required to fulfill
+   */
+  public isAllowedMapper<T>(
+    objects: T[],
+    mapper: (attr: any) => string[] | RegExp[],
+    requiresAll: boolean = false,
+  ): Observable<T[]> {
+    return this.fetchedZitadelPermissions.pipe(
+      withLatestFrom(this.zitadelPermissions),
+      filter(([hL, p]) => {
+        return hL === true && !!p.length;
+      }),
+      map(([_, zroles]) => {
+        return objects.filter((obj) => {
+          const roles = mapper(obj);
+          return this.hasRoles(zroles, roles, requiresAll);
+        });
+      }),
+    );
   }
 
   /**

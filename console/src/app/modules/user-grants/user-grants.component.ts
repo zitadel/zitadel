@@ -1,8 +1,8 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { MatLegacyInput as MatInput } from '@angular/material/legacy-input';
-import { MatLegacyTable as MatTable } from '@angular/material/legacy-table';
+import { MatDialog } from '@angular/material/dialog';
+import { MatInput } from '@angular/material/input';
+import { MatTable } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
@@ -56,7 +56,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   @ViewChild('input') public filter!: MatInput;
 
   public projectRoleOptions: Role.AsObject[] = [];
-  public routerLink: any = [''];
+  public routerLink: any = undefined;
 
   public loadedId: string = '';
   public loadedProjectId: string = '';

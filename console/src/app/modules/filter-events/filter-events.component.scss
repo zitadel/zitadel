@@ -1,17 +1,15 @@
-@use '@angular/material' as mat;
-
 @mixin filter-events-theme($theme) {
   $primary: map-get($theme, primary);
-  $primary-color: mat.get-color-from-palette($primary, 500);
-  $lighter-primary-color: mat.get-color-from-palette($primary, 300);
-  $darker-primary-color: mat.get-color-from-palette($primary, 700);
+  $primary-color: map-get($primary, 500);
+  $lighter-primary-color: map-get($primary, 300);
+  $darker-primary-color: map-get($primary, 700);
 
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
   $secondary-text: map-get($foreground, secondary-text);
   $is-dark-theme: map-get($theme, is-dark);
 
-  $link-hover-color: if($is-dark-theme, mat.get-color-from-palette($primary, 200), $primary-color);
+  $link-hover-color: if($is-dark-theme, map-get($primary, 200), $primary-color);
   $link-color: if($is-dark-theme, $lighter-primary-color, $primary-color);
 
   .filter-events-wrapper {
@@ -66,7 +64,7 @@
       background-color: if($is-dark-theme, #00000020, #00000008);
       margin: 0 -0.5rem;
 
-      .aggregate-type-select .mat-select {
+      .aggregate-type-select .mat-mdc-select {
         height: 36px;
         padding: 7px 10px;
       }

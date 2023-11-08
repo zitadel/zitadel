@@ -2,12 +2,10 @@ package action
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -20,15 +18,15 @@ const (
 	RemovedEventType     = eventTypePrefix + "removed"
 )
 
-func NewAddActionNameUniqueConstraint(actionName, resourceOwner string) *eventstore.EventUniqueConstraint {
+func NewAddActionNameUniqueConstraint(actionName, resourceOwner string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueActionNameType,
 		actionName+":"+resourceOwner,
 		"Errors.Action.AlreadyExists")
 }
 
-func NewRemoveActionNameUniqueConstraint(actionName, resourceOwner string) *eventstore.EventUniqueConstraint {
-	return eventstore.NewRemoveEventUniqueConstraint(
+func NewRemoveActionNameUniqueConstraint(actionName, resourceOwner string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
 		UniqueActionNameType,
 		actionName+":"+resourceOwner)
 }
@@ -42,12 +40,12 @@ type AddedEvent struct {
 	AllowedToFail bool          `json:"allowedToFail"`
 }
 
-func (e *AddedEvent) Data() interface{} {
+func (e *AddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddActionNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddActionNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
 }
 
 func NewAddedEvent(
@@ -71,12 +69,12 @@ func NewAddedEvent(
 	}
 }
 
-func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func AddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "ACTION-4n8vs", "unable to unmarshal action added")
 	}
@@ -94,15 +92,15 @@ type ChangedEvent struct {
 	oldName       string
 }
 
-func (e *ChangedEvent) Data() interface{} {
+func (e *ChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *ChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *ChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	if e.oldName == "" {
 		return nil
 	}
-	return []*eventstore.EventUniqueConstraint{
+	return []*eventstore.UniqueConstraint{
 		NewRemoveActionNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
 		NewAddActionNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner),
 	}
@@ -156,12 +154,12 @@ func ChangeAllowedToFail(allowedToFail bool) func(event *ChangedEvent) {
 	}
 }
 
-func ChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func ChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &ChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "ACTION-4n8vs", "unable to unmarshal action changed")
 	}
@@ -173,11 +171,11 @@ type DeactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *DeactivatedEvent) Data() interface{} {
+func (e *DeactivatedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *DeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *DeactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -191,7 +189,7 @@ func NewDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *
 	}
 }
 
-func DeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DeactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &DeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -201,11 +199,11 @@ type ReactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *ReactivatedEvent) Data() interface{} {
+func (e *ReactivatedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *ReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *ReactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -219,7 +217,7 @@ func NewReactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *
 	}
 }
 
-func ReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func ReactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &ReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -231,12 +229,12 @@ type RemovedEvent struct {
 	name string
 }
 
-func (e *RemovedEvent) Data() interface{} {
+func (e *RemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *RemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveActionNameUniqueConstraint(e.name, e.Aggregate().ResourceOwner)}
+func (e *RemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewRemoveActionNameUniqueConstraint(e.name, e.Aggregate().ResourceOwner)}
 }
 
 func NewRemovedEvent(
@@ -254,7 +252,7 @@ func NewRemovedEvent(
 	}
 }
 
-func RemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func RemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &RemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

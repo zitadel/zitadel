@@ -52,9 +52,10 @@ func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChanges
 		AllowTimeTravel().
 		Limit(limit).
 		OrderDesc().
+		AwaitOpenTransactions().
 		ResourceOwner(authz.GetCtxData(ctx).OrgID).
-		AddQuery().
 		SequenceGreater(sequence).
+		AddQuery().
 		AggregateTypes(org.AggregateType).
 		AggregateIDs(authz.GetCtxData(ctx).OrgID).
 		Builder()
@@ -62,7 +63,7 @@ func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChanges
 		query.OrderAsc()
 	}
 
-	response, err := s.query.SearchEvents(ctx, query, s.auditLogRetention)
+	response, err := s.query.SearchEvents(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +73,11 @@ func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChanges
 }
 
 func (s *Server) AddOrg(ctx context.Context, req *mgmt_pb.AddOrgRequest) (*mgmt_pb.AddOrgResponse, error) {
-	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, domain.NewIAMDomainName(req.Name, authz.GetInstance(ctx).RequestedDomain()), "")
+	orgDomain, err := domain.NewIAMDomainName(req.Name, authz.GetInstance(ctx).RequestedDomain())
+	if err != nil {
+		return nil, err
+	}
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, orgDomain, "")
 	if err != nil {
 		return nil, err
 	}
@@ -172,7 +177,7 @@ func (s *Server) ListOrgDomains(ctx context.Context, req *mgmt_pb.ListOrgDomains
 	}
 	return &mgmt_pb.ListOrgDomainsResponse{
 		Result:  org_grpc.DomainsToPb(domains.Domains),
-		Details: object.ToListDetails(domains.Count, domains.Sequence, domains.Timestamp),
+		Details: object.ToListDetails(domains.Count, domains.Sequence, domains.LastRun),
 	}, nil
 }
 
@@ -268,7 +273,7 @@ func (s *Server) ListOrgMembers(ctx context.Context, req *mgmt_pb.ListOrgMembers
 	}
 	return &mgmt_pb.ListOrgMembersResponse{
 		Result:  member_grpc.MembersToPb(s.assetAPIPrefix(ctx), members.Members),
-		Details: object.ToListDetails(members.Count, members.Sequence, members.Timestamp),
+		Details: object.ToListDetails(members.Count, members.Sequence, members.LastRun),
 	}, nil
 }
 
@@ -346,7 +351,7 @@ func (s *Server) ListOrgMetadata(ctx context.Context, req *mgmt_pb.ListOrgMetada
 	}
 	return &mgmt_pb.ListOrgMetadataResponse{
 		Result:  metadata.OrgMetadataListToPb(res.Metadata),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastRun),
 	}, nil
 }
 

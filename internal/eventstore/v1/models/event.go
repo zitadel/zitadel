@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 type EventType string
@@ -14,21 +15,83 @@ func (et EventType) String() string {
 	return string(et)
 }
 
+var _ eventstore.Event = (*Event)(nil)
+
 type Event struct {
 	ID               string
-	Sequence         uint64
+	Seq              uint64
+	Pos              float64
 	CreationDate     time.Time
-	Type             EventType
+	Typ              eventstore.EventType
 	PreviousSequence uint64
 	Data             []byte
 
 	AggregateID      string
-	AggregateType    AggregateType
-	AggregateVersion Version
-	EditorService    string
-	EditorUser       string
+	AggregateType    eventstore.AggregateType
+	AggregateVersion eventstore.Version
+	Service          string
+	User             string
 	ResourceOwner    string
 	InstanceID       string
+}
+
+// Aggregate implements [eventstore.Event]
+func (e *Event) Aggregate() *eventstore.Aggregate {
+	return &eventstore.Aggregate{
+		ID:            e.AggregateID,
+		Type:          e.AggregateType,
+		ResourceOwner: e.ResourceOwner,
+		InstanceID:    e.InstanceID,
+		// Version:       eventstore.Version(e.AggregateVersion),
+	}
+}
+
+// CreatedAt implements [eventstore.Event]
+func (e *Event) CreatedAt() time.Time {
+	return e.CreationDate
+}
+
+// DataAsBytes implements [eventstore.Event]
+func (e *Event) DataAsBytes() []byte {
+	return e.Data
+}
+
+// Unmarshal implements [eventstore.Event]
+func (e *Event) Unmarshal(ptr any) error {
+	if len(e.Data) == 0 {
+		return nil
+	}
+	return json.Unmarshal(e.Data, ptr)
+}
+
+// EditorService implements [eventstore.Event]
+func (e *Event) EditorService() string {
+	return e.Service
+}
+
+// Creator implements [eventstore.action]
+func (e *Event) Creator() string {
+	return e.User
+}
+
+// Sequence implements [eventstore.Event]
+func (e *Event) Sequence() uint64 {
+	return e.Seq
+}
+
+// Position implements [eventstore.Event]
+func (e *Event) Position() float64 {
+	return e.Pos
+}
+
+// Type implements [eventstore.action]
+func (e *Event) Type() eventstore.EventType {
+	return e.Typ
+}
+
+// Type implements [eventstore.action]
+func (e *Event) Revision() uint16 {
+	return 0
 }
 
 func eventData(i interface{}) ([]byte, error) {
@@ -63,7 +126,7 @@ func (e *Event) Validate() error {
 	if e == nil {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-oEAG4", "event is nil")
 	}
-	if string(e.Type) == "" {
+	if string(e.Typ) == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-R2sB0", "type not defined")
 	}
 
@@ -74,13 +137,12 @@ func (e *Event) Validate() error {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-EzdyK", "aggregate type not set")
 	}
 	if err := e.AggregateVersion.Validate(); err != nil {
-		return err
+		return errors.ThrowPreconditionFailed(err, "MODEL-KO71q", "version invalid")
 	}
-
-	if e.EditorService == "" {
+	if e.Service == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-4Yqik", "editor service not set")
 	}
-	if e.EditorUser == "" {
+	if e.User == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-L3NHO", "editor user not set")
 	}
 	if e.ResourceOwner == "" {

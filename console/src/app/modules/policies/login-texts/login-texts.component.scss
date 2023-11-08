@@ -23,22 +23,18 @@
 
   button {
     align-self: center;
-
-    i {
-      margin-bottom: 3px;
-      margin-right: 0.5rem;
-    }
   }
 }
 
 .top-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  column-gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 
   .keys {
     min-width: 150px;
-    grid-column: span 3;
+    flex: 1;
+    margin-right: 1rem;
   }
 
   .language {
@@ -54,6 +50,7 @@
 .centerline {
   display: flex;
   align-items: center;
+  text-wrap: nowrap;
 }
 
 .content {
@@ -93,14 +90,5 @@
   .reset-button {
     display: block;
     margin: 0 0.25rem 3rem 0.25rem;
-  }
-
-  .reset-button {
-    display: flex;
-    align-items: center;
-
-    i {
-      margin-bottom: 3px;
-    }
   }
 }

@@ -11,10 +11,10 @@ func (n *NotificationQueries) IsAlreadyHandled(ctx context.Context, event events
 		ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 			InstanceID(event.Aggregate().InstanceID).
+			SequenceGreater(event.Sequence()).
 			AddQuery().
 			AggregateTypes(aggregateType).
 			AggregateIDs(event.Aggregate().ID).
-			SequenceGreater(event.Sequence()).
 			EventTypes(eventTypes...).
 			EventData(data).
 			Builder(),

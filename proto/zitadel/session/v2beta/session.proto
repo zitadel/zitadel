@@ -39,6 +39,12 @@ message Session {
       description: "\"custom key value list\"";
     }
   ];
+  UserAgent user_agent = 7;
+  optional google.protobuf.Timestamp expiration_date = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time the session will be automatically invalidated\"";
+    }
+  ];
 }
 
 message Factors {
@@ -72,9 +78,15 @@ message UserFactor {
       description: "\"display name of the checked user\"";
     }
   ];
+  // deprecated: use organization_id, will be remove before GA (https://github.com/zitadel/zitadel/issues/6718)
   string organisation_id = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"organisation id of the checked user\"";
+      description: "\"organization id of the checked user; deprecated: use organization_id\"";
+    }
+  ];
+  string organization_id = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"organization id of the checked user\"";
     }
   ];
 }
@@ -130,4 +142,19 @@ message SearchQuery {
 
 message IDsQuery {
   repeated string ids = 1;
+}
+
+message UserAgent {
+  optional string fingerprint_id = 1;
+  optional string ip  = 2;
+  optional string description = 3;
+
+  // A header may have multiple values.
+  // In Go, headers are defined
+  // as map[string][]string, but protobuf
+  // doesn't allow this scheme.
+  message HeaderValues {
+    repeated string values = 1;
+  }
+  map<string,HeaderValues> header = 4;
 }

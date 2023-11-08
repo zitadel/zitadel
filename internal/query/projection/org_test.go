@@ -6,8 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -25,17 +24,17 @@ func TestOrgProjection_reduces(t *testing.T) {
 		{
 			name: "reducePrimaryDomainSet",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgDomainPrimarySetEventType),
-					org.AggregateType,
-					[]byte(`{"domain": "domain.new"}`),
-				), org.DomainPrimarySetEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgDomainPrimarySetEventType,
+						org.AggregateType,
+						[]byte(`{"domain": "domain.new"}`),
+					), org.DomainPrimarySetEventMapper),
 			},
 			reduce: (&orgProjection{}).reducePrimaryDomainSet,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -55,17 +54,17 @@ func TestOrgProjection_reduces(t *testing.T) {
 		{
 			name: "reduceOrgReactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgReactivatedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgReactivatedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgReactivatedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgReactivatedEventMapper),
 			},
 			reduce: (&orgProjection{}).reduceOrgReactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -85,17 +84,17 @@ func TestOrgProjection_reduces(t *testing.T) {
 		{
 			name: "reduceOrgDeactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgDeactivatedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgDeactivatedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgDeactivatedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgDeactivatedEventMapper),
 			},
 			reduce: (&orgProjection{}).reduceOrgDeactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -115,17 +114,17 @@ func TestOrgProjection_reduces(t *testing.T) {
 		{
 			name: "reduceOrgChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgChangedEventType),
-					org.AggregateType,
-					[]byte(`{"name": "new name"}`),
-				), org.OrgChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgChangedEventType,
+						org.AggregateType,
+						[]byte(`{"name": "new name"}`),
+					), org.OrgChangedEventMapper),
 			},
 			reduce: (&orgProjection{}).reduceOrgChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -145,34 +144,34 @@ func TestOrgProjection_reduces(t *testing.T) {
 		{
 			name: "reduceOrgChanged no changes",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgChangedEventType),
-					org.AggregateType,
-					[]byte(`{}`),
-				), org.OrgChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgChangedEventType,
+						org.AggregateType,
+						[]byte(`{}`),
+					), org.OrgChangedEventMapper),
 			},
 			reduce: (&orgProjection{}).reduceOrgChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
-				executer:         &testExecuter{},
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
+				executer:      &testExecuter{},
 			},
 		},
 		{
 			name: "reduceOrgAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgAddedEventType),
-					org.AggregateType,
-					[]byte(`{"name": "name"}`),
-				), org.OrgAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgAddedEventType,
+						org.AggregateType,
+						[]byte(`{"name": "name"}`),
+					), org.OrgAddedEventMapper),
 			},
 			reduce: (&orgProjection{}).reduceOrgAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -195,17 +194,17 @@ func TestOrgProjection_reduces(t *testing.T) {
 		{
 			name: "reduceOrgRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			reduce: (&orgProjection{}).reduceOrgRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -222,17 +221,17 @@ func TestOrgProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(OrgColumnInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

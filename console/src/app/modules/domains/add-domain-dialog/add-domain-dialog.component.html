@@ -1,0 +1,18 @@
+<h1 class="title" mat-dialog-title>{{ 'ORG.DOMAINS.ADD.TITLE' | translate }}</h1>
+<div mat-dialog-content>
+  <p class="desc cnsl-secondary-text">{{ 'ORG.DOMAINS.ADD.DESCRIPTION' | translate }}</p>
+
+  <cnsl-form-field label="Domain" required="true" class="form-field">
+    <cnsl-label>Domain</cnsl-label>
+    <input cnslInput [(ngModel)]="newdomain" />
+  </cnsl-form-field>
+</div>
+<div mat-dialog-actions class="action">
+  <button mat-stroked-button (click)="closeDialog()">
+    {{ 'ACTIONS.CANCEL' | translate }}
+  </button>
+
+  <button color="primary" mat-raised-button class="ok-button" [disabled]="!newdomain" (click)="closeDialogWithSuccess()">
+    {{ 'ACTIONS.ADD' | translate }}
+  </button>
+</div>

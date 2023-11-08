@@ -3,93 +3,90 @@
 @import 'codemirror/lib/codemirror.css';
 @import './component-themes';
 @import './styles/lato-font.scss';
+@import './styles/ailerons.scss';
 @import '@angular/material/theming';
 @import '/node_modules/flag-icons/css/flag-icons.min.css';
+@import './styles/palette-helper.scss';
+@import './styles/palette.scss';
 
 $material-design-icons-font-directory-path: '~material-design-icons-iconfont/dist/fonts/';
 
 @import 'material-design-icons-iconfont/src/material-design-icons.scss';
 
-@font-face {
-  font-family: ailerons;
-  font-display: auto;
-  src: url(./assets/ailerons.otf) format('opentype');
-}
-
 :root {
+  --mat-table-row-item-label-text-size: 14px;
+  --mat-menu-item-label-text-size: 14px;
+
   --grey: #8795a1;
   --warn: #ff3b5b;
   --success: #10b981;
   --table-row-back: #363738;
+
+  --theme-dark-background-50: #7c93c6;
+  --theme-dark-background-contrast-50: hsla(0, 0%, 0%, 0.87);
+  --theme-dark-background-100: #4a69aa;
+  --theme-dark-background-contrast-100: #ffffff;
+  --theme-dark-background-200: #395183;
+  --theme-dark-background-contrast-200: #ffffff;
+  --theme-dark-background-300: #243252;
+  --theme-dark-background-contrast-300: #ffffff;
+  --theme-dark-background-400: #1a253c;
+  --theme-dark-background-contrast-400: #ffffff;
+  --theme-dark-background-500: #111827;
+  --theme-dark-background-contrast-500: #ffffff;
+  --theme-dark-background-600: #080b12;
+  --theme-dark-background-contrast-600: #ffffff;
+  --theme-dark-background-700: #000000;
+  --theme-dark-background-contrast-700: #ffffff;
+  --theme-dark-background-800: #000000;
+  --theme-dark-background-contrast-800: #ffffff;
+  --theme-dark-background-900: #000000;
+  --theme-dark-background-contrast-900: #ffffff;
+  --theme-dark-background-A100: #5782e0;
+  --theme-dark-background-contrast-A100: hsla(0, 0%, 0%, 0.87);
+  --theme-dark-background-A200: #204eb1;
+  --theme-dark-background-contrast-A200: #ffffff;
+  --theme-dark-background-A400: #182b53;
+  --theme-dark-background-contrast-A400: #ffffff;
+  --theme-dark-background-A700: #17223b;
+  --theme-dark-background-contrast-A700: #ffffff;
+
+  --theme-light-background-50: #ffffff;
+  --theme-light-background-contrast-50: hsla(0, 0%, 0%, 0.87);
+  --theme-light-background-100: #ffffff;
+  --theme-light-background-contrast-100: hsla(0, 0%, 0%, 0.87);
+  --theme-light-background-200: #ffffff;
+  --theme-light-background-contrast-200: hsla(0, 0%, 0%, 0.87);
+  --theme-light-background-300: #ffffff;
+  --theme-light-background-contrast-300: hsla(0, 0%, 0%, 0.87);
+  --theme-light-background-400: #ffffff;
+  --theme-light-background-contrast-400: hsla(0, 0%, 0%, 0.87);
+  --theme-light-background-500: #fafafa;
+  --theme-light-background-contrast-500: hsla(0, 0%, 0%, 0.87);
+  --theme-light-background-600: #ebebeb;
+  --theme-light-background-contrast-600: hsla(0, 0%, 0%, 0.87);
+  --theme-light-background-700: #dbdbdb;
+  --theme-light-background-contrast-700: hsla(0, 0%, 0%, 0.87);
+  --theme-light-background-800: #cccccc;
+  --theme-light-background-contrast-800: hsla(0, 0%, 0%, 0.87);
+  --theme-light-background-900: #bdbdbd;
+  --theme-light-background-contrast-900: hsla(0, 0%, 0%, 0.87);
+  --theme-light-background-A100: #ffffff;
+  --theme-light-background-contrast-A100: hsla(0, 0%, 0%, 0.87);
+  --theme-light-background-A200: #ffffff;
+  --theme-light-background-contrast-A200: hsla(0, 0%, 0%, 0.87);
+  --theme-light-background-A400: #ffffff;
+  --theme-light-background-contrast-A400: hsla(0, 0%, 0%, 0.87);
+  --theme-light-background-A700: #ffffff;
+  --theme-light-background-contrast-A700: hsla(0, 0%, 0%, 0.87);
+
+  --theme-dark-text: #ffffff;
+  --theme-dark-secondary-text: #ffffffc7;
+  --theme-light-text: #000000;
+  --theme-light-secondary-text: #000000c7;
 }
 
-$caos-dark-primary: (
-  50: var(--theme-dark-primary-50),
-  100: var(--theme-dark-primary-100),
-  200: var(--theme-dark-primary-200),
-  300: var(--theme-dark-primary-300),
-  400: var(--theme-dark-primary-400),
-  500: var(--theme-dark-primary-500),
-  600: var(--theme-dark-primary-600),
-  700: var(--theme-dark-primary-700),
-  800: var(--theme-dark-primary-800),
-  900: var(--theme-dark-primary-900),
-  A100: var(--theme-dark-primary-A100),
-  A200: var(--theme-dark-primary-A200),
-  A400: var(--theme-dark-primary-A400),
-  A700: var(--theme-dark-primary-A700),
-  contrast: (
-    50: var(--theme-dark-primary-contrast-50),
-    100: var(--theme-dark-primary-contrast-100),
-    200: var(--theme-dark-primary-contrast-200),
-    300: var(--theme-dark-primary-contrast-300),
-    400: var(--theme-dark-primary-contrast-400),
-    500: var(--theme-dark-primary-contrast-500),
-    600: var(--theme-dark-primary-contrast-600),
-    700: var(--theme-dark-primary-contrast-700),
-    800: var(--theme-dark-primary-contrast-800),
-    900: var(--theme-dark-primary-contrast-900),
-    A100: var(--theme-dark-primary-contrast-A100),
-    A200: var(--theme-dark-primary-contrast-A200),
-    A400: var(--theme-dark-primary-contrast-A400),
-    A700: var(--theme-dark-primary-contrast-A700),
-  ),
-);
-
-$caos-light-primary: (
-  50: var(--theme-light-primary-50),
-  100: var(--theme-light-primary-100),
-  200: var(--theme-light-primary-200),
-  300: var(--theme-light-primary-300),
-  400: var(--theme-light-primary-400),
-  500: var(--theme-light-primary-500),
-  600: var(--theme-light-primary-600),
-  700: var(--theme-light-primary-700),
-  800: var(--theme-light-primary-800),
-  900: var(--theme-light-primary-900),
-  A100: var(--theme-light-primary-A100),
-  A200: var(--theme-light-primary-A200),
-  A400: var(--theme-light-primary-A400),
-  A700: var(--theme-light-primary-A700),
-  contrast: (
-    50: var(--theme-light-primary-contrast-50),
-    100: var(--theme-light-primary-contrast-100),
-    200: var(--theme-light-primary-contrast-200),
-    300: var(--theme-light-primary-contrast-300),
-    400: var(--theme-light-primary-contrast-400),
-    500: var(--theme-light-primary-contrast-500),
-    600: var(--theme-light-primary-contrast-600),
-    700: var(--theme-light-primary-contrast-700),
-    800: var(--theme-light-primary-contrast-800),
-    900: var(--theme-light-primary-contrast-900),
-    A100: var(--theme-light-primary-contrast-A100),
-    A200: var(--theme-light-primary-contrast-A200),
-    A400: var(--theme-light-primary-contrast-A400),
-    A700: var(--theme-light-primary-contrast-A700),
-  ),
-);
-
-$caos-dark-background: (
+$cnsl-dark-background: (
   50: var(--theme-dark-background-50),
   100: var(--theme-dark-background-100),
   200: var(--theme-dark-background-200),
@@ -122,7 +119,7 @@ $caos-dark-background: (
   ),
 );
 
-$caos-light-background: (
+$cnsl-light-background: (
   50: var(--theme-light-background-50),
   100: var(--theme-light-background-100),
   200: var(--theme-light-background-200),
@@ -155,148 +152,81 @@ $caos-light-background: (
   ),
 );
 
-$caos-dark-warn: (
-  50: var(--theme-dark-warn-50),
-  100: var(--theme-dark-warn-100),
-  200: var(--theme-dark-warn-200),
-  300: var(--theme-dark-warn-300),
-  400: var(--theme-dark-warn-400),
-  500: var(--theme-dark-warn-500),
-  600: var(--theme-dark-warn-600),
-  700: var(--theme-dark-warn-700),
-  800: var(--theme-dark-warn-800),
-  900: var(--theme-dark-warn-900),
-  A100: var(--theme-dark-warn-A100),
-  A200: var(--theme-dark-warn-A200),
-  A400: var(--theme-dark-warn-A400),
-  A700: var(--theme-dark-warn-A700),
-  contrast: (
-    50: var(--theme-dark-warn-contrast-50),
-    100: var(--theme-dark-warn-contrast-100),
-    200: var(--theme-dark-warn-contrast-200),
-    300: var(--theme-dark-warn-contrast-300),
-    400: var(--theme-dark-warn-contrast-400),
-    500: var(--theme-dark-warn-contrast-500),
-    600: var(--theme-dark-warn-contrast-600),
-    700: var(--theme-dark-warn-contrast-700),
-    800: var(--theme-dark-warn-contrast-800),
-    900: var(--theme-dark-warn-contrast-900),
-    A100: var(--theme-dark-warn-contrast-A100),
-    A200: var(--theme-dark-warn-contrast-A200),
-    A400: var(--theme-dark-warn-contrast-A400),
-    A700: var(--theme-dark-warn-contrast-A700),
-  ),
-);
+$cnsl-dark-theme-secondary-text: var(--theme-dark-secondary-text);
+$cnsl-light-theme-secondary-text: var(--theme-light-secondary-text);
 
-$caos-light-warn: (
-  50: var(--theme-light-warn-50),
-  100: var(--theme-light-warn-100),
-  200: var(--theme-light-warn-200),
-  300: var(--theme-light-warn-300),
-  400: var(--theme-light-warn-400),
-  500: var(--theme-light-warn-500),
-  600: var(--theme-light-warn-600),
-  700: var(--theme-light-warn-700),
-  800: var(--theme-light-warn-800),
-  900: var(--theme-light-warn-900),
-  A100: var(--theme-light-warn-A100),
-  A200: var(--theme-light-warn-A200),
-  A400: var(--theme-light-warn-A400),
-  A700: var(--theme-light-warn-A700),
-  contrast: (
-    50: var(--theme-light-warn-contrast-50),
-    100: var(--theme-light-warn-contrast-100),
-    200: var(--theme-light-warn-contrast-200),
-    300: var(--theme-light-warn-contrast-300),
-    400: var(--theme-light-warn-contrast-400),
-    500: var(--theme-light-warn-contrast-500),
-    600: var(--theme-light-warn-contrast-600),
-    700: var(--theme-light-warn-contrast-700),
-    800: var(--theme-light-warn-contrast-800),
-    900: var(--theme-light-warn-contrast-900),
-    A100: var(--theme-light-warn-contrast-A100),
-    A200: var(--theme-light-warn-contrast-A200),
-    A400: var(--theme-light-warn-contrast-A400),
-    A700: var(--theme-light-warn-contrast-A700),
-  ),
-);
-
-$caos-dark-theme-text: var(--theme-dark-text);
-$caos-light-theme-text: var(--theme-light-text);
-
-$caos-dark-theme-secondary-text: var(--theme-dark-secondary-text);
-$caos-light-theme-secondary-text: var(--theme-light-secondary-text);
-
-$caos-dark-theme-background: (
-  status-bar: map_get($caos-dark-background, 300),
-  app-bar: map_get($caos-dark-background, 500),
-  background: map_get($caos-dark-background, 500),
+$cnsl-dark-theme-background: (
+  status-bar: map_get($cnsl-dark-background, 300),
+  app-bar: map_get($cnsl-dark-background, 500),
+  background: map_get($cnsl-dark-background, 500),
   hover: rgba(black, 0.04),
   card: #222,
   // set fixed color due to https://github.com/angular/components/pull/14253
   // change where a scss mix function can't use a css var
-  cards: map_get($caos-dark-background, 400),
-  cardhovered: map_get($caos-dark-background, 300),
-  contributor: map_get($caos-dark-background, 400),
-  contributor-avatar: map_get($caos-dark-background, 300),
-  dialog: map_get($caos-dark-background, 500),
+  cards: map_get($cnsl-dark-background, 400),
+  cardhovered: map_get($cnsl-dark-background, 300),
+  contributor: map_get($cnsl-dark-background, 400),
+  contributor-avatar: map_get($cnsl-dark-background, 300),
+  dialog: map_get($cnsl-dark-background, 500),
   disabled-button: rgba(black, 0.12),
   raised-button: white,
   focused-button: $dark-focused,
-  selected-button: map_get($caos-dark-background, 300),
-  selected-disabled-button: map_get($caos-dark-background, 400),
-  disabled-button-toggle: map_get($caos-dark-background, 200),
-  unselected-chip: map_get($caos-dark-background, 300),
-  disabled-list-option: map_get($caos-dark-background, 200),
+  selected-button: map_get($cnsl-dark-background, 300),
+  selected-disabled-button: map_get($cnsl-dark-background, 400),
+  disabled-button-toggle: map_get($cnsl-dark-background, 200),
+  unselected-chip: map_get($cnsl-dark-background, 300),
+  disabled-list-option: map_get($cnsl-dark-background, 200),
   tooltip: map_get($mat-gray, 700),
-  infosection: map_get($caos-dark-background, 300),
+  infosection: map_get($cnsl-dark-background, 300),
   warninfosection: #741f2c4a,
   alertinfosection: #92400e50,
-  successinfosection: map_get($caos-dark-background, 300),
-  state: map_get($caos-dark-background, 300),
+  successinfosection: map_get($cnsl-dark-background, 300),
+  state: map_get($cnsl-dark-background, 300),
   state-active: #68cf8340,
   state-inactive: #af455359,
-  toolbar: rgba(map_get($caos-dark-background, 500), 0.9),
-  moz-toolbar: map_get($caos-dark-background, 500),
+  toolbar: rgba(map_get($cnsl-dark-background, 500), 0.9),
+  moz-toolbar: map_get($cnsl-dark-background, 500),
   footer: #00000020,
   metadata-section: #00000020,
   alert: #fbbf24,
+  toast: map_get($cnsl-dark-background, 400),
 );
 
-$caos-light-theme-background: (
-  status-bar: map_get($caos-light-background, 300),
-  app-bar: map_get($caos-light-background, 100),
-  background: map_get($caos-light-background, 500),
+$cnsl-light-theme-background: (
+  status-bar: map_get($cnsl-light-background, 300),
+  app-bar: map_get($cnsl-light-background, 100),
+  background: map_get($cnsl-light-background, 500),
   hover: rgba(black, 0.04),
   contributor: #00000010,
   contributor-avatar: map_get($caos-light-primary, 300),
   card: #fff,
   // set fixed color due to https://github.com/angular/components/pull/14253
   // change where a scss mix function can't use a css var
-  cards: map_get($caos-light-background, 400),
-  cardhovered: map_get($caos-light-background, 300),
-  dialog: map_get($caos-light-background, 500),
+  cards: map_get($cnsl-light-background, 400),
+  cardhovered: map_get($cnsl-light-background, 300),
+  dialog: map_get($cnsl-light-background, 500),
   disabled-button: rgba(black, 0.12),
   raised-button: white,
   focused-button: $light-focused,
-  selected-button: map_get($caos-light-background, 300),
-  selected-disabled-button: map_get($caos-light-background, 400),
-  disabled-button-toggle: map_get($caos-light-background, 200),
-  unselected-chip: map_get($caos-light-background, 300),
-  disabled-list-option: map_get($caos-light-background, 200),
+  selected-button: map_get($cnsl-light-background, 300),
+  selected-disabled-button: map_get($cnsl-light-background, 400),
+  disabled-button-toggle: map_get($cnsl-light-background, 200),
+  unselected-chip: map_get($cnsl-light-background, 300),
+  disabled-list-option: map_get($cnsl-light-background, 200),
   tooltip: map_get($mat-gray, 700),
-  infosection: map_get($caos-light-background, 600),
+  infosection: map_get($cnsl-light-background, 600),
   warninfosection: #ffc1c1,
   alertinfosection: rgb(251, 191, 36),
   successinfosection: #cbf4c9,
-  toolbar: rgba(map_get($caos-light-background, 500), 0.9),
-  moz-toolbar: map_get($caos-light-background, 500),
+  toolbar: rgba(map_get($cnsl-light-background, 500), 0.9),
+  moz-toolbar: map_get($cnsl-light-background, 500),
   footer: #00000008,
   metadata-section: #605f5f08,
   alert: rgb(251, 191, 36),
+  toast: map_get($cnsl-light-background, 400),
 );
 
-$caos-dark-theme-foreground: (
+$cnsl-dark-theme-foreground: (
   base: white,
   divider: $light-dividers,
   dividers: $light-dividers,
@@ -305,11 +235,11 @@ $caos-dark-theme-foreground: (
   disabled-text: $light-disabled-text,
   elevation: black,
   hint-text: $light-disabled-text,
-  secondary-text: $caos-dark-theme-secondary-text,
+  secondary-text: $cnsl-dark-theme-secondary-text,
   placeholder-text: rgba(white, 0.4),
   icon: rgba(white, 0.54),
   icons: rgba(white, 0.54),
-  text: $caos-dark-theme-text,
+  text: $cnsl-dark-theme-text,
   slider-min: rgba(white, 0.87),
   slider-off: rgba(white, 0.26),
   slider-off-active: rgba(white, 0.38),
@@ -321,7 +251,7 @@ $caos-dark-theme-foreground: (
   slash: #ffffff6e,
 );
 
-$caos-light-theme-foreground: (
+$cnsl-light-theme-foreground: (
   base: black,
   divider: $dark-dividers,
   dividers: $dark-dividers,
@@ -330,15 +260,15 @@ $caos-light-theme-foreground: (
   disabled-text: $dark-disabled-text,
   elevation: black,
   hint-text: $dark-disabled-text,
-  secondary-text: $caos-light-theme-secondary-text,
+  secondary-text: $cnsl-light-theme-secondary-text,
   placeholder-text: rgba(black, 0.3),
   icon: rgba(black, 0.54),
   icons: rgba(black, 0.54),
-  text: $caos-light-theme-text,
+  text: $cnsl-light-theme-text,
   slider-min: rgba(black, 0.87),
   slider-off: rgba(black, 0.26),
   slider-off-active: rgba(black, 0.38),
-  infosection: map-get(map-get($caos-light-background, contrast), 600),
+  infosection: map-get(map-get($cnsl-light-background, contrast), 600),
   warninfosection: #620e0e,
   alertinfosection: rgb(146, 64, 14),
   successinfosection: #0e6245,
@@ -346,38 +276,79 @@ $caos-light-theme-foreground: (
   slash: #0000006e,
 );
 
-$caos-dark-app-theme: (
-  primary: mat-palette($caos-dark-primary),
-  accent: mat-palette($caos-dark-primary),
-  warn: mat-palette($caos-dark-warn),
-  is-dark: true,
-  foreground: $caos-dark-theme-foreground,
-  background: $caos-dark-theme-background,
+$custom-level: mat.define-typography-level(
+  $font-family: Lato,
+  $font-weight: 500,
+  $font-size: 14px,
+  $line-height: 1,
+  $letter-spacing: normal,
 );
 
-$caos-light-app-theme: (
-  primary: mat-palette($caos-light-primary),
-  accent: mat-palette($caos-light-primary),
-  warn: mat-palette($caos-light-warn),
-  is-dark: false,
-  foreground: $caos-light-theme-foreground,
-  background: $caos-light-theme-background,
+$custom-body-level: mat.define-typography-level(
+  $font-family: Lato,
+  $font-weight: 500,
+  $font-size: 16px,
+  $letter-spacing: normal,
 );
 
-$custom-typography: mat.define-legacy-typography-config(
-  $font-family: 'Lato',
+$custom-caption-level: mat.define-typography-level(
+  $font-family: Lato,
+  $font-weight: 500,
+  $font-size: 12px,
+  $letter-spacing: normal,
 );
 
-@include mat.all-legacy-component-typographies($custom-typography);
-@include mat.legacy-core();
+$custom-typography: mat.define-typography-config(
+  $font-family: Lato,
+  $button: $custom-level,
+  $body-1: $custom-body-level,
+  $caption: $custom-caption-level,
+);
 
-.mat-dialog-container,
-.mat-raised-button,
-.mat-stroked-button {
+$caos-light-app-theme: mat.define-light-theme(
+  (
+    color: (
+      primary: mat-palette($caos-light-primary),
+      accent: mat-palette($caos-light-primary),
+      warn: mat-palette($caos-light-warn),
+    ),
+    typography: $custom-typography,
+    density: 0,
+  )
+);
+
+$caos-dark-app-theme: mat.define-dark-theme(
+  (
+    color: (
+      primary: mat-palette($caos-dark-primary),
+      accent: mat-palette($caos-dark-primary),
+      warn: mat-palette($caos-dark-warn),
+    ),
+    typography: $custom-typography,
+    density: 0,
+  )
+);
+
+$caos-light-app-theme: modify-palette($caos-light-app-theme, background, $cnsl-light-theme-background);
+$caos-dark-app-theme: modify-palette($caos-dark-app-theme, background, $cnsl-dark-theme-background);
+
+$caos-light-app-theme: modify-palette($caos-light-app-theme, foreground, $cnsl-light-theme-foreground);
+$caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dark-theme-foreground);
+
+@include mat.all-component-typographies($custom-typography);
+@include mat.core();
+
+.mat-mdc-dialog-container,
+.mat-mdc-raised-button,
+.mat-mdc-outlined-button {
   border-radius: 6px !important;
 }
 
-.mat-menu-item {
+.mdc-dialog__actions {
+  padding: 0 1.5rem 1.5rem 1.5rem !important;
+}
+
+.mat-mdc-menu-item {
   line-height: 35px !important;
   height: 35px !important;
 }
@@ -385,25 +356,18 @@ $custom-typography: mat.define-legacy-typography-config(
 .cnsl-action-button {
   display: flex;
   align-items: center;
+  margin-left: -0.5rem;
+  height: 100%;
+  padding-left: 0.25rem;
+  height: 36px;
 
-  &.mat-raised-button,
-  &.mat-stroked-button {
-    padding-left: 0.5rem;
-    height: 36px;
+  i:not(.no-margin) {
+    margin-right: 0.25rem;
+    font-size: 1.3rem;
+  }
 
-    .mat-button-wrapper {
-      display: flex;
-      align-items: center;
-    }
-
-    i:not(.no-margin) {
-      margin-right: 0.25rem;
-      font-size: 1.3rem;
-    }
-
-    .mat-icon {
-      margin-right: 0.25rem;
-    }
+  .mat-icon {
+    margin-right: 0.25rem;
   }
 }
 
@@ -411,12 +375,28 @@ $custom-typography: mat.define-legacy-typography-config(
   height: 280px;
 }
 
+.mat-mdc-select-panel {
+  margin-left: -11px;
+}
+
+.mat-mdc-select {
+  padding-top: 7px !important;
+}
+
 @include component-themes($caos-dark-app-theme);
-@include mat.all-legacy-component-themes($caos-dark-app-theme);
+@include mat.all-component-themes($caos-dark-app-theme);
+
+.progress {
+  --mdc-linear-progress-active-indicator-color: var(--success);
+  --mdc-linear-progress-track-height: 8px !important;
+  --mdc-linear-progress-track-color: #00000010;
+  --mat-select-enabled-trigger-text-color: #000;
+  --mdc-linear-progress-active-indicator-height: 8px !important;
+}
 
 .light-theme {
   @include component-themes($caos-light-app-theme);
-  @include mat.all-legacy-component-themes($caos-light-app-theme);
+  @include mat.all-component-colors($caos-light-app-theme);
 
   $background: map-get($caos-light-app-theme, background);
   $foreground: map-get($caos-light-app-theme, foreground);
@@ -425,23 +405,32 @@ $custom-typography: mat.define-legacy-typography-config(
   --success: #10b981;
   $border-color: map-get($foreground, divider);
 
-  .mat-menu-panel {
+  --mat-select-enabled-trigger-text-color: #000;
+  --mat-table-row-item-label-text-size: 14px;
+  --mat-menu-item-label-text-size: 14px;
+
+  .progress {
+    --mdc-linear-progress-track-color: #00000010;
+    --mdc-linear-progress-active-indicator-color: var(--success);
+  }
+
+  .mat-mdc-menu-panel {
     background-color: map-get($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     border-radius: 6px;
     min-height: fit-content;
   }
 
-  .mat-option {
+  .mat-mdc-select-panel {
+    background-color: map-get($background, cards);
+  }
+
+  .mat-mdc-option {
     background-color: map-get($background, cards);
 
     &:hover {
       background-color: map-get($background, cardhovered);
     }
-  }
-
-  .mat-button-toggle-group-appearance-standard {
-    border-color: map-get($foreground, divider);
   }
 
   .mat-button-toggle {
@@ -450,12 +439,12 @@ $custom-typography: mat.define-legacy-typography-config(
     transition: border-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
 
     &.mat-button-toggle-checked {
-      background-color: #00000010;
+      background-color: mat.get-color-from-palette($background, background);
     }
   }
 
   .main-container,
-  .mat-dialog-container,
+  .mat-mdc-dialog-container,
   .mat-calendar {
     background-color: map-get($background, background);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -481,7 +470,7 @@ $custom-typography: mat.define-legacy-typography-config(
   }
 
   .root-header {
-    box-shadow: inset 0 -1px map-get($caos-light-theme-foreground, divider);
+    box-shadow: inset 0 -1px map-get($cnsl-light-theme-foreground, divider);
   }
 }
 
@@ -493,27 +482,37 @@ $custom-typography: mat.define-legacy-typography-config(
   --success: #10b981;
   $border-color: map-get($foreground, divider);
 
+  --mat-select-enabled-trigger-text-color: #fff;
+  --mat-table-row-item-label-text-size: 14px;
+  --mat-menu-item-label-text-size: 14px;
+
+  .progress {
+    --mdc-linear-progress-track-color: #ffffff20;
+    --mdc-linear-progress-active-indicator-color: var(--success);
+  }
+
   .main-container {
+    background-color: mat.get-color-from-palette($background, background);
     color: map-get($foreground, text);
   }
 
-  .mat-menu-panel {
+  .mat-mdc-menu-panel {
     background-color: map-get($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     border-radius: 6px;
     min-height: fit-content;
   }
 
-  .mat-option {
+  .mat-mdc-select-panel {
+    background-color: map-get($background, cards);
+  }
+
+  .mat-mdc-option {
     background-color: map-get($background, cards);
 
     &:hover {
       background-color: map-get($background, cardhovered);
     }
-  }
-
-  .mat-button-toggle-group-appearance-standard {
-    border-color: map-get($foreground, divider);
   }
 
   .mat-button-toggle {
@@ -527,9 +526,9 @@ $custom-typography: mat.define-legacy-typography-config(
   }
 
   .main-container,
-  .mat-dialog-container,
+  .mat-mdc-dialog-container,
   .mat-calendar {
-    background-color: map-get($background, background);
+    background-color: mat.get-color-from-palette($background, background);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
 
@@ -556,7 +555,7 @@ $custom-typography: mat.define-legacy-typography-config(
   }
 
   .root-header {
-    box-shadow: inset 0 -1px map-get($caos-dark-theme-foreground, divider);
+    box-shadow: inset 0 -1px map-get($cnsl-dark-theme-foreground, divider);
   }
 }
 
@@ -569,8 +568,26 @@ body {
 
 body {
   margin: 0;
-  font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
-    'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family:
+    'Lato',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  -moz-osx-font-smoothing: inherit;
+  -webkit-font-smoothing: auto;
+
+  * {
+    -moz-osx-font-smoothing: inherit !important;
+    -webkit-font-smoothing: auto !important;
+  }
 }
 
 h1 {
@@ -587,7 +604,7 @@ h2 {
   opacity: 0;
 }
 
-.mat-paginator .mat-select {
+.mat-mdc-paginator .mat-mdc-select {
   border: none;
 }
 
@@ -608,18 +625,10 @@ i {
   font-size: 1.5rem;
 }
 
-.mat-checkbox-inner-container.mat-checkbox-inner-container-no-side-margin {
-  margin-right: 0.5rem !important;
-}
-
 .mat-button-toggle-button {
   display: flex;
   height: 36px;
   line-height: 36px !important;
   align-items: center;
   font-size: 14px !important;
-}
-
-.mat-button-toggle-label-content {
-  line-height: 36px;
 }

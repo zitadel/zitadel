@@ -9,9 +9,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/zitadel/oidc/v2/pkg/client/rp"
-	"github.com/zitadel/oidc/v2/pkg/client/rs"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
+	"github.com/zitadel/oidc/v3/pkg/client/rs"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 
 	"github.com/zitadel/zitadel/pkg/grpc/authn"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
@@ -21,7 +21,7 @@ import (
 func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
 	clientID := createClient(t)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -41,9 +41,9 @@ func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
 
 	// test actual userinfo
-	provider, err := Tester.CreateRelyingParty(clientID, redirectURI)
+	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
-	userinfo, err := rp.Userinfo(tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
+	userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
 	require.NoError(t, err)
 	assertUserinfo(t, userinfo)
 }
@@ -62,12 +62,12 @@ func TestOPStorage_SetIntrospectionFromToken(t *testing.T) {
 		ExpirationDate: nil,
 	})
 	require.NoError(t, err)
-	resourceServer, err := Tester.CreateResourceServer(keyResp.GetKeyDetails())
+	resourceServer, err := Tester.CreateResourceServer(CTX, keyResp.GetKeyDetails())
 	require.NoError(t, err)
 
 	scope := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess}
 	authRequestID := createAuthRequest(t, app.GetClientId(), redirectURI, scope...)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerfiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -87,7 +87,7 @@ func TestOPStorage_SetIntrospectionFromToken(t *testing.T) {
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
 
 	// test actual introspection
-	introspection, err := rs.Introspect(context.Background(), resourceServer, tokens.AccessToken)
+	introspection, err := rs.Introspect[*oidc.IntrospectionResponse](context.Background(), resourceServer, tokens.AccessToken)
 	require.NoError(t, err)
 	assertIntrospection(t, introspection,
 		Tester.OIDCIssuer(), app.GetClientId(),

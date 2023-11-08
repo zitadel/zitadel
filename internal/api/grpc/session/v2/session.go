@@ -2,10 +2,16 @@ package session
 
 import (
 	"context"
+	"net"
+	"net/http"
+	"time"
 
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/muhlemmer/gu"
+
+	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
@@ -41,7 +47,7 @@ func (s *Server) ListSessions(ctx context.Context, req *session.ListSessionsRequ
 }
 
 func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRequest) (*session.CreateSessionResponse, error) {
-	checks, metadata, err := s.createSessionRequestToCommand(ctx, req)
+	checks, metadata, userAgent, lifetime, err := s.createSessionRequestToCommand(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -50,10 +56,11 @@ func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRe
 		return nil, err
 	}
 
-	set, err := s.command.CreateSession(ctx, cmds, metadata)
+	set, err := s.command.CreateSession(ctx, cmds, metadata, userAgent, lifetime)
 	if err != nil {
 		return nil, err
 	}
+
 	return &session.CreateSessionResponse{
 		Details:      object.DomainToDetailsPb(set.ObjectDetails),
 		SessionId:    set.ID,
@@ -72,7 +79,7 @@ func (s *Server) SetSession(ctx context.Context, req *session.SetSessionRequest)
 		return nil, err
 	}
 
-	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), req.GetSessionToken(), cmds, req.GetMetadata())
+	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), req.GetSessionToken(), cmds, req.GetMetadata(), req.GetLifetime().AsDuration())
 	if err != nil {
 		return nil, err
 	}
@@ -107,13 +114,46 @@ func sessionsToPb(sessions []*query.Session) []*session.Session {
 
 func sessionToPb(s *query.Session) *session.Session {
 	return &session.Session{
-		Id:           s.ID,
-		CreationDate: timestamppb.New(s.CreationDate),
-		ChangeDate:   timestamppb.New(s.ChangeDate),
-		Sequence:     s.Sequence,
-		Factors:      factorsToPb(s),
-		Metadata:     s.Metadata,
+		Id:             s.ID,
+		CreationDate:   timestamppb.New(s.CreationDate),
+		ChangeDate:     timestamppb.New(s.ChangeDate),
+		Sequence:       s.Sequence,
+		Factors:        factorsToPb(s),
+		Metadata:       s.Metadata,
+		UserAgent:      userAgentToPb(s.UserAgent),
+		ExpirationDate: expirationToPb(s.Expiration),
 	}
+}
+
+func userAgentToPb(ua domain.UserAgent) *session.UserAgent {
+	if ua.IsEmpty() {
+		return nil
+	}
+
+	out := &session.UserAgent{
+		FingerprintId: ua.FingerprintID,
+		Description:   ua.Description,
+	}
+	if ua.IP != nil {
+		out.Ip = gu.Ptr(ua.IP.String())
+	}
+	if ua.Header == nil {
+		return out
+	}
+	out.Header = make(map[string]*session.UserAgent_HeaderValues, len(ua.Header))
+	for k, v := range ua.Header {
+		out.Header[k] = &session.UserAgent_HeaderValues{
+			Values: v,
+		}
+	}
+	return out
+}
+
+func expirationToPb(expiration time.Time) *timestamppb.Timestamp {
+	if expiration.IsZero() {
+		return nil
+	}
+	return timestamppb.New(expiration)
 }
 
 func factorsToPb(s *query.Session) *session.Factors {
@@ -188,6 +228,7 @@ func userFactorToPb(factor query.SessionUserFactor) *session.UserFactor {
 		LoginName:      factor.LoginName,
 		DisplayName:    factor.DisplayName,
 		OrganisationId: factor.ResourceOwner,
+		OrganizationId: factor.ResourceOwner,
 	}
 }
 
@@ -236,12 +277,30 @@ func idsQueryToQuery(q *session.IDsQuery) (query.SearchQuery, error) {
 	return query.NewSessionIDsSearchQuery(q.Ids)
 }
 
-func (s *Server) createSessionRequestToCommand(ctx context.Context, req *session.CreateSessionRequest) ([]command.SessionCommand, map[string][]byte, error) {
+func (s *Server) createSessionRequestToCommand(ctx context.Context, req *session.CreateSessionRequest) ([]command.SessionCommand, map[string][]byte, *domain.UserAgent, time.Duration, error) {
 	checks, err := s.checksToCommand(ctx, req.Checks)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, 0, err
 	}
-	return checks, req.GetMetadata(), nil
+	return checks, req.GetMetadata(), userAgentToCommand(req.GetUserAgent()), req.GetLifetime().AsDuration(), nil
+}
+
+func userAgentToCommand(userAgent *session.UserAgent) *domain.UserAgent {
+	if userAgent == nil {
+		return nil
+	}
+	out := &domain.UserAgent{
+		FingerprintID: userAgent.FingerprintId,
+		IP:            net.ParseIP(userAgent.GetIp()),
+		Description:   userAgent.Description,
+	}
+	if len(userAgent.Header) > 0 {
+		out.Header = make(http.Header, len(userAgent.Header))
+		for k, values := range userAgent.Header {
+			out.Header[k] = values.GetValues()
+		}
+	}
+	return out
 }
 
 func (s *Server) setSessionRequestToCommand(ctx context.Context, req *session.SetSessionRequest) ([]command.SessionCommand, error) {
@@ -263,6 +322,9 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 		if err != nil {
 			return nil, err
 		}
+
+		// trigger activity log for session for user
+		activity.Trigger(ctx, user.ResourceOwner, user.ID, activity.SessionAPI)
 		sessionChecks = append(sessionChecks, command.CheckUser(user.ID))
 	}
 	if password := checks.GetPassword(); password != nil {

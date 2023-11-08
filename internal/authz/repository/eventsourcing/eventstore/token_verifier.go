@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
-	"github.com/zitadel/oidc/v2/pkg/op"
-	"gopkg.in/square/go-jose.v2"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
@@ -19,8 +19,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
@@ -30,7 +29,7 @@ import (
 
 type TokenVerifierRepo struct {
 	TokenVerificationKey crypto.EncryptionAlgorithm
-	Eventstore           v1.Eventstore
+	Eventstore           *eventstore.Eventstore
 	View                 *view.View
 	Query                *query.Queries
 	ExternalSecure       bool
@@ -45,21 +44,24 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 	defer func() { span.EndWithError(err) }()
 
 	instanceID := authz.GetInstance(ctx).InstanceID()
+
+	// always load the latest sequence first, so in case the token was not found by id,
+	// the sequence will be equal or lower than the actual projection and no events are lost
+	sequence, err := repo.View.GetLatestState(ctx)
+	logging.WithFields("instanceID", instanceID, "userID", userID, "tokenID", tokenID).
+		OnError(err).
+		Errorf("could not get current sequence for token check")
+
 	token, viewErr := repo.View.TokenByIDs(tokenID, userID, instanceID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
 	if caos_errs.IsNotFound(viewErr) {
-		sequence, err := repo.View.GetLatestTokenSequence(ctx, instanceID)
-		logging.WithFields("instanceID", instanceID, "userID", userID, "tokenID", tokenID).
-			OnError(err).
-			Errorf("could not get current sequence for token check")
-
 		token = new(model.TokenView)
 		token.ID = tokenID
 		token.UserID = userID
 		if sequence != nil {
-			token.Sequence = sequence.CurrentSequence
+			token.Sequence = sequence.Sequence
 		}
 	}
 
@@ -150,6 +152,9 @@ func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID
 	session, err := repo.Query.SessionByID(ctx, true, sessionID, token)
 	if err != nil {
 		return "", "", "", err
+	}
+	if !session.Expiration.IsZero() && session.Expiration.Before(time.Now()) {
+		return "", "", "", caos_errs.ThrowPermissionDenied(nil, "AUTHZ-EGDo3", "session expired")
 	}
 	if err = repo.checkAuthentication(ctx, authMethodsFromSession(session), session.UserFactor.UserID); err != nil {
 		return "", "", "", err
@@ -242,14 +247,14 @@ func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName str
 	return clientID, app.ProjectID, nil
 }
 
-func (repo *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64, eventTypes []models.EventType) (_ []*models.Event, err error) {
+func (repo *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64, eventTypes []eventstore.EventType) (_ []eventstore.Event, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence, eventTypes)
 	if err != nil {
 		return nil, err
 	}
-	return repo.Eventstore.FilterEvents(ctx, query)
+	return repo.Eventstore.Filter(ctx, query)
 }
 
 // getTokenIDAndSubject returns the TokenID and Subject of both opaque tokens and JWTs
@@ -272,7 +277,7 @@ func (repo *TokenVerifierRepo) getTokenIDAndSubject(ctx context.Context, accessT
 	return splitToken[0], splitToken[1], true
 }
 
-func (repo *TokenVerifierRepo) jwtTokenVerifier(ctx context.Context) op.AccessTokenVerifier {
+func (repo *TokenVerifierRepo) jwtTokenVerifier(ctx context.Context) *op.AccessTokenVerifier {
 	keySet := &openIDKeySet{repo.Query}
 	issuer := http_util.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), repo.ExternalSecure)
 	return op.NewAccessTokenVerifier(issuer, keySet)

@@ -1,9 +1,9 @@
 ---
-title: SaaS Product with Authentication and Authorization
+title: Set up a SaaS Product with Authentication and Authorization using ZITADEL
 sidebar_label: Software-as-a-Service
 ---
 
-This is an example architecture for a typical SaaS product. 
+This is an example architecture for a typical SaaS product.
 To illustrate it, a fictional organization and project is used.
 
 ## Example Case
@@ -17,10 +17,10 @@ This means that the users and also their authorizations will be managed within Z
 
 ## Organization
 
-An organization is the ZITADEL resource which contains users, projects, applications, policies and so on. 
+An organization is the ZITADEL resource which contains users, projects, applications, policies and so on.
 In an organization projects and users are managed by the organization.
 You need at least one organization for your own company in our case "The Timing Company".
-As next step grate an organization for each of your costumers.
+Your next step is to create an organization for each of your customers.
 
 ## Project
 
@@ -39,7 +39,7 @@ You can configure `check roles on authentication` on the project, if you want to
 
 To give a customer permissions to a project, a project grant to the customers organization is needed (search the granted organization by its domain).
 It is also possible to delegate only specific roles of the project to a certain customer.
-As soon as a project grant exists, the customer will see the project in the granted projects section of his organization and will be able to authorize his own users to the given project.
+As soon as a project grant exists, the customer will see the project in the granted projects section of their organization and will be able to authorize their own users to the given project.
 
 ## Authorizations
 

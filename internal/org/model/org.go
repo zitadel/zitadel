@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 )
@@ -36,15 +37,16 @@ func (o *Org) GetDomain(domain *OrgDomain) (int, *OrgDomain) {
 	return -1, nil
 }
 
-func (o *Org) GetPrimaryDomain() *OrgDomain {
+func (o *Org) GetPrimaryDomain() (string, error) {
 	for _, d := range o.Domains {
 		if d.Primary {
-			return d
+			return d.Domain, nil
 		}
 	}
-	return nil
+	return "", errors.ThrowInternalf(nil, "ORG-Dertg", "no primary domain found for org: %s (instanceID: %s)", o.AggregateID, o.InstanceID)
 }
 
 func (o *Org) AddIAMDomain(iamDomain string) {
-	o.Domains = append(o.Domains, &OrgDomain{Domain: domain.NewIAMDomainName(o.Name, iamDomain), Verified: true, Primary: true})
+	orgDomain, _ := domain.NewIAMDomainName(o.Name, iamDomain)
+	o.Domains = append(o.Domains, &OrgDomain{Domain: orgDomain, Verified: true, Primary: true})
 }

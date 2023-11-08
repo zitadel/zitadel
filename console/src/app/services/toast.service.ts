@@ -1,9 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  MatLegacySnackBar as MatSnackBar,
-  MatLegacySnackBarHorizontalPosition as MatSnackBarHorizontalPosition,
-  MatLegacySnackBarVerticalPosition as MatSnackBarVerticalPosition,
-} from '@angular/material/legacy-snack-bar';
+import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
@@ -15,7 +11,10 @@ export class ToastService {
   horizontalPosition: MatSnackBarHorizontalPosition = 'end';
   verticalPosition: MatSnackBarVerticalPosition = 'top';
 
-  constructor(private snackBar: MatSnackBar, private translate: TranslateService) {}
+  constructor(
+    private snackBar: MatSnackBar,
+    private translate: TranslateService,
+  ) {}
 
   public showInfo(message: string, i18nkey: boolean = false): void {
     if (i18nkey) {
@@ -65,7 +64,7 @@ export class ToastService {
       data: {
         message,
       },
-      duration: success ? 4000 : 5000,
+      duration: success ? 4000 : 50000,
       panelClass: ['data-e2e-message', success ? 'data-e2e-success' : 'data-e2e-failure'],
       horizontalPosition: this.horizontalPosition,
       verticalPosition: this.verticalPosition,

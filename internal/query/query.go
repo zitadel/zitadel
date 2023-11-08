@@ -12,6 +12,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
@@ -23,9 +24,11 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/repository/limits"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
@@ -48,6 +51,7 @@ type Queries struct {
 	supportedLangs                      []language.Tag
 	zitadelRoles                        []authz.RoleMapping
 	multifactors                        domain.MultifactorConfigs
+	defaultAuditLogRetention            time.Duration
 }
 
 func StartQueries(
@@ -60,6 +64,8 @@ func StartQueries(
 	zitadelRoles []authz.RoleMapping,
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
 	permissionCheck func(q *Queries) domain.PermissionCheck,
+	defaultAuditLogRetention time.Duration,
+	systemAPIUsers map[string]*internal_authz.SystemAPIUser,
 ) (repo *Queries, err error) {
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	if err != nil {
@@ -81,6 +87,7 @@ func StartQueries(
 		NotificationTranslationFileContents: make(map[string][]byte),
 		zitadelRoles:                        zitadelRoles,
 		sessionTokenVerifier:                sessionTokenVerifier,
+		defaultAuditLogRetention:            defaultAuditLogRetention,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)
@@ -93,6 +100,8 @@ func StartQueries(
 	idpintent.RegisterEventMappers(repo.eventstore)
 	authrequest.RegisterEventMappers(repo.eventstore)
 	oidcsession.RegisterEventMappers(repo.eventstore)
+	quota.RegisterEventMappers(repo.eventstore)
+	limits.RegisterEventMappers(repo.eventstore)
 
 	repo.idpConfigEncryption = idpConfigEncryption
 	repo.multifactors = domain.MultifactorConfigs{
@@ -104,11 +113,11 @@ func StartQueries(
 
 	repo.checkPermission = permissionCheck(repo)
 
-	err = projection.Create(ctx, sqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm)
+	err = projection.Create(ctx, sqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm, systemAPIUsers)
 	if err != nil {
 		return nil, err
 	}
-	projection.Start()
+	projection.Start(ctx)
 
 	return repo, nil
 }

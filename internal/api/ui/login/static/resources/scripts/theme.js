@@ -1,10 +1,16 @@
-const usesDarkTheme = hasDarkModeOverwriteCookie() || (!hasLightModeOverwriteCookie() && window.matchMedia('(prefers-color-scheme: dark)').matches);
-if (usesDarkTheme) {
-    document.documentElement.classList.replace('lgn-light-theme', 'lgn-dark-theme');
-    writeModeCookie('dark');
-} else {
-    document.documentElement.classList.replace('lgn-dark-theme', 'lgn-light-theme');
-    writeModeCookie('light');
+if (isAutoMode()) {
+    const usesDarkTheme = hasDarkModeOverwriteCookie() || (!hasLightModeOverwriteCookie() && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    if (usesDarkTheme) {
+        document.documentElement.classList.replace('lgn-light-theme', 'lgn-dark-theme');
+        writeModeCookie('dark');
+    } else {
+        document.documentElement.classList.replace('lgn-dark-theme', 'lgn-light-theme');
+        writeModeCookie('light');
+    }
+}
+
+function isAutoMode() {
+    return document.documentElement.dataset["themeMode"] === "0"
 }
 
 function hasDarkModeOverwriteCookie() {

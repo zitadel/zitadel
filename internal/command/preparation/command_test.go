@@ -167,10 +167,10 @@ type testCommand struct {
 	eventstore.BaseEvent
 }
 
-func (c *testCommand) Data() interface{} {
+func (c *testCommand) Payload() interface{} {
 	return nil
 }
 
-func (c *testCommand) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (c *testCommand) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }

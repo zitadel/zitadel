@@ -3,167 +3,91 @@ package access
 import (
 	"context"
 	"database/sql"
-	"fmt"
-	"net/http"
-	"strings"
+	"errors"
 	"time"
 
-	"github.com/Masterminds/squirrel"
-	"github.com/zitadel/logging"
-	"google.golang.org/grpc/codes"
-
-	"github.com/zitadel/zitadel/internal/api/call"
-	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/database"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/logstore/record"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-const (
-	accessLogsTable          = "logstore.access"
-	accessTimestampCol       = "log_date"
-	accessProtocolCol        = "protocol"
-	accessRequestURLCol      = "request_url"
-	accessResponseStatusCol  = "response_status"
-	accessRequestHeadersCol  = "request_headers"
-	accessResponseHeadersCol = "response_headers"
-	accessInstanceIdCol      = "instance_id"
-	accessProjectIdCol       = "project_id"
-	accessRequestedDomainCol = "requested_domain"
-	accessRequestedHostCol   = "requested_host"
-)
-
-var _ logstore.UsageQuerier = (*databaseLogStorage)(nil)
-var _ logstore.LogCleanupper = (*databaseLogStorage)(nil)
+var _ logstore.UsageStorer[*record.AccessLog] = (*databaseLogStorage)(nil)
 
 type databaseLogStorage struct {
 	dbClient *database.DB
+	commands *command.Commands
+	queries  *query.Queries
 }
 
-func NewDatabaseLogStorage(dbClient *database.DB) *databaseLogStorage {
-	return &databaseLogStorage{dbClient: dbClient}
+func NewDatabaseLogStorage(dbClient *database.DB, commands *command.Commands, queries *query.Queries) *databaseLogStorage {
+	return &databaseLogStorage{dbClient: dbClient, commands: commands, queries: queries}
 }
 
 func (l *databaseLogStorage) QuotaUnit() quota.Unit {
 	return quota.RequestsAllAuthenticated
 }
 
-func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord) error {
+func (l *databaseLogStorage) Emit(ctx context.Context, bulk []*record.AccessLog) error {
 	if len(bulk) == 0 {
 		return nil
 	}
-	builder := squirrel.Insert(accessLogsTable).
-		Columns(
-			accessTimestampCol,
-			accessProtocolCol,
-			accessRequestURLCol,
-			accessResponseStatusCol,
-			accessRequestHeadersCol,
-			accessResponseHeadersCol,
-			accessInstanceIdCol,
-			accessProjectIdCol,
-			accessRequestedDomainCol,
-			accessRequestedHostCol,
-		).
-		PlaceholderFormat(squirrel.Dollar)
-
-	for idx := range bulk {
-		item := bulk[idx].(*Record)
-		builder = builder.Values(
-			item.LogDate,
-			item.Protocol,
-			item.RequestURL,
-			item.ResponseStatus,
-			item.RequestHeaders,
-			item.ResponseHeaders,
-			item.InstanceID,
-			item.ProjectID,
-			item.RequestedDomain,
-			item.RequestedHost,
-		)
-	}
-
-	stmt, args, err := builder.ToSql()
-	if err != nil {
-		return caos_errors.ThrowInternal(err, "ACCESS-KOS7I", "Errors.Internal")
-	}
-
-	result, err := l.dbClient.ExecContext(ctx, stmt, args...)
-	if err != nil {
-		return caos_errors.ThrowInternal(err, "ACCESS-alnT9", "Errors.Access.StorageFailed")
-	}
-
-	rows, err := result.RowsAffected()
-	if err != nil {
-		return caos_errors.ThrowInternal(err, "ACCESS-7KIpL", "Errors.Internal")
-	}
-
-	logging.WithFields("rows", rows).Debug("successfully stored access logs")
-	return nil
+	return l.incrementUsage(ctx, bulk)
 }
 
-func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, start time.Time) (uint64, error) {
-	stmt, args, err := squirrel.Select(
-		fmt.Sprintf("count(%s)", accessInstanceIdCol),
-	).
-		From(accessLogsTable + l.dbClient.Timetravel(call.Took(ctx))).
-		Where(squirrel.And{
-			squirrel.Eq{accessInstanceIdCol: instanceId},
-			squirrel.GtOrEq{accessTimestampCol: start},
-			squirrel.Expr(fmt.Sprintf(`%s #>> '{%s,0}' = '[REDACTED]'`, accessRequestHeadersCol, strings.ToLower(zitadel_http.Authorization))),
-			squirrel.NotLike{accessRequestURLCol: "%/zitadel.system.v1.SystemService/%"},
-			squirrel.NotLike{accessRequestURLCol: "%/system/v1/%"},
-			squirrel.Or{
-				squirrel.And{
-					squirrel.Eq{accessProtocolCol: HTTP},
-					squirrel.NotEq{accessResponseStatusCol: http.StatusForbidden},
-					squirrel.NotEq{accessResponseStatusCol: http.StatusInternalServerError},
-					squirrel.NotEq{accessResponseStatusCol: http.StatusTooManyRequests},
-				},
-				squirrel.And{
-					squirrel.Eq{accessProtocolCol: GRPC},
-					squirrel.NotEq{accessResponseStatusCol: codes.PermissionDenied},
-					squirrel.NotEq{accessResponseStatusCol: codes.Internal},
-					squirrel.NotEq{accessResponseStatusCol: codes.ResourceExhausted},
-				},
-			},
-		}).
-		PlaceholderFormat(squirrel.Dollar).
-		ToSql()
+func (l *databaseLogStorage) incrementUsage(ctx context.Context, bulk []*record.AccessLog) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 
-	if err != nil {
-		return 0, caos_errors.ThrowInternal(err, "ACCESS-V9Sde", "Errors.Internal")
+	byInstance := make(map[string][]*record.AccessLog)
+	for _, r := range bulk {
+		if r.InstanceID != "" {
+			byInstance[r.InstanceID] = append(byInstance[r.InstanceID], r)
+		}
 	}
+	for instanceID, instanceBulk := range byInstance {
+		q, getQuotaErr := l.queries.GetQuota(ctx, instanceID, quota.RequestsAllAuthenticated)
+		if errors.Is(getQuotaErr, sql.ErrNoRows) {
+			continue
+		}
+		err = errors.Join(err, getQuotaErr)
+		if getQuotaErr != nil {
+			continue
+		}
+		sum, incrementErr := l.incrementUsageFromAccessLogs(ctx, instanceID, q.CurrentPeriodStart, instanceBulk)
+		err = errors.Join(err, incrementErr)
+		if incrementErr != nil {
+			continue
+		}
+		notifications, getNotificationErr := l.queries.GetDueQuotaNotifications(ctx, instanceID, quota.RequestsAllAuthenticated, q, q.CurrentPeriodStart, sum)
+		err = errors.Join(err, getNotificationErr)
+		if getNotificationErr != nil || len(notifications) == 0 {
+			continue
+		}
+		ctx = authz.WithInstanceID(ctx, instanceID)
+		reportErr := l.commands.ReportQuotaUsage(ctx, notifications)
+		err = errors.Join(err, reportErr)
+		if reportErr != nil {
+			continue
+		}
+	}
+	return err
+}
+
+func (l *databaseLogStorage) incrementUsageFromAccessLogs(ctx context.Context, instanceID string, periodStart time.Time, records []*record.AccessLog) (sum uint64, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 
 	var count uint64
-	err = l.dbClient.
-		QueryRowContext(ctx,
-			func(row *sql.Row) error {
-				return row.Scan(&count)
-			},
-			stmt, args...,
-		)
-
-	if err != nil {
-		return 0, caos_errors.ThrowInternal(err, "ACCESS-pBPrM", "Errors.Logstore.Access.ScanFailed")
+	for _, r := range records {
+		if r.IsAuthenticated() {
+			count++
+		}
 	}
-
-	return count, nil
-}
-
-func (l *databaseLogStorage) Cleanup(ctx context.Context, keep time.Duration) error {
-	stmt, args, err := squirrel.Delete(accessLogsTable).
-		Where(squirrel.LtOrEq{accessTimestampCol: time.Now().Add(-keep)}).
-		PlaceholderFormat(squirrel.Dollar).
-		ToSql()
-
-	if err != nil {
-		return caos_errors.ThrowInternal(err, "ACCESS-2oTh6", "Errors.Internal")
-	}
-
-	execCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
-	_, err = l.dbClient.ExecContext(execCtx, stmt, args...)
-	return err
+	return projection.QuotaProjection.IncrementUsage(ctx, quota.RequestsAllAuthenticated, instanceID, periodStart, count)
 }

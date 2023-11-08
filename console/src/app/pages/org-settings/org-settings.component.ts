@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { take } from 'rxjs';
+import { Observable, of, take } from 'rxjs';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import {
   BRANDING,
   COMPLEXITY,
@@ -14,8 +15,9 @@ import {
   LOGIN,
   LOGINTEXTS,
   MESSAGETEXTS,
-  NOTIFICATION_POLICY,
+  NOTIFICATIONS,
   PRIVACYPOLICY,
+  VERIFIED_DOMAINS,
 } from '../../modules/settings-list/settings';
 
 @Component({
@@ -23,15 +25,17 @@ import {
   templateUrl: './org-settings.component.html',
   styleUrls: ['./org-settings.component.scss'],
 })
-export class OrgSettingsComponent {
+export class OrgSettingsComponent implements OnInit {
   public id: string = '';
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
-  public settingsList: SidenavSetting[] = [
+
+  private defaultSettingsList: SidenavSetting[] = [
     LOGIN,
     IDP,
     COMPLEXITY,
     LOCKOUT,
-    NOTIFICATION_POLICY,
+    NOTIFICATIONS,
+    VERIFIED_DOMAINS,
     DOMAIN,
     BRANDING,
     MESSAGETEXTS,
@@ -39,7 +43,13 @@ export class OrgSettingsComponent {
     PRIVACYPOLICY,
   ];
 
-  constructor(breadcrumbService: BreadcrumbService, activatedRoute: ActivatedRoute) {
+  public settingsList: Observable<Array<SidenavSetting>> = of([]);
+
+  constructor(
+    breadcrumbService: BreadcrumbService,
+    activatedRoute: ActivatedRoute,
+    public authService: GrpcAuthService,
+  ) {
     const breadcrumbs = [
       new Breadcrumb({
         type: BreadcrumbType.ORG,
@@ -54,5 +64,11 @@ export class OrgSettingsComponent {
         this.id = id;
       }
     });
+  }
+
+  ngOnInit(): void {
+    this.settingsList = this.authService
+      .isAllowedMapper(this.defaultSettingsList, (setting) => setting.requiredRoles.mgmt || [])
+      .pipe(take(1));
   }
 }

@@ -8,12 +8,14 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -88,7 +90,7 @@ type Instance struct {
 
 type csp struct {
 	enabled        bool
-	allowedOrigins database.StringArray
+	allowedOrigins database.TextArray[string]
 }
 
 type Instances struct {
@@ -148,6 +150,15 @@ func NewInstanceIDsListSearchQuery(ids ...string) (SearchQuery, error) {
 	return NewListQuery(InstanceColumnID, list, ListIn)
 }
 
+func NewInstanceDomainsListSearchQuery(domains ...string) (SearchQuery, error) {
+	list := make([]interface{}, len(domains))
+	for i, value := range domains {
+		list[i] = value
+	}
+
+	return NewListQuery(InstanceDomainDomainCol, list, ListIn)
+}
+
 func (q *InstanceSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
@@ -181,7 +192,10 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (instanc
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.InstanceProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerInstanceProjection")
+		ctx, err = projection.InstanceProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	stmt, scan := prepareInstanceDomainQuery(ctx, q.client, authz.GetInstance(ctx).RequestedDomain())
@@ -277,7 +291,8 @@ func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 	return sq.Select(
 			InstanceColumnID.identifier(),
 			countColumn.identifier(),
-		).From(instanceTable.identifier()),
+		).Distinct().From(instanceTable.identifier()).
+			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)),
 		func(builder sq.SelectBuilder) sq.SelectBuilder {
 			return sq.Select(
 				instanceFilterCountColumn,
@@ -535,7 +550,7 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 				instance.csp.enabled = securityPolicyEnabled.Bool
 			}
 			if instance.ID == "" {
-				return nil, errors.ThrowNotFound(nil, "QUERY-n0wng", "Errors.IAM.NotFound")
+				return nil, errors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.IAM.NotFound")
 			}
 			instance.DefaultLang = language.Make(lang)
 			if err := rows.Close(); err != nil {

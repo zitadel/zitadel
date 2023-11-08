@@ -1,5 +1,3 @@
-@use '@angular/material' as mat;
-
 @mixin login-policy-mfas-theme($theme) {
   $foreground: map-get($theme, foreground);
 

@@ -15,7 +15,9 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
+	"github.com/zitadel/zitadel/internal/repository/feature"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/limits"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/quota"
@@ -95,6 +97,7 @@ type InstanceSetup struct {
 		HideLoginNameSuffix bool
 		ErrorMsgPopup       bool
 		DisableWatermark    bool
+		ThemeMode           domain.LabelPolicyThemeMode
 	}
 	LockoutPolicy struct {
 		MaxAttempts              uint64
@@ -110,7 +113,11 @@ type InstanceSetup struct {
 		RefreshTokenExpiration     time.Duration
 	}
 	Quotas *struct {
-		Items []*AddQuota
+		Items []*SetQuota
+	}
+	Features map[domain.Feature]any
+	Limits   *struct {
+		AuditLogRetention *time.Duration
 	}
 }
 
@@ -133,6 +140,7 @@ type ZitadelConfig struct {
 	adminAppID   string
 	authAppID    string
 	consoleAppID string
+	limitsID     string
 }
 
 func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
@@ -160,16 +168,13 @@ func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
 	if err != nil {
 		return err
 	}
-	return nil
+	s.zitadel.limitsID, err = idGenerator.Next()
+	return err
 }
 
 func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, string, *MachineKey, *domain.ObjectDetails, error) {
 	instanceID, err := c.idGenerator.Next()
 	if err != nil {
-		return "", "", nil, nil, err
-	}
-
-	if err = c.eventstore.NewInstance(ctx, instanceID); err != nil {
 		return "", "", nil, nil, err
 	}
 
@@ -194,6 +199,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	orgAgg := org.NewAggregate(orgID)
 	userAgg := user.NewAggregate(userID, orgID)
 	projectAgg := project.NewAggregate(setup.zitadel.projectID, orgID)
+	limitsAgg := limits.NewAggregate(setup.zitadel.limitsID, instanceID, instanceID)
 
 	validations := []preparation.Validation{
 		prepareAddInstance(instanceAgg, setup.InstanceName, setup.DefaultLanguage),
@@ -271,6 +277,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LabelPolicy.HideLoginNameSuffix,
 			setup.LabelPolicy.ErrorMsgPopup,
 			setup.LabelPolicy.DisableWatermark,
+			setup.LabelPolicy.ThemeMode,
 		),
 		prepareActivateDefaultLabelPolicy(instanceAgg),
 
@@ -283,10 +290,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			if err != nil {
 				return "", "", nil, nil, err
 			}
-
-			quotaAggregate := quota.NewAggregate(quotaId, instanceID, instanceID)
-
-			validations = append(validations, c.AddQuotaCommand(quotaAggregate, q))
+			validations = append(validations, c.SetQuotaCommand(quota.NewAggregate(quotaId, instanceID), nil, true, q))
 		}
 	}
 
@@ -435,6 +439,25 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		)
 	}
 
+	for f, value := range setup.Features {
+		switch v := value.(type) {
+		case bool:
+			wm, err := NewInstanceFeatureWriteModel[feature.Boolean](instanceID, f)
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+			validations = append(validations, prepareSetFeature(wm, feature.Boolean{Boolean: v}, c.idGenerator))
+		default:
+			return "", "", nil, nil, errors.ThrowInvalidArgument(nil, "INST-GE4tg", "Errors.Feature.TypeNotSupported")
+		}
+	}
+
+	if setup.Limits != nil {
+		validations = append(validations, c.SetLimitsCommand(limitsAgg, &limitsWriteModel{}, &SetLimits{
+			AuditLogRetention: setup.Limits.AuditLogRetention,
+		}))
+	}
+
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {
 		return "", "", nil, nil, err
@@ -452,7 +475,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 	return instanceID, token, machineKey, &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: orgID,
 	}, nil
 }
@@ -683,7 +706,7 @@ func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.Objec
 
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
 	}, nil
 }

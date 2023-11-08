@@ -3,11 +3,11 @@
   $warn: map-get($theme, warn);
   $background: map-get($theme, background);
   $accent: map-get($theme, accent);
-  $primary-color: mat.get-color-from-palette($primary, 500);
-  $card-background-color: mat.get-color-from-palette($background, cards);
+  $primary-color: map-get($primary, 500);
+  $card-background-color: map-get($background, cards);
 
-  $warn-color: mat.get-color-from-palette($warn, 500);
-  $accent-color: mat.get-color-from-palette($accent, 500);
+  $warn-color: map-get($warn, 500);
+  $accent-color: map-get($accent, 500);
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
   $back: map-get($background, background);
@@ -54,10 +54,6 @@
     button {
       border-radius: 50vh;
       margin: 0.5rem;
-
-      .mat-button-wrapper {
-        font-size: 0.8rem;
-      }
     }
 
     .l-accounts {

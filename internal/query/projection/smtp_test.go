@@ -5,8 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -23,10 +22,11 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 		{
 			name: "reduceSMTPConfigChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SMTPConfigChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.SMTPConfigChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"tls": true,
 						"senderAddress": "sender",
 						"senderName": "name",
@@ -34,14 +34,13 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						"host": "host",
 						"user": "user"
 					}`,
-					),
-				), instance.SMTPConfigChangedEventMapper),
+						),
+					), instance.SMTPConfigChangedEventMapper),
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -66,10 +65,11 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 		{
 			name: "reduceSMTPConfigAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SMTPConfigAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.SMTPConfigAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"tls": true,
 						"senderAddress": "sender",
 						"senderName": "name",
@@ -82,13 +82,12 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 							"keyId": "key-id"
 						}
 					}`),
-				), instance.SMTPConfigAddedEventMapper),
+					), instance.SMTPConfigAddedEventMapper),
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -116,23 +115,23 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 		{
 			name: "reduceSMTPConfigPasswordChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SMTPConfigPasswordChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.SMTPConfigPasswordChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"password": {
 							"cryptoType": 0,
 							"algorithm": "RSA-265",
 							"keyId": "key-id"
 						}
 					}`),
-				), instance.SMTPConfigPasswordChangedEventMapper),
+					), instance.SMTPConfigPasswordChangedEventMapper),
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigPasswordChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -153,16 +152,15 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 			name: "reduceSMTPConfigRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.SMTPConfigRemovedEventType),
+					instance.SMTPConfigRemovedEventType,
 					instance.AggregateType,
 					[]byte(`{}`),
 				), instance.SMTPConfigRemovedEventMapper),
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -179,17 +177,17 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(SMTPConfigColumnInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

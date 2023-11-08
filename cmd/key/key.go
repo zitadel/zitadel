@@ -124,7 +124,7 @@ func openFile(fileName string) (io.Reader, error) {
 }
 
 func keyStorage(config database.Config, masterKey string) (crypto.KeyStorage, error) {
-	db, err := database.Connect(config, false)
+	db, err := database.Connect(config, false, false)
 	if err != nil {
 		return nil, err
 	}

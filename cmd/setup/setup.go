@@ -14,6 +14,8 @@ import (
 	"github.com/zitadel/zitadel/cmd/tls"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
+	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
 	"github.com/zitadel/zitadel/internal/migration"
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
@@ -62,22 +64,26 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	ctx := context.Background()
 	logging.Info("setup started")
 
-	dbClient, err := database.Connect(config.Database, false)
+	zitadelDBClient, err := database.Connect(config.Database, false, false)
+	logging.OnError(err).Fatal("unable to connect to database")
+	esPusherDBClient, err := database.Connect(config.Database, false, true)
 	logging.OnError(err).Fatal("unable to connect to database")
 
-	eventstoreClient, err := eventstore.Start(&eventstore.Config{Client: dbClient})
+	config.Eventstore.Querier = old_es.NewCRDB(zitadelDBClient)
+	config.Eventstore.Pusher = new_es.NewEventstore(esPusherDBClient)
+	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 	logging.OnError(err).Fatal("unable to start eventstore")
 	migration.RegisterMappers(eventstoreClient)
 
-	steps.s1ProjectionTable = &ProjectionTable{dbClient: dbClient.DB}
-	steps.s2AssetsTable = &AssetTable{dbClient: dbClient.DB}
+	steps.s1ProjectionTable = &ProjectionTable{dbClient: zitadelDBClient.DB}
+	steps.s2AssetsTable = &AssetTable{dbClient: zitadelDBClient.DB}
 
 	steps.FirstInstance.instanceSetup = config.DefaultInstance
 	steps.FirstInstance.userEncryptionKey = config.EncryptionKeys.User
 	steps.FirstInstance.smtpEncryptionKey = config.EncryptionKeys.SMTP
 	steps.FirstInstance.oidcEncryptionKey = config.EncryptionKeys.OIDC
 	steps.FirstInstance.masterKey = masterKey
-	steps.FirstInstance.db = dbClient
+	steps.FirstInstance.db = zitadelDBClient
 	steps.FirstInstance.es = eventstoreClient
 	steps.FirstInstance.defaults = config.SystemDefaults
 	steps.FirstInstance.zitadelRoles = config.InternalAuthZ.RolePermissionMappings
@@ -85,18 +91,17 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.FirstInstance.externalSecure = config.ExternalSecure
 	steps.FirstInstance.externalPort = config.ExternalPort
 
-	steps.s4EventstoreIndexes = New04(dbClient)
-	steps.s5LastFailed = &LastFailed{dbClient: dbClient.DB}
-	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: dbClient.DB}
-	steps.s7LogstoreTables = &LogstoreTables{dbClient: dbClient.DB, username: config.Database.Username(), dbType: config.Database.Type()}
-	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: dbClient}
-	steps.s9EventstoreIndexes2 = New09(dbClient)
-	steps.CorrectCreationDate.dbClient = dbClient
-	steps.AddEventCreatedAt.dbClient = dbClient
-	steps.AddEventCreatedAt.step10 = steps.CorrectCreationDate
-	steps.s12AddOTPColumns = &AddOTPColumns{dbClient: dbClient}
+	steps.s5LastFailed = &LastFailed{dbClient: zitadelDBClient.DB}
+	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: zitadelDBClient.DB}
+	steps.s7LogstoreTables = &LogstoreTables{dbClient: zitadelDBClient.DB, username: config.Database.Username(), dbType: config.Database.Type()}
+	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: zitadelDBClient}
+	steps.CorrectCreationDate.dbClient = esPusherDBClient
+	steps.s12AddOTPColumns = &AddOTPColumns{dbClient: zitadelDBClient}
+	steps.s13FixQuotaProjection = &FixQuotaConstraints{dbClient: zitadelDBClient}
+	steps.s14NewEventsTable = &NewEventsTable{dbClient: esPusherDBClient}
+	steps.s15CurrentStates = &CurrentProjectionState{dbClient: zitadelDBClient}
 
-	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil)
+	err = projection.Create(ctx, zitadelDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
 
 	repeatableSteps := []migration.RepeatableMigration{
@@ -113,30 +118,28 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 		},
 	}
 
+	err = migration.Migrate(ctx, eventstoreClient, steps.s14NewEventsTable)
+	logging.WithFields("name", steps.s14NewEventsTable.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s1ProjectionTable)
-	logging.OnError(err).Fatal("unable to migrate step 1")
+	logging.WithFields("name", steps.s1ProjectionTable.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s2AssetsTable)
-	logging.OnError(err).Fatal("unable to migrate step 2")
+	logging.WithFields("name", steps.s2AssetsTable.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.FirstInstance)
-	logging.OnError(err).Fatal("unable to migrate step 3")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s4EventstoreIndexes)
-	logging.OnError(err).Fatal("unable to migrate step 4")
+	logging.WithFields("name", steps.FirstInstance.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s5LastFailed)
-	logging.OnError(err).Fatal("unable to migrate step 5")
+	logging.WithFields("name", steps.s5LastFailed.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s6OwnerRemoveColumns)
-	logging.OnError(err).Fatal("unable to migrate step 6")
+	logging.WithFields("name", steps.s6OwnerRemoveColumns.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s7LogstoreTables)
-	logging.OnError(err).Fatal("unable to migrate step 7")
+	logging.WithFields("name", steps.s7LogstoreTables.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s8AuthTokens)
-	logging.OnError(err).Fatal("unable to migrate step 8")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s9EventstoreIndexes2)
-	logging.OnError(err).Fatal("unable to migrate step 9")
-	err = migration.Migrate(ctx, eventstoreClient, steps.CorrectCreationDate)
-	logging.OnError(err).Fatal("unable to migrate step 10")
-	err = migration.Migrate(ctx, eventstoreClient, steps.AddEventCreatedAt)
-	logging.OnError(err).Fatal("unable to migrate step 11")
+	logging.WithFields("name", steps.s8AuthTokens.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s12AddOTPColumns)
-	logging.OnError(err).Fatal("unable to migrate step 12")
+	logging.WithFields("name", steps.s12AddOTPColumns.String()).OnError(err).Fatal("migration failed")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s13FixQuotaProjection)
+	logging.WithFields("name", steps.s13FixQuotaProjection.String()).OnError(err).Fatal("migration failed")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s15CurrentStates)
+	logging.WithFields("name", steps.s15CurrentStates.String()).OnError(err).Fatal("migration failed")
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)

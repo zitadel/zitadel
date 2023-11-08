@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Human, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 
@@ -26,7 +26,10 @@ export class ContactComponent {
   public UserState: any = UserState;
 
   public EditDialogType: any = EditDialogType;
-  constructor(private dialog: MatDialog, private authService: GrpcAuthService) {}
+  constructor(
+    private dialog: MatDialog,
+    private authService: GrpcAuthService,
+  ) {}
 
   async emitDeletePhone(): Promise<void> {
     const { resultList } = await this.authService.listMyMultiFactors();

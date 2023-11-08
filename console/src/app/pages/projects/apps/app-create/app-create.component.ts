@@ -3,7 +3,7 @@ import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Buffer } from 'buffer';
 import { Subject, Subscription } from 'rxjs';
@@ -28,6 +28,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { MatLegacySlideToggleChange } from '@angular/material/legacy-slide-toggle';
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
 import {
   BASIC_AUTH_METHOD,
@@ -51,7 +52,7 @@ const MAX_ALLOWED_SIZE = 1 * 1024 * 1024;
 export class AppCreateComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
   private destroyed$: Subject<void> = new Subject();
-  public devmode: boolean = false;
+  public pro: boolean = false;
   public projectId: string = '';
   public loading: boolean = false;
 
@@ -149,6 +150,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
     this.samlConfigForm = this.fb.group({
       metadataUrl: ['', []],
+      entityId: ['', []],
+      acsURL: ['', []],
     });
 
     this.firstFormGroup.valueChanges.subscribe((value) => {
@@ -217,8 +220,23 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     });
 
     this.samlConfigForm.valueChanges.subscribe((form) => {
+      let minimalMetadata =
+        this.entityId?.value && this.acsURL?.value
+          ? `<?xml version="1.0"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="${this.entityId?.value}">
+    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol">
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${this.acsURL?.value}" index="0"/>
+    </md:SPSSODescriptor>
+</md:EntityDescriptor>`
+          : '';
+
       if (form.metadataUrl && form.metadataUrl.length > 0) {
         this.samlAppRequest.setMetadataUrl(form.metadataUrl);
+      }
+
+      if (this.samlAppRequest) {
+        const base64 = Buffer.from(minimalMetadata, 'utf-8').toString('base64');
+        this.samlAppRequest.setMetadataXml(base64);
       }
     });
   }
@@ -239,7 +257,16 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     this.oidcAppRequest.setPostLogoutRedirectUrisList(value);
   }
 
+  public get devMode() {
+    return this.oidcAppRequest.toObject().devMode;
+  }
+
+  public set devMode(value: boolean) {
+    this.oidcAppRequest.setDevMode(value);
+  }
+
   public ngOnInit(): void {
+    this.devMode = false;
     this.subscription = this.route.params.subscribe((params) => this.getData(params));
 
     const projectId = this.route.snapshot.paramMap.get('projectid');
@@ -342,6 +369,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   public onDropXML(filelist: FileList): void {
     const file = filelist.item(0);
     this.metadataUrl?.setValue('');
+    this.entityId?.setValue('');
+    this.acsURL?.setValue('');
     if (file) {
       if (file.size > MAX_ALLOWED_SIZE) {
         this.toast.showInfo('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', true);
@@ -362,9 +391,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   }
 
   public createApp(): void {
-    const appOIDCCheck = this.devmode ? this.isDevOIDC : this.isStepperOIDC;
-    const appAPICheck = this.devmode ? this.isDevAPI : this.isStepperAPI;
-    const appSAMLCheck = this.devmode ? this.isDevSAML : this.isStepperSAML;
+    const appOIDCCheck = this.pro ? this.isDevOIDC : this.isStepperOIDC;
+    const appAPICheck = this.pro ? this.isDevAPI : this.isStepperAPI;
+    const appSAMLCheck = this.pro ? this.isDevSAML : this.isStepperSAML;
 
     if (appOIDCCheck) {
       this.requestRedirectValuesSubject$.next();
@@ -536,5 +565,13 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
   public get metadataUrl(): AbstractControl | null {
     return this.samlConfigForm.get('metadataUrl');
+  }
+
+  public get entityId(): AbstractControl | null {
+    return this.samlConfigForm.get('entityId');
+  }
+
+  public get acsURL(): AbstractControl | null {
+    return this.samlConfigForm.get('acsURL');
   }
 }

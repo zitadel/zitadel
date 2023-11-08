@@ -2,14 +2,12 @@ package project
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -43,11 +41,11 @@ type OIDCConfigAddedEvent struct {
 	SkipNativeAppSuccessPage bool                       `json:"skipNativeAppSuccessPage,omitempty"`
 }
 
-func (e *OIDCConfigAddedEvent) Data() interface{} {
+func (e *OIDCConfigAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OIDCConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OIDCConfigAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -185,12 +183,12 @@ func (e *OIDCConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 	return e.SkipNativeAppSuccessPage == c.SkipNativeAppSuccessPage
 }
 
-func OIDCConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &OIDCConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-BFd15", "unable to unmarshal oidc config")
 	}
@@ -219,11 +217,11 @@ type OIDCConfigChangedEvent struct {
 	SkipNativeAppSuccessPage *bool                       `json:"skipNativeAppSuccessPage,omitempty"`
 }
 
-func (e *OIDCConfigChangedEvent) Data() interface{} {
+func (e *OIDCConfigChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OIDCConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OIDCConfigChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -343,12 +341,12 @@ func ChangeSkipNativeAppSuccessPage(skipNativeAppSuccessPage bool) func(event *O
 	}
 }
 
-func OIDCConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &OIDCConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-BFd15", "unable to unmarshal oidc config")
 	}
@@ -363,11 +361,11 @@ type OIDCConfigSecretChangedEvent struct {
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
 }
 
-func (e *OIDCConfigSecretChangedEvent) Data() interface{} {
+func (e *OIDCConfigSecretChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OIDCConfigSecretChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OIDCConfigSecretChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -388,12 +386,12 @@ func NewOIDCConfigSecretChangedEvent(
 	}
 }
 
-func OIDCConfigSecretChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCConfigSecretChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &OIDCConfigSecretChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-M893d", "unable to unmarshal oidc config")
 	}
@@ -407,11 +405,11 @@ type OIDCConfigSecretCheckSucceededEvent struct {
 	AppID string `json:"appId"`
 }
 
-func (e *OIDCConfigSecretCheckSucceededEvent) Data() interface{} {
+func (e *OIDCConfigSecretCheckSucceededEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OIDCConfigSecretCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OIDCConfigSecretCheckSucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -430,12 +428,12 @@ func NewOIDCConfigSecretCheckSucceededEvent(
 	}
 }
 
-func OIDCConfigSecretCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCConfigSecretCheckSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &OIDCConfigSecretCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-837gV", "unable to unmarshal oidc config")
 	}
@@ -449,11 +447,11 @@ type OIDCConfigSecretCheckFailedEvent struct {
 	AppID string `json:"appId"`
 }
 
-func (e *OIDCConfigSecretCheckFailedEvent) Data() interface{} {
+func (e *OIDCConfigSecretCheckFailedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OIDCConfigSecretCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OIDCConfigSecretCheckFailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -472,12 +470,12 @@ func NewOIDCConfigSecretCheckFailedEvent(
 	}
 }
 
-func OIDCConfigSecretCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCConfigSecretCheckFailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &OIDCConfigSecretCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-987g%", "unable to unmarshal oidc config")
 	}

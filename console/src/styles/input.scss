@@ -1,16 +1,14 @@
-@use '@angular/material' as mat;
-
 @mixin input-theme($theme) {
   $primary: map-get($theme, primary);
-  $primary-color: mat.get-color-from-palette($primary, 500);
-  $primary-light-color: mat.get-color-from-palette($primary, 200);
+  $primary-color: map-get($primary, 500);
+  $primary-light-color: map-get($primary, 200);
   $warn: map-get($theme, warn);
-  $warn-color: mat.get-color-from-palette($warn, 500);
+  $warn-color: map-get($warn, 500);
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
 
   [cnslInput],
-  .mat-select {
+  .mat-mdc-select {
     box-sizing: border-box;
     padding-inline-start: 10px;
     outline: none;
@@ -25,10 +23,12 @@
     border-radius: 4px;
     height: 40px;
     padding: 10px;
-    transition: border-color 0.15s ease-in-out, background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1),
+    transition:
+      border-color 0.15s ease-in-out,
+      background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1),
       color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     width: 100%;
-    color: mat.get-color-from-palette($foreground, text);
+    color: map-get($foreground, text);
     margin-bottom: 2px;
 
     &:hover {
@@ -62,8 +62,8 @@
     font-style: italic;
   }
 
-  .mat-paginator {
-    .mat-select {
+  .mat-mdc-paginator {
+    .mat-mdc-select {
       background-color: inherit;
     }
   }

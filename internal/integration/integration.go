@@ -8,15 +8,19 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"os"
+	"reflect"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/client"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/client"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
@@ -30,6 +34,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/webauthn"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -71,6 +76,11 @@ const (
 	UserPassword          = "VeryS3cret!"
 )
 
+const (
+	PortMilestoneServer = "8081"
+	PortQuotaServer     = "8082"
+)
+
 // User information with a Personal Access Token.
 type User struct {
 	*query.User
@@ -100,6 +110,11 @@ type Tester struct {
 	Instance     authz.Instance
 	Organisation *query.Org
 	Users        InstanceUserMap
+
+	MilestoneChan           chan []byte
+	milestoneServer         *httptest.Server
+	QuotaNotificationChan   chan []byte
+	quotaNotificationServer *httptest.Server
 
 	Client   Client
 	WebAuthN *webauthn.Client
@@ -271,6 +286,8 @@ func (s *Tester) Done() {
 
 	s.Shutdown <- os.Interrupt
 	s.wg.Wait()
+	s.milestoneServer.Close()
+	s.quotaNotificationServer.Close()
 }
 
 // NewTester start a new Zitadel server by passing the default commandline.
@@ -279,13 +296,13 @@ func (s *Tester) Done() {
 // INTEGRATION_DB_FLAVOR environment variable and can have the values "cockroach"
 // or "postgres". Defaults to "cockroach".
 //
-// The deault Instance and Organisation are read from the DB and system
+// The default Instance and Organisation are read from the DB and system
 // users are created as needed.
 //
 // After the server is started, a [grpc.ClientConn] will be created and
 // the server is polled for it's health status.
 //
-// Note: the database must already be setup and intialized before
+// Note: the database must already be setup and initialized before
 // using NewTester. See the CONTRIBUTING.md document for details.
 func NewTester(ctx context.Context) *Tester {
 	args := strings.Split(commandLine, " ")
@@ -311,6 +328,13 @@ func NewTester(ctx context.Context) *Tester {
 	tester := Tester{
 		Users: make(InstanceUserMap),
 	}
+	tester.MilestoneChan = make(chan []byte, 100)
+	tester.milestoneServer, err = runMilestoneServer(ctx, tester.MilestoneChan)
+	logging.OnError(err).Fatal()
+	tester.QuotaNotificationChan = make(chan []byte, 100)
+	tester.quotaNotificationServer, err = runQuotaServer(ctx, tester.QuotaNotificationChan)
+	logging.OnError(err).Fatal()
+
 	tester.wg.Add(1)
 	go func(wg *sync.WaitGroup) {
 		logging.OnError(cmd.Execute()).Fatal()
@@ -328,7 +352,6 @@ func NewTester(ctx context.Context) *Tester {
 	tester.createMachineUserOrgOwner(ctx)
 	tester.createMachineUserInstanceOwner(ctx)
 	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, "https://"+tester.Host())
-
 	return &tester
 }
 
@@ -337,4 +360,52 @@ func Contexts(timeout time.Duration) (ctx, errCtx context.Context, cancel contex
 	cancel()
 	ctx, cancel = context.WithTimeout(context.Background(), timeout)
 	return ctx, errCtx, cancel
+}
+
+func runMilestoneServer(ctx context.Context, bodies chan []byte) (*httptest.Server, error) {
+	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if r.Header.Get("single-value") != "single-value" {
+			http.Error(w, "single-value header not set", http.StatusInternalServerError)
+			return
+		}
+		if reflect.DeepEqual(r.Header.Get("multi-value"), "multi-value-1,multi-value-2") {
+			http.Error(w, "single-value header not set", http.StatusInternalServerError)
+			return
+		}
+		bodies <- body
+		w.WriteHeader(http.StatusOK)
+	}))
+	config := net.ListenConfig()
+	listener, err := config.Listen(ctx, "tcp", ":"+PortMilestoneServer)
+	if err != nil {
+		return nil, err
+	}
+	mockServer.Listener = listener
+	mockServer.Start()
+	return mockServer, nil
+}
+
+func runQuotaServer(ctx context.Context, bodies chan []byte) (*httptest.Server, error) {
+	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		bodies <- body
+		w.WriteHeader(http.StatusOK)
+	}))
+	config := net.ListenConfig()
+	listener, err := config.Listen(ctx, "tcp", ":"+PortQuotaServer)
+	if err != nil {
+		return nil, err
+	}
+	mockServer.Listener = listener
+	mockServer.Start()
+	return mockServer, nil
 }

@@ -2,14 +2,16 @@
   <p class="subinfo" sub>
     <span class="cnsl-secondary-text">{{ 'PROJECT.GRANT.DETAIL.DESC' | translate }}</span>
     <a mat-icon-button href="https://zitadel.com/docs/concepts/structure/projects#granted-organizations" target="_blank">
-      <i class="las la-info-circle"></i>
+      <mat-icon class="icon">info_outline</mat-icon>
     </a>
   </p>
 
   <div actions>
     <button class="actions-trigger-desk" mat-raised-button color="primary" [matMenuTriggerFor]="actions">
-      <span>{{ 'ACTIONS.ACTIONS' | translate }}</span>
-      <mat-icon class="icon">keyboard_arrow_down</mat-icon>
+      <div class="cnsl-action-button">
+        <span>{{ 'ACTIONS.ACTIONS' | translate }}</span>
+        <mat-icon class="icon">keyboard_arrow_down</mat-icon>
+      </div>
     </button>
     <button
       class="actions-trigger-mob"
@@ -67,7 +69,6 @@
     [refreshTrigger]="changePage"
   >
     <button
-      class="cnsl-action-button"
       selectactions
       (click)="removeProjectMemberSelection()"
       [disabled]="
@@ -77,13 +78,14 @@
       color="warn"
       mat-raised-button
     >
-      <i class="las la-trash"></i>
-      <span>{{ 'ACTIONS.SELECTIONDELETE' | translate }}</span>
-      <cnsl-action-keys [type]="ActionKeysType.DELETE" (actionTriggered)="removeProjectMemberSelection()">
-      </cnsl-action-keys>
+      <div class="cnsl-action-button">
+        <i class="las la-trash"></i>
+        <span>{{ 'ACTIONS.SELECTIONDELETE' | translate }}</span>
+        <cnsl-action-keys [type]="ActionKeysType.DELETE" (actionTriggered)="removeProjectMemberSelection()">
+        </cnsl-action-keys>
+      </div>
     </button>
     <button
-      class="cnsl-action-button"
       writeactions
       color="primary"
       [disabled]="
@@ -93,8 +95,10 @@
       color="primary"
       mat-raised-button
     >
-      <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
-      <cnsl-action-keys (actionTriggered)="openAddMember()"> </cnsl-action-keys>
+      <div class="cnsl-action-button">
+        <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+        <cnsl-action-keys (actionTriggered)="openAddMember()"> </cnsl-action-keys>
+      </div>
     </button>
   </cnsl-members-table>
 </cnsl-detail-layout>

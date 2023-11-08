@@ -17,7 +17,7 @@ func (s *Server) ListEvents(ctx context.Context, in *admin_pb.ListEventsRequest)
 	if err != nil {
 		return nil, err
 	}
-	events, err := s.query.SearchEvents(ctx, filter, s.auditLogRetention)
+	events, err := s.query.SearchEvents(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -57,18 +57,24 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 		OrderDesc().
 		InstanceID(authz.GetInstance(ctx).InstanceID()).
 		Limit(limit).
+		AwaitOpenTransactions().
 		ResourceOwner(req.ResourceOwner).
 		EditorUser(req.EditorUserId).
-		AddQuery().
-		AggregateIDs(aggregateIDs...).
-		AggregateTypes(aggregateTypes...).
-		EventTypes(eventTypes...).
-		CreationDateAfter(req.CreationDate.AsTime()).
-		SequenceGreater(req.Sequence).
-		Builder()
+		SequenceGreater(req.Sequence)
 
-	if req.Asc {
+	if len(aggregateIDs) > 0 || len(aggregateTypes) > 0 || len(eventTypes) > 0 {
+		builder.AddQuery().
+			AggregateIDs(aggregateIDs...).
+			AggregateTypes(aggregateTypes...).
+			EventTypes(eventTypes...).
+			Builder()
+	}
+
+	if req.GetAsc() {
 		builder.OrderAsc()
+		builder.CreationDateAfter(req.CreationDate.AsTime())
+	} else {
+		builder.CreationDateBefore(req.CreationDate.AsTime())
 	}
 
 	return builder, nil

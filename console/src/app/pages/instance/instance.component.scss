@@ -1,5 +1,3 @@
-@use '@angular/material' as mat;
-
 @mixin instance-detail-theme($theme) {
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);

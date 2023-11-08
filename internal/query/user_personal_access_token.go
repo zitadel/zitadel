@@ -8,10 +8,13 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -77,7 +80,7 @@ type PersonalAccessToken struct {
 
 	UserID     string
 	Expiration time.Time
-	Scopes     database.StringArray
+	Scopes     database.TextArray[string]
 }
 
 type PersonalAccessTokenSearchQueries struct {
@@ -90,7 +93,10 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.PersonalAccessTokenProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerPersonalAccessTokenProjection")
+		ctx, err = projection.PersonalAccessTokenProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	query, scan := preparePersonalAccessTokenQuery(ctx, q.client)
@@ -144,7 +150,7 @@ func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *Perso
 		return nil, errors.ThrowInternal(err, "QUERY-Bmz63", "Errors.Internal")
 	}
 
-	personalAccessTokens.LatestSequence, err = q.latestSequence(ctx, personalAccessTokensTable)
+	personalAccessTokens.State, err = q.latestState(ctx, personalAccessTokensTable)
 	return personalAccessTokens, err
 }
 
@@ -199,7 +205,7 @@ func preparePersonalAccessTokenQuery(ctx context.Context, db prepareDatabase) (s
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-fk2fs", "Errors.PersonalAccessToken.NotFound")
+					return nil, errors.ThrowNotFound(err, "QUERY-fRunu", "Errors.PersonalAccessToken.NotFound")
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-dj2FF", "Errors.Internal")
 			}

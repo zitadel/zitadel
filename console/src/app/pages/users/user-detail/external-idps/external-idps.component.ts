@@ -1,7 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+import { MatDialog } from '@angular/material/dialog';
+import { MatTableDataSource } from '@angular/material/table';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
@@ -35,7 +35,10 @@ export class ExternalIdpsComponent implements OnInit, OnDestroy {
     'actions',
   ];
 
-  constructor(private toast: ToastService, private dialog: MatDialog) {}
+  constructor(
+    private toast: ToastService,
+    private dialog: MatDialog,
+  ) {}
 
   ngOnInit(): void {
     this.getData(10, 0);

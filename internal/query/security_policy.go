@@ -54,7 +54,7 @@ type SecurityPolicy struct {
 	Sequence      uint64
 
 	Enabled        bool
-	AllowedOrigins database.StringArray
+	AllowedOrigins database.TextArray[string]
 }
 
 func (q *Queries) SecurityPolicy(ctx context.Context) (policy *SecurityPolicy, err error) {

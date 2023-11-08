@@ -51,7 +51,7 @@
       "TITLE": "Get your ZITADEL running",
       "DESCRIPTION": "This checklist helps to setup your instance and guides your through the most essential steps"
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Setup your brand",
         "description": "Define coloring and shape of your login and upload your logo and icons.",
@@ -62,15 +62,20 @@
         "description": "Set your own mail server settings.",
         "action": "Setup SMTP"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Create a project",
         "description": "Add a project and define its roles and authorizations.",
         "action": "Create project"
       },
-      "project.application.added": {
-        "title": "Create an application",
-        "description": "Create a web, native, api or saml application and setup your authentication flow.",
-        "action": "Create app"
+      "APPLICATION_CREATED": {
+        "title": "Register your app",
+        "description": "Register your web, native, api or saml application and setup an authentication flow.",
+        "action": "Register app"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Log in to your app",
+        "description": "Integrate your application with ZITADEL for authentication and test it by logging in with your admin user.",
+        "action": "Log in"
       },
       "user.human.added": {
         "title": "Add users",
@@ -95,7 +100,6 @@
     "EVENTS": "Events",
     "FAILEDEVENTS": "Failed Events",
     "ORGANIZATION": "Organization",
-    "DOMAINS": "Domains",
     "PROJECT": "Projects",
     "PROJECTOVERVIEW": "Overview",
     "PROJECTGRANTS": "Grants",
@@ -275,7 +279,7 @@
     "SYMBOLERROR": "Must include a symbol or punctuation mark.",
     "NUMBERERROR": "Must include a digit.",
     "PWNOTEQUAL": "The passwords provided do not match.",
-    "PHONE": "The phone number must start with 00 or +."
+    "PHONE": "The phone number must start with +."
   },
   "USER": {
     "SETTINGS": {
@@ -487,7 +491,7 @@
       "TITLE": "Profile",
       "EMAIL": "E-mail",
       "PHONE": "Phone number",
-      "PHONE_HINT": "Use 00 or the + symbol followed by the calling country code, or select the country from the dropdown and finally enter the phone number",
+      "PHONE_HINT": "Use the + symbol followed by the calling country code, or select the country from the dropdown and finally enter the phone number",
       "USERNAME": "User Name",
       "CHANGEUSERNAME": "modify",
       "CHANGEUSERNAME_TITLE": "Change username",
@@ -496,6 +500,7 @@
       "LASTNAME": "Family Name",
       "NICKNAME": "Nickname",
       "DISPLAYNAME": "Display Name",
+      "PREFERREDLOGINNAME": "Preferred login name",
       "PREFERRED_LANGUAGE": "Language",
       "GENDER": "Gender",
       "PASSWORD": "Password",
@@ -713,7 +718,6 @@
   },
   "METADATA": {
     "TITLE": "Metadata",
-    "DESCRIPTION": "",
     "KEY": "Key",
     "VALUE": "Value",
     "ADD": "New Entry",
@@ -796,7 +800,7 @@
     },
     "PAGES": {
       "STATE": "Status",
-      "DOMAINLIST": "Domains"
+      "DOMAINLIST": "Custom Domains"
     },
     "STATE": {
       "0": "Unspecified",
@@ -953,16 +957,16 @@
     },
     "DOMAINS": {
       "NEW": "Add Domain",
-      "TITLE": "Domains",
-      "DESCRIPTION": "Configure your domains. This domain can be used to log in with your users.",
+      "TITLE": "Verified domains",
+      "DESCRIPTION": "Configure your organization domains. This domain can be used for domain discovery and username suffixing.",
       "SETPRIMARY": "Set as Primary",
       "DELETE": {
         "TITLE": "Delete Domain",
-        "DESCRIPTION": "You are about to delete one of your domains. Note that your users can no longer use this domain for their login."
+        "DESCRIPTION": "You are about to delete one of your domains."
       },
       "ADD": {
         "TITLE": "Add Domain",
-        "DESCRIPTION": "You are about to add a domain for your organization. After successful process, you users will be able to use the domain for their login."
+        "DESCRIPTION": "You are about to add a domain for your organization. After successful process, the domain can be used for domain discovery and as suffix for your users."
       }
     },
     "STATE": {
@@ -1019,16 +1023,19 @@
       "LOGIN": "Login Behavior and Security",
       "LOCKOUT": "Lockout",
       "COMPLEXITY": "Password complexity",
-      "NOTIFICATIONS": "Notification settings",
+      "NOTIFICATIONS": "Notifications",
+      "SMTP_PROVIDER": "SMTP Provider",
+      "SMS_PROVIDER": "SMS/Phone Provider",
       "NOTIFICATIONS_DESC": "SMTP and SMS Settings",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
+      "VERIFIED_DOMAINS": "Verified domains",
       "DOMAIN": "Domain settings",
       "LOGINTEXTS": "Login Interface Texts",
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Privacy Policy",
       "OIDC": "OIDC Token lifetime and expiration",
-      "SECRETS": "Secret Appearance",
+      "SECRETS": "Secret Generator",
       "SECURITY": "Security settings"
     },
     "GROUPS": {
@@ -1090,6 +1097,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio added successfully.",
+        "UPDATED": "Twilio updated successfully.",
         "REMOVED": "Twilio removed",
         "CHANGETOKEN": "Change Token",
         "SETTOKEN": "Set Token",
@@ -1106,7 +1114,7 @@
       "INDAYS": "Days"
     },
     "SECRETS": {
-      "TITLE": "Secret Appearance",
+      "TITLE": "Secret Generator",
       "TYPES": "Secret Types",
       "TYPE": {
         "1": "Initialization Mail",
@@ -1118,7 +1126,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - Email"
       },
-      "ADDGENERATOR": "Define Secret Appearance",
+      "ADDGENERATOR": "Define Secret Generator",
       "GENERATORTYPE": "Type",
       "EXPIRY": "Expiration (in hours)",
       "INCLUDEDIGITS": "Include Numbers",
@@ -1196,6 +1204,11 @@
         "ERROR": "User could not be found!",
         "PRIMARYBUTTON": "next",
         "SECONDARYBUTTON": "register"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Auto Mode",
+        "THEME_MODE_LIGHT": "Light Mode only",
+        "THEME_MODE_DARK": "Dark Mode only"
       }
     },
     "PWD_AGE": {
@@ -1353,7 +1366,7 @@
       "MAXAGEDAYS": "Max Age in days",
       "USERLOGINMUSTBEDOMAIN": "Add organization domain as suffix to loginnames",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
-      "VALIDATEORGDOMAINS": "Validate Org domains",
+      "VALIDATEORGDOMAINS": "Organization domain verification required (DNS or HTTP challenge)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
       "ALLOWUSERNAMEPASSWORD": "Username Password allowed",
       "ALLOWEXTERNALIDP": "External IDP allowed",
@@ -1715,6 +1728,10 @@
       "APPLE": {
         "TITLE": "Sign in with Apple",
         "DESCRIPTION": "Enter the credentials for your Apple Provider"
+      },
+      "SAML": {
+        "TITLE": "Sign in with Saml SP",
+        "DESCRIPTION": "Enter the credentials for your SAML Provider"
       }
     },
     "DETAIL": {
@@ -1835,6 +1852,12 @@
       "UPDATEPRIVATEKEY": "Update Private Key",
       "UPLOADPRIVATEKEY": "Upload Private Key",
       "KEYMAXSIZEEXCEEDED": "Maximum size of 5kB exceeded."
+    },
+    "SAML": {
+      "METADATAXML": "Metadata Xml",
+      "METADATAURL": "Metadata URL",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "Signed Request"
     },
     "TOAST": {
       "SAVED": "Successfully saved.",
@@ -1994,6 +2017,8 @@
       "CLIENTSECRET_DESCRIPTION": "Keep your client secret at a safe place as it will disappear once the dialog is closed.",
       "REGENERATESECRET": "Regenerate Client Secret",
       "DEVMODE": "Development Mode",
+      "DEVMODE_ENABLED": "Enabled",
+      "DEVMODE_DISABLED": "Disabled",
       "DEVMODEDESC": "Beware: With development mode enabled redirect URIs will not be validated.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Skip Login Success Page",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Skip the success page after a login for this native app.",
@@ -2080,11 +2105,16 @@
         "DESCRIPTION": "SAML Applications"
       },
       "CONFIGSECTION": "SAML Configuration",
-      "URL": "Url where Metadata file is located",
-      "OR": "or",
-      "XML": "Upload Metadata XML",
+      "CHOOSEMETADATASOURCE": "Provide your SAML configuration using one of the following options:",
+      "METADATAOPT1": "Option 1. Specify the url where metadata file is located",
+      "METADATAOPT2": "Option 2. Upload a file containing your metadata XML",
+      "METADATAOPT3": "Option 3. Create a minimal metadata file on the fly providing ENTITYID and ACS URL",
+      "UPLOAD": "Upload XML file",
       "METADATA": "Metadata",
-      "METADATAFROMFILE": "Metadata from File"
+      "METADATAFROMFILE": "Metadata from file",
+      "CREATEMETADATA": "Create metadata",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {

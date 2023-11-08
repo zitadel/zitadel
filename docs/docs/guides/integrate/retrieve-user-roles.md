@@ -1,5 +1,6 @@
 ---
-title: Retrieve user roles
+title: Retrieve User Roles in ZITADEL
+sidebar_label: Retrieve User Roles
 ---
 
 This guide explains all the possible ways of retrieving user roles across different organizations and projects using ZITADEL's APIs. 
@@ -82,7 +83,7 @@ Alternatively, you can include the claims `urn:iam:org:project:roles` or/and `ur
 
 ### Retrieve roles from the userinfo endpoint
 
-The user info endpoint is  **ZITADEL_DOMAIN/oidc/v1/userinfo**.
+The user info endpoint is  **$CUSTOM-DOMAIN/oidc/v1/userinfo**.
 
 This endpoint will return information about the authenticated user.
 Send the access token of the user as `Bearer Token` in the `Authorization` header:
@@ -90,7 +91,7 @@ Send the access token of the user as `Bearer Token` in the `Authorization` heade
 **cURL Request:**
 ```bash
 curl --request GET \
- --url $ZITADEL_DOMAIN/oidc/v1/userinfo
+ --url $CUSTOM-DOMAIN/oidc/v1/userinfo
  --header 'Authorization: Bearer <TOKEN>'
 ```
 
@@ -205,11 +206,11 @@ Let’s start with a user who has multiple roles in different organizations in a
 
 Returns a list of roles for the authenticated user and for the requesting project (based on the token).
 
-**URL: https://$ZITADEL_DOMAIN/auth/v1/permissions/me/_search**
+**URL: https://$CUSTOM-DOMAIN/auth/v1/permissions/me/_search**
 
 **cURL request:** 
 ```bash
-curl -L -X POST 'https://$ZITADEL_DOMAIN/auth/v1/permissions/me/_search' \
+curl -L -X POST 'https://$CUSTOM-DOMAIN/auth/v1/permissions/me/_search' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>'
 ```
@@ -230,12 +231,12 @@ Returns a list of permissions the authenticated user has in ZITADEL based on the
 
 This request can be used if you are building a management UI. For instance, if the UI is managing users, you can show the management functionality based on the permissions the user has. Here’s an example: if the user has `user.read` and `user.write` permission you can show the edit buttons, if the user only has `user.read` permission, you can hide the edit buttons.
 
-**URL: https://ZITADEL_DOMAIN/auth/v1/permissions/zitadel/me/_search**
+**URL: https://$CUSTOM-DOMAIN/auth/v1/permissions/zitadel/me/_search**
 
 **cURL Request:** 
 
 ```bash
-curl -L -X POST 'https://$ZITADEL_DOMAIN/auth/v1/permissions/zitadel/me/_search' \
+curl -L -X POST 'https://$CUSTOM-DOMAIN/auth/v1/permissions/zitadel/me/_search' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>'
 ```
@@ -276,12 +277,12 @@ curl -L -X POST 'https://$ZITADEL_DOMAIN/auth/v1/permissions/zitadel/me/_search'
 
 Returns a list of user grants the authenticated user has. User grants consist of an organization, a project and roles.
 
-**URL: https://$ZITADEL_DOMAIN/auth/v1/usergrants/me/_search**
+**URL: https://$CUSTOM-DOMAIN/auth/v1/usergrants/me/_search**
 
 **cURL request:**
 
 ```bash
-curl -L -X POST 'https://$ZITADEL_DOMAIN/auth/v1/usergrants/me/_search' \
+curl -L -X POST 'https://$CUSTOM-DOMAIN/auth/v1/usergrants/me/_search' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -378,7 +379,7 @@ curl -L -X POST 'https://$ZITADEL_DOMAIN/auth/v1/usergrants/me/_search' \
 ### Retrieve roles using the management API
 Now we will use the management API to retrieve user roles under an admin user. 
 
-The base URL is: **https://$ZITADEL_DOMAIN/management/v1**
+The base URL is: **https://$CUSTOM-DOMAIN/management/v1**
 
 In [APIs listed under user grants in the management API](/docs/category/apis/resources/mgmt/user-grants), you will see that you can use the management API to retrieve and modify user grants. The two API paths that we are interested in to fetch user roles are given below.
 
@@ -388,12 +389,12 @@ In [APIs listed under user grants in the management API](/docs/category/apis/res
 
 Returns a list of user roles that match the search queries. A user with manager permissions will call this API and will also have to reside in the same organization as the user. 
 
-**URL: https://$ZITADEL_DOMAIN/management/v1/users/grants/_search**
+**URL: https://$CUSTOM-DOMAIN/management/v1/users/grants/_search**
 
 **cURL request:** 
 
 ```bash
-curl -L -X POST 'https://$ZITADEL_DOMAIN/management/v1/users/grants/_search' \
+curl -L -X POST 'https://$CUSTOM-DOMAIN/management/v1/users/grants/_search' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \

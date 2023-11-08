@@ -83,6 +83,8 @@ import {
   AddProjectRoleResponse,
   AddSAMLAppRequest,
   AddSAMLAppResponse,
+  AddSAMLProviderRequest,
+  AddSAMLProviderResponse,
   AddSecondFactorToLoginPolicyRequest,
   AddSecondFactorToLoginPolicyResponse,
   AddUserGrantRequest,
@@ -322,8 +324,12 @@ import {
   RemoveCustomLabelPolicyLogoDarkResponse,
   RemoveCustomLabelPolicyLogoRequest,
   RemoveCustomLabelPolicyLogoResponse,
+  RemoveHumanAuthFactorOTPEmailRequest,
+  RemoveHumanAuthFactorOTPEmailResponse,
   RemoveHumanAuthFactorOTPRequest,
   RemoveHumanAuthFactorOTPResponse,
+  RemoveHumanAuthFactorOTPSMSRequest,
+  RemoveHumanAuthFactorOTPSMSResponse,
   RemoveHumanAuthFactorU2FRequest,
   RemoveHumanAuthFactorU2FResponse,
   RemoveHumanLinkedIDPRequest,
@@ -507,6 +513,8 @@ import {
   UpdateProjectRoleResponse,
   UpdateSAMLAppConfigRequest,
   UpdateSAMLAppConfigResponse,
+  UpdateSAMLProviderRequest,
+  UpdateSAMLProviderResponse,
   UpdateUserGrantRequest,
   UpdateUserGrantResponse,
   UpdateUserNameRequest,
@@ -1031,6 +1039,14 @@ export class ManagementService {
 
   public updateJWTProvider(req: UpdateJWTProviderRequest): Promise<UpdateJWTProviderResponse.AsObject> {
     return this.grpcService.mgmt.updateJWTProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addSAMLProvider(req: AddSAMLProviderRequest): Promise<AddSAMLProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addSAMLProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateSAMLProvider(req: UpdateSAMLProviderRequest): Promise<UpdateSAMLProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateSAMLProvider(req, null).then((resp) => resp.toObject());
   }
 
   public addGitHubEnterpriseServerProvider(
@@ -1803,6 +1819,18 @@ export class ManagementService {
     req.setUserId(userId);
     req.setTokenId(tokenId);
     return this.grpcService.mgmt.removeHumanAuthFactorU2F(req, null).then((resp) => resp.toObject());
+  }
+
+  public removeHumanAuthFactorOTPSMS(userId: string): Promise<RemoveHumanAuthFactorOTPSMSResponse.AsObject> {
+    const req = new RemoveHumanAuthFactorOTPSMSRequest();
+    req.setUserId(userId);
+    return this.grpcService.mgmt.removeHumanAuthFactorOTPSMS(req, null).then((resp) => resp.toObject());
+  }
+
+  public removeHumanAuthFactorOTPEmail(userId: string): Promise<RemoveHumanAuthFactorOTPEmailResponse.AsObject> {
+    const req = new RemoveHumanAuthFactorOTPEmailRequest();
+    req.setUserId(userId);
+    return this.grpcService.mgmt.removeHumanAuthFactorOTPEmail(req, null).then((resp) => resp.toObject());
   }
 
   public updateHumanProfile(

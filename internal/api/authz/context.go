@@ -1,12 +1,15 @@
+//go:generate enumer -type MemberType -trimprefix MemberType
+
 package authz
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/errors"
+	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -26,10 +29,11 @@ type CtxData struct {
 	AgentID           string
 	PreferredLanguage string
 	ResourceOwner     string
+	SystemMemberships Memberships
 }
 
 func (ctxData CtxData) IsZero() bool {
-	return ctxData.UserID == "" || ctxData.OrgID == ""
+	return ctxData.UserID == "" || ctxData.OrgID == "" && ctxData.SystemMemberships == nil
 }
 
 type Grants []*Grant
@@ -54,58 +58,94 @@ type MemberType int32
 
 const (
 	MemberTypeUnspecified MemberType = iota
-	MemberTypeOrganisation
+	MemberTypeOrganization
 	MemberTypeProject
 	MemberTypeProjectGrant
-	MemberTypeIam
+	MemberTypeIAM
+	MemberTypeSystem
 )
 
-func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain string, t *TokenVerifier, method string) (_ CtxData, err error) {
+type TokenVerifier interface {
+	ExistsOrg(ctx context.Context, id, domain string) (string, error)
+	ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error)
+	AccessTokenVerifier
+	SystemTokenVerifier
+}
+
+type AccessTokenVerifier interface {
+	VerifyAccessToken(ctx context.Context, token string) (userID, clientID, agentID, prefLan, resourceOwner string, err error)
+}
+
+// AccessTokenVerifierFunc implements the SystemTokenVerifier interface so that a function can be used as a AccessTokenVerifier.
+type AccessTokenVerifierFunc func(context.Context, string) (string, string, string, string, string, error)
+
+func (a AccessTokenVerifierFunc) VerifyAccessToken(ctx context.Context, token string) (string, string, string, string, string, error) {
+	return a(ctx, token)
+}
+
+type SystemTokenVerifier interface {
+	VerifySystemToken(ctx context.Context, token string, orgID string) (matchingMemberships Memberships, userID string, err error)
+}
+
+// SystemTokenVerifierFunc implements the SystemTokenVerifier interface so that a function can be used as a SystemTokenVerifier.
+type SystemTokenVerifierFunc func(context.Context, string, string) (Memberships, string, error)
+
+func (s SystemTokenVerifierFunc) VerifySystemToken(ctx context.Context, token string, orgID string) (Memberships, string, error) {
+	return s(ctx, token, orgID)
+}
+
+func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain string, t APITokenVerifier) (_ CtxData, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-
-	userID, clientID, agentID, prefLang, resourceOwner, err := verifyAccessToken(ctx, token, t, method)
+	tokenWOBearer, err := extractBearerToken(token)
 	if err != nil {
 		return CtxData{}, err
 	}
-	if strings.HasPrefix(method, "/zitadel.system.v1.SystemService") {
-		return CtxData{UserID: userID}, nil
+	userID, clientID, agentID, prefLang, resourceOwner, err := t.VerifyAccessToken(ctx, tokenWOBearer)
+	var sysMemberships Memberships
+	if err != nil && !zitadel_errors.IsUnauthenticated(err) {
+		return CtxData{}, err
+	}
+	if err != nil {
+		var sysTokenErr error
+		sysMemberships, userID, sysTokenErr = t.VerifySystemToken(ctx, tokenWOBearer, orgID)
+		if sysTokenErr != nil || sysMemberships == nil {
+			return CtxData{}, zitadel_errors.ThrowUnauthenticated(errors.Join(err, sysTokenErr), "AUTH-7fs1e", "Errors.Token.Invalid")
+		}
 	}
 	var projectID string
 	var origins []string
 	if clientID != "" {
 		projectID, origins, err = t.ProjectIDAndOriginsByClientID(ctx, clientID)
 		if err != nil {
-			return CtxData{}, errors.ThrowPermissionDenied(err, "AUTH-GHpw2", "could not read projectid by clientid")
+			return CtxData{}, zitadel_errors.ThrowPermissionDenied(err, "AUTH-GHpw2", "could not read projectid by clientid")
 		}
-	}
-	if err := checkOrigin(ctx, origins); err != nil {
-		return CtxData{}, err
+		// We used to check origins for every token, but service users shouldn't be used publicly (native app / SPA).
+		// Therefore, mostly won't send an origin and aren't able to configure them anyway.
+		// For the current time we will only check origins for tokens issued to users through apps (code / implicit flow).
+		if err := checkOrigin(ctx, origins); err != nil {
+			return CtxData{}, err
+		}
 	}
 	if orgID == "" && orgDomain == "" {
 		orgID = resourceOwner
 	}
-
-	verifiedOrgID, err := t.ExistsOrg(ctx, orgID, orgDomain)
-	if err != nil {
-		err = retry(func() error {
-			verifiedOrgID, err = t.ExistsOrg(ctx, orgID, orgDomain)
-			return err
-		})
+	// System API calls dont't have a resource owner
+	if orgID != "" {
+		orgID, err = t.ExistsOrg(ctx, orgID, orgDomain)
 		if err != nil {
-			return CtxData{}, errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
+			return CtxData{}, zitadel_errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
 		}
 	}
-
 	return CtxData{
 		UserID:            userID,
-		OrgID:             verifiedOrgID,
+		OrgID:             orgID,
 		ProjectID:         projectID,
 		AgentID:           agentID,
 		PreferredLanguage: prefLang,
 		ResourceOwner:     resourceOwner,
+		SystemMemberships: sysMemberships,
 	}, nil
-
 }
 
 func SetCtxData(ctx context.Context, ctxData CtxData) context.Context {
@@ -122,15 +162,10 @@ func GetRequestPermissionsFromCtx(ctx context.Context) []string {
 	return ctxPermission
 }
 
-func GetAllPermissionsFromCtx(ctx context.Context) []string {
-	ctxPermission, _ := ctx.Value(allPermissionsKey).([]string)
-	return ctxPermission
-}
-
 func checkOrigin(ctx context.Context, origins []string) error {
 	origin := grpc.GetGatewayHeader(ctx, http_util.Origin)
 	if origin == "" {
-		origin = http_util.OriginFromCtx(ctx)
+		origin = http_util.OriginHeader(ctx)
 		if origin == "" {
 			return nil
 		}
@@ -138,5 +173,13 @@ func checkOrigin(ctx context.Context, origins []string) error {
 	if http_util.IsOriginAllowed(origins, origin) {
 		return nil
 	}
-	return errors.ThrowPermissionDenied(nil, "AUTH-DZG21", "Errors.OriginNotAllowed")
+	return zitadel_errors.ThrowPermissionDenied(nil, "AUTH-DZG21", "Errors.OriginNotAllowed")
+}
+
+func extractBearerToken(token string) (part string, err error) {
+	parts := strings.Split(token, BearerPrefix)
+	if len(parts) != 2 {
+		return "", zitadel_errors.ThrowUnauthenticated(nil, "AUTH-7fs1e", "invalid auth header")
+	}
+	return parts[1], nil
 }

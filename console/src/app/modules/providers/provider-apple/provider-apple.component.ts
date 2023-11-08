@@ -2,7 +2,7 @@ import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
-import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
+import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs';
 import {
@@ -246,7 +246,8 @@ export class ProviderAppleComponent {
           return (e) => {
             const keyBase64 = e.target?.result;
             if (keyBase64 && typeof keyBase64 === 'string') {
-              const cropped = keyBase64.replace('data:application/octet-stream;base64,', '');
+              const contentType = file.type || 'application/octet-stream';
+              const cropped = keyBase64.replace(`data:${contentType};base64,`, '');
               this.privateKey?.setValue(cropped);
             }
           };

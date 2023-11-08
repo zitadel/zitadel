@@ -96,7 +96,7 @@ func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage dom
 		return nil, errors.ThrowInternal(err, "QUERY-Sgan4", "Errors.Internal")
 	}
 
-	certs.LatestSequence, err = q.latestSequence(ctx, keyTable)
+	certs.State, err = q.latestState(ctx, keyTable)
 	if !errors.IsNotFound(err) {
 		return certs, err
 	}

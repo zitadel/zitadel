@@ -55,12 +55,6 @@ func AssetAPI(externalSecure bool) func(context.Context) string {
 	}
 }
 
-func AssetAPIFromDomain(externalSecure bool, externalPort uint16) func(context.Context) string {
-	return func(ctx context.Context) string {
-		return http_util.BuildHTTP(authz.GetInstance(ctx).RequestedDomain(), externalPort, externalSecure) + HandlerPrefix
-	}
-}
-
 type Uploader interface {
 	UploadAsset(ctx context.Context, info string, asset *command.AssetUpload, commands *command.Commands) error
 	ObjectName(data authz.CtxData) (string, error)
@@ -86,7 +80,7 @@ func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error, defa
 	http.Error(w, err.Error(), code)
 }
 
-func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authConfig authz.Config, idGenerator id.Generator, storage static.Storage, queries *query.Queries, callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor func(handler http.Handler) http.Handler) http.Handler {
+func NewHandler(commands *command.Commands, verifier authz.APITokenVerifier, authConfig authz.Config, idGenerator id.Generator, storage static.Storage, queries *query.Queries, callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor func(handler http.Handler) http.Handler) http.Handler {
 	h := &Handler{
 		commands:        commands,
 		errorHandler:    DefaultErrorHandler,
@@ -98,6 +92,8 @@ func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authC
 
 	verifier.RegisterServer("Assets-API", "assets", AssetsService_AuthMethods)
 	router := mux.NewRouter()
+	csp := http_mw.SecurityHeaders(&http_mw.DefaultSCP, nil)
+	router.Use(callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor, csp)
 	router.Use(callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor)
 	RegisterRoutes(router, h)
 	router.PathPrefix("/{owner}").Methods("GET").HandlerFunc(DownloadHandleFunc(h, h.GetFile()))
@@ -146,7 +142,7 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 			return
 		}
 		if size > uploader.MaxFileSize() {
-			s.ErrorHandler()(w, r, fmt.Errorf("file to big, max file size is %vKB", uploader.MaxFileSize()/1024), http.StatusBadRequest)
+			s.ErrorHandler()(w, r, fmt.Errorf("file too big, max file size is %vKB", uploader.MaxFileSize()/1024), http.StatusBadRequest)
 			return
 		}
 

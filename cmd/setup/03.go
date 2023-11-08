@@ -24,6 +24,7 @@ type FirstInstance struct {
 	Org             command.InstanceOrgSetup
 	MachineKeyPath  string
 	PatPath         string
+	Features        map[domain.Feature]any
 
 	instanceSetup     command.InstanceSetup
 	userEncryptionKey *crypto.KeyConfig
@@ -104,13 +105,21 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 	// check if username is email style or else append @<orgname>.<custom-domain>
 	//this way we have the same value as before changing `UserLoginMustBeDomain` to false
 	if !mig.instanceSetup.DomainPolicy.UserLoginMustBeDomain && !strings.Contains(mig.instanceSetup.Org.Human.Username, "@") {
-		mig.instanceSetup.Org.Human.Username = mig.instanceSetup.Org.Human.Username + "@" + domain.NewIAMDomainName(mig.instanceSetup.Org.Name, mig.instanceSetup.CustomDomain)
+		orgDomain, err := domain.NewIAMDomainName(mig.instanceSetup.Org.Name, mig.instanceSetup.CustomDomain)
+		if err != nil {
+			return err
+		}
+		mig.instanceSetup.Org.Human.Username = mig.instanceSetup.Org.Human.Username + "@" + orgDomain
 	}
 	mig.instanceSetup.Org.Human.Email.Address = mig.instanceSetup.Org.Human.Email.Address.Normalize()
 	if mig.instanceSetup.Org.Human.Email.Address == "" {
 		mig.instanceSetup.Org.Human.Email.Address = domain.EmailAddress(mig.instanceSetup.Org.Human.Username)
 		if !strings.Contains(string(mig.instanceSetup.Org.Human.Email.Address), "@") {
-			mig.instanceSetup.Org.Human.Email.Address = domain.EmailAddress(mig.instanceSetup.Org.Human.Username + "@" + domain.NewIAMDomainName(mig.instanceSetup.Org.Name, mig.instanceSetup.CustomDomain))
+			orgDomain, err := domain.NewIAMDomainName(mig.instanceSetup.Org.Name, mig.instanceSetup.CustomDomain)
+			if err != nil {
+				return err
+			}
+			mig.instanceSetup.Org.Human.Email.Address = domain.EmailAddress(mig.instanceSetup.Org.Human.Username + "@" + orgDomain)
 		}
 	}
 

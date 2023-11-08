@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/client/rp"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -30,9 +30,9 @@ type Session struct {
 	Tokens  *oidc.Tokens[*oidc.IDTokenClaims]
 }
 
-// GetAuthURL implements the [idp.Session] interface
-func (s *Session) GetAuthURL() string {
-	return s.AuthURL
+// GetAuth implements the [idp.Session] interface.
+func (s *Session) GetAuth(ctx context.Context) (string, bool) {
+	return idp.Redirect(s.AuthURL)
 }
 
 // FetchUser implements the [idp.Session] interface.

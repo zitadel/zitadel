@@ -22,29 +22,27 @@ FirstInstance:
       PasswordChangeRequired: false
 
 LogStore:
-  Access:
-    Database:
-      Enabled: true
-      Debounce:
-        MinFrequency: 0s
-        MaxBulkSize: 0
   Execution:
-    Database:
-      Enabled: true
     Stdout:
       Enabled: true
 
 Quotas:
   Access:
+    Enabled: true
     ExhaustedCookieKey: "zitadel.quota.limiting"
     ExhaustedCookieMaxAge: "60s"
+  Execution:
+    Enabled: true
 
 Projections:
+  HandleActiveInstances: 60s
   Customizations:
     NotificationsQuotas:
       RequeueEvery: 1s
+      HandleActiveInstances: 60s
     Telemetry:
       RequeueEvery: 5s
+      HandleActiveInstances: 60s
 
 DefaultInstance:
   LoginPolicy:

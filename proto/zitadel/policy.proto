@@ -145,6 +145,14 @@ message LabelPolicy {
         }
     ];
     string font_url = 18;
+    ThemeMode theme_mode = 19;
+}
+
+enum ThemeMode {
+    THEME_MODE_UNSPECIFIED = 0;
+    THEME_MODE_AUTO = 1;
+    THEME_MODE_DARK = 2;
+    THEME_MODE_LIGHT = 3;
 }
 
 message LoginPolicy {

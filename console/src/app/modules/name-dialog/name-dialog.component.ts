@@ -1,8 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import {
-  MatLegacyDialogRef as MatDialogRef,
-  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
-} from '@angular/material/legacy-dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
   selector: 'cnsl-name-dialog',
@@ -11,7 +8,10 @@ import {
 })
 export class NameDialogComponent {
   public name: string = '';
-  constructor(public dialogRef: MatDialogRef<NameDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor(
+    public dialogRef: MatDialogRef<NameDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+  ) {
     this.name = data.name ?? '';
   }
 

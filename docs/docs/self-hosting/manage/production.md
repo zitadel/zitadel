@@ -1,5 +1,6 @@
 ---
-title: Production Setup
+title: ZITADEL Production Setup
+sidebar_lable: Production Setup
 ---
 
 As soon as you successfully deployed ZITADEL as a proof of concept using one of our [deployment guides](/docs/self-hosting/deploy/overview),
@@ -208,10 +209,10 @@ DefaultInstance:
 - Probably, you also want to [apply your custom branding](/guides/manage/customize/branding), [hook into certain events](/guides/manage/customize/behavior), [customize texts](/guides/manage/customize/texts) or [add metadata to your users](/guides/manage/customize/user-metadata).
 - If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/guides/manage/terraform/basics).
 
-## Quotas
+## Limits and Quotas
 
 If you host ZITADEL as a service,
-you might want to [limit usage and/or execute tasks on certain usage units and levels](/self-hosting/manage/quotas).
+you might want to [limit usage and/or execute tasks on certain usage units and levels](/self-hosting/manage/usage_control).
 
 ## Minimum system requirements
 

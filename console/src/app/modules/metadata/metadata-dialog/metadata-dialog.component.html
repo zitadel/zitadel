@@ -1,10 +1,8 @@
 <div class="title-row">
-  <h1 class="metadata-title">{{ 'METADATA.TITLE' | translate }}</h1>
+  <h1 class="metadata-title" mat-dialog-title>{{ 'METADATA.TITLE' | translate }}</h1>
   <span class="fill-space"></span>
-  <p *ngIf="ts" class="ts cnsl-secondary-text">{{ ts | timestampToDate | localizedDate : 'dd. MMM, HH:mm' }}</p>
-  <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+  <p *ngIf="ts" class="ts cnsl-secondary-text">{{ ts | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</p>
 </div>
-<p class="desc">{{ 'METADATA.DESCRIPTION' | translate }}</p>
 <div mat-dialog-content class="metadata-dialog-content">
   <form *ngFor="let md of metadata; index as i" (ngSubmit)="saveElement(i)">
     <div class="content">
@@ -40,9 +38,11 @@
       </button>
     </div>
   </form>
-  <button (click)="addEntry()" mat-stroked-button class="continue-button" type="button">
-    <mat-icon>add</mat-icon>
-    {{ 'ACTIONS.ADD' | translate }}
+  <button (click)="addEntry()" mat-stroked-button type="button">
+    <div class="cnsl-action-button">
+      <mat-icon>add</mat-icon>
+      <span> {{ 'ACTIONS.ADD' | translate }}</span>
+    </div>
   </button>
 </div>
 <div mat-dialog-actions class="action">

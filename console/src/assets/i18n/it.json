@@ -51,7 +51,7 @@
       "TITLE": "Fate funzionare il vostro ZITADEL",
       "DESCRIPTION": "Questa lista di azioni aiuta a configurare la vostra istanza e vi guida attraverso i passaggi più essenziali."
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Imposta il tuo marchio",
         "description": "Definisci la colorazione e il design del vostro login e caricate il vostro logo e le vostre icone.",
@@ -62,15 +62,20 @@
         "description": "Imposta il proprio server di posta",
         "action": "Configura SMTP"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Crea il tuo primo progetto",
         "description": "Aggiungere il primo progetto e definire i ruoli e le autorizzazioni.",
         "action": "Crea progetto"
       },
-      "project.application.added": {
-        "title": "Crea la tua prima applicazione",
-        "description": "Crea un'applicazione web, nativa, api o saml e imposta il flusso di autenticazione.",
-        "action": "Crea applicazione"
+      "APPLICATION_CREATED": {
+        "title": "Registra la tua app",
+        "description": "Registra la tua applicazione web, nativa, api o saml e configura un flusso di autenticazione.",
+        "action": "Registra app"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Accedi alla tua app",
+        "description": "Integra la tua applicazione con ZITADEL per l'autenticazione e testala accedendo con il tuo utente amministratore.",
+        "action": "Accedi"
       },
       "user.human.added": {
         "title": "Aggiungi utenti",
@@ -95,7 +100,6 @@
     "EVENTS": "Eventi",
     "FAILEDEVENTS": "Eventi falliti",
     "ORGANIZATION": "Organizzazione",
-    "DOMAINS": "Domini",
     "PROJECT": "Progetti",
     "PROJECTOVERVIEW": "Progetto",
     "PROJECTGRANTS": "Organizzazioni ammissibili",
@@ -273,7 +277,7 @@
     "SYMBOLERROR": "Deve includere un simbolo o un segno di punteggiatura.",
     "NUMBERERROR": "Deve includere una cifra.",
     "PWNOTEQUAL": "Le password fornite non corrispondono.",
-    "PHONE": "Il numero di telefono deve iniziare con 00 o +."
+    "PHONE": "Il numero di telefono deve iniziare con +."
   },
   "USER": {
     "SETTINGS": {
@@ -485,7 +489,7 @@
       "TITLE": "Profilo",
       "EMAIL": "E-mail",
       "PHONE": "Numero di telefono",
-      "PHONE_HINT": "Utilizza 00 o il simbolo + seguito dal prefisso del paese, o seleziona il paese ed inserisci il numero di telefono",
+      "PHONE_HINT": "Utilizza il simbolo + seguito dal prefisso del paese, o seleziona il paese ed inserisci il numero di telefono",
       "USERNAME": "Nome utente",
       "CHANGEUSERNAME": "cambia",
       "CHANGEUSERNAME_TITLE": "Cambia nome utente",
@@ -494,6 +498,7 @@
       "LASTNAME": "Cognome",
       "NICKNAME": "Soprannome",
       "DISPLAYNAME": "DisplayName",
+      "PREFERREDLOGINNAME": "Nome di accesso preferito",
       "PREFERRED_LANGUAGE": "Lingua",
       "GENDER": "Genere",
       "PASSWORD": "Password",
@@ -711,7 +716,6 @@
   },
   "METADATA": {
     "TITLE": "Metadati",
-    "DESCRIPTION": "",
     "KEY": "Chiave",
     "VALUE": "Valore",
     "ADD": "Nuova voce",
@@ -794,7 +798,7 @@
     },
     "PAGES": {
       "STATE": "Stato",
-      "DOMAINLIST": "Domini"
+      "DOMAINLIST": "Domini personalizzati"
     },
     "STATE": {
       "0": "Non specifico",
@@ -952,7 +956,7 @@
     },
     "DOMAINS": {
       "NEW": "Aggiungi dominio",
-      "TITLE": "Domini",
+      "TITLE": "Domini verificati",
       "DESCRIPTION": "Configura i tuoi domini. Questo dominio pu\u00f2 essere utilizzato per accedere con i tuoi utenti.",
       "SETPRIMARY": "Impostato come primario",
       "DELETE": {
@@ -1019,9 +1023,12 @@
       "LOCKOUT": "Meccanismi di bloccaggio",
       "COMPLEXITY": "Complessità della password",
       "NOTIFICATIONS": "Impostazioni di notifica",
+      "SMTP_PROVIDER": "Fornitore SMTP",
+      "SMS_PROVIDER": "Fornitore di servizi SMS/telefonici",
       "NOTIFICATIONS_DESC": "Impostazioni SMTP e SMS",
       "MESSAGETEXTS": "Testi di notifica",
       "IDP": "Fornitori di identità",
+      "VERIFIED_DAMAINS": "Domini verificati",
       "DOMAIN": "Impostazioni del dominio",
       "LOGINTEXTS": "Testi dell'interfaccia login",
       "BRANDING": "Branding",
@@ -1089,6 +1096,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio aggiunto con successo.",
+        "UPDATED": "Twilio aggiornato correttamente.",
         "REMOVED": "Twilio rimosso con successo.",
         "CHANGETOKEN": "Cambia Token",
         "SETTOKEN": "Cambia Token",
@@ -1105,7 +1113,7 @@
       "INDAYS": "giorni"
     },
     "SECRETS": {
-      "TITLE": "Aspetto dei segreti",
+      "TITLE": "Generatore di password",
       "TYPES": "Tipi di segreti",
       "TYPE": {
         "1": "Initializzazione email",
@@ -1117,7 +1125,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
-      "ADDGENERATOR": "Definisci aspetto",
+      "ADDGENERATOR": "Imposta il generatore di password",
       "GENERATORTYPE": "Tipo",
       "EXPIRY": "Scadenza (in ore)",
       "INCLUDEDIGITS": "Contiene numeri",
@@ -1195,6 +1203,11 @@
         "ERROR": "L'utente non \u00e8 stato trovato!",
         "PRIMARYBUTTON": "Avanti",
         "SECONDARYBUTTON": "Registra"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Modalità automatica",
+        "THEME_MODE_LIGHT": "Solo modalità luminosa",
+        "THEME_MODE_DARK": "Solo modalità oscura"
       }
     },
     "PWD_AGE": {
@@ -1352,7 +1365,7 @@
       "MAXAGEDAYS": "Lunghezza massima in giorni",
       "USERLOGINMUSTBEDOMAIN": "Nome utente deve contenere il dominio dell' organizzazione",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Se abiliti questa impostazione, a tutti i nomi di accesso verrà aggiunto il suffisso del dominio dell'organizzazione. Se questa impostazione è disabilitata, devi assicurarti che i nomi utente siano univoci per tutte le organizzazioni.",
-      "VALIDATEORGDOMAINS": "Verifica domini dell' organizzazione",
+      "VALIDATEORGDOMAINS": "Verifica del dominio dell'organizzazione richiesta (challenge DNS o HTTP)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "L'indirizzo mittente SMTP corrisponde al dominio dell'istanza",
       "ALLOWUSERNAMEPASSWORD": "Autenticazione classica con password consentita",
       "ALLOWEXTERNALIDP": "IDP esterno consentito",
@@ -1986,6 +1999,8 @@
       "CLIENTSECRET_DESCRIPTION": "Salvate il Client Secret in un luogo sicuro, perch\u00e9 non sarà più disponibile dopo aver chiuso la finestra di dialogo",
       "REGENERATESECRET": "Rigenera il Client Secret",
       "DEVMODE": "Modalit\u00e0 di sviluppo (DEV Mode)",
+      "DEVMODE_ENABLED": "Attivato",
+      "DEVMODE_DISABLED": "Disattivato",
       "DEVMODEDESC": "Attenzione: Con la modalit\u00e0 di sviluppo abilitata, gli URI di reindirizzamento non saranno convalidati.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Salta la pagina di successo dopo il login",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Salta la pagina di successo dopo il login per questa applicazione nativa",
@@ -2072,11 +2087,16 @@
         "DESCRIPTION": "Applicazioni SAMML"
       },
       "CONFIGSECTION": "Configurazione SAML",
-      "URL": "URL in cui si trova il file di metadati",
-      "OR": "o",
-      "XML": "Carica Metadata XML",
+      "CHOOSEMETADATASOURCE": "Fornisci la tua configurazione SAML utilizzando una delle seguenti opzioni:",
+      "METADATAOPT1": "Opzione 1. Specificare l'URL in cui si trova il file di metadati",
+      "METADATAOPT2": "Opzione 2. Carica un file contenente il tuo XML di metadati",
+      "METADATAOPT3": "Opzione 3. Crea al volo un file di metadati minimo fornendo ENTITYID e URL ACS",
+      "UPLOAD": "Carica il file XML",
       "METADATA": "Metadata",
-      "METADATAFROMFILE": "Metadati dal file"
+      "METADATAFROMFILE": "Metadati dal file",
+      "CREATEMETADATA": "Crea metadati",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {

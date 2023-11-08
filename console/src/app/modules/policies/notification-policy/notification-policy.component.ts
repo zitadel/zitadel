@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import {
   AddNotificationPolicyRequest,
   GetNotificationPolicyResponse as AdminGetNotificationPolicyResponse,
@@ -36,7 +36,11 @@ export class NotificationPolicyComponent implements OnInit {
 
   public isDefault: boolean = false;
   private hasNotificationPolicy: boolean = false;
-  constructor(private toast: ToastService, private injector: Injector, private dialog: MatDialog) {}
+  constructor(
+    private toast: ToastService,
+    private injector: Injector,
+    private dialog: MatDialog,
+  ) {}
 
   public ngOnInit(): void {
     switch (this.serviceType) {

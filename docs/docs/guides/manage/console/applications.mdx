@@ -1,5 +1,6 @@
 ---
-title: Applications
+title: ZITADEL Applications
+sidebar_label: Applications
 ---
 
 import ThemedImage from "@theme/ThemedImage";
@@ -7,7 +8,7 @@ import ThemedImage from "@theme/ThemedImage";
 import AuthType from "../../integrate/application/_auth-type.mdx";
 import ReviewConfig from "../../integrate/application/_review-config.mdx";
 
-# What is an application?
+## What is an application?
 
 Applications are the entry point to your project.
 Users either login into one of your clients and interact with them directly or use one of your APIs.
@@ -111,7 +112,16 @@ Native applications can use a different protocol than http or https in order to 
   width="600px"
 />
 
-In order to **develop locally** and due to the fact that any ZITADEL configuration is secure by default, ZITADEL requires you enable **dev mode** if you want to redirect users to URIs other than https://.
+### Development mode
+
+In order to develop locally, or you want to redirect users to any other protocol than https://, you must enable **Development mode**.
+When disabled only https is allowed, as ZITADEL's configuration is secure by default.
+
+<img
+  alt="Development mode"
+  src="/docs/img/guides/console/developmentmode.png"
+  width="600px"
+/>
 
 ## Review Configuration
 

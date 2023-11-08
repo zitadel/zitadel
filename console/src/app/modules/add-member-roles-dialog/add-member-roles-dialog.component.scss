@@ -12,8 +12,6 @@
   flex-direction: column;
 
   .role-cb {
-    padding: 0.25rem 0;
-
     .role-cb-content {
       padding-left: 0.5rem;
       display: flex;
@@ -30,5 +28,9 @@
 
 .action {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+
+  .ok-button {
+    margin-left: 1rem;
+  }
 }

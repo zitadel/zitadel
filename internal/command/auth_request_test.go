@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"net"
+	"net/http"
 	"testing"
 	"time"
 
@@ -13,7 +15,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
@@ -77,29 +78,26 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("instanceID",
-								authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
-									"loginClient",
-									"clientID",
-									"redirectURI",
-									"state",
-									"nonce",
-									[]string{"openid"},
-									[]string{"audience"},
-									domain.OIDCResponseTypeCode,
-									&domain.OIDCCodeChallenge{
-										Challenge: "challenge",
-										Method:    domain.CodeChallengeMethodS256,
-									},
-									[]domain.Prompt{domain.PromptNone},
-									[]string{"en", "de"},
-									gu.Ptr(time.Duration(0)),
-									gu.Ptr("loginHint"),
-									gu.Ptr("hintUserID"),
-								),
-							),
-						}),
+						authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							"loginClient",
+							"clientID",
+							"redirectURI",
+							"state",
+							"nonce",
+							[]string{"openid"},
+							[]string{"audience"},
+							domain.OIDCResponseTypeCode,
+							&domain.OIDCCodeChallenge{
+								Challenge: "challenge",
+								Method:    domain.CodeChallengeMethodS256,
+							},
+							[]domain.Prompt{domain.PromptNone},
+							[]string{"en", "de"},
+							gu.Ptr(time.Duration(0)),
+							gu.Ptr("loginHint"),
+							gu.Ptr("hintUserID"),
+						),
+					),
 				),
 				idGenerator: mock.NewIDGeneratorExpectIDs(t, "id"),
 			},
@@ -329,7 +327,67 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				sessionID: "sessionID",
 			},
 			res{
-				wantErr: caos_errs.ThrowNotFound(nil, "COMMAND-x0099887", "Errors.Session.NotExisting"),
+				wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Flk38", "Errors.Session.NotExisting"),
+			},
+		},
+		{
+			"session expired",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"loginClient",
+								"clientID",
+								"redirectURI",
+								"state",
+								"nonce",
+								[]string{"openid"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeCode,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(mockCtx,
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+								"userID", testNow.Add(-5*time.Minute)),
+						),
+						eventFromEventPusher(
+							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+								testNow.Add(-5*time.Minute)),
+						),
+						eventFromEventPusher(
+							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+								2*time.Minute),
+						),
+					),
+				),
+			},
+			args{
+				ctx:          mockCtx,
+				id:           "V2_id",
+				sessionID:    "sessionID",
+				sessionToken: "token",
+			},
+			res{
+				wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Hkl3d", "Errors.Session.Expired"),
 			},
 		},
 		{
@@ -358,7 +416,15 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate)),
+							session.NewAddedEvent(mockCtx,
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
 					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
@@ -401,7 +467,15 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate)),
+							session.NewAddedEvent(mockCtx,
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
 					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
@@ -444,8 +518,15 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate),
-						),
+							session.NewAddedEvent(mockCtx,
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
 								"userID", testNow),
@@ -454,17 +535,19 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
 								testNow),
 						),
+						eventFromEventPusherWithCreationDateNow(
+							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+								2*time.Minute),
+						),
 					),
 					expectPush(
-						[]*repository.Event{eventFromEventPusherWithInstanceID(
-							"instanceID",
-							authrequest.NewSessionLinkedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
-								"sessionID",
-								"userID",
-								testNow,
-								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-							),
-						)}),
+						authrequest.NewSessionLinkedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							"sessionID",
+							"userID",
+							testNow,
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+						),
+					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
 					return nil
@@ -523,8 +606,15 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							session.NewAddedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate),
-						),
+							session.NewAddedEvent(mockCtx,
+								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
 								"userID", testNow),
@@ -533,17 +623,19 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
 								testNow),
 						),
+						eventFromEventPusherWithCreationDateNow(
+							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+								2*time.Minute),
+						),
 					),
 					expectPush(
-						[]*repository.Event{eventFromEventPusherWithInstanceID(
-							"instanceID",
-							authrequest.NewSessionLinkedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
-								"sessionID",
-								"userID",
-								testNow,
-								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-							),
-						)}),
+						authrequest.NewSessionLinkedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							"sessionID",
+							"userID",
+							testNow,
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+						),
+					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
 					return nil
@@ -659,11 +751,9 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{eventFromEventPusherWithInstanceID(
-							"instanceID",
-							authrequest.NewFailedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
-								domain.OIDCErrorReasonLoginRequired),
-						)}),
+						authrequest.NewFailedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							domain.OIDCErrorReasonLoginRequired),
+					),
 				),
 			},
 			args{
@@ -802,11 +892,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("instanceID",
-								authrequest.NewCodeAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
-							),
-						},
+						authrequest.NewCodeAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 					),
 				),
 			},
@@ -937,11 +1023,7 @@ func TestCommands_ExchangeAuthCode(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("instanceID",
-								authrequest.NewCodeExchangedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
-							),
-						},
+						authrequest.NewCodeExchangedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 					),
 				),
 			},

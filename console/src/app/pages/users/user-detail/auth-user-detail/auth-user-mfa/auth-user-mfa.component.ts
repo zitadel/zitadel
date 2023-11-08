@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { MatLegacyTable as MatTable, MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
+import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { AuthFactor, AuthFactorState } from 'src/app/proto/generated/zitadel/user_pb';
@@ -42,7 +42,11 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   public otpSmsDisabled$ = new BehaviorSubject<boolean>(true);
   public otpEmailDisabled$ = new BehaviorSubject<boolean>(true);
 
-  constructor(private service: GrpcAuthService, private toast: ToastService, private dialog: MatDialog) {}
+  constructor(
+    private service: GrpcAuthService,
+    private toast: ToastService,
+    private dialog: MatDialog,
+  ) {}
 
   public ngOnInit(): void {
     this.getMFAs();
@@ -153,7 +157,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
           this.service
             .removeMyAuthFactorOTPEmail()
             .then(() => {
-              this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
+              this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
 
               this.cleanupList();
               this.getMFAs();
@@ -165,7 +169,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
           this.service
             .removeMyAuthFactorOTPSMS()
             .then(() => {
-              this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
+              this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
 
               this.cleanupList();
               this.getMFAs();

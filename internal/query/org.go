@@ -8,10 +8,13 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	domain_pkg "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -94,7 +97,10 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.OrgProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerOrgProjection")
+		ctx, err = projection.OrgProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	stmt, scan := prepareOrgQuery(ctx, q.client)
@@ -231,7 +237,7 @@ func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (or
 		return nil, errors.ThrowInternal(err, "QUERY-M6mYN", "Errors.Internal")
 	}
 
-	orgs.LatestSequence, err = q.latestSequence(ctx, orgsTable)
+	orgs.State, err = q.latestState(ctx, orgsTable)
 	return orgs, err
 }
 

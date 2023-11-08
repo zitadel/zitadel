@@ -13,16 +13,6 @@ import (
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
-)
-
-const (
-	metricSuccessfulDeliveriesEmail = "successful_deliveries_email"
-	metricFailedDeliveriesEmail     = "failed_deliveries_email"
-	metricSuccessfulDeliveriesSMS   = "successful_deliveries_sms"
-	metricFailedDeliveriesSMS       = "failed_deliveries_sms"
-	metricSuccessfulDeliveriesJSON  = "successful_deliveries_json"
-	metricFailedDeliveriesJSON      = "failed_deliveries_json"
 )
 
 func Start(
@@ -35,55 +25,17 @@ func Start(
 	commands *command.Commands,
 	queries *query.Queries,
 	es *eventstore.Eventstore,
-	assetsPrefix func(context.Context) string,
 	otpEmailTmpl string,
 	fileSystemPath string,
 	userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm,
 ) {
 	statikFS, err := statik_fs.NewWithNamespace("notification")
 	logging.OnError(err).Panic("unable to start listener")
-	err = metrics.RegisterCounter(metricSuccessfulDeliveriesEmail, "Successfully delivered emails")
-	logging.WithFields("metric", metricSuccessfulDeliveriesEmail).OnError(err).Panic("unable to register counter")
-	err = metrics.RegisterCounter(metricFailedDeliveriesEmail, "Failed email deliveries")
-	logging.WithFields("metric", metricFailedDeliveriesEmail).OnError(err).Panic("unable to register counter")
-	err = metrics.RegisterCounter(metricSuccessfulDeliveriesSMS, "Successfully delivered SMS")
-	logging.WithFields("metric", metricSuccessfulDeliveriesSMS).OnError(err).Panic("unable to register counter")
-	err = metrics.RegisterCounter(metricFailedDeliveriesSMS, "Failed SMS deliveries")
-	logging.WithFields("metric", metricFailedDeliveriesSMS).OnError(err).Panic("unable to register counter")
-	err = metrics.RegisterCounter(metricSuccessfulDeliveriesJSON, "Successfully delivered JSON messages")
-	logging.WithFields("metric", metricSuccessfulDeliveriesJSON).OnError(err).Panic("unable to register counter")
-	err = metrics.RegisterCounter(metricFailedDeliveriesJSON, "Failed JSON message deliveries")
-	logging.WithFields("metric", metricFailedDeliveriesJSON).OnError(err).Panic("unable to register counter")
 	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption, statikFS)
-	handlers.NewUserNotifier(
-		ctx,
-		projection.ApplyCustomConfig(userHandlerCustomConfig),
-		commands,
-		q,
-		assetsPrefix,
-		otpEmailTmpl,
-		metricSuccessfulDeliveriesEmail,
-		metricFailedDeliveriesEmail,
-		metricSuccessfulDeliveriesSMS,
-		metricFailedDeliveriesSMS,
-	).Start()
-	handlers.NewQuotaNotifier(
-		ctx,
-		projection.ApplyCustomConfig(quotaHandlerCustomConfig),
-		commands,
-		q,
-		metricSuccessfulDeliveriesJSON,
-		metricFailedDeliveriesJSON,
-	).Start()
+	c := newChannels(q)
+	handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl).Start(ctx)
+	handlers.NewQuotaNotifier(ctx, projection.ApplyCustomConfig(quotaHandlerCustomConfig), commands, q, c).Start(ctx)
 	if telemetryCfg.Enabled {
-		handlers.NewTelemetryPusher(
-			ctx,
-			telemetryCfg,
-			projection.ApplyCustomConfig(telemetryHandlerCustomConfig),
-			commands,
-			q,
-			metricSuccessfulDeliveriesJSON,
-			metricFailedDeliveriesJSON,
-		).Start()
+		handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c).Start(ctx)
 	}
 }

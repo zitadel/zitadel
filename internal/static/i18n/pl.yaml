@@ -28,6 +28,9 @@ Errors:
       RemoveFailed: Obiekt nie mógł zostać usunięty
   Limit:
     ExceedsDefault: Limit przekracza domyślny limit
+  Limits:
+    NotFound: Limit nie znaleziony
+    NoneSpecified: Nie określono limitów
   Language:
     NotParsed: Nie można przeanalizować języka
   OIDCSettings:
@@ -120,7 +123,7 @@ Errors:
       Empty: Hasło jest puste
       Invalid: Hasło jest nieprawidłowe
       NotSet: Użytkownik nie ustawił hasła
-      NotChanged: Hasło nie zostało zmienione
+      NotChanged: Nowe hasło nie może być takie samo jak Twoje obecne hasło
       NotSupported: Kodowanie skrótu hasła nie jest obsługiwane
     PasswordComplexityPolicy:
       NotFound: Polityka hasła nie znaleziona
@@ -182,6 +185,11 @@ Errors:
     DomainVerificationTypeInvalid: Typ weryfikacji domeny jest nieprawidłowy
     DomainVerificationMissing: Weryfikacja domeny nie została jeszcze rozpoczęta
     DomainVerificationFailed: Weryfikacja domeny nie powiodła się
+    DomainVerificationTXTNotFound: Nie znaleziono rekordu TXT _zitadel-challenge dla Twojej domeny. Sprawdź, czy dodałeś go do swojego serwera DNS lub poczekaj, aż nowy rekord zostanie rozpropagowany
+    DomainVerificationTXTNoMatch: Znaleziono rekord TXT _zitadel-challenge dla Twojej domeny, ale nie zawiera on prawidłowego tekstu tokena. Sprawdź, czy dodałeś właściwy token do swojego serwera DNS lub poczekaj, aż nowy rekord zostanie rozpropagowany
+    DomainVerificationHTTPNotFound: Pod oczekiwanym adresem URL nie znaleziono pliku zawierającego wyzwanie. Sprawdź, czy przesłałeś plik we właściwe miejsce z uprawnieniami do odczytu
+    DomainVerificationHTTPNoMatch: Znaleziono plik zawierający wyzwanie pod oczekiwanym adresem URL, ale nie zawiera on prawidłowego tekstu tokena. Sprawdź jego zawartość
+    DomainVerificationTimeout: Upłynął limit czasu podczas wysyłania zapytania do serwera DNS
     PrimaryDomainNotDeletable: Domena główna nie może być usunięta
     DomainNotFound: Domena nie znaleziona
     MemberIDMissing: Brak identyfikatora członka
@@ -197,6 +205,7 @@ Errors:
     Domain:
       AlreadyExists: Domena już istnieje
       InvalidCharacter: Tylko znaki alfanumeryczne, . i - są dozwolone dla domeny
+      EmptyString: Nieprawidłowe znaki inne niż numeryczne i alfabetyczne zostały zastąpione pustymi spacjami, a wynikowa domena jest pustym ciągiem znaków
     IDP:
       InvalidSearchQuery: Nieprawidłowe zapytanie wyszukiwania
       ClientIDMissing: Brak ClientID
@@ -415,6 +424,7 @@ Errors:
     AuditRetention: Historia jest poza zasięgiem retencji dziennika audytu
   Token:
     NotFound: Token nie znaleziony
+    Invalid: Token jest nieprawidłowy
   UserSession:
     NotFound: Sesja użytkownika nie znaleziona
   Key:
@@ -481,12 +491,16 @@ Errors:
   Session:
     NotExisting: Sesja nie istnieje
     Terminated: Sesja już zakończona
+    Expired: Sesja wygasła
+    PositiveLifetime: Czas życia sesji nie może być krótszy niż 0
     Token:
       Invalid: Token sesji jest nieprawidłowy
     WebAuthN:
       NoChallenge: Sesja bez wyzwania WebAuthN
   Intent:
     IDPMissing: Brak identyfikatora IDP w żądaniu
+    IDPInvalid: IDP nieprawidłowe dla żądania
+    ResponseInvalid: Odpowiedź IDP jest nieprawidłowa
     SuccessURLMissing: Brak adresu URL powodzenia w żądaniu
     FailureURLMissing: Brak adresu URL niepowodzenia w żądaniu
     StateMissing: Brak parametru stanu w żądaniu
@@ -505,6 +519,10 @@ Errors:
       Invalid: Token jest nieprawidłowy
       Expired: Token wygasł
     InvalidClient: Token nie został wydany dla tego klienta
+  Feature:
+    NotExisting: Funkcja nie istnieje
+    TypeNotSupported: Typ funkcji nie jest obsługiwany
+    InvalidValue: Nieprawidłowa wartość dla tej funkcji
 
 AggregateTypes:
   action: Działanie
@@ -515,6 +533,7 @@ AggregateTypes:
   user: Użytkownik
   usergrant: Uprawnienie użytkownika
   quota: Limit
+  feature: Funkcja
 
 EventTypes:
   user:

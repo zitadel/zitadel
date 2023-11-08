@@ -2,7 +2,13 @@ package command
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/pem"
+	"math/big"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -16,9 +22,11 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
+	"github.com/zitadel/zitadel/internal/repository/feature"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	instance_repo "github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/repository/limits"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -73,6 +81,8 @@ type Commands struct {
 	publicKeyLifetime       time.Duration
 	certificateLifetime     time.Duration
 	defaultSecretGenerators *SecretGenerators
+
+	samlCertificateAndKeyGenerator func(id string) ([]byte, []byte, error)
 }
 
 func StartCommands(
@@ -130,6 +140,7 @@ func StartCommands(
 		defaultRefreshTokenLifetime:     defaultRefreshTokenLifetime,
 		defaultRefreshTokenIdleLifetime: defaultRefreshTokenIdleLifetime,
 		defaultSecretGenerators:         defaultSecretGenerators,
+		samlCertificateAndKeyGenerator:  samlCertificateAndKeyGenerator(defaults.KeyConfig.Size),
 	}
 
 	instance_repo.RegisterEventMappers(repo.eventstore)
@@ -140,11 +151,13 @@ func StartCommands(
 	keypair.RegisterEventMappers(repo.eventstore)
 	action.RegisterEventMappers(repo.eventstore)
 	quota.RegisterEventMappers(repo.eventstore)
+	limits.RegisterEventMappers(repo.eventstore)
 	session.RegisterEventMappers(repo.eventstore)
 	idpintent.RegisterEventMappers(repo.eventstore)
 	authrequest.RegisterEventMappers(repo.eventstore)
 	oidcsession.RegisterEventMappers(repo.eventstore)
 	milestone.RegisterEventMappers(repo.eventstore)
+	feature.RegisterEventMappers(repo.eventstore)
 
 	repo.codeAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.userPasswordHasher, err = defaults.PasswordHasher.PasswordHasher()
@@ -208,4 +221,37 @@ func exists(ctx context.Context, filter preparation.FilterToQueryReducer, wm exi
 		return false, err
 	}
 	return wm.Exists(), nil
+}
+
+func samlCertificateAndKeyGenerator(keySize int) func(id string) ([]byte, []byte, error) {
+	return func(id string) ([]byte, []byte, error) {
+		priv, pub, err := crypto.GenerateKeyPair(keySize)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		serial, err := strconv.Atoi(id)
+		if err != nil {
+			return nil, nil, err
+		}
+		template := x509.Certificate{
+			SerialNumber: big.NewInt(int64(serial)),
+			Subject: pkix.Name{
+				Organization: []string{"ZITADEL"},
+				SerialNumber: id,
+			},
+			KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+			ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			BasicConstraintsValid: true,
+		}
+
+		derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, pub, priv)
+		if err != nil {
+			return nil, nil, errors.ThrowInternalf(err, "COMMAND-x92u101j", "failed to create certificate")
+		}
+
+		keyBlock := &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(priv)}
+		certBlock := &pem.Block{Type: "CERTIFICATE", Bytes: derBytes}
+		return pem.EncodeToMemory(keyBlock), pem.EncodeToMemory(certBlock), nil
+	}
 }

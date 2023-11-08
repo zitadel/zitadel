@@ -30,11 +30,11 @@ type AddedEvent struct {
 	AuthTime    time.Time                   `json:"authTime"`
 }
 
-func (e *AddedEvent) Data() interface{} {
+func (e *AddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -76,11 +76,11 @@ type AccessTokenAddedEvent struct {
 	Lifetime time.Duration `json:"lifetime"`
 }
 
-func (e *AccessTokenAddedEvent) Data() interface{} {
+func (e *AccessTokenAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *AccessTokenAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *AccessTokenAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -111,11 +111,11 @@ type AccessTokenRevokedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *AccessTokenRevokedEvent) Data() interface{} {
+func (e *AccessTokenRevokedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *AccessTokenRevokedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *AccessTokenRevokedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -144,11 +144,11 @@ type RefreshTokenAddedEvent struct {
 	IdleLifetime time.Duration `json:"idleLifetime"`
 }
 
-func (e *RefreshTokenAddedEvent) Data() interface{} {
+func (e *RefreshTokenAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *RefreshTokenAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *RefreshTokenAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -182,11 +182,11 @@ type RefreshTokenRenewedEvent struct {
 	IdleLifetime time.Duration `json:"idleLifetime"`
 }
 
-func (e *RefreshTokenRenewedEvent) Data() interface{} {
+func (e *RefreshTokenRenewedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *RefreshTokenRenewedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *RefreshTokenRenewedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -215,11 +215,11 @@ type RefreshTokenRevokedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *RefreshTokenRevokedEvent) Data() interface{} {
+func (e *RefreshTokenRevokedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *RefreshTokenRevokedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *RefreshTokenRevokedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 

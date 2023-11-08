@@ -26,86 +26,102 @@
   <ng-template cnslHasRole [hasRole]="['user.write']" actions>
     <button
       (click)="deactivateSelectedUsers()"
-      class="cnsl-action-button bg-state inactive"
+      class="bg-state inactive"
       mat-raised-button
       *ngIf="selection.hasValue() && multipleDeactivatePossible"
-      [disabled]="!canWrite"
+      [disabled]="(canWrite$ | async) === false"
       color="primary"
     >
-      <span class="">{{ 'USER.TABLE.DEACTIVATE' | translate }}</span>
-      <cnsl-action-keys (actionTriggered)="deactivateSelectedUsers()" [type]="ActionKeysType.DEACTIVATE"> </cnsl-action-keys>
+      <div class="cnsl-action-button">
+        <span class="">{{ 'USER.TABLE.DEACTIVATE' | translate }}</span>
+        <cnsl-action-keys (actionTriggered)="deactivateSelectedUsers()" [type]="ActionKeysType.DEACTIVATE">
+        </cnsl-action-keys>
+      </div>
     </button>
     <button
       (click)="reactivateSelectedUsers()"
-      class="cnsl-action-button bg-state active margin-left"
+      class="bg-state active margin-left"
       mat-raised-button
       *ngIf="selection.hasValue() && multipleActivatePossible"
-      [disabled]="!canWrite"
+      [disabled]="(canWrite$ | async) === false"
       color="primary"
     >
-      <span class="">{{ 'USER.TABLE.ACTIVATE' | translate }}</span>
-      <cnsl-action-keys (actionTriggered)="reactivateSelectedUsers()" [type]="ActionKeysType.REACTIVATE"> </cnsl-action-keys>
+      <div class="cnsl-action-button">
+        <span class="">{{ 'USER.TABLE.ACTIVATE' | translate }}</span>
+        <cnsl-action-keys (actionTriggered)="reactivateSelectedUsers()" [type]="ActionKeysType.REACTIVATE">
+        </cnsl-action-keys>
+      </div>
     </button>
     <cnsl-filter-user
       *ngIf="!selection.hasValue()"
       (filterChanged)="applySearchQuery($any($event))"
       (filterOpen)="filterOpen = $event"
     ></cnsl-filter-user>
-    <a
-      [routerLink]="['/users', type === Type.TYPE_HUMAN ? 'create' : 'create-machine']"
+    <button
+      (click)="gotoRouterLink(['/users', type === Type.TYPE_HUMAN ? 'create' : 'create-machine'])"
       color="primary"
       mat-raised-button
-      [disabled]="!canWrite"
-      class="cnsl-action-button"
+      [disabled]="(canWrite$ | async) === false"
       *ngIf="!selection.hasValue()"
       data-e2e="create-user-button"
     >
-      <mat-icon class="icon">add</mat-icon>
-      <span>{{ 'ACTIONS.NEW' | translate }}</span>
-      <cnsl-action-keys
-        *ngIf="!filterOpen"
-        (actionTriggered)="gotoRouterLink(['/users', type === Type.TYPE_HUMAN ? 'create' : 'create-machine'])"
-      >
-      </cnsl-action-keys>
-    </a>
+      <div class="cnsl-action-button">
+        <mat-icon class="icon">add</mat-icon>
+        <span>{{ 'ACTIONS.NEW' | translate }}</span>
+        <cnsl-action-keys
+          *ngIf="!filterOpen"
+          (actionTriggered)="gotoRouterLink(['/users', type === Type.TYPE_HUMAN ? 'create' : 'create-machine'])"
+        >
+        </cnsl-action-keys>
+      </div>
+    </button>
   </ng-template>
 
   <div class="table-wrapper">
     <table class="table" mat-table [dataSource]="dataSource" matSort (matSortChange)="sortChange($event)">
       <ng-container matColumnDef="select">
-        <th mat-header-cell *matHeaderCellDef class="selection">
-          <mat-checkbox
-            [disabled]="!canWrite"
-            color="primary"
-            (change)="$event ? masterToggle() : null"
-            [checked]="selection.hasValue() && isAllSelected()"
-            [indeterminate]="selection.hasValue() && !isAllSelected()"
-          >
-          </mat-checkbox>
-        </th>
-        <td mat-cell *matCellDef="let user" class="selection">
-          <mat-checkbox
-            [disabled]="!canWrite"
-            color="primary"
-            (click)="$event.stopPropagation()"
-            (change)="$event ? selection.toggle(user) : null"
-            [checked]="selection.isSelected(user)"
-          >
-            <cnsl-avatar
-              *ngIf="user.human && user.human.profile; else cog"
-              class="avatar"
-              [name]="user.human.profile.displayName"
-              [avatarUrl]="user.human.profile.avatarUrl || ''"
-              [forColor]="user.preferredLoginName"
-              [size]="32"
+        <th mat-header-cell *matHeaderCellDef>
+          <div class="selection">
+            <mat-checkbox
+              class="checkbox"
+              [disabled]="(canWrite$ | async) === false"
+              color="primary"
+              (change)="$event ? masterToggle() : null"
+              [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()"
             >
-            </cnsl-avatar>
-            <ng-template #cog>
-              <cnsl-avatar [forColor]="user?.preferredLoginName" [isMachine]="true">
+              <cnsl-avatar class="hidden" [isMachine]="true">
                 <i class="las la-robot"></i>
               </cnsl-avatar>
-            </ng-template>
-          </mat-checkbox>
+            </mat-checkbox>
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let user">
+          <div class="selection">
+            <mat-checkbox
+              class="checkbox"
+              [disabled]="(canWrite$ | async) === false"
+              color="primary"
+              (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(user) : null"
+              [checked]="selection.isSelected(user)"
+            >
+              <cnsl-avatar
+                *ngIf="user.human && user.human.profile; else cog"
+                class="avatar"
+                [name]="user.human.profile.displayName"
+                [avatarUrl]="user.human.profile.avatarUrl || ''"
+                [forColor]="user.preferredLoginName"
+                [size]="32"
+              >
+              </cnsl-avatar>
+              <ng-template #cog>
+                <cnsl-avatar [forColor]="user?.preferredLoginName" [isMachine]="true">
+                  <i class="las la-robot"></i>
+                </cnsl-avatar>
+              </ng-template>
+            </mat-checkbox>
+          </div>
         </td>
       </ng-container>
 
@@ -121,6 +137,20 @@
         <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id] : null">
           <span *ngIf="user.human">{{ user.human.profile?.displayName }}</span>
           <span *ngIf="user.machine">{{ user.machine.name }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="preferredLoginName">
+        <th
+          mat-header-cell
+          *matHeaderCellDef
+          mat-sort-header
+          [ngClass]="{ 'search-active': this.userSearchKey === UserListSearchKey.DISPLAY_NAME }"
+        >
+          {{ 'USER.PROFILE.PREFERREDLOGINNAME' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id] : null">
+          <span *ngIf="user.human">{{ user.preferredLoginName }}</span>
         </td>
       </ng-container>
 
@@ -170,14 +200,14 @@
       <ng-container matColumnDef="creationDate">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'USER.TABLE.CREATIONDATE' | translate }}</th>
         <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id] : null">
-          <span class="no-break">{{ user.details.creationDate | timestampToDate | localizedDate : 'regular' }}</span>
+          <span class="no-break">{{ user.details.creationDate | timestampToDate | localizedDate: 'regular' }}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="changeDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'USER.TABLE.CHANGEDATE' | translate }}</th>
         <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id] : null">
-          <span class="no-break">{{ user.details.changeDate | timestampToDate | localizedDate : 'regular' }}</span>
+          <span class="no-break">{{ user.details.changeDate | timestampToDate | localizedDate: 'regular' }}</span>
         </td>
       </ng-container>
 
@@ -190,8 +220,12 @@
               matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
               color="warn"
               (click)="deleteUser(user)"
-              [disabled]="!canWrite || !canDelete"
-              [attr.data-e2e]="!canWrite || !canDelete ? 'disabled-delete-button' : 'enabled-delete-button'"
+              [disabled]="(canWrite$ | async) === false || (canDelete$ | async) === false"
+              [attr.data-e2e]="
+                (canWrite$ | async) === false || (canDelete$ | async) === false
+                  ? 'disabled-delete-button'
+                  : 'enabled-delete-button'
+              "
               mat-icon-button
             >
               <i class="las la-trash"></i>
