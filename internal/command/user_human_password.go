@@ -233,9 +233,12 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 	if wm.UserState == domain.UserStateUnspecified || wm.UserState == domain.UserStateDeleted {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.NotFound")
 	}
+	if wm.UserState == domain.UserStateLocked {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JLK35", "Errors.User.Locked")
+	}
 
 	if wm.EncodedHash == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.Password.NotSet")
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3nJ4t", "Errors.User.Password.NotSet")
 	}
 
 	userAgg := UserAggregateFromWriteModel(&wm.WriteModel)
@@ -243,8 +246,17 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 	updated, err := c.userPasswordHasher.Verify(wm.EncodedHash, password)
 	spanPasswordComparison.EndWithError(err)
 	err = convertPasswapErr(err)
-
 	commands := make([]eventstore.Command, 0, 2)
+
+	// recheck for additional events (failed password checks or locks)
+	recheckErr := c.eventstore.FilterToQueryReducer(ctx, wm)
+	if recheckErr != nil {
+		return recheckErr
+	}
+	if wm.UserState == domain.UserStateLocked {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SFA3t", "Errors.User.Locked")
+	}
+
 	if err == nil {
 		commands = append(commands, user.NewHumanPasswordCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 		if updated != "" {
@@ -259,7 +271,6 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 		if wm.PasswordCheckFailedCount+1 >= lockoutPolicy.MaxPasswordAttempts {
 			commands = append(commands, user.NewUserLockedEvent(ctx, userAgg))
 		}
-
 	}
 	_, pushErr := c.eventstore.Push(ctx, commands...)
 	logging.OnError(pushErr).Error("error create password check failed event")
