@@ -1061,7 +1061,8 @@
       "bg": "Български",
       "pt": "Portuguese",
       "mk": "Македонски",
-      "cs": "Čeština"
+      "cs": "Čeština",
+      "ru": "Русский"
     },
     "SMTP": {
       "TITLE": "Nastavení SMTP",
@@ -1273,7 +1274,8 @@
         "bg": "Български",
         "pt": "Portuguese",
         "mk": "Македонски",
-        "cs": "Čeština"
+        "cs": "Čeština",
+        "ru": "Русский"
       },
       "KEYS": {
         "emailVerificationDoneText": "Ověření e-mailu dokončeno",
@@ -2170,7 +2172,8 @@
     "bg": "Български",
     "pt": "Portuguese",
     "mk": "Македонски",
-    "cs": "Čeština"
+    "cs": "Čeština",
+    "ru": "Русский"
   },
   "MEMBER": {
     "ADD": "Přidat manažera",
