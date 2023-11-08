@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [go,javascirpt]
+        language: [go,javascript]
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -58,7 +58,8 @@ jobs:
       uses: github/codeql-action/autobuild@v2
     - if: matrix.language == 'go'
       name: compile go
-      run: |
-        make compile
+      uses: github/codeql-action/autobuild@v2
+      #run: |
+       # make compile
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
