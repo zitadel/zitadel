@@ -2084,7 +2084,12 @@
       "OR": "или",
       "XML": "Загрузить XML-метаданные",
       "METADATA": "Метаданные",
-      "METADATAFROMFILE": "Метаданные из файла"
+      "METADATAFROMFILE": "Метаданные из файла",
+      "CERTIFICATE": "SAML-сертификат",
+      "DOWNLOADCERT": "Скачать сертификат SAML",
+      "CREATEMETADATA": "Создать метаданные",
+      "ENTITYID": "Идентификатор объекта",
+      "ACSURL": "URL-адрес конечной точки ACS"
     },
     "AUTHMETHODS": {
       "CODE": {

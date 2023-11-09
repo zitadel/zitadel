@@ -2104,6 +2104,8 @@
       "UPLOAD": "Nahrát XML soubor",
       "METADATA": "Metadata",
       "METADATAFROMFILE": "Metadata ze souboru",
+      "CERTIFICATE": "certifikát SAML",
+      "DOWNLOADCERT": "Stáhněte si certifikát SAML",
       "CREATEMETADATA": "Vytvořit metadata",
       "ENTITYID": "Entity ID",
       "ACSURL": "ACS koncová URL"
