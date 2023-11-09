@@ -43,7 +43,7 @@ The proxy must either ensure that
 - the original *Host* header value is assigned to the *Forwarded* headers host directive.
 - the original requests *Host* header value is unchanged by the proxy.
 
-Check out the [reverse proxy configuration examples](/self-hosting/manage/reverseproxy) for more information.
+Check out the [reverse proxy configuration examples](/self-hosting/manage/reverseproxy/reverse_proxy) for more information.
 
 ## Organization Domains
 
