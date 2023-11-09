@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/golang/protobuf/ptypes/empty"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/zitadel/zitadel/internal/errors"
 )
@@ -15,7 +15,7 @@ func TestValidator_Healthz(t *testing.T) {
 		validations map[string]ValidationFunction
 	}
 	type res struct {
-		want   *empty.Empty
+		want   *emptypb.Empty
 		hasErr bool
 	}
 	tests := []struct {
@@ -27,7 +27,7 @@ func TestValidator_Healthz(t *testing.T) {
 			"ok",
 			fields{},
 			res{
-				&empty.Empty{},
+				&emptypb.Empty{},
 				false,
 			},
 		},
@@ -37,7 +37,7 @@ func TestValidator_Healthz(t *testing.T) {
 			v := &Validator{
 				validations: tt.fields.validations,
 			}
-			got, err := v.Healthz(nil, &empty.Empty{})
+			got, err := v.Healthz(context.Background(), &emptypb.Empty{})
 			if (err != nil) != tt.res.hasErr {
 				t.Errorf("Healthz() error = %v, wantErr %v", err, tt.res.hasErr)
 				return
@@ -54,7 +54,7 @@ func TestValidator_Ready(t *testing.T) {
 		validations map[string]ValidationFunction
 	}
 	type res struct {
-		want   *empty.Empty
+		want   *emptypb.Empty
 		hasErr bool
 	}
 	tests := []struct {
@@ -82,7 +82,7 @@ func TestValidator_Ready(t *testing.T) {
 				},
 			}},
 			res{
-				&empty.Empty{},
+				&emptypb.Empty{},
 				false,
 			},
 		},
@@ -92,7 +92,7 @@ func TestValidator_Ready(t *testing.T) {
 			v := &Validator{
 				validations: tt.fields.validations,
 			}
-			got, err := v.Ready(context.Background(), &empty.Empty{})
+			got, err := v.Ready(context.Background(), &emptypb.Empty{})
 			if (err != nil) != tt.res.hasErr {
 				t.Errorf("Ready() error = %v, wantErr %v", err, tt.res.hasErr)
 				return

@@ -44,12 +44,12 @@ endif
 
 .PHONY: core_grpc_dependencies
 core_grpc_dependencies:
-	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.30 
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.31 
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3 
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.15.2 
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.15.2 
-	go install github.com/envoyproxy/protoc-gen-validate@v0.10.1
-	go install github.com/bufbuild/buf/cmd/buf@v1.25.1
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.18.1 
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.18.1 
+	go install github.com/envoyproxy/protoc-gen-validate@v1.0.2
+	go install github.com/bufbuild/buf/cmd/buf@v1.27.2
 
 .PHONY: core_api
 core_api: core_api_generator core_grpc_dependencies
