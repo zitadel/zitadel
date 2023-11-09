@@ -95,8 +95,8 @@ func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, 
 	if err != nil {
 		return nil, nil, err
 	}
-	if sessionWriteModel.State == domain.SessionStateUnspecified {
-		return nil, nil, errors.ThrowNotFound(nil, "COMMAND-x0099887", "Errors.Session.NotExisting")
+	if err = sessionWriteModel.CheckIsActive(); err != nil {
+		return nil, nil, err
 	}
 	if err := c.sessionPermission(ctx, sessionWriteModel, sessionToken, domain.PermissionSessionWrite); err != nil {
 		return nil, nil, err

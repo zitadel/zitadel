@@ -13,6 +13,7 @@ import { ProviderJWTComponent } from './provider-jwt/provider-jwt.component';
 import { ProviderLDAPComponent } from './provider-ldap/provider-ldap.component';
 import { ProviderOAuthComponent } from './provider-oauth/provider-oauth.component';
 import { ProviderOIDCComponent } from './provider-oidc/provider-oidc.component';
+import { ProviderSamlSpComponent } from './provider-saml-sp/provider-saml-sp.component';
 
 const typeMap = {
   [ProviderType.PROVIDER_TYPE_AZURE_AD]: { path: 'azure-ad', component: ProviderAzureADComponent },
@@ -29,6 +30,7 @@ const typeMap = {
   [ProviderType.PROVIDER_TYPE_OIDC]: { path: 'oidc', component: ProviderOIDCComponent },
   [ProviderType.PROVIDER_TYPE_LDAP]: { path: 'ldap', component: ProviderLDAPComponent },
   [ProviderType.PROVIDER_TYPE_APPLE]: { path: 'apple', component: ProviderAppleComponent },
+  [ProviderType.PROVIDER_TYPE_SAML]: { path: 'saml', component: ProviderSamlSpComponent },
 };
 
 const routes: Routes = Object.entries(typeMap).map(([key, value]) => {

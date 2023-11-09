@@ -11,7 +11,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
@@ -159,8 +158,8 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, authRequestID st
 	if err != nil {
 		return nil, err
 	}
-	if sessionWriteModel.State != domain.SessionStateActive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "OIDCS-sjkl3", "Errors.Session.Terminated")
+	if err = sessionWriteModel.CheckIsActive(); err != nil {
+		return nil, err
 	}
 	resourceOwner, err := c.getResourceOwnerOfSessionUser(ctx, sessionWriteModel.UserID, sessionWriteModel.InstanceID)
 	if err != nil {

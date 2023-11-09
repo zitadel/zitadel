@@ -44,6 +44,7 @@ type Session struct {
 	OTPEmailFactor SessionOTPFactor
 	Metadata       map[string][]byte
 	UserAgent      domain.UserAgent
+	Expiration     time.Time
 }
 
 type SessionUserFactor struct {
@@ -185,6 +186,10 @@ var (
 		name:  projection.SessionColumnUserAgentHeader,
 		table: sessionsTable,
 	}
+	SessionColumnExpiration = Column{
+		name:  projection.SessionColumnExpiration,
+		table: sessionsTable,
+	}
 )
 
 func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string) (session *Session, err error) {
@@ -234,7 +239,8 @@ func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQue
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
 			SessionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+		}).
+		ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-sn9Jf", "Errors.Query.InvalidRequest")
 	}
@@ -261,6 +267,14 @@ func NewSessionIDsSearchQuery(ids []string) (SearchQuery, error) {
 
 func NewSessionCreatorSearchQuery(creator string) (SearchQuery, error) {
 	return NewTextQuery(SessionColumnCreator, creator, TextEquals)
+}
+
+func NewUserIDSearchQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(SessionColumnUserID, id, TextEquals)
+}
+
+func NewCreationDateQuery(datetime time.Time, compare TimestampComparison) (SearchQuery, error) {
+	return NewTimestampQuery(SessionColumnCreationDate, datetime, compare)
 }
 
 func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Session, string, error)) {
@@ -290,6 +304,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			SessionColumnUserAgentIP.identifier(),
 			SessionColumnUserAgentDescription.identifier(),
 			SessionColumnUserAgentHeader.identifier(),
+			SessionColumnExpiration.identifier(),
 		).From(sessionsTable.identifier()).
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
 			LeftJoin(join(HumanUserIDCol, SessionColumnUserID)).
@@ -314,6 +329,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				token               sql.NullString
 				userAgentIP         sql.NullString
 				userAgentHeader     database.Map[[]string]
+				expiration          sql.NullTime
 			)
 
 			err := row.Scan(
@@ -342,6 +358,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&userAgentIP,
 				&session.UserAgent.Description,
 				&userAgentHeader,
+				&expiration,
 			)
 
 			if err != nil {
@@ -365,10 +382,10 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session.OTPEmailFactor.OTPCheckedAt = otpEmailCheckedAt.Time
 			session.Metadata = metadata
 			session.UserAgent.Header = http.Header(userAgentHeader)
-
 			if userAgentIP.Valid {
 				session.UserAgent.IP = net.ParseIP(userAgentIP.String)
 			}
+			session.Expiration = expiration.Time
 			return session, token.String, nil
 		}
 }
@@ -395,6 +412,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			SessionColumnOTPSMSCheckedAt.identifier(),
 			SessionColumnOTPEmailCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
+			SessionColumnExpiration.identifier(),
 			countColumn.identifier(),
 		).From(sessionsTable.identifier()).
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
@@ -420,6 +438,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					otpSMSCheckedAt     sql.NullTime
 					otpEmailCheckedAt   sql.NullTime
 					metadata            database.Map[[]byte]
+					expiration          sql.NullTime
 				)
 
 				err := rows.Scan(
@@ -443,6 +462,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&otpSMSCheckedAt,
 					&otpEmailCheckedAt,
 					&metadata,
+					&expiration,
 					&sessions.Count,
 				)
 
@@ -462,6 +482,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session.OTPSMSFactor.OTPCheckedAt = otpSMSCheckedAt.Time
 				session.OTPEmailFactor.OTPCheckedAt = otpEmailCheckedAt.Time
 				session.Metadata = metadata
+				session.Expiration = expiration.Time
 
 				sessions.Sessions = append(sessions.Sessions, session)
 			}
