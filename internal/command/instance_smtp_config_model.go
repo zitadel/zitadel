@@ -27,14 +27,15 @@ type InstanceSMTPConfigWriteModel struct {
 	smtpSenderAddressMatchesInstanceDomain bool
 }
 
-func NewIAMSMTPConfigWriteModel(instanceID, id string) *InstanceSMTPConfigWriteModel {
+func NewIAMSMTPConfigWriteModel(instanceID, id, domain string) *InstanceSMTPConfigWriteModel {
 	return &InstanceSMTPConfigWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   instanceID,
 			ResourceOwner: instanceID,
 			InstanceID:    instanceID,
 		},
-		ID: id,
+		ID:     id,
+		domain: domain,
 	}
 }
 

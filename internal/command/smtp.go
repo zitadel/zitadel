@@ -25,6 +25,8 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config 
 	if from == "" {
 		return "", nil, errors.ThrowInvalidArgument(nil, "INST-ASv2d", "Errors.Invalid.Argument")
 	}
+	fromSplitted := strings.Split(from, "@")
+	senderDomain := fromSplitted[len(fromSplitted)-1]
 
 	replyTo := strings.TrimSpace(config.ReplyToAddress)
 	hostAndPort := strings.TrimSpace(config.SMTP.Host)
@@ -41,13 +43,12 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config 
 		}
 	}
 
-	// TODO @n40lab
-	// err = checkSenderAddress(writeModel)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, senderDomain)
+	if err != nil {
+		return "", nil, err
+	}
 
-	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id)
+	err = checkSenderAddress(smtpConfigWriteModel)
 	if err != nil {
 		return "", nil, err
 	}
@@ -86,6 +87,8 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id s
 	if from == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "INST-ASv2d", "Errors.Invalid.Argument")
 	}
+	fromSplitted := strings.Split(from, "@")
+	senderDomain := fromSplitted[len(fromSplitted)-1]
 
 	replyTo := strings.TrimSpace(config.ReplyToAddress)
 	hostAndPort := strings.TrimSpace(config.SMTP.Host)
@@ -102,13 +105,18 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id s
 		}
 	}
 
-	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id)
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, senderDomain)
 	if err != nil {
 		return nil, err
 	}
 
 	if !smtpConfigWriteModel.State.Exists() {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-7j8gv", "Errors.SMTPConfig.NotFound")
+	}
+
+	err = checkSenderAddress(smtpConfigWriteModel)
+	if err != nil {
+		return nil, err
 	}
 
 	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
@@ -145,7 +153,7 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id s
 func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, instanceID, id string, password string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	// TODO @n40lab test
-	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id)
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +193,7 @@ func (c *Commands) ActivateSMTPConfig(ctx context.Context, instanceID, id, activ
 	}
 
 	if len(activatedId) > 0 {
-		smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, activatedId)
+		smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, activatedId, "")
 		if err != nil {
 			return nil, err
 		}
@@ -207,7 +215,7 @@ func (c *Commands) ActivateSMTPConfig(ctx context.Context, instanceID, id, activ
 		}
 	}
 
-	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id)
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +247,7 @@ func (c *Commands) DeactivateSMTPConfig(ctx context.Context, instanceID, id stri
 	if id == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "SMTP-98ikl", "Errors.IDMissing")
 	}
-	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id)
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
 	if err != nil {
 		return nil, err
 	}
@@ -270,7 +278,7 @@ func (c *Commands) RemoveSMTPConfig(ctx context.Context, instanceID, id string) 
 		return nil, caos_errs.ThrowInvalidArgument(nil, "SMTP-7f5cv", "Errors.IDMissing")
 	}
 
-	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id)
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
 	if err != nil {
 		return nil, err
 	}
@@ -303,8 +311,8 @@ func checkSenderAddress(writeModel *InstanceSMTPConfigWriteModel) error {
 	return nil
 }
 
-func (c *Commands) getSMTPConfig(ctx context.Context, instanceID, id string) (_ *InstanceSMTPConfigWriteModel, err error) {
-	writeModel := NewIAMSMTPConfigWriteModel(instanceID, id)
+func (c *Commands) getSMTPConfig(ctx context.Context, instanceID, id, domain string) (_ *InstanceSMTPConfigWriteModel, err error) {
+	writeModel := NewIAMSMTPConfigWriteModel(instanceID, id, domain)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
