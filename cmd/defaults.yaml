@@ -41,13 +41,13 @@ Telemetry:
 Port: 8080 # ZITADEL_PORT
 # ExternalPort is the port on which end users access ZITADEL.
 # It can differ from Port e.g. if a reverse proxy forwards the traffic to ZITADEL
-# Search the ZITADEL docs page "External ZITADEL Access" more information.
+# Read more about external access: https://zitadel.com/docs/self-hosting/manage/custom-domain
 ExternalPort: 8080 # ZITADEL_EXTERNALPORT
 # ExternalPort is the domain on which end users access ZITADEL.
-# Search the ZITADEL docs page "External ZITADEL Access" more information.
+# Read more about external access: https://zitadel.com/docs/self-hosting/manage/custom-domain
 ExternalDomain: localhost # ZITADEL_EXTERNALDOMAIN
 # ExternalSecure specifies if ZITADEL is exposed externally using HTTPS or HTTP.
-# Search the ZITADEL docs page "External ZITADEL Access" more information.
+# Read more about external access: https://zitadel.com/docs/self-hosting/manage/custom-domain
 ExternalSecure: true # ZITADEL_EXTERNALSECURE
 TLS:
   # If enabled, ZITADEL will serve all traffic over TLS (HTTPS and gRPC)
